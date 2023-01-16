@@ -1,0 +1,27 @@
+flutter_icons:
+  android: "launcher_icon"
+  image_path_android: "assets/app_icons/icon.png"
+  adaptive_icon_background: "assets/app_icons/icon_bg.png" # only available for Android 8.0 devices and above
+  adaptive_icon_foreground: "assets/app_icons/icon_fg.png" # only available for Android 8.0 devices and above
+
+  ios: true
+  image_path: "assets/app_icons/icon.png"
+  #min_sdk_android: 21 # android min sdk min:16, default 21
+  #web:
+  #  generate: true
+  #  image_path: "path/to/image.png"
+  #  background_color: "#hexcode"
+  #  theme_color: "#hexcode"
+  #windows:
+  #  generate: true
+  #  image_path: "path/to/image.png"
+  #  icon_size: 48 # min:48, max:256, default: 48
+  #macos:
+  #  generate: true
+  #  image_path: "path/to/image.png"
+#
+# to run this thing, do this:
+#
+# flutter pub get
+# flutter pub run flutter_launcher_icons
+#
