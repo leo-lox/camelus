@@ -1,3 +1,4 @@
+import 'package:camelus/routes/nostr/blockedUsers/blocked_users.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:camelus/models/Tweet.dart';
@@ -53,6 +54,10 @@ class MyApp extends StatelessWidget {
             return MaterialPageRoute(
               builder: (context) =>
                   ProfilePage(pubkey: settings.arguments as String),
+            );
+          case '/nostr/blockedUsers':
+            return MaterialPageRoute(
+              builder: (context) => BlockedUsers(),
             );
         }
         assert(false, 'Need to implement ${settings.name}');

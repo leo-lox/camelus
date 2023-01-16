@@ -71,6 +71,9 @@ class NostrService {
 
   late KeyPair myKeys;
 
+  // blocked users
+  List<String> blockedUsers = [];
+
   NostrService() {
     isNostrServiceConnected = _isNostrServiceConnectedCompleter.future;
     _init();
@@ -128,6 +131,12 @@ class NostrService {
           following[key]!.add(parentList);
         }
       }
+    }
+
+    // restore blocked users
+    var blockedUsersCache = (await jsonCache.value('blockedUsers'));
+    if (blockedUsersCache != null) {
+      blockedUsers = blockedUsersCache["blockedUsers"];
     }
 
     connectToRelays();
@@ -286,6 +295,20 @@ class NostrService {
       return;
     }
 
+    // blocked users
+
+    if (event.length >= 3) {
+      log(event.length.toString());
+      if (event[2] == null) {
+        var eventMap = event[2];
+
+        if (blockedUsers.contains(eventMap["pubkey"])) {
+          log("blocked user: ${eventMap["pubkey"]}");
+          return;
+        }
+      }
+    }
+
     // filter by subscription id
 
     if (event[1] == ownPubkeySubscriptionId) {
@@ -369,8 +392,6 @@ class NostrService {
       // simply add to pool
       if (event[0] == "EVENT") {
         var eventMap = event[2];
-
-        log("###########  newDATA ####################################");
 
         var tweet = nostrEventToTweet(eventMap);
 
@@ -1355,6 +1376,34 @@ class NostrService {
       }
     }
     return null;
+  }
+
+  Future<void> addToBlocklist(String pubkey) async {
+    if (!blockedUsers.contains(pubkey)) {
+      blockedUsers.add(pubkey);
+      await jsonCache.refresh("blockedUsers", {"blockedUsers": blockedUsers});
+    }
+    // search in feed for pubkey and remove
+    _userFeed.removeWhere((element) => element.pubkey == pubkey);
+    _globalFeed.removeWhere((element) => element.pubkey == pubkey);
+
+    // update cache
+    await jsonCache.refresh("userFeed", {"userFeed": _userFeed});
+    await jsonCache.refresh("globalFeed", {"globalFeed": _globalFeed});
+
+    //notify streams
+    _userFeedStreamController.add(_userFeed);
+    _globalFeedStreamController.add(_globalFeed);
+
+    return;
+  }
+
+  Future<void> removeFromBlocklist(String pubkey) async {
+    if (blockedUsers.contains(pubkey)) {
+      blockedUsers.remove(pubkey);
+      await jsonCache.refresh("blockedUsers", {"blockedUsers": blockedUsers});
+    }
+    return;
   }
 }
 

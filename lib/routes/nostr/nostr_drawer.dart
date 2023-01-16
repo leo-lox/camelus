@@ -241,11 +241,8 @@ class NostrDrawer extends StatelessWidget {
                 label: 'Blocklist',
                 icon: 'assets/icons/yin-yang.svg',
                 onTap: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Not implemented yet'),
-                    ),
-                  );
+                  // navigate to blocklist
+                  Navigator.pushNamed(context, '/nostr/blockedUsers');
                 }),
             const Spacer(),
             const Spacer(),

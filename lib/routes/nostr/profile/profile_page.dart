@@ -119,6 +119,48 @@ class _ProfilePageState extends State<ProfilePage>
     return metadata["banner"];
   }
 
+  _blockUser() async {
+    // open dialog
+    var result = await showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text("Block user"),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: const [
+                Text("Are you sure you want to block this user?"),
+                SizedBox(height: 20),
+                Text("You will no longer see their posts."),
+                SizedBox(height: 10),
+                Text(
+                    "This happens only locally if you login on another client you will see their posts again.")
+              ],
+            ),
+            actions: [
+              TextButton(
+                child: Text("Cancel"),
+                onPressed: () {
+                  Navigator.of(context).pop(false);
+                },
+              ),
+              TextButton(
+                child: Text("Block"),
+                onPressed: () {
+                  Navigator.of(context).pop(true);
+                },
+              ),
+            ],
+          );
+        });
+    if (!result) return;
+
+    // add to blocked list
+    await widget._nostrService.addToBlocklist(widget.pubkey);
+
+    Navigator.pop(context);
+  }
+
   @override
   void initState() {
     super.initState();
@@ -205,12 +247,7 @@ class _ProfilePageState extends State<ProfilePage>
                     onSelected: (e) => {
                       log(e),
                       // toast
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text("Not implemented yet"),
-                          duration: Duration(seconds: 1),
-                        ),
-                      ),
+                      if (e == "block") _blockUser()
                     },
                     itemBuilder: (BuildContext context) {
                       return {'block'}.map((String choice) {
