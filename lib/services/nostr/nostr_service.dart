@@ -136,7 +136,11 @@ class NostrService {
     // restore blocked users
     var blockedUsersCache = (await jsonCache.value('blockedUsers'));
     if (blockedUsersCache != null) {
-      blockedUsers = blockedUsersCache["blockedUsers"];
+      // cast using for loop to avoid type error
+      var list = blockedUsersCache["blockedUsers"];
+      for (String u in list) {
+        blockedUsers.add(u);
+      }
     }
 
     connectToRelays();
