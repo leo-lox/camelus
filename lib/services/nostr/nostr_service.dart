@@ -302,7 +302,6 @@ class NostrService {
     // blocked users
 
     if (event.length >= 3) {
-      log(event.length.toString());
       if (event[2] == null) {
         var eventMap = event[2];
 
@@ -596,6 +595,8 @@ class NostrService {
         // cast every entry to Map<String, dynamic>>
         Map<String, Map<String, dynamic>> casted = cast
             .map((key, value) => MapEntry(key, value as Map<String, dynamic>));
+
+        log("GOT RELAYS: $casted");
 
         // update relays
         relays = casted;
@@ -1178,9 +1179,10 @@ class NostrService {
   Map<String, Completer<List<List>>> contactsFutureHolder = {};
 
   /// get user metadata from cache and if not available request it from network
-  Future<List<List<dynamic>>> getUserContacts(String pubkey) async {
+  Future<List<List<dynamic>>> getUserContacts(String pubkey,
+      {bool force = false}) async {
     // return from cache
-    if (following.containsKey(pubkey)) {
+    if (following.containsKey(pubkey) && !force) {
       return Future(() => following[pubkey]!);
     }
 
