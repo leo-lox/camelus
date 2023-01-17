@@ -249,7 +249,11 @@ class NostrDrawer extends StatelessWidget {
             _divider(),
             Padding(
                 padding: const EdgeInsets.only(left: 20),
-                child: _textButton(text: 'Settings', onPressed: () {})),
+                child: _textButton(
+                    text: 'Settings',
+                    onPressed: () {
+                      Navigator.pushNamed(context, '/settings');
+                    })),
             const SizedBox(height: 10),
             Padding(
                 padding: const EdgeInsets.fromLTRB(20, 10, 15, 20),

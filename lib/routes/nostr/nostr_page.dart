@@ -542,13 +542,24 @@ class _NostrPageState extends State<NostrPage> with TickerProviderStateMixin {
                       )),
                 ),
                 actions: [
-                  TextButton(
-                    onPressed: () => widget._nostrService.clearCache(),
-                    child: const Text("clear cache"),
-                    style: ButtonStyle(
-                      foregroundColor:
-                          MaterialStateProperty.all<Color>(Palette.primary),
-                    ),
+                  Row(
+                    children: [
+                      SvgPicture.asset(
+                        widget._nostrService.connectedRelaysRead.isNotEmpty
+                            ? 'assets/icons/cell-signal-full.svg'
+                            : 'assets/icons/cell-signal-slash.svg',
+                        color: Palette.gray,
+                        height: 22,
+                        width: 22,
+                      ),
+                      const SizedBox(width: 5),
+                      Text(
+                        widget._nostrService.connectedRelaysRead.length
+                            .toString(),
+                        style: const TextStyle(color: Palette.lightGray),
+                      ),
+                      const SizedBox(width: 5),
+                    ],
                   ),
                 ],
                 bottom: PreferredSize(

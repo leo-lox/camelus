@@ -4,6 +4,7 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:crypto/crypto.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:hex/hex.dart';
 import 'package:http/http.dart';
@@ -80,6 +81,12 @@ class NostrService {
   }
 
   _init() async {
+    SystemChannels.lifecycle.setMessageHandler((msg) {
+      log('SystemChannels> $msg');
+      return Future(() {
+        return "ok";
+      });
+    });
     log("init");
 
     _loadKeyPair();
@@ -231,6 +238,7 @@ class NostrService {
 
   Future<void> connectToRelays({bool useDefault = false}) async {
     var usedRelays = useDefault ? defaultRelays : relays;
+    log("connect to relays $usedRelays");
 
     for (var relay in usedRelays.entries) {
       try {
@@ -241,6 +249,10 @@ class NostrService {
 
           var id = "relay-r-${Helpers().getRandomString(5)}";
           SocketControl socketControl = SocketControl(socket, id, relay.key);
+          if (socket.readyState != WebSocket.open) {
+            log("socket not open");
+            continue;
+          }
           connectedRelaysRead[id] = socketControl;
 
           socket.listen((event) {
@@ -256,6 +268,10 @@ class NostrService {
           socket ??= await WebSocket.connect(relay.key);
           var id = "relay-w-${Helpers().getRandomString(5)}";
           SocketControl socketControl = SocketControl(socket, id, relay.key);
+          if (socket.readyState != WebSocket.open) {
+            log("socket not open");
+            continue;
+          }
           connectedRelaysWrite[id] = socketControl;
         }
 

@@ -1,4 +1,5 @@
 import 'package:camelus/routes/nostr/blockedUsers/blocked_users.dart';
+import 'package:camelus/routes/nostr/settings/settings_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:camelus/models/Tweet.dart';
@@ -38,6 +39,11 @@ class MyApp extends StatelessWidget {
           case '/onboarding':
             return MaterialPageRoute(
               builder: (context) => NostrOnboarding(),
+            );
+
+          case '/settings':
+            return MaterialPageRoute(
+              builder: (context) => SettingsPage(),
             );
 
           case '/nostr/replies':
