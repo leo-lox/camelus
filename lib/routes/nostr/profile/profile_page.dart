@@ -16,6 +16,7 @@ import 'package:camelus/routes/nostr/profile/follower_page.dart';
 import 'package:camelus/services/nostr/nostr_injector.dart';
 import 'package:camelus/services/nostr/nostr_service.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 class ProfilePage extends StatefulWidget {
   String pubkey;
@@ -161,6 +162,16 @@ class _ProfilePageState extends State<ProfilePage>
     Navigator.pop(context);
   }
 
+  _openLightningAddress(String lu06) async {
+    final Uri lightningLaunchUri = Uri(
+      scheme: 'lightning',
+      path: lu06.toString(),
+    );
+
+    log("launching $lu06");
+    launchUrl(lightningLaunchUri);
+  }
+
   @override
   void initState() {
     super.initState();
@@ -296,25 +307,50 @@ class _ProfilePageState extends State<ProfilePage>
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
                         // round message button with icon and white border
-                        Container(
-                          margin:
-                              const EdgeInsets.only(top: 0, right: 0, left: 0),
-                          child: ElevatedButton(
-                            onPressed: () {},
-                            child: const Icon(
-                              Icons.message,
-                              color: Palette.white,
-                              size: 20,
-                            ),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Palette.background,
-                              padding: const EdgeInsets.all(0),
-                              shape: const CircleBorder(
-                                  side: BorderSide(
-                                      color: Palette.white, width: 1)),
-                            ),
-                          ),
-                        ),
+                        FutureBuilder<Map>(
+                            future: widget._nostrService
+                                .getUserMetadata(widget.pubkey),
+                            builder: (BuildContext context,
+                                AsyncSnapshot<Map> snapshot) {
+                              String lud06 = "";
+                              String lud16 = "";
+
+                              if (snapshot.hasData) {
+                                log(snapshot.data.toString());
+                                lud06 = snapshot.data?["lud06"] ?? "";
+                                lud16 = snapshot.data?["lud16"] ?? "";
+                              }
+
+                              if (lud06.isNotEmpty || lud16.isNotEmpty) {
+                                return Container(
+                                  margin: const EdgeInsets.only(
+                                      top: 0, right: 0, left: 0),
+                                  child: ElevatedButton(
+                                    onPressed: () {
+                                      if (lud06.isNotEmpty) {
+                                        _openLightningAddress(lud06);
+                                      } else if (lud16.isNotEmpty) {
+                                        _openLightningAddress(lud16);
+                                      }
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Palette.background,
+                                      padding: const EdgeInsets.all(0),
+                                      shape: const CircleBorder(
+                                          side: BorderSide(
+                                              color: Palette.white, width: 1)),
+                                    ),
+                                    child: SvgPicture.asset(
+                                      "assets/icons/lightning-fill.svg",
+                                      height: 25,
+                                      color: Palette.white,
+                                    ),
+                                  ),
+                                );
+                              } else {
+                                return Container();
+                              }
+                            }),
 
                         // follow button black with white border
 
