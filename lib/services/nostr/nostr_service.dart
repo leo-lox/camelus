@@ -217,7 +217,16 @@ class NostrService {
 
   /// used for debugging
   void clearCache() async {
-    await jsonCache.clear();
+    // clears everything including shared preferences! don't use this!
+    //await jsonCache.clear();
+
+    // clear only nostr related stuff
+    await jsonCache.remove('globalFeed');
+    await jsonCache.remove('userFeed');
+    await jsonCache.remove('usersMetadata');
+    await jsonCache.remove('following');
+
+    // don't clear relays and blocked users
   }
 
   Future<void> connectToRelays({bool useDefault = false}) async {
