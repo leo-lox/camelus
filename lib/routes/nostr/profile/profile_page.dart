@@ -767,8 +767,8 @@ class _ProfilePageState extends State<ProfilePage>
 }
 
 Widget _profileImage(ScrollController sController, widget) {
-  final double defaultMargin = 150;
-  final double defaultStart = 150;
+  final double defaultMargin = 125;
+  final double defaultStart = 125;
   final double defaultEnd = defaultStart / 2;
 
   double top = defaultMargin;

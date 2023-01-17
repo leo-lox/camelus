@@ -26,6 +26,12 @@ class NostrService {
   String ownPubkeySubscriptionId = "own-${Helpers().getRandomString(20)}";
 
   Map<String, SocketControl> connectedRelaysRead = {};
+  final StreamController<Map<String, SocketControl>>
+      _connectedRelaysReadStreamController =
+      StreamController<Map<String, SocketControl>>.broadcast();
+  Stream<Map<String, SocketControl>> get connectedRelaysReadStream =>
+      _connectedRelaysReadStreamController.stream;
+
   Map<String, SocketControl> connectedRelaysWrite = {};
 
   final Map<String, Map<String, bool>> defaultRelays = {
@@ -83,10 +89,12 @@ class NostrService {
   _init() async {
     SystemChannels.lifecycle.setMessageHandler((msg) {
       log('SystemChannels> $msg');
+      //todo: handle app lifecycle events: reconnecting to relays
       return Future(() {
         return "ok";
       });
     });
+
     log("init");
 
     _loadKeyPair();
@@ -106,8 +114,8 @@ class NostrService {
     final Map<String, dynamic>? cachedGlobalFeed =
         await jsonCache.value('globalFeed');
 
-    if (cachedGlobalFeed != null) {
-      _globalFeed = cachedGlobalFeed["tweets"]
+    if (cachedGlobalFeed?["tweets"] != null) {
+      _globalFeed = cachedGlobalFeed!["tweets"]
           .map<Tweet>((tweet) => Tweet.fromJson(tweet))
           .toList();
     }
@@ -241,44 +249,50 @@ class NostrService {
     log("connect to relays $usedRelays");
 
     for (var relay in usedRelays.entries) {
-      try {
-        WebSocket? socket;
+      Future<WebSocket>? socket;
 
-        if (relay.value["read"] == true) {
-          socket ??= await WebSocket.connect(relay.key);
+      if (relay.value["read"] == true) {
+        socket ??= WebSocket.connect(relay.key);
 
-          var id = "relay-r-${Helpers().getRandomString(5)}";
-          SocketControl socketControl = SocketControl(socket, id, relay.key);
-          if (socket.readyState != WebSocket.open) {
-            log("socket not open");
-            continue;
-          }
-          connectedRelaysRead[id] = socketControl;
+        var id = "relay-r-${Helpers().getRandomString(5)}";
 
-          socket.listen((event) {
-            var eventJson = json.decode(event);
-            _receiveEvent(
-              eventJson,
-              socketControl,
-            );
-          });
-        }
+        SocketControl socketControl = SocketControl(id, relay.key);
 
-        if (relay.value["write"] == true) {
-          socket ??= await WebSocket.connect(relay.key);
-          var id = "relay-w-${Helpers().getRandomString(5)}";
-          SocketControl socketControl = SocketControl(socket, id, relay.key);
-          if (socket.readyState != WebSocket.open) {
-            log("socket not open");
-            continue;
-          }
-          connectedRelaysWrite[id] = socketControl;
-        }
+        socket.then((value) => {
+              // set socket
+              socketControl.socket = value,
+              socketControl.socketIsRdy = true,
 
-        log("connected to ${relay.key}");
-      } catch (e) {
-        log("failed to connect to $relay, error: $e");
+              value.listen((event) {
+                var eventJson = json.decode(event);
+                _receiveEvent(
+                  eventJson,
+                  socketControl,
+                );
+              }, onDone: () {
+                // on disconnect
+                connectedRelaysRead[id]!.socketIsRdy = false;
+                connectedRelaysRead.remove(id);
+                _connectedRelaysReadStreamController.add(connectedRelaysRead);
+              }),
+              connectedRelaysRead[id] = socketControl,
+              _connectedRelaysReadStreamController.add(connectedRelaysRead),
+            });
       }
+
+      if (relay.value["write"] == true) {
+        socket ??= WebSocket.connect(relay.key);
+        var id = "relay-w-${Helpers().getRandomString(5)}";
+
+        SocketControl socketControl = SocketControl(id, relay.key);
+        socket.then((value) => {
+              socketControl.socket = value,
+              socketControl.socketIsRdy = true,
+              connectedRelaysWrite[id] = socketControl,
+            });
+      }
+
+      log("connected to ${relay.key}");
     }
     log("connected relays: ${connectedRelaysRead.length} => all connected");
     try {
@@ -807,6 +821,10 @@ class NostrService {
 
     var reqJson = jsonEncode(req);
     for (var relay in connectedRelaysWrite.entries) {
+      if (!(relay.value.socketIsRdy)) {
+        log("socket not ready");
+        continue;
+      }
       relay.value.socket.add(reqJson);
     }
   }

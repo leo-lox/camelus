@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
 
+import 'package:camelus/models/socket_control.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
@@ -357,6 +358,16 @@ class _NostrPageState extends State<NostrPage> with TickerProviderStateMixin {
         });
   }
 
+  int _countRedyRelays(Map<String, SocketControl> relays) {
+    int count = 0;
+    for (var r in relays.values) {
+      if (r.socketIsRdy) {
+        count++;
+      }
+    }
+    return count;
+  }
+
   @override
   void initState() {
     _getPubkey();
@@ -542,25 +553,49 @@ class _NostrPageState extends State<NostrPage> with TickerProviderStateMixin {
                       )),
                 ),
                 actions: [
-                  Row(
-                    children: [
-                      SvgPicture.asset(
-                        widget._nostrService.connectedRelaysRead.isNotEmpty
-                            ? 'assets/icons/cell-signal-full.svg'
-                            : 'assets/icons/cell-signal-slash.svg',
-                        color: Palette.gray,
-                        height: 22,
-                        width: 22,
-                      ),
-                      const SizedBox(width: 5),
-                      Text(
-                        widget._nostrService.connectedRelaysRead.length
-                            .toString(),
-                        style: const TextStyle(color: Palette.lightGray),
-                      ),
-                      const SizedBox(width: 5),
-                    ],
-                  ),
+                  StreamBuilder(
+                      stream: widget._nostrService.connectedRelaysReadStream,
+                      builder: (context,
+                          AsyncSnapshot<Map<String, SocketControl>> snapshot) {
+                        if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                          return Row(
+                            children: [
+                              SvgPicture.asset(
+                                'assets/icons/cell-signal-slash.svg',
+                                color: Palette.gray,
+                                height: 22,
+                                width: 22,
+                              ),
+                              const SizedBox(width: 5),
+                              Text(
+                                "0".toString(),
+                                style:
+                                    const TextStyle(color: Palette.lightGray),
+                              ),
+                              const SizedBox(width: 5),
+                            ],
+                          );
+                        } else {
+                          return Row(
+                            children: [
+                              SvgPicture.asset(
+                                'assets/icons/cell-signal-full.svg',
+                                color: Palette.gray,
+                                height: 22,
+                                width: 22,
+                              ),
+                              const SizedBox(width: 5),
+                              Text(
+                                // count how many relays are ready
+                                _countRedyRelays(snapshot.data!).toString(),
+                                style:
+                                    const TextStyle(color: Palette.lightGray),
+                              ),
+                              const SizedBox(width: 5),
+                            ],
+                          );
+                        }
+                      }),
                 ],
                 bottom: PreferredSize(
                   preferredSize: const Size.fromHeight(20),
