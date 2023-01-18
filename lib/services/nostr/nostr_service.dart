@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
+import 'dart:ui';
 
 import 'package:crypto/crypto.dart';
 import 'package:flutter/services.dart';
@@ -89,9 +90,21 @@ class NostrService {
   _init() async {
     SystemChannels.lifecycle.setMessageHandler((msg) {
       log('SystemChannels> $msg');
-      //todo: handle app lifecycle events: reconnecting to relays
+      switch (msg) {
+        case "AppLifecycleState.resumed":
+          _checkRelaysForConnection();
+          break;
+        case "AppLifecycleState.inactive":
+          break;
+        case "AppLifecycleState.paused":
+          break;
+        case "AppLifecycleState.detached":
+          closeRelays();
+          break;
+      }
+      // reconnect to relays
       return Future(() {
-        return "ok";
+        return;
       });
     });
 
@@ -258,26 +271,31 @@ class NostrService {
 
         SocketControl socketControl = SocketControl(id, relay.key);
 
-        socket.then((value) => {
-              // set socket
-              socketControl.socket = value,
-              socketControl.socketIsRdy = true,
+        socket
+            .then((value) => {
+                  // set socket
+                  socketControl.socket = value,
+                  socketControl.socketIsRdy = true,
 
-              value.listen((event) {
-                var eventJson = json.decode(event);
-                _receiveEvent(
-                  eventJson,
-                  socketControl,
-                );
-              }, onDone: () {
-                // on disconnect
-                connectedRelaysRead[id]!.socketIsRdy = false;
-                connectedRelaysRead.remove(id);
-                _connectedRelaysReadStreamController.add(connectedRelaysRead);
-              }),
-              connectedRelaysRead[id] = socketControl,
-              _connectedRelaysReadStreamController.add(connectedRelaysRead),
-            });
+                  value.listen((event) {
+                    var eventJson = json.decode(event);
+                    _receiveEvent(
+                      eventJson,
+                      socketControl,
+                    );
+                  }, onDone: () {
+                    // on disconnect
+                    connectedRelaysRead[id]!.socketIsRdy = false;
+                    _reconnectToRelayRead(id);
+                    _connectedRelaysReadStreamController
+                        .add(connectedRelaysRead);
+                  }),
+                  connectedRelaysRead[id] = socketControl,
+                  _connectedRelaysReadStreamController.add(connectedRelaysRead),
+                })
+            .catchError((e) {
+          return Future(() => {log("error connecting to relay $e")});
+        });
       }
 
       if (relay.value["write"] == true) {
@@ -285,10 +303,19 @@ class NostrService {
         var id = "relay-w-${Helpers().getRandomString(5)}";
 
         SocketControl socketControl = SocketControl(id, relay.key);
+
         socket.then((value) => {
               socketControl.socket = value,
               socketControl.socketIsRdy = true,
               connectedRelaysWrite[id] = socketControl,
+
+              // check if already listened to this socket
+              if (value.hashCode != connectedRelaysWrite[id]!.socket.hashCode)
+                value.listen((event) {}, onDone: () {
+                  // on disconnect
+                  connectedRelaysWrite[id]!.socketIsRdy = false;
+                  _reconnectToRelayWrite(id);
+                }),
             });
       }
 
@@ -302,6 +329,93 @@ class NostrService {
     }
 
     return;
+  }
+
+  _reconnectToRelayRead(String id) async {
+    SocketControl socketControl = connectedRelaysRead[id]!;
+    socketControl.socketIsRdy = false;
+    var waitTime = 1 * socketControl.socketFailingAttempts;
+    // wait
+
+    await Future.delayed(Duration(seconds: waitTime));
+    log("reconnect to relay read ${socketControl.connectionUrl}, attempt: ${socketControl.socketFailingAttempts}");
+    // try to reconnect
+    WebSocket? socket;
+    try {
+      socket = await WebSocket.connect(socketControl.connectionUrl);
+    } catch (e) {}
+
+    if (socket?.readyState == WebSocket.open) {
+      socketControl.socket = socket!;
+      socketControl.socketIsRdy = true;
+      socketControl.socketFailingAttempts = 0;
+      socket.listen((event) {
+        var eventJson = json.decode(event);
+        _receiveEvent(
+          eventJson,
+          socketControl,
+        );
+      }, onDone: () {
+        // on disconnect
+        connectedRelaysRead[id]!.socketIsRdy = false;
+        _reconnectToRelayRead(id);
+        _connectedRelaysReadStreamController.add(connectedRelaysRead);
+      });
+    } else if (socketControl.socketFailingAttempts > 30) {
+      socketControl.socketIsFailing = true;
+      socketControl.socketIsRdy = false;
+      _connectedRelaysReadStreamController.add(connectedRelaysRead);
+    } else {
+      socketControl.socketFailingAttempts++;
+      _reconnectToRelayRead(id);
+    }
+  }
+
+  _reconnectToRelayWrite(String id) async {
+    SocketControl socketControl = connectedRelaysWrite[id]!;
+    socketControl.socketIsRdy = false;
+    var waitTime = 1 * socketControl.socketFailingAttempts;
+    // wait
+    await Future.delayed(Duration(seconds: waitTime));
+    // try to reconnect
+    WebSocket? socket;
+    try {
+      socket = await WebSocket.connect(socketControl.connectionUrl);
+    } catch (e) {}
+
+    if (socket?.readyState == WebSocket.open) {
+      socketControl.socket = socket!;
+      socketControl.socketIsRdy = true;
+      socketControl.socketFailingAttempts = 0;
+      socket.listen((event) {}, onDone: () {
+        // on disconnect
+        connectedRelaysWrite[id]!.socketIsRdy = false;
+        _reconnectToRelayWrite(id);
+      });
+    } else if (socketControl.socketFailingAttempts > 30) {
+      socketControl.socketIsFailing = true;
+      socketControl.socketIsRdy = false;
+    } else {
+      socketControl.socketFailingAttempts++;
+      _reconnectToRelayWrite(id);
+    }
+  }
+
+  _checkRelaysForConnection() async {
+    if (connectedRelaysRead.isEmpty) {
+      await connectToRelays();
+    }
+
+    for (var relay in connectedRelaysRead.entries) {
+      if (relay.value.socketIsRdy == false) {
+        _reconnectToRelayRead(relay.key);
+      }
+    }
+    for (var relay in connectedRelaysWrite.entries) {
+      if (relay.value.socketIsRdy == false) {
+        _reconnectToRelayWrite(relay.key);
+      }
+    }
   }
 
   Future<void> closeRelays() async {
@@ -341,9 +455,8 @@ class NostrService {
     // blocked users
 
     if (event.length >= 3) {
-      if (event[2] == null) {
+      if (event[2] != null) {
         var eventMap = event[2];
-
         if (blockedUsers.contains(eventMap["pubkey"])) {
           log("blocked user: ${eventMap["pubkey"]}");
           return;
@@ -1437,8 +1550,9 @@ class NostrService {
     _globalFeed.removeWhere((element) => element.pubkey == pubkey);
 
     // update cache
-    await jsonCache.refresh("userFeed", {"userFeed": _userFeed});
-    await jsonCache.refresh("globalFeed", {"globalFeed": _globalFeed});
+
+    await jsonCache.refresh('userFeed', {"tweets": _userFeed});
+    await jsonCache.refresh("globalFeed", {"tweets": _globalFeed});
 
     //notify streams
     _userFeedStreamController.add(_userFeed);
