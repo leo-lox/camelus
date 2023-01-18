@@ -322,7 +322,7 @@ class _NostrPageState extends State<NostrPage> with TickerProviderStateMixin {
 
     var updateInfo = jsonDecode(response.body);
 
-    if (updateInfo["version"] <= 1) {
+    if (updateInfo["version"] <= 2) {
       // <-- current version
 
       return;

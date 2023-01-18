@@ -1312,7 +1312,6 @@ class NostrService {
     }
 
     metadataResult.future.then((value) => {
-          log("metadata result: $value"),
           for (var key in metadataFutureHolder.keys)
             {
               metadataFutureHolder[key]!.complete(value[key] ?? {}),
