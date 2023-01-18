@@ -437,13 +437,13 @@ class NostrService {
     return;
   }
 
-  _receiveEvent(event, SocketControl socketControl) {
+  _receiveEvent(event, SocketControl socketControl) async {
     if (event[0] != "EVENT") {
       log("not an event: $event");
     }
 
     if (event[0] == "NOTICE") {
-      log("notice: $event");
+      log("notice: $event, socket: ${socketControl.connectionUrl}");
       return;
     }
 
@@ -704,9 +704,7 @@ class NostrService {
       usersMetadata[pubkey] = jsonDecode(eventMap["content"]);
 
       // add access time
-      var time = DateTime.now().millisecondsSinceEpoch / 1000;
-      // cut decimals
-      var now = time.toInt();
+      int now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
 
       usersMetadata[pubkey]["accessTime"] = now;
 
@@ -742,18 +740,21 @@ class NostrService {
         // update my following
         following[pubkey] = tags;
 
-        Map cast = json.decode(eventMap["content"]);
+        try {
+          Map cast = json.decode(eventMap["content"]);
+          // cast every entry to Map<String, dynamic>>
+          Map<String, Map<String, dynamic>> casted = cast.map(
+              (key, value) => MapEntry(key, value as Map<String, dynamic>));
 
-        // cast every entry to Map<String, dynamic>>
-        Map<String, Map<String, dynamic>> casted = cast
-            .map((key, value) => MapEntry(key, value as Map<String, dynamic>));
+          log("GOT RELAYS: $casted");
 
-        log("GOT RELAYS: $casted");
-
-        // update relays
-        relays = casted;
-        //update cache
-        jsonCache.refresh('relays', relays);
+          // update relays
+          relays = casted;
+          //update cache
+          jsonCache.refresh('relays', relays);
+        } catch (e) {
+          log("error: $e");
+        }
       }
     }
 
@@ -851,15 +852,22 @@ class NostrService {
       var now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
 
       if (socketControl.requestInFlight[event[1]] != null) {
-        if (_isLastIncomingEvent(
-            event[1], socketControl, connectedRelaysRead)) {
+        // if _isLastIncomingEvent(event[1], socketControl, connectedRelaysRead)
+
+        var requestsLeft =
+            _howManyRequestsLeft(event[1], socketControl, connectedRelaysRead);
+        if (requestsLeft < 2) {
           // callback
           if (socketControl.completers.containsKey(event[1])) {
-            if (!socketControl.completers[event[1]]!.isCompleted) {
-              socketControl.completers[event[1]]!.complete();
-            }
+            // wait 200ms for other events to arrive
+            Future.delayed(const Duration(milliseconds: 200)).then((value) {
+              if (!socketControl.completers[event[1]]!.isCompleted) {
+                socketControl.completers[event[1]]!.complete();
+              }
+            });
           }
         }
+
         //update cache
         jsonCache.refresh('usersMetadata', usersMetadata);
 
@@ -956,6 +964,20 @@ class NostrService {
     }
     log("is last incoming event for $requestId");
     return true;
+  }
+
+  _howManyRequestsLeft(String requestId, SocketControl currentSocket,
+      Map<String, SocketControl> pool) {
+    int count = 0;
+    for (var socket in pool.entries) {
+      if (socket.value.requestInFlight.containsKey(requestId)) {
+        if (socket.value.id == currentSocket.id) {
+          continue;
+        }
+        count++;
+      }
+    }
+    return count;
   }
 
   Tweet nostrEventToTweet(dynamic eventMap) {
@@ -1245,41 +1267,42 @@ class NostrService {
 
     // return from cache
     if (usersMetadata.containsKey(pubkey)) {
-      return Future(() => {...usersMetadata[pubkey]});
+      return Future(() => usersMetadata[pubkey]);
+    }
+
+    // check if pubkey is already in waiting pool
+    if (!(metadataWaitingPool.contains(pubkey))) {
+      metadataWaitingPool.add(pubkey);
     }
 
     Completer<Map> metadataResult = Completer();
 
-    // check if pubkey is already in waiting pool
-    if (!metadataWaitingPool.contains(pubkey)) {
-      metadataWaitingPool.add(pubkey);
-    }
-
     // if pool is full submit request
-    if (metadataWaitingPool.length >= 100) {
+    if (metadataWaitingPool.length >= 50) {
       metadataWaitingPoolTimer.cancel();
       metadataWaitingPoolTimerRunning = false;
 
       // submit request
-      metadataResult.complete(_prepareMetadataRequest(pubkey));
+      metadataResult.complete(_prepareMetadataRequest());
     } else if (!metadataWaitingPoolTimerRunning) {
       metadataWaitingPoolTimerRunning = true;
-      metadataWaitingPoolTimer = Timer(const Duration(milliseconds: 500), () {
+      metadataWaitingPoolTimer = Timer(const Duration(milliseconds: 200), () {
         metadataWaitingPoolTimerRunning = false;
+        metadataWaitingPoolTimer.cancel();
 
         // submit request
-        metadataResult.complete(_prepareMetadataRequest(pubkey));
+        metadataResult.complete(_prepareMetadataRequest());
       });
     } else {
       // cancel previous timer
       metadataWaitingPoolTimer.cancel();
       // start timer again
       metadataWaitingPoolTimerRunning = true;
-      metadataWaitingPoolTimer = Timer(const Duration(milliseconds: 500), () {
+      metadataWaitingPoolTimer = Timer(const Duration(milliseconds: 200), () {
         metadataWaitingPoolTimerRunning = false;
 
         // submit request
-        metadataResult.complete(_prepareMetadataRequest(pubkey));
+        metadataResult.complete(_prepareMetadataRequest());
       });
     }
 
@@ -1289,13 +1312,11 @@ class NostrService {
     }
 
     metadataResult.future.then((value) => {
+          log("metadata result: $value"),
           for (var key in metadataFutureHolder.keys)
             {
-              if (!(metadataFutureHolder[key]!.isCompleted))
-                {
-                  metadataFutureHolder[key]?.complete(value[key] ?? {}),
-                  // remove
-                }
+              metadataFutureHolder[key]!.complete(value[key] ?? {}),
+              // remove
             },
           metadataFutureHolder = {},
         });
@@ -1304,7 +1325,7 @@ class NostrService {
   }
 
   /// prepare metadata request
-  Future<Map> _prepareMetadataRequest(String pubkey) {
+  Future<Map> _prepareMetadataRequest() async {
     // gets notified when first or last (on no data) request is received
     Completer completer = Completer();
 
@@ -1317,15 +1338,10 @@ class NostrService {
     // free pool
     metadataWaitingPool = [];
 
-    return completer.future.then((value) {
-      if (usersMetadata.containsKey(pubkey)) {
-        log("metadata callback ${usersMetadata[pubkey]!.length}");
-        // wait 300ms for the contacts to be received
-        return Future.delayed(const Duration(milliseconds: 300), () {
-          return Future(() => usersMetadata);
-        });
-      }
-      return Future(() => {});
+    return completer.future.then((value) async {
+      // wait 300ms for the contacts to be received
+      await Future.delayed(const Duration(milliseconds: 300));
+      return usersMetadata;
     });
   }
 
