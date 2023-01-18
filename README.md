@@ -8,7 +8,7 @@ camelus is a nostr client written in flutter, it is in heavy development, feel f
 
 ### Android
 
-You can download the apk from [here](https://lox.de/downloads/app-release.apk), it is signed with my key so you will need to enable "install from unknown sources" in your phone settings.
+You can download the apk from [here](https://camelus.app/), it is signed with my key so you will need to enable "install from unknown sources" in your phone settings.
 
 Otherwise wait for the testlink to be available.
 
