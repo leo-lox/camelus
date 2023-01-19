@@ -9,6 +9,7 @@ import 'package:camelus/helpers/helpers.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:camelus/services/nostr/nostr_injector.dart';
 import 'package:camelus/services/nostr/nostr_service.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class NostrOnboarding extends StatefulWidget {
   late NostrService _nostrService;
@@ -23,6 +24,8 @@ class NostrOnboarding extends StatefulWidget {
 
 class _NostrOnboardingState extends State<NostrOnboarding> {
   var myKeys = Bip340().generatePrivateKey();
+
+  bool _termsAndConditions = false;
 
   @override
   void initState() {
@@ -74,6 +77,16 @@ class _NostrOnboardingState extends State<NostrOnboarding> {
   }
 
   _onSubmit() {
+    if (!_termsAndConditions) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content:
+              Text('Please read and accept the terms and conditions first'),
+        ),
+      );
+      return;
+    }
+
     // store in secure storage
     const storage = FlutterSecureStorage();
     storage.write(key: "nostrKeys", value: json.encode(myKeys.toJson()));
@@ -101,7 +114,7 @@ class _NostrOnboardingState extends State<NostrOnboarding> {
               const Spacer(),
               // the logo
               const Text(
-                "Logo?",
+                "camelus",
                 style: TextStyle(
                     color: Palette.white,
                     fontSize: 45,
@@ -110,7 +123,7 @@ class _NostrOnboardingState extends State<NostrOnboarding> {
               const SizedBox(height: 20),
               // the title
               const Text(
-                "app name?",
+                "early preview",
                 style: TextStyle(
                   color: Palette.white,
                   fontSize: 24,
@@ -176,6 +189,8 @@ class _NostrOnboardingState extends State<NostrOnboarding> {
                 ),
               ),
               const SizedBox(height: 50),
+              // checkbox to accept the privacy policy
+
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
@@ -219,6 +234,65 @@ class _NostrOnboardingState extends State<NostrOnboarding> {
                     ),
                   ),
                 ],
+              ),
+
+              const SizedBox(height: 15),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Checkbox(
+                    value: _termsAndConditions,
+                    onChanged: (value) {
+                      setState(() {
+                        _termsAndConditions = value!;
+                      });
+                    },
+                    activeColor: Palette.white,
+                    checkColor: Palette.black,
+                    fillColor: MaterialStateProperty.all(Palette.white),
+                    //overlayColor: MaterialStateProperty.all(Palette.primary),
+                  ),
+                  const Text(
+                    "I have read and accept the ",
+                    style: TextStyle(
+                      color: Palette.white,
+                      fontSize: 12,
+                      fontWeight: FontWeight.normal,
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      Uri url = Uri.parse("https://camelus.app/terms/");
+                      launchUrl(url, mode: LaunchMode.externalApplication);
+                    },
+                    child: const Text(
+                      "terms and conditions",
+                      style: TextStyle(
+                        color: Palette.white,
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        decoration: TextDecoration.underline,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 5),
+              GestureDetector(
+                onTap: () {
+                  Uri url = Uri.parse("https://camelus.app/privacy/");
+                  launchUrl(url, mode: LaunchMode.externalApplication);
+                },
+                child: const Text(
+                  "privacy policy",
+                  style: TextStyle(
+                    color: Palette.white,
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                    decoration: TextDecoration.underline,
+                  ),
+                ),
               ),
 
               const Spacer(),
