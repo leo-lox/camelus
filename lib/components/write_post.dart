@@ -4,6 +4,7 @@ import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_mentions/flutter_mentions.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:lottie/lottie.dart';
 import 'package:camelus/config/palette.dart';
@@ -29,6 +30,7 @@ class WritePost extends StatefulWidget {
 
 class _WritePostState extends State<WritePost> {
   final TextEditingController _textEditingController = TextEditingController();
+  GlobalKey _textEditingControllerKey = GlobalKey();
   final FocusNode _focusNode = FocusNode();
 
   bool submitLoading = false;
@@ -312,21 +314,100 @@ class _WritePostState extends State<WritePost> {
                   borderRadius: BorderRadius.circular(10),
                   //border: Border.all(color: Palette.primary), //debug
                 ),
-                child: TextField(
-                  focusNode: _focusNode,
-                  controller: _textEditingController,
-                  style: const TextStyle(color: Palette.white, fontSize: 21),
-                  textInputAction: TextInputAction.newline,
-                  minLines: 5,
-                  maxLines: 10,
-                  decoration: const InputDecoration(
-                    border: InputBorder.none,
-                    hintText: "What's on your mind?",
-                    hintStyle: TextStyle(
-                      color: Palette.gray,
-                      fontSize: 20,
+                child: Stack(
+                  children: [
+                    //TextField(
+                    //  focusNode: _focusNode,
+                    //  controller: _textEditingController,
+                    //  style:
+                    //      const TextStyle(color: Palette.white, fontSize: 21),
+                    //  textInputAction: TextInputAction.newline,
+                    //  minLines: 5,
+                    //  maxLines: 10,
+                    //  decoration: const InputDecoration(
+                    //    border: InputBorder.none,
+                    //    hintText: "What's on your mind?",
+                    //    hintStyle: TextStyle(
+                    //      color: Palette.gray,
+                    //      fontSize: 20,
+                    //    ),
+                    //  ),
+                    //),
+                    FlutterMentions(
+                      key: _textEditingControllerKey,
+                      suggestionPosition: SuggestionPosition.Top,
+                      focusNode: _focusNode,
+                      style:
+                          const TextStyle(color: Palette.white, fontSize: 21),
+                      decoration: const InputDecoration(
+                        border: InputBorder.none,
+                        hintText: "What's on your mind?",
+                        hintStyle: TextStyle(
+                          color: Palette.gray,
+                          fontSize: 20,
+                        ),
+                      ),
+                      maxLines: 10,
+                      minLines: 5,
+                      onMentionAdd: (p0) {
+                        log("onMentionAdd: $p0");
+                      },
+                      suggestionListDecoration: BoxDecoration(
+                        color: Palette.extraDarkGray,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      mentions: [
+                        Mention(
+                          suggestionBuilder: (data) {
+                            return Container(
+                              //color: Palette.extraDarkGray,
+                              padding: EdgeInsets.all(10.0),
+                              child: Row(
+                                children: <Widget>[
+                                  CircleAvatar(
+                                    backgroundImage: NetworkImage(
+                                      data['photo'],
+                                    ),
+                                  ),
+                                  const SizedBox(
+                                    width: 20.0,
+                                  ),
+                                  Column(
+                                    children: <Widget>[
+                                      Text(
+                                        data['display'],
+                                        style: const TextStyle(
+                                          color: Palette.lightGray,
+                                          fontSize: 20,
+                                        ),
+                                      ),
+                                      Text('@${data['display']}'),
+                                    ],
+                                  )
+                                ],
+                              ),
+                            );
+                          },
+                          trigger: "@",
+                          style: const TextStyle(color: Palette.primary),
+                          data: [
+                            {
+                              "id": "61as61fsa",
+                              "display": "fayeedP",
+                              "photo":
+                                  "https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg"
+                            },
+                            {
+                              "id": "61asasgasgsag6a",
+                              "display": "khaled",
+                              "photo":
+                                  "https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg",
+                            },
+                          ],
+                        )
+                      ],
                     ),
-                  ),
+                  ],
                 ),
               ),
               // image preview
