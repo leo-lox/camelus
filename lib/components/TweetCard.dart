@@ -38,110 +38,121 @@ class _TweetCardState extends State<TweetCard> {
 
   List<TextSpan> textSpans = [];
 
-  Map<String, dynamic> _tagsMetadata = {};
+  final Map<String, dynamic> _tagsMetadata = {};
 
   List<TextSpan> _buildTextSpans(String content) {
-    List<TextSpan> spans = [];
+    var spans = _buildUrlSpans(content);
+    var completeSpans = _buildHashtagSpans(spans);
 
-    RegExp urlRegex = RegExp(r"(https?|ftp)://[^\s/$.?#].[^\s]*");
-    RegExp hashRegex = RegExp(r"#\[\d+\]"); // RegExp(r"#\[0\]");
+    return completeSpans;
+  }
 
+  List<TextSpan> _buildUrlSpans(String input) {
+    final spans = <TextSpan>[];
+    final linkRegex = RegExp(
+        r"(https?|ftp|file)://[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]");
+    final linkMatches = linkRegex.allMatches(input);
     int lastMatchEnd = 0;
-
-// Find all URLs in the user-generated text
-    urlRegex.allMatches(content).forEach((match) {
-      // Add the text before the match as a normal span
-      if (lastMatchEnd != match.start) {
-        spans.add(TextSpan(
-          text: content.substring(lastMatchEnd, match.start),
-          style: const TextStyle(
-              color: Palette.lightGray, fontSize: 17, height: 1.3),
-        ));
-      }
-
-      // Add the URL as a hyperlink span
-      spans.add(TextSpan(
-        text: match.group(0),
-        style: const TextStyle(
-            color: Palette.primary,
-            fontSize: 17,
-            height: 1.3,
-            decoration: TextDecoration.underline),
-        // underline
-
-        recognizer: TapGestureRecognizer()
-          ..onTap = () {
-            if (match.group(0) == null) return;
-
-            // Open the URL in a browser
-            launchUrlString(match.group(0)!,
-                mode: LaunchMode.externalApplication);
-            log(match.group(0)!);
-          },
-      ));
-
-      lastMatchEnd = match.end;
-    });
-
-// Find all #[0] in the user-generated text
-    hashRegex.allMatches(content).forEach((match) async {
-      // Add the text before the match as a normal span
-      if (lastMatchEnd != match.start) {
-        try {
-          spans.add(TextSpan(
-            text: content.substring(lastMatchEnd, match.start),
+    for (final match in linkMatches) {
+      if (match.start > lastMatchEnd) {
+        spans.add(
+          TextSpan(
+            text: input.substring(lastMatchEnd, match.start),
             style: const TextStyle(
                 color: Palette.lightGray, fontSize: 17, height: 1.3),
-          ));
-        } catch (e) {
-          log(e.toString());
-        }
+          ),
+        );
       }
-
-      var indexString =
-          match.group(0)!.replaceAll("#[", "").replaceAll("]", "");
-      var index = int.parse(indexString);
-      var tag = widget.tweet.tags[index];
-
-      if (tag[0] == 'p' && _tagsMetadata[tag[1]] == null) {
-        _tagsMetadata[tag[1]] = "loading...";
-        var metadata = widget._nostrService.getUserMetadata(tag[1]);
-
-        metadata.then((value) {
-          setState(() {
-            _tagsMetadata[tag[1]] = value["name"];
-          });
-        });
-      }
-
-      // Add the #[0] as a hyperlink span
       spans.add(TextSpan(
-        text: "@${_tagsMetadata[tag[1]]}",
-        style:
-            const TextStyle(color: Palette.primary, fontSize: 17, height: 1.3),
-        recognizer: TapGestureRecognizer()
-          ..onTap = () {
-            // Do something when #[0] is tapped
-            log("${match.group(0)} tapped");
-            // navigate to user profile
-            Navigator.pushNamed(context, "/nostr/profile", arguments: tag[1]);
-          },
-      ));
+          text: match.group(0),
+          style: const TextStyle(
+              color: Palette.primary,
+              fontSize: 17,
+              height: 1.3,
+              decoration: TextDecoration.underline),
+          recognizer: TapGestureRecognizer()
+            ..onTap = () {
+              if (match.group(0) == null) return;
 
+              // Open the URL in a browser
+              launchUrlString(match.group(0)!,
+                  mode: LaunchMode.externalApplication);
+              log(match.group(0)!);
+            }));
       lastMatchEnd = match.end;
-    });
-
-// Add the remaining text after the last match as a normal span
-    if (lastMatchEnd != content.length) {
+    }
+    if (lastMatchEnd < input.length) {
       spans.add(TextSpan(
-        text: content.substring(lastMatchEnd),
-        style: const TextStyle(
-            color: Palette.lightGray, fontSize: 17, height: 1.3),
-      ));
+          text: input.substring(lastMatchEnd),
+          style: const TextStyle(
+              color: Palette.lightGray, fontSize: 17, height: 1.3)));
+    }
+    return spans;
+  }
+
+  List<TextSpan> _buildHashtagSpans(List<TextSpan> spans) {
+    var finalSpans = <TextSpan>[];
+
+    for (var span in spans) {
+      if (span.text!.contains("#[")) {
+        final pattern = RegExp(r"#\[\d+\]");
+        final hashMatches = pattern.allMatches(span.text!);
+        int lastMatchEnd = 0;
+        for (final match in hashMatches) {
+          if (match.start > lastMatchEnd) {
+            finalSpans.add(
+              TextSpan(
+                text: span.text!.substring(lastMatchEnd, match.start),
+                style: const TextStyle(
+                    color: Palette.lightGray, fontSize: 17, height: 1.3),
+              ),
+            );
+          }
+          var indexString =
+              match.group(0)!.replaceAll("#[", "").replaceAll("]", "");
+          var index = int.parse(indexString);
+          var tag = widget.tweet.tags[index];
+
+          if (tag[0] == 'p' && _tagsMetadata[tag[1]] == null) {
+            var pubkeyBech = Helpers().encodeBech32(tag[1], "npub");
+            // first 5 chars then ... then last 5 chars
+            var pubkeyHr =
+                "${pubkeyBech.substring(0, 5)}...${pubkeyBech.substring(pubkeyBech.length - 5)}";
+            _tagsMetadata[tag[1]] = pubkeyHr;
+            var metadata = widget._nostrService.getUserMetadata(tag[1]);
+
+            metadata.then((value) {
+              setState(() {
+                _tagsMetadata[tag[1]] = value["name"] ?? pubkeyHr;
+              });
+            });
+          }
+          finalSpans.add(TextSpan(
+              text: "@${_tagsMetadata[tag[1]]}",
+              style: const TextStyle(
+                  color: Palette.primary, fontSize: 17, height: 1.3),
+              recognizer: TapGestureRecognizer()
+                ..onTap = () {
+                  Navigator.pushNamed(context, "/nostr/profile",
+                      arguments: tag[1]);
+                }));
+          lastMatchEnd = match.end;
+        }
+        if (lastMatchEnd < span.text!.length) {
+          finalSpans.add(
+            TextSpan(
+              text: span.text!.substring(lastMatchEnd),
+              style: const TextStyle(
+                  color: Palette.lightGray, fontSize: 17, height: 1.3),
+            ),
+          );
+        }
+      } else {
+        finalSpans.add(span);
+      }
     }
 
-    //textSpans = spans;
-    return spans;
+    return finalSpans;
   }
 
   // open image in full screen with dialog and zoom
