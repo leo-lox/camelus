@@ -9,7 +9,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:hex/hex.dart';
 import 'package:http/http.dart';
-import 'package:camelus/helpers/Helpers.dart';
+import 'package:camelus/helpers/helpers.dart';
 import 'package:camelus/helpers/bip340.dart';
 import 'package:camelus/models/Tweet.dart';
 import 'package:json_cache/json_cache.dart';
