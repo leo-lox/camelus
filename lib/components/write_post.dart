@@ -8,7 +8,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:lottie/lottie.dart';
 import 'package:camelus/config/palette.dart';
 import 'package:camelus/helpers/helpers.dart';
-import 'package:camelus/models/PostContext.dart';
+import 'package:camelus/models/post_context.dart';
 import 'package:camelus/services/nostr/nostr_injector.dart';
 import 'package:camelus/services/nostr/nostr_service.dart';
 import 'package:http/http.dart' as http;

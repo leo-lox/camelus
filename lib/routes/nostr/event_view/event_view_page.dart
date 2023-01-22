@@ -2,11 +2,11 @@ import 'dart:async';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:camelus/components/TweetCard.dart';
+import 'package:camelus/components/tweet_card.dart';
 import 'package:camelus/config/palette.dart';
 import 'package:camelus/helpers/helpers.dart';
-import 'package:camelus/models/Tweet.dart';
-import 'package:camelus/models/TweetControl.dart';
+import 'package:camelus/models/tweet.dart';
+import 'package:camelus/models/tweet_control.dart';
 import 'package:camelus/services/nostr/nostr_injector.dart';
 import 'package:camelus/services/nostr/nostr_service.dart';
 

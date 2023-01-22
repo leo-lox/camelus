@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
-import 'dart:ui';
 
 import 'package:crypto/crypto.dart';
 import 'package:flutter/services.dart';
@@ -11,7 +10,7 @@ import 'package:hex/hex.dart';
 import 'package:http/http.dart';
 import 'package:camelus/helpers/helpers.dart';
 import 'package:camelus/helpers/bip340.dart';
-import 'package:camelus/models/Tweet.dart';
+import 'package:camelus/models/tweet.dart';
 import 'package:json_cache/json_cache.dart';
 import 'package:cross_local_storage/cross_local_storage.dart';
 

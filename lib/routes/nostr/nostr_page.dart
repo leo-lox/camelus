@@ -10,9 +10,9 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
 import 'package:camelus/atoms/my_profile_picture.dart';
-import 'package:camelus/components/TweetCard.dart';
+import 'package:camelus/components/tweet_card.dart';
 
-import 'package:camelus/models/Tweet.dart';
+import 'package:camelus/models/tweet.dart';
 import 'package:camelus/services/nostr/nostr_injector.dart';
 import 'package:camelus/services/nostr/nostr_service.dart';
 import 'package:badges/badges.dart';
