@@ -1,4 +1,4 @@
-import 'package:camelus/models/Tweet.dart';
+import 'package:camelus/models/tweet.dart';
 
 class PostContext {
   Tweet replyToTweet;
