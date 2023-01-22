@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 
+import 'package:camelus/helpers/search.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mentions/flutter_mentions.dart';
@@ -36,6 +37,7 @@ class _WritePostState extends State<WritePost> {
   bool submitLoading = false;
 
   List<File> _images = [];
+  List<Map<String, dynamic>> _mentionsSearchResults = [];
 
   _addImage() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles();
@@ -49,6 +51,30 @@ class _WritePostState extends State<WritePost> {
 
     setState(() {
       _images.add(File(result.files.single.path!));
+    });
+  }
+
+  _searchMentions(search) async {
+    List<Map<String, dynamic>> results = Search().searchUsersMetadata(search);
+
+    for (var result in results) {
+      if (result['picture'] == null) {
+        result['picture'] = "";
+      }
+
+      if (result['nip05'] == null) {
+        result['nip05'] = "";
+      }
+
+      if (result['name'] == null) {
+        result['display'] = "";
+      }
+      // rename name to display
+      result['display'] = result['name'];
+    }
+
+    setState(() {
+      _mentionsSearchResults = results;
     });
   }
 
@@ -352,6 +378,11 @@ class _WritePostState extends State<WritePost> {
                       onMentionAdd: (p0) {
                         log("onMentionAdd: $p0");
                       },
+                      onSearchChanged: (String trigger, search) {
+                        if (search.isNotEmpty && trigger == "@") {
+                          _searchMentions(search);
+                        }
+                      },
                       suggestionListDecoration: BoxDecoration(
                         color: Palette.extraDarkGray,
                         borderRadius: BorderRadius.circular(20),
@@ -366,22 +397,30 @@ class _WritePostState extends State<WritePost> {
                                 children: <Widget>[
                                   CircleAvatar(
                                     backgroundImage: NetworkImage(
-                                      data['photo'],
+                                      data['picture'] ?? "",
                                     ),
                                   ),
                                   const SizedBox(
                                     width: 20.0,
                                   ),
                                   Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: <Widget>[
                                       Text(
-                                        data['display'],
+                                        data['name'] ?? "",
                                         style: const TextStyle(
                                           color: Palette.lightGray,
                                           fontSize: 20,
                                         ),
                                       ),
-                                      Text('@${data['display']}'),
+                                      Text(
+                                        '${data['nip05'] ?? ""}',
+                                        style: const TextStyle(
+                                          color: Palette.gray,
+                                          fontSize: 12,
+                                        ),
+                                      ),
                                     ],
                                   )
                                 ],
@@ -390,20 +429,7 @@ class _WritePostState extends State<WritePost> {
                           },
                           trigger: "@",
                           style: const TextStyle(color: Palette.primary),
-                          data: [
-                            {
-                              "id": "61as61fsa",
-                              "display": "fayeedP",
-                              "photo":
-                                  "https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg"
-                            },
-                            {
-                              "id": "61asasgasgsag6a",
-                              "display": "khaled",
-                              "photo":
-                                  "https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg",
-                            },
-                          ],
+                          data: _mentionsSearchResults,
                         )
                       ],
                     ),
