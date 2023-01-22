@@ -31,7 +31,8 @@ class WritePost extends StatefulWidget {
 
 class _WritePostState extends State<WritePost> {
   final TextEditingController _textEditingController = TextEditingController();
-  GlobalKey _textEditingControllerKey = GlobalKey();
+  final GlobalKey<FlutterMentionsState> _textEditingControllerKey =
+      GlobalKey<FlutterMentionsState>();
   final FocusNode _focusNode = FocusNode();
 
   bool submitLoading = false;
@@ -39,6 +40,7 @@ class _WritePostState extends State<WritePost> {
   List<File> _images = [];
   List<Map<String, dynamic>> _mentionsSearchResults = [];
   List<Map<String, dynamic>> _mentionsSearchResultsHashTags = [];
+  List<String> _mentionedInPost = [];
 
   _addImage() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles();
@@ -74,6 +76,29 @@ class _WritePostState extends State<WritePost> {
       result['display'] = result['name'];
     }
 
+    // keep data from already mentioned users
+    for (var mention in _mentionedInPost) {
+      if (results.any((element) => element['id'] == mention)) {
+        continue;
+      }
+
+      // find user in _mentionsSearchResults and add it to results
+      // to keep the data
+
+      var user = _mentionsSearchResults.firstWhere((element) {
+        return element['id'] == mention;
+      },
+          // should not happen
+          orElse: () => {
+                "id": mention,
+                "display": mention,
+                "picture": "",
+                "nip05": "",
+              });
+
+      results.add(user);
+    }
+
     setState(() {
       _mentionsSearchResults = results;
     });
@@ -90,10 +115,22 @@ class _WritePostState extends State<WritePost> {
       }
     ];
 
-    log(results.toString() + "   " + search);
-
     setState(() {
       _mentionsSearchResultsHashTags = results;
+    });
+  }
+
+  _extractMentions(String markupText) {
+    final mentionKeys = <String>[];
+    final keyRegex = RegExp(r'@\[__(.*?)__\]');
+
+    markupText.replaceAllMapped(keyRegex, (match) {
+      mentionKeys.add(match.group(1)!);
+      return '';
+    });
+
+    setState(() {
+      _mentionedInPost = mentionKeys;
     });
   }
 
@@ -136,7 +173,9 @@ class _WritePostState extends State<WritePost> {
   }
 
   _submitPost() async {
-    if (_textEditingController.text == "") {
+    var textController = _textEditingControllerKey.currentState!.controller;
+
+    if (textController!.text == "") {
       return;
     }
 
@@ -144,8 +183,33 @@ class _WritePostState extends State<WritePost> {
       submitLoading = true;
     });
 
-    var content = _textEditingController.text;
+    var markupText = textController.markupText;
+
+    // extract mentions from markupText
+
+    final mentionKeys = <String>[];
+    final keyRegex = RegExp(r'@\[__(.*?)__\]');
+
+    String output = markupText.replaceAllMapped(keyRegex, (match) {
+      mentionKeys.add(match.group(1)!);
+      return '#[${mentionKeys.length - 1}]';
+    });
+
+    output = output.replaceAllMapped(RegExp(r'\(__.*?\)'), (match) {
+      return '';
+    });
+
+    var content = output;
+
     var tags = [];
+
+    if (mentionKeys.isNotEmpty) {
+      for (int i = 0; i < mentionKeys.length; i++) {
+        var key = mentionKeys[i];
+        tags.add(["p", key]);
+      }
+    }
+
     var firstWriteRelayKey =
         widget._nostrService.connectedRelaysWrite.keys.toList()[0];
     var firstWriteRelay = widget
@@ -375,10 +439,13 @@ class _WritePostState extends State<WritePost> {
                   maxLines: 10,
                   minLines: 5,
                   onMentionAdd: (p0) {
-                    log("onMentionAdd: $p0");
+                    // only triggers when user selects a mention from the list
+                  },
+                  onMarkupChanged: (p0) {
+                    // triggers when something is typed in the text field
+                    _extractMentions(p0);
                   },
                   onSearchChanged: (String trigger, search) {
-                    log("Search changed: $trigger, $search");
                     if (search.isNotEmpty && trigger == "@") {
                       _searchMentions(search);
                     }
@@ -394,8 +461,7 @@ class _WritePostState extends State<WritePost> {
                     Mention(
                       suggestionBuilder: (data) {
                         return Container(
-                          //color: Palette.extraDarkGray,
-                          padding: EdgeInsets.all(10.0),
+                          padding: const EdgeInsets.all(10.0),
                           child: Row(
                             children: <Widget>[
                               CircleAvatar(
@@ -430,6 +496,8 @@ class _WritePostState extends State<WritePost> {
                         );
                       },
                       trigger: "@",
+                      matchAll: true,
+                      disableMarkup: false,
                       style: const TextStyle(color: Palette.primary),
                       data: _mentionsSearchResults,
                     ),
