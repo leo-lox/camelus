@@ -2,8 +2,10 @@ import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 
+import 'package:camelus/helpers/search.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_mentions/flutter_mentions.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:lottie/lottie.dart';
 import 'package:camelus/config/palette.dart';
@@ -29,11 +31,16 @@ class WritePost extends StatefulWidget {
 
 class _WritePostState extends State<WritePost> {
   final TextEditingController _textEditingController = TextEditingController();
+  final GlobalKey<FlutterMentionsState> _textEditingControllerKey =
+      GlobalKey<FlutterMentionsState>();
   final FocusNode _focusNode = FocusNode();
 
   bool submitLoading = false;
 
   List<File> _images = [];
+  List<Map<String, dynamic>> _mentionsSearchResults = [];
+  List<Map<String, dynamic>> _mentionsSearchResultsHashTags = [];
+  List<String> _mentionedInPost = [];
 
   _addImage() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles();
@@ -47,6 +54,83 @@ class _WritePostState extends State<WritePost> {
 
     setState(() {
       _images.add(File(result.files.single.path!));
+    });
+  }
+
+  _searchMentions(search) async {
+    List<Map<String, dynamic>> results = Search().searchUsersMetadata(search);
+
+    for (var result in results) {
+      if (result['picture'] == null) {
+        result['picture'] = "";
+      }
+
+      if (result['nip05'] == null) {
+        result['nip05'] = "";
+      }
+
+      if (result['name'] == null) {
+        result['display'] = "";
+      }
+      // rename name to display
+      result['display'] = result['name'];
+    }
+
+    // keep data from already mentioned users
+    for (var mention in _mentionedInPost) {
+      if (results.any((element) => element['id'] == mention)) {
+        continue;
+      }
+
+      // find user in _mentionsSearchResults and add it to results
+      // to keep the data
+
+      var user = _mentionsSearchResults.firstWhere((element) {
+        return element['id'] == mention;
+      },
+          // should not happen
+          orElse: () => {
+                "id": mention,
+                "display": mention,
+                "picture": "",
+                "nip05": "",
+              });
+
+      results.add(user);
+    }
+
+    setState(() {
+      _mentionsSearchResults = results;
+    });
+  }
+
+  /// todo: build this properly
+  _searchHashtags(String search) async {
+    List<Map<String, dynamic>> results = [];
+
+    results = [
+      {
+        "id": "todo",
+        "display": search,
+      }
+    ];
+
+    setState(() {
+      _mentionsSearchResultsHashTags = results;
+    });
+  }
+
+  _extractMentions(String markupText) {
+    final mentionKeys = <String>[];
+    final keyRegex = RegExp(r'@\[__(.*?)__\]');
+
+    markupText.replaceAllMapped(keyRegex, (match) {
+      mentionKeys.add(match.group(1)!);
+      return '';
+    });
+
+    setState(() {
+      _mentionedInPost = mentionKeys;
     });
   }
 
@@ -89,7 +173,9 @@ class _WritePostState extends State<WritePost> {
   }
 
   _submitPost() async {
-    if (_textEditingController.text == "") {
+    var textController = _textEditingControllerKey.currentState!.controller;
+
+    if (textController!.text == "") {
       return;
     }
 
@@ -97,8 +183,33 @@ class _WritePostState extends State<WritePost> {
       submitLoading = true;
     });
 
-    var content = _textEditingController.text;
+    var markupText = textController.markupText;
+
+    // extract mentions from markupText
+
+    final mentionKeys = <String>[];
+    final keyRegex = RegExp(r'@\[__(.*?)__\]');
+
+    String output = markupText.replaceAllMapped(keyRegex, (match) {
+      mentionKeys.add(match.group(1)!);
+      return '#[${mentionKeys.length - 1}]';
+    });
+
+    output = output.replaceAllMapped(RegExp(r'\(__.*?\)'), (match) {
+      return '';
+    });
+
+    var content = output;
+
     var tags = [];
+
+    if (mentionKeys.isNotEmpty) {
+      for (int i = 0; i < mentionKeys.length; i++) {
+        var key = mentionKeys[i];
+        tags.add(["p", key]);
+      }
+    }
+
     var firstWriteRelayKey =
         widget._nostrService.connectedRelaysWrite.keys.toList()[0];
     var firstWriteRelay = widget
@@ -312,13 +423,11 @@ class _WritePostState extends State<WritePost> {
                   borderRadius: BorderRadius.circular(10),
                   //border: Border.all(color: Palette.primary), //debug
                 ),
-                child: TextField(
+                child: FlutterMentions(
+                  key: _textEditingControllerKey,
+                  suggestionPosition: SuggestionPosition.Top,
                   focusNode: _focusNode,
-                  controller: _textEditingController,
                   style: const TextStyle(color: Palette.white, fontSize: 21),
-                  textInputAction: TextInputAction.newline,
-                  minLines: 5,
-                  maxLines: 10,
                   decoration: const InputDecoration(
                     border: InputBorder.none,
                     hintText: "What's on your mind?",
@@ -327,6 +436,82 @@ class _WritePostState extends State<WritePost> {
                       fontSize: 20,
                     ),
                   ),
+                  maxLines: 10,
+                  minLines: 5,
+                  onMentionAdd: (p0) {
+                    // only triggers when user selects a mention from the list
+                  },
+                  onMarkupChanged: (p0) {
+                    // triggers when something is typed in the text field
+                    _extractMentions(p0);
+                  },
+                  onSearchChanged: (String trigger, search) {
+                    if (search.isNotEmpty && trigger == "@") {
+                      _searchMentions(search);
+                    }
+                    if (search.isNotEmpty && trigger == "#") {
+                      _searchHashtags(search);
+                    }
+                  },
+                  suggestionListDecoration: BoxDecoration(
+                    color: Palette.extraDarkGray,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  mentions: [
+                    Mention(
+                      suggestionBuilder: (data) {
+                        return Container(
+                          padding: const EdgeInsets.all(10.0),
+                          child: Row(
+                            children: <Widget>[
+                              CircleAvatar(
+                                backgroundImage: NetworkImage(
+                                  data['picture'] ?? "",
+                                ),
+                              ),
+                              const SizedBox(
+                                width: 20.0,
+                              ),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: <Widget>[
+                                  Text(
+                                    data['name'] ?? "",
+                                    style: const TextStyle(
+                                      color: Palette.lightGray,
+                                      fontSize: 20,
+                                    ),
+                                  ),
+                                  Text(
+                                    '${data['nip05'] ?? ""}',
+                                    style: const TextStyle(
+                                      color: Palette.gray,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ],
+                              )
+                            ],
+                          ),
+                        );
+                      },
+                      trigger: "@",
+                      matchAll: true,
+                      disableMarkup: false,
+                      style: const TextStyle(color: Palette.primary),
+                      data: _mentionsSearchResults,
+                    ),
+                    Mention(
+                      suggestionBuilder: (data) {
+                        return Container();
+                      },
+                      trigger: "#",
+                      matchAll: true,
+                      disableMarkup: true,
+                      style: const TextStyle(color: Palette.purple),
+                      data: _mentionsSearchResultsHashTags,
+                    ),
+                  ],
                 ),
               ),
               // image preview
