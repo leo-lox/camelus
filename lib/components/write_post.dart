@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:camelus/atoms/picture.dart';
 import 'package:camelus/helpers/search.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -464,9 +466,15 @@ class _WritePostState extends State<WritePost> {
                           padding: const EdgeInsets.all(10.0),
                           child: Row(
                             children: <Widget>[
-                              CircleAvatar(
-                                backgroundImage: NetworkImage(
-                                  data['picture'] ?? "",
+                              ClipOval(
+                                child: SizedBox.fromSize(
+                                  size:
+                                      const Size.fromRadius(30), // Image radius
+                                  child: Container(
+                                    color: Palette.background,
+                                    child: simplePicture(
+                                        data['picture'], data['id']),
+                                  ),
                                 ),
                               ),
                               const SizedBox(
