@@ -6,6 +6,7 @@ import 'package:camelus/routes/nostr/event_view/event_view_page.dart';
 import 'package:camelus/routes/nostr/onboarding/onboarding.dart';
 import 'package:camelus/routes/nostr/profile/profile_page.dart';
 import 'package:camelus/routes/nostr/replies/replies_page.dart';
+import 'package:flutter_mentions/flutter_mentions.dart';
 
 import 'routes/home_page.dart';
 import 'theme.dart' as theme;
