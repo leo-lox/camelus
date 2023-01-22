@@ -38,6 +38,7 @@ class _WritePostState extends State<WritePost> {
 
   List<File> _images = [];
   List<Map<String, dynamic>> _mentionsSearchResults = [];
+  List<Map<String, dynamic>> _mentionsSearchResultsHashTags = [];
 
   _addImage() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles();
@@ -75,6 +76,24 @@ class _WritePostState extends State<WritePost> {
 
     setState(() {
       _mentionsSearchResults = results;
+    });
+  }
+
+  /// todo: build this properly
+  _searchHashtags(String search) async {
+    List<Map<String, dynamic>> results = [];
+
+    results = [
+      {
+        "id": "todo",
+        "display": search,
+      }
+    ];
+
+    log(results.toString() + "   " + search);
+
+    setState(() {
+      _mentionsSearchResultsHashTags = results;
     });
   }
 
@@ -340,98 +359,89 @@ class _WritePostState extends State<WritePost> {
                   borderRadius: BorderRadius.circular(10),
                   //border: Border.all(color: Palette.primary), //debug
                 ),
-                child: Stack(
-                  children: [
-                    //TextField(
-                    //  focusNode: _focusNode,
-                    //  controller: _textEditingController,
-                    //  style:
-                    //      const TextStyle(color: Palette.white, fontSize: 21),
-                    //  textInputAction: TextInputAction.newline,
-                    //  minLines: 5,
-                    //  maxLines: 10,
-                    //  decoration: const InputDecoration(
-                    //    border: InputBorder.none,
-                    //    hintText: "What's on your mind?",
-                    //    hintStyle: TextStyle(
-                    //      color: Palette.gray,
-                    //      fontSize: 20,
-                    //    ),
-                    //  ),
-                    //),
-                    FlutterMentions(
-                      key: _textEditingControllerKey,
-                      suggestionPosition: SuggestionPosition.Top,
-                      focusNode: _focusNode,
-                      style:
-                          const TextStyle(color: Palette.white, fontSize: 21),
-                      decoration: const InputDecoration(
-                        border: InputBorder.none,
-                        hintText: "What's on your mind?",
-                        hintStyle: TextStyle(
-                          color: Palette.gray,
-                          fontSize: 20,
-                        ),
-                      ),
-                      maxLines: 10,
-                      minLines: 5,
-                      onMentionAdd: (p0) {
-                        log("onMentionAdd: $p0");
-                      },
-                      onSearchChanged: (String trigger, search) {
-                        if (search.isNotEmpty && trigger == "@") {
-                          _searchMentions(search);
-                        }
-                      },
-                      suggestionListDecoration: BoxDecoration(
-                        color: Palette.extraDarkGray,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      mentions: [
-                        Mention(
-                          suggestionBuilder: (data) {
-                            return Container(
-                              //color: Palette.extraDarkGray,
-                              padding: EdgeInsets.all(10.0),
-                              child: Row(
+                child: FlutterMentions(
+                  key: _textEditingControllerKey,
+                  suggestionPosition: SuggestionPosition.Top,
+                  focusNode: _focusNode,
+                  style: const TextStyle(color: Palette.white, fontSize: 21),
+                  decoration: const InputDecoration(
+                    border: InputBorder.none,
+                    hintText: "What's on your mind?",
+                    hintStyle: TextStyle(
+                      color: Palette.gray,
+                      fontSize: 20,
+                    ),
+                  ),
+                  maxLines: 10,
+                  minLines: 5,
+                  onMentionAdd: (p0) {
+                    log("onMentionAdd: $p0");
+                  },
+                  onSearchChanged: (String trigger, search) {
+                    log("Search changed: $trigger, $search");
+                    if (search.isNotEmpty && trigger == "@") {
+                      _searchMentions(search);
+                    }
+                    if (search.isNotEmpty && trigger == "#") {
+                      _searchHashtags(search);
+                    }
+                  },
+                  suggestionListDecoration: BoxDecoration(
+                    color: Palette.extraDarkGray,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  mentions: [
+                    Mention(
+                      suggestionBuilder: (data) {
+                        return Container(
+                          //color: Palette.extraDarkGray,
+                          padding: EdgeInsets.all(10.0),
+                          child: Row(
+                            children: <Widget>[
+                              CircleAvatar(
+                                backgroundImage: NetworkImage(
+                                  data['picture'] ?? "",
+                                ),
+                              ),
+                              const SizedBox(
+                                width: 20.0,
+                              ),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: <Widget>[
-                                  CircleAvatar(
-                                    backgroundImage: NetworkImage(
-                                      data['picture'] ?? "",
+                                  Text(
+                                    data['name'] ?? "",
+                                    style: const TextStyle(
+                                      color: Palette.lightGray,
+                                      fontSize: 20,
                                     ),
                                   ),
-                                  const SizedBox(
-                                    width: 20.0,
+                                  Text(
+                                    '${data['nip05'] ?? ""}',
+                                    style: const TextStyle(
+                                      color: Palette.gray,
+                                      fontSize: 12,
+                                    ),
                                   ),
-                                  Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: <Widget>[
-                                      Text(
-                                        data['name'] ?? "",
-                                        style: const TextStyle(
-                                          color: Palette.lightGray,
-                                          fontSize: 20,
-                                        ),
-                                      ),
-                                      Text(
-                                        '${data['nip05'] ?? ""}',
-                                        style: const TextStyle(
-                                          color: Palette.gray,
-                                          fontSize: 12,
-                                        ),
-                                      ),
-                                    ],
-                                  )
                                 ],
-                              ),
-                            );
-                          },
-                          trigger: "@",
-                          style: const TextStyle(color: Palette.primary),
-                          data: _mentionsSearchResults,
-                        )
-                      ],
+                              )
+                            ],
+                          ),
+                        );
+                      },
+                      trigger: "@",
+                      style: const TextStyle(color: Palette.primary),
+                      data: _mentionsSearchResults,
+                    ),
+                    Mention(
+                      suggestionBuilder: (data) {
+                        return Container();
+                      },
+                      trigger: "#",
+                      matchAll: true,
+                      disableMarkup: true,
+                      style: const TextStyle(color: Palette.purple),
+                      data: _mentionsSearchResultsHashTags,
                     ),
                   ],
                 ),
