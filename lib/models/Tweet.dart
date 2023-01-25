@@ -64,6 +64,48 @@ class Tweet {
         'retweetsCount': retweetsCount,
         'isReply': isReply
       };
+
+  factory Tweet.fromNostrEvent(dynamic eventMap) {
+    // extract media links from content and remove from content
+    String content = eventMap["content"];
+    List<String> imageLinks = [];
+    RegExp exp = RegExp(r"(https?:\/\/[^\s]+)");
+    Iterable<RegExpMatch> matches = exp.allMatches(content);
+    for (var match in matches) {
+      var link = match.group(0);
+      if (link!.endsWith(".jpg") ||
+          link.endsWith(".jpeg") ||
+          link.endsWith(".png") ||
+          link.endsWith(".gif")) {
+        imageLinks.add(link);
+        content = content.replaceAll(link, "");
+      }
+    }
+
+    // check if it is a reply
+    var isReply = false;
+    for (var t in eventMap["tags"]) {
+      if (t[0] == "e") {
+        isReply = true;
+      }
+    }
+
+    return Tweet(
+        id: eventMap["id"],
+        pubkey: eventMap["pubkey"],
+        userFirstName: "name",
+        userUserName: eventMap["pubkey"],
+        userProfilePic: "",
+        content: content,
+        imageLinks: imageLinks,
+        tweetedAt: eventMap["created_at"],
+        tags: eventMap["tags"],
+        replies: [],
+        likesCount: 0,
+        commentsCount: 0,
+        retweetsCount: 0,
+        isReply: isReply);
+  }
 }
 
 List tweets = [

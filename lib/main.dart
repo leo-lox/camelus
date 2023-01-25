@@ -1,11 +1,10 @@
 import 'package:camelus/routes/nostr/blockedUsers/blocked_users.dart';
 import 'package:camelus/routes/nostr/settings/settings_page.dart';
 import 'package:flutter/material.dart';
-import 'package:camelus/models/tweet.dart';
 import 'package:camelus/routes/nostr/event_view/event_view_page.dart';
 import 'package:camelus/routes/nostr/onboarding/onboarding.dart';
 import 'package:camelus/routes/nostr/profile/profile_page.dart';
-import 'package:camelus/routes/nostr/replies/replies_page.dart';
+
 import 'package:flutter_mentions/flutter_mentions.dart';
 
 import 'routes/home_page.dart';
@@ -43,12 +42,6 @@ class MyApp extends StatelessWidget {
             case '/settings':
               return MaterialPageRoute(
                 builder: (context) => SettingsPage(),
-              );
-
-            case '/nostr/replies':
-              return MaterialPageRoute(
-                builder: (context) =>
-                    repliesPage(tweet: settings.arguments as Tweet),
               );
             case '/nostr/event':
               return MaterialPageRoute(

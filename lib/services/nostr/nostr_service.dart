@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 
+import 'package:camelus/services/nostr/global_feed.dart';
+import 'package:camelus/services/nostr/user_feed.dart';
 import 'package:crypto/crypto.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -18,7 +20,7 @@ import 'package:http/http.dart' as http;
 import 'package:camelus/models/socket_control.dart';
 
 class NostrService {
-  Completer _isNostrServiceConnectedCompleter = Completer();
+  final Completer _isNostrServiceConnectedCompleter = Completer();
   late Future isNostrServiceConnected;
 
   Map<String, Map<String, dynamic>> relays = {};
@@ -43,16 +45,10 @@ class NostrService {
   var counterOwnSubscriptionsHits = 0;
 
   // global feed
-  var _globalFeed = <Tweet>[];
-  late Stream globalFeedStream;
-  final StreamController<List<Tweet>> _globalFeedStreamController =
-      StreamController<List<Tweet>>.broadcast();
+  var globalFeedObj = GlobalFeed();
 
   // user feed
-  var _userFeed = <Tweet>[];
-  late Stream userFeedStream;
-  final StreamController<List<Tweet>> _userFeedStreamController =
-      StreamController<List<Tweet>>.broadcast();
+  var userFeedObj = UserFeed();
 
   // authors
   var _authors = <String, List<Tweet>>{};
@@ -112,30 +108,12 @@ class NostrService {
     _loadKeyPair();
 
     // init streams
-    globalFeedStream = _globalFeedStreamController.stream;
-    userFeedStream = _userFeedStreamController.stream;
     authorsStream = _authorsStreamController.stream;
     mixedPoolStream = _mixedPoolStreamController.stream;
 
     // init json cache
     LocalStorageInterface prefs = await LocalStorage.getInstance();
     jsonCache = JsonCacheCrossLocalStorage(prefs);
-
-    // load cached feeds
-    // global feed
-    final Map<String, dynamic>? cachedGlobalFeed =
-        await jsonCache.value('globalFeed');
-
-    if (cachedGlobalFeed?["tweets"] != null) {
-      _globalFeed = cachedGlobalFeed!["tweets"]
-          .map<Tweet>((tweet) => Tweet.fromJson(tweet))
-          .toList();
-    }
-    // replies
-    for (var tweet in _globalFeed) {
-      tweet.replies =
-          tweet.replies.map<Tweet>((reply) => Tweet.fromJson(reply)).toList();
-    }
 
     if (relays.isEmpty) {
       var relaysCache = await jsonCache.value('relays');
@@ -172,31 +150,8 @@ class NostrService {
 
     connectToRelays();
 
-    // send to stream /send to ui
-    _globalFeedStreamController.add(_globalFeed);
-
-    // user feed
-    final Map<String, dynamic>? cachedUserFeed =
-        await jsonCache.value('userFeed');
-    if (cachedUserFeed != null) {
-      _userFeed = cachedUserFeed["tweets"]
-          .map<Tweet>((tweet) => Tweet.fromJson(tweet))
-          .toList();
-
-      // replies
-      for (var tweet in _userFeed) {
-        tweet.replies =
-            tweet.replies.map<Tweet>((reply) => Tweet.fromJson(reply)).toList();
-      }
-
-      // send to stream /send to ui
-      _userFeedStreamController.add(_userFeed);
-    }
-
-    //sort global feed by tweetedAt reverse
-    //todo: debug this
-    _globalFeed.sort((a, b) => b.tweetedAt.compareTo(a.tweetedAt));
-    _userFeed.sort((a, b) => b.tweetedAt.compareTo(a.tweetedAt));
+    userFeedObj.restoreFromCache();
+    globalFeedObj.restoreFromCache();
 
     // load cached users metadata
     final Map<String, dynamic>? cachedUsersMetadata =
@@ -442,7 +397,7 @@ class NostrService {
     }
 
     if (event[0] == "NOTICE") {
-      log("notice: $event, socket: ${socketControl.connectionUrl}");
+      log("notice: $event, socket: ${socketControl.connectionUrl}, url: ${socketControl.connectionUrl}");
       return;
     }
 
@@ -512,7 +467,7 @@ class NostrService {
 
         // content
         if (eventMap["kind"] == 1) {
-          var tweet = nostrEventToTweet(eventMap);
+          var tweet = Tweet.fromNostrEvent(eventMap);
 
           //create key value if not exists
           if (!_authors.containsKey(eventMap["pubkey"])) {
@@ -547,7 +502,7 @@ class NostrService {
       if (event[0] == "EVENT") {
         var eventMap = event[2];
 
-        var tweet = nostrEventToTweet(eventMap);
+        var tweet = Tweet.fromNostrEvent(eventMap);
 
         var rootId = socketControl.additionalData[event[1]]?["eventIds"][0];
         //create key value if not exists
@@ -602,91 +557,12 @@ class NostrService {
 
     /// user feed
     if (event[1].contains("ufeed")) {
-      if (event[0] == "EOSE") {
-        return;
-      }
+      userFeedObj.receiveNostrEvent(event, socketControl);
+    }
 
-      if (event[0] == "EVENT") {
-        var eventMap = event[2];
-        // content
-        if (eventMap["kind"] == 1) {
-          var tweet = nostrEventToTweet(eventMap);
-
-          if (tweet.isReply) {
-            // find parent tweet in tags else return null
-            var parentTweet = Tweet(
-              id: "",
-              pubkey: "",
-              userFirstName: '',
-              userUserName: '',
-              userProfilePic: '',
-              content: '',
-              imageLinks: [''],
-              tweetedAt: 0,
-              tags: [],
-              replies: [],
-              likesCount: 0,
-              commentsCount: 0,
-              retweetsCount: 0,
-            );
-            for (var tag in tweet.tags) {
-              if (tag[0] == "p") {
-                // p for pubkey
-                parentTweet = _userFeed.firstWhere(
-                  (element) => element.pubkey == tag[1],
-                  orElse: () => Tweet(
-                    id: "",
-                    pubkey: "",
-                    userFirstName: '',
-                    userUserName: '',
-                    userProfilePic: '',
-                    content: '',
-                    imageLinks: [''],
-                    tweetedAt: 0,
-                    tags: [],
-                    replies: [],
-                    likesCount: 0,
-                    commentsCount: 0,
-                    retweetsCount: 0,
-                  ),
-                );
-              }
-            }
-
-            if (parentTweet.id.isEmpty) {
-              //log("parent tweet not found for reply: ${tweet.tags}");
-              log("parent tweet not found for reply:");
-              return;
-            }
-
-            // check if reply already exists
-            if (parentTweet.replies.any((element) => element.id == tweet.id)) {
-              return;
-            }
-
-            // add reply to parent tweet
-            parentTweet.replies.add(tweet);
-            parentTweet.commentsCount = parentTweet.replies.length;
-          }
-
-          if (!tweet.isReply) {
-            // check if tweet already exists
-            if (_userFeed.any((element) => element.id == tweet.id)) {
-              return;
-            }
-            // add to feed
-            _userFeed.add(tweet);
-          }
-
-          //update cache
-          jsonCache.refresh('userFeed', {"tweets": _userFeed});
-
-          // sent to stream
-          _userFeedStreamController.sink.add(_userFeed);
-          return;
-        }
-      }
-      return;
+    /// global feed
+    if (event[1].contains("gfeed")) {
+      globalFeedObj.receiveNostrEvent(event, socketControl);
     }
 
     var eventMap = {};
@@ -755,95 +631,6 @@ class NostrService {
           log("error: $e");
         }
       }
-    }
-
-    /// global content
-    if (eventMap["kind"] == 1) {
-      log("tweet: ${eventMap}");
-
-      List<dynamic> tags = eventMap["tags"] ?? [];
-      var isReply = false;
-      for (List<dynamic> t in tags) {
-        // tweet is a reply
-        if (t[0] == "e") {
-          isReply = true;
-          //find parent tweet
-          Tweet parentTweet = _globalFeed.firstWhere(
-            (element) => element.id == t[1],
-            orElse: () {
-              log("parent tweet not found: $tags");
-              return Tweet(
-                  id: "0",
-                  pubkey: "0",
-                  userFirstName: "0",
-                  userUserName: "0",
-                  userProfilePic: "0",
-                  content: "0",
-                  imageLinks: [],
-                  tweetedAt: 0,
-                  tags: [],
-                  replies: [],
-                  likesCount: 0,
-                  commentsCount: 0,
-                  retweetsCount: 0,
-                  isReply: isReply);
-            },
-          );
-
-          if (parentTweet.id == "0") {
-            log("parent tweet not found: ${t[1]}");
-            return;
-          }
-
-          // check for duplicates
-          if (parentTweet.replies
-              .any((element) => element.id == eventMap["id"])) {
-            log("duplicate reply: ${eventMap["id"]}");
-            return;
-          }
-
-          //add reply to parent tweet
-          parentTweet.replies.add(nostrEventToTweet(eventMap));
-          parentTweet.commentsCount = parentTweet.replies.length;
-
-          // sort replies by time
-          try {
-            parentTweet.replies.sort((a, b) {
-              return a.tweetedAt.compareTo(b.tweetedAt);
-            });
-          } catch (e) {
-            log("error sorting replies");
-          }
-        }
-      }
-
-      if (!isReply) {
-        Tweet tweet = nostrEventToTweet(eventMap);
-
-        //check for duplicates
-        if (_globalFeed.any((element) => element.id == tweet.id)) {
-          log("duplicate tweet: ${tweet.id}");
-          return;
-        }
-
-        // add tweet to global feed on top
-        _globalFeed.insert(0, tweet);
-      }
-
-      //sort global feed by time
-      _globalFeed.sort((a, b) => b.tweetedAt.compareTo(a.tweetedAt));
-
-      // trim feed to 200 tweets
-      //if (_globalFeed.length > 200) {
-      //  _globalFeed.removeRange(200, _globalFeed.length);
-      //}
-
-      // save to cache as json
-      jsonCache.refresh('globalFeed',
-          {"tweets": _globalFeed.map((tweet) => tweet.toJson()).toList()});
-
-      //log("nostr_service: new tweet added to global feed");
-      _globalFeedStreamController.add(_globalFeed);
     }
 
     // global EOSE
@@ -979,48 +766,6 @@ class NostrService {
     return count;
   }
 
-  Tweet nostrEventToTweet(dynamic eventMap) {
-    // extract media links from content and remove from content
-    String content = eventMap["content"];
-    List<String> imageLinks = [];
-    RegExp exp = RegExp(r"(https?:\/\/[^\s]+)");
-    Iterable<RegExpMatch> matches = exp.allMatches(content);
-    for (var match in matches) {
-      var link = match.group(0);
-      if (link!.endsWith(".jpg") ||
-          link.endsWith(".jpeg") ||
-          link.endsWith(".png") ||
-          link.endsWith(".gif")) {
-        imageLinks.add(link);
-        content = content.replaceAll(link, "");
-      }
-    }
-
-    // check if it is a reply
-    var isReply = false;
-    for (var t in eventMap["tags"]) {
-      if (t[0] == "e") {
-        isReply = true;
-      }
-    }
-
-    return Tweet(
-        id: eventMap["id"],
-        pubkey: eventMap["pubkey"],
-        userFirstName: "name",
-        userUserName: eventMap["pubkey"],
-        userProfilePic: "",
-        content: content,
-        imageLinks: imageLinks,
-        tweetedAt: eventMap["created_at"],
-        tags: eventMap["tags"],
-        replies: [],
-        likesCount: 0,
-        commentsCount: 0,
-        retweetsCount: 0,
-        isReply: isReply);
-  }
-
   void requestGlobalFeed({
     required String requestId,
     int? since,
@@ -1029,7 +774,7 @@ class NostrService {
   }) {
     // global feed ["REQ","globalFeed 0739",{"since":1672483074,"kinds":[1,2],"limit":5}]
 
-    var reqId = "globalFeed-$requestId";
+    var reqId = "gfeed-$requestId";
     int now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
 
     var body = {
@@ -1049,8 +794,6 @@ class NostrService {
     for (var relay in connectedRelaysRead.entries) {
       relay.value.socket.add(jsonString);
     }
-
-    log("globalFeed request sent");
   }
 
   void requestUserFeed(
@@ -1560,17 +1303,16 @@ class NostrService {
       await jsonCache.refresh("blockedUsers", {"blockedUsers": blockedUsers});
     }
     // search in feed for pubkey and remove
-    _userFeed.removeWhere((element) => element.pubkey == pubkey);
-    _globalFeed.removeWhere((element) => element.pubkey == pubkey);
+    userFeedObj.feed.removeWhere((element) => element.pubkey == pubkey);
+    globalFeedObj.feed.removeWhere((element) => element.pubkey == pubkey);
 
     // update cache
 
-    await jsonCache.refresh('userFeed', {"tweets": _userFeed});
-    await jsonCache.refresh("globalFeed", {"tweets": _globalFeed});
+    await jsonCache.refresh('userFeed', {"tweets": userFeedObj.feed});
+    await jsonCache.refresh("globalFeed", {"tweets": globalFeedObj.feed});
 
     //notify streams
-    _userFeedStreamController.add(_userFeed);
-    _globalFeedStreamController.add(_globalFeed);
+    // todo
 
     return;
   }

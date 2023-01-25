@@ -376,11 +376,12 @@ class _NostrPageState extends State<NostrPage> with TickerProviderStateMixin {
 
     // listen to nostr service
     globalFeedSubscription =
-        widget._nostrService.globalFeedStream.listen((event) {
+        widget._nostrService.globalFeedObj.globalFeedStream.listen((event) {
       _onGlobalTweetReceived(event);
     });
 
-    userFeedSubscription = widget._nostrService.userFeedStream.listen((event) {
+    userFeedSubscription =
+        widget._nostrService.userFeedObj.userFeedStream.listen((event) {
       _onUserFeedReceived(event);
     });
 
