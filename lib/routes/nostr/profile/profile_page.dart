@@ -179,7 +179,8 @@ class _ProfilePageState extends State<ProfilePage>
     int now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
 
     // listen to nostr service
-    _nostrStream = widget._nostrService.authorsStream.listen((event) {
+    _nostrStream =
+        widget._nostrService.authorsFeedObj.authorsStream.listen((event) {
       setState(() {
         _myTweets = event[widget.pubkey] ?? [];
       });

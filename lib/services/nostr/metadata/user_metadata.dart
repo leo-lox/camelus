@@ -6,6 +6,14 @@ import 'package:camelus/models/socket_control.dart';
 import 'package:cross_local_storage/cross_local_storage.dart';
 import 'package:json_cache/json_cache.dart';
 
+///
+/// how metadata request works
+///
+/// batches of pubkeys in metadata request
+/// request pool
+/// mark no metadata available in cache do prevent double requests
+///
+
 class UserMetadata {
   Map<String, dynamic> usersMetadata = {};
 

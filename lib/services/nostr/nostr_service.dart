@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 
+import 'package:camelus/services/nostr/feeds/authors_feed.dart';
 import 'package:camelus/services/nostr/feeds/global_feed.dart';
 import 'package:camelus/services/nostr/feeds/user_feed.dart';
 import 'package:camelus/services/nostr/metadata/user_contacts.dart';
@@ -53,23 +54,16 @@ class NostrService {
   // user feed
   var userFeedObj = UserFeed();
 
+  // authors feed
+
+  var authorsFeedObj = AuthorsFeed();
+
   var userMetadataObj = UserMetadata(connectedRelaysRead: connectedRelaysRead);
 
   var userContactsObj = UserContacts(connectedRelaysRead: connectedRelaysRead);
 
-  // authors
-  var _authors = <String, List<Tweet>>{};
-  late Stream<Map<String, List<Tweet>>> authorsStream;
-  final StreamController<Map<String, List<Tweet>>> _authorsStreamController =
-      StreamController<Map<String, List<Tweet>>>.broadcast();
-
   // events, replies
   var _events = <String, List<Tweet>>{};
-
-  var _mixedPool = <String, Tweet>{};
-  late Stream<Map<String, Tweet>> mixedPoolStream;
-  final StreamController<Map<String, Tweet>> _mixedPoolStreamController =
-      StreamController<Map<String, Tweet>>.broadcast();
 
   late JsonCache jsonCache;
 
@@ -77,6 +71,9 @@ class NostrService {
 
   // blocked users
   List<String> blockedUsers = [];
+
+  Map<String, dynamic> get usersMetadata => userMetadataObj.usersMetadata;
+  Map<String, List<List<dynamic>>> get following => userContactsObj.following;
 
   NostrService() {
     isNostrServiceConnected = _isNostrServiceConnectedCompleter.future;
@@ -109,8 +106,6 @@ class NostrService {
     _loadKeyPair();
 
     // init streams
-    authorsStream = _authorsStreamController.stream;
-    mixedPoolStream = _mixedPoolStreamController.stream;
 
     // init json cache
     LocalStorageInterface prefs = await LocalStorage.getInstance();
@@ -162,9 +157,6 @@ class NostrService {
       userMetadataObj.usersMetadata = cachedUsersMetadata;
     }
   }
-
-  Map<String, dynamic> get usersMetadata => userMetadataObj.usersMetadata;
-  Map<String, List<List<dynamic>>> get following => userContactsObj.following;
 
   void _loadKeyPair() {
     // load keypair from storage
@@ -465,42 +457,7 @@ class NostrService {
     }
 
     if (event[1].contains("authors")) {
-      if (event[0] == "EOSE") {
-        return;
-      }
-      if (event[0] == "EVENT") {
-        var eventMap = event[2];
-
-        // content
-        if (eventMap["kind"] == 1) {
-          var tweet = Tweet.fromNostrEvent(eventMap);
-
-          //create key value if not exists
-          if (!_authors.containsKey(eventMap["pubkey"])) {
-            _authors[eventMap["pubkey"]] = [];
-          }
-
-          // check if tweet already exists
-          if (_authors[eventMap["pubkey"]]!
-              .any((element) => element.id == tweet.id)) {
-            return;
-          }
-
-          _authors[eventMap["pubkey"]]!.add(tweet);
-
-          // sort by timestamp
-          _authors[eventMap["pubkey"]]!
-              .sort((a, b) => b.tweetedAt.compareTo(a.tweetedAt));
-
-          //update cache
-          //todo implement cache for authors
-          //jsonCache.refresh('authors', _authors);
-
-          // sent to stream
-          _authorsStreamController.add(_authors);
-          return;
-        }
-      }
+      authorsFeedObj.receiveNostrEvent(event, socketControl);
     }
 
     if (event[1].contains("event")) {
@@ -797,19 +754,6 @@ class NostrService {
       int? since,
       int? until,
       int? limit}) {
-    // check if authors are already in _authors
-    var atLeastOneAuthorIsIn = false;
-    for (var author in authors) {
-      if (_authors.containsKey(author)) {
-        atLeastOneAuthorIsIn = true;
-        break;
-      }
-    }
-    // aka. load from cache
-    if (atLeastOneAuthorIsIn) {
-      _authorsStreamController.add(_authors);
-    }
-
     // reqId contains authors to later sort it out
     var reqId = "authors-$requestId";
 
@@ -1062,11 +1006,3 @@ class NostrService {
     return;
   }
 }
-
-/**
- * how metadata request works
- * 
- * batches of pubkeys in metadata request
- * request pool
- * mark no metadata available in cache do prevent double requests
- */
