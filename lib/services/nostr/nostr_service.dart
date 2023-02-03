@@ -3,8 +3,9 @@ import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 
-import 'package:camelus/services/nostr/global_feed.dart';
-import 'package:camelus/services/nostr/user_feed.dart';
+import 'package:camelus/services/nostr/feeds/global_feed.dart';
+import 'package:camelus/services/nostr/feeds/user_feed.dart';
+import 'package:camelus/services/nostr/metadata/user_metadata.dart';
 import 'package:crypto/crypto.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -23,18 +24,19 @@ class NostrService {
   final Completer _isNostrServiceConnectedCompleter = Completer();
   late Future isNostrServiceConnected;
 
-  Map<String, Map<String, dynamic>> relays = {};
+  static Map<String, Map<String, dynamic>> relays = {};
 
-  String ownPubkeySubscriptionId = "own-${Helpers().getRandomString(20)}";
+  static String ownPubkeySubscriptionId =
+      "own-${Helpers().getRandomString(20)}";
 
-  Map<String, SocketControl> connectedRelaysRead = {};
-  final StreamController<Map<String, SocketControl>>
+  static final StreamController<Map<String, SocketControl>>
       _connectedRelaysReadStreamController =
       StreamController<Map<String, SocketControl>>.broadcast();
   Stream<Map<String, SocketControl>> get connectedRelaysReadStream =>
       _connectedRelaysReadStreamController.stream;
 
-  Map<String, SocketControl> connectedRelaysWrite = {};
+  static Map<String, SocketControl> connectedRelaysRead = {};
+  static Map<String, SocketControl> connectedRelaysWrite = {};
 
   final Map<String, Map<String, bool>> defaultRelays = {
     "wss://nostr-pub.semisol.dev": {"write": true, "read": true},
@@ -49,6 +51,8 @@ class NostrService {
 
   // user feed
   var userFeedObj = UserFeed();
+
+  var userMetadataObj = UserMetadata(connectedRelaysRead: connectedRelaysRead);
 
   // authors
   var _authors = <String, List<Tweet>>{};
@@ -66,9 +70,6 @@ class NostrService {
 
   /// map with pubkey as identifier, second list [0] is p, [1] is pubkey, [2] is the relay url
   var following = <String, List<List>>{};
-
-  // metadata
-  Map<String, dynamic> usersMetadata = {};
 
   late JsonCache jsonCache;
 
@@ -157,7 +158,7 @@ class NostrService {
     final Map<String, dynamic>? cachedUsersMetadata =
         await jsonCache.value('usersMetadata');
     if (cachedUsersMetadata != null) {
-      usersMetadata = cachedUsersMetadata;
+      userMetadataObj.usersMetadata = cachedUsersMetadata;
     }
   }
 
@@ -572,19 +573,7 @@ class NostrService {
 
     /// global metadata
     if (eventMap["kind"] == 0) {
-      // unsubscribe from user metadata
-
-      var pubkey = eventMap["pubkey"];
-
-      usersMetadata[pubkey] = jsonDecode(eventMap["content"]);
-
-      // add access time
-      int now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
-
-      usersMetadata[pubkey]["accessTime"] = now;
-
-      //update cache
-      jsonCache.refresh('usersMetadata', usersMetadata);
+      userMetadataObj.receiveNostrEvent(event, socketControl);
     }
 
     /// global following / contacts
@@ -653,9 +642,6 @@ class NostrService {
             });
           }
         }
-
-        //update cache
-        jsonCache.refresh('usersMetadata', usersMetadata);
 
         // send close request
         var req = ["CLOSE", event[1]];
@@ -844,27 +830,6 @@ class NostrService {
     }
   }
 
-  void _requestMetadata(List<String> users, requestId, Completer? completer) {
-    var data = [
-      "REQ",
-      requestId,
-      {
-        "authors": users,
-        "kinds": [0],
-        "limit": users.length
-      },
-    ];
-
-    var jsonString = json.encode(data);
-    for (var relay in connectedRelaysRead.entries) {
-      relay.value.socket.add(jsonString);
-      relay.value.requestInFlight[requestId] = true;
-      if (completer != null) {
-        relay.value.completers[requestId] = completer;
-      }
-    }
-  }
-
   void _requestContacts(
       List<String> users, requestId, Completer? completer) async {
     var data = [
@@ -996,94 +961,9 @@ class NostrService {
     }
   }
 
-  List<String> metadataWaitingPool = [];
-  late Timer metadataWaitingPoolTimer;
-  var metadataWaitingPoolTimerRunning = false;
-  Map<String, Completer<Map>> metadataFutureHolder = {};
-
   /// get user metadata from cache and if not available request it from network
   Future<Map> getUserMetadata(String pubkey) async {
-    if (pubkey.isEmpty) {
-      return Future(() => {});
-    }
-
-    // return from cache
-    if (usersMetadata.containsKey(pubkey)) {
-      return Future(() => usersMetadata[pubkey]);
-    }
-
-    // check if pubkey is already in waiting pool
-    if (!(metadataWaitingPool.contains(pubkey))) {
-      metadataWaitingPool.add(pubkey);
-    }
-
-    Completer<Map> metadataResult = Completer();
-
-    // if pool is full submit request
-    if (metadataWaitingPool.length >= 50) {
-      metadataWaitingPoolTimer.cancel();
-      metadataWaitingPoolTimerRunning = false;
-
-      // submit request
-      metadataResult.complete(_prepareMetadataRequest());
-    } else if (!metadataWaitingPoolTimerRunning) {
-      metadataWaitingPoolTimerRunning = true;
-      metadataWaitingPoolTimer = Timer(const Duration(milliseconds: 200), () {
-        metadataWaitingPoolTimerRunning = false;
-        metadataWaitingPoolTimer.cancel();
-
-        // submit request
-        metadataResult.complete(_prepareMetadataRequest());
-      });
-    } else {
-      // cancel previous timer
-      metadataWaitingPoolTimer.cancel();
-      // start timer again
-      metadataWaitingPoolTimerRunning = true;
-      metadataWaitingPoolTimer = Timer(const Duration(milliseconds: 200), () {
-        metadataWaitingPoolTimerRunning = false;
-
-        // submit request
-        metadataResult.complete(_prepareMetadataRequest());
-      });
-    }
-
-    // don't add to future holder if already in there (double requests from future builder)
-    if (metadataFutureHolder[pubkey] == null) {
-      metadataFutureHolder[pubkey] = Completer<Map>();
-    }
-
-    metadataResult.future.then((value) => {
-          for (var key in metadataFutureHolder.keys)
-            {
-              metadataFutureHolder[key]!.complete(value[key] ?? {}),
-              // remove
-            },
-          metadataFutureHolder = {},
-        });
-
-    return metadataFutureHolder[pubkey]!.future;
-  }
-
-  /// prepare metadata request
-  Future<Map> _prepareMetadataRequest() async {
-    // gets notified when first or last (on no data) request is received
-    Completer completer = Completer();
-
-    var requestId = "metadata-${Helpers().getRandomString(4)}";
-
-    List<String> poolCopy = [...metadataWaitingPool];
-
-    _requestMetadata(poolCopy, requestId, completer);
-
-    // free pool
-    metadataWaitingPool = [];
-
-    return completer.future.then((value) async {
-      // wait 300ms for the contacts to be received
-      await Future.delayed(const Duration(milliseconds: 300));
-      return usersMetadata;
-    });
+    return userMetadataObj.getMetadataByPubkey(pubkey);
   }
 
   List<String> contactsWaitingPool = [];

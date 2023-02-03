@@ -5,7 +5,7 @@ import 'package:camelus/models/socket_control.dart';
 import 'package:cross_local_storage/cross_local_storage.dart';
 import 'package:json_cache/json_cache.dart';
 
-import '../../models/tweet.dart';
+import '../../../models/tweet.dart';
 
 class UserFeed {
   var feed = <Tweet>[];
