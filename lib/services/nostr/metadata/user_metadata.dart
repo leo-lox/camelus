@@ -133,7 +133,7 @@ class UserMetadata {
   }
 
   receiveNostrEvent(event, SocketControl socketControl) {
-    var eventMap = jsonDecode(event);
+    var eventMap = event[2];
 
     var pubkey = eventMap["pubkey"];
 

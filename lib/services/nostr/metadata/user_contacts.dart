@@ -9,7 +9,7 @@ import 'package:json_cache/json_cache.dart';
 
 class UserContacts {
   Map<String, SocketControl> connectedRelaysRead = {};
-  Map<String, Map<String, dynamic>> relays = {};
+  late Map<String, Map<String, dynamic>> relays = {};
   late String ownPubkey;
 
   /// map with pubkey as identifier, second list [0] is p, [1] is pubkey, [2] is the relay url
@@ -22,10 +22,7 @@ class UserContacts {
   var _contactsWaitingPoolTimerRunning = false;
   Map<String, Completer<List<List>>> _contactsFutureHolder = {};
 
-  UserContacts(
-      {required this.connectedRelaysRead,
-      required relays,
-      required ownPubkey}) {
+  UserContacts({required this.connectedRelaysRead}) {
     _init();
   }
 
@@ -137,7 +134,7 @@ class UserContacts {
   }
 
   receiveNostrEvent(event, SocketControl socketControl) {
-    var eventMap = jsonDecode(event);
+    var eventMap = event[2];
 
     var pubkey = eventMap["pubkey"];
 

@@ -25,7 +25,7 @@ class NostrService {
   final Completer _isNostrServiceConnectedCompleter = Completer();
   late Future isNostrServiceConnected;
 
-  static Map<String, Map<String, dynamic>> relays = {};
+  Map<String, Map<String, dynamic>> relays = {};
 
   static String ownPubkeySubscriptionId =
       "own-${Helpers().getRandomString(20)}";
@@ -37,7 +37,7 @@ class NostrService {
       _connectedRelaysReadStreamController.stream;
 
   static Map<String, SocketControl> connectedRelaysRead = {};
-  static Map<String, SocketControl> connectedRelaysWrite = {};
+  Map<String, SocketControl> connectedRelaysWrite = {};
 
   final Map<String, Map<String, bool>> defaultRelays = {
     "wss://nostr-pub.semisol.dev": {"write": true, "read": true},
@@ -55,10 +55,7 @@ class NostrService {
 
   var userMetadataObj = UserMetadata(connectedRelaysRead: connectedRelaysRead);
 
-  var userContactsObj = UserContacts(
-      connectedRelaysRead: connectedRelaysRead,
-      relays: relays,
-      ownPubkey: myKeys.publicKey);
+  var userContactsObj = UserContacts(connectedRelaysRead: connectedRelaysRead);
 
   // authors
   var _authors = <String, List<Tweet>>{};
@@ -76,7 +73,7 @@ class NostrService {
 
   late JsonCache jsonCache;
 
-  static late KeyPair myKeys;
+  late KeyPair myKeys;
 
   // blocked users
   List<String> blockedUsers = [];
@@ -128,6 +125,7 @@ class NostrService {
         relays = defaultRelays;
       }
     }
+    userContactsObj.relays = relays;
 
     // restore following
     var followingCache = (await jsonCache.value('following'));
@@ -165,6 +163,9 @@ class NostrService {
     }
   }
 
+  Map<String, dynamic> get usersMetadata => userMetadataObj.usersMetadata;
+  Map<String, List<List<dynamic>>> get following => userContactsObj.following;
+
   void _loadKeyPair() {
     // load keypair from storage
     FlutterSecureStorage storage = const FlutterSecureStorage();
@@ -175,6 +176,7 @@ class NostrService {
 
       // to obj
       myKeys = KeyPair.fromJson(json.decode(nostrKeysString));
+      userContactsObj.ownPubkey = myKeys.publicKey;
     });
   }
 
