@@ -5,6 +5,7 @@ import 'dart:io';
 
 import 'package:camelus/services/nostr/feeds/global_feed.dart';
 import 'package:camelus/services/nostr/feeds/user_feed.dart';
+import 'package:camelus/services/nostr/metadata/user_contacts.dart';
 import 'package:camelus/services/nostr/metadata/user_metadata.dart';
 import 'package:crypto/crypto.dart';
 import 'package:flutter/services.dart';
@@ -54,6 +55,11 @@ class NostrService {
 
   var userMetadataObj = UserMetadata(connectedRelaysRead: connectedRelaysRead);
 
+  var userContactsObj = UserContacts(
+      connectedRelaysRead: connectedRelaysRead,
+      relays: relays,
+      ownPubkey: myKeys.publicKey);
+
   // authors
   var _authors = <String, List<Tweet>>{};
   late Stream<Map<String, List<Tweet>>> authorsStream;
@@ -68,12 +74,9 @@ class NostrService {
   final StreamController<Map<String, Tweet>> _mixedPoolStreamController =
       StreamController<Map<String, Tweet>>.broadcast();
 
-  /// map with pubkey as identifier, second list [0] is p, [1] is pubkey, [2] is the relay url
-  var following = <String, List<List>>{};
-
   late JsonCache jsonCache;
 
-  late KeyPair myKeys;
+  static late KeyPair myKeys;
 
   // blocked users
   List<String> blockedUsers = [];
@@ -131,10 +134,10 @@ class NostrService {
     if (followingCache != null) {
       // cast using for loop to avoid type error
       for (var key in followingCache.keys) {
-        following[key] = [];
+        userContactsObj.following[key] = [];
         var value = followingCache[key];
         for (List parentList in value) {
-          following[key]!.add(parentList);
+          userContactsObj.following[key]!.add(parentList);
         }
       }
     }
@@ -578,48 +581,7 @@ class NostrService {
 
     /// global following / contacts
     if (eventMap["kind"] == 3) {
-      var pubkey = eventMap["pubkey"];
-
-      // cast with for loop
-      List<List<dynamic>> tags = [];
-      for (List t in eventMap["tags"]) {
-        tags.add(t as List<dynamic>);
-      }
-
-      // cast to list of lists
-      following[pubkey] = tags;
-      //following[pubkey] = tags as List<List>;
-
-      //update cache
-      jsonCache.refresh('following', following);
-
-      // callback
-      if (socketControl.completers.containsKey(event[1])) {
-        if (!socketControl.completers[event[1]]!.isCompleted) {
-          socketControl.completers[event[1]]!.complete();
-        }
-      }
-
-      if (pubkey == myKeys.publicKey) {
-        // update my following
-        following[pubkey] = tags;
-
-        try {
-          Map cast = json.decode(eventMap["content"]);
-          // cast every entry to Map<String, dynamic>>
-          Map<String, Map<String, dynamic>> casted = cast.map(
-              (key, value) => MapEntry(key, value as Map<String, dynamic>));
-
-          log("GOT RELAYS: $casted");
-
-          // update relays
-          relays = casted;
-          //update cache
-          jsonCache.refresh('relays', relays);
-        } catch (e) {
-          log("error: $e");
-        }
-      }
+      userContactsObj.receiveNostrEvent(event, socketControl);
     }
 
     // global EOSE
@@ -664,9 +626,6 @@ class NostrService {
             }
           }
         }
-
-        //update cache
-        jsonCache.refresh('following', following);
 
         // send close request
         var req = ["CLOSE", event[1]];
@@ -830,28 +789,6 @@ class NostrService {
     }
   }
 
-  void _requestContacts(
-      List<String> users, requestId, Completer? completer) async {
-    var data = [
-      "REQ",
-      requestId,
-      {
-        "authors": users,
-        "kinds": [3],
-        "limit": users.length
-      },
-    ];
-    var jsonString = json.encode(data);
-
-    for (var relay in connectedRelaysRead.entries) {
-      relay.value.socket.add(jsonString);
-      relay.value.requestInFlight[requestId] = true;
-      if (completer != null) {
-        relay.value.completers[requestId] = completer;
-      }
-    }
-  }
-
   void requestAuthors(
       {required List<String> authors,
       required String requestId,
@@ -966,92 +903,10 @@ class NostrService {
     return userMetadataObj.getMetadataByPubkey(pubkey);
   }
 
-  List<String> contactsWaitingPool = [];
-  late Timer contactsWaitingPoolTimer;
-  var contactsWaitingPoolTimerRunning = false;
-  Map<String, Completer<List<List>>> contactsFutureHolder = {};
-
   /// get user metadata from cache and if not available request it from network
   Future<List<List<dynamic>>> getUserContacts(String pubkey,
       {bool force = false}) async {
-    // return from cache
-    if (following.containsKey(pubkey) && !force) {
-      return Future(() => following[pubkey]!);
-    }
-
-    Completer<Map> result = Completer();
-
-    // check if pubkey is already in waiting pool
-    if (!contactsWaitingPool.contains(pubkey)) {
-      contactsWaitingPool.add(pubkey);
-    }
-
-    // if pool is full submit request
-    if (contactsWaitingPool.length >= 10) {
-      contactsWaitingPoolTimer.cancel();
-      contactsWaitingPoolTimerRunning = false;
-
-      // submit request
-      result.complete(_prepareContactsRequest(pubkey));
-    } else if (!contactsWaitingPoolTimerRunning) {
-      contactsWaitingPoolTimerRunning = true;
-      contactsWaitingPoolTimer = Timer(const Duration(milliseconds: 500), () {
-        contactsWaitingPoolTimerRunning = false;
-        // submit request
-        result.complete(_prepareContactsRequest(pubkey));
-      });
-    } else {
-      // cancel previous timer
-      contactsWaitingPoolTimer.cancel();
-      // start timer again
-      contactsWaitingPoolTimerRunning = true;
-      contactsWaitingPoolTimer = Timer(const Duration(milliseconds: 500), () {
-        contactsWaitingPoolTimerRunning = false;
-
-        // submit request
-        result.complete(_prepareContactsRequest(pubkey));
-      });
-    }
-    if (contactsFutureHolder[pubkey] == null) {
-      contactsFutureHolder[pubkey] = Completer<List<List>>();
-    }
-    result.future.then((value) => {
-          for (var key in contactsFutureHolder.keys)
-            {
-              if (!contactsFutureHolder[key]!.isCompleted)
-                {
-                  contactsFutureHolder[key]!.complete(value[key] ?? []),
-                }
-            },
-          contactsFutureHolder = {}
-        });
-
-    return contactsFutureHolder[pubkey]!.future;
-  }
-
-  Future<Map<String, List>> _prepareContactsRequest(String pubkey) {
-    // gets notified when first or last (on no data) request is received
-    Completer completer = Completer();
-
-    var requestId = "contacts-${Helpers().getRandomString(4)}";
-
-    List<String> poolCopy = [...contactsWaitingPool];
-
-    _requestContacts(poolCopy, requestId, completer);
-
-    // free pool
-    contactsWaitingPool = [];
-
-    return completer.future.then((value) {
-      if (following.containsKey(pubkey)) {
-        log("contacts callback ${following[pubkey]!.length}");
-        // wait 300ms for the contacts to be received
-        return Future.delayed(const Duration(milliseconds: 300), () {
-          return Future(() => following);
-        });
-      }
-      return Future(() => {});
-    });
+    return userContactsObj.getContactsByPubkey(pubkey, force: force);
   }
 
   /// returns [nip5 identifier, true] if valid or [null, null] if not found

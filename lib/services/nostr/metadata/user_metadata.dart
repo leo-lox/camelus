@@ -133,7 +133,6 @@ class UserMetadata {
   }
 
   receiveNostrEvent(event, SocketControl socketControl) {
-    // unsubscribe from user metadata
     var eventMap = jsonDecode(event);
 
     var pubkey = eventMap["pubkey"];
