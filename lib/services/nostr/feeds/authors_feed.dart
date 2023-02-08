@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:camelus/models/socket_control.dart';
 import 'package:cross_local_storage/cross_local_storage.dart';
 import 'package:json_cache/json_cache.dart';
@@ -12,7 +13,9 @@ class AuthorsFeed {
   final StreamController<Map<String, List<Tweet>>> _authorsStreamController =
       StreamController<Map<String, List<Tweet>>>.broadcast();
 
-  AuthorsFeed() {
+  Map<String, SocketControl> connectedRelaysRead;
+
+  AuthorsFeed({required this.connectedRelaysRead}) {
     authorsStream = _authorsStreamController.stream;
     _init();
   }
@@ -58,6 +61,40 @@ class AuthorsFeed {
         _authorsStreamController.add(authors);
         return;
       }
+    }
+  }
+
+  void requestAuthors(
+      {required List<String> authors,
+      required String requestId,
+      int? since,
+      int? until,
+      int? limit}) {
+    // reqId contains authors to later sort it out
+    var reqId = "authors-$requestId";
+
+    Map<String, dynamic> body = {
+      "authors": authors,
+      "kinds": [1],
+    };
+    if (limit != null) {
+      body["limit"] = limit;
+    }
+    if (since != null) {
+      body["since"] = since;
+    }
+    if (until != null) {
+      body["until"] = until;
+    }
+    var data = [
+      "REQ",
+      reqId,
+      body,
+    ];
+
+    var jsonString = json.encode(data);
+    for (var relay in connectedRelaysRead.entries) {
+      relay.value.socket.add(jsonString);
     }
   }
 }

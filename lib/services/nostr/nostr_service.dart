@@ -49,14 +49,13 @@ class NostrService {
   var counterOwnSubscriptionsHits = 0;
 
   // global feed
-  var globalFeedObj = GlobalFeed();
+  var globalFeedObj = GlobalFeed(connectedRelaysRead: connectedRelaysRead);
 
   // user feed
-  var userFeedObj = UserFeed();
+  var userFeedObj = UserFeed(connectedRelaysRead: connectedRelaysRead);
 
   // authors feed
-
-  var authorsFeedObj = AuthorsFeed();
+  var authorsFeedObj = AuthorsFeed(connectedRelaysRead: connectedRelaysRead);
 
   var userMetadataObj = UserMetadata(connectedRelaysRead: connectedRelaysRead);
 
@@ -649,28 +648,8 @@ class NostrService {
     int? until,
     int? limit,
   }) {
-    // global feed ["REQ","globalFeed 0739",{"since":1672483074,"kinds":[1,2],"limit":5}]
-
-    var reqId = "gfeed-$requestId";
-    int now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
-
-    var body = {
-      "kinds": [1, 2],
-      "limit": limit ?? 5,
-    };
-    if (since != null) {
-      body["since"] = since;
-    }
-    if (until != null) {
-      body["until"] = until;
-    }
-
-    var data = ["REQ", reqId, body];
-
-    var jsonString = json.encode(data);
-    for (var relay in connectedRelaysRead.entries) {
-      relay.value.socket.add(jsonString);
-    }
+    globalFeedObj.requestGlobalFeed(
+        requestId: requestId, since: since, until: until, limit: limit);
   }
 
   void requestUserFeed(
@@ -680,45 +659,13 @@ class NostrService {
       int? until,
       int? limit,
       bool? includeComments}) {
-    var reqId = "ufeed-$requestId";
-    const defaultLimit = 5;
-
-    var body1 = {
-      "authors": users,
-      "kinds": [1],
-      "limit": limit ?? defaultLimit,
-    };
-
-    // used to fetch comments on the posts
-    var body2 = {
-      "#p": users,
-      "kinds": [1],
-      "limit": limit ?? defaultLimit,
-    };
-    if (since != null) {
-      body1["since"] = since;
-      body2["since"] = since;
-    }
-    if (until != null) {
-      body1["until"] = until;
-      body2["until"] = until;
-    }
-
-    var data = [
-      "REQ",
-      reqId,
-      body1,
-      //todo: add body2
-    ];
-    if (includeComments == true) {
-      data.add(body2);
-    }
-
-    var jsonString = json.encode(data);
-    for (var relay in connectedRelaysRead.entries) {
-      relay.value.socket.add(jsonString);
-      relay.value.requestInFlight[reqId] = true;
-    }
+    userFeedObj.requestUserFeed(
+        users: users,
+        requestId: requestId,
+        since: since,
+        until: until,
+        limit: limit,
+        includeComments: includeComments);
   }
 
   void requestAuthors(
@@ -727,32 +674,12 @@ class NostrService {
       int? since,
       int? until,
       int? limit}) {
-    // reqId contains authors to later sort it out
-    var reqId = "authors-$requestId";
-
-    Map<String, dynamic> body = {
-      "authors": authors,
-      "kinds": [1],
-    };
-    if (limit != null) {
-      body["limit"] = limit;
-    }
-    if (since != null) {
-      body["since"] = since;
-    }
-    if (until != null) {
-      body["until"] = until;
-    }
-    var data = [
-      "REQ",
-      reqId,
-      body,
-    ];
-
-    var jsonString = json.encode(data);
-    for (var relay in connectedRelaysRead.entries) {
-      relay.value.socket.add(jsonString);
-    }
+    authorsFeedObj.requestAuthors(
+        authors: authors,
+        requestId: requestId,
+        since: since,
+        until: until,
+        limit: limit);
   }
 
   // eventId for the nostr event, requestId to track the request

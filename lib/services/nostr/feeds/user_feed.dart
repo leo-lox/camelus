@@ -19,7 +19,9 @@ class UserFeed {
   final StreamController<List<Tweet>> _userFeedStreamControllerReplies =
       StreamController<List<Tweet>>.broadcast();
 
-  UserFeed() {
+  Map<String, SocketControl> connectedRelaysRead;
+
+  UserFeed({required this.connectedRelaysRead}) {
     userFeedStream = _userFeedStreamController.stream;
     userFeedStreamReplies = _userFeedStreamControllerReplies.stream;
     _init();
@@ -135,5 +137,53 @@ class UserFeed {
       }
     }
     return;
+  }
+
+  void requestUserFeed(
+      {required List<String> users,
+      required String requestId,
+      int? since,
+      int? until,
+      int? limit,
+      bool? includeComments}) {
+    var reqId = "ufeed-$requestId";
+    const defaultLimit = 5;
+
+    var body1 = {
+      "authors": users,
+      "kinds": [1],
+      "limit": limit ?? defaultLimit,
+    };
+
+    // used to fetch comments on the posts
+    var body2 = {
+      "#p": users,
+      "kinds": [1],
+      "limit": limit ?? defaultLimit,
+    };
+    if (since != null) {
+      body1["since"] = since;
+      body2["since"] = since;
+    }
+    if (until != null) {
+      body1["until"] = until;
+      body2["until"] = until;
+    }
+
+    var data = [
+      "REQ",
+      reqId,
+      body1,
+      //todo: add body2
+    ];
+    if (includeComments == true) {
+      data.add(body2);
+    }
+
+    var jsonString = json.encode(data);
+    for (var relay in connectedRelaysRead.entries) {
+      relay.value.socket.add(jsonString);
+      relay.value.requestInFlight[reqId] = true;
+    }
   }
 }

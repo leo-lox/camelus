@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:camelus/models/socket_control.dart';
 import 'package:cross_local_storage/cross_local_storage.dart';
@@ -14,7 +15,9 @@ class GlobalFeed {
   final StreamController<List<Tweet>> _globalFeedStreamController =
       StreamController<List<Tweet>>.broadcast();
 
-  GlobalFeed() {
+  Map<String, SocketControl> connectedRelaysRead;
+
+  GlobalFeed({required this.connectedRelaysRead}) {
     globalFeedStream = _globalFeedStreamController.stream;
     _init();
   }
@@ -79,6 +82,36 @@ class GlobalFeed {
         //log("nostr_service: new tweet added to global feed");
         _globalFeedStreamController.add(feed);
       }
+    }
+  }
+
+  void requestGlobalFeed({
+    required String requestId,
+    int? since,
+    int? until,
+    int? limit,
+  }) {
+    // global feed ["REQ","globalFeed 0739",{"since":1672483074,"kinds":[1,2],"limit":5}]
+
+    var reqId = "gfeed-$requestId";
+    int now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
+
+    var body = {
+      "kinds": [1, 2],
+      "limit": limit ?? 5,
+    };
+    if (since != null) {
+      body["since"] = since;
+    }
+    if (until != null) {
+      body["until"] = until;
+    }
+
+    var data = ["REQ", reqId, body];
+
+    var jsonString = json.encode(data);
+    for (var relay in connectedRelaysRead.entries) {
+      relay.value.socket.add(jsonString);
     }
   }
 }
