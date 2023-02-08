@@ -508,12 +508,6 @@ class NostrService {
 
         //todo update cache
 
-        // is last relay
-        var isLast =
-            _isLastIncomingEvent(event[1], socketControl, connectedRelaysRead);
-
-        log("########### is last: $isLast");
-
         return;
       }
     }
@@ -548,8 +542,6 @@ class NostrService {
       var now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
 
       if (socketControl.requestInFlight[event[1]] != null) {
-        // if _isLastIncomingEvent(event[1], socketControl, connectedRelaysRead)
-
         var requestsLeft =
             _howManyRequestsLeft(event[1], socketControl, connectedRelaysRead);
         if (requestsLeft < 2) {
@@ -576,13 +568,10 @@ class NostrService {
 
       // contacts
       if (socketControl.requestInFlight[event[1]] != null) {
-        if (_isLastIncomingEvent(
-            event[1], socketControl, connectedRelaysRead)) {
-          // callback
-          if (socketControl.completers.containsKey(event[1])) {
-            if (!socketControl.completers[event[1]]!.isCompleted) {
-              socketControl.completers[event[1]]!.complete();
-            }
+        // callback
+        if (socketControl.completers.containsKey(event[1])) {
+          if (!socketControl.completers[event[1]]!.isCompleted) {
+            socketControl.completers[event[1]]!.complete();
           }
         }
 
@@ -638,22 +627,6 @@ class NostrService {
       }
       relay.value.socket.add(reqJson);
     }
-  }
-
-  // returns true if this is the last incoming event for this request
-  _isLastIncomingEvent(String requestId, SocketControl currentSocket,
-      Map<String, SocketControl> pool) {
-    for (var socket in pool.entries) {
-      if (socket.value.requestInFlight.containsKey(requestId)) {
-        if (socket.value.id == currentSocket.id) {
-          continue;
-        }
-
-        return false;
-      }
-    }
-    log("is last incoming event for $requestId");
-    return true;
   }
 
   _howManyRequestsLeft(String requestId, SocketControl currentSocket,
