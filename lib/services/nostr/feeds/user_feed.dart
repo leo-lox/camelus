@@ -2,10 +2,9 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:camelus/models/socket_control.dart';
+import 'package:camelus/models/tweet.dart';
 import 'package:cross_local_storage/cross_local_storage.dart';
 import 'package:json_cache/json_cache.dart';
-
-import '../../../models/tweet.dart';
 
 class UserFeed {
   var feed = <Tweet>[];
