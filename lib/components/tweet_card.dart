@@ -276,54 +276,59 @@ class _TweetCardState extends State<TweetCard> {
                                   style: TextStyle(
                                       fontSize: 16, color: Palette.gray)),
                               const SizedBox(width: 5),
-                              FutureBuilder(
-                                future: widget._nostrService.getUserMetadata(
-                                    Helpers().getPubkeysFromTags(
-                                            widget.tweet.tags)[
-                                        0]), // todo fix this for multiple tags
-                                builder: (BuildContext context,
-                                    AsyncSnapshot<Map> snapshot) {
-                                  var name = "";
-                                  if (snapshot.hasData) {
-                                    name = snapshot.data?["name"] ?? "";
-                                    // only calculate when necessary
-                                    if (name.isEmpty) {
-                                      var pubkey = Helpers().getPubkeysFromTags(
-                                          widget.tweet.tags)[0];
-                                      var pubkeyHr = Helpers()
-                                          .encodeBech32(pubkey, "npub");
-                                      var pubkeyHrShort = pubkeyHr.substring(
-                                              0, 5) +
-                                          "..." +
-                                          pubkeyHr
-                                              .substring(pubkeyHr.length - 5);
-                                      name = pubkeyHrShort;
+                              if (Helpers()
+                                  .getPubkeysFromTags(widget.tweet.tags)
+                                  .isNotEmpty) //todo this is a hotfix to not break the feed
+                                FutureBuilder(
+                                  future: widget._nostrService.getUserMetadata(
+                                      Helpers().getPubkeysFromTags(
+                                              widget.tweet.tags)[
+                                          0]), // todo fix this for multiple tags
+                                  builder: (BuildContext context,
+                                      AsyncSnapshot<Map> snapshot) {
+                                    var name = "";
+                                    if (snapshot.hasData) {
+                                      name = snapshot.data?["name"] ?? "";
+                                      // only calculate when necessary
+                                      if (name.isEmpty) {
+                                        var pubkey = Helpers()
+                                            .getPubkeysFromTags(
+                                                widget.tweet.tags)[0];
+                                        var pubkeyHr = Helpers()
+                                            .encodeBech32(pubkey, "npub");
+                                        var pubkeyHrShort = pubkeyHr.substring(
+                                                0, 5) +
+                                            "..." +
+                                            pubkeyHr
+                                                .substring(pubkeyHr.length - 5);
+                                        name = pubkeyHrShort;
+                                      }
+                                    } else if (snapshot.hasError) {
+                                      name = "error";
+                                    } else {
+                                      // loading
+                                      name = "...";
                                     }
-                                  } else if (snapshot.hasError) {
-                                    name = "error";
-                                  } else {
-                                    // loading
-                                    name = "...";
-                                  }
-                                  return GestureDetector(
-                                    onTap: () {
-                                      Navigator.popAndPushNamed(
-                                          context, "/nostr/event",
-                                          arguments: Helpers()
-                                                  .getEventsFromTags(
-                                                      widget.tweet.tags)[
-                                              0]); // todo fix this for multiple tags
-                                    },
-                                    child: Text(
-                                      name,
-                                      style: const TextStyle(
-                                          fontSize: 18,
-                                          color: Palette.lightGray,
-                                          decoration: TextDecoration.underline),
-                                    ),
-                                  );
-                                },
-                              ),
+                                    return GestureDetector(
+                                      onTap: () {
+                                        Navigator.popAndPushNamed(
+                                            context, "/nostr/event",
+                                            arguments: Helpers()
+                                                    .getEventsFromTags(
+                                                        widget.tweet.tags)[
+                                                0]); // todo fix this for multiple tags
+                                      },
+                                      child: Text(
+                                        name,
+                                        style: const TextStyle(
+                                            fontSize: 18,
+                                            color: Palette.lightGray,
+                                            decoration:
+                                                TextDecoration.underline),
+                                      ),
+                                    );
+                                  },
+                                ),
                               if (Helpers()
                                       .getEventsFromTags(widget.tweet.tags)
                                       .length >
