@@ -4,13 +4,17 @@
 
 camelus is a nostr client written in flutter, it is in heavy development, feel free to test it but expect some issues and missing features.
 
+## What is the current mission?
+
+I want to transform camelus into a simple but usable client. If you are looking for fancy features, please look elsewhere.
+
 ## how can I test it?
 
 ### Android
 
-You can download the apk from [here](https://camelus.app/), it is signed with my key so you will need to enable "install from unknown sources" in your phone settings.
+You can join the test and download it from google play [link](https://camelus.app/)
 
-Otherwise wait for the testlink to be available.
+or use the [apk](https://camelus.app/), it is signed with my key so you will need to enable "install from unknown sources" in your phone settings.
 
 ### iOS
 
