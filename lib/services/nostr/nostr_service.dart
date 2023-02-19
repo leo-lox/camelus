@@ -9,6 +9,8 @@ import 'package:camelus/services/nostr/feeds/global_feed.dart';
 import 'package:camelus/services/nostr/feeds/user_feed.dart';
 import 'package:camelus/services/nostr/metadata/user_contacts.dart';
 import 'package:camelus/services/nostr/metadata/user_metadata.dart';
+import 'package:camelus/services/nostr/relays/relay_tracker.dart';
+import 'package:camelus/services/nostr/relays/relays.dart';
 import 'package:crypto/crypto.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -33,7 +35,8 @@ class NostrService {
   var counterOwnSubscriptionsHits = 0;
 
   // global feed
-  var globalFeedObj = GlobalFeed(connectedRelaysRead: connectedRelaysRead);
+  var globalFeedObj =
+      GlobalFeed(connectedRelaysRead: relayTracker.connectedRelaysRead);
 
   // user feed
   var userFeedObj = UserFeed(connectedRelaysRead: connectedRelaysRead);
@@ -93,7 +96,7 @@ class NostrService {
     LocalStorageInterface prefs = await LocalStorage.getInstance();
     jsonCache = JsonCacheCrossLocalStorage(prefs);
 
-    userContactsObj.relays = relays;
+    userContactsObj.relays = relayTracker;
 
     // restore following
     var followingCache = (await jsonCache.value('following'));
@@ -217,7 +220,7 @@ class NostrService {
         counterOwnSubscriptionsHits++;
 
         if (counterOwnSubscriptionsHits == connectedRelaysWrite.length) {
-          if (relays.isEmpty) {
+          if (relayTracker.isEmpty) {
             //publish default relays
 
             log("using default relays: $defaultRelays and write this to relays");
@@ -240,10 +243,10 @@ class NostrService {
         var content = Map<String, Map<String, dynamic>>.from(
             json.decode(eventMap["content"]));
 
-        relays = content;
-        log("got recommended relays: $relays");
+        relayTracker = content;
+        log("got recommended relays: $relayTracker");
         //update cache
-        jsonCache.refresh('relays', relays);
+        jsonCache.refresh('relays', relayTracker);
         //todo connect to relays if not already connected
         return;
       }

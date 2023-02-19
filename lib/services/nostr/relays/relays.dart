@@ -21,7 +21,7 @@ class Relays {
 
   Map<String, List<dynamic>> userRelayMatching = {};
 
-  static Map<String, SocketControl> connectedRelaysRead = {};
+  Map<String, SocketControl> connectedRelaysRead = {};
   Map<String, SocketControl> connectedRelaysWrite = {};
 
   static final StreamController<Map<String, SocketControl>>

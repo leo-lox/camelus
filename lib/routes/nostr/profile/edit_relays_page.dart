@@ -20,7 +20,7 @@ class EditRelaysPage extends StatefulWidget {
 
 class _EditRelaysPageState extends State<EditRelaysPage> {
   // copy of relays from nostr service
-  late var myRelays = widget._nostrService.relays;
+  late var myRelays = widget._nostrService.relayTracker;
 
   TextEditingController _relayNameController = TextEditingController();
 
@@ -94,7 +94,7 @@ class _EditRelaysPageState extends State<EditRelaysPage> {
   }
 
   _saveRelays() async {
-    widget._nostrService.relays = myRelays;
+    widget._nostrService.relayTracker = myRelays;
     // publish relays to nostr service
 
     String relaysJson = jsonEncode(myRelays);
