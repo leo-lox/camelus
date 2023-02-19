@@ -32,6 +32,8 @@ class Relays {
 
   late JsonCache jsonCache;
 
+  final Completer isNostrServiceConnectedCompleter = Completer();
+
   Relays() {
     _initCache();
     _restoreFromCache();
@@ -120,7 +122,7 @@ class Relays {
     }
     log("connected relays: ${connectedRelaysRead.length} => all connected");
     try {
-      _isNostrServiceConnectedCompleter.complete(true);
+      isNostrServiceConnectedCompleter.complete(true);
     } catch (e) {
       log("e");
     }
@@ -198,7 +200,7 @@ class Relays {
     }
   }
 
-  _checkRelaysForConnection() async {
+  checkRelaysForConnection() async {
     if (connectedRelaysRead.isEmpty) {
       await connectToRelays();
     }

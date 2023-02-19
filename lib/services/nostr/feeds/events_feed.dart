@@ -4,14 +4,21 @@ import 'dart:developer';
 
 import 'package:camelus/models/socket_control.dart';
 import 'package:camelus/models/tweet.dart';
+import 'package:camelus/services/nostr/relays/relays.dart';
+import 'package:camelus/services/nostr/relays/relays_injector.dart';
 
 class EventsFeed {
-  Map<String, SocketControl> connectedRelaysRead;
+  late Relays _relays;
+  late Map<String, SocketControl> _connectedRelaysRead;
 
   // events, replies
   var _events = <String, List<Tweet>>{};
 
-  EventsFeed({required this.connectedRelaysRead}) {}
+  EventsFeed() {
+    RelaysInjector injector = RelaysInjector();
+    _relays = injector.relays;
+    _connectedRelaysRead = _relays.connectedRelaysRead;
+  }
 
   receiveNostrEvent(event, SocketControl socketControl) {
     // simply add to pool
@@ -195,7 +202,7 @@ class EventsFeed {
 
     var jsonString = json.encode(data);
 
-    for (var relay in connectedRelaysRead.entries) {
+    for (var relay in _connectedRelaysRead.entries) {
       relay.value.socket.add(jsonString);
       relay.value.requestInFlight[reqId] = true;
       relay.value.additionalData[reqId] = {"eventIds": eventIds};

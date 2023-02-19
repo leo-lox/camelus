@@ -3,6 +3,8 @@ import 'dart:convert';
 
 import 'package:camelus/helpers/helpers.dart';
 import 'package:camelus/models/socket_control.dart';
+import 'package:camelus/services/nostr/relays/relays.dart';
+import 'package:camelus/services/nostr/relays/relays_injector.dart';
 import 'package:cross_local_storage/cross_local_storage.dart';
 import 'package:json_cache/json_cache.dart';
 
@@ -17,7 +19,8 @@ import 'package:json_cache/json_cache.dart';
 class UserMetadata {
   Map<String, dynamic> usersMetadata = {};
 
-  Map<String, SocketControl> connectedRelaysRead = {};
+  late Map<String, SocketControl> _connectedRelaysRead = {};
+  late Relays _relays;
 
   late JsonCache _jsonCache;
 
@@ -26,7 +29,10 @@ class UserMetadata {
   var _metadataWaitingPoolTimerRunning = false;
   Map<String, Completer<Map>> _metadataFutureHolder = {};
 
-  UserMetadata({required this.connectedRelaysRead}) {
+  UserMetadata() {
+    RelaysInjector injector = RelaysInjector();
+    _relays = injector.relays;
+    _connectedRelaysRead = _relays.connectedRelaysRead;
     _init();
   }
 
@@ -131,7 +137,7 @@ class UserMetadata {
     ];
 
     var jsonString = json.encode(data);
-    for (var relay in connectedRelaysRead.entries) {
+    for (var relay in _connectedRelaysRead.entries) {
       relay.value.socket.add(jsonString);
       relay.value.requestInFlight[requestId] = true;
       if (completer != null) {

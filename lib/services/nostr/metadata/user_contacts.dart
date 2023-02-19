@@ -4,12 +4,14 @@ import 'dart:developer';
 
 import 'package:camelus/helpers/helpers.dart';
 import 'package:camelus/models/socket_control.dart';
+import 'package:camelus/services/nostr/relays/relays.dart';
+import 'package:camelus/services/nostr/relays/relays_injector.dart';
 import 'package:cross_local_storage/cross_local_storage.dart';
 import 'package:json_cache/json_cache.dart';
 
 class UserContacts {
-  Map<String, SocketControl> connectedRelaysRead = {};
-  late Map<String, Map<String, dynamic>> relays = {};
+  late Map<String, SocketControl> _connectedRelaysRead = {};
+  late Relays _relays;
   late String ownPubkey;
 
   /// map with pubkey as identifier, second list [0] is p, [1] is pubkey, [2] is the relay url
@@ -22,7 +24,10 @@ class UserContacts {
   var _contactsWaitingPoolTimerRunning = false;
   Map<String, Completer<List<List>>> _contactsFutureHolder = {};
 
-  UserContacts({required this.connectedRelaysRead}) {
+  UserContacts() {
+    RelaysInjector injector = RelaysInjector();
+    _relays = injector.relays;
+    _connectedRelaysRead = _relays.connectedRelaysRead;
     _init();
   }
 
@@ -124,7 +129,7 @@ class UserContacts {
     ];
     var jsonString = json.encode(data);
 
-    for (var relay in connectedRelaysRead.entries) {
+    for (var relay in _connectedRelaysRead.entries) {
       relay.value.socket.add(jsonString);
       relay.value.requestInFlight[requestId] = true;
       if (completer != null) {
@@ -168,10 +173,11 @@ class UserContacts {
         Map<String, Map<String, dynamic>> casted = cast
             .map((key, value) => MapEntry(key, value as Map<String, dynamic>));
 
+        // todo: update relays
         // update relays
-        relays = casted;
+        //relays = casted;
         //update cache
-        _jsonCache.refresh('relays', relays);
+        //_jsonCache.refresh('relays', relays);
       } catch (e) {
         log("error: $e");
       }

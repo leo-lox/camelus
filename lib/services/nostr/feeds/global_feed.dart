@@ -18,11 +18,13 @@ class GlobalFeed {
   final StreamController<List<Tweet>> _globalFeedStreamController =
       StreamController<List<Tweet>>.broadcast();
 
-  Map<String, SocketControl> connectedRelaysRead;
+  late Map<String, SocketControl> _connectedRelaysRead;
 
-  GlobalFeed({required this.connectedRelaysRead}) {
+  GlobalFeed() {
     RelaysInjector injector = RelaysInjector();
     _relays = injector.relays;
+
+    _connectedRelaysRead = _relays.connectedRelaysRead;
 
     globalFeedStream = _globalFeedStreamController.stream;
     _init();
@@ -116,7 +118,7 @@ class GlobalFeed {
     var data = ["REQ", reqId, body];
 
     var jsonString = json.encode(data);
-    for (var relay in connectedRelaysRead.entries) {
+    for (var relay in _connectedRelaysRead.entries) {
       relay.value.socket.add(jsonString);
     }
   }

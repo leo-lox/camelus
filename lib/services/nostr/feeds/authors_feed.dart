@@ -1,21 +1,28 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:camelus/models/socket_control.dart';
+import 'package:camelus/services/nostr/relays/relays.dart';
+import 'package:camelus/services/nostr/relays/relays_injector.dart';
 import 'package:cross_local_storage/cross_local_storage.dart';
 import 'package:json_cache/json_cache.dart';
 import 'package:camelus/models/tweet.dart';
 
 class AuthorsFeed {
   late JsonCache _jsonCache;
+  late Relays _relays;
 
   var authors = <String, List<Tweet>>{};
   late Stream<Map<String, List<Tweet>>> authorsStream;
   final StreamController<Map<String, List<Tweet>>> _authorsStreamController =
       StreamController<Map<String, List<Tweet>>>.broadcast();
 
-  Map<String, SocketControl> connectedRelaysRead;
+  late Map<String, SocketControl> _connectedRelaysRead;
 
-  AuthorsFeed({required this.connectedRelaysRead}) {
+  AuthorsFeed() {
+    RelaysInjector injector = RelaysInjector();
+    _relays = injector.relays;
+    _connectedRelaysRead = _relays.connectedRelaysRead;
+
     authorsStream = _authorsStreamController.stream;
     _init();
   }
@@ -93,7 +100,7 @@ class AuthorsFeed {
     ];
 
     var jsonString = json.encode(data);
-    for (var relay in connectedRelaysRead.entries) {
+    for (var relay in _connectedRelaysRead.entries) {
       relay.value.socket.add(jsonString);
     }
   }
