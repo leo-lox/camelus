@@ -555,7 +555,8 @@ class _NostrPageState extends State<NostrPage> with TickerProviderStateMixin {
                 ),
                 actions: [
                   StreamBuilder(
-                      stream: widget._nostrService.connectedRelaysReadStream,
+                      stream:
+                          widget._nostrService.relays.connectedRelaysReadStream,
                       builder: (context,
                           AsyncSnapshot<Map<String, SocketControl>> snapshot) {
                         if (!snapshot.hasData || snapshot.data!.isEmpty) {

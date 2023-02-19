@@ -51,8 +51,8 @@ class NostrService {
 
   late JsonCache jsonCache;
 
-  late Relays _relays;
-  late RelayTracker _relayTracker;
+  late Relays relays;
+  late RelayTracker relayTracker;
 
   late KeyPair myKeys;
 
@@ -64,9 +64,14 @@ class NostrService {
 
   NostrService() {
     RelaysInjector injector = RelaysInjector();
-    _relays = injector.relays;
-    _relayTracker = injector.relayTracker;
-    isNostrServiceConnected = _relays.isNostrServiceConnectedCompleter.future;
+    relays = injector.relays;
+    relayTracker = injector.relayTracker;
+    isNostrServiceConnected = relays.isNostrServiceConnectedCompleter.future;
+
+    relays.receiveEventStream.listen((e) {
+      _receiveEvent(e["event"], e["socketControl"]);
+    });
+
     _init();
   }
 
@@ -75,14 +80,14 @@ class NostrService {
       log('SystemChannels> $msg');
       switch (msg) {
         case "AppLifecycleState.resumed":
-          _relays.checkRelaysForConnection();
+          relays.checkRelaysForConnection();
           break;
         case "AppLifecycleState.inactive":
           break;
         case "AppLifecycleState.paused":
           break;
         case "AppLifecycleState.detached":
-          _relays.closeRelays();
+          relays.closeRelays();
           break;
       }
       // reconnect to relays
@@ -124,7 +129,7 @@ class NostrService {
       }
     }
 
-    _relays.connectToRelays();
+    relays.connectToRelays();
 
     userFeedObj.restoreFromCache();
     globalFeedObj.restoreFromCache();
@@ -154,7 +159,7 @@ class NostrService {
   finishedOnboarding() async {
     _loadKeyPair();
 
-    await _relays.connectToRelays(useDefault: true);
+    await relays.connectToRelays(useDefault: true);
 
     // subscribe to own pubkey
 
@@ -169,7 +174,7 @@ class NostrService {
 
     var jsonString = json.encode(data);
 
-    for (var relay in _relays.connectedRelaysRead.entries) {
+    for (var relay in relays.connectedRelaysRead.entries) {
       relay.value.socket.add(jsonString);
     }
   }
@@ -222,8 +227,7 @@ class NostrService {
         // check if this is for all relays
         counterOwnSubscriptionsHits++;
 
-        if (counterOwnSubscriptionsHits ==
-            _relays.connectedRelaysWrite.length) {
+        if (counterOwnSubscriptionsHits == relays.connectedRelaysWrite.length) {
           //if (relayTracker.isEmpty) {
           //  //publish default relays
 
@@ -287,7 +291,7 @@ class NostrService {
 
       if (socketControl.requestInFlight[event[1]] != null) {
         var requestsLeft = _howManyRequestsLeft(
-            event[1], socketControl, _relays.connectedRelaysRead);
+            event[1], socketControl, relays.connectedRelaysRead);
         if (requestsLeft < 2) {
           // callback
           if (socketControl.completers.containsKey(event[1])) {
@@ -364,7 +368,7 @@ class NostrService {
     log("write event: $req");
 
     var reqJson = jsonEncode(req);
-    for (var relay in _relays.connectedRelaysWrite.entries) {
+    for (var relay in relays.connectedRelaysWrite.entries) {
       if (!(relay.value.socketIsRdy)) {
         log("socket not ready");
         continue;
@@ -452,7 +456,7 @@ class NostrService {
     ];
 
     var jsonString = json.encode(data);
-    for (var relay in _relays.connectedRelaysRead.entries) {
+    for (var relay in relays.connectedRelaysRead.entries) {
       relay.value.socket.add(jsonString);
       relay.value.requestInFlight[subId] = true;
       //todo add stream

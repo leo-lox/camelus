@@ -20,7 +20,7 @@ class EditRelaysPage extends StatefulWidget {
 
 class _EditRelaysPageState extends State<EditRelaysPage> {
   // copy of relays from nostr service
-  late var myRelays = widget._nostrService.relayTracker;
+  late var myRelays = widget._nostrService.relayTracker.tracker;
 
   TextEditingController _relayNameController = TextEditingController();
 
@@ -94,7 +94,7 @@ class _EditRelaysPageState extends State<EditRelaysPage> {
   }
 
   _saveRelays() async {
-    widget._nostrService.relayTracker = myRelays;
+    widget._nostrService.relayTracker.tracker = myRelays;
     // publish relays to nostr service
 
     String relaysJson = jsonEncode(myRelays);
@@ -107,8 +107,8 @@ class _EditRelaysPageState extends State<EditRelaysPage> {
   }
 
   Future<void> _reconnect() async {
-    await widget._nostrService.closeRelays();
-    await widget._nostrService.connectToRelays();
+    await widget._nostrService.relays.closeRelays();
+    await widget._nostrService.relays.connectToRelays();
     return;
   }
 

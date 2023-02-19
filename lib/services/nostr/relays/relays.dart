@@ -34,6 +34,13 @@ class Relays {
 
   final Completer isNostrServiceConnectedCompleter = Completer();
 
+  // stream for receiving events from relays
+  static final StreamController<Map<String, dynamic>>
+      _receiveEventStreamController =
+      StreamController<Map<String, dynamic>>.broadcast();
+  Stream<Map<String, dynamic>> get receiveEventStream =>
+      _receiveEventStreamController.stream;
+
   Relays() {
     _initCache();
     _restoreFromCache();
@@ -78,10 +85,10 @@ class Relays {
 
                   value.listen((event) {
                     var eventJson = json.decode(event);
-                    _receiveEvent(
-                      eventJson,
-                      socketControl,
-                    );
+                    _receiveEventStreamController.add({
+                      "event": eventJson,
+                      "socketControl": socketControl,
+                    });
                   }, onDone: () {
                     // on disconnect
                     connectedRelaysRead[id]!.socketIsRdy = false;
@@ -150,10 +157,10 @@ class Relays {
       socketControl.socketFailingAttempts = 0;
       socket.listen((event) {
         var eventJson = json.decode(event);
-        _receiveEvent(
-          eventJson,
-          socketControl,
-        );
+        _receiveEventStreamController.add({
+          "event": eventJson,
+          "socketControl": socketControl,
+        });
       }, onDone: () {
         // on disconnect
         connectedRelaysRead[id]!.socketIsRdy = false;

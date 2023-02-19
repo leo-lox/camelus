@@ -681,7 +681,7 @@ class _ProfilePageState extends State<ProfilePage>
                               if (widget.pubkey ==
                                   widget._nostrService.myKeys.publicKey)
                                 Text(
-                                  "${widget._nostrService.relayTracker.length} relays",
+                                  "${widget._nostrService.relayTracker.tracker.length} relays",
                                   style: const TextStyle(
                                     color: Palette.white,
                                     fontSize: 14,

@@ -213,9 +213,9 @@ class _WritePostState extends State<WritePost> {
     }
 
     var firstWriteRelayKey =
-        widget._nostrService.connectedRelaysWrite.keys.toList()[0];
-    var firstWriteRelay = widget
-        ._nostrService.connectedRelaysWrite[firstWriteRelayKey]!.connectionUrl;
+        widget._nostrService.relays.connectedRelaysWrite.keys.toList()[0];
+    var firstWriteRelay = widget._nostrService.relays
+        .connectedRelaysWrite[firstWriteRelayKey]!.connectionUrl;
 
     if (widget.context != null) {
       // add previous tweet tags
