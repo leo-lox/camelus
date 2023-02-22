@@ -249,21 +249,24 @@ class Relays {
     return;
   }
 
-  Map<String, List<String>> getRelaysPubkeyMatch(List<String> authors) {
+  Map<String, List<String>> getRelaysPubkeyMatchInConnected(
+      List<String> authors) {
     // tracker has a list of pubkey,relayUrl :{, lastSuggestedKind3, lastSuggestedNip05, lastSuggestedBytag}
     // return a map with relayUrl, [pubkeys]
-    var tracker = relayTracker.tracker;
-    var relays = <String, List<String>>{};
+
+    Map<String, List<String>> relaysPubkeyMatch = {};
+
     for (var author in authors) {
-      for (var relay in tracker.entries) {
-        if (relay.value["pubkey"] == author) {
-          if (relays[relay.key] == null) {
-            relays[relay.key] = [];
+      for (var relay in connectedRelaysRead.entries) {
+        if (relay.value.connectionUrl == author) {
+          if (relaysPubkeyMatch[relay.value.connectionUrl] == null) {
+            relaysPubkeyMatch[relay.value.connectionUrl] = [];
           }
-          relays[relay.key]!.add(author);
+          relaysPubkeyMatch[relay.value.connectionUrl]!.add(author);
         }
       }
     }
-    return relays;
+
+    return relaysPubkeyMatch;
   }
 }
