@@ -5,7 +5,8 @@ enum RelayTrackerAdvType {
 }
 
 class RelayTracker {
-  Map<String, Map> tracker = {};
+  /// pubkey,relayUrl :{, lastSuggestedKind3, lastSuggestedNip05, lastSuggestedBytag}
+  Map<String, Map<String, dynamic>> tracker = {};
 
   RelayTracker() {}
 

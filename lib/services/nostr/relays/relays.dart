@@ -5,6 +5,8 @@ import 'dart:io';
 
 import 'package:camelus/helpers/helpers.dart';
 import 'package:camelus/models/socket_control.dart';
+import 'package:camelus/services/nostr/relays/relay_tracker.dart';
+import 'package:camelus/services/nostr/relays/relays_injector.dart';
 import 'package:cross_local_storage/cross_local_storage.dart';
 
 import 'package:json_cache/json_cache.dart';
@@ -30,7 +32,9 @@ class Relays {
   Stream<Map<String, SocketControl>> get connectedRelaysReadStream =>
       _connectedRelaysReadStreamController.stream;
 
-  late JsonCache jsonCache;
+  late JsonCache _jsonCache;
+
+  late RelayTracker relayTracker;
 
   final Completer isNostrServiceConnectedCompleter = Completer();
 
@@ -42,18 +46,20 @@ class Relays {
       _receiveEventStreamController.stream;
 
   Relays() {
-    _initCache();
-    _restoreFromCache();
+    _initCache().then((value) => _restoreFromCache());
+    RelaysInjector injector = RelaysInjector();
+    relayTracker = injector.relayTracker;
   }
 
   _initCache() async {
     LocalStorageInterface prefs = await LocalStorage.getInstance();
-    jsonCache = JsonCacheCrossLocalStorage(prefs);
+    _jsonCache = JsonCacheCrossLocalStorage(prefs);
+    return Future(() => true);
   }
 
   _restoreFromCache() async {
     if (relays.isEmpty) {
-      var relaysCache = await jsonCache.value('relays');
+      var relaysCache = await _jsonCache.value('relays');
       if (relaysCache != null) {
         relays = relaysCache.cast<String, Map<String, dynamic>>();
       } else {
@@ -241,5 +247,23 @@ class Relays {
     connectedRelaysWrite = {};
 
     return;
+  }
+
+  Map<String, List<String>> getRelaysPubkeyMatch(List<String> authors) {
+    // tracker has a list of pubkey,relayUrl :{, lastSuggestedKind3, lastSuggestedNip05, lastSuggestedBytag}
+    // return a map with relayUrl, [pubkeys]
+    var tracker = relayTracker.tracker;
+    var relays = <String, List<String>>{};
+    for (var author in authors) {
+      for (var relay in tracker.entries) {
+        if (relay.value["pubkey"] == author) {
+          if (relays[relay.key] == null) {
+            relays[relay.key] = [];
+          }
+          relays[relay.key]!.add(author);
+        }
+      }
+    }
+    return relays;
   }
 }
