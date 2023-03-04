@@ -129,7 +129,7 @@ class NostrService {
       }
     }
 
-    relays.connectToRelays();
+    relays.start();
 
     userFeedObj.restoreFromCache();
     globalFeedObj.restoreFromCache();
@@ -191,6 +191,11 @@ class NostrService {
     await jsonCache.remove('following');
 
     // don't clear relays and blocked users
+  }
+
+  // clears everything, potentially dangerous
+  void clearCacheReset() async {
+    await jsonCache.clear();
   }
 
   _receiveEvent(event, SocketControl socketControl) async {

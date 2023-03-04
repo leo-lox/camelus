@@ -38,6 +38,8 @@ class Relays {
 
   final Completer isNostrServiceConnectedCompleter = Completer();
 
+  Completer relayServiceRdy = Completer();
+
   // stream for receiving events from relays
   static final StreamController<Map<String, dynamic>>
       _receiveEventStreamController =
@@ -46,9 +48,9 @@ class Relays {
       _receiveEventStreamController.stream;
 
   Relays() {
-    _initCache().then((value) => _restoreFromCache());
     RelaysInjector injector = RelaysInjector();
     relayTracker = injector.relayTracker;
+    _initCache().then((value) => {_restoreFromCache()});
   }
 
   _initCache() async {
@@ -67,6 +69,14 @@ class Relays {
         relays = initRelays;
       }
     }
+    relayServiceRdy.complete();
+  }
+
+  void start() {
+    // interval to check
+    relayServiceRdy.future.then((value) => {
+          connectToRelays(),
+        });
   }
 
   Future<void> connectToRelays({bool useDefault = false}) async {
@@ -95,6 +105,7 @@ class Relays {
                       "event": eventJson,
                       "socketControl": socketControl,
                     });
+                    relayTracker.analyzeNostrEvent(eventJson, socketControl);
                   }, onDone: () {
                     // on disconnect
                     connectedRelaysRead[id]!.socketIsRdy = false;
@@ -247,26 +258,5 @@ class Relays {
     connectedRelaysWrite = {};
 
     return;
-  }
-
-  Map<String, List<String>> getRelaysPubkeyMatchInConnected(
-      List<String> authors) {
-    // tracker has a list of pubkey,relayUrl :{, lastSuggestedKind3, lastSuggestedNip05, lastSuggestedBytag}
-    // return a map with relayUrl, [pubkeys]
-
-    Map<String, List<String>> relaysPubkeyMatch = {};
-
-    for (var author in authors) {
-      for (var relay in connectedRelaysRead.entries) {
-        if (relay.value.connectionUrl == author) {
-          if (relaysPubkeyMatch[relay.value.connectionUrl] == null) {
-            relaysPubkeyMatch[relay.value.connectionUrl] = [];
-          }
-          relaysPubkeyMatch[relay.value.connectionUrl]!.add(author);
-        }
-      }
-    }
-
-    return relaysPubkeyMatch;
   }
 }

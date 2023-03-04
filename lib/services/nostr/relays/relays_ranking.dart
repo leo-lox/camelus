@@ -2,73 +2,80 @@ import 'package:flutter/foundation.dart';
 import 'dart:math';
 
 class RelaysRanking {
-  Future<List<dynamic>> getBestRelays(String pubkeyHex, Direction dir) async {
-    final sql = "SELECT person, relay, last_fetched, last_suggested_kind3, "
-        "last_suggested_nip05, last_suggested_bytag, read, write, "
-        "manually_paired_read, manually_paired_write "
-        "FROM person_relay WHERE person=?";
-
-    final rankedRelays = (() {
-      //final maybeDb = "GLOBALS.db.blockingLock()";
-      //final db = maybeDb.value;
-      //final stmt = db.prepare(sql);
-      //stmt.rawBindParameter(1, pubkeyHex);
-      //final rows = stmt.rawQuery();
-
-      final dbprs = <DbPersonRelay>[];
-      //while (rows.hasNext()) {
-      //  final row = rows.next();
-      //  final s = row.get(1);
-      //  try {
-      //    final url = RelayUrl.tryFromStr(s);
-      //    final dbpr = DbPersonRelay(
-      //      person: row.get(0),
-      //      relay: url,
-      //      lastFetched: row.get(2),
-      //      lastSuggestedKind3: row.get(3),
-      //      lastSuggestedNip05: row.get(4),
-      //      lastSuggestedBytag: row.get(5),
-      //      read: row.get(6),
-      //      write: row.get(7),
-      //      manuallyPairedRead: row.get(8),
-      //      manuallyPairedWrite: row.get(9),
-      //    );
-      //    dbprs.add(dbpr);
-      //  } on Exception {
-      //    // Just skip over bad relay URLs
-      //  }
-      //}
-
-      switch (dir) {
-        case Direction.write:
-          return _writeRank(dbprs as List<Map<String, dynamic>>);
-        case Direction.read:
-          return _readRank(dbprs as List<Map<String, dynamic>>);
-      }
-    });
-
-    final rankedRelaysList = rankedRelays as List<Map<String, dynamic>>;
-    final numRelaysPerPerson = 2; //todo: move this to settings
-
-    // If we can't get enough of them, extend with some of our relays
-    // at whatever the lowest score of their last one was
-    if (rankedRelaysList.length < (numRelaysPerPerson + 1)) {
-      final howManyMore = (numRelaysPerPerson + 1) - rankedRelaysList.length;
-      final lastScore =
-          rankedRelaysList.isEmpty ? 20 : rankedRelaysList.last.value2;
-      final additional = GLOBALS.relayTracker.allRelays.entries
-          .where((r) =>
-              !rankedRelaysList.any((rel) => rel.value1 == r.key) &&
-              ((dir == Direction.write && r.value.write) ||
-                  (dir == Direction.read && r.value.read)))
-          .take(howManyMore)
-          .map((r) => Tuple2(r.key.clone(), lastScore))
-          .toList();
-      rankedRelaysList.addAll(additional);
-    }
-
-    return rankedRelaysList;
-  }
+//  Future<List<dynamic>> getBestRelays(String pubkeyHex, Direction dir) async {
+//    final sql = "SELECT person, relay, last_fetched, last_suggested_kind3, "
+//        "last_suggested_nip05, last_suggested_bytag, read, write, "
+//        "manually_paired_read, manually_paired_write "
+//        "FROM person_relay WHERE person=?";
+//
+//    final rankedRelays = (() {
+//      //final maybeDb = "GLOBALS.db.blockingLock()";
+//      //final db = maybeDb.value;
+//      //final stmt = db.prepare(sql);
+//      //stmt.rawBindParameter(1, pubkeyHex);
+//      //final rows = stmt.rawQuery();
+//
+//      final dbprs = <DbPersonRelay>[];
+//      //while (rows.hasNext()) {
+//      //  final row = rows.next();
+//      //  final s = row.get(1);
+//      //  try {
+//      //    final url = RelayUrl.tryFromStr(s);
+//      //    final dbpr = DbPersonRelay(
+//      //      person: row.get(0),
+//      //      relay: url,
+//      //      lastFetched: row.get(2),
+//      //      lastSuggestedKind3: row.get(3),
+//      //      lastSuggestedNip05: row.get(4),
+//      //      lastSuggestedBytag: row.get(5),
+//      //      read: row.get(6),
+//      //      write: row.get(7),
+//      //      manuallyPairedRead: row.get(8),
+//      //      manuallyPairedWrite: row.get(9),
+//      //    );
+//      //    dbprs.add(dbpr);
+//      //  } on Exception {
+//      //    // Just skip over bad relay URLs
+//      //  }
+//      //}
+//
+//      switch (dir) {
+//        case Direction.write:
+//          return _writeRank(dbprs as List<Map<String, dynamic>>);
+//        case Direction.read:
+//          return _readRank(dbprs as List<Map<String, dynamic>>);
+//      }
+//    });
+//
+//    final rankedRelaysList = rankedRelays as List<Map<String, dynamic>>;
+//    final numRelaysPerPerson = 2; //todo: move this to settings
+//
+//    // If we can't get enough of them, extend with some of our relays
+//    // at whatever the lowest score of their last one was
+//    if (rankedRelaysList.length < (numRelaysPerPerson + 1)) {
+//      final howManyMore = (numRelaysPerPerson + 1) - rankedRelaysList.length;
+//
+//      final lastScore =
+//          rankedRelaysList.isEmpty ? 20 : rankedRelaysList.last.value2;
+//
+//      List<Tuple2<String, int>> myTuplesList = [
+//        Tuple2('a', 1),
+//        Tuple2('b', 2),
+//        Tuple2('c', 3),
+//      ];
+//      final additional = myTuplesList
+//          .where((r) =>
+//              !rankedRelaysList.any((rel) => rel.values.first == r.key) &&
+//              ((dir == Direction.write && r.value.write) ||
+//                  (dir == Direction.read && r.value.read)))
+//          .take(howManyMore)
+//          .map((r) => Tuple2(r.key.clone(), lastScore))
+//          .toList();
+//      rankedRelaysList.addAll(additional);
+//    }
+//
+//    return rankedRelaysList;
+//  }
 }
 
 List<Map<String, dynamic>> _writeRank(List<Map<String, dynamic>> dbprs) {
@@ -262,9 +269,9 @@ class RelayUrl {
   String toString() => url;
 }
 
-class Tuple2 {
-  final value1;
-  final value2;
+class Tuple2<T1, T2> {
+  T1 value1;
+  T2 value2;
 
   Tuple2(this.value1, this.value2);
 }
