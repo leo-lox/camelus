@@ -7,6 +7,8 @@ import 'package:camelus/services/nostr/feeds/authors_feed.dart';
 import 'package:camelus/services/nostr/feeds/events_feed.dart';
 import 'package:camelus/services/nostr/feeds/global_feed.dart';
 import 'package:camelus/services/nostr/feeds/user_feed.dart';
+import 'package:camelus/services/nostr/metadata/metadata_injector.dart';
+import 'package:camelus/services/nostr/metadata/nip_05.dart';
 import 'package:camelus/services/nostr/metadata/user_contacts.dart';
 import 'package:camelus/services/nostr/metadata/user_metadata.dart';
 import 'package:camelus/services/nostr/relays/relay_tracker.dart';
@@ -23,7 +25,6 @@ import 'package:camelus/models/tweet.dart';
 import 'package:json_cache/json_cache.dart';
 import 'package:cross_local_storage/cross_local_storage.dart';
 
-import 'package:http/http.dart' as http;
 import 'package:camelus/models/socket_control.dart';
 
 class NostrService {
@@ -56,6 +57,8 @@ class NostrService {
 
   late KeyPair myKeys;
 
+  late Nip05 nip05service;
+
   // blocked users
   List<String> blockedUsers = [];
 
@@ -64,6 +67,8 @@ class NostrService {
 
   NostrService() {
     RelaysInjector injector = RelaysInjector();
+    MetadataInjector metadataInjector = MetadataInjector();
+    nip05service = metadataInjector.nip05;
     relays = injector.relays;
     relayTracker = injector.relayTracker;
     isNostrServiceConnected = relays.isNostrServiceConnectedCompleter.future;
@@ -479,34 +484,9 @@ class NostrService {
     return userContactsObj.getContactsByPubkey(pubkey, force: force);
   }
 
-  /// returns [nip5 identifier, true] if valid or [null, null] if not found
-  Future<List> checkNip5(String nip05, String pubkey) async {
-    // checks if the nip5 token is valid
-    String username = nip05.split("@")[0];
-    String url = nip05.split("@")[1];
-
-    // make get request
-    Response response = await http
-        .get(Uri.parse("https://$url/.well-known/nostr.json?name=$username"));
-
-    if (response.statusCode != 200) {
-      return [null, null];
-    }
-
-    try {
-      var json = jsonDecode(response.body);
-      Map names = json["names"];
-
-      if (names[username] == pubkey) {
-        return [nip05, true];
-      } else {
-        return [nip05, false];
-      }
-    } catch (e) {
-      log("err, decoding nip5 json ${e.toString()}}");
-    }
-
-    return [null, null];
+  /// returns [nip5 identifier, true, ] if valid or [null, null] if not found
+  Future<Map> checkNip05(String nip05, String pubkey) async {
+    return await nip05service.checkNip05(nip05, pubkey);
   }
 
   Future<void> addToBlocklist(String pubkey) async {

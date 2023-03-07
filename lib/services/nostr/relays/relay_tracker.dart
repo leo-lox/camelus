@@ -20,14 +20,13 @@ class RelayTracker {
 
   void analyzeNostrEvent(event, SocketControl socketControl) {
     // catch EOSE events etc.
-
+    log("tracker:1 ${event[0]}");
     if (event[0] != "EVENT") {
       return;
     }
 
-    log("analyzeNostrEventTrack:");
-
     Map eventMap = event[2];
+    log("tracker:2 ${eventMap["tags"]}");
     // kind 3
     if (eventMap["kind"] == 3) {
       /* EXAMPLE
@@ -73,7 +72,6 @@ class RelayTracker {
         }
       }
     }
-    log("analyzeNostrEvent: $tracker");
   }
 
   /// get called when a event advertises a relay pubkey connection
@@ -100,6 +98,7 @@ class RelayTracker {
         tracker[personPubkey]![relayUrl]!["lastSuggestedBytag"] = timestamp;
         break;
     }
+    log("tracker: $tracker");
   }
 
   _populateTracker(String personPubkey, String relayUrl) {

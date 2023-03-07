@@ -57,11 +57,11 @@ class _ProfilePageState extends State<ProfilePage>
     if (nip05.isEmpty) return;
     if (nip05verified.isNotEmpty) return;
 
-    var check = await widget._nostrService.checkNip5(nip05, pubkey);
+    var check = await widget._nostrService.checkNip05(nip05, pubkey);
 
-    if (check[1] == true) {
+    if (check["valid"] == true) {
       setState(() {
-        nip05verified = check[0];
+        nip05verified = check["nip05"];
       });
     }
   }
