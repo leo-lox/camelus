@@ -10,6 +10,7 @@ class Nip05 {
     // todo cache
   }
 
+  /// returns {nip05, valid, lastCheck, relayHint} or {} when error
   Future<Map<String, dynamic>> checkNip05(String nip05, String pubkey) async {
     if (_history.containsKey(nip05)) {
       Map<String, dynamic> result = _history[nip05];
@@ -23,7 +24,7 @@ class Nip05 {
     return await _checkNip05(nip05, pubkey);
   }
 
-  /// returns [nip5 identifier, true] if valid or [null, null] if not found
+  /// returns {nip05, valid, lastCheck, relayHint}
   Future<Map<String, dynamic>> _checkNip05(String nip05, String pubkey) async {
     int now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
 
