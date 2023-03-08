@@ -4,7 +4,8 @@ import 'dart:developer';
 import 'package:http/http.dart' as http;
 
 class Nip05 {
-  final Map _history = {};
+  final Map<String, dynamic> _history = {};
+  final List<String> _inFlight = [];
 
   Nip05() {
     // todo cache
@@ -21,14 +22,27 @@ class Nip05 {
       }
     }
 
-    return await _checkNip05(nip05, pubkey);
+    if (_inFlight.contains(nip05)) {
+      //  wait for result
+      while (_inFlight.contains(nip05)) {
+        await Future.delayed(const Duration(milliseconds: 500));
+      }
+      return _history[nip05];
+    }
+
+    _inFlight.add(nip05);
+
+    var result = await _checkNip05Request(nip05, pubkey);
+    _inFlight.remove(nip05);
+    return result;
   }
 
   /// returns {nip05, valid, lastCheck, relayHint}
-  Future<Map<String, dynamic>> _checkNip05(String nip05, String pubkey) async {
+  Future<Map<String, dynamic>> _checkNip05Request(
+      String nip05, String pubkey) async {
     int now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
 
-    // checks if the nip5 token is valid
+    // split in username and url/domain
     String username = nip05.split("@")[0];
     String url = nip05.split("@")[1];
 
