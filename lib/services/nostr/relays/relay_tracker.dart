@@ -27,13 +27,12 @@ class RelayTracker {
 
   Future<void> analyzeNostrEvent(event, SocketControl socketControl) async {
     // catch EOSE events etc.
-    log("tracker:1 ${event[0]}");
     if (event[0] != "EVENT") {
       return;
     }
 
     Map eventMap = event[2];
-    log("tracker:2 ${eventMap["tags"]}");
+
     // kind 3
     if (eventMap["kind"] == 3) {
       /* EXAMPLE
@@ -48,10 +47,28 @@ class RelayTracker {
 
       for (var tag in tags) {
         if (tag[0] == "p" && tag.length >= 3 && tag[2] != null) {
-          trackRelay(tag[1], tag[2], RelayTrackerAdvType.kind03,
+          trackRelays(tag[1], [tag[2]], RelayTrackerAdvType.kind03,
               eventMap["created_at"]);
         }
       }
+
+      // own adv
+      Map content = jsonDecode(eventMap["content"]);
+      List<String> writeRelays = [];
+      String personPubkey = eventMap["pubkey"] ?? "";
+
+      if (personPubkey.isEmpty) {
+        return;
+      }
+
+      // extract write relays
+      for (var relay in content.entries) {
+        if (relay.value["write"] == true) {
+          writeRelays.add(relay.key);
+        }
+      }
+      trackRelays(personPubkey, writeRelays, RelayTrackerAdvType.kind03,
+          eventMap["created_at"]);
     }
 
     // nip05
@@ -72,9 +89,8 @@ class RelayTracker {
       if (result["relays"] == null) {
         return;
       }
-      log("tracker:3-3 ##### ${result["relays"]}");
-      //todo don't only use first relay
-      trackRelay(pubkey, result["relays"][0], RelayTrackerAdvType.nip05,
+
+      trackRelays(pubkey, result["relays"], RelayTrackerAdvType.nip05,
           eventMap["created_at"]);
     }
     // by tag
@@ -92,8 +108,8 @@ class RelayTracker {
 
       for (var tag in tags) {
         if (tag[0] == "p" && tag.length >= 3 && tag[2] != null) {
-          trackRelay(
-              tag[1], tag[2], RelayTrackerAdvType.tag, eventMap["created_at"]);
+          trackRelays(tag[1], [tag[2]], RelayTrackerAdvType.tag,
+              eventMap["created_at"]);
         }
       }
     }
@@ -101,29 +117,33 @@ class RelayTracker {
 
   /// get called when a event advertises a relay pubkey connection
   /// timestamp can be a string or int
-  void trackRelay(String personPubkey, String relayUrl, RelayTrackerAdvType nip,
-      dynamic timestamp) {
+  void trackRelays(String personPubkey, List<String> relayUrls,
+      RelayTrackerAdvType nip, dynamic timestamp) {
     if (timestamp.runtimeType == String) {
       timestamp = int.parse(timestamp);
     }
 
-    if (personPubkey.isEmpty || relayUrl.isEmpty) {
+    if (personPubkey.isEmpty || relayUrls.isEmpty) {
       return;
     }
 
-    _populateTracker(personPubkey, relayUrl);
-    switch (nip) {
-      case RelayTrackerAdvType.kind03:
-        tracker[personPubkey]![relayUrl]!["lastSuggestedKind3"] = timestamp;
-        break;
-      case RelayTrackerAdvType.nip05:
-        tracker[personPubkey]![relayUrl]!["lastSuggestedNip05"] = timestamp;
-        break;
-      case RelayTrackerAdvType.tag:
-        tracker[personPubkey]![relayUrl]!["lastSuggestedBytag"] = timestamp;
-        break;
+    for (var relayUrl in relayUrls) {
+      _populateTracker(personPubkey, relayUrl);
     }
-    log("tracker: $tracker");
+
+    for (var relayUrl in relayUrls) {
+      switch (nip) {
+        case RelayTrackerAdvType.kind03:
+          tracker[personPubkey]![relayUrl]!["lastSuggestedKind3"] = timestamp;
+          break;
+        case RelayTrackerAdvType.nip05:
+          tracker[personPubkey]![relayUrl]!["lastSuggestedNip05"] = timestamp;
+          break;
+        case RelayTrackerAdvType.tag:
+          tracker[personPubkey]![relayUrl]!["lastSuggestedBytag"] = timestamp;
+          break;
+      }
+    }
   }
 
   _populateTracker(String personPubkey, String relayUrl) {
