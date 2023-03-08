@@ -87,150 +87,150 @@ class RelaysRanking {
 
     return rankedRelaysList;
   }
-}
 
-List<Map<String, dynamic>> _writeRank(List<Map<String, dynamic>> dbprs) {
-  // This is the ranking we are using. There might be reasons
-  // for ranking differently.
-  //   write (score=20)    [ they claim (to us) ]
-  //   manually_paired_write (score=20)    [ we claim (to us) ]
-  //   kind3 tag (score=5) [ we say ]
-  //   nip05 (score=4)     [ they claim, unsigned ]
-  //   fetched (score=3)   [ we found ]
-  //   bytag (score=1)     [ someone else mentions ]
+  List<Map<String, dynamic>> _writeRank(List<Map<String, dynamic>> dbprs) {
+    // This is the ranking we are using. There might be reasons
+    // for ranking differently.
+    //   write (score=20)    [ they claim (to us) ]
+    //   manually_paired_write (score=20)    [ we claim (to us) ]
+    //   kind3 tag (score=5) [ we say ]
+    //   nip05 (score=4)     [ they claim, unsigned ]
+    //   fetched (score=3)   [ we found ]
+    //   bytag (score=1)     [ someone else mentions ]
 
-  var now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
-  var output = <Map<String, dynamic>>[];
+    var now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
+    var output = <Map<String, dynamic>>[];
 
-  int scorefn(int when, int fadePeriod, int base) {
-    var dur = now - when; // seconds since
-    var periods = (dur / fadePeriod).floor() + 1; // minimum one period
-    return base ~/ periods;
+    int scorefn(int when, int fadePeriod, int base) {
+      var dur = now - when; // seconds since
+      var periods = (dur / fadePeriod).floor() + 1; // minimum one period
+      return base ~/ periods;
+    }
+
+    for (var dbpr in List<Map<String, dynamic>>.from(dbprs)) {
+      var score = 0;
+
+      // 'write' is an author-signed explicit claim of where they write
+      if (dbpr['write'] ?? false || dbpr['manually_paired_write'] ?? false) {
+        score += 20;
+      }
+
+      // kind3 is our memory of where we are following someone
+      if (dbpr['last_suggested_kind3'] != null) {
+        score += scorefn(
+          dbpr['last_suggested_kind3'],
+          60 * 60 * 24 * 30,
+          7,
+        );
+      }
+
+      // nip05 is an unsigned dns-based author claim of using this relay
+      if (dbpr['last_suggested_nip05'] != null) {
+        score += scorefn(
+          dbpr['last_suggested_nip05'],
+          60 * 60 * 24 * 15,
+          4,
+        );
+      }
+
+      // last_fetched is gossip verified happened-to-work-before
+      if (dbpr['last_fetched'] != null) {
+        score += scorefn(
+          dbpr['last_fetched'],
+          60 * 60 * 24 * 3,
+          3,
+        );
+      }
+
+      // last_suggested_bytag is an anybody-signed suggestion
+      if (dbpr['last_suggested_bytag'] != null) {
+        score += scorefn(
+          dbpr['last_suggested_bytag'],
+          60 * 60 * 24 * 2,
+          1,
+        );
+      }
+
+      // Prune score=0 associations
+      if (score == 0) {
+        continue;
+      }
+
+      output.add({
+        'relay': dbpr['relay'],
+        'score': score,
+      });
+    }
+
+    output.sort((a, b) => b['score'].compareTo(a['score']));
+
+    // prune everything below a score of 20, but only after the first 6 entries
+    while (output.length > 6 && output.last['score'] < 20) {
+      output.removeLast();
+    }
+
+    return output;
   }
 
-  for (var dbpr in List<Map<String, dynamic>>.from(dbprs)) {
-    var score = 0;
+  List<Map<String, dynamic>> _readRank(List<Map<String, dynamic>> dbprs) {
+    var now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
+    var output = <Map<String, dynamic>>[];
 
-    // 'write' is an author-signed explicit claim of where they write
-    if (dbpr['write'] ?? false || dbpr['manually_paired_write'] ?? false) {
-      score += 20;
+    scorefn(int when, int fadePeriod, int base) {
+      var dur = max(0, now - when); // seconds since
+      var periods = (dur / fadePeriod).floor() + 1; // minimum one period
+      return base ~/ periods;
     }
 
-    // kind3 is our memory of where we are following someone
-    if (dbpr['last_suggested_kind3'] != null) {
-      score += scorefn(
-        dbpr['last_suggested_kind3'],
-        60 * 60 * 24 * 30,
-        7,
-      );
+    for (var dbpr in dbprs) {
+      var score = 0;
+
+      // 'read' is an author-signed explicit claim of where they read
+      if (dbpr['read'] || dbpr['manually_paired_read']) {
+        score += 20;
+      }
+
+      // kind3 is our memory of where we are following someone
+      var lastSuggestedKind3 = dbpr['last_suggested_kind3'];
+      if (lastSuggestedKind3 != null) {
+        score += scorefn(lastSuggestedKind3, 60 * 60 * 24 * 30, 7);
+      }
+
+      // nip05 is an unsigned dns-based author claim of using this relay
+      var lastSuggestedNip05 = dbpr['last_suggested_nip05'];
+      if (lastSuggestedNip05 != null) {
+        score += scorefn(lastSuggestedNip05, 60 * 60 * 24 * 15, 4);
+      }
+
+      // last_fetched is gossip verified happened-to-work-before
+      var lastFetched = dbpr['last_fetched'];
+      if (lastFetched != null) {
+        score += scorefn(lastFetched, 60 * 60 * 24 * 3, 3);
+      }
+
+      // last_suggested_bytag is an anybody-signed suggestion
+      var lastSuggestedBytag = dbpr['last_suggested_bytag'];
+      if (lastSuggestedBytag != null) {
+        score += scorefn(lastSuggestedBytag, 60 * 60 * 24 * 2, 1);
+      }
+
+      // Prune score=0 associations
+      if (score == 0) {
+        continue;
+      }
+
+      output.add({'relay': dbpr['relay'], 'score': score});
     }
 
-    // nip05 is an unsigned dns-based author claim of using this relay
-    if (dbpr['last_suggested_nip05'] != null) {
-      score += scorefn(
-        dbpr['last_suggested_nip05'],
-        60 * 60 * 24 * 15,
-        4,
-      );
+    output.sort((a, b) => b['score'].compareTo(a['score']));
+
+    // prune everything below a score 20, but only after the first 6 entries
+    while (output.length > 6 && output.last['score'] < 20) {
+      output.removeLast();
     }
 
-    // last_fetched is gossip verified happened-to-work-before
-    if (dbpr['last_fetched'] != null) {
-      score += scorefn(
-        dbpr['last_fetched'],
-        60 * 60 * 24 * 3,
-        3,
-      );
-    }
-
-    // last_suggested_bytag is an anybody-signed suggestion
-    if (dbpr['last_suggested_bytag'] != null) {
-      score += scorefn(
-        dbpr['last_suggested_bytag'],
-        60 * 60 * 24 * 2,
-        1,
-      );
-    }
-
-    // Prune score=0 associations
-    if (score == 0) {
-      continue;
-    }
-
-    output.add({
-      'relay': dbpr['relay'],
-      'score': score,
-    });
+    return output;
   }
-
-  output.sort((a, b) => b['score'].compareTo(a['score']));
-
-  // prune everything below a score of 20, but only after the first 6 entries
-  while (output.length > 6 && output.last['score'] < 20) {
-    output.removeLast();
-  }
-
-  return output;
-}
-
-List<Map<String, dynamic>> _readRank(List<Map<String, dynamic>> dbprs) {
-  var now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
-  var output = <Map<String, dynamic>>[];
-
-  scorefn(int when, int fadePeriod, int base) {
-    var dur = max(0, now - when); // seconds since
-    var periods = (dur / fadePeriod).floor() + 1; // minimum one period
-    return base ~/ periods;
-  }
-
-  for (var dbpr in dbprs) {
-    var score = 0;
-
-    // 'read' is an author-signed explicit claim of where they read
-    if (dbpr['read'] || dbpr['manually_paired_read']) {
-      score += 20;
-    }
-
-    // kind3 is our memory of where we are following someone
-    var lastSuggestedKind3 = dbpr['last_suggested_kind3'];
-    if (lastSuggestedKind3 != null) {
-      score += scorefn(lastSuggestedKind3, 60 * 60 * 24 * 30, 7);
-    }
-
-    // nip05 is an unsigned dns-based author claim of using this relay
-    var lastSuggestedNip05 = dbpr['last_suggested_nip05'];
-    if (lastSuggestedNip05 != null) {
-      score += scorefn(lastSuggestedNip05, 60 * 60 * 24 * 15, 4);
-    }
-
-    // last_fetched is gossip verified happened-to-work-before
-    var lastFetched = dbpr['last_fetched'];
-    if (lastFetched != null) {
-      score += scorefn(lastFetched, 60 * 60 * 24 * 3, 3);
-    }
-
-    // last_suggested_bytag is an anybody-signed suggestion
-    var lastSuggestedBytag = dbpr['last_suggested_bytag'];
-    if (lastSuggestedBytag != null) {
-      score += scorefn(lastSuggestedBytag, 60 * 60 * 24 * 2, 1);
-    }
-
-    // Prune score=0 associations
-    if (score == 0) {
-      continue;
-    }
-
-    output.add({'relay': dbpr['relay'], 'score': score});
-  }
-
-  output.sort((a, b) => b['score'].compareTo(a['score']));
-
-  // prune everything below a score 20, but only after the first 6 entries
-  while (output.length > 6 && output.last['score'] < 20) {
-    output.removeLast();
-  }
-
-  return output;
 }
 
 class DbPersonRelay {
