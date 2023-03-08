@@ -1,6 +1,9 @@
+import 'dart:convert';
 import 'dart:developer';
 
 import 'package:camelus/models/socket_control.dart';
+import 'package:camelus/services/nostr/metadata/metadata_injector.dart';
+import 'package:camelus/services/nostr/metadata/nip_05.dart';
 
 enum RelayTrackerAdvType {
   kind03,
@@ -12,13 +15,17 @@ class RelayTracker {
   /// pubkey,relayUrl :{, lastSuggestedKind3, lastSuggestedNip05, lastSuggestedBytag}
   Map<String, Map<String, dynamic>> tracker = {};
 
-  RelayTracker() {}
+  late Nip05 nip05service;
+
+  RelayTracker() {
+    nip05service = MetadataInjector().nip05;
+  }
 
   void clear() {
     tracker = {};
   }
 
-  void analyzeNostrEvent(event, SocketControl socketControl) {
+  Future<void> analyzeNostrEvent(event, SocketControl socketControl) async {
     // catch EOSE events etc.
     log("tracker:1 ${event[0]}");
     if (event[0] != "EVENT") {
@@ -49,8 +56,26 @@ class RelayTracker {
 
     // nip05
     if (eventMap["kind"] == 0) {
-      //todo: move verification into own file with timestamp check ( only run every 24h )
+      Map metadata = jsonDecode(eventMap["content"]);
+      String nip05 = metadata["nip05"] ?? "";
+      String pubkey = eventMap["pubkey"] ?? "";
+      if (nip05.isEmpty || pubkey.isEmpty) {
+        return;
+      }
 
+      Map<String, dynamic> result =
+          await nip05service.checkNip05(nip05, pubkey);
+      if (!result["valid"]) {
+        return;
+      }
+
+      if (result["relays"] == null) {
+        return;
+      }
+      log("tracker:3-3 ##### ${result["relays"]}");
+      //todo don't only use first relay
+      trackRelay(pubkey, result["relays"][0], RelayTrackerAdvType.nip05,
+          eventMap["created_at"]);
     }
     // by tag
     if (eventMap["kind"] == 1) {

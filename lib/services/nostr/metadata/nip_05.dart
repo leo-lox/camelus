@@ -60,15 +60,15 @@ class Nip05 {
 
       Map relays = json["relays"] ?? {};
 
-      String pRelay = relays[pubkey] ?? "";
+      String pRelays = relays[pubkey] ?? "";
 
       Map<String, dynamic> result = {
         "nip05": nip05,
         "valid": false,
         "lastCheck": now
       };
-      if (pRelay.isNotEmpty) {
-        result["relayHint"](pRelay);
+      if (pRelays.isNotEmpty) {
+        result["relays"] = pRelays;
       }
 
       if (names[username] == pubkey) {
