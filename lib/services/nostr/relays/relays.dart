@@ -13,10 +13,10 @@ import 'package:json_cache/json_cache.dart';
 
 class Relays {
   final Map<String, Map<String, bool>> initRelays = {
-    "wss://nostr-pub.semisol.dev": {"write": true, "read": true},
     "wss://nostr.bitcoiner.social": {"write": true, "read": true},
     "wss://nostr.zebedee.cloud": {"write": true, "read": true},
-    "wss://nostr.onsats.org": {"write": true, "read": true},
+    "wss://brb.io": {"write": true, "read": true},
+    "wss://nos.lol": {"write": true, "read": true},
   };
 
   Map<String, Map<String, dynamic>> relays = {};
