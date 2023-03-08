@@ -15,7 +15,7 @@ class Relays {
   final Map<String, Map<String, bool>> initRelays = {
     "wss://nostr.bitcoiner.social": {"write": true, "read": true},
     "wss://nostr.zebedee.cloud": {"write": true, "read": true},
-    "wss://brb.io": {"write": true, "read": true},
+    //"wss://brb.io": {"write": true, "read": true},
     "wss://nos.lol": {"write": true, "read": true},
   };
 

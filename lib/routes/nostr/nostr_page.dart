@@ -554,50 +554,54 @@ class _NostrPageState extends State<NostrPage> with TickerProviderStateMixin {
                       )),
                 ),
                 actions: [
-                  StreamBuilder(
-                      stream:
-                          widget._nostrService.relays.connectedRelaysReadStream,
-                      builder: (context,
-                          AsyncSnapshot<Map<String, SocketControl>> snapshot) {
-                        if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                          return Row(
-                            children: [
-                              SvgPicture.asset(
-                                'assets/icons/cell-signal-slash.svg',
-                                color: Palette.gray,
-                                height: 22,
-                                width: 22,
-                              ),
-                              const SizedBox(width: 5),
-                              Text(
-                                "0".toString(),
-                                style:
-                                    const TextStyle(color: Palette.lightGray),
-                              ),
-                              const SizedBox(width: 5),
-                            ],
-                          );
-                        } else {
-                          return Row(
-                            children: [
-                              SvgPicture.asset(
-                                'assets/icons/cell-signal-full.svg',
-                                color: Palette.gray,
-                                height: 22,
-                                width: 22,
-                              ),
-                              const SizedBox(width: 5),
-                              Text(
-                                // count how many relays are ready
-                                _countRedyRelays(snapshot.data!).toString(),
-                                style:
-                                    const TextStyle(color: Palette.lightGray),
-                              ),
-                              const SizedBox(width: 5),
-                            ],
-                          );
-                        }
-                      }),
+                  GestureDetector(
+                    onTap: () => widget._nostrService.debug(),
+                    child: StreamBuilder(
+                        stream: widget
+                            ._nostrService.relays.connectedRelaysReadStream,
+                        builder: (context,
+                            AsyncSnapshot<Map<String, SocketControl>>
+                                snapshot) {
+                          if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                            return Row(
+                              children: [
+                                SvgPicture.asset(
+                                  'assets/icons/cell-signal-slash.svg',
+                                  color: Palette.gray,
+                                  height: 22,
+                                  width: 22,
+                                ),
+                                const SizedBox(width: 5),
+                                Text(
+                                  "0".toString(),
+                                  style:
+                                      const TextStyle(color: Palette.lightGray),
+                                ),
+                                const SizedBox(width: 5),
+                              ],
+                            );
+                          } else {
+                            return Row(
+                              children: [
+                                SvgPicture.asset(
+                                  'assets/icons/cell-signal-full.svg',
+                                  color: Palette.gray,
+                                  height: 22,
+                                  width: 22,
+                                ),
+                                const SizedBox(width: 5),
+                                Text(
+                                  // count how many relays are ready
+                                  _countRedyRelays(snapshot.data!).toString(),
+                                  style:
+                                      const TextStyle(color: Palette.lightGray),
+                                ),
+                                const SizedBox(width: 5),
+                              ],
+                            );
+                          }
+                        }),
+                  ),
                 ],
                 bottom: PreferredSize(
                   preferredSize: const Size.fromHeight(20),

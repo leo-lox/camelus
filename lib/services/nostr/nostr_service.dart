@@ -14,6 +14,7 @@ import 'package:camelus/services/nostr/metadata/user_metadata.dart';
 import 'package:camelus/services/nostr/relays/relay_tracker.dart';
 import 'package:camelus/services/nostr/relays/relays.dart';
 import 'package:camelus/services/nostr/relays/relays_injector.dart';
+import 'package:camelus/services/nostr/relays/relays_ranking.dart';
 import 'package:crypto/crypto.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -59,6 +60,8 @@ class NostrService {
 
   late Nip05 nip05service;
 
+  late RelaysRanking relaysRanking;
+
   // blocked users
   List<String> blockedUsers = [];
 
@@ -66,11 +69,13 @@ class NostrService {
   Map<String, List<List<dynamic>>> get following => userContactsObj.following;
 
   NostrService() {
-    RelaysInjector injector = RelaysInjector();
+    RelaysInjector relaysInjector = RelaysInjector();
     MetadataInjector metadataInjector = MetadataInjector();
+
     nip05service = metadataInjector.nip05;
-    relays = injector.relays;
-    relayTracker = injector.relayTracker;
+    relays = relaysInjector.relays;
+    relayTracker = relaysInjector.relayTracker;
+    relaysRanking = relaysInjector.relaysRanking;
     isNostrServiceConnected = relays.isNostrServiceConnectedCompleter.future;
 
     relays.receiveEventStream.listen((e) {
@@ -515,5 +520,12 @@ class NostrService {
       await jsonCache.refresh("blockedUsers", {"blockedUsers": blockedUsers});
     }
     return;
+  }
+
+  void debug() {
+    log("debug");
+    relaysRanking.getBestRelays(
+        "cd25e76b6a171b9a01a166a37dae7d217e0ccd573fb53207ca6d4d082bddc605",
+        Direction.read);
   }
 }
