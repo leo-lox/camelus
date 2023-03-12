@@ -523,14 +523,14 @@ class NostrService {
     return;
   }
 
-  void debug() {
+  Future<void> debug() async {
     log("debug");
     //relaysRanking.getBestRelays(
     //    "cd25e76b6a171b9a01a166a37dae7d217e0ccd573fb53207ca6d4d082bddc605",
     //    Direction.read);
 
     var relaysPicker = RelaysPicker();
-    relaysPicker.init(pubkeys: [
+    await relaysPicker.init(pubkeys: [
       "cd25e76b6a171b9a01a166a37dae7d217e0ccd573fb53207ca6d4d082bddc605"
     ], coverageCount: 2);
 

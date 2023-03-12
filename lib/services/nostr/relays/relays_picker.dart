@@ -9,7 +9,6 @@ class RelaysPicker {
   late RelaysRanking relaysRanking;
 
   Map<String, int> pubkeyCounts = {
-    'cd25e76b6a171b9a01a166a37dae7d217e0ccd573fb53207ca6d4d082bddc605': 1,
     //'pubkey2': 2,
     //'pubkey3': 1,
   };
@@ -21,10 +20,6 @@ class RelaysPicker {
   };
 
   Map<String, Map<String, int>> personRelayScores = {
-    'cd25e76b6a171b9a01a166a37dae7d217e0ccd573fb53207ca6d4d082bddc605': {
-      'wss://relay.damus.io': 10,
-      //'relay2': 5
-    },
     //'pubkey2': {'relay1': 7, 'relay2': 8},
   };
 
