@@ -12,14 +12,18 @@ class RelaysRanking {
   }
 
   Future<List<dynamic>> getBestRelays(String pubkeyHex, Direction dir) async {
+    var tracker = relayTracker.tracker;
+
+    if (tracker[pubkeyHex] == null) {
+      return [];
+    }
+
     final rankedRelays = (() {
       //final maybeDb = "GLOBALS.db.blockingLock()";
       //final db = maybeDb.value;
       //final stmt = db.prepare(sql);
       //stmt.rawBindParameter(1, pubkeyHex);
       //final rows = stmt.rawQuery();
-
-      var tracker = relayTracker.tracker;
 
       //
       //tracker to dbprs

@@ -44,6 +44,9 @@ class RelaysPicker {
     for (var pubkey in pubkeys) {
       var scoresList =
           await relaysRanking.getBestRelays(pubkey, Direction.read);
+      if (scoresList.isEmpty) {
+        return;
+      }
 
       Map<String, int> scoresMap = {
         //'wss://relay.damus.io': 10,

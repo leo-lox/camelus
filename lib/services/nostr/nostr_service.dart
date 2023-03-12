@@ -524,20 +524,19 @@ class NostrService {
   }
 
   Future<void> debug() async {
+    List<String> userFollows = (await getUserContacts(myKeys.publicKey))
+        .map<String>((e) => e[1])
+        .toList();
+    log("userFollows: $userFollows");
     log("debug");
     //relaysRanking.getBestRelays(
     //    "cd25e76b6a171b9a01a166a37dae7d217e0ccd573fb53207ca6d4d082bddc605",
     //    Direction.read);
 
     var relaysPicker = RelaysPicker();
-    await relaysPicker.init(pubkeys: [
-      "cd25e76b6a171b9a01a166a37dae7d217e0ccd573fb53207ca6d4d082bddc605"
-    ], coverageCount: 2);
+    await relaysPicker.init(pubkeys: userFollows, coverageCount: 2);
 
-    var result = relaysPicker.pick([
-      "cd25e76b6a171b9a01a166a37dae7d217e0ccd573fb53207ca6d4d082bddc605",
-      "not-existing"
-    ]);
+    var result = relaysPicker.pick(userFollows);
 
     var assignment = relaysPicker.getRelayAssignment(result);
     log("result: $result, assignment: ${assignment?.pubkeys}");
