@@ -10,7 +10,6 @@ class RelaysInjector {
   Relays? _relays;
   RelayTracker? _relayTracker;
   RelaysRanking? _relaysRanking;
-  RelaysPicker? _relaysPicker;
 
   factory RelaysInjector() {
     return _injector != null ? _injector! : _singleton;
@@ -32,9 +31,5 @@ class RelaysInjector {
 
   RelaysRanking get relaysRanking {
     return _relaysRanking ??= RelaysRanking();
-  }
-
-  RelaysPicker get relaysPicker {
-    return _relaysPicker ??= RelaysPicker();
   }
 }

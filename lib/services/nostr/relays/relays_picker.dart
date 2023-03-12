@@ -2,9 +2,11 @@ import 'dart:developer';
 
 import 'package:camelus/services/nostr/relays/relay_tracker.dart';
 import 'package:camelus/services/nostr/relays/relays_injector.dart';
+import 'package:camelus/services/nostr/relays/relays_ranking.dart';
 
 class RelaysPicker {
   late RelayTracker relayTracker;
+  late RelaysRanking relaysRanking;
 
   Map<String, int> pubkeyCounts = {
     'cd25e76b6a171b9a01a166a37dae7d217e0ccd573fb53207ca6d4d082bddc605': 1,
@@ -32,7 +34,32 @@ class RelaysPicker {
   };
 
   RelaysPicker() {
-    relayTracker = RelaysInjector().relayTracker;
+    RelaysInjector relaysInjector = RelaysInjector();
+    relayTracker = relaysInjector.relayTracker;
+    relaysRanking = relaysInjector.relaysRanking;
+  }
+
+  Future<void> init(
+      {required List<String> pubkeys, required int coverageCount}) async {
+    for (var pubkey in pubkeys) {
+      pubkeyCounts[pubkey] = coverageCount;
+    }
+
+    // populate personRelayScores
+    for (var pubkey in pubkeys) {
+      var scoresList =
+          await relaysRanking.getBestRelays(pubkey, Direction.read);
+
+      Map<String, int> scoresMap = {
+        //'wss://relay.damus.io': 10,
+      };
+
+      for (Map listItem in scoresList) {
+        scoresMap[listItem["relay"]] = listItem["score"];
+      }
+
+      personRelayScores[pubkey] = scoresMap;
+    }
   }
 
   String pick(List<String> pubkeys, {int? limit}) {
@@ -170,6 +197,10 @@ class RelaysPicker {
     }
 
     return winningUrl;
+  }
+
+  RelayAssignment? getRelayAssignment(String relayUrl) {
+    return relayAssignments[relayUrl];
   }
 }
 

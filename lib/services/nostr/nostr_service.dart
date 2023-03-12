@@ -62,7 +62,6 @@ class NostrService {
   late Nip05 nip05service;
 
   late RelaysRanking relaysRanking;
-  late RelaysPicker relaysPicker;
 
   // blocked users
   List<String> blockedUsers = [];
@@ -78,7 +77,6 @@ class NostrService {
     relays = relaysInjector.relays;
     relayTracker = relaysInjector.relayTracker;
     relaysRanking = relaysInjector.relaysRanking;
-    relaysPicker = relaysInjector.relaysPicker;
     isNostrServiceConnected = relays.isNostrServiceConnectedCompleter.future;
 
     relays.receiveEventStream.listen((e) {
@@ -531,10 +529,17 @@ class NostrService {
     //    "cd25e76b6a171b9a01a166a37dae7d217e0ccd573fb53207ca6d4d082bddc605",
     //    Direction.read);
 
+    var relaysPicker = RelaysPicker();
+    relaysPicker.init(pubkeys: [
+      "cd25e76b6a171b9a01a166a37dae7d217e0ccd573fb53207ca6d4d082bddc605"
+    ], coverageCount: 2);
+
     var result = relaysPicker.pick([
       "cd25e76b6a171b9a01a166a37dae7d217e0ccd573fb53207ca6d4d082bddc605",
       "not-existing"
     ]);
-    log("result: $result");
+
+    var assignment = relaysPicker.getRelayAssignment(result);
+    log("result: $result, assignment: ${assignment?.pubkeys}");
   }
 }

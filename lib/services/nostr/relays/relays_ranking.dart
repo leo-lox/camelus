@@ -83,7 +83,7 @@ class RelaysRanking {
       //rankedRelaysList.addAll(additional);
     }
 
-    developer.log("rankedRelaysList: $rankedRelaysList", name: 'RelaysRanking');
+    //developer.log("rankedRelaysList: $rankedRelaysList", name: 'RelaysRanking');
 
     return rankedRelaysList;
   }
