@@ -14,6 +14,7 @@ import 'package:camelus/services/nostr/metadata/user_metadata.dart';
 import 'package:camelus/services/nostr/relays/relay_tracker.dart';
 import 'package:camelus/services/nostr/relays/relays.dart';
 import 'package:camelus/services/nostr/relays/relays_injector.dart';
+import 'package:camelus/services/nostr/relays/relays_picker.dart';
 import 'package:camelus/services/nostr/relays/relays_ranking.dart';
 import 'package:crypto/crypto.dart';
 import 'package:flutter/services.dart';
@@ -61,6 +62,7 @@ class NostrService {
   late Nip05 nip05service;
 
   late RelaysRanking relaysRanking;
+  late RelaysPicker relaysPicker;
 
   // blocked users
   List<String> blockedUsers = [];
@@ -76,6 +78,7 @@ class NostrService {
     relays = relaysInjector.relays;
     relayTracker = relaysInjector.relayTracker;
     relaysRanking = relaysInjector.relaysRanking;
+    relaysPicker = relaysInjector.relaysPicker;
     isNostrServiceConnected = relays.isNostrServiceConnectedCompleter.future;
 
     relays.receiveEventStream.listen((e) {
@@ -524,8 +527,14 @@ class NostrService {
 
   void debug() {
     log("debug");
-    relaysRanking.getBestRelays(
-        "cd25e76b6a171b9a01a166a37dae7d217e0ccd573fb53207ca6d4d082bddc605",
-        Direction.read);
+    //relaysRanking.getBestRelays(
+    //    "cd25e76b6a171b9a01a166a37dae7d217e0ccd573fb53207ca6d4d082bddc605",
+    //    Direction.read);
+
+    var result = relaysPicker.pick([
+      "cd25e76b6a171b9a01a166a37dae7d217e0ccd573fb53207ca6d4d082bddc605",
+      "not-existing"
+    ]);
+    log("result: $result");
   }
 }

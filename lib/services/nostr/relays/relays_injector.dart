@@ -1,5 +1,6 @@
 import 'package:camelus/services/nostr/relays/relay_tracker.dart';
 import 'package:camelus/services/nostr/relays/relays.dart';
+import 'package:camelus/services/nostr/relays/relays_picker.dart';
 import 'package:camelus/services/nostr/relays/relays_ranking.dart';
 
 class RelaysInjector {
@@ -9,6 +10,7 @@ class RelaysInjector {
   Relays? _relays;
   RelayTracker? _relayTracker;
   RelaysRanking? _relaysRanking;
+  RelaysPicker? _relaysPicker;
 
   factory RelaysInjector() {
     return _injector != null ? _injector! : _singleton;
@@ -30,5 +32,9 @@ class RelaysInjector {
 
   RelaysRanking get relaysRanking {
     return _relaysRanking ??= RelaysRanking();
+  }
+
+  RelaysPicker get relaysPicker {
+    return _relaysPicker ??= RelaysPicker();
   }
 }

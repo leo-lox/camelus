@@ -52,6 +52,10 @@ class RelayTracker {
         }
       }
 
+      if (eventMap["content"] == "") {
+        return;
+      }
+
       // own adv
       Map content = jsonDecode(eventMap["content"]);
       List<String> writeRelays = [];
@@ -82,6 +86,11 @@ class RelayTracker {
 
       Map<String, dynamic> result =
           await nip05service.checkNip05(nip05, pubkey);
+      log("tracker nip05 result: $result");
+      if (result.isEmpty) {
+        return;
+      }
+
       if (!result["valid"]) {
         return;
       }

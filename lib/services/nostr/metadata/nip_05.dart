@@ -76,7 +76,10 @@ class Nip05 {
         _history[nip05] = result;
         return result;
       } else {
-        _history[nip05] = result;
+        if (result.isNotEmpty) {
+          _history[nip05] = result;
+        }
+
         return result;
       }
     } catch (e) {

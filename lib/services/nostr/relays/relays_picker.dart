@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:camelus/services/nostr/relays/relay_tracker.dart';
 import 'package:camelus/services/nostr/relays/relays_injector.dart';
 
@@ -5,25 +7,28 @@ class RelaysPicker {
   late RelayTracker relayTracker;
 
   Map<String, int> pubkeyCounts = {
-    'pubkey1': 3,
-    'pubkey2': 2,
-    'pubkey3': 1,
+    'cd25e76b6a171b9a01a166a37dae7d217e0ccd573fb53207ca6d4d082bddc605': 1,
+    //'pubkey2': 2,
+    //'pubkey3': 1,
   };
 
   Map<String, RelayAssignment> relayAssignments = {
-    'relay1':
-        RelayAssignment(relayUrl: 'relay1', pubkeys: ['pubkey1', 'pubkey2']),
-    'relay2': RelayAssignment(relayUrl: 'relay2', pubkeys: ['pubkey3']),
+    //'relay1':
+    //    RelayAssignment(relayUrl: 'relay1', pubkeys: ['pubkey1', 'pubkey2']),
+    //'relay2': RelayAssignment(relayUrl: 'relay2', pubkeys: ['pubkey3']),
   };
 
   Map<String, Map<String, int>> personRelayScores = {
-    'pubkey1': {'relay1': 10, 'relay2': 5},
-    'pubkey2': {'relay1': 7, 'relay2': 8},
+    'cd25e76b6a171b9a01a166a37dae7d217e0ccd573fb53207ca6d4d082bddc605': {
+      'wss://relay.damus.io': 10,
+      //'relay2': 5
+    },
+    //'pubkey2': {'relay1': 7, 'relay2': 8},
   };
 
   Map<String, int> excludedRelays = {
-    'relay1': DateTime.now().add(Duration(hours: 1)).millisecondsSinceEpoch,
-    'relay2': DateTime.now().add(Duration(hours: 2)).millisecondsSinceEpoch,
+    //'relay1': DateTime.now().add(Duration(hours: 1)).millisecondsSinceEpoch,
+    //'relay2': DateTime.now().add(Duration(hours: 2)).millisecondsSinceEpoch,
   };
 
   RelaysPicker() {
@@ -44,7 +49,9 @@ class RelaysPicker {
       throw Exception('NoPeopleLeft');
     }
 
-    List allRelays = tracker.keys.toList(); //hooks.getAllRelays();
+    // combine list of maps into one list containing the map
+    List allRelays = tracker.values.expand((element) => element.keys).toList();
+    //List allRelays = tracker.values.; //hooks.getAllRelays();
 
     if (allRelays.isEmpty) {
       throw Exception('NoRelays');
@@ -98,11 +105,12 @@ class RelaysPicker {
     //});
 
     var winner = scoreboard.entries.reduce((a, b) => a.value > b.value ? a : b);
+
     String winningUrl = winner.key;
     int winningScore = winner.value;
 
     if (winningScore == 0) {
-      throw Exception('NoProgress');
+      throw Exception('NoProgress $winningUrl');
     }
 
 // Now sort out which public keys go with that relay
@@ -149,7 +157,9 @@ class RelaysPicker {
 
     var assignment = RelayAssignment(
       relayUrl: winningUrl,
-      pubkeys: coveredPublicKeys as List<String>,
+      pubkeys: coveredPublicKeys
+          .map((item) => item.toString())
+          .toList(), // cast to string
     );
 
 // Put assignment into relayAssignments
