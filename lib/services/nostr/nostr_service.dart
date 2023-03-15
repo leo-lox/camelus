@@ -140,8 +140,6 @@ class NostrService {
       }
     }
 
-    relays.start();
-
     userFeedObj.restoreFromCache();
     globalFeedObj.restoreFromCache();
 
@@ -151,20 +149,24 @@ class NostrService {
     if (cachedUsersMetadata != null) {
       userMetadataObj.usersMetadata = cachedUsersMetadata;
     }
+
+    var followingCacheList = followingCache?.keys.toList();
+    followingCacheList ??= [];
+    relays.start(followingCacheList);
   }
 
-  void _loadKeyPair() {
+  Future<void> _loadKeyPair() async {
     // load keypair from storage
     FlutterSecureStorage storage = const FlutterSecureStorage();
-    storage.read(key: "nostrKeys").then((nostrKeysString) {
-      if (nostrKeysString == null) {
-        return;
-      }
+    var nostrKeysString = await storage.read(key: "nostrKeys");
+    if (nostrKeysString == null) {
+      return;
+    }
 
-      // to obj
-      myKeys = KeyPair.fromJson(json.decode(nostrKeysString));
-      userContactsObj.ownPubkey = myKeys.publicKey;
-    });
+    // to obj
+    myKeys = KeyPair.fromJson(json.decode(nostrKeysString));
+    userContactsObj.ownPubkey = myKeys.publicKey;
+    return;
   }
 
   finishedOnboarding() async {
@@ -529,6 +531,6 @@ class NostrService {
         .toList();
     log("userFollows: $userFollows");
     log("debug");
-    relays.selectBestRelays(userFollows);
+    relays.getOptimalRelays(userFollows);
   }
 }

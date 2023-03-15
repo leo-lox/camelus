@@ -51,10 +51,21 @@ class Relays {
     relayTracker = injector.relayTracker;
   }
 
-  void start() {
-    // interval to check
+  void start(List<String> pubkeys) async {
+    List<RelayAssignment> optimalRelays = await getOptimalRelays(pubkeys);
+    //"wss://nostr.bitcoiner.social": {"write": true, "read": true}
 
-    connectToRelays();
+    var converted =
+        Map.fromEntries(optimalRelays.map((e) => MapEntry(e.relayUrl, {
+              "write": false,
+              "read": true,
+            })));
+
+    relays = converted;
+
+    bool useDefault = relays.isEmpty;
+
+    connectToRelays(useDefault: useDefault);
   }
 
   Future<void> connectToRelays({bool useDefault = false}) async {
@@ -239,9 +250,11 @@ class Relays {
   }
 
   // selects the best relays based on the given pubkeys of the tracked pubkeys
-  Future<List<RelayAssignment>> selectBestRelays(List<String> pubkeys) async {
+  Future<List<RelayAssignment>> getOptimalRelays(List<String> pubkeys) async {
     var relaysPicker = RelaysPicker();
-    await relaysPicker.init(pubkeys: pubkeys, coverageCount: 2);
+    await relaysPicker.init(
+        pubkeys: pubkeys,
+        coverageCount: 2); //todo: move coverageCount to settings
 
     List<RelayAssignment> foundRelays = [];
     Map<String, int> excludedRelays = {};
