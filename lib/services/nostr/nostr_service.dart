@@ -531,14 +531,13 @@ class NostrService {
     log("debug");
 
     var relaysPicker = RelaysPicker();
-    await relaysPicker.init(pubkeys: userFollows, coverageCount: 5);
+    await relaysPicker.init(pubkeys: userFollows, coverageCount: 2);
 
     List<RelayAssignment> foundRelays = [];
     Map<String, int> excludedRelays = {};
     int now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
     while (true) {
       try {
-        // todo: add function to relay picker to insert found/blocked relays
         var result = relaysPicker.pick(userFollows);
         var assignment = relaysPicker.getRelayAssignment(result);
         if (assignment == null) {
@@ -546,7 +545,9 @@ class NostrService {
         }
         foundRelays.add(assignment);
 
+        // exclude already found relays
         excludedRelays[assignment.relayUrl] = now;
+
         relaysPicker.setExcludedRelays = excludedRelays;
       } catch (e) {
         log("catch: $e");

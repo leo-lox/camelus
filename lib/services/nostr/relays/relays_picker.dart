@@ -183,7 +183,7 @@ class RelaysPicker {
     }
 
 // Only keep pubkeyCounts that are still >0
-    pubkeyCounts.removeWhere((k, v) => v > 0);
+    pubkeyCounts.removeWhere((k, v) => v < 1);
 
     var assignment = RelayAssignment(
       relayUrl: winningUrl,

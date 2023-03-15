@@ -38,8 +38,6 @@ class Relays {
 
   final Completer isNostrServiceConnectedCompleter = Completer();
 
-  Completer relayServiceRdy = Completer();
-
   // stream for receiving events from relays
   static final StreamController<Map<String, dynamic>>
       _receiveEventStreamController =
@@ -50,33 +48,12 @@ class Relays {
   Relays() {
     RelaysInjector injector = RelaysInjector();
     relayTracker = injector.relayTracker;
-    _initCache().then((value) => {_restoreFromCache()});
-  }
-
-  _initCache() async {
-    LocalStorageInterface prefs = await LocalStorage.getInstance();
-    _jsonCache = JsonCacheCrossLocalStorage(prefs);
-    return Future(() => true);
-  }
-
-  _restoreFromCache() async {
-    if (relays.isEmpty) {
-      var relaysCache = await _jsonCache.value('relays');
-      if (relaysCache != null) {
-        relays = relaysCache.cast<String, Map<String, dynamic>>();
-      } else {
-        // if everything fails, use default relays
-        relays = initRelays;
-      }
-    }
-    relayServiceRdy.complete();
   }
 
   void start() {
     // interval to check
-    relayServiceRdy.future.then((value) => {
-          connectToRelays(),
-        });
+
+    connectToRelays();
   }
 
   Future<void> connectToRelays({bool useDefault = false}) async {
@@ -259,4 +236,6 @@ class Relays {
 
     return;
   }
+
+  selectBestRelays(List<String> pubkeys) {}
 }
