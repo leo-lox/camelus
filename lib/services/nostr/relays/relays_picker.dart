@@ -23,7 +23,7 @@ class RelaysPicker {
     //'pubkey2': {'relay1': 7, 'relay2': 8},
   };
 
-  Map<String, int> excludedRelays = {
+  Map<String, int> _excludedRelays = {
     //'relay1': DateTime.now().add(Duration(hours: 1)).millisecondsSinceEpoch,
     //'relay2': DateTime.now().add(Duration(hours: 2)).millisecondsSinceEpoch,
   };
@@ -45,7 +45,7 @@ class RelaysPicker {
       var scoresList =
           await relaysRanking.getBestRelays(pubkey, Direction.read);
       if (scoresList.isEmpty) {
-        return;
+        continue;
       }
 
       Map<String, int> scoresMap = {
@@ -58,6 +58,11 @@ class RelaysPicker {
 
       personRelayScores[pubkey] = scoresMap;
     }
+    return;
+  }
+
+  set setExcludedRelays(Map<String, int> value) {
+    _excludedRelays = value;
   }
 
   String pick(List<String> pubkeys, {int? limit}) {
@@ -67,8 +72,8 @@ class RelaysPicker {
         15; //todo move to settings  hooks.getMaxRelays();
 
 // Maybe include excluded relays
-    int now = DateTime.now().millisecondsSinceEpoch;
-    excludedRelays.removeWhere((k, v) => v > now);
+    int now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
+    _excludedRelays.removeWhere((k, v) => v > now);
 
     if (pubkeyCounts.isEmpty) {
       throw Exception('NoPeopleLeft');
@@ -101,7 +106,7 @@ class RelaysPicker {
       // Add scores of their relays
       relayScores.forEach((relay, score) {
         // Skip relays that are excluded
-        if (excludedRelays.containsKey(relay)) {
+        if (_excludedRelays.containsKey(relay)) {
           return;
         }
 

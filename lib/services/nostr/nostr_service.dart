@@ -529,16 +529,33 @@ class NostrService {
         .toList();
     log("userFollows: $userFollows");
     log("debug");
-    //relaysRanking.getBestRelays(
-    //    "cd25e76b6a171b9a01a166a37dae7d217e0ccd573fb53207ca6d4d082bddc605",
-    //    Direction.read);
 
     var relaysPicker = RelaysPicker();
-    await relaysPicker.init(pubkeys: userFollows, coverageCount: 2);
+    await relaysPicker.init(pubkeys: userFollows, coverageCount: 5);
 
-    var result = relaysPicker.pick(userFollows);
+    List<RelayAssignment> foundRelays = [];
+    Map<String, int> excludedRelays = {};
+    int now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
+    while (true) {
+      try {
+        // todo: add function to relay picker to insert found/blocked relays
+        var result = relaysPicker.pick(userFollows);
+        var assignment = relaysPicker.getRelayAssignment(result);
+        if (assignment == null) {
+          continue;
+        }
+        foundRelays.add(assignment);
 
-    var assignment = relaysPicker.getRelayAssignment(result);
-    log("result: $result, assignment: ${assignment?.pubkeys}");
+        excludedRelays[assignment.relayUrl] = now;
+        relaysPicker.setExcludedRelays = excludedRelays;
+      } catch (e) {
+        log("catch: $e");
+        break;
+      }
+    }
+    for (var relay in foundRelays) {
+      log("relay: ${relay.relayUrl}, pubkey: ${relay.pubkeys}");
+    }
+    log("found relays: $foundRelays");
   }
 }
