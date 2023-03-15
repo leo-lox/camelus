@@ -7,6 +7,7 @@ import 'package:camelus/helpers/helpers.dart';
 import 'package:camelus/models/socket_control.dart';
 import 'package:camelus/services/nostr/relays/relay_tracker.dart';
 import 'package:camelus/services/nostr/relays/relays_injector.dart';
+import 'package:camelus/services/nostr/relays/relays_picker.dart';
 import 'package:cross_local_storage/cross_local_storage.dart';
 
 import 'package:json_cache/json_cache.dart';
@@ -237,5 +238,37 @@ class Relays {
     return;
   }
 
-  selectBestRelays(List<String> pubkeys) {}
+  // selects the best relays based on the given pubkeys of the tracked pubkeys
+  Future<List<RelayAssignment>> selectBestRelays(List<String> pubkeys) async {
+    var relaysPicker = RelaysPicker();
+    await relaysPicker.init(pubkeys: pubkeys, coverageCount: 2);
+
+    List<RelayAssignment> foundRelays = [];
+    Map<String, int> excludedRelays = {};
+
+    int now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
+    while (true) {
+      try {
+        var result = relaysPicker.pick(pubkeys);
+        var assignment = relaysPicker.getRelayAssignment(result);
+        if (assignment == null) {
+          continue;
+        }
+        foundRelays.add(assignment);
+
+        // exclude already found relays
+        excludedRelays[assignment.relayUrl] = now;
+
+        relaysPicker.setExcludedRelays = excludedRelays;
+      } catch (e) {
+        log("catch: $e");
+        break;
+      }
+    }
+    for (var relay in foundRelays) {
+      log("relay: ${relay.relayUrl}, pubkey: ${relay.pubkeys}");
+    }
+    log("found relays: $foundRelays");
+    return foundRelays;
+  }
 }
