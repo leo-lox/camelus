@@ -33,7 +33,7 @@ class RelayTracker {
   }
 
   void _restoreFromCache() async {
-    var cache = await (await jsonCache.value('tracker'));
+    var cache = await jsonCache.value('tracker');
     // cast to Map<String, Map<String, dynamic>>
 
     if (cache != null) {
@@ -115,7 +115,7 @@ class RelayTracker {
 
       Map<String, dynamic> result =
           await nip05service.checkNip05(nip05, pubkey);
-      log("tracker nip05 result: $result");
+
       if (result.isEmpty) {
         return;
       }

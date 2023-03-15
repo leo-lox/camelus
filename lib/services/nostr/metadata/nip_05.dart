@@ -1,14 +1,41 @@
 import 'dart:convert';
 import 'dart:developer';
-
+import 'package:cross_local_storage/cross_local_storage.dart';
+import 'package:json_cache/json_cache.dart';
 import 'package:http/http.dart' as http;
 
 class Nip05 {
-  final Map<String, dynamic> _history = {};
+  Map<String, dynamic> _history = {};
   final List<String> _inFlight = [];
 
+  late JsonCache jsonCache;
+
   Nip05() {
-    // todo cache
+    _initJsonCache();
+  }
+
+  void _initJsonCache() async {
+    LocalStorageInterface prefs = await LocalStorage.getInstance();
+    jsonCache = JsonCacheCrossLocalStorage(prefs);
+    _restoreFromCache();
+  }
+
+  void _restoreFromCache() async {
+    var cache = (await jsonCache.value('nip05'));
+
+    if (cache == null) {
+      return;
+    }
+
+    // purge entries older than 24h
+    int now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
+    cache.removeWhere((key, value) => now - value["lastCheck"] > 60 * 60 * 24);
+
+    _history = cache;
+  }
+
+  _updateCache() async {
+    await jsonCache.refresh('nip05', _history);
   }
 
   /// returns {nip05, valid, lastCheck, relayHint} or {} when error
@@ -34,6 +61,7 @@ class Nip05 {
 
     var result = await _checkNip05Request(nip05, pubkey);
     _inFlight.remove(nip05);
+    _updateCache();
     return result;
   }
 
@@ -74,6 +102,7 @@ class Nip05 {
       if (names[username] == pubkey) {
         result["valid"] = true;
         _history[nip05] = result;
+
         return result;
       } else {
         if (result.isNotEmpty) {
