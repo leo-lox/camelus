@@ -15,7 +15,7 @@ import 'package:camelus/components/tweet_card.dart';
 import 'package:camelus/models/tweet.dart';
 import 'package:camelus/services/nostr/nostr_injector.dart';
 import 'package:camelus/services/nostr/nostr_service.dart';
-import 'package:badges/badges.dart';
+import 'package:badges/badges.dart' as badges;
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../config/palette.dart';
@@ -535,8 +535,8 @@ class _NostrPageState extends State<NostrPage> with TickerProviderStateMixin {
                 centerTitle: true,
                 title: GestureDetector(
                   onTap: () => _syncWithGlobalFeed(),
-                  child: Badge(
-                      animationType: BadgeAnimationType.fade,
+                  child: badges.Badge(
+                      animationType: badges.BadgeAnimationType.fade,
                       toAnimate: false,
                       showBadge: _newTweetsGlobal.isNotEmpty,
                       badgeColor: Palette.primary,
