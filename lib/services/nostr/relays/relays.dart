@@ -27,6 +27,8 @@ class Relays {
   Map<String, SocketControl> connectedRelaysRead = {};
   Map<String, SocketControl> connectedRelaysWrite = {};
 
+  List<RelayAssignment> _relayAssignments = [];
+
   static final StreamController<Map<String, SocketControl>>
       _connectedRelaysReadStreamController =
       StreamController<Map<String, SocketControl>>.broadcast();
@@ -52,11 +54,12 @@ class Relays {
   }
 
   void start(List<String> pubkeys) async {
-    List<RelayAssignment> optimalRelays = await getOptimalRelays(pubkeys);
+    _relayAssignments = await getOptimalRelays(pubkeys);
+
     //"wss://nostr.bitcoiner.social": {"write": true, "read": true}
 
     var converted =
-        Map.fromEntries(optimalRelays.map((e) => MapEntry(e.relayUrl, {
+        Map.fromEntries(_relayAssignments.map((e) => MapEntry(e.relayUrl, {
               "write": false,
               "read": true,
             })));
@@ -283,5 +286,32 @@ class Relays {
     }
     log("found relays: $foundRelays");
     return foundRelays;
+  }
+
+  /// sends a request to specified relays in relay assignments or default if not in relay assignments
+  void requestEvents(List<dynamic> request,
+      {dynamic additionalData,
+      StreamController? streamController,
+      Completer? completer}) {
+    // todo: figure out how to send to specific relays
+
+    String reqId = request[1];
+
+    var jsonRequest = json.encode(request);
+    for (var relay in connectedRelaysRead.entries) {
+      relay.value.socket.add(jsonRequest);
+      relay.value.requestInFlight[reqId] = true;
+
+      if (additionalData != null) {
+        relay.value.additionalData[reqId] = additionalData;
+      }
+
+      if (streamController != null) {
+        relay.value.streamControllers[reqId] = streamController;
+      }
+      if (completer != null) {
+        relay.value.completers[reqId] = completer;
+      }
+    }
   }
 }

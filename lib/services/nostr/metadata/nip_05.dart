@@ -54,7 +54,7 @@ class Nip05 {
       while (_inFlight.contains(nip05)) {
         await Future.delayed(const Duration(milliseconds: 500));
       }
-      return _history[nip05];
+      return _history[nip05] ?? {};
     }
 
     _inFlight.add(nip05);

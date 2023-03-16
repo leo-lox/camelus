@@ -9,7 +9,6 @@ import 'package:camelus/services/nostr/relays/relays_injector.dart';
 
 class EventsFeed {
   late Relays _relays;
-  late Map<String, SocketControl> _connectedRelaysRead;
 
   // events, replies
   var _events = <String, List<Tweet>>{};
@@ -17,7 +16,6 @@ class EventsFeed {
   EventsFeed() {
     RelaysInjector injector = RelaysInjector();
     _relays = injector.relays;
-    _connectedRelaysRead = _relays.connectedRelaysRead;
   }
 
   receiveNostrEvent(event, SocketControl socketControl) {
@@ -200,15 +198,8 @@ class EventsFeed {
       body2,
     ];
 
-    var jsonString = json.encode(data);
-
-    for (var relay in _connectedRelaysRead.entries) {
-      relay.value.socket.add(jsonString);
-      relay.value.requestInFlight[reqId] = true;
-      relay.value.additionalData[reqId] = {"eventIds": eventIds};
-      if (streamController != null) {
-        relay.value.streamControllers[reqId] = streamController;
-      }
-    }
+    _relays.requestEvents(data,
+        streamController: streamController,
+        additionalData: {"eventIds": eventIds});
   }
 }

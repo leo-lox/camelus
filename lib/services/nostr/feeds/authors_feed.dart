@@ -16,12 +16,9 @@ class AuthorsFeed {
   final StreamController<Map<String, List<Tweet>>> _authorsStreamController =
       StreamController<Map<String, List<Tweet>>>.broadcast();
 
-  late Map<String, SocketControl> _connectedRelaysRead;
-
   AuthorsFeed() {
     RelaysInjector injector = RelaysInjector();
     _relays = injector.relays;
-    _connectedRelaysRead = _relays.connectedRelaysRead;
 
     authorsStream = _authorsStreamController.stream;
     _init();
@@ -99,9 +96,6 @@ class AuthorsFeed {
       body,
     ];
 
-    var jsonString = json.encode(data);
-    for (var relay in _connectedRelaysRead.entries) {
-      relay.value.socket.add(jsonString);
-    }
+    _relays.requestEvents(data);
   }
 }
