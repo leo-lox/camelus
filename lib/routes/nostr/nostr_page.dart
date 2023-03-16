@@ -32,7 +32,11 @@ class NostrPage extends StatefulWidget {
   State<NostrPage> createState() => _NostrPageState();
 }
 
-class _NostrPageState extends State<NostrPage> with TickerProviderStateMixin {
+class _NostrPageState extends State<NostrPage>
+    with TickerProviderStateMixin, AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
+
   bool _isLoading = true;
 
   var _myTweetsGlobal = <Tweet>[];
