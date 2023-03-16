@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:camelus/routes/search_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_svg/svg.dart';
@@ -18,6 +19,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   int _selectedIndex = 0;
+  PageController _myPage = PageController(initialPage: 0);
 
   void _show(BuildContext ctx) {
     showModalBottomSheet(
@@ -63,103 +65,90 @@ class _HomePageState extends State<HomePage> {
       key: _scaffoldKey,
       drawer: NostrDrawer(),
       backgroundColor: Palette.background,
-      body: SafeArea(
-        child: Scaffold(
-            body: Stack(children: <Widget>[
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Expanded(
-                child: Stack(children: <Widget>[
-                  NostrPage(parentScaffoldKey: _scaffoldKey),
-                  Positioned(
-                    bottom: 25,
-                    right: 25,
-                    child: FloatingActionButton(
-                      backgroundColor: Palette.primary,
-                      child: SvgPicture.asset(
-                        'assets/icons/plus.svg',
-                        color: Palette.white,
-                        height: 27,
-                        width: 27,
-                      ),
-                      onPressed: () => {
-                        _show(context),
-                      },
-                    ),
-                  )
-                ]),
-              ),
-              BottomAppBar(
-                color: Palette.background,
-                child: Align(
-                  alignment: Alignment.bottomCenter,
-                  child: Container(
-                    decoration: const BoxDecoration(
-                      border: Border(
-                          top: BorderSide(color: Palette.darkGray, width: 0.5)),
-                    ),
-                    child: BottomNavigationBar(
-                      backgroundColor: Palette.background,
-                      showSelectedLabels: false,
-                      showUnselectedLabels: false,
-                      type: BottomNavigationBarType.fixed,
-                      currentIndex: _selectedIndex,
-                      onTap: (int index) {
-                        setState(() {
-                          _selectedIndex = index;
-                          // currentPage = pages[index];
-                        });
-                      },
-                      items: <BottomNavigationBarItem>[
-                        BottomNavigationBarItem(
-                          icon: SvgPicture.asset(
-                            height: 23,
-                            'assets/icons/house.svg',
-                            color: _selectedIndex == 0
-                                ? Palette.primary
-                                : Palette.darkGray,
-                          ),
-                          label: "home",
-                        ),
-                        BottomNavigationBarItem(
-                          icon: SvgPicture.asset(
-                            height: 23,
-                            'assets/icons/magnifying-glass.svg',
-                            color: _selectedIndex == 1
-                                ? Palette.primary
-                                : Palette.darkGray,
-                          ),
-                          label: "",
-                        ),
-                        BottomNavigationBarItem(
-                          icon: SvgPicture.asset(
-                            height: 23,
-                            'assets/icons/bell.svg',
-                            color: _selectedIndex == 2
-                                ? Palette.primary
-                                : Palette.darkGray,
-                          ),
-                          label: "",
-                        ),
-                        BottomNavigationBarItem(
-                          icon: SvgPicture.asset(
-                            height: 23,
-                            'assets/icons/chats.svg',
-                            color: _selectedIndex == 3
-                                ? Palette.primary
-                                : Palette.darkGray,
-                          ),
-                          label: "",
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ],
+      floatingActionButton: AnimatedOpacity(
+        opacity: (_selectedIndex != 0) ? 0.0 : 1.0,
+        duration: const Duration(milliseconds: 150),
+        child: FloatingActionButton(
+          backgroundColor: Palette.primary,
+          child: SvgPicture.asset(
+            'assets/icons/plus.svg',
+            color: Palette.white,
+            height: 27,
+            width: 27,
           ),
-        ])),
+          onPressed: () => {
+            _show(context),
+          },
+        ),
+      ),
+      body: SafeArea(
+        child: PageView(
+          controller: _myPage,
+          physics: const NeverScrollableScrollPhysics(),
+          children: <Widget>[
+            NostrPage(parentScaffoldKey: _scaffoldKey),
+            SearchPage(),
+            const Center(
+              child:
+                  Text('Empty Body 2', style: TextStyle(color: Colors.white)),
+            ),
+            const Center(
+              child:
+                  Text('Empty Body 3', style: TextStyle(color: Colors.white)),
+            )
+          ], // Comment this if you need to use Swipe.
+        ),
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: Palette.background,
+        showSelectedLabels: false,
+        showUnselectedLabels: false,
+        type: BottomNavigationBarType.fixed,
+        currentIndex: _selectedIndex,
+        onTap: (int index) {
+          setState(() {
+            _selectedIndex = index;
+            // currentPage = pages[index];
+
+            setState(() {
+              _myPage.jumpToPage(index);
+            });
+          });
+        },
+        items: <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: SvgPicture.asset(
+              height: 23,
+              'assets/icons/house.svg',
+              color: _selectedIndex == 0 ? Palette.primary : Palette.darkGray,
+            ),
+            label: "home",
+          ),
+          BottomNavigationBarItem(
+            icon: SvgPicture.asset(
+              height: 23,
+              'assets/icons/magnifying-glass.svg',
+              color: _selectedIndex == 1 ? Palette.primary : Palette.darkGray,
+            ),
+            label: "",
+          ),
+          BottomNavigationBarItem(
+            icon: SvgPicture.asset(
+              height: 23,
+              'assets/icons/bell.svg',
+              color: _selectedIndex == 2 ? Palette.primary : Palette.darkGray,
+            ),
+            label: "",
+          ),
+          BottomNavigationBarItem(
+            icon: SvgPicture.asset(
+              height: 23,
+              'assets/icons/chats.svg',
+              color: _selectedIndex == 3 ? Palette.primary : Palette.darkGray,
+            ),
+            label: "",
+          ),
+        ],
       ),
     );
   }
