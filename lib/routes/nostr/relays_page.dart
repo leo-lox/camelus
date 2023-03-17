@@ -1,9 +1,18 @@
+import 'dart:developer';
+
 import 'package:camelus/config/palette.dart';
+import 'package:camelus/models/socket_control.dart';
+import 'package:camelus/services/nostr/relays/relays.dart';
+import 'package:camelus/services/nostr/relays/relays_injector.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
 class RelaysPage extends StatefulWidget {
-  const RelaysPage({Key? key}) : super(key: key);
+  late Relays _relaysService;
+  RelaysPage({Key? key}) : super(key: key) {
+    RelaysInjector injector = RelaysInjector();
+    _relaysService = injector.relays;
+  }
 
   @override
   State<RelaysPage> createState() => _RelaysPageState();
@@ -63,21 +72,43 @@ class _RelaysPageState extends State<RelaysPage> {
                 height: MediaQuery.of(context).size.height - 110,
                 child: ListView(
                   children: [
-                    const Text('dynamic',
-                        style: TextStyle(
-                          color: Palette.white,
-                          fontSize: 28.0,
-                          fontWeight: FontWeight.w500,
-                        )),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: const [
+                        Text('dynamic',
+                            style: TextStyle(
+                              color: Palette.white,
+                              fontSize: 28.0,
+                              fontWeight: FontWeight.w500,
+                            )),
+                        SizedBox(width: 8.0),
+                        Text("read",
+                            style: TextStyle(
+                              color: Palette.lightGray,
+                              fontSize: 16.0,
+                            )),
+                      ],
+                    ),
                     const SizedBox(height: 8.0),
-                    _dynamicRelays(),
+                    _dynamicRelays(widget._relaysService),
                     const SizedBox(height: 30.0),
-                    const Text('static/manual',
-                        style: TextStyle(
-                          color: Palette.white,
-                          fontSize: 28.0,
-                          fontWeight: FontWeight.w500,
-                        )),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: const [
+                        Text('static/manual',
+                            style: TextStyle(
+                              color: Palette.white,
+                              fontSize: 28.0,
+                              fontWeight: FontWeight.w500,
+                            )),
+                        SizedBox(width: 8.0),
+                        Text("write",
+                            style: TextStyle(
+                              color: Palette.lightGray,
+                              fontSize: 16.0,
+                            )),
+                      ],
+                    ),
                     const SizedBox(height: 8.0),
                     _staticRelays(),
                     const SizedBox(height: 30.0),
@@ -102,10 +133,10 @@ class _RelaysPageState extends State<RelaysPage> {
   }
 }
 
-Widget _dynamicRelays() {
+Widget _dynamicRelays(Relays relaysService) {
   // define the number of columns and rows
   int columnCount = 3;
-  int rowCount = 2;
+  int rowCount = relaysService.relayAssignments.length;
 
 // create a list to hold the rows
   List<TableRow> rows = [];
@@ -122,15 +153,26 @@ Widget _dynamicRelays() {
 // create the remaining rows with data
   for (int i = 0; i < rowCount; i++) {
     List<Widget> dataRow = [];
-    dataRow.add(Text('Row $i', style: const TextStyle(color: Palette.white)));
+    String relayUrl = relaysService.relayAssignments[i].relayUrl;
+    dataRow.add(Text(relayUrl, style: const TextStyle(color: Palette.white)));
 
     for (int j = 1; j < columnCount; j++) {
       if (j == 1) {
-        dataRow
-            .add(Text('$j -a', style: const TextStyle(color: Palette.white)));
+        Iterable<SocketControl> tmp = relaysService.connectedRelaysRead.values;
+        var socketReceivedEventsCount = -1;
+        try {
+          socketReceivedEventsCount = tmp
+              .singleWhere((element) => element.connectionUrl == relayUrl)
+              .socketReceivedEventsCount;
+        } catch (e) {
+          //log('error: $e');
+        }
+
+        dataRow.add(Text('$socketReceivedEventsCount',
+            style: const TextStyle(color: Palette.white)));
       } else if (j == 2) {
-        dataRow
-            .add(Text('$j -b', style: const TextStyle(color: Palette.white)));
+        dataRow.add(Text('${relaysService.relayAssignments[i].pubkeys.length}',
+            style: const TextStyle(color: Palette.white)));
       }
     }
     rows.add(TableRow(children: dataRow));

@@ -14,10 +14,14 @@ import 'package:json_cache/json_cache.dart';
 
 class Relays {
   final Map<String, Map<String, bool>> initRelays = {
-    "wss://nostr.bitcoiner.social": {"write": true, "read": true},
-    "wss://nostr.zebedee.cloud": {"write": true, "read": true},
+    "wss://nostr.bitcoiner.social": {
+      "write": true,
+      "read": true,
+      "default": true
+    },
+    "wss://nostr.zebedee.cloud": {"write": true, "read": true, "default": true},
     //"wss://brb.io": {"write": true, "read": true},
-    "wss://nos.lol": {"write": true, "read": true},
+    "wss://nos.lol": {"write": true, "read": true, "default": true},
   };
 
   Map<String, Map<String, dynamic>> relays = {};
@@ -27,7 +31,7 @@ class Relays {
   Map<String, SocketControl> connectedRelaysRead = {};
   Map<String, SocketControl> connectedRelaysWrite = {};
 
-  List<RelayAssignment> _relayAssignments = [];
+  List<RelayAssignment> relayAssignments = [];
 
   static final StreamController<Map<String, SocketControl>>
       _connectedRelaysReadStreamController =
@@ -54,14 +58,17 @@ class Relays {
   }
 
   void start(List<String> pubkeys) async {
-    _relayAssignments = await getOptimalRelays(pubkeys);
+    relayAssignments = await getOptimalRelays(pubkeys);
 
     //"wss://nostr.bitcoiner.social": {"write": true, "read": true}
 
     var converted =
-        Map.fromEntries(_relayAssignments.map((e) => MapEntry(e.relayUrl, {
+        Map.fromEntries(relayAssignments.map((e) => MapEntry(e.relayUrl, {
               "write": false,
               "read": true,
+              "dynamic": true,
+              "manual": false,
+              "default": false,
             })));
 
     relays = converted;
@@ -92,6 +99,7 @@ class Relays {
                   socketControl.socketIsRdy = true,
 
                   value.listen((event) {
+                    socketControl.socketReceivedEventsCount++;
                     var eventJson = json.decode(event);
                     _receiveEventStreamController.add({
                       "event": eventJson,
