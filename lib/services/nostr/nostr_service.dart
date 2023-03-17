@@ -533,4 +533,16 @@ class NostrService {
     log("debug");
     relays.getOptimalRelays(userFollows);
   }
+
+  Future<void> pickAndReconnect() async {
+    log("pickAndReconnect");
+    var userFollows = (await getUserContacts(myKeys.publicKey))
+        .map<String>((e) => e[1])
+        .toList();
+    log("userFollows: $userFollows");
+
+    await relays.closeRelays();
+    await relays.start(userFollows);
+    return;
+  }
 }

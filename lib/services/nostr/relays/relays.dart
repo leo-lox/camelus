@@ -24,6 +24,10 @@ class Relays {
     "wss://nos.lol": {"write": true, "read": true, "default": true},
   };
 
+  Map<String, Map<String, dynamic>> manualRelays = {};
+
+  Map<String, Map<String, dynamic>> failingRelays = {};
+
   Map<String, Map<String, dynamic>> relays = {};
 
   Map<String, List<dynamic>> userRelayMatching = {};
@@ -57,7 +61,7 @@ class Relays {
     relayTracker = injector.relayTracker;
   }
 
-  void start(List<String> pubkeys) async {
+  Future<void> start(List<String> pubkeys) async {
     relayAssignments = await getOptimalRelays(pubkeys);
 
     //"wss://nostr.bitcoiner.social": {"write": true, "read": true}
@@ -75,7 +79,8 @@ class Relays {
 
     bool useDefault = relays.isEmpty;
 
-    connectToRelays(useDefault: useDefault);
+    await connectToRelays(useDefault: useDefault);
+    return;
   }
 
   Future<void> connectToRelays({bool useDefault = false}) async {
@@ -107,16 +112,21 @@ class Relays {
                     });
                     relayTracker.analyzeNostrEvent(eventJson, socketControl);
                   }, onDone: () {
-                    // on disconnect
-                    connectedRelaysRead[id]!.socketIsRdy = false;
-                    _reconnectToRelayRead(id);
-                    _connectedRelaysReadStreamController
-                        .add(connectedRelaysRead);
+                    // if pick and connect don't try to reconnect
+                    try {
+                      // on disconnect
+                      connectedRelaysRead[id]!.socketIsRdy = false;
+                      _reconnectToRelayRead(id);
+                      _connectedRelaysReadStreamController
+                          .add(connectedRelaysRead);
+                      // ignore: empty_catches
+                    } catch (e) {}
                   }),
                   connectedRelaysRead[id] = socketControl,
                   _connectedRelaysReadStreamController.add(connectedRelaysRead),
                 })
             .catchError((e) {
+          failingRelays[relay.key] = {...relay.value, "error": e.toString()};
           return Future(() => {log("error connecting to relay $e")});
         });
       }
@@ -127,19 +137,24 @@ class Relays {
 
         SocketControl socketControl = SocketControl(id, relay.key);
 
-        socket.then((value) => {
-              socketControl.socket = value,
-              socketControl.socketIsRdy = true,
-              connectedRelaysWrite[id] = socketControl,
+        socket
+            .then((value) => {
+                  socketControl.socket = value,
+                  socketControl.socketIsRdy = true,
+                  connectedRelaysWrite[id] = socketControl,
 
-              // check if already listened to this socket
-              if (value.hashCode != connectedRelaysWrite[id]!.socket.hashCode)
-                value.listen((event) {}, onDone: () {
-                  // on disconnect
-                  connectedRelaysWrite[id]!.socketIsRdy = false;
-                  _reconnectToRelayWrite(id);
-                }),
-            });
+                  // check if already listened to this socket
+                  if (value.hashCode !=
+                      connectedRelaysWrite[id]!.socket.hashCode)
+                    value.listen((event) {}, onDone: () {
+                      // on disconnect
+                      connectedRelaysWrite[id]!.socketIsRdy = false;
+                      _reconnectToRelayWrite(id);
+                    }),
+                })
+            .catchError((e) {
+          failingRelays[relay.key] = {...relay.value, "error": e.toString()};
+        });
       }
 
       log("connected to ${relay.key}");
@@ -254,8 +269,18 @@ class Relays {
     }
     log("connected relays: ${connectedRelaysRead.length} => all closed");
 
+    manualRelays = {};
+
+    failingRelays = {};
+
+    relays = {};
+
+    userRelayMatching = {};
+
     connectedRelaysRead = {};
     connectedRelaysWrite = {};
+
+    relayAssignments = [];
 
     return;
   }
@@ -321,5 +346,18 @@ class Relays {
         relay.value.completers[reqId] = completer;
       }
     }
+  }
+
+  setManualRelays(Map<String, Map<String, dynamic>> relays) {
+    // add manual true to relays
+    for (var relay in relays.entries) {
+      relays[relay.key]!['manual'] = true;
+    }
+
+    manualRelays = relays;
+
+    // add to cache
+    int now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
+    _jsonCache.refresh('relays', {'relays': relays, 'timestamp': now});
   }
 }

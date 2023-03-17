@@ -165,11 +165,8 @@ class UserContacts {
         Map<String, Map<String, dynamic>> casted = cast
             .map((key, value) => MapEntry(key, value as Map<String, dynamic>));
 
-        // todo: update relays
         // update relays
-        //relays = casted;
-        //update cache
-        //_jsonCache.refresh('relays', relays);
+        _relays.setManualRelays(casted);
       } catch (e) {
         log("error: $e");
       }
