@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:developer';
 import 'package:camelus/models/socket_control.dart';
 import 'package:camelus/services/nostr/relays/relays.dart';
 import 'package:camelus/services/nostr/relays/relays_injector.dart';
@@ -74,6 +75,9 @@ class AuthorsFeed {
       int? since,
       int? until,
       int? limit}) {
+    // trigger existing data
+    _authorsStreamController.add(this.authors);
+
     // reqId contains authors to later sort it out
     var reqId = "authors-$requestId";
 

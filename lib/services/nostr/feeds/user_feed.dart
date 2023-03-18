@@ -149,6 +149,9 @@ class UserFeed {
       int? until,
       int? limit,
       bool? includeComments}) {
+    // send existing  stream /send to ui
+    _userFeedStreamController.add(feed);
+
     var reqId = "ufeed-$requestId";
     const defaultLimit = 5;
 
