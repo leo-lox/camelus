@@ -257,7 +257,7 @@ class _ProfilePageState extends State<ProfilePage>
                   PopupMenuButton<String>(
                     tooltip: "More",
                     onSelected: (e) => {
-                      log(e),
+                      //log(e),
                       // toast
                       if (e == "block") _blockUser()
                     },
@@ -317,7 +317,6 @@ class _ProfilePageState extends State<ProfilePage>
                               String lud16 = "";
 
                               if (snapshot.hasData) {
-                                log(snapshot.data.toString());
                                 lud06 = snapshot.data?["lud06"] ?? "";
                                 lud16 = snapshot.data?["lud16"] ?? "";
                               }
@@ -681,7 +680,7 @@ class _ProfilePageState extends State<ProfilePage>
                               if (widget.pubkey ==
                                   widget._nostrService.myKeys.publicKey)
                                 Text(
-                                  "${widget._nostrService.relayTracker.tracker.length} relays",
+                                  "${widget._nostrService.relays.manualRelays.length} relays",
                                   style: const TextStyle(
                                     color: Palette.white,
                                     fontSize: 14,

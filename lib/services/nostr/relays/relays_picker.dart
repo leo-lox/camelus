@@ -1,33 +1,68 @@
+import 'dart:developer';
+
 import 'package:camelus/services/nostr/relays/relay_tracker.dart';
 import 'package:camelus/services/nostr/relays/relays_injector.dart';
+import 'package:camelus/services/nostr/relays/relays_ranking.dart';
 
 class RelaysPicker {
   late RelayTracker relayTracker;
+  late RelaysRanking relaysRanking;
 
   Map<String, int> pubkeyCounts = {
-    'pubkey1': 3,
-    'pubkey2': 2,
-    'pubkey3': 1,
+    //'pubkey2': 2,
+    //'pubkey3': 1,
   };
 
   Map<String, RelayAssignment> relayAssignments = {
-    'relay1':
-        RelayAssignment(relayUrl: 'relay1', pubkeys: ['pubkey1', 'pubkey2']),
-    'relay2': RelayAssignment(relayUrl: 'relay2', pubkeys: ['pubkey3']),
+    //'relay1':
+    //    RelayAssignment(relayUrl: 'relay1', pubkeys: ['pubkey1', 'pubkey2']),
+    //'relay2': RelayAssignment(relayUrl: 'relay2', pubkeys: ['pubkey3']),
   };
 
   Map<String, Map<String, int>> personRelayScores = {
-    'pubkey1': {'relay1': 10, 'relay2': 5},
-    'pubkey2': {'relay1': 7, 'relay2': 8},
+    //'pubkey2': {'relay1': 7, 'relay2': 8},
   };
 
-  Map<String, int> excludedRelays = {
-    'relay1': DateTime.now().add(Duration(hours: 1)).millisecondsSinceEpoch,
-    'relay2': DateTime.now().add(Duration(hours: 2)).millisecondsSinceEpoch,
+  Map<String, int> _excludedRelays = {
+    //'relay1': DateTime.now().add(Duration(hours: 1)).millisecondsSinceEpoch,
+    //'relay2': DateTime.now().add(Duration(hours: 2)).millisecondsSinceEpoch,
   };
 
   RelaysPicker() {
-    relayTracker = RelaysInjector().relayTracker;
+    RelaysInjector relaysInjector = RelaysInjector();
+    relayTracker = relaysInjector.relayTracker;
+    relaysRanking = relaysInjector.relaysRanking;
+  }
+
+  Future<void> init(
+      {required List<String> pubkeys, required int coverageCount}) async {
+    for (var pubkey in pubkeys) {
+      pubkeyCounts[pubkey] = coverageCount;
+    }
+
+    // populate personRelayScores
+    for (var pubkey in pubkeys) {
+      var scoresList =
+          await relaysRanking.getBestRelays(pubkey, Direction.read);
+      if (scoresList.isEmpty) {
+        continue;
+      }
+
+      Map<String, int> scoresMap = {
+        //'wss://relay.damus.io': 10,
+      };
+
+      for (Map listItem in scoresList) {
+        scoresMap[listItem["relay"]] = listItem["score"];
+      }
+
+      personRelayScores[pubkey] = scoresMap;
+    }
+    return;
+  }
+
+  set setExcludedRelays(Map<String, int> value) {
+    _excludedRelays = value;
   }
 
   String pick(List<String> pubkeys, {int? limit}) {
@@ -37,14 +72,16 @@ class RelaysPicker {
         15; //todo move to settings  hooks.getMaxRelays();
 
 // Maybe include excluded relays
-    int now = DateTime.now().millisecondsSinceEpoch;
-    excludedRelays.removeWhere((k, v) => v > now);
+    int now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
+    _excludedRelays.removeWhere((k, v) => v > now);
 
     if (pubkeyCounts.isEmpty) {
       throw Exception('NoPeopleLeft');
     }
 
-    List allRelays = tracker.keys.toList(); //hooks.getAllRelays();
+    // combine list of maps into one list containing the map
+    List allRelays = tracker.values.expand((element) => element.keys).toList();
+    //List allRelays = tracker.values.; //hooks.getAllRelays();
 
     if (allRelays.isEmpty) {
       throw Exception('NoRelays');
@@ -69,7 +106,7 @@ class RelaysPicker {
       // Add scores of their relays
       relayScores.forEach((relay, score) {
         // Skip relays that are excluded
-        if (excludedRelays.containsKey(relay)) {
+        if (_excludedRelays.containsKey(relay)) {
           return;
         }
 
@@ -98,11 +135,12 @@ class RelaysPicker {
     //});
 
     var winner = scoreboard.entries.reduce((a, b) => a.value > b.value ? a : b);
+
     String winningUrl = winner.key;
     int winningScore = winner.value;
 
     if (winningScore == 0) {
-      throw Exception('NoProgress');
+      throw Exception('NoProgress $winningUrl');
     }
 
 // Now sort out which public keys go with that relay
@@ -145,11 +183,13 @@ class RelaysPicker {
     }
 
 // Only keep pubkeyCounts that are still >0
-    pubkeyCounts.removeWhere((k, v) => v > 0);
+    pubkeyCounts.removeWhere((k, v) => v < 1);
 
     var assignment = RelayAssignment(
       relayUrl: winningUrl,
-      pubkeys: coveredPublicKeys as List<String>,
+      pubkeys: coveredPublicKeys
+          .map((item) => item.toString())
+          .toList(), // cast to string
     );
 
 // Put assignment into relayAssignments
@@ -160,6 +200,10 @@ class RelaysPicker {
     }
 
     return winningUrl;
+  }
+
+  RelayAssignment? getRelayAssignment(String relayUrl) {
+    return relayAssignments[relayUrl];
   }
 }
 

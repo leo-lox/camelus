@@ -10,7 +10,6 @@ import 'package:cross_local_storage/cross_local_storage.dart';
 import 'package:json_cache/json_cache.dart';
 
 class UserContacts {
-  late Map<String, SocketControl> _connectedRelaysRead = {};
   late Relays _relays;
   late String ownPubkey;
 
@@ -27,7 +26,7 @@ class UserContacts {
   UserContacts() {
     RelaysInjector injector = RelaysInjector();
     _relays = injector.relays;
-    _connectedRelaysRead = _relays.connectedRelaysRead;
+
     _init();
   }
 
@@ -127,15 +126,8 @@ class UserContacts {
         "limit": users.length
       },
     ];
-    var jsonString = json.encode(data);
 
-    for (var relay in _connectedRelaysRead.entries) {
-      relay.value.socket.add(jsonString);
-      relay.value.requestInFlight[requestId] = true;
-      if (completer != null) {
-        relay.value.completers[requestId] = completer;
-      }
-    }
+    _relays.requestEvents(data, completer: completer);
   }
 
   receiveNostrEvent(event, SocketControl socketControl) {
@@ -173,11 +165,8 @@ class UserContacts {
         Map<String, Map<String, dynamic>> casted = cast
             .map((key, value) => MapEntry(key, value as Map<String, dynamic>));
 
-        // todo: update relays
         // update relays
-        //relays = casted;
-        //update cache
-        //_jsonCache.refresh('relays', relays);
+        _relays.setManualRelays(casted);
       } catch (e) {
         log("error: $e");
       }

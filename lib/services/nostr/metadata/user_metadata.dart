@@ -19,7 +19,6 @@ import 'package:json_cache/json_cache.dart';
 class UserMetadata {
   Map<String, dynamic> usersMetadata = {};
 
-  late Map<String, SocketControl> _connectedRelaysRead = {};
   late Relays _relays;
 
   late JsonCache _jsonCache;
@@ -32,7 +31,6 @@ class UserMetadata {
   UserMetadata() {
     RelaysInjector injector = RelaysInjector();
     _relays = injector.relays;
-    _connectedRelaysRead = _relays.connectedRelaysRead;
     _init();
   }
 
@@ -136,14 +134,7 @@ class UserMetadata {
       },
     ];
 
-    var jsonString = json.encode(data);
-    for (var relay in _connectedRelaysRead.entries) {
-      relay.value.socket.add(jsonString);
-      relay.value.requestInFlight[requestId] = true;
-      if (completer != null) {
-        relay.value.completers[requestId] = completer;
-      }
-    }
+    _relays.requestEvents(data, completer: completer);
   }
 
   receiveNostrEvent(event, SocketControl socketControl) {

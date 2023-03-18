@@ -4,6 +4,8 @@ import 'dart:developer';
 import 'package:camelus/models/socket_control.dart';
 import 'package:camelus/services/nostr/metadata/metadata_injector.dart';
 import 'package:camelus/services/nostr/metadata/nip_05.dart';
+import 'package:cross_local_storage/cross_local_storage.dart';
+import 'package:json_cache/json_cache.dart';
 
 enum RelayTrackerAdvType {
   kind03,
@@ -16,13 +18,40 @@ class RelayTracker {
   Map<String, Map<String, dynamic>> tracker = {};
 
   late Nip05 nip05service;
+  late JsonCache jsonCache;
 
   RelayTracker() {
     nip05service = MetadataInjector().nip05;
+
+    _initJsonCache();
+  }
+
+  void _initJsonCache() async {
+    LocalStorageInterface prefs = await LocalStorage.getInstance();
+    jsonCache = JsonCacheCrossLocalStorage(prefs);
+    _restoreFromCache();
+  }
+
+  void _restoreFromCache() async {
+    var cache = await jsonCache.value('tracker');
+    // cast to Map<String, Map<String, dynamic>>
+
+    if (cache != null) {
+      // cast to Map<String, Map<String, dynamic>>
+      var cacheMap = Map.fromEntries(cache.entries.map(
+          (entry) => MapEntry(entry.key, entry.value as Map<String, dynamic>)));
+
+      tracker = cacheMap;
+    }
+  }
+
+  void _updateCache() async {
+    await jsonCache.refresh('tracker', tracker);
   }
 
   void clear() {
     tracker = {};
+    _updateCache();
   }
 
   Future<void> analyzeNostrEvent(event, SocketControl socketControl) async {
@@ -50,6 +79,10 @@ class RelayTracker {
           trackRelays(tag[1], [tag[2]], RelayTrackerAdvType.kind03,
               eventMap["created_at"]);
         }
+      }
+
+      if (eventMap["content"] == "") {
+        return;
       }
 
       // own adv
@@ -82,6 +115,11 @@ class RelayTracker {
 
       Map<String, dynamic> result =
           await nip05service.checkNip05(nip05, pubkey);
+
+      if (result.isEmpty) {
+        return;
+      }
+
       if (!result["valid"]) {
         return;
       }
@@ -144,6 +182,7 @@ class RelayTracker {
           break;
       }
     }
+    _updateCache();
   }
 
   _populateTracker(String personPubkey, String relayUrl) {

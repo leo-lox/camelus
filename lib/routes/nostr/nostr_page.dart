@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:camelus/models/socket_control.dart';
+import 'package:camelus/routes/nostr/relays_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
@@ -372,6 +373,31 @@ class _NostrPageState extends State<NostrPage>
     return count;
   }
 
+  _openRelaysView() {
+    Navigator.of(context).push(
+      PageRouteBuilder(
+        pageBuilder: (context, animation, secondaryAnimation) => RelaysPage(),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          var begin = const Offset(0.0, 0.2);
+          var end = Offset.zero;
+          var curve = Curves.linear;
+
+          var tween =
+              Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
+          return ScaleTransition(
+            alignment: Alignment.topRight,
+            scale: animation,
+            child: SlideTransition(
+              position: animation.drive(tween),
+              child: child,
+            ),
+          );
+        },
+      ),
+    );
+  }
+
   @override
   void initState() {
     _getPubkey();
@@ -559,7 +585,7 @@ class _NostrPageState extends State<NostrPage>
                 ),
                 actions: [
                   GestureDetector(
-                    onTap: () => widget._nostrService.debug(),
+                    onTap: () => _openRelaysView(),
                     child: StreamBuilder(
                         stream: widget
                             ._nostrService.relays.connectedRelaysReadStream,

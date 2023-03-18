@@ -21,12 +21,9 @@ class UserFeed {
   final StreamController<List<Tweet>> _userFeedStreamControllerReplies =
       StreamController<List<Tweet>>.broadcast();
 
-  late Map<String, SocketControl> _connectedRelaysRead;
-
   UserFeed() {
     RelaysInjector injector = RelaysInjector();
     _relays = injector.relays;
-    _connectedRelaysRead = _relays.connectedRelaysRead;
 
     userFeedStream = _userFeedStreamController.stream;
     userFeedStreamReplies = _userFeedStreamControllerReplies.stream;
@@ -180,16 +177,11 @@ class UserFeed {
       "REQ",
       reqId,
       body1,
-      //todo: add body2
     ];
     if (includeComments == true) {
       data.add(body2);
     }
 
-    var jsonString = json.encode(data);
-    for (var relay in _connectedRelaysRead.entries) {
-      relay.value.socket.add(jsonString);
-      relay.value.requestInFlight[reqId] = true;
-    }
+    _relays.requestEvents(data);
   }
 }

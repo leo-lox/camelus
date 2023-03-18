@@ -12,5 +12,6 @@ class SocketControl {
   bool socketIsRdy = false;
   bool socketIsFailing = false;
   int socketFailingAttempts = 0;
+  int socketReceivedEventsCount = 0;
   SocketControl(this.id, this.connectionUrl);
 }

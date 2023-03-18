@@ -14,6 +14,7 @@ import 'package:camelus/services/nostr/metadata/user_metadata.dart';
 import 'package:camelus/services/nostr/relays/relay_tracker.dart';
 import 'package:camelus/services/nostr/relays/relays.dart';
 import 'package:camelus/services/nostr/relays/relays_injector.dart';
+import 'package:camelus/services/nostr/relays/relays_picker.dart';
 import 'package:camelus/services/nostr/relays/relays_ranking.dart';
 import 'package:crypto/crypto.dart';
 import 'package:flutter/services.dart';
@@ -33,8 +34,6 @@ class NostrService {
 
   static String ownPubkeySubscriptionId =
       "own-${Helpers().getRandomString(20)}";
-
-  var counterOwnSubscriptionsHits = 0;
 
   // global feed
   var globalFeedObj = GlobalFeed();
@@ -139,8 +138,6 @@ class NostrService {
       }
     }
 
-    relays.start();
-
     userFeedObj.restoreFromCache();
     globalFeedObj.restoreFromCache();
 
@@ -150,20 +147,24 @@ class NostrService {
     if (cachedUsersMetadata != null) {
       userMetadataObj.usersMetadata = cachedUsersMetadata;
     }
+
+    var followingCacheList = followingCache?.keys.toList();
+    followingCacheList ??= [];
+    relays.start(followingCacheList);
   }
 
-  void _loadKeyPair() {
+  Future<void> _loadKeyPair() async {
     // load keypair from storage
     FlutterSecureStorage storage = const FlutterSecureStorage();
-    storage.read(key: "nostrKeys").then((nostrKeysString) {
-      if (nostrKeysString == null) {
-        return;
-      }
+    var nostrKeysString = await storage.read(key: "nostrKeys");
+    if (nostrKeysString == null) {
+      return;
+    }
 
-      // to obj
-      myKeys = KeyPair.fromJson(json.decode(nostrKeysString));
-      userContactsObj.ownPubkey = myKeys.publicKey;
-    });
+    // to obj
+    myKeys = KeyPair.fromJson(json.decode(nostrKeysString));
+    userContactsObj.ownPubkey = myKeys.publicKey;
+    return;
   }
 
   finishedOnboarding() async {
@@ -238,23 +239,7 @@ class NostrService {
     // filter by subscription id
 
     if (event[1] == ownPubkeySubscriptionId) {
-      if (event[0] == "EOSE") {
-        // check if this is for all relays
-        counterOwnSubscriptionsHits++;
-
-        if (counterOwnSubscriptionsHits == relays.connectedRelaysWrite.length) {
-          //if (relayTracker.isEmpty) {
-          //  //publish default relays
-
-          //  log("using default relays: $defaultRelays and write this to relays");
-
-          //  writeEvent(json.encode(defaultRelays), 2, []);
-          //}
-
-          return;
-        }
-        return;
-      }
+      if (event[0] == "EOSE") {}
 
       Map eventMap = event[2];
       // metadata
@@ -522,10 +507,24 @@ class NostrService {
     return;
   }
 
-  void debug() {
+  Future<void> debug() async {
+    List<String> userFollows = (await getUserContacts(myKeys.publicKey))
+        .map<String>((e) => e[1])
+        .toList();
+    log("userFollows: $userFollows");
     log("debug");
-    relaysRanking.getBestRelays(
-        "cd25e76b6a171b9a01a166a37dae7d217e0ccd573fb53207ca6d4d082bddc605",
-        Direction.read);
+    relays.getOptimalRelays(userFollows);
+  }
+
+  Future<void> pickAndReconnect() async {
+    log("pickAndReconnect");
+    var userFollows = (await getUserContacts(myKeys.publicKey))
+        .map<String>((e) => e[1])
+        .toList();
+    log("userFollows: $userFollows");
+
+    await relays.closeRelays();
+    await relays.start(userFollows);
+    return;
   }
 }
