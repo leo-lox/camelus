@@ -15,6 +15,7 @@ class UserContacts {
 
   /// map with pubkey as identifier, second list [0] is p, [1] is pubkey, [2] is the relay url
   var following = <String, List<List>>{};
+  var followingLastFetch = <String, int>{};
 
   late JsonCache _jsonCache;
 
@@ -33,13 +34,74 @@ class UserContacts {
   _init() async {
     LocalStorageInterface prefs = await LocalStorage.getInstance();
     _jsonCache = JsonCacheCrossLocalStorage(prefs);
+
+    _restoreCache().then((_) => {_removeOldData()});
+  }
+
+  Future<void> _restoreCache() async {
+    var cache = await _jsonCache.value(
+      'followingLastFetch',
+    );
+    if (cache != null) {
+      followingLastFetch = Map<String, int>.from(cache);
+    }
+
+    // restore following
+    var followingCache = (await _jsonCache.value('following'));
+    if (followingCache != null) {
+      // cast using for loop to avoid type error
+      for (var key in followingCache.keys) {
+        following[key] = [];
+        var value = followingCache[key];
+        for (List parentList in value) {
+          following[key]!.add(parentList);
+        }
+      }
+    }
+    return;
+  }
+
+  _removeOldData() {
+    // 4 hours //todo move magic number to settings
+    int timeBarrier = 60 * 60 * 4;
+    var now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
+    var oldData = <String, int>{};
+    for (var key in followingLastFetch.keys) {
+      if (now - followingLastFetch[key]! > timeBarrier) {
+        oldData[key] = followingLastFetch[key]!;
+      }
+    }
+    for (var key in oldData.keys) {
+      followingLastFetch.remove(key);
+      following.remove(key);
+    }
+    _jsonCache.refresh('followingLastFetch', followingLastFetch);
+    _jsonCache.refresh('following', following);
   }
 
   getContactsByPubkey(String pubkey, {bool force = false}) {
-    // return from cache
+    var now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
+
     if (following.containsKey(pubkey) && !force) {
+      // check if no relation
+      if (followingLastFetch[pubkey] == null) {
+        //set relation
+        followingLastFetch[pubkey] = now;
+        //update cache
+        _jsonCache.refresh('followingLastFetch', followingLastFetch);
+
+        // update in background
+        getContactsByPubkey(pubkey, force: true);
+      }
+
+      // return from cache
       return Future(() => following[pubkey]!);
     }
+
+    //set relation
+    followingLastFetch[pubkey] = now;
+    //update cache
+    _jsonCache.refresh('followingLastFetch', followingLastFetch);
 
     Completer<Map> result = Completer();
 

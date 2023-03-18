@@ -18,6 +18,7 @@ import 'package:json_cache/json_cache.dart';
 
 class UserMetadata {
   Map<String, dynamic> usersMetadata = {};
+  var metadataLastFetch = <String, int>{};
 
   late Relays _relays;
 
@@ -37,6 +38,43 @@ class UserMetadata {
   _init() async {
     LocalStorageInterface prefs = await LocalStorage.getInstance();
     _jsonCache = JsonCacheCrossLocalStorage(prefs);
+    _restoreCache().then((_) => {_removeOldData()});
+  }
+
+  Future<void> _restoreCache() async {
+    var cache = await _jsonCache.value(
+      'metadataLastFetch',
+    );
+    if (cache != null) {
+      metadataLastFetch = Map<String, int>.from(cache);
+    }
+
+    // restore metadata
+    // load cached users metadata
+    final Map<String, dynamic>? cachedUsersMetadata =
+        await _jsonCache.value('usersMetadata');
+    if (cachedUsersMetadata != null) {
+      usersMetadata = cachedUsersMetadata;
+    }
+    return;
+  }
+
+  _removeOldData() {
+    // 4 hours //todo move magic number to settings
+    int timeBarrier = 60 * 60 * 4;
+    var now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
+    var oldData = <String, int>{};
+    for (var key in metadataLastFetch.keys) {
+      if (now - metadataLastFetch[key]! > timeBarrier) {
+        oldData[key] = metadataLastFetch[key]!;
+      }
+    }
+    for (var key in oldData.keys) {
+      metadataLastFetch.remove(key);
+      usersMetadata.remove(key);
+    }
+    _jsonCache.refresh('metadataLastFetch', metadataLastFetch);
+    _jsonCache.refresh('usersMetadata', usersMetadata);
   }
 
   Future<Map> getMetadataByPubkey(String pubkey) async {

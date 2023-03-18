@@ -115,19 +115,6 @@ class NostrService {
     LocalStorageInterface prefs = await LocalStorage.getInstance();
     jsonCache = JsonCacheCrossLocalStorage(prefs);
 
-    // restore following
-    var followingCache = (await jsonCache.value('following'));
-    if (followingCache != null) {
-      // cast using for loop to avoid type error
-      for (var key in followingCache.keys) {
-        userContactsObj.following[key] = [];
-        var value = followingCache[key];
-        for (List parentList in value) {
-          userContactsObj.following[key]!.add(parentList);
-        }
-      }
-    }
-
     // restore blocked users
     var blockedUsersCache = (await jsonCache.value('blockedUsers'));
     if (blockedUsersCache != null) {
@@ -141,16 +128,7 @@ class NostrService {
     userFeedObj.restoreFromCache();
     globalFeedObj.restoreFromCache();
 
-    // load cached users metadata
-    final Map<String, dynamic>? cachedUsersMetadata =
-        await jsonCache.value('usersMetadata');
-    if (cachedUsersMetadata != null) {
-      userMetadataObj.usersMetadata = cachedUsersMetadata;
-    }
-
-    var followingCacheList = followingCache?.keys.toList();
-    followingCacheList ??= [];
-    relays.start(followingCacheList);
+    relays.start(userContactsObj.following.keys.toList());
   }
 
   Future<void> _loadKeyPair() async {
