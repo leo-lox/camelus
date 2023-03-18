@@ -223,39 +223,41 @@ class _TweetCardState extends State<TweetCard> {
       }).image;
     }
 
-    return Stack(
-      children: [
-        if ((widget.tweetControl?.showVerticalLineTop) ?? false)
-          Positioned(
-            top: 0,
-            left: 49,
-            child: Container(
-              height: 50,
-              width: 2,
-              color: Palette.gray,
-            ),
-          ),
-        if ((widget.tweetControl?.showVerticalLineBottom) ?? false)
-          //line from profile picture to bottom of tweet
-          Positioned(
-            top: 50,
-            bottom: 0,
-            left: 49,
-            child: Container(
-              height: 50,
-              width: 2,
-              color: Palette.gray,
-            ),
-          ),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            GestureDetector(
-              onTap: () {
-                _openReplies(context);
-              },
+    return GestureDetector(
+      behavior: HitTestBehavior.translucent,
+      onTap: () {
+        _openReplies(context);
+      },
+      child: Stack(
+        children: [
+          if ((widget.tweetControl?.showVerticalLineTop) ?? false)
+            Positioned(
+              top: 0,
+              left: 49,
               child: Container(
+                height: 50,
+                width: 2,
+                color: Palette.gray,
+              ),
+            ),
+          if ((widget.tweetControl?.showVerticalLineBottom) ?? false)
+            //line from profile picture to bottom of tweet
+            Positioned(
+              top: 50,
+              bottom: 0,
+              left: 49,
+              child: Container(
+                height: 50,
+                width: 2,
+                color: Palette.gray,
+              ),
+            ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
                 // fix so whole card is clickable
+                //color: Palette.purple,
                 margin: const EdgeInsets.fromLTRB(10, 10, 10, 0),
                 // debug:  color if is reply
                 //color: tweet.isReply ? Palette.darkGray : null,
@@ -578,23 +580,6 @@ class _TweetCardState extends State<TweetCard> {
                                   ),
                                   const SizedBox(height: 20),
                                   // show text if replies > 0
-                                  if (widget.tweet.isReply)
-                                    Text(
-                                      "debug: isReply ${widget.tweet.replies.length}",
-                                      style: TextStyle(
-                                          color: Palette.darkGray, fontSize: 7),
-                                    ),
-                                  if (false)
-                                    GestureDetector(
-                                      onTap: (() {
-                                        _openReplies(context);
-                                      }),
-                                      child: const Text(
-                                        'Show this thread',
-                                        style:
-                                            TextStyle(color: Palette.primary),
-                                      ),
-                                    ),
                                 ],
                               ),
                             ),
@@ -605,14 +590,14 @@ class _TweetCardState extends State<TweetCard> {
                   ),
                 ),
               ),
-            ),
-            const Divider(
-              thickness: 0.3,
-              color: Palette.darkGray,
-            )
-          ],
-        ),
-      ],
+              const Divider(
+                thickness: 0.3,
+                color: Palette.darkGray,
+              )
+            ],
+          ),
+        ],
+      ),
     );
   }
 }

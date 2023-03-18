@@ -89,12 +89,12 @@ class _HomePageState extends State<HomePage> {
             NostrPage(parentScaffoldKey: _scaffoldKey),
             SearchPage(),
             const Center(
-              child:
-                  Text('Empty Body 2', style: TextStyle(color: Colors.white)),
+              child: Text('work in progress',
+                  style: TextStyle(color: Colors.white)),
             ),
             const Center(
-              child:
-                  Text('Empty Body 3', style: TextStyle(color: Colors.white)),
+              child: Text('work in progress',
+                  style: TextStyle(color: Colors.white)),
             )
           ], // Comment this if you need to use Swipe.
         ),

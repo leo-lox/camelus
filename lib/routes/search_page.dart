@@ -14,7 +14,7 @@ class _SearchPageState extends State<SearchPage> {
     return Scaffold(
       backgroundColor: Palette.background,
       body: const Center(
-        child: Text('Search', style: TextStyle(color: Palette.white)),
+        child: Text('work in progress', style: TextStyle(color: Palette.white)),
       ),
     );
   }

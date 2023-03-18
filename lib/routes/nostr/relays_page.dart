@@ -74,7 +74,7 @@ class _RelaysPageState extends State<RelaysPage> {
             Padding(
               padding: const EdgeInsets.fromLTRB(12.0, 0.0, 12.0, 0.0),
               child: SizedBox(
-                height: MediaQuery.of(context).size.height - 110,
+                height: MediaQuery.of(context).size.height - 140,
                 child: ListView(
                   children: [
                     Row(
