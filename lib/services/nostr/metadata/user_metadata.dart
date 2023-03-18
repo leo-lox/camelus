@@ -77,15 +77,27 @@ class UserMetadata {
     _jsonCache.refresh('usersMetadata', usersMetadata);
   }
 
-  Future<Map> getMetadataByPubkey(String pubkey) async {
+  Future<Map> getMetadataByPubkey(String pubkey, {bool force = false}) async {
+    var now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
     if (pubkey.isEmpty) {
       return Future(() => {});
     }
 
-    // return from cache
-    if (usersMetadata.containsKey(pubkey)) {
+    if (usersMetadata.containsKey(pubkey) && !force) {
+      // check if no relation
+      if (metadataLastFetch[pubkey] == null) {
+        // update in background
+        getMetadataByPubkey(pubkey, force: true);
+      }
+
+      // return from cache
       return Future(() => usersMetadata[pubkey]);
     }
+
+    //set relation
+    metadataLastFetch[pubkey] = now;
+    //update cache
+    _jsonCache.refresh('metadataLastFetch', metadataLastFetch);
 
     // check if pubkey is already in waiting pool
     if (!(_metadataWaitingPool.contains(pubkey))) {

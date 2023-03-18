@@ -85,11 +85,6 @@ class UserContacts {
     if (following.containsKey(pubkey) && !force) {
       // check if no relation
       if (followingLastFetch[pubkey] == null) {
-        //set relation
-        followingLastFetch[pubkey] = now;
-        //update cache
-        _jsonCache.refresh('followingLastFetch', followingLastFetch);
-
         // update in background
         getContactsByPubkey(pubkey, force: true);
       }
