@@ -236,7 +236,7 @@ class _NostrPageState extends State<NostrPage>
         users: followingPubkeys,
         requestId: userFeedTimelineFetchId,
         limit: 20,
-        since: _userFeedOriginalOnly.last.tweetedAt,
+        until: _userFeedOriginalOnly.last.tweetedAt,
         includeComments: true);
   }
 
