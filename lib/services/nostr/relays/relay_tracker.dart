@@ -11,6 +11,7 @@ enum RelayTrackerAdvType {
   kind03,
   nip05,
   tag,
+  lastFetched,
 }
 
 class RelayTracker {
@@ -61,6 +62,13 @@ class RelayTracker {
     }
 
     Map eventMap = event[2];
+
+    // lastFetched
+    var personPubkey = eventMap["pubkey"];
+    var now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
+    var myRelayUrl = socketControl.connectionUrl;
+    trackRelays(
+        personPubkey, [myRelayUrl], RelayTrackerAdvType.lastFetched, now);
 
     // kind 3
     if (eventMap["kind"] == 3) {
@@ -170,6 +178,17 @@ class RelayTracker {
     }
 
     for (var relayUrl in relayUrls) {
+      if (relayUrl.isEmpty) {
+        continue;
+      }
+      //remove trailing slash
+      if (relayUrl.endsWith("/")) {
+        relayUrl = relayUrl.substring(0, relayUrl.length - 1);
+      }
+
+      // remove spaces
+      relayUrl = relayUrl.replaceAll(" ", "");
+
       switch (nip) {
         case RelayTrackerAdvType.kind03:
           tracker[personPubkey]![relayUrl]!["lastSuggestedKind3"] = timestamp;
@@ -179,6 +198,9 @@ class RelayTracker {
           break;
         case RelayTrackerAdvType.tag:
           tracker[personPubkey]![relayUrl]!["lastSuggestedBytag"] = timestamp;
+          break;
+        case RelayTrackerAdvType.lastFetched:
+          tracker[personPubkey]![relayUrl]!["lastFetched"] = timestamp;
           break;
       }
     }
