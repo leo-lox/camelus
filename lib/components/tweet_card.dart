@@ -504,8 +504,8 @@ class _TweetCardState extends State<TweetCard> {
                                               const SizedBox(width: 5),
                                               Text(
                                                 // show number of comments if >0
-                                                widget.tweet.commentsCount > 0
-                                                    ? widget.tweet.commentsCount
+                                                widget.tweet.commentsCount >= 2
+                                                    ? "+1" //widget.tweet.commentsCount
                                                         .toString()
                                                     : "",
 
@@ -516,21 +516,31 @@ class _TweetCardState extends State<TweetCard> {
                                             ],
                                           ),
                                         ),
-                                        Row(
-                                          children: [
-                                            SvgPicture.asset(
-                                              'assets/icons/retweet.svg',
-                                              color: Palette.darkGray,
-                                            ),
-                                            const SizedBox(width: 5),
-                                            Text(
-                                              widget.tweet.retweetsCount
-                                                  .toString(),
-                                              style: const TextStyle(
-                                                  color: Palette.gray,
-                                                  fontSize: 16),
-                                            ),
-                                          ],
+                                        GestureDetector(
+                                          onTap: () => {
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(const SnackBar(
+                                              content: Text(
+                                                  'repost implemented yet'),
+                                              duration: Duration(seconds: 1),
+                                            )),
+                                          },
+                                          child: Row(
+                                            children: [
+                                              SvgPicture.asset(
+                                                'assets/icons/retweet.svg',
+                                                color: Palette.darkGray,
+                                              ),
+                                              const SizedBox(width: 5),
+                                              Text(
+                                                "" //widget.tweet.retweetsCount
+                                                    .toString(),
+                                                style: const TextStyle(
+                                                    color: Palette.gray,
+                                                    fontSize: 16),
+                                              ),
+                                            ],
+                                          ),
                                         ),
                                         // like button
                                         GestureDetector(
@@ -551,7 +561,7 @@ class _TweetCardState extends State<TweetCard> {
                                               ),
                                               const SizedBox(width: 5),
                                               Text(
-                                                widget.tweet.likesCount
+                                                "" //widget.tweet.likesCount
                                                     .toString(),
                                                 style: const TextStyle(
                                                     color: Palette.gray,
