@@ -35,8 +35,6 @@ class NostrService {
   static String ownPubkeySubscriptionId =
       "own-${Helpers().getRandomString(20)}";
 
-  var counterOwnSubscriptionsHits = 0;
-
   // global feed
   var globalFeedObj = GlobalFeed();
 
@@ -241,23 +239,7 @@ class NostrService {
     // filter by subscription id
 
     if (event[1] == ownPubkeySubscriptionId) {
-      if (event[0] == "EOSE") {
-        // check if this is for all relays
-        counterOwnSubscriptionsHits++;
-
-        if (counterOwnSubscriptionsHits == relays.connectedRelaysWrite.length) {
-          //if (relayTracker.isEmpty) {
-          //  //publish default relays
-
-          //  log("using default relays: $defaultRelays and write this to relays");
-
-          //  writeEvent(json.encode(defaultRelays), 2, []);
-          //}
-
-          return;
-        }
-        return;
-      }
+      if (event[0] == "EOSE") {}
 
       Map eventMap = event[2];
       // metadata

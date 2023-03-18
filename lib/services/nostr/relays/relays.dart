@@ -59,9 +59,33 @@ class Relays {
   Relays() {
     RelaysInjector injector = RelaysInjector();
     relayTracker = injector.relayTracker;
+    _initJsonCache();
+  }
+
+  void _initJsonCache() async {
+    LocalStorageInterface prefs = await LocalStorage.getInstance();
+    _jsonCache = JsonCacheCrossLocalStorage(prefs);
+    _restoreFromCache();
+  }
+
+  void _restoreFromCache() async {
+    var cache = await _jsonCache.value('manual-relays');
+
+    if (cache == null) {
+      return;
+    }
+    //{'relays': relays, 'timestamp': now}
+
+    //manualRelays = cache['relays'];
+
+    manualRelays = Map<String, Map<String, dynamic>>.from(cache['relays']);
   }
 
   Future<void> start(List<String> pubkeys) async {
+    log("start relays with pubkeys $pubkeys");
+    //clean up
+    relayAssignments = [];
+
     relayAssignments = await getOptimalRelays(pubkeys);
 
     //"wss://nostr.bitcoiner.social": {"write": true, "read": true}
@@ -76,6 +100,12 @@ class Relays {
             })));
 
     relays = converted;
+
+    // add manual relays
+    var manualRelaysCast = Map<String, Map<String, bool>>.from(manualRelays.map(
+        (key, value) =>
+            MapEntry(key.toString(), Map<String, bool>.from(value))));
+    relays.addAll(manualRelaysCast);
 
     bool useDefault = relays.isEmpty;
 
@@ -195,9 +225,12 @@ class Relays {
         });
       }, onDone: () {
         // on disconnect
-        connectedRelaysRead[id]!.socketIsRdy = false;
-        _reconnectToRelayRead(id);
-        _connectedRelaysReadStreamController.add(connectedRelaysRead);
+        try {
+          connectedRelaysRead[id]!.socketIsRdy = false;
+          _reconnectToRelayRead(id);
+          _connectedRelaysReadStreamController.add(connectedRelaysRead);
+          // ignore: empty_catches
+        } catch (e) {}
       });
     } else if (socketControl.socketFailingAttempts > 30) {
       socketControl.socketIsFailing = true;
@@ -269,7 +302,7 @@ class Relays {
     }
     log("connected relays: ${connectedRelaysRead.length} => all closed");
 
-    manualRelays = {};
+    //manualRelays = {};
 
     failingRelays = {};
 
@@ -280,7 +313,7 @@ class Relays {
     connectedRelaysRead = {};
     connectedRelaysWrite = {};
 
-    relayAssignments = [];
+    //relayAssignments = [];
 
     return;
   }
@@ -358,6 +391,6 @@ class Relays {
 
     // add to cache
     int now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
-    _jsonCache.refresh('relays', {'relays': relays, 'timestamp': now});
+    _jsonCache.refresh('manual-relays', {'relays': relays, 'timestamp': now});
   }
 }

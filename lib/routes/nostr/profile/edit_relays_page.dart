@@ -20,9 +20,9 @@ class EditRelaysPage extends StatefulWidget {
 
 class _EditRelaysPageState extends State<EditRelaysPage> {
   // copy of relays from nostr service
-  late var myRelays = widget._nostrService.relayTracker.tracker;
+  late var myRelays = widget._nostrService.relays.manualRelays;
 
-  TextEditingController _relayNameController = TextEditingController();
+  final TextEditingController _relayNameController = TextEditingController();
 
   bool reconnecting = false;
   bool touched = false;
@@ -94,13 +94,17 @@ class _EditRelaysPageState extends State<EditRelaysPage> {
   }
 
   _saveRelays() async {
-    widget._nostrService.relayTracker.tracker = myRelays;
+    widget._nostrService.relays.setManualRelays(myRelays);
     // publish relays to nostr service
 
     String relaysJson = jsonEncode(myRelays);
     log(relaysJson);
     var following =
         widget._nostrService.following[widget._nostrService.myKeys.publicKey];
+
+    // add to cache
+
+    // todo write event
     await widget._nostrService.writeEvent(relaysJson, 3, following as List);
 
     await _reconnect();
@@ -290,7 +294,6 @@ class _EditRelaysPageState extends State<EditRelaysPage> {
                       onPressed: () {
                         _addRelay();
                       },
-                      child: const Text('Add relay'),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Palette.primary,
                         foregroundColor: Colors.white,
@@ -298,6 +301,7 @@ class _EditRelaysPageState extends State<EditRelaysPage> {
                           borderRadius: BorderRadius.circular(10),
                         ),
                       ),
+                      child: const Text('Add relay'),
                     ),
                   ),
                 ],
