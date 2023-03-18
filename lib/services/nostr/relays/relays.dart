@@ -105,6 +105,24 @@ class Relays {
     var manualRelaysCast = Map<String, Map<String, bool>>.from(manualRelays.map(
         (key, value) =>
             MapEntry(key.toString(), Map<String, bool>.from(value))));
+
+    // check for duplicates && merge
+    for (var item in List.from(manualRelaysCast.entries)) {
+      //check for duplicates
+      if (relays.containsKey(item.key)) {
+        log("duplicate relay $item");
+        // merge them if one of the values is true => true
+        var relay = relays[item.key];
+        var manualRelay = manualRelaysCast[item.key];
+
+        if (relay?["write"] == true || manualRelay?["write"] == true) {
+          manualRelay?["write"] = true;
+        }
+        if (relay?["read"] == true || manualRelay!["read"] == true) {
+          manualRelay?["read"] = true;
+        }
+      }
+    }
     relays.addAll(manualRelaysCast);
 
     bool useDefault = relays.isEmpty;
@@ -143,6 +161,7 @@ class Relays {
                     relayTracker.analyzeNostrEvent(eventJson, socketControl);
                   }, onDone: () {
                     // if pick and connect don't try to reconnect
+                    log("onDone: $id");
                     try {
                       // on disconnect
                       connectedRelaysRead[id]!.socketIsRdy = false;
@@ -150,7 +169,9 @@ class Relays {
                       _connectedRelaysReadStreamController
                           .add(connectedRelaysRead);
                       // ignore: empty_catches
-                    } catch (e) {}
+                    } catch (e) {
+                      log("654dD: $e");
+                    }
                   }),
                   connectedRelaysRead[id] = socketControl,
                   _connectedRelaysReadStreamController.add(connectedRelaysRead),
@@ -167,7 +188,7 @@ class Relays {
 
         SocketControl socketControl = SocketControl(id, relay.key);
 
-        socket
+        await socket
             .then((value) => {
                   socketControl.socket = value,
                   socketControl.socketIsRdy = true,
@@ -189,7 +210,7 @@ class Relays {
 
       log("connected to ${relay.key}");
     }
-    log("connected relays: ${connectedRelaysRead.length} => all connected");
+    log("connected relays: ${connectedRelaysRead.length} ${connectedRelaysWrite.length} => all connected");
     try {
       isNostrServiceConnectedCompleter.complete(true);
     } catch (e) {

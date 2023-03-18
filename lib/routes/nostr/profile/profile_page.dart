@@ -208,7 +208,7 @@ class _ProfilePageState extends State<ProfilePage>
             authors: [widget.pubkey],
             requestId: requestId,
             limit: 10,
-            since: _myTweets.last.tweetedAt);
+            until: _myTweets.last.tweetedAt);
       }
     });
 

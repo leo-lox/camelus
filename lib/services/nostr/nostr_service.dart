@@ -107,7 +107,7 @@ class NostrService {
 
     log("init");
 
-    _loadKeyPair();
+    await _loadKeyPair();
 
     // init streams
 
@@ -128,7 +128,8 @@ class NostrService {
     userFeedObj.restoreFromCache();
     globalFeedObj.restoreFromCache();
 
-    relays.start(userContactsObj.following.keys.toList());
+    relays
+        .start([...userContactsObj.following.keys.toList(), myKeys.publicKey]);
   }
 
   Future<void> _loadKeyPair() async {
