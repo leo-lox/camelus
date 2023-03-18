@@ -218,7 +218,7 @@ Widget _dynamicRelays(Relays relaysService) {
 
 Widget _staticRelays(Relays relaysService) {
   // define the number of columns and rows
-  int columnCount = 5;
+  int columnCount = 3;
   int rowCount = relaysService.manualRelays.length;
 
 // create a list to hold the rows
@@ -226,8 +226,6 @@ Widget _staticRelays(Relays relaysService) {
 
   List<Widget> labelRow = const [
     Text('relay', style: TextStyle(color: Palette.white)),
-    Text('events', style: TextStyle(color: Palette.white)),
-    Text('coverage', style: TextStyle(color: Palette.white)),
     Text('read', style: TextStyle(color: Palette.white)),
     Text('write', style: TextStyle(color: Palette.white)),
   ];
@@ -243,15 +241,9 @@ Widget _staticRelays(Relays relaysService) {
 
     for (int j = 1; j < columnCount; j++) {
       if (j == 1) {
-        dataRow
-            .add(Text('$j -a', style: const TextStyle(color: Palette.white)));
-      } else if (j == 2) {
-        dataRow
-            .add(Text('$j -b', style: const TextStyle(color: Palette.white)));
-      } else if (j == 3) {
         dataRow.add(Text('${relay.value['read']}',
             style: const TextStyle(color: Palette.white)));
-      } else if (j == 4) {
+      } else if (j == 2) {
         dataRow.add(Text('${relay.value['write']}',
             style: const TextStyle(color: Palette.white)));
       }

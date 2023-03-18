@@ -336,6 +336,9 @@ class Relays {
         if (assignment == null) {
           continue;
         }
+        if (assignment.relayUrl.isEmpty) {
+          continue;
+        }
         foundRelays.add(assignment);
 
         // exclude already found relays
