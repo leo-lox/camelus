@@ -35,6 +35,13 @@ class _SettingsPageState extends State<SettingsPage> {
               widget._nostrService.clearCache();
             },
           ),
+          ListTile(
+            title: const Text('Clear everything DANGEROUS!',
+                style: TextStyle(color: Colors.white)),
+            onTap: () {
+              widget._nostrService.clearCacheReset();
+            },
+          ),
         ],
       ),
     );

@@ -7,8 +7,15 @@ import 'package:camelus/services/nostr/feeds/authors_feed.dart';
 import 'package:camelus/services/nostr/feeds/events_feed.dart';
 import 'package:camelus/services/nostr/feeds/global_feed.dart';
 import 'package:camelus/services/nostr/feeds/user_feed.dart';
+import 'package:camelus/services/nostr/metadata/metadata_injector.dart';
+import 'package:camelus/services/nostr/metadata/nip_05.dart';
 import 'package:camelus/services/nostr/metadata/user_contacts.dart';
 import 'package:camelus/services/nostr/metadata/user_metadata.dart';
+import 'package:camelus/services/nostr/relays/relay_tracker.dart';
+import 'package:camelus/services/nostr/relays/relays.dart';
+import 'package:camelus/services/nostr/relays/relays_injector.dart';
+import 'package:camelus/services/nostr/relays/relays_picker.dart';
+import 'package:camelus/services/nostr/relays/relays_ranking.dart';
 import 'package:crypto/crypto.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -20,53 +27,39 @@ import 'package:camelus/models/tweet.dart';
 import 'package:json_cache/json_cache.dart';
 import 'package:cross_local_storage/cross_local_storage.dart';
 
-import 'package:http/http.dart' as http;
 import 'package:camelus/models/socket_control.dart';
 
 class NostrService {
-  final Completer _isNostrServiceConnectedCompleter = Completer();
   late Future isNostrServiceConnected;
-
-  Map<String, Map<String, dynamic>> relays = {};
 
   static String ownPubkeySubscriptionId =
       "own-${Helpers().getRandomString(20)}";
 
-  static final StreamController<Map<String, SocketControl>>
-      _connectedRelaysReadStreamController =
-      StreamController<Map<String, SocketControl>>.broadcast();
-  Stream<Map<String, SocketControl>> get connectedRelaysReadStream =>
-      _connectedRelaysReadStreamController.stream;
-
-  static Map<String, SocketControl> connectedRelaysRead = {};
-  Map<String, SocketControl> connectedRelaysWrite = {};
-
-  final Map<String, Map<String, bool>> defaultRelays = {
-    "wss://nostr-pub.semisol.dev": {"write": true, "read": true},
-    "wss://nostr.bitcoiner.social": {"write": true, "read": true},
-    "wss://nostr.zebedee.cloud": {"write": true, "read": true},
-    "wss://nostr.onsats.org": {"write": false, "read": true},
-  };
-  var counterOwnSubscriptionsHits = 0;
-
   // global feed
-  var globalFeedObj = GlobalFeed(connectedRelaysRead: connectedRelaysRead);
+  var globalFeedObj = GlobalFeed();
 
   // user feed
-  var userFeedObj = UserFeed(connectedRelaysRead: connectedRelaysRead);
+  var userFeedObj = UserFeed();
 
   // authors feed
-  var authorsFeedObj = AuthorsFeed(connectedRelaysRead: connectedRelaysRead);
+  var authorsFeedObj = AuthorsFeed();
 
-  var eventsFeedObj = EventsFeed(connectedRelaysRead: connectedRelaysRead);
+  var eventsFeedObj = EventsFeed();
 
-  var userMetadataObj = UserMetadata(connectedRelaysRead: connectedRelaysRead);
+  var userMetadataObj = UserMetadata();
 
-  var userContactsObj = UserContacts(connectedRelaysRead: connectedRelaysRead);
+  var userContactsObj = UserContacts();
 
   late JsonCache jsonCache;
 
+  late Relays relays;
+  late RelayTracker relayTracker;
+
   late KeyPair myKeys;
+
+  late Nip05 nip05service;
+
+  late RelaysRanking relaysRanking;
 
   // blocked users
   List<String> blockedUsers = [];
@@ -75,7 +68,19 @@ class NostrService {
   Map<String, List<List<dynamic>>> get following => userContactsObj.following;
 
   NostrService() {
-    isNostrServiceConnected = _isNostrServiceConnectedCompleter.future;
+    RelaysInjector relaysInjector = RelaysInjector();
+    MetadataInjector metadataInjector = MetadataInjector();
+
+    nip05service = metadataInjector.nip05;
+    relays = relaysInjector.relays;
+    relayTracker = relaysInjector.relayTracker;
+    relaysRanking = relaysInjector.relaysRanking;
+    isNostrServiceConnected = relays.isNostrServiceConnectedCompleter.future;
+
+    relays.receiveEventStream.listen((e) {
+      _receiveEvent(e["event"], e["socketControl"]);
+    });
+
     _init();
   }
 
@@ -84,14 +89,14 @@ class NostrService {
       log('SystemChannels> $msg');
       switch (msg) {
         case "AppLifecycleState.resumed":
-          _checkRelaysForConnection();
+          relays.checkRelaysForConnection();
           break;
         case "AppLifecycleState.inactive":
           break;
         case "AppLifecycleState.paused":
           break;
         case "AppLifecycleState.detached":
-          closeRelays();
+          relays.closeRelays();
           break;
       }
       // reconnect to relays
@@ -102,37 +107,13 @@ class NostrService {
 
     log("init");
 
-    _loadKeyPair();
+    await _loadKeyPair();
 
     // init streams
 
     // init json cache
     LocalStorageInterface prefs = await LocalStorage.getInstance();
     jsonCache = JsonCacheCrossLocalStorage(prefs);
-
-    if (relays.isEmpty) {
-      var relaysCache = await jsonCache.value('relays');
-      if (relaysCache != null) {
-        relays = relaysCache.cast<String, Map<String, dynamic>>();
-      } else {
-        // if everything fails, use default relays
-        relays = defaultRelays;
-      }
-    }
-    userContactsObj.relays = relays;
-
-    // restore following
-    var followingCache = (await jsonCache.value('following'));
-    if (followingCache != null) {
-      // cast using for loop to avoid type error
-      for (var key in followingCache.keys) {
-        userContactsObj.following[key] = [];
-        var value = followingCache[key];
-        for (List parentList in value) {
-          userContactsObj.following[key]!.add(parentList);
-        }
-      }
-    }
 
     // restore blocked users
     var blockedUsersCache = (await jsonCache.value('blockedUsers'));
@@ -144,37 +125,31 @@ class NostrService {
       }
     }
 
-    connectToRelays();
-
     userFeedObj.restoreFromCache();
     globalFeedObj.restoreFromCache();
 
-    // load cached users metadata
-    final Map<String, dynamic>? cachedUsersMetadata =
-        await jsonCache.value('usersMetadata');
-    if (cachedUsersMetadata != null) {
-      userMetadataObj.usersMetadata = cachedUsersMetadata;
-    }
+    relays
+        .start([...userContactsObj.following.keys.toList(), myKeys.publicKey]);
   }
 
-  void _loadKeyPair() {
+  Future<void> _loadKeyPair() async {
     // load keypair from storage
     FlutterSecureStorage storage = const FlutterSecureStorage();
-    storage.read(key: "nostrKeys").then((nostrKeysString) {
-      if (nostrKeysString == null) {
-        return;
-      }
+    var nostrKeysString = await storage.read(key: "nostrKeys");
+    if (nostrKeysString == null) {
+      return;
+    }
 
-      // to obj
-      myKeys = KeyPair.fromJson(json.decode(nostrKeysString));
-      userContactsObj.ownPubkey = myKeys.publicKey;
-    });
+    // to obj
+    myKeys = KeyPair.fromJson(json.decode(nostrKeysString));
+    userContactsObj.ownPubkey = myKeys.publicKey;
+    return;
   }
 
   finishedOnboarding() async {
     _loadKeyPair();
 
-    await connectToRelays(useDefault: true);
+    await relays.connectToRelays(useDefault: true);
 
     // subscribe to own pubkey
 
@@ -189,7 +164,7 @@ class NostrService {
 
     var jsonString = json.encode(data);
 
-    for (var relay in connectedRelaysRead.entries) {
+    for (var relay in relays.connectedRelaysRead.entries) {
       relay.value.socket.add(jsonString);
     }
   }
@@ -208,184 +183,9 @@ class NostrService {
     // don't clear relays and blocked users
   }
 
-  Future<void> connectToRelays({bool useDefault = false}) async {
-    var usedRelays = useDefault ? defaultRelays : relays;
-    log("connect to relays $usedRelays");
-
-    for (var relay in usedRelays.entries) {
-      Future<WebSocket>? socket;
-
-      if (relay.value["read"] == true) {
-        socket ??= WebSocket.connect(relay.key);
-
-        var id = "relay-r-${Helpers().getRandomString(5)}";
-
-        SocketControl socketControl = SocketControl(id, relay.key);
-
-        socket
-            .then((value) => {
-                  // set socket
-                  socketControl.socket = value,
-                  socketControl.socketIsRdy = true,
-
-                  value.listen((event) {
-                    var eventJson = json.decode(event);
-                    _receiveEvent(
-                      eventJson,
-                      socketControl,
-                    );
-                  }, onDone: () {
-                    // on disconnect
-                    connectedRelaysRead[id]!.socketIsRdy = false;
-                    _reconnectToRelayRead(id);
-                    _connectedRelaysReadStreamController
-                        .add(connectedRelaysRead);
-                  }),
-                  connectedRelaysRead[id] = socketControl,
-                  _connectedRelaysReadStreamController.add(connectedRelaysRead),
-                })
-            .catchError((e) {
-          return Future(() => {log("error connecting to relay $e")});
-        });
-      }
-
-      if (relay.value["write"] == true) {
-        socket ??= WebSocket.connect(relay.key);
-        var id = "relay-w-${Helpers().getRandomString(5)}";
-
-        SocketControl socketControl = SocketControl(id, relay.key);
-
-        socket.then((value) => {
-              socketControl.socket = value,
-              socketControl.socketIsRdy = true,
-              connectedRelaysWrite[id] = socketControl,
-
-              // check if already listened to this socket
-              if (value.hashCode != connectedRelaysWrite[id]!.socket.hashCode)
-                value.listen((event) {}, onDone: () {
-                  // on disconnect
-                  connectedRelaysWrite[id]!.socketIsRdy = false;
-                  _reconnectToRelayWrite(id);
-                }),
-            });
-      }
-
-      log("connected to ${relay.key}");
-    }
-    log("connected relays: ${connectedRelaysRead.length} => all connected");
-    try {
-      _isNostrServiceConnectedCompleter.complete(true);
-    } catch (e) {
-      log("e");
-    }
-
-    return;
-  }
-
-  _reconnectToRelayRead(String id) async {
-    SocketControl socketControl = connectedRelaysRead[id]!;
-    socketControl.socketIsRdy = false;
-    var waitTime = 1 * socketControl.socketFailingAttempts;
-    // wait
-
-    await Future.delayed(Duration(seconds: waitTime));
-    log("reconnect to relay read ${socketControl.connectionUrl}, attempt: ${socketControl.socketFailingAttempts}");
-    // try to reconnect
-    WebSocket? socket;
-    try {
-      socket = await WebSocket.connect(socketControl.connectionUrl);
-    } catch (e) {}
-
-    if (socket?.readyState == WebSocket.open) {
-      socketControl.socket = socket!;
-      socketControl.socketIsRdy = true;
-      socketControl.socketFailingAttempts = 0;
-      socket.listen((event) {
-        var eventJson = json.decode(event);
-        _receiveEvent(
-          eventJson,
-          socketControl,
-        );
-      }, onDone: () {
-        // on disconnect
-        connectedRelaysRead[id]!.socketIsRdy = false;
-        _reconnectToRelayRead(id);
-        _connectedRelaysReadStreamController.add(connectedRelaysRead);
-      });
-    } else if (socketControl.socketFailingAttempts > 30) {
-      socketControl.socketIsFailing = true;
-      socketControl.socketIsRdy = false;
-      _connectedRelaysReadStreamController.add(connectedRelaysRead);
-    } else {
-      socketControl.socketFailingAttempts++;
-      _reconnectToRelayRead(id);
-    }
-  }
-
-  _reconnectToRelayWrite(String id) async {
-    SocketControl socketControl = connectedRelaysWrite[id]!;
-    socketControl.socketIsRdy = false;
-    var waitTime = 1 * socketControl.socketFailingAttempts;
-    // wait
-    await Future.delayed(Duration(seconds: waitTime));
-    // try to reconnect
-    WebSocket? socket;
-    try {
-      socket = await WebSocket.connect(socketControl.connectionUrl);
-    } catch (e) {}
-
-    if (socket?.readyState == WebSocket.open) {
-      socketControl.socket = socket!;
-      socketControl.socketIsRdy = true;
-      socketControl.socketFailingAttempts = 0;
-      socket.listen((event) {}, onDone: () {
-        // on disconnect
-        connectedRelaysWrite[id]!.socketIsRdy = false;
-        _reconnectToRelayWrite(id);
-      });
-    } else if (socketControl.socketFailingAttempts > 30) {
-      socketControl.socketIsFailing = true;
-      socketControl.socketIsRdy = false;
-    } else {
-      socketControl.socketFailingAttempts++;
-      _reconnectToRelayWrite(id);
-    }
-  }
-
-  _checkRelaysForConnection() async {
-    if (connectedRelaysRead.isEmpty) {
-      await connectToRelays();
-    }
-
-    for (var relay in connectedRelaysRead.entries) {
-      if (relay.value.socketIsRdy == false) {
-        _reconnectToRelayRead(relay.key);
-      }
-    }
-    for (var relay in connectedRelaysWrite.entries) {
-      if (relay.value.socketIsRdy == false) {
-        _reconnectToRelayWrite(relay.key);
-      }
-    }
-  }
-
-  Future<void> closeRelays() async {
-    for (var relay in connectedRelaysRead.entries) {
-      await relay.value.socket.close();
-      // remove from array
-      connectedRelaysRead.remove(relay);
-    }
-    for (var relay in connectedRelaysWrite.entries) {
-      await relay.value.socket.close();
-      // remove from array
-      connectedRelaysWrite.remove(relay);
-    }
-    log("connected relays: ${connectedRelaysRead.length} => all closed");
-
-    connectedRelaysRead = {};
-    connectedRelaysWrite = {};
-
-    return;
+  // clears everything, potentially dangerous
+  void clearCacheReset() async {
+    await jsonCache.clear();
   }
 
   _receiveEvent(event, SocketControl socketControl) async {
@@ -418,23 +218,7 @@ class NostrService {
     // filter by subscription id
 
     if (event[1] == ownPubkeySubscriptionId) {
-      if (event[0] == "EOSE") {
-        // check if this is for all relays
-        counterOwnSubscriptionsHits++;
-
-        if (counterOwnSubscriptionsHits == connectedRelaysWrite.length) {
-          if (relays.isEmpty) {
-            //publish default relays
-
-            log("using default relays: $defaultRelays and write this to relays");
-
-            writeEvent(json.encode(defaultRelays), 2, []);
-          }
-
-          return;
-        }
-        return;
-      }
+      if (event[0] == "EOSE") {}
 
       Map eventMap = event[2];
       // metadata
@@ -443,15 +227,7 @@ class NostrService {
       }
       // recommended relays
       if (eventMap["kind"] == 2) {
-        var content = Map<String, Map<String, dynamic>>.from(
-            json.decode(eventMap["content"]));
-
-        relays = content;
-        log("got recommended relays: $relays");
-        //update cache
-        jsonCache.refresh('relays', relays);
-        //todo connect to relays if not already connected
-        return;
+        // todo
       }
     }
 
@@ -493,8 +269,8 @@ class NostrService {
       var now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
 
       if (socketControl.requestInFlight[event[1]] != null) {
-        var requestsLeft =
-            _howManyRequestsLeft(event[1], socketControl, connectedRelaysRead);
+        var requestsLeft = _howManyRequestsLeft(
+            event[1], socketControl, relays.connectedRelaysRead);
         if (requestsLeft < 2) {
           // callback
           if (socketControl.completers.containsKey(event[1])) {
@@ -571,7 +347,7 @@ class NostrService {
     log("write event: $req");
 
     var reqJson = jsonEncode(req);
-    for (var relay in connectedRelaysWrite.entries) {
+    for (var relay in relays.connectedRelaysWrite.entries) {
       if (!(relay.value.socketIsRdy)) {
         log("socket not ready");
         continue;
@@ -659,7 +435,7 @@ class NostrService {
     ];
 
     var jsonString = json.encode(data);
-    for (var relay in connectedRelaysRead.entries) {
+    for (var relay in relays.connectedRelaysRead.entries) {
       relay.value.socket.add(jsonString);
       relay.value.requestInFlight[subId] = true;
       //todo add stream
@@ -677,34 +453,9 @@ class NostrService {
     return userContactsObj.getContactsByPubkey(pubkey, force: force);
   }
 
-  /// returns [nip5 identifier, true] if valid or [null, null] if not found
-  Future<List> checkNip5(String nip05, String pubkey) async {
-    // checks if the nip5 token is valid
-    String username = nip05.split("@")[0];
-    String url = nip05.split("@")[1];
-
-    // make get request
-    Response response = await http
-        .get(Uri.parse("https://$url/.well-known/nostr.json?name=$username"));
-
-    if (response.statusCode != 200) {
-      return [null, null];
-    }
-
-    try {
-      var json = jsonDecode(response.body);
-      Map names = json["names"];
-
-      if (names[username] == pubkey) {
-        return [nip05, true];
-      } else {
-        return [nip05, false];
-      }
-    } catch (e) {
-      log("err, decoding nip5 json ${e.toString()}}");
-    }
-
-    return [null, null];
+  /// returns [nip5 identifier, true, ] if valid or [null, null] if not found
+  Future<Map> checkNip05(String nip05, String pubkey) async {
+    return await nip05service.checkNip05(nip05, pubkey);
   }
 
   Future<void> addToBlocklist(String pubkey) async {
@@ -732,6 +483,27 @@ class NostrService {
       blockedUsers.remove(pubkey);
       await jsonCache.refresh("blockedUsers", {"blockedUsers": blockedUsers});
     }
+    return;
+  }
+
+  Future<void> debug() async {
+    List<String> userFollows = (await getUserContacts(myKeys.publicKey))
+        .map<String>((e) => e[1])
+        .toList();
+    log("userFollows: $userFollows");
+    log("debug");
+    relays.getOptimalRelays(userFollows);
+  }
+
+  Future<void> pickAndReconnect() async {
+    log("pickAndReconnect");
+    var userFollows = (await getUserContacts(myKeys.publicKey))
+        .map<String>((e) => e[1])
+        .toList();
+    log("userFollows: $userFollows");
+
+    await relays.closeRelays();
+    await relays.start(userFollows);
     return;
   }
 }

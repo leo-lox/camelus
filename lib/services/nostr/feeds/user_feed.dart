@@ -3,12 +3,15 @@ import 'dart:convert';
 
 import 'package:camelus/models/socket_control.dart';
 import 'package:camelus/models/tweet.dart';
+import 'package:camelus/services/nostr/relays/relays.dart';
+import 'package:camelus/services/nostr/relays/relays_injector.dart';
 import 'package:cross_local_storage/cross_local_storage.dart';
 import 'package:json_cache/json_cache.dart';
 
 class UserFeed {
   var feed = <Tweet>[];
   late JsonCache _jsonCache;
+  late Relays _relays;
 
   late Stream userFeedStream;
   final StreamController<List<Tweet>> _userFeedStreamController =
@@ -18,9 +21,10 @@ class UserFeed {
   final StreamController<List<Tweet>> _userFeedStreamControllerReplies =
       StreamController<List<Tweet>>.broadcast();
 
-  Map<String, SocketControl> connectedRelaysRead;
+  UserFeed() {
+    RelaysInjector injector = RelaysInjector();
+    _relays = injector.relays;
 
-  UserFeed({required this.connectedRelaysRead}) {
     userFeedStream = _userFeedStreamController.stream;
     userFeedStreamReplies = _userFeedStreamControllerReplies.stream;
     _init();
@@ -145,6 +149,9 @@ class UserFeed {
       int? until,
       int? limit,
       bool? includeComments}) {
+    // send existing  stream /send to ui
+    _userFeedStreamController.add(feed);
+
     var reqId = "ufeed-$requestId";
     const defaultLimit = 5;
 
@@ -173,16 +180,11 @@ class UserFeed {
       "REQ",
       reqId,
       body1,
-      //todo: add body2
     ];
     if (includeComments == true) {
       data.add(body2);
     }
 
-    var jsonString = json.encode(data);
-    for (var relay in connectedRelaysRead.entries) {
-      relay.value.socket.add(jsonString);
-      relay.value.requestInFlight[reqId] = true;
-    }
+    _relays.requestEvents(data);
   }
 }

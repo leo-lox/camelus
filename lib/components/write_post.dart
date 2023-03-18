@@ -157,21 +157,15 @@ class _WritePostState extends State<WritePost> {
     var responseString = await response.stream.transform(utf8.decoder).join();
 
     // extract url https://nostr.build/i/4697.png
-    // get all urls with  https://nostr.build/i/
-    var urls = responseString.split("https://nostr.build/i/").toList();
-
-    // remove everything except ending with jpg png or jpeg or gif
-    urls.removeWhere((element) => !(element.contains(".jpg") ||
-        element.contains(".png") ||
-        element.contains(".jpeg") ||
-        element.contains(".gif")));
-
-    // find the string containing the number
-    var myName = urls.last.split('"').first;
-
-    var myUrl = "https://nostr.build/i/$myName";
-
-    return myUrl;
+    final RegExp urlPattern =
+        RegExp(r'https:\/\/nostr\.build\/i\/\S+\.(?:jpg|jpeg|png|gif)');
+    final Match? urlMatch = urlPattern.firstMatch(responseString);
+    if (urlMatch != null) {
+      final String myUrl = urlMatch.group(0)!;
+      return myUrl;
+    } else {
+      return "";
+    }
   }
 
   _submitPost() async {
@@ -213,9 +207,9 @@ class _WritePostState extends State<WritePost> {
     }
 
     var firstWriteRelayKey =
-        widget._nostrService.connectedRelaysWrite.keys.toList()[0];
-    var firstWriteRelay = widget
-        ._nostrService.connectedRelaysWrite[firstWriteRelayKey]!.connectionUrl;
+        widget._nostrService.relays.connectedRelaysWrite.keys.toList()[0];
+    var firstWriteRelay = widget._nostrService.relays
+        .connectedRelaysWrite[firstWriteRelayKey]!.connectionUrl;
 
     if (widget.context != null) {
       // add previous tweet tags

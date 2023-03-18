@@ -3,20 +3,25 @@ import 'dart:convert';
 
 import 'package:camelus/models/socket_control.dart';
 import 'package:camelus/models/tweet.dart';
+import 'package:camelus/services/nostr/relays/relays.dart';
+import 'package:camelus/services/nostr/relays/relays_injector.dart';
 import 'package:cross_local_storage/cross_local_storage.dart';
 import 'package:json_cache/json_cache.dart';
 
 class GlobalFeed {
   late JsonCache _jsonCache;
 
+  late Relays _relays;
+
   var feed = <Tweet>[];
   late Stream globalFeedStream;
   final StreamController<List<Tweet>> _globalFeedStreamController =
       StreamController<List<Tweet>>.broadcast();
 
-  Map<String, SocketControl> connectedRelaysRead;
+  GlobalFeed() {
+    RelaysInjector injector = RelaysInjector();
+    _relays = injector.relays;
 
-  GlobalFeed({required this.connectedRelaysRead}) {
     globalFeedStream = _globalFeedStreamController.stream;
     _init();
   }
@@ -108,9 +113,6 @@ class GlobalFeed {
 
     var data = ["REQ", reqId, body];
 
-    var jsonString = json.encode(data);
-    for (var relay in connectedRelaysRead.entries) {
-      relay.value.socket.add(jsonString);
-    }
+    _relays.requestEvents(data);
   }
 }

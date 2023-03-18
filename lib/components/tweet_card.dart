@@ -223,39 +223,41 @@ class _TweetCardState extends State<TweetCard> {
       }).image;
     }
 
-    return Stack(
-      children: [
-        if ((widget.tweetControl?.showVerticalLineTop) ?? false)
-          Positioned(
-            top: 0,
-            left: 49,
-            child: Container(
-              height: 50,
-              width: 2,
-              color: Palette.gray,
-            ),
-          ),
-        if ((widget.tweetControl?.showVerticalLineBottom) ?? false)
-          //line from profile picture to bottom of tweet
-          Positioned(
-            top: 50,
-            bottom: 0,
-            left: 49,
-            child: Container(
-              height: 50,
-              width: 2,
-              color: Palette.gray,
-            ),
-          ),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            GestureDetector(
-              onTap: () {
-                _openReplies(context);
-              },
+    return GestureDetector(
+      behavior: HitTestBehavior.translucent,
+      onTap: () {
+        _openReplies(context);
+      },
+      child: Stack(
+        children: [
+          if ((widget.tweetControl?.showVerticalLineTop) ?? false)
+            Positioned(
+              top: 0,
+              left: 49,
               child: Container(
+                height: 50,
+                width: 2,
+                color: Palette.gray,
+              ),
+            ),
+          if ((widget.tweetControl?.showVerticalLineBottom) ?? false)
+            //line from profile picture to bottom of tweet
+            Positioned(
+              top: 50,
+              bottom: 0,
+              left: 49,
+              child: Container(
+                height: 50,
+                width: 2,
+                color: Palette.gray,
+              ),
+            ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
                 // fix so whole card is clickable
+                //color: Palette.purple,
                 margin: const EdgeInsets.fromLTRB(10, 10, 10, 0),
                 // debug:  color if is reply
                 //color: tweet.isReply ? Palette.darkGray : null,
@@ -502,8 +504,8 @@ class _TweetCardState extends State<TweetCard> {
                                               const SizedBox(width: 5),
                                               Text(
                                                 // show number of comments if >0
-                                                widget.tweet.commentsCount > 0
-                                                    ? widget.tweet.commentsCount
+                                                widget.tweet.commentsCount >= 2
+                                                    ? "+1" //widget.tweet.commentsCount
                                                         .toString()
                                                     : "",
 
@@ -514,21 +516,31 @@ class _TweetCardState extends State<TweetCard> {
                                             ],
                                           ),
                                         ),
-                                        Row(
-                                          children: [
-                                            SvgPicture.asset(
-                                              'assets/icons/retweet.svg',
-                                              color: Palette.darkGray,
-                                            ),
-                                            const SizedBox(width: 5),
-                                            Text(
-                                              widget.tweet.retweetsCount
-                                                  .toString(),
-                                              style: const TextStyle(
-                                                  color: Palette.gray,
-                                                  fontSize: 16),
-                                            ),
-                                          ],
+                                        GestureDetector(
+                                          onTap: () => {
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(const SnackBar(
+                                              content: Text(
+                                                  'repost implemented yet'),
+                                              duration: Duration(seconds: 1),
+                                            )),
+                                          },
+                                          child: Row(
+                                            children: [
+                                              SvgPicture.asset(
+                                                'assets/icons/retweet.svg',
+                                                color: Palette.darkGray,
+                                              ),
+                                              const SizedBox(width: 5),
+                                              Text(
+                                                "" //widget.tweet.retweetsCount
+                                                    .toString(),
+                                                style: const TextStyle(
+                                                    color: Palette.gray,
+                                                    fontSize: 16),
+                                              ),
+                                            ],
+                                          ),
                                         ),
                                         // like button
                                         GestureDetector(
@@ -549,7 +561,7 @@ class _TweetCardState extends State<TweetCard> {
                                               ),
                                               const SizedBox(width: 5),
                                               Text(
-                                                widget.tweet.likesCount
+                                                "" //widget.tweet.likesCount
                                                     .toString(),
                                                 style: const TextStyle(
                                                     color: Palette.gray,
@@ -578,23 +590,6 @@ class _TweetCardState extends State<TweetCard> {
                                   ),
                                   const SizedBox(height: 20),
                                   // show text if replies > 0
-                                  if (widget.tweet.isReply)
-                                    Text(
-                                      "debug: isReply ${widget.tweet.replies.length}",
-                                      style: TextStyle(
-                                          color: Palette.darkGray, fontSize: 7),
-                                    ),
-                                  if (false)
-                                    GestureDetector(
-                                      onTap: (() {
-                                        _openReplies(context);
-                                      }),
-                                      child: const Text(
-                                        'Show this thread',
-                                        style:
-                                            TextStyle(color: Palette.primary),
-                                      ),
-                                    ),
                                 ],
                               ),
                             ),
@@ -605,14 +600,14 @@ class _TweetCardState extends State<TweetCard> {
                   ),
                 ),
               ),
-            ),
-            const Divider(
-              thickness: 0.3,
-              color: Palette.darkGray,
-            )
-          ],
-        ),
-      ],
+              const Divider(
+                thickness: 0.3,
+                color: Palette.darkGray,
+              )
+            ],
+          ),
+        ],
+      ),
     );
   }
 }

@@ -1,21 +1,26 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:developer';
 import 'package:camelus/models/socket_control.dart';
+import 'package:camelus/services/nostr/relays/relays.dart';
+import 'package:camelus/services/nostr/relays/relays_injector.dart';
 import 'package:cross_local_storage/cross_local_storage.dart';
 import 'package:json_cache/json_cache.dart';
 import 'package:camelus/models/tweet.dart';
 
 class AuthorsFeed {
   late JsonCache _jsonCache;
+  late Relays _relays;
 
   var authors = <String, List<Tweet>>{};
   late Stream<Map<String, List<Tweet>>> authorsStream;
   final StreamController<Map<String, List<Tweet>>> _authorsStreamController =
       StreamController<Map<String, List<Tweet>>>.broadcast();
 
-  Map<String, SocketControl> connectedRelaysRead;
+  AuthorsFeed() {
+    RelaysInjector injector = RelaysInjector();
+    _relays = injector.relays;
 
-  AuthorsFeed({required this.connectedRelaysRead}) {
     authorsStream = _authorsStreamController.stream;
     _init();
   }
@@ -70,6 +75,9 @@ class AuthorsFeed {
       int? since,
       int? until,
       int? limit}) {
+    // trigger existing data
+    _authorsStreamController.add(this.authors);
+
     // reqId contains authors to later sort it out
     var reqId = "authors-$requestId";
 
@@ -92,9 +100,6 @@ class AuthorsFeed {
       body,
     ];
 
-    var jsonString = json.encode(data);
-    for (var relay in connectedRelaysRead.entries) {
-      relay.value.socket.add(jsonString);
-    }
+    _relays.requestEvents(data);
   }
 }

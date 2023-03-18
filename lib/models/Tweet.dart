@@ -76,6 +76,7 @@ class Tweet {
       if (link!.endsWith(".jpg") ||
           link.endsWith(".jpeg") ||
           link.endsWith(".png") ||
+          link.endsWith(".webp") ||
           link.endsWith(".gif")) {
         imageLinks.add(link);
         content = content.replaceAll(link, "");

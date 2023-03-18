@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:camelus/models/socket_control.dart';
+import 'package:camelus/routes/nostr/relays_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
@@ -32,7 +33,11 @@ class NostrPage extends StatefulWidget {
   State<NostrPage> createState() => _NostrPageState();
 }
 
-class _NostrPageState extends State<NostrPage> with TickerProviderStateMixin {
+class _NostrPageState extends State<NostrPage>
+    with TickerProviderStateMixin, AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
+
   bool _isLoading = true;
 
   var _myTweetsGlobal = <Tweet>[];
@@ -231,7 +236,7 @@ class _NostrPageState extends State<NostrPage> with TickerProviderStateMixin {
         users: followingPubkeys,
         requestId: userFeedTimelineFetchId,
         limit: 20,
-        since: _userFeedOriginalOnly.last.tweetedAt,
+        until: _userFeedOriginalOnly.last.tweetedAt,
         includeComments: true);
   }
 
@@ -322,7 +327,7 @@ class _NostrPageState extends State<NostrPage> with TickerProviderStateMixin {
 
     var updateInfo = jsonDecode(response.body);
 
-    if (updateInfo["version"] <= 2) {
+    if (updateInfo["version"] <= 3) {
       // <-- current version
 
       return;
@@ -366,6 +371,31 @@ class _NostrPageState extends State<NostrPage> with TickerProviderStateMixin {
       }
     }
     return count;
+  }
+
+  _openRelaysView() {
+    Navigator.of(context).push(
+      PageRouteBuilder(
+        pageBuilder: (context, animation, secondaryAnimation) => RelaysPage(),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          var begin = const Offset(0.0, 0.2);
+          var end = Offset.zero;
+          var curve = Curves.linear;
+
+          var tween =
+              Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
+          return ScaleTransition(
+            alignment: Alignment.topRight,
+            scale: animation,
+            child: SlideTransition(
+              position: animation.drive(tween),
+              child: child,
+            ),
+          );
+        },
+      ),
+    );
   }
 
   @override
@@ -554,49 +584,54 @@ class _NostrPageState extends State<NostrPage> with TickerProviderStateMixin {
                       )),
                 ),
                 actions: [
-                  StreamBuilder(
-                      stream: widget._nostrService.connectedRelaysReadStream,
-                      builder: (context,
-                          AsyncSnapshot<Map<String, SocketControl>> snapshot) {
-                        if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                          return Row(
-                            children: [
-                              SvgPicture.asset(
-                                'assets/icons/cell-signal-slash.svg',
-                                color: Palette.gray,
-                                height: 22,
-                                width: 22,
-                              ),
-                              const SizedBox(width: 5),
-                              Text(
-                                "0".toString(),
-                                style:
-                                    const TextStyle(color: Palette.lightGray),
-                              ),
-                              const SizedBox(width: 5),
-                            ],
-                          );
-                        } else {
-                          return Row(
-                            children: [
-                              SvgPicture.asset(
-                                'assets/icons/cell-signal-full.svg',
-                                color: Palette.gray,
-                                height: 22,
-                                width: 22,
-                              ),
-                              const SizedBox(width: 5),
-                              Text(
-                                // count how many relays are ready
-                                _countRedyRelays(snapshot.data!).toString(),
-                                style:
-                                    const TextStyle(color: Palette.lightGray),
-                              ),
-                              const SizedBox(width: 5),
-                            ],
-                          );
-                        }
-                      }),
+                  GestureDetector(
+                    onTap: () => _openRelaysView(),
+                    child: StreamBuilder(
+                        stream: widget
+                            ._nostrService.relays.connectedRelaysReadStream,
+                        builder: (context,
+                            AsyncSnapshot<Map<String, SocketControl>>
+                                snapshot) {
+                          if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                            return Row(
+                              children: [
+                                SvgPicture.asset(
+                                  'assets/icons/cell-signal-slash.svg',
+                                  color: Palette.gray,
+                                  height: 22,
+                                  width: 22,
+                                ),
+                                const SizedBox(width: 5),
+                                Text(
+                                  "0".toString(),
+                                  style:
+                                      const TextStyle(color: Palette.lightGray),
+                                ),
+                                const SizedBox(width: 5),
+                              ],
+                            );
+                          } else {
+                            return Row(
+                              children: [
+                                SvgPicture.asset(
+                                  'assets/icons/cell-signal-full.svg',
+                                  color: Palette.gray,
+                                  height: 22,
+                                  width: 22,
+                                ),
+                                const SizedBox(width: 5),
+                                Text(
+                                  // count how many relays are ready
+                                  _countRedyRelays(snapshot.data!).toString(),
+                                  style:
+                                      const TextStyle(color: Palette.lightGray),
+                                ),
+                                const SizedBox(width: 5),
+                              ],
+                            );
+                          }
+                        }),
+                  ),
                 ],
                 bottom: PreferredSize(
                   preferredSize: const Size.fromHeight(20),

@@ -4,16 +4,18 @@ import 'dart:developer';
 
 import 'package:camelus/helpers/helpers.dart';
 import 'package:camelus/models/socket_control.dart';
+import 'package:camelus/services/nostr/relays/relays.dart';
+import 'package:camelus/services/nostr/relays/relays_injector.dart';
 import 'package:cross_local_storage/cross_local_storage.dart';
 import 'package:json_cache/json_cache.dart';
 
 class UserContacts {
-  Map<String, SocketControl> connectedRelaysRead = {};
-  late Map<String, Map<String, dynamic>> relays = {};
+  late Relays _relays;
   late String ownPubkey;
 
   /// map with pubkey as identifier, second list [0] is p, [1] is pubkey, [2] is the relay url
   var following = <String, List<List>>{};
+  var followingLastFetch = <String, int>{};
 
   late JsonCache _jsonCache;
 
@@ -22,20 +24,79 @@ class UserContacts {
   var _contactsWaitingPoolTimerRunning = false;
   Map<String, Completer<List<List>>> _contactsFutureHolder = {};
 
-  UserContacts({required this.connectedRelaysRead}) {
+  UserContacts() {
+    RelaysInjector injector = RelaysInjector();
+    _relays = injector.relays;
+
     _init();
   }
 
   _init() async {
     LocalStorageInterface prefs = await LocalStorage.getInstance();
     _jsonCache = JsonCacheCrossLocalStorage(prefs);
+
+    _restoreCache().then((_) => {_removeOldData()});
+  }
+
+  Future<void> _restoreCache() async {
+    var cache = await _jsonCache.value(
+      'followingLastFetch',
+    );
+    if (cache != null) {
+      followingLastFetch = Map<String, int>.from(cache);
+    }
+
+    // restore following
+    var followingCache = (await _jsonCache.value('following'));
+    if (followingCache != null) {
+      // cast using for loop to avoid type error
+      for (var key in followingCache.keys) {
+        following[key] = [];
+        var value = followingCache[key];
+        for (List parentList in value) {
+          following[key]!.add(parentList);
+        }
+      }
+    }
+    return;
+  }
+
+  _removeOldData() {
+    // 4 hours //todo move magic number to settings
+    int timeBarrier = 60 * 60 * 4;
+    var now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
+    var oldData = <String, int>{};
+    for (var key in followingLastFetch.keys) {
+      if (now - followingLastFetch[key]! > timeBarrier) {
+        oldData[key] = followingLastFetch[key]!;
+      }
+    }
+    for (var key in oldData.keys) {
+      followingLastFetch.remove(key);
+      following.remove(key);
+    }
+    _jsonCache.refresh('followingLastFetch', followingLastFetch);
+    _jsonCache.refresh('following', following);
   }
 
   getContactsByPubkey(String pubkey, {bool force = false}) {
-    // return from cache
+    var now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
+
     if (following.containsKey(pubkey) && !force) {
+      // check if no relation
+      if (followingLastFetch[pubkey] == null) {
+        // update in background
+        getContactsByPubkey(pubkey, force: true);
+      }
+
+      // return from cache
       return Future(() => following[pubkey]!);
     }
+
+    //set relation
+    followingLastFetch[pubkey] = now;
+    //update cache
+    _jsonCache.refresh('followingLastFetch', followingLastFetch);
 
     Completer<Map> result = Completer();
 
@@ -122,15 +183,8 @@ class UserContacts {
         "limit": users.length
       },
     ];
-    var jsonString = json.encode(data);
 
-    for (var relay in connectedRelaysRead.entries) {
-      relay.value.socket.add(jsonString);
-      relay.value.requestInFlight[requestId] = true;
-      if (completer != null) {
-        relay.value.completers[requestId] = completer;
-      }
-    }
+    _relays.requestEvents(data, completer: completer);
   }
 
   receiveNostrEvent(event, SocketControl socketControl) {
@@ -169,9 +223,7 @@ class UserContacts {
             .map((key, value) => MapEntry(key, value as Map<String, dynamic>));
 
         // update relays
-        relays = casted;
-        //update cache
-        _jsonCache.refresh('relays', relays);
+        _relays.setManualRelays(casted);
       } catch (e) {
         log("error: $e");
       }

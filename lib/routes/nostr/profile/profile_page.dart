@@ -57,11 +57,11 @@ class _ProfilePageState extends State<ProfilePage>
     if (nip05.isEmpty) return;
     if (nip05verified.isNotEmpty) return;
 
-    var check = await widget._nostrService.checkNip5(nip05, pubkey);
+    var check = await widget._nostrService.checkNip05(nip05, pubkey);
 
-    if (check[1] == true) {
+    if (check["valid"] == true) {
       setState(() {
-        nip05verified = check[0];
+        nip05verified = check["nip05"];
       });
     }
   }
@@ -208,7 +208,7 @@ class _ProfilePageState extends State<ProfilePage>
             authors: [widget.pubkey],
             requestId: requestId,
             limit: 10,
-            since: _myTweets.last.tweetedAt);
+            until: _myTweets.last.tweetedAt);
       }
     });
 
@@ -257,7 +257,7 @@ class _ProfilePageState extends State<ProfilePage>
                   PopupMenuButton<String>(
                     tooltip: "More",
                     onSelected: (e) => {
-                      log(e),
+                      //log(e),
                       // toast
                       if (e == "block") _blockUser()
                     },
@@ -317,7 +317,6 @@ class _ProfilePageState extends State<ProfilePage>
                               String lud16 = "";
 
                               if (snapshot.hasData) {
-                                log(snapshot.data.toString());
                                 lud06 = snapshot.data?["lud06"] ?? "";
                                 lud16 = snapshot.data?["lud16"] ?? "";
                               }
@@ -681,7 +680,7 @@ class _ProfilePageState extends State<ProfilePage>
                               if (widget.pubkey ==
                                   widget._nostrService.myKeys.publicKey)
                                 Text(
-                                  "${widget._nostrService.relays.length} relays",
+                                  "${widget._nostrService.relays.manualRelays.length} relays",
                                   style: const TextStyle(
                                     color: Palette.white,
                                     fontSize: 14,
