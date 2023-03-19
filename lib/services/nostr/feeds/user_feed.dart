@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:camelus/models/socket_control.dart';
 import 'package:camelus/models/tweet.dart';
@@ -127,15 +128,18 @@ class UserFeed {
           if (feed.any((element) => element.id == tweet.id)) {
             return;
           }
-          // add to feed
-          feed.add(tweet);
+          // add to top of feed
+          feed.insert(0, tweet);
         }
 
         //update cache
         _jsonCache.refresh('userFeed', {"tweets": feed});
 
+        //sort feed
+        feed.sort((a, b) => b.tweetedAt.compareTo(a.tweetedAt));
+
         // sent to stream
-        _userFeedStreamController.sink.add(feed);
+        _userFeedStreamController.add(feed);
         return;
       }
     }
