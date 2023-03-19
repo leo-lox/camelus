@@ -228,7 +228,7 @@ class _NostrPageState extends State<NostrPage>
     widget._nostrService.requestUserFeed(
         users: followingPubkeys,
         requestId: userFeedFreshId,
-        limit: 10,
+        limit: 50,
         since: latestTweet, //since latest tweet
         includeComments: false);
 
@@ -646,6 +646,9 @@ class _NostrPageState extends State<NostrPage>
                   color: Palette.primary,
                   backgroundColor: Palette.extraDarkGray,
                   onRefresh: () {
+                    // todo fix this hack (should auto update)
+                    isUserFeedSubscribed = false;
+                    _subscribeToUserFeed();
                     return Future.delayed(const Duration(milliseconds: 150));
                   },
                   child: CustomScrollView(

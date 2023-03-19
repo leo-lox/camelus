@@ -52,6 +52,13 @@ class UserFeed {
       }
       feed.sort((a, b) => b.tweetedAt.compareTo(a.tweetedAt));
 
+      // delete messages over 50
+      if (feed.length > 50) {
+        feed.removeRange(50, feed.length);
+      }
+      // save to cache
+      _jsonCache.refresh('userFeed', {"tweets": feed});
+
       // send to stream /send to ui
       _userFeedStreamController.add(feed);
     }
