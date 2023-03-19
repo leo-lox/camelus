@@ -233,20 +233,33 @@ class NostrService {
 
     if (event[1].contains("authors")) {
       authorsFeedObj.receiveNostrEvent(event, socketControl);
+      if (event[0] == "EOSE") {
+        return;
+      }
     }
 
     if (event[1].contains("event")) {
       eventsFeedObj.receiveNostrEvent(event, socketControl);
+      if (event[0] == "EOSE") {
+        return;
+      }
     }
 
     /// user feed
     if (event[1].contains("ufeed")) {
       userFeedObj.receiveNostrEvent(event, socketControl);
+
+      if (event[0] == "EOSE") {
+        return;
+      }
     }
 
     /// global feed
     if (event[1].contains("gfeed")) {
       globalFeedObj.receiveNostrEvent(event, socketControl);
+      if (event[0] == "EOSE") {
+        return;
+      }
     }
 
     var eventMap = {};

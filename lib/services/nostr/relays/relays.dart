@@ -172,6 +172,8 @@ class Relays {
                     } catch (e) {
                       log("654dD: $e");
                     }
+                  }, onError: (e) {
+                    log("onError: $e");
                   }),
                   connectedRelaysRead[id] = socketControl,
                   _connectedRelaysReadStreamController.add(connectedRelaysRead),
