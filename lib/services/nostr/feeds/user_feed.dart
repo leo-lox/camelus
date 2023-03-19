@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:camelus/models/socket_control.dart';
 import 'package:camelus/models/tweet.dart';
@@ -50,6 +51,13 @@ class UserFeed {
             tweet.replies.map<Tweet>((reply) => Tweet.fromJson(reply)).toList();
       }
       feed.sort((a, b) => b.tweetedAt.compareTo(a.tweetedAt));
+
+      // delete messages over 50
+      if (feed.length > 50) {
+        feed.removeRange(50, feed.length);
+      }
+      // save to cache
+      _jsonCache.refresh('userFeed', {"tweets": feed});
 
       // send to stream /send to ui
       _userFeedStreamController.add(feed);
@@ -127,15 +135,18 @@ class UserFeed {
           if (feed.any((element) => element.id == tweet.id)) {
             return;
           }
-          // add to feed
-          feed.add(tweet);
+          // add to top of feed
+          feed.insert(0, tweet);
         }
 
         //update cache
         _jsonCache.refresh('userFeed', {"tweets": feed});
 
+        //sort feed
+        feed.sort((a, b) => b.tweetedAt.compareTo(a.tweetedAt));
+
         // sent to stream
-        _userFeedStreamController.sink.add(feed);
+        _userFeedStreamController.add(feed);
         return;
       }
     }

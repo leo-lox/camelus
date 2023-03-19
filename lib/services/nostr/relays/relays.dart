@@ -172,6 +172,8 @@ class Relays {
                     } catch (e) {
                       log("654dD: $e");
                     }
+                  }, onError: (e) {
+                    log("onError: $e");
                   }),
                   connectedRelaysRead[id] = socketControl,
                   _connectedRelaysReadStreamController.add(connectedRelaysRead),
@@ -188,7 +190,7 @@ class Relays {
 
         SocketControl socketControl = SocketControl(id, relay.key);
 
-        await socket
+        socket
             .then((value) => {
                   socketControl.socket = value,
                   socketControl.socketIsRdy = true,
@@ -210,6 +212,9 @@ class Relays {
 
       log("connected to ${relay.key}");
     }
+    // wait check if relays promise is resolved //todo currently hotfix
+    await Future.delayed(const Duration(seconds: 2));
+
     log("connected relays: ${connectedRelaysRead.length} ${connectedRelaysWrite.length} => all connected");
     try {
       isNostrServiceConnectedCompleter.complete(true);

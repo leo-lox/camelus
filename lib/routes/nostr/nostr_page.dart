@@ -58,7 +58,7 @@ class _NostrPageState extends State<NostrPage>
   static String userFeedTimelineFetchId = "timeline";
 
   List<Tweet> _userFeedOriginalOnly = [];
-  List<Tweet> _newUserFeedOriginalOnly = [];
+
   //List<Tweet> _userFeedOriginalAndReplies = [];
 
   late final ScrollController _scrollControllerPage = ScrollController();
@@ -165,54 +165,12 @@ class _NostrPageState extends State<NostrPage>
 
   /// listener attached from the NostrService
   _onUserFeedReceived(List<Tweet> tweets) {
-    if (_userFeedOriginalOnly.isEmpty) {
-      setState(() {
-        _userFeedOriginalOnly = List.from(tweets);
-      });
-      return;
-    }
-
-    //// add tweets posted later (tweetedAt) than the last one in the feed to the new tweets list
-    //var lastTweet = _userFeedOriginalOnly.last;
-    //_newUserFeedOriginalOnly = tweets.where((tweet) {
-    //  return tweet.tweetedAt < lastTweet.tweetedAt;
-    //}).toList();
-//
-    //// sort by tweetedAt
-    //_newUserFeedOriginalOnly.sort((a, b) => b.tweetedAt.compareTo(a.tweetedAt));
-//
-    //
-    //// add tweets without the new ones (to load timeline)
-    //_userFeedOriginalOnly = tweets.where((tweet) {
-    //  return tweet.tweetedAt >= lastTweet.tweetedAt;
-    //}).toList();
-
-    _userFeedOriginalOnly = tweets;
-
     // sort by tweetedAt
     _userFeedOriginalOnly.sort((a, b) => b.tweetedAt.compareTo(a.tweetedAt));
 
     setState(() {
-      _newUserFeedOriginalOnly = _newUserFeedOriginalOnly;
-      _userFeedOriginalOnly = _userFeedOriginalOnly;
+      _userFeedOriginalOnly = List.from(tweets);
     });
-  }
-
-  /// aka. sync with main feed, currently not used
-  void _userFeedLoadNewTweets() {
-    _userFeedOriginalOnly.insertAll(
-        _userFeedOriginalOnly.length, _newUserFeedOriginalOnly);
-    // sort by tweetedAt
-    _userFeedOriginalOnly.sort((a, b) => b.tweetedAt.compareTo(a.tweetedAt));
-    _newUserFeedOriginalOnly = [];
-    setState(() {
-      _userFeedOriginalOnly = _userFeedOriginalOnly;
-      _newUserFeedOriginalOnly = [];
-    });
-
-    // scroll to top
-    _scrollControllerPage.animateTo(0,
-        duration: const Duration(milliseconds: 500), curve: Curves.easeOut);
   }
 
   /// timeline scroll request more tweets
@@ -262,12 +220,17 @@ class _NostrPageState extends State<NostrPage>
 
     int now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
 
+    int latestTweet = now - 86400; // -1 day
+    if (_userFeedOriginalOnly.isNotEmpty) {
+      latestTweet = _userFeedOriginalOnly.first.tweetedAt;
+    }
+
     widget._nostrService.requestUserFeed(
         users: followingPubkeys,
         requestId: userFeedFreshId,
-        limit: 15,
-        //until: now,
-        includeComments: true);
+        limit: 50,
+        since: latestTweet, //since latest tweet
+        includeComments: false);
 
     setState(() {
       isUserFeedSubscribed = true;
@@ -276,7 +239,7 @@ class _NostrPageState extends State<NostrPage>
 
   void _unsubscribeFromUserFeed() {
     if (!isUserFeedSubscribed) return;
-    log("unsubscribed from user feed called");
+    log("nostr:page unsubscribed from user feed called");
 
     widget._nostrService.closeSubscription("ufeed-$userFeedFreshId");
     if (userFeedTimelineFetchId.isNotEmpty) {
@@ -683,6 +646,9 @@ class _NostrPageState extends State<NostrPage>
                   color: Palette.primary,
                   backgroundColor: Palette.extraDarkGray,
                   onRefresh: () {
+                    // todo fix this hack (should auto update)
+                    isUserFeedSubscribed = false;
+                    _subscribeToUserFeed();
                     return Future.delayed(const Duration(milliseconds: 150));
                   },
                   child: CustomScrollView(
