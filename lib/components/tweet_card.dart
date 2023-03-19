@@ -1,7 +1,6 @@
 import 'dart:developer';
 import 'dart:ui';
 
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -13,9 +12,10 @@ import 'package:camelus/models/post_context.dart';
 import 'package:camelus/models/tweet.dart';
 import 'package:camelus/models/tweet_control.dart';
 import 'package:camelus/services/nostr/nostr_injector.dart';
-import 'package:timeago_flutter/timeago_flutter.dart';
+
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:url_launcher/url_launcher_string.dart';
+import 'package:photo_view/photo_view.dart';
 
 import '../services/nostr/nostr_service.dart';
 
@@ -173,15 +173,20 @@ class _TweetCardState extends State<TweetCard> {
   }
 
   // open image in full screen with dialog and zoom
-  void openImage(ImageProvider image, BuildContext context) {
+  void _openImage(ImageProvider image, BuildContext context) {
     showDialog(
         context: context,
         builder: (BuildContext context) {
           return Dialog(
             clipBehavior: Clip.antiAliasWithSaveLayer,
             insetPadding: const EdgeInsets.all(5),
-            child: InteractiveViewer(
-              child: Image(image: image),
+            child: PhotoView(
+              minScale: PhotoViewComputedScale.contained * 1,
+              onTapUp: (context, details, controllerValue) {
+                Navigator.pop(context);
+              },
+              tightMode: true,
+              imageProvider: image,
             ),
           );
         });
@@ -506,7 +511,7 @@ class _TweetCardState extends State<TweetCard> {
                                   if (widget.tweet.imageLinks.isNotEmpty &&
                                       widget.tweet.imageLinks != null)
                                     GestureDetector(
-                                      onTap: () => openImage(myImage, context),
+                                      onTap: () => _openImage(myImage, context),
                                       child: Container(
                                         height: 200,
                                         decoration: BoxDecoration(

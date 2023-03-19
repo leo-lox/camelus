@@ -15,6 +15,7 @@ import 'package:camelus/routes/nostr/profile/edit_relays_page.dart';
 import 'package:camelus/routes/nostr/profile/follower_page.dart';
 import 'package:camelus/services/nostr/nostr_injector.dart';
 import 'package:camelus/services/nostr/nostr_service.dart';
+import 'package:photo_view/photo_view.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
@@ -789,6 +790,26 @@ Widget _profileImage(ScrollController sController, widget) {
     }
   }
 
+  // open image in full screen with dialog and zoom
+  void _openImage(ImageProvider image, BuildContext context) {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return Dialog(
+            clipBehavior: Clip.antiAliasWithSaveLayer,
+            insetPadding: const EdgeInsets.all(5),
+            child: PhotoView(
+              minScale: PhotoViewComputedScale.contained * 1,
+              onTapUp: (context, details, controllerValue) {
+                Navigator.pop(context);
+              },
+              tightMode: true,
+              imageProvider: image,
+            ),
+          );
+        });
+  }
+
   return Positioned(
     top: top,
     left: 0,
@@ -819,7 +840,11 @@ Widget _profileImage(ScrollController sController, widget) {
                 picture =
                     "https://avatars.dicebear.com/api/personas/${widget.pubkey}.svg";
               }
-              return myProfilePicture(picture, widget.pubkey);
+              return GestureDetector(
+                  onTap: (() {
+                    _openImage(NetworkImage(picture), context);
+                  }),
+                  child: myProfilePicture(picture, widget.pubkey));
             }),
       ),
     ),
