@@ -38,8 +38,12 @@ class Nip05 {
     await jsonCache.refresh('nip05', _history);
   }
 
-  /// returns {nip05, valid, lastCheck, relayHint} or {} when error
+  /// returns {nip05, valid, lastCheck, relayHints} or exception
   Future<Map<String, dynamic>> checkNip05(String nip05, String pubkey) async {
+    if (nip05.isEmpty || pubkey.isEmpty) {
+      throw Exception("nip05 or pubkey empty");
+    }
+
     if (_history.containsKey(nip05)) {
       Map<String, dynamic> result = _history[nip05];
       int now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
@@ -65,7 +69,7 @@ class Nip05 {
     return result;
   }
 
-  /// returns {nip05, valid, lastCheck, relayHint}
+  /// returns {nip05, valid, lastCheck, relays}
   Future<Map<String, dynamic>> _checkNip05Request(
       String nip05, String pubkey) async {
     int now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
@@ -88,7 +92,10 @@ class Nip05 {
 
       Map relays = json["relays"] ?? {};
 
-      String pRelays = relays[pubkey] ?? "";
+      List<String> pRelays = [];
+      if (relays[pubkey]?.isNotEmpty) {
+        pRelays = List<String>.from(relays[pubkey]);
+      }
 
       Map<String, dynamic> result = {
         "nip05": nip05,

@@ -40,6 +40,8 @@ class _TweetCardState extends State<TweetCard> {
 
   final Map<String, dynamic> _tagsMetadata = {};
 
+  String nip05verified = "";
+
   List<TextSpan> _buildTextSpans(String content) {
     var spans = _buildUrlSpans(content);
     var completeSpans = _buildHashtagSpans(spans);
@@ -153,6 +155,21 @@ class _TweetCardState extends State<TweetCard> {
     }
 
     return finalSpans;
+  }
+
+  void _checkNip05(String nip05, String pubkey) async {
+    if (nip05.isEmpty) return;
+    if (nip05verified.isNotEmpty) return;
+    try {
+      var check = await widget._nostrService.checkNip05(nip05, pubkey);
+
+      if (check["valid"] == true) {
+        setState(() {
+          nip05verified = check["nip05"];
+        });
+      }
+      // ignore: empty_catches
+    } catch (e) {}
   }
 
   // open image in full screen with dialog and zoom
@@ -403,6 +420,10 @@ class _TweetCardState extends State<TweetCard> {
                                                     "${npubHr.substring(0, 4)}...${npubHr.substring(npubHr.length - 4)}";
                                                 name = snapshot.data?["name"] ??
                                                     npubHrShort;
+                                                _checkNip05(
+                                                    snapshot.data?["nip05"] ??
+                                                        "",
+                                                    widget.tweet.pubkey);
                                               } else if (snapshot.hasError) {
                                                 name = "error";
                                               } else {
@@ -410,24 +431,39 @@ class _TweetCardState extends State<TweetCard> {
                                                 name = "loading";
                                               }
 
-                                              return Container(
-                                                constraints:
-                                                    const BoxConstraints(
-                                                        minWidth: 50,
-                                                        maxWidth: 150),
-                                                child: RichText(
-                                                  maxLines: 2,
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
-                                                  text: TextSpan(
-                                                    text: name,
-                                                    style: const TextStyle(
-                                                        color: Colors.white,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        fontSize: 17),
+                                              return Row(
+                                                children: [
+                                                  Container(
+                                                    constraints:
+                                                        const BoxConstraints(
+                                                            minWidth: 5,
+                                                            maxWidth: 150),
+                                                    child: RichText(
+                                                      maxLines: 2,
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                      text: TextSpan(
+                                                        text: name,
+                                                        style: const TextStyle(
+                                                            color: Colors.white,
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                            fontSize: 17),
+                                                      ),
+                                                    ),
                                                   ),
-                                                ),
+                                                  if (nip05verified.isNotEmpty)
+                                                    Container(
+                                                      margin:
+                                                          const EdgeInsets.only(
+                                                              top: 0, left: 5),
+                                                      child: const Icon(
+                                                        Icons.verified,
+                                                        color: Palette.white,
+                                                        size: 15,
+                                                      ),
+                                                    ),
+                                                ],
                                               );
                                             }),
                                         const SizedBox(width: 10),

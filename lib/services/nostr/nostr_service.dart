@@ -453,7 +453,7 @@ class NostrService {
     return userContactsObj.getContactsByPubkey(pubkey, force: force);
   }
 
-  /// returns [nip5 identifier, true, ] if valid or [null, null] if not found
+  /// returns {nip05, valid, lastCheck, relayHint} exception
   Future<Map> checkNip05(String nip05, String pubkey) async {
     return await nip05service.checkNip05(nip05, pubkey);
   }
