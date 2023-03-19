@@ -791,7 +791,7 @@ Widget _profileImage(ScrollController sController, widget) {
   }
 
   // open image in full screen with dialog and zoom
-  void _openImage(ImageProvider image, BuildContext context) {
+  void openImage(ImageProvider image, BuildContext context) {
     showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -842,7 +842,7 @@ Widget _profileImage(ScrollController sController, widget) {
               }
               return GestureDetector(
                   onTap: (() {
-                    _openImage(NetworkImage(picture), context);
+                    openImage(NetworkImage(picture), context);
                   }),
                   child: myProfilePicture(picture, widget.pubkey));
             }),
