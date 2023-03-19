@@ -1,7 +1,6 @@
 import 'dart:developer';
 import 'dart:ui';
 
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -13,9 +12,10 @@ import 'package:camelus/models/post_context.dart';
 import 'package:camelus/models/tweet.dart';
 import 'package:camelus/models/tweet_control.dart';
 import 'package:camelus/services/nostr/nostr_injector.dart';
-import 'package:timeago_flutter/timeago_flutter.dart';
+
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:url_launcher/url_launcher_string.dart';
+import 'package:photo_view/photo_view.dart';
 
 import '../services/nostr/nostr_service.dart';
 
@@ -39,6 +39,8 @@ class _TweetCardState extends State<TweetCard> {
   List<TextSpan> textSpans = [];
 
   final Map<String, dynamic> _tagsMetadata = {};
+
+  String nip05verified = "";
 
   List<TextSpan> _buildTextSpans(String content) {
     var spans = _buildUrlSpans(content);
@@ -155,16 +157,36 @@ class _TweetCardState extends State<TweetCard> {
     return finalSpans;
   }
 
+  void _checkNip05(String nip05, String pubkey) async {
+    if (nip05.isEmpty) return;
+    if (nip05verified.isNotEmpty) return;
+    try {
+      var check = await widget._nostrService.checkNip05(nip05, pubkey);
+
+      if (check["valid"] == true) {
+        setState(() {
+          nip05verified = check["nip05"];
+        });
+      }
+      // ignore: empty_catches
+    } catch (e) {}
+  }
+
   // open image in full screen with dialog and zoom
-  void openImage(ImageProvider image, BuildContext context) {
+  void _openImage(ImageProvider image, BuildContext context) {
     showDialog(
         context: context,
         builder: (BuildContext context) {
           return Dialog(
             clipBehavior: Clip.antiAliasWithSaveLayer,
             insetPadding: const EdgeInsets.all(5),
-            child: InteractiveViewer(
-              child: Image(image: image),
+            child: PhotoView(
+              minScale: PhotoViewComputedScale.contained * 1,
+              onTapUp: (context, details, controllerValue) {
+                Navigator.pop(context);
+              },
+              tightMode: true,
+              imageProvider: image,
             ),
           );
         });
@@ -403,6 +425,10 @@ class _TweetCardState extends State<TweetCard> {
                                                     "${npubHr.substring(0, 4)}...${npubHr.substring(npubHr.length - 4)}";
                                                 name = snapshot.data?["name"] ??
                                                     npubHrShort;
+                                                _checkNip05(
+                                                    snapshot.data?["nip05"] ??
+                                                        "",
+                                                    widget.tweet.pubkey);
                                               } else if (snapshot.hasError) {
                                                 name = "error";
                                               } else {
@@ -410,24 +436,39 @@ class _TweetCardState extends State<TweetCard> {
                                                 name = "loading";
                                               }
 
-                                              return Container(
-                                                constraints:
-                                                    const BoxConstraints(
-                                                        minWidth: 50,
-                                                        maxWidth: 150),
-                                                child: RichText(
-                                                  maxLines: 2,
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
-                                                  text: TextSpan(
-                                                    text: name,
-                                                    style: const TextStyle(
-                                                        color: Colors.white,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        fontSize: 17),
+                                              return Row(
+                                                children: [
+                                                  Container(
+                                                    constraints:
+                                                        const BoxConstraints(
+                                                            minWidth: 5,
+                                                            maxWidth: 150),
+                                                    child: RichText(
+                                                      maxLines: 2,
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                      text: TextSpan(
+                                                        text: name,
+                                                        style: const TextStyle(
+                                                            color: Colors.white,
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                            fontSize: 17),
+                                                      ),
+                                                    ),
                                                   ),
-                                                ),
+                                                  if (nip05verified.isNotEmpty)
+                                                    Container(
+                                                      margin:
+                                                          const EdgeInsets.only(
+                                                              top: 0, left: 5),
+                                                      child: const Icon(
+                                                        Icons.verified,
+                                                        color: Palette.white,
+                                                        size: 15,
+                                                      ),
+                                                    ),
+                                                ],
                                               );
                                             }),
                                         const SizedBox(width: 10),
@@ -470,7 +511,7 @@ class _TweetCardState extends State<TweetCard> {
                                   if (widget.tweet.imageLinks.isNotEmpty &&
                                       widget.tweet.imageLinks != null)
                                     GestureDetector(
-                                      onTap: () => openImage(myImage, context),
+                                      onTap: () => _openImage(myImage, context),
                                       child: Container(
                                         height: 200,
                                         decoration: BoxDecoration(
@@ -505,7 +546,7 @@ class _TweetCardState extends State<TweetCard> {
                                               Text(
                                                 // show number of comments if >0
                                                 widget.tweet.commentsCount >= 2
-                                                    ? "+1" //widget.tweet.commentsCount
+                                                    ? "1+" //widget.tweet.commentsCount
                                                         .toString()
                                                     : "",
 

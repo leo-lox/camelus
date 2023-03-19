@@ -254,9 +254,9 @@ class _WritePostState extends State<WritePost> {
 
     widget._nostrService.writeEvent(content, 1, tags);
 
-    // wait for 1 second
+    // wait for x seconds
     Future.delayed(const Duration(milliseconds: 200), () {
-      // after 1 second, close modal
+      // close modal
       Navigator.pop(context);
     });
   }

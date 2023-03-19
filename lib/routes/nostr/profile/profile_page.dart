@@ -15,6 +15,7 @@ import 'package:camelus/routes/nostr/profile/edit_relays_page.dart';
 import 'package:camelus/routes/nostr/profile/follower_page.dart';
 import 'package:camelus/services/nostr/nostr_injector.dart';
 import 'package:camelus/services/nostr/nostr_service.dart';
+import 'package:photo_view/photo_view.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
@@ -56,14 +57,16 @@ class _ProfilePageState extends State<ProfilePage>
   void _checkNip05(String nip05, String pubkey) async {
     if (nip05.isEmpty) return;
     if (nip05verified.isNotEmpty) return;
+    try {
+      var check = await widget._nostrService.checkNip05(nip05, pubkey);
 
-    var check = await widget._nostrService.checkNip05(nip05, pubkey);
-
-    if (check["valid"] == true) {
-      setState(() {
-        nip05verified = check["nip05"];
-      });
-    }
+      if (check["valid"] == true) {
+        setState(() {
+          nip05verified = check["nip05"];
+        });
+      }
+      // ignore: empty_catches
+    } catch (e) {}
   }
 
   void checkIamFollowing() {
@@ -787,6 +790,26 @@ Widget _profileImage(ScrollController sController, widget) {
     }
   }
 
+  // open image in full screen with dialog and zoom
+  void openImage(ImageProvider image, BuildContext context) {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return Dialog(
+            clipBehavior: Clip.antiAliasWithSaveLayer,
+            insetPadding: const EdgeInsets.all(5),
+            child: PhotoView(
+              minScale: PhotoViewComputedScale.contained * 1,
+              onTapUp: (context, details, controllerValue) {
+                Navigator.pop(context);
+              },
+              tightMode: true,
+              imageProvider: image,
+            ),
+          );
+        });
+  }
+
   return Positioned(
     top: top,
     left: 0,
@@ -817,7 +840,11 @@ Widget _profileImage(ScrollController sController, widget) {
                 picture =
                     "https://avatars.dicebear.com/api/personas/${widget.pubkey}.svg";
               }
-              return myProfilePicture(picture, widget.pubkey);
+              return GestureDetector(
+                  onTap: (() {
+                    openImage(NetworkImage(picture), context);
+                  }),
+                  child: myProfilePicture(picture, widget.pubkey));
             }),
       ),
     ),

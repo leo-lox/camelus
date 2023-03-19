@@ -127,12 +127,25 @@ class _FollowerPageState extends State<FollowerPage> {
 
 Widget _profile(String pubkey, widget, List myFollowing, List myNewFollowing,
     List myNewUnfollowing, Function updateUi) {
+  Future<String> checkNip05(String nip05, String pubkey) async {
+    try {
+      var check = await widget._nostrService.checkNip05(nip05, pubkey);
+
+      if (check["valid"] == true) {
+        return check["nip05"];
+      }
+      // ignore: empty_catches
+    } catch (e) {}
+    return "";
+  }
+
   return FutureBuilder<Map>(
       future: widget._nostrService.getUserMetadata(pubkey),
       builder: (BuildContext context, AsyncSnapshot<Map> snapshot) {
         String picture = "";
         String name = "";
         String about = "";
+        String? nip05 = "";
 
         if (snapshot.hasData) {
           picture = snapshot.data?["picture"] ??
@@ -140,6 +153,7 @@ Widget _profile(String pubkey, widget, List myFollowing, List myNewFollowing,
           name =
               snapshot.data?["name"] ?? Helpers().encodeBech32(pubkey, "npub");
           about = snapshot.data?["about"] ?? "";
+          nip05 = snapshot.data?["nip05"] ?? "";
         } else if (snapshot.hasError) {
           picture = "https://avatars.dicebear.com/api/personas/${pubkey}.svg";
           name = Helpers().encodeBech32(pubkey, "npub");
@@ -196,13 +210,34 @@ Widget _profile(String pubkey, widget, List myFollowing, List myNewFollowing,
                           ),
                         ),
                       if (!name.startsWith("npub"))
-                        Text(
-                          name,
-                          style: const TextStyle(
-                            color: Palette.white,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                          ),
+                        Row(
+                          children: [
+                            Text(
+                              name,
+                              style: const TextStyle(
+                                color: Palette.white,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            FutureBuilder(
+                                future: checkNip05(nip05 ?? "", pubkey),
+                                builder: (context, snapshot) {
+                                  if (snapshot.hasData && snapshot.data != "") {
+                                    return Container(
+                                      margin: const EdgeInsets.only(
+                                          top: 0, left: 5),
+                                      child: const Icon(
+                                        Icons.verified,
+                                        color: Palette.white,
+                                        size: 18,
+                                      ),
+                                    );
+                                  } else {
+                                    return Container();
+                                  }
+                                }),
+                          ],
                         ),
                       const SizedBox(height: 4),
                       SizedBox(

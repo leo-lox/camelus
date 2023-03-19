@@ -265,7 +265,7 @@ class _NostrPageState extends State<NostrPage>
     widget._nostrService.requestUserFeed(
         users: followingPubkeys,
         requestId: userFeedFreshId,
-        limit: 25,
+        limit: 15,
         //until: now,
         includeComments: true);
 
