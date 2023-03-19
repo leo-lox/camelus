@@ -505,7 +505,7 @@ class _TweetCardState extends State<TweetCard> {
                                               Text(
                                                 // show number of comments if >0
                                                 widget.tweet.commentsCount >= 2
-                                                    ? "+1" //widget.tweet.commentsCount
+                                                    ? "1+" //widget.tweet.commentsCount
                                                         .toString()
                                                     : "",
 
