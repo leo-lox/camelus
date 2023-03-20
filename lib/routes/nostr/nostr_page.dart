@@ -130,12 +130,9 @@ class _NostrPageState extends State<NostrPage>
   void _unsubscribeFromGlobalFeed() {
     if (!isGlobalFeedSubscribed) return;
 
-    widget._nostrService.closeSubscription("globalFeed-$globalFeedFreshId");
+    widget._nostrService.closeSubscription("gfeed-$globalFeedFreshId");
 
-    if (globalFeedTimelineFetchId.isNotEmpty) {
-      widget._nostrService
-          .closeSubscription("globalFeed-$globalFeedTimelineFetchId");
-    }
+    widget._nostrService.closeSubscription("gfeed-$globalFeedTimelineFetchId");
 
     setState(() {
       isGlobalFeedSubscribed = false;
