@@ -390,6 +390,8 @@ class Relays {
       Completer? completer}) {
     // todo: figure out how to send to specific relays
 
+    _splitRequestByRelays(request);
+
     String reqId = request[1];
 
     var jsonRequest = json.encode(request);
@@ -408,6 +410,62 @@ class Relays {
         relay.value.completers[reqId] = completer;
       }
     }
+  }
+
+  _splitRequestByRelays(List<dynamic> request) {
+    Map<String, dynamic> requestBody = Map<String, dynamic>.from(request[2]);
+
+    // for now authors
+    if (!requestBody.containsKey("authors")) {
+      return;
+    }
+    List<String> pubkeys = requestBody["authors"];
+
+    Map countMap = {};
+    for (var pubkey in pubkeys) {
+      countMap[pubkey] = 2; //todo: magic number move to settings
+    }
+
+    Map<String, List<String>> relayPubkeyMap = {};
+
+    var assignments = relayAssignments;
+
+    // result should look like this
+    // relayPubkeyMap = {
+    //   "relay1": ["pubkey1", "pubkey2"],
+    //   "relay2": ["pubkey3", "pubkey4"],
+    // }
+    // and with each iteration the countMap is reduced
+    // countMap = {
+    //   "pubkey1": 0,
+    //   "pubkey2": 0,
+    //   "pubkey3": 0,
+    //   "pubkey4": 0,
+    // }
+
+    for (var relay in connectedRelaysRead.entries) {
+      var relayUrl = relay.value.connectionUrl;
+
+      for (var pubkey in pubkeys) {
+        if (countMap[pubkey] == 0) {
+          continue;
+        }
+        if (assignments
+            .where((element) =>
+                element.relayUrl == relayUrl &&
+                element.pubkeys.contains(pubkey))
+            .isNotEmpty) {
+          if (relayPubkeyMap.containsKey(relayUrl)) {
+            relayPubkeyMap[relayUrl]!.add(pubkey);
+          } else {
+            relayPubkeyMap[relayUrl] = [pubkey];
+          }
+          countMap[pubkey] = countMap[pubkey] - 1;
+        }
+      }
+    }
+
+    log("relayPubkeyMap: $relayPubkeyMap, countMap: $countMap");
   }
 
   setManualRelays(Map<String, Map<String, dynamic>> relays) {
