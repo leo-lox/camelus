@@ -465,7 +465,28 @@ class Relays {
       }
     }
 
-    log("relayPubkeyMap: $relayPubkeyMap, countMap: $countMap");
+    log("split: relayPubkeyMap: $relayPubkeyMap, countMap: $countMap");
+
+    List<String> remainingPubkeys = List<String>.from(countMap.entries
+        .where((element) => element.value > 0)
+        .map((e) => e.key)
+        .toList());
+
+    Map<String, dynamic> newRequests = {};
+    // craft new request for each relay  SPECIFIC
+    for (var relay in relayPubkeyMap.entries) {
+      var relayUrl = relay.key;
+      var pubkeys = relay.value;
+
+      var newRequest = List<dynamic>.from(request);
+      newRequest[2]["authors"] = pubkeys;
+
+      newRequests[relayUrl] = newRequest;
+    }
+
+    // add remaining pubkeys to new request for each relay  GENERAL
+    //todo
+    log("split: newRequests: $newRequests");
   }
 
   setManualRelays(Map<String, Map<String, dynamic>> relays) {
