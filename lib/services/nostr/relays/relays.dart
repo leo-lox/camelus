@@ -389,14 +389,22 @@ class Relays {
       {dynamic additionalData,
       StreamController? streamController,
       Completer? completer}) {
-    // todo: figure out how to send to specific relays
-
-    _splitRequestByRelays(request);
+    Map<String, dynamic> splitRequest = _splitRequestByRelays(request);
 
     String reqId = request[1];
 
-    var jsonRequest = json.encode(request);
     for (var relay in connectedRelaysRead.entries) {
+      List specificRequest = [];
+      try {
+        // if something disconnects and the relay is not in the list anymore
+        specificRequest = splitRequest[relay.value.connectionUrl];
+      } catch (e) {
+        log("error: $e");
+        return;
+      }
+
+      var jsonRequest = json.encode(specificRequest);
+
       relay.value.socket.add(jsonRequest);
       relay.value.requestInFlight[reqId] = true;
 
@@ -413,12 +421,12 @@ class Relays {
     }
   }
 
-  _splitRequestByRelays(List<dynamic> request) {
+  Map<String, dynamic> _splitRequestByRelays(List<dynamic> request) {
     Map<String, dynamic> requestBody = Map<String, dynamic>.from(request[2]);
 
     // for now authors
     if (!requestBody.containsKey("authors")) {
-      return;
+      throw Exception("request does not contain authors");
     }
     List<String> pubkeys = requestBody["authors"];
 
