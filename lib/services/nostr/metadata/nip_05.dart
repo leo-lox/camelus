@@ -86,40 +86,36 @@ class Nip05 {
       return {};
     }
 
-    try {
-      var json = jsonDecode(response.body);
-      Map names = json["names"];
+    var json = jsonDecode(response.body);
+    Map names = json["names"];
 
-      Map relays = json["relays"] ?? {};
+    Map relays = json["relays"] ?? {};
 
-      List<String> pRelays = [];
-      if (relays[pubkey]?.isNotEmpty) {
-        pRelays = List<String>.from(relays[pubkey]);
-      }
+    List<String> pRelays = [];
+    if (relays[pubkey] != null) {
+      pRelays = List<String>.from(relays[pubkey]);
+    }
 
-      Map<String, dynamic> result = {
-        "nip05": nip05,
-        "valid": false,
-        "lastCheck": now
-      };
-      if (pRelays.isNotEmpty) {
-        result["relays"] = pRelays;
-      }
+    Map<String, dynamic> result = {
+      "nip05": nip05,
+      "valid": false,
+      "lastCheck": now
+    };
+    if (pRelays.isNotEmpty) {
+      result["relays"] = pRelays;
+    }
 
-      if (names[username] == pubkey) {
-        result["valid"] = true;
+    if (names[username] == pubkey) {
+      result["valid"] = true;
+      _history[nip05] = result;
+
+      return result;
+    } else {
+      if (result.isNotEmpty) {
         _history[nip05] = result;
-
-        return result;
-      } else {
-        if (result.isNotEmpty) {
-          _history[nip05] = result;
-        }
-
-        return result;
       }
-    } catch (e) {
-      log("err, decoding nip5 json ${e.toString()}}");
+
+      return result;
     }
 
     return {};

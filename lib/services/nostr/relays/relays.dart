@@ -11,6 +11,7 @@ import 'package:camelus/services/nostr/relays/relays_picker.dart';
 import 'package:cross_local_storage/cross_local_storage.dart';
 
 import 'package:json_cache/json_cache.dart';
+import 'dart:convert';
 
 class Relays {
   final Map<String, Map<String, bool>> initRelays = {
@@ -22,6 +23,7 @@ class Relays {
     "wss://nostr.zebedee.cloud": {"write": true, "read": true, "default": true},
     //"wss://brb.io": {"write": true, "read": true},
     "wss://nos.lol": {"write": true, "read": true, "default": true},
+    "wss://relay.damus.io": {"write": true, "read": true, "default": true},
   };
 
   Map<String, Map<String, dynamic>> manualRelays = {};
@@ -388,12 +390,22 @@ class Relays {
       {dynamic additionalData,
       StreamController? streamController,
       Completer? completer}) {
-    // todo: figure out how to send to specific relays
+    Map<String, dynamic> splitRequest = _splitRequestByRelays(request);
 
     String reqId = request[1];
 
-    var jsonRequest = json.encode(request);
     for (var relay in connectedRelaysRead.entries) {
+      List specificRequest = [];
+      try {
+        // if something disconnects and the relay is not in the list anymore
+        specificRequest = splitRequest[relay.value.connectionUrl];
+      } catch (e) {
+        log("error: $e");
+        return;
+      }
+
+      var jsonRequest = json.encode(specificRequest);
+
       relay.value.socket.add(jsonRequest);
       relay.value.requestInFlight[reqId] = true;
 
@@ -408,6 +420,104 @@ class Relays {
         relay.value.completers[reqId] = completer;
       }
     }
+  }
+
+  Map<String, dynamic> _splitRequestByRelays(List<dynamic> request) {
+    Map<String, dynamic> requestBody = Map<String, dynamic>.from(request[2]);
+
+    // don't do anything if there is no authors
+    if (!requestBody.containsKey("authors")) {
+      for (var relay in connectedRelaysRead.entries) {
+        String relayUrl = relay.value.connectionUrl;
+
+        Map<String, dynamic> requestsMap = {};
+
+        requestsMap[relayUrl] = request;
+        return requestsMap;
+      }
+    }
+    List<String> pubkeys = requestBody["authors"];
+
+    Map countMap = {};
+    for (var pubkey in pubkeys) {
+      countMap[pubkey] = 2; //todo: magic number move to settings
+    }
+
+    Map<String, List<String>> relayPubkeyMap = {};
+
+    var assignments = relayAssignments;
+
+    // result should look like this
+    // relayPubkeyMap = {
+    //   "relay1": ["pubkey1", "pubkey2"],
+    //   "relay2": ["pubkey3", "pubkey4"],
+    // }
+    // and with each iteration the countMap is reduced
+    // countMap = {
+    //   "pubkey1": 0,
+    //   "pubkey2": 0,
+    //   "pubkey3": 0,
+    //   "pubkey4": 0,
+    // }
+
+    for (var relay in connectedRelaysRead.entries) {
+      var relayUrl = relay.value.connectionUrl;
+
+      for (var pubkey in pubkeys) {
+        if (countMap[pubkey] == 0) {
+          continue;
+        }
+        if (assignments
+            .where((element) =>
+                element.relayUrl == relayUrl &&
+                element.pubkeys.contains(pubkey))
+            .isNotEmpty) {
+          if (relayPubkeyMap.containsKey(relayUrl)) {
+            relayPubkeyMap[relayUrl]!.add(pubkey);
+          } else {
+            relayPubkeyMap[relayUrl] = [pubkey];
+          }
+          countMap[pubkey] = countMap[pubkey] - 1;
+        }
+      }
+    }
+
+    List<String> remainingPubkeys = List<String>.from(countMap.entries
+        .where((element) => element.value > 0)
+        .map((e) => e.key)
+        .toList());
+
+    Map<String, dynamic> newRequests = {};
+    // craft new request for each relay  SPECIFIC
+    for (var relay in relayPubkeyMap.entries) {
+      var relayUrl = relay.key;
+      var pubkeys = relay.value;
+
+      // deep copy request, if there is a better way, please let me know
+      List newRequest = json.decode(json.encode(request));
+      newRequest[2]["authors"] = pubkeys;
+
+      newRequests[relayUrl] = newRequest;
+    }
+
+    // add remaining pubkeys to new request for each relay  GENERAL
+    for (var relayUrl
+        in connectedRelaysRead.values.map((e) => e.connectionUrl)) {
+      //var relayUrl = relay.key;
+
+      if (newRequests.containsKey(relayUrl)) {
+        var request = newRequests[relayUrl];
+        request[2]["authors"].addAll(remainingPubkeys);
+      } else {
+        // deep copy request, if there is a better way, please let me know
+        List newRequest = json.decode(json.encode(request));
+        newRequest[2]["authors"] = remainingPubkeys;
+
+        newRequests[relayUrl] = newRequest;
+      }
+    }
+
+    return newRequests;
   }
 
   setManualRelays(Map<String, Map<String, dynamic>> relays) {

@@ -72,6 +72,9 @@ class UserContacts {
       }
     }
     for (var key in oldData.keys) {
+      // don't delete own data
+      if (key == ownPubkey) continue;
+
       followingLastFetch.remove(key);
       following.remove(key);
     }
@@ -201,9 +204,6 @@ class UserContacts {
     // cast to list of lists
     following[pubkey] = tags;
     //following[pubkey] = tags as List<List>;
-
-    //update cache
-    _jsonCache.refresh('following', following);
 
     // callback
     if (socketControl.completers.containsKey(event[1])) {

@@ -33,7 +33,7 @@ class RelaysRanking {
         var d = DbPersonRelay(
             person: pubkeyHex,
             relay: entry.key,
-            lastFetched: 0, //todo: implement lastFetched
+            lastFetched: entry.value["lastFetched"] ?? 0,
             lastSuggestedKind3: entry.value["lastSuggestedKind3"] ?? 0,
             lastSuggestedNip05: entry.value["lastSuggestedNip05"] ?? 0,
             lastSuggestedBytag: entry.value["lastSuggestedBytag"] ?? 0,
