@@ -23,6 +23,7 @@ class Relays {
     "wss://nostr.zebedee.cloud": {"write": true, "read": true, "default": true},
     //"wss://brb.io": {"write": true, "read": true},
     "wss://nos.lol": {"write": true, "read": true, "default": true},
+    "wss://relay.damus.io": {"write": true, "read": true, "default": true},
   };
 
   Map<String, Map<String, dynamic>> manualRelays = {};
