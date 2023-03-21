@@ -11,6 +11,7 @@ import 'package:camelus/services/nostr/relays/relays_picker.dart';
 import 'package:cross_local_storage/cross_local_storage.dart';
 
 import 'package:json_cache/json_cache.dart';
+import 'dart:convert';
 
 class Relays {
   final Map<String, Map<String, bool>> initRelays = {
@@ -465,8 +466,6 @@ class Relays {
       }
     }
 
-    log("split: relayPubkeyMap: $relayPubkeyMap, countMap: $countMap");
-
     List<String> remainingPubkeys = List<String>.from(countMap.entries
         .where((element) => element.value > 0)
         .map((e) => e.key)
@@ -478,15 +477,31 @@ class Relays {
       var relayUrl = relay.key;
       var pubkeys = relay.value;
 
-      var newRequest = List<dynamic>.from(request);
+      // deep copy request, if there is a better way, please let me know
+      List newRequest = json.decode(json.encode(request));
       newRequest[2]["authors"] = pubkeys;
 
       newRequests[relayUrl] = newRequest;
     }
 
     // add remaining pubkeys to new request for each relay  GENERAL
-    //todo
-    log("split: newRequests: $newRequests");
+    for (var relayUrl
+        in connectedRelaysRead.values.map((e) => e.connectionUrl)) {
+      //var relayUrl = relay.key;
+
+      if (newRequests.containsKey(relayUrl)) {
+        var request = newRequests[relayUrl];
+        request[2]["authors"].addAll(remainingPubkeys);
+      } else {
+        // deep copy request, if there is a better way, please let me know
+        List newRequest = json.decode(json.encode(request));
+        newRequest[2]["authors"] = remainingPubkeys;
+
+        newRequests[relayUrl] = newRequest;
+      }
+    }
+
+    return newRequests;
   }
 
   setManualRelays(Map<String, Map<String, dynamic>> relays) {
