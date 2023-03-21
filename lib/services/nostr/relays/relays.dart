@@ -424,9 +424,16 @@ class Relays {
   Map<String, dynamic> _splitRequestByRelays(List<dynamic> request) {
     Map<String, dynamic> requestBody = Map<String, dynamic>.from(request[2]);
 
-    // for now authors
+    // don't do anything if there is no authors
     if (!requestBody.containsKey("authors")) {
-      throw Exception("request does not contain authors");
+      for (var relay in connectedRelaysRead.entries) {
+        String relayUrl = relay.value.connectionUrl;
+
+        Map<String, dynamic> requestsMap = {};
+
+        requestsMap[relayUrl] = request;
+        return requestsMap;
+      }
     }
     List<String> pubkeys = requestBody["authors"];
 
