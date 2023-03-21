@@ -183,13 +183,16 @@ class RelayTracker {
       if (relayUrl.isEmpty) {
         continue;
       }
-      //remove trailing slash
-      if (relayUrl.endsWith("/")) {
-        relayUrl = relayUrl.substring(0, relayUrl.length - 1);
+      if (personPubkey.isEmpty) {
+        continue;
       }
+      //clean relay url
 
-      // remove spaces
-      relayUrl = relayUrl.replaceAll(" ", "");
+      RegExp exp = RegExp(r'^(?:https?|wss?):\/\/[^\/]+');
+      String? wssDomain = exp.firstMatch(relayUrl)?.group(0);
+      if (wssDomain == null) {
+        continue;
+      }
 
       switch (nip) {
         case RelayTrackerAdvType.kind03:
