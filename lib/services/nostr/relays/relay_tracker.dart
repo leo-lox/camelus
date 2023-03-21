@@ -136,7 +136,9 @@ class RelayTracker {
         return;
       }
 
-      trackRelays(pubkey, result["relays"], RelayTrackerAdvType.nip05,
+      List<String> resultRelays = List<String>.from(result["relays"]);
+
+      trackRelays(pubkey, resultRelays, RelayTrackerAdvType.nip05,
           eventMap["created_at"]);
     }
     // by tag
