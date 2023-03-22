@@ -22,10 +22,10 @@ class NprofileHelper {
     String pubkey = "";
     var relays = [];
     for (int i = 0; i < tlvList.length; i++) {
-      if (i == 0) {
+      if (tlvList[i].type == 0) {
         var value = tlvList[i].value;
         pubkey = HEX.encode(value);
-      } else {
+      } else if (tlvList[i].type == 1) {
         var decoded = ascii.decode(tlvList[i].value);
         relays.add(decoded);
       }
@@ -38,5 +38,30 @@ class NprofileHelper {
       "pubkey": pubkey,
       "relays": relays,
     };
+  }
+
+  String mapToBech32(Map<String, dynamic> map) {
+    var helper = Helpers();
+    String pubkey = map["pubkey"];
+    List<String> relays = map["relays"];
+
+    List<int> pubkeyInt = HEX.decode(pubkey);
+    Uint8List pubkeyBytes = Uint8List.fromList(pubkeyInt);
+
+    List<TLV> tlvList = [];
+    tlvList.add(TLV(type: 0, length: 32, value: pubkeyBytes));
+
+    for (int i = 0; i < relays.length; i++) {
+      var relay = relays[i];
+      var relayBytes = Uint8List.fromList(ascii.encode(relay));
+      tlvList.add(TLV(type: 1, length: relayBytes.length, value: relayBytes));
+    }
+
+    Uint8List bytes = TlvUtils.encode(tlvList);
+    String dataString = HEX.encode(bytes);
+
+    String bech32 = helper.encodeBech32(dataString, "nprofile");
+
+    return bech32;
   }
 }
