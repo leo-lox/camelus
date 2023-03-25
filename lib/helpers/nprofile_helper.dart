@@ -16,14 +16,27 @@ class NprofileHelper {
     _relayRanking = injector.relaysRanking;
   }
 
+  // return nprofile in bech32 populated with user relays
+  Future<String> getNprofile(String pubkey) async {
+    // get user relays
+    List<String> userRelays = await getUserBestRelays(pubkey);
+
+    var nProfile = NprofileHelper().mapToBech32({
+      "pubkey": pubkey,
+      "relays": userRelays,
+    });
+
+    return nProfile;
+  }
+
   Future<List<String>> getUserBestRelays(pubkey) async {
     List userRelaysTmp =
         await _relayRanking.getBestRelays(pubkey, Direction.read);
 
-    // turn list of map {relay: url, score: s} into list of url strings with only the 3 best scores
+    // turn list of map {relay: url, score: s} into list of url strings with only the 5 best scores
     List<String> userRelays = [];
     for (var i = 0; i < userRelaysTmp.length; i++) {
-      if (i > 2) break;
+      if (i > 4) break;
       try {
         userRelays.add(userRelaysTmp[i]["relay"]);
       } catch (e) {
