@@ -1,11 +1,55 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'dart:typed_data';
 
 import 'package:camelus/helpers/helpers.dart';
 import 'package:camelus/helpers/tlv_helpers.dart';
+import 'package:camelus/services/nostr/relays/relays_injector.dart';
+import 'package:camelus/services/nostr/relays/relays_ranking.dart';
 import 'package:hex/hex.dart';
 
 class NprofileHelper {
+  late RelaysRanking _relayRanking;
+
+  NprofileHelper() {
+    RelaysInjector injector = RelaysInjector();
+    _relayRanking = injector.relaysRanking;
+  }
+
+  Future<List<String>> getUserBestRelays(pubkey) async {
+    List userRelaysTmp =
+        await _relayRanking.getBestRelays(pubkey, Direction.read);
+
+    // turn list of map {relay: url, score: s} into list of url strings with only the 3 best scores
+    List<String> userRelays = [];
+    for (var i = 0; i < userRelaysTmp.length; i++) {
+      if (i > 2) break;
+      try {
+        userRelays.add(userRelaysTmp[i]["relay"]);
+      } catch (e) {
+        log(e.toString());
+      }
+    }
+
+    return userRelays;
+  }
+
+  /// {pubkey: 02b0e, relays: [relay1, relay2]} => nprofile1qdfdf:qdfdf
+  String mapToBech32Hr(Map<String, dynamic> map) {
+    String bech32 = mapToBech32(map);
+
+    return bech32toHr(bech32);
+  }
+
+  String bech32toHr(String bech32) {
+    var length = bech32.length;
+    // split in first 20 chars and last 20 chars
+    String first = bech32.substring(0, 15);
+    String last = bech32.substring(length - 15, length);
+
+    return "$first:$last";
+  }
+
   Map<String, dynamic> bech32toMap(String bech32) {
     var helper = Helpers();
     var decodedBech32 = helper.decodeBech32(bech32);
@@ -43,7 +87,7 @@ class NprofileHelper {
   String mapToBech32(Map<String, dynamic> map) {
     var helper = Helpers();
     String pubkey = map["pubkey"];
-    List<String> relays = map["relays"];
+    List<String> relays = List<String>.from(map['relays']);
 
     List<int> pubkeyInt = HEX.decode(pubkey);
     Uint8List pubkeyBytes = Uint8List.fromList(pubkeyInt);

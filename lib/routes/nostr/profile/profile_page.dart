@@ -2,6 +2,8 @@ import 'dart:async';
 import 'dart:developer';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:camelus/helpers/nprofile_helper.dart';
+import 'package:camelus/services/nostr/relays/relays_ranking.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
@@ -21,12 +23,29 @@ import 'package:url_launcher/url_launcher_string.dart';
 
 class ProfilePage extends StatefulWidget {
   String pubkey;
-  late String pubkeyHr;
+  late String nProfile;
+  late String nProfileHr;
   late NostrService _nostrService;
   ProfilePage({Key? key, required this.pubkey}) : super(key: key) {
     NostrServiceInjector injector = NostrServiceInjector();
     _nostrService = injector.nostrService;
-    pubkeyHr = Helpers().encodeBech32(pubkey, "npub");
+
+    nProfile = NprofileHelper().mapToBech32({
+      "pubkey": pubkey,
+      "relays": [],
+    });
+    nProfileHr = NprofileHelper().bech32toHr(nProfile);
+    repopulateNprofile();
+  }
+
+  repopulateNprofile() async {
+    List<String> userRelays = await NprofileHelper().getUserBestRelays(pubkey);
+    nProfile = NprofileHelper().mapToBech32({
+      "pubkey": pubkey,
+      "relays": userRelays,
+    });
+    nProfileHr = NprofileHelper().bech32toHr(nProfile);
+    log("repopulated nprofile: $nProfileHr");
   }
 
   @override
@@ -561,7 +580,7 @@ class _ProfilePageState extends State<ProfilePage>
                                         ),
                                       ),
                                       child: Text(
-                                        '${widget.pubkeyHr.substring(0, 10)}...${widget.pubkeyHr.substring(widget.pubkey.length - 10)}',
+                                        '${widget.nProfileHr}',
                                         style: const TextStyle(
                                           color: Palette.white,
                                           fontSize: 16,
@@ -570,7 +589,7 @@ class _ProfilePageState extends State<ProfilePage>
                                     ),
                                     IconButton(
                                       onPressed: () {
-                                        _copyToClipboard(widget.pubkeyHr);
+                                        _copyToClipboard(widget.nProfile);
                                       },
                                       icon: const Icon(
                                         Icons.copy,
@@ -741,7 +760,7 @@ class _ProfilePageState extends State<ProfilePage>
 
                           if (snapshot.hasData) {
                             name = snapshot.data?["name"] ??
-                                '${widget.pubkeyHr.substring(0, 10)}...${widget.pubkeyHr.substring(widget.pubkey.length - 10)}';
+                                '${widget.nProfile.substring(0, 10)}...${widget.nProfile.substring(widget.pubkey.length - 10)}';
                           } else if (snapshot.hasError) {
                             name = "error";
                           } else {
