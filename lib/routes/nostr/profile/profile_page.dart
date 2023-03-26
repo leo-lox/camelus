@@ -25,6 +25,7 @@ class ProfilePage extends StatefulWidget {
   String pubkey;
   late String nProfile;
   late String nProfileHr;
+  late String pubkeyBech32;
   late NostrService _nostrService;
   ProfilePage({Key? key, required this.pubkey}) : super(key: key) {
     NostrServiceInjector injector = NostrServiceInjector();
@@ -35,6 +36,7 @@ class ProfilePage extends StatefulWidget {
       "relays": [],
     });
     nProfileHr = NprofileHelper().bech32toHr(nProfile);
+    pubkeyBech32 = Helpers().encodeBech32(pubkey, "npub");
     repopulateNprofile();
   }
 
@@ -560,30 +562,36 @@ class _ProfilePageState extends State<ProfilePage>
                                 margin: const EdgeInsets.only(top: 0, left: 20),
                                 child: Row(
                                   children: [
-                                    Container(
-                                      transform: Matrix4.translationValues(
-                                          -12.0, 0.0, 0.0),
-                                      // rounded
-                                      padding: const EdgeInsets.only(
-                                          top: 5,
-                                          bottom: 5,
-                                          left: 12,
-                                          right: 12),
-                                      decoration: const BoxDecoration(
-                                        color: Palette.extraDarkGray,
-                                        borderRadius: BorderRadius.all(
-                                          Radius.circular(20),
+                                    GestureDetector(
+                                      onTap: () {
+                                        _copyToClipboard(widget.pubkeyBech32);
+                                      },
+                                      child: Container(
+                                        transform: Matrix4.translationValues(
+                                            -12.0, 0.0, 0.0),
+                                        // rounded
+                                        padding: const EdgeInsets.only(
+                                            top: 5,
+                                            bottom: 5,
+                                            left: 12,
+                                            right: 12),
+                                        decoration: const BoxDecoration(
+                                          color: Palette.extraDarkGray,
+                                          borderRadius: BorderRadius.all(
+                                            Radius.circular(20),
+                                          ),
                                         ),
-                                      ),
-                                      child: Text(
-                                        '${widget.nProfileHr}',
-                                        style: const TextStyle(
-                                          color: Palette.white,
-                                          fontSize: 16,
+                                        child: Text(
+                                          '${widget.pubkeyBech32.substring(0, 10)}...${widget.pubkeyBech32.substring(widget.pubkeyBech32.length - 10)}',
+                                          style: const TextStyle(
+                                            color: Palette.white,
+                                            fontSize: 16,
+                                          ),
                                         ),
                                       ),
                                     ),
                                     IconButton(
+                                      tooltip: 'copy nprofile',
                                       onPressed: () {
                                         _copyToClipboard(widget.nProfile);
                                       },
