@@ -31,6 +31,8 @@ class _UserFeedOriginalViewState extends State<UserFeedOriginalView> {
 
   bool _isLoading = true;
 
+  final GlobalKey _listKey = GlobalKey<AnimatedListState>();
+
   List<Tweet> _displayList = [];
 
   late List<String> _followingPubkeys;
@@ -117,14 +119,19 @@ class _UserFeedOriginalViewState extends State<UserFeedOriginalView> {
   /// listener attached from the NostrService
   _onUserFeedReceived(List<Tweet> tweets) {
     // sort by tweetedAt
-    _displayList.sort((a, b) => b.tweetedAt.compareTo(a.tweetedAt));
+    //_displayList.sort((a, b) => b.tweetedAt.compareTo(a.tweetedAt));
 
     setState(() {
+      //todo: keep scroll position
       _displayList = List.from(tweets);
-      //_displayList.addAll(tweets);
+
+      //_displayList.insertAll(0, tweets);
+      //_displayList.insert(0, tweets.first);
       try {
-        _scrollControllerFeed
-            .jumpTo(_scrollControllerFeed.position.maxScrollExtent);
+        //_scrollControllerFeed
+        //    .jumpTo(_scrollControllerFeed.position.maxScrollExtent);
+        // keep scroll position
+
       } catch (e) {
         log("scroll controller not initialized yet");
       }
@@ -194,7 +201,6 @@ class _UserFeedOriginalViewState extends State<UserFeedOriginalView> {
     if (_displayList.isEmpty && _isLoading) {
       return spinnerCenter();
     }
-
     if (_displayList.isEmpty && !_isLoading) {
       return Center(
         child: Column(
@@ -228,12 +234,14 @@ class _UserFeedOriginalViewState extends State<UserFeedOriginalView> {
         physics: const BouncingScrollPhysics(),
         slivers: [
           SliverList(
+            key: _listKey,
             delegate: SliverChildBuilderDelegate(
               (BuildContext context, int index) {
                 return TweetCard(
                   tweet: _displayList[index],
                 );
               },
+              childCount: _displayList.length,
             ),
           ),
         ],

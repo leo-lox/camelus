@@ -47,7 +47,7 @@ class _SearchPageState extends State<SearchPage> {
       // Add new item to your list here
       _list.insert(0, tweet);
       // After adding new item, restore scroll position
-      _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+      //_scrollController.jumpTo(_scrollController.position.maxScrollExtent);
     });
   }
 

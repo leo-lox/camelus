@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:camelus/routes/notification_page.dart';
 import 'package:camelus/routes/search_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -88,10 +89,7 @@ class _HomePageState extends State<HomePage> {
           children: <Widget>[
             NostrPage(parentScaffoldKey: _scaffoldKey),
             SearchPage(),
-            const Center(
-              child: Text('work in progress',
-                  style: TextStyle(color: Colors.white)),
-            ),
+            NotificationPage(),
             const Center(
               child: Text('work in progress',
                   style: TextStyle(color: Colors.white)),

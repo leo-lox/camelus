@@ -445,8 +445,12 @@ class _NostrPageState extends State<NostrPage>
             controller: _tabController,
             physics: const BouncingScrollPhysics(),
             children: [
-              if (pubkey.isNotEmpty) UserFeedOriginalView(pubkey: pubkey),
-              if (pubkey.isEmpty) spinnerCenter(),
+              if (false) UserFeedOriginalView(pubkey: pubkey),
+              if (true)
+                const Center(
+                  child: Text("####",
+                      style: TextStyle(fontSize: 25, color: Palette.white)),
+                ),
               const Center(
                 child: Text("work in progress",
                     style: TextStyle(fontSize: 25, color: Palette.white)),
