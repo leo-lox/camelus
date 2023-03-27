@@ -2,7 +2,9 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
 
+import 'package:camelus/atoms/spinner_center.dart';
 import 'package:camelus/models/socket_control.dart';
+import 'package:camelus/routes/nostr/nostr_page/user_feed_original_view.dart';
 import 'package:camelus/routes/nostr/relays_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -19,7 +21,7 @@ import 'package:camelus/services/nostr/nostr_service.dart';
 import 'package:badges/badges.dart' as badges;
 import 'package:url_launcher/url_launcher.dart';
 
-import '../../config/palette.dart';
+import '../../../config/palette.dart';
 
 class NostrPage extends StatefulWidget {
   late NostrService _nostrService;
@@ -51,34 +53,28 @@ class _NostrPageState extends State<NostrPage>
   static String globalFeedFreshId = "fresh";
   static String globalFeedTimelineFetchId = "timeline";
 
-  // user feed
-  late StreamSubscription userFeedSubscription;
-  bool isUserFeedSubscribed = false;
-  static String userFeedFreshId = "fresh";
-  static String userFeedTimelineFetchId = "timeline";
-
-  List<Tweet> _userFeedOriginalOnly = [];
-
   //List<Tweet> _userFeedOriginalAndReplies = [];
 
   late final ScrollController _scrollControllerPage = ScrollController();
-  late final ScrollController _scrollControllerUserFeedOriginal =
-      ScrollController();
 
   late TabController _tabController;
 
   late String pubkey = "";
   int _tabIndex = 0;
 
-  _getPubkey() {
-    //wait 1 second for the service to be ready
-    Future.delayed(const Duration(seconds: 2), () {
-      // check mounted to avoid setState after dispose
-      if (!mounted) return;
+  _getPubkey() async {
+    //wait for connection
+    bool connection = await widget._nostrService.isNostrServiceConnected;
+    if (!connection) {
+      log("no connection to nostr service");
+      return;
+    }
 
-      setState(() {
-        pubkey = widget._nostrService.myKeys.publicKey;
-      });
+    // check mounted to avoid setState after dispose
+    if (!mounted) return;
+
+    setState(() {
+      pubkey = widget._nostrService.myKeys.publicKey;
     });
   }
 
@@ -158,120 +154,6 @@ class _NostrPageState extends State<NostrPage>
     // scroll to top
     _scrollControllerPage.animateTo(0,
         duration: const Duration(milliseconds: 500), curve: Curves.easeOut);
-  }
-
-  /// listener attached from the NostrService
-  _onUserFeedReceived(List<Tweet> tweets) {
-    // sort by tweetedAt
-    _userFeedOriginalOnly.sort((a, b) => b.tweetedAt.compareTo(a.tweetedAt));
-
-    setState(() {
-      _userFeedOriginalOnly = List.from(tweets);
-    });
-  }
-
-  /// timeline scroll request more tweets
-  void _userFeedLoadMore() async {
-    log("load more called");
-    var following = await widget._nostrService.getUserContacts(pubkey);
-    // extract public keys
-    followingPubkeys = [];
-    for (var f in following) {
-      followingPubkeys.add(f[1]);
-    }
-    // add own pubkey
-    followingPubkeys.add(pubkey);
-
-    if (followingPubkeys.isEmpty) {
-      log("!!! no following users found !!!");
-      return;
-    }
-
-    widget._nostrService.requestUserFeed(
-        users: followingPubkeys,
-        requestId: userFeedTimelineFetchId,
-        limit: 20,
-        until: _userFeedOriginalOnly.last.tweetedAt,
-        includeComments: true);
-  }
-
-  Future<void> _subscribeToUserFeed() async {
-    if (isUserFeedSubscribed) return;
-    log("subscribed to user feed called");
-
-    /// map with pubkey as identifier, second list [0] is p, [1] is pubkey, [2] is the relay url
-    var following = await widget._nostrService.getUserContacts(pubkey);
-
-    // extract public keys
-    followingPubkeys = [];
-    for (var f in following) {
-      followingPubkeys.add(f[1]);
-    }
-
-    if (followingPubkeys.isEmpty) {
-      log("!!! no following users found !!!");
-    }
-
-    // add own pubkey
-    followingPubkeys.add(pubkey);
-
-    int now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
-
-    int latestTweet = now - 86400; // -1 day
-    if (_userFeedOriginalOnly.isNotEmpty) {
-      latestTweet = _userFeedOriginalOnly.first.tweetedAt;
-    }
-
-    widget._nostrService.requestUserFeed(
-        users: followingPubkeys,
-        requestId: userFeedFreshId,
-        limit: 50,
-        since: latestTweet, //since latest tweet
-        includeComments: false);
-
-    setState(() {
-      isUserFeedSubscribed = true;
-    });
-  }
-
-  void _unsubscribeFromUserFeed() {
-    if (!isUserFeedSubscribed) return;
-    log("nostr:page unsubscribed from user feed called");
-
-    widget._nostrService.closeSubscription("ufeed-$userFeedFreshId");
-    if (userFeedTimelineFetchId.isNotEmpty) {
-      widget._nostrService.closeSubscription("ufeed-$userFeedTimelineFetchId");
-    }
-    setState(() {
-      isUserFeedSubscribed = false;
-    });
-  }
-
-  /// only for initial load
-  void _initUserFeed() async {
-    //wait for connection
-    bool connection = await widget._nostrService.isNostrServiceConnected;
-    if (!connection) {
-      log("no connection to nostr service");
-      return;
-    }
-
-    // check mounted
-    if (!mounted) {
-      log("not mounted");
-      return;
-    }
-
-    //wait
-    await Future.delayed(const Duration(seconds: 2));
-    _subscribeToUserFeed();
-    setState(() {
-      isUserFeedSubscribed = true;
-    });
-    await Future.delayed(const Duration(seconds: 2));
-    setState(() {
-      _isLoading = false;
-    });
   }
 
   void _betaCheckForUpdates() async {
@@ -370,33 +252,27 @@ class _NostrPageState extends State<NostrPage>
       _onGlobalTweetReceived(event);
     });
 
-    userFeedSubscription =
-        widget._nostrService.userFeedObj.userFeedStream.listen((event) {
-      _onUserFeedReceived(event);
-    });
-
-    _initUserFeed();
-
     _tabController = TabController(length: 3, vsync: this);
 
     _tabController.addListener(() {
       if (_tabController.indexIsChanging) {}
+      //todo: moved to own file
 
       // subscribe to user feed
-      if (_tabController.index == 0 && !isUserFeedSubscribed) {
-        _subscribeToUserFeed();
-      }
-      // unsubscribe from user feed
-      if (_tabController.index != 0 && isUserFeedSubscribed) {
-        _unsubscribeFromUserFeed();
-      }
-
-      if (_tabController.index == 2 && !isGlobalFeedSubscribed) {
-        _subscribeToGlobalFeed();
-      }
-      if (_tabController.index != 2 && isGlobalFeedSubscribed) {
-        _unsubscribeFromGlobalFeed();
-      }
+      //if (_tabController.index == 0 && !isUserFeedSubscribed) {
+      //  _subscribeToUserFeed();
+      //}
+      //// unsubscribe from user feed
+      //if (_tabController.index != 0 && isUserFeedSubscribed) {
+      //  _unsubscribeFromUserFeed();
+      //}
+//
+      //if (_tabController.index == 2 && !isGlobalFeedSubscribed) {
+      //  _subscribeToGlobalFeed();
+      //}
+      //if (_tabController.index != 2 && isGlobalFeedSubscribed) {
+      //  _unsubscribeFromGlobalFeed();
+      //}
     });
 
     _tabController.animation?.addListener(() {
@@ -408,50 +284,6 @@ class _NostrPageState extends State<NostrPage>
       }
     });
 
-    _scrollControllerUserFeedOriginal.addListener(() {
-      //log("scrolling ${_scrollControllerUserFeedOriginal.position.pixels} -- ${_scrollControllerUserFeedOriginal.position.maxScrollExtent}");
-      if (_scrollControllerUserFeedOriginal.position.pixels ==
-          _scrollControllerUserFeedOriginal.position.maxScrollExtent) {
-        //log("reached bottom");
-        if (_tabController.index == 0) {
-          _userFeedLoadMore();
-        }
-        if (_tabController.index == 1) {}
-        if (_tabController.index == 2) {
-          //_globalFeedLoadMore();
-        }
-      }
-      // scrolling up
-      if (_scrollControllerUserFeedOriginal.position.userScrollDirection ==
-          ScrollDirection.forward) {
-        if (_scrollUpLock) return;
-        setState(() {
-          _scrollUpLock = true;
-        });
-        //_scrollControllerPage.animateTo(0,
-        //    duration: const Duration(milliseconds: 100), curve: Curves.linear);
-        Future.delayed(const Duration(milliseconds: 100), () {
-          setState(() {
-            _scrollUpLock = false;
-          });
-        });
-      }
-      // scrolling down
-      if (_scrollControllerUserFeedOriginal.position.userScrollDirection ==
-          ScrollDirection.reverse) {
-        if (_scrollDownLock) return;
-        setState(() {
-          _scrollDownLock = true;
-        });
-        //_scrollControllerPage.animateTo(70,
-        //    duration: const Duration(milliseconds: 100), curve: Curves.linear);
-        Future.delayed(const Duration(milliseconds: 100), () {
-          setState(() {
-            _scrollDownLock = false;
-          });
-        });
-      }
-    });
     _scrollControllerPage.addListener(() {
       //log("scrolling page");
     });
@@ -459,19 +291,15 @@ class _NostrPageState extends State<NostrPage>
     super.initState();
   }
 
-  bool _scrollUpLock = false;
-  bool _scrollDownLock = false;
-
   @override
   void dispose() {
     // cancel subscription
     try {
       globalFeedSubscription.cancel();
-      userFeedSubscription.cancel();
     } catch (e) {}
 
     _scrollControllerPage.dispose();
-    _scrollControllerUserFeedOriginal.dispose();
+
     _tabController.dispose();
 
     super.dispose();
@@ -484,12 +312,12 @@ class _NostrPageState extends State<NostrPage>
       appBar: null,
       body: SafeArea(
         child: NestedScrollView(
-          controller: _scrollControllerPage,
           headerSliverBuilder: (context, value) {
             return [
               SliverAppBar(
-                floating: true,
-                snap: true,
+                floating: false,
+                snap: false,
+                pinned: false,
                 elevation: 1.0,
                 backgroundColor: Palette.background,
                 leading: InkWell(
@@ -534,12 +362,15 @@ class _NostrPageState extends State<NostrPage>
                         _newTweetsGlobal.length.toString(),
                         style: const TextStyle(color: Colors.white),
                       ),
-                      child: const Text(
-                        "nostr",
-                        style: TextStyle(
-                          color: Palette.lightGray,
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
+                      child: GestureDetector(
+                        onTap: () {},
+                        child: const Text(
+                          "nostr",
+                          style: TextStyle(
+                            color: Palette.lightGray,
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       )),
                 ),
@@ -614,57 +445,8 @@ class _NostrPageState extends State<NostrPage>
             controller: _tabController,
             physics: const BouncingScrollPhysics(),
             children: [
-              if (_userFeedOriginalOnly.isEmpty && _isLoading)
-                const Center(
-                  child: CircularProgressIndicator(
-                    color: Palette.white,
-                  ),
-                ),
-              if (_userFeedOriginalOnly.isEmpty && !_isLoading)
-                Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: const [
-                      Text(
-                        "no tweets yet",
-                        style: TextStyle(fontSize: 25, color: Palette.white),
-                      ),
-                      SizedBox(height: 20),
-                      Text(
-                        "follow people to see their tweets (global feed)",
-                        style: TextStyle(fontSize: 15, color: Palette.white),
-                      ),
-                    ],
-                  ),
-                ),
-              //user feed
-              if (_userFeedOriginalOnly.isNotEmpty)
-                RefreshIndicator(
-                  color: Palette.primary,
-                  backgroundColor: Palette.extraDarkGray,
-                  onRefresh: () {
-                    // todo fix this hack (should auto update)
-                    isUserFeedSubscribed = false;
-                    _subscribeToUserFeed();
-                    return Future.delayed(const Duration(milliseconds: 150));
-                  },
-                  child: CustomScrollView(
-                    controller: _scrollControllerUserFeedOriginal,
-                    physics: const BouncingScrollPhysics(),
-                    slivers: [
-                      SliverList(
-                        delegate: SliverChildBuilderDelegate(
-                          (BuildContext context, int index) {
-                            return TweetCard(
-                              tweet: _userFeedOriginalOnly[index],
-                            );
-                          },
-                          childCount: _userFeedOriginalOnly.length,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+              if (pubkey.isNotEmpty) UserFeedOriginalView(pubkey: pubkey),
+              if (pubkey.isEmpty) spinnerCenter(),
               const Center(
                 child: Text("work in progress",
                     style: TextStyle(fontSize: 25, color: Palette.white)),

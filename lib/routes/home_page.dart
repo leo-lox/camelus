@@ -7,7 +7,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:camelus/components/write_post.dart';
 import 'package:camelus/config/palette.dart';
 import 'package:camelus/routes/nostr/nostr_drawer.dart';
-import 'package:camelus/routes/nostr/nostr_page.dart';
+import 'package:camelus/routes/nostr/nostr_page/nostr_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
