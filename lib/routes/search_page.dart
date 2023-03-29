@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:camelus/components/tweet_card.dart';
 import 'package:camelus/config/palette.dart';
 import 'package:camelus/models/tweet.dart';
+import 'package:camelus/physics/position_retained_scroll_physics.dart';
+import 'package:camelus/scroll_controller/retainable_scroll_controller.dart';
 import 'package:flutter/material.dart';
 
 class SearchPage extends StatefulWidget {
@@ -17,7 +19,9 @@ class _SearchPageState extends State<SearchPage> {
 
   List<Tweet> _list = [];
 
-  final ScrollController _scrollController = ScrollController();
+  //final ScrollController _scrollController = ScrollController();
+  final RetainableScrollController _scrollController =
+      RetainableScrollController();
 
   @override
   void initState() {
@@ -45,9 +49,11 @@ class _SearchPageState extends State<SearchPage> {
 
     setState(() {
       // Add new item to your list here
-      _list.insert(0, tweet);
+      //_list.insert(0, tweet);
+      _list.add(tweet);
       // After adding new item, restore scroll position
       //_scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+      //_scrollController.retainOffset();
     });
   }
 
@@ -55,29 +61,28 @@ class _SearchPageState extends State<SearchPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Palette.background,
-      body: CustomScrollView(
-        controller: _scrollController,
-        slivers: [
-          SliverAppBar(
-            title: const Text('Search'),
-            floating: true,
-            actions: [
-              IconButton(
-                onPressed: _insert,
-                icon: const Icon(Icons.add),
-              ),
-            ],
-          ),
-          SliverList(
-            key: _listKey,
-            delegate: SliverChildBuilderDelegate(
-              (context, index) {
-                return TweetCard(tweet: _list[index]);
-              },
-              childCount: _list.length,
-            ),
+      appBar: AppBar(
+        title: Text("Search"),
+        actions: [
+          IconButton(
+            onPressed: () {
+              _insert();
+            },
+            icon: Icon(Icons.add),
           ),
         ],
+      ),
+      body: ListView.builder(
+        key: _listKey,
+        reverse: true,
+        shrinkWrap: true,
+        controller: _scrollController,
+        itemCount: _list.length,
+        itemBuilder: (context, index) {
+          return TweetCard(
+            tweet: _list[index],
+          );
+        },
       ),
     );
   }

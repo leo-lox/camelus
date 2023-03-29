@@ -5,6 +5,8 @@ import 'package:camelus/atoms/spinner_center.dart';
 import 'package:camelus/components/tweet_card.dart';
 import 'package:camelus/config/palette.dart';
 import 'package:camelus/models/tweet.dart';
+import 'package:camelus/physics/position_retained_scroll_physics.dart';
+import 'package:camelus/scroll_controller/retainable_scroll_controller.dart';
 import 'package:camelus/services/nostr/nostr_injector.dart';
 import 'package:camelus/services/nostr/nostr_service.dart';
 import 'package:flutter/material.dart';
@@ -31,13 +33,17 @@ class _UserFeedOriginalViewState extends State<UserFeedOriginalView> {
 
   bool _isLoading = true;
 
+  bool _newPostsAvailable = false;
+
   final GlobalKey _listKey = GlobalKey<AnimatedListState>();
 
   List<Tweet> _displayList = [];
 
   late List<String> _followingPubkeys;
 
-  late final ScrollController _scrollControllerFeed = ScrollController();
+  //late final ScrollController _scrollControllerFeed = ScrollController();
+  late final RetainableScrollController _scrollControllerFeed =
+      RetainableScrollController();
 
   /// only for initial load
   void _initUserFeed() async {
@@ -121,19 +127,45 @@ class _UserFeedOriginalViewState extends State<UserFeedOriginalView> {
     // sort by tweetedAt
     //_displayList.sort((a, b) => b.tweetedAt.compareTo(a.tweetedAt));
 
+    // if empty, just add all
+    if (_displayList.isEmpty) {
+      setState(() {
+        _displayList = List.from(tweets);
+      });
+      return;
+    }
+
+    // calculate new tweets
+    List<Tweet> newTweets = [];
+    List<Tweet> findIndexTweets = [];
+    for (var t in tweets) {
+      if (!_displayList.contains(t)) {
+        if (t.tweetedAt > _displayList.first.tweetedAt) {
+          newTweets.add(t);
+        } else {
+          findIndexTweets.add(t);
+        }
+      }
+    }
+
+    // insert at correct position
+    for (var t in findIndexTweets) {
+      int index =
+          _displayList.indexWhere((element) => element.tweetedAt < t.tweetedAt);
+      _displayList.insert(index, t);
+    }
+
     setState(() {
       //todo: keep scroll position
-      _displayList = List.from(tweets);
+      //_displayList = List.from(tweets);
 
-      //_displayList.insertAll(0, tweets);
-      //_displayList.insert(0, tweets.first);
-      try {
-        //_scrollControllerFeed
-        //    .jumpTo(_scrollControllerFeed.position.maxScrollExtent);
-        // keep scroll position
+      if (newTweets.isNotEmpty) {
+        _newPostsAvailable = true;
+        _displayList.insertAll(0, newTweets);
+      }
 
-      } catch (e) {
-        log("scroll controller not initialized yet");
+      if (!_isLoading) {
+        _scrollControllerFeed.retainOffset();
       }
     });
   }
@@ -220,32 +252,69 @@ class _UserFeedOriginalViewState extends State<UserFeedOriginalView> {
       );
     }
 
-    return RefreshIndicator(
-      color: Palette.primary,
-      backgroundColor: Palette.extraDarkGray,
-      onRefresh: () {
-        // todo fix this hack (should auto update)
-        isUserFeedSubscribed = false;
-        _subscribeToUserFeed();
-        return Future.delayed(const Duration(milliseconds: 150));
-      },
-      child: CustomScrollView(
-        controller: _scrollControllerFeed,
-        physics: const BouncingScrollPhysics(),
-        slivers: [
-          SliverList(
-            key: _listKey,
-            delegate: SliverChildBuilderDelegate(
-              (BuildContext context, int index) {
-                return TweetCard(
-                  tweet: _displayList[index],
-                );
-              },
-              childCount: _displayList.length,
-            ),
+    return Stack(
+      children: [
+        RefreshIndicator(
+          color: Palette.primary,
+          backgroundColor: Palette.extraDarkGray,
+          onRefresh: () {
+            // todo fix this hack (should auto update)
+            isUserFeedSubscribed = false;
+            _subscribeToUserFeed();
+            return Future.delayed(const Duration(milliseconds: 150));
+          },
+          child: CustomScrollView(
+            controller: _scrollControllerFeed,
+            physics: const BouncingScrollPhysics(),
+            //physics: const PositionRetainedScrollPhysics(),
+            slivers: [
+              SliverList(
+                key: _listKey,
+                delegate: SliverChildBuilderDelegate(
+                  (BuildContext context, int index) {
+                    return TweetCard(
+                      tweet: _displayList[index],
+                    );
+                  },
+                  childCount: _displayList.length,
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
+        ),
+
+        // if it is top
+        if (_newPostsAvailable)
+          Positioned(
+              top: 20,
+              width: MediaQuery.of(context).size.width,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  Container(
+                      width: 120,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20),
+                        color: Palette.primary,
+                      ),
+                      child: TextButton(
+                        onPressed: () {
+                          setState(() {
+                            _newPostsAvailable = false;
+                          });
+                          _scrollControllerFeed.animateTo(0,
+                              duration: const Duration(milliseconds: 300),
+                              curve: Curves.easeOut);
+                        },
+                        child: const Text(
+                          "new posts",
+                          style: TextStyle(color: Palette.white),
+                        ),
+                      ))
+                ],
+              )),
+      ],
     );
   }
 }

@@ -445,8 +445,8 @@ class _NostrPageState extends State<NostrPage>
             controller: _tabController,
             physics: const BouncingScrollPhysics(),
             children: [
-              if (false) UserFeedOriginalView(pubkey: pubkey),
-              if (true)
+              if (pubkey.isNotEmpty) UserFeedOriginalView(pubkey: pubkey),
+              if (pubkey.isEmpty)
                 const Center(
                   child: Text("####",
                       style: TextStyle(fontSize: 25, color: Palette.white)),
