@@ -283,19 +283,43 @@ class _UserFeedOriginalViewState extends State<UserFeedOriginalView> {
             _subscribeToUserFeed();
             return Future.delayed(const Duration(milliseconds: 150));
           },
-          child: ListView.builder(
-            key: _listKey,
-            reverse: true,
-            scrollDirection: Axis.vertical,
-            shrinkWrap: true,
+          child: CustomScrollView(
             controller: _scrollControllerFeed,
-            itemCount: _displayList.length,
-            physics: const BouncingScrollPhysics(),
-            itemBuilder: (context, index) {
-              return TweetCard(
-                tweet: _displayList[index],
-              );
-            },
+            slivers: [
+              SliverList(
+                //key: _leadingKey,
+                delegate: SliverChildBuilderDelegate(
+                  (context, index) {
+                    return TweetCard(
+                      tweet: _displayList[index],
+                    );
+                  },
+                  childCount: _displayList.length + 1,
+                ),
+              ),
+              SliverList(
+                // key: _centerKey,
+                delegate: SliverChildBuilderDelegate(
+                  (context, index) {
+                    return TweetCard(
+                      tweet: _displayList[index],
+                    );
+                  },
+                  childCount: _displayList.length + 1,
+                ),
+              ),
+              SliverList(
+                // key: _trailingKey,
+                delegate: SliverChildBuilderDelegate(
+                  (context, index) {
+                    return TweetCard(
+                      tweet: _displayList[index],
+                    );
+                  },
+                  childCount: _displayList.length + 1,
+                ),
+              ),
+            ],
           ),
         ),
 

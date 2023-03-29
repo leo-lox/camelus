@@ -124,6 +124,8 @@ class _TweetCardState extends State<TweetCard> {
             var metadata = widget._nostrService.getUserMetadata(tag[1]);
 
             metadata.then((value) {
+              // check if mounted
+              if (!mounted) return;
               setState(() {
                 _tagsMetadata[tag[1]] = value["name"] ?? pubkeyHr;
               });
