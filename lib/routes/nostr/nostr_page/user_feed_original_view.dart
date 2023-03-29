@@ -125,7 +125,7 @@ class _UserFeedOriginalViewState extends State<UserFeedOriginalView> {
   /// listener attached from the NostrService
   _onUserFeedReceived(List<Tweet> tweets) {
     // sort by tweetedAt
-    //_displayList.sort((a, b) => b.tweetedAt.compareTo(a.tweetedAt));
+    _displayList.sort((a, b) => a.tweetedAt.compareTo(b.tweetedAt));
 
     // if empty, just add all
     if (_displayList.isEmpty) {
@@ -140,7 +140,7 @@ class _UserFeedOriginalViewState extends State<UserFeedOriginalView> {
     List<Tweet> findIndexTweets = [];
     for (var t in tweets) {
       if (!_displayList.contains(t)) {
-        if (t.tweetedAt > _displayList.first.tweetedAt) {
+        if (t.tweetedAt > _displayList.last.tweetedAt) {
           newTweets.add(t);
         } else {
           findIndexTweets.add(t);
@@ -148,12 +148,24 @@ class _UserFeedOriginalViewState extends State<UserFeedOriginalView> {
       }
     }
 
-    // insert at correct position
+    // insert tweet at correct position
     for (var t in findIndexTweets) {
       int index =
-          _displayList.indexWhere((element) => element.tweetedAt < t.tweetedAt);
+          _displayList.indexWhere((element) => element.tweetedAt > t.tweetedAt);
+      if (index == -1) {
+        index = _displayList.length;
+      }
       _displayList.insert(index, t);
     }
+
+    //for (var t in findIndexTweets) {
+    //  int index =
+    //      _displayList.indexWhere((element) => element.tweetedAt > t.tweetedAt);
+    //  if (index == -1) {
+    //    index = _displayList.length;
+    //  }
+    //  _displayList.insert(index, t);
+    //}
 
     setState(() {
       //todo: keep scroll position
@@ -161,7 +173,8 @@ class _UserFeedOriginalViewState extends State<UserFeedOriginalView> {
 
       if (newTweets.isNotEmpty) {
         _newPostsAvailable = true;
-        _displayList.insertAll(0, newTweets);
+        //_displayList.insertAll(0, newTweets);
+        _displayList.addAll(newTweets);
       }
 
       if (!_isLoading) {
@@ -183,17 +196,24 @@ class _UserFeedOriginalViewState extends State<UserFeedOriginalView> {
         users: _followingPubkeys,
         requestId: userFeedTimelineFetchId,
         limit: 20,
-        until: _displayList.last.tweetedAt,
+        until: _displayList.first.tweetedAt,
         includeComments: true);
+
+    // lock croll and keep position
+
+    _scrollControllerFeed.jumpTo(0);
   }
 
   void _setupScrollListener() {
     _scrollControllerFeed.addListener(() {
-      //log("scrolling ${_scrollControllerUserFeedOriginal.position.pixels} -- ${_scrollControllerUserFeedOriginal.position.maxScrollExtent}");
       if (_scrollControllerFeed.position.pixels ==
           _scrollControllerFeed.position.maxScrollExtent) {
-        //log("reached bottom");
+        log("reached top");
 
+        //_userFeedLoadMore();
+      }
+
+      if (_scrollControllerFeed.position.pixels == 0) {
         _userFeedLoadMore();
       }
     });
@@ -263,23 +283,19 @@ class _UserFeedOriginalViewState extends State<UserFeedOriginalView> {
             _subscribeToUserFeed();
             return Future.delayed(const Duration(milliseconds: 150));
           },
-          child: CustomScrollView(
+          child: ListView.builder(
+            key: _listKey,
+            reverse: true,
+            scrollDirection: Axis.vertical,
+            shrinkWrap: true,
             controller: _scrollControllerFeed,
+            itemCount: _displayList.length,
             physics: const BouncingScrollPhysics(),
-            //physics: const PositionRetainedScrollPhysics(),
-            slivers: [
-              SliverList(
-                key: _listKey,
-                delegate: SliverChildBuilderDelegate(
-                  (BuildContext context, int index) {
-                    return TweetCard(
-                      tweet: _displayList[index],
-                    );
-                  },
-                  childCount: _displayList.length,
-                ),
-              ),
-            ],
+            itemBuilder: (context, index) {
+              return TweetCard(
+                tweet: _displayList[index],
+              );
+            },
           ),
         ),
 
@@ -303,7 +319,10 @@ class _UserFeedOriginalViewState extends State<UserFeedOriginalView> {
                           setState(() {
                             _newPostsAvailable = false;
                           });
-                          _scrollControllerFeed.animateTo(0,
+                          // animate to last
+                          _scrollControllerFeed.animateTo(
+                              _scrollControllerFeed.position.maxScrollExtent +
+                                  100,
                               duration: const Duration(milliseconds: 300),
                               curve: Curves.easeOut);
                         },
