@@ -4,6 +4,7 @@ import 'dart:developer';
 
 import 'package:camelus/atoms/spinner_center.dart';
 import 'package:camelus/models/socket_control.dart';
+import 'package:camelus/routes/nostr/nostr_page/global_feed_view.dart';
 import 'package:camelus/routes/nostr/nostr_page/user_feed_original_view.dart';
 import 'package:camelus/routes/nostr/relays_page.dart';
 import 'package:flutter/material.dart';
@@ -42,18 +43,7 @@ class _NostrPageState extends State<NostrPage>
 
   bool _isLoading = true;
 
-  var _myTweetsGlobal = <Tweet>[];
-  var _newTweetsGlobal = <Tweet>[];
-
   List<String> followingPubkeys = [];
-
-  // global feed
-  late StreamSubscription globalFeedSubscription;
-  bool isGlobalFeedSubscribed = false;
-  static String globalFeedFreshId = "fresh";
-  static String globalFeedTimelineFetchId = "timeline";
-
-  //List<Tweet> _userFeedOriginalAndReplies = [];
 
   late final ScrollController _scrollControllerPage = ScrollController();
 
@@ -76,84 +66,6 @@ class _NostrPageState extends State<NostrPage>
     setState(() {
       pubkey = widget._nostrService.myKeys.publicKey;
     });
-  }
-
-  //receive tweets from nostr
-  void _onGlobalTweetReceived(List<Tweet> tweets) {
-    // fill the screen with tweets (initial load)
-    if (_myTweetsGlobal.isEmpty) {
-      setState(() {
-        // copy the list
-        _myTweetsGlobal = List.from(tweets);
-      });
-      return;
-    }
-
-    // calculate new tweets
-    _newTweetsGlobal = tweets.where((tweet) {
-      return !_myTweetsGlobal.any((myTweet) => myTweet.id == tweet.id);
-    }).toList();
-
-    // sync comments
-    for (var tweet in _newTweetsGlobal) {
-      try {
-        var myTweet =
-            _myTweetsGlobal.firstWhere((myTweet) => myTweet.id == tweet.id);
-        myTweet.commentsCount = tweet.commentsCount;
-        myTweet.replies = tweet.replies;
-      } catch (e) {}
-    }
-    // update ui
-    setState(() {
-      _newTweetsGlobal = _newTweetsGlobal;
-      _myTweetsGlobal = _myTweetsGlobal;
-    });
-  }
-
-  void _subscribeToGlobalFeed() {
-    if (isGlobalFeedSubscribed) return;
-
-    var now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
-
-    widget._nostrService
-        .requestGlobalFeed(requestId: globalFeedFreshId, limit: 10);
-
-    setState(() {
-      isGlobalFeedSubscribed = true;
-    });
-  }
-
-  void _unsubscribeFromGlobalFeed() {
-    if (!isGlobalFeedSubscribed) return;
-
-    widget._nostrService.closeSubscription("gfeed-$globalFeedFreshId");
-
-    widget._nostrService.closeSubscription("gfeed-$globalFeedTimelineFetchId");
-
-    setState(() {
-      isGlobalFeedSubscribed = false;
-    });
-  }
-
-  /// sync the new tweets with the global feed provided by nostr service
-  void _syncWithGlobalFeed() {
-    setState(() {
-      //add new tweets to the global feed
-      _myTweetsGlobal.insertAll(0, _newTweetsGlobal);
-      _newTweetsGlobal = [];
-    });
-
-    // sort the global feed by tweetedAt
-    _myTweetsGlobal.sort((a, b) => b.tweetedAt.compareTo(a.tweetedAt));
-
-    // todo-later: remember position and then scroll
-    //SchedulerBinding.instance.addPostFrameCallback((_) {
-    //  _scrollController.jumpTo(scrollPosition);
-    //});
-
-    // scroll to top
-    _scrollControllerPage.animateTo(0,
-        duration: const Duration(milliseconds: 500), curve: Curves.easeOut);
   }
 
   void _betaCheckForUpdates() async {
@@ -246,33 +158,10 @@ class _NostrPageState extends State<NostrPage>
 
     _betaCheckForUpdates();
 
-    // listen to nostr service
-    globalFeedSubscription =
-        widget._nostrService.globalFeedObj.globalFeedStream.listen((event) {
-      _onGlobalTweetReceived(event);
-    });
-
     _tabController = TabController(length: 3, vsync: this);
 
     _tabController.addListener(() {
       if (_tabController.indexIsChanging) {}
-      //todo: moved to own file
-
-      // subscribe to user feed
-      //if (_tabController.index == 0 && !isUserFeedSubscribed) {
-      //  _subscribeToUserFeed();
-      //}
-      //// unsubscribe from user feed
-      //if (_tabController.index != 0 && isUserFeedSubscribed) {
-      //  _unsubscribeFromUserFeed();
-      //}
-//
-      //if (_tabController.index == 2 && !isGlobalFeedSubscribed) {
-      //  _subscribeToGlobalFeed();
-      //}
-      //if (_tabController.index != 2 && isGlobalFeedSubscribed) {
-      //  _unsubscribeFromGlobalFeed();
-      //}
     });
 
     _tabController.animation?.addListener(() {
@@ -293,11 +182,6 @@ class _NostrPageState extends State<NostrPage>
 
   @override
   void dispose() {
-    // cancel subscription
-    try {
-      globalFeedSubscription.cancel();
-    } catch (e) {}
-
     _scrollControllerPage.dispose();
 
     _tabController.dispose();
@@ -352,14 +236,14 @@ class _NostrPageState extends State<NostrPage>
                 ),
                 centerTitle: true,
                 title: GestureDetector(
-                  onTap: () => _syncWithGlobalFeed(),
+                  onTap: () => {},
                   child: badges.Badge(
                       animationType: badges.BadgeAnimationType.fade,
                       toAnimate: false,
-                      showBadge: _newTweetsGlobal.isNotEmpty,
+                      showBadge: false,
                       badgeColor: Palette.primary,
                       badgeContent: Text(
-                        _newTweetsGlobal.length.toString(),
+                        "",
                         style: const TextStyle(color: Colors.white),
                       ),
                       child: GestureDetector(
@@ -446,39 +330,12 @@ class _NostrPageState extends State<NostrPage>
             physics: const BouncingScrollPhysics(),
             children: [
               if (pubkey.isNotEmpty) UserFeedOriginalView(pubkey: pubkey),
-              if (pubkey.isEmpty)
-                const Center(
-                  child: Text("####",
-                      style: TextStyle(fontSize: 25, color: Palette.white)),
-                ),
+              if (pubkey.isEmpty) spinnerCenter(),
               const Center(
                 child: Text("work in progress",
                     style: TextStyle(fontSize: 25, color: Palette.white)),
               ),
-              RefreshIndicator(
-                color: Palette.primary,
-                backgroundColor: Palette.extraDarkGray,
-                onRefresh: () {
-                  _syncWithGlobalFeed();
-
-                  return Future.delayed(const Duration(milliseconds: 150));
-                },
-                child: CustomScrollView(
-                  physics: const BouncingScrollPhysics(),
-                  slivers: [
-                    SliverList(
-                      delegate: SliverChildBuilderDelegate(
-                        (BuildContext context, int index) {
-                          return TweetCard(
-                            tweet: _myTweetsGlobal[index],
-                          );
-                        },
-                        childCount: _myTweetsGlobal.length,
-                      ),
-                    ),
-                  ],
-                ),
-              )
+              GlobalFeedView()
             ],
           ),
         ),
