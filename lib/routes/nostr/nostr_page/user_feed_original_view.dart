@@ -125,7 +125,7 @@ class _UserFeedOriginalViewState extends State<UserFeedOriginalView> {
   /// listener attached from the NostrService
   _onUserFeedReceived(List<Tweet> tweets) {
     // sort by tweetedAt
-    _displayList.sort((a, b) => a.tweetedAt.compareTo(b.tweetedAt));
+    _displayList.sort((a, b) => b.tweetedAt.compareTo(a.tweetedAt));
 
     // if empty, just add all
     if (_displayList.isEmpty) {
@@ -138,34 +138,36 @@ class _UserFeedOriginalViewState extends State<UserFeedOriginalView> {
     // calculate new tweets
     List<Tweet> newTweets = [];
     List<Tweet> findIndexTweets = [];
+    List<Tweet> timelineTweets = [];
     for (var t in tweets) {
+      // check if tweet is already in the list
+      if (_displayList.contains(t)) {
+        continue;
+      }
+
+      // latest tweet
       if (!_displayList.contains(t)) {
-        if (t.tweetedAt > _displayList.last.tweetedAt) {
+        if (t.tweetedAt > _displayList.first.tweetedAt) {
           newTweets.add(t);
-        } else {
-          findIndexTweets.add(t);
         }
       }
+      // timeline tweets that are older than the latest tweet and younger than the oldest tweet
+      if (t.tweetedAt < _displayList.first.tweetedAt &&
+          t.tweetedAt > _displayList.last.tweetedAt) {
+        findIndexTweets.add(t);
+      }
+      // tweets that are older than the oldest tweet
+      if (t.tweetedAt < _displayList.last.tweetedAt) {
+        timelineTweets.add(t);
+      }
     }
 
-    // insert tweet at correct position
+    // insert tweet at correct index
     for (var t in findIndexTweets) {
       int index =
-          _displayList.indexWhere((element) => element.tweetedAt > t.tweetedAt);
-      if (index == -1) {
-        index = _displayList.length;
-      }
+          _displayList.indexWhere((element) => element.tweetedAt < t.tweetedAt);
       _displayList.insert(index, t);
     }
-
-    //for (var t in findIndexTweets) {
-    //  int index =
-    //      _displayList.indexWhere((element) => element.tweetedAt > t.tweetedAt);
-    //  if (index == -1) {
-    //    index = _displayList.length;
-    //  }
-    //  _displayList.insert(index, t);
-    //}
 
     setState(() {
       //todo: keep scroll position
@@ -173,12 +175,10 @@ class _UserFeedOriginalViewState extends State<UserFeedOriginalView> {
 
       if (newTweets.isNotEmpty) {
         _newPostsAvailable = true;
-        //_displayList.insertAll(0, newTweets);
-        _displayList.addAll(newTweets);
+        _displayList.insertAll(0, newTweets);
       }
-
-      if (!_isLoading) {
-        _scrollControllerFeed.retainOffset();
+      if (timelineTweets.isNotEmpty) {
+        _displayList.addAll(timelineTweets);
       }
     });
   }
@@ -196,25 +196,26 @@ class _UserFeedOriginalViewState extends State<UserFeedOriginalView> {
         users: _followingPubkeys,
         requestId: userFeedTimelineFetchId,
         limit: 20,
-        until: _displayList.first.tweetedAt,
+        until: _displayList.last.tweetedAt,
         includeComments: true);
-
-    // lock croll and keep position
-
-    _scrollControllerFeed.jumpTo(0);
   }
 
   void _setupScrollListener() {
     _scrollControllerFeed.addListener(() {
       if (_scrollControllerFeed.position.pixels ==
           _scrollControllerFeed.position.maxScrollExtent) {
-        log("reached top");
+        log("reached end of scroll");
 
-        //_userFeedLoadMore();
+        _userFeedLoadMore();
       }
 
-      if (_scrollControllerFeed.position.pixels == 0) {
-        _userFeedLoadMore();
+      if (_scrollControllerFeed.position.pixels < 100) {
+        //log("reached top of scroll");
+        if (_newPostsAvailable) {
+          setState(() {
+            _newPostsAvailable = false;
+          });
+        }
       }
     });
   }
@@ -285,38 +286,17 @@ class _UserFeedOriginalViewState extends State<UserFeedOriginalView> {
           },
           child: CustomScrollView(
             controller: _scrollControllerFeed,
+            physics: const BouncingScrollPhysics(),
             slivers: [
               SliverList(
                 //key: _leadingKey,
                 delegate: SliverChildBuilderDelegate(
-                  (context, index) {
+                  (BuildContext context, int index) {
                     return TweetCard(
                       tweet: _displayList[index],
                     );
                   },
-                  childCount: _displayList.length + 1,
-                ),
-              ),
-              SliverList(
-                // key: _centerKey,
-                delegate: SliverChildBuilderDelegate(
-                  (context, index) {
-                    return TweetCard(
-                      tweet: _displayList[index],
-                    );
-                  },
-                  childCount: _displayList.length + 1,
-                ),
-              ),
-              SliverList(
-                // key: _trailingKey,
-                delegate: SliverChildBuilderDelegate(
-                  (context, index) {
-                    return TweetCard(
-                      tweet: _displayList[index],
-                    );
-                  },
-                  childCount: _displayList.length + 1,
+                  childCount: _displayList.length,
                 ),
               ),
             ],
@@ -343,10 +323,10 @@ class _UserFeedOriginalViewState extends State<UserFeedOriginalView> {
                           setState(() {
                             _newPostsAvailable = false;
                           });
-                          // animate to last
+                          // animate to top
                           _scrollControllerFeed.animateTo(
-                              _scrollControllerFeed.position.maxScrollExtent +
-                                  100,
+                              _scrollControllerFeed.position.minScrollExtent -
+                                  50,
                               duration: const Duration(milliseconds: 300),
                               curve: Curves.easeOut);
                         },
