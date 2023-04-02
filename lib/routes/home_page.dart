@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:camelus/routes/notification_page.dart';
 import 'package:camelus/routes/search_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -7,7 +8,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:camelus/components/write_post.dart';
 import 'package:camelus/config/palette.dart';
 import 'package:camelus/routes/nostr/nostr_drawer.dart';
-import 'package:camelus/routes/nostr/nostr_page.dart';
+import 'package:camelus/routes/nostr/nostr_page/nostr_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -88,10 +89,7 @@ class _HomePageState extends State<HomePage> {
           children: <Widget>[
             NostrPage(parentScaffoldKey: _scaffoldKey),
             SearchPage(),
-            const Center(
-              child: Text('work in progress',
-                  style: TextStyle(color: Colors.white)),
-            ),
+            NotificationPage(),
             const Center(
               child: Text('work in progress',
                   style: TextStyle(color: Colors.white)),
