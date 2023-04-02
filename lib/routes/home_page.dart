@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:camelus/helpers/helpers.dart';
 import 'package:camelus/routes/notification_page.dart';
 import 'package:camelus/routes/search_page.dart';
 import 'package:flutter/material.dart';
@@ -9,6 +10,7 @@ import 'package:camelus/components/write_post.dart';
 import 'package:camelus/config/palette.dart';
 import 'package:camelus/routes/nostr/nostr_drawer.dart';
 import 'package:camelus/routes/nostr/nostr_page/nostr_page.dart';
+import 'package:matomo_tracker/matomo_tracker.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -38,7 +40,7 @@ class _HomePageState extends State<HomePage> {
             ));
   }
 
-  void checkForOnboarding() {
+  void _checkForOnboarding() {
     // check secure storage for keys
     const storage = FlutterSecureStorage();
     storage.read(key: "nostrKeys").then((nostrKeysString) {
@@ -49,9 +51,30 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  void _initMatomo() async {
+    // get or create visitor id
+    const storage = FlutterSecureStorage();
+
+    storage.read(key: "visitorId").then((visitorId) async {
+      var myVisitorId = visitorId;
+      if (myVisitorId == null) {
+        myVisitorId = Helpers().getRandomString(16);
+        // if visitor id is not found, create one
+        storage.write(key: "visitorId", value: visitorId);
+      }
+
+      await MatomoTracker.instance.initialize(
+        siteId: 3,
+        url: 'https://customer.beonde.de/matomo/matomo.php',
+        visitorId: myVisitorId,
+      );
+    });
+  }
+
   @override
   void initState() {
-    checkForOnboarding();
+    _checkForOnboarding();
+    _initMatomo();
     super.initState();
   }
 

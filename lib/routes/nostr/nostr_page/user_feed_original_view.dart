@@ -222,9 +222,6 @@ class _UserFeedOriginalViewState extends State<UserFeedOriginalView> {
 
   @override
   void initState() {
-    // todo:
-    log(widget.pubkey + "##################");
-
     _initUserFeed();
     _setupScrollListener();
 

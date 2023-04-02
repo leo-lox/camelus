@@ -3,6 +3,7 @@ import 'dart:developer';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:camelus/helpers/nprofile_helper.dart';
+import 'package:camelus/routes/nostr/nostr_page/perspective_feed_page.dart';
 import 'package:camelus/services/nostr/relays/relays_ranking.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -17,6 +18,7 @@ import 'package:camelus/routes/nostr/profile/edit_relays_page.dart';
 import 'package:camelus/routes/nostr/profile/follower_page.dart';
 import 'package:camelus/services/nostr/nostr_injector.dart';
 import 'package:camelus/services/nostr/nostr_service.dart';
+import 'package:matomo_tracker/matomo_tracker.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:url_launcher/url_launcher_string.dart';
@@ -51,8 +53,11 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage>
-    with TickerProviderStateMixin {
+    with TickerProviderStateMixin, TraceableClientMixin {
   late ScrollController _scrollController;
+
+  @override
+  String get traceTitle => "profilePage";
 
   String nip05verified = "";
   String requestId = Helpers().getRandomString(14);
@@ -160,13 +165,13 @@ class _ProfilePageState extends State<ProfilePage>
             ),
             actions: [
               TextButton(
-                child: Text("Cancel"),
+                child: const Text("Cancel"),
                 onPressed: () {
                   Navigator.of(context).pop(false);
                 },
               ),
               TextButton(
-                child: Text("Block"),
+                child: const Text("Block"),
                 onPressed: () {
                   Navigator.of(context).pop(true);
                 },
@@ -190,6 +195,133 @@ class _ProfilePageState extends State<ProfilePage>
 
     log("launching $lu06");
     launchUrl(lightningLaunchUri);
+  }
+
+  _launchPerspectiveFeed(String pubkey) async {
+    log("launching perspective feed for $pubkey");
+
+    // launch bottom sheet
+    showModalBottomSheet(
+        context: context,
+        backgroundColor: Palette.background,
+        barrierColor: Palette.black.withOpacity(0.8),
+        builder: (context) {
+          // ask for yes or no confirmation and return the result
+          return Container(
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  const Text(
+                    "perspective feed preview",
+                    style: TextStyle(
+                      color: Palette.white,
+                      fontSize: 25,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  const Text(
+                    "Perspective is an experimental feature that allows you to see the feed of a specific user. My hope is that this will create an unbubble effect. Currently, this is only a proof of concept. It will break your home feed and clear the cache.\n\n The feed is also incomplete because its not using the gossip model for other users yet. \n\n If you tab yes, you signal you like this feature and want to see it in the future in a more polished form. If you tab no, you signal you don't like this feature and want to see it removed.",
+                    style: TextStyle(
+                      color: Palette.lightGray,
+                      fontSize: 16,
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 50,
+                  ),
+                  Row(
+                    children: [
+                      // yes button
+
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: () {
+                            _perspectiveFeedTrackAndLaunch(pubkey, false);
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Palette.black,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20),
+                              side: const BorderSide(
+                                  color: Palette.white, width: 1),
+                            ),
+                          ),
+                          child: const Text(
+                            'no',
+                            style: TextStyle(
+                              color: Palette.white,
+                              fontSize: 16,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(
+                        width: 20,
+                      ),
+                      // no button
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: () {
+                            _perspectiveFeedTrackAndLaunch(pubkey, true);
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Palette.black,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20),
+                              side: const BorderSide(
+                                  color: Palette.white, width: 1),
+                            ),
+                          ),
+                          child: const Text(
+                            'yes',
+                            style: TextStyle(
+                              color: Palette.white,
+                              fontSize: 16,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(
+                    height: 30,
+                  ),
+                ],
+              ),
+            ),
+          );
+        });
+  }
+
+  _perspectiveFeedTrackAndLaunch(String pubkey, bool feedback) async {
+    MatomoTracker.instance.trackEvent(
+      eventCategory: 'perspectiveFeed',
+      action: 'perspectiveFeedLaunch',
+      eventValue: feedback ? 1 : 0,
+    );
+
+    log("launching perspective feed for $pubkey, feedback: $feedback");
+    // launch
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => PerspectiveFeedPage(
+          pubkey: pubkey,
+        ),
+      ),
+    ).then((value) => {
+          widget._nostrService.clearCache(),
+          widget._nostrService.userFeedObj.feed = [],
+        });
   }
 
   @override
@@ -327,6 +459,31 @@ class _ProfilePageState extends State<ProfilePage>
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
+                        if (widget.pubkey !=
+                            widget._nostrService.myKeys.publicKey)
+                          SizedBox(
+                            width: 35,
+                            height: 35,
+                            child: ElevatedButton(
+                              onPressed: () {
+                                _launchPerspectiveFeed(widget.pubkey);
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Palette.background,
+                                padding: const EdgeInsets.all(0),
+                                enableFeedback: true,
+                                shape: const CircleBorder(
+                                    side: BorderSide(
+                                        color: Palette.white, width: 1)),
+                              ),
+                              child: SvgPicture.asset(
+                                "assets/icons/eye.svg",
+                                height: 25,
+                                color: Palette.white,
+                              ),
+                            ),
+                          ),
+
                         // round message button with icon and white border
                         FutureBuilder<Map>(
                             future: widget._nostrService
