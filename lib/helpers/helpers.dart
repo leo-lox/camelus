@@ -44,7 +44,8 @@ class Helpers {
     // Convert the 8-bit words to 5-bit words.
     List<int> fiveBitWords = convertBits(bytes, 8, 5, true);
 
-    var bech32String = bech32.encode(Bech32(hrp, fiveBitWords));
+    var bech32String =
+        bech32.encode(Bech32(hrp, fiveBitWords), myHex.length + hrp.length);
 
     return bech32String;
   }

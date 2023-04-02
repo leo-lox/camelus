@@ -1,12 +1,15 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:camelus/helpers/nprofile_helper.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:camelus/atoms/my_profile_picture.dart';
 import 'package:camelus/config/palette.dart';
 import 'package:camelus/services/nostr/nostr_injector.dart';
 import 'package:camelus/services/nostr/nostr_service.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 
 class NostrDrawer extends StatelessWidget {
   late NostrService _nostrService;
@@ -19,6 +22,68 @@ class NostrDrawer extends StatelessWidget {
   void navigateToProfile(BuildContext context) {
     Navigator.pushNamed(context, "/nostr/profile",
         arguments: _nostrService.myKeys.publicKey);
+  }
+
+  void _copyToClipboard(BuildContext context, String text) {
+    Clipboard.setData(ClipboardData(text: text));
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text("Copied to clipboard: $text"),
+    ));
+  }
+
+  void openQrShareDialog(BuildContext context) async {
+    String nprofile =
+        await NprofileHelper().getNprofile(_nostrService.myKeys.publicKey);
+
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return Dialog(
+            backgroundColor: Palette.extraDarkGray,
+
+            //white border
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+              //side: const BorderSide(color: Colors.white, width: 1),
+            ),
+            child: Container(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text(
+                    "Share your Profile",
+                    style: TextStyle(color: Colors.white),
+                  ),
+                  const SizedBox(height: 40),
+                  QrImage(
+                    data: "nostr:${nprofile}",
+                    version: QrVersions.auto,
+                    size: 300.0,
+                    backgroundColor: Colors.white,
+
+                    //embeddedImage: AssetImage('assets/app_icons/icon.png'),
+                  ),
+                  const SizedBox(height: 20),
+                  GestureDetector(
+                    onTap: () => _copyToClipboard(context, nprofile),
+                    child: Text(
+                      "nostr:${nprofile}",
+                      style: const TextStyle(color: Palette.lightGray),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    child: const Text("close"),
+                  ),
+                ],
+              ),
+            ),
+          );
+        });
   }
 
   Widget _drawerHeader(context) {
@@ -271,11 +336,16 @@ class NostrDrawer extends StatelessWidget {
                     height: 22,
                     width: 22,
                   ),
-                  SvgPicture.asset(
-                    'assets/icons/qr-code.svg',
-                    color: Palette.primary,
-                    height: 22,
-                    width: 22,
+                  GestureDetector(
+                    onTap: () {
+                      openQrShareDialog(context);
+                    },
+                    child: SvgPicture.asset(
+                      'assets/icons/qr-code.svg',
+                      color: Palette.primary,
+                      height: 22,
+                      width: 22,
+                    ),
                   ),
                 ],
               ),

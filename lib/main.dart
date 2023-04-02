@@ -24,6 +24,7 @@ class MyApp extends StatelessWidget {
 
     return Portal(
       child: MaterialApp(
+        debugShowCheckedModeBanner: false,
         title: 'camelus',
         theme: theme.themeMap["DARK"],
         initialRoute: initialRoute,
