@@ -154,6 +154,7 @@ class _NostrPageState extends State<NostrPage>
 
   @override
   void initState() {
+    super.initState();
     _getPubkey();
 
     _betaCheckForUpdates();
@@ -176,8 +177,6 @@ class _NostrPageState extends State<NostrPage>
     _scrollControllerPage.addListener(() {
       //log("scrolling page");
     });
-
-    super.initState();
   }
 
   @override

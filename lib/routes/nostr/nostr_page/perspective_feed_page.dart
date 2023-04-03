@@ -27,11 +27,10 @@ class _PerspectiveFeedPageState extends State<PerspectiveFeedPage>
 
   @override
   void initState() {
+    super.initState();
     //clear user feed cache
     widget._nostrService.clearCache();
     widget._nostrService.userFeedObj.feed = [];
-
-    super.initState();
   }
 
   @override

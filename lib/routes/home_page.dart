@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:ui';
 
 import 'package:camelus/helpers/helpers.dart';
@@ -60,7 +61,7 @@ class _HomePageState extends State<HomePage> {
       if (myVisitorId == null) {
         myVisitorId = Helpers().getRandomString(16);
         // if visitor id is not found, create one
-        storage.write(key: "visitorId", value: visitorId);
+        storage.write(key: "visitorId", value: myVisitorId);
       }
 
       await MatomoTracker.instance.initialize(
@@ -73,9 +74,9 @@ class _HomePageState extends State<HomePage> {
 
   @override
   void initState() {
+    super.initState();
     _checkForOnboarding();
     _initMatomo();
-    super.initState();
   }
 
   @override
