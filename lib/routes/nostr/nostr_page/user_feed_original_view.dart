@@ -222,6 +222,7 @@ class _UserFeedOriginalViewState extends State<UserFeedOriginalView> {
 
   @override
   void initState() {
+    super.initState();
     _initUserFeed();
     _setupScrollListener();
 
@@ -229,8 +230,6 @@ class _UserFeedOriginalViewState extends State<UserFeedOriginalView> {
         widget._nostrService.userFeedObj.userFeedStream.listen((event) {
       _onUserFeedReceived(event);
     });
-
-    super.initState();
   }
 
   @override

@@ -141,6 +141,7 @@ class _GlobalFeedViewState extends State<GlobalFeedView> {
 
   @override
   void initState() {
+    super.initState();
     log("globalFeedView initState");
     // listen to nostr service
     globalFeedSubscription =
@@ -150,7 +151,6 @@ class _GlobalFeedViewState extends State<GlobalFeedView> {
 
     _subscribeToGlobalFeed();
     _setupScrollListener();
-    super.initState();
   }
 
   @override
