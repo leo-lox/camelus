@@ -23,7 +23,7 @@ class EventsFeed {
     if (event[0] == "EVENT") {
       var eventMap = event[2];
 
-      var tweet = Tweet.fromNostrEvent(eventMap);
+      var tweet = Tweet.fromNostrEvent(eventMap, socketControl);
 
       var rootId = socketControl.additionalData[event[1]]?["eventIds"][0];
       //create key value if not exists
@@ -33,6 +33,9 @@ class EventsFeed {
 
       // check if tweet already exists
       if (_events[rootId]!.any((element) => element.id == tweet.id)) {
+        Tweet currentTweet =
+            _events[rootId]!.firstWhere((element) => element.id == tweet.id);
+        currentTweet.updateRelayHintLastFetched(socketControl.connectionUrl);
         return;
       }
 
@@ -40,6 +43,7 @@ class EventsFeed {
       _events[rootId]!.add(tweet);
 
       if (!socketControl.requestInFlight[event[1]]) {
+        log("TEST");
         // rebuild reply tree
         var result = _buildReplyTree(_events[rootId]!);
 

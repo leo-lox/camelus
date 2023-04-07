@@ -1,6 +1,7 @@
 import 'dart:developer';
 import 'dart:ui';
 
+import 'package:camelus/components/seen_on_relays.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -215,6 +216,80 @@ class _TweetCardState extends State<TweetCard> {
                       bottom: MediaQuery.of(ctx).viewInsets.bottom),
                   child: WritePost(
                     context: PostContext(replyToTweet: tweet),
+                  )),
+            ));
+  }
+
+  void _openBottomSheet(context) {
+    showModalBottomSheet(
+        isScrollControlled: false,
+        elevation: 10,
+        backgroundColor: Palette.background,
+        isDismissible: true,
+        enableDrag: true,
+        context: context,
+        builder: (ctx) => BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 2, sigmaY: 2),
+              child: Padding(
+                  padding: EdgeInsets.only(bottom: 20),
+                  child: Container(
+                    padding: const EdgeInsets.all(20),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        GestureDetector(
+                          onTap: () {
+                            // push Seen on relays
+
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    SeenOnRelaysPage(tweet: widget.tweet),
+                              ),
+                            );
+                          },
+                          child: Row(
+                            children: [
+                              // svg icon
+                              SvgPicture.asset(
+                                height: 30,
+                                width: 30,
+                                'assets/icons/target.svg',
+                                color: Palette.gray,
+                              ),
+                              const SizedBox(width: 10),
+                              Text(
+                                "seen on relays",
+                                style: const TextStyle(
+                                    color: Palette.lightGray, fontSize: 17),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        // GestureDetector(
+                        //   onTap: () {},
+                        //   child: Row(
+                        //     children: [
+                        //       // svg icon
+                        //       SvgPicture.asset(
+                        //         height: 30,
+                        //         width: 30,
+                        //         'assets/icons/speaker-simple-slash.svg',
+                        //         color: Palette.gray,
+                        //       ),
+                        //       const SizedBox(width: 10),
+                        //       Text(
+                        //         "mute",
+                        //         style: const TextStyle(
+                        //             color: Palette.lightGray, fontSize: 17),
+                        //       ),
+                        //     ],
+                        //   ),
+                        // )
+                      ],
+                    ),
                   )),
             ));
   }
@@ -494,10 +569,15 @@ class _TweetCardState extends State<TweetCard> {
                                                 fontSize: 12),
                                           ),
                                         ),
-                                        SvgPicture.asset(
-                                          'assets/icons/tweetSetting.svg',
-                                          color: Palette.darkGray,
-                                        ),
+                                        GestureDetector(
+                                          onTap: () {
+                                            _openBottomSheet(context);
+                                          },
+                                          child: SvgPicture.asset(
+                                            'assets/icons/tweetSetting.svg',
+                                            color: Palette.darkGray,
+                                          ),
+                                        )
                                       ]),
                                   const SizedBox(height: 2),
                                   // content

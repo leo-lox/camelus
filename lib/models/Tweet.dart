@@ -1,3 +1,5 @@
+import 'package:camelus/models/socket_control.dart';
+
 class Tweet {
   String id;
   String pubkey;
@@ -13,6 +15,7 @@ class Tweet {
   List<dynamic> tags;
   List<dynamic> replies;
   bool isReply = false;
+  Map<String, Map<String, dynamic>> relayHints = {};
 
   Tweet(
       {required this.id,
@@ -28,6 +31,7 @@ class Tweet {
       required this.commentsCount,
       required this.retweetsCount,
       required this.replies,
+      this.relayHints = const {},
       this.isReply = false});
 
   factory Tweet.fromJson(Map<String, dynamic> json) {
@@ -45,7 +49,8 @@ class Tweet {
         likesCount: json['likesCount'],
         commentsCount: json['commentsCount'],
         retweetsCount: json['retweetsCount'],
-        isReply: json['isReply']);
+        isReply: json['isReply'],
+        relayHints: json['relayHints']);
   }
 
   Map<String, dynamic> toJson() => {
@@ -62,10 +67,12 @@ class Tweet {
         'likesCount': likesCount,
         'commentsCount': commentsCount,
         'retweetsCount': retweetsCount,
-        'isReply': isReply
+        'isReply': isReply,
+        'relayHints': relayHints
       };
 
-  factory Tweet.fromNostrEvent(dynamic eventMap) {
+  factory Tweet.fromNostrEvent(dynamic eventMap, SocketControl socketControl) {
+    int now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
     // extract media links from content and remove from content
     String content = eventMap["content"];
     List<String> imageLinks = [];
@@ -91,6 +98,12 @@ class Tweet {
       }
     }
 
+    Map<String, Map<String, dynamic>> myRelayHints = {
+      socketControl.connectionUrl: {
+        "lastFetched": now,
+      }
+    };
+
     return Tweet(
         id: eventMap["id"],
         pubkey: eventMap["pubkey"],
@@ -105,7 +118,18 @@ class Tweet {
         likesCount: 0,
         commentsCount: 0,
         retweetsCount: 0,
+        relayHints: myRelayHints,
         isReply: isReply);
+  }
+
+  void updateRelayHintLastFetched(String relayUrl) {
+    var now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
+
+    if (relayHints[relayUrl] == null) {
+      relayHints[relayUrl] = {};
+    }
+
+    relayHints[relayUrl]!["lastFetched"] = now;
   }
 }
 

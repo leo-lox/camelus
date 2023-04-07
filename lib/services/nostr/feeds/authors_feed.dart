@@ -39,7 +39,7 @@ class AuthorsFeed {
 
       // content
       if (eventMap["kind"] == 1) {
-        var tweet = Tweet.fromNostrEvent(eventMap);
+        var tweet = Tweet.fromNostrEvent(eventMap, socketControl);
 
         //create key value if not exists
         if (!authors.containsKey(eventMap["pubkey"])) {
@@ -49,6 +49,9 @@ class AuthorsFeed {
         // check if tweet already exists
         if (authors[eventMap["pubkey"]]!
             .any((element) => element.id == tweet.id)) {
+          Tweet currentTweet = authors[eventMap["pubkey"]]!
+              .firstWhere((element) => element.id == tweet.id);
+          currentTweet.updateRelayHintLastFetched(socketControl.connectionUrl);
           return;
         }
 

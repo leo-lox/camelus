@@ -73,7 +73,7 @@ class UserFeed {
       var eventMap = event[2];
       // content
       if (eventMap["kind"] == 1) {
-        var tweet = Tweet.fromNostrEvent(eventMap);
+        var tweet = Tweet.fromNostrEvent(eventMap, socketControl);
 
         if (tweet.isReply) {
           // find parent tweet in tags else return null
@@ -133,6 +133,13 @@ class UserFeed {
         if (!tweet.isReply) {
           // check if tweet already exists
           if (feed.any((element) => element.id == tweet.id)) {
+            // update last fetched
+            Tweet currentTweet =
+                feed.firstWhere((element) => element.id == tweet.id);
+
+            currentTweet
+                .updateRelayHintLastFetched(socketControl.connectionUrl);
+
             return;
           }
           // add to top of feed

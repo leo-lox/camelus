@@ -61,10 +61,14 @@ class GlobalFeed {
       if (eventMap["kind"] == 1) {
         List<dynamic> tags = eventMap["tags"] ?? [];
 
-        Tweet tweet = Tweet.fromNostrEvent(eventMap);
+        Tweet tweet = Tweet.fromNostrEvent(eventMap, socketControl);
 
         //check for duplicates
         if (feed.any((element) => element.id == tweet.id)) {
+          Tweet currentTweet =
+              feed.firstWhere((element) => element.id == tweet.id);
+          currentTweet.updateRelayHintLastFetched(socketControl.connectionUrl);
+
           return;
         }
 
