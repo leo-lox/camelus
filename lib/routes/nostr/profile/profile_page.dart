@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:developer';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:camelus/atoms/long_button.dart';
 import 'package:camelus/helpers/nprofile_helper.dart';
 import 'package:camelus/routes/nostr/nostr_page/perspective_feed_page.dart';
 import 'package:camelus/services/nostr/relays/relays_ranking.dart';
@@ -243,52 +244,22 @@ class _ProfilePageState extends State<ProfilePage>
                       // yes button
 
                       Expanded(
-                        child: ElevatedButton(
-                          onPressed: () {
-                            _perspectiveFeedTrackAndLaunch(pubkey, false);
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Palette.black,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20),
-                              side: const BorderSide(
-                                  color: Palette.white, width: 1),
-                            ),
-                          ),
-                          child: const Text(
-                            'no',
-                            style: TextStyle(
-                              color: Palette.white,
-                              fontSize: 16,
-                            ),
-                          ),
-                        ),
+                        child: longButton(
+                            name: "no",
+                            onPressed: () {
+                              _perspectiveFeedTrackAndLaunch(pubkey, false);
+                            }),
                       ),
+
                       const SizedBox(
                         width: 20,
                       ),
-                      // no button
                       Expanded(
-                        child: ElevatedButton(
-                          onPressed: () {
-                            _perspectiveFeedTrackAndLaunch(pubkey, true);
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Palette.black,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20),
-                              side: const BorderSide(
-                                  color: Palette.white, width: 1),
-                            ),
-                          ),
-                          child: const Text(
-                            'yes',
-                            style: TextStyle(
-                              color: Palette.white,
-                              fontSize: 16,
-                            ),
-                          ),
-                        ),
+                        child: longButton(
+                            name: "yes",
+                            onPressed: () {
+                              _perspectiveFeedTrackAndLaunch(pubkey, true);
+                            }),
                       ),
                     ],
                   ),
