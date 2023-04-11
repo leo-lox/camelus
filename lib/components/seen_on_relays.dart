@@ -45,10 +45,11 @@ class _SeenOnRelaysPageState extends State<SeenOnRelaysPage> {
           padding: const EdgeInsets.all(10),
           child: SingleChildScrollView(
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(height: 20),
-                const Text('this event was seen on',
-                    style: TextStyle(color: Palette.lightGray, fontSize: 20)),
+                const Text('event seen on',
+                    style: TextStyle(color: Palette.white, fontSize: 35)),
                 ListView.builder(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
@@ -67,9 +68,9 @@ class _SeenOnRelaysPageState extends State<SeenOnRelaysPage> {
                     );
                   },
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 25),
                 const Text('author gossip hints',
-                    style: TextStyle(color: Palette.lightGray, fontSize: 20)),
+                    style: TextStyle(color: Palette.white, fontSize: 35)),
                 FutureBuilder<List>(
                   future: widget._relaysRanking
                       .getBestRelays(widget.tweet.pubkey, Direction.read),
@@ -99,10 +100,10 @@ class _SeenOnRelaysPageState extends State<SeenOnRelaysPage> {
                   },
                 ),
                 const SizedBox(
-                  height: 20,
+                  height: 25,
                 ),
                 const Text('recorded data',
-                    style: TextStyle(color: Palette.lightGray, fontSize: 20)),
+                    style: TextStyle(color: Palette.white, fontSize: 35)),
                 ListView.builder(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
