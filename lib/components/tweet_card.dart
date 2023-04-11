@@ -2,6 +2,7 @@ import 'dart:developer';
 import 'dart:ui';
 
 import 'package:camelus/components/seen_on_relays.dart';
+import 'package:camelus/routes/nostr/blockedUsers/block_page.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -268,26 +269,35 @@ class _TweetCardState extends State<TweetCard> {
                           ),
                         ),
                         const SizedBox(height: 20),
-                        // GestureDetector(
-                        //   onTap: () {},
-                        //   child: Row(
-                        //     children: [
-                        //       // svg icon
-                        //       SvgPicture.asset(
-                        //         height: 30,
-                        //         width: 30,
-                        //         'assets/icons/speaker-simple-slash.svg',
-                        //         color: Palette.gray,
-                        //       ),
-                        //       const SizedBox(width: 10),
-                        //       Text(
-                        //         "mute",
-                        //         style: const TextStyle(
-                        //             color: Palette.lightGray, fontSize: 17),
-                        //       ),
-                        //     ],
-                        //   ),
-                        // )
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => BlockPage(
+                                    postId: widget.tweet.id,
+                                    userPubkey: widget.tweet.pubkey),
+                              ),
+                            );
+                          },
+                          child: Row(
+                            children: [
+                              // svg icon
+                              SvgPicture.asset(
+                                height: 30,
+                                width: 30,
+                                'assets/icons/speaker-simple-slash.svg',
+                                color: Palette.gray,
+                              ),
+                              const SizedBox(width: 10),
+                              Text(
+                                "mute/block",
+                                style: const TextStyle(
+                                    color: Palette.lightGray, fontSize: 17),
+                              ),
+                            ],
+                          ),
+                        )
                       ],
                     ),
                   )),

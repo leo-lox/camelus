@@ -15,7 +15,7 @@ Widget longButton({required String name, required Function() onPressed}) {
       name,
       style: const TextStyle(
         color: Palette.white,
-        fontSize: 16,
+        fontSize: 18,
       ),
     ),
   );
