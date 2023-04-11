@@ -1,6 +1,8 @@
 import 'dart:developer';
 import 'dart:ui';
 
+import 'package:camelus/components/bottom_sheet_more.dart';
+import 'package:camelus/components/bottom_sheet_share.dart';
 import 'package:camelus/components/seen_on_relays.dart';
 import 'package:camelus/routes/nostr/blockedUsers/block_page.dart';
 import 'package:flutter/gestures.dart';
@@ -217,89 +219,6 @@ class _TweetCardState extends State<TweetCard> {
                       bottom: MediaQuery.of(ctx).viewInsets.bottom),
                   child: WritePost(
                     context: PostContext(replyToTweet: tweet),
-                  )),
-            ));
-  }
-
-  void _openBottomSheet(context) {
-    showModalBottomSheet(
-        isScrollControlled: false,
-        elevation: 10,
-        backgroundColor: Palette.background,
-        isDismissible: true,
-        enableDrag: true,
-        context: context,
-        builder: (ctx) => BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 2, sigmaY: 2),
-              child: Padding(
-                  padding: EdgeInsets.only(bottom: 20),
-                  child: Container(
-                    padding: const EdgeInsets.all(20),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        GestureDetector(
-                          onTap: () {
-                            // push Seen on relays
-
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    SeenOnRelaysPage(tweet: widget.tweet),
-                              ),
-                            );
-                          },
-                          child: Row(
-                            children: [
-                              // svg icon
-                              SvgPicture.asset(
-                                height: 30,
-                                width: 30,
-                                'assets/icons/target.svg',
-                                color: Palette.gray,
-                              ),
-                              const SizedBox(width: 10),
-                              Text(
-                                "seen on relays",
-                                style: const TextStyle(
-                                    color: Palette.lightGray, fontSize: 17),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-                        GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => BlockPage(
-                                    postId: widget.tweet.id,
-                                    userPubkey: widget.tweet.pubkey),
-                              ),
-                            );
-                          },
-                          child: Row(
-                            children: [
-                              // svg icon
-                              SvgPicture.asset(
-                                height: 30,
-                                width: 30,
-                                'assets/icons/speaker-simple-slash.svg',
-                                color: Palette.gray,
-                              ),
-                              const SizedBox(width: 10),
-                              Text(
-                                "mute/block",
-                                style: const TextStyle(
-                                    color: Palette.lightGray, fontSize: 17),
-                              ),
-                            ],
-                          ),
-                        )
-                      ],
-                    ),
                   )),
             ));
   }
@@ -581,7 +500,8 @@ class _TweetCardState extends State<TweetCard> {
                                         ),
                                         GestureDetector(
                                           onTap: () {
-                                            _openBottomSheet(context);
+                                            openBottomSheetMore(
+                                                context, widget.tweet);
                                           },
                                           child: SvgPicture.asset(
                                             'assets/icons/tweetSetting.svg',
@@ -705,12 +625,8 @@ class _TweetCardState extends State<TweetCard> {
                                         ),
                                         GestureDetector(
                                           onTap: () => {
-                                            ScaffoldMessenger.of(context)
-                                                .showSnackBar(const SnackBar(
-                                              content: Text(
-                                                  'Share functionality is not implemented yet'),
-                                              duration: Duration(seconds: 1),
-                                            )),
+                                            openBottomSheetShare(
+                                                context, widget.tweet)
                                           },
                                           child: SvgPicture.asset(
                                             height: 23,
