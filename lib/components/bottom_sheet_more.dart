@@ -36,22 +36,26 @@ void openBottomSheetMore(context, Tweet tweet) {
                             ),
                           );
                         },
-                        child: Row(
-                          children: [
-                            // svg icon
-                            SvgPicture.asset(
-                              height: 30,
-                              width: 30,
-                              'assets/icons/target.svg',
-                              color: Palette.gray,
-                            ),
-                            const SizedBox(width: 10),
-                            Text(
-                              "seen on relays",
-                              style: const TextStyle(
-                                  color: Palette.lightGray, fontSize: 17),
-                            ),
-                          ],
+                        child: Container(
+                          color: Palette.background,
+                          padding: const EdgeInsets.all(5),
+                          child: Row(
+                            children: [
+                              // svg icon
+                              SvgPicture.asset(
+                                height: 30,
+                                width: 30,
+                                'assets/icons/target.svg',
+                                color: Palette.gray,
+                              ),
+                              const SizedBox(width: 15),
+                              Text(
+                                "seen on relays",
+                                style: const TextStyle(
+                                    color: Palette.lightGray, fontSize: 17),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                       const SizedBox(height: 20),
@@ -65,22 +69,26 @@ void openBottomSheetMore(context, Tweet tweet) {
                             ),
                           );
                         },
-                        child: Row(
-                          children: [
-                            // svg icon
-                            SvgPicture.asset(
-                              height: 30,
-                              width: 30,
-                              'assets/icons/speaker-simple-slash.svg',
-                              color: Palette.gray,
-                            ),
-                            const SizedBox(width: 10),
-                            Text(
-                              "mute/block",
-                              style: const TextStyle(
-                                  color: Palette.lightGray, fontSize: 17),
-                            ),
-                          ],
+                        child: Container(
+                          color: Palette.background,
+                          padding: const EdgeInsets.all(5),
+                          child: Row(
+                            children: [
+                              // svg icon
+                              SvgPicture.asset(
+                                height: 30,
+                                width: 30,
+                                'assets/icons/speaker-simple-slash.svg',
+                                color: Palette.gray,
+                              ),
+                              const SizedBox(width: 15),
+                              Text(
+                                "mute/block",
+                                style: const TextStyle(
+                                    color: Palette.lightGray, fontSize: 17),
+                              ),
+                            ],
+                          ),
                         ),
                       )
                     ],
