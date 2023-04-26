@@ -81,7 +81,7 @@ class _NostrPageState extends State<NostrPage>
 
     var updateInfo = jsonDecode(response.body);
 
-    if (updateInfo["version"] <= 3) {
+    if (updateInfo["version"] <= 18) {
       // <-- current version
 
       return;
