@@ -1,8 +1,6 @@
 import 'dart:convert';
-import 'dart:developer';
 import 'dart:io';
 
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:camelus/atoms/picture.dart';
 import 'package:camelus/helpers/search.dart';
 import 'package:file_picker/file_picker.dart';
@@ -39,7 +37,7 @@ class _WritePostState extends State<WritePost> {
 
   bool submitLoading = false;
 
-  List<File> _images = [];
+  final List<File> _images = [];
   List<Map<String, dynamic>> _mentionsSearchResults = [];
   List<Map<String, dynamic>> _mentionsSearchResultsHashTags = [];
   List<String> _mentionedInPost = [];

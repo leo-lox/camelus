@@ -5,7 +5,6 @@ import 'package:camelus/atoms/spinner_center.dart';
 import 'package:camelus/components/tweet_card.dart';
 import 'package:camelus/config/palette.dart';
 import 'package:camelus/models/tweet.dart';
-import 'package:camelus/physics/position_retained_scroll_physics.dart';
 import 'package:camelus/scroll_controller/retainable_scroll_controller.dart';
 import 'package:camelus/services/nostr/nostr_injector.dart';
 import 'package:camelus/services/nostr/nostr_service.dart';
@@ -251,10 +250,10 @@ class _UserFeedOriginalViewState extends State<UserFeedOriginalView> {
       return spinnerCenter();
     }
     if (_displayList.isEmpty && !_isLoading) {
-      return Center(
+      return const Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: const [
+          children: [
             Text(
               "no tweets yet",
               style: TextStyle(fontSize: 25, color: Palette.white),

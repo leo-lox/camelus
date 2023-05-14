@@ -41,7 +41,7 @@ class _BlockedUsersState extends State<BlockedUsers> {
         backgroundColor: Palette.background,
         appBar: AppBar(
           backgroundColor: Palette.background,
-          title: Text('Blocked Users'),
+          title: const Text('Blocked Users'),
         ),
         body: CustomScrollView(
           slivers: [
@@ -78,17 +78,17 @@ Widget _profile(String pubkey, StreamController streamController, widget) {
 
         if (snapshot.hasData) {
           picture = snapshot.data?["picture"] ??
-              "https://avatars.dicebear.com/api/personas/${pubkey}.svg";
+              "https://avatars.dicebear.com/api/personas/$pubkey.svg";
           name =
               snapshot.data?["name"] ?? Helpers().encodeBech32(pubkey, "npub");
           about = snapshot.data?["about"] ?? "";
         } else if (snapshot.hasError) {
-          picture = "https://avatars.dicebear.com/api/personas/${pubkey}.svg";
+          picture = "https://avatars.dicebear.com/api/personas/$pubkey.svg";
           name = Helpers().encodeBech32(pubkey, "npub");
           about = "";
         } else {
           // loading
-          picture = "https://avatars.dicebear.com/api/personas/${pubkey}.svg";
+          picture = "https://avatars.dicebear.com/api/personas/$pubkey.svg";
           name = "loading...";
           about = "";
         }

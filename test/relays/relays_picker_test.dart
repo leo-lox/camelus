@@ -1,5 +1,3 @@
-import 'dart:developer';
-import 'dart:math';
 import 'package:camelus/services/nostr/relays/relays_picker.dart';
 import 'package:test/test.dart';
 

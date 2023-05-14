@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:math';
-import 'dart:typed_data';
 
 import 'package:bech32/bech32.dart';
 import 'package:hex/hex.dart';
@@ -43,7 +42,7 @@ class Helpers {
 
   /// Decode a bech32 string into a hex string + human readable part
   List<String> decodeBech32(String bech32String) {
-    final Bech32Codec codec = const Bech32Codec();
+    const Bech32Codec codec = Bech32Codec();
     final Bech32 bech32 = codec.decode(bech32String, bech32String.length);
     final eightBitWords = _convertBits(bech32.data, 5, 8, false);
     return [HEX.encode(eightBitWords), bech32.hrp];

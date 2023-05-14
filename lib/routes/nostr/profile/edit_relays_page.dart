@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:camelus/config/palette.dart';
 import 'package:camelus/services/nostr/nostr_injector.dart';
 import 'package:camelus/services/nostr/nostr_service.dart';
@@ -142,10 +141,10 @@ class _EditRelaysPageState extends State<EditRelaysPage> {
         ),
         // show loading indicator when reconnecting
         body: reconnecting
-            ? Center(
+            ? const Center(
                 child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: const [
+                children: [
                   CircularProgressIndicator(),
                   SizedBox(height: 20),
                   Text(

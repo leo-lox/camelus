@@ -1,4 +1,3 @@
-import 'dart:developer';
 
 import 'package:camelus/helpers/nprofile_helper.dart';
 import 'package:test/test.dart';

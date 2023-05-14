@@ -1,4 +1,3 @@
-import 'dart:developer';
 
 import 'package:camelus/services/nostr/metadata/nip_05.dart';
 import 'package:test/test.dart';

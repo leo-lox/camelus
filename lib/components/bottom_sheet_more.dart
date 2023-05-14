@@ -18,7 +18,7 @@ void openBottomSheetMore(context, Tweet tweet) {
       builder: (ctx) => BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 2, sigmaY: 2),
             child: Padding(
-                padding: EdgeInsets.only(bottom: 20),
+                padding: const EdgeInsets.only(bottom: 20),
                 child: Container(
                   padding: const EdgeInsets.all(20),
                   child: Column(
@@ -49,9 +49,9 @@ void openBottomSheetMore(context, Tweet tweet) {
                                 color: Palette.gray,
                               ),
                               const SizedBox(width: 15),
-                              Text(
+                              const Text(
                                 "seen on relays",
-                                style: const TextStyle(
+                                style: TextStyle(
                                     color: Palette.lightGray, fontSize: 17),
                               ),
                             ],
@@ -82,9 +82,9 @@ void openBottomSheetMore(context, Tweet tweet) {
                                 color: Palette.gray,
                               ),
                               const SizedBox(width: 15),
-                              Text(
+                              const Text(
                                 "mute/block",
-                                style: const TextStyle(
+                                style: TextStyle(
                                     color: Palette.lightGray, fontSize: 17),
                               ),
                             ],

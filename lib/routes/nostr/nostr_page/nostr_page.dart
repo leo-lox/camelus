@@ -8,15 +8,12 @@ import 'package:camelus/routes/nostr/nostr_page/global_feed_view.dart';
 import 'package:camelus/routes/nostr/nostr_page/user_feed_original_view.dart';
 import 'package:camelus/routes/nostr/relays_page.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
 import 'package:camelus/atoms/my_profile_picture.dart';
-import 'package:camelus/components/tweet_card.dart';
 
-import 'package:camelus/models/tweet.dart';
 import 'package:camelus/services/nostr/nostr_injector.dart';
 import 'package:camelus/services/nostr/nostr_service.dart';
 import 'package:badges/badges.dart' as badges;
@@ -41,7 +38,7 @@ class _NostrPageState extends State<NostrPage>
   @override
   bool get wantKeepAlive => true;
 
-  bool _isLoading = true;
+  final bool _isLoading = true;
 
   List<String> followingPubkeys = [];
 
@@ -50,7 +47,7 @@ class _NostrPageState extends State<NostrPage>
   late TabController _tabController;
 
   late String pubkey = "";
-  int _tabIndex = 0;
+  final int _tabIndex = 0;
 
   _getPubkey() async {
     //wait for connection
@@ -220,14 +217,14 @@ class _NostrPageState extends State<NostrPage>
 
                           if (snapshot.hasData) {
                             picture = snapshot.data?["picture"] ??
-                                "https://avatars.dicebear.com/api/personas/${pubkey}.svg";
+                                "https://avatars.dicebear.com/api/personas/$pubkey.svg";
                           } else if (snapshot.hasError) {
                             picture =
-                                "https://avatars.dicebear.com/api/personas/${pubkey}.svg";
+                                "https://avatars.dicebear.com/api/personas/$pubkey.svg";
                           } else {
                             // loading
                             picture =
-                                "https://avatars.dicebear.com/api/personas/${pubkey}.svg";
+                                "https://avatars.dicebear.com/api/personas/$pubkey.svg";
                           }
                           return myProfilePicture(picture, pubkey);
                         }),
@@ -241,9 +238,9 @@ class _NostrPageState extends State<NostrPage>
                       toAnimate: false,
                       showBadge: false,
                       badgeColor: Palette.primary,
-                      badgeContent: Text(
+                      badgeContent: const Text(
                         "",
-                        style: const TextStyle(color: Colors.white),
+                        style: TextStyle(color: Colors.white),
                       ),
                       child: GestureDetector(
                         onTap: () {},

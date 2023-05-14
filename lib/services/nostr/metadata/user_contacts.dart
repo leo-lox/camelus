@@ -198,7 +198,7 @@ class UserContacts {
     // cast with for loop
     List<List<dynamic>> tags = [];
     for (List t in eventMap["tags"]) {
-      tags.add(t as List<dynamic>);
+      tags.add(t);
     }
 
     // cast to list of lists

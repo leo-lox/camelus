@@ -1,11 +1,9 @@
 import 'dart:async';
 import 'dart:developer';
 
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:camelus/atoms/long_button.dart';
 import 'package:camelus/helpers/nprofile_helper.dart';
 import 'package:camelus/routes/nostr/nostr_page/perspective_feed_page.dart';
-import 'package:camelus/services/nostr/relays/relays_ranking.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
@@ -22,7 +20,6 @@ import 'package:camelus/services/nostr/nostr_service.dart';
 import 'package:matomo_tracker/matomo_tracker.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:url_launcher/url_launcher_string.dart';
 
 class ProfilePage extends StatefulWidget {
   String pubkey;
@@ -153,9 +150,9 @@ class _ProfilePageState extends State<ProfilePage>
         builder: (BuildContext context) {
           return AlertDialog(
             title: const Text("Block user"),
-            content: Column(
+            content: const Column(
               mainAxisSize: MainAxisSize.min,
-              children: const [
+              children: [
                 Text("Are you sure you want to block this user?"),
                 SizedBox(height: 20),
                 Text("You will no longer see their posts."),
@@ -802,8 +799,8 @@ class _ProfilePageState extends State<ProfilePage>
                                 }),
                           ],
                         ),
-                        Row(
-                          children: const [
+                        const Row(
+                          children: [
                             Icon(Icons.follow_the_signs,
                                 color: Palette.white, size: 17),
                             SizedBox(width: 5),
@@ -871,7 +868,7 @@ class _ProfilePageState extends State<ProfilePage>
           ),
           _profileImage(_scrollController, widget),
           SafeArea(
-            child: Container(
+            child: SizedBox(
               height: 55,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -921,9 +918,9 @@ class _ProfilePageState extends State<ProfilePage>
 }
 
 Widget _profileImage(ScrollController sController, widget) {
-  final double defaultMargin = 125;
-  final double defaultStart = 125;
-  final double defaultEnd = defaultStart / 2;
+  const double defaultMargin = 125;
+  const double defaultStart = 125;
+  const double defaultEnd = defaultStart / 2;
 
   double top = defaultMargin;
   double scale = 1.0;

@@ -1,4 +1,3 @@
-import 'dart:developer';
 
 import 'package:camelus/services/nostr/relays/relay_tracker.dart';
 import 'package:camelus/services/nostr/relays/relays_injector.dart';
@@ -89,7 +88,7 @@ class RelaysPicker {
 
 // Keep score for each relay
     Map scoreboard =
-        Map.fromIterable(allRelays, key: (e) => e, value: (e) => 0);
+        { for (var e in allRelays) e : 0 };
 
 // Assign scores to relays from each pubkey
     personRelayScores.forEach((pubkeyhex, relayScores) {

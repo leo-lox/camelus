@@ -6,13 +6,11 @@ final Map<String, ThemeData> themeMap = {
 };
 
 final ThemeData darkTheme = ThemeData(
-  primaryColor: Colors.white70,
-  backgroundColor: Colors.black,
+  primaryColor: Colors.white70, colorScheme: const ColorScheme(background: Colors.black),
 );
 
 final ThemeData lightTheme = ThemeData(
-  primaryColor: Colors.black,
-  backgroundColor: Colors.white,
+  primaryColor: Colors.black, colorScheme: const ColorScheme(background: Colors.white),
 );
 
 const TextStyle smallTextStyle =

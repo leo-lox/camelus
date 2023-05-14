@@ -1,8 +1,5 @@
-import 'dart:developer';
 
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:camelus/config/palette.dart';
 import 'package:camelus/helpers/helpers.dart';
 import 'package:camelus/routes/nostr/profile/profile_page.dart';
@@ -31,8 +28,8 @@ class FollowerPage extends StatefulWidget {
 
 class _FollowerPageState extends State<FollowerPage> {
   List<String> _myFollowing = [];
-  List<String> _myNewFollowing = [];
-  List<String> _myNewUnfollowing = [];
+  final List<String> _myNewFollowing = [];
+  final List<String> _myNewUnfollowing = [];
 
   void getFollowed() {
     List<List> folloing =
@@ -149,18 +146,18 @@ Widget _profile(String pubkey, widget, List myFollowing, List myNewFollowing,
 
         if (snapshot.hasData) {
           picture = snapshot.data?["picture"] ??
-              "https://avatars.dicebear.com/api/personas/${pubkey}.svg";
+              "https://avatars.dicebear.com/api/personas/$pubkey.svg";
           name =
               snapshot.data?["name"] ?? Helpers().encodeBech32(pubkey, "npub");
           about = snapshot.data?["about"] ?? "";
           nip05 = snapshot.data?["nip05"] ?? "";
         } else if (snapshot.hasError) {
-          picture = "https://avatars.dicebear.com/api/personas/${pubkey}.svg";
+          picture = "https://avatars.dicebear.com/api/personas/$pubkey.svg";
           name = Helpers().encodeBech32(pubkey, "npub");
           about = "";
         } else {
           // loading
-          picture = "https://avatars.dicebear.com/api/personas/${pubkey}.svg";
+          picture = "https://avatars.dicebear.com/api/personas/$pubkey.svg";
           name = "loading...";
           about = "";
         }
@@ -274,7 +271,7 @@ Widget _profile(String pubkey, widget, List myFollowing, List myNewFollowing,
                       backgroundColor: Palette.white,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20),
-                        side: BorderSide(color: Palette.black, width: 1),
+                        side: const BorderSide(color: Palette.black, width: 1),
                       ),
                     ),
                     child: const Text(

@@ -11,7 +11,6 @@ import 'package:camelus/services/nostr/relays/relays_picker.dart';
 import 'package:cross_local_storage/cross_local_storage.dart';
 
 import 'package:json_cache/json_cache.dart';
-import 'dart:convert';
 
 class Relays {
   final Map<String, Map<String, bool>> initRelays = {

@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:developer';
 
 import 'package:camelus/models/socket_control.dart';
@@ -11,7 +10,7 @@ class EventsFeed {
   late Relays _relays;
 
   // events, replies
-  var _events = <String, List<Tweet>>{};
+  final _events = <String, List<Tweet>>{};
 
   EventsFeed() {
     RelaysInjector injector = RelaysInjector();

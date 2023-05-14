@@ -29,7 +29,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
   TextEditingController websiteController = TextEditingController(text: "");
 
   // scroll controller
-  ScrollController _scrollController = ScrollController();
+  final ScrollController _scrollController = ScrollController();
 
   late String pubkey;
 

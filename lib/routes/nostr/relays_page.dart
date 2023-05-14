@@ -1,4 +1,3 @@
-import 'dart:developer';
 
 import 'package:camelus/config/palette.dart';
 import 'package:camelus/models/socket_control.dart';
@@ -119,9 +118,9 @@ class _RelaysPageState extends State<RelaysPage> {
                     const SizedBox(height: 8.0),
                     _dynamicRelays(widget._relaysService),
                     const SizedBox(height: 30.0),
-                    Row(
+                    const Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: const [
+                      children: [
                         Text('static/manual',
                             style: TextStyle(
                               color: Palette.white,
@@ -237,7 +236,7 @@ Widget _staticRelays(Relays relaysService) {
     List<Widget> dataRow = [];
     var relay = relaysService.manualRelays.entries.elementAt(i);
     dataRow.add(
-        Text('${relay.key}', style: const TextStyle(color: Palette.white)));
+        Text(relay.key, style: const TextStyle(color: Palette.white)));
 
     for (int j = 1; j < columnCount; j++) {
       if (j == 1) {
@@ -304,9 +303,9 @@ Widget _failingRelays(Relays relaysService) {
             style: const TextStyle(color: Palette.white)));
       } else if (j == 2) {
         dataRow.add(
-            Text('${readWrite}', style: const TextStyle(color: Palette.white)));
+            Text(readWrite, style: const TextStyle(color: Palette.white)));
       } else if (j == 3) {
-        dataRow.add(Text('${staticDynamic}',
+        dataRow.add(Text(staticDynamic,
             style: const TextStyle(color: Palette.white)));
       }
     }
@@ -327,14 +326,14 @@ Widget _failingRelays(Relays relaysService) {
 }
 
 Widget _explainerText() {
-  return Padding(
-    padding: const EdgeInsets.fromLTRB(8.0, 0.0, 8.0, 30.0),
+  return const Padding(
+    padding: EdgeInsets.fromLTRB(8.0, 0.0, 8.0, 30.0),
     child: Column(
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: const [
+          children: [
             Text(
               "dynamic:",
               style: TextStyle(
@@ -357,11 +356,11 @@ Widget _explainerText() {
             ),
           ],
         ),
-        const SizedBox(height: 8.0),
+        SizedBox(height: 8.0),
         Row(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: const [
+          children: [
             Text(
               "static:",
               style: TextStyle(
@@ -384,11 +383,11 @@ Widget _explainerText() {
             ),
           ],
         ),
-        const SizedBox(height: 8.0),
+        SizedBox(height: 8.0),
         Row(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: const [
+          children: [
             Text(
               "failing:",
               style: TextStyle(

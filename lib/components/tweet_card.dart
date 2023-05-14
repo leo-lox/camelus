@@ -3,8 +3,6 @@ import 'dart:ui';
 
 import 'package:camelus/components/bottom_sheet_more.dart';
 import 'package:camelus/components/bottom_sheet_share.dart';
-import 'package:camelus/components/seen_on_relays.dart';
-import 'package:camelus/routes/nostr/blockedUsers/block_page.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -326,11 +324,9 @@ class _TweetCardState extends State<TweetCard> {
                                                 widget.tweet.tags)[0];
                                         var pubkeyHr = Helpers()
                                             .encodeBech32(pubkey, "npub");
-                                        var pubkeyHrShort = pubkeyHr.substring(
-                                                0, 5) +
-                                            "..." +
-                                            pubkeyHr
-                                                .substring(pubkeyHr.length - 5);
+                                        var pubkeyHrShort = "${pubkeyHr.substring(
+                                                0, 5)}...${pubkeyHr
+                                                .substring(pubkeyHr.length - 5)}";
                                         name = pubkeyHrShort;
                                       }
                                     } else if (snapshot.hasError) {
@@ -520,8 +516,7 @@ class _TweetCardState extends State<TweetCard> {
                                   ),
 
                                   const SizedBox(height: 6),
-                                  if (widget.tweet.imageLinks.isNotEmpty &&
-                                      widget.tweet.imageLinks != null)
+                                  if (widget.tweet.imageLinks.isNotEmpty)
                                     GestureDetector(
                                       onTap: () => _openImage(myImage, context),
                                       child: Container(

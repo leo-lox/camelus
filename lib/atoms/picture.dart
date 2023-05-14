@@ -5,7 +5,7 @@ import 'package:flutter_svg/svg.dart';
 Widget simplePicture(String pictureUrl, String? pubkey) {
   if (pictureUrl == null) {
     return SvgPicture.network(
-        "https://avatars.dicebear.com/api/personas/${pubkey}.svg");
+        "https://avatars.dicebear.com/api/personas/$pubkey.svg");
   }
 
   if (pictureUrl.contains(".svg")) {
@@ -20,10 +20,10 @@ Widget simplePicture(String pictureUrl, String? pubkey) {
       imageUrl: pictureUrl,
       progressIndicatorBuilder: (context, url, downloadProgress) =>
           CircularProgressIndicator(value: downloadProgress.progress),
-      errorWidget: (context, url, error) => Icon(Icons.error),
+      errorWidget: (context, url, error) => const Icon(Icons.error),
     );
   }
 
   return SvgPicture.network(
-      "https://avatars.dicebear.com/api/personas/${pubkey}.svg");
+      "https://avatars.dicebear.com/api/personas/$pubkey.svg");
 }

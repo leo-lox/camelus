@@ -22,7 +22,7 @@ void openBottomSheetShare(context, Tweet tweet) {
       builder: (ctx) => BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 2, sigmaY: 2),
             child: Padding(
-                padding: EdgeInsets.only(bottom: 20),
+                padding: const EdgeInsets.only(bottom: 20),
                 child: Container(
                   padding: const EdgeInsets.all(20),
                   child: Column(
@@ -72,7 +72,7 @@ void openBottomSheetShare(context, Tweet tweet) {
                                     "relays": tweet.relayHints.keys.toList(),
                                   });
                                   _copyToClipboard(
-                                      'https://www.nostr.guru/${bech32nevent}');
+                                      'https://www.nostr.guru/$bech32nevent');
                                 },
                                 icon: const Icon(
                                   Icons.link,

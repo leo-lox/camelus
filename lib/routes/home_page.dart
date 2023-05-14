@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:ui';
 
 import 'package:camelus/helpers/helpers.dart';
@@ -23,7 +22,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   int _selectedIndex = 0;
-  PageController _myPage = PageController(initialPage: 0);
+  final PageController _myPage = PageController(initialPage: 0);
 
   void _show(BuildContext ctx) {
     showModalBottomSheet(
@@ -112,8 +111,8 @@ class _HomePageState extends State<HomePage> {
           physics: const NeverScrollableScrollPhysics(),
           children: <Widget>[
             NostrPage(parentScaffoldKey: _scaffoldKey),
-            SearchPage(),
-            NotificationPage(),
+            const SearchPage(),
+            const NotificationPage(),
             const Center(
               child: Text('work in progress',
                   style: TextStyle(color: Colors.white)),

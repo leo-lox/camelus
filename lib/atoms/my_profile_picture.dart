@@ -18,7 +18,7 @@ Widget myProfilePicture(String pictureUrl, String pubkey) {
             imageUrl: pictureUrl,
             progressIndicatorBuilder: (context, url, downloadProgress) =>
                 CircularProgressIndicator(value: downloadProgress.progress),
-            errorWidget: (context, url, error) => Icon(Icons.error),
+            errorWidget: (context, url, error) => const Icon(Icons.error),
           ),
         ),
       ),
@@ -46,6 +46,6 @@ Widget myProfilePicture(String pictureUrl, String pubkey) {
       shape: BoxShape.circle,
     ),
     child: SvgPicture.network(
-        "https://avatars.dicebear.com/api/personas/${pubkey}.svg"),
+        "https://avatars.dicebear.com/api/personas/$pubkey.svg"),
   );
 }

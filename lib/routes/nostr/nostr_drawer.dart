@@ -1,8 +1,5 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:camelus/helpers/nprofile_helper.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/painting.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:camelus/atoms/my_profile_picture.dart';
@@ -57,7 +54,7 @@ class NostrDrawer extends StatelessWidget {
                   ),
                   const SizedBox(height: 40),
                   QrImage(
-                    data: "nostr:${nprofile}",
+                    data: "nostr:$nprofile",
                     version: QrVersions.auto,
                     size: 300.0,
                     backgroundColor: Colors.white,
@@ -68,7 +65,7 @@ class NostrDrawer extends StatelessWidget {
                   GestureDetector(
                     onTap: () => _copyToClipboard(context, nprofile),
                     child: Text(
-                      "nostr:${nprofile}",
+                      "nostr:$nprofile",
                       style: const TextStyle(color: Palette.lightGray),
                     ),
                   ),

@@ -16,10 +16,10 @@ class _SearchPageState extends State<SearchPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return const Scaffold(
       backgroundColor: Palette.background,
       body: Center(
-        child: const Text('work in progress',
+        child: Text('work in progress',
             style: TextStyle(color: Colors.white)),
       ),
     );
