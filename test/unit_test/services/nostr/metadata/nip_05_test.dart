@@ -1,13 +1,16 @@
-
 import 'package:camelus/services/nostr/metadata/nip_05.dart';
-import 'package:test/test.dart';
+import 'package:flutter_test/flutter_test.dart';
+//import 'package:test/test.dart';
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
   group('Nip05', () {
     late Nip05 nip05;
 
     setUp(() {
       nip05 = Nip05();
+
+      return Future.delayed(const Duration(milliseconds: 100));
     });
 
     test('should throw exception if nip05 or pubkey is empty', () {

@@ -1,7 +1,11 @@
 import 'package:camelus/services/nostr/relays/relays_picker.dart';
+import 'package:flutter/material.dart';
+//import 'package:flutter_test/flutter_test.dart';
 import 'package:test/test.dart';
 
 void main() {
+  //TestWidgetsFlutterBinding.ensureInitialized();
+  WidgetsFlutterBinding.ensureInitialized();
   group('picker EmptyTracker', () {
     var picker = RelaysPicker();
     picker.relayTracker.tracker = {};

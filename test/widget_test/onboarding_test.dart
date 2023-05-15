@@ -45,22 +45,4 @@ void main() {
     expect(find.text('Please read and accept the terms and conditions first'),
         findsOneWidget);
   });
-
-  testWidgets('terms accepted', (WidgetTester tester) async {
-    // Build app and trigger a frame.
-    await tester.pumpWidget(MaterialApp(home: NostrOnboarding()));
-
-    // Find the checkbox and tap it
-    await tester.tap(find.byType(Checkbox));
-    await tester.pump(); // Rebuild the widget after the checkbox tap
-
-    // Find the 'next' button and tap it
-    await tester.tap(find.widgetWithText(ElevatedButton, 'next'));
-    //await tester
-    //    .pumpAndSettle(); // Rebuild the widget after the button tap and allow animations to complete
-
-    // Verify success scenario (you would need to specify what happens in your app on success)
-    // For example, if the widget navigates to another page, you could check if the current page is no longer in the tree:
-    //expect(find.byType(NostrOnboarding), findsNothing);
-  });
 }

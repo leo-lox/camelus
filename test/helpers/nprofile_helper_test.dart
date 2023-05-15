@@ -1,8 +1,10 @@
-
 import 'package:camelus/helpers/nprofile_helper.dart';
-import 'package:test/test.dart';
+import 'package:flutter_test/flutter_test.dart';
+//import 'package:test/test.dart';
 
 void main() {
+  //WidgetsFlutterBinding.ensureInitialized();
+  TestWidgetsFlutterBinding.ensureInitialized();
   group('main', () {
     test('decode', () {
       var nprofileHelper = NprofileHelper();

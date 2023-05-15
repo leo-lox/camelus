@@ -1,5 +1,6 @@
 import 'dart:convert';
-import 'package:cross_local_storage/cross_local_storage.dart';
+//import 'package:cross_local_storage/cross_local_storage.dart';
+import 'package:cross_local_storage/cross_json_storage.dart';
 import 'package:json_cache/json_cache.dart';
 import 'package:http/http.dart' as http;
 
@@ -14,8 +15,8 @@ class Nip05 {
   }
 
   void _initJsonCache() async {
-    LocalStorageInterface prefs = await LocalStorage.getInstance();
-    jsonCache = JsonCacheCrossLocalStorage(prefs);
+    LocalStorageInterface? prefs = await LocalStorage.getInstance();
+    jsonCache = JsonCacheCrossLocalStorage(prefs!);
     _restoreFromCache();
   }
 
