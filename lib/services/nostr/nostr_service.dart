@@ -124,8 +124,13 @@ class NostrService {
     userFeedObj.restoreFromCache();
     globalFeedObj.restoreFromCache();
 
-    relays
-        .start([...userContactsObj.following.keys.toList(), myKeys.publicKey]);
+    try {
+      //todo: fix this for onboarding
+      relays.start(
+          [...userContactsObj.following.keys.toList(), myKeys.publicKey]);
+    } catch (e) {
+      log(" $e");
+    }
   }
 
   Future<void> _loadKeyPair() async {

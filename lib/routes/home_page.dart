@@ -62,12 +62,14 @@ class _HomePageState extends State<HomePage> {
         // if visitor id is not found, create one
         storage.write(key: "visitorId", value: myVisitorId);
       }
-
-      await MatomoTracker.instance.initialize(
-        siteId: 3,
-        url: 'https://customer.beonde.de/matomo/matomo.php',
-        visitorId: myVisitorId,
-      );
+      try {
+        //todo: fix onboarding
+        await MatomoTracker.instance.initialize(
+          siteId: 3,
+          url: 'https://customer.beonde.de/matomo/matomo.php',
+          visitorId: myVisitorId,
+        );
+      } catch (e) {}
     });
   }
 
