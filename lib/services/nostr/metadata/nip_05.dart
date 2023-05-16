@@ -1,12 +1,13 @@
 import 'dart:convert';
-//import 'package:cross_local_storage/cross_local_storage.dart';
-import 'package:cross_local_storage/cross_json_storage.dart';
+import 'package:cross_local_storage/cross_local_storage.dart';
+//import 'package:cross_local_storage/cross_json_storage.dart';
 import 'package:json_cache/json_cache.dart';
 import 'package:http/http.dart' as http;
 
 class Nip05 {
   Map<String, dynamic> _history = {};
   final List<String> _inFlight = [];
+  http.Client client = http.Client();
 
   late JsonCache jsonCache;
 
@@ -16,7 +17,7 @@ class Nip05 {
 
   void _initJsonCache() async {
     LocalStorageInterface? prefs = await LocalStorage.getInstance();
-    jsonCache = JsonCacheCrossLocalStorage(prefs!);
+    jsonCache = JsonCacheCrossLocalStorage(prefs);
     _restoreFromCache();
   }
 
@@ -79,11 +80,11 @@ class Nip05 {
     String url = nip05.split("@")[1];
 
     // make get request
-    http.Response response = await http
+    http.Response response = await client
         .get(Uri.parse("https://$url/.well-known/nostr.json?name=$username"));
 
     if (response.statusCode != 200) {
-      return {};
+      return throw Exception("error fetching nostr.json");
     }
 
     var json = jsonDecode(response.body);
