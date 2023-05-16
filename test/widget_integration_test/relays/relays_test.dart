@@ -1,3 +1,4 @@
+import 'package:camelus/services/nostr/relays/relays.dart';
 import 'package:camelus/services/nostr/relays/relays_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:mockito/mockito.dart';
@@ -12,52 +13,15 @@ void main() {
 
   //TestWidgetsFlutterBinding.ensureInitialized();
   WidgetsFlutterBinding.ensureInitialized();
-  group('picker EmptyTracker', () {
-    var picker = RelaysPicker();
-    picker.relayTracker.tracker = {};
 
+  group('relays', () {
     final mockSharedPreferences = MockSharedPreferences();
     when(mockSharedPreferences.getString('')).thenReturn('mock');
 
-    test('emptyTracker:NoPeopleLeft', () {
-      picker.relayTracker.tracker = {};
-      const pubkeys = ['pubkey1', 'pubkey2', 'pubkey3'];
-      picker.init(pubkeys: [], coverageCount: 2);
-
-      expect(
-        () => picker.pick(pubkeys),
-        throwsA(predicate((e) =>
-            e is Exception && e.toString() == 'Exception: NoPeopleLeft')),
-      );
-    });
-
-    test('emptyTracker:noRelays', () {
-      picker.relayTracker.tracker = {};
-      const pubkeys = ['pubkey1', 'pubkey2', 'pubkey3'];
-
-      picker.init(pubkeys: pubkeys, coverageCount: 2);
-
-      String result;
-      try {
-        var relayAssignments = picker.pick(pubkeys);
-
-        result = relayAssignments.toString();
-      } catch (e) {
-        result = e.toString();
-      }
-
-      expect(result, "Exception: NoRelays");
-    });
-  });
-
-  group("picker Populated", () {
-    final mockSharedPreferences = MockSharedPreferences();
-    when(mockSharedPreferences.getString('')).thenReturn('mock');
     var picker = RelaysPicker();
 
     var now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
 
-    /// pubkey,relayUrl :{, lastSuggestedKind3, lastSuggestedNip05, lastSuggestedBytag}
     var mockRelays = {
       'pubkey1': {
         'relay1': {
@@ -96,5 +60,26 @@ void main() {
         },
       }
     };
+
+    test('get optimal relays', () async {
+      picker.relayTracker.tracker = mockRelays;
+      const pubkeys = ['pubkey1', 'pubkey2', 'pubkey3'];
+      picker.init(pubkeys: pubkeys, coverageCount: 2);
+
+      var relays = Relays();
+      var result = await relays.getOptimalRelays(pubkeys);
+
+      var checkList = [
+        RelayAssignment(
+            relayUrl: "relay2", pubkeys: ["pubkey1", "pubkey2", "pubkey3"]),
+        RelayAssignment(
+            relayUrl: "relay1", pubkeys: ["pubkey1", "pubkey2", "pubkey3"]),
+      ];
+
+      // check if all values in checkList are in result
+      for (var i = 0; i < checkList.length; i++) {
+        expect(result[i].relayUrl, checkList[i].relayUrl);
+      }
+    });
   });
 }
