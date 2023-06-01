@@ -22,9 +22,12 @@ class Tag {
 
   final String? recommended_relay;
 
+  final String? marker;
+
   Tag(
       {required this.id,
       required this.note_id,
       required this.pubkey,
-      this.recommended_relay});
+      this.recommended_relay,
+      this.marker});
 }
