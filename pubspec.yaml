@@ -58,8 +58,11 @@ dependencies:
   qr_flutter: ^4.0.0
   matomo_tracker: ^2.0.0
   shared_preferences: ^2.1.1
+  floor: ^1.4.2
 
 dev_dependencies:
+  floor_generator: ^1.4.2
+  build_runner: ^2.1.2
   flutter_test:
     sdk: flutter
   integration_test:
