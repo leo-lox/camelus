@@ -60,6 +60,7 @@ dependencies:
   shared_preferences: ^2.1.1
   floor: ^1.4.2
   sqflite: ^2.2.8+4
+  riverpod: ^2.3.6
 
 dev_dependencies:
   floor_generator: ^1.4.2

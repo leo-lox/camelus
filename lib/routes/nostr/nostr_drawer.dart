@@ -29,8 +29,8 @@ class NostrDrawer extends StatelessWidget {
   }
 
   void openQrShareDialog(BuildContext context) async {
-    String nprofile =
-        await NprofileHelper().getNprofile(_nostrService.myKeys.publicKey);
+    String nprofile = await NprofileHelper().getNprofile(
+        _nostrService.myKeys.publicKey, []); //todo: get recommended relays
 
     showDialog(
         context: context,

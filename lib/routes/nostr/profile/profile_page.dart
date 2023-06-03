@@ -41,7 +41,8 @@ class ProfilePage extends StatefulWidget {
   }
 
   repopulateNprofile() async {
-    nProfile = await NprofileHelper().getNprofile(pubkey);
+    nProfile = await NprofileHelper()
+        .getNprofile(pubkey, []); //todo: get recommended relays
     nProfileHr = NprofileHelper().bech32toHr(nProfile);
     log("repopulated nprofile: $nProfileHr");
   }
