@@ -87,11 +87,11 @@ class _$AppDatabase extends AppDatabase {
       },
       onCreate: (database, version) async {
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `note` (`id` TEXT NOT NULL, `pubkey` TEXT NOT NULL, `created_at` INTEGER NOT NULL, `index_kind` INTEGER NOT NULL, `content` TEXT NOT NULL, `sig` TEXT NOT NULL, PRIMARY KEY (`id`))');
+            'CREATE TABLE IF NOT EXISTS `Note` (`id` TEXT NOT NULL, `pubkey` TEXT NOT NULL, `created_at` INTEGER NOT NULL, `index_kind` INTEGER NOT NULL, `content` TEXT NOT NULL, `sig` TEXT NOT NULL, PRIMARY KEY (`id`))');
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `tag` (`note_id` TEXT NOT NULL, `type` TEXT NOT NULL, `value` TEXT NOT NULL, `recommended_relay` TEXT, `marker` TEXT, FOREIGN KEY (`note_id`) REFERENCES `note` (`id`) ON UPDATE NO ACTION ON DELETE NO ACTION, PRIMARY KEY (`note_id`, `value`))');
+            'CREATE TABLE IF NOT EXISTS `Tag` (`note_id` TEXT NOT NULL, `type` TEXT NOT NULL, `value` TEXT NOT NULL, `recommended_relay` TEXT, `marker` TEXT, FOREIGN KEY (`note_id`) REFERENCES `Note` (`id`) ON UPDATE NO ACTION ON DELETE NO ACTION, PRIMARY KEY (`note_id`, `value`))');
         await database.execute(
-            'CREATE INDEX `index_note_index_kind` ON `note` (`index_kind`)');
+            'CREATE INDEX `index_Note_index_kind` ON `Note` (`index_kind`)');
 
         await callback?.onCreate?.call(database, version);
       },
@@ -117,7 +117,7 @@ class _$NoteDao extends NoteDao {
   )   : _queryAdapter = QueryAdapter(database, changeListener),
         _dbNoteInsertionAdapter = InsertionAdapter(
             database,
-            'note',
+            'Note',
             (DbNote item) => <String, Object?>{
                   'id': item.id,
                   'pubkey': item.pubkey,
@@ -129,7 +129,7 @@ class _$NoteDao extends NoteDao {
             changeListener),
         _dbTagInsertionAdapter = InsertionAdapter(
             database,
-            'tag',
+            'Tag',
             (DbTag item) => <String, Object?>{
                   'note_id': item.note_id,
                   'type': item.type,
@@ -166,7 +166,7 @@ class _$NoteDao extends NoteDao {
   @override
   Future<List<DbNote>> findAllNotes() async {
     return _queryAdapter.queryList(
-        'SELECT * FROM Note JOIN Tag ON Note.id = Tag.note_id',
+        'SELECT * FROM Note LEFT JOIN Tag ON Note.id = Tag.note_id',
         mapper: (Map<String, Object?> row) => DbNote(
             row['id'] as String,
             row['pubkey'] as String,
@@ -178,9 +178,9 @@ class _$NoteDao extends NoteDao {
 
   @override
   Stream<List<String>> findAllNotesContentStream() {
-    return _queryAdapter.queryListStream('SELECT content FROM Note',
+    return _queryAdapter.queryListStream('SELECT content FROM note',
         mapper: (Map<String, Object?> row) => row.values.first as String,
-        queryableName: 'Note',
+        queryableName: 'note',
         isView: false);
   }
 
@@ -260,7 +260,7 @@ class _$TagDao extends TagDao {
   )   : _queryAdapter = QueryAdapter(database, changeListener),
         _dbTagInsertionAdapter = InsertionAdapter(
             database,
-            'tag',
+            'Tag',
             (DbTag item) => <String, Object?>{
                   'note_id': item.note_id,
                   'type': item.type,

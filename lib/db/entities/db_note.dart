@@ -1,6 +1,6 @@
 import 'package:floor/floor.dart';
 
-@Entity(tableName: 'note', indices: [
+@Entity(tableName: 'Note', indices: [
   Index(value: ['index_kind'])
 ])
 class DbNote {

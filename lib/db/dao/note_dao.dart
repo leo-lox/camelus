@@ -8,10 +8,10 @@ abstract class NoteDao {
   @Query('SELECT * FROM Note')
   Stream<List<DbNote>> findAllNotesAsStream();
 
-  @Query('SELECT * FROM Note JOIN Tag ON Note.id = Tag.note_id')
+  @Query('SELECT * FROM Note LEFT JOIN Tag ON Note.id = Tag.note_id')
   Future<List<DbNote>> findAllNotes();
 
-  @Query('SELECT content FROM Note')
+  @Query('SELECT content FROM note')
   Stream<List<String>> findAllNotesContentStream();
 
   @Query('SELECT * FROM Note WHERE id = :id')

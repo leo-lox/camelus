@@ -2,7 +2,7 @@ import 'package:camelus/db/entities/db_note.dart';
 import 'package:floor/floor.dart';
 
 @Entity(
-  tableName: 'tag',
+  tableName: 'Tag',
   primaryKeys: ['note_id', 'value'],
   foreignKeys: [
     ForeignKey(
