@@ -3,12 +3,13 @@ import 'package:floor/floor.dart';
 @Entity(tableName: 'note', indices: [
   Index(value: ['index_kind'])
 ])
-class Note {
+class DbNote {
   @primaryKey
   final String id;
 
   final String pubkey;
 
+  // ignore: non_constant_identifier_names
   final int created_at;
 
   @ColumnInfo(name: 'index_kind')
@@ -21,6 +22,6 @@ class Note {
 
   final String sig;
 
-  Note(
+  DbNote(
       this.id, this.pubkey, this.created_at, this.kind, this.content, this.sig);
 }

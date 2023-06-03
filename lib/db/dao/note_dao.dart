@@ -1,26 +1,27 @@
-import 'package:camelus/db/entities/tag.dart';
+import 'package:camelus/db/entities/db_tag.dart';
+import 'package:camelus/models/nostr_note.dart';
 import 'package:floor/floor.dart';
-import '../entities/note.dart';
+import '../entities/db_note.dart';
 
 @dao
 abstract class NoteDao {
   @Query('SELECT * FROM Note')
-  Stream<List<Note>> findAllNotesAsStream();
+  Stream<List<DbNote>> findAllNotesAsStream();
 
   @Query('SELECT * FROM Note JOIN Tag ON Note.id = Tag.note_id')
-  Future<List<Note>> findAllNotes();
+  Future<List<DbNote>> findAllNotes();
 
   @Query('SELECT content FROM Note')
   Stream<List<String>> findAllNotesContentStream();
 
   @Query('SELECT * FROM Note WHERE id = :id')
-  Stream<Note?> findNoteByIdStream(int id);
+  Stream<DbNote?> findNoteByIdStream(int id);
 
   @insert
-  Future<void> insertNote(Note note);
+  Future<void> insertNote(DbNote note);
 
   @insert
-  Future<List<int>> insertNotes(List<Note> notes);
+  Future<List<int>> insertNotes(List<DbNote> notes);
 
   @Query('DELETE FROM Note')
   Future<void> deleteAllNotes();
@@ -30,4 +31,13 @@ abstract class NoteDao {
 
   @Query('DELETE FROM Note WHERE id IN (:ids)')
   Future<void> deleteNotesByIds(List<int> ids);
+
+  @transaction
+  Future<void> insertNostrNote(NostrNote nostrNote) async {
+    await insertNote(nostrNote.toDbNote());
+    await insertTags(nostrNote.toDbTag());
+  }
+
+  @insert
+  Future<List<int>> insertTags(List<DbTag> tags);
 }

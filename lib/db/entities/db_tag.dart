@@ -1,33 +1,33 @@
-import 'package:camelus/db/entities/note.dart';
+import 'package:camelus/db/entities/db_note.dart';
 import 'package:floor/floor.dart';
 
 @Entity(
   tableName: 'tag',
+  primaryKeys: ['note_id', 'value'],
   foreignKeys: [
     ForeignKey(
       childColumns: ['note_id'],
       parentColumns: ['id'],
-      entity: Note,
+      entity: DbNote,
     )
   ],
 )
-class Tag {
-  @primaryKey
-  final int id;
-
+class DbTag {
   // forin key
   final String note_id;
 
-  final String pubkey;
+  final String type;
+
+  final String value;
 
   final String? recommended_relay;
 
   final String? marker;
 
-  Tag(
-      {required this.id,
-      required this.note_id,
-      required this.pubkey,
+  DbTag(
+      {required this.note_id,
+      required this.type,
+      required this.value,
       this.recommended_relay,
       this.marker});
 }
