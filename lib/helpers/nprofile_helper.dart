@@ -1,42 +1,15 @@
 import 'dart:convert';
-import 'dart:developer';
 import 'dart:typed_data';
 import 'package:camelus/helpers/helpers.dart';
 import 'package:camelus/helpers/tlv_helpers.dart';
-import 'package:camelus/services/nostr/relays/relays_injector.dart';
-import 'package:camelus/services/nostr/relays/relays_ranking.dart';
 import 'package:hex/hex.dart';
 
 class NprofileHelper {
-  late final RelaysRanking _relayRanking;
-
-  NprofileHelper() {
-    _relayRanking = RelaysInjector().relaysRanking;
-  }
+  NprofileHelper() {}
 
   /// finds relays and [returns] a bech32 encoded nprofile with relay hints
-  Future<String> getNprofile(String pubkey) async {
-    final List<String> userRelays = await _getUserBestRelays(pubkey);
+  Future<String> getNprofile(String pubkey, List<String> userRelays) async {
     return mapToBech32({"pubkey": pubkey, "relays": userRelays});
-  }
-
-  /// tries to find the best relays for a user and [returns] a list of relay urls
-  Future<List<String>> _getUserBestRelays(pubkey, {numberOfRelays = 5}) async {
-    List userRelaysTmp =
-        await _relayRanking.getBestRelays(pubkey, Direction.read);
-
-    // turn list of map {relay: url, score: s} into list of url strings with only the 5 best scores
-    List<String> userRelays = [];
-    for (var i = 0; i < userRelaysTmp.length; i++) {
-      if (i >= numberOfRelays) break;
-      try {
-        userRelays.add(userRelaysTmp[i]["relay"]);
-      } catch (e) {
-        log(e.toString());
-      }
-    }
-
-    return userRelays;
   }
 
   /// [returns] a short version nprofile1:sdf54e:ewfd54
