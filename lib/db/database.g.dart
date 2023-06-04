@@ -87,11 +87,11 @@ class _$AppDatabase extends AppDatabase {
       },
       onCreate: (database, version) async {
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `Note` (`id` TEXT NOT NULL, `pubkey` TEXT NOT NULL, `created_at` INTEGER NOT NULL, `index_kind` INTEGER NOT NULL, `content` TEXT NOT NULL, `sig` TEXT NOT NULL, PRIMARY KEY (`id`))');
+            'CREATE TABLE IF NOT EXISTS `Note` (`id` TEXT NOT NULL, `pubkey` TEXT NOT NULL, `created_at` INTEGER NOT NULL, `kind` INTEGER NOT NULL, `content` TEXT NOT NULL, `sig` TEXT NOT NULL, PRIMARY KEY (`id`))');
         await database.execute(
             'CREATE TABLE IF NOT EXISTS `Tag` (`note_id` TEXT NOT NULL, `type` TEXT NOT NULL, `value` TEXT NOT NULL, `recommended_relay` TEXT, `marker` TEXT, FOREIGN KEY (`note_id`) REFERENCES `Note` (`id`) ON UPDATE NO ACTION ON DELETE NO ACTION, PRIMARY KEY (`note_id`, `value`))');
-        await database.execute(
-            'CREATE INDEX `index_Note_index_kind` ON `Note` (`index_kind`)');
+        await database
+            .execute('CREATE INDEX `index_Note_kind` ON `Note` (`kind`)');
         await database.execute(
             'CREATE VIEW IF NOT EXISTS `noteView` AS SELECT Note.*, GROUP_CONCAT(Tag.type) as tag_types, GROUP_CONCAT(Tag.value) as tag_values, GROUP_CONCAT(Tag.recommended_relay) as tag_recommended_relays, GROUP_CONCAT(Tag.marker) as tag_markers FROM Note LEFT JOIN Tag ON Note.id = Tag.note_id GROUP BY Note.id;');
 
@@ -124,7 +124,7 @@ class _$NoteDao extends NoteDao {
                   'id': item.id,
                   'pubkey': item.pubkey,
                   'created_at': item.created_at,
-                  'index_kind': item.kind,
+                  'kind': item.kind,
                   'content': item.content,
                   'sig': item.sig
                 },
@@ -158,7 +158,7 @@ class _$NoteDao extends NoteDao {
             row['id'] as String,
             row['pubkey'] as String,
             row['created_at'] as int,
-            row['index_kind'] as int,
+            row['kind'] as int,
             row['content'] as String,
             row['sig'] as String),
         queryableName: 'Note',
@@ -172,7 +172,7 @@ class _$NoteDao extends NoteDao {
             id: row['id'] as String,
             pubkey: row['pubkey'] as String,
             created_at: row['created_at'] as int,
-            kind: row['index_kind'] as int,
+            kind: row['kind'] as int,
             content: row['content'] as String,
             sig: row['sig'] as String,
             tag_types: row['tag_types'] as String?,
@@ -196,7 +196,7 @@ class _$NoteDao extends NoteDao {
             row['id'] as String,
             row['pubkey'] as String,
             row['created_at'] as int,
-            row['index_kind'] as int,
+            row['kind'] as int,
             row['content'] as String,
             row['sig'] as String),
         arguments: [id],

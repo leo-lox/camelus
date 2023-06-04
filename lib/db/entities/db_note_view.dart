@@ -9,7 +9,6 @@ class DbNoteView {
   String id;
   String pubkey;
   int created_at;
-  @ColumnInfo(name: 'index_kind')
   int kind;
   String content;
   String sig;

@@ -2,7 +2,7 @@ import 'package:camelus/db/entities/db_tag.dart';
 import 'package:floor/floor.dart';
 
 @Entity(tableName: 'Note', indices: [
-  Index(value: ['index_kind'])
+  Index(value: ['kind'])
 ])
 class DbNote {
   @primaryKey
@@ -13,7 +13,7 @@ class DbNote {
   // ignore: non_constant_identifier_names
   final int created_at;
 
-  @ColumnInfo(name: 'index_kind')
+  @ColumnInfo(name: 'kind')
   final int kind;
 
   //final List<String> tags;
