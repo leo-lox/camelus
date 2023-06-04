@@ -12,6 +12,9 @@ abstract class NoteDao {
   @Query('SELECT * FROM noteView')
   Future<List<DbNoteView>> findAllNotes();
 
+  @Query("SELECT * FROM noteView WHERE noteView.pubkey IN (:pubkeys)")
+  Future<List<DbNoteView>> findPubkeyNotes(List<String> pubkeys);
+
   @Query('SELECT content FROM note')
   Stream<List<String>> findAllNotesContentStream();
 

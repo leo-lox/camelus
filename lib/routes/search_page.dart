@@ -37,7 +37,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
 
     try {
       await db.noteDao.insertNostrNote(
-        NostrNote("myId2", "myPubkey", 0, 1, "mytest2", "invalidSig", [
+        NostrNote("myId10", "myPubkey10", 0, 1, "mytest2", "invalidSig", [
           NostrTag(
               type: "p",
               value: "myTag1Pubkey",
@@ -50,7 +50,8 @@ class _SearchPageState extends ConsumerState<SearchPage> {
     }
 
     var b = await db.noteDao.findAllNotes();
-    log("findAllNotes: ${b}");
+    var c = await db.noteDao.findPubkeyNotes(['myPubkey', 'myPubkey10']);
+    log("findPubkeyNotes: ${c}");
   }
 
   @override

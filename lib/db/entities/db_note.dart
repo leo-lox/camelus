@@ -1,4 +1,3 @@
-import 'package:camelus/db/entities/db_tag.dart';
 import 'package:floor/floor.dart';
 
 @Entity(tableName: 'Note', indices: [

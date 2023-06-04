@@ -182,6 +182,30 @@ class _$NoteDao extends NoteDao {
   }
 
   @override
+  Future<List<DbNoteView>> findPubkeyNotes(List<String> pubkeys) async {
+    const offset = 1;
+    final _sqliteVariablesForPubkeys =
+        Iterable<String>.generate(pubkeys.length, (i) => '?${i + offset}')
+            .join(',');
+    return _queryAdapter.queryList(
+        'SELECT * FROM noteView WHERE noteView.pubkey IN (' +
+            _sqliteVariablesForPubkeys +
+            ')',
+        mapper: (Map<String, Object?> row) => DbNoteView(
+            id: row['id'] as String,
+            pubkey: row['pubkey'] as String,
+            created_at: row['created_at'] as int,
+            kind: row['kind'] as int,
+            content: row['content'] as String,
+            sig: row['sig'] as String,
+            tag_types: row['tag_types'] as String?,
+            tag_values: row['tag_values'] as String?,
+            tag_recommended_relays: row['tag_recommended_relays'] as String?,
+            tag_markers: row['tag_markers'] as String?),
+        arguments: [...pubkeys]);
+  }
+
+  @override
   Stream<List<String>> findAllNotesContentStream() {
     return _queryAdapter.queryListStream('SELECT content FROM note',
         mapper: (Map<String, Object?> row) => row.values.first as String,
