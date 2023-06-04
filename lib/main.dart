@@ -1,4 +1,3 @@
-import 'package:camelus/db/database.dart';
 import 'package:camelus/routes/nostr/blockedUsers/blocked_users.dart';
 import 'package:camelus/routes/nostr/settings/settings_page.dart';
 import 'package:flutter/material.dart';

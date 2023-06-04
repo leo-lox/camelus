@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:camelus/config/palette.dart';
 import 'package:camelus/models/nostr_note.dart';
+import 'package:camelus/models/nostr_tag.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:camelus/providers/database_provider.dart';
@@ -34,8 +35,22 @@ class _SearchPageState extends ConsumerState<SearchPage> {
       log("note likely already exists");
     }
 
+    try {
+      await db.noteDao.insertNostrNote(
+        NostrNote("myId2", "myPubkey", 0, 1, "mytest2", "invalidSig", [
+          NostrTag(
+              type: "p",
+              value: "myTag1Pubkey",
+              recommended_relay: "myTag1Relay"),
+          NostrTag(type: "e", value: "myTag2EvnetId"),
+        ]),
+      );
+    } catch (e) {
+      log("note2 likely already exists");
+    }
+
     var b = await db.noteDao.findAllNotes();
-    log(b.map((e) => e.id).toString());
+    log("findAllNotes: ${b}");
   }
 
   @override

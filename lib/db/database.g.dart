@@ -92,6 +92,8 @@ class _$AppDatabase extends AppDatabase {
             'CREATE TABLE IF NOT EXISTS `Tag` (`note_id` TEXT NOT NULL, `type` TEXT NOT NULL, `value` TEXT NOT NULL, `recommended_relay` TEXT, `marker` TEXT, FOREIGN KEY (`note_id`) REFERENCES `Note` (`id`) ON UPDATE NO ACTION ON DELETE NO ACTION, PRIMARY KEY (`note_id`, `value`))');
         await database.execute(
             'CREATE INDEX `index_Note_index_kind` ON `Note` (`index_kind`)');
+        await database.execute(
+            'CREATE VIEW IF NOT EXISTS `noteView` AS SELECT Note.*, GROUP_CONCAT(Tag.type) as tag_types, GROUP_CONCAT(Tag.value) as tag_values, GROUP_CONCAT(Tag.recommended_relay) as tag_recommended_relays, GROUP_CONCAT(Tag.marker) as tag_markers FROM Note LEFT JOIN Tag ON Note.id = Tag.note_id GROUP BY Note.id;');
 
         await callback?.onCreate?.call(database, version);
       },
@@ -164,16 +166,19 @@ class _$NoteDao extends NoteDao {
   }
 
   @override
-  Future<List<DbNote>> findAllNotes() async {
-    return _queryAdapter.queryList(
-        'SELECT * FROM Note LEFT JOIN Tag ON Note.id = Tag.note_id',
-        mapper: (Map<String, Object?> row) => DbNote(
-            row['id'] as String,
-            row['pubkey'] as String,
-            row['created_at'] as int,
-            row['index_kind'] as int,
-            row['content'] as String,
-            row['sig'] as String));
+  Future<List<DbNoteView>> findAllNotes() async {
+    return _queryAdapter.queryList('SELECT * FROM noteView',
+        mapper: (Map<String, Object?> row) => DbNoteView(
+            id: row['id'] as String,
+            pubkey: row['pubkey'] as String,
+            created_at: row['created_at'] as int,
+            kind: row['index_kind'] as int,
+            content: row['content'] as String,
+            sig: row['sig'] as String,
+            tag_types: row['tag_types'] as String?,
+            tag_values: row['tag_values'] as String?,
+            tag_recommended_relays: row['tag_recommended_relays'] as String?,
+            tag_markers: row['tag_markers'] as String?));
   }
 
   @override

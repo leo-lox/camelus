@@ -1,3 +1,4 @@
+import 'package:camelus/db/entities/db_tag.dart';
 import 'package:floor/floor.dart';
 
 @Entity(tableName: 'Note', indices: [
@@ -24,4 +25,9 @@ class DbNote {
 
   DbNote(
       this.id, this.pubkey, this.created_at, this.kind, this.content, this.sig);
+
+  @override
+  String toString() {
+    return 'DbNote{id: $id, pubkey: $pubkey, created_at: $created_at, kind: $kind, content: $content, sig: $sig}';
+  }
 }

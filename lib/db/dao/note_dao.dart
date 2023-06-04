@@ -1,3 +1,4 @@
+import 'package:camelus/db/entities/db_note_view.dart';
 import 'package:camelus/db/entities/db_tag.dart';
 import 'package:camelus/models/nostr_note.dart';
 import 'package:floor/floor.dart';
@@ -8,8 +9,8 @@ abstract class NoteDao {
   @Query('SELECT * FROM Note')
   Stream<List<DbNote>> findAllNotesAsStream();
 
-  @Query('SELECT * FROM Note LEFT JOIN Tag ON Note.id = Tag.note_id')
-  Future<List<DbNote>> findAllNotes();
+  @Query('SELECT * FROM noteView')
+  Future<List<DbNoteView>> findAllNotes();
 
   @Query('SELECT content FROM note')
   Stream<List<String>> findAllNotesContentStream();

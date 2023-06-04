@@ -14,6 +14,7 @@ import 'package:floor/floor.dart';
 )
 class DbTag {
   // forin key
+  @ColumnInfo(name: 'note_id')
   final String note_id;
 
   final String type;
