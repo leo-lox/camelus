@@ -42,6 +42,13 @@ abstract class NoteDao {
     await insertTags(nostrNote.toDbTag());
   }
 
+  @transaction
+  Future<void> insertNostrNotes(List<NostrNote> nostrNotes) async {
+    await insertNotes(nostrNotes.map((e) => e.toDbNote()).toList());
+    await insertTags(
+        nostrNotes.map((e) => e.toDbTag()).expand((x) => x).toList());
+  }
+
   @insert
   Future<List<int>> insertTags(List<DbTag> tags);
 }

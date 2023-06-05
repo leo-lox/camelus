@@ -47,13 +47,16 @@ class NostrNote {
 
   // ignore: non_constant_identifier_names
   List<DbTag> toDbTag() {
-    return tags
-        .map((tag) => DbTag(
-            note_id: id,
-            type: tag.type,
-            value: tag.value,
-            recommended_relay: tag.recommended_relay,
-            marker: tag.marker))
-        .toList();
+    List<DbTag> tags = [];
+    for (int i = 0; i < this.tags.length; i++) {
+      tags.add(DbTag(
+          note_id: id,
+          index: i,
+          type: this.tags[i].type,
+          value: this.tags[i].value,
+          recommended_relay: this.tags[i].recommended_relay,
+          marker: this.tags[i].marker));
+    }
+    return tags;
   }
 }

@@ -17,6 +17,8 @@ class DbTag {
   @ColumnInfo(name: 'note_id')
   final String note_id;
 
+  final int index;
+
   final String type;
 
   final String value;
@@ -27,6 +29,7 @@ class DbTag {
 
   DbTag(
       {required this.note_id,
+      required this.index,
       required this.type,
       required this.value,
       this.recommended_relay,
