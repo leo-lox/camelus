@@ -4,23 +4,22 @@ import 'dart:developer';
 import 'package:camelus/components/tweet_card.dart';
 import 'package:camelus/config/palette.dart';
 import 'package:camelus/models/tweet.dart';
+import 'package:camelus/providers/nostr_service_provider.dart';
 import 'package:camelus/scroll_controller/retainable_scroll_controller.dart';
 import 'package:camelus/services/nostr/nostr_injector.dart';
 import 'package:camelus/services/nostr/nostr_service.dart';
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-class GlobalFeedView extends StatefulWidget {
-  late NostrService _nostrService;
-  GlobalFeedView({Key? key}) : super(key: key) {
-    NostrServiceInjector injector = NostrServiceInjector();
-    _nostrService = injector.nostrService;
-  }
+class GlobalFeedView extends ConsumerStatefulWidget {
+  GlobalFeedView({Key? key}) : super(key: key);
 
   @override
-  State<GlobalFeedView> createState() => _GlobalFeedViewState();
+  ConsumerState<GlobalFeedView> createState() => _GlobalFeedViewState();
 }
 
-class _GlobalFeedViewState extends State<GlobalFeedView> {
+class _GlobalFeedViewState extends ConsumerState<GlobalFeedView> {
+  late NostrService _nostrService;
   var _myTweetsGlobal = <Tweet>[];
   var _newTweetsGlobal = <Tweet>[];
 
@@ -77,8 +76,7 @@ class _GlobalFeedViewState extends State<GlobalFeedView> {
 
     var now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
 
-    widget._nostrService
-        .requestGlobalFeed(requestId: globalFeedFreshId, limit: 10);
+    _nostrService.requestGlobalFeed(requestId: globalFeedFreshId, limit: 10);
 
     setState(() {
       isGlobalFeedSubscribed = true;
@@ -89,9 +87,9 @@ class _GlobalFeedViewState extends State<GlobalFeedView> {
     if (!isGlobalFeedSubscribed) return;
     log("unsubscribe from global feed");
 
-    widget._nostrService.closeSubscription("gfeed-$globalFeedFreshId");
+    _nostrService.closeSubscription("gfeed-$globalFeedFreshId");
 
-    widget._nostrService.closeSubscription("gfeed-$globalFeedTimelineFetchId");
+    _nostrService.closeSubscription("gfeed-$globalFeedTimelineFetchId");
 
     try {
       setState(() {
@@ -139,13 +137,18 @@ class _GlobalFeedViewState extends State<GlobalFeedView> {
     });
   }
 
+  void _initNostrService() {
+    _nostrService = ref.read(nostrServiceProvider);
+  }
+
   @override
   void initState() {
     super.initState();
+    _initNostrService();
     log("globalFeedView initState");
     // listen to nostr service
     globalFeedSubscription =
-        widget._nostrService.globalFeedObj.globalFeedStream.listen((event) {
+        _nostrService.globalFeedObj.globalFeedStream.listen((event) {
       _onGlobalTweetReceived(event);
     });
 

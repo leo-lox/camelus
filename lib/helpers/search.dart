@@ -2,12 +2,11 @@ import 'package:camelus/services/nostr/nostr_injector.dart';
 import 'package:camelus/services/nostr/nostr_service.dart';
 
 class Search {
-  late NostrService _nostrService;
+  final NostrService _nostrService;
 
-  Search() {
-    NostrServiceInjector injector = NostrServiceInjector();
-    _nostrService = injector.nostrService;
-  }
+  Search(
+    this._nostrService,
+  );
 
   /// search in nostr metadata for name and nip05
   List<Map<String, dynamic>> searchUsersMetadata(String query) {

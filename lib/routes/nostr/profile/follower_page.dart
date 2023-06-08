@@ -1,4 +1,4 @@
-
+import 'package:camelus/providers/nostr_service_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:camelus/config/palette.dart';
 import 'package:camelus/helpers/helpers.dart';
@@ -7,9 +7,9 @@ import 'package:camelus/services/nostr/nostr_injector.dart';
 import 'package:camelus/services/nostr/nostr_service.dart';
 
 import 'package:camelus/atoms/my_profile_picture.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-class FollowerPage extends StatefulWidget {
-  late NostrService _nostrService;
+class FollowerPage extends ConsumerStatefulWidget {
   String title;
   List<List<dynamic>> contacts;
 
@@ -17,24 +17,21 @@ class FollowerPage extends StatefulWidget {
     Key? key,
     required this.title,
     required this.contacts,
-  }) : super(key: key) {
-    NostrServiceInjector injector = NostrServiceInjector();
-    _nostrService = injector.nostrService;
-  }
+  }) : super(key: key) {}
 
   @override
-  State<FollowerPage> createState() => _FollowerPageState();
+  ConsumerState<FollowerPage> createState() => _FollowerPageState();
 }
 
-class _FollowerPageState extends State<FollowerPage> {
+class _FollowerPageState extends ConsumerState<FollowerPage> {
+  late NostrService _nostrService;
   List<String> _myFollowing = [];
   final List<String> _myNewFollowing = [];
   final List<String> _myNewUnfollowing = [];
 
   void getFollowed() {
     List<List> folloing =
-        widget._nostrService.following[widget._nostrService.myKeys.publicKey] ??
-            [];
+        _nostrService.following[_nostrService.myKeys.publicKey] ?? [];
     for (var i = 0; i < folloing.length; i++) {
       _myFollowing.add(folloing[i][1]);
     }
@@ -70,24 +67,27 @@ class _FollowerPageState extends State<FollowerPage> {
         tags.add(d);
       }
 
-      widget._nostrService.writeEvent("", 3, tags);
+      _nostrService.writeEvent("", 3, tags);
 
       // update following locally
-      widget._nostrService.following[widget._nostrService.myKeys.publicKey] =
-          [];
+      _nostrService.following[_nostrService.myKeys.publicKey] = [];
       for (var i = 0; i < _myFollowing.length; i++) {
         var d = ["p", _myFollowing[i]];
-        widget._nostrService.following[widget._nostrService.myKeys.publicKey]!
-            .add(d);
+        _nostrService.following[_nostrService.myKeys.publicKey]!.add(d);
       }
     }
     // get updated contacts
-    widget._nostrService.getUserContacts(widget._nostrService.myKeys.publicKey);
+    _nostrService.getUserContacts(_nostrService.myKeys.publicKey);
+  }
+
+  void _initNostrService() {
+    _nostrService = ref.read(nostrServiceProvider);
   }
 
   @override
   void initState() {
     super.initState();
+    _initNostrService();
     getFollowed();
   }
 
@@ -110,8 +110,14 @@ class _FollowerPageState extends State<FollowerPage> {
           SliverList(
             delegate: SliverChildBuilderDelegate(
               (context, index) {
-                return _profile(widget.contacts[index][1], widget, _myFollowing,
-                    _myNewFollowing, _myNewUnfollowing, _updateUi);
+                return _profile(
+                    widget.contacts[index][1],
+                    widget,
+                    _myFollowing,
+                    _myNewFollowing,
+                    _myNewUnfollowing,
+                    _updateUi,
+                    _nostrService);
               },
               childCount: widget.contacts.length,
             ),
@@ -123,10 +129,10 @@ class _FollowerPageState extends State<FollowerPage> {
 }
 
 Widget _profile(String pubkey, widget, List myFollowing, List myNewFollowing,
-    List myNewUnfollowing, Function updateUi) {
+    List myNewUnfollowing, Function updateUi, NostrService nostrService) {
   Future<String> checkNip05(String nip05, String pubkey) async {
     try {
-      var check = await widget._nostrService.checkNip05(nip05, pubkey);
+      var check = await nostrService.checkNip05(nip05, pubkey);
 
       if (check["valid"] == true) {
         return check["nip05"];
@@ -137,7 +143,7 @@ Widget _profile(String pubkey, widget, List myFollowing, List myNewFollowing,
   }
 
   return FutureBuilder<Map>(
-      future: widget._nostrService.getUserMetadata(pubkey),
+      future: nostrService.getUserMetadata(pubkey),
       builder: (BuildContext context, AsyncSnapshot<Map> snapshot) {
         String picture = "";
         String name = "";

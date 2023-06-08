@@ -1,34 +1,37 @@
 import 'dart:convert';
 
+import 'package:camelus/providers/nostr_service_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:camelus/config/palette.dart';
 import 'package:camelus/helpers/bip340.dart';
 import 'package:flutter/services.dart';
 import 'package:camelus/helpers/helpers.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:camelus/services/nostr/nostr_injector.dart';
 import 'package:camelus/services/nostr/nostr_service.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class NostrOnboarding extends StatefulWidget {
-  late NostrService _nostrService;
-  NostrOnboarding({Key? key}) : super(key: key) {
-    NostrServiceInjector injector = NostrServiceInjector();
-    _nostrService = injector.nostrService;
-  }
+class NostrOnboarding extends ConsumerStatefulWidget {
+  NostrOnboarding({Key? key}) : super(key: key);
 
   @override
-  State<NostrOnboarding> createState() => _NostrOnboardingState();
+  ConsumerState<NostrOnboarding> createState() => _NostrOnboardingState();
 }
 
-class _NostrOnboardingState extends State<NostrOnboarding> {
+class _NostrOnboardingState extends ConsumerState<NostrOnboarding> {
+  late NostrService _nostrService;
   var myKeys = Bip340().generatePrivateKey();
 
   bool _termsAndConditions = false;
 
+  void _initNostrService() {
+    _nostrService = ref.read(nostrServiceProvider);
+  }
+
   @override
   void initState() {
     super.initState();
+    _initNostrService();
   }
 
   @override
@@ -90,7 +93,7 @@ class _NostrOnboardingState extends State<NostrOnboarding> {
     const storage = FlutterSecureStorage();
     storage.write(key: "nostrKeys", value: json.encode(myKeys.toJson()));
 
-    widget._nostrService.finishedOnboarding();
+    _nostrService.finishedOnboarding();
 
     Navigator.popAndPushNamed(context, '/');
   }

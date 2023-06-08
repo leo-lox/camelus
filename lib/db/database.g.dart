@@ -89,11 +89,11 @@ class _$AppDatabase extends AppDatabase {
         await database.execute(
             'CREATE TABLE IF NOT EXISTS `Note` (`id` TEXT NOT NULL, `pubkey` TEXT NOT NULL, `created_at` INTEGER NOT NULL, `kind` INTEGER NOT NULL, `content` TEXT NOT NULL, `sig` TEXT NOT NULL, PRIMARY KEY (`id`))');
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `Tag` (`note_id` TEXT NOT NULL, `index` INTEGER NOT NULL, `type` TEXT NOT NULL, `value` TEXT NOT NULL, `recommended_relay` TEXT, `marker` TEXT, FOREIGN KEY (`note_id`) REFERENCES `Note` (`id`) ON UPDATE NO ACTION ON DELETE NO ACTION, PRIMARY KEY (`note_id`, `value`))');
+            'CREATE TABLE IF NOT EXISTS `Tag` (`note_id` TEXT NOT NULL, `tag_index` INTEGER NOT NULL, `type` TEXT NOT NULL, `value` TEXT NOT NULL, `recommended_relay` TEXT, `marker` TEXT, FOREIGN KEY (`note_id`) REFERENCES `Note` (`id`) ON UPDATE NO ACTION ON DELETE NO ACTION, PRIMARY KEY (`note_id`, `value`))');
         await database
             .execute('CREATE INDEX `index_Note_kind` ON `Note` (`kind`)');
         await database.execute(
-            'CREATE VIEW IF NOT EXISTS `noteView` AS SELECT Note.*, GROUP_CONCAT(Tag.type) as tag_types, GROUP_CONCAT(Tag.value) as tag_values, GROUP_CONCAT(Tag.recommended_relay) as tag_recommended_relays, GROUP_CONCAT(Tag.marker) as tag_markers, GROUP_CONCAT(Tag.index) as tag_index FROM Note LEFT JOIN Tag ON Note.id = Tag.note_id GROUP BY Note.id;');
+            'CREATE VIEW IF NOT EXISTS `noteView` AS SELECT Note.*, GROUP_CONCAT(Tag.type) as tag_types, GROUP_CONCAT(Tag.value) as tag_values, GROUP_CONCAT(Tag.recommended_relay) as tag_recommended_relays, GROUP_CONCAT(Tag.marker) as tag_markers, GROUP_CONCAT(Tag.tag_index) as tag_index FROM Note LEFT JOIN Tag ON Note.id = Tag.note_id GROUP BY Note.id;');
 
         await callback?.onCreate?.call(database, version);
       },
@@ -134,7 +134,7 @@ class _$NoteDao extends NoteDao {
             'Tag',
             (DbTag item) => <String, Object?>{
                   'note_id': item.note_id,
-                  'index': item.index,
+                  'tag_index': item.tag_index,
                   'type': item.type,
                   'value': item.value,
                   'recommended_relay': item.recommended_relay,
@@ -309,7 +309,7 @@ class _$TagDao extends TagDao {
             'Tag',
             (DbTag item) => <String, Object?>{
                   'note_id': item.note_id,
-                  'index': item.index,
+                  'tag_index': item.tag_index,
                   'type': item.type,
                   'value': item.value,
                   'recommended_relay': item.recommended_relay,
@@ -330,7 +330,7 @@ class _$TagDao extends TagDao {
     return _queryAdapter.queryListStream('SELECT * FROM Tag',
         mapper: (Map<String, Object?> row) => DbTag(
             note_id: row['note_id'] as String,
-            index: row['index'] as int,
+            tag_index: row['tag_index'] as int,
             type: row['type'] as String,
             value: row['value'] as String,
             recommended_relay: row['recommended_relay'] as String?,
@@ -344,7 +344,7 @@ class _$TagDao extends TagDao {
     return _queryAdapter.queryList('SELECT * FROM Tag',
         mapper: (Map<String, Object?> row) => DbTag(
             note_id: row['note_id'] as String,
-            index: row['index'] as int,
+            tag_index: row['tag_index'] as int,
             type: row['type'] as String,
             value: row['value'] as String,
             recommended_relay: row['recommended_relay'] as String?,
@@ -356,7 +356,7 @@ class _$TagDao extends TagDao {
     return _queryAdapter.queryStream('SELECT * FROM Tag WHERE id = ?1',
         mapper: (Map<String, Object?> row) => DbTag(
             note_id: row['note_id'] as String,
-            index: row['index'] as int,
+            tag_index: row['tag_index'] as int,
             type: row['type'] as String,
             value: row['value'] as String,
             recommended_relay: row['recommended_relay'] as String?,

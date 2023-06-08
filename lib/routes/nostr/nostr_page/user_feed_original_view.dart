@@ -5,25 +5,25 @@ import 'package:camelus/atoms/spinner_center.dart';
 import 'package:camelus/components/tweet_card.dart';
 import 'package:camelus/config/palette.dart';
 import 'package:camelus/models/tweet.dart';
+import 'package:camelus/providers/nostr_service_provider.dart';
 import 'package:camelus/scroll_controller/retainable_scroll_controller.dart';
 import 'package:camelus/services/nostr/nostr_injector.dart';
 import 'package:camelus/services/nostr/nostr_service.dart';
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-class UserFeedOriginalView extends StatefulWidget {
-  late NostrService _nostrService;
+class UserFeedOriginalView extends ConsumerStatefulWidget {
   late String pubkey;
 
-  UserFeedOriginalView({Key? key, required this.pubkey}) : super(key: key) {
-    NostrServiceInjector injector = NostrServiceInjector();
-    _nostrService = injector.nostrService;
-  }
+  UserFeedOriginalView({Key? key, required this.pubkey}) : super(key: key);
 
   @override
-  State<UserFeedOriginalView> createState() => _UserFeedOriginalViewState();
+  ConsumerState<UserFeedOriginalView> createState() =>
+      _UserFeedOriginalViewState();
 }
 
-class _UserFeedOriginalViewState extends State<UserFeedOriginalView> {
+class _UserFeedOriginalViewState extends ConsumerState<UserFeedOriginalView> {
+  late NostrService _nostrService;
   // user feed
   late StreamSubscription userFeedSubscription;
   bool isUserFeedSubscribed = false;
@@ -47,7 +47,7 @@ class _UserFeedOriginalViewState extends State<UserFeedOriginalView> {
   /// only for initial load
   void _initUserFeed() async {
     //wait for connection
-    bool connection = await widget._nostrService.isNostrServiceConnected;
+    bool connection = await _nostrService.isNostrServiceConnected;
     if (!connection) {
       log("no connection to nostr service");
       return;
@@ -74,7 +74,7 @@ class _UserFeedOriginalViewState extends State<UserFeedOriginalView> {
     log("subscribed to user feed called");
 
     /// map with pubkey as identifier, second list [0] is p, [1] is pubkey, [2] is the relay url
-    var following = await widget._nostrService.getUserContacts(widget.pubkey);
+    var following = await _nostrService.getUserContacts(widget.pubkey);
 
     // extract public keys
     _followingPubkeys = [];
@@ -96,7 +96,7 @@ class _UserFeedOriginalViewState extends State<UserFeedOriginalView> {
       latestTweet = _displayList.first.tweetedAt;
     }
 
-    widget._nostrService.requestUserFeed(
+    _nostrService.requestUserFeed(
         users: _followingPubkeys,
         requestId: userFeedFreshId,
         limit: 50,
@@ -112,9 +112,9 @@ class _UserFeedOriginalViewState extends State<UserFeedOriginalView> {
     if (!isUserFeedSubscribed) return;
     log("nostr:page unsubscribed from user feed called");
 
-    widget._nostrService.closeSubscription("ufeed-$userFeedFreshId");
+    _nostrService.closeSubscription("ufeed-$userFeedFreshId");
     if (userFeedTimelineFetchId.isNotEmpty) {
-      widget._nostrService.closeSubscription("ufeed-$userFeedTimelineFetchId");
+      _nostrService.closeSubscription("ufeed-$userFeedTimelineFetchId");
     }
     setState(() {
       isUserFeedSubscribed = false;
@@ -191,7 +191,7 @@ class _UserFeedOriginalViewState extends State<UserFeedOriginalView> {
       return;
     }
 
-    widget._nostrService.requestUserFeed(
+    _nostrService.requestUserFeed(
         users: _followingPubkeys,
         requestId: userFeedTimelineFetchId,
         limit: 20,
@@ -219,14 +219,19 @@ class _UserFeedOriginalViewState extends State<UserFeedOriginalView> {
     });
   }
 
+  void _initNostrService() {
+    _nostrService = ref.read(nostrServiceProvider);
+  }
+
   @override
   void initState() {
     super.initState();
+    _initNostrService();
     _initUserFeed();
     _setupScrollListener();
 
     userFeedSubscription =
-        widget._nostrService.userFeedObj.userFeedStream.listen((event) {
+        _nostrService.userFeedObj.userFeedStream.listen((event) {
       _onUserFeedReceived(event);
     });
   }

@@ -1,3 +1,5 @@
+// ignore_for_file: non_constant_identifier_names
+
 import 'package:camelus/db/entities/db_note.dart';
 import 'package:floor/floor.dart';
 
@@ -17,7 +19,8 @@ class DbTag {
   @ColumnInfo(name: 'note_id')
   final String note_id;
 
-  final int index;
+  @ColumnInfo(name: 'tag_index')
+  final int tag_index;
 
   final String type;
 
@@ -29,7 +32,7 @@ class DbTag {
 
   DbTag(
       {required this.note_id,
-      required this.index,
+      required this.tag_index,
       required this.type,
       required this.value,
       this.recommended_relay,

@@ -1,28 +1,39 @@
-
 import 'package:camelus/config/palette.dart';
 import 'package:camelus/models/socket_control.dart';
-import 'package:camelus/services/nostr/nostr_injector.dart';
+import 'package:camelus/providers/nostr_service_provider.dart';
+
 import 'package:camelus/services/nostr/nostr_service.dart';
 import 'package:camelus/services/nostr/relays/relays.dart';
 import 'package:camelus/services/nostr/relays/relays_injector.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-class RelaysPage extends StatefulWidget {
+class RelaysPage extends ConsumerStatefulWidget {
   late Relays _relaysService;
-  late NostrService _nostrService;
+
   RelaysPage({Key? key}) : super(key: key) {
     RelaysInjector injector = RelaysInjector();
     _relaysService = injector.relays;
-    NostrServiceInjector nostrInjector = NostrServiceInjector();
-    _nostrService = nostrInjector.nostrService;
   }
 
   @override
-  State<RelaysPage> createState() => _RelaysPageState();
+  ConsumerState<RelaysPage> createState() => _RelaysPageState();
 }
 
-class _RelaysPageState extends State<RelaysPage> {
+class _RelaysPageState extends ConsumerState<RelaysPage> {
+  late NostrService _nostrService;
+
+  void _initNostrService() {
+    _nostrService = ref.read(nostrServiceProvider);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _initNostrService();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -96,7 +107,7 @@ class _RelaysPageState extends State<RelaysPage> {
                         const Spacer(),
                         GestureDetector(
                           onTap: () {
-                            widget._nostrService
+                            _nostrService
                                 .pickAndReconnect()
                                 .then((value) => setState(() {}));
                           },
@@ -235,8 +246,7 @@ Widget _staticRelays(Relays relaysService) {
   for (int i = 0; i < rowCount; i++) {
     List<Widget> dataRow = [];
     var relay = relaysService.manualRelays.entries.elementAt(i);
-    dataRow.add(
-        Text(relay.key, style: const TextStyle(color: Palette.white)));
+    dataRow.add(Text(relay.key, style: const TextStyle(color: Palette.white)));
 
     for (int j = 1; j < columnCount; j++) {
       if (j == 1) {
@@ -302,11 +312,11 @@ Widget _failingRelays(Relays relaysService) {
         dataRow.add(Text('${relay.value['error']}',
             style: const TextStyle(color: Palette.white)));
       } else if (j == 2) {
-        dataRow.add(
-            Text(readWrite, style: const TextStyle(color: Palette.white)));
+        dataRow
+            .add(Text(readWrite, style: const TextStyle(color: Palette.white)));
       } else if (j == 3) {
-        dataRow.add(Text(staticDynamic,
-            style: const TextStyle(color: Palette.white)));
+        dataRow.add(
+            Text(staticDynamic, style: const TextStyle(color: Palette.white)));
       }
     }
     rows.add(TableRow(children: dataRow));

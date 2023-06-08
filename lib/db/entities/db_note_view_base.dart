@@ -35,29 +35,34 @@ abstract class DbNoteViewBase {
   }
 
   NostrNote toNostrNote() {
+    List<NostrTag> mytags = [];
+    if (tag_values != null && tag_values!.isNotEmpty) {
+      mytags = toNostrTags(
+          tag_intexs: tag_index ?? '',
+          tag_types: tag_types!,
+          tag_values: tag_values!,
+          tag_recommended_relays: tag_recommended_relays ?? '',
+          tag_markers: tag_markers ?? '');
+    }
+
     return NostrNote(
-        id,
-        pubkey,
-        created_at,
-        kind,
-        content,
-        sig,
-        toNostrTags(
-            tag_intex: tag_index!,
-            tag_types: tag_types!,
-            tag_values: tag_values!,
-            tag_recommended_relays: tag_recommended_relays!,
-            tag_markers: tag_markers!));
+        id: id,
+        pubkey: pubkey,
+        created_at: created_at,
+        kind: kind,
+        content: content,
+        sig: sig,
+        tags: mytags);
   }
 
   List<NostrTag> toNostrTags(
-      {required String tag_intex,
+      {required String tag_intexs,
       required String tag_types,
       required String tag_values,
       required String tag_recommended_relays,
       required String tag_markers}) {
     List<NostrTag> tags = [];
-    List<String> tag_index_list = tag_intex.split(',');
+    List<String> tag_index_list = tag_intexs.split(',');
     List<String> tag_types_list = tag_types.split(',');
     List<String> tag_values_list = tag_values.split(',');
     List<String> tag_recommended_relays_list =
@@ -70,11 +75,27 @@ abstract class DbNoteViewBase {
 
     for (int i = 0; i < tag_index_list_int.length; i++) {
       int posIndex = tag_index_list_int.indexOf(i);
+
+      Map newNostrTag = {
+        "type": tag_types_list[posIndex],
+        "value": tag_values_list[posIndex],
+      };
+
+      if (tag_recommended_relays_list.length > posIndex &&
+          tag_recommended_relays_list[posIndex].isNotEmpty) {
+        newNostrTag["recommended_relay"] =
+            tag_recommended_relays_list[posIndex];
+      }
+      if (tag_markers_list.length > posIndex &&
+          tag_markers_list[posIndex].isNotEmpty) {
+        newNostrTag["marker"] = tag_markers_list[posIndex];
+      }
+
       tags.add(NostrTag(
-          type: tag_types_list[posIndex],
-          value: tag_values_list[posIndex],
-          recommended_relay: tag_recommended_relays_list[posIndex],
-          marker: tag_markers_list[posIndex]));
+          type: newNostrTag["type"],
+          value: newNostrTag["value"],
+          recommended_relay: newNostrTag["recommended_relay"],
+          marker: newNostrTag["marker"]));
     }
     return tags;
   }

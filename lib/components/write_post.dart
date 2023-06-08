@@ -3,10 +3,12 @@ import 'dart:io';
 
 import 'package:camelus/atoms/picture.dart';
 import 'package:camelus/helpers/search.dart';
+import 'package:camelus/providers/nostr_service_provider.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mentions/flutter_mentions.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lottie/lottie.dart';
 import 'package:camelus/config/palette.dart';
 import 'package:camelus/helpers/helpers.dart';
@@ -17,19 +19,18 @@ import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import 'package:mime/mime.dart';
 
-class WritePost extends StatefulWidget {
+class WritePost extends ConsumerStatefulWidget {
   PostContext? context;
 
-  late NostrService _nostrService;
-  WritePost({Key? key, this.context}) : super(key: key) {
-    NostrServiceInjector injector = NostrServiceInjector();
-    _nostrService = injector.nostrService;
-  }
+  WritePost({Key? key, this.context}) : super(key: key) {}
+
   @override
-  State<WritePost> createState() => _WritePostState();
+  ConsumerState<WritePost> createState() => _WritePostState();
 }
 
-class _WritePostState extends State<WritePost> {
+class _WritePostState extends ConsumerState<WritePost> {
+  late NostrService _nostrService;
+
   final TextEditingController _textEditingController = TextEditingController();
   final GlobalKey<FlutterMentionsState> _textEditingControllerKey =
       GlobalKey<FlutterMentionsState>();
@@ -58,7 +59,8 @@ class _WritePostState extends State<WritePost> {
   }
 
   _searchMentions(search) async {
-    List<Map<String, dynamic>> results = Search().searchUsersMetadata(search);
+    List<Map<String, dynamic>> results =
+        Search(_nostrService).searchUsersMetadata(search);
 
     for (var result in results) {
       if (result['picture'] == null) {
@@ -205,9 +207,9 @@ class _WritePostState extends State<WritePost> {
     }
 
     var firstWriteRelayKey =
-        widget._nostrService.relays.connectedRelaysWrite.keys.toList()[0];
-    var firstWriteRelay = widget._nostrService.relays
-        .connectedRelaysWrite[firstWriteRelayKey]!.connectionUrl;
+        _nostrService.relays.connectedRelaysWrite.keys.toList()[0];
+    var firstWriteRelay = _nostrService
+        .relays.connectedRelaysWrite[firstWriteRelayKey]!.connectionUrl;
 
     if (widget.context != null) {
       // add previous tweet tags
@@ -250,7 +252,7 @@ class _WritePostState extends State<WritePost> {
       content += " $url";
     }
 
-    widget._nostrService.writeEvent(content, 1, tags);
+    _nostrService.writeEvent(content, 1, tags);
 
     // wait for x seconds
     Future.delayed(const Duration(milliseconds: 200), () {
@@ -259,11 +261,16 @@ class _WritePostState extends State<WritePost> {
     });
   }
 
+  void _initNostrService() {
+    _nostrService = ref.read(nostrServiceProvider);
+  }
+
   @override
   void initState() {
     super.initState();
     // focus text field
     _focusNode.requestFocus();
+    _initNostrService();
   }
 
   @override
@@ -327,7 +334,7 @@ class _WritePostState extends State<WritePost> {
                       children: [
                         // get metadata
                         FutureBuilder<Map>(
-                            future: widget._nostrService.getUserMetadata(
+                            future: _nostrService.getUserMetadata(
                                 widget.context!.replyToTweet.pubkey),
                             builder: (BuildContext context,
                                 AsyncSnapshot<Map> snapshot) {

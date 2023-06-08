@@ -1,28 +1,27 @@
 import 'dart:async';
 import 'dart:developer';
 
+import 'package:camelus/providers/nostr_service_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:camelus/components/tweet_card.dart';
 import 'package:camelus/config/palette.dart';
 import 'package:camelus/helpers/helpers.dart';
 import 'package:camelus/models/tweet.dart';
 import 'package:camelus/models/tweet_control.dart';
-import 'package:camelus/services/nostr/nostr_injector.dart';
 import 'package:camelus/services/nostr/nostr_service.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-class EventViewPage extends StatefulWidget {
+class EventViewPage extends ConsumerStatefulWidget {
   late String eventId;
-  late NostrService _nostrService;
-  EventViewPage({Key? key, required this.eventId}) : super(key: key) {
-    NostrServiceInjector injector = NostrServiceInjector();
-    _nostrService = injector.nostrService;
-  }
+
+  EventViewPage({Key? key, required this.eventId}) : super(key: key);
 
   @override
   _EventViewPageState createState() => _EventViewPageState();
 }
 
-class _EventViewPageState extends State<EventViewPage> {
+class _EventViewPageState extends ConsumerState<EventViewPage> {
+  late NostrService _nostrService;
   final StreamController<List<Tweet>> _streamController =
       StreamController<List<Tweet>>.broadcast();
   late StreamSubscription _streamSubscription;
@@ -32,7 +31,7 @@ class _EventViewPageState extends State<EventViewPage> {
   late Tweet rootTweet;
 
   void _requestEvents() {
-    widget._nostrService.requestEvents(
+    _nostrService.requestEvents(
         eventIds: [widget.eventId],
         requestId: requestId,
         //limit: 30,
@@ -40,12 +39,17 @@ class _EventViewPageState extends State<EventViewPage> {
   }
 
   void _closeSubscription() {
-    widget._nostrService.closeSubscription("event-$requestId");
+    _nostrService.closeSubscription("event-$requestId");
+  }
+
+  void _initNostrService() {
+    _nostrService = ref.read(nostrServiceProvider);
   }
 
   @override
   void initState() {
     super.initState();
+    _initNostrService();
     _requestEvents();
 
     _streamSubscription = _streamController.stream.listen((event) {

@@ -3,6 +3,7 @@ import 'dart:ui';
 
 import 'package:camelus/components/bottom_sheet_more.dart';
 import 'package:camelus/components/bottom_sheet_share.dart';
+import 'package:camelus/providers/nostr_service_provider.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -14,6 +15,7 @@ import 'package:camelus/models/post_context.dart';
 import 'package:camelus/models/tweet.dart';
 import 'package:camelus/models/tweet_control.dart';
 import 'package:camelus/services/nostr/nostr_injector.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:url_launcher/url_launcher_string.dart';
@@ -21,21 +23,19 @@ import 'package:photo_view/photo_view.dart';
 
 import '../services/nostr/nostr_service.dart';
 
-class TweetCard extends StatefulWidget {
+class TweetCard extends ConsumerStatefulWidget {
   final Tweet tweet;
   final TweetControl? tweetControl;
-  late NostrService _nostrService;
+
   TweetCard({Key? key, required this.tweet, this.tweetControl})
-      : super(key: key) {
-    NostrServiceInjector injector = NostrServiceInjector();
-    _nostrService = injector.nostrService;
-  }
+      : super(key: key);
 
   @override
-  State<TweetCard> createState() => _TweetCardState();
+  ConsumerState<TweetCard> createState() => _TweetCardState();
 }
 
-class _TweetCardState extends State<TweetCard> {
+class _TweetCardState extends ConsumerState<TweetCard> {
+  late NostrService _nostrService;
   late ImageProvider myImage;
 
   List<TextSpan> textSpans = [];
@@ -123,7 +123,7 @@ class _TweetCardState extends State<TweetCard> {
             var pubkeyHr =
                 "${pubkeyBech.substring(0, 5)}...${pubkeyBech.substring(pubkeyBech.length - 5)}";
             _tagsMetadata[tag[1]] = pubkeyHr;
-            var metadata = widget._nostrService.getUserMetadata(tag[1]);
+            var metadata = _nostrService.getUserMetadata(tag[1]);
 
             metadata.then((value) {
               // check if mounted
@@ -165,7 +165,7 @@ class _TweetCardState extends State<TweetCard> {
     if (nip05.isEmpty) return;
     if (nip05verified.isNotEmpty) return;
     try {
-      var check = await widget._nostrService.checkNip05(nip05, pubkey);
+      var check = await _nostrService.checkNip05(nip05, pubkey);
 
       if (check["valid"] == true) {
         setState(() {
@@ -221,9 +221,14 @@ class _TweetCardState extends State<TweetCard> {
             ));
   }
 
+  void _initNostrService() {
+    _nostrService = ref.read(nostrServiceProvider);
+  }
+
   @override
   void initState() {
     super.initState();
+    _initNostrService();
   }
 
   @override
@@ -308,10 +313,10 @@ class _TweetCardState extends State<TweetCard> {
                                   .getPubkeysFromTags(widget.tweet.tags)
                                   .isNotEmpty) //todo this is a hotfix to not break the feed
                                 FutureBuilder(
-                                  future: widget._nostrService.getUserMetadata(
-                                      Helpers().getPubkeysFromTags(
+                                  future: _nostrService.getUserMetadata(Helpers()
+                                          .getPubkeysFromTags(
                                               widget.tweet.tags)[
-                                          0]), // todo fix this for multiple tags
+                                      0]), // todo fix this for multiple tags
                                   builder: (BuildContext context,
                                       AsyncSnapshot<Map> snapshot) {
                                     var name = "";
@@ -324,9 +329,8 @@ class _TweetCardState extends State<TweetCard> {
                                                 widget.tweet.tags)[0];
                                         var pubkeyHr = Helpers()
                                             .encodeBech32(pubkey, "npub");
-                                        var pubkeyHrShort = "${pubkeyHr.substring(
-                                                0, 5)}...${pubkeyHr
-                                                .substring(pubkeyHr.length - 5)}";
+                                        var pubkeyHrShort =
+                                            "${pubkeyHr.substring(0, 5)}...${pubkeyHr.substring(pubkeyHr.length - 5)}";
                                         name = pubkeyHrShort;
                                       }
                                     } else if (snapshot.hasError) {
@@ -377,7 +381,7 @@ class _TweetCardState extends State<TweetCard> {
                                   arguments: widget.tweet.pubkey);
                             },
                             child: FutureBuilder<Map>(
-                                future: widget._nostrService
+                                future: _nostrService
                                     .getUserMetadata(widget.tweet.pubkey),
                                 builder: (BuildContext context,
                                     AsyncSnapshot<Map> snapshot) {
@@ -411,8 +415,8 @@ class _TweetCardState extends State<TweetCard> {
                                       //crossAxisAlignment: CrossAxisAlignment.center,
                                       children: [
                                         FutureBuilder<Map>(
-                                            future: widget._nostrService
-                                                .getUserMetadata(
+                                            future:
+                                                _nostrService.getUserMetadata(
                                                     widget.tweet.pubkey),
                                             builder: (BuildContext context,
                                                 AsyncSnapshot<Map> snapshot) {

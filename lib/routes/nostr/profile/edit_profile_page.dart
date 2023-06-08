@@ -1,25 +1,23 @@
 import 'dart:convert';
 import 'dart:developer';
 
+import 'package:camelus/providers/nostr_service_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:camelus/config/palette.dart';
 import 'package:camelus/services/nostr/nostr_injector.dart';
 import 'package:camelus/services/nostr/nostr_service.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-class EditProfilePage extends StatefulWidget {
-  late NostrService _nostrService;
-
-  EditProfilePage({Key? key}) : super(key: key) {
-    NostrServiceInjector injector = NostrServiceInjector();
-    _nostrService = injector.nostrService;
-  }
+class EditProfilePage extends ConsumerStatefulWidget {
+  EditProfilePage({Key? key}) : super(key: key);
 
   @override
-  State<EditProfilePage> createState() => _EditProfilePageState();
+  ConsumerState<EditProfilePage> createState() => _EditProfilePageState();
 }
 
-class _EditProfilePageState extends State<EditProfilePage> {
+class _EditProfilePageState extends ConsumerState<EditProfilePage> {
+  late NostrService _nostrService;
   // create text input controllers
   TextEditingController pictureController = TextEditingController(text: "");
   TextEditingController bannerController = TextEditingController(text: "");
@@ -36,12 +34,17 @@ class _EditProfilePageState extends State<EditProfilePage> {
   bool loading = true;
 
   bool isKeysExpanded = false;
+  void _initNostrService() {
+    _nostrService = ref.read(nostrServiceProvider);
+  }
 
   @override
   void initState() {
     super.initState();
+
+    _initNostrService();
     // get user public key
-    pubkey = widget._nostrService.myKeys.publicKey;
+    pubkey = _nostrService.myKeys.publicKey;
 
     // set initial values of text input controllers
     _loadProfileValues();
@@ -77,7 +80,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
   }
 
   Future<void> _loadProfileValues() async {
-    var profileData = await widget._nostrService.getUserMetadata(pubkey);
+    var profileData = await _nostrService.getUserMetadata(pubkey);
     setState(() {
       loading = false;
     });
@@ -124,10 +127,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
     var contentString = json.encode(content);
 
-    widget._nostrService.writeEvent(contentString, 0, []);
+    _nostrService.writeEvent(contentString, 0, []);
 
     // update cache
-    widget._nostrService.usersMetadata[pubkey] = content;
+    _nostrService.usersMetadata[pubkey] = content;
 
     Navigator.pop(context, "updated");
   }
@@ -297,11 +300,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                 padding: const EdgeInsets.all(5),
                                 child: GestureDetector(
                                   onTap: () {
-                                    copyToClipboard(widget
-                                        ._nostrService.myKeys.publicKeyHr);
+                                    copyToClipboard(
+                                        _nostrService.myKeys.publicKeyHr);
                                   },
-                                  child: Text(
-                                      widget._nostrService.myKeys.publicKeyHr),
+                                  child: Text(_nostrService.myKeys.publicKeyHr),
                                 ),
                               ),
                               // private key
@@ -310,11 +312,11 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                 padding: const EdgeInsets.all(5),
                                 child: GestureDetector(
                                   onTap: () {
-                                    copyToClipboard(widget
-                                        ._nostrService.myKeys.privateKeyHr);
+                                    copyToClipboard(
+                                        _nostrService.myKeys.privateKeyHr);
                                   },
-                                  child: Text(
-                                      widget._nostrService.myKeys.privateKeyHr),
+                                  child:
+                                      Text(_nostrService.myKeys.privateKeyHr),
                                 ),
                               ),
                             ],

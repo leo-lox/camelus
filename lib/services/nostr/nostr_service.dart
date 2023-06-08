@@ -2,6 +2,9 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
 
+import 'package:camelus/db/database.dart';
+import 'package:camelus/models/nostr_note.dart';
+import 'package:camelus/providers/database_provider.dart';
 import 'package:camelus/services/nostr/feeds/authors_feed.dart';
 import 'package:camelus/services/nostr/feeds/events_feed.dart';
 import 'package:camelus/services/nostr/feeds/global_feed.dart';
@@ -16,16 +19,20 @@ import 'package:camelus/services/nostr/relays/relays_injector.dart';
 import 'package:camelus/services/nostr/relays/relays_ranking.dart';
 import 'package:crypto/crypto.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:hex/hex.dart';
 import 'package:camelus/helpers/helpers.dart';
 import 'package:camelus/helpers/bip340.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:json_cache/json_cache.dart';
 import 'package:cross_local_storage/cross_local_storage.dart';
 
 import 'package:camelus/models/socket_control.dart';
 
 class NostrService {
+  final Future<AppDatabase> database;
+
   late Future isNostrServiceConnected;
 
   static String ownPubkeySubscriptionId =
@@ -63,7 +70,7 @@ class NostrService {
   Map<String, dynamic> get usersMetadata => userMetadataObj.usersMetadata;
   Map<String, List<List<dynamic>>> get following => userContactsObj.following;
 
-  NostrService() {
+  NostrService({required this.database}) {
     RelaysInjector relaysInjector = RelaysInjector();
     MetadataInjector metadataInjector = MetadataInjector();
 
@@ -214,6 +221,14 @@ class NostrService {
           return;
         }
       }
+    }
+
+    // ! debug only
+    if (event[0] == "EVENT") {
+      log("debug: $event");
+      var eventBody = event[2];
+      database.then(
+          (db) => db.noteDao.insertNostrNote(NostrNote.fromJson(eventBody)));
     }
 
     // filter by subscription id
@@ -519,5 +534,10 @@ class NostrService {
     await relays.closeRelays();
     await relays.start(userFollows);
     return;
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    throw UnimplementedError();
   }
 }

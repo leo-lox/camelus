@@ -12,18 +12,34 @@ class NostrNote {
   final String sig;
   final List<NostrTag> tags;
 
-  NostrNote(this.id, this.pubkey, this.created_at, this.kind, this.content,
-      this.sig, this.tags);
+  NostrNote({
+    required this.id,
+    required this.pubkey,
+    // ignore: non_constant_identifier_names
+    required this.created_at,
+    required this.kind,
+    required this.content,
+    required this.sig,
+    required this.tags,
+  });
 
   factory NostrNote.fromJson(Map<String, dynamic> json) {
+    List<dynamic> tagsJson = json['tags'] ?? [];
+    List<List<String>> tags = [];
+    //cast using for loop
+    for (List tag in tagsJson) {
+      tags.add(tag.cast<String>());
+    }
+
     return NostrNote(
-        json['id'],
-        json['pubkey'],
-        json['created_at'],
-        json['kind'],
-        json['content'],
-        json['sig'],
-        json['tags'].cast<String>());
+      id: json['id'],
+      pubkey: json['pubkey'],
+      created_at: json['created_at'],
+      kind: json['kind'],
+      content: json['content'],
+      sig: json['sig'],
+      tags: tags.map((tag) => NostrTag.fromJson(tag)).toList(),
+    );
   }
 
   Map<String, dynamic> toJson() => {
@@ -51,7 +67,7 @@ class NostrNote {
     for (int i = 0; i < this.tags.length; i++) {
       tags.add(DbTag(
           note_id: id,
-          index: i,
+          tag_index: i,
           type: this.tags[i].type,
           value: this.tags[i].value,
           recommended_relay: this.tags[i].recommended_relay,

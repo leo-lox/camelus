@@ -3,27 +3,32 @@ import 'dart:async';
 import 'package:camelus/atoms/my_profile_picture.dart';
 import 'package:camelus/config/palette.dart';
 import 'package:camelus/helpers/helpers.dart';
-import 'package:camelus/services/nostr/nostr_injector.dart';
+import 'package:camelus/providers/nostr_service_provider.dart';
+
 import 'package:camelus/services/nostr/nostr_service.dart';
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-class BlockedUsers extends StatefulWidget {
-  late NostrService _nostrService;
-  BlockedUsers({Key? key}) : super(key: key) {
-    NostrServiceInjector injector = NostrServiceInjector();
-    _nostrService = injector.nostrService;
-  }
+class BlockedUsers extends ConsumerStatefulWidget {
+  BlockedUsers({Key? key}) : super(key: key);
 
   @override
-  State<BlockedUsers> createState() => _BlockedUsersState();
+  ConsumerState<BlockedUsers> createState() => _BlockedUsersState();
 }
 
-class _BlockedUsersState extends State<BlockedUsers> {
+class _BlockedUsersState extends ConsumerState<BlockedUsers> {
   final StreamController _streamController = StreamController();
+
+  late NostrService _nostrService;
+
+  void _initNostrService() {
+    _nostrService = ref.read(nostrServiceProvider);
+  }
 
   @override
   void initState() {
     super.initState();
+    _initNostrService();
     _streamController.stream.listen((event) {
       setState(() {});
     });
@@ -48,13 +53,13 @@ class _BlockedUsersState extends State<BlockedUsers> {
             SliverList(
               delegate: SliverChildBuilderDelegate(
                 (context, index) {
-                  return _profile(widget._nostrService.blockedUsers[index],
-                      _streamController, widget);
+                  return _profile(_nostrService.blockedUsers[index],
+                      _streamController, widget, _nostrService);
                 },
-                childCount: widget._nostrService.blockedUsers.length,
+                childCount: _nostrService.blockedUsers.length,
               ),
             ),
-            if (widget._nostrService.blockedUsers.isEmpty)
+            if (_nostrService.blockedUsers.isEmpty)
               const SliverFillRemaining(
                 child: Center(
                   child: Text(
@@ -68,9 +73,10 @@ class _BlockedUsersState extends State<BlockedUsers> {
   }
 }
 
-Widget _profile(String pubkey, StreamController streamController, widget) {
+Widget _profile(String pubkey, StreamController streamController, widget,
+    NostrService nostrService) {
   return FutureBuilder<Map>(
-      future: widget._nostrService.getUserMetadata(pubkey),
+      future: nostrService.getUserMetadata(pubkey),
       builder: (BuildContext context, AsyncSnapshot<Map> snapshot) {
         String picture = "";
         String name = "";
@@ -119,7 +125,7 @@ Widget _profile(String pubkey, StreamController streamController, widget) {
                 icon: const Icon(Icons.block_flipped),
                 color: Palette.white,
                 onPressed: () {
-                  widget._nostrService.removeFromBlocklist(pubkey);
+                  nostrService.removeFromBlocklist(pubkey);
                   streamController.add(true);
                 },
               ),

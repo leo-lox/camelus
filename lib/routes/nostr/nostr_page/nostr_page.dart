@@ -4,37 +4,34 @@ import 'dart:developer';
 
 import 'package:camelus/atoms/spinner_center.dart';
 import 'package:camelus/models/socket_control.dart';
+import 'package:camelus/providers/nostr_service_provider.dart';
 import 'package:camelus/routes/nostr/nostr_page/global_feed_view.dart';
 import 'package:camelus/routes/nostr/nostr_page/user_feed_original_view.dart';
 import 'package:camelus/routes/nostr/relays_page.dart';
 import 'package:flutter/material.dart';
 
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
 import 'package:camelus/atoms/my_profile_picture.dart';
 
-import 'package:camelus/services/nostr/nostr_injector.dart';
 import 'package:camelus/services/nostr/nostr_service.dart';
 import 'package:badges/badges.dart' as badges;
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../config/palette.dart';
 
-class NostrPage extends StatefulWidget {
-  late NostrService _nostrService;
+class NostrPage extends ConsumerStatefulWidget {
   var parentScaffoldKey = GlobalKey<ScaffoldState>();
-  NostrPage({Key? key, required this.parentScaffoldKey}) : super(key: key) {
-    NostrServiceInjector injector = NostrServiceInjector();
-    _nostrService = injector.nostrService;
-  }
-
+  NostrPage({Key? key, required this.parentScaffoldKey}) : super(key: key);
   @override
-  State<NostrPage> createState() => _NostrPageState();
+  ConsumerState<NostrPage> createState() => _NostrPageState();
 }
 
-class _NostrPageState extends State<NostrPage>
+class _NostrPageState extends ConsumerState<NostrPage>
     with TickerProviderStateMixin, AutomaticKeepAliveClientMixin {
+  late NostrService _nostrService;
   @override
   bool get wantKeepAlive => true;
 
@@ -51,7 +48,7 @@ class _NostrPageState extends State<NostrPage>
 
   _getPubkey() async {
     //wait for connection
-    bool connection = await widget._nostrService.isNostrServiceConnected;
+    bool connection = await _nostrService.isNostrServiceConnected;
     if (!connection) {
       log("no connection to nostr service");
       return;
@@ -61,7 +58,7 @@ class _NostrPageState extends State<NostrPage>
     if (!mounted) return;
 
     setState(() {
-      pubkey = widget._nostrService.myKeys.publicKey;
+      pubkey = _nostrService.myKeys.publicKey;
     });
   }
 
@@ -149,9 +146,15 @@ class _NostrPageState extends State<NostrPage>
     );
   }
 
+  void _initNostrService() {
+    _nostrService = ref.read(nostrServiceProvider);
+  }
+
   @override
   void initState() {
+    _initNostrService();
     super.initState();
+
     _getPubkey();
 
     _betaCheckForUpdates();
@@ -210,7 +213,7 @@ class _NostrPageState extends State<NostrPage>
                       shape: BoxShape.circle,
                     ),
                     child: FutureBuilder<Map>(
-                        future: widget._nostrService.getUserMetadata(pubkey),
+                        future: _nostrService.getUserMetadata(pubkey),
                         builder: (BuildContext context,
                             AsyncSnapshot<Map> snapshot) {
                           var picture = "";
@@ -258,8 +261,7 @@ class _NostrPageState extends State<NostrPage>
                   GestureDetector(
                     onTap: () => _openRelaysView(),
                     child: StreamBuilder(
-                        stream: widget
-                            ._nostrService.relays.connectedRelaysReadStream,
+                        stream: _nostrService.relays.connectedRelaysReadStream,
                         builder: (context,
                             AsyncSnapshot<Map<String, SocketControl>>
                                 snapshot) {

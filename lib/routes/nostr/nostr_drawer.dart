@@ -1,4 +1,5 @@
 import 'package:camelus/helpers/nprofile_helper.dart';
+import 'package:camelus/providers/nostr_service_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -6,15 +7,15 @@ import 'package:camelus/atoms/my_profile_picture.dart';
 import 'package:camelus/config/palette.dart';
 import 'package:camelus/services/nostr/nostr_injector.dart';
 import 'package:camelus/services/nostr/nostr_service.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
-class NostrDrawer extends StatelessWidget {
+class NostrDrawer extends ConsumerWidget {
   late NostrService _nostrService;
 
-  NostrDrawer({Key? key}) : super(key: key) {
-    NostrServiceInjector injector = NostrServiceInjector();
-    _nostrService = injector.nostrService;
-  }
+  //late NostrService _nostrService;
+
+  NostrDrawer({Key? key}) : super(key: key);
 
   void navigateToProfile(BuildContext context) {
     Navigator.pushNamed(context, "/nostr/profile",
@@ -262,8 +263,14 @@ class NostrDrawer extends StatelessWidget {
     );
   }
 
+  void _initNostrService(ref) async {
+    _nostrService = await ref.read(nostrServiceProvider);
+  }
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    _initNostrService(ref);
+
     return Drawer(
       child: Container(
         color: Palette.background,

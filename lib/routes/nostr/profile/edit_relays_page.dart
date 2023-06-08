@@ -1,25 +1,23 @@
 import 'dart:convert';
 import 'dart:developer';
 
+import 'package:camelus/providers/nostr_service_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:camelus/config/palette.dart';
-import 'package:camelus/services/nostr/nostr_injector.dart';
 import 'package:camelus/services/nostr/nostr_service.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-class EditRelaysPage extends StatefulWidget {
-  late NostrService _nostrService;
+class EditRelaysPage extends ConsumerStatefulWidget {
+  EditRelaysPage({Key? key}) : super(key: key);
 
-  EditRelaysPage({Key? key}) : super(key: key) {
-    NostrServiceInjector injector = NostrServiceInjector();
-    _nostrService = injector.nostrService;
-  }
   @override
-  State<EditRelaysPage> createState() => _EditRelaysPageState();
+  ConsumerState<EditRelaysPage> createState() => _EditRelaysPageState();
 }
 
-class _EditRelaysPageState extends State<EditRelaysPage> {
+class _EditRelaysPageState extends ConsumerState<EditRelaysPage> {
+  late NostrService _nostrService;
   // copy of relays from nostr service
-  late var myRelays = widget._nostrService.relays.manualRelays;
+  late var myRelays = _nostrService.relays.manualRelays;
 
   final TextEditingController _relayNameController = TextEditingController();
 
@@ -93,31 +91,35 @@ class _EditRelaysPageState extends State<EditRelaysPage> {
   }
 
   _saveRelays() async {
-    widget._nostrService.relays.setManualRelays(myRelays);
+    _nostrService.relays.setManualRelays(myRelays);
     // publish relays to nostr service
 
     String relaysJson = jsonEncode(myRelays);
     log(relaysJson);
-    var following =
-        widget._nostrService.following[widget._nostrService.myKeys.publicKey];
+    var following = _nostrService.following[_nostrService.myKeys.publicKey];
 
     // add to cache
 
     // todo write event
-    await widget._nostrService.writeEvent(relaysJson, 3, following as List);
+    await _nostrService.writeEvent(relaysJson, 3, following as List);
 
     await _reconnect();
   }
 
   Future<void> _reconnect() async {
-    await widget._nostrService.relays.closeRelays();
-    await widget._nostrService.relays.connectToRelays();
+    await _nostrService.relays.closeRelays();
+    await _nostrService.relays.connectToRelays();
     return;
+  }
+
+  void _initNostrService() {
+    _nostrService = ref.read(nostrServiceProvider);
   }
 
   @override
   void initState() {
     super.initState();
+    _initNostrService();
   }
 
   @override

@@ -4,7 +4,7 @@ import 'package:camelus/db/entities/db_note_view_base.dart';
 import 'package:floor/floor.dart';
 
 @DatabaseView(
-    'SELECT Note.*, GROUP_CONCAT(Tag.type) as tag_types, GROUP_CONCAT(Tag.value) as tag_values, GROUP_CONCAT(Tag.recommended_relay) as tag_recommended_relays, GROUP_CONCAT(Tag.marker) as tag_markers, GROUP_CONCAT(Tag.index) as tag_index FROM Note LEFT JOIN Tag ON Note.id = Tag.note_id GROUP BY Note.id;',
+    'SELECT Note.*, GROUP_CONCAT(Tag.type) as tag_types, GROUP_CONCAT(Tag.value) as tag_values, GROUP_CONCAT(Tag.recommended_relay) as tag_recommended_relays, GROUP_CONCAT(Tag.marker) as tag_markers, GROUP_CONCAT(Tag.tag_index) as tag_index FROM Note LEFT JOIN Tag ON Note.id = Tag.note_id GROUP BY Note.id;',
     viewName: 'noteView')
 class DbNoteView extends DbNoteViewBase {
   DbNoteView(

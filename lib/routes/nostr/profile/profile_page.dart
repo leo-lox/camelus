@@ -3,6 +3,7 @@ import 'dart:developer';
 
 import 'package:camelus/atoms/long_button.dart';
 import 'package:camelus/helpers/nprofile_helper.dart';
+import 'package:camelus/providers/nostr_service_provider.dart';
 import 'package:camelus/routes/nostr/nostr_page/perspective_feed_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -15,22 +16,20 @@ import 'package:camelus/models/tweet.dart';
 import 'package:camelus/routes/nostr/profile/edit_profile_page.dart';
 import 'package:camelus/routes/nostr/profile/edit_relays_page.dart';
 import 'package:camelus/routes/nostr/profile/follower_page.dart';
-import 'package:camelus/services/nostr/nostr_injector.dart';
+
 import 'package:camelus/services/nostr/nostr_service.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:matomo_tracker/matomo_tracker.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class ProfilePage extends StatefulWidget {
+class ProfilePage extends ConsumerStatefulWidget {
   String pubkey;
   late String nProfile;
   late String nProfileHr;
   late String pubkeyBech32;
-  late NostrService _nostrService;
-  ProfilePage({Key? key, required this.pubkey}) : super(key: key) {
-    NostrServiceInjector injector = NostrServiceInjector();
-    _nostrService = injector.nostrService;
 
+  ProfilePage({Key? key, required this.pubkey}) : super(key: key) {
     nProfile = NprofileHelper().mapToBech32({
       "pubkey": pubkey,
       "relays": [],
@@ -48,11 +47,12 @@ class ProfilePage extends StatefulWidget {
   }
 
   @override
-  State<ProfilePage> createState() => _ProfilePageState();
+  ConsumerState<ProfilePage> createState() => _ProfilePageState();
 }
 
-class _ProfilePageState extends State<ProfilePage>
+class _ProfilePageState extends ConsumerState<ProfilePage>
     with TickerProviderStateMixin, TraceableClientMixin {
+  late NostrService _nostrService;
   late ScrollController _scrollController;
 
   @override
@@ -79,7 +79,7 @@ class _ProfilePageState extends State<ProfilePage>
     if (nip05.isEmpty) return;
     if (nip05verified.isNotEmpty) return;
     try {
-      var check = await widget._nostrService.checkNip05(nip05, pubkey);
+      var check = await _nostrService.checkNip05(nip05, pubkey);
 
       if (check["valid"] == true) {
         setState(() {
@@ -92,8 +92,7 @@ class _ProfilePageState extends State<ProfilePage>
 
   void checkIamFollowing() {
     _myFollowing =
-        widget._nostrService.following[widget._nostrService.myKeys.publicKey] ??
-            [];
+        _nostrService.following[_nostrService.myKeys.publicKey] ?? [];
     for (var i = 0; i < _myFollowing.length; i++) {
       if (_myFollowing[i][1] == widget.pubkey) {
         setState(() {
@@ -124,9 +123,8 @@ class _ProfilePageState extends State<ProfilePage>
 
   void _saveFollowing() async {
     if (!_followTouched) return;
-    widget._nostrService.following[widget._nostrService.myKeys.publicKey] =
-        _myFollowing;
-    await widget._nostrService.writeEvent("", 3, _myFollowing);
+    _nostrService.following[_nostrService.myKeys.publicKey] = _myFollowing;
+    await _nostrService.writeEvent("", 3, _myFollowing);
   }
 
   Future<void> _copyToClipboard(String data) async {
@@ -134,7 +132,7 @@ class _ProfilePageState extends State<ProfilePage>
   }
 
   _getBannerImage() async {
-    var metadata = await widget._nostrService.getUserMetadata(widget.pubkey);
+    var metadata = await _nostrService.getUserMetadata(widget.pubkey);
     if (metadata["banner"] == null) return null;
 
     setState(() {
@@ -181,7 +179,7 @@ class _ProfilePageState extends State<ProfilePage>
     if (!result) return;
 
     // add to blocked list
-    await widget._nostrService.addToBlocklist(widget.pubkey);
+    await _nostrService.addToBlocklist(widget.pubkey);
 
     Navigator.pop(context);
   }
@@ -288,20 +286,24 @@ class _ProfilePageState extends State<ProfilePage>
         ),
       ),
     ).then((value) => {
-          widget._nostrService.clearCache(),
-          widget._nostrService.userFeedObj.feed = [],
+          _nostrService.clearCache(),
+          _nostrService.userFeedObj.feed = [],
         });
+  }
+
+  void _initNostrService() {
+    _nostrService = ref.read(nostrServiceProvider);
   }
 
   @override
   void initState() {
     super.initState();
+    _initNostrService();
 
     int now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
 
     // listen to nostr service
-    _nostrStream =
-        widget._nostrService.authorsFeedObj.authorsStream.listen((event) {
+    _nostrStream = _nostrService.authorsFeedObj.authorsStream.listen((event) {
       setState(() {
         _myTweets = event[widget.pubkey] ?? [];
       });
@@ -313,7 +315,7 @@ class _ProfilePageState extends State<ProfilePage>
     });
 
     // subscribe to user's tweets
-    widget._nostrService.requestAuthors(
+    _nostrService.requestAuthors(
         authors: [widget.pubkey], requestId: requestId, limit: 10, until: now);
 
     _scrollController = ScrollController();
@@ -325,7 +327,7 @@ class _ProfilePageState extends State<ProfilePage>
         loadTweetsLock = true;
         // load more tweets
         log("load more tweets");
-        widget._nostrService.requestAuthors(
+        _nostrService.requestAuthors(
             authors: [widget.pubkey],
             requestId: requestId,
             limit: 10,
@@ -344,7 +346,7 @@ class _ProfilePageState extends State<ProfilePage>
     _nostrStream.cancel();
 
     // cancel subscription
-    widget._nostrService.closeSubscription("authors-$requestId");
+    _nostrService.closeSubscription("authors-$requestId");
 
     super.dispose();
   }
@@ -428,8 +430,7 @@ class _ProfilePageState extends State<ProfilePage>
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
-                        if (widget.pubkey !=
-                            widget._nostrService.myKeys.publicKey)
+                        if (widget.pubkey != _nostrService.myKeys.publicKey)
                           SizedBox(
                             width: 35,
                             height: 35,
@@ -455,8 +456,8 @@ class _ProfilePageState extends State<ProfilePage>
 
                         // round message button with icon and white border
                         FutureBuilder<Map>(
-                            future: widget._nostrService
-                                .getUserMetadata(widget.pubkey),
+                            future:
+                                _nostrService.getUserMetadata(widget.pubkey),
                             builder: (BuildContext context,
                                 AsyncSnapshot<Map> snapshot) {
                               String lud06 = "";
@@ -500,8 +501,7 @@ class _ProfilePageState extends State<ProfilePage>
 
                         // follow button black with white border
 
-                        if (widget.pubkey !=
-                                widget._nostrService.myKeys.publicKey &&
+                        if (widget.pubkey != _nostrService.myKeys.publicKey &&
                             !_iamFollowing)
                           Container(
                             margin: const EdgeInsets.only(top: 0, right: 10),
@@ -528,8 +528,7 @@ class _ProfilePageState extends State<ProfilePage>
                           ),
 
                         // unfollow button white with black border
-                        if (widget.pubkey !=
-                                widget._nostrService.myKeys.publicKey &&
+                        if (widget.pubkey != _nostrService.myKeys.publicKey &&
                             _iamFollowing)
                           Container(
                             margin: const EdgeInsets.only(top: 0, right: 10),
@@ -556,8 +555,7 @@ class _ProfilePageState extends State<ProfilePage>
                           ),
 
                         // edit button
-                        if (widget.pubkey ==
-                            widget._nostrService.myKeys.publicKey)
+                        if (widget.pubkey == _nostrService.myKeys.publicKey)
                           Container(
                             margin: const EdgeInsets.only(top: 0, right: 10),
                             child: ElevatedButton(
@@ -569,7 +567,7 @@ class _ProfilePageState extends State<ProfilePage>
                                     builder: (context) => EditProfilePage(),
                                   ),
                                 ).then((value) => {
-                                      widget._nostrService
+                                      _nostrService
                                           .getUserMetadata(widget.pubkey),
                                       _getBannerImage(),
                                       setState(() {
@@ -601,8 +599,7 @@ class _ProfilePageState extends State<ProfilePage>
                     Container(
                       transform: Matrix4.translationValues(0.0, -10.0, 0.0),
                       child: FutureBuilder<Map>(
-                        future:
-                            widget._nostrService.getUserMetadata(widget.pubkey),
+                        future: _nostrService.getUserMetadata(widget.pubkey),
                         builder: (BuildContext context,
                             AsyncSnapshot<Map> snapshot) {
                           var name = "";
@@ -756,7 +753,7 @@ class _ProfilePageState extends State<ProfilePage>
                                 color: Palette.white, size: 17),
                             const SizedBox(width: 5),
                             FutureBuilder<List<List<dynamic>>>(
-                                future: widget._nostrService
+                                future: _nostrService
                                     .getUserContacts(widget.pubkey),
                                 builder: (BuildContext context,
                                     AsyncSnapshot<List<List<dynamic>>>
@@ -815,7 +812,7 @@ class _ProfilePageState extends State<ProfilePage>
                         GestureDetector(
                           onTap: () {
                             if (widget.pubkey ==
-                                widget._nostrService.myKeys.publicKey) {
+                                _nostrService.myKeys.publicKey) {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
@@ -830,16 +827,16 @@ class _ProfilePageState extends State<ProfilePage>
                                   color: Palette.white, size: 17),
                               const SizedBox(width: 5),
                               if (widget.pubkey ==
-                                  widget._nostrService.myKeys.publicKey)
+                                  _nostrService.myKeys.publicKey)
                                 Text(
-                                  "${widget._nostrService.relays.manualRelays.length} relays",
+                                  "${_nostrService.relays.manualRelays.length} relays",
                                   style: const TextStyle(
                                     color: Palette.white,
                                     fontSize: 14,
                                   ),
                                 ),
                               if (widget.pubkey !=
-                                  widget._nostrService.myKeys.publicKey)
+                                  _nostrService.myKeys.publicKey)
                                 const Text(
                                   "n.a. relays",
                                   style: TextStyle(
@@ -867,7 +864,7 @@ class _ProfilePageState extends State<ProfilePage>
               ),
             ],
           ),
-          _profileImage(_scrollController, widget),
+          _profileImage(_scrollController, widget, _nostrService),
           SafeArea(
             child: SizedBox(
               height: 55,
@@ -882,8 +879,7 @@ class _ProfilePageState extends State<ProfilePage>
                         : 0.0,
                     duration: const Duration(milliseconds: 200),
                     child: FutureBuilder<Map>(
-                        future:
-                            widget._nostrService.getUserMetadata(widget.pubkey),
+                        future: _nostrService.getUserMetadata(widget.pubkey),
                         builder: (BuildContext context,
                             AsyncSnapshot<Map> snapshot) {
                           var name = "";
@@ -918,7 +914,8 @@ class _ProfilePageState extends State<ProfilePage>
   }
 }
 
-Widget _profileImage(ScrollController sController, widget) {
+Widget _profileImage(
+    ScrollController sController, widget, NostrService nostrService) {
   const double defaultMargin = 125;
   const double defaultStart = 125;
   const double defaultEnd = defaultStart / 2;
@@ -974,7 +971,7 @@ Widget _profileImage(ScrollController sController, widget) {
           shape: BoxShape.circle,
         ),
         child: FutureBuilder<Map>(
-            future: widget._nostrService.getUserMetadata(widget.pubkey),
+            future: nostrService.getUserMetadata(widget.pubkey),
             builder: (BuildContext context, AsyncSnapshot<Map> snapshot) {
               var picture = "";
 
