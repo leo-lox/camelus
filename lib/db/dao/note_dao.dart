@@ -15,6 +15,25 @@ abstract class NoteDao {
   @Query("SELECT * FROM noteView WHERE noteView.pubkey IN (:pubkeys)")
   Future<List<DbNoteView>> findPubkeyNotes(List<String> pubkeys);
 
+  @Query(
+      "SELECT * FROM noteView WHERE noteView.pubkey IN (:pubkeys) ORDER BY created_at DESC")
+  Stream<List<DbNoteView>> findPubkeyNotesStream(List<String> pubkeys);
+
+  @Query(
+      "SELECT * FROM noteView WHERE noteView.pubkey IN (:pubkeys) AND kind = (:kind) ORDER BY created_at DESC")
+  Future<List<DbNoteView>> findPubkeyNotesByKind(
+      List<String> pubkeys, int kind);
+
+  @Query(
+      "SELECT * FROM noteView WHERE noteView.pubkey IN (:pubkeys) AND kind = (:kind) ORDER BY created_at DESC ")
+  Stream<List<DbNoteView>> findPubkeyNotesStreamByKind(
+      List<String> pubkeys, int kind);
+
+  @Query(
+      "SELECT * FROM noteView WHERE noteView.pubkey IN (:pubkeys) AND kind = (:kind) AND created_at > (:timestamp) ORDER BY created_at DESC")
+  Stream<List<DbNoteView>> findPubkeyNotesStreamByKindAndTimestamp(
+      List<String> pubkeys, int kind, int timestamp);
+
   @Query('SELECT content FROM note')
   Stream<List<String>> findAllNotesContentStream();
 

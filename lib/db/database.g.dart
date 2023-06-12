@@ -209,6 +209,122 @@ class _$NoteDao extends NoteDao {
   }
 
   @override
+  Stream<List<DbNoteView>> findPubkeyNotesStream(List<String> pubkeys) {
+    const offset = 1;
+    final _sqliteVariablesForPubkeys =
+        Iterable<String>.generate(pubkeys.length, (i) => '?${i + offset}')
+            .join(',');
+    return _queryAdapter.queryListStream(
+        'SELECT * FROM noteView WHERE noteView.pubkey IN (' +
+            _sqliteVariablesForPubkeys +
+            ') ORDER BY created_at DESC',
+        mapper: (Map<String, Object?> row) => DbNoteView(
+            id: row['id'] as String,
+            pubkey: row['pubkey'] as String,
+            created_at: row['created_at'] as int,
+            kind: row['kind'] as int,
+            content: row['content'] as String,
+            sig: row['sig'] as String,
+            tag_index: row['tag_index'] as String?,
+            tag_types: row['tag_types'] as String?,
+            tag_values: row['tag_values'] as String?,
+            tag_recommended_relays: row['tag_recommended_relays'] as String?,
+            tag_markers: row['tag_markers'] as String?),
+        arguments: [...pubkeys],
+        queryableName: 'noteView',
+        isView: true);
+  }
+
+  @override
+  Future<List<DbNoteView>> findPubkeyNotesByKind(
+    List<String> pubkeys,
+    int kind,
+  ) async {
+    const offset = 2;
+    final _sqliteVariablesForPubkeys =
+        Iterable<String>.generate(pubkeys.length, (i) => '?${i + offset}')
+            .join(',');
+    return _queryAdapter.queryList(
+        'SELECT * FROM noteView WHERE noteView.pubkey IN (' +
+            _sqliteVariablesForPubkeys +
+            ') AND kind = (?1) ORDER BY created_at DESC',
+        mapper: (Map<String, Object?> row) => DbNoteView(
+            id: row['id'] as String,
+            pubkey: row['pubkey'] as String,
+            created_at: row['created_at'] as int,
+            kind: row['kind'] as int,
+            content: row['content'] as String,
+            sig: row['sig'] as String,
+            tag_index: row['tag_index'] as String?,
+            tag_types: row['tag_types'] as String?,
+            tag_values: row['tag_values'] as String?,
+            tag_recommended_relays: row['tag_recommended_relays'] as String?,
+            tag_markers: row['tag_markers'] as String?),
+        arguments: [kind, ...pubkeys]);
+  }
+
+  @override
+  Stream<List<DbNoteView>> findPubkeyNotesStreamByKind(
+    List<String> pubkeys,
+    int kind,
+  ) {
+    const offset = 2;
+    final _sqliteVariablesForPubkeys =
+        Iterable<String>.generate(pubkeys.length, (i) => '?${i + offset}')
+            .join(',');
+    return _queryAdapter.queryListStream(
+        'SELECT * FROM noteView WHERE noteView.pubkey IN (' +
+            _sqliteVariablesForPubkeys +
+            ') AND kind = (?1) ORDER BY created_at DESC',
+        mapper: (Map<String, Object?> row) => DbNoteView(
+            id: row['id'] as String,
+            pubkey: row['pubkey'] as String,
+            created_at: row['created_at'] as int,
+            kind: row['kind'] as int,
+            content: row['content'] as String,
+            sig: row['sig'] as String,
+            tag_index: row['tag_index'] as String?,
+            tag_types: row['tag_types'] as String?,
+            tag_values: row['tag_values'] as String?,
+            tag_recommended_relays: row['tag_recommended_relays'] as String?,
+            tag_markers: row['tag_markers'] as String?),
+        arguments: [kind, ...pubkeys],
+        queryableName: 'noteView',
+        isView: true);
+  }
+
+  @override
+  Stream<List<DbNoteView>> findPubkeyNotesStreamByKindAndTimestamp(
+    List<String> pubkeys,
+    int kind,
+    int timestamp,
+  ) {
+    const offset = 3;
+    final _sqliteVariablesForPubkeys =
+        Iterable<String>.generate(pubkeys.length, (i) => '?${i + offset}')
+            .join(',');
+    return _queryAdapter.queryListStream(
+        'SELECT * FROM noteView WHERE noteView.pubkey IN (' +
+            _sqliteVariablesForPubkeys +
+            ') AND kind = (?1) AND created_at > (?2) ORDER BY created_at DESC',
+        mapper: (Map<String, Object?> row) => DbNoteView(
+            id: row['id'] as String,
+            pubkey: row['pubkey'] as String,
+            created_at: row['created_at'] as int,
+            kind: row['kind'] as int,
+            content: row['content'] as String,
+            sig: row['sig'] as String,
+            tag_index: row['tag_index'] as String?,
+            tag_types: row['tag_types'] as String?,
+            tag_values: row['tag_values'] as String?,
+            tag_recommended_relays: row['tag_recommended_relays'] as String?,
+            tag_markers: row['tag_markers'] as String?),
+        arguments: [kind, timestamp, ...pubkeys],
+        queryableName: 'noteView',
+        isView: true);
+  }
+
+  @override
   Stream<List<String>> findAllNotesContentStream() {
     return _queryAdapter.queryListStream('SELECT content FROM note',
         mapper: (Map<String, Object?> row) => row.values.first as String,

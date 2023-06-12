@@ -6,6 +6,7 @@ import 'package:camelus/atoms/spinner_center.dart';
 import 'package:camelus/models/socket_control.dart';
 import 'package:camelus/providers/nostr_service_provider.dart';
 import 'package:camelus/routes/nostr/nostr_page/global_feed_view.dart';
+import 'package:camelus/routes/nostr/nostr_page/user_feed_and_replies_page.dart';
 import 'package:camelus/routes/nostr/nostr_page/user_feed_original_view.dart';
 import 'package:camelus/routes/nostr/relays_page.dart';
 import 'package:flutter/material.dart';
@@ -329,10 +330,8 @@ class _NostrPageState extends ConsumerState<NostrPage>
             children: [
               if (pubkey.isNotEmpty) UserFeedOriginalView(pubkey: pubkey),
               if (pubkey.isEmpty) spinnerCenter(),
-              const Center(
-                child: Text("work in progress",
-                    style: TextStyle(fontSize: 25, color: Palette.white)),
-              ),
+              if (pubkey.isNotEmpty) UserFeedAndRepliesView(pubkey: pubkey),
+              if (pubkey.isEmpty) spinnerCenter(),
               GlobalFeedView()
             ],
           ),
