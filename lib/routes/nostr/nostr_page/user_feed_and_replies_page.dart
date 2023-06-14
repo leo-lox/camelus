@@ -3,9 +3,8 @@ import 'dart:developer';
 
 import 'package:camelus/db/database.dart';
 import 'package:camelus/db/entities/db_note_view.dart';
+import 'package:camelus/models/nostr_note.dart';
 import 'package:camelus/providers/database_provider.dart';
-import 'package:camelus/providers/nostr_service_provider.dart';
-import 'package:camelus/services/nostr/nostr_service.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -21,13 +20,12 @@ class UserFeedAndRepliesView extends ConsumerStatefulWidget {
 
 class UserFeedAndRepliesViewState
     extends ConsumerState<UserFeedAndRepliesView> {
-  late NostrService _nostrService;
   late AppDatabase db;
   late List<String> _followingPubkeys;
   final List<StreamSubscription> _subscriptions = [];
 
-  final StreamController<List<DbNoteView>> _streamController =
-      StreamController<List<DbNoteView>>.broadcast();
+  final StreamController<List<NostrNote>> _streamController =
+      StreamController<List<NostrNote>>.broadcast();
 
   _streamFeed() async {
     log("streaming feed ");
@@ -38,7 +36,7 @@ class UserFeedAndRepliesViewState
         await db.noteDao.findPubkeyNotesByKind(_followingPubkeys, 1);
     log("streaming getResult: ${getresult.length} notes; executed in ${stopwatch.elapsed}");
 
-    _streamController.add(getresult);
+    _streamController.add(getresult.map((e) => e.toNostrNote()).toList());
 
     Stream<List<DbNoteView>> stream =
         db.noteDao.findPubkeyNotesStreamByKind(_followingPubkeys, 1);
@@ -46,18 +44,18 @@ class UserFeedAndRepliesViewState
     _subscriptions.add(stream.listen((event) {
       stream.listen((event) {
         log("streaming: ${event.length} notes");
-        _streamController.add(event);
+        _streamController.add(event.map((e) => e.toNostrNote()).toList());
       });
     }));
   }
 
   Future<void> _getFollowingPubkeys() async {
-    var following = await _nostrService.getUserContacts(widget.pubkey);
-    // extract public keys
-    _followingPubkeys = [];
-    for (var f in following) {
-      _followingPubkeys.add(f[1]);
-    }
+    var kind3 = (await db.noteDao.findPubkeyNotesByKind([widget.pubkey], 3))[0]
+        .toNostrNote();
+    List<String> followingList =
+        kind3.getTagPubkeys.map((e) => e.value).toList();
+
+    _followingPubkeys = followingList;
     return;
   }
 
@@ -66,13 +64,8 @@ class UserFeedAndRepliesViewState
     return;
   }
 
-  void _initNostrService() {
-    _nostrService = ref.read(nostrServiceProvider);
-  }
-
   void _initSequence() async {
     await _initDb();
-    _initNostrService();
     await _getFollowingPubkeys();
     //_streamFeed();
   }
@@ -97,7 +90,7 @@ class UserFeedAndRepliesViewState
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<List<DbNoteView>>(
+    return StreamBuilder<List<NostrNote>>(
       stream: _streamController.stream,
       builder: (context, snapshot) {
         if (snapshot.hasData) {

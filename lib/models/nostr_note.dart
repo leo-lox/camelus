@@ -75,4 +75,14 @@ class NostrNote {
     }
     return tags;
   }
+
+  List<NostrTag> get getTagPubkeys {
+    List<NostrTag> mytags = [];
+    for (NostrTag tag in tags) {
+      if (tag.type == 'p') {
+        mytags.add(tag);
+      }
+    }
+    return mytags;
+  }
 }
