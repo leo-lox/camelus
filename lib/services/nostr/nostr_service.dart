@@ -225,10 +225,15 @@ class NostrService {
 
     // ! debug only
     if (event[0] == "EVENT") {
-      log("debug: $event");
       var eventBody = event[2];
-      database.then(
-          (db) => db.noteDao.insertNostrNote(NostrNote.fromJson(eventBody)));
+      // check if its already in the db
+      await database
+          .then(
+            (db) => db.noteDao.insertNostrNote(NostrNote.fromJson(eventBody)),
+          )
+          .onError((error, stackTrace) => {
+                // probably already in db
+              });
     }
 
     // filter by subscription id

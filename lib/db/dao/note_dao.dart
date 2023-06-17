@@ -12,6 +12,9 @@ abstract class NoteDao {
   @Query('SELECT * FROM noteView')
   Future<List<DbNoteView>> findAllNotes();
 
+  @Query('SELECT * FROM noteView WHERE id = :id')
+  Future<List<DbNoteView>> findNote(String id);
+
   @Query("SELECT * FROM noteView WHERE noteView.pubkey IN (:pubkeys)")
   Future<List<DbNoteView>> findPubkeyNotes(List<String> pubkeys);
 
@@ -26,7 +29,13 @@ abstract class NoteDao {
 
   @Query(
       "SELECT * FROM noteView WHERE noteView.pubkey IN (:pubkeys) AND kind = (:kind) ORDER BY created_at DESC ")
-  Stream<List<DbNoteView>> findPubkeyNotesStreamByKind(
+  Stream<List<DbNoteView>> findPubkeyNotesByKindStream(
+      List<String> pubkeys, int kind);
+
+  /// floor gets confused when streaming from a view, so instead use this to notify and then get notes from the view
+  @Query(
+      "SELECT * FROM Note WHERE Note.pubkey IN (:pubkeys) AND kind = (:kind) ORDER BY created_at DESC ")
+  Stream<List<DbNoteView>> findPubkeyNotesByKindStreamNotifyOnly(
       List<String> pubkeys, int kind);
 
   @Query(
@@ -57,6 +66,9 @@ abstract class NoteDao {
 
   @transaction
   Future<void> insertNostrNote(NostrNote nostrNote) async {
+    // probalby faster then failed unique contraint && doenst trigger updates on streams
+    var exists = await findNote(nostrNote.id);
+    if (exists.isNotEmpty) return;
     await insertNote(nostrNote.toDbNote());
     await insertTags(nostrNote.toDbTag());
   }

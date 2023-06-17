@@ -184,6 +184,24 @@ class _$NoteDao extends NoteDao {
   }
 
   @override
+  Future<List<DbNoteView>> findNote(String id) async {
+    return _queryAdapter.queryList('SELECT * FROM noteView WHERE id = ?1',
+        mapper: (Map<String, Object?> row) => DbNoteView(
+            id: row['id'] as String,
+            pubkey: row['pubkey'] as String,
+            created_at: row['created_at'] as int,
+            kind: row['kind'] as int,
+            content: row['content'] as String,
+            sig: row['sig'] as String,
+            tag_index: row['tag_index'] as String?,
+            tag_types: row['tag_types'] as String?,
+            tag_values: row['tag_values'] as String?,
+            tag_recommended_relays: row['tag_recommended_relays'] as String?,
+            tag_markers: row['tag_markers'] as String?),
+        arguments: [id]);
+  }
+
+  @override
   Future<List<DbNoteView>> findPubkeyNotes(List<String> pubkeys) async {
     const offset = 1;
     final _sqliteVariablesForPubkeys =
@@ -264,7 +282,7 @@ class _$NoteDao extends NoteDao {
   }
 
   @override
-  Stream<List<DbNoteView>> findPubkeyNotesStreamByKind(
+  Stream<List<DbNoteView>> findPubkeyNotesByKindStream(
     List<String> pubkeys,
     int kind,
   ) {
@@ -290,6 +308,36 @@ class _$NoteDao extends NoteDao {
             tag_markers: row['tag_markers'] as String?),
         arguments: [kind, ...pubkeys],
         queryableName: 'noteView',
+        isView: true);
+  }
+
+  @override
+  Stream<List<DbNoteView>> findPubkeyNotesByKindStreamNotifyOnly(
+    List<String> pubkeys,
+    int kind,
+  ) {
+    const offset = 2;
+    final _sqliteVariablesForPubkeys =
+        Iterable<String>.generate(pubkeys.length, (i) => '?${i + offset}')
+            .join(',');
+    return _queryAdapter.queryListStream(
+        'SELECT * FROM Note WHERE Note.pubkey IN (' +
+            _sqliteVariablesForPubkeys +
+            ') AND kind = (?1) ORDER BY created_at DESC',
+        mapper: (Map<String, Object?> row) => DbNoteView(
+            id: row['id'] as String,
+            pubkey: row['pubkey'] as String,
+            created_at: row['created_at'] as int,
+            kind: row['kind'] as int,
+            content: row['content'] as String,
+            sig: row['sig'] as String,
+            tag_index: row['tag_index'] as String?,
+            tag_types: row['tag_types'] as String?,
+            tag_values: row['tag_values'] as String?,
+            tag_recommended_relays: row['tag_recommended_relays'] as String?,
+            tag_markers: row['tag_markers'] as String?),
+        arguments: [kind, ...pubkeys],
+        queryableName: 'Note',
         isView: true);
   }
 
@@ -468,8 +516,8 @@ class _$TagDao extends TagDao {
   }
 
   @override
-  Stream<DbTag?> findNoteByIdStream(int id) {
-    return _queryAdapter.queryStream('SELECT * FROM Tag WHERE id = ?1',
+  Stream<DbTag?> findNoteByNoteIdStream(int noteId) {
+    return _queryAdapter.queryStream('SELECT * FROM Tag WHERE note_id = ?1',
         mapper: (Map<String, Object?> row) => DbTag(
             note_id: row['note_id'] as String,
             tag_index: row['tag_index'] as int,
@@ -477,7 +525,7 @@ class _$TagDao extends TagDao {
             value: row['value'] as String,
             recommended_relay: row['recommended_relay'] as String?,
             marker: row['marker'] as String?),
-        arguments: [id],
+        arguments: [noteId],
         queryableName: 'Tag',
         isView: false);
   }

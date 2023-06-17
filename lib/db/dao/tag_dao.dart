@@ -9,8 +9,8 @@ abstract class TagDao {
   @Query('SELECT * FROM Tag ')
   Future<List<DbTag>> findAllNotes();
 
-  @Query('SELECT * FROM Tag WHERE id = :id')
-  Stream<DbTag?> findNoteByIdStream(int id);
+  @Query('SELECT * FROM Tag WHERE note_id = :noteId')
+  Stream<DbTag?> findNoteByNoteIdStream(int noteId);
 
   @insert
   Future<void> insertTag(DbTag tag);

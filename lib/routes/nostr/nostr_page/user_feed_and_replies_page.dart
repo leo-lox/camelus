@@ -5,14 +5,19 @@ import 'package:camelus/db/database.dart';
 import 'package:camelus/db/entities/db_note_view.dart';
 import 'package:camelus/models/nostr_note.dart';
 import 'package:camelus/providers/database_provider.dart';
+import 'package:camelus/services/nostr/feeds/user_and_replies_feed.dart';
+import 'package:camelus/services/nostr/relays/relays.dart';
+import 'package:camelus/services/nostr/relays/relays_injector.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class UserFeedAndRepliesView extends ConsumerStatefulWidget {
   final String pubkey;
+  final Relays _relays;
 
-  const UserFeedAndRepliesView({Key? key, required this.pubkey})
-      : super(key: key);
+  UserFeedAndRepliesView({Key? key, required this.pubkey})
+      : _relays = RelaysInjector().relays,
+        super(key: key);
 
   @override
   UserFeedAndRepliesViewState createState() => UserFeedAndRepliesViewState();
@@ -22,32 +27,9 @@ class UserFeedAndRepliesViewState
     extends ConsumerState<UserFeedAndRepliesView> {
   late AppDatabase db;
   late List<String> _followingPubkeys;
-  final List<StreamSubscription> _subscriptions = [];
+  late UserFeedAndRepliesFeed _userFeedAndRepliesFeed;
 
-  final StreamController<List<NostrNote>> _streamController =
-      StreamController<List<NostrNote>>.broadcast();
-
-  _streamFeed() async {
-    log("streaming feed ");
-
-    final stopwatch = Stopwatch()..start();
-
-    var getresult =
-        await db.noteDao.findPubkeyNotesByKind(_followingPubkeys, 1);
-    log("streaming getResult: ${getresult.length} notes; executed in ${stopwatch.elapsed}");
-
-    _streamController.add(getresult.map((e) => e.toNostrNote()).toList());
-
-    Stream<List<DbNoteView>> stream =
-        db.noteDao.findPubkeyNotesStreamByKind(_followingPubkeys, 1);
-
-    _subscriptions.add(stream.listen((event) {
-      stream.listen((event) {
-        log("streaming: ${event.length} notes");
-        _streamController.add(event.map((e) => e.toNostrNote()).toList());
-      });
-    }));
-  }
+  final Completer<void> _servicesReady = Completer<void>();
 
   Future<void> _getFollowingPubkeys() async {
     var kind3 = (await db.noteDao.findPubkeyNotesByKind([widget.pubkey], 3))[0]
@@ -64,10 +46,13 @@ class UserFeedAndRepliesViewState
     return;
   }
 
-  void _initSequence() async {
+  Future<void> _initSequence() async {
     await _initDb();
     await _getFollowingPubkeys();
-    //_streamFeed();
+    _userFeedAndRepliesFeed =
+        UserFeedAndRepliesFeed(db, _followingPubkeys, widget._relays);
+    _servicesReady.complete();
+    return;
   }
 
   @override
@@ -78,44 +63,54 @@ class UserFeedAndRepliesViewState
 
   @override
   void dispose() {
-    _disposeSubscriptions();
+    _userFeedAndRepliesFeed.cleanup();
     super.dispose();
-  }
-
-  void _disposeSubscriptions() {
-    for (var s in _subscriptions) {
-      s.cancel();
-    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<List<NostrNote>>(
-      stream: _streamController.stream,
+    return FutureBuilder(
+      future: _servicesReady.future,
       builder: (context, snapshot) {
-        if (snapshot.hasData) {
-          var notes = snapshot.data!;
-          return ListView.builder(
-            itemCount: notes.length,
-            itemBuilder: (context, index) {
-              var note = notes[index];
-              return ListTile(
-                title: Text(note.content),
-                subtitle: Text(note.created_at.toString()),
-              );
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        if (snapshot.hasError) {
+          return const Center(child: Text('Error'));
+        }
+
+        if (snapshot.connectionState == ConnectionState.done) {
+          return StreamBuilder<List<NostrNote>>(
+            stream: _userFeedAndRepliesFeed.feedStream,
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                var notes = snapshot.data!;
+                return ListView.builder(
+                  itemCount: notes.length,
+                  itemBuilder: (context, index) {
+                    var note = notes[index];
+                    return ListTile(
+                      title: Text(note.content),
+                      subtitle: Text(note.created_at.toString()),
+                    );
+                  },
+                );
+              }
+              if (snapshot.hasError) {
+                return Center(
+                    //button
+                    child: ElevatedButton(
+                  onPressed: () {},
+                  child: Text(snapshot.error.toString(),
+                      style: TextStyle(fontSize: 20, color: Colors.white)),
+                ));
+              }
+              return const Text("waiting for stream trigger ",
+                  style: TextStyle(fontSize: 20));
             },
           );
-        } else {
-          return Center(
-              //button
-              child: ElevatedButton(
-            onPressed: () {
-              _streamFeed();
-            },
-            child: Text("Refresh",
-                style: TextStyle(fontSize: 20, color: Colors.white)),
-          ));
         }
+        return const Center(child: Text('Error'));
       },
     );
   }
