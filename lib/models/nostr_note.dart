@@ -23,6 +23,18 @@ class NostrNote {
     required this.tags,
   });
 
+  List<String> get relayHints => _extractRelayHints();
+
+  List<String> _extractRelayHints() {
+    List<String> relayHints = [];
+    for (NostrTag tag in tags) {
+      if (tag.recommended_relay != null) {
+        relayHints.add(tag.recommended_relay!);
+      }
+    }
+    return relayHints;
+  }
+
   factory NostrNote.fromJson(Map<String, dynamic> json) {
     List<dynamic> tagsJson = json['tags'] ?? [];
     List<List<String>> tags = [];

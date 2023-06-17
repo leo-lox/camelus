@@ -1,7 +1,7 @@
 import 'dart:developer';
 import 'dart:ui';
 
-import 'package:camelus/components/bottom_sheet_more.dart';
+import 'package:camelus/components/note_card/bottom_sheet_more.dart';
 import 'package:camelus/components/bottom_sheet_share.dart';
 import 'package:camelus/providers/nostr_service_provider.dart';
 import 'package:flutter/gestures.dart';
@@ -500,8 +500,8 @@ class _TweetCardState extends ConsumerState<TweetCard> {
                                         ),
                                         GestureDetector(
                                           onTap: () {
-                                            openBottomSheetMore(
-                                                context, widget.tweet);
+                                            //openBottomSheetMore(
+                                            //    context, widget.tweet);
                                           },
                                           child: SvgPicture.asset(
                                             'assets/icons/tweetSetting.svg',
@@ -624,8 +624,8 @@ class _TweetCardState extends ConsumerState<TweetCard> {
                                         ),
                                         GestureDetector(
                                           onTap: () => {
-                                            openBottomSheetShare(
-                                                context, widget.tweet)
+                                            // openBottomSheetShare(
+                                            //     context, widget.tweet)
                                           },
                                           child: SvgPicture.asset(
                                             height: 23,

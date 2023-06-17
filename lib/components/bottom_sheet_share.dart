@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:camelus/config/palette.dart';
 import 'package:camelus/helpers/helpers.dart';
 import 'package:camelus/helpers/nevent_helper.dart';
+import 'package:camelus/models/nostr_note.dart';
 import 'package:camelus/models/tweet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -11,7 +12,7 @@ Future<void> _copyToClipboard(String data) async {
   await Clipboard.setData(ClipboardData(text: data));
 }
 
-void openBottomSheetShare(context, Tweet tweet) {
+void openBottomSheetShare(context, NostrNote note) {
   showModalBottomSheet(
       isScrollControlled: false,
       elevation: 10,
@@ -43,9 +44,9 @@ void openBottomSheetShare(context, Tweet tweet) {
                                 onPressed: () {
                                   var bech32nevent =
                                       NeventHelper().mapToBech32({
-                                    "eventId": tweet.id,
-                                    "authorPubkey": tweet.pubkey,
-                                    "relays": tweet.relayHints.keys.toList(),
+                                    "eventId": note.id,
+                                    "authorPubkey": note.pubkey,
+                                    "relays": note.relayHints,
                                   });
                                   _copyToClipboard(bech32nevent);
                                 },
@@ -67,9 +68,9 @@ void openBottomSheetShare(context, Tweet tweet) {
                                 onPressed: () {
                                   var bech32nevent =
                                       NeventHelper().mapToBech32({
-                                    "eventId": tweet.id,
-                                    "authorPubkey": tweet.pubkey,
-                                    "relays": tweet.relayHints.keys.toList(),
+                                    "eventId": note.id,
+                                    "authorPubkey": note.pubkey,
+                                    "relays": note.relayHints,
                                   });
                                   _copyToClipboard(
                                       'https://www.nostr.guru/$bech32nevent');
@@ -100,9 +101,9 @@ void openBottomSheetShare(context, Tweet tweet) {
                                 onPressed: () {
                                   var bech32nevent =
                                       NeventHelper().mapToBech32({
-                                    "eventId": tweet.id,
-                                    "authorPubkey": tweet.pubkey,
-                                    "relays": tweet.relayHints.keys.toList(),
+                                    "eventId": note.id,
+                                    "authorPubkey": note.pubkey,
+                                    "relays": note.relayHints,
                                   });
 
                                   _copyToClipboard(
@@ -125,7 +126,7 @@ void openBottomSheetShare(context, Tweet tweet) {
                                 tooltip: 'iris',
                                 onPressed: () {
                                   var bech32note =
-                                      Helpers().encodeBech32(tweet.id, "note");
+                                      Helpers().encodeBech32(note.id, "note");
                                   _copyToClipboard(
                                       'https://iris.to/$bech32note');
                                 },
@@ -147,9 +148,9 @@ void openBottomSheetShare(context, Tweet tweet) {
                                 onPressed: () {
                                   var bech32nevent =
                                       NeventHelper().mapToBech32({
-                                    "eventId": tweet.id,
-                                    "authorPubkey": tweet.pubkey,
-                                    "relays": tweet.relayHints.keys.toList(),
+                                    "eventId": note.id,
+                                    "authorPubkey": note.pubkey,
+                                    "relays": note.relayHints,
                                   });
                                   _copyToClipboard(
                                       'https://coracle.social/$bech32nevent');

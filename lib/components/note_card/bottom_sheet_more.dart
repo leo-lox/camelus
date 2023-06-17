@@ -2,12 +2,13 @@ import 'dart:ui';
 
 import 'package:camelus/components/seen_on_relays.dart';
 import 'package:camelus/config/palette.dart';
+import 'package:camelus/models/nostr_note.dart';
 import 'package:camelus/models/tweet.dart';
 import 'package:camelus/routes/nostr/blockedUsers/block_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
-void openBottomSheetMore(context, Tweet tweet) {
+void openBottomSheetMore(context, NostrNote note) {
   showModalBottomSheet(
       isScrollControlled: false,
       elevation: 10,
@@ -28,13 +29,14 @@ void openBottomSheetMore(context, Tweet tweet) {
                         onTap: () {
                           // push Seen on relays
 
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  SeenOnRelaysPage(tweet: tweet),
-                            ),
-                          );
+                          //Navigator.push(
+                          //  context,
+                          //  MaterialPageRoute(
+                          //    builder: (context) =>
+                          //        SeenOnRelaysPage(note: note),
+                          //  ),
+                          //);
+                          //! todo: push seen on relays
                         },
                         child: Container(
                           color: Palette.background,
@@ -65,7 +67,7 @@ void openBottomSheetMore(context, Tweet tweet) {
                             context,
                             MaterialPageRoute(
                               builder: (context) => BlockPage(
-                                  postId: tweet.id, userPubkey: tweet.pubkey),
+                                  postId: note.id, userPubkey: note.pubkey),
                             ),
                           );
                         },

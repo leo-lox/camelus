@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:developer';
 
+import 'package:camelus/components/note_card/note_card_container.dart';
 import 'package:camelus/db/database.dart';
 import 'package:camelus/db/entities/db_note_view.dart';
 import 'package:camelus/models/nostr_note.dart';
@@ -85,15 +86,18 @@ class UserFeedAndRepliesViewState
             builder: (context, snapshot) {
               if (snapshot.hasData) {
                 var notes = snapshot.data!;
-                return ListView.builder(
-                  itemCount: notes.length,
-                  itemBuilder: (context, index) {
-                    var note = notes[index];
-                    return ListTile(
-                      title: Text(note.content),
-                      subtitle: Text(note.created_at.toString()),
-                    );
-                  },
+                return CustomScrollView(
+                  slivers: [
+                    SliverList(
+                      delegate: SliverChildBuilderDelegate(
+                        (context, index) {
+                          var note = notes[index];
+                          return NoteCardContainer(notes: [note]);
+                        },
+                        childCount: notes.length,
+                      ),
+                    ),
+                  ],
                 );
               }
               if (snapshot.hasError) {
