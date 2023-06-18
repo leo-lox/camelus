@@ -14,17 +14,17 @@ class ImagesTileView extends StatelessWidget {
     int imageCount = images.length;
     int additionalImages = imageCount - 4;
 
-    return SizedBox(
-      width: double.infinity,
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(8),
-          color: Palette.extraDarkGray.withOpacity(0.5),
-        ),
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(10),
+      child: SizedBox(
+        width: double.infinity,
         child: GridView.count(
+          childAspectRatio: (16 / 10),
+          crossAxisSpacing: 2,
+          mainAxisSpacing: 2,
           physics: const NeverScrollableScrollPhysics(),
           shrinkWrap: true,
-          crossAxisCount: imageCount > 2 ? 2 : 1,
+          crossAxisCount: imageCount > 1 ? 2 : 1,
           children: List.generate(
             imageCount > 4 ? 4 : imageCount,
             (index) {

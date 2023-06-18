@@ -3,6 +3,7 @@ import 'dart:ffi';
 import 'package:camelus/config/palette.dart';
 import 'package:flutter/material.dart';
 import 'package:photo_view/photo_view.dart';
+import 'package:flutter/services.dart';
 
 class ImageGallery extends StatefulWidget {
   final List<String> imageUrls;
@@ -27,9 +28,32 @@ class _ImageGalleryState extends State<ImageGallery> {
   bool _hideStatusBarWhileViewing = false;
   late int _currentPageIndex;
 
+  void _showHideStatusBar(bool show) {
+    if (show) {
+      SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+
+      // SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+      //   statusBarColor: Palette.background.withOpacity(0.8),
+      //   statusBarIconBrightness: Brightness.light,
+      //   statusBarBrightness: Brightness.light,
+      //   systemNavigationBarColor: Colors.transparent,
+      //   systemNavigationBarIconBrightness: Brightness.light,
+      // ));
+    } else {
+      SystemChrome.setEnabledSystemUIMode(SystemUiMode.leanBack);
+    }
+  }
+
+  void _resetStatusBar() {
+    if (!_hideStatusBarWhileViewing) return;
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
+        overlays: SystemUiOverlay.values);
+  }
+
   @override
   void initState() {
     super.initState();
+    _showHideStatusBar(true);
     _currentPageIndex = widget.defaultImageIndex;
     _pageController = PageController(initialPage: widget.defaultImageIndex);
     // notify on page change
@@ -42,6 +66,7 @@ class _ImageGalleryState extends State<ImageGallery> {
 
   @override
   void dispose() {
+    _resetStatusBar();
     _pageController.dispose();
     super.dispose();
   }
@@ -49,10 +74,13 @@ class _ImageGalleryState extends State<ImageGallery> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      extendBody: true,
+      extendBodyBehindAppBar: true,
+      backgroundColor: Colors.transparent,
       body: GestureDetector(
         onTap: () {
           setState(() {
+            _showHideStatusBar(_hideStatusBarWhileViewing);
             _hideStatusBarWhileViewing = !_hideStatusBarWhileViewing;
           });
         },
@@ -78,14 +106,14 @@ class _ImageGalleryState extends State<ImageGallery> {
                 );
               },
             ),
-            AnimatedOpacity(
-              opacity: _hideStatusBarWhileViewing ? 0 : 1,
-              duration: const Duration(milliseconds: 100),
-              curve: Curves.easeInOut,
-              child: Container(
-                width: MediaQuery.of(context).size.width,
-                color: Palette.background.withOpacity(0.8),
-                child: SafeArea(
+            SafeArea(
+              child: AnimatedOpacity(
+                opacity: _hideStatusBarWhileViewing ? 0 : 1,
+                duration: const Duration(milliseconds: 100),
+                curve: Curves.easeInOut,
+                child: Container(
+                  width: MediaQuery.of(context).size.width,
+                  color: Palette.background.withOpacity(0.25),
                   child: Row(
                     children: [
                       IconButton(
