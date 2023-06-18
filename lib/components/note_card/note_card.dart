@@ -63,7 +63,7 @@ class _NoteCardState extends ConsumerState<NoteCard> {
         Container(
           // fix so whole card is clickable
           //color: Palette.purple,
-          margin: const EdgeInsets.fromLTRB(10, 10, 10, 0),
+          margin: const EdgeInsets.fromLTRB(10, 0, 10, 0),
           // debug:  color if is reply
           //color: tweet.isReply ? Palette.darkGray : null,
           // height: 200.0,

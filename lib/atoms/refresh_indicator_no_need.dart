@@ -15,11 +15,10 @@ Widget RefreshIndicatorNoNeed(
           myIndicator(
               value: controller.value, loading: controller.state.isLoading),
           Transform.scale(
-            scale: controller.value < 0.2 ? 1.0 - controller.value : 0.80,
-            child: Container(
-              color: Palette.black,
-              child: child,
-            ),
+            scale: (controller.value * 0.2) < 0.1
+                ? 1.0 - (controller.value * 0.2)
+                : 0.90,
+            child: child,
           ),
         ],
       );

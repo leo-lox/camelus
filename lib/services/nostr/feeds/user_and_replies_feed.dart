@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:developer';
 
 import 'package:camelus/db/database.dart';
@@ -30,6 +31,8 @@ class UserFeedAndRepliesFeed {
   /// streams the current feed with updates as they come in below the fixedTopNote
   Stream<List<NostrNote>> get feedStream => _feedStreamController.stream;
 
+  List<NostrNote> get feed => _feed;
+
   /// notifies when new notes are available with a list of new notes @call integrateNewNotes()
   Stream<List<NostrNote>> get newNotesStream => _newNotesController.stream;
 
@@ -43,6 +46,7 @@ class UserFeedAndRepliesFeed {
 
   /// cancels relay subscriptions and stream subscriptions
   void cleanup() {
+    log("debug: cleanupCalled");
     _closeAllRelaySubscriptions();
     _disposeSubscriptions();
   }
@@ -135,7 +139,7 @@ class UserFeedAndRepliesFeed {
 
   /// Relay handeling
 
-  void _requestRelayUserFeedAndReplies({
+  void requestRelayUserFeedAndReplies({
     required List<String> users,
     required String requestId,
     int? since,
@@ -184,7 +188,8 @@ class UserFeedAndRepliesFeed {
   }
 
   void _closeAllRelaySubscriptions() {
-    for (var reqId in _requestIds) {
+    List<String> copy = List.from(_requestIds);
+    for (var reqId in copy) {
       _closeRelaySubscription(reqId);
     }
   }
@@ -195,7 +200,11 @@ class UserFeedAndRepliesFeed {
       subId,
     ];
 
-    _relays.requestEvents(data);
+    var jsonString = json.encode(data);
+    for (var relay in _relays.connectedRelaysRead.entries) {
+      relay.value.socket.add(jsonString);
+      relay.value.requestInFlight[subId] = true;
+    }
 
     _requestIds.remove(subId);
   }

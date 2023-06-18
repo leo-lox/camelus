@@ -97,4 +97,14 @@ class NostrNote {
     }
     return mytags;
   }
+
+  List<NostrTag> get getTagEvents {
+    List<NostrTag> mytags = [];
+    for (NostrTag tag in tags) {
+      if (tag.type == 'e') {
+        mytags.add(tag);
+      }
+    }
+    return mytags;
+  }
 }

@@ -305,7 +305,7 @@ class _TweetCardState extends ConsumerState<TweetCard> {
                           child: Row(
                             children: [
                               const SizedBox(width: 25),
-                              const Text("in reply to ",
+                              const Text("replying to",
                                   style: TextStyle(
                                       fontSize: 16, color: Palette.gray)),
                               const SizedBox(width: 5),

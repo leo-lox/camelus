@@ -38,4 +38,9 @@ class NostrTag {
         recommended_relay: newTag["recommended_relay"],
         marker: newTag["marker"]);
   }
+
+  @override
+  String toString() {
+    return 'NostrTag{type: $type, value: $value, recommended_relay: $recommended_relay, marker: $marker}';
+  }
 }

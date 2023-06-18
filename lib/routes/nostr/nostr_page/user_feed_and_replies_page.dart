@@ -31,6 +31,7 @@ class UserFeedAndRepliesView extends ConsumerStatefulWidget {
 class UserFeedAndRepliesViewState
     extends ConsumerState<UserFeedAndRepliesView> {
   late AppDatabase db;
+  final List<StreamSubscription> _subscriptions = [];
   late List<String> _followingPubkeys;
   late UserFeedAndRepliesFeed _userFeedAndRepliesFeed;
   final Completer<void> _servicesReady = Completer<void>();
@@ -38,6 +39,98 @@ class UserFeedAndRepliesViewState
   late final RetainableScrollController _scrollControllerFeed =
       RetainableScrollController();
   bool _newPostsAvailable = false;
+
+  final String userFeedFreshId = "fresh";
+  final String userFeedTimelineFetchId = "timeline";
+
+  NostrNote? _lastNoteInFeed;
+
+  void _setupScrollListener() {
+    _scrollControllerFeed.addListener(() {
+      if (_scrollControllerFeed.position.pixels ==
+          _scrollControllerFeed.position.maxScrollExtent) {
+        log("reached end of scroll");
+
+        _userFeedLoadMore();
+      }
+
+      if (_scrollControllerFeed.position.pixels < 100) {
+        //log("reached top of scroll");
+        if (_newPostsAvailable) {
+          setState(() {
+            _newPostsAvailable = false;
+          });
+        }
+      }
+    });
+  }
+
+  void _setupNewNotesListener() {
+    _subscriptions.add(
+      _userFeedAndRepliesFeed.newNotesStream.listen((event) {
+        log("new notes stream event");
+        setState(() {
+          _newPostsAvailable = true;
+        });
+      }),
+    );
+  }
+
+  void _integrateNewNotes() {
+    _userFeedAndRepliesFeed.integrateNewNotes();
+    _scrollControllerFeed.animateTo(
+      _scrollControllerFeed.position.minScrollExtent - 50,
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeOut,
+    );
+    setState(() {
+      _newPostsAvailable = false;
+    });
+  }
+
+  void _initUserFeed() {
+    int now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
+
+    int latestTweet = now - 86400; // -1 day
+
+    // add own pubkey to list
+    var combinedPubkeys = [
+      ..._followingPubkeys,
+      widget.pubkey,
+    ];
+
+    _userFeedAndRepliesFeed.requestRelayUserFeedAndReplies(
+      users: combinedPubkeys,
+      requestId: userFeedFreshId,
+      limit: 15,
+      since: latestTweet,
+    );
+  }
+
+  void _userFeedLoadMore() async {
+    log("load more called");
+
+    if (_followingPubkeys.isEmpty) {
+      log("!!! no following users found !!!");
+      return;
+    }
+    // add own pubkey to list
+    var combinedPubkeys = [
+      ..._followingPubkeys,
+      widget.pubkey,
+    ];
+
+    int now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
+    // schould not be needed
+    int defaultUntil = now - 86400 * 7; // -1 week
+
+    _userFeedAndRepliesFeed.requestRelayUserFeedAndReplies(
+      users: combinedPubkeys,
+      requestId: userFeedTimelineFetchId,
+      limit: 20,
+      until: _lastNoteInFeed?.created_at ?? defaultUntil,
+    );
+  }
 
   Future<void> _getFollowingPubkeys() async {
     var kind3 = (await db.noteDao.findPubkeyNotesByKind([widget.pubkey], 3))[0]
@@ -55,11 +148,16 @@ class UserFeedAndRepliesViewState
   }
 
   Future<void> _initSequence() async {
+    log("init sequence");
     await _initDb();
     await _getFollowingPubkeys();
     _userFeedAndRepliesFeed =
         UserFeedAndRepliesFeed(db, _followingPubkeys, widget._relays);
     _servicesReady.complete();
+
+    _initUserFeed();
+    _setupScrollListener();
+    _setupNewNotesListener();
 
     return;
   }
@@ -73,7 +171,14 @@ class UserFeedAndRepliesViewState
   @override
   void dispose() {
     _userFeedAndRepliesFeed.cleanup();
+    _disposeSubscriptions();
     super.dispose();
+  }
+
+  void _disposeSubscriptions() {
+    for (var s in _subscriptions) {
+      s.cancel();
+    }
   }
 
   @override
@@ -97,9 +202,11 @@ class UserFeedAndRepliesViewState
                 },
                 child: StreamBuilder<List<NostrNote>>(
                   stream: _userFeedAndRepliesFeed.feedStream,
+                  //initialData: _userFeedAndRepliesFeed.feed,
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
                       var notes = snapshot.data!;
+                      _lastNoteInFeed = notes.last;
                       return CustomScrollView(
                         physics: const BouncingScrollPhysics(),
                         controller: _scrollControllerFeed,
@@ -135,13 +242,7 @@ class UserFeedAndRepliesViewState
                 newPostsAvailable(
                     name: "ok",
                     onPressed: () {
-                      _scrollControllerFeed.animateTo(
-                          _scrollControllerFeed.position.minScrollExtent - 50,
-                          duration: const Duration(milliseconds: 300),
-                          curve: Curves.easeOut);
-                      setState(() {
-                        _newPostsAvailable = false;
-                      });
+                      _integrateNewNotes();
                     }),
             ],
           );
