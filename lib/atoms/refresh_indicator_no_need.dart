@@ -12,21 +12,15 @@ Widget RefreshIndicatorNoNeed(
     ) {
       return Stack(
         children: <Widget>[
-          //Transform.scale(
-          //  // max 0.8
-          //  scale: 1.0 - controller.value,
-          //  child: child,
-          //),
-          //child,
-
-          Transform.scale(
-            scale: controller.value < 0.1 ? 1.0 - controller.value : 0.9,
-            child: child,
-          ),
-
-          /// Your indicator implementation
           myIndicator(
               value: controller.value, loading: controller.state.isLoading),
+          Transform.scale(
+            scale: controller.value < 0.2 ? 1.0 - controller.value : 0.80,
+            child: Container(
+              color: Palette.black,
+              child: child,
+            ),
+          ),
         ],
       );
     },
@@ -54,8 +48,8 @@ Widget myIndicator({
               borderRadius: BorderRadius.circular(20),
               color: Palette.extraDarkGray,
             ),
-            child: Text(
-              'dark pattern detected',
+            child: const Text(
+              'no need 😉',
               style: TextStyle(color: Palette.white, fontSize: 18),
             ),
           ),
