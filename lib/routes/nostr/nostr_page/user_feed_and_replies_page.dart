@@ -55,12 +55,12 @@ class UserFeedAndRepliesViewState
       }
 
       if (_scrollControllerFeed.position.pixels < 100) {
-        //log("reached top of scroll");
-        if (_newPostsAvailable) {
-          setState(() {
-            _newPostsAvailable = false;
-          });
-        }
+        // disable after sroll
+        // if (_newPostsAvailable) {
+        //   setState(() {
+        //     _newPostsAvailable = false;
+        //   });
+        // }
       }
     });
   }
@@ -239,11 +239,14 @@ class UserFeedAndRepliesViewState
                 ),
               ),
               if (_newPostsAvailable)
-                newPostsAvailable(
-                    name: "ok",
-                    onPressed: () {
-                      _integrateNewNotes();
-                    }),
+                Container(
+                  margin: const EdgeInsets.only(top: 20),
+                  child: newPostsAvailable(
+                      name: "new posts",
+                      onPressed: () {
+                        _integrateNewNotes();
+                      }),
+                ),
             ],
           );
         }

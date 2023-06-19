@@ -74,9 +74,9 @@ class UserFeedAndRepliesFeed {
   /// updates and calls feedStream with new notes, you should call this to
   void integrateNewNotes() {
     _insertUnsortedNotesIntoFeed(_feedNewNotes, _feed);
+    _fixedTopNote = _feed[0];
     _feedNewNotes = [];
     _feedStreamController.add(_feed);
-    _fixedTopNote = _feed[0];
   }
 
   Future<List<NostrNote>> _getCurrentNotes() async {

@@ -6,21 +6,22 @@ Widget newPostsAvailable({required String name, required Function onPressed}) {
     mainAxisAlignment: MainAxisAlignment.spaceAround,
     children: [
       Container(
-          width: 120,
-          height: 40,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20),
-            color: Palette.primary,
+        width: 120,
+        height: 40,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+          color: Palette.primary,
+        ),
+        child: TextButton(
+          onPressed: () {
+            onPressed();
+          },
+          child: Text(
+            name,
+            style: const TextStyle(color: Palette.white),
           ),
-          child: TextButton(
-            onPressed: () {
-              onPressed();
-            },
-            child: Text(
-              name,
-              style: const TextStyle(color: Palette.white),
-            ),
-          ))
+        ),
+      )
     ],
   );
 }
