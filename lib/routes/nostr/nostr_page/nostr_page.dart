@@ -230,7 +230,8 @@ class _NostrPageState extends ConsumerState<NostrPage>
                             picture =
                                 "https://avatars.dicebear.com/api/personas/$pubkey.svg";
                           }
-                          return myProfilePicture(picture, pubkey);
+                          return myProfilePicture(
+                              pictureUrl: picture, pubkey: pubkey);
                         }),
                   ),
                 ),

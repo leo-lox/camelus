@@ -184,7 +184,10 @@ Widget _profile(String pubkey, widget, List myFollowing, List myNewFollowing,
                     ),
                   );
                 },
-                child: myProfilePicture(picture, pubkey),
+                child: myProfilePicture(
+                    pictureUrl: picture,
+                    pubkey: pubkey,
+                    filterQuality: FilterQuality.high),
               ),
               const SizedBox(width: 16),
               //text section

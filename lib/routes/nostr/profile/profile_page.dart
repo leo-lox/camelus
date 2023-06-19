@@ -990,7 +990,11 @@ Widget _profileImage(
                   onTap: (() {
                     openImage(NetworkImage(picture), context);
                   }),
-                  child: myProfilePicture(picture, widget.pubkey));
+                  child: myProfilePicture(
+                    pictureUrl: picture,
+                    pubkey: widget.pubkey,
+                    filterQuality: FilterQuality.high,
+                  ));
             }),
       ),
     ),

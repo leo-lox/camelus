@@ -1,9 +1,13 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:camelus/config/palette.dart';
 
-Widget myProfilePicture(String pictureUrl, String pubkey) {
+Widget myProfilePicture({
+  required String pictureUrl,
+  required String pubkey,
+  FilterQuality filterQuality = FilterQuality.medium,
+  int? cacheHeight,
+}) {
   // all other image types
   if (pictureUrl.contains(".png") ||
       pictureUrl.contains(".jpg") ||
@@ -14,11 +18,27 @@ Widget myProfilePicture(String pictureUrl, String pubkey) {
         size: const Size.fromRadius(30), // Image radius
         child: Container(
           color: Palette.background,
-          child: CachedNetworkImage(
-            imageUrl: pictureUrl,
-            progressIndicatorBuilder: (context, url, downloadProgress) =>
-                CircularProgressIndicator(value: downloadProgress.progress),
-            errorWidget: (context, url, error) => const Icon(Icons.error),
+          child: Image.network(
+            cacheHeight: cacheHeight,
+            cacheWidth: cacheHeight,
+            filterQuality: filterQuality,
+            pictureUrl,
+            loadingBuilder: (BuildContext context, Widget child,
+                ImageChunkEvent? loadingProgress) {
+              if (loadingProgress == null) return child;
+              return Center(
+                child: CircularProgressIndicator(
+                  value: loadingProgress.expectedTotalBytes != null
+                      ? loadingProgress.cumulativeBytesLoaded /
+                          loadingProgress.expectedTotalBytes!
+                      : null,
+                ),
+              );
+            },
+            errorBuilder: (BuildContext context, Object exception,
+                StackTrace? stackTrace) {
+              return const Icon(Icons.error);
+            },
           ),
         ),
       ),

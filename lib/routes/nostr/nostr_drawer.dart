@@ -117,7 +117,9 @@ class NostrDrawer extends ConsumerWidget {
                             "https://avatars.dicebear.com/api/personas/${_nostrService.myKeys.publicKey}.svg";
                       }
                       return myProfilePicture(
-                          picture, _nostrService.myKeys.publicKey);
+                          pictureUrl: picture,
+                          pubkey: _nostrService.myKeys.publicKey,
+                          filterQuality: FilterQuality.medium);
                     }),
               ),
             ),

@@ -103,7 +103,11 @@ class _NoteCardState extends ConsumerState<NoteCard> {
                             }
 
                             return myProfilePicture(
-                                picture, widget.note.pubkey);
+                              pictureUrl: picture,
+                              pubkey: widget.note.pubkey,
+                              cacheHeight: 60,
+                              filterQuality: FilterQuality.low,
+                            );
                           }),
                     ),
                     Expanded(

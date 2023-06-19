@@ -103,7 +103,7 @@ Widget _profile(String pubkey, StreamController streamController, widget,
           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 12),
           child: Row(
             children: [
-              myProfilePicture(picture, pubkey),
+              myProfilePicture(pictureUrl: picture, pubkey: pubkey),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(

@@ -400,7 +400,8 @@ class _TweetCardState extends ConsumerState<TweetCard> {
                                   }
 
                                   return myProfilePicture(
-                                      picture, widget.tweet.pubkey);
+                                      pictureUrl: picture,
+                                      pubkey: widget.tweet.pubkey);
                                 }),
                           ),
                           Expanded(
