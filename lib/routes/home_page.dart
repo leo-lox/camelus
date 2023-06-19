@@ -176,6 +176,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                   )
               ],
             ),
+            tooltip: _selectedIndex == 0 ? "scroll to top" : "home",
             label: "home",
           ),
           BottomNavigationBarItem(
