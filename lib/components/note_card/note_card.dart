@@ -202,12 +202,9 @@ class _NoteCardState extends ConsumerState<NoteCard> {
                                   )
                                 ]),
                             const SizedBox(height: 2),
+
                             // content
-                            RichText(
-                              text: TextSpan(
-                                children: splitContent.textSpans,
-                              ),
-                            ),
+                            splitContent.content,
 
                             const SizedBox(height: 6),
                             if (splitContent.imageLinks.isNotEmpty)

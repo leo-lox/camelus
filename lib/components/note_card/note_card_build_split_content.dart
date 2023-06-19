@@ -32,7 +32,29 @@ class NoteCardSplitContent {
     imageLinks.addAll(_extractImages(_note));
   }
 
-  List<TextSpan> get textSpans => _buildTextSpans(_note.content);
+  List<TextSpan> get _textSpans => _buildTextSpans(_note.content);
+
+  Widget get content => _buildContent();
+
+  Widget _buildContent() {
+    return FutureBuilder(
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            return RichText(
+              text: TextSpan(
+                children: _textSpans,
+              ),
+            );
+          } else {
+            return RichText(
+              text: TextSpan(
+                children: _textSpans,
+              ),
+            );
+          }
+        },
+        future: _nostrService.getUserMetadata(_note.pubkey));
+  }
 
   List<TextSpan> _buildTextSpans(String content) {
     var urlSpans = _buildUrlSpans(content);

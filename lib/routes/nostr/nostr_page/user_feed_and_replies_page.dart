@@ -8,6 +8,7 @@ import 'package:camelus/db/database.dart';
 import 'package:camelus/db/entities/db_note_view.dart';
 import 'package:camelus/models/nostr_note.dart';
 import 'package:camelus/providers/database_provider.dart';
+import 'package:camelus/providers/navigation_bar_provider.dart';
 import 'package:camelus/scroll_controller/retainable_scroll_controller.dart';
 import 'package:camelus/services/nostr/feeds/user_and_replies_feed.dart';
 import 'package:camelus/services/nostr/relays/relays.dart';
@@ -72,14 +73,35 @@ class UserFeedAndRepliesViewState
         setState(() {
           _newPostsAvailable = true;
         });
+        // notify navigation bar
+        ref.read(navigatiionBarProvider).newNotesCount = event.length;
       }),
+    );
+  }
+
+  void _setupNavBarHomeListener() {
+    var provider = ref.read(navigatiionBarProvider);
+    _subscriptions.add(provider.onTabHome.listen((event) {
+      _handleHomeBarTab();
+    }));
+  }
+
+  void _handleHomeBarTab() {
+    if (_newPostsAvailable) {
+      _integrateNewNotes();
+    }
+    // scroll to top
+    _scrollControllerFeed.animateTo(
+      _scrollControllerFeed.position.minScrollExtent,
+      duration: const Duration(milliseconds: 500),
+      curve: Curves.easeOut,
     );
   }
 
   void _integrateNewNotes() {
     _userFeedAndRepliesFeed.integrateNewNotes();
     _scrollControllerFeed.animateTo(
-      _scrollControllerFeed.position.minScrollExtent - 50,
+      _scrollControllerFeed.position.minScrollExtent,
       duration: const Duration(milliseconds: 300),
       curve: Curves.easeOut,
     );
@@ -158,6 +180,7 @@ class UserFeedAndRepliesViewState
     _initUserFeed();
     _setupScrollListener();
     _setupNewNotesListener();
+    _setupNavBarHomeListener();
 
     return;
   }

@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:camelus/helpers/helpers.dart';
+import 'package:camelus/providers/navigation_bar_provider.dart';
 import 'package:camelus/providers/nostr_service_provider.dart';
 import 'package:camelus/routes/notification_page.dart';
 import 'package:camelus/routes/search_page.dart';
@@ -89,6 +90,8 @@ class _HomePageState extends ConsumerState<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final navBarProvider = ref.watch(navigatiionBarProvider);
+
     return Scaffold(
       key: _scaffoldKey,
       drawer: NostrDrawer(),
@@ -131,6 +134,11 @@ class _HomePageState extends ConsumerState<HomePage> {
         type: BottomNavigationBarType.fixed,
         currentIndex: _selectedIndex,
         onTap: (int index) {
+          // used to notify feeds to scroll up
+          if (index == 0) {
+            navBarProvider.tabHome();
+          }
+
           setState(() {
             _selectedIndex = index;
             // currentPage = pages[index];
@@ -142,10 +150,31 @@ class _HomePageState extends ConsumerState<HomePage> {
         },
         items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(
-            icon: SvgPicture.asset(
-              height: 23,
-              'assets/icons/house.svg',
-              color: _selectedIndex == 0 ? Palette.primary : Palette.darkGray,
+            icon: Stack(
+              children: <Widget>[
+                SvgPicture.asset(
+                  height: 23,
+                  'assets/icons/house.svg',
+                  color:
+                      _selectedIndex == 0 ? Palette.primary : Palette.darkGray,
+                ),
+                if (navBarProvider.newNotesCount > 0)
+                  Positioned(
+                    right: 0,
+                    bottom: 0,
+                    child: Container(
+                      padding: const EdgeInsets.all(1),
+                      decoration: BoxDecoration(
+                        color: Palette.primary,
+                        borderRadius: BorderRadius.circular(50),
+                      ),
+                      constraints: const BoxConstraints(
+                        minWidth: 12,
+                        minHeight: 12,
+                      ),
+                    ),
+                  )
+              ],
             ),
             label: "home",
           ),
