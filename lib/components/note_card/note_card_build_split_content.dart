@@ -2,16 +2,20 @@ import 'dart:developer';
 
 import 'package:camelus/config/palette.dart';
 import 'package:camelus/helpers/helpers.dart';
+import 'package:camelus/helpers/nprofile_helper.dart';
 import 'package:camelus/models/nostr_note.dart';
 import 'package:camelus/services/nostr/nostr_service.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
+/// this class is responsible for building the content of a note
 class NoteCardSplitContent {
   final NostrNote _note;
 
   final Function(String) _profileCallback;
+
+  final Function _stateCallback;
 
   final Map<String, dynamic> _tagsMetadata = {};
 
@@ -23,6 +27,7 @@ class NoteCardSplitContent {
     this._note,
     this._nostrService,
     this._profileCallback,
+    this._stateCallback,
   ) {
     imageLinks.addAll(_extractImages(_note));
   }
@@ -30,10 +35,11 @@ class NoteCardSplitContent {
   List<TextSpan> get textSpans => _buildTextSpans(_note.content);
 
   List<TextSpan> _buildTextSpans(String content) {
-    var spans = _buildUrlSpans(content);
-    var completeSpans = _buildHashtagSpans(spans);
+    var urlSpans = _buildUrlSpans(content);
+    var hashtagSpans = _buildHashtagSpans(urlSpans);
+    var nprofileSpans = _buildNprofileSpans(hashtagSpans);
 
-    return completeSpans;
+    return nprofileSpans;
   }
 
   List<String> _extractImages(NostrNote note) {
@@ -54,6 +60,7 @@ class NoteCardSplitContent {
     return imageLinks;
   }
 
+  /// removes the given strings from the input
   String _removeStrings(String input, List<String> strings) {
     for (var string in strings) {
       input = input.replaceAll(string, "");
@@ -142,6 +149,7 @@ class NoteCardSplitContent {
               // check if mounted
 
               _tagsMetadata[tag.value] = value["name"] ?? pubkeyHr;
+              _stateCallback();
             });
           }
           finalSpans.add(TextSpan(
@@ -165,6 +173,100 @@ class NoteCardSplitContent {
         }
       } else {
         finalSpans.add(span);
+      }
+    }
+
+    return finalSpans;
+  }
+
+  List<TextSpan> _buildNprofileSpans(List<TextSpan> spans) {
+    final finalSpans = <TextSpan>[];
+
+    for (final span in spans) {
+      // only edit my spans and not the ones that are already edited
+      if (!span.text!.contains("nostr:nprofile") &&
+          !span.text!.contains("nostr:npub")) {
+        finalSpans.add(span);
+        continue;
+      }
+
+      final pattern = RegExp(r"nostr:(nprofile|npub)[^\s]+");
+      final hashMatches = pattern.allMatches(span.text!);
+      var lastMatchEnd = 0;
+
+      for (final match in hashMatches) {
+        if (match.start > lastMatchEnd) {
+          finalSpans.add(TextSpan(
+            text: span.text!.substring(lastMatchEnd, match.start),
+            style: const TextStyle(
+              color: Palette.lightGray,
+              fontSize: 17,
+              height: 1.3,
+            ),
+          ));
+        }
+
+        final myMatch = match.group(0)!.replaceAll("nostr:", "");
+        String myPubkeyHex = "";
+        String pubkeyBech = "";
+        if (myMatch.contains("nprofile")) {
+          // remove the "nostr:" part
+
+          Map<String, dynamic> nProfileDecode =
+              NprofileHelper().bech32toMap(myMatch);
+
+          final List<String> myRelays = nProfileDecode['relays'];
+          myPubkeyHex = nProfileDecode['pubkey'];
+          pubkeyBech = Helpers().encodeBech32(myPubkeyHex, "npub");
+        }
+
+        if (myMatch.contains("npub")) {
+          final List decode = Helpers().decodeBech32(myMatch);
+          myPubkeyHex = decode[0];
+          pubkeyBech = myMatch;
+        }
+
+        final String pubkeyHr =
+            "${pubkeyBech.substring(0, 5)}...${pubkeyBech.substring(pubkeyBech.length - 5)}";
+
+        var metadata = _nostrService.getUserMetadata(myPubkeyHex);
+
+        if (_tagsMetadata[myPubkeyHex] == null) {
+          _tagsMetadata[myPubkeyHex] = pubkeyHr;
+
+          metadata.then((value) {
+            _tagsMetadata[myPubkeyHex] = value["name"];
+          });
+        }
+
+        finalSpans.add(TextSpan(
+          text: "@${_tagsMetadata[myPubkeyHex]}",
+          style: const TextStyle(
+            color: Palette.primary,
+            fontSize: 17,
+            height: 1.3,
+            decoration: TextDecoration.underline,
+          ),
+          recognizer: TapGestureRecognizer()
+            ..onTap = () {
+              if (match.group(0) == null) return;
+              // log(match.group(0)!);
+              _profileCallback(myPubkeyHex);
+            },
+        ));
+
+        lastMatchEnd = match.end;
+      }
+
+      if (lastMatchEnd < span.text!.length) {
+        finalSpans.add(TextSpan(
+          text: span.text!.substring(lastMatchEnd),
+          style: const TextStyle(
+            color: Palette.lightGray,
+            fontSize: 17,
+            height: 1.3,
+          ),
+        ));
       }
     }
 

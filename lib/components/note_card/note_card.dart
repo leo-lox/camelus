@@ -48,14 +48,18 @@ class _NoteCardState extends ConsumerState<NoteCard> {
     Navigator.pushNamed(context, "/nostr/profile", arguments: pubkey);
   }
 
+  void _splitContentStateUpdate() {
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     final myNostrService = ref.watch(nostrServiceProvider);
 
     final myMetadata = myNostrService.getUserMetadata(widget.note.pubkey);
 
-    final splitContent =
-        NoteCardSplitContent(widget.note, myNostrService, _openProfile);
+    final splitContent = NoteCardSplitContent(
+        widget.note, myNostrService, _openProfile, _splitContentStateUpdate);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -206,7 +210,7 @@ class _NoteCardState extends ConsumerState<NoteCard> {
                             ),
 
                             const SizedBox(height: 6),
-                            if (splitContent.imageLinks.length > 0)
+                            if (splitContent.imageLinks.isNotEmpty)
                               ImagesTileView(images: splitContent.imageLinks),
                             Padding(
                               padding: const EdgeInsets.only(top: 10.0),
