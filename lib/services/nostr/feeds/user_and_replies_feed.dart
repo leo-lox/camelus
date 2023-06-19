@@ -109,6 +109,10 @@ class UserFeedAndRepliesFeed {
           if (_feed.any((element) => element.id == note.id)) {
             continue;
           }
+          // usually one note gets served from two relays, so we need to check for duplicates
+          if (newNotes.any((element) => element.id == note.id)) {
+            continue;
+          }
 
           if (note.created_at > _fixedTopNote!.created_at) {
             newNotes.add(note);
