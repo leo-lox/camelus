@@ -43,17 +43,6 @@ class _HomePageState extends ConsumerState<HomePage> {
             ));
   }
 
-  void _checkForOnboarding() {
-    // check secure storage for keys
-    const storage = FlutterSecureStorage();
-    storage.read(key: "nostrKeys").then((nostrKeysString) {
-      if (nostrKeysString == null) {
-        // if keys are not found, redirect to onboarding
-        Navigator.popAndPushNamed(context, '/onboarding');
-      }
-    });
-  }
-
   void _initMatomo() async {
     // get or create visitor id
     const storage = FlutterSecureStorage();
@@ -79,7 +68,6 @@ class _HomePageState extends ConsumerState<HomePage> {
   @override
   void initState() {
     super.initState();
-    _checkForOnboarding();
     _initMatomo();
   }
 
@@ -159,21 +147,27 @@ class _HomePageState extends ConsumerState<HomePage> {
                       _selectedIndex == 0 ? Palette.primary : Palette.darkGray,
                 ),
                 if (navBarProvider.newNotesCount > 0)
-                  Positioned(
-                    right: 0,
-                    bottom: 0,
-                    child: Container(
-                      padding: const EdgeInsets.all(1),
-                      decoration: BoxDecoration(
-                        color: Palette.primary,
-                        borderRadius: BorderRadius.circular(50),
-                      ),
-                      constraints: const BoxConstraints(
-                        minWidth: 12,
-                        minHeight: 12,
-                      ),
-                    ),
-                  )
+                  StreamBuilder(
+                      stream: navBarProvider.newNotesCountStream,
+                      initialData: 0,
+                      builder: (context, snapshot) {
+                        if (snapshot.data == 0) return Container();
+                        return Positioned(
+                          right: 0,
+                          bottom: 0,
+                          child: Container(
+                            padding: const EdgeInsets.all(1),
+                            decoration: BoxDecoration(
+                              color: Palette.primary,
+                              borderRadius: BorderRadius.circular(50),
+                            ),
+                            constraints: const BoxConstraints(
+                              minWidth: 12,
+                              minHeight: 12,
+                            ),
+                          ),
+                        );
+                      })
               ],
             ),
             tooltip: _selectedIndex == 0 ? "scroll to top" : "home",

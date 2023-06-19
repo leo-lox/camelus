@@ -1,3 +1,8 @@
+import 'dart:convert';
+
+import 'package:camelus/config/palette.dart';
+import 'package:camelus/helpers/bip340.dart';
+import 'package:camelus/providers/key_pair_provider.dart';
 import 'package:camelus/routes/nostr/blockedUsers/blocked_users.dart';
 import 'package:camelus/routes/nostr/settings/settings_page.dart';
 import 'package:flutter/material.dart';
@@ -6,6 +11,7 @@ import 'package:camelus/routes/nostr/onboarding/onboarding.dart';
 import 'package:camelus/routes/nostr/profile/profile_page.dart';
 
 import 'package:flutter_mentions/flutter_mentions.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import 'routes/home_page.dart';
@@ -18,54 +24,74 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
 
+  Future<String> _initialRoute() async {
+    var wrapper = await ProviderContainer().read(keyPairProvider.future);
+
+    if (wrapper.keyPair == null) {
+      var initialRoute = '/onboarding';
+      return initialRoute;
+    }
+    return '/';
+  }
+
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    var initialRoute = '/';
+    return FutureBuilder<String>(
+        future: _initialRoute(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const MaterialApp(
+              debugShowCheckedModeBanner: false,
+              home: Scaffold(
+                backgroundColor: Palette.background,
+              ),
+            );
+          }
+          return Portal(
+            child: ProviderScope(
+              child: MaterialApp(
+                debugShowCheckedModeBanner: false,
+                title: 'camelus',
+                theme: theme.themeMap["DARK"],
+                initialRoute: snapshot.data,
+                onGenerateRoute: (RouteSettings settings) {
+                  switch (settings.name) {
+                    case '/':
+                      return MaterialPageRoute(
+                        builder: (context) => const HomePage(),
+                      );
 
-    return Portal(
-      child: ProviderScope(
-        child: MaterialApp(
-          debugShowCheckedModeBanner: false,
-          title: 'camelus',
-          theme: theme.themeMap["DARK"],
-          initialRoute: initialRoute,
-          onGenerateRoute: (RouteSettings settings) {
-            switch (settings.name) {
-              case '/':
-                return MaterialPageRoute(
-                  builder: (context) => const HomePage(),
-                );
+                    case '/onboarding':
+                      return MaterialPageRoute(
+                        builder: (context) => NostrOnboarding(),
+                      );
 
-              case '/onboarding':
-                return MaterialPageRoute(
-                  builder: (context) => NostrOnboarding(),
-                );
-
-              case '/settings':
-                return MaterialPageRoute(
-                  builder: (context) => SettingsPage(),
-                );
-              case '/nostr/event':
-                return MaterialPageRoute(
-                  builder: (context) =>
-                      EventViewPage(eventId: settings.arguments as String),
-                );
-              case '/nostr/profile':
-                return MaterialPageRoute(
-                  builder: (context) =>
-                      ProfilePage(pubkey: settings.arguments as String),
-                );
-              case '/nostr/blockedUsers':
-                return MaterialPageRoute(
-                  builder: (context) => BlockedUsers(),
-                );
-            }
-            assert(false, 'Need to implement ${settings.name}');
-            return null;
-          },
-        ),
-      ),
-    );
+                    case '/settings':
+                      return MaterialPageRoute(
+                        builder: (context) => SettingsPage(),
+                      );
+                    case '/nostr/event':
+                      return MaterialPageRoute(
+                        builder: (context) => EventViewPage(
+                            eventId: settings.arguments as String),
+                      );
+                    case '/nostr/profile':
+                      return MaterialPageRoute(
+                        builder: (context) =>
+                            ProfilePage(pubkey: settings.arguments as String),
+                      );
+                    case '/nostr/blockedUsers':
+                      return MaterialPageRoute(
+                        builder: (context) => BlockedUsers(),
+                      );
+                  }
+                  assert(false, 'Need to implement ${settings.name}');
+                  return null;
+                },
+              ),
+            ),
+          );
+        });
   }
 }

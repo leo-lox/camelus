@@ -50,7 +50,8 @@ class Tweet {
         commentsCount: json['commentsCount'],
         retweetsCount: json['retweetsCount'],
         isReply: json['isReply'],
-        relayHints: json['relayHints']);
+        relayHints: {} //json['relayHints'] ?? {},
+        );
   }
 
   Map<String, dynamic> toJson() => {

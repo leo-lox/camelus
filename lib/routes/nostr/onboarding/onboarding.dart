@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:camelus/providers/key_pair_provider.dart';
 import 'package:camelus/providers/nostr_service_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:camelus/config/palette.dart';
@@ -78,7 +79,7 @@ class _NostrOnboardingState extends ConsumerState<NostrOnboarding> {
     );
   }
 
-  _onSubmit() {
+  _onSubmit() async {
     if (!_termsAndConditions) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -92,6 +93,10 @@ class _NostrOnboardingState extends ConsumerState<NostrOnboarding> {
     // store in secure storage
     const storage = FlutterSecureStorage();
     storage.write(key: "nostrKeys", value: json.encode(myKeys.toJson()));
+    // save in provider
+
+    var provider = await ref.watch(keyPairProvider.future);
+    provider.setKeyPair(myKeys);
 
     _nostrService.finishedOnboarding();
 

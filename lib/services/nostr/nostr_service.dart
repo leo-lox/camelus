@@ -5,6 +5,7 @@ import 'dart:developer';
 import 'package:camelus/db/database.dart';
 import 'package:camelus/models/nostr_note.dart';
 import 'package:camelus/providers/database_provider.dart';
+import 'package:camelus/providers/key_pair_provider.dart';
 import 'package:camelus/services/nostr/feeds/authors_feed.dart';
 import 'package:camelus/services/nostr/feeds/events_feed.dart';
 import 'package:camelus/services/nostr/feeds/global_feed.dart';
@@ -32,6 +33,8 @@ import 'package:camelus/models/socket_control.dart';
 
 class NostrService {
   final Future<AppDatabase> database;
+
+  final Future<KeyPairWrapper> keyPairWrapper;
 
   late Future isNostrServiceConnected;
 
@@ -70,7 +73,7 @@ class NostrService {
   Map<String, dynamic> get usersMetadata => userMetadataObj.usersMetadata;
   Map<String, List<List<dynamic>>> get following => userContactsObj.following;
 
-  NostrService({required this.database}) {
+  NostrService({required this.database, required this.keyPairWrapper}) {
     RelaysInjector relaysInjector = RelaysInjector();
     MetadataInjector metadataInjector = MetadataInjector();
 
@@ -141,17 +144,11 @@ class NostrService {
   }
 
   Future<void> _loadKeyPair() async {
-    // load keypair from storage
-    FlutterSecureStorage storage = const FlutterSecureStorage();
-    var nostrKeysString = await storage.read(key: "nostrKeys");
-    if (nostrKeysString == null) {
+    var wrapper = await keyPairWrapper;
+    if (wrapper.keyPair == null) {
       return;
     }
-
-    // to obj
-    myKeys = KeyPair.fromJson(json.decode(nostrKeysString));
-    userContactsObj.ownPubkey = myKeys.publicKey;
-    return;
+    myKeys = wrapper.keyPair!;
   }
 
   finishedOnboarding() async {

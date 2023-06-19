@@ -94,7 +94,7 @@ class UserFeedAndRepliesViewState
     _scrollControllerFeed.animateTo(
       _scrollControllerFeed.position.minScrollExtent,
       duration: const Duration(milliseconds: 500),
-      curve: Curves.easeOut,
+      curve: Curves.easeOutCubic,
     );
   }
 

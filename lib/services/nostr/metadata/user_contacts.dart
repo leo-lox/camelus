@@ -35,7 +35,11 @@ class UserContacts {
     LocalStorageInterface prefs = await LocalStorage.getInstance();
     _jsonCache = JsonCacheCrossLocalStorage(prefs);
 
-    _restoreCache().then((_) => {_removeOldData()});
+    _restoreCache().then((_) async => {
+          // lauch fix this gets to the new db anyway
+          await Future.delayed(const Duration(seconds: 5)),
+          _removeOldData()
+        });
   }
 
   Future<void> _restoreCache() async {
