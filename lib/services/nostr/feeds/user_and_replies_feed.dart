@@ -73,7 +73,16 @@ class UserFeedAndRepliesFeed {
 
   /// updates and calls feedStream with new notes, you should call this to
   void integrateNewNotes() {
-    _insertUnsortedNotesIntoFeed(_feedNewNotes, _feed);
+    List<NostrNote> copyCleaned = [];
+    // remove duplicates
+    for (var note in _feedNewNotes) {
+      if (copyCleaned.any((element) => element.id == note.id)) {
+        continue;
+      }
+      copyCleaned.add(note);
+    }
+
+    _insertUnsortedNotesIntoFeed(copyCleaned, _feed);
     _fixedTopNote = _feed[0];
     _feedNewNotes = [];
     _feedStreamController.add(_feed);
@@ -136,8 +145,10 @@ class UserFeedAndRepliesFeed {
 
   void _insertUnsortedNotesIntoFeed(
       List<NostrNote> notesToIntegrate, List<NostrNote> sourceFeed) {
+    // copy list
+    var copy = [...notesToIntegrate];
     // add to feed sorted by created_at
-    sourceFeed.addAll(notesToIntegrate);
+    sourceFeed.addAll(copy);
     sourceFeed.sort((a, b) => b.created_at.compareTo(a.created_at));
   }
 

@@ -169,15 +169,15 @@ Widget linkedUsername(
       builder: (context, AsyncSnapshot<Map> snapshot) {
         var pubkeyBech = Helpers().encodeBech32(pubkey, "npub");
         var pubkeyHr =
-            "${pubkeyBech.substring(0, 5)}...${pubkeyBech.substring(pubkeyBech.length - 5)}";
+            "${pubkeyBech.substring(0, 4)}:${pubkeyBech.substring(pubkeyBech.length - 5)}";
         if (snapshot.hasData) {
           return Text('@${snapshot.data?['name'] ?? pubkeyHr} ',
               style: const TextStyle(
-                  color: Palette.primary, fontSize: 17, height: 1.3));
+                  color: Palette.primary, fontSize: 16, height: 1.3));
         } else {
           return Text(pubkeyHr,
               style: const TextStyle(
-                  color: Palette.primary, fontSize: 17, height: 1.3));
+                  color: Palette.primary, fontSize: 16, height: 1.3));
         }
       },
       future: nostrService.getUserMetadata(pubkey),
