@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:camelus/config/palette.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 Widget myProfilePicture({
   required String pictureUrl,
@@ -17,30 +18,20 @@ Widget myProfilePicture({
       child: SizedBox.fromSize(
         size: const Size.fromRadius(30), // Image radius
         child: Container(
-          color: Palette.background,
-          child: Image.network(
-            cacheHeight: cacheHeight,
-            cacheWidth: cacheHeight,
-            filterQuality: filterQuality,
-            pictureUrl,
-            loadingBuilder: (BuildContext context, Widget child,
-                ImageChunkEvent? loadingProgress) {
-              if (loadingProgress == null) return child;
-              return Center(
-                child: CircularProgressIndicator(
-                  value: loadingProgress.expectedTotalBytes != null
-                      ? loadingProgress.cumulativeBytesLoaded /
-                          loadingProgress.expectedTotalBytes!
-                      : null,
-                ),
-              );
-            },
-            errorBuilder: (BuildContext context, Object exception,
-                StackTrace? stackTrace) {
-              return const Icon(Icons.error);
-            },
-          ),
-        ),
+            color: Palette.background,
+            child: CachedNetworkImage(
+              imageUrl: pictureUrl,
+              filterQuality: filterQuality,
+              progressIndicatorBuilder: (context, url, downloadProgress) =>
+                  const CircularProgressIndicator(
+                color: Palette.darkGray,
+              ),
+              errorWidget: (context, url, error) => const Icon(Icons.error),
+              memCacheHeight: cacheHeight ?? 200,
+              memCacheWidth: cacheHeight ?? 200,
+              maxHeightDiskCache: cacheHeight ?? 200,
+              maxWidthDiskCache: cacheHeight ?? 200,
+            )),
       ),
     );
   }

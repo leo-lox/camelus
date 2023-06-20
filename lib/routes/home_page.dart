@@ -138,36 +138,41 @@ class _HomePageState extends ConsumerState<HomePage> {
         },
         items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(
-            icon: Stack(
-              children: <Widget>[
-                SvgPicture.asset(
-                  height: 23,
-                  'assets/icons/house.svg',
-                  color:
-                      _selectedIndex == 0 ? Palette.primary : Palette.darkGray,
+            icon: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Stack(
+                  children: <Widget>[
+                    SvgPicture.asset(
+                      height: 23,
+                      'assets/icons/house.svg',
+                      color: _selectedIndex == 0
+                          ? Palette.primary
+                          : Palette.darkGray,
+                    ),
+                    StreamBuilder(
+                        stream: navBarProvider.newNotesCountStream,
+                        initialData: 0,
+                        builder: (context, snapshot) {
+                          if (snapshot.data == 0) return Container();
+                          return Positioned(
+                            right: 0,
+                            bottom: 0,
+                            child: Container(
+                              padding: const EdgeInsets.all(1),
+                              decoration: BoxDecoration(
+                                color: Palette.lightGray,
+                                borderRadius: BorderRadius.circular(50),
+                              ),
+                              constraints: const BoxConstraints(
+                                minWidth: 12,
+                                minHeight: 12,
+                              ),
+                            ),
+                          );
+                        })
+                  ],
                 ),
-                if (navBarProvider.newNotesCount > 0)
-                  StreamBuilder(
-                      stream: navBarProvider.newNotesCountStream,
-                      initialData: 0,
-                      builder: (context, snapshot) {
-                        if (snapshot.data == 0) return Container();
-                        return Positioned(
-                          right: 0,
-                          bottom: 0,
-                          child: Container(
-                            padding: const EdgeInsets.all(1),
-                            decoration: BoxDecoration(
-                              color: Palette.primary,
-                              borderRadius: BorderRadius.circular(50),
-                            ),
-                            constraints: const BoxConstraints(
-                              minWidth: 12,
-                              minHeight: 12,
-                            ),
-                          ),
-                        );
-                      })
               ],
             ),
             tooltip: _selectedIndex == 0 ? "scroll to top" : "home",

@@ -90,6 +90,7 @@ class UserFeedAndRepliesViewState
     if (_newPostsAvailable) {
       _integrateNewNotes();
     }
+    ref.watch(navigatiionBarProvider).resetNewNotesCount();
     // scroll to top
     _scrollControllerFeed.animateTo(
       _scrollControllerFeed.position.minScrollExtent,
@@ -195,6 +196,7 @@ class UserFeedAndRepliesViewState
   void dispose() {
     _userFeedAndRepliesFeed.cleanup();
     _disposeSubscriptions();
+    ref.watch(navigatiionBarProvider).resetNewNotesCount();
     super.dispose();
   }
 
