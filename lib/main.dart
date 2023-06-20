@@ -74,7 +74,11 @@ class MyApp extends StatelessWidget {
                     case '/nostr/event':
                       return MaterialPageRoute(
                         builder: (context) => EventViewPage(
-                            eventId: settings.arguments as String),
+                            rootId: (settings.arguments
+                                as Map<String, dynamic>)['root'] as String,
+                            scrollIntoView: (settings.arguments
+                                    as Map<String, dynamic>)['scrollIntoView']
+                                as String?),
                       );
                     case '/nostr/profile':
                       return MaterialPageRoute(

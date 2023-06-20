@@ -7,7 +7,7 @@ import 'package:camelus/models/nostr_note.dart';
 import 'package:camelus/providers/database_provider.dart';
 import 'package:camelus/providers/key_pair_provider.dart';
 import 'package:camelus/services/nostr/feeds/authors_feed.dart';
-import 'package:camelus/services/nostr/feeds/events_feed.dart';
+
 import 'package:camelus/services/nostr/feeds/user_feed.dart';
 import 'package:camelus/services/nostr/metadata/metadata_injector.dart';
 import 'package:camelus/services/nostr/metadata/nip_05.dart';
@@ -45,8 +45,6 @@ class NostrService {
 
   // authors feed
   var authorsFeedObj = AuthorsFeed();
-
-  var eventsFeedObj = EventsFeed();
 
   var userMetadataObj = UserMetadata();
 
@@ -250,13 +248,6 @@ class NostrService {
       }
     }
 
-    if (event[1].contains("event")) {
-      eventsFeedObj.receiveNostrEvent(event, socketControl);
-      if (event[0] == "EOSE") {
-        return;
-      }
-    }
-
     /// user feed
     if (event[1].contains("ufeed")) {
       userFeedObj.receiveNostrEvent(event, socketControl);
@@ -415,24 +406,6 @@ class NostrService {
         since: since,
         until: until,
         limit: limit);
-  }
-
-  // eventId for the nostr event, requestId to track the request
-  void requestEvents(
-      {required List<String> eventIds,
-      required String requestId,
-      int? since,
-      int? until,
-      int? limit,
-      StreamController? streamController}) {
-    eventsFeedObj.requestEvents(
-      eventIds: eventIds,
-      requestId: requestId,
-      since: since,
-      until: until,
-      limit: limit,
-      streamController: streamController,
-    );
   }
 
   void closeSubscription(String subId) {

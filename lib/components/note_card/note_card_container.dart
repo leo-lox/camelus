@@ -1,7 +1,11 @@
+import 'dart:developer';
+import 'dart:ffi';
+
 import 'package:camelus/components/note_card/note_card.dart';
 import 'package:camelus/config/palette.dart';
 import 'package:camelus/helpers/helpers.dart';
 import 'package:camelus/models/nostr_note.dart';
+import 'package:camelus/models/nostr_tag.dart';
 import 'package:camelus/providers/nostr_service_provider.dart';
 import 'package:camelus/services/nostr/nostr_service.dart';
 import 'package:flutter/material.dart';
@@ -24,6 +28,62 @@ class NoteCardContainer extends ConsumerStatefulWidget {
 }
 
 class _NoteCardContainerState extends ConsumerState<NoteCardContainer> {
+  void _onNoteTab(NostrNote myNote) {
+    var refEvents = myNote.getTagEvents;
+
+    // try to find root note
+    NostrTag? rootNote;
+    NostrTag? replyNote;
+
+    for (NostrTag tag in refEvents) {
+      if (tag.marker == "root") {
+        rootNote = tag;
+      }
+      if (tag.marker == "reply") {
+        replyNote = tag;
+      }
+    }
+    // in spec
+    if (rootNote != null || replyNote != null) {
+      log("is reply");
+      // off spec support, sometimes not marked as root
+      var root = rootNote?.value;
+      root ??= refEvents.first.value;
+
+      _navigateToEventViewPage(root, replyNote?.value ?? myNote.id);
+      return;
+    }
+
+    // support off spec
+    if (refEvents.length == 1) {
+      log("is reply");
+      _navigateToEventViewPage(refEvents[0].value, myNote.id);
+      return;
+    }
+
+    // support off spec
+    if (refEvents.length > 1) {
+      log("is reply");
+      var root = refEvents.first;
+      var reply = refEvents.last;
+      _navigateToEventViewPage(root.value, reply.value);
+      return;
+    }
+
+    if (rootNote == null) {
+      log("is root");
+      _navigateToEventViewPage(myNote.id, null);
+      return;
+    }
+  }
+
+  _navigateToEventViewPage(String root, String? scrollIntoView) {
+    Navigator.pushNamed(context, "/nostr/event", arguments: <String, String?>{
+      "root": root,
+      "scrollIntoView": scrollIntoView
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final _nostrService = ref.read(nostrServiceProvider);
@@ -77,7 +137,16 @@ class _NoteCardContainerState extends ConsumerState<NoteCardContainer> {
                                   ),
                               ],
                             ),
-                          NoteCard(note: myNote),
+
+                          GestureDetector(
+                            onTap: () {
+                              _onNoteTab(myNote);
+                            },
+                            child: Container(
+                              color: Palette.background,
+                              child: NoteCard(note: myNote),
+                            ),
+                          ),
                         ],
                       ),
                     ))
