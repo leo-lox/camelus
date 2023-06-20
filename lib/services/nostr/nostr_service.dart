@@ -8,7 +8,6 @@ import 'package:camelus/providers/database_provider.dart';
 import 'package:camelus/providers/key_pair_provider.dart';
 import 'package:camelus/services/nostr/feeds/authors_feed.dart';
 import 'package:camelus/services/nostr/feeds/events_feed.dart';
-import 'package:camelus/services/nostr/feeds/global_feed.dart';
 import 'package:camelus/services/nostr/feeds/user_feed.dart';
 import 'package:camelus/services/nostr/metadata/metadata_injector.dart';
 import 'package:camelus/services/nostr/metadata/nip_05.dart';
@@ -40,9 +39,6 @@ class NostrService {
 
   static String ownPubkeySubscriptionId =
       "own-${Helpers().getRandomString(20)}";
-
-  // global feed
-  var globalFeedObj = GlobalFeed();
 
   // user feed
   var userFeedObj = UserFeed();
@@ -132,7 +128,6 @@ class NostrService {
     }
 
     userFeedObj.restoreFromCache();
-    globalFeedObj.restoreFromCache();
 
     try {
       //todo: fix this for onboarding
@@ -180,7 +175,6 @@ class NostrService {
     //await jsonCache.clear();
 
     // clear only nostr related stuff
-    await jsonCache.remove('globalFeed');
     await jsonCache.remove('userFeed');
     await jsonCache.remove('usersMetadata');
     await jsonCache.remove('following');
@@ -267,14 +261,6 @@ class NostrService {
     if (event[1].contains("ufeed")) {
       userFeedObj.receiveNostrEvent(event, socketControl);
 
-      if (event[0] == "EOSE") {
-        return;
-      }
-    }
-
-    /// global feed
-    if (event[1].contains("gfeed")) {
-      globalFeedObj.receiveNostrEvent(event, socketControl);
       if (event[0] == "EOSE") {
         return;
       }
@@ -401,16 +387,6 @@ class NostrService {
     return count;
   }
 
-  void requestGlobalFeed({
-    required String requestId,
-    int? since,
-    int? until,
-    int? limit,
-  }) {
-    globalFeedObj.requestGlobalFeed(
-        requestId: requestId, since: since, until: until, limit: limit);
-  }
-
   void requestUserFeed(
       {required List<String> users,
       required String requestId,
@@ -496,12 +472,10 @@ class NostrService {
     }
     // search in feed for pubkey and remove
     userFeedObj.feed.removeWhere((element) => element.pubkey == pubkey);
-    globalFeedObj.feed.removeWhere((element) => element.pubkey == pubkey);
 
     // update cache
 
     await jsonCache.refresh('userFeed', {"tweets": userFeedObj.feed});
-    await jsonCache.refresh("globalFeed", {"tweets": globalFeedObj.feed});
 
     //notify streams
     // todo
