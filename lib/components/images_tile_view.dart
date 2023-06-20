@@ -5,7 +5,9 @@ import 'package:flutter/material.dart';
 
 class ImagesTileView extends StatelessWidget {
   final List<String> images;
-  ImagesTileView({Key? key, required this.images}) : super(key: key);
+  final Widget? galleryBottomWidget;
+  ImagesTileView({Key? key, required this.images, this.galleryBottomWidget})
+      : super(key: key);
 
   final String _tileViewId = Helpers().getRandomString(4);
 
@@ -39,6 +41,7 @@ class ImagesTileView extends StatelessWidget {
                         imageUrls: images,
                         defaultImageIndex: index,
                         topBarTitle: 'close',
+                        bottomBarWidget: galleryBottomWidget,
                         heroTag: _tileViewId,
                       ),
                     ),

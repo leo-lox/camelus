@@ -211,7 +211,10 @@ class _NoteCardState extends ConsumerState<NoteCard> {
 
                             const SizedBox(height: 6),
                             if (splitContent.imageLinks.isNotEmpty)
-                              ImagesTileView(images: splitContent.imageLinks),
+                              ImagesTileView(
+                                images: splitContent.imageLinks,
+                                //galleryBottomWidget: splitContent.content,
+                              ),
                             Padding(
                               padding: const EdgeInsets.only(top: 10.0),
                               child: Row(
