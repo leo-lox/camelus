@@ -17,7 +17,9 @@ class UserFeedAndRepliesFeed {
   final StreamController<List<NostrNote>> _newNotesController =
       StreamController<List<NostrNote>>.broadcast();
   final StreamController<List<NostrNote>> _feedStreamController =
-      StreamController<List<NostrNote>>.broadcast();
+      StreamController<List<NostrNote>>();
+
+  Completer<List<NostrNote>> _feedRdy = Completer<List<NostrNote>>();
 
   NostrNote? _fixedTopNote;
 
@@ -39,9 +41,11 @@ class UserFeedAndRepliesFeed {
   /// returns the fixed top note, the feed only updates below this note, unless you call integrateNewNotes()
   NostrNote? get fixedTopNote => _fixedTopNote;
 
+  Future<List<NostrNote>> get feedRdy => _feedRdy.future;
+
   void init() async {
     await _initFeed();
-    _streamFeed();
+    await _streamFeed();
   }
 
   /// cancels relay subscriptions and stream subscriptions
@@ -68,6 +72,7 @@ class UserFeedAndRepliesFeed {
     }
     _feed = notes;
     _feedStreamController.add(_feed);
+    _feedRdy.complete(_feed);
     return;
   }
 

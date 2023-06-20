@@ -36,8 +36,6 @@ class _NostrPageState extends ConsumerState<NostrPage>
   @override
   bool get wantKeepAlive => true;
 
-  final bool _isLoading = true;
-
   List<String> followingPubkeys = [];
 
   late final ScrollController _scrollControllerPage = ScrollController();
@@ -45,7 +43,6 @@ class _NostrPageState extends ConsumerState<NostrPage>
   late TabController _tabController;
 
   late String pubkey = "";
-  final int _tabIndex = 0;
 
   _getPubkey() async {
     //wait for connection

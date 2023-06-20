@@ -4,6 +4,7 @@ import 'dart:developer';
 import 'package:camelus/atoms/new_posts_available.dart';
 import 'package:camelus/atoms/refresh_indicator_no_need.dart';
 import 'package:camelus/components/note_card/note_card_container.dart';
+import 'package:camelus/config/palette.dart';
 import 'package:camelus/db/database.dart';
 import 'package:camelus/db/entities/db_note_view.dart';
 import 'package:camelus/models/nostr_note.dart';
@@ -172,10 +173,14 @@ class UserFeedAndRepliesViewState
 
   Future<void> _initSequence() async {
     log("init sequence");
+
     await _initDb();
     await _getFollowingPubkeys();
+
     _userFeedAndRepliesFeed =
         UserFeedAndRepliesFeed(db, _followingPubkeys, widget._relays);
+    await _userFeedAndRepliesFeed.feedRdy;
+
     _servicesReady.complete();
 
     _initUserFeed();
@@ -212,7 +217,10 @@ class UserFeedAndRepliesViewState
       future: _servicesReady.future,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
+          return const Center(
+              child: CircularProgressIndicator(
+            color: Palette.white,
+          ));
         }
         if (snapshot.hasError) {
           return const Center(child: Text('Error'));
@@ -227,11 +235,22 @@ class UserFeedAndRepliesViewState
                 },
                 child: StreamBuilder<List<NostrNote>>(
                   stream: _userFeedAndRepliesFeed.feedStream,
-                  //initialData: _userFeedAndRepliesFeed.feed,
-                  builder: (context, snapshot) {
+                  initialData: _userFeedAndRepliesFeed.feed,
+                  builder: (BuildContext context,
+                      AsyncSnapshot<List<NostrNote>> snapshot) {
                     if (snapshot.hasData) {
                       var notes = snapshot.data!;
+
+                      if (notes.isEmpty) {
+                        return const Center(
+                          child: Text("no notes found",
+                              style: TextStyle(
+                                  fontSize: 20, color: Palette.white)),
+                        );
+                      }
+
                       _lastNoteInFeed = notes.last;
+
                       return CustomScrollView(
                         physics: const BouncingScrollPhysics(),
                         controller: _scrollControllerFeed,
