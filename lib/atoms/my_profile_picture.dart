@@ -13,7 +13,9 @@ Widget myProfilePicture({
   if (pictureUrl.contains(".png") ||
       pictureUrl.contains(".jpg") ||
       pictureUrl.contains(".jpeg") ||
-      pictureUrl.contains(".gif")) {
+      pictureUrl.contains(".gif") ||
+      pictureUrl.contains(".webp") ||
+      pictureUrl.contains(".avif")) {
     return ClipOval(
       child: SizedBox.fromSize(
         size: const Size.fromRadius(30), // Image radius
@@ -31,6 +33,8 @@ Widget myProfilePicture({
               memCacheWidth: cacheHeight ?? 200,
               maxHeightDiskCache: cacheHeight ?? 200,
               maxWidthDiskCache: cacheHeight ?? 200,
+              alignment: Alignment.center,
+              fit: BoxFit.cover,
             )),
       ),
     );
