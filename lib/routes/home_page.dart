@@ -150,11 +150,12 @@ class _HomePageState extends ConsumerState<HomePage> {
                           ? Palette.primary
                           : Palette.darkGray,
                     ),
-                    StreamBuilder(
+                    StreamBuilder<int>(
                         stream: navBarProvider.newNotesCountStream,
                         initialData: 0,
-                        builder: (context, snapshot) {
-                          if (snapshot.data == 0) return Container();
+                        builder: (context, AsyncSnapshot<int> snapshot) {
+                          if (!snapshot.hasData) return Container();
+                          if (snapshot.data! < 1) return Container();
                           return Positioned(
                             right: 0,
                             bottom: 0,

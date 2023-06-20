@@ -26,6 +26,7 @@ class NavigationBarControls {
 
   void resetNewNotesCount() {
     _newNotesCount = 0;
+    _newNotesCountController.add(_newNotesCount);
   }
 
   void tabHome() {
