@@ -16,7 +16,8 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:matomo_tracker/matomo_tracker.dart';
 
 class HomePage extends ConsumerStatefulWidget {
-  const HomePage({Key? key}) : super(key: key);
+  final String pubkey;
+  const HomePage({Key? key, required this.pubkey}) : super(key: key);
 
   @override
   ConsumerState<HomePage> createState() => _HomePageState();
@@ -105,7 +106,7 @@ class _HomePageState extends ConsumerState<HomePage> {
           controller: _myPage,
           physics: const NeverScrollableScrollPhysics(),
           children: <Widget>[
-            NostrPage(parentScaffoldKey: _scaffoldKey),
+            NostrPage(parentScaffoldKey: _scaffoldKey, pubkey: widget.pubkey),
             const SearchPage(),
             const NotificationPage(),
             const Center(

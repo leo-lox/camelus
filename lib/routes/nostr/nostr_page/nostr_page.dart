@@ -4,6 +4,7 @@ import 'dart:developer';
 
 import 'package:camelus/atoms/spinner_center.dart';
 import 'package:camelus/models/socket_control.dart';
+import 'package:camelus/providers/key_pair_provider.dart';
 import 'package:camelus/providers/nostr_service_provider.dart';
 import 'package:camelus/routes/nostr/nostr_page/global_feed_view.dart';
 import 'package:camelus/routes/nostr/nostr_page/user_feed_and_replies_page.dart';
@@ -25,7 +26,10 @@ import '../../../config/palette.dart';
 
 class NostrPage extends ConsumerStatefulWidget {
   var parentScaffoldKey = GlobalKey<ScaffoldState>();
-  NostrPage({Key? key, required this.parentScaffoldKey}) : super(key: key);
+  final String pubkey;
+
+  NostrPage({Key? key, required this.parentScaffoldKey, required this.pubkey})
+      : super(key: key);
   @override
   ConsumerState<NostrPage> createState() => _NostrPageState();
 }
@@ -41,24 +45,6 @@ class _NostrPageState extends ConsumerState<NostrPage>
   late final ScrollController _scrollControllerPage = ScrollController();
 
   late TabController _tabController;
-
-  late String pubkey = "";
-
-  _getPubkey() async {
-    //wait for connection
-    bool connection = await _nostrService.isNostrServiceConnected;
-    if (!connection) {
-      log("no connection to nostr service");
-      return;
-    }
-
-    // check mounted to avoid setState after dispose
-    if (!mounted) return;
-
-    setState(() {
-      pubkey = _nostrService.myKeys.publicKey;
-    });
-  }
 
   void _betaCheckForUpdates() async {
     await Future.delayed(const Duration(seconds: 15));
@@ -153,8 +139,6 @@ class _NostrPageState extends ConsumerState<NostrPage>
     _initNostrService();
     super.initState();
 
-    _getPubkey();
-
     _betaCheckForUpdates();
 
     _tabController = TabController(length: 3, vsync: this);
@@ -211,24 +195,24 @@ class _NostrPageState extends ConsumerState<NostrPage>
                       shape: BoxShape.circle,
                     ),
                     child: FutureBuilder<Map>(
-                        future: _nostrService.getUserMetadata(pubkey),
+                        future: _nostrService.getUserMetadata(widget.pubkey),
                         builder: (BuildContext context,
                             AsyncSnapshot<Map> snapshot) {
                           var picture = "";
 
                           if (snapshot.hasData) {
                             picture = snapshot.data?["picture"] ??
-                                "https://avatars.dicebear.com/api/personas/$pubkey.svg";
+                                "https://avatars.dicebear.com/api/personas/${widget.pubkey}.svg";
                           } else if (snapshot.hasError) {
                             picture =
-                                "https://avatars.dicebear.com/api/personas/$pubkey.svg";
+                                "https://avatars.dicebear.com/api/personas/${widget.pubkey}.svg";
                           } else {
                             // loading
                             picture =
-                                "https://avatars.dicebear.com/api/personas/$pubkey.svg";
+                                "https://avatars.dicebear.com/api/personas/${widget.pubkey}.svg";
                           }
                           return myProfilePicture(
-                              pictureUrl: picture, pubkey: pubkey);
+                              pictureUrl: picture, pubkey: widget.pubkey);
                         }),
                   ),
                 ),
@@ -326,10 +310,8 @@ class _NostrPageState extends ConsumerState<NostrPage>
             controller: _tabController,
             physics: const BouncingScrollPhysics(),
             children: [
-              if (pubkey.isNotEmpty) UserFeedOriginalView(pubkey: pubkey),
-              if (pubkey.isEmpty) spinnerCenter(),
-              if (pubkey.isNotEmpty) UserFeedAndRepliesView(pubkey: pubkey),
-              if (pubkey.isEmpty) spinnerCenter(),
+              UserFeedOriginalView(pubkey: widget.pubkey),
+              UserFeedAndRepliesView(pubkey: widget.pubkey),
               GlobalFeedView()
             ],
           ),

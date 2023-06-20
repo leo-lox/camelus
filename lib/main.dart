@@ -24,20 +24,22 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
 
-  Future<String> _initialRoute() async {
+  //! first is route, second is pubkey
+  Future<List<String>> _initialRoute() async {
     var wrapper = await ProviderContainer().read(keyPairProvider.future);
 
     if (wrapper.keyPair == null) {
       var initialRoute = '/onboarding';
-      return initialRoute;
+      return [initialRoute, ""];
     }
-    return '/';
+
+    return ['/', wrapper.keyPair!.publicKey];
   }
 
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<String>(
+    return FutureBuilder<List<String>>(
         future: _initialRoute(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
@@ -54,12 +56,13 @@ class MyApp extends StatelessWidget {
                 debugShowCheckedModeBanner: false,
                 title: 'camelus',
                 theme: theme.themeMap["DARK"],
-                initialRoute: snapshot.data,
+                initialRoute: snapshot.data![0],
                 onGenerateRoute: (RouteSettings settings) {
                   switch (settings.name) {
                     case '/':
                       return MaterialPageRoute(
-                        builder: (context) => const HomePage(),
+                        builder: (context) =>
+                            HomePage(pubkey: snapshot.data![1]),
                       );
 
                     case '/onboarding':
