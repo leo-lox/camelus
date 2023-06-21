@@ -40,9 +40,6 @@ class NostrService {
   static String ownPubkeySubscriptionId =
       "own-${Helpers().getRandomString(20)}";
 
-  // user feed
-  var userFeedObj = UserFeed();
-
   // authors feed
   var authorsFeedObj = AuthorsFeed();
 
@@ -124,8 +121,6 @@ class NostrService {
         blockedUsers.add(u);
       }
     }
-
-    userFeedObj.restoreFromCache();
 
     try {
       //todo: fix this for onboarding
@@ -243,15 +238,6 @@ class NostrService {
 
     if (event[1].contains("authors")) {
       authorsFeedObj.receiveNostrEvent(event, socketControl);
-      if (event[0] == "EOSE") {
-        return;
-      }
-    }
-
-    /// user feed
-    if (event[1].contains("ufeed")) {
-      userFeedObj.receiveNostrEvent(event, socketControl);
-
       if (event[0] == "EOSE") {
         return;
       }
@@ -378,22 +364,6 @@ class NostrService {
     return count;
   }
 
-  void requestUserFeed(
-      {required List<String> users,
-      required String requestId,
-      int? since,
-      int? until,
-      int? limit,
-      bool? includeComments}) {
-    userFeedObj.requestUserFeed(
-        users: users,
-        requestId: requestId,
-        since: since,
-        until: until,
-        limit: limit,
-        includeComments: includeComments);
-  }
-
   void requestAuthors(
       {required List<String> authors,
       required String requestId,
@@ -443,15 +413,6 @@ class NostrService {
       blockedUsers.add(pubkey);
       await jsonCache.refresh("blockedUsers", {"blockedUsers": blockedUsers});
     }
-    // search in feed for pubkey and remove
-    userFeedObj.feed.removeWhere((element) => element.pubkey == pubkey);
-
-    // update cache
-
-    await jsonCache.refresh('userFeed', {"tweets": userFeedObj.feed});
-
-    //notify streams
-    // todo
 
     return;
   }

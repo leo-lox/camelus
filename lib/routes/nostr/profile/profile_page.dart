@@ -285,10 +285,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
           pubkey: pubkey,
         ),
       ),
-    ).then((value) => {
-          _nostrService.clearCache(),
-          _nostrService.userFeedObj.feed = [],
-        });
+    ).then((value) => {});
   }
 
   void _initNostrService() {

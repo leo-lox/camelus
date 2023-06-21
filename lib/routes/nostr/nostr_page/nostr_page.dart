@@ -7,7 +7,7 @@ import 'package:camelus/models/socket_control.dart';
 import 'package:camelus/providers/key_pair_provider.dart';
 import 'package:camelus/providers/nostr_service_provider.dart';
 import 'package:camelus/routes/nostr/nostr_page/global_feed_view.dart';
-import 'package:camelus/routes/nostr/nostr_page/user_feed_and_replies_page.dart';
+import 'package:camelus/routes/nostr/nostr_page/user_feed_and_replies_view.dart';
 import 'package:camelus/routes/nostr/nostr_page/user_feed_original_view.dart';
 import 'package:camelus/routes/nostr/relays_page.dart';
 import 'package:flutter/material.dart';

@@ -33,15 +33,10 @@ class _PerspectiveFeedPageState extends ConsumerState<PerspectiveFeedPage>
   void initState() {
     super.initState();
     _initNostrService();
-    //clear user feed cache
-    _nostrService.clearCache();
-    _nostrService.userFeedObj.feed = [];
   }
 
   @override
   void dispose() {
-    _nostrService.clearCache();
-    _nostrService.userFeedObj.feed = [];
     super.dispose();
   }
 
