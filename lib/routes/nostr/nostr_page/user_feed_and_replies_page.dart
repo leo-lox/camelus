@@ -110,6 +110,7 @@ class UserFeedAndRepliesViewState
     setState(() {
       _newPostsAvailable = false;
     });
+    ref.watch(navigatiionBarProvider).resetNewNotesCount();
   }
 
   void _initUserFeed() {
@@ -183,6 +184,9 @@ class UserFeedAndRepliesViewState
 
     _servicesReady.complete();
 
+    // reset home bar new notes count
+    ref.watch(navigatiionBarProvider).resetNewNotesCount();
+
     _initUserFeed();
     _setupScrollListener();
     _setupNewNotesListener();
@@ -201,7 +205,6 @@ class UserFeedAndRepliesViewState
   void dispose() {
     _userFeedAndRepliesFeed.cleanup();
     _disposeSubscriptions();
-    ref.watch(navigatiionBarProvider).resetNewNotesCount();
     super.dispose();
   }
 
