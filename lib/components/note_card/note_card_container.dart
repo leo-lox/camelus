@@ -103,6 +103,7 @@ class _NoteCardContainerState extends ConsumerState<NoteCardContainer> {
                           if (myNote.getTagEvents.isNotEmpty)
                             // for myNote.getTagPubkeys
                             Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 const SizedBox(width: 25),
                                 const Text(
@@ -118,22 +119,27 @@ class _NoteCardContainerState extends ConsumerState<NoteCardContainer> {
                                       )
                                       .toList(),
                                 if (myNote.getTagPubkeys.length > 2)
-                                  Row(
-                                    children: [
-                                      linkedUsername(
-                                          myNote.getTagPubkeys[0].value,
-                                          _nostrService,
-                                          context),
-                                      linkedUsername(
-                                          myNote.getTagPubkeys[1].value,
-                                          _nostrService,
-                                          context),
-                                      Text(
-                                        "and ${myNote.getTagPubkeys.length - 2} ${myNote.getTagPubkeys.length > 3 ? 'others' : 'other'}",
-                                        style: const TextStyle(
-                                            fontSize: 16, color: Palette.gray),
-                                      )
-                                    ],
+                                  SizedBox(
+                                    width:
+                                        MediaQuery.of(context).size.width - 100,
+                                    child: Wrap(
+                                      children: [
+                                        linkedUsername(
+                                            myNote.getTagPubkeys[0].value,
+                                            _nostrService,
+                                            context),
+                                        linkedUsername(
+                                            myNote.getTagPubkeys[1].value,
+                                            _nostrService,
+                                            context),
+                                        Text(
+                                          "and ${myNote.getTagPubkeys.length - 2} ${myNote.getTagPubkeys.length > 3 ? 'others' : 'other'}",
+                                          style: const TextStyle(
+                                              fontSize: 16,
+                                              color: Palette.gray),
+                                        )
+                                      ],
+                                    ),
                                   ),
                               ],
                             ),
