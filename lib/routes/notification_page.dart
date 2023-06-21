@@ -20,8 +20,7 @@ class _NotificationPageState extends State<NotificationPage> {
     return const Scaffold(
       backgroundColor: Palette.background,
       body: Center(
-        child: Text('work in progress',
-            style: TextStyle(color: Colors.white)),
+        child: Text('work in progress', style: TextStyle(color: Colors.white)),
       ),
     );
   }

@@ -36,7 +36,6 @@ class NostrPage extends ConsumerStatefulWidget {
 
 class _NostrPageState extends ConsumerState<NostrPage>
     with TickerProviderStateMixin, AutomaticKeepAliveClientMixin {
-  late NostrService _nostrService;
   @override
   bool get wantKeepAlive => true;
 
@@ -130,13 +129,8 @@ class _NostrPageState extends ConsumerState<NostrPage>
     );
   }
 
-  void _initNostrService() {
-    _nostrService = ref.read(nostrServiceProvider);
-  }
-
   @override
   void initState() {
-    _initNostrService();
     super.initState();
 
     _betaCheckForUpdates();
@@ -172,6 +166,9 @@ class _NostrPageState extends ConsumerState<NostrPage>
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
+    var nostrService = ref.watch(nostrServiceProvider);
+
     return Scaffold(
       backgroundColor: Palette.background,
       appBar: null,
@@ -195,7 +192,7 @@ class _NostrPageState extends ConsumerState<NostrPage>
                       shape: BoxShape.circle,
                     ),
                     child: FutureBuilder<Map>(
-                        future: _nostrService.getUserMetadata(widget.pubkey),
+                        future: nostrService.getUserMetadata(widget.pubkey),
                         builder: (BuildContext context,
                             AsyncSnapshot<Map> snapshot) {
                           var picture = "";
@@ -244,7 +241,7 @@ class _NostrPageState extends ConsumerState<NostrPage>
                   GestureDetector(
                     onTap: () => _openRelaysView(),
                     child: StreamBuilder(
-                        stream: _nostrService.relays.connectedRelaysReadStream,
+                        stream: nostrService.relays.connectedRelaysReadStream,
                         builder: (context,
                             AsyncSnapshot<Map<String, SocketControl>>
                                 snapshot) {
