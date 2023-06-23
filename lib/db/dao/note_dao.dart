@@ -74,6 +74,16 @@ abstract class NoteDao {
   Stream<List<DbNoteView>> findPubkeyRootNotesByKindStreamNotifyOnly(
       List<String> pubkeys, int kind);
 
+  // event view
+  @Query("""
+      SELECT * FROM noteView 
+      WHERE noteView.id = :id
+      AND kind = :kind
+      OR instr(',' || tag_values || ',', :id) > 0
+      ORDER BY created_at ASC
+      """)
+  Future<List<DbNoteView>> findRepliesByIdAndByKind(String id, int kind);
+
   @Query('SELECT content FROM note')
   Stream<List<String>> findAllNotesContentStream();
 
