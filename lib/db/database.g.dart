@@ -92,6 +92,10 @@ class _$AppDatabase extends AppDatabase {
             'CREATE TABLE IF NOT EXISTS `Tag` (`note_id` TEXT NOT NULL, `tag_index` INTEGER NOT NULL, `type` TEXT NOT NULL, `value` TEXT NOT NULL, `recommended_relay` TEXT, `marker` TEXT, FOREIGN KEY (`note_id`) REFERENCES `Note` (`id`) ON UPDATE NO ACTION ON DELETE NO ACTION, PRIMARY KEY (`note_id`, `value`))');
         await database
             .execute('CREATE INDEX `index_Note_kind` ON `Note` (`kind`)');
+        await database
+            .execute('CREATE INDEX `index_Note_pubkey` ON `Note` (`pubkey`)');
+        await database.execute(
+            'CREATE INDEX `index_Note_created_at` ON `Note` (`created_at`)');
         await database.execute(
             'CREATE VIEW IF NOT EXISTS `noteView` AS SELECT Note.*, GROUP_CONCAT(Tag.type) as tag_types, GROUP_CONCAT(Tag.value) as tag_values, GROUP_CONCAT(Tag.recommended_relay) as tag_recommended_relays, GROUP_CONCAT(Tag.marker) as tag_markers, GROUP_CONCAT(Tag.tag_index) as tag_index FROM Note LEFT JOIN Tag ON Note.id = Tag.note_id GROUP BY Note.id;');
 
@@ -369,6 +373,53 @@ class _$NoteDao extends NoteDao {
             tag_markers: row['tag_markers'] as String?),
         arguments: [kind, timestamp, ...pubkeys],
         queryableName: 'noteView',
+        isView: true);
+  }
+
+  @override
+  Future<List<DbNoteView>> findPubkeyRootNotesByKind(
+    List<String> pubkeys,
+    int kind,
+  ) async {
+    const offset = 2;
+    final _sqliteVariablesForPubkeys =
+        Iterable<String>.generate(pubkeys.length, (i) => '?${i + offset}')
+            .join(',');
+    return _queryAdapter.queryList(
+        'SELECT * FROM noteView        WHERE noteView.pubkey        IN (' +
+            _sqliteVariablesForPubkeys +
+            ')        AND kind = (?1)       AND NOT (\',\' || tag_types || \',\' LIKE \'%,e,%\')       OR (tag_types IS NULL AND kind = (?1))        ORDER BY created_at DESC',
+        mapper: (Map<String, Object?> row) => DbNoteView(id: row['id'] as String, pubkey: row['pubkey'] as String, created_at: row['created_at'] as int, kind: row['kind'] as int, content: row['content'] as String, sig: row['sig'] as String, tag_index: row['tag_index'] as String?, tag_types: row['tag_types'] as String?, tag_values: row['tag_values'] as String?, tag_recommended_relays: row['tag_recommended_relays'] as String?, tag_markers: row['tag_markers'] as String?),
+        arguments: [kind, ...pubkeys]);
+  }
+
+  @override
+  Stream<List<DbNoteView>> findPubkeyRootNotesByKindStreamNotifyOnly(
+    List<String> pubkeys,
+    int kind,
+  ) {
+    const offset = 2;
+    final _sqliteVariablesForPubkeys =
+        Iterable<String>.generate(pubkeys.length, (i) => '?${i + offset}')
+            .join(',');
+    return _queryAdapter.queryListStream(
+        'SELECT * FROM (         SELECT Note.*, GROUP_CONCAT(Tag.type) as tag_types, GROUP_CONCAT(Tag.value) as tag_values, GROUP_CONCAT(Tag.recommended_relay) as tag_recommended_relays, GROUP_CONCAT(Tag.marker) as tag_markers, GROUP_CONCAT(Tag.tag_index) as tag_index          FROM Note          LEFT JOIN Tag ON Note.id = Tag.note_id          GROUP BY Note.id         ) AS noteView         WHERE noteView.pubkey IN (' +
+            _sqliteVariablesForPubkeys +
+            ')          AND kind = (?1)         AND NOT (\',\' || tag_types || \',\' LIKE \'%,e,%\')         OR (tag_types IS NULL AND kind = (?1))         ORDER BY created_at DESC',
+        mapper: (Map<String, Object?> row) => DbNoteView(
+            id: row['id'] as String,
+            pubkey: row['pubkey'] as String,
+            created_at: row['created_at'] as int,
+            kind: row['kind'] as int,
+            content: row['content'] as String,
+            sig: row['sig'] as String,
+            tag_index: row['tag_index'] as String?,
+            tag_types: row['tag_types'] as String?,
+            tag_values: row['tag_values'] as String?,
+            tag_recommended_relays: row['tag_recommended_relays'] as String?,
+            tag_markers: row['tag_markers'] as String?),
+        arguments: [kind, ...pubkeys],
+        queryableName: 'Note',
         isView: true);
   }
 

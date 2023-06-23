@@ -43,6 +43,37 @@ abstract class NoteDao {
   Stream<List<DbNoteView>> findPubkeyNotesStreamByKindAndTimestamp(
       List<String> pubkeys, int kind, int timestamp);
 
+  // find root notes
+  @Query("""
+      SELECT * FROM noteView 
+      WHERE noteView.pubkey 
+      IN (:pubkeys) 
+      AND kind = (:kind)
+      AND NOT (',' || tag_types || ',' LIKE '%,e,%')
+      OR (tag_types IS NULL AND kind = (:kind))
+
+      ORDER BY created_at DESC
+      """)
+  Future<List<DbNoteView>> findPubkeyRootNotesByKind(
+      List<String> pubkeys, int kind);
+
+  // copied view because otherwise floor change/stream detection gets confused
+  @Query("""
+        SELECT * FROM (
+        SELECT Note.*, GROUP_CONCAT(Tag.type) as tag_types, GROUP_CONCAT(Tag.value) as tag_values, GROUP_CONCAT(Tag.recommended_relay) as tag_recommended_relays, GROUP_CONCAT(Tag.marker) as tag_markers, GROUP_CONCAT(Tag.tag_index) as tag_index 
+        FROM Note 
+        LEFT JOIN Tag ON Note.id = Tag.note_id 
+        GROUP BY Note.id
+        ) AS noteView
+        WHERE noteView.pubkey IN (:pubkeys) 
+        AND kind = (:kind)
+        AND NOT (',' || tag_types || ',' LIKE '%,e,%')
+        OR (tag_types IS NULL AND kind = (:kind))
+        ORDER BY created_at DESC
+      """)
+  Stream<List<DbNoteView>> findPubkeyRootNotesByKindStreamNotifyOnly(
+      List<String> pubkeys, int kind);
+
   @Query('SELECT content FROM note')
   Stream<List<String>> findAllNotesContentStream();
 

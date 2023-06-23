@@ -11,6 +11,7 @@ import 'package:camelus/models/nostr_note.dart';
 import 'package:camelus/providers/nostr_service_provider.dart';
 import 'package:camelus/services/nostr/nostr_service.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -272,6 +273,10 @@ class _NoteCardState extends ConsumerState<NoteCard> {
                                   // like button
                                   GestureDetector(
                                     onTap: () => {
+                                      // copy to clipboard
+                                      Clipboard.setData(ClipboardData(
+                                          text:
+                                              widget.note.toJson().toString())),
                                       ScaffoldMessenger.of(context)
                                           .showSnackBar(const SnackBar(
                                         content: Text(

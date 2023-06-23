@@ -202,6 +202,7 @@ class UserFeedAndRepliesFeed {
       "REQ",
       reqId,
       body1,
+      body2,
     ];
 
     _relays.requestEvents(data);

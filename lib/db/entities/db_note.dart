@@ -1,7 +1,9 @@
 import 'package:floor/floor.dart';
 
 @Entity(tableName: 'Note', indices: [
-  Index(value: ['kind'])
+  Index(value: ['kind']),
+  Index(value: ['pubkey']),
+  Index(value: ['created_at'])
 ])
 class DbNote {
   @primaryKey

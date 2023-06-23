@@ -94,15 +94,15 @@ class UserFeed {
   Future<List<NostrNote>> _getCurrentNotes() async {
     //! todo
     var getresult =
-        await _db.noteDao.findPubkeyNotesByKind(_followingPubkeys, 1);
+        await _db.noteDao.findPubkeyRootNotesByKind(_followingPubkeys, 1);
 
     return getresult.map((e) => e.toNostrNote()).toList();
   }
 
   _streamFeed() async {
     //! todo
-    Stream<List<DbNoteView>> stream =
-        _db.noteDao.findPubkeyNotesByKindStreamNotifyOnly(_followingPubkeys, 1);
+    Stream<List<DbNoteView>> stream = _db.noteDao
+        .findPubkeyRootNotesByKindStreamNotifyOnly(_followingPubkeys, 1);
 
     _subscriptions.add(
       stream.listen((event) async {
