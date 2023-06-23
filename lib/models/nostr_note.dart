@@ -35,6 +35,17 @@ class NostrNote {
     return relayHints;
   }
 
+  factory NostrNote.empty({String? id, String? pubkey, int? kind}) {
+    return NostrNote(
+        id: id ?? 'missing',
+        pubkey: pubkey ?? 'missing',
+        created_at: 0,
+        kind: kind ?? 1,
+        content: 'missing event',
+        sig: '',
+        tags: []);
+  }
+
   factory NostrNote.fromJson(Map<String, dynamic> json) {
     List<dynamic> tagsJson = json['tags'] ?? [];
     List<List<String>> tags = [];
@@ -106,5 +117,47 @@ class NostrNote {
       }
     }
     return mytags;
+  }
+
+  bool get isRoot {
+    return getRootReply == null && getDirectReply == null;
+  }
+
+  NostrTag? get getRootReply {
+    for (NostrTag tag in getTagEvents) {
+      // in spec
+      if (tag.marker == "root") {
+        return tag;
+      }
+
+      // support off spec
+      if (tags.length == 1) {
+        return getTagEvents[0];
+      }
+      // off spec
+      if (tags.length > 1) {
+        var root = getTagEvents.first;
+        return root;
+      }
+    }
+
+    return null;
+  }
+
+  NostrTag? get getDirectReply {
+    for (NostrTag tag in getTagEvents) {
+      // in spec
+      if (tag.marker == "reply") {
+        return tag;
+      }
+
+      // off spec
+      if (tags.length > 2) {
+        var reply = getTagEvents.last;
+
+        return reply;
+      }
+    }
+    return null;
   }
 }

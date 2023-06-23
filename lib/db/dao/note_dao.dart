@@ -84,6 +84,21 @@ abstract class NoteDao {
       """)
   Future<List<DbNoteView>> findRepliesByIdAndByKind(String id, int kind);
 
+  // event view
+  @Query("""
+       SELECT * FROM (
+        SELECT Note.*, GROUP_CONCAT(Tag.type) as tag_types, GROUP_CONCAT(Tag.value) as tag_values, GROUP_CONCAT(Tag.recommended_relay) as tag_recommended_relays, GROUP_CONCAT(Tag.marker) as tag_markers, GROUP_CONCAT(Tag.tag_index) as tag_index 
+        FROM Note 
+        LEFT JOIN Tag ON Note.id = Tag.note_id 
+        GROUP BY Note.id
+        ) AS noteView
+      WHERE noteView.id = :id
+      AND kind = :kind
+      OR instr(',' || tag_values || ',', :id) > 0
+      ORDER BY created_at ASC
+      """)
+  Stream<List<DbNoteView>> findRepliesByIdAndByKindStream(String id, int kind);
+
   @Query('SELECT content FROM note')
   Stream<List<String>> findAllNotesContentStream();
 

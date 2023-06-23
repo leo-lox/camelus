@@ -31,50 +31,18 @@ class _NoteCardContainerState extends ConsumerState<NoteCardContainer> {
   void _onNoteTab(NostrNote myNote) {
     var refEvents = myNote.getTagEvents;
 
-    // try to find root note
-    NostrTag? rootNote;
-    NostrTag? replyNote;
-
-    for (NostrTag tag in refEvents) {
-      if (tag.marker == "root") {
-        rootNote = tag;
-      }
-      if (tag.marker == "reply") {
-        replyNote = tag;
-      }
-    }
-    // in spec
-    if (rootNote != null || replyNote != null) {
-      log("is reply");
-      // off spec support, sometimes not marked as root
-      var root = rootNote?.value;
-      root ??= refEvents.first.value;
-
-      _navigateToEventViewPage(root, replyNote?.value ?? myNote.id);
-      return;
-    }
-
-    // support off spec
-    if (refEvents.length == 1) {
-      log("is reply");
-      _navigateToEventViewPage(refEvents[0].value, myNote.id);
-      return;
-    }
-
-    // support off spec
-    if (refEvents.length > 1) {
-      log("is reply");
-      var root = refEvents.first;
-      var reply = refEvents.last;
-      _navigateToEventViewPage(root.value, reply.value);
-      return;
-    }
-
-    if (rootNote == null) {
-      log("is root");
+    if (myNote.isRoot) {
       _navigateToEventViewPage(myNote.id, null);
       return;
     }
+
+    NostrTag? root = myNote.getRootReply;
+    NostrTag? reply = myNote.getDirectReply;
+
+    // off spec support, sometimes not marked as root
+    root ??= refEvents.first;
+
+    _navigateToEventViewPage(root.value, reply?.value ?? myNote.id);
   }
 
   _navigateToEventViewPage(String root, String? scrollIntoView) {
@@ -86,12 +54,20 @@ class _NoteCardContainerState extends ConsumerState<NoteCardContainer> {
 
   @override
   Widget build(BuildContext context) {
-    final _nostrService = ref.read(nostrServiceProvider);
+    final nostrService = ref.read(nostrServiceProvider);
 
     return SizedBox(
       width: double.infinity,
       child: Container(
-        color: Palette.background,
+        //color: Palette.background,
+        // random border color
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: Palette.purple,
+            width: 2,
+          ),
+          borderRadius: BorderRadius.circular(5),
+        ),
         child: Column(
           children: [
             ...widget.notes
@@ -115,7 +91,7 @@ class _NoteCardContainerState extends ConsumerState<NoteCardContainer> {
                                   ...myNote.getTagPubkeys
                                       .map(
                                         (tag) => linkedUsername(
-                                            tag.value, _nostrService, context),
+                                            tag.value, nostrService, context),
                                       )
                                       .toList(),
                                 if (myNote.getTagPubkeys.length > 2)
@@ -126,11 +102,11 @@ class _NoteCardContainerState extends ConsumerState<NoteCardContainer> {
                                       children: [
                                         linkedUsername(
                                             myNote.getTagPubkeys[0].value,
-                                            _nostrService,
+                                            nostrService,
                                             context),
                                         linkedUsername(
                                             myNote.getTagPubkeys[1].value,
-                                            _nostrService,
+                                            nostrService,
                                             context),
                                         Text(
                                           "and ${myNote.getTagPubkeys.length - 2} ${myNote.getTagPubkeys.length > 3 ? 'others' : 'other'}",
