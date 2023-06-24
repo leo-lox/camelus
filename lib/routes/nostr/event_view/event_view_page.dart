@@ -38,6 +38,30 @@ class _EventViewPageState extends ConsumerState<EventViewPage> {
 
   final Completer<void> _servicesReady = Completer<void>();
 
+  final String eventFeedFreshId = "fresh";
+
+  NostrNote? _lastNoteInFeed;
+
+  void _setupScrollListener() {
+    _scrollControllerFeed.addListener(() {
+      if (_scrollControllerFeed.position.pixels ==
+          _scrollControllerFeed.position.maxScrollExtent) {
+        log("reached end of scroll");
+
+        _eventFeedLoadMore();
+      }
+
+      if (_scrollControllerFeed.position.pixels < 100) {
+        // disable after sroll
+        // if (_newPostsAvailable) {
+        //   setState(() {
+        //     _newPostsAvailable = false;
+        //   });
+        // }
+      }
+    });
+  }
+
   Future<void> _initDb() async {
     db = await ref.read(databaseProvider.future);
     return;
@@ -49,6 +73,9 @@ class _EventViewPageState extends ConsumerState<EventViewPage> {
     _eventFeed = EventFeed(db, widget._rootId, widget._relays);
     await _eventFeed.feedRdy;
     _servicesReady.complete();
+
+    _initUserFeed();
+    _setupScrollListener();
   }
 
   @override
@@ -61,6 +88,29 @@ class _EventViewPageState extends ConsumerState<EventViewPage> {
   void dispose() {
     _eventFeed.cleanup();
     super.dispose();
+  }
+
+  void _initUserFeed() {
+    _eventFeed.requestRelayEventFeed(
+      eventIds: [widget._rootId],
+      requestId: eventFeedFreshId,
+      limit: 5,
+    );
+  }
+
+  void _eventFeedLoadMore() async {
+    log("load more called");
+
+    int now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
+    // schould not be needed
+    int defaultUntil = now - 86400 * 7; // -1 week
+
+    _eventFeed.requestRelayEventFeed(
+      eventIds: [widget._rootId],
+      requestId: eventFeedFreshId,
+      limit: 5,
+      until: _lastNoteInFeed?.created_at ?? defaultUntil,
+    );
   }
 
   @override
@@ -126,6 +176,7 @@ class _EventViewPageState extends ConsumerState<EventViewPage> {
   }
 
   CustomScrollView _buildScrollView(List<NostrNote> notes) {
+    _lastNoteInFeed = notes.last;
     return CustomScrollView(
       physics: const BouncingScrollPhysics(),
       controller: _scrollControllerFeed,
@@ -175,6 +226,7 @@ class _EventViewPageState extends ConsumerState<EventViewPage> {
 
     List<NoteCardContainer> rootLevelRepliesContainers = rootLevelReplies
         .map((e) => NoteCardContainer(
+              key: GlobalObjectKey(e.id),
               notes: [e],
             ))
         .toList();
@@ -188,6 +240,7 @@ class _EventViewPageState extends ConsumerState<EventViewPage> {
             container.notes.add(note);
             // remove note from working list
             foundNotes.add(note);
+            break;
           } else {}
         }
       }
@@ -203,11 +256,13 @@ class _EventViewPageState extends ConsumerState<EventViewPage> {
 
     for (var note in workingList) {
       rootLevelRepliesContainers.add(NoteCardContainer(
+        key: GlobalObjectKey(note.id),
         notes: [NostrNote.empty(id: note.getDirectReply?.value ?? ""), note],
       ));
     }
 
     return NoteCardContainer(
+      key: GlobalObjectKey(rootNote.id),
       notes: [rootNote, ...authorFirstLevelSelfReplies],
       otherContainers: rootLevelRepliesContainers,
     );

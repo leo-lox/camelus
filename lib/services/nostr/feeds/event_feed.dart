@@ -113,7 +113,7 @@ class EventFeed {
   }
 
   void requestRelayEventFeed({
-    required List<String> users,
+    required List<String> eventIds,
     required String requestId,
     int? since,
     int? until,
@@ -131,24 +131,16 @@ class EventFeed {
     const defaultLimit = 5;
 
     var body1 = {
-      "authors": users,
+      "#e": eventIds,
       "kinds": [1],
       "limit": limit ?? defaultLimit,
     };
 
-    // used to fetch comments on the posts
-    var body2 = {
-      "#p": users,
-      "kinds": [1],
-      "limit": limit ?? defaultLimit,
-    };
     if (since != null) {
       body1["since"] = since;
-      body2["since"] = since;
     }
     if (until != null) {
       body1["until"] = until;
-      body2["until"] = until;
     }
 
     var data = [
