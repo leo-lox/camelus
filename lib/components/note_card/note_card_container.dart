@@ -59,84 +59,108 @@ class _NoteCardContainerState extends ConsumerState<NoteCardContainer> {
     return SizedBox(
       width: double.infinity,
       child: Container(
-        //color: Palette.background,
-        // random border color
-        decoration: BoxDecoration(
-          border: Border.all(
-            color: Palette.purple,
-            width: 2,
-          ),
-          borderRadius: BorderRadius.circular(5),
-        ),
+        color: Palette.background,
         child: Column(
           children: [
-            ...widget.notes
-                .map((myNote) => Container(
-                      padding: const EdgeInsets.only(top: 10),
-                      child: Column(
-                        children: [
-                          // check if reply
-                          if (myNote.getTagEvents.isNotEmpty)
-                            // for myNote.getTagPubkeys
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const SizedBox(width: 25),
-                                const Text(
-                                  "in reply to ",
-                                  style: TextStyle(
-                                      fontSize: 16, color: Palette.gray),
-                                ),
-                                if (myNote.getTagPubkeys.length < 3)
-                                  ...myNote.getTagPubkeys
-                                      .map(
-                                        (tag) => linkedUsername(
-                                            tag.value, nostrService, context),
-                                      )
-                                      .toList(),
-                                if (myNote.getTagPubkeys.length > 2)
-                                  SizedBox(
-                                    width:
-                                        MediaQuery.of(context).size.width - 100,
-                                    child: Wrap(
-                                      children: [
-                                        linkedUsername(
-                                            myNote.getTagPubkeys[0].value,
-                                            nostrService,
-                                            context),
-                                        linkedUsername(
-                                            myNote.getTagPubkeys[1].value,
-                                            nostrService,
-                                            context),
-                                        Text(
-                                          "and ${myNote.getTagPubkeys.length - 2} ${myNote.getTagPubkeys.length > 3 ? 'others' : 'other'}",
-                                          style: const TextStyle(
-                                              fontSize: 16,
-                                              color: Palette.gray),
-                                        )
-                                      ],
-                                    ),
-                                  ),
-                              ],
-                            ),
-
-                          GestureDetector(
-                            onTap: () {
-                              _onNoteTab(myNote);
-                            },
-                            child: Container(
-                              color: Palette.background,
-                              child: NoteCard(note: myNote),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ))
-                .toList(),
+            ..._buildContainerNotes(nostrService, context),
             ...widget.otherContainers.map((e) => e).toList()
           ],
         ),
       ),
+    );
+  }
+
+  List<Widget> _buildContainerNotes(
+      NostrService nostrService, BuildContext context) {
+    List<Widget> widgets = [];
+    for (int i = 0; i < widget.notes.length; i++) {
+      var note = widget.notes[i];
+      widgets.add(Stack(
+        children: [
+          // vertical line top
+          if (i != 0)
+            Positioned(
+              left: 40,
+              top: 0,
+              height: 50,
+              child: Container(
+                width: 2,
+                color: Palette.darkGray,
+              ),
+            ),
+          // vertical line bottom
+          if (i != widget.notes.length - 1)
+            Positioned(
+              left: 40,
+              bottom: 0,
+              // top - 50
+              top: 50,
+              child: Container(
+                width: 2,
+                color: Palette.darkGray,
+              ),
+            ),
+          Container(
+            padding: const EdgeInsets.only(top: 10),
+            child: Column(
+              children: [
+                // check if reply
+                if (note.getTagEvents.isNotEmpty)
+                  // for myNote.getTagPubkeys
+                  _buildInReplyTo(note, nostrService, context, i, widget.notes),
+
+                GestureDetector(
+                  onTap: () {
+                    _onNoteTab(note);
+                  },
+                  child: Container(
+                    //color: Palette.background,
+                    child: NoteCard(note: note),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ));
+    }
+    return widgets;
+  }
+
+  Row _buildInReplyTo(NostrNote myNote, NostrService nostrService,
+      BuildContext context, int index, List<NostrNote> notes) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (index != 0) SizedBox(width: notes.length > 1 ? 70 : 30),
+        if (index == 0) const SizedBox(width: 30),
+        const Text(
+          "reply to ",
+          style: TextStyle(fontSize: 16, color: Palette.gray),
+        ),
+        if (myNote.getTagPubkeys.length < 3)
+          ...myNote.getTagPubkeys
+              .map(
+                (tag) => linkedUsername(tag.value, nostrService, context),
+              )
+              .toList(),
+        if (myNote.getTagPubkeys.length > 2)
+          SizedBox(
+            width: MediaQuery.of(context).size.width - 130,
+            child: Wrap(
+              children: [
+                linkedUsername(
+                    myNote.getTagPubkeys[0].value, nostrService, context),
+                linkedUsername(
+                    myNote.getTagPubkeys[1].value, nostrService, context),
+                Text(
+                  " and ${myNote.getTagPubkeys.length - 2} ${myNote.getTagPubkeys.length > 3 ? 'others' : 'other'}",
+                  style: const TextStyle(fontSize: 16, color: Palette.gray),
+                )
+              ],
+            ),
+          ),
+      ],
     );
   }
 }
