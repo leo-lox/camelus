@@ -75,13 +75,13 @@ class UserFeedAndRepliesViewState
           _newPostsAvailable = true;
         });
         // notify navigation bar
-        ref.read(navigatiionBarProvider).newNotesCount = event.length;
+        ref.read(navigationBarProvider).newNotesCount = event.length;
       }),
     );
   }
 
   void _setupNavBarHomeListener() {
-    var provider = ref.read(navigatiionBarProvider);
+    var provider = ref.read(navigationBarProvider);
     _subscriptions.add(provider.onTabHome.listen((event) {
       _handleHomeBarTab();
     }));
@@ -91,7 +91,7 @@ class UserFeedAndRepliesViewState
     if (_newPostsAvailable) {
       _integrateNewNotes();
     }
-    ref.watch(navigatiionBarProvider).resetNewNotesCount();
+    ref.watch(navigationBarProvider).resetNewNotesCount();
     // scroll to top
     _scrollControllerFeed.animateTo(
       _scrollControllerFeed.position.minScrollExtent,
@@ -110,7 +110,7 @@ class UserFeedAndRepliesViewState
     setState(() {
       _newPostsAvailable = false;
     });
-    ref.watch(navigatiionBarProvider).resetNewNotesCount();
+    ref.watch(navigationBarProvider).resetNewNotesCount();
   }
 
   void _initUserFeed() {
@@ -185,7 +185,7 @@ class UserFeedAndRepliesViewState
     _servicesReady.complete();
 
     // reset home bar new notes count
-    ref.watch(navigatiionBarProvider).resetNewNotesCount();
+    ref.watch(navigationBarProvider).resetNewNotesCount();
 
     _initUserFeed();
     _setupScrollListener();

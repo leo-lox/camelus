@@ -79,7 +79,7 @@ class _HomePageState extends ConsumerState<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final navBarProvider = ref.watch(navigatiionBarProvider);
+    final navBarProvider = ref.watch(navigationBarProvider);
 
     return Scaffold(
       key: _scaffoldKey,
@@ -126,6 +126,9 @@ class _HomePageState extends ConsumerState<HomePage> {
           // used to notify feeds to scroll up
           if (index == 0) {
             navBarProvider.tabHome();
+          }
+          if (index == 1) {
+            navBarProvider.tabSearch();
           }
 
           setState(() {

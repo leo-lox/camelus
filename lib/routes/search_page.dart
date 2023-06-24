@@ -1,13 +1,17 @@
+import 'dart:async';
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:camelus/config/palette.dart';
 import 'package:camelus/db/entities/db_note_view.dart';
 import 'package:camelus/db/entities/db_note_view_base.dart';
 import 'package:camelus/models/nostr_note.dart';
 import 'package:camelus/models/nostr_tag.dart';
+import 'package:camelus/providers/navigation_bar_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:camelus/providers/database_provider.dart';
+import 'package:http/http.dart' as http;
 
 class SearchPage extends ConsumerStatefulWidget {
   const SearchPage({Key? key}) : super(key: key);
@@ -17,68 +21,103 @@ class SearchPage extends ConsumerStatefulWidget {
 }
 
 class _SearchPageState extends ConsumerState<SearchPage> {
+  final TextEditingController _searchController = TextEditingController();
+  final FocusNode _searchFocusNode = FocusNode();
+
+  final List<StreamSubscription> _subscriptions = [];
+
+  _listeToNavigationBar() {
+    // listen to home bar
+    final navigationBar = ref.watch(navigationBarProvider);
+    _subscriptions.add(navigationBar.onTabSearch.listen((event) {
+      _focusSearchBar();
+    }));
+  }
+
+  void _focusSearchBar() {
+    log("message");
+    // focus input
+    FocusScope.of(context).requestFocus(_searchFocusNode);
+  }
+
+  void _initSequence() async {
+    // wait 1 second with then
+    await Future.delayed(const Duration(milliseconds: 200)).then((value) {
+      // check if mounted
+      if (mounted) {
+        _listeToNavigationBar();
+      }
+    });
+  }
+
   @override
   void initState() {
     super.initState();
-
-    test();
+    _initSequence();
   }
 
-  test() async {
-    //await ref.watch(databaseProvider.future)
+  @override
+  void dispose() {
+    super.dispose();
+    _disposeSubscriptions();
+  }
 
-    var db = await ref.read(databaseProvider.future);
-
-    try {
-      await db.noteDao.insertNostrNote(
-        NostrNote(
-            id: "myId",
-            pubkey: "myPubkey",
-            created_at: 0,
-            kind: 1,
-            content: "mytest",
-            sig: "invalidSig",
-            tags: []),
-      );
-    } catch (e) {
-      log("note likely already exists");
+  void _disposeSubscriptions() {
+    for (var s in _subscriptions) {
+      s.cancel();
     }
+  }
 
+  void _getTrendingNotes() async {
+    // cached network request from https://api.nostr.band/v0/trending/notes
+
+    final url = Uri.parse('https://api.nostr.band/v0/trending/notes');
     try {
-      await db.noteDao.insertNostrNote(
-        NostrNote(
-            id: "myId10",
-            pubkey: "myPubkey10",
-            created_at: 0,
-            kind: 1,
-            content: "mytest2",
-            sig: "invalidSig",
-            tags: [
-              NostrTag(
-                  type: "p",
-                  value: "myTag1Pubkey",
-                  recommended_relay: "myTag1Relay"),
-              NostrTag(type: "e", value: "myTag2EvnetId"),
-            ]),
-      );
-    } catch (e) {
-      log("note2 likely already exists");
+      var res = await http.get(url, headers: {'cache-control': 'max-age=120'});
+
+      res.headers.addAll({'cache-control': 'private, max-age=120'});
+    } on SocketException {
+      print('No internet connection');
     }
-
-    List<DbNoteView> a = await db.noteDao.findAllNotes();
-
-    List<NostrNote> b = a.map((e) => e.toNostrNote()).toList();
-
-    var c = await db.noteDao.findPubkeyNotes(['myPubkey', 'myPubkey10']);
-    log("findAll: ${b}");
   }
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
+    return Scaffold(
       backgroundColor: Palette.background,
-      body: Center(
-        child: Text('work in progress', style: TextStyle(color: Colors.white)),
+      // scrollable column
+      body: ListView(
+        children: [
+          // search bar
+          Padding(
+            padding: EdgeInsets.only(top: 20, left: 20, right: 20),
+            child: TextField(
+              controller: _searchController,
+              focusNode: _searchFocusNode,
+              decoration: InputDecoration(
+                hintText: 'Search',
+                hintStyle: TextStyle(color: Palette.white),
+                prefixIcon: Icon(Icons.search, color: Palette.white),
+                filled: true,
+                fillColor: Palette.extraDarkGray,
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(12.0)),
+                  borderSide: BorderSide(color: Palette.gray),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                  borderSide: BorderSide(color: Palette.gray),
+                ),
+              ),
+              style: TextStyle(color: Palette.white),
+              onChanged: (value) {},
+              onTapOutside: (value) {
+                // close keyboard
+                FocusScope.of(context).requestFocus(FocusNode());
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
