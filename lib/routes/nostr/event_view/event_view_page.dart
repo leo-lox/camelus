@@ -118,6 +118,7 @@ class _EventViewPageState extends ConsumerState<EventViewPage> {
     return Scaffold(
       backgroundColor: Palette.background,
       appBar: AppBar(
+        foregroundColor: Palette.white,
         backgroundColor: Palette.background,
         title: const Text("thread"),
       ),
@@ -226,7 +227,6 @@ class _EventViewPageState extends ConsumerState<EventViewPage> {
 
     List<NoteCardContainer> rootLevelRepliesContainers = rootLevelReplies
         .map((e) => NoteCardContainer(
-              key: GlobalObjectKey(e.id),
               notes: [e],
             ))
         .toList();
@@ -256,13 +256,11 @@ class _EventViewPageState extends ConsumerState<EventViewPage> {
 
     for (var note in workingList) {
       rootLevelRepliesContainers.add(NoteCardContainer(
-        key: GlobalObjectKey(note.id),
         notes: [NostrNote.empty(id: note.getDirectReply?.value ?? ""), note],
       ));
     }
 
     return NoteCardContainer(
-      key: GlobalObjectKey(rootNote.id),
       notes: [rootNote, ...authorFirstLevelSelfReplies],
       otherContainers: rootLevelRepliesContainers,
     );

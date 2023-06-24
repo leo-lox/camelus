@@ -92,6 +92,9 @@ class EventFeed {
           if (_feed.any((element) => element.id == note.id)) {
             continue;
           }
+          if (feedUpdates.any((element) => element.id == note.id)) {
+            continue;
+          }
 
           feedUpdates.add(note);
 
@@ -109,7 +112,7 @@ class EventFeed {
     var copy = [...notesToIntegrate];
     // add to feed sorted by created_at
     sourceFeed.addAll(copy);
-    sourceFeed.sort((a, b) => b.created_at.compareTo(a.created_at));
+    sourceFeed.sort((a, b) => a.created_at.compareTo(b.created_at));
   }
 
   void requestRelayEventFeed({
