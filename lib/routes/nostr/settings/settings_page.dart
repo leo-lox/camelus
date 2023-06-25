@@ -1,6 +1,9 @@
 // stateful widget
 
+import 'dart:developer';
+
 import 'package:camelus/config/palette.dart';
+import 'package:camelus/providers/database_provider.dart';
 import 'package:camelus/providers/nostr_service_provider.dart';
 import 'package:camelus/services/nostr/nostr_service.dart';
 import 'package:flutter/material.dart';
@@ -24,6 +27,15 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
   void initState() {
     super.initState();
     initNostrService();
+  }
+
+  void _clearSqlDb() async {
+    var db = await ref.watch(databaseProvider.future);
+    db.database.delete(
+      "Note",
+      where: null,
+    );
+    log("cleared sql db");
   }
 
   @override
@@ -51,6 +63,13 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
               _nostrService.clearCacheReset();
             },
           ),
+          ListTile(
+            title: const Text('Clear sql db!',
+                style: TextStyle(color: Colors.white)),
+            onTap: () {
+              _clearSqlDb();
+            },
+          )
         ],
       ),
     );

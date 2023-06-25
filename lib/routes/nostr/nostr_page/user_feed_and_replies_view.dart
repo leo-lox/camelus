@@ -9,6 +9,7 @@ import 'package:camelus/db/database.dart';
 import 'package:camelus/db/entities/db_note_view.dart';
 import 'package:camelus/models/nostr_note.dart';
 import 'package:camelus/providers/database_provider.dart';
+import 'package:camelus/providers/following_provider.dart';
 import 'package:camelus/providers/navigation_bar_provider.dart';
 import 'package:camelus/scroll_controller/retainable_scroll_controller.dart';
 import 'package:camelus/services/nostr/feeds/user_and_replies_feed.dart';
@@ -158,12 +159,10 @@ class UserFeedAndRepliesViewState
   }
 
   Future<void> _getFollowingPubkeys() async {
-    var kind3 = (await db.noteDao.findPubkeyNotesByKind([widget.pubkey], 3))[0]
-        .toNostrNote();
-    List<String> followingList =
-        kind3.getTagPubkeys.map((e) => e.value).toList();
+    var followingP = await ref.read(followingProvider.future);
+    await followingP.servicesReady;
 
-    _followingPubkeys = followingList;
+    _followingPubkeys = followingP.ownContacts.map((e) => e.value).toList();
     return;
   }
 

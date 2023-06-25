@@ -11,6 +11,8 @@ import 'package:floor/floor.dart';
       childColumns: ['note_id'],
       parentColumns: ['id'],
       entity: DbNote,
+      onDelete: ForeignKeyAction.cascade,
+      onUpdate: ForeignKeyAction.cascade,
     )
   ],
 )

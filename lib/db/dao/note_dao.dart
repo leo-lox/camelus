@@ -12,6 +12,20 @@ abstract class NoteDao {
   @Query('SELECT * FROM noteView')
   Future<List<DbNoteView>> findAllNotes();
 
+  @Query('SELECT * FROM noteView WHERE kind = :kind')
+  Future<List<DbNoteView>> findAllNotesByKind(int kind);
+
+  @Query('''
+        SELECT * FROM (
+        SELECT Note.*, GROUP_CONCAT(Tag.type) as tag_types, GROUP_CONCAT(Tag.value) as tag_values, GROUP_CONCAT(Tag.recommended_relay) as tag_recommended_relays, GROUP_CONCAT(Tag.marker) as tag_markers, GROUP_CONCAT(Tag.tag_index) as tag_index 
+        FROM Note 
+        LEFT JOIN Tag ON Note.id = Tag.note_id 
+        GROUP BY Note.id
+        ) AS noteView
+        WHERE kind = :kind
+        ''')
+  Stream<List<DbNoteView>> findAllNotesByKindStream(int kind);
+
   @Query('SELECT * FROM noteView WHERE id = :id')
   Future<List<DbNoteView>> findNote(String id);
 
