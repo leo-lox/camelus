@@ -1,0 +1,178 @@
+import 'dart:developer';
+
+import 'package:camelus/atoms/my_profile_picture.dart';
+import 'package:camelus/config/palette.dart';
+import 'package:camelus/providers/nostr_service_provider.dart';
+import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+
+class PersonCard extends ConsumerWidget {
+  final String pubkey;
+  final String name;
+  final String pictureUrl;
+  final String about;
+  final String? nip05;
+  final bool isFollowing;
+
+  const PersonCard({
+    Key? key,
+    required this.pubkey,
+    required this.name,
+    required this.pictureUrl,
+    required this.about,
+    required this.isFollowing,
+    this.nip05,
+  }) : super(key: key);
+
+  Future<String> checkNip05(String nip05, String pubkey, WidgetRef ref) async {
+    var nostrService = ref.watch(nostrServiceProvider);
+    try {
+      var check = await nostrService.checkNip05(nip05, pubkey);
+
+      if (check["valid"] == true) {
+        return check["nip05"];
+      }
+      // ignore: empty_catches
+    } catch (e) {}
+    return "";
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 12),
+      child: Row(
+        // profile
+        children: [
+          GestureDetector(
+            onTap: () {
+              log("profile tapped");
+            },
+            child: myProfilePicture(
+                pictureUrl: pictureUrl,
+                pubkey: pubkey,
+                filterQuality: FilterQuality.high),
+          ),
+          const SizedBox(width: 16),
+          //text section
+          Expanded(
+            child: GestureDetector(
+              onTap: () {
+                log("name tapped");
+              },
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (name.startsWith("npub"))
+                    Text(
+                      "${name.substring(0, 7)}...${name.substring(name.length - 7, name.length)}",
+                      style: const TextStyle(
+                        color: Palette.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  if (!name.startsWith("npub"))
+                    Row(
+                      children: [
+                        Text(
+                          name,
+                          style: const TextStyle(
+                            color: Palette.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        FutureBuilder(
+                            future: checkNip05(nip05 ?? "", pubkey, ref),
+                            builder: (context, snapshot) {
+                              if (snapshot.hasData && snapshot.data != "") {
+                                return Container(
+                                  margin:
+                                      const EdgeInsets.only(top: 0, left: 5),
+                                  child: const Icon(
+                                    Icons.verified,
+                                    color: Palette.white,
+                                    size: 18,
+                                  ),
+                                );
+                              } else {
+                                return Container();
+                              }
+                            }),
+                      ],
+                    ),
+                  const SizedBox(height: 4),
+                  SizedBox(
+                    // 1/3 of screen width
+                    width: MediaQuery.of(context).size.width / 2,
+                    child: Text(
+                      about,
+                      style: const TextStyle(
+                        color: Palette.white,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w400,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          const SizedBox(width: 16),
+          //follow and unfollow button
+          if (!isFollowing)
+            Container(
+              margin: const EdgeInsets.only(top: 0, right: 10),
+              child: ElevatedButton(
+                onPressed: () {
+                  log("follow button pressed");
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Palette.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                    side: const BorderSide(color: Palette.black, width: 1),
+                  ),
+                ),
+                child: const Text(
+                  'follow',
+                  style: TextStyle(
+                    color: Palette.black,
+                    fontSize: 16,
+                  ),
+                ),
+              ),
+            ),
+
+          if (isFollowing)
+            Container(
+              margin: const EdgeInsets.only(top: 0, right: 10),
+              child: ElevatedButton(
+                onPressed: () {
+                  log("unfollow button pressed");
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Palette.black,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                    side: const BorderSide(color: Palette.white, width: 1),
+                  ),
+                ),
+                child: const Text(
+                  'unfollow',
+                  style: TextStyle(
+                    color: Palette.white,
+                    fontSize: 16,
+                  ),
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
