@@ -148,6 +148,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
           _searchBar(context),
           Expanded(
             child: ListView(
+              physics: const BouncingScrollPhysics(),
               children: [
                 Container(
                     padding: EdgeInsets.only(left: 20, top: 20, bottom: 10),
@@ -194,8 +195,12 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                                 return const Text('no connection');
                               }
 
-                              return const Center(
-                                  child: CircularProgressIndicator());
+                              return Column(
+                                children: [
+                                  for (var i = 0; i < 10; i++)
+                                    const HashtagCardSkeleton()
+                                ],
+                              );
                             }),
                         const SizedBox(height: 20),
                         const Text(

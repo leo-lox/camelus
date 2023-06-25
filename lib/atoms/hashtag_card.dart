@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'dart:math';
 
 import 'package:camelus/config/palette.dart';
 import 'package:flutter/material.dart';
@@ -18,7 +19,7 @@ class HashtagCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
-        log("hashtag tapped");
+        //log("hashtag tapped");
       },
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 12),
@@ -73,6 +74,59 @@ class HashtagCard extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class HashtagCardSkeleton extends StatelessWidget {
+  const HashtagCardSkeleton({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Container(
+                width: 20,
+                height: 20,
+                decoration: BoxDecoration(
+                  color: Palette.extraDarkGray,
+                  borderRadius: BorderRadius.circular(5),
+                ),
+              ),
+              const SizedBox(width: 5),
+              Container(
+                // random between 100 and 200
+                width: 80 + (140 * (Random().nextDouble() * 1.0)),
+                height: 40,
+                decoration: BoxDecoration(
+                  color: Palette.extraDarkGray,
+                  borderRadius: BorderRadius.circular(5),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 2),
+          Row(
+            children: [
+              const SizedBox(width: 25),
+              Container(
+                width: 100,
+                height: 20,
+                decoration: BoxDecoration(
+                  color: Palette.extraDarkGray,
+                  borderRadius: BorderRadius.circular(5),
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
