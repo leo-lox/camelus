@@ -20,6 +20,7 @@ import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:camelus/providers/database_provider.dart';
 import 'package:http/http.dart' as http;
+import 'package:url_launcher/url_launcher.dart';
 
 class SearchPage extends ConsumerStatefulWidget {
   const SearchPage({Key? key}) : super(key: key);
@@ -153,12 +154,28 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          "trends",
-                          style: TextStyle(
-                              color: Palette.white,
-                              fontSize: 25,
-                              fontWeight: FontWeight.bold),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            const Text(
+                              "trends",
+                              style: TextStyle(
+                                  color: Palette.white,
+                                  fontSize: 25,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                            const SizedBox(width: 18),
+                            GestureDetector(
+                              onTap: () {
+                                Uri url = Uri.parse("https://nostr.band");
+                                launchUrl(url,
+                                    mode: LaunchMode.externalApplication);
+                              },
+                              child: const Text("by nostr.band",
+                                  style: TextStyle(
+                                      color: Palette.gray, fontSize: 15)),
+                            ),
+                          ],
                         ),
                         FutureBuilder<ApiNostrBandHashtags?>(
                             future: _getTrendingHashtags(),

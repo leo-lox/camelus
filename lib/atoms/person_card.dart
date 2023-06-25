@@ -39,27 +39,27 @@ class PersonCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 12),
-      child: Row(
-        // profile
-        children: [
-          GestureDetector(
-            onTap: () {
-              log("profile tapped");
-            },
-            child: myProfilePicture(
-                pictureUrl: pictureUrl,
-                pubkey: pubkey,
-                filterQuality: FilterQuality.high),
-          ),
-          const SizedBox(width: 16),
-          //text section
-          Expanded(
-            child: GestureDetector(
+    return InkWell(
+      onTap: () {
+        log("person card tapped");
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 12),
+        child: Row(
+          // profile
+          children: [
+            GestureDetector(
               onTap: () {
-                log("name tapped");
+                log("profile tapped");
               },
+              child: myProfilePicture(
+                  pictureUrl: pictureUrl,
+                  pubkey: pubkey,
+                  filterQuality: FilterQuality.high),
+            ),
+            const SizedBox(width: 16),
+            //text section
+            Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -120,58 +120,58 @@ class PersonCard extends ConsumerWidget {
                 ],
               ),
             ),
-          ),
 
-          const SizedBox(width: 16),
-          //follow and unfollow button
-          if (!isFollowing)
-            Container(
-              margin: const EdgeInsets.only(top: 0, right: 10),
-              child: ElevatedButton(
-                onPressed: () {
-                  log("follow button pressed");
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Palette.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
-                    side: const BorderSide(color: Palette.black, width: 1),
+            const SizedBox(width: 16),
+            //follow and unfollow button
+            if (!isFollowing)
+              Container(
+                margin: const EdgeInsets.only(top: 0, right: 10),
+                child: ElevatedButton(
+                  onPressed: () {
+                    log("follow button pressed");
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Palette.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                      side: const BorderSide(color: Palette.black, width: 1),
+                    ),
                   ),
-                ),
-                child: const Text(
-                  'follow',
-                  style: TextStyle(
-                    color: Palette.black,
-                    fontSize: 16,
+                  child: const Text(
+                    'follow',
+                    style: TextStyle(
+                      color: Palette.black,
+                      fontSize: 16,
+                    ),
                   ),
                 ),
               ),
-            ),
 
-          if (isFollowing)
-            Container(
-              margin: const EdgeInsets.only(top: 0, right: 10),
-              child: ElevatedButton(
-                onPressed: () {
-                  log("unfollow button pressed");
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Palette.black,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
-                    side: const BorderSide(color: Palette.white, width: 1),
+            if (isFollowing)
+              Container(
+                margin: const EdgeInsets.only(top: 0, right: 10),
+                child: ElevatedButton(
+                  onPressed: () {
+                    log("unfollow button pressed");
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Palette.black,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                      side: const BorderSide(color: Palette.white, width: 1),
+                    ),
                   ),
-                ),
-                child: const Text(
-                  'unfollow',
-                  style: TextStyle(
-                    color: Palette.white,
-                    fontSize: 16,
+                  child: const Text(
+                    'unfollow',
+                    style: TextStyle(
+                      color: Palette.white,
+                      fontSize: 16,
+                    ),
                   ),
                 ),
               ),
-            ),
-        ],
+          ],
+        ),
       ),
     );
   }
