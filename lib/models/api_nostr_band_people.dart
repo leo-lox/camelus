@@ -1,11 +1,11 @@
 import 'package:camelus/models/nostr_note.dart';
 
-class ApiNostrBand {
+class ApiNostrBandPeople {
   final List<Profiles> profiles;
 
-  ApiNostrBand({required this.profiles});
+  ApiNostrBandPeople({required this.profiles});
 
-  factory ApiNostrBand.fromJson(Map<String, dynamic> json) {
+  factory ApiNostrBandPeople.fromJson(Map<String, dynamic> json) {
     List<dynamic> profilesJson = json['profiles'] ?? [];
     List<Profiles> profiles = [];
     //cast using for loop
@@ -13,7 +13,7 @@ class ApiNostrBand {
       profiles.add(Profiles.fromJson(profile));
     }
 
-    return ApiNostrBand(
+    return ApiNostrBandPeople(
       profiles: profiles,
     );
   }

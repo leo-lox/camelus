@@ -3,17 +3,20 @@ import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 
+import 'package:camelus/atoms/hashtag_card.dart';
 import 'package:camelus/atoms/person_card.dart';
 import 'package:camelus/config/palette.dart';
 import 'package:camelus/db/entities/db_note_view.dart';
 import 'package:camelus/db/entities/db_note_view_base.dart';
 import 'package:camelus/helpers/search.dart';
-import 'package:camelus/models/api_nostr_band.dart';
+import 'package:camelus/models/api_nostr_band_hashtags.dart';
+import 'package:camelus/models/api_nostr_band_people.dart';
 import 'package:camelus/models/nostr_note.dart';
 import 'package:camelus/models/nostr_tag.dart';
 import 'package:camelus/providers/navigation_bar_provider.dart';
 import 'package:camelus/providers/nostr_service_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:camelus/providers/database_provider.dart';
 import 'package:http/http.dart' as http;
@@ -64,6 +67,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
       }
     });
     _setupSearchObj();
+    _getTrendingHashtags();
   }
 
   @override
@@ -84,27 +88,38 @@ class _SearchPageState extends ConsumerState<SearchPage> {
     }
   }
 
-  Future<ApiNostrBand> _getTrendingProfiles() async {
-    // cached network request from https://api.nostr.band/v0/trending/notes
+  Future<ApiNostrBandPeople?> _getTrendingProfiles() async {
+    // cached network request from https://api.nostr.band/v0/trending/profiles
 
-    var result;
-
-    final url = Uri.parse('https://api.nostr.band/v0/trending/profiles');
-    try {
-      var res = await http.get(url, headers: {'cache-control': 'max-age=120'});
-
-      res.headers.addAll({'cache-control': 'private, max-age=120'});
-
-      if (res.statusCode == 200) {
-        result = jsonDecode(res.body);
-      } else {
-        print('Request failed with status: ${res.statusCode}.');
-      }
-    } on SocketException {
-      print('No internet connection');
+    var file = await DefaultCacheManager().getSingleFile(
+      'https://api.nostr.band/v0/trending/profiles',
+      key: 'trending_profiles_nostr_band',
+      // 30 min
+      headers: {'cache-control': 'max-age=1800, immutable'},
+    );
+    var result = await file.readAsString();
+    if (result.isEmpty) {
+      return null;
     }
+    var json = jsonDecode(result);
 
-    return ApiNostrBand.fromJson(result);
+    return ApiNostrBandPeople.fromJson(json);
+  }
+
+  Future<ApiNostrBandHashtags?> _getTrendingHashtags() async {
+    //var file = await DefaultCacheManager().getSingleFile(url);
+    var file = await DefaultCacheManager().getSingleFile(
+      'https://api.nostr.band/nostr?method=trending&type=hashtags',
+      key: 'trending_hashtags_nostr_band',
+      // 30 min
+      headers: {'cache-control': 'max-age=1800'},
+    );
+    var result = await file.readAsString();
+    if (result.isEmpty) {
+      return null;
+    }
+    var json = jsonDecode(result);
+    return ApiNostrBandHashtags.fromJson(json);
   }
 
   void _onSearchChanged(String value) async {
@@ -139,6 +154,34 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const Text(
+                          "trends",
+                          style: TextStyle(
+                              color: Palette.white,
+                              fontSize: 25,
+                              fontWeight: FontWeight.bold),
+                        ),
+                        FutureBuilder<ApiNostrBandHashtags?>(
+                            future: _getTrendingHashtags(),
+                            builder: (context,
+                                AsyncSnapshot<ApiNostrBandHashtags?> snapshot) {
+                              if (snapshot.hasError) {
+                                log(snapshot.error.toString());
+                                return const Text('Something went wrong');
+                              }
+                              if (snapshot.hasData) {
+                                return _trendingHashtags(
+                                    api: snapshot.data!, limit: 10);
+                              }
+                              if (snapshot.connectionState ==
+                                  ConnectionState.done) {
+                                return const Text('no connection');
+                              }
+
+                              return const Center(
+                                  child: CircularProgressIndicator());
+                            }),
+                        const SizedBox(height: 20),
+                        const Text(
                           "trending people",
                           style: TextStyle(
                               color: Palette.white,
@@ -146,15 +189,20 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                               fontWeight: FontWeight.bold),
                         ),
                         const SizedBox(height: 10),
-                        FutureBuilder<ApiNostrBand>(
+                        FutureBuilder<ApiNostrBandPeople?>(
                             future: _getTrendingProfiles(),
                             builder: (context,
-                                AsyncSnapshot<ApiNostrBand> snapshot) {
+                                AsyncSnapshot<ApiNostrBandPeople?> snapshot) {
                               if (snapshot.hasError) {
+                                log(snapshot.error.toString());
                                 return const Text('Something went wrong');
                               }
                               if (snapshot.hasData) {
                                 return _trendingPeople(snapshot.data!, 5);
+                              }
+                              if (snapshot.connectionState ==
+                                  ConnectionState.done) {
+                                return const Text('no connection');
                               }
 
                               return const Center(
@@ -184,7 +232,33 @@ class _SearchPageState extends ConsumerState<SearchPage> {
     );
   }
 
-  Widget _trendingPeople(ApiNostrBand api, int limit) {
+  Widget _trendingHashtags({required ApiNostrBandHashtags api, int? limit}) {
+    var myHashtags = api.hashtags;
+
+    List<Widget> hashtagWidgets = [];
+
+    for (int i = 0; i < myHashtags.length; i++) {
+      if (i == limit) {
+        break;
+      }
+      var hashtag = myHashtags[i];
+      String cleanHashtag = hashtag.hashtag.replaceFirst('#', '');
+      hashtagWidgets.add(
+        HashtagCard(
+          index: i,
+          hashtag: cleanHashtag,
+          threadsCount: hashtag.threadsCount,
+        ),
+      );
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: hashtagWidgets,
+    );
+  }
+
+  Widget _trendingPeople(ApiNostrBandPeople api, int limit) {
     List<PersonCard> personCards = [];
 
     for (int i = 0; i < api.profiles.length; i++) {
