@@ -5,9 +5,11 @@ import 'dart:io';
 import 'package:camelus/config/palette.dart';
 import 'package:camelus/db/entities/db_note_view.dart';
 import 'package:camelus/db/entities/db_note_view_base.dart';
+import 'package:camelus/helpers/search.dart';
 import 'package:camelus/models/nostr_note.dart';
 import 'package:camelus/models/nostr_tag.dart';
 import 'package:camelus/providers/navigation_bar_provider.dart';
+import 'package:camelus/providers/nostr_service_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:camelus/providers/database_provider.dart';
@@ -26,6 +28,10 @@ class _SearchPageState extends ConsumerState<SearchPage> {
 
   final List<StreamSubscription> _subscriptions = [];
 
+  late Search _search;
+
+  List<Map<String, dynamic>> _searchResults = [];
+
   _listeToNavigationBar() {
     // listen to home bar
     final navigationBar = ref.watch(navigationBarProvider);
@@ -40,6 +46,12 @@ class _SearchPageState extends ConsumerState<SearchPage> {
     FocusScope.of(context).requestFocus(_searchFocusNode);
   }
 
+  void _setupSearchObj() async {
+    var database = await ref.watch(databaseProvider.future);
+
+    _search = Search(database);
+  }
+
   void _initSequence() async {
     // wait 1 second with then
     await Future.delayed(const Duration(milliseconds: 200)).then((value) {
@@ -48,6 +60,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
         _listeToNavigationBar();
       }
     });
+    _setupSearchObj();
   }
 
   @override
@@ -81,6 +94,21 @@ class _SearchPageState extends ConsumerState<SearchPage> {
     }
   }
 
+  void _onSearchChanged(String value) async {
+    if (value.length < 3) {
+      setState(() {
+        _searchResults = [];
+      });
+      return;
+    }
+
+    var localMetadata = _search.searchUsersMetadata(value);
+
+    setState(() {
+      _searchResults = localMetadata;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -110,13 +138,29 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                 ),
               ),
               style: TextStyle(color: Palette.white),
-              onChanged: (value) {},
+              onChanged: (value) {
+                _onSearchChanged(value);
+              },
               onTapOutside: (value) {
                 // close keyboard
                 FocusScope.of(context).requestFocus(FocusNode());
               },
             ),
           ),
+
+          Column(
+            children: [
+              // search results
+              for (var result in _searchResults)
+                ListTile(
+                  leading: CircleAvatar(
+                    backgroundImage: NetworkImage(result['picture'] ?? ''),
+                  ),
+                  title: Text(result['name'] ?? ''),
+                  subtitle: Text(result['nip05'] ?? ''),
+                )
+            ],
+          )
         ],
       ),
     );

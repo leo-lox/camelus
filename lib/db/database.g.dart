@@ -89,7 +89,7 @@ class _$AppDatabase extends AppDatabase {
         await database.execute(
             'CREATE TABLE IF NOT EXISTS `Note` (`id` TEXT NOT NULL, `pubkey` TEXT NOT NULL, `created_at` INTEGER NOT NULL, `kind` INTEGER NOT NULL, `content` TEXT NOT NULL, `sig` TEXT NOT NULL, PRIMARY KEY (`id`))');
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `Tag` (`note_id` TEXT NOT NULL, `tag_index` INTEGER NOT NULL, `type` TEXT NOT NULL, `value` TEXT NOT NULL, `recommended_relay` TEXT, `marker` TEXT, FOREIGN KEY (`note_id`) REFERENCES `Note` (`id`) ON UPDATE NO ACTION ON DELETE NO ACTION, PRIMARY KEY (`note_id`, `value`))');
+            'CREATE TABLE IF NOT EXISTS `Tag` (`note_id` TEXT NOT NULL, `tag_index` INTEGER NOT NULL, `type` TEXT NOT NULL, `value` TEXT NOT NULL, `recommended_relay` TEXT, `marker` TEXT, FOREIGN KEY (`note_id`) REFERENCES `Note` (`id`) ON UPDATE CASCADE ON DELETE CASCADE, PRIMARY KEY (`note_id`, `value`))');
         await database
             .execute('CREATE INDEX `index_Note_kind` ON `Note` (`kind`)');
         await database
@@ -185,6 +185,45 @@ class _$NoteDao extends NoteDao {
             tag_values: row['tag_values'] as String?,
             tag_recommended_relays: row['tag_recommended_relays'] as String?,
             tag_markers: row['tag_markers'] as String?));
+  }
+
+  @override
+  Future<List<DbNoteView>> findAllNotesByKind(int kind) async {
+    return _queryAdapter.queryList('SELECT * FROM noteView WHERE kind = ?1',
+        mapper: (Map<String, Object?> row) => DbNoteView(
+            id: row['id'] as String,
+            pubkey: row['pubkey'] as String,
+            created_at: row['created_at'] as int,
+            kind: row['kind'] as int,
+            content: row['content'] as String,
+            sig: row['sig'] as String,
+            tag_index: row['tag_index'] as String?,
+            tag_types: row['tag_types'] as String?,
+            tag_values: row['tag_values'] as String?,
+            tag_recommended_relays: row['tag_recommended_relays'] as String?,
+            tag_markers: row['tag_markers'] as String?),
+        arguments: [kind]);
+  }
+
+  @override
+  Stream<List<DbNoteView>> findAllNotesByKindStream(int kind) {
+    return _queryAdapter.queryListStream(
+        'SELECT * FROM (         SELECT Note.*, GROUP_CONCAT(Tag.type) as tag_types, GROUP_CONCAT(Tag.value) as tag_values, GROUP_CONCAT(Tag.recommended_relay) as tag_recommended_relays, GROUP_CONCAT(Tag.marker) as tag_markers, GROUP_CONCAT(Tag.tag_index) as tag_index          FROM Note          LEFT JOIN Tag ON Note.id = Tag.note_id          GROUP BY Note.id         ) AS noteView         WHERE kind = ?1',
+        mapper: (Map<String, Object?> row) => DbNoteView(
+            id: row['id'] as String,
+            pubkey: row['pubkey'] as String,
+            created_at: row['created_at'] as int,
+            kind: row['kind'] as int,
+            content: row['content'] as String,
+            sig: row['sig'] as String,
+            tag_index: row['tag_index'] as String?,
+            tag_types: row['tag_types'] as String?,
+            tag_values: row['tag_values'] as String?,
+            tag_recommended_relays: row['tag_recommended_relays'] as String?,
+            tag_markers: row['tag_markers'] as String?),
+        arguments: [kind],
+        queryableName: 'Note',
+        isView: true);
   }
 
   @override

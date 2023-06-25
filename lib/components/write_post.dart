@@ -59,8 +59,8 @@ class _WritePostState extends ConsumerState<WritePost> {
   }
 
   _searchMentions(search) async {
-    List<Map<String, dynamic>> results =
-        Search(_nostrService).searchUsersMetadata(search);
+    List<Map<String, dynamic>> results = [];
+    //Search(_nostrService).searchUsersMetadata(search);
 
     for (var result in results) {
       if (result['picture'] == null) {

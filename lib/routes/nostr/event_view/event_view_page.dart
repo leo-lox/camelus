@@ -261,7 +261,9 @@ class _EventViewPageState extends ConsumerState<EventViewPage> {
     }
 
     return NoteCardContainer(
-      notes: [rootNote, ...authorFirstLevelSelfReplies],
+      notes: [
+        rootNote,
+      ],
       otherContainers: rootLevelRepliesContainers,
     );
   }

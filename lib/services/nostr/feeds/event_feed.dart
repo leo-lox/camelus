@@ -82,12 +82,14 @@ class EventFeed {
         }
 
         /// new notes need to be fetched from the db, because floor stream from a view is buggy
-        var allNotes = await _getCurrentNotes();
+        // var allNotes = await _getCurrentNotes();
+
+        var newNotes = event.map((e) => e.toNostrNote()).toList();
 
         /// used so notes that belong in the feed are updated and
 
         List<NostrNote> feedUpdates = [];
-        for (var note in allNotes) {
+        for (var note in newNotes) {
           // check for duplicates
           if (_feed.any((element) => element.id == note.id)) {
             continue;
@@ -97,13 +99,26 @@ class EventFeed {
           }
 
           feedUpdates.add(note);
-
-          log("feed updates: ${feedUpdates.length}");
-          _insertUnsortedNotesIntoFeed(feedUpdates, _feed);
-          _feedStreamController.add(_feed);
         }
+        log("feed updates: ${feedUpdates.length}");
+        _insertUnsortedNotesIntoFeed(feedUpdates, _feed);
+
+        _removeDuplicates(_feed);
+        _feedStreamController.add(_feed);
       }),
     );
+  }
+
+  void _removeDuplicates(List<NostrNote> notes) {
+    var copy = [...notes];
+    var ids = <String>{};
+    for (var note in copy) {
+      if (ids.contains(note.id)) {
+        notes.remove(note);
+      } else {
+        ids.add(note.id);
+      }
+    }
   }
 
   void _insertUnsortedNotesIntoFeed(
