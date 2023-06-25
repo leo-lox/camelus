@@ -37,14 +37,30 @@ class _SearchPageState extends ConsumerState<SearchPage> {
 
   late Search _search;
 
+  bool _isSearching = false;
+
   List<Map<String, dynamic>> _searchResults = [];
 
-  _listeToNavigationBar() {
+  _listenToNavigationBar() {
     // listen to home bar
     final navigationBar = ref.watch(navigationBarProvider);
     _subscriptions.add(navigationBar.onTabSearch.listen((event) {
       _focusSearchBar();
     }));
+  }
+
+  void _setupFocusNodeListener() {
+    _searchFocusNode.addListener(() {
+      if (_searchFocusNode.hasFocus) {
+        setState(() {
+          _isSearching = true;
+        });
+      } else {
+        setState(() {
+          _isSearching = false;
+        });
+      }
+    });
   }
 
   void _focusSearchBar() {
@@ -64,11 +80,11 @@ class _SearchPageState extends ConsumerState<SearchPage> {
     await Future.delayed(const Duration(milliseconds: 200)).then((value) {
       // check if mounted
       if (mounted) {
-        _listeToNavigationBar();
+        _listenToNavigationBar();
       }
     });
     _setupSearchObj();
-    _getTrendingHashtags();
+    _setupFocusNodeListener();
   }
 
   @override
@@ -150,108 +166,112 @@ class _SearchPageState extends ConsumerState<SearchPage> {
             child: ListView(
               physics: const BouncingScrollPhysics(),
               children: [
-                Container(
-                    padding: EdgeInsets.only(left: 20, top: 20, bottom: 10),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            const Text(
-                              "trends",
-                              style: TextStyle(
-                                  color: Palette.white,
-                                  fontSize: 25,
-                                  fontWeight: FontWeight.bold),
-                            ),
-                            const SizedBox(width: 18),
-                            GestureDetector(
-                              onTap: () {
-                                Uri url = Uri.parse("https://nostr.band");
-                                launchUrl(url,
-                                    mode: LaunchMode.externalApplication);
-                              },
-                              child: const Text("by nostr.band",
-                                  style: TextStyle(
-                                      color: Palette.gray, fontSize: 15)),
-                            ),
-                          ],
-                        ),
-                        FutureBuilder<ApiNostrBandHashtags?>(
-                            future: _getTrendingHashtags(),
-                            builder: (context,
-                                AsyncSnapshot<ApiNostrBandHashtags?> snapshot) {
-                              if (snapshot.hasError) {
-                                log(snapshot.error.toString());
-                                return const Text('Something went wrong');
-                              }
-                              if (snapshot.hasData) {
-                                return _trendingHashtags(
-                                    api: snapshot.data!, limit: 10);
-                              }
-                              if (snapshot.connectionState ==
-                                  ConnectionState.done) {
-                                return const Text('no connection');
-                              }
-
-                              return Column(
-                                children: [
-                                  for (var i = 0; i < 10; i++)
-                                    const HashtagCardSkeleton()
-                                ],
-                              );
-                            }),
-                        const SizedBox(height: 20),
-                        const Text(
-                          "trending people",
-                          style: TextStyle(
-                              color: Palette.white,
-                              fontSize: 25,
-                              fontWeight: FontWeight.bold),
-                        ),
-                        const SizedBox(height: 10),
-                        FutureBuilder<ApiNostrBandPeople?>(
-                            future: _getTrendingProfiles(),
-                            builder: (context,
-                                AsyncSnapshot<ApiNostrBandPeople?> snapshot) {
-                              if (snapshot.hasError) {
-                                log(snapshot.error.toString());
-                                return const Text('Something went wrong');
-                              }
-                              if (snapshot.hasData) {
-                                return _trendingPeople(snapshot.data!, 5);
-                              }
-                              if (snapshot.connectionState ==
-                                  ConnectionState.done) {
-                                return const Text('no connection');
-                              }
-
-                              return const Center(
-                                  child: CircularProgressIndicator());
-                            }),
-                      ],
-                    )),
-                Column(
-                  children: [
-                    // search results
-                    for (var result in _searchResults)
-                      ListTile(
-                        leading: CircleAvatar(
-                          backgroundImage:
-                              NetworkImage(result['picture'] ?? ''),
-                        ),
-                        title: Text(result['name'] ?? ''),
-                        subtitle: Text(result['nip05'] ?? ''),
-                      )
-                  ],
-                )
+                // hide default view when searching
+                Visibility(
+                  maintainState: true,
+                  maintainInteractivity: false,
+                  visible: !_isSearching,
+                  child: _defaultView(),
+                ),
+                if (_searchFocusNode.hasFocus)
+                  Column(
+                    children: [
+                      // search results
+                      for (var result in _searchResults)
+                        ListTile(
+                          leading: CircleAvatar(
+                            backgroundImage:
+                                NetworkImage(result['picture'] ?? ''),
+                          ),
+                          title: Text(result['name'] ?? ''),
+                          subtitle: Text(result['nip05'] ?? ''),
+                        )
+                    ],
+                  )
               ],
             ),
           ),
         ],
       ),
     );
+  }
+
+  Container _defaultView() {
+    return Container(
+        padding: const EdgeInsets.only(left: 20, top: 20, bottom: 10),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                const Text(
+                  "trends",
+                  style: TextStyle(
+                      color: Palette.white,
+                      fontSize: 25,
+                      fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(width: 18),
+                GestureDetector(
+                  onTap: () {
+                    Uri url = Uri.parse("https://nostr.band");
+                    launchUrl(url, mode: LaunchMode.externalApplication);
+                  },
+                  child: const Text("by nostr.band",
+                      style: TextStyle(color: Palette.gray, fontSize: 15)),
+                ),
+              ],
+            ),
+            FutureBuilder<ApiNostrBandHashtags?>(
+                future: _getTrendingHashtags(),
+                builder:
+                    (context, AsyncSnapshot<ApiNostrBandHashtags?> snapshot) {
+                  if (snapshot.hasError) {
+                    log(snapshot.error.toString());
+                    return const Text('Something went wrong');
+                  }
+                  if (snapshot.hasData) {
+                    return _trendingHashtags(api: snapshot.data!, limit: 10);
+                  }
+                  if (snapshot.connectionState == ConnectionState.done) {
+                    return const Text('no connection');
+                  }
+
+                  return Column(
+                    children: [
+                      for (var i = 0; i < 10; i++) const HashtagCardSkeleton()
+                    ],
+                  );
+                }),
+            const SizedBox(height: 20),
+            const Text(
+              "trending people",
+              style: TextStyle(
+                  color: Palette.white,
+                  fontSize: 25,
+                  fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 10),
+            FutureBuilder<ApiNostrBandPeople?>(
+                future: _getTrendingProfiles(),
+                builder:
+                    (context, AsyncSnapshot<ApiNostrBandPeople?> snapshot) {
+                  if (snapshot.hasError) {
+                    log(snapshot.error.toString());
+                    return const Text('Something went wrong');
+                  }
+                  if (snapshot.hasData) {
+                    return _trendingPeople(snapshot.data!, 5);
+                  }
+                  if (snapshot.connectionState == ConnectionState.done) {
+                    return const Text('no connection');
+                  }
+
+                  return const Center(child: CircularProgressIndicator());
+                }),
+          ],
+        ));
   }
 
   Widget _trendingHashtags({required ApiNostrBandHashtags api, int? limit}) {
@@ -306,11 +326,11 @@ class _SearchPageState extends ConsumerState<SearchPage> {
 
   Padding _searchBar(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.only(top: 20, left: 20, right: 20),
+      padding: const EdgeInsets.only(top: 20, left: 20, right: 20),
       child: TextField(
         controller: _searchController,
         focusNode: _searchFocusNode,
-        decoration: InputDecoration(
+        decoration: const InputDecoration(
           hintText: 'Search',
           hintStyle: TextStyle(color: Palette.white),
           prefixIcon: Icon(Icons.search, color: Palette.white),
@@ -325,7 +345,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
             borderSide: BorderSide(color: Palette.gray),
           ),
         ),
-        style: TextStyle(color: Palette.white),
+        style: const TextStyle(color: Palette.white),
         onChanged: (value) {
           _onSearchChanged(value);
         },
