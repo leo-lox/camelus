@@ -62,6 +62,18 @@ class _NoteCardState extends ConsumerState<NoteCard> {
     final splitContent = NoteCardSplitContent(
         widget.note, myNostrService, _openProfile, _splitContentStateUpdate);
 
+    if (widget.note.pubkey == 'missing') {
+      return Container(
+        height: 50,
+        child: Center(
+          child: Text(
+            "Missing note",
+            style: TextStyle(color: Colors.purple, fontSize: 20),
+          ),
+        ),
+      );
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
