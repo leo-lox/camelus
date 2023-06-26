@@ -19,7 +19,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:camelus/providers/database_provider.dart';
-import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
 
 class SearchPage extends ConsumerStatefulWidget {
@@ -149,6 +148,30 @@ class _SearchPageState extends ConsumerState<SearchPage> {
 
     var localMetadata = _search.searchUsersMetadata(value);
 
+    // check if it is a valid nip05
+    RegExp nip05Regex =
+        RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
+    RegExp mastodonRegex =
+        RegExp(r'^@[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
+
+    String? finalNip05;
+
+    if (nip05Regex.hasMatch(value)) {
+      finalNip05 = value;
+    }
+    if (mastodonRegex.hasMatch(value)) {
+      //turn into https://mostr.pub/.well-known/nostr.json?name=username_at_domain.tld
+      final String removeAt = value.replaceFirst('@', '');
+      final String snakeCase = removeAt.replaceAll('@', '_at_');
+      finalNip05 = 'https://mostr.pub/.well-known/nostr.json?name=$snakeCase';
+    }
+    if (finalNip05 != null) {
+      log('finalNip05 $finalNip05');
+      //var nip05Metadata = await _search.searchNip05(finalNip05);
+      //final String nipPubkey = nip05Metadata!['pubkey'];
+      //final List<String> nipRelays = nip05Metadata['relays'];
+    }
+
     setState(() {
       _searchResults = localMetadata;
     });
@@ -178,14 +201,14 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                     children: [
                       // search results
                       for (var result in _searchResults)
-                        ListTile(
-                          leading: CircleAvatar(
-                            backgroundImage:
-                                NetworkImage(result['picture'] ?? ''),
-                          ),
-                          title: Text(result['name'] ?? ''),
-                          subtitle: Text(result['nip05'] ?? ''),
-                        )
+                        PersonCard(
+                          name: result['name'] ?? '',
+                          nip05: result['nip05'] ?? '',
+                          pictureUrl: result['picture'] ?? '',
+                          about: result['about'] ?? '',
+                          pubkey: result['pubkey'] ?? '',
+                          isFollowing: false,
+                        ),
                     ],
                   )
               ],

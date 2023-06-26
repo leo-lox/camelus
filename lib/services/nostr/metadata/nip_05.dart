@@ -79,15 +79,8 @@ class Nip05 {
     String username = nip05.split("@")[0];
     String url = nip05.split("@")[1];
 
-    // make get request
-    http.Response response = await client
-        .get(Uri.parse("https://$url/.well-known/nostr.json?name=$username"));
+    var json = await rawNip05Request(nip05, client);
 
-    if (response.statusCode != 200) {
-      return throw Exception("error fetching nostr.json");
-    }
-
-    var json = jsonDecode(response.body);
     Map names = json["names"];
 
     Map relays = json["relays"] ?? {};
@@ -118,5 +111,20 @@ class Nip05 {
 
       return result;
     }
+  }
+
+  static dynamic rawNip05Request(String nip05, http.Client client) async {
+    String username = nip05.split("@")[0];
+    String url = nip05.split("@")[1];
+    // make get request
+    http.Response response = await client
+        .get(Uri.parse("https://$url/.well-known/nostr.json?name=$username"));
+
+    if (response.statusCode != 200) {
+      return throw Exception("error fetching nostr.json");
+    }
+
+    var json = jsonDecode(response.body);
+    return json;
   }
 }

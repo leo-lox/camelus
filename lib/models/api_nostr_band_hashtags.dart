@@ -14,6 +14,11 @@ class ApiNostrBandHashtags {
     List<Hashtags> hashtags = [];
     //cast using for loop
     for (Map<String, dynamic> hashtag in hashtagsJson) {
+      var myHashtag = Hashtags.fromJson(hashtag);
+      // filter out some hashtags
+      // todo sentiment analysis
+      if (myHashtag.hashtag.contains('nude')) continue;
+      if (myHashtag.hashtag.contains('nsfw')) continue;
       hashtags.add(Hashtags.fromJson(hashtag));
     }
 

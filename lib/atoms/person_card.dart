@@ -102,6 +102,34 @@ class PersonCard extends ConsumerWidget {
                             }),
                       ],
                     ),
+                  // nip 05
+                  if (nip05 != null &&
+                      nip05 != '' &&
+                      nip05!.split('@').length > 1)
+                    Row(
+                      children: [
+                        if (name.split('@')[0] == name ||
+                            nip05!.startsWith("_@"))
+                          Text(
+                            nip05!.split('@')[1],
+                            style: const TextStyle(
+                              color: Palette.white,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
+                        if (name.split('@')[0] != name &&
+                            !nip05!.startsWith("_@"))
+                          Text(
+                            nip05!,
+                            style: const TextStyle(
+                              color: Palette.white,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
+                      ],
+                    ),
                   const SizedBox(height: 4),
                   SizedBox(
                     // 1/3 of screen width

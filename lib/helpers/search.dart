@@ -3,6 +3,8 @@ import 'dart:developer';
 
 import 'package:camelus/db/database.dart';
 import 'package:camelus/models/nostr_note.dart';
+import 'package:camelus/services/nostr/metadata/nip_05.dart';
+import 'package:http/http.dart' as http;
 
 class Search {
   final AppDatabase _db;
@@ -67,5 +69,34 @@ class Search {
     }
 
     return results;
+  }
+
+  Future<Map<String, dynamic>?> searchNip05(String nip05) async {
+    String username = nip05.split("@")[0];
+    String url = nip05.split("@")[1];
+
+    http.Client client = http.Client();
+    Map response;
+    try {
+      response = Nip05.rawNip05Request(nip05, client);
+    } catch (e) {
+      return null;
+    }
+
+    Map names = response["names"];
+    Map relays = response["relays"] ?? {};
+
+    if (names[username] == null) {
+      return null;
+    }
+
+    String myPubkey = names[username];
+    List<String> myRelays = relays[myPubkey] ?? [];
+
+    return {
+      "nip05": nip05,
+      "pubkey": myPubkey,
+      "relays": myRelays,
+    };
   }
 }
