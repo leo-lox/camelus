@@ -63,6 +63,7 @@ dependencies:
   riverpod: ^2.3.6
   custom_refresh_indicator: ^2.2.1
   flutter_cache_manager: ^3.3.0
+  web_socket_channel: ^2.4.0
 
 dev_dependencies:
   floor_generator: ^1.4.2

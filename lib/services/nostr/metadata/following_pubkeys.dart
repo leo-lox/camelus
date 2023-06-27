@@ -21,7 +21,7 @@ class FollowingPubkeys {
 
   Completer<void> _servicesReady = Completer<void>();
 
-  Future get servicesReady => _servicesReady.future;
+  Future<void> get servicesReady => _servicesReady.future;
 
   FollowingPubkeys({required this.pubkey, required AppDatabase db}) : _db = db {
     _init();
