@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:camelus/models/nostr_request.dart';
 
 class NostrRequestClose implements NostrRequest {
@@ -10,8 +12,8 @@ class NostrRequestClose implements NostrRequest {
   });
 
   @override
-  List toRawList() {
-    return [type, subscriptionId];
+  String toRawList() {
+    return jsonEncode([type, subscriptionId]);
   }
 
   @override

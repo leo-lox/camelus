@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
 
@@ -25,10 +26,13 @@ class RelayCoordinator {
   List<MyRelay> _relays = [];
   List<RelayAssignment> _gossipRelayAssignments = [];
 
-  RelayCoordinator(
-      {required this.dbFuture,
-      required this.keyPairFuture,
-      required this.followingFuture}) {
+  final Completer _ready = Completer();
+
+  RelayCoordinator({
+    required this.dbFuture,
+    required this.keyPairFuture,
+    required this.followingFuture,
+  }) {
     _init();
   }
 
@@ -38,18 +42,23 @@ class RelayCoordinator {
     _following = await followingFuture;
     await _following.servicesReady;
 
-    _initConnectSequence();
+    await _initConnectSequence();
+
+    _ready.complete();
   }
 
-  _initConnectSequence() async {
+  Future<void> _initConnectSequence() async {
     var selectedManualRelays = await _findInitalManualRelays();
 
+    List<Future> connectFutures = [];
     for (var relay in selectedManualRelays.entries) {
-      _connectToRelay(
-        relayUrl: relay.key,
-        read: relay.value['read'] ?? true,
-        write: relay.value['write'] ?? true,
-        persistance: RelayPersistance.manual,
+      connectFutures.add(
+        _connectToRelay(
+          relayUrl: relay.key,
+          read: relay.value['read'] ?? true,
+          write: relay.value['write'] ?? true,
+          persistance: RelayPersistance.manual,
+        ),
       );
     }
 
@@ -63,13 +72,20 @@ class RelayCoordinator {
         _relays.any((element) => element.relayUrl == key));
 
     for (var relay in selectedGossipRelays.entries) {
-      _connectToRelay(
-        relayUrl: relay.key,
-        read: relay.value['read'] ?? true,
-        write: relay.value['write'] ?? true,
-        persistance: RelayPersistance.gossip,
+      connectFutures.add(
+        _connectToRelay(
+          relayUrl: relay.key,
+          read: relay.value['read'] ?? true,
+          write: relay.value['write'] ?? true,
+          persistance: RelayPersistance.gossip,
+        ),
       );
     }
+
+    await Future.any(connectFutures);
+    // wait additional 2 seconds for other relays to connect
+    await Future.delayed(const Duration(seconds: 2));
+    return;
   }
 
   Future<Map<String, Map<String, bool>>> _findInitalManualRelays() async {
@@ -111,7 +127,9 @@ class RelayCoordinator {
     return converted;
   }
 
-  request(NostrRequestQuery request) {
+  request(NostrRequestQuery request) async {
+    await _ready.future; // wait to be connected to at least one relay
+
     var subscription = _checkForAlreadyActiveSubscription(request);
 
     if (subscription == null) {
@@ -198,10 +216,13 @@ class RelayCoordinator {
   RelaySubscriptionHolder? _checkForAlreadyActiveSubscription(
       NostrRequestQuery request) {
     // check if we have a subscription for this request
-    var subscription = (_activeSubscriptions as List<RelaySubscriptionHolder?>)
-        .firstWhere(
-            (element) => element?.subscriptionId == request.subscriptionId,
-            orElse: () => null);
+    RelaySubscriptionHolder? subscription;
+    for (var element in _activeSubscriptions) {
+      if (element.subscriptionId == request.subscriptionId) {
+        subscription = element;
+        break;
+      }
+    }
     return subscription;
   }
 
@@ -342,10 +363,11 @@ class RelayCoordinator {
       newRequests[relayUrl] = newRequest;
     }
 
+    var readRelays = _relays.where((element) => element.read).toList();
+
     // add remaining pubkeys to new request for each relay  GENERAL
-    for (String relayUrl
-        in _relays.where((element) => element.read).map((e) => e.relayUrl)) {
-      //var relayUrl = relay.key;
+    for (var relay in readRelays) {
+      var relayUrl = relay.relayUrl;
 
       if (newRequests.containsKey(relayUrl)) {
         var request = newRequests[relayUrl];
@@ -397,9 +419,8 @@ class RelayCoordinator {
       }
     }
     for (var relay in foundRelays) {
-      log("relay: ${relay.relayUrl}, pubkey: ${relay.pubkeys}");
+      log("relay-assignment: ${relay.relayUrl}, pubkey: ${relay.pubkeys.length}");
     }
-    log("found relays: $foundRelays");
     return foundRelays;
   }
 }

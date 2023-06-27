@@ -1,5 +1,7 @@
 // ignore_for_file: non_constant_identifier_names
 
+import 'dart:convert';
+
 import 'package:camelus/models/nostr_request.dart';
 
 class NostrRequestEvent implements NostrRequest {
@@ -14,8 +16,8 @@ class NostrRequestEvent implements NostrRequest {
   });
 
   @override
-  List toRawList() {
-    return [type, subscriptionId, body.toJson()];
+  String toRawList() {
+    return jsonEncode([type, subscriptionId, body.toMap()]);
   }
 
   @override
@@ -43,8 +45,8 @@ class NostrRequestEventJson {
     required this.sig,
   });
 
-  Map<String, dynamic> toJson() {
-    return {
+  Map<String, dynamic> toMap() {
+    var body = {
       "id": id,
       "pubkey": pubkey,
       "created_at": created_at,
@@ -53,5 +55,7 @@ class NostrRequestEventJson {
       "content": content,
       "sig": sig,
     };
+    body.removeWhere((key, value) => value == null);
+    return body;
   }
 }

@@ -23,10 +23,10 @@ class MyRelay {
   late WebSocketChannel _channel;
 
   // stream
-  final StreamController<Map> _eoseStreamController =
-      StreamController<Map>.broadcast();
+  final StreamController<List> _eoseStreamController =
+      StreamController<List>.broadcast();
 
-  Stream<Map> get eoseStream => _eoseStreamController.stream;
+  Stream<List> get eoseStream => _eoseStreamController.stream;
 
   MyRelay({
     required this.database,
@@ -40,10 +40,19 @@ class MyRelay {
     final wssUrl = Uri.parse(relayUrl);
     WebSocketChannel channel = WebSocketChannel.connect(wssUrl);
     _channel = channel;
+
+    channel.ready.catchError((error) {
+      log(error.toString());
+      //throw Exception("Error in socket");
+      failing = true;
+      return;
+    });
+
     await channel.ready;
 
     connected = true;
     _listen(channel);
+    log("connteected to relay: $relayUrl");
     return;
   }
 
@@ -58,7 +67,8 @@ class MyRelay {
   }
 
   void request(NostrRequest request) {
-    _write(_channel, request.toRawList());
+    var requestJson = request.toRawList();
+    _write(_channel, requestJson);
   }
 
   _write(WebSocketChannel channel, dynamic data) {
@@ -74,8 +84,7 @@ class MyRelay {
   }
 
   _handleIncommingMessage(dynamic message) async {
-    log(message);
-    var eventJson = json.decode(message);
+    List<dynamic> eventJson = json.decode(message);
 
     if (eventJson[0] == 'OK') {
       //nip 20 used to notify clients if an EVENT was successful
@@ -87,13 +96,14 @@ class MyRelay {
       log("NOTICE: ${eventJson[1]}");
       return;
     }
+
     if (eventJson[0] == 'EVENT') {
-      var note = NostrNote.fromJson(eventJson);
+      var note = NostrNote.fromJson(eventJson[2]);
       _insertNoteIntoDb(note);
       return;
     }
     if (eventJson[0] == 'EOSE') {
-      log("EOSE: ${eventJson[1]}");
+      log("EOSE: ${eventJson[1]}, $relayUrl");
       _eoseStreamController.add(eventJson);
       return;
     }

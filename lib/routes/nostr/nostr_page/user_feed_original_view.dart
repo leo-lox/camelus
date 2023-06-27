@@ -10,6 +10,7 @@ import 'package:camelus/models/nostr_note.dart';
 import 'package:camelus/providers/database_provider.dart';
 import 'package:camelus/providers/following_provider.dart';
 import 'package:camelus/providers/navigation_bar_provider.dart';
+import 'package:camelus/providers/relay_provider.dart';
 import 'package:camelus/scroll_controller/retainable_scroll_controller.dart';
 import 'package:camelus/services/nostr/feeds/user_feed.dart';
 import 'package:camelus/services/nostr/metadata/following_pubkeys.dart';
@@ -20,11 +21,8 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class UserFeedOriginalView extends ConsumerStatefulWidget {
   final String pubkey;
-  final Relays _relays;
 
-  UserFeedOriginalView({Key? key, required this.pubkey})
-      : _relays = RelaysInjector().relays,
-        super(key: key);
+  UserFeedOriginalView({Key? key, required this.pubkey}) : super(key: key);
 
   @override
   ConsumerState<UserFeedOriginalView> createState() =>
@@ -171,12 +169,12 @@ class _UserFeedOriginalViewState extends ConsumerState<UserFeedOriginalView> {
   }
 
   Future<void> _initSequence() async {
-    log("init sequence");
-
     await _initDb();
     await _getFollowingPubkeys();
 
-    _userFeed = UserFeed(db, _followingPubkeys, widget._relays);
+    var relayCoordinator = ref.watch(relayServiceProvider);
+
+    _userFeed = UserFeed(db, _followingPubkeys, relayCoordinator);
     await _userFeed.feedRdy;
 
     _servicesReady.complete();

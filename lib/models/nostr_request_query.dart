@@ -1,10 +1,11 @@
+import 'dart:convert';
 import 'package:camelus/models/nostr_request.dart';
 
 class NostrRequestQuery implements NostrRequest {
   final String type = "REQ";
   @override
   final String subscriptionId;
-  final NostrRequestQueryJson body;
+  final NostrRequestQueryBody body;
 
   NostrRequestQuery({
     required this.subscriptionId,
@@ -12,8 +13,10 @@ class NostrRequestQuery implements NostrRequest {
   });
 
   @override
-  List toRawList() {
-    return [type, subscriptionId, body.toJson()];
+  String toRawList() {
+    List req = [type, subscriptionId, body.toMap()];
+
+    return jsonEncode(req);
   }
 
   @override
@@ -22,7 +25,7 @@ class NostrRequestQuery implements NostrRequest {
   }
 }
 
-class NostrRequestQueryJson {
+class NostrRequestQueryBody {
   List<String>? ids;
   List<String>? authors;
   List<int> kinds;
@@ -33,7 +36,7 @@ class NostrRequestQueryJson {
   int? until;
   int? limit;
 
-  NostrRequestQueryJson({
+  NostrRequestQueryBody({
     this.ids,
     this.authors,
     required this.kinds,
@@ -45,8 +48,8 @@ class NostrRequestQueryJson {
     this.limit,
   });
 
-  Map<String, dynamic> toJson() {
-    return {
+  Map<String, dynamic> toMap() {
+    var body = {
       "ids": ids,
       "authors": authors,
       "kinds": kinds,
@@ -57,10 +60,14 @@ class NostrRequestQueryJson {
       "until": until,
       "limit": limit,
     };
+    // remove null values
+    body.removeWhere((key, value) => value == null);
+
+    return body;
   }
 
   @override
   String toString() {
-    return toJson().toString();
+    return toMap().toString();
   }
 }

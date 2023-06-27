@@ -102,8 +102,6 @@ class NostrService {
       });
     });
 
-    log("init");
-
     await _loadKeyPair();
 
     // init streams

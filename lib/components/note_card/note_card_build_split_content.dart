@@ -110,21 +110,22 @@ class NoteCardSplitContent {
         );
       }
       spans.add(TextSpan(
-          text: match.group(0),
-          style: const TextStyle(
-              color: Palette.primary,
-              fontSize: 17,
-              height: 1.3,
-              decoration: TextDecoration.underline),
-          recognizer: TapGestureRecognizer()
-            ..onTap = () {
-              if (match.group(0) == null) return;
+        text: match.group(0),
+        style: const TextStyle(
+            color: Palette.primary,
+            fontSize: 17,
+            height: 1.3,
+            decoration: TextDecoration.underline),
+        recognizer: TapGestureRecognizer()
+          ..onTap = () {
+            if (match.group(0) == null) return;
 
-              // Open the URL in a browser
-              launchUrlString(match.group(0)!,
-                  mode: LaunchMode.externalApplication);
-              log(match.group(0)!);
-            }));
+            // Open the URL in a browser
+            launchUrlString(match.group(0)!,
+                mode: LaunchMode.externalApplication);
+            log(match.group(0)!);
+          },
+      ));
       lastMatchEnd = match.end;
     }
     if (lastMatchEnd < input.length) {

@@ -5,7 +5,7 @@ abstract class NostrRequest {
     required this.subscriptionId,
   });
 
-  List toRawList();
+  String toRawList();
 
   @override
   String toString();
