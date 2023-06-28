@@ -123,15 +123,6 @@ class _TweetCardState extends ConsumerState<TweetCard> {
             var pubkeyHr =
                 "${pubkeyBech.substring(0, 5)}...${pubkeyBech.substring(pubkeyBech.length - 5)}";
             _tagsMetadata[tag[1]] = pubkeyHr;
-            var metadata = _nostrService.getUserMetadata(tag[1]);
-
-            metadata.then((value) {
-              // check if mounted
-              if (!mounted) return;
-              setState(() {
-                _tagsMetadata[tag[1]] = value["name"] ?? pubkeyHr;
-              });
-            });
           }
           finalSpans.add(TextSpan(
               text: "@${_tagsMetadata[tag[1]]}",
@@ -312,62 +303,16 @@ class _TweetCardState extends ConsumerState<TweetCard> {
                               if (Helpers()
                                   .getPubkeysFromTags(widget.tweet.tags)
                                   .isNotEmpty) //todo this is a hotfix to not break the feed
-                                FutureBuilder(
-                                  future: _nostrService.getUserMetadata(Helpers()
-                                          .getPubkeysFromTags(
-                                              widget.tweet.tags)[
-                                      0]), // todo fix this for multiple tags
-                                  builder: (BuildContext context,
-                                      AsyncSnapshot<Map> snapshot) {
-                                    var name = "";
-                                    if (snapshot.hasData) {
-                                      name = snapshot.data?["name"] ?? "";
-                                      // only calculate when necessary
-                                      if (name.isEmpty) {
-                                        var pubkey = Helpers()
-                                            .getPubkeysFromTags(
-                                                widget.tweet.tags)[0];
-                                        var pubkeyHr = Helpers()
-                                            .encodeBech32(pubkey, "npub");
-                                        var pubkeyHrShort =
-                                            "${pubkeyHr.substring(0, 5)}...${pubkeyHr.substring(pubkeyHr.length - 5)}";
-                                        name = pubkeyHrShort;
-                                      }
-                                    } else if (snapshot.hasError) {
-                                      name = "error";
-                                    } else {
-                                      // loading
-                                      name = "...";
-                                    }
-                                    return GestureDetector(
-                                      onTap: () {
-                                        Navigator.popAndPushNamed(
-                                            context, "/nostr/event",
-                                            arguments: Helpers()
-                                                    .getEventsFromTags(
-                                                        widget.tweet.tags)[
-                                                0]); // todo fix this for multiple tags
-                                      },
-                                      child: Text(
-                                        name,
-                                        style: const TextStyle(
-                                            fontSize: 18,
-                                            color: Palette.lightGray,
-                                            decoration:
-                                                TextDecoration.underline),
-                                      ),
-                                    );
-                                  },
-                                ),
-                              if (Helpers()
-                                      .getEventsFromTags(widget.tweet.tags)
-                                      .length >
-                                  1)
-                                Text(
-                                  " and ${Helpers().getEventsFromTags(widget.tweet.tags).length - 1} more",
-                                  style: const TextStyle(
-                                      fontSize: 16, color: Palette.gray),
-                                )
+
+                                if (Helpers()
+                                        .getEventsFromTags(widget.tweet.tags)
+                                        .length >
+                                    1)
+                                  Text(
+                                    " and ${Helpers().getEventsFromTags(widget.tweet.tags).length - 1} more",
+                                    style: const TextStyle(
+                                        fontSize: 16, color: Palette.gray),
+                                  )
                             ],
                           ),
                         ),
@@ -380,29 +325,6 @@ class _TweetCardState extends ConsumerState<TweetCard> {
                               Navigator.pushNamed(context, "/nostr/profile",
                                   arguments: widget.tweet.pubkey);
                             },
-                            child: FutureBuilder<Map>(
-                                future: _nostrService
-                                    .getUserMetadata(widget.tweet.pubkey),
-                                builder: (BuildContext context,
-                                    AsyncSnapshot<Map> snapshot) {
-                                  var picture = "";
-
-                                  if (snapshot.hasData) {
-                                    picture = snapshot.data?["picture"] ??
-                                        "https://avatars.dicebear.com/api/personas/${widget.tweet.pubkey}.svg";
-                                  } else if (snapshot.hasError) {
-                                    picture =
-                                        "https://avatars.dicebear.com/api/personas/${widget.tweet.pubkey}.svg";
-                                  } else {
-                                    // loading
-                                    picture =
-                                        "https://avatars.dicebear.com/api/personas/${widget.tweet.pubkey}.svg";
-                                  }
-
-                                  return myProfilePicture(
-                                      pictureUrl: picture,
-                                      pubkey: widget.tweet.pubkey);
-                                }),
                           ),
                           Expanded(
                             child: Padding(
@@ -415,69 +337,6 @@ class _TweetCardState extends ConsumerState<TweetCard> {
                                       //mainAxisAlignment: MainAxisAlignment.end,
                                       //crossAxisAlignment: CrossAxisAlignment.center,
                                       children: [
-                                        FutureBuilder<Map>(
-                                            future:
-                                                _nostrService.getUserMetadata(
-                                                    widget.tweet.pubkey),
-                                            builder: (BuildContext context,
-                                                AsyncSnapshot<Map> snapshot) {
-                                              var name = "";
-
-                                              if (snapshot.hasData) {
-                                                var npubHr = Helpers()
-                                                    .encodeBech32(
-                                                        widget.tweet.pubkey,
-                                                        "npub");
-                                                var npubHrShort =
-                                                    "${npubHr.substring(0, 4)}...${npubHr.substring(npubHr.length - 4)}";
-                                                name = snapshot.data?["name"] ??
-                                                    npubHrShort;
-                                                _checkNip05(
-                                                    snapshot.data?["nip05"] ??
-                                                        "",
-                                                    widget.tweet.pubkey);
-                                              } else if (snapshot.hasError) {
-                                                name = "error";
-                                              } else {
-                                                // loading
-                                                name = "loading";
-                                              }
-
-                                              return Row(
-                                                children: [
-                                                  Container(
-                                                    constraints:
-                                                        const BoxConstraints(
-                                                            minWidth: 5,
-                                                            maxWidth: 150),
-                                                    child: RichText(
-                                                      maxLines: 2,
-                                                      overflow:
-                                                          TextOverflow.ellipsis,
-                                                      text: TextSpan(
-                                                        text: name,
-                                                        style: const TextStyle(
-                                                            color: Colors.white,
-                                                            fontWeight:
-                                                                FontWeight.bold,
-                                                            fontSize: 17),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                  if (nip05verified.isNotEmpty)
-                                                    Container(
-                                                      margin:
-                                                          const EdgeInsets.only(
-                                                              top: 0, left: 5),
-                                                      child: const Icon(
-                                                        Icons.verified,
-                                                        color: Palette.white,
-                                                        size: 15,
-                                                      ),
-                                                    ),
-                                                ],
-                                              );
-                                            }),
                                         const SizedBox(width: 10),
                                         Container(
                                           height: 3,

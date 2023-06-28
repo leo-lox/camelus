@@ -384,11 +384,6 @@ class NostrService {
   }
 
   /// get user metadata from cache and if not available request it from network
-  Future<Map> getUserMetadata(String pubkey) async {
-    return {};
-  }
-
-  /// get user metadata from cache and if not available request it from network
   Future<List<List<dynamic>>> getUserContacts(String pubkey,
       {bool force = false}) async {
     return userContactsObj.getContactsByPubkey(pubkey, force: force);

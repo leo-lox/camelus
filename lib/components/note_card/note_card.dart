@@ -58,11 +58,11 @@ class _NoteCardState extends ConsumerState<NoteCard> {
   Widget build(BuildContext context) {
     final myNostrService = ref.watch(nostrServiceProvider);
 
-    final myMetadata =
-        ref.watch(metadataProvider).getMetadataByPubkey(widget.note.pubkey);
+    final metadata = ref.watch(metadataProvider);
+    final myMetadata = metadata.getMetadataByPubkey(widget.note.pubkey);
 
     final splitContent = NoteCardSplitContent(
-        widget.note, myNostrService, _openProfile, _splitContentStateUpdate);
+        widget.note, metadata, _openProfile, _splitContentStateUpdate);
 
     if (widget.note.pubkey == 'missing') {
       return Container(

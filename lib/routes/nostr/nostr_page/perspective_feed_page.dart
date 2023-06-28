@@ -1,6 +1,8 @@
 import 'package:camelus/config/palette.dart';
+import 'package:camelus/providers/metadata_provider.dart';
 import 'package:camelus/providers/nostr_service_provider.dart';
 import 'package:camelus/routes/nostr/nostr_page/user_feed_original_view.dart';
+import 'package:camelus/services/nostr/metadata/user_metadata.dart';
 import 'package:camelus/services/nostr/nostr_service.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -18,7 +20,7 @@ class PerspectiveFeedPage extends ConsumerStatefulWidget {
 
 class _PerspectiveFeedPageState extends ConsumerState<PerspectiveFeedPage>
     with TraceableClientMixin {
-  late NostrService _nostrService;
+  late UserMetadata _metadata;
   @override
   String get traceName => 'Created PerspectiveFeedPage'; // optional
 
@@ -26,7 +28,7 @@ class _PerspectiveFeedPageState extends ConsumerState<PerspectiveFeedPage>
   String get traceTitle => "perspective_feed_page";
 
   void _initNostrService() {
-    _nostrService = ref.read(nostrServiceProvider);
+    _metadata = ref.read(metadataProvider);
   }
 
   @override
@@ -45,7 +47,7 @@ class _PerspectiveFeedPageState extends ConsumerState<PerspectiveFeedPage>
     return Scaffold(
       appBar: AppBar(
         title: FutureBuilder(
-          future: _nostrService.getUserMetadata(widget.pubkey),
+          future: _metadata.getMetadataByPubkey(widget.pubkey),
           builder: (BuildContext context, AsyncSnapshot snapshot) {
             if (snapshot.hasData) {
               return Text("perspective of ${snapshot.data['name']}");

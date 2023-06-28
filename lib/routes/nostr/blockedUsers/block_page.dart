@@ -1,5 +1,6 @@
 import 'package:camelus/atoms/long_button.dart';
 import 'package:camelus/config/palette.dart';
+import 'package:camelus/providers/metadata_provider.dart';
 import 'package:camelus/providers/nostr_service_provider.dart';
 import 'package:camelus/services/nostr/nostr_service.dart';
 import 'package:flutter/material.dart';
@@ -31,6 +32,7 @@ class _BlockPageState extends ConsumerState<BlockPage> {
 
   @override
   Widget build(BuildContext context) {
+    var metadata = ref.watch(metadataProvider);
     return Scaffold(
       appBar: AppBar(
         title: const Text('block/report'),
@@ -55,7 +57,7 @@ class _BlockPageState extends ConsumerState<BlockPage> {
                       const SizedBox(width: 10),
                       FutureBuilder<Map>(
                         future:
-                            _nostrService.getUserMetadata(widget.userPubkey!),
+                            metadata.getMetadataByPubkey(widget.userPubkey!),
                         builder: (context, snapshot) {
                           if (snapshot.hasData) {
                             return Text(

@@ -1,5 +1,7 @@
 import 'package:camelus/helpers/nprofile_helper.dart';
+import 'package:camelus/providers/metadata_provider.dart';
 import 'package:camelus/providers/nostr_service_provider.dart';
+import 'package:camelus/services/nostr/metadata/user_metadata.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -84,7 +86,7 @@ class NostrDrawer extends ConsumerWidget {
         });
   }
 
-  Widget _drawerHeader(context) {
+  Widget _drawerHeader(context, UserMetadata metadata) {
     return DrawerHeader(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -99,8 +101,8 @@ class NostrDrawer extends ConsumerWidget {
                   shape: BoxShape.circle,
                 ),
                 child: FutureBuilder<Map>(
-                    future: _nostrService
-                        .getUserMetadata(_nostrService.myKeys.publicKey),
+                    future: metadata
+                        .getMetadataByPubkey(_nostrService.myKeys.publicKey),
                     builder:
                         (BuildContext context, AsyncSnapshot<Map> snapshot) {
                       var picture = "";
@@ -137,8 +139,8 @@ class NostrDrawer extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     FutureBuilder<Map>(
-                        future: _nostrService
-                            .getUserMetadata(_nostrService.myKeys.publicKey),
+                        future: metadata.getMetadataByPubkey(
+                            _nostrService.myKeys.publicKey),
                         builder: (BuildContext context,
                             AsyncSnapshot<Map> snapshot) {
                           var name = "";
@@ -273,6 +275,8 @@ class NostrDrawer extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     _initNostrService(ref);
 
+    var metadata = ref.watch(metadataProvider);
+
     return Drawer(
       child: Container(
         color: Palette.background,
@@ -280,7 +284,7 @@ class NostrDrawer extends ConsumerWidget {
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _drawerHeader(context),
+            _drawerHeader(context, metadata),
             _divider(),
             _drawerItem(
                 label: 'Profile',

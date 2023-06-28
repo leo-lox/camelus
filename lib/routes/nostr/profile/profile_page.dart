@@ -3,8 +3,10 @@ import 'dart:developer';
 
 import 'package:camelus/atoms/long_button.dart';
 import 'package:camelus/helpers/nprofile_helper.dart';
+import 'package:camelus/providers/metadata_provider.dart';
 import 'package:camelus/providers/nostr_service_provider.dart';
 import 'package:camelus/routes/nostr/nostr_page/perspective_feed_page.dart';
+import 'package:camelus/services/nostr/metadata/user_metadata.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
@@ -131,8 +133,8 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
     await Clipboard.setData(ClipboardData(text: data));
   }
 
-  _getBannerImage() async {
-    var metadata = await _nostrService.getUserMetadata(widget.pubkey);
+  _getBannerImage(UserMetadata userMetadata) async {
+    var metadata = await userMetadata.getMetadataByPubkey(widget.pubkey);
     if (metadata["banner"] == null) return null;
 
     setState(() {
@@ -333,7 +335,6 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
     });
 
     checkIamFollowing();
-    _getBannerImage();
   }
 
   @override
@@ -350,6 +351,8 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
 
   @override
   Widget build(BuildContext context) {
+    var metadata = ref.watch(metadataProvider);
+
     return Scaffold(
       backgroundColor: Palette.background,
       body: Stack(
@@ -453,8 +456,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
 
                         // round message button with icon and white border
                         FutureBuilder<Map>(
-                            future:
-                                _nostrService.getUserMetadata(widget.pubkey),
+                            future: metadata.getMetadataByPubkey(widget.pubkey),
                             builder: (BuildContext context,
                                 AsyncSnapshot<Map> snapshot) {
                               String lud06 = "";
@@ -564,9 +566,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                                     builder: (context) => EditProfilePage(),
                                   ),
                                 ).then((value) => {
-                                      _nostrService
-                                          .getUserMetadata(widget.pubkey),
-                                      _getBannerImage(),
+                                      metadata
+                                          .getMetadataByPubkey(widget.pubkey),
+                                      _getBannerImage(metadata),
                                       setState(() {
                                         // refresh
                                       })
@@ -596,7 +598,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                     Container(
                       transform: Matrix4.translationValues(0.0, -10.0, 0.0),
                       child: FutureBuilder<Map>(
-                        future: _nostrService.getUserMetadata(widget.pubkey),
+                        future: metadata.getMetadataByPubkey(widget.pubkey),
                         builder: (BuildContext context,
                             AsyncSnapshot<Map> snapshot) {
                           var name = "";
@@ -861,7 +863,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
               ),
             ],
           ),
-          _profileImage(_scrollController, widget, _nostrService),
+          _profileImage(_scrollController, widget, _nostrService, metadata),
           SafeArea(
             child: SizedBox(
               height: 55,
@@ -876,7 +878,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                         : 0.0,
                     duration: const Duration(milliseconds: 200),
                     child: FutureBuilder<Map>(
-                        future: _nostrService.getUserMetadata(widget.pubkey),
+                        future: metadata.getMetadataByPubkey(widget.pubkey),
                         builder: (BuildContext context,
                             AsyncSnapshot<Map> snapshot) {
                           var name = "";
@@ -911,8 +913,8 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
   }
 }
 
-Widget _profileImage(
-    ScrollController sController, widget, NostrService nostrService) {
+Widget _profileImage(ScrollController sController, widget,
+    NostrService nostrService, UserMetadata metadata) {
   const double defaultMargin = 125;
   const double defaultStart = 125;
   const double defaultEnd = defaultStart / 2;
@@ -968,7 +970,7 @@ Widget _profileImage(
           shape: BoxShape.circle,
         ),
         child: FutureBuilder<Map>(
-            future: nostrService.getUserMetadata(widget.pubkey),
+            future: metadata.getMetadataByPubkey(widget.pubkey),
             builder: (BuildContext context, AsyncSnapshot<Map> snapshot) {
               var picture = "";
 

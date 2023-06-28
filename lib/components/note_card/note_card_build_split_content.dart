@@ -4,7 +4,8 @@ import 'package:camelus/config/palette.dart';
 import 'package:camelus/helpers/helpers.dart';
 import 'package:camelus/helpers/nprofile_helper.dart';
 import 'package:camelus/models/nostr_note.dart';
-import 'package:camelus/services/nostr/nostr_service.dart';
+import 'package:camelus/services/nostr/metadata/user_metadata.dart';
+
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher_string.dart';
@@ -19,13 +20,13 @@ class NoteCardSplitContent {
 
   final Map<String, dynamic> _tagsMetadata = {};
 
-  final NostrService _nostrService;
+  final UserMetadata _metadataProvider;
 
   List<String> imageLinks = [];
 
   NoteCardSplitContent(
     this._note,
-    this._nostrService,
+    this._metadataProvider,
     this._profileCallback,
     this._stateCallback,
   ) {
@@ -53,7 +54,7 @@ class NoteCardSplitContent {
             );
           }
         },
-        future: _nostrService.getUserMetadata(_note.pubkey));
+        future: _metadataProvider.getMetadataByPubkey(_note.pubkey));
   }
 
   List<TextSpan> _buildTextSpans(String content) {
@@ -166,7 +167,7 @@ class NoteCardSplitContent {
             var pubkeyHr =
                 "${pubkeyBech.substring(0, 5)}...${pubkeyBech.substring(pubkeyBech.length - 5)}";
             _tagsMetadata[tag.value] = pubkeyHr;
-            var metadata = _nostrService.getUserMetadata(tag.value);
+            var metadata = _metadataProvider.getMetadataByPubkey(tag.value);
 
             metadata.then((value) {
               // check if mounted
@@ -252,7 +253,7 @@ class NoteCardSplitContent {
         final String pubkeyHr =
             "${pubkeyBech.substring(0, 5)}...${pubkeyBech.substring(pubkeyBech.length - 5)}";
 
-        var metadata = _nostrService.getUserMetadata(myPubkeyHex);
+        var metadata = _metadataProvider.getMetadataByPubkey(myPubkeyHex);
 
         if (_tagsMetadata[myPubkeyHex] == null) {
           _tagsMetadata[myPubkeyHex] = pubkeyHr;

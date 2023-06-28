@@ -6,7 +6,9 @@ import 'package:camelus/config/palette.dart';
 import 'package:camelus/helpers/helpers.dart';
 import 'package:camelus/models/nostr_note.dart';
 import 'package:camelus/models/nostr_tag.dart';
+import 'package:camelus/providers/metadata_provider.dart';
 import 'package:camelus/providers/nostr_service_provider.dart';
+import 'package:camelus/services/nostr/metadata/user_metadata.dart';
 import 'package:camelus/services/nostr/nostr_service.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -54,7 +56,7 @@ class _NoteCardContainerState extends ConsumerState<NoteCardContainer> {
 
   @override
   Widget build(BuildContext context) {
-    final nostrService = ref.read(nostrServiceProvider);
+    final metadata = ref.watch(metadataProvider);
 
     return SizedBox(
       width: double.infinity,
@@ -62,7 +64,7 @@ class _NoteCardContainerState extends ConsumerState<NoteCardContainer> {
         color: Palette.background,
         child: Column(
           children: [
-            ..._buildContainerNotes(nostrService, context),
+            ..._buildContainerNotes(metadata, context),
             ...widget.otherContainers.map((e) => e).toList()
           ],
         ),
@@ -71,7 +73,7 @@ class _NoteCardContainerState extends ConsumerState<NoteCardContainer> {
   }
 
   List<Widget> _buildContainerNotes(
-      NostrService nostrService, BuildContext context) {
+      UserMetadata metadata, BuildContext context) {
     List<Widget> widgets = [];
     for (int i = 0; i < widget.notes.length; i++) {
       var note = widget.notes[i];
@@ -107,7 +109,7 @@ class _NoteCardContainerState extends ConsumerState<NoteCardContainer> {
                 // check if reply
                 if (note.getTagEvents.isNotEmpty)
                   // for myNote.getTagPubkeys
-                  _buildInReplyTo(note, nostrService, context, i, widget.notes),
+                  _buildInReplyTo(note, metadata, context, i, widget.notes),
 
                 GestureDetector(
                   onTap: () {
@@ -127,7 +129,7 @@ class _NoteCardContainerState extends ConsumerState<NoteCardContainer> {
     return widgets;
   }
 
-  Row _buildInReplyTo(NostrNote myNote, NostrService nostrService,
+  Row _buildInReplyTo(NostrNote myNote, UserMetadata metadata,
       BuildContext context, int index, List<NostrNote> notes) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -141,7 +143,7 @@ class _NoteCardContainerState extends ConsumerState<NoteCardContainer> {
         if (myNote.getTagPubkeys.length < 3)
           ...myNote.getTagPubkeys
               .map(
-                (tag) => linkedUsername(tag.value, nostrService, context),
+                (tag) => linkedUsername(tag.value, metadata, context),
               )
               .toList(),
         if (myNote.getTagPubkeys.length > 2)
@@ -150,9 +152,9 @@ class _NoteCardContainerState extends ConsumerState<NoteCardContainer> {
             child: Wrap(
               children: [
                 linkedUsername(
-                    myNote.getTagPubkeys[0].value, nostrService, context),
+                    myNote.getTagPubkeys[0].value, metadata, context),
                 linkedUsername(
-                    myNote.getTagPubkeys[1].value, nostrService, context),
+                    myNote.getTagPubkeys[1].value, metadata, context),
                 Text(
                   " and ${myNote.getTagPubkeys.length - 2} ${myNote.getTagPubkeys.length > 3 ? 'others' : 'other'}",
                   style: const TextStyle(fontSize: 16, color: Palette.gray),
@@ -166,7 +168,7 @@ class _NoteCardContainerState extends ConsumerState<NoteCardContainer> {
 }
 
 Widget linkedUsername(
-    String pubkey, NostrService nostrService, BuildContext context) {
+    String pubkey, UserMetadata metadata, BuildContext context) {
   return GestureDetector(
     onTap: () {
       Navigator.pushNamed(context, "/nostr/profile", arguments: pubkey);
@@ -186,7 +188,7 @@ Widget linkedUsername(
                   color: Palette.primary, fontSize: 16, height: 1.3));
         }
       },
-      future: nostrService.getUserMetadata(pubkey),
+      future: metadata.getMetadataByPubkey(pubkey),
     ),
   );
 }

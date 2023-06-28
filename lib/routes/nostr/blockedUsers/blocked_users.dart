@@ -3,7 +3,9 @@ import 'dart:async';
 import 'package:camelus/atoms/my_profile_picture.dart';
 import 'package:camelus/config/palette.dart';
 import 'package:camelus/helpers/helpers.dart';
+import 'package:camelus/providers/metadata_provider.dart';
 import 'package:camelus/providers/nostr_service_provider.dart';
+import 'package:camelus/services/nostr/metadata/user_metadata.dart';
 
 import 'package:camelus/services/nostr/nostr_service.dart';
 import 'package:flutter/material.dart';
@@ -42,6 +44,7 @@ class _BlockedUsersState extends ConsumerState<BlockedUsers> {
 
   @override
   Widget build(BuildContext context) {
+    var metadata = ref.watch(metadataProvider);
     return Scaffold(
         backgroundColor: Palette.background,
         appBar: AppBar(
@@ -54,7 +57,7 @@ class _BlockedUsersState extends ConsumerState<BlockedUsers> {
               delegate: SliverChildBuilderDelegate(
                 (context, index) {
                   return _profile(_nostrService.blockedUsers[index],
-                      _streamController, widget, _nostrService);
+                      _streamController, widget, metadata, metadata);
                 },
                 childCount: _nostrService.blockedUsers.length,
               ),
@@ -74,9 +77,9 @@ class _BlockedUsersState extends ConsumerState<BlockedUsers> {
 }
 
 Widget _profile(String pubkey, StreamController streamController, widget,
-    NostrService nostrService) {
+    UserMetadata nostrService, UserMetadata userMetadata) {
   return FutureBuilder<Map>(
-      future: nostrService.getUserMetadata(pubkey),
+      future: userMetadata.getMetadataByPubkey(pubkey),
       builder: (BuildContext context, AsyncSnapshot<Map> snapshot) {
         String picture = "";
         String name = "";
@@ -125,7 +128,7 @@ Widget _profile(String pubkey, StreamController streamController, widget,
                 icon: const Icon(Icons.block_flipped),
                 color: Palette.white,
                 onPressed: () {
-                  nostrService.removeFromBlocklist(pubkey);
+                  //nostrService.removeFromBlocklist(pubkey);
                   streamController.add(true);
                 },
               ),

@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:camelus/atoms/picture.dart';
 import 'package:camelus/helpers/search.dart';
+import 'package:camelus/providers/metadata_provider.dart';
 import 'package:camelus/providers/nostr_service_provider.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -282,6 +283,7 @@ class _WritePostState extends ConsumerState<WritePost> {
 
   @override
   Widget build(BuildContext context) {
+    var metadata = ref.watch(metadataProvider);
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -334,7 +336,7 @@ class _WritePostState extends ConsumerState<WritePost> {
                       children: [
                         // get metadata
                         FutureBuilder<Map>(
-                            future: _nostrService.getUserMetadata(
+                            future: metadata.getMetadataByPubkey(
                                 widget.context!.replyToTweet.pubkey),
                             builder: (BuildContext context,
                                 AsyncSnapshot<Map> snapshot) {

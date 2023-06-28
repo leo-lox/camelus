@@ -1,7 +1,9 @@
 import 'dart:convert';
 import 'dart:developer';
 
+import 'package:camelus/providers/metadata_provider.dart';
 import 'package:camelus/providers/nostr_service_provider.dart';
+import 'package:camelus/services/nostr/metadata/user_metadata.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:camelus/config/palette.dart';
@@ -18,6 +20,7 @@ class EditProfilePage extends ConsumerStatefulWidget {
 
 class _EditProfilePageState extends ConsumerState<EditProfilePage> {
   late NostrService _nostrService;
+  late UserMetadata _metadataService;
   // create text input controllers
   TextEditingController pictureController = TextEditingController(text: "");
   TextEditingController bannerController = TextEditingController(text: "");
@@ -34,15 +37,16 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
   bool loading = true;
 
   bool isKeysExpanded = false;
-  void _initNostrService() {
+  void _initServices() {
     _nostrService = ref.read(nostrServiceProvider);
+    _metadataService = ref.read(metadataProvider);
   }
 
   @override
   void initState() {
     super.initState();
 
-    _initNostrService();
+    _initServices();
     // get user public key
     pubkey = _nostrService.myKeys.publicKey;
 
@@ -80,7 +84,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
   }
 
   Future<void> _loadProfileValues() async {
-    var profileData = await _nostrService.getUserMetadata(pubkey);
+    var profileData = await _metadataService.getMetadataByPubkey(pubkey);
     setState(() {
       loading = false;
     });

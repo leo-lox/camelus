@@ -1,4 +1,6 @@
+import 'package:camelus/providers/metadata_provider.dart';
 import 'package:camelus/providers/nostr_service_provider.dart';
+import 'package:camelus/services/nostr/metadata/user_metadata.dart';
 import 'package:flutter/material.dart';
 import 'package:camelus/config/palette.dart';
 import 'package:camelus/helpers/helpers.dart';
@@ -99,6 +101,7 @@ class _FollowerPageState extends ConsumerState<FollowerPage> {
 
   @override
   Widget build(BuildContext context) {
+    var metadata = ref.watch(metadataProvider);
     return Scaffold(
       backgroundColor: Palette.background,
       appBar: AppBar(
@@ -117,7 +120,8 @@ class _FollowerPageState extends ConsumerState<FollowerPage> {
                     _myNewFollowing,
                     _myNewUnfollowing,
                     _updateUi,
-                    _nostrService);
+                    _nostrService,
+                    metadata);
               },
               childCount: widget.contacts.length,
             ),
@@ -128,8 +132,15 @@ class _FollowerPageState extends ConsumerState<FollowerPage> {
   }
 }
 
-Widget _profile(String pubkey, widget, List myFollowing, List myNewFollowing,
-    List myNewUnfollowing, Function updateUi, NostrService nostrService) {
+Widget _profile(
+    String pubkey,
+    widget,
+    List myFollowing,
+    List myNewFollowing,
+    List myNewUnfollowing,
+    Function updateUi,
+    NostrService nostrService,
+    UserMetadata metadata) {
   Future<String> checkNip05(String nip05, String pubkey) async {
     try {
       var check = await nostrService.checkNip05(nip05, pubkey);
@@ -143,7 +154,7 @@ Widget _profile(String pubkey, widget, List myFollowing, List myNewFollowing,
   }
 
   return FutureBuilder<Map>(
-      future: nostrService.getUserMetadata(pubkey),
+      future: metadata.getMetadataByPubkey(pubkey),
       builder: (BuildContext context, AsyncSnapshot<Map> snapshot) {
         String picture = "";
         String name = "";

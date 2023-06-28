@@ -5,6 +5,7 @@ import 'dart:developer';
 import 'package:camelus/atoms/spinner_center.dart';
 import 'package:camelus/models/socket_control.dart';
 import 'package:camelus/providers/key_pair_provider.dart';
+import 'package:camelus/providers/metadata_provider.dart';
 import 'package:camelus/providers/nostr_service_provider.dart';
 import 'package:camelus/routes/nostr/nostr_page/global_feed_view.dart';
 import 'package:camelus/routes/nostr/nostr_page/user_feed_and_replies_view.dart';
@@ -168,6 +169,7 @@ class _NostrPageState extends ConsumerState<NostrPage>
   Widget build(BuildContext context) {
     super.build(context);
     var nostrService = ref.watch(nostrServiceProvider);
+    var metadata = ref.watch(metadataProvider);
 
     return Scaffold(
       backgroundColor: Palette.background,
@@ -192,7 +194,7 @@ class _NostrPageState extends ConsumerState<NostrPage>
                       shape: BoxShape.circle,
                     ),
                     child: FutureBuilder<Map>(
-                        future: nostrService.getUserMetadata(widget.pubkey),
+                        future: metadata.getMetadataByPubkey(widget.pubkey),
                         builder: (BuildContext context,
                             AsyncSnapshot<Map> snapshot) {
                           var picture = "";
