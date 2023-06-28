@@ -43,8 +43,6 @@ class NostrService {
   // authors feed
   var authorsFeedObj = AuthorsFeed();
 
-  var userMetadataObj = UserMetadata();
-
   var userContactsObj = UserContacts();
 
   late JsonCache jsonCache;
@@ -61,7 +59,7 @@ class NostrService {
   // blocked users
   List<String> blockedUsers = [];
 
-  Map<String, dynamic> get usersMetadata => userMetadataObj.usersMetadata;
+  Map<String, dynamic> get usersMetadata => {};
   Map<String, List<List<dynamic>>> get following => userContactsObj.following;
 
   NostrService({required this.database, required this.keyPairWrapper}) {
@@ -246,11 +244,6 @@ class NostrService {
       eventMap = event[2]; //json.decode(event[2])
     } catch (e) {}
 
-    /// global metadata
-    if (eventMap["kind"] == 0) {
-      userMetadataObj.receiveNostrEvent(event, socketControl);
-    }
-
     /// global following / contacts
     if (eventMap["kind"] == 3) {
       userContactsObj.receiveNostrEvent(event, socketControl);
@@ -392,7 +385,7 @@ class NostrService {
 
   /// get user metadata from cache and if not available request it from network
   Future<Map> getUserMetadata(String pubkey) async {
-    return userMetadataObj.getMetadataByPubkey(pubkey);
+    return {};
   }
 
   /// get user metadata from cache and if not available request it from network

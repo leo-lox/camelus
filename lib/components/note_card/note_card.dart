@@ -8,6 +8,7 @@ import 'package:camelus/components/note_card/note_card_build_split_content.dart'
 import 'package:camelus/config/palette.dart';
 import 'package:camelus/helpers/helpers.dart';
 import 'package:camelus/models/nostr_note.dart';
+import 'package:camelus/providers/metadata_provider.dart';
 import 'package:camelus/providers/nostr_service_provider.dart';
 import 'package:camelus/services/nostr/nostr_service.dart';
 import 'package:flutter/material.dart';
@@ -57,7 +58,8 @@ class _NoteCardState extends ConsumerState<NoteCard> {
   Widget build(BuildContext context) {
     final myNostrService = ref.watch(nostrServiceProvider);
 
-    final myMetadata = myNostrService.getUserMetadata(widget.note.pubkey);
+    final myMetadata =
+        ref.watch(metadataProvider).getMetadataByPubkey(widget.note.pubkey);
 
     final splitContent = NoteCardSplitContent(
         widget.note, myNostrService, _openProfile, _splitContentStateUpdate);
