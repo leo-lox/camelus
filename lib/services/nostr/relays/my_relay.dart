@@ -5,6 +5,7 @@ import 'dart:developer';
 import 'package:camelus/db/database.dart';
 import 'package:camelus/models/nostr_note.dart';
 import 'package:camelus/models/nostr_request.dart';
+import 'package:camelus/models/nostr_request_event.dart';
 import 'package:camelus/models/nostr_request_query.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
@@ -28,6 +29,8 @@ class MyRelay {
 
   Stream<List> get eoseStream => _eoseStreamController.stream;
 
+  Map<String, Completer<String>> _completers = {};
+
   MyRelay({
     required this.database,
     required this.persistance,
@@ -36,6 +39,7 @@ class MyRelay {
     required this.write,
   });
 
+  /// connects to the relay and listens for events
   Future<void> connect() async {
     final wssUrl = Uri.parse(relayUrl);
     WebSocketChannel channel = WebSocketChannel.connect(wssUrl);
@@ -66,15 +70,38 @@ class MyRelay {
     });
   }
 
-  void request(NostrRequest request) {
+  /// sends a request to the relay
+  /// if request is a query, it returns the subscriptionId when the server sends EOSE
+  /// if request is an event, it returns the eventId when the server sends OK
+  Future<String> request(NostrRequest request) {
     var requestJson = request.toRawList();
     _write(_channel, requestJson);
+
+    return _buildCompleter(request);
+  }
+
+  Future<String> _buildCompleter(NostrRequest request) {
+    var completer = Completer<String>();
+
+    // returns EOSE with subscriptionId
+    if (request is NostrRequestQuery) {
+      _completers[request.subscriptionId] = completer;
+    }
+
+    // returns OK with event Id
+    if (request is NostrRequestEvent) {
+      _completers[request.body.id] = completer;
+    }
+
+    var future = completer.future.timeout(const Duration(seconds: 10));
+    return future;
   }
 
   _write(WebSocketChannel channel, dynamic data) {
     channel.sink.add(data);
   }
 
+  /// closes the websocket
   Future<void> close() {
     return _close(_channel);
   }
@@ -89,6 +116,9 @@ class MyRelay {
     if (eventJson[0] == 'OK') {
       //nip 20 used to notify clients if an EVENT was successful
       log("OK: ${eventJson[1]}");
+
+      // used for await on query
+      _completers[eventJson[1]]?.complete(eventJson[1]);
       return;
     }
 
@@ -105,17 +135,23 @@ class MyRelay {
     if (eventJson[0] == 'EOSE') {
       log("EOSE: ${eventJson[1]}, $relayUrl");
       _eoseStreamController.add(eventJson);
+      // used for await on query
+      _completers[eventJson[1]]?.complete(eventJson[1]);
       return;
     }
     if (eventJson[0] == 'AUTH') {
       log("AUTH: ${eventJson[1]}");
       // nip 42 used to send authentication challenges
+      return;
     }
 
     if (eventJson[0] == 'COUNT') {
       log("COUNT: ${eventJson[1]}");
       // nip 45 used to send requested event counts to clients
+      return;
     }
+
+    log("unknown event: $eventJson");
   }
 
   _insertNoteIntoDb(NostrNote note) {
