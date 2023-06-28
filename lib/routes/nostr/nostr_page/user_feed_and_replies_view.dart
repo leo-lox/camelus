@@ -11,6 +11,7 @@ import 'package:camelus/models/nostr_note.dart';
 import 'package:camelus/providers/database_provider.dart';
 import 'package:camelus/providers/following_provider.dart';
 import 'package:camelus/providers/navigation_bar_provider.dart';
+import 'package:camelus/providers/relay_provider.dart';
 import 'package:camelus/scroll_controller/retainable_scroll_controller.dart';
 import 'package:camelus/services/nostr/feeds/user_and_replies_feed.dart';
 import 'package:camelus/services/nostr/relays/relays.dart';
@@ -21,11 +22,9 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class UserFeedAndRepliesView extends ConsumerStatefulWidget {
   final String pubkey;
-  final Relays _relays;
 
-  UserFeedAndRepliesView({Key? key, required this.pubkey})
-      : _relays = RelaysInjector().relays,
-        super(key: key);
+  const UserFeedAndRepliesView({Key? key, required this.pubkey})
+      : super(key: key);
 
   @override
   UserFeedAndRepliesViewState createState() => UserFeedAndRepliesViewState();
@@ -177,8 +176,10 @@ class UserFeedAndRepliesViewState
     await _initDb();
     await _getFollowingPubkeys();
 
+    var relayCoordinator = ref.watch(relayServiceProvider);
+
     _userFeedAndRepliesFeed =
-        UserFeedAndRepliesFeed(db, _followingPubkeys, widget._relays);
+        UserFeedAndRepliesFeed(db, _followingPubkeys, relayCoordinator);
     await _userFeedAndRepliesFeed.feedRdy;
 
     _servicesReady.complete();

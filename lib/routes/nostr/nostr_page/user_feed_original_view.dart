@@ -13,16 +13,15 @@ import 'package:camelus/providers/navigation_bar_provider.dart';
 import 'package:camelus/providers/relay_provider.dart';
 import 'package:camelus/scroll_controller/retainable_scroll_controller.dart';
 import 'package:camelus/services/nostr/feeds/user_feed.dart';
-import 'package:camelus/services/nostr/metadata/following_pubkeys.dart';
-import 'package:camelus/services/nostr/relays/relays.dart';
-import 'package:camelus/services/nostr/relays/relays_injector.dart';
+
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class UserFeedOriginalView extends ConsumerStatefulWidget {
   final String pubkey;
 
-  UserFeedOriginalView({Key? key, required this.pubkey}) : super(key: key);
+  const UserFeedOriginalView({Key? key, required this.pubkey})
+      : super(key: key);
 
   @override
   ConsumerState<UserFeedOriginalView> createState() =>

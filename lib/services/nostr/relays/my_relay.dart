@@ -5,6 +5,7 @@ import 'dart:developer';
 import 'package:camelus/db/database.dart';
 import 'package:camelus/models/nostr_note.dart';
 import 'package:camelus/models/nostr_request.dart';
+import 'package:camelus/models/nostr_request_close.dart';
 import 'package:camelus/models/nostr_request_event.dart';
 import 'package:camelus/models/nostr_request_query.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
@@ -29,7 +30,7 @@ class MyRelay {
 
   Stream<List> get eoseStream => _eoseStreamController.stream;
 
-  Map<String, Completer<String>> _completers = {};
+  final Map<String, Completer<String>> _completers = {};
 
   MyRelay({
     required this.database,
@@ -85,6 +86,16 @@ class MyRelay {
 
     // returns EOSE with subscriptionId
     if (request is NostrRequestQuery) {
+      if (_completers.containsKey(request.subscriptionId)) {
+        try {
+          _completers[request.subscriptionId]?.complete("closed by new query");
+        } catch (e) {
+          // probably already completed
+        }
+        // delete completer
+        _completers.remove(request.subscriptionId);
+      }
+
       _completers[request.subscriptionId] = completer;
     }
 
@@ -93,7 +104,15 @@ class MyRelay {
       _completers[request.body.id] = completer;
     }
 
-    var future = completer.future.timeout(const Duration(seconds: 10));
+    if (request is NostrRequestClose) {
+      return Future.value("closed");
+    }
+
+    var future =
+        completer.future.timeout(const Duration(seconds: 10), onTimeout: () {
+      log("timeout: ${request.subscriptionId}");
+      return "timeout";
+    });
     return future;
   }
 

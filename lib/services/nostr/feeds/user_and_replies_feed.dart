@@ -5,12 +5,13 @@ import 'dart:developer';
 import 'package:camelus/db/database.dart';
 import 'package:camelus/db/entities/db_note_view.dart';
 import 'package:camelus/models/nostr_note.dart';
-import 'package:camelus/services/nostr/relays/relays.dart';
+import 'package:camelus/models/nostr_request_query.dart';
+import 'package:camelus/services/nostr/relays/relay_coordinator.dart';
 
 class UserFeedAndRepliesFeed {
   final AppDatabase _db;
   final List<String> _followingPubkeys;
-  final Relays _relays;
+  final RelayCoordinator _relays;
   final List<String> _requestIds = [];
 
   final List<StreamSubscription> _subscriptions = [];
@@ -177,35 +178,17 @@ class UserFeedAndRepliesFeed {
 
     const defaultLimit = 5;
 
-    var body1 = {
-      "authors": users,
-      "kinds": [1],
-      "limit": limit ?? defaultLimit,
-    };
+    var myBody = NostrRequestQueryBody(
+      hastagP: users,
+      kinds: [1],
+      limit: limit ?? defaultLimit,
+      since: since,
+      until: until,
+    );
 
-    // used to fetch comments on the posts
-    var body2 = {
-      "#p": users,
-      "kinds": [1],
-      "limit": limit ?? defaultLimit,
-    };
-    if (since != null) {
-      body1["since"] = since;
-      body2["since"] = since;
-    }
-    if (until != null) {
-      body1["until"] = until;
-      body2["until"] = until;
-    }
+    var myRequest = NostrRequestQuery(subscriptionId: reqId, body: myBody);
 
-    var data = [
-      "REQ",
-      reqId,
-      body1,
-      body2,
-    ];
-
-    _relays.requestEvents(data);
+    _relays.request(myRequest);
   }
 
   void _closeAllRelaySubscriptions() {
@@ -216,16 +199,7 @@ class UserFeedAndRepliesFeed {
   }
 
   void _closeRelaySubscription(String subId) {
-    var data = [
-      "CLOSE",
-      subId,
-    ];
-
-    var jsonString = json.encode(data);
-    for (var relay in _relays.connectedRelaysRead.entries) {
-      relay.value.socket.add(jsonString);
-      relay.value.requestInFlight[subId] = true;
-    }
+    _relays.closeSubscription(subId);
 
     _requestIds.remove(subId);
   }
