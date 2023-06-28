@@ -150,13 +150,12 @@ class NostrNote {
       if (tag.marker == "reply") {
         return tag;
       }
+    }
+    // off spec
+    if (getTagEvents.isNotEmpty) {
+      var reply = getTagEvents.last;
 
-      // off spec
-      if (tags.length > 2) {
-        var reply = getTagEvents.last;
-
-        return reply;
-      }
+      return reply;
     }
     return null;
   }

@@ -219,8 +219,9 @@ class _EventViewPageState extends ConsumerState<EventViewPage> {
         .toList();
 
     // get root level replies and build containers
-    List<NostrNote> rootLevelReplies =
-        workingList.where((element) => element.getDirectReply == null).toList();
+    List<NostrNote> rootLevelReplies = workingList.where((element) {
+      return element.getDirectReply?.value == rootNote.id;
+    }).toList();
 
     // remove root level replies from working list
     for (var element in rootLevelReplies) {
@@ -254,7 +255,7 @@ class _EventViewPageState extends ConsumerState<EventViewPage> {
 
     log("####unresolved notes: ${workingList.length}");
 
-    _tryToFetchUnresolvedNotes(workingList);
+    _tryToFetchUnresolvedNotes(workingList, rootNote);
 
     // add unresolved notes to root level replies with missing Note
 
@@ -273,7 +274,7 @@ class _EventViewPageState extends ConsumerState<EventViewPage> {
   }
 
   List<NostrNote> unresolvedNotesLoopWaiting = [];
-  _tryToFetchUnresolvedNotes(List<NostrNote> notes) async {
+  _tryToFetchUnresolvedNotes(List<NostrNote> notes, NostrNote rootNote) async {
     if (notes.isEmpty) return;
 
     if (!unresolvedNotesLoopWaiting.contains(notes.first) ||
@@ -284,7 +285,7 @@ class _EventViewPageState extends ConsumerState<EventViewPage> {
     if (unresolvedNotesLoop.isEmpty) {
       unresolvedNotesLoop.addAll(unresolvedNotesLoopWaiting);
       unresolvedNotesLoopWaiting.clear();
-      await _unresolvedLoop();
+      await _unresolvedLoop(rootNote);
       unresolvedNotesLoop.clear();
       return;
     }
@@ -293,12 +294,13 @@ class _EventViewPageState extends ConsumerState<EventViewPage> {
 
     await Future.delayed(const Duration(milliseconds: 500));
 
-    _tryToFetchUnresolvedNotes(notes);
+    _tryToFetchUnresolvedNotes(notes, rootNote);
   }
 
   List<NostrNote> unresolvedNotesLoop = [];
-  Future _unresolvedLoop() async {
+  Future _unresolvedLoop(NostrNote rootNote) async {
     List<String> myEventIds = [];
+    List<String> myAuthorPubkeys = [];
     List<String> myRelayCandidates = [];
 
     for (var note in unresolvedNotesLoop) {
@@ -307,6 +309,16 @@ class _EventViewPageState extends ConsumerState<EventViewPage> {
 
       var noteIdRoot = note.getRootReply?.value;
       var relayRootRelay = note.getRootReply?.recommended_relay;
+
+      List<String> authorPubkeys =
+          note.getTagPubkeys.map((e) => e.value).toList();
+
+      List<String> authorPubkeysRelays = [];
+      for (var tag in note.getTagPubkeys) {
+        if (tag.recommended_relay != null) {
+          authorPubkeysRelays.add(tag.recommended_relay!);
+        }
+      }
 
       log("noteIdReplyRelay: $relayReplyRelay, noteIdRootRelay: $relayRootRelay");
 
@@ -322,19 +334,32 @@ class _EventViewPageState extends ConsumerState<EventViewPage> {
       if (relayRootRelay != null) {
         myRelayCandidates.add(relayRootRelay);
       }
+      if (authorPubkeys.isNotEmpty) {
+        myAuthorPubkeys.addAll(authorPubkeys);
+      }
+      if (authorPubkeysRelays.isNotEmpty) {
+        myRelayCandidates.addAll(authorPubkeysRelays);
+      }
     }
 
-    if (myEventIds.isEmpty || myRelayCandidates.isEmpty) {
-      return;
+    if (myRelayCandidates.isEmpty) {
+      //return;
     }
+
+    // remove duplicates
+    myRelayCandidates = myRelayCandidates.toSet().toList();
+    myAuthorPubkeys = myAuthorPubkeys.toSet().toList();
+    myEventIds = myEventIds.toSet().toList();
 
     var result = await _eventFeed.requestRelayEventFeedFixedRelays(
-      eventIds: myEventIds,
-      relayCandidates: myRelayCandidates,
-      requestId: "efeed-tmp-unresolvedLoop",
-      timeout: const Duration(seconds: 1),
-      limit: 5,
-    );
+        pubkeys: myAuthorPubkeys,
+        eventIds: myEventIds,
+        relayCandidates: myRelayCandidates,
+        requestId: "efeed-tmp-unresolvedLoop",
+        timeout: const Duration(seconds: 1),
+        limit: 5,
+        until: rootNote.created_at // root note
+        );
     log("resultRelay: $result");
     _eventFeed.closeRelaySubscription("efeed-tmp-unresolvedLoop");
     return;
