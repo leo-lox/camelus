@@ -186,7 +186,7 @@ class UserFeed {
     );
     var myRequest = NostrRequestQuery(subscriptionId: reqId, body: myBody);
 
-    _relays.request(myRequest);
+    _relays.request(request: myRequest);
   }
 
   void _closeAllRelaySubscriptions() {

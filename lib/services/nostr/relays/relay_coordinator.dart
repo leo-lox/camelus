@@ -127,7 +127,10 @@ class RelayCoordinator {
     return converted;
   }
 
-  request(NostrRequestQuery request) async {
+  Future request({
+    required NostrRequestQuery request,
+    Duration timeout = const Duration(seconds: 10),
+  }) async {
     await _ready.future; // wait to be connected to at least one relay
 
     var subscription = _checkForAlreadyActiveSubscription(request);
@@ -143,18 +146,31 @@ class RelayCoordinator {
 
     var splitRequest = _splitRequestByRelays(request);
 
+    List<Future<String>> relayRequests = [];
     for (var relay in _relays) {
       if (splitRequest.containsKey(relay.relayUrl)) {
         var relayRequest = splitRequest[relay.relayUrl];
-        relay.request(relayRequest!);
+        var future = relay.request(relayRequest!);
+
+        relayRequests.add(future);
         // to listen to EOSE response
         subscription.addRelay(relay);
       }
     }
+    var combinedFuture = Future.wait(relayRequests).timeout(
+      timeout,
+      onTimeout: () {
+        return [];
+      },
+    );
+    return combinedFuture;
   }
 
-  requestFromRelays(
-      NostrRequestQuery request, List<String> relayCandidates) async {
+  Future requestFromRelays({
+    required NostrRequestQuery request,
+    required List<String> relayCandidates,
+    Duration timeout = const Duration(seconds: 2),
+  }) async {
     var subscription = _checkForAlreadyActiveSubscription(request);
 
     if (subscription == null) {
@@ -205,12 +221,22 @@ class RelayCoordinator {
 
     var combinedRelays = [...connectedRelays, ...myTmpRelays];
 
+    List<Future<String>> relayRequests = [];
     // send request to combined relays
     for (var relay in combinedRelays) {
-      relay.request(request);
+      var future = relay.request(request);
+      relayRequests.add(future);
       // to listen to EOSE response
       subscription.addRelay(relay);
     }
+
+    var combinedFuture = Future.wait(relayRequests).timeout(
+      timeout,
+      onTimeout: () {
+        return [];
+      },
+    );
+    return combinedFuture;
   }
 
   RelaySubscriptionHolder? _checkForAlreadyActiveSubscription(
