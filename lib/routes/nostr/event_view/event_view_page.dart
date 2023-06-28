@@ -253,7 +253,7 @@ class _EventViewPageState extends ConsumerState<EventViewPage> {
       workingList.removeWhere((e) => e.id == note.id);
     }
 
-    log("####unresolved notes: ${workingList.length}");
+    log("unresolved notes: ${workingList.length}");
 
     _tryToFetchUnresolvedNotes(workingList, rootNote);
 

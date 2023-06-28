@@ -166,6 +166,7 @@ class EventFeed {
     required List<String> relayCandidates,
     required Duration timeout,
     required List<String> eventIds,
+    required List<String> pubkeys,
     required String requestId,
     int? since,
     int? until,
@@ -174,6 +175,7 @@ class EventFeed {
     const defaultLimit = 5;
 
     var myBody = NostrRequestQueryBody(
+      authors: pubkeys,
       hastagE: eventIds,
       kinds: [1],
       limit: limit ?? defaultLimit,

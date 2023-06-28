@@ -150,7 +150,7 @@ class MyRelay {
       var note = NostrNote.fromJson(eventJson[2]);
 
       if (eventJson[1] == 'efeed-tmp-unresolvedLoop') {
-        log("WORKS: ${note.content}");
+        log("efeed-tmp-unresolvedLoop-WORKS: ${note.id}");
       }
 
       _insertNoteIntoDb(note);

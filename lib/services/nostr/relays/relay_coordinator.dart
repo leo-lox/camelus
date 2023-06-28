@@ -182,6 +182,8 @@ class RelayCoordinator {
       return;
     }
 
+    var allReadRelays = _relays.where((element) => element.read).toList();
+
     // create list of alrady connected relays that match with the relayCandidates
     var connectedRelays = _relays
         .where((element) => relayCandidates.contains(element.relayUrl))
