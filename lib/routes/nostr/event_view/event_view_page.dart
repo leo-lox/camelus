@@ -7,6 +7,7 @@ import 'package:camelus/config/palette.dart';
 import 'package:camelus/db/database.dart';
 import 'package:camelus/models/nostr_note.dart';
 import 'package:camelus/providers/database_provider.dart';
+import 'package:camelus/providers/relay_provider.dart';
 import 'package:camelus/scroll_controller/retainable_scroll_controller.dart';
 import 'package:camelus/services/nostr/feeds/event_feed.dart';
 import 'package:camelus/services/nostr/relays/relays.dart';
@@ -18,12 +19,11 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 class EventViewPage extends ConsumerStatefulWidget {
   final String _rootId;
   final String? _scrollIntoView;
-  final Relays _relays;
 
-  EventViewPage({Key? key, required String rootId, String? scrollIntoView})
+  const EventViewPage(
+      {Key? key, required String rootId, String? scrollIntoView})
       : _scrollIntoView = scrollIntoView,
         _rootId = rootId,
-        _relays = RelaysInjector().relays,
         super(key: key);
 
   @override
@@ -70,7 +70,9 @@ class _EventViewPageState extends ConsumerState<EventViewPage> {
   Future<void> _initSequence() async {
     await _initDb();
 
-    _eventFeed = EventFeed(db, widget._rootId, widget._relays);
+    var relayCoordinator = ref.watch(relayServiceProvider);
+
+    _eventFeed = EventFeed(db, widget._rootId, relayCoordinator);
     await _eventFeed.feedRdy;
     _servicesReady.complete();
 
@@ -250,7 +252,9 @@ class _EventViewPageState extends ConsumerState<EventViewPage> {
       workingList.removeWhere((e) => e.id == note.id);
     }
 
-    log("unresolved notes: ${workingList.length}");
+    log("####unresolved notes: ${workingList.length}");
+
+    _tryToFetchUnresolvedNotes(workingList);
 
     // add unresolved notes to root level replies with missing Note
 
@@ -266,5 +270,73 @@ class _EventViewPageState extends ConsumerState<EventViewPage> {
       ],
       otherContainers: rootLevelRepliesContainers,
     );
+  }
+
+  List<NostrNote> unresolvedNotesLoopWaiting = [];
+  _tryToFetchUnresolvedNotes(List<NostrNote> notes) async {
+    if (notes.isEmpty) return;
+
+    if (!unresolvedNotesLoopWaiting.contains(notes.first) ||
+        !unresolvedNotesLoop.contains(notes.first)) {
+      unresolvedNotesLoopWaiting.addAll(notes);
+    }
+
+    if (unresolvedNotesLoop.isEmpty) {
+      unresolvedNotesLoop.addAll(unresolvedNotesLoopWaiting);
+      unresolvedNotesLoopWaiting.clear();
+      await _unresolvedLoop();
+      unresolvedNotesLoop.clear();
+      return;
+    }
+
+    // if the loop is already running then it will be triggered again after the loop is done
+
+    await Future.delayed(const Duration(milliseconds: 500));
+
+    _tryToFetchUnresolvedNotes(notes);
+  }
+
+  List<NostrNote> unresolvedNotesLoop = [];
+  Future _unresolvedLoop() async {
+    List<String> myEventIds = [];
+    List<String> myRelayCandidates = [];
+
+    for (var note in unresolvedNotesLoop) {
+      var noteIdReply = note.getDirectReply?.value;
+      var relayReplyRelay = note.getDirectReply?.recommended_relay;
+
+      var noteIdRoot = note.getRootReply?.value;
+      var relayRootRelay = note.getRootReply?.recommended_relay;
+
+      log("noteIdReplyRelay: $relayReplyRelay, noteIdRootRelay: $relayRootRelay");
+
+      if (noteIdReply != null) {
+        myEventIds.add(noteIdReply);
+      }
+      if (noteIdRoot != null) {
+        myEventIds.add(noteIdRoot);
+      }
+      if (relayReplyRelay != null) {
+        myRelayCandidates.add(relayReplyRelay);
+      }
+      if (relayRootRelay != null) {
+        myRelayCandidates.add(relayRootRelay);
+      }
+    }
+
+    if (myEventIds.isEmpty || myRelayCandidates.isEmpty) {
+      return;
+    }
+
+    var result = await _eventFeed.requestRelayEventFeedFixedRelays(
+      eventIds: myEventIds,
+      relayCandidates: myRelayCandidates,
+      requestId: "efeed-tmp-unresolvedLoop",
+      timeout: const Duration(seconds: 1),
+      limit: 5,
+    );
+    log("resultRelay: $result");
+    _eventFeed.closeRelaySubscription("efeed-tmp-unresolvedLoop");
+    return;
   }
 }

@@ -67,7 +67,7 @@ class _NoteCardState extends ConsumerState<NoteCard> {
         height: 50,
         child: Center(
           child: Text(
-            "Missing note",
+            "Missing note:  ${widget.note.getDirectReply?.recommended_relay},  ${widget.note.getRootReply?.recommended_relay}",
             style: TextStyle(color: Colors.purple, fontSize: 20),
           ),
         ),

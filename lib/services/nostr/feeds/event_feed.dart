@@ -5,12 +5,13 @@ import 'dart:developer';
 import 'package:camelus/db/database.dart';
 import 'package:camelus/db/entities/db_note_view.dart';
 import 'package:camelus/models/nostr_note.dart';
-import 'package:camelus/services/nostr/relays/relays.dart';
+import 'package:camelus/models/nostr_request_query.dart';
+import 'package:camelus/services/nostr/relays/relay_coordinator.dart';
 
 class EventFeed {
   final AppDatabase _db;
   final String _rootNoteId;
-  final Relays _relays;
+  final RelayCoordinator _relays;
   final List<String> _requestIds = [];
 
   final List<StreamSubscription> _subscriptions = [];
@@ -148,46 +149,56 @@ class EventFeed {
 
     const defaultLimit = 5;
 
-    var body1 = {
-      "#e": eventIds,
-      "kinds": [1],
-      "limit": limit ?? defaultLimit,
-    };
+    var myBody = NostrRequestQueryBody(
+      hastagE: eventIds,
+      kinds: [1],
+      limit: limit ?? defaultLimit,
+      since: since,
+      until: until,
+    );
 
-    if (since != null) {
-      body1["since"] = since;
-    }
-    if (until != null) {
-      body1["until"] = until;
-    }
+    var myRequest = NostrRequestQuery(subscriptionId: reqId, body: myBody);
 
-    var data = [
-      "REQ",
-      reqId,
-      body1,
-    ];
+    _relays.request(request: myRequest);
+  }
 
-    _relays.requestEvents(data);
+  Future requestRelayEventFeedFixedRelays({
+    required List<String> relayCandidates,
+    required Duration timeout,
+    required List<String> eventIds,
+    required String requestId,
+    int? since,
+    int? until,
+    int? limit,
+  }) {
+    const defaultLimit = 5;
+
+    var myBody = NostrRequestQueryBody(
+      hastagE: eventIds,
+      kinds: [1],
+      limit: limit ?? defaultLimit,
+      since: since,
+      until: until,
+    );
+
+    var myRequest = NostrRequestQuery(subscriptionId: requestId, body: myBody);
+
+    return _relays.requestFromRelays(
+      request: myRequest,
+      relayCandidates: relayCandidates,
+      timeout: timeout,
+    );
   }
 
   void _closeAllRelaySubscriptions() {
     List<String> copy = List.from(_requestIds);
     for (var reqId in copy) {
-      _closeRelaySubscription(reqId);
+      closeRelaySubscription(reqId);
     }
   }
 
-  void _closeRelaySubscription(String subId) {
-    var data = [
-      "CLOSE",
-      subId,
-    ];
-
-    var jsonString = json.encode(data);
-    for (var relay in _relays.connectedRelaysRead.entries) {
-      relay.value.socket.add(jsonString);
-      relay.value.requestInFlight[subId] = true;
-    }
+  void closeRelaySubscription(String subId) {
+    _relays.closeSubscription(subId);
 
     _requestIds.remove(subId);
   }

@@ -178,6 +178,14 @@ class UserFeedAndRepliesFeed {
 
     const defaultLimit = 5;
 
+    var myBodyOriginal = NostrRequestQueryBody(
+      authors: users,
+      kinds: [1],
+      limit: limit ?? defaultLimit,
+      since: since,
+      until: until,
+    );
+
     var myBody = NostrRequestQueryBody(
       hastagP: users,
       kinds: [1],
@@ -186,7 +194,8 @@ class UserFeedAndRepliesFeed {
       until: until,
     );
 
-    var myRequest = NostrRequestQuery(subscriptionId: reqId, body: myBody);
+    var myRequest = NostrRequestQuery(
+        subscriptionId: reqId, body: myBody, body2: myBodyOriginal);
 
     _relays.request(request: myRequest);
   }

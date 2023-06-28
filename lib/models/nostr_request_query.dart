@@ -6,16 +6,22 @@ class NostrRequestQuery implements NostrRequest {
   @override
   final String subscriptionId;
   final NostrRequestQueryBody body;
+  final NostrRequestQueryBody? body2;
 
   NostrRequestQuery({
     required this.subscriptionId,
     required this.body,
+    this.body2,
   });
 
   @override
   String toRawList() {
-    List req = [type, subscriptionId, body.toMap()];
+    if (body2 != null) {
+      List req = [type, subscriptionId, body.toMap(), body2!.toMap()];
+      return jsonEncode(req);
+    }
 
+    List req = [type, subscriptionId, body.toMap()];
     return jsonEncode(req);
   }
 
