@@ -203,8 +203,6 @@ class _NostrPageState extends ConsumerState<NostrPage>
                           if (snapshot.hasData) {
                             picture =
                                 snapshot.data?["picture"] ?? defaultPicture;
-
-                            log("picture: $picture");
                           } else if (snapshot.hasError) {
                             picture = defaultPicture;
                           } else {

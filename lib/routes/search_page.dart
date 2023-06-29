@@ -110,8 +110,8 @@ class _SearchPageState extends ConsumerState<SearchPage> {
     var file = await DefaultCacheManager().getSingleFile(
       'https://api.nostr.band/v0/trending/profiles',
       key: 'trending_profiles_nostr_band',
-      // 30 min
-      headers: {'cache-control': 'max-age=1800, immutable'},
+      // 2 hours
+      headers: {'Cache-Control': 'max-age=7200'},
     );
     var result = await file.readAsString();
     if (result.isEmpty) {
@@ -127,8 +127,8 @@ class _SearchPageState extends ConsumerState<SearchPage> {
     var file = await DefaultCacheManager().getSingleFile(
       'https://api.nostr.band/nostr?method=trending&type=hashtags',
       key: 'trending_hashtags_nostr_band',
-      // 30 min
-      headers: {'cache-control': 'max-age=1800'},
+      // 2 hours min
+      headers: {'Cache-Control': 'max-age=7200'},
     );
     var result = await file.readAsString();
     if (result.isEmpty) {
