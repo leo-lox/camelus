@@ -20,7 +20,7 @@ Widget followButton({
           ),
         ),
         child: const Text(
-          'Unfollow',
+          'unfollow',
           style: TextStyle(
             color: Palette.white,
             fontSize: 16,
@@ -43,7 +43,7 @@ Widget followButton({
         ),
       ),
       child: const Text(
-        'Follow',
+        'follow',
         style: TextStyle(
           color: Palette.black,
           fontSize: 16,

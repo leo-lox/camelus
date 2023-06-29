@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:camelus/atoms/follow_button.dart';
 import 'package:camelus/atoms/my_profile_picture.dart';
 import 'package:camelus/config/palette.dart';
 import 'package:camelus/providers/nostr_service_provider.dart';
@@ -151,53 +152,11 @@ class PersonCard extends ConsumerWidget {
 
             const SizedBox(width: 16),
             //follow and unfollow button
-            if (!isFollowing)
-              Container(
-                margin: const EdgeInsets.only(top: 0, right: 10),
-                child: ElevatedButton(
-                  onPressed: () {
-                    log("follow button pressed");
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Palette.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
-                      side: const BorderSide(color: Palette.black, width: 1),
-                    ),
-                  ),
-                  child: const Text(
-                    'follow',
-                    style: TextStyle(
-                      color: Palette.black,
-                      fontSize: 16,
-                    ),
-                  ),
-                ),
-              ),
-
-            if (isFollowing)
-              Container(
-                margin: const EdgeInsets.only(top: 0, right: 10),
-                child: ElevatedButton(
-                  onPressed: () {
-                    log("unfollow button pressed");
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Palette.black,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
-                      side: const BorderSide(color: Palette.white, width: 1),
-                    ),
-                  ),
-                  child: const Text(
-                    'unfollow',
-                    style: TextStyle(
-                      color: Palette.white,
-                      fontSize: 16,
-                    ),
-                  ),
-                ),
-              ),
+            followButton(
+                isFollowing: isFollowing,
+                onPressed: () {
+                  log("follow button pressed");
+                }),
           ],
         ),
       ),

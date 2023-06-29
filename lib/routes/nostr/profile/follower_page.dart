@@ -1,3 +1,4 @@
+import 'package:camelus/atoms/follow_button.dart';
 import 'package:camelus/models/nostr_tag.dart';
 import 'package:camelus/providers/metadata_provider.dart';
 import 'package:camelus/providers/nostr_service_provider.dart';
@@ -279,57 +280,19 @@ Widget _profile(
 
               const SizedBox(width: 16),
               //follow and unfollow button
-              if (!myFollowing.contains(pubkey))
-                Container(
-                  margin: const EdgeInsets.only(top: 0, right: 10),
-                  child: ElevatedButton(
-                    onPressed: () {
+              followButton(
+                  isFollowing: myFollowing.contains(pubkey),
+                  onPressed: () {
+                    if (!myFollowing.contains(pubkey)) {
                       myFollowing.add(pubkey);
                       myNewFollowing.add(pubkey);
                       updateUi();
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Palette.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
-                        side: const BorderSide(color: Palette.black, width: 1),
-                      ),
-                    ),
-                    child: const Text(
-                      'follow',
-                      style: TextStyle(
-                        color: Palette.black,
-                        fontSize: 16,
-                      ),
-                    ),
-                  ),
-                ),
-
-              if (myFollowing.contains(pubkey))
-                Container(
-                  margin: const EdgeInsets.only(top: 0, right: 10),
-                  child: ElevatedButton(
-                    onPressed: () {
+                    } else {
                       myFollowing.remove(pubkey);
                       myNewUnfollowing.add(pubkey);
                       updateUi();
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Palette.black,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
-                        side: const BorderSide(color: Palette.white, width: 1),
-                      ),
-                    ),
-                    child: const Text(
-                      'unfollow',
-                      style: TextStyle(
-                        color: Palette.white,
-                        fontSize: 16,
-                      ),
-                    ),
-                  ),
-                ),
+                    }
+                  }),
             ],
           ),
         );
