@@ -7,12 +7,10 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 final relayServiceProvider = Provider<RelayCoordinator>((ref) {
   var db = ref.watch(databaseProvider.future);
   var keypair = ref.watch(keyPairProvider.future);
-  var following = ref.watch(followingProvider.future);
 
   var relayService = RelayCoordinator(
     dbFuture: db,
     keyPairFuture: keypair,
-    followingFuture: following,
   );
 
   return relayService;

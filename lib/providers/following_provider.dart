@@ -1,20 +1,17 @@
 import 'package:camelus/db/database.dart';
 import 'package:camelus/providers/database_provider.dart';
 import 'package:camelus/providers/key_pair_provider.dart';
+import 'package:camelus/providers/relay_provider.dart';
 import 'package:camelus/services/nostr/metadata/following_pubkeys.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-final followingProvider = FutureProvider<FollowingPubkeys>((ref) async {
-  final futureKeyPair = ref.watch(keyPairProvider.future);
-  final futureDb = ref.watch(databaseProvider.future);
-
-  final futures = await Future.wait([futureKeyPair, futureDb]);
-
-  final KeyPairWrapper keyPair = futures[0] as KeyPairWrapper;
-  final AppDatabase db = futures[1] as AppDatabase;
+var followingProvider = Provider<FollowingPubkeys>((ref) {
+  final keyPair = ref.watch(keyPairProvider.future);
+  final db = ref.watch(databaseProvider.future);
+  final relays = ref.watch(relayServiceProvider);
 
   final followingPubkeys =
-      FollowingPubkeys(pubkey: keyPair.keyPair!.publicKey, db: db);
+      FollowingPubkeys(keyPair: keyPair, db: db, relays: relays);
 
   return followingPubkeys;
 });

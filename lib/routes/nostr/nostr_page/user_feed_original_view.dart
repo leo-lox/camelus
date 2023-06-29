@@ -155,7 +155,7 @@ class _UserFeedOriginalViewState extends ConsumerState<UserFeedOriginalView> {
   }
 
   Future<void> _getFollowingPubkeys() async {
-    var followingP = await ref.read(followingProvider.future);
+    var followingP = ref.read(followingProvider);
     await followingP.servicesReady;
 
     _followingPubkeys = followingP.ownContacts.map((e) => e.value).toList();

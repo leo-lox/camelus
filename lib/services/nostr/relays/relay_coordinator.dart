@@ -6,6 +6,7 @@ import 'package:camelus/db/database.dart';
 import 'package:camelus/helpers/bip340.dart';
 import 'package:camelus/models/nostr_note.dart';
 import 'package:camelus/models/nostr_request_query.dart';
+import 'package:camelus/models/nostr_tag.dart';
 import 'package:camelus/providers/key_pair_provider.dart';
 import 'package:camelus/services/nostr/metadata/following_pubkeys.dart';
 import 'package:camelus/services/nostr/relays/my_relay.dart';
@@ -17,10 +18,9 @@ class RelayCoordinator {
   final _maxTmpRelayCount = 5; // move magic number to settings
   final Future<AppDatabase> dbFuture;
   final Future<KeyPairWrapper> keyPairFuture;
-  final Future<FollowingPubkeys> followingFuture;
+
   late AppDatabase _db;
   late KeyPair _keyPair;
-  late FollowingPubkeys _following;
 
   List<RelaySubscriptionHolder> _activeSubscriptions = [];
   List<MyRelay> _relays = [];
@@ -28,10 +28,12 @@ class RelayCoordinator {
 
   final Completer _ready = Completer();
 
+  final List<NostrTag> _ownContacts = [];
+  int _fetchLatestContactListAt = 0;
+
   RelayCoordinator({
     required this.dbFuture,
     required this.keyPairFuture,
-    required this.followingFuture,
   }) {
     _init();
   }
@@ -39,12 +41,36 @@ class RelayCoordinator {
   _init() async {
     _db = await dbFuture;
     _keyPair = (await keyPairFuture).keyPair!;
-    _following = await followingFuture;
-    await _following.servicesReady;
+
+    await _initStreamOwnContacts(_keyPair.publicKey);
 
     await _initConnectSequence();
 
     _ready.complete();
+  }
+
+  // following provider cant be used because circular dependency
+  Future _initStreamOwnContacts(String myPubkey) async {
+    _db.noteDao.findPubkeyNotesByKindStream([myPubkey], 3).listen((dbList) {
+      if (dbList.isEmpty) {
+        //_contactsController.add([]);
+        return;
+      }
+
+      var kind3 = dbList.first.toNostrNote();
+      // got something older than latest event
+      if (_fetchLatestContactListAt != 0 &&
+          kind3.created_at <= _fetchLatestContactListAt) {
+        return;
+      }
+
+      _fetchLatestContactListAt = kind3.created_at;
+
+      var newContacts = kind3.getTagPubkeys;
+
+      _ownContacts.clear();
+      _ownContacts.addAll(newContacts);
+    });
   }
 
   Future<void> _initConnectSequence() async {
@@ -62,8 +88,7 @@ class RelayCoordinator {
       );
     }
 
-    List<String> followingPubkeys =
-        _following.ownContacts.map((e) => e.value).toList();
+    List<String> followingPubkeys = _ownContacts.map((e) => e.value).toList();
 
     var selectedGossipRelays = await _findInitalGossipRelays(followingPubkeys);
     //remove potential duplicates

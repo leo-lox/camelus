@@ -5,9 +5,7 @@ import 'package:camelus/db/database.dart';
 import 'package:camelus/helpers/helpers.dart';
 import 'package:camelus/models/nostr_note.dart';
 import 'package:camelus/models/nostr_request_query.dart';
-import 'package:camelus/models/socket_control.dart';
 import 'package:camelus/services/nostr/relays/relay_coordinator.dart';
-import 'package:camelus/services/nostr/relays/relays_injector.dart';
 import 'package:cross_local_storage/cross_local_storage.dart';
 import 'package:json_cache/json_cache.dart';
 
