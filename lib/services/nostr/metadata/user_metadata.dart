@@ -34,6 +34,8 @@ class UserMetadata {
   var _metadataWaitingPoolTimerRunning = false;
   Map<String, Completer<Map>> _metadataFutureHolder = {};
 
+  Completer _serviceRdy = Completer();
+
   UserMetadata({
     required this.relays,
     required this.dbFuture,
@@ -47,6 +49,7 @@ class UserMetadata {
     _restoreCache().then((_) => {_removeOldData()});
     _db = await dbFuture;
     _initDb();
+    _serviceRdy.complete();
   }
 
   _initDb() {
@@ -84,6 +87,7 @@ class UserMetadata {
   }
 
   Future<Map> getMetadataByPubkey(String pubkey, {bool force = false}) async {
+    await _serviceRdy.future;
     var now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
     if (pubkey.isEmpty) {
       return Future(() => {});

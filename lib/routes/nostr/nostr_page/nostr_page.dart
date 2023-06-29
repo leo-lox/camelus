@@ -198,20 +198,25 @@ class _NostrPageState extends ConsumerState<NostrPage>
                         builder: (BuildContext context,
                             AsyncSnapshot<Map> snapshot) {
                           var picture = "";
-
+                          var defaultPicture =
+                              "https://avatars.dicebear.com/api/personas/${widget.pubkey}.svg";
                           if (snapshot.hasData) {
-                            picture = snapshot.data?["picture"] ??
-                                "https://avatars.dicebear.com/api/personas/${widget.pubkey}.svg";
-                          } else if (snapshot.hasError) {
                             picture =
-                                "https://avatars.dicebear.com/api/personas/${widget.pubkey}.svg";
+                                snapshot.data?["picture"] ?? defaultPicture;
+
+                            log("picture: $picture");
+                          } else if (snapshot.hasError) {
+                            picture = defaultPicture;
                           } else {
                             // loading
-                            picture =
-                                "https://avatars.dicebear.com/api/personas/${widget.pubkey}.svg";
+                            picture = defaultPicture;
                           }
+
                           return myProfilePicture(
-                              pictureUrl: picture, pubkey: widget.pubkey);
+                            pictureUrl: picture,
+                            pubkey: widget.pubkey,
+                            filterQuality: FilterQuality.medium,
+                          );
                         }),
                   ),
                 ),

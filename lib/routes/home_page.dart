@@ -83,7 +83,7 @@ class _HomePageState extends ConsumerState<HomePage> {
 
     return Scaffold(
       key: _scaffoldKey,
-      drawer: NostrDrawer(),
+      drawer: NostrDrawer(pubkey: widget.pubkey),
       backgroundColor: Palette.background,
       floatingActionButton: AnimatedOpacity(
         opacity: (_selectedIndex != 0) ? 0.0 : 1.0,

@@ -1,27 +1,23 @@
 import 'package:camelus/helpers/nprofile_helper.dart';
 import 'package:camelus/providers/metadata_provider.dart';
-import 'package:camelus/providers/nostr_service_provider.dart';
 import 'package:camelus/services/nostr/metadata/user_metadata.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:camelus/atoms/my_profile_picture.dart';
 import 'package:camelus/config/palette.dart';
-import 'package:camelus/services/nostr/nostr_injector.dart';
-import 'package:camelus/services/nostr/nostr_service.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
 class NostrDrawer extends ConsumerWidget {
-  late NostrService _nostrService;
+  final String pubkey;
 
   //late NostrService _nostrService;
 
-  NostrDrawer({Key? key}) : super(key: key);
+  NostrDrawer({Key? key, required this.pubkey}) : super(key: key);
 
   void navigateToProfile(BuildContext context) {
-    Navigator.pushNamed(context, "/nostr/profile",
-        arguments: _nostrService.myKeys.publicKey);
+    Navigator.pushNamed(context, "/nostr/profile", arguments: pubkey);
   }
 
   void _copyToClipboard(BuildContext context, String text) {
@@ -32,8 +28,8 @@ class NostrDrawer extends ConsumerWidget {
   }
 
   void openQrShareDialog(BuildContext context) async {
-    String nprofile = await NprofileHelper().getNprofile(
-        _nostrService.myKeys.publicKey, []); //todo: get recommended relays
+    String nprofile = await NprofileHelper()
+        .getNprofile(pubkey, []); //todo: get recommended relays
 
     showDialog(
         context: context,
@@ -101,26 +97,25 @@ class NostrDrawer extends ConsumerWidget {
                   shape: BoxShape.circle,
                 ),
                 child: FutureBuilder<Map>(
-                    future: metadata
-                        .getMetadataByPubkey(_nostrService.myKeys.publicKey),
+                    future: metadata.getMetadataByPubkey(pubkey),
                     builder:
                         (BuildContext context, AsyncSnapshot<Map> snapshot) {
                       var picture = "";
 
                       if (snapshot.hasData) {
                         picture = snapshot.data?["picture"] ??
-                            "https://avatars.dicebear.com/api/personas/${_nostrService.myKeys.publicKey}.svg";
+                            "https://avatars.dicebear.com/api/personas/${pubkey}.svg";
                       } else if (snapshot.hasError) {
                         picture =
-                            "https://avatars.dicebear.com/api/personas/${_nostrService.myKeys.publicKey}.svg";
+                            "https://avatars.dicebear.com/api/personas/${pubkey}.svg";
                       } else {
                         // loading
                         picture =
-                            "https://avatars.dicebear.com/api/personas/${_nostrService.myKeys.publicKey}.svg";
+                            "https://avatars.dicebear.com/api/personas/${pubkey}.svg";
                       }
                       return myProfilePicture(
                           pictureUrl: picture,
-                          pubkey: _nostrService.myKeys.publicKey,
+                          pubkey: pubkey,
                           filterQuality: FilterQuality.medium);
                     }),
               ),
@@ -139,8 +134,7 @@ class NostrDrawer extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     FutureBuilder<Map>(
-                        future: metadata.getMetadataByPubkey(
-                            _nostrService.myKeys.publicKey),
+                        future: metadata.getMetadataByPubkey(pubkey),
                         builder: (BuildContext context,
                             AsyncSnapshot<Map> snapshot) {
                           var name = "";
@@ -267,14 +261,8 @@ class NostrDrawer extends ConsumerWidget {
     );
   }
 
-  void _initNostrService(ref) async {
-    _nostrService = await ref.read(nostrServiceProvider);
-  }
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    _initNostrService(ref);
-
     var metadata = ref.watch(metadataProvider);
 
     return Drawer(
