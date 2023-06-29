@@ -30,7 +30,7 @@ import 'package:photo_view/photo_view.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class ProfilePage extends ConsumerStatefulWidget {
-  String pubkey;
+  final String pubkey;
   late String nProfile;
   late String nProfileHr;
   late String pubkeyBech32;

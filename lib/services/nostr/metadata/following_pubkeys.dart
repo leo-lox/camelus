@@ -165,6 +165,7 @@ class FollowingPubkeys {
     var body = NostrRequestQueryBody(kinds: [3], authors: pubkeys);
     var request = NostrRequestQuery(subscriptionId: requestId, body: body);
     await relays.request(request: request);
+    relays.closeSubscription(requestId);
     return;
   }
 }
