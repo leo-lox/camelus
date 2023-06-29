@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:developer';
 
 import 'package:camelus/atoms/back_button_round.dart';
+import 'package:camelus/atoms/follow_button.dart';
 import 'package:camelus/atoms/long_button.dart';
 import 'package:camelus/helpers/nprofile_helper.dart';
 import 'package:camelus/models/nostr_tag.dart';
@@ -60,6 +61,8 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
     with TickerProviderStateMixin, TraceableClientMixin {
   late NostrService _nostrService;
   late ScrollController _scrollController;
+
+  List<StreamSubscription> _subscriptions = [];
 
   @override
   String get traceTitle => "profilePage";
@@ -266,10 +269,14 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
   void dispose() {
     _scrollController.dispose();
 
-    // cancel subscription
-    _nostrService.closeSubscription("authors-$requestId");
-
+    _closeSubscriptions();
     super.dispose();
+  }
+
+  _closeSubscriptions() {
+    for (var sub in _subscriptions) {
+      sub.cancel();
+    }
   }
 
   @override
@@ -320,7 +327,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                 delegate: SliverChildListDelegate(
                   [
                     const SizedBox(height: 10),
-                    _actionRow(metadata, context),
+                    _actionRow(followingService, metadata, context),
 
                     // move up the profile info by 110
                     _profileInformation(metadata),
@@ -633,7 +640,8 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
     );
   }
 
-  Row _actionRow(UserMetadata metadata, BuildContext context) {
+  Row _actionRow(FollowingPubkeys followingService, UserMetadata metadata,
+      BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
@@ -703,56 +711,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
 
         // follow button black with white border
 
-        if (widget.pubkey != _nostrService.myKeys.publicKey &&
-            false) //!_iamFollowing)
-          Container(
-            margin: const EdgeInsets.only(top: 0, right: 10),
-            child: ElevatedButton(
-              onPressed: () {
-                _follow();
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Palette.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
-                  side: const BorderSide(color: Palette.black, width: 1),
-                ),
-              ),
-              child: const Text(
-                'Follow',
-                style: TextStyle(
-                  color: Palette.black,
-                  fontSize: 16,
-                ),
-              ),
-            ),
-          ),
-
-        // unfollow button white with black border
-        if (widget.pubkey != _nostrService.myKeys.publicKey &&
-            true) //_iamFollowing)
-          Container(
-            margin: const EdgeInsets.only(top: 0, right: 10),
-            child: ElevatedButton(
-              onPressed: () {
-                _unfollow();
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Palette.black,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
-                  side: const BorderSide(color: Palette.white, width: 1),
-                ),
-              ),
-              child: const Text(
-                'Unfollow',
-                style: TextStyle(
-                  color: Palette.white,
-                  fontSize: 16,
-                ),
-              ),
-            ),
-          ),
+        _followButton(followingService),
 
         // edit button
         if (widget.pubkey == _nostrService.myKeys.publicKey)
@@ -790,6 +749,24 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
           ),
       ],
     );
+  }
+
+  Widget _followButton(FollowingPubkeys followingService) {
+    return StreamBuilder<List<NostrTag>>(
+        stream: followingService.ownPubkeyContactsStreamDb,
+        initialData: followingService.ownContacts,
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            var followingList = snapshot.data!.map((e) => e.value).toList();
+
+            if (followingList.contains(widget.pubkey)) {
+              return followButton(isFollowing: true, onPressed: _unfollow);
+            } else {
+              return followButton(isFollowing: false, onPressed: _follow);
+            }
+          }
+          return Container();
+        });
   }
 
   FlexibleSpaceBar _bannerImage() {
