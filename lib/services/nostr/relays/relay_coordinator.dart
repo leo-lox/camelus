@@ -183,6 +183,7 @@ class RelayCoordinator {
         subscription.addRelay(relay);
       }
     }
+
     var combinedFuture = Future.wait(relayRequests).timeout(
       timeout,
       onTimeout: () {

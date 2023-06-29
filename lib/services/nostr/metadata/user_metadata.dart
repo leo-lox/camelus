@@ -185,7 +185,7 @@ class UserMetadata {
       limit: users.length,
     );
     var request = NostrRequestQuery(subscriptionId: requestId, body: body);
-    await relays.request(request: request);
+    await relays.request(request: request, timeout: const Duration(seconds: 2));
     return;
   }
 
