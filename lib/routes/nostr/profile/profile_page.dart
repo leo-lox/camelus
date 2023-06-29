@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:developer';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:camelus/atoms/back_button_round.dart';
 import 'package:camelus/atoms/follow_button.dart';
 import 'package:camelus/atoms/long_button.dart';
@@ -16,10 +17,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:camelus/atoms/my_profile_picture.dart';
-import 'package:camelus/components/tweet_card.dart';
 import 'package:camelus/config/palette.dart';
 import 'package:camelus/helpers/helpers.dart';
-import 'package:camelus/models/tweet.dart';
 import 'package:camelus/routes/nostr/profile/edit_profile_page.dart';
 import 'package:camelus/routes/nostr/profile/edit_relays_page.dart';
 import 'package:camelus/routes/nostr/profile/follower_page.dart';
@@ -296,7 +295,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                 //toolbarHeight: 10,
                 backgroundColor: Palette.background,
                 pinned: true,
-                flexibleSpace: _bannerImage(),
+                flexibleSpace: _bannerImage(metadata),
 
                 actions: [
                   PopupMenuButton<String>(
@@ -711,7 +710,8 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
 
         // follow button black with white border
 
-        _followButton(followingService),
+        if (widget.pubkey != _nostrService.myKeys.publicKey)
+          _followButton(followingService),
 
         // edit button
         if (widget.pubkey == _nostrService.myKeys.publicKey)
@@ -769,17 +769,41 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
         });
   }
 
-  FlexibleSpaceBar _bannerImage() {
+  FlexibleSpaceBar _bannerImage(UserMetadata metadata) {
     return FlexibleSpaceBar(
-        background: false
-            ? Image.network(
-                "bannerUrl",
-                fit: BoxFit.cover,
-              )
-            : Image.asset(
-                'assets/images/default_header.jpg',
-                fit: BoxFit.cover,
-              ));
+        background: FutureBuilder<Map<dynamic, dynamic>>(
+      future: metadata.getMetadataByPubkey(widget.pubkey),
+      builder: (context, snapshot) {
+        if (snapshot.hasData && snapshot.data?["banner"] != null) {
+          return CachedNetworkImage(
+            imageUrl: snapshot.data?["banner"],
+            filterQuality: FilterQuality.high,
+            progressIndicatorBuilder: (context, url, downloadProgress) =>
+                // progress indicator with download progress
+                Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                LinearProgressIndicator(
+                  minHeight: 2,
+                  value: downloadProgress.progress,
+                  color: Palette.lightGray,
+                ),
+              ],
+            ),
+            errorWidget: (context, url, error) => const Icon(Icons.error),
+            memCacheWidth: 800,
+            maxHeightDiskCache: 800,
+            maxWidthDiskCache: 800,
+            alignment: Alignment.center,
+            fit: BoxFit.cover,
+          );
+        }
+        return Image.asset(
+          'assets/images/default_header.jpg',
+          fit: BoxFit.cover,
+        );
+      },
+    ));
   }
 }
 
