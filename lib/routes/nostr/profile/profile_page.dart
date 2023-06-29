@@ -1,11 +1,15 @@
 import 'dart:async';
 import 'dart:developer';
 
+import 'package:camelus/atoms/back_button_round.dart';
 import 'package:camelus/atoms/long_button.dart';
 import 'package:camelus/helpers/nprofile_helper.dart';
+import 'package:camelus/models/nostr_tag.dart';
+import 'package:camelus/providers/following_provider.dart';
 import 'package:camelus/providers/metadata_provider.dart';
 import 'package:camelus/providers/nostr_service_provider.dart';
 import 'package:camelus/routes/nostr/nostr_page/perspective_feed_page.dart';
+import 'package:camelus/services/nostr/metadata/following_pubkeys.dart';
 import 'package:camelus/services/nostr/metadata/user_metadata.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -63,19 +67,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
   String nip05verified = "";
   String requestId = Helpers().getRandomString(14);
 
-  List<Tweet> _myTweets = [];
-
   late StreamSubscription _nostrStream;
-
-  bool loadTweetsLock = false;
-
-  List<List> _myFollowing = [];
-  bool _iamFollowing = false;
-  bool _followTouched = false;
-
-  String bannerUrl = "";
-
-  var repliedToTmp = [];
 
   void _checkNip05(String nip05, String pubkey) async {
     if (nip05.isEmpty) return;
@@ -92,56 +84,16 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
     } catch (e) {}
   }
 
-  void checkIamFollowing() {
-    _myFollowing =
-        _nostrService.following[_nostrService.myKeys.publicKey] ?? [];
-    for (var i = 0; i < _myFollowing.length; i++) {
-      if (_myFollowing[i][1] == widget.pubkey) {
-        setState(() {
-          _iamFollowing = true;
-        });
-      }
-    }
-  }
-
   void _follow() async {
-    _followTouched = true;
-    setState(() {
-      _iamFollowing = true;
-    });
-    // edit _myFollowing
-    _myFollowing.add(["p", widget.pubkey]);
-    _saveFollowing();
+    log("following ${widget.pubkey}");
   }
 
   void _unfollow() async {
-    _followTouched = true;
-    setState(() {
-      _iamFollowing = false;
-    });
-    _myFollowing.removeWhere((element) => element[1] == widget.pubkey);
-    _saveFollowing();
-  }
-
-  void _saveFollowing() async {
-    if (!_followTouched) return;
-    _nostrService.following[_nostrService.myKeys.publicKey] = _myFollowing;
-    await _nostrService.writeEvent("", 3, _myFollowing);
+    log("unfollowing ${widget.pubkey}");
   }
 
   Future<void> _copyToClipboard(String data) async {
     await Clipboard.setData(ClipboardData(text: data));
-  }
-
-  _getBannerImage(UserMetadata userMetadata) async {
-    var metadata = await userMetadata.getMetadataByPubkey(widget.pubkey);
-    if (metadata["banner"] == null) return null;
-
-    setState(() {
-      bannerUrl = metadata["banner"];
-    });
-
-    return metadata["banner"];
   }
 
   _blockUser() async {
@@ -301,40 +253,15 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
 
     int now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
 
-    // listen to nostr service
-    _nostrStream = _nostrService.authorsFeedObj.authorsStream.listen((event) {
-      setState(() {
-        _myTweets = event[widget.pubkey] ?? [];
-      });
-
-      // todo make this better
-      Future.delayed(const Duration(seconds: 5), () {
-        loadTweetsLock = false;
-      });
-    });
-
-    // subscribe to user's tweets
-    _nostrService.requestAuthors(
-        authors: [widget.pubkey], requestId: requestId, limit: 10, until: now);
-
     _scrollController = ScrollController();
     _scrollController.addListener(() {
       setState(() {});
       if (_scrollController.position.pixels >=
           _scrollController.position.maxScrollExtent - 100) {
-        if (loadTweetsLock) return;
-        loadTweetsLock = true;
         // load more tweets
         log("load more tweets");
-        _nostrService.requestAuthors(
-            authors: [widget.pubkey],
-            requestId: requestId,
-            limit: 10,
-            until: _myTweets.last.tweetedAt);
       }
     });
-
-    checkIamFollowing();
   }
 
   @override
@@ -352,6 +279,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
   @override
   Widget build(BuildContext context) {
     var metadata = ref.watch(metadataProvider);
+    var followingService = ref.watch(followingProvider);
 
     return Scaffold(
       backgroundColor: Palette.background,
@@ -365,16 +293,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                 //toolbarHeight: 10,
                 backgroundColor: Palette.background,
                 pinned: true,
-                flexibleSpace: FlexibleSpaceBar(
-                    background: bannerUrl.isNotEmpty
-                        ? Image.network(
-                            bannerUrl,
-                            fit: BoxFit.cover,
-                          )
-                        : Image.asset(
-                            'assets/images/default_header.jpg',
-                            fit: BoxFit.cover,
-                          )),
+                flexibleSpace: _bannerImage(),
 
                 actions: [
                   PopupMenuButton<String>(
@@ -395,29 +314,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                   ),
                 ],
                 // rounded back button
-                leading: Container(
-                  margin: const EdgeInsets.all(0),
-                  padding: const EdgeInsets.only(top: 10, right: 0, left: 0),
-                  child: ButtonTheme(
-                    minWidth: 10,
-                    height: 1,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.black54,
-                        padding: const EdgeInsets.all(0),
-                        shape: const CircleBorder(),
-                      ),
-                      child: const Icon(
-                        Icons.arrow_back,
-                        color: Palette.white,
-                        size: 20,
-                      ),
-                    ),
-                  ),
-                ),
+                leading: const BackButtonRound(),
                 bottom: PreferredSize(
                   preferredSize: const Size.fromHeight(0),
                   child: Container(),
@@ -427,438 +324,20 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                 delegate: SliverChildListDelegate(
                   [
                     const SizedBox(height: 10),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        if (widget.pubkey != _nostrService.myKeys.publicKey)
-                          SizedBox(
-                            width: 35,
-                            height: 35,
-                            child: ElevatedButton(
-                              onPressed: () {
-                                _launchPerspectiveFeed(widget.pubkey);
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Palette.background,
-                                padding: const EdgeInsets.all(0),
-                                enableFeedback: true,
-                                shape: const CircleBorder(
-                                    side: BorderSide(
-                                        color: Palette.white, width: 1)),
-                              ),
-                              child: SvgPicture.asset(
-                                "assets/icons/eye.svg",
-                                height: 25,
-                                color: Palette.white,
-                              ),
-                            ),
-                          ),
-
-                        // round message button with icon and white border
-                        FutureBuilder<Map>(
-                            future: metadata.getMetadataByPubkey(widget.pubkey),
-                            builder: (BuildContext context,
-                                AsyncSnapshot<Map> snapshot) {
-                              String lud06 = "";
-                              String lud16 = "";
-
-                              if (snapshot.hasData) {
-                                lud06 = snapshot.data?["lud06"] ?? "";
-                                lud16 = snapshot.data?["lud16"] ?? "";
-                              }
-
-                              if (lud06.isNotEmpty || lud16.isNotEmpty) {
-                                return Container(
-                                  margin: const EdgeInsets.only(
-                                      top: 0, right: 0, left: 0),
-                                  child: ElevatedButton(
-                                    onPressed: () {
-                                      if (lud06.isNotEmpty) {
-                                        _openLightningAddress(lud06);
-                                      } else if (lud16.isNotEmpty) {
-                                        _openLightningAddress(lud16);
-                                      }
-                                    },
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: Palette.background,
-                                      padding: const EdgeInsets.all(0),
-                                      shape: const CircleBorder(
-                                          side: BorderSide(
-                                              color: Palette.white, width: 1)),
-                                    ),
-                                    child: SvgPicture.asset(
-                                      "assets/icons/lightning-fill.svg",
-                                      height: 25,
-                                      color: Palette.white,
-                                    ),
-                                  ),
-                                );
-                              } else {
-                                return Container();
-                              }
-                            }),
-
-                        // follow button black with white border
-
-                        if (widget.pubkey != _nostrService.myKeys.publicKey &&
-                            !_iamFollowing)
-                          Container(
-                            margin: const EdgeInsets.only(top: 0, right: 10),
-                            child: ElevatedButton(
-                              onPressed: () {
-                                _follow();
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Palette.white,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(20),
-                                  side: const BorderSide(
-                                      color: Palette.black, width: 1),
-                                ),
-                              ),
-                              child: const Text(
-                                'Follow',
-                                style: TextStyle(
-                                  color: Palette.black,
-                                  fontSize: 16,
-                                ),
-                              ),
-                            ),
-                          ),
-
-                        // unfollow button white with black border
-                        if (widget.pubkey != _nostrService.myKeys.publicKey &&
-                            _iamFollowing)
-                          Container(
-                            margin: const EdgeInsets.only(top: 0, right: 10),
-                            child: ElevatedButton(
-                              onPressed: () {
-                                _unfollow();
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Palette.black,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(20),
-                                  side: const BorderSide(
-                                      color: Palette.white, width: 1),
-                                ),
-                              ),
-                              child: const Text(
-                                'Unfollow',
-                                style: TextStyle(
-                                  color: Palette.white,
-                                  fontSize: 16,
-                                ),
-                              ),
-                            ),
-                          ),
-
-                        // edit button
-                        if (widget.pubkey == _nostrService.myKeys.publicKey)
-                          Container(
-                            margin: const EdgeInsets.only(top: 0, right: 10),
-                            child: ElevatedButton(
-                              onPressed: () {
-                                _saveFollowing();
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => EditProfilePage(),
-                                  ),
-                                ).then((value) => {
-                                      metadata
-                                          .getMetadataByPubkey(widget.pubkey),
-                                      _getBannerImage(metadata),
-                                      setState(() {
-                                        // refresh
-                                      })
-                                    });
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Palette.background,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(20),
-                                  side: const BorderSide(
-                                      color: Palette.white, width: 1),
-                                ),
-                              ),
-                              child: const Text(
-                                'Edit',
-                                style: TextStyle(
-                                  color: Palette.white,
-                                  fontSize: 16,
-                                ),
-                              ),
-                            ),
-                          ),
-                      ],
-                    ),
+                    _actionRow(metadata, context),
 
                     // move up the profile info by 110
-                    Container(
-                      transform: Matrix4.translationValues(0.0, -10.0, 0.0),
-                      child: FutureBuilder<Map>(
-                        future: metadata.getMetadataByPubkey(widget.pubkey),
-                        builder: (BuildContext context,
-                            AsyncSnapshot<Map> snapshot) {
-                          var name = "";
-                          var nip05 = "";
-                          var picture = "";
-                          var about = "";
-
-                          if (snapshot.hasData) {
-                            name = snapshot.data?["name"] ?? "";
-                            nip05 = snapshot.data?["nip05"] ?? "";
-                            picture = snapshot.data?["picture"] ?? "";
-                            about = snapshot.data?["about"] ?? "";
-
-                            _checkNip05(nip05, widget.pubkey);
-                          } else if (snapshot.hasError) {
-                            name = "error";
-                            nip05 = "error";
-                            picture = "";
-                            about = "error";
-                          } else {
-                            // loading
-                            name = "loading";
-                            nip05 = "loading";
-                            picture = "";
-                            about = "loading";
-                          }
-
-                          return Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              //profile name
-                              const SizedBox(height: 10),
-                              Row(
-                                children: [
-                                  Container(
-                                    margin:
-                                        const EdgeInsets.only(top: 0, left: 20),
-                                    child: Text(
-                                      name,
-                                      style: const TextStyle(
-                                        color: Palette.white,
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ),
-                                  if (nip05verified.isNotEmpty)
-                                    Container(
-                                      margin: const EdgeInsets.only(
-                                          top: 0, left: 5),
-                                      child: const Icon(
-                                        Icons.verified,
-                                        color: Palette.white,
-                                        size: 23,
-                                      ),
-                                    ),
-                                ],
-                              ),
-                              // handle
-                              Container(
-                                margin: const EdgeInsets.only(top: 0, left: 20),
-                                child: Row(
-                                  children: [
-                                    if (nip05verified.isNotEmpty)
-                                      Text(
-                                        // if name equals name@example.com then hide the name and show only the domain
-                                        name.contains("@")
-                                            ? name.split("@")[1]
-                                            : nip05verified.split("@")[1],
-
-                                        style: const TextStyle(
-                                          color: Palette.white,
-                                          fontSize: 16,
-                                        ),
-                                      ),
-                                    // verified icon
-                                  ],
-                                ),
-                              ),
-                              // pub key in short form (first 10 chars + ... + last 10 chars) + copy button with icon
-                              Container(
-                                margin: const EdgeInsets.only(top: 0, left: 20),
-                                child: Row(
-                                  children: [
-                                    GestureDetector(
-                                      onTap: () {
-                                        _copyToClipboard(widget.pubkeyBech32);
-                                      },
-                                      child: Container(
-                                        transform: Matrix4.translationValues(
-                                            -12.0, 0.0, 0.0),
-                                        // rounded
-                                        padding: const EdgeInsets.only(
-                                            top: 5,
-                                            bottom: 5,
-                                            left: 12,
-                                            right: 12),
-                                        decoration: const BoxDecoration(
-                                          color: Palette.extraDarkGray,
-                                          borderRadius: BorderRadius.all(
-                                            Radius.circular(20),
-                                          ),
-                                        ),
-                                        child: Text(
-                                          '${widget.pubkeyBech32.substring(0, 10)}...${widget.pubkeyBech32.substring(widget.pubkeyBech32.length - 10)}',
-                                          style: const TextStyle(
-                                            color: Palette.white,
-                                            fontSize: 16,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    IconButton(
-                                      tooltip: 'copy nprofile',
-                                      onPressed: () {
-                                        _copyToClipboard(widget.nProfile);
-                                      },
-                                      icon: const Icon(
-                                        Icons.copy,
-                                        color: Palette.white,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              const SizedBox(height: 10),
-                              // bio
-                              Container(
-                                margin: const EdgeInsets.only(top: 0, left: 20),
-                                child: SelectableText(
-                                  about,
-                                  style: const TextStyle(
-                                    color: Palette.white,
-                                    fontSize: 14,
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(height: 5),
-                            ],
-                          );
-                        },
-                      ),
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        Row(
-                          children: [
-                            const Icon(Icons.people,
-                                color: Palette.white, size: 17),
-                            const SizedBox(width: 5),
-                            FutureBuilder<List<List<dynamic>>>(
-                                future: _nostrService
-                                    .getUserContacts(widget.pubkey),
-                                builder: (BuildContext context,
-                                    AsyncSnapshot<List<List<dynamic>>>
-                                        snapshot) {
-                                  var contactsCountString = "";
-
-                                  if (snapshot.hasData) {
-                                    var count = snapshot.data?.length;
-                                    contactsCountString = "$count following";
-                                  } else if (snapshot.hasError) {
-                                    contactsCountString = "n.a. following";
-                                  } else {
-                                    // loading
-                                    contactsCountString = "... following";
-                                  }
-
-                                  return GestureDetector(
-                                    onTap: () {
-                                      if (snapshot.data!.isEmpty) {
-                                        return;
-                                      }
-                                      _saveFollowing();
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => FollowerPage(
-                                            contacts: snapshot.data ?? [],
-                                            title: "Following",
-                                          ),
-                                        ),
-                                      ).then((value) => setState(() {}));
-                                    },
-                                    child: Text(
-                                      contactsCountString,
-                                      style: const TextStyle(
-                                        color: Palette.white,
-                                        fontSize: 14,
-                                      ),
-                                    ),
-                                  );
-                                }),
-                          ],
-                        ),
-                        const Row(
-                          children: [
-                            Icon(Icons.follow_the_signs,
-                                color: Palette.white, size: 17),
-                            SizedBox(width: 5),
-                            Text("n.a. followers",
-                                style: TextStyle(
-                                  color: Palette.white,
-                                  fontSize: 14,
-                                )),
-                          ],
-                        ),
-                        GestureDetector(
-                          onTap: () {
-                            if (widget.pubkey ==
-                                _nostrService.myKeys.publicKey) {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => EditRelaysPage(),
-                                ),
-                              ).then((value) => setState(() {}));
-                            }
-                          },
-                          child: Row(
-                            children: [
-                              const Icon(Icons.connect_without_contact,
-                                  color: Palette.white, size: 17),
-                              const SizedBox(width: 5),
-                              if (widget.pubkey ==
-                                  _nostrService.myKeys.publicKey)
-                                Text(
-                                  "${_nostrService.relays.manualRelays.length} relays",
-                                  style: const TextStyle(
-                                    color: Palette.white,
-                                    fontSize: 14,
-                                  ),
-                                ),
-                              if (widget.pubkey !=
-                                  _nostrService.myKeys.publicKey)
-                                const Text(
-                                  "n.a. relays",
-                                  style: TextStyle(
-                                    color: Palette.white,
-                                    fontSize: 14,
-                                  ),
-                                ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    )
+                    _profileInformation(metadata),
+                    _bottomInformationBar(context, followingService)
                   ],
                 ),
               ),
               SliverList(
                 delegate: SliverChildBuilderDelegate(
                   (BuildContext context, int index) {
-                    return TweetCard(
-                      tweet: _myTweets[index],
-                    );
+                    return Container(); // todo: add notes here
                   },
-                  childCount: _myTweets.length,
+                  childCount: 0,
                 ),
               ),
             ],
@@ -910,6 +389,424 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
         ],
       ),
     );
+  }
+
+  Row _bottomInformationBar(
+      BuildContext context, FollowingPubkeys followingService) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        Row(
+          children: [
+            const Icon(Icons.people, color: Palette.white, size: 17),
+            const SizedBox(width: 5),
+            FutureBuilder<List<NostrTag>>(
+                future: followingService.getFollowingPubkeys(widget.pubkey),
+                builder: (BuildContext context,
+                    AsyncSnapshot<List<NostrTag>> snapshot) {
+                  var contactsCountString = "";
+
+                  if (snapshot.hasData) {
+                    var count = snapshot.data?.length;
+                    contactsCountString = "$count following";
+                  } else if (snapshot.hasError) {
+                    contactsCountString = "n.a. following";
+                  } else {
+                    // loading
+                    contactsCountString = "... following";
+                  }
+
+                  return GestureDetector(
+                    onTap: () {
+                      if (snapshot.data!.isEmpty) {
+                        return;
+                      }
+
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => FollowerPage(
+                            contacts: snapshot.data ?? [],
+                            title: "Following",
+                          ),
+                        ),
+                      ).then((value) => setState(() {}));
+                    },
+                    child: Text(
+                      contactsCountString,
+                      style: const TextStyle(
+                        color: Palette.white,
+                        fontSize: 14,
+                      ),
+                    ),
+                  );
+                }),
+          ],
+        ),
+        const Row(
+          children: [
+            Icon(Icons.follow_the_signs, color: Palette.white, size: 17),
+            SizedBox(width: 5),
+            Text("n.a. followers",
+                style: TextStyle(
+                  color: Palette.white,
+                  fontSize: 14,
+                )),
+          ],
+        ),
+        GestureDetector(
+          onTap: () {
+            if (widget.pubkey == _nostrService.myKeys.publicKey) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => EditRelaysPage(),
+                ),
+              ).then((value) => setState(() {}));
+            }
+          },
+          child: Row(
+            children: [
+              const Icon(Icons.connect_without_contact,
+                  color: Palette.white, size: 17),
+              const SizedBox(width: 5),
+              if (widget.pubkey == _nostrService.myKeys.publicKey)
+                Text(
+                  "${_nostrService.relays.manualRelays.length} relays",
+                  style: const TextStyle(
+                    color: Palette.white,
+                    fontSize: 14,
+                  ),
+                ),
+              if (widget.pubkey != _nostrService.myKeys.publicKey)
+                const Text(
+                  "n.a. relays",
+                  style: TextStyle(
+                    color: Palette.white,
+                    fontSize: 14,
+                  ),
+                ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Container _profileInformation(UserMetadata metadata) {
+    return Container(
+      transform: Matrix4.translationValues(0.0, -10.0, 0.0),
+      child: FutureBuilder<Map>(
+        future: metadata.getMetadataByPubkey(widget.pubkey),
+        builder: (BuildContext context, AsyncSnapshot<Map> snapshot) {
+          var name = "";
+          var nip05 = "";
+          var picture = "";
+          var about = "";
+
+          if (snapshot.hasData) {
+            name = snapshot.data?["name"] ?? "";
+            nip05 = snapshot.data?["nip05"] ?? "";
+            picture = snapshot.data?["picture"] ?? "";
+            about = snapshot.data?["about"] ?? "";
+
+            _checkNip05(nip05, widget.pubkey);
+          } else if (snapshot.hasError) {
+            name = "error";
+            nip05 = "error";
+            picture = "";
+            about = "error";
+          } else {
+            // loading
+            name = "loading";
+            nip05 = "loading";
+            picture = "";
+            about = "loading";
+          }
+
+          return Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              //profile name
+              const SizedBox(height: 10),
+              Row(
+                children: [
+                  Container(
+                    margin: const EdgeInsets.only(top: 0, left: 20),
+                    child: Text(
+                      name,
+                      style: const TextStyle(
+                        color: Palette.white,
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  if (nip05verified.isNotEmpty)
+                    Container(
+                      margin: const EdgeInsets.only(top: 0, left: 5),
+                      child: const Icon(
+                        Icons.verified,
+                        color: Palette.white,
+                        size: 23,
+                      ),
+                    ),
+                ],
+              ),
+              // handle
+              Container(
+                margin: const EdgeInsets.only(top: 0, left: 20),
+                child: Row(
+                  children: [
+                    if (nip05verified.isNotEmpty)
+                      Text(
+                        // if name equals name@example.com then hide the name and show only the domain
+                        name.contains("@")
+                            ? name.split("@")[1]
+                            : nip05verified.split("@")[1],
+
+                        style: const TextStyle(
+                          color: Palette.white,
+                          fontSize: 16,
+                        ),
+                      ),
+                    // verified icon
+                  ],
+                ),
+              ),
+              // pub key in short form (first 10 chars + ... + last 10 chars) + copy button with icon
+              Container(
+                margin: const EdgeInsets.only(top: 0, left: 20),
+                child: Row(
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        _copyToClipboard(widget.pubkeyBech32);
+                      },
+                      child: Container(
+                        transform: Matrix4.translationValues(-12.0, 0.0, 0.0),
+                        // rounded
+                        padding: const EdgeInsets.only(
+                            top: 5, bottom: 5, left: 12, right: 12),
+                        decoration: const BoxDecoration(
+                          color: Palette.extraDarkGray,
+                          borderRadius: BorderRadius.all(
+                            Radius.circular(20),
+                          ),
+                        ),
+                        child: Text(
+                          '${widget.pubkeyBech32.substring(0, 10)}...${widget.pubkeyBech32.substring(widget.pubkeyBech32.length - 10)}',
+                          style: const TextStyle(
+                            color: Palette.white,
+                            fontSize: 16,
+                          ),
+                        ),
+                      ),
+                    ),
+                    IconButton(
+                      tooltip: 'copy nprofile',
+                      onPressed: () {
+                        _copyToClipboard(widget.nProfile);
+                      },
+                      icon: const Icon(
+                        Icons.copy,
+                        color: Palette.white,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 10),
+              // bio
+              Container(
+                margin: const EdgeInsets.only(top: 0, left: 20),
+                child: SelectableText(
+                  about,
+                  style: const TextStyle(
+                    color: Palette.white,
+                    fontSize: 14,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 5),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  Row _actionRow(UserMetadata metadata, BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: [
+        if (widget.pubkey != _nostrService.myKeys.publicKey)
+          SizedBox(
+            width: 35,
+            height: 35,
+            child: ElevatedButton(
+              onPressed: () {
+                _launchPerspectiveFeed(widget.pubkey);
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Palette.background,
+                padding: const EdgeInsets.all(0),
+                enableFeedback: true,
+                shape: const CircleBorder(
+                    side: BorderSide(color: Palette.white, width: 1)),
+              ),
+              child: SvgPicture.asset(
+                "assets/icons/eye.svg",
+                height: 25,
+                color: Palette.white,
+              ),
+            ),
+          ),
+
+        // round message button with icon and white border
+        FutureBuilder<Map>(
+            future: metadata.getMetadataByPubkey(widget.pubkey),
+            builder: (BuildContext context, AsyncSnapshot<Map> snapshot) {
+              String lud06 = "";
+              String lud16 = "";
+
+              if (snapshot.hasData) {
+                lud06 = snapshot.data?["lud06"] ?? "";
+                lud16 = snapshot.data?["lud16"] ?? "";
+              }
+
+              if (lud06.isNotEmpty || lud16.isNotEmpty) {
+                return Container(
+                  margin: const EdgeInsets.only(top: 0, right: 0, left: 0),
+                  child: ElevatedButton(
+                    onPressed: () {
+                      if (lud06.isNotEmpty) {
+                        _openLightningAddress(lud06);
+                      } else if (lud16.isNotEmpty) {
+                        _openLightningAddress(lud16);
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Palette.background,
+                      padding: const EdgeInsets.all(0),
+                      shape: const CircleBorder(
+                          side: BorderSide(color: Palette.white, width: 1)),
+                    ),
+                    child: SvgPicture.asset(
+                      "assets/icons/lightning-fill.svg",
+                      height: 25,
+                      color: Palette.white,
+                    ),
+                  ),
+                );
+              } else {
+                return Container();
+              }
+            }),
+
+        // follow button black with white border
+
+        if (widget.pubkey != _nostrService.myKeys.publicKey &&
+            false) //!_iamFollowing)
+          Container(
+            margin: const EdgeInsets.only(top: 0, right: 10),
+            child: ElevatedButton(
+              onPressed: () {
+                _follow();
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Palette.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                  side: const BorderSide(color: Palette.black, width: 1),
+                ),
+              ),
+              child: const Text(
+                'Follow',
+                style: TextStyle(
+                  color: Palette.black,
+                  fontSize: 16,
+                ),
+              ),
+            ),
+          ),
+
+        // unfollow button white with black border
+        if (widget.pubkey != _nostrService.myKeys.publicKey &&
+            true) //_iamFollowing)
+          Container(
+            margin: const EdgeInsets.only(top: 0, right: 10),
+            child: ElevatedButton(
+              onPressed: () {
+                _unfollow();
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Palette.black,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                  side: const BorderSide(color: Palette.white, width: 1),
+                ),
+              ),
+              child: const Text(
+                'Unfollow',
+                style: TextStyle(
+                  color: Palette.white,
+                  fontSize: 16,
+                ),
+              ),
+            ),
+          ),
+
+        // edit button
+        if (widget.pubkey == _nostrService.myKeys.publicKey)
+          Container(
+            margin: const EdgeInsets.only(top: 0, right: 10),
+            child: ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => EditProfilePage(),
+                  ),
+                ).then((value) => {
+                      metadata.getMetadataByPubkey(widget.pubkey),
+                      setState(() {
+                        // refresh
+                      })
+                    });
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Palette.background,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                  side: const BorderSide(color: Palette.white, width: 1),
+                ),
+              ),
+              child: const Text(
+                'Edit',
+                style: TextStyle(
+                  color: Palette.white,
+                  fontSize: 16,
+                ),
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+
+  FlexibleSpaceBar _bannerImage() {
+    return FlexibleSpaceBar(
+        background: false
+            ? Image.network(
+                "bannerUrl",
+                fit: BoxFit.cover,
+              )
+            : Image.asset(
+                'assets/images/default_header.jpg',
+                fit: BoxFit.cover,
+              ));
   }
 }
 
