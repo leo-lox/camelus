@@ -1,3 +1,4 @@
+import 'package:camelus/models/nostr_tag.dart';
 import 'package:camelus/providers/metadata_provider.dart';
 import 'package:camelus/providers/nostr_service_provider.dart';
 import 'package:camelus/services/nostr/metadata/user_metadata.dart';
@@ -13,7 +14,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class FollowerPage extends ConsumerStatefulWidget {
   String title;
-  List<List<dynamic>> contacts;
+  List<NostrTag> contacts;
 
   FollowerPage({
     Key? key,
@@ -114,7 +115,7 @@ class _FollowerPageState extends ConsumerState<FollowerPage> {
             delegate: SliverChildBuilderDelegate(
               (context, index) {
                 return _profile(
-                    widget.contacts[index][1],
+                    widget.contacts[index].value,
                     widget,
                     _myFollowing,
                     _myNewFollowing,
