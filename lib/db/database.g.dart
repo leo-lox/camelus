@@ -427,7 +427,9 @@ class _$NoteDao extends NoteDao {
     return _queryAdapter.queryList(
         'SELECT * FROM noteView        WHERE noteView.pubkey        IN (' +
             _sqliteVariablesForPubkeys +
-            ')        AND kind = (?1)       AND NOT (\',\' || tag_types || \',\' LIKE \'%,e,%\')       OR (tag_types IS NULL AND kind = (?1))        ORDER BY created_at DESC',
+            ')        AND kind = (?1)       AND NOT (\',\' || tag_types || \',\' LIKE \'%,e,%\')       OR (tag_types IS NULL AND kind = (?1))       IN (' +
+            _sqliteVariablesForPubkeys +
+            ')         ORDER BY created_at DESC',
         mapper: (Map<String, Object?> row) => DbNoteView(id: row['id'] as String, pubkey: row['pubkey'] as String, created_at: row['created_at'] as int, kind: row['kind'] as int, content: row['content'] as String, sig: row['sig'] as String, tag_index: row['tag_index'] as String?, tag_types: row['tag_types'] as String?, tag_values: row['tag_values'] as String?, tag_recommended_relays: row['tag_recommended_relays'] as String?, tag_markers: row['tag_markers'] as String?),
         arguments: [kind, ...pubkeys]);
   }
@@ -444,7 +446,9 @@ class _$NoteDao extends NoteDao {
     return _queryAdapter.queryListStream(
         'SELECT * FROM (         SELECT Note.*, GROUP_CONCAT(Tag.type) as tag_types, GROUP_CONCAT(Tag.value) as tag_values, GROUP_CONCAT(Tag.recommended_relay) as tag_recommended_relays, GROUP_CONCAT(Tag.marker) as tag_markers, GROUP_CONCAT(Tag.tag_index) as tag_index          FROM Note          LEFT JOIN Tag ON Note.id = Tag.note_id          GROUP BY Note.id         ) AS noteView         WHERE noteView.pubkey IN (' +
             _sqliteVariablesForPubkeys +
-            ')          AND kind = (?1)         AND NOT (\',\' || tag_types || \',\' LIKE \'%,e,%\')         OR (tag_types IS NULL AND kind = (?1))         ORDER BY created_at DESC',
+            ')          AND kind = (?1)         AND NOT (\',\' || tag_types || \',\' LIKE \'%,e,%\')         OR (tag_types IS NULL AND kind = (?1))         IN (' +
+            _sqliteVariablesForPubkeys +
+            ')          ORDER BY created_at DESC',
         mapper: (Map<String, Object?> row) => DbNoteView(
             id: row['id'] as String,
             pubkey: row['pubkey'] as String,

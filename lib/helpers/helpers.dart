@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer' as developer;
 import 'dart:math';
 
 import 'package:bech32/bech32.dart';
@@ -42,10 +43,16 @@ class Helpers {
 
   /// Decode a bech32 string into a hex string + human readable part
   List<String> decodeBech32(String bech32String) {
-    const Bech32Codec codec = Bech32Codec();
-    final Bech32 bech32 = codec.decode(bech32String, bech32String.length);
-    final eightBitWords = _convertBits(bech32.data, 5, 8, false);
-    return [HEX.encode(eightBitWords), bech32.hrp];
+    try {
+      const Bech32Codec codec = Bech32Codec();
+      final Bech32 bech32 = codec.decode(bech32String, bech32String.length);
+      final eightBitWords = _convertBits(bech32.data, 5, 8, false);
+      return [HEX.encode(eightBitWords), bech32.hrp];
+    } catch (e) {
+      developer.log('decodeBech32 error: $e, \n \n String is: $bech32String',
+          error: e);
+    }
+    return ["", ""];
   }
 
   /// reads tags from a nostr event and returns a list of pubkeys

@@ -65,6 +65,7 @@ abstract class NoteDao {
       AND kind = (:kind)
       AND NOT (',' || tag_types || ',' LIKE '%,e,%')
       OR (tag_types IS NULL AND kind = (:kind))
+      IN (:pubkeys) 
 
       ORDER BY created_at DESC
       """)
@@ -83,6 +84,7 @@ abstract class NoteDao {
         AND kind = (:kind)
         AND NOT (',' || tag_types || ',' LIKE '%,e,%')
         OR (tag_types IS NULL AND kind = (:kind))
+        IN (:pubkeys) 
         ORDER BY created_at DESC
       """)
   Stream<List<DbNoteView>> findPubkeyRootNotesByKindStreamNotifyOnly(
