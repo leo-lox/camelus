@@ -67,8 +67,6 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
   String nip05verified = "";
   String requestId = Helpers().getRandomString(14);
 
-  late StreamSubscription _nostrStream;
-
   void _checkNip05(String nip05, String pubkey) async {
     if (nip05.isEmpty) return;
     if (nip05verified.isNotEmpty) return;
@@ -267,8 +265,6 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
   @override
   void dispose() {
     _scrollController.dispose();
-
-    _nostrStream.cancel();
 
     // cancel subscription
     _nostrService.closeSubscription("authors-$requestId");

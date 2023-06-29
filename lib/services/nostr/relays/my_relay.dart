@@ -110,7 +110,7 @@ class MyRelay {
 
     var future =
         completer.future.timeout(const Duration(seconds: 10), onTimeout: () {
-      log("timeout: ${request.subscriptionId}");
+      log("Rtimeout: ${request.subscriptionId}, $relayUrl");
       return "timeout";
     });
     return future;

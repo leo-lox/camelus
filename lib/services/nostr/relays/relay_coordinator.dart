@@ -8,7 +8,6 @@ import 'package:camelus/models/nostr_note.dart';
 import 'package:camelus/models/nostr_request_query.dart';
 import 'package:camelus/models/nostr_tag.dart';
 import 'package:camelus/providers/key_pair_provider.dart';
-import 'package:camelus/services/nostr/metadata/following_pubkeys.dart';
 import 'package:camelus/services/nostr/relays/my_relay.dart';
 import 'package:camelus/services/nostr/relays/relay_address_parser.dart';
 import 'package:camelus/services/nostr/relays/relay_subscription_holder.dart';
@@ -47,6 +46,8 @@ class RelayCoordinator {
     await _initConnectSequence();
 
     _ready.complete();
+
+    _setupOwnPermanentSubscription(pubkey: _keyPair.publicKey);
   }
 
   // following provider cant be used because circular dependency
@@ -475,5 +476,20 @@ class RelayCoordinator {
       log("relay-assignment: ${relay.relayUrl}, pubkey: ${relay.pubkeys.length}");
     }
     return foundRelays;
+  }
+
+  // used to keep in sync
+  void _setupOwnPermanentSubscription({required String pubkey}) {
+    var myBody = NostrRequestQueryBody(
+      authors: [pubkey],
+      kinds: [
+        0,
+        1,
+        3,
+      ],
+      limit: 5,
+    );
+    var myRequest = NostrRequestQuery(subscriptionId: "self", body: myBody);
+    request(request: myRequest);
   }
 }
