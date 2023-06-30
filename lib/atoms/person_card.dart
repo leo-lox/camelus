@@ -56,7 +56,8 @@ class PersonCard extends ConsumerWidget {
               child: myProfilePicture(
                   pictureUrl: pictureUrl,
                   pubkey: pubkey,
-                  filterQuality: FilterQuality.high),
+                  filterQuality: FilterQuality.medium,
+                  disableGif: true),
             ),
             const SizedBox(width: 16),
             //text section
@@ -64,16 +65,16 @@ class PersonCard extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  if (name.startsWith("npub"))
+                  if (name == '')
                     Text(
-                      "${name.substring(0, 7)}...${name.substring(name.length - 7, name.length)}",
+                      "${pubkey.substring(0, 7)}...${pubkey.substring(pubkey.length - 7, pubkey.length)}",
                       style: const TextStyle(
                         color: Palette.white,
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
-                  if (!name.startsWith("npub"))
+                  if (name != '')
                     Row(
                       children: [
                         Text(

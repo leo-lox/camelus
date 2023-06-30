@@ -8,12 +8,13 @@ Widget myProfilePicture({
   required String pubkey,
   FilterQuality filterQuality = FilterQuality.medium,
   int? cacheHeight,
+  bool disableGif = false,
 }) {
   // all other image types
   if (pictureUrl.contains(".png") ||
       pictureUrl.contains(".jpg") ||
       pictureUrl.contains(".jpeg") ||
-      pictureUrl.contains(".gif") ||
+      (!disableGif && pictureUrl.contains(".gif")) ||
       pictureUrl.contains(".webp") ||
       pictureUrl.contains(".avif")) {
     return ClipOval(
