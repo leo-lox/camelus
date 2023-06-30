@@ -367,7 +367,17 @@ class RelayCoordinator {
       throw Exception("No relays found for this user");
     }
     NostrNote latest = kind3.first.toNostrNote();
-    Map<String, Map<String, bool>> relays = jsonDecode(latest.content);
+    var rawJson = jsonDecode(latest.content);
+
+    // cast to Map<String, Map<String, bool>>
+    var toCast = Map<String, Map<dynamic, dynamic>>.from(rawJson);
+
+    toCast.map((key, value) {
+      var casted = Map<String, bool>.from(value);
+      toCast[key] = casted;
+      return MapEntry(key, casted);
+    });
+    var relays = Map<String, Map<String, bool>>.from(toCast);
 
     // parse relayUrls
     for (var relayUrl in relays.keys) {
