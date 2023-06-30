@@ -158,7 +158,7 @@ class Relays {
                       "event": eventJson,
                       "socketControl": socketControl,
                     });
-                    relayTracker.analyzeNostrEvent(eventJson, socketControl);
+                    //relayTracker.analyzeNostrEvent(eventJson, socketControl);
                   }, onDone: () {
                     // if pick and connect don't try to reconnect
 

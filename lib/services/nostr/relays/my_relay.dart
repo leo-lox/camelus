@@ -8,6 +8,8 @@ import 'package:camelus/models/nostr_request.dart';
 import 'package:camelus/models/nostr_request_close.dart';
 import 'package:camelus/models/nostr_request_event.dart';
 import 'package:camelus/models/nostr_request_query.dart';
+import 'package:camelus/services/nostr/relays/relay_tracker.dart';
+import 'package:camelus/services/nostr/relays/relays_injector.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
 class MyRelay {
@@ -32,13 +34,18 @@ class MyRelay {
 
   final Map<String, Completer<String>> _completers = {};
 
+  late RelayTracker relayTracker;
+
   MyRelay({
     required this.database,
     required this.persistance,
     required this.relayUrl,
     required this.read,
     required this.write,
-  });
+  }) {
+    RelaysInjector injector = RelaysInjector();
+    relayTracker = injector.relayTracker;
+  }
 
   /// connects to the relay and listens for events
   Future<void> connect() async {
@@ -154,6 +161,7 @@ class MyRelay {
       }
 
       _insertNoteIntoDb(note);
+      relayTracker.analyzeNostrEvent(note, relayUrl);
       return;
     }
     if (eventJson[0] == 'EOSE') {

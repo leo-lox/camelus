@@ -117,14 +117,6 @@ class NostrService {
         blockedUsers.add(u);
       }
     }
-
-    try {
-      //todo: fix this for onboarding
-      relays.start(
-          [...userContactsObj.following.keys.toList(), myKeys.publicKey]);
-    } catch (e) {
-      log(" $e");
-    }
   }
 
   Future<void> _loadKeyPair() async {
@@ -386,7 +378,7 @@ class NostrService {
   /// get user metadata from cache and if not available request it from network
   Future<List<List<dynamic>>> getUserContacts(String pubkey,
       {bool force = false}) async {
-    return userContactsObj.getContactsByPubkey(pubkey, force: force);
+    return [];
   }
 
   /// returns {nip05, valid, lastCheck, relayHint} exception

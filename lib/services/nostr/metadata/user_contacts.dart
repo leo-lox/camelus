@@ -65,26 +65,7 @@ class UserContacts {
     return;
   }
 
-  _removeOldData() {
-    // 4 hours //todo move magic number to settings
-    int timeBarrier = 60 * 60 * 4;
-    var now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
-    var oldData = <String, int>{};
-    for (var key in followingLastFetch.keys) {
-      if (now - followingLastFetch[key]! > timeBarrier) {
-        oldData[key] = followingLastFetch[key]!;
-      }
-    }
-    for (var key in oldData.keys) {
-      // don't delete own data
-      if (key == ownPubkey) continue;
-
-      followingLastFetch.remove(key);
-      following.remove(key);
-    }
-    _jsonCache.refresh('followingLastFetch', followingLastFetch);
-    _jsonCache.refresh('following', following);
-  }
+  _removeOldData() {}
 
   getContactsByPubkey(String pubkey, {bool force = false}) {
     var now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
