@@ -214,7 +214,7 @@ class NoteCardSplitContent {
         continue;
       }
 
-      final pattern = RegExp(r"nostr:(nprofile|npub)[^\s]+");
+      final pattern = RegExp(r"nostr:(nprofile|npub)[a-zA-Z0-9]+");
       final hashMatches = pattern.allMatches(span.text!);
       var lastMatchEnd = 0;
 
