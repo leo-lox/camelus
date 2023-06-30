@@ -11,17 +11,16 @@ import 'package:hex/hex.dart';
 class NostrRequestEvent implements NostrRequest {
   final String type = "EVENT";
   @override
-  final String subscriptionId;
-  final NostrRequestEventJson body;
+  final String subscriptionId = "EVENT";
+  final NostrRequestEventBody body;
 
   NostrRequestEvent({
-    required this.subscriptionId,
     required this.body,
   });
 
   @override
   String toRawList() {
-    return jsonEncode([type, subscriptionId, body.toMap()]);
+    return jsonEncode([type, body.toMap()]);
   }
 
   @override
@@ -30,7 +29,7 @@ class NostrRequestEvent implements NostrRequest {
   }
 }
 
-class NostrRequestEventJson {
+class NostrRequestEventBody {
   late String id;
   String pubkey;
   int? created_at;
@@ -40,7 +39,7 @@ class NostrRequestEventJson {
   late String sig;
   String privateKey;
 
-  NostrRequestEventJson({
+  NostrRequestEventBody({
     required this.pubkey,
     required this.kind,
     required this.tags,
@@ -54,7 +53,15 @@ class NostrRequestEventJson {
   _signEvent() {
     created_at ??= DateTime.now().millisecondsSinceEpoch ~/ 1000;
 
-    var calcId = [0, pubkey, created_at, kind, tags, content];
+    var tagsList = tags.map((e) => e.toList()).toList();
+    var calcId = [
+      0,
+      pubkey,
+      created_at,
+      kind,
+      tagsList,
+      content,
+    ];
 
     // serialize
     String calcIdJson = jsonEncode(calcId);
@@ -75,7 +82,7 @@ class NostrRequestEventJson {
       "pubkey": pubkey,
       "created_at": created_at,
       "kind": kind,
-      "tags": tags,
+      "tags": tags.map((e) => e.toList()).toList(),
       "content": content,
       "sig": sig,
     };

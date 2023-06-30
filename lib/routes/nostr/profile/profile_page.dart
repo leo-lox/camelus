@@ -6,10 +6,14 @@ import 'package:camelus/atoms/back_button_round.dart';
 import 'package:camelus/atoms/follow_button.dart';
 import 'package:camelus/atoms/long_button.dart';
 import 'package:camelus/helpers/nprofile_helper.dart';
+import 'package:camelus/models/nostr_request_event.dart';
 import 'package:camelus/models/nostr_tag.dart';
+import 'package:camelus/providers/database_provider.dart';
 import 'package:camelus/providers/following_provider.dart';
+import 'package:camelus/providers/key_pair_provider.dart';
 import 'package:camelus/providers/metadata_provider.dart';
 import 'package:camelus/providers/nostr_service_provider.dart';
+import 'package:camelus/providers/relay_provider.dart';
 import 'package:camelus/routes/nostr/nostr_page/perspective_feed_page.dart';
 import 'package:camelus/services/nostr/metadata/following_pubkeys.dart';
 import 'package:camelus/services/nostr/metadata/user_metadata.dart';
@@ -84,12 +88,65 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
     } catch (e) {}
   }
 
-  void _follow() async {
-    log("following ${widget.pubkey}");
+  void _follow(String toFollow, List<NostrTag> currentContacts) async {
+    //log("follow ${widget.pubkey}");
+    //log("test: ownContacts $currentContacts");
+    var mykeys = await ref.watch(keyPairProvider.future);
+    var db = await ref.watch(databaseProvider.future);
+
+    var myLastNote =
+        (await db.noteDao.findPubkeyNotesByKind([mykeys.keyPair!.publicKey], 3))
+            .first;
+
+    List<NostrTag> newContacts = [...currentContacts];
+    newContacts.add(NostrTag(type: 'p', value: toFollow));
+    _writeContacts(
+      publicKey: mykeys.keyPair!.publicKey,
+      privateKey: mykeys.keyPair!.privateKey,
+      content: myLastNote.content,
+      updatedContacts: newContacts,
+    );
   }
 
-  void _unfollow() async {
-    log("unfollowing ${widget.pubkey}");
+  void _unfollow(String toUnfollow, List<NostrTag> currentContacts) async {
+    var mykeys = await ref.watch(keyPairProvider.future);
+    var db = await ref.watch(databaseProvider.future);
+
+    var myLastNote =
+        (await db.noteDao.findPubkeyNotesByKind([mykeys.keyPair!.publicKey], 3))
+            .first;
+
+    List<NostrTag> newContacts = [...currentContacts];
+
+    newContacts.removeWhere((element) => element.value == toUnfollow);
+
+    _writeContacts(
+      publicKey: mykeys.keyPair!.publicKey,
+      privateKey: mykeys.keyPair!.privateKey,
+      content: myLastNote.content,
+      updatedContacts: newContacts,
+    );
+  }
+
+  Future _writeContacts({
+    required String publicKey,
+    required String privateKey,
+    required String content,
+    required List<NostrTag> updatedContacts,
+  }) async {
+    var relays = ref.watch(relayServiceProvider);
+    NostrRequestEventBody body = NostrRequestEventBody(
+      pubkey: publicKey,
+      privateKey: privateKey,
+      content: content,
+      kind: 3,
+      tags: updatedContacts,
+    );
+    NostrRequestEvent myEvent = NostrRequestEvent(body: body);
+
+    await relays.write(request: myEvent);
+
+    return;
   }
 
   Future<void> _copyToClipboard(String data) async {
@@ -760,9 +817,13 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
             var followingList = snapshot.data!.map((e) => e.value).toList();
 
             if (followingList.contains(widget.pubkey)) {
-              return followButton(isFollowing: true, onPressed: _unfollow);
+              return followButton(
+                  isFollowing: true,
+                  onPressed: () => _unfollow(widget.pubkey, snapshot.data!));
             } else {
-              return followButton(isFollowing: false, onPressed: _follow);
+              return followButton(
+                  isFollowing: false,
+                  onPressed: () => _follow(widget.pubkey, snapshot.data!));
             }
           }
           return Container();

@@ -39,7 +39,7 @@ class NostrTag {
         marker: newTag["marker"]);
   }
 
-  List<String> toRaw() {
+  List<String> toList() {
     List<String> raw = [type, value];
 
     raw.add(recommended_relay ?? "");
