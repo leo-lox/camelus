@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'dart:developer';
+
 import 'package:camelus/db/entities/db_note_view.dart';
 import 'package:camelus/db/entities/db_tag.dart';
 import 'package:camelus/models/nostr_note.dart';
@@ -27,7 +30,7 @@ abstract class NoteDao {
   Stream<List<DbNoteView>> findAllNotesByKindStream(int kind);
 
   @Query('SELECT * FROM noteView WHERE id = :id')
-  Future<List<DbNoteView>> findNote(String id);
+  Future<List<DbNoteView?>> findNote(String id);
 
   @Query("SELECT * FROM noteView WHERE noteView.pubkey IN (:pubkeys)")
   Future<List<DbNoteView>> findPubkeyNotes(List<String> pubkeys);
@@ -121,11 +124,14 @@ abstract class NoteDao {
   @Query('SELECT * FROM Note WHERE id = :id')
   Stream<DbNote?> findNoteByIdStream(int id);
 
-  @insert
+  @Insert(onConflict: OnConflictStrategy.ignore)
   Future<void> insertNote(DbNote note);
 
-  @insert
+  @Insert(onConflict: OnConflictStrategy.ignore)
   Future<List<int>> insertNotes(List<DbNote> notes);
+
+  @Insert(onConflict: OnConflictStrategy.ignore)
+  Future<List<int>> insertTags(List<DbTag> tags);
 
   @Query('DELETE FROM Note')
   Future<void> deleteAllNotes();
@@ -154,9 +160,32 @@ abstract class NoteDao {
           nostrNotes.map((e) => e.toDbTag()).expand((x) => x).toList());
     } catch (e) {
       // problably already exists
+      log(e.toString());
     }
   }
 
-  @insert
-  Future<List<int>> insertTags(List<DbTag> tags);
+  List<NostrNote> toInsertNotes = [];
+  Timer? insertNotesTimer;
+  stackInsertNotes(List<NostrNote> notes) async {
+    // stack insert after 100 notes or 1 seconds
+    toInsertNotes.addAll(notes);
+
+    toInsertNotes = toInsertNotes.toSet().toList();
+
+    if (insertNotesTimer != null) {
+      insertNotesTimer!.cancel();
+    }
+    insertNotesTimer = Timer(const Duration(milliseconds: 100), () async {
+      var copy = [...toInsertNotes];
+      toInsertNotes = [];
+      await insertNostrNotes(copy);
+    });
+
+    if (toInsertNotes.length > 100) {
+      insertNotesTimer!.cancel();
+      var copy = [...toInsertNotes];
+      toInsertNotes = [];
+      await insertNostrNotes(copy);
+    }
+  }
 }

@@ -331,8 +331,8 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
 
     _userFeedAndRepliesFeed.requestRelayUserFeedAndReplies(
       users: [widget.pubkey],
-      requestId: "profilePage",
-      limit: 15,
+      requestId: "profilePage-${widget.pubkey.substring(5, 15)}",
+      limit: 10,
       since: latestTweet,
     );
   }
@@ -357,10 +357,18 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
 
     _userFeedAndRepliesFeed.requestRelayUserFeedAndReplies(
       users: [widget.pubkey],
-      requestId: "profilePage-timeLine",
-      limit: 20,
+      requestId: "profilePage-timeLine-${widget.pubkey.substring(5, 15)}",
+      limit: 10,
       until: _lastNoteInFeed?.created_at ?? defaultUntil,
     );
+  }
+
+  void _onNavigateAway() async {
+    try {
+      _userFeedAndRepliesFeed.cleanup();
+    } catch (e) {
+      log("error in navigate away");
+    }
   }
 
   @override
@@ -368,6 +376,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
     super.initState();
     _initSequence();
     _initNostrService();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _onNavigateAway();
+    });
   }
 
   @override
@@ -499,10 +510,15 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
           if (snapshot.connectionState == ConnectionState.waiting) {
             return SliverList(
                 delegate: SliverChildListDelegate([
-              const Center(
-                  child: CircularProgressIndicator(
-                color: Palette.white,
-              ))
+              const Column(
+                children: [
+                  SizedBox(height: 100),
+                  Center(
+                      child: CircularProgressIndicator(
+                    color: Palette.white,
+                  )),
+                ],
+              )
             ]));
           }
           if (snapshot.hasError) {
@@ -525,10 +541,13 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                   return SliverList(
                     delegate: SliverChildListDelegate(
                       [
-                        const Center(
-                          child: Text("no notes found",
-                              style: TextStyle(
-                                  fontSize: 20, color: Palette.white)),
+                        const Column(
+                          children: [
+                            SizedBox(height: 100),
+                            Text("no notes found",
+                                style: TextStyle(
+                                    fontSize: 20, color: Palette.white))
+                          ],
                         ),
                       ],
                     ),

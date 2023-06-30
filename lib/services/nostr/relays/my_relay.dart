@@ -187,9 +187,7 @@ class MyRelay {
   }
 
   _insertNoteIntoDb(NostrNote note) {
-    database.noteDao.insertNostrNote(note).onError((error, stackTrace) => {
-          // probably already in db
-        });
+    database.noteDao.stackInsertNotes([note]);
   }
 
   @override

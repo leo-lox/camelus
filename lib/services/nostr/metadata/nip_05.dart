@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'package:cross_local_storage/cross_local_storage.dart';
 //import 'package:cross_local_storage/cross_json_storage.dart';
 import 'package:json_cache/json_cache.dart';
@@ -77,7 +78,12 @@ class Nip05 {
 
     // split in username and url/domain
     String username = nip05.split("@")[0];
-    String url = nip05.split("@")[1];
+    try {
+      String url = nip05.split("@")[1];
+    } catch (e) {
+      log("invalid nip05: $nip05");
+      throw Exception("invalid nip05 $nip05");
+    }
 
     var json = await rawNip05Request(nip05, client);
 

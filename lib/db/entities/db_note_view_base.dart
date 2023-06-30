@@ -75,6 +75,7 @@ abstract class DbNoteViewBase {
 
     for (int i = 0; i < tag_index_list_int.length; i++) {
       int posIndex = tag_index_list_int.indexOf(i);
+      if (posIndex == -1) continue; // skip if not found (should not happen)
 
       Map newNostrTag = {
         "type": tag_types_list[posIndex],

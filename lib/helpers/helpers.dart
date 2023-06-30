@@ -49,7 +49,8 @@ class Helpers {
       final eightBitWords = _convertBits(bech32.data, 5, 8, false);
       return [HEX.encode(eightBitWords), bech32.hrp];
     } catch (e) {
-      developer.log('decodeBech32 error: $e, \n \n String is: $bech32String',
+      developer.log(
+          'decodeBech32 error: $e, \n \n String is: $bech32String \n \n',
           error: e);
     }
     return ["", ""];

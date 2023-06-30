@@ -227,7 +227,7 @@ class _$NoteDao extends NoteDao {
   }
 
   @override
-  Future<List<DbNoteView>> findNote(String id) async {
+  Future<List<DbNoteView?>> findNote(String id) async {
     return _queryAdapter.queryList('SELECT * FROM noteView WHERE id = ?1',
         mapper: (Map<String, Object?> row) => DbNoteView(
             id: row['id'] as String,
@@ -548,19 +548,19 @@ class _$NoteDao extends NoteDao {
 
   @override
   Future<void> insertNote(DbNote note) async {
-    await _dbNoteInsertionAdapter.insert(note, OnConflictStrategy.abort);
+    await _dbNoteInsertionAdapter.insert(note, OnConflictStrategy.ignore);
   }
 
   @override
   Future<List<int>> insertNotes(List<DbNote> notes) {
     return _dbNoteInsertionAdapter.insertListAndReturnIds(
-        notes, OnConflictStrategy.abort);
+        notes, OnConflictStrategy.ignore);
   }
 
   @override
   Future<List<int>> insertTags(List<DbTag> tags) {
     return _dbTagInsertionAdapter.insertListAndReturnIds(
-        tags, OnConflictStrategy.abort);
+        tags, OnConflictStrategy.ignore);
   }
 
   @override

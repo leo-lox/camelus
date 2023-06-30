@@ -193,7 +193,11 @@ class UserMetadata {
   _receiveNostrEvents(List<NostrNote> notes) {
     for (var note in notes) {
       String pubkey = note.pubkey;
-      usersMetadata[pubkey] = jsonDecode(note.content);
+      try {
+        usersMetadata[pubkey] = jsonDecode(note.content);
+      } catch (e) {
+        return;
+      }
 
       // add access time
       int now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
