@@ -1,127 +1,141 @@
+import 'package:camelus/atoms/back_button_round.dart';
 import 'package:camelus/atoms/follow_button.dart';
 import 'package:camelus/atoms/person_card.dart';
+import 'package:camelus/models/nostr_request_event.dart';
 import 'package:camelus/models/nostr_tag.dart';
+import 'package:camelus/providers/database_provider.dart';
+import 'package:camelus/providers/following_provider.dart';
+import 'package:camelus/providers/key_pair_provider.dart';
 import 'package:camelus/providers/metadata_provider.dart';
-import 'package:camelus/providers/nostr_service_provider.dart';
-import 'package:camelus/services/nostr/metadata/user_metadata.dart';
+import 'package:camelus/providers/relay_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:camelus/config/palette.dart';
-import 'package:camelus/helpers/helpers.dart';
 import 'package:camelus/routes/nostr/profile/profile_page.dart';
-import 'package:camelus/services/nostr/nostr_injector.dart';
-import 'package:camelus/services/nostr/nostr_service.dart';
-
-import 'package:camelus/atoms/my_profile_picture.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class FollowerPage extends ConsumerStatefulWidget {
-  String title;
-  List<NostrTag> contacts;
+  final String title;
+  final List<NostrTag> contacts;
 
-  FollowerPage({
+  const FollowerPage({
     Key? key,
     required this.title,
     required this.contacts,
-  }) : super(key: key) {}
+  }) : super(key: key);
 
   @override
   ConsumerState<FollowerPage> createState() => _FollowerPageState();
 }
 
 class _FollowerPageState extends ConsumerState<FollowerPage> {
-  late NostrService _nostrService;
-  List<String> _myFollowing = [];
-  final List<String> _myNewFollowing = [];
-  final List<String> _myNewUnfollowing = [];
+  /// follow Change - true to add, false to remove
+  void _changeFollowing(bool followChange, String pubkey,
+      List<NostrTag> currentOwnContacts) async {
+    var mykeys = await ref.watch(keyPairProvider.future);
+    var db = await ref.watch(databaseProvider.future);
 
-  void getFollowed() {
-    List<List> folloing =
-        _nostrService.following[_nostrService.myKeys.publicKey] ?? [];
-    for (var i = 0; i < folloing.length; i++) {
-      _myFollowing.add(folloing[i][1]);
+    var myLastNote =
+        (await db.noteDao.findPubkeyNotesByKind([mykeys.keyPair!.publicKey], 3))
+            .first;
+
+    List<NostrTag> newContacts = [...currentOwnContacts];
+
+    if (followChange) {
+      newContacts.add(NostrTag(type: 'p', value: pubkey));
+    } else {
+      newContacts.removeWhere((element) => element.value == pubkey);
     }
 
-    setState(() {
-      _myFollowing = _myFollowing;
-    });
+    _writeContacts(
+      publicKey: mykeys.keyPair!.publicKey,
+      privateKey: mykeys.keyPair!.privateKey,
+      content: myLastNote.content,
+      updatedContacts: newContacts,
+    );
   }
 
-  _calculateFollowing() {
-    for (var i = 0; i < _myNewFollowing.length; i++) {
-      if (!_myFollowing.contains(_myNewFollowing[i])) {
-        _myFollowing.add(_myNewFollowing[i]);
-      }
-    }
+  Future _writeContacts({
+    required String publicKey,
+    required String privateKey,
+    required String content,
+    required List<NostrTag> updatedContacts,
+  }) async {
+    var relays = ref.watch(relayServiceProvider);
+    NostrRequestEventBody body = NostrRequestEventBody(
+      pubkey: publicKey,
+      privateKey: privateKey,
+      content: content,
+      kind: 3,
+      tags: updatedContacts,
+    );
+    NostrRequestEvent myEvent = NostrRequestEvent(body: body);
 
-    for (var i = 0; i < _myNewUnfollowing.length; i++) {
-      if (_myFollowing.contains(_myNewUnfollowing[i])) {
-        _myFollowing.remove(_myNewUnfollowing[i]);
-      }
-    }
-    if (_myNewFollowing.isNotEmpty || _myNewUnfollowing.isNotEmpty) {
-      // write event to nostr
+    await relays.write(request: myEvent);
 
-      var tags = [];
-
-      for (var i = 0; i < _myFollowing.length; i++) {
-        var d = ["p", _myFollowing[i]];
-        tags.add(d);
-      }
-
-      _nostrService.writeEvent("", 3, tags);
-
-      // update following locally
-      _nostrService.following[_nostrService.myKeys.publicKey] = [];
-      for (var i = 0; i < _myFollowing.length; i++) {
-        var d = ["p", _myFollowing[i]];
-        _nostrService.following[_nostrService.myKeys.publicKey]!.add(d);
-      }
-    }
-    // get updated contacts
-    _nostrService.getUserContacts(_nostrService.myKeys.publicKey);
-  }
-
-  void _initNostrService() {
-    _nostrService = ref.read(nostrServiceProvider);
+    return;
   }
 
   @override
   void initState() {
     super.initState();
-    _initNostrService();
-    getFollowed();
   }
 
   @override
   void dispose() {
-    _calculateFollowing();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     var metadata = ref.watch(metadataProvider);
+    var followingService = ref.watch(followingProvider);
     return Scaffold(
       backgroundColor: Palette.background,
       appBar: AppBar(
         backgroundColor: Palette.background,
         title: Text(widget.title),
+        foregroundColor: Palette.white,
       ),
-      body: ListView.builder(
-          itemCount: widget.contacts.length,
-          itemBuilder: (context, index) {
-            return FutureBuilder<Map<dynamic, dynamic>>(
-                future:
-                    metadata.getMetadataByPubkey(widget.contacts[index].value),
-                builder: (BuildContext context, snapshot) {
-                  return PersonCard(
-                    pubkey: widget.contacts[index].value,
-                    name: snapshot.data?["name"] ?? "",
-                    pictureUrl: snapshot.data?["picture"] ?? "",
-                    about: snapshot.data?["about"] ?? "",
-                    nip05: snapshot.data?["nip05"] ?? "",
-                    isFollowing: true,
-                  );
+      body: StreamBuilder<List<NostrTag>>(
+          stream: followingService.ownPubkeyContactsStreamDb,
+          initialData: followingService.ownContacts,
+          builder: (context, ownFollowingSnapshot) {
+            return ListView.builder(
+                physics: const BouncingScrollPhysics(),
+                itemCount: widget.contacts.length,
+                itemBuilder: (context, index) {
+                  var displayPubkey = widget.contacts[index].value;
+                  return FutureBuilder<Map<dynamic, dynamic>>(
+                      future: metadata.getMetadataByPubkey(displayPubkey),
+                      builder: (BuildContext context, metadataSnapshot) {
+                        return PersonCard(
+                          pubkey: displayPubkey,
+                          name: metadataSnapshot.data?["name"] ?? "",
+                          pictureUrl: metadataSnapshot.data?["picture"] ?? "",
+                          about: metadataSnapshot.data?["about"] ?? "",
+                          nip05: metadataSnapshot.data?["nip05"] ?? "",
+                          isFollowing: ownFollowingSnapshot.data!
+                              .any((element) => element.value == displayPubkey),
+                          onTap: () {
+                            // navigate to profile page
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => ProfilePage(
+                                  pubkey: displayPubkey,
+                                ),
+                              ),
+                            );
+                          },
+                          onFollowTab: (followState) {
+                            _changeFollowing(
+                              followState,
+                              displayPubkey,
+                              ownFollowingSnapshot.data!,
+                            );
+                          },
+                        );
+                      });
                 });
           }),
     );

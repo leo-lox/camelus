@@ -15,6 +15,7 @@ import 'package:camelus/models/nostr_note.dart';
 import 'package:camelus/models/nostr_tag.dart';
 import 'package:camelus/providers/navigation_bar_provider.dart';
 import 'package:camelus/providers/nostr_service_provider.dart';
+import 'package:camelus/routes/nostr/profile/profile_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -208,6 +209,18 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                           about: result['about'] ?? '',
                           pubkey: result['pubkey'] ?? '',
                           isFollowing: false,
+                          onTap: () {
+                            // navigate to profile page
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => ProfilePage(
+                                  pubkey: result['pubkey'],
+                                ),
+                              ),
+                            );
+                          },
+                          onFollowTab: (followState) {},
                         ),
                     ],
                   )
@@ -339,6 +352,17 @@ class _SearchPageState extends ConsumerState<SearchPage> {
         about: metadata['about'] ?? '',
         nip05: metadata['nip05'] ?? '',
         isFollowing: false,
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ProfilePage(
+                pubkey: profile.pubkey,
+              ),
+            ),
+          );
+        },
+        onFollowTab: (followState) {},
       );
       personCards.add(myCard);
     }

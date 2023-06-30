@@ -14,6 +14,8 @@ class PersonCard extends ConsumerWidget {
   final String about;
   final String? nip05;
   final bool isFollowing;
+  final Function onTap;
+  final Function(bool) onFollowTab;
 
   const PersonCard({
     Key? key,
@@ -22,6 +24,8 @@ class PersonCard extends ConsumerWidget {
     required this.pictureUrl,
     required this.about,
     required this.isFollowing,
+    required this.onTap,
+    required this.onFollowTab,
     this.nip05,
   }) : super(key: key);
 
@@ -42,23 +46,18 @@ class PersonCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return InkWell(
       onTap: () {
-        log("person card tapped");
+        onTap();
       },
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 12),
         child: Row(
           // profile
           children: [
-            GestureDetector(
-              onTap: () {
-                log("profile tapped");
-              },
-              child: myProfilePicture(
-                  pictureUrl: pictureUrl,
-                  pubkey: pubkey,
-                  filterQuality: FilterQuality.medium,
-                  disableGif: true),
-            ),
+            myProfilePicture(
+                pictureUrl: pictureUrl,
+                pubkey: pubkey,
+                filterQuality: FilterQuality.medium,
+                disableGif: true),
             const SizedBox(width: 16),
             //text section
             Expanded(
@@ -156,7 +155,7 @@ class PersonCard extends ConsumerWidget {
             followButton(
                 isFollowing: isFollowing,
                 onPressed: () {
-                  log("follow button pressed");
+                  onFollowTab(!isFollowing);
                 }),
           ],
         ),
