@@ -5,7 +5,10 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:camelus/atoms/back_button_round.dart';
 import 'package:camelus/atoms/follow_button.dart';
 import 'package:camelus/atoms/long_button.dart';
+import 'package:camelus/components/note_card/note_card_container.dart';
+import 'package:camelus/db/database.dart';
 import 'package:camelus/helpers/nprofile_helper.dart';
+import 'package:camelus/models/nostr_note.dart';
 import 'package:camelus/models/nostr_request_event.dart';
 import 'package:camelus/models/nostr_tag.dart';
 import 'package:camelus/providers/database_provider.dart';
@@ -15,6 +18,7 @@ import 'package:camelus/providers/metadata_provider.dart';
 import 'package:camelus/providers/nostr_service_provider.dart';
 import 'package:camelus/providers/relay_provider.dart';
 import 'package:camelus/routes/nostr/nostr_page/perspective_feed_page.dart';
+import 'package:camelus/services/nostr/feeds/user_and_replies_feed.dart';
 import 'package:camelus/services/nostr/metadata/following_pubkeys.dart';
 import 'package:camelus/services/nostr/metadata/user_metadata.dart';
 import 'package:flutter/material.dart';
@@ -63,7 +67,9 @@ class ProfilePage extends ConsumerStatefulWidget {
 class _ProfilePageState extends ConsumerState<ProfilePage>
     with TickerProviderStateMixin, TraceableClientMixin {
   late NostrService _nostrService;
-  late ScrollController _scrollController;
+  ScrollController _scrollController = ScrollController();
+  late AppDatabase _db;
+  late UserFeedAndRepliesFeed _userFeedAndRepliesFeed;
 
   List<StreamSubscription> _subscriptions = [];
 
@@ -303,28 +309,71 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
     _nostrService = ref.read(nostrServiceProvider);
   }
 
-  @override
-  void initState() {
-    super.initState();
-    _initNostrService();
+  final Completer<void> _feedReady = Completer<void>();
+  Future<void> _initSequence() async {
+    _db = await ref.read(databaseProvider.future);
+    var relayCoordinator = ref.watch(relayServiceProvider);
+    _userFeedAndRepliesFeed =
+        UserFeedAndRepliesFeed(_db, [widget.pubkey], relayCoordinator);
+    await _userFeedAndRepliesFeed.feedRdy;
+    _feedReady.complete();
 
+    _initUserFeed();
+    _setupScrollListener();
+
+    return;
+  }
+
+  void _initUserFeed() {
     int now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
 
-    _scrollController = ScrollController();
+    int latestTweet = now - 86400; // -1 day
+
+    _userFeedAndRepliesFeed.requestRelayUserFeedAndReplies(
+      users: [widget.pubkey],
+      requestId: "profilePage",
+      limit: 15,
+      since: latestTweet,
+    );
+  }
+
+  void _setupScrollListener() {
     _scrollController.addListener(() {
       setState(() {});
       if (_scrollController.position.pixels >=
           _scrollController.position.maxScrollExtent - 100) {
         // load more tweets
-        log("load more tweets");
+        _userFeedLoadMore();
       }
     });
+  }
+
+  NostrNote? _lastNoteInFeed;
+  void _userFeedLoadMore() async {
+    log("load more called");
+    int now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
+    // schould not be needed
+    int defaultUntil = now - 86400 * 7; // -1 week
+
+    _userFeedAndRepliesFeed.requestRelayUserFeedAndReplies(
+      users: [widget.pubkey],
+      requestId: "profilePage-timeLine",
+      limit: 20,
+      until: _lastNoteInFeed?.created_at ?? defaultUntil,
+    );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _initSequence();
+    _initNostrService();
   }
 
   @override
   void dispose() {
     _scrollController.dispose();
-
+    _userFeedAndRepliesFeed.cleanup();
     _closeSubscriptions();
     super.dispose();
   }
@@ -391,14 +440,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                   ],
                 ),
               ),
-              SliverList(
-                delegate: SliverChildBuilderDelegate(
-                  (BuildContext context, int index) {
-                    return Container(); // todo: add notes here
-                  },
-                  childCount: 0,
-                ),
-              ),
+              _feed(),
             ],
           ),
           _profileImage(_scrollController, widget, _nostrService, metadata),
@@ -448,6 +490,81 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
         ],
       ),
     );
+  }
+
+  _feed() {
+    return FutureBuilder(
+        future: _feedReady.future,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return SliverList(
+                delegate: SliverChildListDelegate([
+              const Center(
+                  child: CircularProgressIndicator(
+                color: Palette.white,
+              ))
+            ]));
+          }
+          if (snapshot.hasError) {
+            return SliverList(
+                delegate: SliverChildListDelegate([
+              const Center(
+                child: Text('Error'),
+              )
+            ]));
+          }
+          return StreamBuilder<List<NostrNote>>(
+            stream: _userFeedAndRepliesFeed.feedStream,
+            initialData: _userFeedAndRepliesFeed.feed,
+            builder: (BuildContext context,
+                AsyncSnapshot<List<NostrNote>> snapshot) {
+              if (snapshot.hasData) {
+                var notes = snapshot.data!;
+
+                if (notes.isEmpty) {
+                  return SliverList(
+                    delegate: SliverChildListDelegate(
+                      [
+                        const Center(
+                          child: Text("no notes found",
+                              style: TextStyle(
+                                  fontSize: 20, color: Palette.white)),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+
+                _lastNoteInFeed = notes.last;
+
+                return SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) {
+                      var note = notes[index];
+                      return NoteCardContainer(notes: [note]);
+                    },
+                    childCount: notes.length,
+                  ),
+                );
+              }
+              if (snapshot.hasError) {
+                return SliverList(
+                  delegate: SliverChildListDelegate([
+                    Center(
+                        //button
+                        child: ElevatedButton(
+                      onPressed: () {},
+                      child: Text(snapshot.error.toString(),
+                          style: TextStyle(fontSize: 20, color: Colors.white)),
+                    ))
+                  ]),
+                );
+              }
+              return const Text("waiting for stream trigger ",
+                  style: TextStyle(fontSize: 20));
+            },
+          );
+        });
   }
 
   Row _bottomInformationBar(

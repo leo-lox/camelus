@@ -138,18 +138,23 @@ abstract class NoteDao {
 
   @transaction
   Future<void> insertNostrNote(NostrNote nostrNote) async {
-    // probalby faster then failed unique contraint && doenst trigger updates on streams
-    var exists = await findNote(nostrNote.id);
-    if (exists.isNotEmpty) return;
-    await insertNote(nostrNote.toDbNote());
-    await insertTags(nostrNote.toDbTag());
+    try {
+      await insertNote(nostrNote.toDbNote());
+      await insertTags(nostrNote.toDbTag());
+    } catch (e) {
+      // problably already exists
+    }
   }
 
   @transaction
   Future<void> insertNostrNotes(List<NostrNote> nostrNotes) async {
-    await insertNotes(nostrNotes.map((e) => e.toDbNote()).toList());
-    await insertTags(
-        nostrNotes.map((e) => e.toDbTag()).expand((x) => x).toList());
+    try {
+      await insertNotes(nostrNotes.map((e) => e.toDbNote()).toList());
+      await insertTags(
+          nostrNotes.map((e) => e.toDbTag()).expand((x) => x).toList());
+    } catch (e) {
+      // problably already exists
+    }
   }
 
   @insert

@@ -51,6 +51,7 @@ class _NoteCardState extends ConsumerState<NoteCard> {
   }
 
   void _splitContentStateUpdate() {
+    if (!mounted) return;
     setState(() {});
   }
 

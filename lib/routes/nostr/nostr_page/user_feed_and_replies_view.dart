@@ -6,7 +6,6 @@ import 'package:camelus/atoms/refresh_indicator_no_need.dart';
 import 'package:camelus/components/note_card/note_card_container.dart';
 import 'package:camelus/config/palette.dart';
 import 'package:camelus/db/database.dart';
-import 'package:camelus/db/entities/db_note_view.dart';
 import 'package:camelus/models/nostr_note.dart';
 import 'package:camelus/providers/database_provider.dart';
 import 'package:camelus/providers/following_provider.dart';
@@ -14,9 +13,6 @@ import 'package:camelus/providers/navigation_bar_provider.dart';
 import 'package:camelus/providers/relay_provider.dart';
 import 'package:camelus/scroll_controller/retainable_scroll_controller.dart';
 import 'package:camelus/services/nostr/feeds/user_and_replies_feed.dart';
-import 'package:camelus/services/nostr/relays/relays.dart';
-import 'package:camelus/services/nostr/relays/relays_injector.dart';
-import 'package:custom_refresh_indicator/custom_refresh_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
