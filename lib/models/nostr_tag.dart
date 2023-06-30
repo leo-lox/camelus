@@ -39,6 +39,16 @@ class NostrTag {
         marker: newTag["marker"]);
   }
 
+  List<String> toRaw() {
+    List<String> raw = [type, value];
+
+    raw.add(recommended_relay ?? "");
+
+    raw.add(marker ?? "");
+
+    return raw;
+  }
+
   @override
   String toString() {
     return 'NostrTag{type: $type, value: $value, recommended_relay: $recommended_relay, marker: $marker}';

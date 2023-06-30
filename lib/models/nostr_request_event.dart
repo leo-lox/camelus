@@ -2,7 +2,11 @@
 
 import 'dart:convert';
 
+import 'package:camelus/helpers/bip340.dart';
 import 'package:camelus/models/nostr_request.dart';
+import 'package:camelus/models/nostr_tag.dart';
+import 'package:crypto/crypto.dart';
+import 'package:hex/hex.dart';
 
 class NostrRequestEvent implements NostrRequest {
   final String type = "EVENT";
@@ -27,23 +31,43 @@ class NostrRequestEvent implements NostrRequest {
 }
 
 class NostrRequestEventJson {
-  String id;
+  late String id;
   String pubkey;
-  int created_at;
+  int? created_at;
   int kind;
-  List tags; // todo define tags
+  List<NostrTag> tags;
   String content;
-  String sig;
+  late String sig;
+  String privateKey;
 
   NostrRequestEventJson({
-    required this.id,
     required this.pubkey,
-    required this.created_at,
     required this.kind,
     required this.tags,
     required this.content,
-    required this.sig,
-  });
+    required this.privateKey,
+    this.created_at,
+  }) {
+    _signEvent();
+  }
+
+  _signEvent() {
+    created_at ??= DateTime.now().millisecondsSinceEpoch ~/ 1000;
+
+    var calcId = [0, pubkey, created_at, kind, tags, content];
+
+    // serialize
+    String calcIdJson = jsonEncode(calcId);
+    // hash
+    Digest myId = sha256.convert(utf8.encode(calcIdJson));
+
+    id = myId.toString();
+    // hex encode
+    String idHex = HEX.encode(myId.bytes);
+
+    // sign
+    sig = Bip340().sign(idHex, privateKey);
+  }
 
   Map<String, dynamic> toMap() {
     var body = {
@@ -55,7 +79,7 @@ class NostrRequestEventJson {
       "content": content,
       "sig": sig,
     };
-    body.removeWhere((key, value) => value == null);
+
     return body;
   }
 }

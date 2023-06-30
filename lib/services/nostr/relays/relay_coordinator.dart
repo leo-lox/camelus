@@ -5,6 +5,7 @@ import 'dart:developer';
 import 'package:camelus/db/database.dart';
 import 'package:camelus/helpers/bip340.dart';
 import 'package:camelus/models/nostr_note.dart';
+import 'package:camelus/models/nostr_request_event.dart';
 import 'package:camelus/models/nostr_request_query.dart';
 import 'package:camelus/models/nostr_tag.dart';
 import 'package:camelus/providers/key_pair_provider.dart';
@@ -265,6 +266,69 @@ class RelayCoordinator {
         return [];
       },
     );
+    return combinedFuture;
+  }
+
+  Future write({
+    required NostrRequestEvent request,
+    Duration timeout = const Duration(seconds: 10),
+    List<String> exactRelays = const [],
+  }) async {
+    List<MyRelay> allWriteRelays =
+        _relays.where((element) => element.write).toList();
+
+    List<MyRelay> connectedRelaysThatMatch = [];
+
+    if (exactRelays.isNotEmpty) {
+      connectedRelaysThatMatch = _relays
+          .where((element) => exactRelays.contains(element.relayUrl))
+          .toList();
+    }
+
+    List<String> toConnectRelays = exactRelays
+        .where((element) =>
+            !connectedRelaysThatMatch
+                .any((connected) => connected.relayUrl == element) &&
+            allWriteRelays.any((all) => all.relayUrl == element))
+        .toList();
+
+    List<Future<MyRelay>> futures = [];
+    for (var relay in toConnectRelays) {
+      futures.add(_connectToRelay(
+        relayUrl: relay,
+        read: false,
+        write: true,
+        persistance: RelayPersistance.tmp,
+      ));
+    }
+    var myTmpRelays = await Future.wait(futures);
+
+    List<MyRelay> combinedRelays = [];
+    if (exactRelays.isEmpty) {
+      combinedRelays = [...allWriteRelays];
+    } else {
+      combinedRelays = [...connectedRelaysThatMatch, ...myTmpRelays];
+    }
+
+    List<Future<String>> relayRequests = [];
+    // send request to combined relays
+    for (var relay in combinedRelays) {
+      var future = relay.request(request);
+      relayRequests.add(future);
+    }
+
+    var combinedFuture = Future.wait(relayRequests).timeout(
+      timeout,
+      onTimeout: () {
+        return [];
+      },
+    );
+
+    // disconnect write tmp relays
+    for (var relay in myTmpRelays) {
+      await relay.close();
+    }
+
     return combinedFuture;
   }
 
