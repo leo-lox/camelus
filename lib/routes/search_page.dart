@@ -140,7 +140,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
   }
 
   void _onSearchChanged(String value) async {
-    if (value.length < 3) {
+    if (value.length <= 3) {
       setState(() {
         _searchResults = [];
       });
@@ -154,6 +154,10 @@ class _SearchPageState extends ConsumerState<SearchPage> {
         RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
     RegExp mastodonRegex =
         RegExp(r'^@[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
+
+    RegExp hastagRegex = RegExp(r'^#\S+');
+
+    RegExp cashtagRegex = RegExp(r'^(\$|\€|\£|\¥|\₿)\S+');
 
     String? finalNip05;
 
@@ -171,6 +175,17 @@ class _SearchPageState extends ConsumerState<SearchPage> {
       //var nip05Metadata = await _search.searchNip05(finalNip05);
       //final String nipPubkey = nip05Metadata!['pubkey'];
       //final List<String> nipRelays = nip05Metadata['relays'];
+    }
+
+    if (hastagRegex.hasMatch(value)) {
+      // search for hashtag
+
+      log('hashtagRelays $value');
+    }
+
+    if (cashtagRegex.hasMatch(value)) {
+      // search for cashtag
+      log('cashtag $value');
     }
 
     setState(() {
