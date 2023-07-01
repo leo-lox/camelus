@@ -154,6 +154,7 @@ abstract class NoteDao {
 
   @transaction
   Future<void> insertNostrNotes(List<NostrNote> nostrNotes) async {
+    log('inserting ${nostrNotes.length} notes');
     try {
       await insertNotes(nostrNotes.map((e) => e.toDbNote()).toList());
       await insertTags(
@@ -166,7 +167,7 @@ abstract class NoteDao {
 
   List<NostrNote> toInsertNotes = [];
   Timer? insertNotesTimer;
-  stackInsertNotes(List<NostrNote> notes) async {
+  Future stackInsertNotes(List<NostrNote> notes) async {
     // stack insert after 100 notes or 1 seconds
     toInsertNotes.addAll(notes);
 
@@ -175,17 +176,20 @@ abstract class NoteDao {
     if (insertNotesTimer != null) {
       insertNotesTimer!.cancel();
     }
-    insertNotesTimer = Timer(const Duration(milliseconds: 100), () async {
+    insertNotesTimer = Timer(const Duration(milliseconds: 400), () async {
       var copy = [...toInsertNotes];
       toInsertNotes = [];
       await insertNostrNotes(copy);
+      return;
     });
 
-    if (toInsertNotes.length > 100) {
+    if (toInsertNotes.length >= 20) {
       insertNotesTimer!.cancel();
       var copy = [...toInsertNotes];
       toInsertNotes = [];
       await insertNostrNotes(copy);
+      return;
     }
+    return;
   }
 }

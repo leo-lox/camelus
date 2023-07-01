@@ -82,10 +82,17 @@ class Nip05 {
       String url = nip05.split("@")[1];
     } catch (e) {
       log("invalid nip05: $nip05");
+      return {};
       throw Exception("invalid nip05 $nip05");
     }
 
-    var json = await rawNip05Request(nip05, client);
+    var json;
+    try {
+      json = await rawNip05Request(nip05, client);
+    } catch (e) {
+      log("error fetching nip05: $e");
+      return {};
+    }
 
     Map names = json["names"];
 
@@ -123,14 +130,19 @@ class Nip05 {
     String username = nip05.split("@")[0];
     String url = nip05.split("@")[1];
     // make get request
-    http.Response response = await client
-        .get(Uri.parse("https://$url/.well-known/nostr.json?name=$username"));
+    try {
+      http.Response response = await client
+          .get(Uri.parse("https://$url/.well-known/nip05.json?name=$username"));
 
-    if (response.statusCode != 200) {
-      return throw Exception("error fetching nostr.json");
+      if (response.statusCode != 200) {
+        return throw Exception(
+            "error fetching nip05.json STATUS: ${response.statusCode}}");
+      }
+
+      var json = jsonDecode(response.body);
+      return json;
+    } catch (e) {
+      throw Exception("error fetching nip05.json $e");
     }
-
-    var json = jsonDecode(response.body);
-    return json;
   }
 }
