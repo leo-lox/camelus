@@ -56,6 +56,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
           _isSearching = true;
         });
       } else {
+        log("schould unfocus");
         setState(() {
           _isSearching = false;
         });
@@ -195,54 +196,65 @@ class _SearchPageState extends ConsumerState<SearchPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Palette.background,
-      // scrollable column
-      body: Column(
-        children: [
-          _searchBar(context),
-          Expanded(
-            child: ListView(
-              physics: const BouncingScrollPhysics(),
-              children: [
-                // hide default view when searching
-                Visibility(
-                  maintainState: true,
-                  maintainInteractivity: false,
-                  visible: !_isSearching,
-                  child: _defaultView(),
-                ),
-                if (_searchFocusNode.hasFocus)
-                  Column(
-                    children: [
-                      // search results
-                      for (var result in _searchResults)
-                        PersonCard(
-                          name: result['name'] ?? '',
-                          nip05: result['nip05'] ?? '',
-                          pictureUrl: result['picture'] ?? '',
-                          about: result['about'] ?? '',
-                          pubkey: result['pubkey'] ?? '',
-                          isFollowing: false,
-                          onTap: () {
-                            // navigate to profile page
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => ProfilePage(
-                                  pubkey: result['pubkey'],
+    return WillPopScope(
+      onWillPop: () async {
+        // check if search is focused
+        if (_searchFocusNode.hasFocus) {
+          _searchFocusNode.unfocus();
+
+          return false;
+        }
+        return true;
+      },
+      child: Scaffold(
+        backgroundColor: Palette.background,
+        // scrollable column
+        body: Column(
+          children: [
+            _searchBar(context),
+            Expanded(
+              child: ListView(
+                physics: const BouncingScrollPhysics(),
+                children: [
+                  // hide default view when searching
+                  Visibility(
+                    maintainState: true,
+                    maintainInteractivity: false,
+                    visible: !_isSearching,
+                    child: _defaultView(),
+                  ),
+                  if (_searchFocusNode.hasFocus)
+                    Column(
+                      children: [
+                        // search results
+                        for (var result in _searchResults)
+                          PersonCard(
+                            name: result['name'] ?? '',
+                            nip05: result['nip05'] ?? '',
+                            pictureUrl: result['picture'] ?? '',
+                            about: result['about'] ?? '',
+                            pubkey: result['pubkey'] ?? '',
+                            isFollowing: false,
+                            onTap: () {
+                              // navigate to profile page
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ProfilePage(
+                                    pubkey: result['pubkey'],
+                                  ),
                                 ),
-                              ),
-                            );
-                          },
-                          onFollowTab: (followState) {},
-                        ),
-                    ],
-                  )
-              ],
+                              );
+                            },
+                            onFollowTab: (followState) {},
+                          ),
+                      ],
+                    )
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -388,33 +400,56 @@ class _SearchPageState extends ConsumerState<SearchPage> {
 
   Padding _searchBar(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(top: 20, left: 20, right: 20),
-      child: TextField(
-        controller: _searchController,
-        focusNode: _searchFocusNode,
-        decoration: const InputDecoration(
-          hintText: 'Search',
-          hintStyle: TextStyle(color: Palette.white),
-          prefixIcon: Icon(Icons.search, color: Palette.white),
-          filled: true,
-          fillColor: Palette.extraDarkGray,
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.all(Radius.circular(12.0)),
-            borderSide: BorderSide(color: Palette.gray),
+      padding: const EdgeInsets.only(top: 20, left: 10, right: 20),
+      child: Row(
+        children: [
+          // back button
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              //color: Palette.extraDarkGray,
+              borderRadius: BorderRadius.circular(200),
+            ),
+            child: IconButton(
+              icon: const Icon(Icons.arrow_back),
+              color: Palette.white,
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
           ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.all(Radius.circular(10.0)),
-            borderSide: BorderSide(color: Palette.gray),
+          const SizedBox(width: 20),
+          Expanded(
+            child: TextField(
+              controller: _searchController,
+              focusNode: _searchFocusNode,
+              decoration: const InputDecoration(
+                hintText: 'Search',
+                hintStyle: TextStyle(color: Palette.white),
+                prefixIcon: Icon(Icons.search, color: Palette.white),
+                filled: true,
+                fillColor: Palette.extraDarkGray,
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(12.0)),
+                  borderSide: BorderSide(color: Palette.gray),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                  borderSide: BorderSide(color: Palette.gray),
+                ),
+              ),
+              style: const TextStyle(color: Palette.white),
+              onChanged: (value) {
+                _onSearchChanged(value);
+              },
+              onTapOutside: (value) {
+                // close keyboard
+                //FocusScope.of(context).requestFocus(FocusNode());
+              },
+            ),
           ),
-        ),
-        style: const TextStyle(color: Palette.white),
-        onChanged: (value) {
-          _onSearchChanged(value);
-        },
-        onTapOutside: (value) {
-          // close keyboard
-          FocusScope.of(context).requestFocus(FocusNode());
-        },
+        ],
       ),
     );
   }
