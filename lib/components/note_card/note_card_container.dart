@@ -17,7 +17,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 /// its purpose is to hold connected notes (mostly replies) and paint connections between them
 /// it also handles the logic on what to show => button to show more replies, etc
 
-class NoteCardContainer extends ConsumerStatefulWidget {
+class NoteCardContainer extends ConsumerWidget {
   final List<NostrNote> notes;
   final List<NoteCardContainer> otherContainers;
 
@@ -25,16 +25,11 @@ class NoteCardContainer extends ConsumerStatefulWidget {
       {Key? key, required this.notes, this.otherContainers = const []})
       : super(key: key);
 
-  @override
-  ConsumerState<NoteCardContainer> createState() => _NoteCardContainerState();
-}
-
-class _NoteCardContainerState extends ConsumerState<NoteCardContainer> {
-  void _onNoteTab(NostrNote myNote) {
+  void _onNoteTab(BuildContext context, NostrNote myNote) {
     var refEvents = myNote.getTagEvents;
 
     if (myNote.isRoot) {
-      _navigateToEventViewPage(myNote.id, null);
+      _navigateToEventViewPage(context, myNote.id, null);
       return;
     }
 
@@ -44,10 +39,11 @@ class _NoteCardContainerState extends ConsumerState<NoteCardContainer> {
     // off spec support, sometimes not marked as root
     root ??= refEvents.first;
 
-    _navigateToEventViewPage(root.value, reply?.value ?? myNote.id);
+    _navigateToEventViewPage(context, root.value, reply?.value ?? myNote.id);
   }
 
-  _navigateToEventViewPage(String root, String? scrollIntoView) {
+  void _navigateToEventViewPage(
+      BuildContext context, String root, String? scrollIntoView) {
     Navigator.pushNamed(context, "/nostr/event", arguments: <String, String?>{
       "root": root,
       "scrollIntoView": scrollIntoView
@@ -55,7 +51,7 @@ class _NoteCardContainerState extends ConsumerState<NoteCardContainer> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, ref) {
     final metadata = ref.watch(metadataProvider);
 
     return SizedBox(
@@ -65,7 +61,7 @@ class _NoteCardContainerState extends ConsumerState<NoteCardContainer> {
         child: Column(
           children: [
             ..._buildContainerNotes(metadata, context),
-            ...widget.otherContainers.map((e) => e).toList()
+            ...otherContainers.map((e) => e).toList()
           ],
         ),
       ),
@@ -75,8 +71,8 @@ class _NoteCardContainerState extends ConsumerState<NoteCardContainer> {
   List<Widget> _buildContainerNotes(
       UserMetadata metadata, BuildContext context) {
     List<Widget> widgets = [];
-    for (int i = 0; i < widget.notes.length; i++) {
-      var note = widget.notes[i];
+    for (int i = 0; i < notes.length; i++) {
+      var note = notes[i];
       widgets.add(Stack(
         children: [
           // vertical line top
@@ -91,7 +87,7 @@ class _NoteCardContainerState extends ConsumerState<NoteCardContainer> {
               ),
             ),
           // vertical line bottom
-          if (i != widget.notes.length - 1)
+          if (i != notes.length - 1)
             Positioned(
               left: 40,
               bottom: 0,
@@ -109,11 +105,11 @@ class _NoteCardContainerState extends ConsumerState<NoteCardContainer> {
                 // check if reply
                 if (note.getTagEvents.isNotEmpty)
                   // for myNote.getTagPubkeys
-                  _buildInReplyTo(note, metadata, context, i, widget.notes),
+                  _buildInReplyTo(note, metadata, context, i, notes),
 
                 GestureDetector(
                   onTap: () {
-                    _onNoteTab(note);
+                    _onNoteTab(context, note);
                   },
                   child: Container(
                     //color: Palette.background,

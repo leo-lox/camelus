@@ -55,16 +55,34 @@ class _NoteCardState extends ConsumerState<NoteCard> {
     setState(() {});
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final myNostrService = ref.watch(nostrServiceProvider);
+  late NostrService myNostrService;
+  late Future<Map<dynamic, dynamic>> myMetadata;
+  late NoteCardSplitContent splitContent;
+
+  void _initSequence() {
+    myNostrService = ref.watch(nostrServiceProvider);
 
     final metadata = ref.watch(metadataProvider);
-    final myMetadata = metadata.getMetadataByPubkey(widget.note.pubkey);
+    myMetadata = metadata.getMetadataByPubkey(widget.note.pubkey);
 
-    final splitContent = NoteCardSplitContent(
+    splitContent = NoteCardSplitContent(
         widget.note, metadata, _openProfile, _splitContentStateUpdate);
+  }
 
+  @override
+  void initState() {
+    super.initState();
+    //_initSequence();
+  }
+
+  @override
+  didChangeDependencies() {
+    super.didChangeDependencies();
+    _initSequence();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     if (widget.note.pubkey == 'missing') {
       return Container(
         height: 50,
