@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:camelus/atoms/my_profile_picture.dart';
 import 'package:camelus/components/bottom_sheet_share.dart';
 import 'package:camelus/components/images_tile_view.dart';
@@ -10,6 +8,7 @@ import 'package:camelus/helpers/helpers.dart';
 import 'package:camelus/models/nostr_note.dart';
 import 'package:camelus/providers/metadata_provider.dart';
 import 'package:camelus/providers/nostr_service_provider.dart';
+import 'package:camelus/services/nostr/metadata/user_metadata.dart';
 import 'package:camelus/services/nostr/nostr_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -56,33 +55,46 @@ class _NoteCardState extends ConsumerState<NoteCard> {
   }
 
   late NostrService myNostrService;
+  late UserMetadata metadata;
   late Future<Map<dynamic, dynamic>> myMetadata;
   late NoteCardSplitContent splitContent;
 
-  void _initSequence() {
-    myNostrService = ref.watch(nostrServiceProvider);
-
-    final metadata = ref.watch(metadataProvider);
-    myMetadata = metadata.getMetadataByPubkey(widget.note.pubkey);
-
+  void _splitContent() {
     splitContent = NoteCardSplitContent(
         widget.note, metadata, _openProfile, _splitContentStateUpdate);
+    setState(() {});
+  }
+
+  String oldId = "";
+  void _checkRebuild() {
+    if (oldId == widget.note.id) return;
+
+    oldId = widget.note.content;
+    _splitContent();
+
+    myMetadata = metadata.getMetadataByPubkey(widget.note.pubkey);
   }
 
   @override
   void initState() {
     super.initState();
-    //_initSequence();
   }
 
   @override
   didChangeDependencies() {
     super.didChangeDependencies();
-    _initSequence();
+    //_splitContent();
+    metadata = ref.watch(metadataProvider);
+    _checkRebuild();
+    oldId = widget.note.id;
   }
 
   @override
   Widget build(BuildContext context) {
+    myNostrService = ref.watch(nostrServiceProvider);
+
+    _checkRebuild();
+
     if (widget.note.pubkey == 'missing') {
       return Container(
         height: 50,

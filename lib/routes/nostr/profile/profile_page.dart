@@ -39,9 +39,9 @@ import 'package:url_launcher/url_launcher.dart';
 
 class ProfilePage extends ConsumerStatefulWidget {
   final String pubkey;
-  late String nProfile;
-  late String nProfileHr;
-  late String pubkeyBech32;
+  late final String nProfile;
+  late final String nProfileHr;
+  late final String pubkeyBech32;
 
   ProfilePage({Key? key, required this.pubkey}) : super(key: key) {
     nProfile = NprofileHelper().mapToBech32({
@@ -560,7 +560,10 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                   delegate: SliverChildBuilderDelegate(
                     (context, index) {
                       var note = notes[index];
-                      return NoteCardContainer(notes: [note]);
+                      return NoteCardContainer(
+                        notes: [note],
+                        key: ValueKey(note.id),
+                      );
                     },
                     childCount: notes.length,
                   ),

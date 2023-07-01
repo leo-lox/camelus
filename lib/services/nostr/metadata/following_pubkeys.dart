@@ -155,7 +155,12 @@ class FollowingPubkeys {
     await _requestContacts(pubkeys: [pubkey], requestId: requestId);
     followingLastFetch[pubkey] = now;
     await _jsonCache.refresh('followingLastFetch', followingLastFetch);
+    // wait 500 ms
+    await Future.delayed(const Duration(milliseconds: 500));
     var dbListNew = (await _db.noteDao.findPubkeyNotesByKind([pubkey], 3));
+    if (dbListNew.isEmpty) {
+      return []; // nothing found
+    }
     var kind3New = dbListNew.first.toNostrNote();
     return kind3New.tags;
   }
