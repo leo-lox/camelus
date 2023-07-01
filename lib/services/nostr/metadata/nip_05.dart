@@ -131,12 +131,13 @@ class Nip05 {
     String url = nip05.split("@")[1];
     // make get request
     try {
+      String myUrl = "https://$url/.well-known/nostr.json?name=$username";
       http.Response response = await client
-          .get(Uri.parse("https://$url/.well-known/nip05.json?name=$username"));
+          .get(Uri.parse(myUrl), headers: {"Accept": "application/json"});
 
       if (response.statusCode != 200) {
         return throw Exception(
-            "error fetching nip05.json STATUS: ${response.statusCode}}");
+            "error fetching nip05.json STATUS: ${response.statusCode}}, Link: $myUrl");
       }
 
       var json = jsonDecode(response.body);
