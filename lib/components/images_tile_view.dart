@@ -54,6 +54,7 @@ class ImagesTileView extends StatelessWidget {
                       transitionOnUserGestures: true,
                       tag: 'image-${images[index]}-$_tileViewId',
                       child: Image.network(
+                        cacheHeight: 500,
                         images[index],
                         fit: BoxFit.cover,
                         alignment: Alignment.center,
