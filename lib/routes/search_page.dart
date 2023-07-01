@@ -16,8 +16,10 @@ import 'package:camelus/models/nostr_tag.dart';
 import 'package:camelus/providers/navigation_bar_provider.dart';
 import 'package:camelus/providers/nostr_service_provider.dart';
 import 'package:camelus/routes/nostr/profile/profile_page.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:camelus/providers/database_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -141,7 +143,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
   }
 
   void _onSearchChanged(String value) async {
-    if (value.length <= 3) {
+    if (value.length <= 1) {
       setState(() {
         _searchResults = [];
       });
@@ -400,7 +402,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
 
   Padding _searchBar(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(top: 20, left: 10, right: 20),
+      padding: const EdgeInsets.only(top: 20, left: 15, right: 10, bottom: 10),
       child: Row(
         children: [
           // back button
@@ -412,31 +414,39 @@ class _SearchPageState extends ConsumerState<SearchPage> {
               borderRadius: BorderRadius.circular(200),
             ),
             child: IconButton(
-              icon: const Icon(Icons.arrow_back),
+              icon: _searchFocusNode.hasFocus
+                  ? const Icon(Icons.arrow_back)
+                  : const Icon(Icons.search),
               color: Palette.white,
               onPressed: () {
-                Navigator.pop(context);
+                // unfocus search bar
+                _searchFocusNode.hasFocus
+                    ? _searchFocusNode.unfocus()
+                    : _searchFocusNode.requestFocus();
               },
             ),
           ),
-          const SizedBox(width: 20),
+          const SizedBox(width: 5),
           Expanded(
             child: TextField(
               controller: _searchController,
               focusNode: _searchFocusNode,
-              decoration: const InputDecoration(
-                hintText: 'Search',
-                hintStyle: TextStyle(color: Palette.white),
-                prefixIcon: Icon(Icons.search, color: Palette.white),
+              decoration: InputDecoration(
+                isDense: true,
+                hintText: ' Search',
+                hintStyle:
+                    const TextStyle(color: Palette.white, letterSpacing: 1.1),
                 filled: true,
-                fillColor: Palette.extraDarkGray,
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(12.0)),
-                  borderSide: BorderSide(color: Palette.gray),
+                fillColor: _searchFocusNode.hasFocus
+                    ? Palette.background
+                    : Palette.extraDarkGray,
+                enabledBorder: const OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(50.0)),
+                  borderSide: BorderSide(color: Palette.extraDarkGray),
                 ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                  borderSide: BorderSide(color: Palette.gray),
+                focusedBorder: const OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(25.0)),
+                  borderSide: BorderSide(color: Palette.background),
                 ),
               ),
               style: const TextStyle(color: Palette.white),
@@ -449,8 +459,135 @@ class _SearchPageState extends ConsumerState<SearchPage> {
               },
             ),
           ),
+          const SizedBox(width: 5),
+          SizedBox(
+            width: 41,
+            height: 41,
+            child: IconButton(
+              icon: SvgPicture.asset(
+                'assets/icons/question.svg',
+                color: Palette.extraLightGray,
+              ),
+              color: Palette.white,
+              onPressed: () => _helpSearch(context),
+            ),
+          ),
         ],
       ),
     );
   }
+}
+
+_helpSearch(BuildContext context) {
+  // open bottom sheet
+  return showModalBottomSheet(
+    backgroundColor: Palette.extraDarkGray,
+    context: context,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.only(
+        topLeft: Radius.circular(20),
+        topRight: Radius.circular(20),
+      ),
+    ),
+    //showDragHandle: true,
+    builder: (context) {
+      return const Padding(
+        padding: const EdgeInsets.fromLTRB(30, 20, 30, 20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Text(
+              'Search',
+              style: TextStyle(
+                color: Palette.white,
+                fontSize: 30,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            SizedBox(height: 25),
+            // hashtag
+            Text(
+              '#hashtag',
+              style: TextStyle(
+                color: Palette.white,
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            SizedBox(height: 5),
+            Expanded(
+              child: Text(
+                'search for hashtags',
+                style: TextStyle(
+                  color: Palette.white,
+                  fontSize: 18,
+                ),
+              ),
+            ),
+            SizedBox(height: 20),
+            // username
+            Text(
+              'username',
+              style: TextStyle(
+                color: Palette.white,
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            SizedBox(height: 5),
+            Expanded(
+              child: Text(
+                'works only if already in cache',
+                style: TextStyle(
+                  color: Palette.white,
+                  fontSize: 18,
+                ),
+              ),
+            ),
+            SizedBox(height: 20),
+            // nip05
+            Text(
+              'user@domain.tld',
+              style: TextStyle(
+                color: Palette.white,
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            SizedBox(height: 5),
+            Expanded(
+              child: Text(
+                'nip05 address',
+                style: TextStyle(
+                  color: Palette.white,
+                  fontSize: 18,
+                ),
+              ),
+            ),
+            SizedBox(height: 20),
+            // mastodon
+            Text(
+              '@mastodon@domain.tld',
+              style: TextStyle(
+                color: Palette.white,
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            SizedBox(height: 5),
+            Expanded(
+              child: Text(
+                'mastodon address (provided by mostr.pub)',
+                style: TextStyle(
+                  color: Palette.white,
+                  fontSize: 18,
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    },
+  );
 }
