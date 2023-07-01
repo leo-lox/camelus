@@ -159,6 +159,8 @@ class NoteCardSplitContent {
           var indexString =
               match.group(0)!.replaceAll("#[", "").replaceAll("]", "");
           var index = int.parse(indexString);
+
+          if (index >= _note.tags.length) continue;
           var tag = _note.tags[index];
 
           if (tag.type == 'p' && _tagsMetadata[tag.value] == null) {
