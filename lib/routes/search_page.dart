@@ -1,27 +1,21 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
-import 'dart:io';
 
 import 'package:camelus/atoms/hashtag_card.dart';
 import 'package:camelus/atoms/person_card.dart';
 import 'package:camelus/config/palette.dart';
-import 'package:camelus/db/entities/db_note_view.dart';
-import 'package:camelus/db/entities/db_note_view_base.dart';
 import 'package:camelus/helpers/search.dart';
 import 'package:camelus/models/api_nostr_band_hashtags.dart';
 import 'package:camelus/models/api_nostr_band_people.dart';
-import 'package:camelus/models/nostr_note.dart';
 import 'package:camelus/models/nostr_request_event.dart';
 import 'package:camelus/models/nostr_tag.dart';
 import 'package:camelus/providers/following_provider.dart';
 import 'package:camelus/providers/key_pair_provider.dart';
 import 'package:camelus/providers/metadata_provider.dart';
 import 'package:camelus/providers/navigation_bar_provider.dart';
-import 'package:camelus/providers/nostr_service_provider.dart';
 import 'package:camelus/providers/relay_provider.dart';
 import 'package:camelus/routes/nostr/profile/profile_page.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_svg/svg.dart';
@@ -586,7 +580,7 @@ _helpSearch(BuildContext context) {
     //showDragHandle: true,
     builder: (context) {
       return const Padding(
-        padding: const EdgeInsets.fromLTRB(30, 20, 30, 20),
+        padding: EdgeInsets.fromLTRB(30, 20, 30, 20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.start,

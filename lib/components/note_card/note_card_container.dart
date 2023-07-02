@@ -1,5 +1,3 @@
-import 'dart:developer';
-import 'dart:ffi';
 
 import 'package:camelus/components/note_card/note_card.dart';
 import 'package:camelus/config/palette.dart';
@@ -7,9 +5,7 @@ import 'package:camelus/helpers/helpers.dart';
 import 'package:camelus/models/nostr_note.dart';
 import 'package:camelus/models/nostr_tag.dart';
 import 'package:camelus/providers/metadata_provider.dart';
-import 'package:camelus/providers/nostr_service_provider.dart';
 import 'package:camelus/services/nostr/metadata/user_metadata.dart';
-import 'package:camelus/services/nostr/nostr_service.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 

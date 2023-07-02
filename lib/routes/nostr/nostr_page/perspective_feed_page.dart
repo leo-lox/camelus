@@ -1,9 +1,7 @@
 import 'package:camelus/config/palette.dart';
 import 'package:camelus/providers/metadata_provider.dart';
-import 'package:camelus/providers/nostr_service_provider.dart';
 import 'package:camelus/routes/nostr/nostr_page/user_feed_original_view.dart';
 import 'package:camelus/services/nostr/metadata/user_metadata.dart';
-import 'package:camelus/services/nostr/nostr_service.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:matomo_tracker/matomo_tracker.dart';

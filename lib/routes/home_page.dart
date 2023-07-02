@@ -2,7 +2,6 @@ import 'dart:ui';
 
 import 'package:camelus/helpers/helpers.dart';
 import 'package:camelus/providers/navigation_bar_provider.dart';
-import 'package:camelus/providers/nostr_service_provider.dart';
 import 'package:camelus/routes/notification_page.dart';
 import 'package:camelus/routes/search_page.dart';
 import 'package:flutter/material.dart';

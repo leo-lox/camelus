@@ -75,13 +75,13 @@ class ImagesTileView extends StatelessWidget {
                                 Palette.black.withOpacity(0.8),
                                 Palette.extraDarkGray.withOpacity(0.5),
                               ],
-                              stops: [0.0, 1.0],
+                              stops: const [0.0, 1.0],
                             ),
                             color: Palette.extraDarkGray.withOpacity(0.5)),
                         child: Center(
                           child: Text(
                             '+$additionalImages',
-                            style: TextStyle(color: Colors.white, fontSize: 38),
+                            style: const TextStyle(color: Colors.white, fontSize: 38),
                           ),
                         ),
                       ),

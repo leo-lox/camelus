@@ -28,8 +28,8 @@ class FollowingPubkeys {
 
   int _fetchLatestEventAt = 0;
 
-  Completer<void> _servicesReady = Completer<void>();
-  Completer<void> _dbStreamReady = Completer<void>();
+  final Completer<void> _servicesReady = Completer<void>();
+  final Completer<void> _dbStreamReady = Completer<void>();
 
   Future<void> get servicesReady => _servicesReady.future;
 

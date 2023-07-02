@@ -8,7 +8,7 @@ import 'package:camelus/services/nostr/nostr_service.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class EditRelaysPage extends ConsumerStatefulWidget {
-  EditRelaysPage({Key? key}) : super(key: key);
+  const EditRelaysPage({Key? key}) : super(key: key);
 
   @override
   ConsumerState<EditRelaysPage> createState() => _EditRelaysPageState();

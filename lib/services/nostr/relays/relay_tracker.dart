@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:camelus/models/nostr_note.dart';
 import 'package:camelus/models/nostr_tag.dart';
-import 'package:camelus/models/socket_control.dart';
 import 'package:camelus/services/nostr/metadata/metadata_injector.dart';
 import 'package:camelus/services/nostr/metadata/nip_05.dart';
 import 'package:cross_local_storage/cross_local_storage.dart';

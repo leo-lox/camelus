@@ -96,12 +96,12 @@ class _NoteCardState extends ConsumerState<NoteCard> {
     _checkRebuild();
 
     if (widget.note.pubkey == 'missing') {
-      return Container(
+      return SizedBox(
         height: 50,
         child: Center(
           child: Text(
             "Missing note:  ${widget.note.getDirectReply?.recommended_relay},  ${widget.note.getRootReply?.recommended_relay}",
-            style: TextStyle(color: Colors.purple, fontSize: 20),
+            style: const TextStyle(color: Colors.purple, fontSize: 20),
           ),
         ),
       );
@@ -295,11 +295,11 @@ class _NoteCardState extends ConsumerState<NoteCard> {
                 color: Palette.darkGray,
               ),
               const SizedBox(width: 5),
-              Text(
+              const Text(
                 // show number of comments if >0
                 "wip",
 
-                style: const TextStyle(color: Palette.gray, fontSize: 16),
+                style: TextStyle(color: Palette.gray, fontSize: 16),
               ),
             ],
           ),

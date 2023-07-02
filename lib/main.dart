@@ -61,12 +61,12 @@ class MyApp extends StatelessWidget {
 
               case '/onboarding':
                 return MaterialPageRoute(
-                  builder: (context) => NostrOnboarding(),
+                  builder: (context) => const NostrOnboarding(),
                 );
 
               case '/settings':
                 return MaterialPageRoute(
-                  builder: (context) => SettingsPage(),
+                  builder: (context) => const SettingsPage(),
                 );
               case '/nostr/event':
                 return MaterialPageRoute(
@@ -84,7 +84,7 @@ class MyApp extends StatelessWidget {
                 );
               case '/nostr/blockedUsers':
                 return MaterialPageRoute(
-                  builder: (context) => BlockedUsers(),
+                  builder: (context) => const BlockedUsers(),
                 );
             }
             assert(false, 'Need to implement ${settings.name}');

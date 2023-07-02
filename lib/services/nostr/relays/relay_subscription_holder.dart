@@ -8,8 +8,8 @@ class RelaySubscriptionHolder {
   final NostrRequestQuery _request;
   final List<MyRelay> _relays = [];
 
-  List<Map> _EOSEvents = [];
-  List<StreamSubscription> _subscriptions = [];
+  final List<Map> _EOSEvents = [];
+  final List<StreamSubscription> _subscriptions = [];
 
   RelaySubscriptionHolder({required NostrRequestQuery request})
       : _request = request;

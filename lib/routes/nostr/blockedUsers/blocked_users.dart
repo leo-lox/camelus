@@ -12,7 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class BlockedUsers extends ConsumerStatefulWidget {
-  BlockedUsers({Key? key}) : super(key: key);
+  const BlockedUsers({Key? key}) : super(key: key);
 
   @override
   ConsumerState<BlockedUsers> createState() => _BlockedUsersState();

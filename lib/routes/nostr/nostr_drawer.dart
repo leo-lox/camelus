@@ -14,7 +14,7 @@ class NostrDrawer extends ConsumerWidget {
 
   //late NostrService _nostrService;
 
-  NostrDrawer({Key? key, required this.pubkey}) : super(key: key);
+  const NostrDrawer({Key? key, required this.pubkey}) : super(key: key);
 
   void navigateToProfile(BuildContext context) {
     Navigator.pushNamed(context, "/nostr/profile", arguments: pubkey);
@@ -104,14 +104,14 @@ class NostrDrawer extends ConsumerWidget {
 
                       if (snapshot.hasData) {
                         picture = snapshot.data?["picture"] ??
-                            "https://avatars.dicebear.com/api/personas/${pubkey}.svg";
+                            "https://avatars.dicebear.com/api/personas/$pubkey.svg";
                       } else if (snapshot.hasError) {
                         picture =
-                            "https://avatars.dicebear.com/api/personas/${pubkey}.svg";
+                            "https://avatars.dicebear.com/api/personas/$pubkey.svg";
                       } else {
                         // loading
                         picture =
-                            "https://avatars.dicebear.com/api/personas/${pubkey}.svg";
+                            "https://avatars.dicebear.com/api/personas/$pubkey.svg";
                       }
                       return myProfilePicture(
                           pictureUrl: picture,

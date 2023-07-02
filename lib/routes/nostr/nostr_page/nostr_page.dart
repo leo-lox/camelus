@@ -1,10 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:developer';
 
-import 'package:camelus/atoms/spinner_center.dart';
 import 'package:camelus/models/socket_control.dart';
-import 'package:camelus/providers/key_pair_provider.dart';
 import 'package:camelus/providers/metadata_provider.dart';
 import 'package:camelus/providers/nostr_service_provider.dart';
 import 'package:camelus/routes/nostr/nostr_page/global_feed_view.dart';
@@ -19,7 +16,6 @@ import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
 import 'package:camelus/atoms/my_profile_picture.dart';
 
-import 'package:camelus/services/nostr/nostr_service.dart';
 import 'package:badges/badges.dart' as badges;
 import 'package:url_launcher/url_launcher.dart';
 
@@ -314,7 +310,7 @@ class _NostrPageState extends ConsumerState<NostrPage>
             children: [
               UserFeedOriginalView(pubkey: widget.pubkey),
               UserFeedAndRepliesView(pubkey: widget.pubkey),
-              GlobalFeedView()
+              const GlobalFeedView()
             ],
           ),
         ),

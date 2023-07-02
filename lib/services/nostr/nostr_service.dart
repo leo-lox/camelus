@@ -4,15 +4,12 @@ import 'dart:developer';
 
 import 'package:camelus/db/database.dart';
 import 'package:camelus/models/nostr_note.dart';
-import 'package:camelus/providers/database_provider.dart';
 import 'package:camelus/providers/key_pair_provider.dart';
 import 'package:camelus/services/nostr/feeds/authors_feed.dart';
 
-import 'package:camelus/services/nostr/feeds/user_feed.dart';
 import 'package:camelus/services/nostr/metadata/metadata_injector.dart';
 import 'package:camelus/services/nostr/metadata/nip_05.dart';
 import 'package:camelus/services/nostr/metadata/user_contacts.dart';
-import 'package:camelus/services/nostr/metadata/user_metadata.dart';
 import 'package:camelus/services/nostr/relays/relay_tracker.dart';
 import 'package:camelus/services/nostr/relays/relays.dart';
 import 'package:camelus/services/nostr/relays/relays_injector.dart';
@@ -20,7 +17,6 @@ import 'package:camelus/services/nostr/relays/relays_ranking.dart';
 import 'package:crypto/crypto.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:hex/hex.dart';
 import 'package:camelus/helpers/helpers.dart';
 import 'package:camelus/helpers/bip340.dart';

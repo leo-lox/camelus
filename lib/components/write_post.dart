@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:camelus/atoms/picture.dart';
-import 'package:camelus/helpers/search.dart';
 import 'package:camelus/providers/metadata_provider.dart';
 import 'package:camelus/providers/nostr_service_provider.dart';
 import 'package:file_picker/file_picker.dart';
@@ -14,7 +13,6 @@ import 'package:lottie/lottie.dart';
 import 'package:camelus/config/palette.dart';
 import 'package:camelus/helpers/helpers.dart';
 import 'package:camelus/models/post_context.dart';
-import 'package:camelus/services/nostr/nostr_injector.dart';
 import 'package:camelus/services/nostr/nostr_service.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
@@ -23,7 +21,7 @@ import 'package:mime/mime.dart';
 class WritePost extends ConsumerStatefulWidget {
   PostContext? context;
 
-  WritePost({Key? key, this.context}) : super(key: key) {}
+  WritePost({Key? key, this.context}) : super(key: key);
 
   @override
   ConsumerState<WritePost> createState() => _WritePostState();

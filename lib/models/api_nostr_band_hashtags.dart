@@ -30,7 +30,7 @@ class ApiNostrBandHashtags {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = <String, dynamic>{};
     data['type'] = type;
     data['hashtags'] = hashtags.map((v) => v.toJson()).toList();
     data['relays'] = relays;
@@ -65,7 +65,7 @@ class Hashtags {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = <String, dynamic>{};
     data['hashtag'] = hashtag;
     data['threads_count'] = threadsCount;
     data['threads'] = threads.map((v) => v.toJson()).toList();
@@ -132,7 +132,7 @@ class Threads {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = <String, dynamic>{};
     data['id'] = id;
     data['kind'] = kind;
     data['pubkey'] = pubkey;

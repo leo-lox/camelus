@@ -5,7 +5,7 @@ import 'package:camelus/helpers/tlv_helpers.dart';
 import 'package:hex/hex.dart';
 
 class NprofileHelper {
-  NprofileHelper() {}
+  NprofileHelper();
 
   /// finds relays and [returns] a bech32 encoded nprofile with relay hints
   Future<String> getNprofile(String pubkey, List<String> userRelays) async {

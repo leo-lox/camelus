@@ -67,11 +67,11 @@ class ProfilePage extends ConsumerStatefulWidget {
 class _ProfilePageState extends ConsumerState<ProfilePage>
     with TickerProviderStateMixin, TraceableClientMixin {
   late NostrService _nostrService;
-  ScrollController _scrollController = ScrollController();
+  final ScrollController _scrollController = ScrollController();
   late AppDatabase _db;
   late UserFeedAndRepliesFeed _userFeedAndRepliesFeed;
 
-  List<StreamSubscription> _subscriptions = [];
+  final List<StreamSubscription> _subscriptions = [];
 
   @override
   String get traceTitle => "profilePage";
@@ -577,7 +577,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                         child: ElevatedButton(
                       onPressed: () {},
                       child: Text(snapshot.error.toString(),
-                          style: TextStyle(fontSize: 20, color: Colors.white)),
+                          style: const TextStyle(fontSize: 20, color: Colors.white)),
                     ))
                   ]),
                 );
@@ -658,7 +658,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => EditRelaysPage(),
+                  builder: (context) => const EditRelaysPage(),
                 ),
               ).then((value) => setState(() {}));
             }
@@ -918,7 +918,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => EditProfilePage(),
+                    builder: (context) => const EditProfilePage(),
                   ),
                 ).then((value) => {
                       metadata.getMetadataByPubkey(widget.pubkey),

@@ -19,7 +19,7 @@ class ApiNostrBandPeople {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
+    final Map<String, dynamic> data = <String, dynamic>{};
     data['profiles'] = profiles.map((v) => v.toJson()).toList();
     return data;
   }
@@ -54,9 +54,9 @@ class Profiles {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = <String, dynamic>{};
     data['pubkey'] = pubkey;
-    data['new_followers_count'] = this.newFollowersCount;
+    data['new_followers_count'] = newFollowersCount;
     data['relays'] = relays;
     data['profile'] = profile.toJson();
     return data;

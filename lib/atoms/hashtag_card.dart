@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'dart:math';
 
 import 'package:camelus/config/palette.dart';
@@ -9,7 +8,7 @@ class HashtagCard extends StatelessWidget {
   final String hashtag;
   final int threadsCount;
 
-  const HashtagCard({
+  const HashtagCard({super.key, 
     required this.index,
     required this.hashtag,
     required this.threadsCount,

@@ -1,20 +1,16 @@
 import 'dart:developer';
 import 'dart:ui';
 
-import 'package:camelus/components/note_card/bottom_sheet_more.dart';
-import 'package:camelus/components/bottom_sheet_share.dart';
 import 'package:camelus/providers/nostr_service_provider.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:camelus/atoms/my_profile_picture.dart';
 import 'package:camelus/components/write_post.dart';
 import 'package:camelus/config/palette.dart';
 import 'package:camelus/helpers/helpers.dart';
 import 'package:camelus/models/post_context.dart';
 import 'package:camelus/models/tweet.dart';
 import 'package:camelus/models/tweet_control.dart';
-import 'package:camelus/services/nostr/nostr_injector.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import 'package:timeago/timeago.dart' as timeago;
@@ -27,7 +23,7 @@ class TweetCard extends ConsumerStatefulWidget {
   final Tweet tweet;
   final TweetControl? tweetControl;
 
-  TweetCard({Key? key, required this.tweet, this.tweetControl})
+  const TweetCard({Key? key, required this.tweet, this.tweetControl})
       : super(key: key);
 
   @override

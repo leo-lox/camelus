@@ -1,4 +1,3 @@
-import 'package:camelus/db/database.dart';
 import 'package:camelus/providers/database_provider.dart';
 import 'package:camelus/providers/key_pair_provider.dart';
 import 'package:camelus/providers/relay_provider.dart';

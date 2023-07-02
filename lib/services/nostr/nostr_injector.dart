@@ -1,6 +1,3 @@
-import 'package:camelus/providers/database_provider.dart';
-import 'package:camelus/providers/nostr_service_provider.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:http/http.dart';
 import 'nostr_service.dart';
 

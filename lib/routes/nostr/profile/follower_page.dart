@@ -1,5 +1,3 @@
-import 'package:camelus/atoms/back_button_round.dart';
-import 'package:camelus/atoms/follow_button.dart';
 import 'package:camelus/atoms/person_card.dart';
 import 'package:camelus/models/nostr_request_event.dart';
 import 'package:camelus/models/nostr_tag.dart';

@@ -37,12 +37,12 @@ Widget myIndicator({
 }) {
   if (value == 0) return Container();
   return Padding(
-      padding: EdgeInsets.only(top: 28),
+      padding: const EdgeInsets.only(top: 28),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Container(
-            padding: EdgeInsets.fromLTRB(20, 10, 20, 10),
+            padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(20),
               color: Palette.extraDarkGray,

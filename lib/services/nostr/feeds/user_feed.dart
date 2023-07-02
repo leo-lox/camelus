@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:developer';
 
 import 'package:camelus/db/database.dart';
@@ -7,7 +6,6 @@ import 'package:camelus/db/entities/db_note_view.dart';
 import 'package:camelus/models/nostr_note.dart';
 import 'package:camelus/models/nostr_request_query.dart';
 import 'package:camelus/services/nostr/relays/relay_coordinator.dart';
-import 'package:camelus/services/nostr/relays/relays.dart';
 
 class UserFeed {
   final AppDatabase _db;
@@ -21,7 +19,7 @@ class UserFeed {
   final StreamController<List<NostrNote>> _feedStreamController =
       StreamController<List<NostrNote>>();
 
-  Completer<List<NostrNote>> _feedRdy = Completer<List<NostrNote>>();
+  final Completer<List<NostrNote>> _feedRdy = Completer<List<NostrNote>>();
 
   NostrNote? _fixedTopNote;
 

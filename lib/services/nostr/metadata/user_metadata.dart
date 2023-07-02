@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:developer';
 
 import 'package:camelus/db/database.dart';
 import 'package:camelus/helpers/helpers.dart';
@@ -33,7 +32,7 @@ class UserMetadata {
   var _metadataWaitingPoolTimerRunning = false;
   Map<String, Completer<Map>> _metadataFutureHolder = {};
 
-  Completer _serviceRdy = Completer();
+  final Completer _serviceRdy = Completer();
 
   UserMetadata({
     required this.relays,

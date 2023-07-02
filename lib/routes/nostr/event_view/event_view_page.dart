@@ -10,8 +10,6 @@ import 'package:camelus/providers/database_provider.dart';
 import 'package:camelus/providers/relay_provider.dart';
 import 'package:camelus/scroll_controller/retainable_scroll_controller.dart';
 import 'package:camelus/services/nostr/feeds/event_feed.dart';
-import 'package:camelus/services/nostr/relays/relays.dart';
-import 'package:camelus/services/nostr/relays/relays_injector.dart';
 import 'package:flutter/material.dart';
 
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -163,7 +161,7 @@ class _EventViewPageState extends ConsumerState<EventViewPage> {
                         child: ElevatedButton(
                       onPressed: () {},
                       child: Text(snapshot.error.toString(),
-                          style: TextStyle(fontSize: 20, color: Colors.white)),
+                          style: const TextStyle(fontSize: 20, color: Colors.white)),
                     ));
                   }
                   return const Text("waiting for stream trigger ",

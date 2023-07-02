@@ -273,7 +273,7 @@ class UserFeedAndRepliesViewState
                         onPressed: () {},
                         child: Text(snapshot.error.toString(),
                             style:
-                                TextStyle(fontSize: 20, color: Colors.white)),
+                                const TextStyle(fontSize: 20, color: Colors.white)),
                       ));
                     }
                     return const Text("waiting for stream trigger ",

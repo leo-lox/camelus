@@ -13,7 +13,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class NostrOnboarding extends ConsumerStatefulWidget {
-  NostrOnboarding({Key? key}) : super(key: key);
+  const NostrOnboarding({Key? key}) : super(key: key);
 
   @override
   ConsumerState<NostrOnboarding> createState() => _NostrOnboardingState();

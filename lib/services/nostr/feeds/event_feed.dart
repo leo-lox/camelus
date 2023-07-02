@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:developer';
 
 import 'package:camelus/db/database.dart';
@@ -20,10 +19,10 @@ class EventFeed {
   final StreamController<List<NostrNote>> _feedStreamController =
       StreamController<List<NostrNote>>();
 
-  Completer<List<NostrNote>> _feedRdy = Completer<List<NostrNote>>();
+  final Completer<List<NostrNote>> _feedRdy = Completer<List<NostrNote>>();
 
   List<NostrNote> _feed = [];
-  List<NostrNote> _feedNewNotes = [];
+  final List<NostrNote> _feedNewNotes = [];
 
   EventFeed(this._db, this._rootNoteId, this._relays) {
     init();

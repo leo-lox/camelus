@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:camelus/config/palette.dart';
 import 'package:flutter/material.dart';
 import 'package:photo_view/photo_view.dart';
@@ -121,7 +119,7 @@ class _ImageGalleryState extends State<ImageGallery> {
       child: Row(
         children: [
           IconButton(
-            icon: Icon(Icons.close, size: 30),
+            icon: const Icon(Icons.close, size: 30),
             color: Colors.white,
             onPressed: () {
               Navigator.of(context).pop();

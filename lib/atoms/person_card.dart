@@ -1,4 +1,3 @@
-import 'dart:developer';
 
 import 'package:camelus/atoms/follow_button.dart';
 import 'package:camelus/atoms/my_profile_picture.dart';

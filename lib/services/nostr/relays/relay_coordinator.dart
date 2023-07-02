@@ -22,8 +22,8 @@ class RelayCoordinator {
   late AppDatabase _db;
   late KeyPair _keyPair;
 
-  List<RelaySubscriptionHolder> _activeSubscriptions = [];
-  List<MyRelay> _relays = [];
+  final List<RelaySubscriptionHolder> _activeSubscriptions = [];
+  final List<MyRelay> _relays = [];
   List<RelayAssignment> _gossipRelayAssignments = [];
 
   final Completer _ready = Completer();

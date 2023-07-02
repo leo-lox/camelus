@@ -1,9 +1,7 @@
 import 'dart:ui';
 
-import 'package:camelus/components/seen_on_relays.dart';
 import 'package:camelus/config/palette.dart';
 import 'package:camelus/models/nostr_note.dart';
-import 'package:camelus/models/tweet.dart';
 import 'package:camelus/routes/nostr/blockedUsers/block_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
