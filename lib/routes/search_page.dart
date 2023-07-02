@@ -12,9 +12,14 @@ import 'package:camelus/helpers/search.dart';
 import 'package:camelus/models/api_nostr_band_hashtags.dart';
 import 'package:camelus/models/api_nostr_band_people.dart';
 import 'package:camelus/models/nostr_note.dart';
+import 'package:camelus/models/nostr_request_event.dart';
 import 'package:camelus/models/nostr_tag.dart';
+import 'package:camelus/providers/following_provider.dart';
+import 'package:camelus/providers/key_pair_provider.dart';
+import 'package:camelus/providers/metadata_provider.dart';
 import 'package:camelus/providers/navigation_bar_provider.dart';
 import 'package:camelus/providers/nostr_service_provider.dart';
+import 'package:camelus/providers/relay_provider.dart';
 import 'package:camelus/routes/nostr/profile/profile_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -149,8 +154,9 @@ class _SearchPageState extends ConsumerState<SearchPage> {
       });
       return;
     }
+    List<Map<String, dynamic>> workingMetadata = [];
 
-    var localMetadata = _search.searchUsersMetadata(value);
+    //workingMetadata.addAll(_search.searchUsersMetadata(value));
 
     // check if it is a valid nip05
     RegExp nip05Regex =
@@ -171,13 +177,31 @@ class _SearchPageState extends ConsumerState<SearchPage> {
       //turn into https://mostr.pub/.well-known/nostr.json?name=username_at_domain.tld
       final String removeAt = value.replaceFirst('@', '');
       final String snakeCase = removeAt.replaceAll('@', '_at_');
-      finalNip05 = 'https://mostr.pub/.well-known/nostr.json?name=$snakeCase';
+      //finalNip05 = 'https://mostr.pub/.well-known/nostr.json?name=$snakeCase';
+      finalNip05 = "$snakeCase@mostr.pub";
     }
     if (finalNip05 != null) {
       log('finalNip05 $finalNip05');
-      //var nip05Metadata = await _search.searchNip05(finalNip05);
-      //final String nipPubkey = nip05Metadata!['pubkey'];
-      //final List<String> nipRelays = nip05Metadata['relays'];
+      var nip05Metadata = await _search.searchNip05(finalNip05);
+
+      if (nip05Metadata != null) {
+        final String nipPubkey = nip05Metadata['pubkey'];
+        final List nipRelays = nip05Metadata['relays'];
+
+        var metadata = ref.watch(metadataProvider);
+
+        var personMetadata = await metadata.getMetadataByPubkey(nipPubkey);
+
+        if (personMetadata.keys.isNotEmpty) {
+          workingMetadata.add(personMetadata as Map<String, dynamic>);
+        } else {
+          workingMetadata.add({
+            'pubkey': nipPubkey,
+            'name': value,
+            'relays': nipRelays,
+          });
+        }
+      }
     }
 
     if (hastagRegex.hasMatch(value)) {
@@ -192,12 +216,60 @@ class _SearchPageState extends ConsumerState<SearchPage> {
     }
 
     setState(() {
-      _searchResults = localMetadata;
+      _searchResults = workingMetadata;
     });
+  }
+
+  void _changeFollowing(bool followChange, String pubkey,
+      List<NostrTag> currentOwnContacts) async {
+    var mykeys = await ref.watch(keyPairProvider.future);
+    var db = await ref.watch(databaseProvider.future);
+
+    var myLastNote =
+        (await db.noteDao.findPubkeyNotesByKind([mykeys.keyPair!.publicKey], 3))
+            .first;
+
+    List<NostrTag> newContacts = [...currentOwnContacts];
+
+    if (followChange) {
+      newContacts.add(NostrTag(type: 'p', value: pubkey));
+    } else {
+      newContacts.removeWhere((element) => element.value == pubkey);
+    }
+
+    _writeContacts(
+      publicKey: mykeys.keyPair!.publicKey,
+      privateKey: mykeys.keyPair!.privateKey,
+      content: myLastNote.content,
+      updatedContacts: newContacts,
+    );
+  }
+
+  Future _writeContacts({
+    required String publicKey,
+    required String privateKey,
+    required String content,
+    required List<NostrTag> updatedContacts,
+  }) async {
+    var relays = ref.watch(relayServiceProvider);
+    NostrRequestEventBody body = NostrRequestEventBody(
+      pubkey: publicKey,
+      privateKey: privateKey,
+      content: content,
+      kind: 3,
+      tags: updatedContacts,
+    );
+    NostrRequestEvent myEvent = NostrRequestEvent(body: body);
+
+    await relays.write(request: myEvent);
+
+    return;
   }
 
   @override
   Widget build(BuildContext context) {
+    var followingService = ref.watch(followingProvider);
+
     return WillPopScope(
       onWillPop: () async {
         // check if search is focused
@@ -211,57 +283,71 @@ class _SearchPageState extends ConsumerState<SearchPage> {
       child: Scaffold(
         backgroundColor: Palette.background,
         // scrollable column
-        body: Column(
-          children: [
-            _searchBar(context),
-            Expanded(
-              child: ListView(
-                physics: const BouncingScrollPhysics(),
-                children: [
-                  // hide default view when searching
-                  Visibility(
-                    maintainState: true,
-                    maintainInteractivity: false,
-                    visible: !_isSearching,
-                    child: _defaultView(),
+        body: StreamBuilder<List<NostrTag>>(
+          stream: followingService.ownPubkeyContactsStreamDb,
+          initialData: followingService.ownContacts,
+          builder: (context, ownFollowingSnapshot) {
+            return Column(
+              children: [
+                _searchBar(context),
+                Expanded(
+                  child: ListView(
+                    physics: const BouncingScrollPhysics(),
+                    children: [
+                      // hide default view when searching
+                      Visibility(
+                        maintainState: true,
+                        maintainInteractivity: false,
+                        visible: !_isSearching,
+                        child: _defaultView(ownFollowingSnapshot.data!),
+                      ),
+                      if (_searchFocusNode.hasFocus)
+                        Column(
+                          children: [
+                            // search results
+                            for (var result in _searchResults)
+                              PersonCard(
+                                name: result['name'] ?? '',
+                                nip05: result['nip05'] ?? '',
+                                pictureUrl: result['picture'] ?? '',
+                                about: result['about'] ?? '',
+                                pubkey: result['pubkey'] ?? '',
+                                isFollowing: ownFollowingSnapshot.data!.any(
+                                    (element) =>
+                                        element.value == result['pubkey']),
+                                onTap: () {
+                                  // navigate to profile page
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => ProfilePage(
+                                        pubkey: result['pubkey'],
+                                      ),
+                                    ),
+                                  );
+                                },
+                                onFollowTab: (followState) {
+                                  _changeFollowing(
+                                    followState,
+                                    result['pubkey'],
+                                    ownFollowingSnapshot.data!,
+                                  );
+                                },
+                              ),
+                          ],
+                        )
+                    ],
                   ),
-                  if (_searchFocusNode.hasFocus)
-                    Column(
-                      children: [
-                        // search results
-                        for (var result in _searchResults)
-                          PersonCard(
-                            name: result['name'] ?? '',
-                            nip05: result['nip05'] ?? '',
-                            pictureUrl: result['picture'] ?? '',
-                            about: result['about'] ?? '',
-                            pubkey: result['pubkey'] ?? '',
-                            isFollowing: false,
-                            onTap: () {
-                              // navigate to profile page
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => ProfilePage(
-                                    pubkey: result['pubkey'],
-                                  ),
-                                ),
-                              );
-                            },
-                            onFollowTab: (followState) {},
-                          ),
-                      ],
-                    )
-                ],
-              ),
-            ),
-          ],
+                ),
+              ],
+            );
+          },
         ),
       ),
     );
   }
 
-  Container _defaultView() {
+  Container _defaultView(List<NostrTag> currentFollowing) {
     return Container(
         padding: const EdgeInsets.only(left: 20, top: 20, bottom: 10),
         child: Column(
@@ -327,7 +413,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                     return const Text('Something went wrong');
                   }
                   if (snapshot.hasData) {
-                    return _trendingPeople(snapshot.data!, 5);
+                    return _trendingPeople(snapshot.data!, 5, currentFollowing);
                   }
                   if (snapshot.connectionState == ConnectionState.done) {
                     return const Text('no connection');
@@ -365,7 +451,8 @@ class _SearchPageState extends ConsumerState<SearchPage> {
     );
   }
 
-  Widget _trendingPeople(ApiNostrBandPeople api, int limit) {
+  Widget _trendingPeople(
+      ApiNostrBandPeople api, int limit, List<NostrTag> currentFollowing) {
     List<PersonCard> personCards = [];
 
     for (int i = 0; i < api.profiles.length; i++) {
@@ -380,7 +467,8 @@ class _SearchPageState extends ConsumerState<SearchPage> {
         pictureUrl: metadata['picture'] ?? '',
         about: metadata['about'] ?? '',
         nip05: metadata['nip05'] ?? '',
-        isFollowing: false,
+        isFollowing:
+            currentFollowing.any((element) => element.value == profile.pubkey),
         onTap: () {
           Navigator.push(
             context,
@@ -391,7 +479,13 @@ class _SearchPageState extends ConsumerState<SearchPage> {
             ),
           );
         },
-        onFollowTab: (followState) {},
+        onFollowTab: (followState) {
+          _changeFollowing(
+            followState,
+            profile.pubkey,
+            currentFollowing,
+          );
+        },
       );
       personCards.add(myCard);
     }

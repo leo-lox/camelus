@@ -126,7 +126,7 @@ class Nip05 {
     }
   }
 
-  static dynamic rawNip05Request(String nip05, http.Client client) async {
+  static Future rawNip05Request(String nip05, http.Client client) async {
     String username = nip05.split("@")[0];
     String url = nip05.split("@")[1];
     // make get request

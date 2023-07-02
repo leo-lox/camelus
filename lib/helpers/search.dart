@@ -73,13 +73,18 @@ class Search {
 
   Future<Map<String, dynamic>?> searchNip05(String nip05) async {
     String username = nip05.split("@")[0];
-    String url = nip05.split("@")[1];
+    try {
+      String url = nip05.split("@")[1];
+    } catch (e) {
+      return null;
+    }
 
     http.Client client = http.Client();
     Map response;
     try {
-      response = Nip05.rawNip05Request(nip05, client);
+      response = await Nip05.rawNip05Request(nip05, client);
     } catch (e) {
+      log("error serachNip05 nip05: $e");
       return null;
     }
 
@@ -91,7 +96,7 @@ class Search {
     }
 
     String myPubkey = names[username];
-    List<String> myRelays = relays[myPubkey] ?? [];
+    List<String> myRelays = List<String>.from(relays[myPubkey]) ?? [];
 
     return {
       "nip05": nip05,
