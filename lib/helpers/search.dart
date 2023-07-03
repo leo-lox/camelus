@@ -96,7 +96,12 @@ class Search {
     }
 
     String myPubkey = names[username];
-    List<String> myRelays = List<String>.from(relays[myPubkey]) ?? [];
+    List<String> myRelays;
+    try {
+      myRelays = List<String>.from(relays[myPubkey]);
+    } catch (e) {
+      myRelays = [];
+    }
 
     return {
       "nip05": nip05,

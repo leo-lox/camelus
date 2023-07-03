@@ -5,6 +5,8 @@ import 'dart:developer';
 import 'package:camelus/atoms/hashtag_card.dart';
 import 'package:camelus/atoms/person_card.dart';
 import 'package:camelus/config/palette.dart';
+import 'package:camelus/helpers/helpers.dart';
+import 'package:camelus/helpers/nprofile_helper.dart';
 import 'package:camelus/helpers/search.dart';
 import 'package:camelus/models/api_nostr_band_hashtags.dart';
 import 'package:camelus/models/api_nostr_band_people.dart';
@@ -148,9 +150,12 @@ class _SearchPageState extends ConsumerState<SearchPage> {
       });
       return;
     }
+    var metadata = ref.watch(metadataProvider);
     List<Map<String, dynamic>> workingMetadata = [];
 
-    //workingMetadata.addAll(_search.searchUsersMetadata(value));
+    workingMetadata.addAll(_search.searchUsersMetadata(value));
+
+    final pattern = RegExp(r"nostr:(nprofile|npub)[a-zA-Z0-9]+");
 
     // check if it is a valid nip05
     RegExp nip05Regex =
@@ -162,7 +167,46 @@ class _SearchPageState extends ConsumerState<SearchPage> {
 
     RegExp cashtagRegex = RegExp(r'^(\$|\€|\£|\¥|\₿)\S+');
 
+    RegExp hexRegex = RegExp(r'[a-fA-F0-9]{64}');
+
+    RegExp nprofileNpubRegex = RegExp(r'(nostr:|)(nprofile|npub)[a-zA-Z0-9]+');
+
     String? finalNip05;
+
+    if (hexRegex.hasMatch(value) || nprofileNpubRegex.hasMatch(value)) {
+      String hex = '';
+      if (value.contains('nostr:')) {
+        value = value.replaceAll('nostr:', '');
+      }
+
+      if (value.contains('nprofile')) {
+        Map nprofile = NprofileHelper().bech32toMap(value);
+        hex = nprofile['pubkey'];
+        var relays = nprofile['relays'];
+      }
+
+      if (value.contains('npub')) {
+        List<String> npub = Helpers().decodeBech32(value);
+        hex = npub[0];
+      }
+
+      if (hexRegex.hasMatch(value)) {
+        hex = value;
+      }
+
+      var personMetadata = await metadata.getMetadataByPubkey(hex);
+
+      if (personMetadata.keys.isNotEmpty) {
+        workingMetadata.add(personMetadata as Map<String, dynamic>);
+        personMetadata['pubkey'] = hex;
+      } else {
+        workingMetadata.add({
+          'pubkey': value,
+          'name': value,
+          'relays': [],
+        });
+      }
+    }
 
     if (nip05Regex.hasMatch(value)) {
       finalNip05 = value;
@@ -182,9 +226,8 @@ class _SearchPageState extends ConsumerState<SearchPage> {
         final String nipPubkey = nip05Metadata['pubkey'];
         final List nipRelays = nip05Metadata['relays'];
 
-        var metadata = ref.watch(metadataProvider);
-
         var personMetadata = await metadata.getMetadataByPubkey(nipPubkey);
+        personMetadata['pubkey'] = nipPubkey;
 
         if (personMetadata.keys.isNotEmpty) {
           workingMetadata.add(personMetadata as Map<String, dynamic>);
