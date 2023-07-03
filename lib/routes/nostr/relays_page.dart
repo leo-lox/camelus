@@ -79,7 +79,7 @@ class _RelaysPageState extends ConsumerState<RelaysPage> {
               padding: const EdgeInsets.fromLTRB(12.0, 0.0, 12.0, 0.0),
               child: SizedBox(
                 height: MediaQuery.of(context).size.height - 140,
-                child: ListView(
+                child: Column(
                   children: [
                     StreamBuilder<List<MyRelay>>(
                       initialData: myRelays.relays,
@@ -89,67 +89,70 @@ class _RelaysPageState extends ConsumerState<RelaysPage> {
                           return const Center(
                               child: CircularProgressIndicator());
                         }
-                        return ListView.builder(
-                          shrinkWrap: true,
-                          itemCount: snapshot.data!.length,
-                          itemBuilder: (context, index) {
-                            return Column(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      snapshot.data![index].relayUrl,
-                                      style: const TextStyle(
-                                        color: Palette.white,
-                                        fontSize: 14.0,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 12.0),
-                                    Expanded(
-                                      child: Text(
-                                        "conn: ${snapshot.data![index].connected.toString()}",
-                                        textAlign: TextAlign.start,
+                        return SizedBox(
+                          height: MediaQuery.of(context).size.height - 400,
+                          child: ListView.builder(
+                            itemCount: snapshot.data!.length,
+                            itemBuilder: (context, index) {
+                              return Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        snapshot.data![index].relayUrl,
                                         style: const TextStyle(
                                           color: Palette.white,
                                           fontSize: 14.0,
-                                          fontWeight: FontWeight.w400,
+                                          fontWeight: FontWeight.w500,
                                         ),
                                       ),
-                                    ),
-                                    const SizedBox(width: 12.0),
-                                  ],
-                                ),
-                                const SizedBox(height: 2.0),
-                                Text(
-                                    "read ${snapshot.data![index].read.toString()}",
-                                    style: const TextStyle(
-                                      color: Palette.white,
-                                      fontSize: 14.0,
-                                      fontWeight: FontWeight.w400,
-                                    )),
-                                Text(
-                                    "write ${snapshot.data![index].write.toString()}",
-                                    style: const TextStyle(
-                                      color: Palette.white,
-                                      fontSize: 14.0,
-                                      fontWeight: FontWeight.w400,
-                                    )),
-                                Text(
-                                    "persistance ${snapshot.data![index].persistance.toString()}",
-                                    style: const TextStyle(
-                                      color: Palette.white,
-                                      fontSize: 14.0,
-                                      fontWeight: FontWeight.bold,
-                                    )),
-                                const SizedBox(height: 25.0),
-                              ],
-                            );
-                          },
+                                      const SizedBox(width: 12.0),
+                                      Expanded(
+                                        child: Text(
+                                          "conn: ${snapshot.data![index].connected.toString()}",
+                                          textAlign: TextAlign.start,
+                                          style: const TextStyle(
+                                            color: Palette.white,
+                                            fontSize: 14.0,
+                                            fontWeight: FontWeight.w400,
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 12.0),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 2.0),
+                                  Text(
+                                      "read ${snapshot.data![index].read.toString()}",
+                                      style: const TextStyle(
+                                        color: Palette.white,
+                                        fontSize: 14.0,
+                                        fontWeight: FontWeight.w400,
+                                      )),
+                                  Text(
+                                      "write ${snapshot.data![index].write.toString()}",
+                                      style: const TextStyle(
+                                        color: Palette.white,
+                                        fontSize: 14.0,
+                                        fontWeight: FontWeight.w400,
+                                      )),
+                                  Text(
+                                      "persistance ${snapshot.data![index].persistance.toString()}",
+                                      style: const TextStyle(
+                                        color: Palette.white,
+                                        fontSize: 14.0,
+                                        fontWeight: FontWeight.bold,
+                                      )),
+                                  const SizedBox(height: 25.0),
+                                ],
+                              );
+                            },
+                          ),
                         );
                       },
                     ),

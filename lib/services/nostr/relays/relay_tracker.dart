@@ -4,6 +4,7 @@ import 'package:camelus/models/nostr_note.dart';
 import 'package:camelus/models/nostr_tag.dart';
 import 'package:camelus/services/nostr/metadata/metadata_injector.dart';
 import 'package:camelus/services/nostr/metadata/nip_05.dart';
+import 'package:camelus/services/nostr/relays/relay_address_parser.dart';
 import 'package:cross_local_storage/cross_local_storage.dart';
 import 'package:json_cache/json_cache.dart';
 
@@ -59,7 +60,7 @@ class RelayTracker {
     // lastFetched
     var personPubkey = event.pubkey;
     var now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
-    var myRelayUrl = socketUrl;
+    var myRelayUrl = RelayAddressParser.parseAddress(socketUrl);
     trackRelays(
         personPubkey, [myRelayUrl], RelayTrackerAdvType.lastFetched, now);
 
@@ -162,19 +163,30 @@ class RelayTracker {
   /// timestamp can be a string or int
   void trackRelays(String personPubkey, List<String> relayUrls,
       RelayTrackerAdvType nip, dynamic timestamp) {
+    var relayUrlsCleaned = <String>[];
+
+    for (var relay in relayUrls) {
+      try {
+        var cleaned = RelayAddressParser.parseAddress(relay);
+        relayUrlsCleaned.add(cleaned);
+      } catch (e) {
+        continue;
+      }
+    }
+
     if (timestamp.runtimeType == String) {
       timestamp = int.parse(timestamp);
     }
 
-    if (personPubkey.isEmpty || relayUrls.isEmpty) {
+    if (personPubkey.isEmpty || relayUrlsCleaned.isEmpty) {
       return;
     }
 
-    for (var relayUrl in relayUrls) {
+    for (var relayUrl in relayUrlsCleaned) {
       _populateTracker(personPubkey, relayUrl);
     }
 
-    for (var relayUrl in relayUrls) {
+    for (var relayUrl in relayUrlsCleaned) {
       if (relayUrl.isEmpty) {
         continue;
       }

@@ -1,5 +1,5 @@
 class RelayAddressParser {
-  static parseAddress(String address) {
+  static String parseAddress(String address) {
     // Check if input starts with "wss://"
     if (!address.startsWith("wss://")) {
       address = "wss://$address";
