@@ -1,9 +1,11 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:camelus/atoms/picture.dart';
 import 'package:camelus/providers/metadata_provider.dart';
 import 'package:camelus/providers/nostr_service_provider.dart';
+import 'package:camelus/services/external/nostr_build_file_upload.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mentions/flutter_mentions.dart';
@@ -135,38 +137,6 @@ class _WritePostState extends ConsumerState<WritePost> {
     });
   }
 
-  Future<String> _uploadImage(File file) async {
-    final uri = Uri.parse('https://nostr.build/upload.php');
-    var request = http.MultipartRequest('POST', uri);
-
-    var bytes = await file.readAsBytes();
-    var mimeType = lookupMimeType(file.path);
-    var filename = file.path.split('/').last;
-
-    final httpImage = http.MultipartFile.fromBytes("fileToUpload", bytes,
-        contentType: MediaType.parse(mimeType!), filename: filename);
-    request.files.add(httpImage);
-
-    final response = await request.send();
-
-    if (response.statusCode != 200) {
-      return "";
-    }
-
-    var responseString = await response.stream.transform(utf8.decoder).join();
-
-    // extract url https://nostr.build/i/4697.png
-    final RegExp urlPattern =
-        RegExp(r'https:\/\/nostr\.build\/i\/\S+\.(?:jpg|jpeg|png|gif)');
-    final Match? urlMatch = urlPattern.firstMatch(responseString);
-    if (urlMatch != null) {
-      final String myUrl = urlMatch.group(0)!;
-      return myUrl;
-    } else {
-      return "";
-    }
-  }
-
   _submitPost() async {
     var textController = _textEditingControllerKey.currentState!.controller;
 
@@ -239,9 +209,11 @@ class _WritePostState extends ConsumerState<WritePost> {
     // upload images
     List<String> imageUrls = [];
     for (var image in _images) {
-      var url = await _uploadImage(image);
-      if (url.isNotEmpty) {
+      try {
+        var url = await NostrBuildFileUpload.uploadImage(image);
         imageUrls.add(url);
+      } catch (e) {
+        log("errUploadImage:  ${e.toString()}");
       }
     }
 
