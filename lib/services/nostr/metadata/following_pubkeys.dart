@@ -150,10 +150,14 @@ class FollowingPubkeys {
   }
 
   Future<List<NostrTag>> _checkIfFetching(
-      String pubkey, String requestId, int now) {
+      String pubkey, String requestId, int now) async {
     if (_currentlyFetching.map((e) => e.pubkey).contains(pubkey)) {
       // already fetching
-      return _currentlyFetching.firstWhere((e) => e.pubkey == pubkey).fetchNew;
+      var result = await _currentlyFetching
+          .firstWhere((e) => e.pubkey == pubkey)
+          .fetchNew;
+      _currentlyFetching.removeWhere((e) => e.pubkey == pubkey);
+      return result;
     }
     var current = CurrentlyFetching(
         pubkey: pubkey,
@@ -161,7 +165,9 @@ class FollowingPubkeys {
     _currentlyFetching.add(
       current,
     );
-    return current.fetchNew;
+    var result = await current.fetchNew;
+    _currentlyFetching.removeWhere((e) => e.pubkey == pubkey);
+    return result;
   }
 
   Future<List<NostrTag>> _fetchNew(
