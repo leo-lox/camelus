@@ -312,7 +312,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
         // check if search is focused
         if (_searchFocusNode.hasFocus) {
           _searchFocusNode.unfocus();
-
+          _searchController.clear();
           return false;
         }
         return true;
@@ -450,7 +450,8 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                     return const Text('Something went wrong');
                   }
                   if (snapshot.hasData) {
-                    return _trendingPeople(snapshot.data!, 5, currentFollowing);
+                    return _trendingPeople(
+                        snapshot.data!, 10, currentFollowing);
                   }
                   if (snapshot.connectionState == ConnectionState.done) {
                     return const Text('no connection');
@@ -550,6 +551,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                   : const Icon(Icons.search),
               color: Palette.white,
               onPressed: () {
+                _searchController.clear();
                 // unfocus search bar
                 _searchFocusNode.hasFocus
                     ? _searchFocusNode.unfocus()
