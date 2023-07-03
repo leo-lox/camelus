@@ -18,6 +18,8 @@ class FollowingPubkeys {
 
   final List<StreamSubscription> _subscriptions = [];
 
+  final List<CurrentlyFetching> _currentlyFetching = [];
+
   final StreamController<List<NostrTag>> _contactsController =
       StreamController<List<NostrTag>>.broadcast();
   Stream<List<NostrTag>> get ownPubkeyContactsStreamDb =>
@@ -133,7 +135,8 @@ class FollowingPubkeys {
     if (dbList.isEmpty) {
       // no data in db, request it
 
-      return _fetchNew(pubkey: pubkey, requestId: requestId, now: now);
+      return _checkIfFetching(pubkey, requestId, now);
+      //return _fetchNew(pubkey: pubkey, requestId: requestId, now: now);
     }
 
     // check how fresh the data is / 4 hours
@@ -144,8 +147,23 @@ class FollowingPubkeys {
     }
 
     // data is old, request it
+    return _checkIfFetching(pubkey, requestId, now);
+    //return _fetchNew(pubkey: pubkey, requestId: requestId, now: now);
+  }
 
-    return _fetchNew(pubkey: pubkey, requestId: requestId, now: now);
+  Future<List<NostrTag>> _checkIfFetching(
+      String pubkey, String requestId, int now) {
+    if (_currentlyFetching.map((e) => e.pubkey).contains(pubkey)) {
+      // already fetching
+      return _currentlyFetching.firstWhere((e) => e.pubkey == pubkey).fetchNew;
+    }
+    var current = CurrentlyFetching(
+        pubkey: pubkey,
+        fetchNew: _fetchNew(pubkey: pubkey, requestId: requestId, now: now));
+    _currentlyFetching.add(
+      current,
+    );
+    return current.fetchNew;
   }
 
   Future<List<NostrTag>> _fetchNew(
@@ -173,4 +191,14 @@ class FollowingPubkeys {
     relays.closeSubscription(requestId);
     return;
   }
+}
+
+class CurrentlyFetching {
+  final String pubkey;
+  final Future<List<NostrTag>> fetchNew;
+
+  CurrentlyFetching({
+    required this.pubkey,
+    required this.fetchNew,
+  });
 }
