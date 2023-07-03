@@ -31,6 +31,11 @@ class RelayCoordinator {
   final List<NostrTag> _ownContacts = [];
   int _fetchLatestContactListAt = 0;
 
+  List<MyRelay> get relays => _relays;
+  Stream<List<MyRelay>> get relaysStream => _relaysStreamController.stream;
+  final StreamController<List<MyRelay>> _relaysStreamController =
+      StreamController<List<MyRelay>>.broadcast();
+
   RelayCoordinator({
     required this.dbFuture,
     required this.keyPairFuture,
@@ -407,6 +412,7 @@ class RelayCoordinator {
         persistance: persistance);
     await relay.connect();
     _relays.add(relay);
+    _relaysStreamController.add(_relays);
     return relay;
   }
 

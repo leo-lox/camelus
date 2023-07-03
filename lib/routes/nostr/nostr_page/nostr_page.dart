@@ -4,10 +4,12 @@ import 'dart:convert';
 import 'package:camelus/models/socket_control.dart';
 import 'package:camelus/providers/metadata_provider.dart';
 import 'package:camelus/providers/nostr_service_provider.dart';
+import 'package:camelus/providers/relay_provider.dart';
 import 'package:camelus/routes/nostr/nostr_page/global_feed_view.dart';
 import 'package:camelus/routes/nostr/nostr_page/user_feed_and_replies_view.dart';
 import 'package:camelus/routes/nostr/nostr_page/user_feed_original_view.dart';
 import 'package:camelus/routes/nostr/relays_page.dart';
+import 'package:camelus/services/nostr/relays/my_relay.dart';
 import 'package:flutter/material.dart';
 
 import 'package:flutter_svg/flutter_svg.dart';
@@ -91,16 +93,6 @@ class _NostrPageState extends ConsumerState<NostrPage>
         });
   }
 
-  int _countRedyRelays(Map<String, SocketControl> relays) {
-    int count = 0;
-    for (var r in relays.values) {
-      if (r.socketIsRdy) {
-        count++;
-      }
-    }
-    return count;
-  }
-
   _openRelaysView() {
     Navigator.of(context).push(
       PageRouteBuilder(
@@ -166,6 +158,7 @@ class _NostrPageState extends ConsumerState<NostrPage>
     super.build(context);
     var nostrService = ref.watch(nostrServiceProvider);
     var metadata = ref.watch(metadataProvider);
+    var myRelays = ref.watch(relayServiceProvider);
 
     return Scaffold(
       backgroundColor: Palette.background,
@@ -241,11 +234,10 @@ class _NostrPageState extends ConsumerState<NostrPage>
                 actions: [
                   GestureDetector(
                     onTap: () => _openRelaysView(),
-                    child: StreamBuilder(
-                        stream: nostrService.relays.connectedRelaysReadStream,
-                        builder: (context,
-                            AsyncSnapshot<Map<String, SocketControl>>
-                                snapshot) {
+                    child: StreamBuilder<List<MyRelay>>(
+                        stream: myRelays.relaysStream,
+                        initialData: myRelays.relays,
+                        builder: (context, snapshot) {
                           if (!snapshot.hasData || snapshot.data!.isEmpty) {
                             return Row(
                               children: [
@@ -276,7 +268,10 @@ class _NostrPageState extends ConsumerState<NostrPage>
                                 const SizedBox(width: 5),
                                 Text(
                                   // count how many relays are ready
-                                  _countRedyRelays(snapshot.data!).toString(),
+                                  snapshot.data!
+                                      .where((element) => element.connected)
+                                      .length
+                                      .toString(),
                                   style:
                                       const TextStyle(color: Palette.lightGray),
                                 ),
