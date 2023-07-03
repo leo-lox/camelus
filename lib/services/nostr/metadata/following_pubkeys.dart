@@ -136,7 +136,6 @@ class FollowingPubkeys {
       // no data in db, request it
 
       return _checkIfFetching(pubkey, requestId, now);
-      //return _fetchNew(pubkey: pubkey, requestId: requestId, now: now);
     }
 
     // check how fresh the data is / 4 hours
@@ -148,7 +147,6 @@ class FollowingPubkeys {
 
     // data is old, request it
     return _checkIfFetching(pubkey, requestId, now);
-    //return _fetchNew(pubkey: pubkey, requestId: requestId, now: now);
   }
 
   Future<List<NostrTag>> _checkIfFetching(
