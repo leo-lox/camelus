@@ -69,8 +69,8 @@ class UserMetadata {
   }
 
   _removeOldData() {
-    // 4 hours //todo move magic number to settings
-    int timeBarrier = 60 * 60 * 4;
+    // 12 hours //todo move magic number to settings
+    int timeBarrier = 60 * 60 * 12;
     var now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
     var oldData = <String, int>{};
     for (var key in metadataLastFetch.keys) {
@@ -181,7 +181,7 @@ class UserMetadata {
   Future _requestMetadata(List<String> users, requestId) async {
     var body = NostrRequestQueryBody(
       authors: users,
-      kinds: [0],
+      kinds: [0, 10002], // + nip 65
       limit: users.length,
     );
     var request = NostrRequestQuery(subscriptionId: requestId, body: body);

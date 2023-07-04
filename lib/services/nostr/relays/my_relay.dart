@@ -199,4 +199,4 @@ class MyRelay {
 /// manual - added by user
 /// gossip - added by gossip
 /// tmp - used to query some events
-enum RelayPersistance { manual, gossip, tmp }
+enum RelayPersistance { manual, gossip, tmp, auto }

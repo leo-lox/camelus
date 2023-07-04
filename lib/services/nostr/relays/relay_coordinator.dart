@@ -9,6 +9,7 @@ import 'package:camelus/models/nostr_request_event.dart';
 import 'package:camelus/models/nostr_request_query.dart';
 import 'package:camelus/models/nostr_tag.dart';
 import 'package:camelus/providers/key_pair_provider.dart';
+import 'package:camelus/services/nostr/metadata/nip_65.dart';
 import 'package:camelus/services/nostr/relays/my_relay.dart';
 import 'package:camelus/services/nostr/relays/relay_address_parser.dart';
 import 'package:camelus/services/nostr/relays/relay_subscription_holder.dart';
@@ -24,6 +25,7 @@ class RelayCoordinator {
 
   final List<RelaySubscriptionHolder> _activeSubscriptions = [];
   final List<MyRelay> _relays = [];
+  final List<String> _currentlyConnectingRelays = [];
   List<RelayAssignment> _gossipRelayAssignments = [];
 
   final Completer _ready = Completer();
@@ -103,16 +105,16 @@ class RelayCoordinator {
         selectedManualRelays.containsKey(key) ||
         _relays.any((element) => element.relayUrl == key));
 
-    for (var relay in selectedGossipRelays.entries) {
-      connectFutures.add(
-        _connectToRelay(
-          relayUrl: relay.key,
-          read: relay.value['read'] ?? true,
-          write: relay.value['write'] ?? true,
-          persistance: RelayPersistance.gossip,
-        ),
-      );
-    }
+    // for (var relay in selectedGossipRelays.entries) {
+    //   connectFutures.add(
+    //     _connectToRelay(
+    //       relayUrl: relay.key,
+    //       read: relay.value['read'] ?? true,
+    //       write: relay.value['write'] ?? true,
+    //       persistance: RelayPersistance.gossip,
+    //     ),
+    //   );
+    // }
 
     await Future.any(connectFutures);
     // wait additional 2 seconds for other relays to connect
@@ -176,21 +178,113 @@ class RelayCoordinator {
       return;
     }
 
-    var splitRequest = _splitRequestByRelays(request);
+    var connectedRelays =
+        _relays.where((element) => element.connected).toList();
+    var connectedRelayUrls = connectedRelays.map((e) => e.relayUrl).toList();
 
-    List<Future<String>> relayRequests = [];
-    for (var relay in _relays) {
-      if (splitRequest.containsKey(relay.relayUrl)) {
-        var relayRequest = splitRequest[relay.relayUrl];
-        var future = relay.request(relayRequest!);
+    var nip65Helper = Nip65(_db);
 
-        relayRequests.add(future);
+    // find minimal relay set
+    var minimalRelaySet = await nip65Helper.calcMinimalRelaySet(
+      pubkeys: request.getAllPossiblePubkeys,
+      preferConnectedRelays: connectedRelayUrls,
+    );
+
+    // split among found pubkey relay assignments
+    var foundSplitAssignmentRequest = Nip65.splitUpRequests(
+      request: request,
+      assignments: minimalRelaySet.relayAssignments,
+    );
+
+    // craft relay assignment for missing pubkeys
+    List<String> combindedRelayUrls = [
+      ...connectedRelayUrls,
+      ...minimalRelaySet.relayAssignments.map((e) => e.relayUrl)
+    ];
+    // remove duplicates
+    combindedRelayUrls = combindedRelayUrls.toSet().toList();
+
+    List<RelayAssignment> missingAssignments = [];
+    if (minimalRelaySet.missingWithNoRelay.isNotEmpty) {
+      for (var relayUrl in combindedRelayUrls) {
+        missingAssignments.add(
+          RelayAssignment(
+            relayUrl: relayUrl,
+            pubkeys: minimalRelaySet.missingWithNoRelay,
+          ),
+        );
+      }
+    }
+
+    var missingSplitAssignmentRequest = Nip65.splitUpRequests(
+      request: request,
+      assignments: missingAssignments,
+    );
+
+    // connect to relays that are not connected yet
+    List<Future<MyRelay>> autoRelayFuture = [];
+    for (var splitRequest in foundSplitAssignmentRequest.entries) {
+      if (connectedRelayUrls.contains(splitRequest.key)) {
+        // already connected to this relay
+        continue;
+      }
+      if (_currentlyConnectingRelays.contains(splitRequest.key)) {
+        continue;
+      }
+      autoRelayFuture.add(_connectToRelay(
+        relayUrl: splitRequest.key,
+        read: true,
+        write: false,
+        persistance: RelayPersistance.auto,
+      ));
+    }
+    var myNewAutoRelays = await Future.wait(autoRelayFuture);
+
+    var combindedRelays = [...myNewAutoRelays, ...connectedRelays];
+
+    // send out requests
+    List<Future<String>> allRelayRequests = [];
+
+    for (var relay in combindedRelays) {
+      if (foundSplitAssignmentRequest.containsKey(relay.relayUrl) &&
+          missingSplitAssignmentRequest.containsKey(relay.relayUrl)) {
+        var myFirstRequest = foundSplitAssignmentRequest[relay.relayUrl]!;
+        var mySecondRequest = missingSplitAssignmentRequest[relay.relayUrl]!;
+        var myCombinedRequest = myFirstRequest.mergeQuery(mySecondRequest);
+
+        log("sending combined request to ${relay.relayUrl} for ${myCombinedRequest.body.authors} ${myCombinedRequest.subscriptionId}");
+
+        var future = relay.request(myCombinedRequest);
+        allRelayRequests.add(future);
+        // to listen to EOSE response
+        subscription.addRelay(relay);
+
+        continue;
+      }
+
+      if (foundSplitAssignmentRequest.containsKey(relay.relayUrl)) {
+        var myRequest = foundSplitAssignmentRequest[relay.relayUrl]!;
+        log("sending targeted request to ${relay.relayUrl} for ${myRequest.body.authors} ${myRequest.subscriptionId}");
+
+        var future = relay.request(myRequest);
+        allRelayRequests.add(future);
+        // to listen to EOSE response
+        subscription.addRelay(relay);
+        //continue; // todo combine with missing
+      }
+
+      if (missingSplitAssignmentRequest.containsKey(relay.relayUrl)) {
+        var myRequest = missingSplitAssignmentRequest[relay.relayUrl]!;
+        log("sending missing request to ${relay.relayUrl} for ${myRequest.body.authors} ${myRequest.subscriptionId}");
+
+        var future = relay.request(myRequest);
+        allRelayRequests.add(future);
         // to listen to EOSE response
         subscription.addRelay(relay);
       }
     }
 
-    var combinedFuture = Future.wait(relayRequests).timeout(
+    var combinedFuture = Future.wait(allRelayRequests).timeout(
       timeout,
       onTimeout: () {
         return [];
@@ -404,6 +498,8 @@ class RelayCoordinator {
     required bool write,
     required RelayPersistance persistance,
   }) async {
+    _currentlyConnectingRelays.add(relayUrl);
+
     var relay = MyRelay(
         database: _db,
         relayUrl: relayUrl,
@@ -413,113 +509,8 @@ class RelayCoordinator {
     await relay.connect();
     _relays.add(relay);
     _relaysStreamController.add(_relays);
+    _currentlyConnectingRelays.remove(relayUrl);
     return relay;
-  }
-
-  // return string is the relayUrl/relayId
-  Map<String, NostrRequestQuery> _splitRequestByRelays(
-      NostrRequestQuery request) {
-    var requestBody = request.body;
-    //Map<String, dynamic> requestBody = Map<String, dynamic>.from(request[2]);
-
-    // don't do anything if there is no authors
-    if (requestBody.authors == null) {
-      for (MyRelay relay in _relays.where((element) => element.read)) {
-        String relayUrl = relay.relayUrl;
-
-        Map<String, NostrRequestQuery> requestsMap = {};
-
-        requestsMap[relayUrl] = request;
-        return requestsMap;
-      }
-    }
-    List<String> pubkeys = requestBody.authors!;
-
-    Map countMap = {};
-    for (var pubkey in pubkeys) {
-      countMap[pubkey] = 2; //todo: magic number move to settings
-    }
-
-    Map<String, List<String>> relayPubkeyMap = {};
-
-    var assignments = _gossipRelayAssignments;
-
-    // result should look like this
-    // relayPubkeyMap = {
-    //   "relay1": ["pubkey1", "pubkey2"],
-    //   "relay2": ["pubkey3", "pubkey4"],
-    // }
-    // and with each iteration the countMap is reduced
-    // countMap = {
-    //   "pubkey1": 0,
-    //   "pubkey2": 0,
-    //   "pubkey3": 0,
-    //   "pubkey4": 0,
-    // }
-
-    for (MyRelay relay in _relays.where((element) => element.read)) {
-      var relayUrl = relay.relayUrl;
-
-      for (var pubkey in pubkeys) {
-        if (countMap[pubkey] == 0) {
-          continue;
-        }
-        if (assignments
-            .where((element) =>
-                element.relayUrl == relayUrl &&
-                element.pubkeys.contains(pubkey))
-            .isNotEmpty) {
-          if (relayPubkeyMap.containsKey(relayUrl)) {
-            relayPubkeyMap[relayUrl]!.add(pubkey);
-          } else {
-            relayPubkeyMap[relayUrl] = [pubkey];
-          }
-          countMap[pubkey] = countMap[pubkey] - 1;
-        }
-      }
-    }
-
-    List<String> remainingPubkeys = List<String>.from(countMap.entries
-        .where((element) => element.value > 0)
-        .map((e) => e.key)
-        .toList());
-
-    Map<String, NostrRequestQuery> newRequests = {};
-    // craft new request for each relay  SPECIFIC
-    for (var relay in relayPubkeyMap.entries) {
-      var relayUrl = relay.key;
-      var pubkeys = relay.value;
-
-      // deep copy request
-      NostrRequestQuery newRequest = NostrRequestQuery(
-          subscriptionId: request.subscriptionId, body: request.body);
-
-      newRequest.body.authors = pubkeys;
-      newRequests[relayUrl] = newRequest;
-    }
-
-    var readRelays = _relays.where((element) => element.read).toList();
-
-    // add remaining pubkeys to new request for each relay  GENERAL
-    for (var relay in readRelays) {
-      var relayUrl = relay.relayUrl;
-
-      if (newRequests.containsKey(relayUrl)) {
-        var request = newRequests[relayUrl];
-
-        request!.body.authors!.addAll(remainingPubkeys);
-      } else {
-        // deep copy request
-        NostrRequestQuery newRequest = NostrRequestQuery(
-            subscriptionId: request.subscriptionId, body: request.body);
-
-        newRequest.body.authors = pubkeys;
-
-        newRequests[relayUrl] = newRequest;
-      }
-    }
-
-    return newRequests;
   }
 
   Future<List<RelayAssignment>> _getOptimalRelays(List<String> pubkeys) async {
@@ -567,6 +558,7 @@ class RelayCoordinator {
         0,
         1,
         3,
+        10002,
       ],
       limit: 5,
     );

@@ -12,9 +12,9 @@ class RelayAddressParser {
 
     // Check if input is in the correct format
     RegExp regex =
-        RegExp(r'^wss:\/\/[a-z0-9]+(\.[a-z0-9]+)*$', caseSensitive: false);
+        RegExp(r'^wss:\/\/[a-z-0-9]+(\.[a-z0-9]+)*$', caseSensitive: false);
     if (!regex.hasMatch(address)) {
-      throw Exception("Invalid address format");
+      throw Exception("Invalid address format $address");
     }
     return address;
   }
