@@ -117,12 +117,12 @@ class NostrRequestQueryBody {
 
   NostrRequestQueryBody.clone(NostrRequestQueryBody obj)
       : this(
-          ids: List<String>.from(obj.ids ?? []),
-          authors: List<String>.from(obj.authors ?? []),
+          ids: obj.ids == null ? null : List<String>.from(obj.ids!),
+          authors: obj.authors == null ? null : List<String>.from(obj.authors!),
           kinds: List<int>.from(obj.kinds),
-          hastagE: List<String>.from(obj.hastagE ?? []),
-          hastagP: List<String>.from(obj.hastagP ?? []),
-          hastagT: List<String>.from(obj.hastagT ?? []),
+          hastagE: obj.hastagE == null ? null : List<String>.from(obj.hastagE!),
+          hastagP: obj.hastagP == null ? null : List<String>.from(obj.hastagP!),
+          hastagT: obj.hastagT == null ? null : List<String>.from(obj.hastagT!),
           since: obj.since,
           until: obj.until,
           limit: obj.limit,
@@ -141,7 +141,7 @@ class NostrRequestQueryBody {
       "limit": limit,
     };
     // remove null values
-    body.removeWhere((key, value) => (value == null || value == []));
+    body.removeWhere((key, value) => value == null);
 
     return body;
   }
