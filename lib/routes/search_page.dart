@@ -257,6 +257,13 @@ class _SearchPageState extends ConsumerState<SearchPage> {
     });
   }
 
+  void _onSubmit(String value) {
+    if (value.startsWith('#')) {
+      var hastag = value.substring(1);
+      Navigator.pushNamed(context, '/nostr/hastag', arguments: hastag);
+    }
+  }
+
   void _changeFollowing(bool followChange, String pubkey,
       List<NostrTag> currentOwnContacts) async {
     var mykeys = await ref.watch(keyPairProvider.future);
@@ -479,6 +486,9 @@ class _SearchPageState extends ConsumerState<SearchPage> {
           index: i,
           hashtag: cleanHashtag,
           threadsCount: hashtag.threadsCount,
+          onTap: (hashtag) {
+            Navigator.pushNamed(context, '/nostr/hastag', arguments: hashtag);
+          },
         ),
       );
     }
@@ -585,6 +595,9 @@ class _SearchPageState extends ConsumerState<SearchPage> {
               style: const TextStyle(color: Palette.white),
               onChanged: (value) {
                 _onSearchChanged(value);
+              },
+              onSubmitted: (value) {
+                _onSubmit(value);
               },
               onTapOutside: (value) {
                 // close keyboard

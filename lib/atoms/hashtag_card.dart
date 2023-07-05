@@ -7,18 +7,21 @@ class HashtagCard extends StatelessWidget {
   final int index;
   final String hashtag;
   final int threadsCount;
+  final Function(String hashtag) onTap;
 
-  const HashtagCard({super.key, 
+  const HashtagCard({
+    super.key,
     required this.index,
     required this.hashtag,
     required this.threadsCount,
+    required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
-        //log("hashtag tapped");
+        onTap(hashtag);
       },
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 12),

@@ -1,5 +1,6 @@
 import 'package:camelus/providers/key_pair_provider.dart';
 import 'package:camelus/routes/nostr/blockedUsers/blocked_users.dart';
+import 'package:camelus/routes/nostr/hashtag_view/hashtag_view_page.dart';
 import 'package:camelus/routes/nostr/settings/settings_page.dart';
 import 'package:flutter/material.dart';
 import 'package:camelus/routes/nostr/event_view/event_view_page.dart';
@@ -81,6 +82,11 @@ class MyApp extends StatelessWidget {
                 return MaterialPageRoute(
                   builder: (context) =>
                       ProfilePage(pubkey: settings.arguments as String),
+                );
+              case '/nostr/hastag':
+                return MaterialPageRoute(
+                  builder: (context) =>
+                      HastagViewPage(hashtag: settings.arguments as String),
                 );
               case '/nostr/blockedUsers':
                 return MaterialPageRoute(
