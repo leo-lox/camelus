@@ -64,12 +64,10 @@ abstract class NoteDao {
   @Query("""
       SELECT * FROM noteView 
       WHERE noteView.pubkey 
-      IN (:pubkeys) 
+      IN (:pubkeys)
       AND kind = (:kind)
-      AND NOT (',' || tag_types || ',' LIKE '%,e,%')
-      OR (tag_types IS NULL AND kind = (:kind))
-      IN (:pubkeys) 
-
+      AND (NOT (',' || tag_types || ',' LIKE '%,e,%')
+      OR (tag_types IS NULL))
       ORDER BY created_at DESC
       """)
   Future<List<DbNoteView>> findPubkeyRootNotesByKind(
