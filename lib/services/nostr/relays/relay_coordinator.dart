@@ -222,7 +222,7 @@ class RelayCoordinator {
     );
 
     // connect to relays that are not connected yet
-    List<Future<MyRelay>> autoRelayFuture = [];
+    List<Future<MyRelay?>> autoRelayFuture = [];
     for (var splitRequest in foundSplitAssignmentRequest.entries) {
       if (connectedRelayUrls.contains(splitRequest.key)) {
         // already connected to this relay
@@ -238,7 +238,12 @@ class RelayCoordinator {
         persistance: RelayPersistance.auto,
       ));
     }
-    var myNewAutoRelays = await Future.wait(autoRelayFuture);
+    var myNewAutoRelaysResult =
+        await Future.wait(autoRelayFuture, eagerError: false);
+    // remove nulls
+    myNewAutoRelaysResult.removeWhere((element) => element == null);
+    List<MyRelay> myNewAutoRelays =
+        myNewAutoRelaysResult.map((e) => e as MyRelay).toList();
 
     var combindedRelays = [...myNewAutoRelays, ...connectedRelays];
 
@@ -337,7 +342,7 @@ class RelayCoordinator {
         .toList();
 
     // connect to relays
-    List<Future<MyRelay>> futures = [];
+    List<Future<MyRelay?>> futures = [];
     for (var relay in relaysToConnect) {
       futures.add(_connectToRelay(
         relayUrl: relay,
@@ -346,7 +351,10 @@ class RelayCoordinator {
         persistance: RelayPersistance.tmp,
       ));
     }
-    var myTmpRelays = await Future.wait(futures);
+    var myTmpRelaysResult = await Future.wait(futures);
+    myTmpRelaysResult.removeWhere((element) => element == null);
+    List<MyRelay> myTmpRelays =
+        myTmpRelaysResult.map((e) => e as MyRelay).toList();
 
     var combinedRelays = [...connectedRelays, ...myTmpRelays];
 
@@ -391,7 +399,7 @@ class RelayCoordinator {
             allWriteRelays.any((all) => all.relayUrl == element))
         .toList();
 
-    List<Future<MyRelay>> futures = [];
+    List<Future<MyRelay?>> futures = [];
     for (var relay in toConnectRelays) {
       futures.add(_connectToRelay(
         relayUrl: relay,
@@ -400,7 +408,11 @@ class RelayCoordinator {
         persistance: RelayPersistance.tmp,
       ));
     }
-    var myTmpRelays = await Future.wait(futures);
+    // remove nulls
+    var myTmpRelaysResult = await Future.wait(futures);
+    myTmpRelaysResult.removeWhere((element) => element == null);
+    List<MyRelay> myTmpRelays =
+        myTmpRelaysResult.map((e) => e as MyRelay).toList();
 
     List<MyRelay> combinedRelays = [];
     if (exactRelays.isEmpty) {
@@ -492,7 +504,7 @@ class RelayCoordinator {
     return relays;
   }
 
-  Future<MyRelay> _connectToRelay({
+  Future<MyRelay?> _connectToRelay({
     required String relayUrl,
     required bool read,
     required bool write,
@@ -506,7 +518,14 @@ class RelayCoordinator {
         read: read,
         write: write,
         persistance: persistance);
-    await relay.connect();
+    try {
+      await relay.connect();
+    } catch (e) {
+      _currentlyConnectingRelays.remove(relayUrl);
+      log("Failed to connect to relay: $relayUrl error: $e");
+      return null;
+    }
+
     _relays.add(relay);
     _relaysStreamController.add(_relays);
     _currentlyConnectingRelays.remove(relayUrl);
