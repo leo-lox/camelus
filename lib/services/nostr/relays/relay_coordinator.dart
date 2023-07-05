@@ -105,6 +105,7 @@ class RelayCoordinator {
         selectedManualRelays.containsKey(key) ||
         _relays.any((element) => element.relayUrl == key));
 
+    //! disabled gossip for now
     // for (var relay in selectedGossipRelays.entries) {
     //   connectFutures.add(
     //     _connectToRelay(

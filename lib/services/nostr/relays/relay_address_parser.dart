@@ -11,10 +11,13 @@ class RelayAddressParser {
     }
 
     // Check if input is in the correct format
-    RegExp regex =
-        RegExp(r'^wss:\/\/[a-z-0-9]+(\.[a-z0-9]+)*(\/[a-z0-9?&=]+)*$');
-    if (!regex.hasMatch(address)) {
+    RegExp regexDomain =
+        RegExp(r'^(?:wss?:\/\/)?(?:[a-z0-9-]+\.)+[a-z]{2,}(\/.*)?$');
+    if (!regexDomain.hasMatch(address)) {
       throw Exception("Invalid address format $address");
+    }
+    if (address.endsWith("/")) {
+      throw Exception("Invalid address format, tailing slash $address");
     }
     return address;
   }

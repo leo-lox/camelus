@@ -119,18 +119,6 @@ class Nip65 {
     Map<String, NostrRequestQuery> result = {};
 
     for (var assignment in assignments) {
-      // NostrRequestQueryBody? body2Copy;
-      // if (request.body2 != null) {
-      //   body2Copy = NostrRequestQueryBody.copy(request.body2!);
-      // }
-
-      // var newRequest = NostrRequestQuery(
-      //   subscriptionId: request.subscriptionId,
-      //   body: NostrRequestQueryBody.copy(request.body),
-      //   body2: body2Copy,
-      // );
-      //var newRequest = request.copyWith(request);
-
       NostrRequestQuery newRequest = NostrRequestQuery.clone(request);
 
       // remove all authors that are not in the assignment
