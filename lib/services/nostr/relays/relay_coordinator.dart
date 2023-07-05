@@ -179,6 +179,42 @@ class RelayCoordinator {
       return;
     }
 
+    var possiblePubkeys = request.getAllPossiblePubkeys;
+    if (possiblePubkeys.isNotEmpty) {
+      return _optimizedPubkeyRequest(
+        request: request,
+        subscription: subscription,
+        timeout: timeout,
+      );
+    }
+
+    var allReadRelays = _relays.where((element) => element.read).toList();
+
+    if (allReadRelays.isEmpty) {
+      throw Exception("no read relays");
+    }
+
+    List<Future<String>> allRelayRequests = [];
+    for (var relay in allReadRelays) {
+      var future = relay.request(request);
+      allRelayRequests.add(future);
+      subscription.addRelay(relay);
+      log("sending unoptimized request to ${relay.relayUrl} -- ${request.subscriptionId}");
+    }
+    var combinedFuture = Future.wait(allRelayRequests).timeout(
+      timeout,
+      onTimeout: () {
+        return [];
+      },
+    );
+    return combinedFuture;
+  }
+
+  Future _optimizedPubkeyRequest({
+    required NostrRequestQuery request,
+    required RelaySubscriptionHolder subscription,
+    required Duration timeout,
+  }) async {
     var connectedRelays =
         _relays.where((element) => element.connected).toList();
     var connectedRelayUrls = connectedRelays.map((e) => e.relayUrl).toList();

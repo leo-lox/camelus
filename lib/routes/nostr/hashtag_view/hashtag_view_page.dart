@@ -11,9 +11,25 @@ class HastagViewPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          "#$hashtag",
-          style: const TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+        title: Row(
+          children: [
+            const Text(
+              '#',
+              style: TextStyle(
+                fontSize: 30,
+                color: Palette.white,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+            const SizedBox(width: 4),
+            Text(
+              hashtag,
+              style: const TextStyle(
+                  fontSize: 25,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 1.1),
+            ),
+          ],
         ),
         foregroundColor: Palette.white,
         backgroundColor: Palette.background,

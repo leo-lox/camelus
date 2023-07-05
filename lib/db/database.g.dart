@@ -500,6 +500,41 @@ class _$NoteDao extends NoteDao {
   }
 
   @override
+  Future<List<DbNoteView>> findTagByKind(
+    int kind,
+    String tag,
+  ) async {
+    return _queryAdapter.queryList(
+        'SELECT * FROM noteView        WHERE  (\',\' || tag_types || \',\' LIKE \'%,t,%\')       AND (\',\' || tag_values || \',\' LIKE ?2)        AND kind = ?1       ORDER BY created_at DESC',
+        mapper: (Map<String, Object?> row) => DbNoteView(id: row['id'] as String, pubkey: row['pubkey'] as String, created_at: row['created_at'] as int, kind: row['kind'] as int, content: row['content'] as String, sig: row['sig'] as String, tag_index: row['tag_index'] as String?, tag_types: row['tag_types'] as String?, tag_values: row['tag_values'] as String?, tag_recommended_relays: row['tag_recommended_relays'] as String?, tag_markers: row['tag_markers'] as String?),
+        arguments: [kind, tag]);
+  }
+
+  @override
+  Stream<List<DbNoteView>> findTagByKindStream(
+    int kind,
+    String tag,
+  ) {
+    return _queryAdapter.queryListStream(
+        'SELECT * FROM (         SELECT Note.*, GROUP_CONCAT(Tag.type) as tag_types, GROUP_CONCAT(Tag.value) as tag_values, GROUP_CONCAT(Tag.recommended_relay) as tag_recommended_relays, GROUP_CONCAT(Tag.marker) as tag_markers, GROUP_CONCAT(Tag.tag_index) as tag_index          FROM Note          LEFT JOIN Tag ON Note.id = Tag.note_id          GROUP BY Note.id         ) AS noteView       WHERE  (\',\' || tag_types || \',\' LIKE \'%,t,%\')       AND (\',\' || tag_values || \',\' LIKE ?2)        AND kind = ?1       ORDER BY created_at DESC',
+        mapper: (Map<String, Object?> row) => DbNoteView(
+            id: row['id'] as String,
+            pubkey: row['pubkey'] as String,
+            created_at: row['created_at'] as int,
+            kind: row['kind'] as int,
+            content: row['content'] as String,
+            sig: row['sig'] as String,
+            tag_index: row['tag_index'] as String?,
+            tag_types: row['tag_types'] as String?,
+            tag_values: row['tag_values'] as String?,
+            tag_recommended_relays: row['tag_recommended_relays'] as String?,
+            tag_markers: row['tag_markers'] as String?),
+        arguments: [kind, tag],
+        queryableName: 'Note',
+        isView: true);
+  }
+
+  @override
   Stream<List<String>> findAllNotesContentStream() {
     return _queryAdapter.queryListStream('SELECT content FROM note',
         mapper: (Map<String, Object?> row) => row.values.first as String,
