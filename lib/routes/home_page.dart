@@ -39,7 +39,7 @@ class _HomePageState extends ConsumerState<HomePage> {
               child: Padding(
                   padding: EdgeInsets.only(
                       bottom: MediaQuery.of(context).viewInsets.bottom),
-                  child: WritePost()),
+                  child: const WritePost()),
             ));
   }
 

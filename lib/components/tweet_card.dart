@@ -203,8 +203,8 @@ class _TweetCardState extends ConsumerState<TweetCard> {
                   padding: EdgeInsets.only(
                       bottom: MediaQuery.of(ctx).viewInsets.bottom),
                   child: WritePost(
-                    context: PostContext(replyToTweet: tweet),
-                  )),
+                      // context: PostContext(replyToTweet: tweet),
+                      )),
             ));
   }
 

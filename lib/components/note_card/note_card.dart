@@ -1,11 +1,15 @@
+import 'dart:ui';
+
 import 'package:camelus/atoms/my_profile_picture.dart';
 import 'package:camelus/components/bottom_sheet_share.dart';
 import 'package:camelus/components/images_tile_view.dart';
 import 'package:camelus/components/note_card/bottom_sheet_more.dart';
 import 'package:camelus/components/note_card/note_card_build_split_content.dart';
+import 'package:camelus/components/write_post.dart';
 import 'package:camelus/config/palette.dart';
 import 'package:camelus/helpers/helpers.dart';
 import 'package:camelus/models/nostr_note.dart';
+import 'package:camelus/models/post_context.dart';
 import 'package:camelus/providers/metadata_provider.dart';
 import 'package:camelus/providers/nostr_service_provider.dart';
 import 'package:camelus/services/nostr/metadata/user_metadata.dart';
@@ -283,25 +287,28 @@ class _NoteCardState extends ConsumerState<NoteCard> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        GestureDetector(
-          onTap: () => {
-            //_writeReply(context, widget.tweet)
-          },
-          child: Row(
-            children: [
-              SvgPicture.asset(
-                height: 23,
-                'assets/icons/chat-teardrop-text.svg',
-                color: Palette.darkGray,
-              ),
-              const SizedBox(width: 5),
-              const Text(
-                // show number of comments if >0
-                "wip",
+        InkWell(
+          onTap: () => {_writeReply(context, widget.note)},
+          child: Container(
+            padding:
+                const EdgeInsets.only(left: 10, right: 10, top: 2, bottom: 2),
+            //color: Palette.primary,
+            child: Row(
+              children: [
+                SvgPicture.asset(
+                  height: 23,
+                  'assets/icons/chat-teardrop-text.svg',
+                  color: Palette.darkGray,
+                ),
+                const SizedBox(width: 5),
+                const Text(
+                  // show number of comments if >0
+                  "",
 
-                style: TextStyle(color: Palette.gray, fontSize: 16),
-              ),
-            ],
+                  style: TextStyle(color: Palette.gray, fontSize: 16),
+                ),
+              ],
+            ),
           ),
         ),
         GestureDetector(
@@ -364,4 +371,22 @@ class _NoteCardState extends ConsumerState<NoteCard> {
       ],
     );
   }
+}
+
+void _writeReply(ctx, NostrNote note) {
+  showModalBottomSheet(
+      isScrollControlled: true,
+      elevation: 10,
+      backgroundColor: Palette.background,
+      isDismissible: false,
+      context: ctx,
+      builder: (ctx) => BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+            child: Padding(
+                padding: EdgeInsets.only(
+                    bottom: MediaQuery.of(ctx).viewInsets.bottom),
+                child: WritePost(
+                  context: PostContext(replyToNote: note),
+                )),
+          ));
 }
