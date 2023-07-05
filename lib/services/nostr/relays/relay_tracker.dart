@@ -193,13 +193,6 @@ class RelayTracker {
       if (personPubkey.isEmpty) {
         continue;
       }
-      //clean relay url
-
-      RegExp exp = RegExp(r'^(?:https?|wss?):\/\/[^\/]+');
-      String? wssDomain = exp.firstMatch(relayUrl)?.group(0);
-      if (wssDomain == null) {
-        continue;
-      }
 
       switch (nip) {
         case RelayTrackerAdvType.kind03:
