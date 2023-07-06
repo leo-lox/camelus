@@ -580,6 +580,12 @@ class _$NoteDao extends NoteDao {
   }
 
   @override
+  Future<void> deleteNotesByKind(int kind) async {
+    await _queryAdapter
+        .queryNoReturn('DELETE FROM Note WHERE kind = ?1', arguments: [kind]);
+  }
+
+  @override
   Future<void> insertNote(DbNote note) async {
     await _dbNoteInsertionAdapter.insert(note, OnConflictStrategy.ignore);
   }

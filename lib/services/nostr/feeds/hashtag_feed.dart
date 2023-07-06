@@ -76,6 +76,9 @@ class HashtagFeed {
     return;
   }
 
+  NostrNote? _oldestNoteInSession;
+  NostrNote? get oldestNoteInSession => _oldestNoteInSession;
+
   void _streamFeed() {
     Stream<List<DbNoteView>> stream =
         _db.noteDao.findTagByKindStream(1, '%,$_hashtag,%');
@@ -87,6 +90,9 @@ class HashtagFeed {
         List<NostrNote> feedUpdates = [];
 
         for (var note in notes) {
+          // set oldest note in session when fetched from db
+          _oldestNoteInSession ??= _feed[5];
+
           if (_feed.any((element) => element.id == note.id)) {
             continue;
           }
@@ -100,6 +106,11 @@ class HashtagFeed {
           }
           if (note.created_at < _feedFixedTopAt) {
             feedUpdates.add(note);
+          }
+
+          // update oldest note in session
+          if (note.created_at < _oldestNoteInSession!.created_at) {
+            _oldestNoteInSession = note;
           }
         }
 
@@ -152,7 +163,7 @@ class HashtagFeed {
 
     // skip if already requested
     if (_requestIds.contains(reqId)) {
-      return;
+      //return;
     } else {
       _requestIds.add(reqId);
     }

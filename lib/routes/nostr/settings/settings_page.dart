@@ -38,6 +38,12 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     log("cleared sql db");
   }
 
+  void _deleteKind01() async {
+    var db = await ref.watch(databaseProvider.future);
+    db.noteDao.deleteNotesByKind(1);
+    log("deleted kind 01");
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -68,6 +74,13 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                 style: TextStyle(color: Colors.white)),
             onTap: () {
               _clearSqlDb();
+            },
+          ),
+          ListTile(
+            title: const Text('delete all kind01!',
+                style: TextStyle(color: Colors.white)),
+            onTap: () {
+              _deleteKind01();
             },
           )
         ],

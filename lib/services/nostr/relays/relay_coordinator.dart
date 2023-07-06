@@ -175,8 +175,8 @@ class RelayCoordinator {
       subscription = RelaySubscriptionHolder(request: request);
       _activeSubscriptions.add(subscription);
     } else {
-      log("already have subscription for this request");
-      return;
+      log("WARN: already have subscription for this request");
+      //return;
     }
 
     var possiblePubkeys = request.getAllPossiblePubkeys;

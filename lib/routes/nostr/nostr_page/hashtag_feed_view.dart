@@ -42,7 +42,10 @@ class _HashtagFeedViewState extends ConsumerState<HashtagFeedView> {
           _scrollControllerFeed.position.maxScrollExtent) {
         log("reached end of scroll");
 
-        _hashtagFeedLoadMore();
+        var latest =
+            _hashtagFeed.feed.last.created_at; //- 86400 * 7; // -1 week
+
+        _hashtagFeedLoadMore(latest);
       }
 
       if (_scrollControllerFeed.position.pixels < 100) {
@@ -92,7 +95,7 @@ class _HashtagFeedViewState extends ConsumerState<HashtagFeedView> {
     );
   }
 
-  void _hashtagFeedLoadMore() async {
+  void _hashtagFeedLoadMore(int? until) async {
     log("load more called");
 
     int now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
@@ -102,9 +105,22 @@ class _HashtagFeedViewState extends ConsumerState<HashtagFeedView> {
     _hashtagFeed.requestRelayHashtagFeed(
       hashtags: [widget.hashtag],
       requestId: hashtagFeedTimelineFetchId,
-      limit: 20,
-      until: defaultUntil, //! todo
+      limit: 5,
+      until: until ?? defaultUntil,
     );
+  }
+
+  void _hashtagFeedCheckForNewData(NostrNote currentBuilNote) {
+    var latestSessionNote = _hashtagFeed.oldestNoteInSession;
+    if (latestSessionNote == null) {
+      return;
+    }
+    var difference = currentBuilNote.created_at - latestSessionNote.created_at;
+    log("${latestSessionNote.created_at} -- ${currentBuilNote.created_at} -- $difference");
+    if (latestSessionNote.id == currentBuilNote.id) {
+      log("### load more please #################################");
+      _hashtagFeedLoadMore(currentBuilNote.created_at);
+    }
   }
 
   Future<void> _initDb() async {
@@ -194,6 +210,7 @@ class _HashtagFeedViewState extends ConsumerState<HashtagFeedView> {
                             delegate: SliverChildBuilderDelegate(
                               (context, index) {
                                 var note = notes[index];
+                                _hashtagFeedCheckForNewData(note);
                                 return NoteCardContainer(notes: [note]);
                               },
                               childCount: notes.length,

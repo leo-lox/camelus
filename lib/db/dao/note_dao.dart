@@ -166,6 +166,9 @@ abstract class NoteDao {
   @Query('DELETE FROM Note WHERE id IN (:ids)')
   Future<void> deleteNotesByIds(List<int> ids);
 
+  @Query('DELETE FROM Note WHERE kind = :kind')
+  Future<void> deleteNotesByKind(int kind);
+
   @transaction
   Future<void> insertNostrNote(NostrNote nostrNote) async {
     try {
