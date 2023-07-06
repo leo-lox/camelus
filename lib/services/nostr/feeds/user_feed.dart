@@ -124,7 +124,11 @@ class UserFeed {
           _fixedTopNote ??= note;
 
           // set oldest note in session when fetched from db
-          _oldestNoteInSession ??= _feed[5];
+          try {
+            _oldestNoteInSession ??= _feed[5];
+          } catch (e) {
+            // feed is empty
+          }
 
           // check for duplicates
           if (_feed.any((element) => element.id == note.id)) {
@@ -143,7 +147,7 @@ class UserFeed {
           }
 
           // update oldest note in session
-          if (note.created_at < _oldestNoteInSession!.created_at) {
+          if (note.created_at < (_oldestNoteInSession?.created_at ?? 0)) {
             _oldestNoteInSession = note;
           }
         }

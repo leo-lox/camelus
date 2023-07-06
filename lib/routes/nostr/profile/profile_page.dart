@@ -342,25 +342,47 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
       setState(() {});
       if (_scrollController.position.pixels >=
           _scrollController.position.maxScrollExtent - 100) {
+        var latest = _userFeedAndRepliesFeed.feed.last.created_at;
         // load more tweets
-        _userFeedLoadMore();
+        _userFeedLoadMore(latest);
       }
     });
   }
 
   NostrNote? _lastNoteInFeed;
-  void _userFeedLoadMore() async {
+  void _userFeedLoadMore(int? until) async {
     log("load more called");
     int now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
     // schould not be needed
-    int defaultUntil = now - 86400 * 7; // -1 week
+    int defaultUntil = now - 86400 * 1; // -1 day
 
     _userFeedAndRepliesFeed.requestRelayUserFeedAndReplies(
       users: [widget.pubkey],
       requestId: "profilePage-timeLine-${widget.pubkey.substring(5, 15)}",
-      limit: 10,
-      until: _lastNoteInFeed?.created_at ?? defaultUntil,
+      limit: 5,
+      until: until ?? defaultUntil,
     );
+  }
+
+  bool timelineFetchLock = false;
+  void _userFeedCheckForNewData(NostrNote currentBuilNote) {
+    if (timelineFetchLock) {
+      return;
+    }
+    var latestSessionNote = _userFeedAndRepliesFeed.oldestNoteInSession;
+    if (latestSessionNote == null) {
+      return;
+    }
+    var difference = currentBuilNote.created_at - latestSessionNote.created_at;
+    log("${latestSessionNote.created_at} -- ${currentBuilNote.created_at} -- $difference");
+    if (latestSessionNote.id == currentBuilNote.id) {
+      timelineFetchLock = true;
+      Future.delayed(const Duration(seconds: 5), () {
+        timelineFetchLock = false;
+      });
+      _userFeedLoadMore(currentBuilNote.created_at);
+      // because of rendering lock for 5 seconds
+    }
   }
 
   void _onNavigateAway() async {
@@ -560,6 +582,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                   delegate: SliverChildBuilderDelegate(
                     (context, index) {
                       var note = notes[index];
+                      _userFeedCheckForNewData(note);
                       return NoteCardContainer(
                         notes: [note],
                         key: ValueKey(note.id),
@@ -577,7 +600,8 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                         child: ElevatedButton(
                       onPressed: () {},
                       child: Text(snapshot.error.toString(),
-                          style: const TextStyle(fontSize: 20, color: Colors.white)),
+                          style: const TextStyle(
+                              fontSize: 20, color: Colors.white)),
                     ))
                   ]),
                 );

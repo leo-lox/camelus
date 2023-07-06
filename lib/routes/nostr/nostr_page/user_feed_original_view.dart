@@ -156,7 +156,7 @@ class _UserFeedOriginalViewState extends ConsumerState<UserFeedOriginalView> {
     );
   }
 
-  void _hashtagFeedCheckForNewData(NostrNote currentBuilNote) {
+  void _userFeedCheckForNewData(NostrNote currentBuilNote) {
     var latestSessionNote = _userFeed.oldestNoteInSession;
     if (latestSessionNote == null) {
       return;
@@ -268,7 +268,7 @@ class _UserFeedOriginalViewState extends ConsumerState<UserFeedOriginalView> {
                             delegate: SliverChildBuilderDelegate(
                               (context, index) {
                                 var note = notes[index];
-                                _hashtagFeedCheckForNewData(note);
+                                _userFeedCheckForNewData(note);
                                 return NoteCardContainer(notes: [note]);
                               },
                               childCount: notes.length,

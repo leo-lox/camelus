@@ -49,7 +49,9 @@ class UserFeedAndRepliesViewState
           _scrollControllerFeed.position.maxScrollExtent) {
         log("reached end of scroll");
 
-        _userFeedLoadMore();
+        var latest = _userFeedAndRepliesFeed.feed.last.created_at;
+
+        _userFeedLoadMore(latest);
       }
 
       if (_scrollControllerFeed.position.pixels < 100) {
@@ -128,7 +130,7 @@ class UserFeedAndRepliesViewState
     );
   }
 
-  void _userFeedLoadMore() async {
+  void _userFeedLoadMore(int? until) async {
     log("load more called");
 
     if (_followingPubkeys.isEmpty) {
@@ -143,14 +145,24 @@ class UserFeedAndRepliesViewState
 
     int now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
     // schould not be needed
-    int defaultUntil = now - 86400 * 7; // -1 week
+    int defaultUntil = now - 86400 * 1; // -1 day
 
     _userFeedAndRepliesFeed.requestRelayUserFeedAndReplies(
       users: combinedPubkeys,
       requestId: userFeedTimelineFetchId,
-      limit: 20,
-      until: _lastNoteInFeed?.created_at ?? defaultUntil,
+      limit: 5,
+      until: until ?? defaultUntil,
     );
+  }
+
+  void _hashtagFeedCheckForNewData(NostrNote currentBuilNote) {
+    var latestSessionNote = _userFeedAndRepliesFeed.oldestNoteInSession;
+    if (latestSessionNote == null) {
+      return;
+    }
+    if (latestSessionNote.id == currentBuilNote.id) {
+      _userFeedLoadMore(currentBuilNote.created_at);
+    }
   }
 
   Future<void> _getFollowingPubkeys() async {
@@ -258,6 +270,7 @@ class UserFeedAndRepliesViewState
                             delegate: SliverChildBuilderDelegate(
                               (context, index) {
                                 var note = notes[index];
+                                _hashtagFeedCheckForNewData(note);
                                 return NoteCardContainer(notes: [note]);
                               },
                               childCount: notes.length,
@@ -272,8 +285,8 @@ class UserFeedAndRepliesViewState
                           child: ElevatedButton(
                         onPressed: () {},
                         child: Text(snapshot.error.toString(),
-                            style:
-                                const TextStyle(fontSize: 20, color: Colors.white)),
+                            style: const TextStyle(
+                                fontSize: 20, color: Colors.white)),
                       ));
                     }
                     return const Text("waiting for stream trigger ",

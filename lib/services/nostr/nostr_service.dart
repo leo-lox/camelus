@@ -5,7 +5,6 @@ import 'dart:developer';
 import 'package:camelus/db/database.dart';
 import 'package:camelus/models/nostr_note.dart';
 import 'package:camelus/providers/key_pair_provider.dart';
-import 'package:camelus/services/nostr/feeds/authors_feed.dart';
 
 import 'package:camelus/services/nostr/metadata/metadata_injector.dart';
 import 'package:camelus/services/nostr/metadata/nip_05.dart';
@@ -35,9 +34,6 @@ class NostrService {
 
   static String ownPubkeySubscriptionId =
       "own-${Helpers().getRandomString(20)}";
-
-  // authors feed
-  var authorsFeedObj = AuthorsFeed();
 
   var userContactsObj = UserContacts();
 
@@ -220,13 +216,6 @@ class NostrService {
       }
     }
 
-    if (event[1].contains("authors")) {
-      authorsFeedObj.receiveNostrEvent(event, socketControl);
-      if (event[0] == "EOSE") {
-        return;
-      }
-    }
-
     var eventMap = {};
     try {
       eventMap = event[2]; //json.decode(event[2])
@@ -348,14 +337,7 @@ class NostrService {
       required String requestId,
       int? since,
       int? until,
-      int? limit}) {
-    authorsFeedObj.requestAuthors(
-        authors: authors,
-        requestId: requestId,
-        since: since,
-        until: until,
-        limit: limit);
-  }
+      int? limit}) {}
 
   void closeSubscription(String subId) {
     var data = [

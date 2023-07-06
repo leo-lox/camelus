@@ -92,7 +92,11 @@ class HashtagFeed {
 
         for (var note in notes) {
           // set oldest note in session when fetched from db
-          _oldestNoteInSession ??= _feed[5];
+          try {
+            _oldestNoteInSession ??= _feed[5];
+          } catch (e) {
+            // feed is empty
+          }
 
           if (_feed.any((element) => element.id == note.id)) {
             continue;
@@ -110,7 +114,7 @@ class HashtagFeed {
           }
 
           // update oldest note in session
-          if (note.created_at < _oldestNoteInSession!.created_at) {
+          if (note.created_at < (_oldestNoteInSession?.created_at ?? 0)) {
             _oldestNoteInSession = note;
           }
         }
