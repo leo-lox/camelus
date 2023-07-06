@@ -175,13 +175,13 @@ class UserFeedAndRepliesFeed {
 
   /// Relay handeling
 
-  void requestRelayUserFeedAndReplies({
+  Future requestRelayUserFeedAndReplies({
     required List<String> users,
     required String requestId,
     int? since,
     int? until,
     int? limit,
-  }) {
+  }) async {
     var reqId = "ufeedAndReplies-$requestId";
 
     // add if not already in list
@@ -210,7 +210,8 @@ class UserFeedAndRepliesFeed {
     var myRequest = NostrRequestQuery(
         subscriptionId: reqId, body: myBody, body2: myBodyOriginal);
 
-    _relays.request(request: myRequest);
+    await _relays.request(request: myRequest);
+    return;
   }
 
   void _closeAllRelaySubscriptions() {

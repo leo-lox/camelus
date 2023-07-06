@@ -337,38 +337,41 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
     );
   }
 
+  bool timelineFetchLock = false;
   void _setupScrollListener() {
-    _scrollController.addListener(() {
+    _scrollController.addListener(() async {
       setState(() {});
       if (_scrollController.position.pixels >=
           _scrollController.position.maxScrollExtent - 100) {
         var latest = _userFeedAndRepliesFeed.feed.last.created_at;
+        if (timelineFetchLock) return;
+        timelineFetchLock = true;
         // load more tweets
-        _userFeedLoadMore(latest);
+        await _userFeedLoadMore(latest);
+        timelineFetchLock = false;
       }
     });
   }
 
-  NostrNote? _lastNoteInFeed;
-  void _userFeedLoadMore(int? until) async {
+  Future _userFeedLoadMore(int? until) async {
     log("load more called");
     int now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
     // schould not be needed
     int defaultUntil = now - 86400 * 1; // -1 day
 
-    _userFeedAndRepliesFeed.requestRelayUserFeedAndReplies(
+    await _userFeedAndRepliesFeed.requestRelayUserFeedAndReplies(
       users: [widget.pubkey],
       requestId: "profilePage-timeLine-${widget.pubkey.substring(5, 15)}",
       limit: 5,
       until: until ?? defaultUntil,
     );
+
+    return;
   }
 
-  bool timelineFetchLock = false;
-  void _userFeedCheckForNewData(NostrNote currentBuilNote) {
-    if (timelineFetchLock) {
-      return;
-    }
+  //! disabled does not work with how @build is called now (on every frame on scroll)
+  void _userFeedCheckForNewData(NostrNote currentBuilNote) async {
+    return;
     var latestSessionNote = _userFeedAndRepliesFeed.oldestNoteInSession;
     if (latestSessionNote == null) {
       return;
@@ -376,12 +379,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
     var difference = currentBuilNote.created_at - latestSessionNote.created_at;
     log("${latestSessionNote.created_at} -- ${currentBuilNote.created_at} -- $difference");
     if (latestSessionNote.id == currentBuilNote.id) {
-      timelineFetchLock = true;
-      Future.delayed(const Duration(seconds: 5), () {
-        timelineFetchLock = false;
-      });
-      _userFeedLoadMore(currentBuilNote.created_at);
-      // because of rendering lock for 5 seconds
+      await _userFeedLoadMore(currentBuilNote.created_at);
     }
   }
 
@@ -575,8 +573,6 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                     ),
                   );
                 }
-
-                _lastNoteInFeed = notes.last;
 
                 return SliverList(
                   delegate: SliverChildBuilderDelegate(
