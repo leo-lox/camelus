@@ -45,7 +45,8 @@ void openBottomSheetShare(context, NostrNote note) {
                                       NeventHelper().mapToBech32({
                                     "eventId": note.id,
                                     "authorPubkey": note.pubkey,
-                                    "relays": note.relayHints,
+                                    "relays": note
+                                        .relayHints, //! todo add relay hints from tracker
                                   });
                                   _copyToClipboard(bech32nevent);
                                 },
@@ -63,7 +64,7 @@ void openBottomSheetShare(context, NostrNote note) {
                           Column(
                             children: [
                               IconButton(
-                                tooltip: 'nostr.guru',
+                                tooltip: 'nostr.com',
                                 onPressed: () {
                                   var bech32nevent =
                                       NeventHelper().mapToBech32({
@@ -72,14 +73,14 @@ void openBottomSheetShare(context, NostrNote note) {
                                     "relays": note.relayHints,
                                   });
                                   _copyToClipboard(
-                                      'https://www.nostr.guru/$bech32nevent');
+                                      'https://nostr.com/$bech32nevent');
                                 },
                                 icon: const Icon(
                                   Icons.link,
                                   color: Palette.white,
                                 ),
                               ),
-                              const Text("gateway link",
+                              const Text("web link",
                                   style: TextStyle(
                                       color: Palette.lightGray, fontSize: 17)),
                             ],
@@ -87,85 +88,6 @@ void openBottomSheetShare(context, NostrNote note) {
                         ],
                       ),
                       const SizedBox(height: 20),
-                      const Text(
-                        "web clients",
-                        style: TextStyle(color: Palette.white, fontSize: 30),
-                      ),
-                      Row(
-                        children: [
-                          Column(
-                            children: [
-                              IconButton(
-                                tooltip: 'snort',
-                                onPressed: () {
-                                  var bech32nevent =
-                                      NeventHelper().mapToBech32({
-                                    "eventId": note.id,
-                                    "authorPubkey": note.pubkey,
-                                    "relays": note.relayHints,
-                                  });
-
-                                  _copyToClipboard(
-                                      'https://snort.social/$bech32nevent');
-                                },
-                                icon: const Icon(
-                                  Icons.link,
-                                  color: Palette.white,
-                                ),
-                              ),
-                              const Text("snort",
-                                  style: TextStyle(
-                                      color: Palette.lightGray, fontSize: 17)),
-                            ],
-                          ),
-                          const SizedBox(width: 20),
-                          Column(
-                            children: [
-                              IconButton(
-                                tooltip: 'iris',
-                                onPressed: () {
-                                  var bech32note =
-                                      Helpers().encodeBech32(note.id, "note");
-                                  _copyToClipboard(
-                                      'https://iris.to/$bech32note');
-                                },
-                                icon: const Icon(
-                                  Icons.link,
-                                  color: Palette.white,
-                                ),
-                              ),
-                              const Text("iris",
-                                  style: TextStyle(
-                                      color: Palette.lightGray, fontSize: 17)),
-                            ],
-                          ),
-                          const SizedBox(width: 20),
-                          Column(
-                            children: [
-                              IconButton(
-                                tooltip: 'iris',
-                                onPressed: () {
-                                  var bech32nevent =
-                                      NeventHelper().mapToBech32({
-                                    "eventId": note.id,
-                                    "authorPubkey": note.pubkey,
-                                    "relays": note.relayHints,
-                                  });
-                                  _copyToClipboard(
-                                      'https://coracle.social/$bech32nevent');
-                                },
-                                icon: const Icon(
-                                  Icons.link,
-                                  color: Palette.white,
-                                ),
-                              ),
-                              const Text("coracle",
-                                  style: TextStyle(
-                                      color: Palette.lightGray, fontSize: 17)),
-                            ],
-                          ),
-                        ],
-                      )
                     ],
                   ),
                 )),
