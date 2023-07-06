@@ -2,12 +2,12 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:camelus/providers/metadata_provider.dart';
-import 'package:camelus/providers/nostr_service_provider.dart';
 import 'package:camelus/providers/relay_provider.dart';
 import 'package:camelus/routes/nostr/nostr_page/user_feed_and_replies_view.dart';
 import 'package:camelus/routes/nostr/nostr_page/user_feed_original_view.dart';
 import 'package:camelus/routes/nostr/relays_page.dart';
 import 'package:camelus/services/nostr/relays/my_relay.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'package:flutter_svg/flutter_svg.dart';
@@ -220,7 +220,7 @@ class _NostrPageState extends ConsumerState<NostrPage>
                       child: GestureDetector(
                         onTap: () {},
                         child: const Text(
-                          "nostr",
+                          "camelus - nostr",
                           style: TextStyle(
                             color: Palette.lightGray,
                             fontSize: 20,
@@ -246,11 +246,12 @@ class _NostrPageState extends ConsumerState<NostrPage>
                                   width: 22,
                                 ),
                                 const SizedBox(width: 5),
-                                Text(
-                                  "0".toString(),
-                                  style:
-                                      const TextStyle(color: Palette.lightGray),
-                                ),
+                                if (!kReleaseMode)
+                                  Text(
+                                    "0".toString(),
+                                    style: const TextStyle(
+                                        color: Palette.lightGray),
+                                  ),
                                 const SizedBox(width: 5),
                               ],
                             );
@@ -264,15 +265,17 @@ class _NostrPageState extends ConsumerState<NostrPage>
                                   width: 22,
                                 ),
                                 const SizedBox(width: 5),
-                                Text(
-                                  // count how many relays are ready
-                                  snapshot.data!
-                                      .where((element) => element.connected)
-                                      .length
-                                      .toString(),
-                                  style:
-                                      const TextStyle(color: Palette.lightGray),
-                                ),
+                                // check if dev build
+                                if (!kReleaseMode)
+                                  Text(
+                                    // count how many relays are ready
+                                    snapshot.data!
+                                        .where((element) => element.connected)
+                                        .length
+                                        .toString(),
+                                    style: const TextStyle(
+                                        color: Palette.lightGray),
+                                  ),
                                 const SizedBox(width: 5),
                               ],
                             );

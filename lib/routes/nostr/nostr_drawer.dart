@@ -1,5 +1,8 @@
 import 'package:camelus/helpers/nprofile_helper.dart';
+import 'package:camelus/models/nostr_tag.dart';
+import 'package:camelus/providers/following_provider.dart';
 import 'package:camelus/providers/metadata_provider.dart';
+import 'package:camelus/services/nostr/metadata/following_pubkeys.dart';
 import 'package:camelus/services/nostr/metadata/user_metadata.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -82,7 +85,8 @@ class NostrDrawer extends ConsumerWidget {
         });
   }
 
-  Widget _drawerHeader(context, UserMetadata metadata) {
+  Widget _drawerHeader(
+      context, UserMetadata metadata, FollowingPubkeys followingService) {
     return DrawerHeader(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -190,22 +194,28 @@ class NostrDrawer extends ConsumerWidget {
           ),
           Row(
             children: [
-              RichText(
-                  text: const TextSpan(
-                      text: 'n.a.',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Palette.extraLightGray,
-                      ),
-                      children: [
-                    TextSpan(
-                      text: 'Following  ',
-                      style: TextStyle(
-                          color: Palette.gray,
-                          fontSize: 13,
-                          fontWeight: FontWeight.normal),
-                    )
-                  ])),
+              FutureBuilder<List<NostrTag>>(
+                  future: followingService.getFollowingPubkeys(pubkey),
+                  builder: (context, snapshot) {
+                    return RichText(
+                        text: TextSpan(
+                            text: snapshot.hasData
+                                ? snapshot.data?.length.toString()
+                                : 'n.a.',
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Palette.extraLightGray,
+                            ),
+                            children: const [
+                          TextSpan(
+                            text: ' Following  ',
+                            style: TextStyle(
+                                color: Palette.gray,
+                                fontSize: 13,
+                                fontWeight: FontWeight.normal),
+                          )
+                        ]));
+                  }),
               const SizedBox(
                 width: 6,
               ),
@@ -264,6 +274,7 @@ class NostrDrawer extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     var metadata = ref.watch(metadataProvider);
+    var followingService = ref.watch(followingProvider);
 
     return Drawer(
       child: Container(
@@ -272,7 +283,7 @@ class NostrDrawer extends ConsumerWidget {
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _drawerHeader(context, metadata),
+            _drawerHeader(context, metadata, followingService),
             _divider(),
             _drawerItem(
                 label: 'Profile',
