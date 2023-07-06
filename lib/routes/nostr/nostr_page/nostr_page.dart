@@ -1,11 +1,9 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:camelus/models/socket_control.dart';
 import 'package:camelus/providers/metadata_provider.dart';
 import 'package:camelus/providers/nostr_service_provider.dart';
 import 'package:camelus/providers/relay_provider.dart';
-import 'package:camelus/routes/nostr/nostr_page/global_feed_view.dart';
 import 'package:camelus/routes/nostr/nostr_page/user_feed_and_replies_view.dart';
 import 'package:camelus/routes/nostr/nostr_page/user_feed_original_view.dart';
 import 'package:camelus/routes/nostr/relays_page.dart';
@@ -24,10 +22,11 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../../config/palette.dart';
 
 class NostrPage extends ConsumerStatefulWidget {
-  var parentScaffoldKey = GlobalKey<ScaffoldState>();
+  final GlobalKey<ScaffoldState> parentScaffoldKey;
   final String pubkey;
 
-  NostrPage({Key? key, required this.parentScaffoldKey, required this.pubkey})
+  const NostrPage(
+      {Key? key, required this.parentScaffoldKey, required this.pubkey})
       : super(key: key);
   @override
   ConsumerState<NostrPage> createState() => _NostrPageState();
@@ -124,7 +123,7 @@ class _NostrPageState extends ConsumerState<NostrPage>
 
     _betaCheckForUpdates();
 
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 2, vsync: this);
 
     _tabController.addListener(() {
       if (_tabController.indexIsChanging) {}
@@ -156,7 +155,6 @@ class _NostrPageState extends ConsumerState<NostrPage>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    var nostrService = ref.watch(nostrServiceProvider);
     var metadata = ref.watch(metadataProvider);
     var myRelays = ref.watch(relayServiceProvider);
 
@@ -287,11 +285,19 @@ class _NostrPageState extends ConsumerState<NostrPage>
                   child: TabBar(
                     controller: _tabController,
                     indicatorColor: Palette.primary,
+                    indicatorSize: TabBarIndicatorSize.label,
+                    automaticIndicatorColorAdjustment: true,
+                    indicator: const UnderlineTabIndicator(
+                      borderRadius: BorderRadius.all(Radius.circular(10)),
+                      borderSide: BorderSide(
+                        width: 2,
+                        color: Palette.primary,
+                      ),
+                    ),
+                    indicatorWeight: 5.0,
                     tabs: const [
                       Text("feed", style: TextStyle(color: Palette.lightGray)),
                       Text("feed & replies",
-                          style: TextStyle(color: Palette.lightGray)),
-                      Text("global",
                           style: TextStyle(color: Palette.lightGray)),
                     ],
                   ),
@@ -305,7 +311,6 @@ class _NostrPageState extends ConsumerState<NostrPage>
             children: [
               UserFeedOriginalView(pubkey: widget.pubkey),
               UserFeedAndRepliesView(pubkey: widget.pubkey),
-              const GlobalFeedView()
             ],
           ),
         ),
