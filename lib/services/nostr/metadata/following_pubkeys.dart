@@ -29,6 +29,11 @@ class FollowingPubkeys {
   final List<NostrTag> _ownContacts = [];
   List<NostrTag> get ownContacts => _ownContacts;
 
+  final StreamController<Map<String, dynamic>> _ownRelaysController =
+      StreamController<Map<String, dynamic>>.broadcast();
+  Stream<Map<String, dynamic>> get ownRelaysStreamDb =>
+      _ownRelaysController.stream;
+
   Map<String, dynamic> _ownRelays = {};
   Map<String, dynamic> get ownRelays => _ownRelays;
 
@@ -115,6 +120,7 @@ class FollowingPubkeys {
       if (newRelays.isNotEmpty) {
         _ownRelays.clear();
         _ownRelays = newRelays;
+        _ownRelaysController.add(newRelays);
       }
 
       if (!_servicesReady.isCompleted) {

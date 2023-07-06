@@ -472,7 +472,8 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                       delegate: SliverChildListDelegate(
                         [
                           const SizedBox(height: 10),
-                          _actionRow(followingService, metadata, context),
+                          _actionRow(
+                              myKeyPair, followingService, metadata, context),
 
                           // move up the profile info by 110
                           _profileInformation(metadata),
@@ -871,12 +872,12 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
     );
   }
 
-  Row _actionRow(FollowingPubkeys followingService, UserMetadata metadata,
-      BuildContext context) {
+  Row _actionRow(KeyPair myKeyPair, FollowingPubkeys followingService,
+      UserMetadata metadata, BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
-        if (widget.pubkey != _nostrService.myKeys.publicKey)
+        if (widget.pubkey != myKeyPair.publicKey)
           SizedBox(
             width: 35,
             height: 35,
@@ -942,11 +943,11 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
 
         // follow button black with white border
 
-        if (widget.pubkey != _nostrService.myKeys.publicKey)
+        if (widget.pubkey != myKeyPair.publicKey)
           _followButton(followingService),
 
         // edit button
-        if (widget.pubkey == _nostrService.myKeys.publicKey)
+        if (widget.pubkey == myKeyPair.publicKey)
           Container(
             margin: const EdgeInsets.only(top: 0, right: 10),
             child: ElevatedButton(
