@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:camelus/db/database.dart';
 import 'package:camelus/helpers/helpers.dart';
@@ -27,6 +28,9 @@ class FollowingPubkeys {
 
   final List<NostrTag> _ownContacts = [];
   List<NostrTag> get ownContacts => _ownContacts;
+
+  Map<String, dynamic> _ownRelays = {};
+  Map<String, dynamic> get ownRelays => _ownRelays;
 
   int _fetchLatestEventAt = 0;
 
@@ -97,10 +101,21 @@ class FollowingPubkeys {
       _fetchLatestEventAt = kind3.created_at;
 
       var newContacts = kind3.getTagPubkeys;
+      Map<String, dynamic> newRelays = {};
+      try {
+        newRelays = jsonDecode(kind3.content);
+      } catch (e) {
+        //
+      }
 
       _ownContacts.clear();
       _ownContacts.addAll(newContacts);
       _contactsController.add(newContacts);
+
+      if (newRelays.isNotEmpty) {
+        _ownRelays.clear();
+        _ownRelays = newRelays;
+      }
 
       if (!_servicesReady.isCompleted) {
         _dbStreamReady.complete();

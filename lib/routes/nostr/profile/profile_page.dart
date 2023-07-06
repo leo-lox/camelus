@@ -7,6 +7,7 @@ import 'package:camelus/atoms/follow_button.dart';
 import 'package:camelus/atoms/long_button.dart';
 import 'package:camelus/components/note_card/note_card_container.dart';
 import 'package:camelus/db/database.dart';
+import 'package:camelus/helpers/bip340.dart';
 import 'package:camelus/helpers/nprofile_helper.dart';
 import 'package:camelus/models/nostr_note.dart';
 import 'package:camelus/models/nostr_request_event.dart';
@@ -419,61 +420,71 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
   Widget build(BuildContext context) {
     var metadata = ref.watch(metadataProvider);
     var followingService = ref.watch(followingProvider);
+    var myKeyPairWrapper = ref.watch(keyPairProvider.future);
 
     return Scaffold(
       backgroundColor: Palette.background,
       body: Stack(
         children: [
-          CustomScrollView(
-            controller: _scrollController,
-            slivers: [
-              SliverAppBar(
-                expandedHeight: 150,
-                //toolbarHeight: 10,
-                backgroundColor: Palette.background,
-                pinned: true,
-                flexibleSpace: _bannerImage(metadata),
+          FutureBuilder<KeyPairWrapper>(
+              future: myKeyPairWrapper,
+              builder: (context, keyPairSnapshot) {
+                if (!keyPairSnapshot.hasData) {
+                  return const SizedBox();
+                }
+                KeyPair myKeyPair = keyPairSnapshot.data!.keyPair!;
+                return CustomScrollView(
+                  controller: _scrollController,
+                  slivers: [
+                    SliverAppBar(
+                      expandedHeight: 150,
+                      //toolbarHeight: 10,
+                      backgroundColor: Palette.background,
+                      pinned: true,
+                      flexibleSpace: _bannerImage(metadata),
 
-                actions: [
-                  PopupMenuButton<String>(
-                    tooltip: "More",
-                    onSelected: (e) => {
-                      //log(e),
-                      // toast
-                      if (e == "block") _blockUser()
-                    },
-                    itemBuilder: (BuildContext context) {
-                      return {'block'}.map((String choice) {
-                        return PopupMenuItem<String>(
-                          value: choice,
-                          child: Text(choice),
-                        );
-                      }).toList();
-                    },
-                  ),
-                ],
-                // rounded back button
-                leading: const BackButtonRound(),
-                bottom: PreferredSize(
-                  preferredSize: const Size.fromHeight(0),
-                  child: Container(),
-                ),
-              ),
-              SliverList(
-                delegate: SliverChildListDelegate(
-                  [
-                    const SizedBox(height: 10),
-                    _actionRow(followingService, metadata, context),
+                      actions: [
+                        PopupMenuButton<String>(
+                          tooltip: "More",
+                          onSelected: (e) => {
+                            //log(e),
+                            // toast
+                            if (e == "block") _blockUser()
+                          },
+                          itemBuilder: (BuildContext context) {
+                            return {'block'}.map((String choice) {
+                              return PopupMenuItem<String>(
+                                value: choice,
+                                child: Text(choice),
+                              );
+                            }).toList();
+                          },
+                        ),
+                      ],
+                      // rounded back button
+                      leading: const BackButtonRound(),
+                      bottom: PreferredSize(
+                        preferredSize: const Size.fromHeight(0),
+                        child: Container(),
+                      ),
+                    ),
+                    SliverList(
+                      delegate: SliverChildListDelegate(
+                        [
+                          const SizedBox(height: 10),
+                          _actionRow(followingService, metadata, context),
 
-                    // move up the profile info by 110
-                    _profileInformation(metadata),
-                    _bottomInformationBar(context, followingService)
+                          // move up the profile info by 110
+                          _profileInformation(metadata),
+                          _bottomInformationBar(
+                              context, followingService, myKeyPair)
+                        ],
+                      ),
+                    ),
+                    _feed(),
                   ],
-                ),
-              ),
-              _feed(),
-            ],
-          ),
+                );
+              }),
           _profileImage(_scrollController, widget, _nostrService, metadata),
           SafeArea(
             child: SizedBox(
@@ -609,8 +620,8 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
         });
   }
 
-  Row _bottomInformationBar(
-      BuildContext context, FollowingPubkeys followingService) {
+  Row _bottomInformationBar(BuildContext context,
+      FollowingPubkeys followingService, KeyPair myKeyPair) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
@@ -672,42 +683,47 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                 )),
           ],
         ),
-        GestureDetector(
-          onTap: () {
-            if (widget.pubkey == _nostrService.myKeys.publicKey) {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const EditRelaysPage(),
-                ),
-              ).then((value) => setState(() {}));
-            }
-          },
-          child: Row(
-            children: [
-              const Icon(Icons.connect_without_contact,
-                  color: Palette.white, size: 17),
-              const SizedBox(width: 5),
-              if (widget.pubkey == _nostrService.myKeys.publicKey)
-                Text(
-                  "${_nostrService.relays.manualRelays.length} relays",
-                  style: const TextStyle(
-                    color: Palette.white,
-                    fontSize: 14,
-                  ),
-                ),
-              if (widget.pubkey != _nostrService.myKeys.publicKey)
-                const Text(
-                  "n.a. relays",
-                  style: TextStyle(
-                    color: Palette.white,
-                    fontSize: 14,
-                  ),
-                ),
-            ],
-          ),
-        ),
+        _relaysInfo(followingService, myKeyPair, context),
       ],
+    );
+  }
+
+  GestureDetector _relaysInfo(FollowingPubkeys followingService,
+      KeyPair myKeyPair, BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        if (widget.pubkey == myKeyPair.publicKey) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const EditRelaysPage(),
+            ),
+          ).then((value) => setState(() {}));
+        }
+      },
+      child: Row(
+        children: [
+          const Icon(Icons.connect_without_contact,
+              color: Palette.white, size: 17),
+          const SizedBox(width: 5),
+          if (widget.pubkey == _nostrService.myKeys.publicKey)
+            Text(
+              "${followingService.ownRelays.entries.length} relays",
+              style: const TextStyle(
+                color: Palette.white,
+                fontSize: 14,
+              ),
+            ),
+          if (widget.pubkey != myKeyPair.publicKey)
+            const Text(
+              "n.a. relays", //nip 65 relays
+              style: TextStyle(
+                color: Palette.white,
+                fontSize: 14,
+              ),
+            ),
+        ],
+      ),
     );
   }
 
