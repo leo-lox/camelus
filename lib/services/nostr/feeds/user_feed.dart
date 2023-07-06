@@ -30,6 +30,10 @@ class UserFeed {
     init();
   }
 
+  NostrNote?
+      _oldestNoteInSession; // oldest note recived by relays in current session
+  NostrNote? get oldestNoteInSession => _oldestNoteInSession;
+
   /// streams the current feed with updates as they come in below the fixedTopNote
   Stream<List<NostrNote>> get feedStream => _feedStreamController.stream;
 
@@ -119,6 +123,9 @@ class UserFeed {
         for (var note in allNotes) {
           _fixedTopNote ??= note;
 
+          // set oldest note in session when fetched from db
+          _oldestNoteInSession ??= _feed[5];
+
           // check for duplicates
           if (_feed.any((element) => element.id == note.id)) {
             continue;
@@ -133,6 +140,11 @@ class UserFeed {
           }
           if (note.created_at < _fixedTopNote!.created_at) {
             feedUpdates.add(note);
+          }
+
+          // update oldest note in session
+          if (note.created_at < _oldestNoteInSession!.created_at) {
+            _oldestNoteInSession = note;
           }
         }
         if (newNotes.isNotEmpty) {
@@ -168,7 +180,7 @@ class UserFeed {
 
     // skip if already requested
     if (_requestIds.contains(reqId)) {
-      return;
+      //return;
     } else {
       _requestIds.add(reqId);
     }

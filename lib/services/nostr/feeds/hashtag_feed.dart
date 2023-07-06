@@ -27,6 +27,10 @@ class HashtagFeed {
 
   int _feedFixedTopAt = DateTime.now().millisecondsSinceEpoch ~/ 1000;
 
+  NostrNote?
+      _oldestNoteInSession; // oldest note recived by relays in current session
+  NostrNote? get oldestNoteInSession => _oldestNoteInSession;
+
   Stream<List<NostrNote>> get feedStream => _feedStreamController.stream;
   List<NostrNote> get feed => _feed;
   Stream<List<NostrNote>> get newNotesStream => _newNotesController.stream;
@@ -75,9 +79,6 @@ class HashtagFeed {
     _feedRdy.complete(_feed);
     return;
   }
-
-  NostrNote? _oldestNoteInSession;
-  NostrNote? get oldestNoteInSession => _oldestNoteInSession;
 
   void _streamFeed() {
     Stream<List<DbNoteView>> stream =
