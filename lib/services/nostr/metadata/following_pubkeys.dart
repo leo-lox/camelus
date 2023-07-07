@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:camelus/db/database.dart';
 import 'package:camelus/helpers/helpers.dart';
+import 'package:camelus/models/nostr_request_event.dart';
 import 'package:camelus/models/nostr_request_query.dart';
 import 'package:camelus/models/nostr_tag.dart';
 import 'package:camelus/providers/key_pair_provider.dart';
@@ -13,6 +14,7 @@ import 'package:json_cache/json_cache.dart';
 class FollowingPubkeys {
   final Future<KeyPairWrapper> keyPair;
   late String _myPubkey;
+  late String _myPrivkey;
   final Future<AppDatabase> db;
   late AppDatabase _db;
   final RelayCoordinator relays;
@@ -57,6 +59,7 @@ class FollowingPubkeys {
 
   void _init() async {
     _myPubkey = (await keyPair).keyPair!.publicKey;
+    _myPrivkey = (await keyPair).keyPair!.privateKey;
     _db = await db;
     _initStream(_myPubkey);
     await _restoreCache();
@@ -214,6 +217,60 @@ class FollowingPubkeys {
     var request = NostrRequestQuery(subscriptionId: requestId, body: body);
     await relays.request(request: request);
     relays.closeSubscription(requestId);
+    return;
+  }
+
+  Future follow(
+    String toFollow,
+  ) async {
+    var myLastNote =
+        (await _db.noteDao.findPubkeyNotesByKind([_myPubkey], 3)).first;
+
+    List<NostrTag> newContacts = [..._ownContacts];
+    newContacts.add(NostrTag(type: 'p', value: toFollow));
+    await _writeContacts(
+      publicKey: _myPubkey,
+      privateKey: _myPrivkey,
+      content: myLastNote.content,
+      updatedContacts: newContacts,
+    );
+    return;
+  }
+
+  Future unfollow(String toUnfollow) async {
+    var myLastNote =
+        (await _db.noteDao.findPubkeyNotesByKind([_myPubkey], 3)).first;
+
+    List<NostrTag> newContacts = [..._ownContacts];
+
+    newContacts.removeWhere((element) => element.value == toUnfollow);
+
+    await _writeContacts(
+      publicKey: _myPubkey,
+      privateKey: _myPrivkey,
+      content: myLastNote.content,
+      updatedContacts: newContacts,
+    );
+    return;
+  }
+
+  Future _writeContacts({
+    required String publicKey,
+    required String privateKey,
+    required String content,
+    required List<NostrTag> updatedContacts,
+  }) async {
+    NostrRequestEventBody body = NostrRequestEventBody(
+      pubkey: publicKey,
+      privateKey: privateKey,
+      content: content,
+      kind: 3,
+      tags: updatedContacts,
+    );
+    NostrRequestEvent myEvent = NostrRequestEvent(body: body);
+
+    await relays.write(request: myEvent);
+
     return;
   }
 }
