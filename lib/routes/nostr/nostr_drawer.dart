@@ -11,6 +11,7 @@ import 'package:camelus/atoms/my_profile_picture.dart';
 import 'package:camelus/config/palette.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class NostrDrawer extends ConsumerWidget {
   final String pubkey;
@@ -331,7 +332,13 @@ class NostrDrawer extends ConsumerWidget {
             const SizedBox(height: 10),
             Padding(
                 padding: const EdgeInsets.fromLTRB(20, 10, 15, 20),
-                child: _textButton(text: 'contact', onPressed: () {})),
+                child: _textButton(
+                    text: 'terms of service',
+                    onPressed: () {
+                      // lauch url
+                      Uri url = Uri.parse("https://camelus.app/terms");
+                      launchUrl(url, mode: LaunchMode.externalApplication);
+                    })),
             const Spacer(),
             _divider(),
             Padding(
