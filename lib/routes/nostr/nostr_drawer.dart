@@ -35,6 +35,7 @@ class NostrDrawer extends ConsumerWidget {
     String nprofile = await NprofileHelper()
         .getNprofile(pubkey, []); //todo: get recommended relays
 
+    // ignore: use_build_context_synchronously
     showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -73,12 +74,6 @@ class NostrDrawer extends ConsumerWidget {
                     ),
                   ),
                   const SizedBox(height: 20),
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    child: const Text("close"),
-                  ),
                 ],
               ),
             ),
