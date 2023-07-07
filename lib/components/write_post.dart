@@ -6,10 +6,13 @@ import 'package:camelus/atoms/picture.dart';
 import 'package:camelus/db/database.dart';
 import 'package:camelus/helpers/nprofile_helper.dart';
 import 'package:camelus/helpers/search.dart';
+import 'package:camelus/models/nostr_request_event.dart';
 import 'package:camelus/models/nostr_tag.dart';
 import 'package:camelus/providers/database_provider.dart';
+import 'package:camelus/providers/key_pair_provider.dart';
 import 'package:camelus/providers/metadata_provider.dart';
 import 'package:camelus/providers/nostr_service_provider.dart';
+import 'package:camelus/providers/relay_provider.dart';
 import 'package:camelus/services/external/nostr_build_file_upload.dart';
 import 'package:camelus/services/nostr/metadata/user_metadata.dart';
 import 'package:camelus/services/nostr/relays/relays_ranking.dart';
@@ -194,6 +197,7 @@ class _WritePostState extends ConsumerState<WritePost> {
         );
         tags.add(tag);
       } else {
+        // is reply to root
         var tag = NostrTag(
           type: "e",
           value: widget.context!.replyToNote.id,
@@ -201,6 +205,13 @@ class _WritePostState extends ConsumerState<WritePost> {
           marker: "root",
         );
         tags.add(tag);
+        var tagPubkey = NostrTag(
+          type: "p",
+          value: widget.context!.replyToNote.pubkey,
+          recommended_relay: "",
+          marker: "root",
+        );
+        tags.add(tagPubkey);
       }
 
       // add previous tweet tags
@@ -209,18 +220,38 @@ class _WritePostState extends ConsumerState<WritePost> {
           if (tag.marker == "root" || tag.marker == "reply") {
             continue;
           }
-          tags.add(tag);
+          if (!(tags.map((e) => e.value).contains(tag.value))) {
+            tags.add(tag);
+          }
         }
         if (tag.type == "p") {
+          if (tag.marker == 'reply') {
+            var replaceTag = NostrTag(type: 'p', value: tag.value);
+            tags.add(replaceTag);
+            continue;
+          }
           tags.add(tag);
         }
       }
 
-      var replyIsDirectReply = widget.context!.replyToNote.getDirectReply;
-      if (replyIsReplyToRoot != null) {
+      if (mentionKeys.isNotEmpty) {
+        for (int i = 0; i < mentionKeys.length; i++) {
+          var pubkey = mentionKeys[i];
+          var potentialRelays =
+              await RelaysRanking().getBestRelays(pubkey, Direction.read);
+          tags.add(NostrTag(
+            type: "p",
+            value: pubkey,
+            recommended_relay: potentialRelays.firstOrNull ?? "",
+            marker: "mention",
+          ));
+        }
+      }
+
+      if (widget.context != null) {
         var tag = NostrTag(
           type: "e",
-          value: replyIsDirectReply!.value,
+          value: widget.context!.replyToNote.id,
           recommended_relay: "",
           marker: "reply",
         );
@@ -233,20 +264,6 @@ class _WritePostState extends ConsumerState<WritePost> {
           marker: 'reply',
         );
         tags.add(tagPubkey);
-      }
-    }
-
-    if (mentionKeys.isNotEmpty) {
-      for (int i = 0; i < mentionKeys.length; i++) {
-        var pubkey = mentionKeys[i];
-        var potentialRelays =
-            await RelaysRanking().getBestRelays(pubkey, Direction.read);
-        tags.add(NostrTag(
-          type: "p",
-          value: pubkey,
-          recommended_relay: potentialRelays.firstOrNull ?? "",
-          marker: "mention",
-        ));
       }
     }
 
@@ -270,11 +287,58 @@ class _WritePostState extends ConsumerState<WritePost> {
     log("content: $content");
     //_nostrService.writeEvent(content, 1, tags);
 
+    var relays = ref.watch(relayServiceProvider);
+    var keyService = await ref.watch(keyPairProvider.future);
+
+    var keyPair = keyService.keyPair!;
+
+    var myBody = NostrRequestEventBody(
+      pubkey: keyPair.publicKey,
+      privateKey: keyPair.privateKey,
+      kind: 1,
+      content: content,
+      tags: tags,
+    );
+    var myRequest = NostrRequestEvent(body: myBody);
+    List<String> results = await relays.write(request: myRequest);
+
+    // check if all are timeout
+    var timeouts = results.where((element) => element == 'timeout');
+    if (timeouts.length == results.length || results == []) {
+      log("error sending msg");
+      setState(() {
+        submitLoading = false;
+      });
+      _showErrorMsg("all relays timed out 😥");
+      return;
+    }
+
     // wait for x seconds
-    Future.delayed(const Duration(milliseconds: 200), () {
+    Future.delayed(const Duration(milliseconds: 100), () {
       // close modal
       Navigator.pop(context);
     });
+  }
+
+  _showErrorMsg(String msg) {
+    // alert dialog
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("error"),
+          content: Text(msg),
+          actions: [
+            TextButton(
+              child: const Text("ok"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   void _initServices() async {
