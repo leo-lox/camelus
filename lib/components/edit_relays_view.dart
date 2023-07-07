@@ -84,7 +84,7 @@ class _EditRelaysViewState extends ConsumerState<EditRelaysView> {
     });
   }
 
-  void initSequence() async {
+  void _initSequence() async {
     var followingPubkeys = ref.read(followingProvider);
     await followingPubkeys.servicesReady;
     var relays = followingPubkeys.ownRelays;
@@ -94,16 +94,16 @@ class _EditRelaysViewState extends ConsumerState<EditRelaysView> {
       // cast to Map<String, bool>
       relaysMap[relay.key] = relay.value.cast<String, bool>();
     }
-
     setState(() {
-      myRelays = relaysMap;
+      myRelays = Map.from(relaysMap);
     });
+    return;
   }
 
   @override
   void initState() {
     super.initState();
-    initSequence();
+    _initSequence();
   }
 
   @override
@@ -112,12 +112,44 @@ class _EditRelaysViewState extends ConsumerState<EditRelaysView> {
     super.dispose();
   }
 
+  _checkClose() async {
+    if (!touched) {
+      Navigator.of(context).pop();
+      return;
+    }
+    // show dialog
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Discard changes?"),
+          content: const Text("Do you want to discard your changes?"),
+          actions: [
+            TextButton(
+              child: const Text("Cancel"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: const Text("Discard"),
+              onPressed: () {
+                Navigator.of(context).pop();
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async {
-        //await _closeView();
-        return true;
+        await _checkClose();
+        return false;
       },
       child: reconnecting
           ? const Center(
