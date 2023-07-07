@@ -113,8 +113,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
     // cached network request from https://api.nostr.band/v0/trending/profiles
 
     var file = await DefaultCacheManager().getSingleFile(
-      //'https://api.nostr.band/v0/trending/profiles',
-      'http://192.168.0.21:5173/api/v1/nostr-band-cache?type=profiles&limit=10',
+      'https://camelus.app/api/v1/nostr-band-cache?type=profiles&limit=10',
       key: 'trending_profiles_nostr_band',
       // 2 hours
       headers: {'Cache-Control': 'max-age=7200'},
@@ -131,8 +130,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
   Future<ApiNostrBandHashtags?> _getTrendingHashtags() async {
     //var file = await DefaultCacheManager().getSingleFile(url);
     var file = await DefaultCacheManager().getSingleFile(
-      //'https://api.nostr.band/nostr?method=trending&type=hashtags',
-      'http://192.168.0.21:5173/api/v1/nostr-band-cache?type=hashtags&limit=10',
+      'https://camelus.app/api/v1/nostr-band-cache?type=hashtags&limit=10',
       key: 'trending_hashtags_nostr_band',
       // 2 hours min
       headers: {'Cache-Control': 'max-age=7200'},
