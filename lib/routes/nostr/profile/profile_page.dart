@@ -646,7 +646,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
           const Icon(Icons.connect_without_contact,
               color: Palette.white, size: 17),
           const SizedBox(width: 5),
-          if (widget.pubkey == _nostrService.myKeys.publicKey)
+          if (widget.pubkey == myKeyPair.publicKey)
             Text(
               "${followingService.ownRelays.entries.length} relays",
               style: const TextStyle(

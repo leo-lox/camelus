@@ -336,9 +336,6 @@ class _NoteCardState extends ConsumerState<NoteCard> {
         // like button
         GestureDetector(
           onTap: () => {
-            // copy to clipboard
-            Clipboard.setData(
-                ClipboardData(text: widget.note.toJson().toString())),
             ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
               content: Text('Like functionality is not implemented yet'),
               duration: Duration(seconds: 1),

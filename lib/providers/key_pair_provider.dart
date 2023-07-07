@@ -23,7 +23,7 @@ class KeyPairWrapper {
   KeyPair? keyPair;
   KeyPairWrapper({this.keyPair});
 
-  setKeyPair(KeyPair keyPair) {
-    this.keyPair = keyPair;
+  setKeyPair(KeyPair myKeyPair) {
+    keyPair = myKeyPair;
   }
 }

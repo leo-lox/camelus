@@ -1,7 +1,10 @@
 import 'dart:convert';
 
+import 'package:camelus/models/nostr_request_query.dart';
 import 'package:camelus/providers/key_pair_provider.dart';
 import 'package:camelus/providers/nostr_service_provider.dart';
+import 'package:camelus/providers/relay_provider.dart';
+import 'package:camelus/routes/home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:camelus/config/palette.dart';
 import 'package:camelus/helpers/bip340.dart';
@@ -98,9 +101,14 @@ class _NostrOnboardingState extends ConsumerState<NostrOnboarding> {
     var provider = await ref.watch(keyPairProvider.future);
     provider.setKeyPair(myKeys);
 
-    _nostrService.finishedOnboarding();
+    setState(() {});
 
-    Navigator.popAndPushNamed(context, '/');
+    // ignore: use_build_context_synchronously
+    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
+      return HomePage(pubkey: myKeys.publicKey);
+    }));
+
+    //Navigator.popAndPushNamed(context, '/');
   }
 
   @override
