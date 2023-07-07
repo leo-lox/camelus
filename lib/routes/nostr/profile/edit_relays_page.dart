@@ -4,6 +4,7 @@ import 'dart:developer';
 import 'package:camelus/components/edit_relays_view.dart';
 import 'package:camelus/models/nostr_tag.dart';
 import 'package:camelus/providers/following_provider.dart';
+import 'package:camelus/services/nostr/relays/relay_address_parser.dart';
 
 import 'package:flutter/material.dart';
 import 'package:camelus/config/palette.dart';
@@ -29,8 +30,15 @@ class _EditRelaysPageState extends ConsumerState<EditRelaysPage> {
   }
 
   Future onSave(Map<String, Map<String, bool>> changedRelays) async {
-    var contacts = _saveInContacts(changedRelays);
-    var nip65 = _saveNip65(changedRelays);
+    Map<String, Map<String, bool>> parsedMap = {};
+    // parse all relays
+    for (var relay in changedRelays.entries) {
+      var parsedKey = RelayAddressParser.parseAddress(relay.key);
+      parsedMap[parsedKey] = relay.value;
+    }
+
+    var contacts = _saveInContacts(parsedMap);
+    var nip65 = _saveNip65(parsedMap);
 
     await Future.wait([contacts, nip65]);
 

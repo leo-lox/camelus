@@ -2,6 +2,7 @@ import 'dart:developer';
 import 'package:camelus/atoms/long_button.dart';
 import 'package:camelus/config/palette.dart';
 import 'package:camelus/providers/following_provider.dart';
+import 'package:camelus/services/nostr/relays/relay_address_parser.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -38,6 +39,8 @@ class _EditRelaysViewState extends ConsumerState<EditRelaysView> {
       relayName = "wss://$relayName";
       log("added");
     }
+
+    relayName = RelayAddressParser.parseAddress(relayName);
 
     // check if relay already exists
     if (myRelays.containsKey(relayName)) {
