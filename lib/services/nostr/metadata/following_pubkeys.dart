@@ -23,6 +23,7 @@ class FollowingPubkeys {
 
   final List<CurrentlyFetching> _currentlyFetching = [];
 
+  // own contacts
   final StreamController<List<NostrTag>> _contactsController =
       StreamController<List<NostrTag>>.broadcast();
   Stream<List<NostrTag>> get ownPubkeyContactsStreamDb =>
@@ -31,6 +32,7 @@ class FollowingPubkeys {
   final List<NostrTag> _ownContacts = [];
   List<NostrTag> get ownContacts => _ownContacts;
 
+  // own relays
   final StreamController<Map<String, dynamic>> _ownRelaysController =
       StreamController<Map<String, dynamic>>.broadcast();
   Stream<Map<String, dynamic>> get ownRelaysStreamDb =>
@@ -39,7 +41,16 @@ class FollowingPubkeys {
   Map<String, dynamic> _ownRelays = {};
   Map<String, dynamic> get ownRelays => _ownRelays;
 
+  // nip 65
+  final StreamController<Map<String, dynamic>> _ownNip65Controller =
+      StreamController<Map<String, dynamic>>.broadcast();
+  Stream<Map<String, dynamic>> get ownNip65StreamDb =>
+      _ownNip65Controller.stream;
+  final List<NostrTag> _ownNip65 = [];
+  List<NostrTag> get ownNip65 => _ownNip65;
+
   int _fetchLatestEventAt = 0;
+  int _FetchLatestNip65At = 0;
 
   final Completer<void> _servicesReady = Completer<void>();
   final Completer<void> _dbStreamReady = Completer<void>();
@@ -130,6 +141,25 @@ class FollowingPubkeys {
         _dbStreamReady.complete();
       }
     }));
+
+    _subscriptions.add(
+      _db.noteDao.findPubkeyNotesByKindStream([pubkey], 10002).listen(
+        (dbList) {
+          if (dbList.isEmpty) {
+            return;
+          }
+          var nip65 = dbList.first.toNostrNote();
+
+          if (_FetchLatestNip65At != 0 &&
+              nip65.created_at <= _FetchLatestNip65At) {
+            return;
+          }
+
+          _ownNip65.clear();
+          _ownNip65.addAll(nip65.tags);
+        },
+      ),
+    );
   }
 
   /// gets the data directly from the db without dispaching a request
@@ -254,6 +284,16 @@ class FollowingPubkeys {
     return;
   }
 
+  Future updateContent(String updatedContent) async {
+    await _writeContacts(
+      publicKey: _myPubkey,
+      privateKey: _myPrivkey,
+      content: updatedContent,
+      updatedContacts: _ownContacts,
+    );
+    return;
+  }
+
   Future _writeContacts({
     required String publicKey,
     required String privateKey,
@@ -271,6 +311,21 @@ class FollowingPubkeys {
 
     await relays.write(request: myEvent);
 
+    return;
+  }
+
+  // todo: maybe additonal blaster service?
+  Future publishNip65(List<NostrTag> updatedTags) async {
+    NostrRequestEventBody body = NostrRequestEventBody(
+      pubkey: _myPubkey,
+      privateKey: _myPrivkey,
+      content: "",
+      kind: 10002,
+      tags: updatedTags,
+    );
+
+    NostrRequestEvent myEvent = NostrRequestEvent(body: body);
+    await relays.write(request: myEvent);
     return;
   }
 }

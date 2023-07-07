@@ -6,9 +6,10 @@ Widget longButton({
   required Function() onPressed,
   bool inverted = false,
   bool disabled = false,
+  bool loading = false,
 }) {
   return ElevatedButton(
-    onPressed: disabled ? null : onPressed,
+    onPressed: disabled && !loading ? null : onPressed,
     style: ElevatedButton.styleFrom(
       disabledBackgroundColor: Palette.darkGray,
       foregroundColor: inverted ? Palette.black : Palette.lightGray,
@@ -18,12 +19,24 @@ Widget longButton({
         side: const BorderSide(color: Palette.white, width: 1),
       ),
     ),
-    child: Text(
-      name,
-      style: TextStyle(
-        color: inverted ? Palette.black : Palette.white,
-        fontSize: 18,
-      ),
+    child: loading
+        ? _progress()
+        : Text(
+            name,
+            style: TextStyle(
+              color: inverted ? Palette.black : Palette.white,
+              fontSize: 18,
+            ),
+          ),
+  );
+}
+
+Widget _progress() {
+  return const Padding(
+    padding: EdgeInsets.only(left: 10, right: 10),
+    child: LinearProgressIndicator(
+      backgroundColor: Palette.gray,
+      color: Palette.black,
     ),
   );
 }

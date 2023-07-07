@@ -1,7 +1,4 @@
-import 'dart:convert';
 import 'dart:developer';
-
-import 'package:camelus/atoms/follow_button.dart';
 import 'package:camelus/atoms/long_button.dart';
 import 'package:camelus/config/palette.dart';
 import 'package:camelus/providers/following_provider.dart';
@@ -9,7 +6,9 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class EditRelaysView extends ConsumerStatefulWidget {
-  const EditRelaysView({Key? key}) : super(key: key);
+  // async function with Map<String, Map<String, bool>> as parameter
+  final Function(Map<String, Map<String, bool>>) onSave;
+  const EditRelaysView({Key? key, required this.onSave}) : super(key: key);
 
   @override
   ConsumerState<EditRelaysView> createState() => _EditRelaysViewState();
@@ -20,6 +19,7 @@ class _EditRelaysViewState extends ConsumerState<EditRelaysView> {
 
   bool reconnecting = false;
   bool touched = false;
+  bool loading = false;
 
   late Map<String, Map<String, bool>> myRelays = {};
 
@@ -71,31 +71,17 @@ class _EditRelaysViewState extends ConsumerState<EditRelaysView> {
     _relayNameController.clear();
   }
 
-  // get called when going back
-  _closeView() async {
-    if (touched == false) {
-      Navigator.of(context).pop();
-      return;
-    }
-    setState(() {
-      reconnecting = true;
-    });
-    await _saveRelays();
-    setState(() {
-      reconnecting = false;
-    });
-
-    // ignore: use_build_context_synchronously
-    Navigator.of(context).pop();
-  }
-
   _saveRelays() async {
     log("saving relays $myRelays");
-    await _reconnect();
-  }
-
-  Future<void> _reconnect() async {
-    return;
+    setState(() {
+      loading = true;
+    });
+    // write to relays
+    await widget.onSave(myRelays);
+    setState(() {
+      loading = false;
+      touched = false;
+    });
   }
 
   void initSequence() async {
@@ -299,6 +285,7 @@ class _EditRelaysViewState extends ConsumerState<EditRelaysView> {
                     onPressed: _saveRelays,
                     inverted: true,
                     disabled: !touched,
+                    loading: loading,
                   ),
                 ),
               ],
