@@ -413,7 +413,7 @@ class RelayCoordinator {
     return combinedFuture;
   }
 
-  Future write({
+  Future<List<String>> write({
     required NostrRequestEvent request,
     Duration timeout = const Duration(seconds: 10),
     List<String> exactRelays = const [],

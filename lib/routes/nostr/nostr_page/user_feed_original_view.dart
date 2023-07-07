@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:developer';
-
 import 'package:camelus/atoms/new_posts_available.dart';
 import 'package:camelus/atoms/refresh_indicator_no_need.dart';
 import 'package:camelus/components/note_card/note_card_container.dart';
@@ -13,7 +12,6 @@ import 'package:camelus/providers/navigation_bar_provider.dart';
 import 'package:camelus/providers/relay_provider.dart';
 import 'package:camelus/scroll_controller/retainable_scroll_controller.dart';
 import 'package:camelus/services/nostr/feeds/user_feed.dart';
-
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -117,14 +115,8 @@ class _UserFeedOriginalViewState extends ConsumerState<UserFeedOriginalView> {
 
     int latestTweet = now - 86400; // -1 day
 
-    // add own pubkey to list
-    var combinedPubkeys = [
-      ..._followingPubkeys,
-      widget.pubkey,
-    ];
-
     _userFeed.requestRelayUserFeed(
-      users: combinedPubkeys,
+      users: _followingPubkeys,
       requestId: userFeedFreshId,
       limit: 15,
       since: latestTweet,
@@ -138,18 +130,13 @@ class _UserFeedOriginalViewState extends ConsumerState<UserFeedOriginalView> {
       log("!!! no following users found !!!");
       return;
     }
-    // add own pubkey to list
-    var combinedPubkeys = [
-      ..._followingPubkeys,
-      widget.pubkey,
-    ];
 
     int now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
     // schould not be needed
     int defaultUntil = now - 86400 * 1; // -1 day
 
     _userFeed.requestRelayUserFeed(
-      users: combinedPubkeys,
+      users: _followingPubkeys,
       requestId: userFeedTimelineFetchId,
       limit: 5,
       until: until ?? defaultUntil,
@@ -171,6 +158,7 @@ class _UserFeedOriginalViewState extends ConsumerState<UserFeedOriginalView> {
     await followingP.servicesReady;
 
     _followingPubkeys = followingP.ownContacts.map((e) => e.value).toList();
+    _followingPubkeys = [..._followingPubkeys, widget.pubkey]; // add own pubkey
     return;
   }
 

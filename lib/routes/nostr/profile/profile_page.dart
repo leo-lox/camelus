@@ -587,7 +587,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
 
                   return GestureDetector(
                     onTap: () {
-                      if (snapshot.data!.isEmpty) {
+                      if (snapshot.data == null || snapshot.data!.isEmpty) {
                         return;
                       }
 

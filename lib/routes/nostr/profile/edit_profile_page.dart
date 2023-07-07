@@ -1,8 +1,12 @@
 import 'dart:convert';
 import 'dart:developer';
 
+import 'package:camelus/atoms/long_button.dart';
+import 'package:camelus/models/nostr_request_event.dart';
+import 'package:camelus/providers/key_pair_provider.dart';
 import 'package:camelus/providers/metadata_provider.dart';
 import 'package:camelus/providers/nostr_service_provider.dart';
+import 'package:camelus/providers/relay_provider.dart';
 import 'package:camelus/services/nostr/metadata/user_metadata.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -34,6 +38,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
   late String pubkey;
 
   bool loading = true;
+  bool submitLoading = false;
 
   bool isKeysExpanded = false;
   void _initServices() {
@@ -102,9 +107,9 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
     websiteController.text = profileData["website"] ?? "";
   }
 
-  void _submitData() {
+  void _submitData() async {
     setState(() {
-      loading = true;
+      submitLoading = true;
     });
 
     // create content object
@@ -130,11 +135,21 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
 
     var contentString = json.encode(content);
 
-    _nostrService.writeEvent(contentString, 0, []);
+    var relays = ref.watch(relayServiceProvider);
+    var keyPair = await ref.watch(keyPairProvider.future);
 
-    // update cache
-    _nostrService.usersMetadata[pubkey] = content;
+    var myBody = NostrRequestEventBody(
+        pubkey: keyPair.keyPair!.publicKey,
+        privateKey: keyPair.keyPair!.privateKey,
+        tags: [],
+        content: contentString,
+        kind: 0);
+    var myRequest = NostrRequestEvent(body: myBody);
+    await relays.write(request: myRequest);
 
+    setState(() {
+      submitLoading = false;
+    });
     Navigator.pop(context, "updated");
   }
 
@@ -143,7 +158,8 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Edit Profile'),
-        backgroundColor: Palette.primary,
+        backgroundColor: Palette.background,
+        foregroundColor: Palette.lightGray,
       ),
       body: loading
           ? const Center(child: CircularProgressIndicator())
@@ -252,16 +268,10 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                   // button to save changes
                   Container(
                     margin: const EdgeInsets.all(10),
-                    child: ElevatedButton(
-                      style: ButtonStyle(
-                        backgroundColor: MaterialStateProperty.all<Color>(
-                          Palette.primary,
-                        ),
-                      ),
-                      onPressed: () async {
-                        _submitData();
-                      },
-                      child: const Text('Save'),
+                    child: longButton(
+                      name: "save",
+                      onPressed: _submitData,
+                      loading: submitLoading,
                     ),
                   ),
                   // expandable information
