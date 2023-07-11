@@ -8,7 +8,6 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:camelus/components/write_post.dart';
 import 'package:camelus/config/palette.dart';
 import 'package:camelus/helpers/helpers.dart';
-import 'package:camelus/models/post_context.dart';
 import 'package:camelus/models/tweet.dart';
 import 'package:camelus/models/tweet_control.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -202,7 +201,7 @@ class _TweetCardState extends ConsumerState<TweetCard> {
               child: Padding(
                   padding: EdgeInsets.only(
                       bottom: MediaQuery.of(ctx).viewInsets.bottom),
-                  child: WritePost(
+                  child: const WritePost(
                       // context: PostContext(replyToTweet: tweet),
                       )),
             ));

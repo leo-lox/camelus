@@ -297,6 +297,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "7.0.0"
+  drift:
+    dependency: "direct main"
+    description:
+      name: drift
+      sha256: a8ec4e44b4359ef44eab3d2c2f8e44b41a00c15673b879984484b34d27656ad5
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.9.0"
   encrypt:
     dependency: transitive
     description:
@@ -1136,10 +1144,10 @@ packages:
     dependency: transitive
     description:
       name: sqlite3
-      sha256: "2cef47b59d310e56f8275b13734ee80a9cf4a48a43172020cb55a620121fbf66"
+      sha256: f7511ddd6a2dda8ded9d849f8a925bb6020e0faa59db2443debc18d484e59401
       url: "https://pub.dev"
     source: hosted
-    version: "1.11.1"
+    version: "2.0.0"
   sqlparser:
     dependency: transitive
     description:

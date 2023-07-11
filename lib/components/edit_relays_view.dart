@@ -314,7 +314,7 @@ class _EditRelaysViewState extends ConsumerState<EditRelaysView> {
                   ),
                 const SizedBox(height: 10),
                 Padding(
-                  padding: EdgeInsets.only(left: 20, right: 20, bottom: 10),
+                  padding: const EdgeInsets.only(left: 20, right: 20, bottom: 10),
                   child: longButton(
                     name: "save",
                     onPressed: _saveRelays,

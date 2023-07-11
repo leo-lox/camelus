@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 
@@ -26,9 +25,6 @@ import 'package:camelus/config/palette.dart';
 import 'package:camelus/helpers/helpers.dart';
 import 'package:camelus/models/post_context.dart';
 import 'package:camelus/services/nostr/nostr_service.dart';
-import 'package:http/http.dart' as http;
-import 'package:http_parser/http_parser.dart';
-import 'package:mime/mime.dart';
 
 class WritePost extends ConsumerStatefulWidget {
   final PostContext? context;

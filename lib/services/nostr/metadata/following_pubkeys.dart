@@ -50,7 +50,7 @@ class FollowingPubkeys {
   List<NostrTag> get ownNip65 => _ownNip65;
 
   int _fetchLatestEventAt = 0;
-  int _FetchLatestNip65At = 0;
+  final int _FetchLatestNip65At = 0;
 
   final Completer<void> _servicesReady = Completer<void>();
   final Completer<void> _dbStreamReady = Completer<void>();

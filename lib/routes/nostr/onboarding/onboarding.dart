@@ -1,9 +1,7 @@
 import 'dart:convert';
 
-import 'package:camelus/models/nostr_request_query.dart';
 import 'package:camelus/providers/key_pair_provider.dart';
 import 'package:camelus/providers/nostr_service_provider.dart';
-import 'package:camelus/providers/relay_provider.dart';
 import 'package:camelus/routes/home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:camelus/config/palette.dart';

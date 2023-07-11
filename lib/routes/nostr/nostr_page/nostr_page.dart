@@ -95,7 +95,7 @@ class _NostrPageState extends ConsumerState<NostrPage>
   _openRelaysView() {
     Navigator.of(context).push(
       PageRouteBuilder(
-        pageBuilder: (context, animation, secondaryAnimation) => RelaysPage(),
+        pageBuilder: (context, animation, secondaryAnimation) => const RelaysPage(),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
           var begin = const Offset(0.0, 0.2);
           var end = Offset.zero;

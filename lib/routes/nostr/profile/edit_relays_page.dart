@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:developer';
 
 import 'package:camelus/components/edit_relays_view.dart';
 import 'package:camelus/models/nostr_tag.dart';

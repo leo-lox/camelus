@@ -1,7 +1,6 @@
 import 'dart:ui';
 
 import 'package:camelus/config/palette.dart';
-import 'package:camelus/helpers/helpers.dart';
 import 'package:camelus/helpers/nevent_helper.dart';
 import 'package:camelus/models/nostr_note.dart';
 import 'package:flutter/material.dart';
