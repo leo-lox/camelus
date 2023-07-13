@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:ui';
 
 import 'package:camelus/atoms/my_profile_picture.dart';
@@ -14,6 +15,7 @@ import 'package:camelus/providers/metadata_provider.dart';
 import 'package:camelus/providers/nostr_service_provider.dart';
 import 'package:camelus/services/nostr/metadata/user_metadata.dart';
 import 'package:camelus/services/nostr/nostr_service.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -65,17 +67,8 @@ class _NoteCardState extends ConsumerState<NoteCard> {
   void _splitContent() {
     splitContent = NoteCardSplitContent(
         widget.note, metadata, _openProfile, _splitContentStateUpdate);
+
     setState(() {});
-  }
-
-  String oldId = "";
-  void _checkRebuild() {
-    if (oldId == widget.note.id) return;
-
-    oldId = widget.note.content;
-    _splitContent();
-
-    myMetadata = metadata.getMetadataByPubkey(widget.note.pubkey);
   }
 
   @override
@@ -84,19 +77,27 @@ class _NoteCardState extends ConsumerState<NoteCard> {
   }
 
   @override
-  didChangeDependencies() {
+  void didUpdateWidget(covariant NoteCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.note.id != widget.note.id) {
+      _splitContent();
+      metadata = ref.watch(metadataProvider);
+      myMetadata = metadata.getMetadataByPubkey(widget.note.pubkey);
+    }
+  }
+
+  @override
+  void didChangeDependencies() {
     super.didChangeDependencies();
-    //_splitContent();
     metadata = ref.watch(metadataProvider);
-    _checkRebuild();
-    oldId = widget.note.id;
+    myMetadata = metadata.getMetadataByPubkey(widget.note.pubkey);
+    _splitContent();
+    log("didChangeDependencies");
   }
 
   @override
   Widget build(BuildContext context) {
     myNostrService = ref.watch(nostrServiceProvider);
-
-    _checkRebuild();
 
     if (widget.note.pubkey == 'missing') {
       return SizedBox(
@@ -127,29 +128,8 @@ class _NoteCardState extends ConsumerState<NoteCard> {
                       Navigator.pushNamed(context, "/nostr/profile",
                           arguments: widget.note.pubkey);
                     },
-                    child: FutureBuilder<Map>(
-                        future: myMetadata,
-                        builder: (BuildContext context,
-                            AsyncSnapshot<Map> snapshot) {
-                          var picture = "";
-                          var defaultPicture =
-                              "https://avatars.dicebear.com/api/personas/${widget.note.pubkey}.svg";
-                          if (snapshot.hasData) {
-                            picture =
-                                snapshot.data?["picture"] ?? defaultPicture;
-                          } else if (snapshot.hasError) {
-                            picture = defaultPicture;
-                          } else {
-                            // loading
-                            picture = defaultPicture;
-                          }
-
-                          return myProfilePicture(
-                            pictureUrl: picture,
-                            pubkey: widget.note.pubkey,
-                            filterQuality: FilterQuality.medium,
-                          );
-                        }),
+                    child: UserImage(
+                        myMetadata: myMetadata, pubkey: widget.note.pubkey),
                   ),
                   Expanded(
                     // click container

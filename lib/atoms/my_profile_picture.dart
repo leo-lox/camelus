@@ -65,3 +65,39 @@ Widget myProfilePicture({
         "https://avatars.dicebear.com/api/personas/$pubkey.svg"),
   );
 }
+
+class UserImage extends StatelessWidget {
+  const UserImage({
+    super.key,
+    required this.myMetadata,
+    required this.pubkey,
+  });
+
+  final Future<Map> myMetadata;
+  final String pubkey;
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<Map>(
+        future: myMetadata,
+        builder: (BuildContext context, AsyncSnapshot<Map> snapshot) {
+          var picture = "";
+          var defaultPicture =
+              "https://avatars.dicebear.com/api/personas/${pubkey}.svg";
+          if (snapshot.hasData) {
+            picture = snapshot.data?["picture"] ?? defaultPicture;
+          } else if (snapshot.hasError) {
+            picture = defaultPicture;
+          } else {
+            // loading
+            picture = defaultPicture;
+          }
+
+          return myProfilePicture(
+            pictureUrl: picture,
+            pubkey: pubkey,
+            filterQuality: FilterQuality.medium,
+          );
+        });
+  }
+}
