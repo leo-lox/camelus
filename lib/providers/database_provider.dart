@@ -1,10 +1,10 @@
 import 'dart:developer';
 
-import 'package:camelus/db/database.dart';
+import 'package:camelus/db_drift/database.dart';
 import 'package:riverpod/riverpod.dart';
 
-final databaseProvider = FutureProvider<AppDatabase>((ref) async {
-  var db = await $FloorAppDatabase.databaseBuilder('app_database.db').build();
+final databaseProvider = FutureProvider<MyDatabase>((ref) async {
+  var db = MyDatabase();
   log("databaseProviderINIT");
   return db;
 });

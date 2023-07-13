@@ -58,7 +58,7 @@ dependencies:
   qr_flutter: ^4.0.0
   matomo_tracker: ^2.0.0
   shared_preferences: ^2.1.1
-  floor: ^1.4.2
+  #floor: ^1.4.2
   sqflite: ^2.2.8+4
   riverpod: ^2.3.6
   custom_refresh_indicator: ^2.2.1
@@ -66,15 +66,18 @@ dependencies:
   web_socket_channel: ^2.4.0
   http_parser: ^4.0.2
   drift: ^2.9.0
+  path_provider: ^2.0.15
+  path: ^1.8.3
 
 dev_dependencies:
-  floor_generator: ^1.4.2
-  build_runner: ^2.1.2
+  #floor_generator: ^1.4.2
   flutter_test:
     sdk: flutter
   integration_test:
     sdk: flutter
   mockito: ^5.4.0
+  drift_dev: ^2.9.0
+  build_runner: ^2.4.6
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
