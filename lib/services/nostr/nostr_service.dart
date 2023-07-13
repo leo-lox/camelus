@@ -2,47 +2,38 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
 
-import 'package:camelus/services/nostr/feeds/authors_feed.dart';
-import 'package:camelus/services/nostr/feeds/events_feed.dart';
-import 'package:camelus/services/nostr/feeds/global_feed.dart';
-import 'package:camelus/services/nostr/feeds/user_feed.dart';
+import 'package:camelus/db/database.dart';
+import 'package:camelus/models/nostr_note.dart';
+import 'package:camelus/providers/key_pair_provider.dart';
+
 import 'package:camelus/services/nostr/metadata/metadata_injector.dart';
 import 'package:camelus/services/nostr/metadata/nip_05.dart';
 import 'package:camelus/services/nostr/metadata/user_contacts.dart';
-import 'package:camelus/services/nostr/metadata/user_metadata.dart';
 import 'package:camelus/services/nostr/relays/relay_tracker.dart';
 import 'package:camelus/services/nostr/relays/relays.dart';
 import 'package:camelus/services/nostr/relays/relays_injector.dart';
 import 'package:camelus/services/nostr/relays/relays_ranking.dart';
 import 'package:crypto/crypto.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:flutter/src/widgets/framework.dart';
 import 'package:hex/hex.dart';
 import 'package:camelus/helpers/helpers.dart';
 import 'package:camelus/helpers/bip340.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:json_cache/json_cache.dart';
 import 'package:cross_local_storage/cross_local_storage.dart';
 
 import 'package:camelus/models/socket_control.dart';
 
 class NostrService {
+  final Future<AppDatabase> database;
+
+  final Future<KeyPairWrapper> keyPairWrapper;
+
   late Future isNostrServiceConnected;
 
   static String ownPubkeySubscriptionId =
       "own-${Helpers().getRandomString(20)}";
-
-  // global feed
-  var globalFeedObj = GlobalFeed();
-
-  // user feed
-  var userFeedObj = UserFeed();
-
-  // authors feed
-  var authorsFeedObj = AuthorsFeed();
-
-  var eventsFeedObj = EventsFeed();
-
-  var userMetadataObj = UserMetadata();
 
   var userContactsObj = UserContacts();
 
@@ -60,10 +51,10 @@ class NostrService {
   // blocked users
   List<String> blockedUsers = [];
 
-  Map<String, dynamic> get usersMetadata => userMetadataObj.usersMetadata;
+  Map<String, dynamic> get usersMetadata => {};
   Map<String, List<List<dynamic>>> get following => userContactsObj.following;
 
-  NostrService() {
+  NostrService({required this.database, required this.keyPairWrapper}) {
     RelaysInjector relaysInjector = RelaysInjector();
     MetadataInjector metadataInjector = MetadataInjector();
 
@@ -101,8 +92,6 @@ class NostrService {
       });
     });
 
-    log("init");
-
     await _loadKeyPair();
 
     // init streams
@@ -120,31 +109,14 @@ class NostrService {
         blockedUsers.add(u);
       }
     }
-
-    userFeedObj.restoreFromCache();
-    globalFeedObj.restoreFromCache();
-
-    try {
-      //todo: fix this for onboarding
-      relays.start(
-          [...userContactsObj.following.keys.toList(), myKeys.publicKey]);
-    } catch (e) {
-      log(" $e");
-    }
   }
 
   Future<void> _loadKeyPair() async {
-    // load keypair from storage
-    FlutterSecureStorage storage = const FlutterSecureStorage();
-    var nostrKeysString = await storage.read(key: "nostrKeys");
-    if (nostrKeysString == null) {
+    var wrapper = await keyPairWrapper;
+    if (wrapper.keyPair == null) {
       return;
     }
-
-    // to obj
-    myKeys = KeyPair.fromJson(json.decode(nostrKeysString));
-    userContactsObj.ownPubkey = myKeys.publicKey;
-    return;
+    myKeys = wrapper.keyPair!;
   }
 
   finishedOnboarding() async {
@@ -176,7 +148,6 @@ class NostrService {
     //await jsonCache.clear();
 
     // clear only nostr related stuff
-    await jsonCache.remove('globalFeed');
     await jsonCache.remove('userFeed');
     await jsonCache.remove('usersMetadata');
     await jsonCache.remove('following');
@@ -216,6 +187,19 @@ class NostrService {
       }
     }
 
+    // ! debug only
+    if (event[0] == "EVENT") {
+      var eventBody = event[2];
+      // check if its already in the db
+      await database
+          .then(
+            (db) => db.noteDao.insertNostrNote(NostrNote.fromJson(eventBody)),
+          )
+          .onError((error, stackTrace) => {
+                // probably already in db
+              });
+    }
+
     // filter by subscription id
 
     if (event[1] == ownPubkeySubscriptionId) {
@@ -232,46 +216,10 @@ class NostrService {
       }
     }
 
-    if (event[1].contains("authors")) {
-      authorsFeedObj.receiveNostrEvent(event, socketControl);
-      if (event[0] == "EOSE") {
-        return;
-      }
-    }
-
-    if (event[1].contains("event")) {
-      eventsFeedObj.receiveNostrEvent(event, socketControl);
-      if (event[0] == "EOSE") {
-        return;
-      }
-    }
-
-    /// user feed
-    if (event[1].contains("ufeed")) {
-      userFeedObj.receiveNostrEvent(event, socketControl);
-
-      if (event[0] == "EOSE") {
-        return;
-      }
-    }
-
-    /// global feed
-    if (event[1].contains("gfeed")) {
-      globalFeedObj.receiveNostrEvent(event, socketControl);
-      if (event[0] == "EOSE") {
-        return;
-      }
-    }
-
     var eventMap = {};
     try {
       eventMap = event[2]; //json.decode(event[2])
     } catch (e) {}
-
-    /// global metadata
-    if (eventMap["kind"] == 0) {
-      userMetadataObj.receiveNostrEvent(event, socketControl);
-    }
 
     /// global following / contacts
     if (eventMap["kind"] == 3) {
@@ -384,63 +332,12 @@ class NostrService {
     return count;
   }
 
-  void requestGlobalFeed({
-    required String requestId,
-    int? since,
-    int? until,
-    int? limit,
-  }) {
-    globalFeedObj.requestGlobalFeed(
-        requestId: requestId, since: since, until: until, limit: limit);
-  }
-
-  void requestUserFeed(
-      {required List<String> users,
-      required String requestId,
-      int? since,
-      int? until,
-      int? limit,
-      bool? includeComments}) {
-    userFeedObj.requestUserFeed(
-        users: users,
-        requestId: requestId,
-        since: since,
-        until: until,
-        limit: limit,
-        includeComments: includeComments);
-  }
-
   void requestAuthors(
       {required List<String> authors,
       required String requestId,
       int? since,
       int? until,
-      int? limit}) {
-    authorsFeedObj.requestAuthors(
-        authors: authors,
-        requestId: requestId,
-        since: since,
-        until: until,
-        limit: limit);
-  }
-
-  // eventId for the nostr event, requestId to track the request
-  void requestEvents(
-      {required List<String> eventIds,
-      required String requestId,
-      int? since,
-      int? until,
-      int? limit,
-      StreamController? streamController}) {
-    eventsFeedObj.requestEvents(
-      eventIds: eventIds,
-      requestId: requestId,
-      since: since,
-      until: until,
-      limit: limit,
-      streamController: streamController,
-    );
-  }
+      int? limit}) {}
 
   void closeSubscription(String subId) {
     var data = [
@@ -457,14 +354,9 @@ class NostrService {
   }
 
   /// get user metadata from cache and if not available request it from network
-  Future<Map> getUserMetadata(String pubkey) async {
-    return userMetadataObj.getMetadataByPubkey(pubkey);
-  }
-
-  /// get user metadata from cache and if not available request it from network
   Future<List<List<dynamic>>> getUserContacts(String pubkey,
       {bool force = false}) async {
-    return userContactsObj.getContactsByPubkey(pubkey, force: force);
+    return [];
   }
 
   /// returns {nip05, valid, lastCheck, relayHint} exception
@@ -477,17 +369,6 @@ class NostrService {
       blockedUsers.add(pubkey);
       await jsonCache.refresh("blockedUsers", {"blockedUsers": blockedUsers});
     }
-    // search in feed for pubkey and remove
-    userFeedObj.feed.removeWhere((element) => element.pubkey == pubkey);
-    globalFeedObj.feed.removeWhere((element) => element.pubkey == pubkey);
-
-    // update cache
-
-    await jsonCache.refresh('userFeed', {"tweets": userFeedObj.feed});
-    await jsonCache.refresh("globalFeed", {"tweets": globalFeedObj.feed});
-
-    //notify streams
-    // todo
 
     return;
   }
@@ -519,5 +400,10 @@ class NostrService {
     await relays.closeRelays();
     await relays.start(userFollows);
     return;
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    throw UnimplementedError();
   }
 }

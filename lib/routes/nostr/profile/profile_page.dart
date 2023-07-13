@@ -1,36 +1,49 @@
 import 'dart:async';
 import 'dart:developer';
 
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:camelus/atoms/back_button_round.dart';
+import 'package:camelus/atoms/follow_button.dart';
 import 'package:camelus/atoms/long_button.dart';
+import 'package:camelus/components/note_card/note_card_container.dart';
+import 'package:camelus/db/database.dart';
+import 'package:camelus/helpers/bip340.dart';
 import 'package:camelus/helpers/nprofile_helper.dart';
+import 'package:camelus/models/nostr_note.dart';
+import 'package:camelus/models/nostr_tag.dart';
+import 'package:camelus/providers/database_provider.dart';
+import 'package:camelus/providers/following_provider.dart';
+import 'package:camelus/providers/key_pair_provider.dart';
+import 'package:camelus/providers/metadata_provider.dart';
+import 'package:camelus/providers/nostr_service_provider.dart';
+import 'package:camelus/providers/relay_provider.dart';
 import 'package:camelus/routes/nostr/nostr_page/perspective_feed_page.dart';
+import 'package:camelus/services/nostr/feeds/user_and_replies_feed.dart';
+import 'package:camelus/services/nostr/metadata/following_pubkeys.dart';
+import 'package:camelus/services/nostr/metadata/user_metadata.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:camelus/atoms/my_profile_picture.dart';
-import 'package:camelus/components/tweet_card.dart';
 import 'package:camelus/config/palette.dart';
 import 'package:camelus/helpers/helpers.dart';
-import 'package:camelus/models/tweet.dart';
 import 'package:camelus/routes/nostr/profile/edit_profile_page.dart';
 import 'package:camelus/routes/nostr/profile/edit_relays_page.dart';
 import 'package:camelus/routes/nostr/profile/follower_page.dart';
-import 'package:camelus/services/nostr/nostr_injector.dart';
+
 import 'package:camelus/services/nostr/nostr_service.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:matomo_tracker/matomo_tracker.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class ProfilePage extends StatefulWidget {
-  String pubkey;
-  late String nProfile;
-  late String nProfileHr;
-  late String pubkeyBech32;
-  late NostrService _nostrService;
-  ProfilePage({Key? key, required this.pubkey}) : super(key: key) {
-    NostrServiceInjector injector = NostrServiceInjector();
-    _nostrService = injector.nostrService;
+class ProfilePage extends ConsumerStatefulWidget {
+  final String pubkey;
+  late final String nProfile;
+  late final String nProfileHr;
+  late final String pubkeyBech32;
 
+  ProfilePage({Key? key, required this.pubkey}) : super(key: key) {
     nProfile = NprofileHelper().mapToBech32({
       "pubkey": pubkey,
       "relays": [],
@@ -41,18 +54,24 @@ class ProfilePage extends StatefulWidget {
   }
 
   repopulateNprofile() async {
-    nProfile = await NprofileHelper().getNprofile(pubkey);
+    nProfile = await NprofileHelper()
+        .getNprofile(pubkey, []); //todo: get recommended relays
     nProfileHr = NprofileHelper().bech32toHr(nProfile);
     log("repopulated nprofile: $nProfileHr");
   }
 
   @override
-  State<ProfilePage> createState() => _ProfilePageState();
+  ConsumerState<ProfilePage> createState() => _ProfilePageState();
 }
 
-class _ProfilePageState extends State<ProfilePage>
+class _ProfilePageState extends ConsumerState<ProfilePage>
     with TickerProviderStateMixin, TraceableClientMixin {
-  late ScrollController _scrollController;
+  late NostrService _nostrService;
+  final ScrollController _scrollController = ScrollController();
+  late AppDatabase _db;
+  late UserFeedAndRepliesFeed _userFeedAndRepliesFeed;
+
+  final List<StreamSubscription> _subscriptions = [];
 
   @override
   String get traceTitle => "profilePage";
@@ -60,25 +79,11 @@ class _ProfilePageState extends State<ProfilePage>
   String nip05verified = "";
   String requestId = Helpers().getRandomString(14);
 
-  List<Tweet> _myTweets = [];
-
-  late StreamSubscription _nostrStream;
-
-  bool loadTweetsLock = false;
-
-  List<List> _myFollowing = [];
-  bool _iamFollowing = false;
-  bool _followTouched = false;
-
-  String bannerUrl = "";
-
-  var repliedToTmp = [];
-
   void _checkNip05(String nip05, String pubkey) async {
     if (nip05.isEmpty) return;
     if (nip05verified.isNotEmpty) return;
     try {
-      var check = await widget._nostrService.checkNip05(nip05, pubkey);
+      var check = await _nostrService.checkNip05(nip05, pubkey);
 
       if (check["valid"] == true) {
         setState(() {
@@ -89,58 +94,8 @@ class _ProfilePageState extends State<ProfilePage>
     } catch (e) {}
   }
 
-  void checkIamFollowing() {
-    _myFollowing =
-        widget._nostrService.following[widget._nostrService.myKeys.publicKey] ??
-            [];
-    for (var i = 0; i < _myFollowing.length; i++) {
-      if (_myFollowing[i][1] == widget.pubkey) {
-        setState(() {
-          _iamFollowing = true;
-        });
-      }
-    }
-  }
-
-  void _follow() async {
-    _followTouched = true;
-    setState(() {
-      _iamFollowing = true;
-    });
-    // edit _myFollowing
-    _myFollowing.add(["p", widget.pubkey]);
-    _saveFollowing();
-  }
-
-  void _unfollow() async {
-    _followTouched = true;
-    setState(() {
-      _iamFollowing = false;
-    });
-    _myFollowing.removeWhere((element) => element[1] == widget.pubkey);
-    _saveFollowing();
-  }
-
-  void _saveFollowing() async {
-    if (!_followTouched) return;
-    widget._nostrService.following[widget._nostrService.myKeys.publicKey] =
-        _myFollowing;
-    await widget._nostrService.writeEvent("", 3, _myFollowing);
-  }
-
   Future<void> _copyToClipboard(String data) async {
     await Clipboard.setData(ClipboardData(text: data));
-  }
-
-  _getBannerImage() async {
-    var metadata = await widget._nostrService.getUserMetadata(widget.pubkey);
-    if (metadata["banner"] == null) return null;
-
-    setState(() {
-      bannerUrl = metadata["banner"];
-    });
-
-    return metadata["banner"];
   }
 
   _blockUser() async {
@@ -180,7 +135,7 @@ class _ProfilePageState extends State<ProfilePage>
     if (!result) return;
 
     // add to blocked list
-    await widget._nostrService.addToBlocklist(widget.pubkey);
+    await _nostrService.addToBlocklist(widget.pubkey);
 
     Navigator.pop(context);
   }
@@ -286,587 +241,190 @@ class _ProfilePageState extends State<ProfilePage>
           pubkey: pubkey,
         ),
       ),
-    ).then((value) => {
-          widget._nostrService.clearCache(),
-          widget._nostrService.userFeedObj.feed = [],
-        });
+    ).then((value) => {});
+  }
+
+  void _initNostrService() {
+    _nostrService = ref.read(nostrServiceProvider);
+  }
+
+  final Completer<void> _feedReady = Completer<void>();
+  Future<void> _initSequence() async {
+    _db = await ref.read(databaseProvider.future);
+    var relayCoordinator = ref.watch(relayServiceProvider);
+    _userFeedAndRepliesFeed =
+        UserFeedAndRepliesFeed(_db, [widget.pubkey], relayCoordinator);
+    await _userFeedAndRepliesFeed.feedRdy;
+    _feedReady.complete();
+
+    _initUserFeed();
+    _setupScrollListener();
+
+    return;
+  }
+
+  void _initUserFeed() {
+    int now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
+
+    int latestTweet = now - 86400; // -1 day
+
+    _userFeedAndRepliesFeed.requestRelayUserFeedAndReplies(
+      users: [widget.pubkey],
+      requestId: "profilePage-${widget.pubkey.substring(5, 15)}",
+      limit: 10,
+      since: latestTweet,
+    );
+  }
+
+  bool timelineFetchLock = false;
+  void _setupScrollListener() {
+    _scrollController.addListener(() async {
+      setState(() {});
+      if (_scrollController.position.pixels >=
+          _scrollController.position.maxScrollExtent - 100) {
+        var latest = _userFeedAndRepliesFeed.feed.last.created_at;
+        if (timelineFetchLock) return;
+        timelineFetchLock = true;
+        // load more tweets
+        await _userFeedLoadMore(latest);
+        timelineFetchLock = false;
+      }
+    });
+  }
+
+  Future _userFeedLoadMore(int? until) async {
+    log("load more called");
+    int now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
+    // schould not be needed
+    int defaultUntil = now - 86400 * 1; // -1 day
+
+    await _userFeedAndRepliesFeed.requestRelayUserFeedAndReplies(
+      users: [widget.pubkey],
+      requestId: "profilePage-timeLine-${widget.pubkey.substring(5, 15)}",
+      limit: 5,
+      until: until ?? defaultUntil,
+    );
+
+    return;
+  }
+
+  //! disabled does not work with how @build is called now (on every frame on scroll)
+  void _userFeedCheckForNewData(NostrNote currentBuilNote) async {
+    return;
+    var latestSessionNote = _userFeedAndRepliesFeed.oldestNoteInSession;
+    if (latestSessionNote == null) {
+      return;
+    }
+    var difference = currentBuilNote.created_at - latestSessionNote.created_at;
+    log("${latestSessionNote.created_at} -- ${currentBuilNote.created_at} -- $difference");
+    if (latestSessionNote.id == currentBuilNote.id) {
+      await _userFeedLoadMore(currentBuilNote.created_at);
+    }
+  }
+
+  void _onNavigateAway() async {
+    try {
+      _userFeedAndRepliesFeed.cleanup();
+    } catch (e) {
+      log("error in navigate away");
+    }
   }
 
   @override
   void initState() {
     super.initState();
-
-    int now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
-
-    // listen to nostr service
-    _nostrStream =
-        widget._nostrService.authorsFeedObj.authorsStream.listen((event) {
-      setState(() {
-        _myTweets = event[widget.pubkey] ?? [];
-      });
-
-      // todo make this better
-      Future.delayed(const Duration(seconds: 5), () {
-        loadTweetsLock = false;
-      });
+    _initSequence();
+    _initNostrService();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _onNavigateAway();
     });
-
-    // subscribe to user's tweets
-    widget._nostrService.requestAuthors(
-        authors: [widget.pubkey], requestId: requestId, limit: 10, until: now);
-
-    _scrollController = ScrollController();
-    _scrollController.addListener(() {
-      setState(() {});
-      if (_scrollController.position.pixels >=
-          _scrollController.position.maxScrollExtent - 100) {
-        if (loadTweetsLock) return;
-        loadTweetsLock = true;
-        // load more tweets
-        log("load more tweets");
-        widget._nostrService.requestAuthors(
-            authors: [widget.pubkey],
-            requestId: requestId,
-            limit: 10,
-            until: _myTweets.last.tweetedAt);
-      }
-    });
-
-    checkIamFollowing();
-    _getBannerImage();
   }
 
   @override
   void dispose() {
     _scrollController.dispose();
-
-    _nostrStream.cancel();
-
-    // cancel subscription
-    widget._nostrService.closeSubscription("authors-$requestId");
-
+    _userFeedAndRepliesFeed.cleanup();
+    _closeSubscriptions();
     super.dispose();
+  }
+
+  _closeSubscriptions() {
+    for (var sub in _subscriptions) {
+      sub.cancel();
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    var metadata = ref.watch(metadataProvider);
+    var followingService = ref.watch(followingProvider);
+    var myKeyPairWrapper = ref.watch(keyPairProvider.future);
+
     return Scaffold(
       backgroundColor: Palette.background,
       body: Stack(
         children: [
-          CustomScrollView(
-            controller: _scrollController,
-            slivers: [
-              SliverAppBar(
-                expandedHeight: 150,
-                //toolbarHeight: 10,
-                backgroundColor: Palette.background,
-                pinned: true,
-                flexibleSpace: FlexibleSpaceBar(
-                    background: bannerUrl.isNotEmpty
-                        ? Image.network(
-                            bannerUrl,
-                            fit: BoxFit.cover,
-                          )
-                        : Image.asset(
-                            'assets/images/default_header.jpg',
-                            fit: BoxFit.cover,
-                          )),
+          FutureBuilder<KeyPairWrapper>(
+              future: myKeyPairWrapper,
+              builder: (context, keyPairSnapshot) {
+                if (!keyPairSnapshot.hasData) {
+                  return const SizedBox();
+                }
+                KeyPair myKeyPair = keyPairSnapshot.data!.keyPair!;
+                return CustomScrollView(
+                  controller: _scrollController,
+                  slivers: [
+                    SliverAppBar(
+                      expandedHeight: 150,
+                      //toolbarHeight: 10,
+                      backgroundColor: Palette.background,
+                      pinned: true,
+                      flexibleSpace: _bannerImage(metadata),
 
-                actions: [
-                  PopupMenuButton<String>(
-                    tooltip: "More",
-                    onSelected: (e) => {
-                      //log(e),
-                      // toast
-                      if (e == "block") _blockUser()
-                    },
-                    itemBuilder: (BuildContext context) {
-                      return {'block'}.map((String choice) {
-                        return PopupMenuItem<String>(
-                          value: choice,
-                          child: Text(choice),
-                        );
-                      }).toList();
-                    },
-                  ),
-                ],
-                // rounded back button
-                leading: Container(
-                  margin: const EdgeInsets.all(0),
-                  padding: const EdgeInsets.only(top: 10, right: 0, left: 0),
-                  child: ButtonTheme(
-                    minWidth: 10,
-                    height: 1,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.black54,
-                        padding: const EdgeInsets.all(0),
-                        shape: const CircleBorder(),
-                      ),
-                      child: const Icon(
-                        Icons.arrow_back,
-                        color: Palette.white,
-                        size: 20,
-                      ),
-                    ),
-                  ),
-                ),
-                bottom: PreferredSize(
-                  preferredSize: const Size.fromHeight(0),
-                  child: Container(),
-                ),
-              ),
-              SliverList(
-                delegate: SliverChildListDelegate(
-                  [
-                    const SizedBox(height: 10),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        if (widget.pubkey !=
-                            widget._nostrService.myKeys.publicKey)
-                          SizedBox(
-                            width: 35,
-                            height: 35,
-                            child: ElevatedButton(
-                              onPressed: () {
-                                _launchPerspectiveFeed(widget.pubkey);
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Palette.background,
-                                padding: const EdgeInsets.all(0),
-                                enableFeedback: true,
-                                shape: const CircleBorder(
-                                    side: BorderSide(
-                                        color: Palette.white, width: 1)),
-                              ),
-                              child: SvgPicture.asset(
-                                "assets/icons/eye.svg",
-                                height: 25,
-                                color: Palette.white,
-                              ),
-                            ),
-                          ),
-
-                        // round message button with icon and white border
-                        FutureBuilder<Map>(
-                            future: widget._nostrService
-                                .getUserMetadata(widget.pubkey),
-                            builder: (BuildContext context,
-                                AsyncSnapshot<Map> snapshot) {
-                              String lud06 = "";
-                              String lud16 = "";
-
-                              if (snapshot.hasData) {
-                                lud06 = snapshot.data?["lud06"] ?? "";
-                                lud16 = snapshot.data?["lud16"] ?? "";
-                              }
-
-                              if (lud06.isNotEmpty || lud16.isNotEmpty) {
-                                return Container(
-                                  margin: const EdgeInsets.only(
-                                      top: 0, right: 0, left: 0),
-                                  child: ElevatedButton(
-                                    onPressed: () {
-                                      if (lud06.isNotEmpty) {
-                                        _openLightningAddress(lud06);
-                                      } else if (lud16.isNotEmpty) {
-                                        _openLightningAddress(lud16);
-                                      }
-                                    },
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: Palette.background,
-                                      padding: const EdgeInsets.all(0),
-                                      shape: const CircleBorder(
-                                          side: BorderSide(
-                                              color: Palette.white, width: 1)),
-                                    ),
-                                    child: SvgPicture.asset(
-                                      "assets/icons/lightning-fill.svg",
-                                      height: 25,
-                                      color: Palette.white,
-                                    ),
-                                  ),
-                                );
-                              } else {
-                                return Container();
-                              }
-                            }),
-
-                        // follow button black with white border
-
-                        if (widget.pubkey !=
-                                widget._nostrService.myKeys.publicKey &&
-                            !_iamFollowing)
-                          Container(
-                            margin: const EdgeInsets.only(top: 0, right: 10),
-                            child: ElevatedButton(
-                              onPressed: () {
-                                _follow();
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Palette.white,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(20),
-                                  side: const BorderSide(
-                                      color: Palette.black, width: 1),
-                                ),
-                              ),
-                              child: const Text(
-                                'Follow',
-                                style: TextStyle(
-                                  color: Palette.black,
-                                  fontSize: 16,
-                                ),
-                              ),
-                            ),
-                          ),
-
-                        // unfollow button white with black border
-                        if (widget.pubkey !=
-                                widget._nostrService.myKeys.publicKey &&
-                            _iamFollowing)
-                          Container(
-                            margin: const EdgeInsets.only(top: 0, right: 10),
-                            child: ElevatedButton(
-                              onPressed: () {
-                                _unfollow();
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Palette.black,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(20),
-                                  side: const BorderSide(
-                                      color: Palette.white, width: 1),
-                                ),
-                              ),
-                              child: const Text(
-                                'Unfollow',
-                                style: TextStyle(
-                                  color: Palette.white,
-                                  fontSize: 16,
-                                ),
-                              ),
-                            ),
-                          ),
-
-                        // edit button
-                        if (widget.pubkey ==
-                            widget._nostrService.myKeys.publicKey)
-                          Container(
-                            margin: const EdgeInsets.only(top: 0, right: 10),
-                            child: ElevatedButton(
-                              onPressed: () {
-                                _saveFollowing();
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => EditProfilePage(),
-                                  ),
-                                ).then((value) => {
-                                      widget._nostrService
-                                          .getUserMetadata(widget.pubkey),
-                                      _getBannerImage(),
-                                      setState(() {
-                                        // refresh
-                                      })
-                                    });
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Palette.background,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(20),
-                                  side: const BorderSide(
-                                      color: Palette.white, width: 1),
-                                ),
-                              ),
-                              child: const Text(
-                                'Edit',
-                                style: TextStyle(
-                                  color: Palette.white,
-                                  fontSize: 16,
-                                ),
-                              ),
-                            ),
-                          ),
-                      ],
-                    ),
-
-                    // move up the profile info by 110
-                    Container(
-                      transform: Matrix4.translationValues(0.0, -10.0, 0.0),
-                      child: FutureBuilder<Map>(
-                        future:
-                            widget._nostrService.getUserMetadata(widget.pubkey),
-                        builder: (BuildContext context,
-                            AsyncSnapshot<Map> snapshot) {
-                          var name = "";
-                          var nip05 = "";
-                          var picture = "";
-                          var about = "";
-
-                          if (snapshot.hasData) {
-                            name = snapshot.data?["name"] ?? "";
-                            nip05 = snapshot.data?["nip05"] ?? "";
-                            picture = snapshot.data?["picture"] ?? "";
-                            about = snapshot.data?["about"] ?? "";
-
-                            _checkNip05(nip05, widget.pubkey);
-                          } else if (snapshot.hasError) {
-                            name = "error";
-                            nip05 = "error";
-                            picture = "";
-                            about = "error";
-                          } else {
-                            // loading
-                            name = "loading";
-                            nip05 = "loading";
-                            picture = "";
-                            about = "loading";
-                          }
-
-                          return Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              //profile name
-                              const SizedBox(height: 10),
-                              Row(
-                                children: [
-                                  Container(
-                                    margin:
-                                        const EdgeInsets.only(top: 0, left: 20),
-                                    child: Text(
-                                      name,
-                                      style: const TextStyle(
-                                        color: Palette.white,
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ),
-                                  if (nip05verified.isNotEmpty)
-                                    Container(
-                                      margin: const EdgeInsets.only(
-                                          top: 0, left: 5),
-                                      child: const Icon(
-                                        Icons.verified,
-                                        color: Palette.white,
-                                        size: 23,
-                                      ),
-                                    ),
-                                ],
-                              ),
-                              // handle
-                              Container(
-                                margin: const EdgeInsets.only(top: 0, left: 20),
-                                child: Row(
-                                  children: [
-                                    if (nip05verified.isNotEmpty)
-                                      Text(
-                                        // if name equals name@example.com then hide the name and show only the domain
-                                        name.contains("@")
-                                            ? name.split("@")[1]
-                                            : nip05verified.split("@")[1],
-
-                                        style: const TextStyle(
-                                          color: Palette.white,
-                                          fontSize: 16,
-                                        ),
-                                      ),
-                                    // verified icon
-                                  ],
-                                ),
-                              ),
-                              // pub key in short form (first 10 chars + ... + last 10 chars) + copy button with icon
-                              Container(
-                                margin: const EdgeInsets.only(top: 0, left: 20),
-                                child: Row(
-                                  children: [
-                                    GestureDetector(
-                                      onTap: () {
-                                        _copyToClipboard(widget.pubkeyBech32);
-                                      },
-                                      child: Container(
-                                        transform: Matrix4.translationValues(
-                                            -12.0, 0.0, 0.0),
-                                        // rounded
-                                        padding: const EdgeInsets.only(
-                                            top: 5,
-                                            bottom: 5,
-                                            left: 12,
-                                            right: 12),
-                                        decoration: const BoxDecoration(
-                                          color: Palette.extraDarkGray,
-                                          borderRadius: BorderRadius.all(
-                                            Radius.circular(20),
-                                          ),
-                                        ),
-                                        child: Text(
-                                          '${widget.pubkeyBech32.substring(0, 10)}...${widget.pubkeyBech32.substring(widget.pubkeyBech32.length - 10)}',
-                                          style: const TextStyle(
-                                            color: Palette.white,
-                                            fontSize: 16,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    IconButton(
-                                      tooltip: 'copy nprofile',
-                                      onPressed: () {
-                                        _copyToClipboard(widget.nProfile);
-                                      },
-                                      icon: const Icon(
-                                        Icons.copy,
-                                        color: Palette.white,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              const SizedBox(height: 10),
-                              // bio
-                              Container(
-                                margin: const EdgeInsets.only(top: 0, left: 20),
-                                child: SelectableText(
-                                  about,
-                                  style: const TextStyle(
-                                    color: Palette.white,
-                                    fontSize: 14,
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(height: 5),
-                            ],
-                          );
-                        },
-                      ),
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        Row(
-                          children: [
-                            const Icon(Icons.people,
-                                color: Palette.white, size: 17),
-                            const SizedBox(width: 5),
-                            FutureBuilder<List<List<dynamic>>>(
-                                future: widget._nostrService
-                                    .getUserContacts(widget.pubkey),
-                                builder: (BuildContext context,
-                                    AsyncSnapshot<List<List<dynamic>>>
-                                        snapshot) {
-                                  var contactsCountString = "";
-
-                                  if (snapshot.hasData) {
-                                    var count = snapshot.data?.length;
-                                    contactsCountString = "$count following";
-                                  } else if (snapshot.hasError) {
-                                    contactsCountString = "n.a. following";
-                                  } else {
-                                    // loading
-                                    contactsCountString = "... following";
-                                  }
-
-                                  return GestureDetector(
-                                    onTap: () {
-                                      if (snapshot.data!.isEmpty) {
-                                        return;
-                                      }
-                                      _saveFollowing();
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => FollowerPage(
-                                            contacts: snapshot.data ?? [],
-                                            title: "Following",
-                                          ),
-                                        ),
-                                      ).then((value) => setState(() {}));
-                                    },
-                                    child: Text(
-                                      contactsCountString,
-                                      style: const TextStyle(
-                                        color: Palette.white,
-                                        fontSize: 14,
-                                      ),
-                                    ),
-                                  );
-                                }),
-                          ],
-                        ),
-                        const Row(
-                          children: [
-                            Icon(Icons.follow_the_signs,
-                                color: Palette.white, size: 17),
-                            SizedBox(width: 5),
-                            Text("n.a. followers",
-                                style: TextStyle(
-                                  color: Palette.white,
-                                  fontSize: 14,
-                                )),
-                          ],
-                        ),
-                        GestureDetector(
-                          onTap: () {
-                            if (widget.pubkey ==
-                                widget._nostrService.myKeys.publicKey) {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => EditRelaysPage(),
-                                ),
-                              ).then((value) => setState(() {}));
-                            }
+                      actions: [
+                        PopupMenuButton<String>(
+                          tooltip: "More",
+                          onSelected: (e) => {
+                            //log(e),
+                            // toast
+                            if (e == "block") _blockUser()
                           },
-                          child: Row(
-                            children: [
-                              const Icon(Icons.connect_without_contact,
-                                  color: Palette.white, size: 17),
-                              const SizedBox(width: 5),
-                              if (widget.pubkey ==
-                                  widget._nostrService.myKeys.publicKey)
-                                Text(
-                                  "${widget._nostrService.relays.manualRelays.length} relays",
-                                  style: const TextStyle(
-                                    color: Palette.white,
-                                    fontSize: 14,
-                                  ),
-                                ),
-                              if (widget.pubkey !=
-                                  widget._nostrService.myKeys.publicKey)
-                                const Text(
-                                  "n.a. relays",
-                                  style: TextStyle(
-                                    color: Palette.white,
-                                    fontSize: 14,
-                                  ),
-                                ),
-                            ],
-                          ),
+                          itemBuilder: (BuildContext context) {
+                            return {'block'}.map((String choice) {
+                              return PopupMenuItem<String>(
+                                value: choice,
+                                child: Text(choice),
+                              );
+                            }).toList();
+                          },
                         ),
                       ],
-                    )
+                      // rounded back button
+                      leading: const BackButtonRound(),
+                      bottom: PreferredSize(
+                        preferredSize: const Size.fromHeight(0),
+                        child: Container(),
+                      ),
+                    ),
+                    SliverList(
+                      delegate: SliverChildListDelegate(
+                        [
+                          const SizedBox(height: 10),
+                          _actionRow(
+                              myKeyPair, followingService, metadata, context),
+
+                          // move up the profile info by 110
+                          _profileInformation(metadata),
+                          _bottomInformationBar(
+                              context, followingService, myKeyPair)
+                        ],
+                      ),
+                    ),
+                    _feed(),
                   ],
-                ),
-              ),
-              SliverList(
-                delegate: SliverChildBuilderDelegate(
-                  (BuildContext context, int index) {
-                    return TweetCard(
-                      tweet: _myTweets[index],
-                    );
-                  },
-                  childCount: _myTweets.length,
-                ),
-              ),
-            ],
-          ),
-          _profileImage(_scrollController, widget),
+                );
+              }),
+          _profileImage(_scrollController, widget, _nostrService, metadata),
           SafeArea(
             child: SizedBox(
               height: 55,
@@ -881,8 +439,7 @@ class _ProfilePageState extends State<ProfilePage>
                         : 0.0,
                     duration: const Duration(milliseconds: 200),
                     child: FutureBuilder<Map>(
-                        future:
-                            widget._nostrService.getUserMetadata(widget.pubkey),
+                        future: metadata.getMetadataByPubkey(widget.pubkey),
                         builder: (BuildContext context,
                             AsyncSnapshot<Map> snapshot) {
                           var name = "";
@@ -915,9 +472,522 @@ class _ProfilePageState extends State<ProfilePage>
       ),
     );
   }
+
+  _feed() {
+    return FutureBuilder(
+        future: _feedReady.future,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return SliverList(
+                delegate: SliverChildListDelegate([
+              const Column(
+                children: [
+                  SizedBox(height: 100),
+                  Center(
+                      child: CircularProgressIndicator(
+                    color: Palette.white,
+                  )),
+                ],
+              )
+            ]));
+          }
+          if (snapshot.hasError) {
+            return SliverList(
+                delegate: SliverChildListDelegate([
+              const Center(
+                child: Text('Error'),
+              )
+            ]));
+          }
+          return StreamBuilder<List<NostrNote>>(
+            stream: _userFeedAndRepliesFeed.feedStream,
+            initialData: _userFeedAndRepliesFeed.feed,
+            builder: (BuildContext context,
+                AsyncSnapshot<List<NostrNote>> snapshot) {
+              if (snapshot.hasData) {
+                var notes = snapshot.data!;
+
+                if (notes.isEmpty) {
+                  return SliverList(
+                    delegate: SliverChildListDelegate(
+                      [
+                        const Column(
+                          children: [
+                            SizedBox(height: 100),
+                            Text("no notes found",
+                                style: TextStyle(
+                                    fontSize: 20, color: Palette.white))
+                          ],
+                        ),
+                      ],
+                    ),
+                  );
+                }
+
+                return SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) {
+                      var note = notes[index];
+                      _userFeedCheckForNewData(note);
+                      return NoteCardContainer(
+                        notes: [note],
+                        key: ValueKey(note.id),
+                      );
+                    },
+                    childCount: notes.length,
+                  ),
+                );
+              }
+              if (snapshot.hasError) {
+                return SliverList(
+                  delegate: SliverChildListDelegate([
+                    Center(
+                        //button
+                        child: ElevatedButton(
+                      onPressed: () {},
+                      child: Text(snapshot.error.toString(),
+                          style: const TextStyle(
+                              fontSize: 20, color: Colors.white)),
+                    ))
+                  ]),
+                );
+              }
+              return const Text("waiting for stream trigger ",
+                  style: TextStyle(fontSize: 20));
+            },
+          );
+        });
+  }
+
+  Row _bottomInformationBar(BuildContext context,
+      FollowingPubkeys followingService, KeyPair myKeyPair) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        Row(
+          children: [
+            const Icon(Icons.people, color: Palette.white, size: 17),
+            const SizedBox(width: 5),
+            FutureBuilder<List<NostrTag>>(
+                future: followingService.getFollowingPubkeys(widget.pubkey),
+                builder: (BuildContext context,
+                    AsyncSnapshot<List<NostrTag>> snapshot) {
+                  var contactsCountString = "";
+
+                  if (snapshot.hasData) {
+                    var count = snapshot.data?.length;
+                    contactsCountString = "$count following";
+                  } else if (snapshot.hasError) {
+                    contactsCountString = "n.a. following";
+                  } else {
+                    // loading
+                    contactsCountString = "... following";
+                  }
+
+                  return GestureDetector(
+                    onTap: () {
+                      if (snapshot.data == null || snapshot.data!.isEmpty) {
+                        return;
+                      }
+
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => FollowerPage(
+                            contacts: snapshot.data ?? [],
+                            title: "Following",
+                          ),
+                        ),
+                      ).then((value) => setState(() {}));
+                    },
+                    child: Text(
+                      contactsCountString,
+                      style: const TextStyle(
+                        color: Palette.white,
+                        fontSize: 14,
+                      ),
+                    ),
+                  );
+                }),
+          ],
+        ),
+        const Row(
+          children: [
+            Icon(Icons.follow_the_signs, color: Palette.white, size: 17),
+            SizedBox(width: 5),
+            Text("n.a. followers",
+                style: TextStyle(
+                  color: Palette.white,
+                  fontSize: 14,
+                )),
+          ],
+        ),
+        _relaysInfo(followingService, myKeyPair, context),
+      ],
+    );
+  }
+
+  GestureDetector _relaysInfo(FollowingPubkeys followingService,
+      KeyPair myKeyPair, BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        if (widget.pubkey == myKeyPair.publicKey) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const EditRelaysPage(),
+            ),
+          ).then((value) => setState(() {}));
+        }
+      },
+      child: Row(
+        children: [
+          const Icon(Icons.connect_without_contact,
+              color: Palette.white, size: 17),
+          const SizedBox(width: 5),
+          if (widget.pubkey == myKeyPair.publicKey)
+            Text(
+              "${followingService.ownRelays.entries.length} relays",
+              style: const TextStyle(
+                color: Palette.white,
+                fontSize: 14,
+              ),
+            ),
+          if (widget.pubkey != myKeyPair.publicKey)
+            const Text(
+              "n.a. relays", //nip 65 relays
+              style: TextStyle(
+                color: Palette.white,
+                fontSize: 14,
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Container _profileInformation(UserMetadata metadata) {
+    return Container(
+      transform: Matrix4.translationValues(0.0, -10.0, 0.0),
+      child: FutureBuilder<Map>(
+        future: metadata.getMetadataByPubkey(widget.pubkey),
+        builder: (BuildContext context, AsyncSnapshot<Map> snapshot) {
+          var name = "";
+          var nip05 = "";
+          var picture = "";
+          var about = "";
+
+          if (snapshot.hasData) {
+            name = snapshot.data?["name"] ?? "";
+            nip05 = snapshot.data?["nip05"] ?? "";
+            picture = snapshot.data?["picture"] ?? "";
+            about = snapshot.data?["about"] ?? "";
+
+            _checkNip05(nip05, widget.pubkey);
+          } else if (snapshot.hasError) {
+            name = "error";
+            nip05 = "error";
+            picture = "";
+            about = "error";
+          } else {
+            // loading
+            name = "loading";
+            nip05 = "loading";
+            picture = "";
+            about = "loading";
+          }
+
+          return Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              //profile name
+              const SizedBox(height: 10),
+              Row(
+                children: [
+                  Container(
+                    margin: const EdgeInsets.only(top: 0, left: 20),
+                    child: Text(
+                      name,
+                      style: const TextStyle(
+                        color: Palette.white,
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  if (nip05verified.isNotEmpty)
+                    Container(
+                      margin: const EdgeInsets.only(top: 0, left: 5),
+                      child: const Icon(
+                        Icons.verified,
+                        color: Palette.white,
+                        size: 23,
+                      ),
+                    ),
+                ],
+              ),
+              // handle
+              Container(
+                margin: const EdgeInsets.only(top: 0, left: 20),
+                child: Row(
+                  children: [
+                    if (nip05verified.isNotEmpty)
+                      Text(
+                        // if name equals name@example.com then hide the name and show only the domain
+                        name.contains("@")
+                            ? name.split("@")[1]
+                            : nip05verified.split("@")[1],
+
+                        style: const TextStyle(
+                          color: Palette.white,
+                          fontSize: 16,
+                        ),
+                      ),
+                    // verified icon
+                  ],
+                ),
+              ),
+              // pub key in short form (first 10 chars + ... + last 10 chars) + copy button with icon
+              Container(
+                margin: const EdgeInsets.only(top: 0, left: 20),
+                child: Row(
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        _copyToClipboard(widget.pubkeyBech32);
+                      },
+                      child: Container(
+                        transform: Matrix4.translationValues(-12.0, 0.0, 0.0),
+                        // rounded
+                        padding: const EdgeInsets.only(
+                            top: 5, bottom: 5, left: 12, right: 12),
+                        decoration: const BoxDecoration(
+                          color: Palette.extraDarkGray,
+                          borderRadius: BorderRadius.all(
+                            Radius.circular(20),
+                          ),
+                        ),
+                        child: Text(
+                          '${widget.pubkeyBech32.substring(0, 10)}...${widget.pubkeyBech32.substring(widget.pubkeyBech32.length - 10)}',
+                          style: const TextStyle(
+                            color: Palette.white,
+                            fontSize: 16,
+                          ),
+                        ),
+                      ),
+                    ),
+                    IconButton(
+                      tooltip: 'copy nprofile',
+                      onPressed: () {
+                        _copyToClipboard(widget.nProfile);
+                      },
+                      icon: const Icon(
+                        Icons.copy,
+                        color: Palette.white,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 10),
+              // bio
+              Container(
+                margin: const EdgeInsets.only(top: 0, left: 20),
+                child: SelectableText(
+                  about,
+                  style: const TextStyle(
+                    color: Palette.white,
+                    fontSize: 14,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 5),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  Row _actionRow(KeyPair myKeyPair, FollowingPubkeys followingService,
+      UserMetadata metadata, BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: [
+        if (widget.pubkey != myKeyPair.publicKey)
+          SizedBox(
+            width: 35,
+            height: 35,
+            child: ElevatedButton(
+              onPressed: () {
+                _launchPerspectiveFeed(widget.pubkey);
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Palette.background,
+                padding: const EdgeInsets.all(0),
+                enableFeedback: true,
+                shape: const CircleBorder(
+                    side: BorderSide(color: Palette.white, width: 1)),
+              ),
+              child: SvgPicture.asset(
+                "assets/icons/eye.svg",
+                height: 25,
+                color: Palette.white,
+              ),
+            ),
+          ),
+
+        // round message button with icon and white border
+        FutureBuilder<Map>(
+            future: metadata.getMetadataByPubkey(widget.pubkey),
+            builder: (BuildContext context, AsyncSnapshot<Map> snapshot) {
+              String lud06 = "";
+              String lud16 = "";
+
+              if (snapshot.hasData) {
+                lud06 = snapshot.data?["lud06"] ?? "";
+                lud16 = snapshot.data?["lud16"] ?? "";
+              }
+
+              if (lud06.isNotEmpty || lud16.isNotEmpty) {
+                return Container(
+                  margin: const EdgeInsets.only(top: 0, right: 0, left: 0),
+                  child: ElevatedButton(
+                    onPressed: () {
+                      if (lud06.isNotEmpty) {
+                        _openLightningAddress(lud06);
+                      } else if (lud16.isNotEmpty) {
+                        _openLightningAddress(lud16);
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Palette.background,
+                      padding: const EdgeInsets.all(0),
+                      shape: const CircleBorder(
+                          side: BorderSide(color: Palette.white, width: 1)),
+                    ),
+                    child: SvgPicture.asset(
+                      "assets/icons/lightning-fill.svg",
+                      height: 25,
+                      color: Palette.white,
+                    ),
+                  ),
+                );
+              } else {
+                return Container();
+              }
+            }),
+
+        // follow button black with white border
+
+        if (widget.pubkey != myKeyPair.publicKey)
+          _followButton(followingService),
+
+        // edit button
+        if (widget.pubkey == myKeyPair.publicKey)
+          Container(
+            margin: const EdgeInsets.only(top: 0, right: 10),
+            child: ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const EditProfilePage(),
+                  ),
+                ).then((value) => {
+                      metadata.getMetadataByPubkey(widget.pubkey),
+                      setState(() {
+                        // refresh
+                      })
+                    });
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Palette.background,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                  side: const BorderSide(color: Palette.white, width: 1),
+                ),
+              ),
+              child: const Text(
+                'Edit',
+                style: TextStyle(
+                  color: Palette.white,
+                  fontSize: 16,
+                ),
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+
+  Widget _followButton(FollowingPubkeys followingService) {
+    return StreamBuilder<List<NostrTag>>(
+        stream: followingService.ownPubkeyContactsStreamDb,
+        initialData: followingService.ownContacts,
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            var followingList = snapshot.data!.map((e) => e.value).toList();
+
+            if (followingList.contains(widget.pubkey)) {
+              return followButton(
+                  isFollowing: true,
+                  onPressed: () {
+                    followingService.unfollow(widget.pubkey);
+                  });
+            } else {
+              return followButton(
+                  isFollowing: false,
+                  onPressed: () {
+                    followingService.follow(widget.pubkey);
+                  });
+            }
+          }
+          return Container();
+        });
+  }
+
+  FlexibleSpaceBar _bannerImage(UserMetadata metadata) {
+    return FlexibleSpaceBar(
+        background: FutureBuilder<Map<dynamic, dynamic>>(
+      future: metadata.getMetadataByPubkey(widget.pubkey),
+      builder: (context, snapshot) {
+        if (snapshot.hasData && snapshot.data?["banner"] != null) {
+          return CachedNetworkImage(
+            imageUrl: snapshot.data?["banner"],
+            filterQuality: FilterQuality.high,
+            progressIndicatorBuilder: (context, url, downloadProgress) =>
+                // progress indicator with download progress
+                Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                LinearProgressIndicator(
+                  minHeight: 2,
+                  value: downloadProgress.progress,
+                  color: Palette.lightGray,
+                ),
+              ],
+            ),
+            errorWidget: (context, url, error) => const Icon(Icons.error),
+            memCacheWidth: 800,
+            maxHeightDiskCache: 800,
+            maxWidthDiskCache: 800,
+            alignment: Alignment.center,
+            fit: BoxFit.cover,
+          );
+        }
+        return Image.asset(
+          'assets/images/default_header.jpg',
+          fit: BoxFit.cover,
+        );
+      },
+    ));
+  }
 }
 
-Widget _profileImage(ScrollController sController, widget) {
+Widget _profileImage(ScrollController sController, widget,
+    NostrService nostrService, UserMetadata metadata) {
   const double defaultMargin = 125;
   const double defaultStart = 125;
   const double defaultEnd = defaultStart / 2;
@@ -973,7 +1043,7 @@ Widget _profileImage(ScrollController sController, widget) {
           shape: BoxShape.circle,
         ),
         child: FutureBuilder<Map>(
-            future: widget._nostrService.getUserMetadata(widget.pubkey),
+            future: metadata.getMetadataByPubkey(widget.pubkey),
             builder: (BuildContext context, AsyncSnapshot<Map> snapshot) {
               var picture = "";
 
@@ -992,7 +1062,11 @@ Widget _profileImage(ScrollController sController, widget) {
                   onTap: (() {
                     openImage(NetworkImage(picture), context);
                   }),
-                  child: myProfilePicture(picture, widget.pubkey));
+                  child: myProfilePicture(
+                    pictureUrl: picture,
+                    pubkey: widget.pubkey,
+                    filterQuality: FilterQuality.high,
+                  ));
             }),
       ),
     ),

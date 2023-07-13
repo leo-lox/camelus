@@ -1,69 +1,47 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:developer';
 
-import 'package:camelus/atoms/spinner_center.dart';
-import 'package:camelus/models/socket_control.dart';
-import 'package:camelus/routes/nostr/nostr_page/global_feed_view.dart';
+import 'package:camelus/providers/metadata_provider.dart';
+import 'package:camelus/providers/relay_provider.dart';
+import 'package:camelus/routes/nostr/nostr_page/user_feed_and_replies_view.dart';
 import 'package:camelus/routes/nostr/nostr_page/user_feed_original_view.dart';
 import 'package:camelus/routes/nostr/relays_page.dart';
+import 'package:camelus/services/nostr/relays/my_relay.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
 import 'package:camelus/atoms/my_profile_picture.dart';
 
-import 'package:camelus/services/nostr/nostr_injector.dart';
-import 'package:camelus/services/nostr/nostr_service.dart';
 import 'package:badges/badges.dart' as badges;
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../config/palette.dart';
 
-class NostrPage extends StatefulWidget {
-  late NostrService _nostrService;
-  var parentScaffoldKey = GlobalKey<ScaffoldState>();
-  NostrPage({Key? key, required this.parentScaffoldKey}) : super(key: key) {
-    NostrServiceInjector injector = NostrServiceInjector();
-    _nostrService = injector.nostrService;
-  }
+class NostrPage extends ConsumerStatefulWidget {
+  final GlobalKey<ScaffoldState> parentScaffoldKey;
+  final String pubkey;
 
+  const NostrPage(
+      {Key? key, required this.parentScaffoldKey, required this.pubkey})
+      : super(key: key);
   @override
-  State<NostrPage> createState() => _NostrPageState();
+  ConsumerState<NostrPage> createState() => _NostrPageState();
 }
 
-class _NostrPageState extends State<NostrPage>
+class _NostrPageState extends ConsumerState<NostrPage>
     with TickerProviderStateMixin, AutomaticKeepAliveClientMixin {
   @override
   bool get wantKeepAlive => true;
-
-  final bool _isLoading = true;
 
   List<String> followingPubkeys = [];
 
   late final ScrollController _scrollControllerPage = ScrollController();
 
   late TabController _tabController;
-
-  late String pubkey = "";
-  final int _tabIndex = 0;
-
-  _getPubkey() async {
-    //wait for connection
-    bool connection = await widget._nostrService.isNostrServiceConnected;
-    if (!connection) {
-      log("no connection to nostr service");
-      return;
-    }
-
-    // check mounted to avoid setState after dispose
-    if (!mounted) return;
-
-    setState(() {
-      pubkey = widget._nostrService.myKeys.publicKey;
-    });
-  }
 
   void _betaCheckForUpdates() async {
     await Future.delayed(const Duration(seconds: 15));
@@ -114,20 +92,10 @@ class _NostrPageState extends State<NostrPage>
         });
   }
 
-  int _countRedyRelays(Map<String, SocketControl> relays) {
-    int count = 0;
-    for (var r in relays.values) {
-      if (r.socketIsRdy) {
-        count++;
-      }
-    }
-    return count;
-  }
-
   _openRelaysView() {
     Navigator.of(context).push(
       PageRouteBuilder(
-        pageBuilder: (context, animation, secondaryAnimation) => RelaysPage(),
+        pageBuilder: (context, animation, secondaryAnimation) => const RelaysPage(),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
           var begin = const Offset(0.0, 0.2);
           var end = Offset.zero;
@@ -152,11 +120,10 @@ class _NostrPageState extends State<NostrPage>
   @override
   void initState() {
     super.initState();
-    _getPubkey();
 
     _betaCheckForUpdates();
 
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 2, vsync: this);
 
     _tabController.addListener(() {
       if (_tabController.indexIsChanging) {}
@@ -187,6 +154,10 @@ class _NostrPageState extends State<NostrPage>
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
+    var metadata = ref.watch(metadataProvider);
+    var myRelays = ref.watch(relayServiceProvider);
+
     return Scaffold(
       backgroundColor: Palette.background,
       appBar: null,
@@ -210,23 +181,27 @@ class _NostrPageState extends State<NostrPage>
                       shape: BoxShape.circle,
                     ),
                     child: FutureBuilder<Map>(
-                        future: widget._nostrService.getUserMetadata(pubkey),
+                        future: metadata.getMetadataByPubkey(widget.pubkey),
                         builder: (BuildContext context,
                             AsyncSnapshot<Map> snapshot) {
                           var picture = "";
-
+                          var defaultPicture =
+                              "https://avatars.dicebear.com/api/personas/${widget.pubkey}.svg";
                           if (snapshot.hasData) {
-                            picture = snapshot.data?["picture"] ??
-                                "https://avatars.dicebear.com/api/personas/$pubkey.svg";
-                          } else if (snapshot.hasError) {
                             picture =
-                                "https://avatars.dicebear.com/api/personas/$pubkey.svg";
+                                snapshot.data?["picture"] ?? defaultPicture;
+                          } else if (snapshot.hasError) {
+                            picture = defaultPicture;
                           } else {
                             // loading
-                            picture =
-                                "https://avatars.dicebear.com/api/personas/$pubkey.svg";
+                            picture = defaultPicture;
                           }
-                          return myProfilePicture(picture, pubkey);
+
+                          return myProfilePicture(
+                            pictureUrl: picture,
+                            pubkey: widget.pubkey,
+                            filterQuality: FilterQuality.medium,
+                          );
                         }),
                   ),
                 ),
@@ -245,7 +220,7 @@ class _NostrPageState extends State<NostrPage>
                       child: GestureDetector(
                         onTap: () {},
                         child: const Text(
-                          "nostr",
+                          "camelus - nostr",
                           style: TextStyle(
                             color: Palette.lightGray,
                             fontSize: 20,
@@ -257,12 +232,10 @@ class _NostrPageState extends State<NostrPage>
                 actions: [
                   GestureDetector(
                     onTap: () => _openRelaysView(),
-                    child: StreamBuilder(
-                        stream: widget
-                            ._nostrService.relays.connectedRelaysReadStream,
-                        builder: (context,
-                            AsyncSnapshot<Map<String, SocketControl>>
-                                snapshot) {
+                    child: StreamBuilder<List<MyRelay>>(
+                        stream: myRelays.relaysStream,
+                        initialData: myRelays.relays,
+                        builder: (context, snapshot) {
                           if (!snapshot.hasData || snapshot.data!.isEmpty) {
                             return Row(
                               children: [
@@ -273,11 +246,12 @@ class _NostrPageState extends State<NostrPage>
                                   width: 22,
                                 ),
                                 const SizedBox(width: 5),
-                                Text(
-                                  "0".toString(),
-                                  style:
-                                      const TextStyle(color: Palette.lightGray),
-                                ),
+                                if (!kReleaseMode)
+                                  Text(
+                                    "0".toString(),
+                                    style: const TextStyle(
+                                        color: Palette.lightGray),
+                                  ),
                                 const SizedBox(width: 5),
                               ],
                             );
@@ -291,12 +265,17 @@ class _NostrPageState extends State<NostrPage>
                                   width: 22,
                                 ),
                                 const SizedBox(width: 5),
-                                Text(
-                                  // count how many relays are ready
-                                  _countRedyRelays(snapshot.data!).toString(),
-                                  style:
-                                      const TextStyle(color: Palette.lightGray),
-                                ),
+                                // check if dev build
+                                if (!kReleaseMode)
+                                  Text(
+                                    // count how many relays are ready
+                                    snapshot.data!
+                                        .where((element) => element.connected)
+                                        .length
+                                        .toString(),
+                                    style: const TextStyle(
+                                        color: Palette.lightGray),
+                                  ),
                                 const SizedBox(width: 5),
                               ],
                             );
@@ -309,11 +288,19 @@ class _NostrPageState extends State<NostrPage>
                   child: TabBar(
                     controller: _tabController,
                     indicatorColor: Palette.primary,
+                    indicatorSize: TabBarIndicatorSize.label,
+                    automaticIndicatorColorAdjustment: true,
+                    indicator: const UnderlineTabIndicator(
+                      borderRadius: BorderRadius.all(Radius.circular(10)),
+                      borderSide: BorderSide(
+                        width: 2,
+                        color: Palette.primary,
+                      ),
+                    ),
+                    indicatorWeight: 5.0,
                     tabs: const [
                       Text("feed", style: TextStyle(color: Palette.lightGray)),
                       Text("feed & replies",
-                          style: TextStyle(color: Palette.lightGray)),
-                      Text("global",
                           style: TextStyle(color: Palette.lightGray)),
                     ],
                   ),
@@ -325,13 +312,8 @@ class _NostrPageState extends State<NostrPage>
             controller: _tabController,
             physics: const BouncingScrollPhysics(),
             children: [
-              if (pubkey.isNotEmpty) UserFeedOriginalView(pubkey: pubkey),
-              if (pubkey.isEmpty) spinnerCenter(),
-              const Center(
-                child: Text("work in progress",
-                    style: TextStyle(fontSize: 25, color: Palette.white)),
-              ),
-              GlobalFeedView()
+              UserFeedOriginalView(pubkey: widget.pubkey),
+              UserFeedAndRepliesView(pubkey: widget.pubkey),
             ],
           ),
         ),

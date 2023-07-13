@@ -1,35 +1,45 @@
-import 'dart:convert';
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:camelus/atoms/picture.dart';
+import 'package:camelus/db/database.dart';
+import 'package:camelus/helpers/nprofile_helper.dart';
 import 'package:camelus/helpers/search.dart';
+import 'package:camelus/models/nostr_request_event.dart';
+import 'package:camelus/models/nostr_tag.dart';
+import 'package:camelus/providers/database_provider.dart';
+import 'package:camelus/providers/key_pair_provider.dart';
+import 'package:camelus/providers/metadata_provider.dart';
+import 'package:camelus/providers/nostr_service_provider.dart';
+import 'package:camelus/providers/relay_provider.dart';
+import 'package:camelus/services/external/nostr_build_file_upload.dart';
+import 'package:camelus/services/nostr/metadata/user_metadata.dart';
+import 'package:camelus/services/nostr/relays/relays_ranking.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mentions/flutter_mentions.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lottie/lottie.dart';
 import 'package:camelus/config/palette.dart';
 import 'package:camelus/helpers/helpers.dart';
 import 'package:camelus/models/post_context.dart';
-import 'package:camelus/services/nostr/nostr_injector.dart';
 import 'package:camelus/services/nostr/nostr_service.dart';
-import 'package:http/http.dart' as http;
-import 'package:http_parser/http_parser.dart';
-import 'package:mime/mime.dart';
 
-class WritePost extends StatefulWidget {
-  PostContext? context;
+class WritePost extends ConsumerStatefulWidget {
+  final PostContext? context;
 
-  late NostrService _nostrService;
-  WritePost({Key? key, this.context}) : super(key: key) {
-    NostrServiceInjector injector = NostrServiceInjector();
-    _nostrService = injector.nostrService;
-  }
+  const WritePost({Key? key, this.context}) : super(key: key);
+
   @override
-  State<WritePost> createState() => _WritePostState();
+  ConsumerState<WritePost> createState() => _WritePostState();
 }
 
-class _WritePostState extends State<WritePost> {
+class _WritePostState extends ConsumerState<WritePost> {
+  late NostrService _nostrService;
+  late AppDatabase _db;
+  late Search _search;
+
   final TextEditingController _textEditingController = TextEditingController();
   final GlobalKey<FlutterMentionsState> _textEditingControllerKey =
       GlobalKey<FlutterMentionsState>();
@@ -58,9 +68,12 @@ class _WritePostState extends State<WritePost> {
   }
 
   _searchMentions(search) async {
-    List<Map<String, dynamic>> results = Search().searchUsersMetadata(search);
+    List<Map<String, dynamic>> results = [];
+
+    results = _search.searchUsersMetadata(search);
 
     for (var result in results) {
+      result['id'] = result['pubkey'];
       if (result['picture'] == null) {
         result['picture'] = "";
       }
@@ -134,38 +147,6 @@ class _WritePostState extends State<WritePost> {
     });
   }
 
-  Future<String> _uploadImage(File file) async {
-    final uri = Uri.parse('https://nostr.build/upload.php');
-    var request = http.MultipartRequest('POST', uri);
-
-    var bytes = await file.readAsBytes();
-    var mimeType = lookupMimeType(file.path);
-    var filename = file.path.split('/').last;
-
-    final httpImage = http.MultipartFile.fromBytes("fileToUpload", bytes,
-        contentType: MediaType.parse(mimeType!), filename: filename);
-    request.files.add(httpImage);
-
-    final response = await request.send();
-
-    if (response.statusCode != 200) {
-      return "";
-    }
-
-    var responseString = await response.stream.transform(utf8.decoder).join();
-
-    // extract url https://nostr.build/i/4697.png
-    final RegExp urlPattern =
-        RegExp(r'https:\/\/nostr\.build\/i\/\S+\.(?:jpg|jpeg|png|gif)');
-    final Match? urlMatch = urlPattern.firstMatch(responseString);
-    if (urlMatch != null) {
-      final String myUrl = urlMatch.group(0)!;
-      return myUrl;
-    } else {
-      return "";
-    }
-  }
-
   _submitPost() async {
     var textController = _textEditingControllerKey.currentState!.controller;
 
@@ -186,7 +167,11 @@ class _WritePostState extends State<WritePost> {
 
     String output = markupText.replaceAllMapped(keyRegex, (match) {
       mentionKeys.add(match.group(1)!);
-      return '#[${mentionKeys.length - 1}]';
+      var userHex = match.group(1)!;
+
+      var nprofile =
+          NprofileHelper().mapToBech32({'pubkey': userHex, 'relays': []});
+      return 'nostr:$nprofile ';
     });
 
     output = output.replaceAllMapped(RegExp(r'\(__.*?\)'), (match) {
@@ -195,52 +180,97 @@ class _WritePostState extends State<WritePost> {
 
     var content = output;
 
-    var tags = [];
-
-    if (mentionKeys.isNotEmpty) {
-      for (int i = 0; i < mentionKeys.length; i++) {
-        var key = mentionKeys[i];
-        tags.add(["p", key]);
-      }
-    }
-
-    var firstWriteRelayKey =
-        widget._nostrService.relays.connectedRelaysWrite.keys.toList()[0];
-    var firstWriteRelay = widget._nostrService.relays
-        .connectedRelaysWrite[firstWriteRelayKey]!.connectionUrl;
+    List<NostrTag> tags = [];
 
     if (widget.context != null) {
+      var replyIsReplyToRoot = widget.context!.replyToNote.getRootReply;
+      if (replyIsReplyToRoot != null) {
+        var tag = NostrTag(
+          type: "e",
+          value: replyIsReplyToRoot.value,
+          recommended_relay: "",
+          marker: "root",
+        );
+        tags.add(tag);
+      } else {
+        // is reply to root
+        var tag = NostrTag(
+          type: "e",
+          value: widget.context!.replyToNote.id,
+          recommended_relay: "",
+          marker: "root",
+        );
+        tags.add(tag);
+        var tagPubkey = NostrTag(
+          type: "p",
+          value: widget.context!.replyToNote.pubkey,
+          recommended_relay: "",
+          marker: "root",
+        );
+        tags.add(tagPubkey);
+      }
+
       // add previous tweet tags
-      for (var tag in widget.context!.replyToTweet.tags) {
-        if (tag[0] == "e") {
-          tags.add(tag);
+      for (NostrTag tag in widget.context!.replyToNote.tags) {
+        if (tag.type == "e") {
+          if (tag.marker == "root" || tag.marker == "reply") {
+            continue;
+          }
+          if (!(tags.map((e) => e.value).contains(tag.value))) {
+            tags.add(tag);
+          }
         }
-        if (tag[0] == "p") {
+        if (tag.type == "p") {
+          if (tag.marker == 'reply') {
+            var replaceTag = NostrTag(type: 'p', value: tag.value);
+            tags.add(replaceTag);
+            continue;
+          }
           tags.add(tag);
         }
       }
 
-      if (!(tags.contains(widget.context!.replyToTweet.id))) {
-        var tag = [
-          "e",
-          widget.context!.replyToTweet.id,
-          firstWriteRelay,
-          "reply"
-        ];
-        tags.add(tag);
+      if (mentionKeys.isNotEmpty) {
+        for (int i = 0; i < mentionKeys.length; i++) {
+          var pubkey = mentionKeys[i];
+          var potentialRelays =
+              await RelaysRanking().getBestRelays(pubkey, Direction.read);
+          tags.add(NostrTag(
+            type: "p",
+            value: pubkey,
+            recommended_relay: potentialRelays.firstOrNull ?? "",
+            marker: "mention",
+          ));
+        }
       }
-      if (!(tags.contains(widget.context!.replyToTweet.pubkey))) {
-        var tag = ["p", widget.context!.replyToTweet.pubkey];
+
+      if (widget.context != null) {
+        var tag = NostrTag(
+          type: "e",
+          value: widget.context!.replyToNote.id,
+          recommended_relay: "",
+          marker: "reply",
+        );
         tags.add(tag);
+
+        var tagPubkey = NostrTag(
+          type: 'p',
+          value: widget.context!.replyToNote.pubkey,
+          recommended_relay: '',
+          marker: 'reply',
+        );
+        tags.add(tagPubkey);
       }
     }
 
     // upload images
     List<String> imageUrls = [];
     for (var image in _images) {
-      var url = await _uploadImage(image);
-      if (url.isNotEmpty) {
+      try {
+        var url = await NostrBuildFileUpload.uploadImage(image);
         imageUrls.add(url);
+      } catch (e) {
+        log("errUploadImage:  ${e.toString()}");
       }
     }
 
@@ -250,13 +280,67 @@ class _WritePostState extends State<WritePost> {
       content += " $url";
     }
 
-    widget._nostrService.writeEvent(content, 1, tags);
+    log("content: $content");
+    //_nostrService.writeEvent(content, 1, tags);
+
+    var relays = ref.watch(relayServiceProvider);
+    var keyService = await ref.watch(keyPairProvider.future);
+
+    var keyPair = keyService.keyPair!;
+
+    var myBody = NostrRequestEventBody(
+      pubkey: keyPair.publicKey,
+      privateKey: keyPair.privateKey,
+      kind: 1,
+      content: content,
+      tags: tags,
+    );
+    var myRequest = NostrRequestEvent(body: myBody);
+    List<String> results = await relays.write(request: myRequest);
+
+    // check if all are timeout
+    var timeouts = results.where((element) => element == 'timeout');
+    if (timeouts.length == results.length || results == []) {
+      log("error sending msg");
+      setState(() {
+        submitLoading = false;
+      });
+      _showErrorMsg("all relays timed out 😥");
+      return;
+    }
 
     // wait for x seconds
-    Future.delayed(const Duration(milliseconds: 200), () {
+    Future.delayed(const Duration(milliseconds: 100), () {
       // close modal
       Navigator.pop(context);
     });
+  }
+
+  _showErrorMsg(String msg) {
+    // alert dialog
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("error"),
+          content: Text(msg),
+          actions: [
+            TextButton(
+              child: const Text("ok"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _initServices() async {
+    _nostrService = ref.read(nostrServiceProvider);
+    _db = await ref.watch(databaseProvider.future);
+    _search = Search(_db);
   }
 
   @override
@@ -264,6 +348,12 @@ class _WritePostState extends State<WritePost> {
     super.initState();
     // focus text field
     _focusNode.requestFocus();
+  }
+
+  @override
+  didChangeDependencies() {
+    super.didChangeDependencies();
+    _initServices();
   }
 
   @override
@@ -275,6 +365,7 @@ class _WritePostState extends State<WritePost> {
 
   @override
   Widget build(BuildContext context) {
+    var metadata = ref.watch(metadataProvider);
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -300,308 +391,17 @@ class _WritePostState extends State<WritePost> {
               const SizedBox(
                 height: 5,
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  TextButton(
-                    onPressed: (() {
-                      Navigator.pop(context);
-                    }),
-                    child: SvgPicture.asset(
-                      height: 25,
-                      'assets/icons/x.svg',
-                      color: Palette.gray,
-                    ),
-                  ),
-                  if (widget.context == null)
-                    const Text(
-                      "write a post",
-                      style: TextStyle(
-                        color: Palette.lightGray,
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  if (widget.context != null)
-                    Column(
-                      children: [
-                        // get metadata
-                        FutureBuilder<Map>(
-                            future: widget._nostrService.getUserMetadata(
-                                widget.context!.replyToTweet.pubkey),
-                            builder: (BuildContext context,
-                                AsyncSnapshot<Map> snapshot) {
-                              var name = "";
-
-                              if (snapshot.hasData) {
-                                name = snapshot.data?["name"] ?? "";
-                              } else if (snapshot.hasError) {
-                                name = "";
-                              } else {
-                                // loading
-                                name = "...";
-                              }
-                              if (name.isEmpty) {
-                                var pubkey =
-                                    widget.context!.replyToTweet.pubkey;
-                                var pubkeyHr =
-                                    Helpers().encodeBech32(pubkey, "npub");
-                                var pubkeyHrShort =
-                                    "${pubkeyHr.substring(0, 5)}...${pubkeyHr.substring(pubkeyHr.length - 5)}";
-                                name = pubkeyHrShort;
-                              }
-
-                              return SizedBox(
-                                width: MediaQuery.of(context).size.width * 0.6,
-                                child: Container(
-                                  margin: const EdgeInsets.only(
-                                      left: 10, right: 10, top: 5),
-                                  child: Text(
-                                    "reply to $name",
-                                    overflow: TextOverflow.ellipsis,
-                                    maxLines: 2,
-                                    style: const TextStyle(
-                                      color: Palette.lightGray,
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                              );
-                            }),
-
-                        /// check if replying to multiple people
-                        if ((Helpers()
-                                .getPubkeysFromTags(
-                                    widget.context?.replyToTweet.tags ?? [])
-                                .length >
-                            1))
-                          Text(
-                            "and ${Helpers().getPubkeysFromTags(widget.context?.replyToTweet.tags ?? []).length - 1} more",
-                            style: const TextStyle(
-                              color: Palette.lightGray,
-                              fontSize: 16,
-                              fontWeight: FontWeight.normal,
-                            ),
-                          ),
-                      ],
-                    ),
-                  // if submitLoading is true, show spinner
-                  !submitLoading
-                      ? TextButton(
-                          onPressed: (() {
-                            _submitPost();
-                          }),
-                          child: SvgPicture.asset(
-                            height: 25,
-                            'assets/icons/paper-plane-tilt.svg',
-                            color: Palette.primary,
-                          ),
-                        )
-                      : Lottie.asset(
-                          'assets/lottie/spinner.json',
-                          height: 40,
-                          width: 64,
-                          alignment: Alignment.topCenter,
-                        )
-                ],
-              ),
+              _topBar(context, metadata),
               const SizedBox(
                 height: 20,
               ),
               // large text field
-              Container(
-                //height: 200,
-                padding: const EdgeInsets.only(left: 20, right: 20),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  //border: Border.all(color: Palette.primary), //debug
-                ),
-                child: FlutterMentions(
-                  key: _textEditingControllerKey,
-                  suggestionPosition: SuggestionPosition.Top,
-                  focusNode: _focusNode,
-                  style: const TextStyle(color: Palette.white, fontSize: 21),
-                  decoration: const InputDecoration(
-                    border: InputBorder.none,
-                    hintText: "What's on your mind?",
-                    hintStyle: TextStyle(
-                      color: Palette.gray,
-                      fontSize: 20,
-                    ),
-                  ),
-                  maxLines: 10,
-                  minLines: 5,
-                  onMentionAdd: (p0) {
-                    // only triggers when user selects a mention from the list
-                  },
-                  onMarkupChanged: (p0) {
-                    // triggers when something is typed in the text field
-                    _extractMentions(p0);
-                  },
-                  onSearchChanged: (String trigger, search) {
-                    if (search.isNotEmpty && trigger == "@") {
-                      _searchMentions(search);
-                    }
-                    if (search.isNotEmpty && trigger == "#") {
-                      _searchHashtags(search);
-                    }
-                  },
-                  suggestionListDecoration: BoxDecoration(
-                    color: Palette.extraDarkGray,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  mentions: [
-                    Mention(
-                      suggestionBuilder: (data) {
-                        return Container(
-                          padding: const EdgeInsets.all(10.0),
-                          child: Row(
-                            children: <Widget>[
-                              ClipOval(
-                                child: SizedBox.fromSize(
-                                  size:
-                                      const Size.fromRadius(30), // Image radius
-                                  child: Container(
-                                    color: Palette.background,
-                                    child: simplePicture(
-                                        data['picture'], data['id']),
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(
-                                width: 20.0,
-                              ),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: <Widget>[
-                                  Text(
-                                    data['name'] ?? "",
-                                    style: const TextStyle(
-                                      color: Palette.lightGray,
-                                      fontSize: 20,
-                                    ),
-                                  ),
-                                  Text(
-                                    '${data['nip05'] ?? ""}',
-                                    style: const TextStyle(
-                                      color: Palette.gray,
-                                      fontSize: 12,
-                                    ),
-                                  ),
-                                ],
-                              )
-                            ],
-                          ),
-                        );
-                      },
-                      trigger: "@",
-                      matchAll: true,
-                      disableMarkup: false,
-                      style: const TextStyle(color: Palette.primary),
-                      data: _mentionsSearchResults,
-                    ),
-                    Mention(
-                      suggestionBuilder: (data) {
-                        return Container();
-                      },
-                      trigger: "#",
-                      matchAll: true,
-                      disableMarkup: true,
-                      style: const TextStyle(color: Palette.purple),
-                      data: _mentionsSearchResultsHashTags,
-                    ),
-                  ],
-                ),
-              ),
+              _writingArea(),
               // image preview
-              if (_images.isNotEmpty)
-                SizedBox(
-                  height: 100,
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: _images.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      return Stack(
-                        children: [
-                          Container(
-                            margin: const EdgeInsets.only(left: 10, right: 10),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(10),
-                              child: Image.file(
-                                _images[index],
-                                fit: BoxFit.cover,
-                                width: 100,
-                                height: 100,
-                              ),
-                            ),
-                          ),
-                          Positioned(
-                            top: 0,
-                            right: 0,
-                            child: TextButton(
-                              onPressed: (() {
-                                setState(() {
-                                  _images.removeAt(index);
-                                });
-                              }),
-                              child: SvgPicture.asset(
-                                height: 25,
-                                'assets/icons/x.svg',
-                                color: Palette.gray,
-                              ),
-                            ),
-                          ),
-                        ],
-                      );
-                    },
-                  ),
-                ),
+              if (_images.isNotEmpty) _previewImages(),
 
               // bottom row
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      // add image
-                      TextButton(
-                        onPressed: (() {
-                          _addImage();
-                        }),
-                        child: SvgPicture.asset(
-                          height: 25,
-                          'assets/icons/image.svg',
-                          color: Palette.gray,
-                        ),
-                      ),
-                      // add video
-
-                      //TextButton(
-                      //  onPressed: (() {
-                      //    // _addVideo();
-                      //  }),
-                      //  child: SvgPicture.asset(
-                      //    height: 25,
-                      //    'assets/icons/file-video.svg',
-                      //    color: Palette.gray,
-                      //  ),
-                      //),
-
-                      // on bottom
-                    ],
-                  ),
-                  if (_images.isNotEmpty)
-                    Container(
-                      margin: const EdgeInsets.only(left: 10, right: 10),
-                      child: const Text(
-                        "provided by nostr.build",
-                        style:
-                            TextStyle(color: Palette.lightGray, fontSize: 11),
-                      ),
-                    ),
-                ],
-              ),
+              _bottomRow(),
               // to left
 
               const SizedBox(
@@ -610,6 +410,310 @@ class _WritePostState extends State<WritePost> {
             ],
           ),
         ),
+      ],
+    );
+  }
+
+  SizedBox _previewImages() {
+    return SizedBox(
+      height: 100,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        itemCount: _images.length,
+        itemBuilder: (BuildContext context, int index) {
+          return Stack(
+            children: [
+              Container(
+                margin: const EdgeInsets.only(left: 10, right: 10),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
+                  child: Image.file(
+                    _images[index],
+                    fit: BoxFit.cover,
+                    width: 100,
+                    height: 100,
+                  ),
+                ),
+              ),
+              Positioned(
+                top: 0,
+                right: 0,
+                child: TextButton(
+                  onPressed: (() {
+                    setState(() {
+                      _images.removeAt(index);
+                    });
+                  }),
+                  child: SvgPicture.asset(
+                    height: 25,
+                    'assets/icons/x.svg',
+                    color: Palette.gray,
+                  ),
+                ),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  Column _bottomRow() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            // add image
+            TextButton(
+              onPressed: (() {
+                _addImage();
+              }),
+              child: SvgPicture.asset(
+                height: 25,
+                'assets/icons/image.svg',
+                color: Palette.gray,
+              ),
+            ),
+            // add video
+
+            //TextButton(
+            //  onPressed: (() {
+            //    // _addVideo();
+            //  }),
+            //  child: SvgPicture.asset(
+            //    height: 25,
+            //    'assets/icons/file-video.svg',
+            //    color: Palette.gray,
+            //  ),
+            //),
+
+            // on bottom
+          ],
+        ),
+        if (_images.isNotEmpty)
+          Container(
+            margin: const EdgeInsets.only(left: 10, right: 10),
+            child: const Text(
+              "provided by nostr.build",
+              style: TextStyle(color: Palette.lightGray, fontSize: 11),
+            ),
+          ),
+      ],
+    );
+  }
+
+  Container _writingArea() {
+    return Container(
+      //height: 200,
+      padding: const EdgeInsets.only(left: 20, right: 20),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(10),
+        //border: Border.all(color: Palette.primary), //debug
+      ),
+      child: FlutterMentions(
+        key: _textEditingControllerKey,
+        keyboardType: TextInputType.multiline,
+        keyboardAppearance: Brightness.dark,
+        suggestionPosition: SuggestionPosition.Top,
+        focusNode: _focusNode,
+        style: const TextStyle(color: Palette.white, fontSize: 21),
+        decoration: const InputDecoration(
+          border: InputBorder.none,
+          hintText: "What's on your mind?",
+          hintStyle: TextStyle(
+            color: Palette.gray,
+            fontSize: 20,
+          ),
+        ),
+        maxLines: 10,
+        minLines: 5,
+        onMentionAdd: (p0) {
+          // only triggers when user selects a mention from the list
+          log("mention added: $p0");
+        },
+        onMarkupChanged: (p0) {
+          // triggers when something is typed in the text field
+          _extractMentions(p0);
+        },
+        onSearchChanged: (String trigger, search) {
+          if (search.isNotEmpty && trigger == "@") {
+            log("message: $search");
+            _searchMentions(search);
+          }
+          if (search.isNotEmpty && trigger == "#") {
+            _searchHashtags(search);
+          }
+        },
+        suggestionListDecoration: BoxDecoration(
+          color: Palette.extraDarkGray,
+          borderRadius: BorderRadius.circular(20),
+        ),
+        mentions: [
+          Mention(
+            suggestionBuilder: (data) {
+              return Container(
+                padding: const EdgeInsets.all(10.0),
+                child: Row(
+                  children: <Widget>[
+                    ClipOval(
+                      child: SizedBox.fromSize(
+                        size: const Size.fromRadius(30), // Image radius
+                        child: Container(
+                          color: Palette.background,
+                          child: simplePicture(data['picture'], data['id']),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(
+                      width: 20.0,
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Text(
+                          data['name'] ?? "",
+                          style: const TextStyle(
+                            color: Palette.lightGray,
+                            fontSize: 20,
+                          ),
+                        ),
+                        Text(
+                          '${data['nip05'] ?? ""}',
+                          style: const TextStyle(
+                            color: Palette.gray,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ],
+                    )
+                  ],
+                ),
+              );
+            },
+            trigger: "@",
+            matchAll: true,
+            disableMarkup: false,
+            style: const TextStyle(color: Palette.primary),
+            data: _mentionsSearchResults,
+          ),
+          Mention(
+            suggestionBuilder: (data) {
+              return Container();
+            },
+            trigger: "#",
+            matchAll: true,
+            disableMarkup: true,
+            style: const TextStyle(color: Palette.purple),
+            data: _mentionsSearchResultsHashTags,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Row _topBar(BuildContext context, UserMetadata metadata) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        TextButton(
+          onPressed: (() {
+            Navigator.pop(context);
+          }),
+          child: SvgPicture.asset(
+            height: 25,
+            'assets/icons/x.svg',
+            color: Palette.gray,
+          ),
+        ),
+        if (widget.context == null)
+          const Text(
+            "write a post",
+            style: TextStyle(
+              color: Palette.lightGray,
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        if (widget.context != null)
+          Column(
+            children: [
+              // get metadata
+              FutureBuilder<Map>(
+                  future: metadata
+                      .getMetadataByPubkey(widget.context!.replyToNote.pubkey),
+                  builder: (BuildContext context, AsyncSnapshot<Map> snapshot) {
+                    var name = "";
+
+                    if (snapshot.hasData) {
+                      name = snapshot.data?["name"] ?? "";
+                    } else if (snapshot.hasError) {
+                      name = "";
+                    } else {
+                      // loading
+                      name = "...";
+                    }
+                    if (name.isEmpty) {
+                      var pubkey = widget.context!.replyToNote.pubkey;
+                      var pubkeyHr = Helpers().encodeBech32(pubkey, "npub");
+                      var pubkeyHrShort =
+                          "${pubkeyHr.substring(0, 5)}...${pubkeyHr.substring(pubkeyHr.length - 5)}";
+                      name = pubkeyHrShort;
+                    }
+
+                    return SizedBox(
+                      width: MediaQuery.of(context).size.width * 0.6,
+                      child: Container(
+                        margin:
+                            const EdgeInsets.only(left: 10, right: 10, top: 5),
+                        child: Text(
+                          "reply to $name",
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 2,
+                          style: const TextStyle(
+                            color: Palette.lightGray,
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    );
+                  }),
+
+              /// check if replying to multiple people
+              // if ((Helpers()
+              //         .getPubkeysFromTags(
+              //             widget.context?.replyToTweet.tags ?? [])
+              //         .length >
+              //     1))
+              //   Text(
+              //     "and ${Helpers().getPubkeysFromTags(widget.context?.replyToTweet.tags ?? []).length - 1} more",
+              //     style: const TextStyle(
+              //       color: Palette.lightGray,
+              //       fontSize: 16,
+              //       fontWeight: FontWeight.normal,
+              //     ),
+              //   ),
+            ],
+          ),
+        // if submitLoading is true, show spinner
+        !submitLoading
+            ? TextButton(
+                onPressed: (() {
+                  _submitPost();
+                }),
+                child: SvgPicture.asset(
+                  height: 25,
+                  'assets/icons/paper-plane-tilt.svg',
+                  color: Palette.primary,
+                ),
+              )
+            : Lottie.asset(
+                'assets/lottie/spinner.json',
+                height: 40,
+                width: 64,
+                alignment: Alignment.topCenter,
+              )
       ],
     );
   }

@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:camelus/helpers/helpers.dart';
+import 'package:camelus/providers/navigation_bar_provider.dart';
 import 'package:camelus/routes/notification_page.dart';
 import 'package:camelus/routes/search_page.dart';
 import 'package:flutter/material.dart';
@@ -10,16 +11,18 @@ import 'package:camelus/components/write_post.dart';
 import 'package:camelus/config/palette.dart';
 import 'package:camelus/routes/nostr/nostr_drawer.dart';
 import 'package:camelus/routes/nostr/nostr_page/nostr_page.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:matomo_tracker/matomo_tracker.dart';
 
-class HomePage extends StatefulWidget {
-  const HomePage({Key? key}) : super(key: key);
+class HomePage extends ConsumerStatefulWidget {
+  final String pubkey;
+  const HomePage({Key? key, required this.pubkey}) : super(key: key);
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  ConsumerState<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends ConsumerState<HomePage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   int _selectedIndex = 0;
   final PageController _myPage = PageController(initialPage: 0);
@@ -36,19 +39,8 @@ class _HomePageState extends State<HomePage> {
               child: Padding(
                   padding: EdgeInsets.only(
                       bottom: MediaQuery.of(context).viewInsets.bottom),
-                  child: WritePost()),
+                  child: const WritePost()),
             ));
-  }
-
-  void _checkForOnboarding() {
-    // check secure storage for keys
-    const storage = FlutterSecureStorage();
-    storage.read(key: "nostrKeys").then((nostrKeysString) {
-      if (nostrKeysString == null) {
-        // if keys are not found, redirect to onboarding
-        Navigator.popAndPushNamed(context, '/onboarding');
-      }
-    });
   }
 
   void _initMatomo() async {
@@ -76,7 +68,6 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    _checkForOnboarding();
     _initMatomo();
   }
 
@@ -87,9 +78,11 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final navBarProvider = ref.watch(navigationBarProvider);
+
     return Scaffold(
       key: _scaffoldKey,
-      drawer: NostrDrawer(),
+      drawer: NostrDrawer(pubkey: widget.pubkey),
       backgroundColor: Palette.background,
       floatingActionButton: AnimatedOpacity(
         opacity: (_selectedIndex != 0) ? 0.0 : 1.0,
@@ -112,7 +105,7 @@ class _HomePageState extends State<HomePage> {
           controller: _myPage,
           physics: const NeverScrollableScrollPhysics(),
           children: <Widget>[
-            NostrPage(parentScaffoldKey: _scaffoldKey),
+            NostrPage(parentScaffoldKey: _scaffoldKey, pubkey: widget.pubkey),
             const SearchPage(),
             const NotificationPage(),
             const Center(
@@ -129,6 +122,14 @@ class _HomePageState extends State<HomePage> {
         type: BottomNavigationBarType.fixed,
         currentIndex: _selectedIndex,
         onTap: (int index) {
+          // used to notify feeds to scroll up
+          if (index == 0) {
+            navBarProvider.tabHome();
+          }
+          if (index == 1) {
+            navBarProvider.tabSearch();
+          }
+
           setState(() {
             _selectedIndex = index;
             // currentPage = pages[index];
@@ -140,11 +141,45 @@ class _HomePageState extends State<HomePage> {
         },
         items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(
-            icon: SvgPicture.asset(
-              height: 23,
-              'assets/icons/house.svg',
-              color: _selectedIndex == 0 ? Palette.primary : Palette.darkGray,
+            icon: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Stack(
+                  children: <Widget>[
+                    SvgPicture.asset(
+                      height: 23,
+                      'assets/icons/house.svg',
+                      color: _selectedIndex == 0
+                          ? Palette.primary
+                          : Palette.darkGray,
+                    ),
+                    StreamBuilder<int>(
+                        stream: navBarProvider.newNotesCountStream,
+                        initialData: 0,
+                        builder: (context, AsyncSnapshot<int> snapshot) {
+                          if (!snapshot.hasData) return Container();
+                          if (snapshot.data! < 1) return Container();
+                          return Positioned(
+                            right: 0,
+                            bottom: 0,
+                            child: Container(
+                              padding: const EdgeInsets.all(1),
+                              decoration: BoxDecoration(
+                                color: Palette.lightGray,
+                                borderRadius: BorderRadius.circular(50),
+                              ),
+                              constraints: const BoxConstraints(
+                                minWidth: 12,
+                                minHeight: 12,
+                              ),
+                            ),
+                          );
+                        })
+                  ],
+                ),
+              ],
             ),
+            tooltip: _selectedIndex == 0 ? "scroll to top" : "home",
             label: "home",
           ),
           BottomNavigationBarItem(

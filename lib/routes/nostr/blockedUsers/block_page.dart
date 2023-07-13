@@ -1,32 +1,38 @@
 import 'package:camelus/atoms/long_button.dart';
 import 'package:camelus/config/palette.dart';
-import 'package:camelus/services/nostr/nostr_injector.dart';
+import 'package:camelus/providers/metadata_provider.dart';
+import 'package:camelus/providers/nostr_service_provider.dart';
 import 'package:camelus/services/nostr/nostr_service.dart';
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-class BlockPage extends StatefulWidget {
+class BlockPage extends ConsumerStatefulWidget {
   String? userPubkey;
   String? postId;
-  late NostrService _nostrService;
-  BlockPage({Key? key, this.userPubkey, this.postId}) : super(key: key) {
-    NostrServiceInjector injector = NostrServiceInjector();
-    _nostrService = injector.nostrService;
-  }
+
+  BlockPage({Key? key, this.userPubkey, this.postId}) : super(key: key);
 
   @override
-  State<BlockPage> createState() => _BlockPageState();
+  ConsumerState<BlockPage> createState() => _BlockPageState();
 }
 
-class _BlockPageState extends State<BlockPage> {
+class _BlockPageState extends ConsumerState<BlockPage> {
+  late NostrService _nostrService;
   bool isUserBlocked = false;
+
+  void _initNostrService() {
+    _nostrService = ref.read(nostrServiceProvider);
+  }
 
   @override
   void initState() {
     super.initState();
+    _initNostrService();
   }
 
   @override
   Widget build(BuildContext context) {
+    var metadata = ref.watch(metadataProvider);
     return Scaffold(
       appBar: AppBar(
         title: const Text('block/report'),
@@ -50,8 +56,8 @@ class _BlockPageState extends State<BlockPage> {
                               color: Palette.lightGray, fontSize: 20)),
                       const SizedBox(width: 10),
                       FutureBuilder<Map>(
-                        future: widget._nostrService
-                            .getUserMetadata(widget.userPubkey!),
+                        future:
+                            metadata.getMetadataByPubkey(widget.userPubkey!),
                         builder: (context, snapshot) {
                           if (snapshot.hasData) {
                             return Text(
@@ -75,11 +81,10 @@ class _BlockPageState extends State<BlockPage> {
                         name: isUserBlocked ? "unblock" : "block",
                         onPressed: () {
                           if (isUserBlocked) {
-                            widget._nostrService
+                            _nostrService
                                 .removeFromBlocklist(widget.userPubkey!);
                           } else {
-                            widget._nostrService
-                                .addToBlocklist(widget.userPubkey!);
+                            _nostrService.addToBlocklist(widget.userPubkey!);
                           }
                           setState(() {
                             isUserBlocked = !isUserBlocked;

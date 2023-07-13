@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 void main() {
   testWidgets('NostrOnboarding widget test', (WidgetTester tester) async {
     // Build our app and trigger a frame.
-    await tester.pumpWidget(MaterialApp(home: NostrOnboarding()));
+    await tester.pumpWidget(const MaterialApp(home: NostrOnboarding()));
 
     // Check if the "camelus" title appears
     expect(find.text('camelus'), findsOneWidget);
@@ -34,7 +34,7 @@ void main() {
 
   testWidgets('terms not accepted', (WidgetTester tester) async {
     // Build our app and trigger a frame.
-    await tester.pumpWidget(MaterialApp(home: NostrOnboarding()));
+    await tester.pumpWidget(const MaterialApp(home: NostrOnboarding()));
 
     // Find the 'next' button and tap it
     await tester.tap(find.widgetWithText(ElevatedButton, 'next'));

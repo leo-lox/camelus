@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'package:cross_local_storage/cross_local_storage.dart';
 //import 'package:cross_local_storage/cross_json_storage.dart';
 import 'package:json_cache/json_cache.dart';
@@ -77,17 +78,22 @@ class Nip05 {
 
     // split in username and url/domain
     String username = nip05.split("@")[0];
-    String url = nip05.split("@")[1];
-
-    // make get request
-    http.Response response = await client
-        .get(Uri.parse("https://$url/.well-known/nostr.json?name=$username"));
-
-    if (response.statusCode != 200) {
-      return throw Exception("error fetching nostr.json");
+    try {
+      String url = nip05.split("@")[1];
+    } catch (e) {
+      log("invalid nip05: $nip05");
+      return {};
+      throw Exception("invalid nip05 $nip05");
     }
 
-    var json = jsonDecode(response.body);
+    var json;
+    try {
+      json = await rawNip05Request(nip05, client);
+    } catch (e) {
+      log("error fetching nip05: $e");
+      return {};
+    }
+
     Map names = json["names"];
 
     Map relays = json["relays"] ?? {};
@@ -117,6 +123,27 @@ class Nip05 {
       }
 
       return result;
+    }
+  }
+
+  static Future rawNip05Request(String nip05, http.Client client) async {
+    String username = nip05.split("@")[0];
+    String url = nip05.split("@")[1];
+    // make get request
+    try {
+      String myUrl = "https://$url/.well-known/nostr.json?name=$username";
+      http.Response response = await client
+          .get(Uri.parse(myUrl), headers: {"Accept": "application/json"});
+
+      if (response.statusCode != 200) {
+        return throw Exception(
+            "error fetching nip05.json STATUS: ${response.statusCode}}, Link: $myUrl");
+      }
+
+      var json = jsonDecode(response.body);
+      return json;
+    } catch (e) {
+      throw Exception("error fetching nip05.json $e");
     }
   }
 }

@@ -18,10 +18,6 @@ class NostrServiceInjector {
     _injector = injector;
   }
 
-  NostrService get nostrService {
-    return _nostrService ??= NostrService();
-  }
-
   Client get client {
     return _client ??= Client();
   }
