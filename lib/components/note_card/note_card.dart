@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'package:camelus/atoms/my_profile_picture.dart';
 import 'package:camelus/components/bottom_sheet_share.dart';
 import 'package:camelus/components/images_tile_view.dart';
+import 'package:camelus/components/note_card/bottom_action_row.dart';
 import 'package:camelus/components/note_card/bottom_sheet_more.dart';
 import 'package:camelus/components/note_card/note_card_build_split_content.dart';
 import 'package:camelus/components/write_post.dart';
@@ -15,7 +16,6 @@ import 'package:camelus/providers/metadata_provider.dart';
 import 'package:camelus/providers/nostr_service_provider.dart';
 import 'package:camelus/services/nostr/metadata/user_metadata.dart';
 import 'package:camelus/services/nostr/nostr_service.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -156,7 +156,16 @@ class _NoteCardState extends ConsumerState<NoteCard> {
                               ),
                             Padding(
                               padding: const EdgeInsets.only(top: 10.0),
-                              child: _bottomActionRow(context),
+                              child: BottomActionRow(
+                                onComment: () {
+                                  _writeReply(context, widget.note);
+                                },
+                                onLike: () {},
+                                onRetweet: () {},
+                                onShare: () {
+                                  openBottomSheetShare(context, widget.note);
+                                },
+                              ),
                             ),
                             const SizedBox(height: 20),
                             // show text if replies > 0
@@ -260,92 +269,6 @@ class _NoteCardState extends ConsumerState<NoteCard> {
             ),
           )
         ]);
-  }
-
-  Row _bottomActionRow(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        InkWell(
-          onTap: () => {_writeReply(context, widget.note)},
-          child: Container(
-            padding:
-                const EdgeInsets.only(left: 10, right: 10, top: 2, bottom: 2),
-            //color: Palette.primary,
-            child: Row(
-              children: [
-                SvgPicture.asset(
-                  height: 23,
-                  'assets/icons/chat-teardrop-text.svg',
-                  color: Palette.darkGray,
-                ),
-                const SizedBox(width: 5),
-                const Text(
-                  // show number of comments if >0
-                  "",
-
-                  style: TextStyle(color: Palette.gray, fontSize: 16),
-                ),
-              ],
-            ),
-          ),
-        ),
-        GestureDetector(
-          onTap: () => {
-            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-              content: Text('repost implemented yet'),
-              duration: Duration(seconds: 1),
-            )),
-          },
-          child: Row(
-            children: [
-              SvgPicture.asset(
-                'assets/icons/retweet.svg',
-                color: Palette.darkGray,
-              ),
-              const SizedBox(width: 5),
-              Text(
-                "" //widget.tweet.retweetsCount
-                    .toString(),
-                style: const TextStyle(color: Palette.gray, fontSize: 16),
-              ),
-            ],
-          ),
-        ),
-        // like button
-        GestureDetector(
-          onTap: () => {
-            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-              content: Text('Like functionality is not implemented yet'),
-              duration: Duration(seconds: 1),
-            )),
-          },
-          child: Row(
-            children: [
-              SvgPicture.asset(
-                height: 23,
-                'assets/icons/heart.svg',
-                color: Palette.darkGray,
-              ),
-              const SizedBox(width: 5),
-              Text(
-                "" //widget.tweet.likesCount
-                    .toString(),
-                style: const TextStyle(color: Palette.gray, fontSize: 16),
-              ),
-            ],
-          ),
-        ),
-        GestureDetector(
-          onTap: () => {openBottomSheetShare(context, widget.note)},
-          child: SvgPicture.asset(
-            height: 23,
-            'assets/icons/share.svg',
-            color: Palette.darkGray,
-          ),
-        ),
-      ],
-    );
   }
 }
 

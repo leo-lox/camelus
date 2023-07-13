@@ -38,23 +38,11 @@ class NoteCardSplitContent {
   Widget get content => _buildContent();
 
   Widget _buildContent() {
-    return FutureBuilder(
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            return RichText(
-              text: TextSpan(
-                children: _textSpans,
-              ),
-            );
-          } else {
-            return RichText(
-              text: TextSpan(
-                children: _textSpans,
-              ),
-            );
-          }
-        },
-        future: _metadataProvider.getMetadataByPubkey(_note.pubkey));
+    return RichText(
+      text: TextSpan(
+        children: _textSpans,
+      ),
+    );
   }
 
   List<TextSpan> _buildTextSpans(String content) {
