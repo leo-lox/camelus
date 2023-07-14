@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'dart:ui';
 
 import 'package:camelus/atoms/my_profile_picture.dart';
@@ -6,10 +5,10 @@ import 'package:camelus/components/bottom_sheet_share.dart';
 import 'package:camelus/components/images_tile_view.dart';
 import 'package:camelus/components/note_card/bottom_action_row.dart';
 import 'package:camelus/components/note_card/bottom_sheet_more.dart';
+import 'package:camelus/components/note_card/name_row.dart';
 import 'package:camelus/components/note_card/note_card_build_split_content.dart';
 import 'package:camelus/components/write_post.dart';
 import 'package:camelus/config/palette.dart';
-import 'package:camelus/helpers/helpers.dart';
 import 'package:camelus/models/nostr_note.dart';
 import 'package:camelus/models/post_context.dart';
 import 'package:camelus/providers/metadata_provider.dart';
@@ -17,9 +16,7 @@ import 'package:camelus/providers/nostr_service_provider.dart';
 import 'package:camelus/services/nostr/metadata/user_metadata.dart';
 import 'package:camelus/services/nostr/nostr_service.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-
 import 'package:timeago/timeago.dart' as timeago;
 
 class NoteCard extends ConsumerStatefulWidget {
@@ -32,24 +29,6 @@ class NoteCard extends ConsumerStatefulWidget {
 }
 
 class _NoteCardState extends ConsumerState<NoteCard> {
-  String nip05verified = "";
-
-  void _checkNip05(
-      String nip05, String pubkey, NostrService nostrService) async {
-    if (nip05.isEmpty) return;
-    if (nip05verified.isNotEmpty) return;
-    try {
-      var check = await nostrService.checkNip05(nip05, pubkey);
-
-      if (check["valid"] == true) {
-        setState(() {
-          nip05verified = check["nip05"];
-        });
-      }
-      // ignore: empty_catches
-    } catch (e) {}
-  }
-
   _openProfile(String pubkey) {
     Navigator.pushNamed(context, "/nostr/profile", arguments: pubkey);
   }
@@ -136,7 +115,14 @@ class _NoteCardState extends ConsumerState<NoteCard> {
                           mainAxisAlignment: MainAxisAlignment.end,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            _nameRow(myMetadata, myNostrService, context),
+                            NoteCardNameRow(
+                              created_at: widget.note.created_at,
+                              myMetadata: myMetadata,
+                              pubkey: widget.note.pubkey,
+                              openMore: () =>
+                                  openBottomSheetMore(context, widget.note),
+                            ),
+
                             const SizedBox(height: 10),
 
                             // content
@@ -179,90 +165,6 @@ class _NoteCardState extends ConsumerState<NoteCard> {
         )
       ],
     );
-  }
-
-  Row _nameRow(Future<Map<dynamic, dynamic>> myMetadata,
-      NostrService myNostrService, BuildContext context) {
-    return Row(
-        //mainAxisAlignment: MainAxisAlignment.end,
-        //crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          FutureBuilder<Map>(
-              future: myMetadata,
-              builder: (BuildContext context, AsyncSnapshot<Map> snapshot) {
-                var name = "";
-
-                if (snapshot.hasData) {
-                  var npubHr =
-                      Helpers().encodeBech32(widget.note.pubkey, "npub");
-                  var npubHrShort =
-                      "${npubHr.substring(0, 4)}...${npubHr.substring(npubHr.length - 4)}";
-                  name = snapshot.data?["name"] ?? npubHrShort;
-                  _checkNip05(snapshot.data?["nip05"] ?? "", widget.note.pubkey,
-                      myNostrService);
-                } else if (snapshot.hasError) {
-                  name = "error";
-                } else {
-                  // loading
-                  name = "loading";
-                }
-
-                return Row(
-                  children: [
-                    Container(
-                      constraints:
-                          const BoxConstraints(minWidth: 5, maxWidth: 150),
-                      child: RichText(
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        text: TextSpan(
-                          text: name,
-                          style: const TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 17),
-                        ),
-                      ),
-                    ),
-                    if (nip05verified.isNotEmpty)
-                      Container(
-                        margin: const EdgeInsets.only(top: 0, left: 5),
-                        child: const Icon(
-                          Icons.verified,
-                          color: Palette.white,
-                          size: 15,
-                        ),
-                      ),
-                  ],
-                );
-              }),
-          const SizedBox(width: 10),
-          Container(
-            height: 3,
-            width: 3,
-            decoration: const BoxDecoration(
-              color: Palette.gray,
-              shape: BoxShape.circle,
-            ),
-          ),
-          const SizedBox(width: 5),
-          Expanded(
-            child: Text(
-              timeago.format(DateTime.fromMillisecondsSinceEpoch(
-                  widget.note.created_at * 1000)),
-              style: const TextStyle(color: Palette.gray, fontSize: 12),
-            ),
-          ),
-          GestureDetector(
-            onTap: () {
-              openBottomSheetMore(context, widget.note);
-            },
-            child: SvgPicture.asset(
-              'assets/icons/tweetSetting.svg',
-              color: Palette.darkGray,
-            ),
-          )
-        ]);
   }
 }
 
