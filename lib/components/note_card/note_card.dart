@@ -74,6 +74,9 @@ class _NoteCardState extends ConsumerState<NoteCard> {
   @override
   void initState() {
     super.initState();
+    metadata = ref.read(metadataProvider);
+    myMetadata = metadata.getMetadataByPubkey(widget.note.pubkey);
+    _splitContent();
   }
 
   @override
@@ -84,15 +87,6 @@ class _NoteCardState extends ConsumerState<NoteCard> {
       metadata = ref.watch(metadataProvider);
       myMetadata = metadata.getMetadataByPubkey(widget.note.pubkey);
     }
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    metadata = ref.watch(metadataProvider);
-    myMetadata = metadata.getMetadataByPubkey(widget.note.pubkey);
-    _splitContent();
-    log("didChangeDependencies");
   }
 
   @override
