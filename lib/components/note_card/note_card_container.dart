@@ -1,3 +1,4 @@
+import 'dart:developer';
 
 import 'package:camelus/components/note_card/note_card.dart';
 import 'package:camelus/config/palette.dart';
@@ -13,13 +14,21 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 /// its purpose is to hold connected notes (mostly replies) and paint connections between them
 /// it also handles the logic on what to show => button to show more replies, etc
 
-class NoteCardContainer extends ConsumerWidget {
+class NoteCardContainer extends ConsumerStatefulWidget {
   final List<NostrNote> notes;
   final List<NoteCardContainer> otherContainers;
 
   const NoteCardContainer(
       {Key? key, required this.notes, this.otherContainers = const []})
       : super(key: key);
+
+  @override
+  ConsumerState<NoteCardContainer> createState() => _NoteCardContainerState();
+}
+
+class _NoteCardContainerState extends ConsumerState<NoteCardContainer> {
+  List<Widget> myWidgets = [];
+  List<Widget> combinedWidgets = [];
 
   void _onNoteTab(BuildContext context, NostrNote myNote) {
     var refEvents = myNote.getTagEvents;
@@ -47,18 +56,39 @@ class NoteCardContainer extends ConsumerWidget {
   }
 
   @override
-  Widget build(BuildContext context, ref) {
-    final metadata = ref.watch(metadataProvider);
+  void initState() {
+    super.initState();
+    myWidgets = _buildContainerNotes(ref.read(metadataProvider), context);
+    combinedWidgets = [...myWidgets, ...widget.otherContainers];
+  }
 
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
+  @override
+  void didUpdateWidget(NoteCardContainer oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.notes != widget.notes) {
+      setState(() {
+        myWidgets = _buildContainerNotes(ref.read(metadataProvider), context);
+        combinedWidgets = [...myWidgets, ...widget.otherContainers];
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return SizedBox(
       width: double.infinity,
       child: Container(
         color: Palette.background,
-        child: Column(
-          children: [
-            ..._buildContainerNotes(metadata, context),
-            ...otherContainers.map((e) => e).toList()
-          ],
+        child: ListView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: combinedWidgets.length,
+          itemBuilder: (context, index) => combinedWidgets[index],
         ),
       ),
     );
@@ -67,8 +97,8 @@ class NoteCardContainer extends ConsumerWidget {
   List<Widget> _buildContainerNotes(
       UserMetadata metadata, BuildContext context) {
     List<Widget> widgets = [];
-    for (int i = 0; i < notes.length; i++) {
-      var note = notes[i];
+    for (int i = 0; i < widget.notes.length; i++) {
+      var note = widget.notes[i];
       widgets.add(Stack(
         children: [
           // vertical line top
@@ -83,7 +113,7 @@ class NoteCardContainer extends ConsumerWidget {
               ),
             ),
           // vertical line bottom
-          if (i != notes.length - 1)
+          if (i != widget.notes.length - 1)
             Positioned(
               left: 40,
               bottom: 0,
@@ -101,7 +131,7 @@ class NoteCardContainer extends ConsumerWidget {
                 // check if reply
                 if (note.getTagEvents.isNotEmpty)
                   // for myNote.getTagPubkeys
-                  _buildInReplyTo(note, metadata, context, i, notes),
+                  _buildInReplyTo(note, metadata, context, i, widget.notes),
 
                 GestureDetector(
                   onTap: () {
