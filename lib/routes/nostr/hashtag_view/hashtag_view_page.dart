@@ -36,17 +36,7 @@ class HastagViewPage extends StatelessWidget {
         foregroundColor: Palette.white,
         backgroundColor: Palette.background,
       ),
-      //body: HashtagFeedView(hashtag: hashtag),
-      // random color
-      body: ListView.builder(
-        itemCount: 500,
-        itemBuilder: (context, index) {
-          return Container(
-            height: 100,
-            color: Colors.primaries[Random().nextInt(Colors.primaries.length)],
-          );
-        },
-      ),
+      body: HashtagFeedView(hashtag: hashtag),
     );
   }
 }

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 
 import 'package:camelus/config/palette.dart';
@@ -5,7 +6,6 @@ import 'package:camelus/helpers/helpers.dart';
 import 'package:camelus/helpers/nprofile_helper.dart';
 import 'package:camelus/models/nostr_note.dart';
 import 'package:camelus/services/nostr/metadata/user_metadata.dart';
-
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher_string.dart';
@@ -15,6 +15,7 @@ class NoteCardSplitContent {
   final NostrNote _note;
 
   final Function(String) _profileCallback;
+  final Function(String) _hashtagCallback;
 
   final Function _stateCallback;
 
@@ -24,33 +25,54 @@ class NoteCardSplitContent {
 
   List<String> imageLinks = [];
 
+  final StreamController<Widget> _contentStreamController =
+      StreamController<Widget>();
+
   NoteCardSplitContent(
     this._note,
     this._metadataProvider,
     this._profileCallback,
+    this._hashtagCallback,
     this._stateCallback,
   ) {
     imageLinks.addAll(_extractImages(_note));
+    _buildContentStream();
   }
 
-  List<TextSpan> get _textSpans => _buildTextSpans(_note.content);
+  Future<List<TextSpan>> get _textSpans => _buildTextSpans(_note.content);
 
-  Widget get content => _buildContent();
+  Widget get content => _buildUnparsedContent();
+  Stream<Widget> get contentStream => _contentStreamController.stream;
 
-  Widget _buildContent() {
-    return RichText(
-      text: TextSpan(
-        children: _textSpans,
+  Widget _buildUnparsedContent() {
+    return Text(
+      _note.content,
+      style: const TextStyle(
+        color: Palette.lightGray,
+        fontSize: 17,
+        height: 1.3,
       ),
     );
   }
 
-  List<TextSpan> _buildTextSpans(String content) {
-    var urlSpans = _buildUrlSpans(content);
-    var hashtagSpans = _buildHashtagSpans(urlSpans);
-    var nprofileSpans = _buildNprofileSpans(hashtagSpans);
+  _buildContentStream() async {
+    var result = await _textSpans;
 
-    return nprofileSpans;
+    _contentStreamController.add(RichText(
+      text: TextSpan(
+        children: result,
+      ),
+    ));
+  }
+
+  Future<List<TextSpan>> _buildTextSpans(String content) async {
+    var urlSpans = _buildUrlSpans(content);
+    var hashtagLegacyMentionSpans = _buildLegacyMentionHashtagSpans(urlSpans);
+    var nprofileSpans = _buildNprofileSpans(hashtagLegacyMentionSpans);
+
+    var hashtagSpans = _buildHashtagSpans(nprofileSpans, _hashtagCallback);
+
+    return hashtagSpans;
   }
 
   List<String> _extractImages(NostrNote note) {
@@ -126,7 +148,7 @@ class NoteCardSplitContent {
     return spans;
   }
 
-  List<TextSpan> _buildHashtagSpans(List<TextSpan> spans) {
+  List<TextSpan> _buildLegacyMentionHashtagSpans(List<TextSpan> spans) {
     var finalSpans = <TextSpan>[];
 
     for (var span in spans) {
@@ -286,4 +308,65 @@ class NoteCardSplitContent {
 
     return finalSpans;
   }
+}
+
+List<TextSpan> _buildHashtagSpans(
+    List<TextSpan> spans, Function(String) hashtagCallback) {
+  final finalSpans = <TextSpan>[];
+
+  for (final span in spans) {
+    if (!span.text!.contains("#")) {
+      finalSpans.add(span);
+      continue;
+    }
+
+    final pattern = RegExp(r"#\w+");
+    final hashMatches = pattern.allMatches(span.text!);
+
+    var lastMatchEnd = 0;
+
+    for (final match in hashMatches) {
+      if (match.start > lastMatchEnd) {
+        finalSpans.add(TextSpan(
+          text: span.text!.substring(lastMatchEnd, match.start),
+          style: const TextStyle(
+            color: Palette.lightGray,
+            fontSize: 17,
+            height: 1.3,
+          ),
+        ));
+      }
+
+      finalSpans.add(TextSpan(
+        text: match.group(0)!,
+        style: const TextStyle(
+          color: Palette.primary,
+          fontSize: 17,
+          height: 1.3,
+          decoration: TextDecoration.none,
+        ),
+        recognizer: TapGestureRecognizer()
+          ..onTap = () {
+            // log(match.group(0)!);
+            var cleanedHashtag = match.group(0)!.replaceAll("#", "");
+            hashtagCallback(cleanedHashtag);
+          },
+      ));
+
+      lastMatchEnd = match.end;
+    }
+
+    if (lastMatchEnd < span.text!.length) {
+      finalSpans.add(TextSpan(
+        text: span.text!.substring(lastMatchEnd),
+        style: const TextStyle(
+          color: Palette.lightGray,
+          fontSize: 17,
+          height: 1.3,
+        ),
+      ));
+    }
+  }
+
+  return finalSpans;
 }
