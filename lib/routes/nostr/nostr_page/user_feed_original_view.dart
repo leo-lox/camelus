@@ -1,204 +1,46 @@
 import 'dart:async';
 import 'dart:developer';
-
-import 'package:camelus/atoms/spinner_center.dart';
-import 'package:camelus/components/tweet_card.dart';
+import 'package:camelus/atoms/new_posts_available.dart';
+import 'package:camelus/atoms/refresh_indicator_no_need.dart';
+import 'package:camelus/components/note_card/note_card_container.dart';
 import 'package:camelus/config/palette.dart';
-import 'package:camelus/models/tweet.dart';
-import 'package:camelus/physics/position_retained_scroll_physics.dart';
+import 'package:camelus/db/database.dart';
+import 'package:camelus/models/nostr_note.dart';
+import 'package:camelus/providers/database_provider.dart';
+import 'package:camelus/providers/following_provider.dart';
+import 'package:camelus/providers/navigation_bar_provider.dart';
+import 'package:camelus/providers/relay_provider.dart';
 import 'package:camelus/scroll_controller/retainable_scroll_controller.dart';
-import 'package:camelus/services/nostr/nostr_injector.dart';
-import 'package:camelus/services/nostr/nostr_service.dart';
+import 'package:camelus/services/nostr/feeds/user_feed.dart';
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-class UserFeedOriginalView extends StatefulWidget {
-  late NostrService _nostrService;
-  late String pubkey;
+class UserFeedOriginalView extends ConsumerStatefulWidget {
+  final String pubkey;
 
-  UserFeedOriginalView({Key? key, required this.pubkey}) : super(key: key) {
-    NostrServiceInjector injector = NostrServiceInjector();
-    _nostrService = injector.nostrService;
-  }
+  const UserFeedOriginalView({Key? key, required this.pubkey})
+      : super(key: key);
 
   @override
-  State<UserFeedOriginalView> createState() => _UserFeedOriginalViewState();
+  ConsumerState<UserFeedOriginalView> createState() =>
+      _UserFeedOriginalViewState();
 }
 
-class _UserFeedOriginalViewState extends State<UserFeedOriginalView> {
-  // user feed
-  late StreamSubscription userFeedSubscription;
-  bool isUserFeedSubscribed = false;
-  static String userFeedFreshId = "fresh";
-  static String userFeedTimelineFetchId = "timeline";
-
-  bool _isLoading = true;
-
-  bool _newPostsAvailable = false;
-
-  final GlobalKey _listKey = GlobalKey<AnimatedListState>();
-
-  List<Tweet> _displayList = [];
-
+class _UserFeedOriginalViewState extends ConsumerState<UserFeedOriginalView> {
+  late AppDatabase db;
+  final List<StreamSubscription> _subscriptions = [];
   late List<String> _followingPubkeys;
+  late UserFeed _userFeed;
+  final Completer<void> _servicesReady = Completer<void>();
 
-  //late final ScrollController _scrollControllerFeed = ScrollController();
   late final RetainableScrollController _scrollControllerFeed =
       RetainableScrollController();
+  bool _newPostsAvailable = false;
 
-  /// only for initial load
-  void _initUserFeed() async {
-    //wait for connection
-    bool connection = await widget._nostrService.isNostrServiceConnected;
-    if (!connection) {
-      log("no connection to nostr service");
-      return;
-    }
+  final String userFeedFreshId = "fresh";
+  final String userFeedTimelineFetchId = "timeline";
 
-    // check mounted
-    if (!mounted) {
-      log("not mounted");
-      return;
-    }
-
-    _subscribeToUserFeed();
-    setState(() {
-      isUserFeedSubscribed = true;
-    });
-    await Future.delayed(const Duration(seconds: 1));
-    setState(() {
-      _isLoading = false;
-    });
-  }
-
-  Future<void> _subscribeToUserFeed() async {
-    if (isUserFeedSubscribed) return;
-    log("subscribed to user feed called");
-
-    /// map with pubkey as identifier, second list [0] is p, [1] is pubkey, [2] is the relay url
-    var following = await widget._nostrService.getUserContacts(widget.pubkey);
-
-    // extract public keys
-    _followingPubkeys = [];
-    for (var f in following) {
-      _followingPubkeys.add(f[1]);
-    }
-
-    if (_followingPubkeys.isEmpty) {
-      log("!!! no following users found !!!");
-    }
-
-    // add own pubkey
-    _followingPubkeys.add(widget.pubkey);
-
-    int now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
-
-    int latestTweet = now - 86400; // -1 day
-    if (_displayList.isNotEmpty) {
-      latestTweet = _displayList.first.tweetedAt;
-    }
-
-    widget._nostrService.requestUserFeed(
-        users: _followingPubkeys,
-        requestId: userFeedFreshId,
-        limit: 50,
-        since: latestTweet, //since latest tweet
-        includeComments: false);
-
-    setState(() {
-      isUserFeedSubscribed = true;
-    });
-  }
-
-  void _unsubscribeFromUserFeed() {
-    if (!isUserFeedSubscribed) return;
-    log("nostr:page unsubscribed from user feed called");
-
-    widget._nostrService.closeSubscription("ufeed-$userFeedFreshId");
-    if (userFeedTimelineFetchId.isNotEmpty) {
-      widget._nostrService.closeSubscription("ufeed-$userFeedTimelineFetchId");
-    }
-    setState(() {
-      isUserFeedSubscribed = false;
-    });
-  }
-
-  /// listener attached from the NostrService
-  _onUserFeedReceived(List<Tweet> tweets) {
-    // sort by tweetedAt
-    _displayList.sort((a, b) => b.tweetedAt.compareTo(a.tweetedAt));
-
-    // if empty, just add all
-    if (_displayList.isEmpty) {
-      setState(() {
-        _displayList = List.from(tweets);
-      });
-      return;
-    }
-
-    // calculate new tweets
-    List<Tweet> newTweets = [];
-    List<Tweet> findIndexTweets = [];
-    List<Tweet> timelineTweets = [];
-    for (var t in tweets) {
-      // check if tweet is already in the list
-      if (_displayList.contains(t)) {
-        continue;
-      }
-
-      // latest tweet
-      if (!_displayList.contains(t)) {
-        if (t.tweetedAt > _displayList.first.tweetedAt) {
-          newTweets.add(t);
-        }
-      }
-      // timeline tweets that are older than the latest tweet and younger than the oldest tweet
-      if (t.tweetedAt < _displayList.first.tweetedAt &&
-          t.tweetedAt > _displayList.last.tweetedAt) {
-        findIndexTweets.add(t);
-      }
-      // tweets that are older than the oldest tweet
-      if (t.tweetedAt < _displayList.last.tweetedAt) {
-        timelineTweets.add(t);
-      }
-    }
-
-    // insert tweet at correct index
-    for (var t in findIndexTweets) {
-      int index =
-          _displayList.indexWhere((element) => element.tweetedAt < t.tweetedAt);
-      _displayList.insert(index, t);
-    }
-
-    setState(() {
-      //todo: keep scroll position
-      //_displayList = List.from(tweets);
-
-      if (newTweets.isNotEmpty) {
-        _newPostsAvailable = true;
-        _displayList.insertAll(0, newTweets);
-      }
-      if (timelineTweets.isNotEmpty) {
-        _displayList.addAll(timelineTweets);
-      }
-    });
-  }
-
-  /// timeline scroll request more tweets
-  void _userFeedLoadMore() async {
-    log("load more called");
-
-    if (_followingPubkeys.isEmpty) {
-      log("!!! no following users found !!!");
-      return;
-    }
-
-    widget._nostrService.requestUserFeed(
-        users: _followingPubkeys,
-        requestId: userFeedTimelineFetchId,
-        limit: 20,
-        until: _displayList.last.tweetedAt,
-        includeComments: true);
-  }
+  NostrNote? _lastNoteInFeed;
 
   void _setupScrollListener() {
     _scrollControllerFeed.addListener(() {
@@ -206,134 +48,252 @@ class _UserFeedOriginalViewState extends State<UserFeedOriginalView> {
           _scrollControllerFeed.position.maxScrollExtent) {
         log("reached end of scroll");
 
-        _userFeedLoadMore();
+        var latest = _userFeed.feed.last.created_at; //- 86400 * 7; // -1 week
+
+        _userFeedLoadMore(latest);
       }
 
       if (_scrollControllerFeed.position.pixels < 100) {
-        //log("reached top of scroll");
-        if (_newPostsAvailable) {
-          setState(() {
-            _newPostsAvailable = false;
-          });
-        }
+        // disable after sroll
+        // if (_newPostsAvailable) {
+        //   setState(() {
+        //     _newPostsAvailable = false;
+        //   });
+        // }
       }
     });
+  }
+
+  void _setupNewNotesListener() {
+    _subscriptions.add(
+      _userFeed.newNotesStream.listen((event) {
+        log("new notes stream event");
+        setState(() {
+          _newPostsAvailable = true;
+        });
+        // notify navigation bar
+        ref.read(navigationBarProvider).newNotesCount = event.length;
+      }),
+    );
+  }
+
+  void _setupNavBarHomeListener() {
+    var provider = ref.read(navigationBarProvider);
+    _subscriptions.add(provider.onTabHome.listen((event) {
+      _handleHomeBarTab();
+    }));
+  }
+
+  void _handleHomeBarTab() {
+    if (_newPostsAvailable) {
+      _integrateNewNotes();
+    }
+    ref.watch(navigationBarProvider).resetNewNotesCount();
+    // scroll to top
+    _scrollControllerFeed.animateTo(
+      _scrollControllerFeed.position.minScrollExtent,
+      duration: const Duration(milliseconds: 500),
+      curve: Curves.easeOutCubic,
+    );
+  }
+
+  void _integrateNewNotes() {
+    _userFeed.integrateNewNotes();
+    _scrollControllerFeed.animateTo(
+      _scrollControllerFeed.position.minScrollExtent,
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeOut,
+    );
+    setState(() {
+      _newPostsAvailable = false;
+    });
+    ref.watch(navigationBarProvider).resetNewNotesCount();
+  }
+
+  void _initUserFeed() {
+    int now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
+
+    int latestTweet = now - 86400; // -1 day
+
+    _userFeed.requestRelayUserFeed(
+      users: _followingPubkeys,
+      requestId: userFeedFreshId,
+      limit: 15,
+      since: latestTweet,
+    );
+  }
+
+  void _userFeedLoadMore(int? until) async {
+    log("load more called");
+
+    if (_followingPubkeys.isEmpty) {
+      log("!!! no following users found !!!");
+      return;
+    }
+
+    int now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
+    // schould not be needed
+    int defaultUntil = now - 86400 * 1; // -1 day
+
+    _userFeed.requestRelayUserFeed(
+      users: _followingPubkeys,
+      requestId: userFeedTimelineFetchId,
+      limit: 5,
+      until: until ?? defaultUntil,
+    );
+  }
+
+  void _userFeedCheckForNewData(NostrNote currentBuilNote) {
+    var latestSessionNote = _userFeed.oldestNoteInSession;
+    if (latestSessionNote == null) {
+      return;
+    }
+    if (latestSessionNote.id == currentBuilNote.id) {
+      _userFeedLoadMore(currentBuilNote.created_at);
+    }
+  }
+
+  Future<void> _getFollowingPubkeys() async {
+    var followingP = ref.read(followingProvider);
+    await followingP.servicesReady;
+
+    _followingPubkeys = followingP.ownContacts.map((e) => e.value).toList();
+    _followingPubkeys = [..._followingPubkeys, widget.pubkey]; // add own pubkey
+    return;
+  }
+
+  Future<void> _initDb() async {
+    db = await ref.read(databaseProvider.future);
+    return;
+  }
+
+  Future<void> _initSequence() async {
+    await _initDb();
+    await _getFollowingPubkeys();
+
+    var relayCoordinator = ref.watch(relayServiceProvider);
+
+    _userFeed = UserFeed(db, _followingPubkeys, relayCoordinator);
+    await _userFeed.feedRdy;
+
+    _servicesReady.complete();
+
+    // reset home bar new notes count
+    ref.watch(navigationBarProvider).resetNewNotesCount();
+
+    _initUserFeed();
+    _setupScrollListener();
+    _setupNewNotesListener();
+    _setupNavBarHomeListener();
+
+    return;
   }
 
   @override
   void initState() {
     super.initState();
-    _initUserFeed();
-    _setupScrollListener();
-
-    userFeedSubscription =
-        widget._nostrService.userFeedObj.userFeedStream.listen((event) {
-      _onUserFeedReceived(event);
-    });
+    _initSequence();
   }
 
   @override
   void dispose() {
-    // todo:
-    // cancel subscription
-    try {
-      userFeedSubscription.cancel();
-    } catch (e) {}
-
-    _scrollControllerFeed.dispose();
-
+    _userFeed.cleanup();
+    _disposeSubscriptions();
     super.dispose();
+  }
+
+  void _disposeSubscriptions() {
+    for (var s in _subscriptions) {
+      s.cancel();
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_displayList.isEmpty && _isLoading) {
-      return spinnerCenter();
-    }
-    if (_displayList.isEmpty && !_isLoading) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: const [
-            Text(
-              "no tweets yet",
-              style: TextStyle(fontSize: 25, color: Palette.white),
-            ),
-            SizedBox(height: 20),
-            Text(
-              "follow people to see their tweets (global feed)",
-              style: TextStyle(fontSize: 15, color: Palette.white),
-            ),
-          ],
-        ),
-      );
-    }
+    return FutureBuilder(
+      future: _servicesReady.future,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(
+              child: CircularProgressIndicator(
+            color: Palette.white,
+          ));
+        }
+        if (snapshot.hasError) {
+          return const Center(child: Text('Error'));
+        }
 
-    return Stack(
-      children: [
-        RefreshIndicator(
-          color: Palette.primary,
-          backgroundColor: Palette.extraDarkGray,
-          onRefresh: () {
-            // todo fix this hack (should auto update)
-            isUserFeedSubscribed = false;
-            _subscribeToUserFeed();
-            return Future.delayed(const Duration(milliseconds: 150));
-          },
-          child: CustomScrollView(
-            controller: _scrollControllerFeed,
-            physics: const BouncingScrollPhysics(),
-            slivers: [
-              SliverList(
-                //key: _leadingKey,
-                delegate: SliverChildBuilderDelegate(
-                  (BuildContext context, int index) {
-                    return TweetCard(
-                      tweet: _displayList[index],
-                    );
+        if (snapshot.connectionState == ConnectionState.done) {
+          return Stack(
+            children: [
+              RefreshIndicatorNoNeed(
+                onRefresh: () {
+                  return Future.delayed(const Duration(milliseconds: 0));
+                },
+                child: StreamBuilder<List<NostrNote>>(
+                  stream: _userFeed.feedStream,
+                  initialData: _userFeed.feed,
+                  builder: (BuildContext context,
+                      AsyncSnapshot<List<NostrNote>> snapshot) {
+                    if (snapshot.hasData) {
+                      var notes = snapshot.data!;
+
+                      if (notes.isEmpty) {
+                        return const Center(
+                          child: Text("no notes found",
+                              style: TextStyle(
+                                  fontSize: 20, color: Palette.white)),
+                        );
+                      }
+
+                      _lastNoteInFeed = notes.last;
+
+                      return CustomScrollView(
+                        physics: const BouncingScrollPhysics(),
+                        controller: _scrollControllerFeed,
+                        slivers: [
+                          SliverList(
+                            delegate: SliverChildBuilderDelegate(
+                              (context, index) {
+                                var note = notes[index];
+                                _userFeedCheckForNewData(note);
+                                return NoteCardContainer(notes: [note]);
+                              },
+                              childCount: notes.length,
+                            ),
+                          ),
+                        ],
+                      );
+                    }
+                    if (snapshot.hasError) {
+                      return Center(
+                          //button
+                          child: ElevatedButton(
+                        onPressed: () {},
+                        child: Text(snapshot.error.toString(),
+                            style: const TextStyle(
+                                fontSize: 20, color: Colors.white)),
+                      ));
+                    }
+                    return const Text("waiting for stream trigger ",
+                        style: TextStyle(fontSize: 20));
                   },
-                  childCount: _displayList.length,
                 ),
               ),
+              if (_newPostsAvailable)
+                Container(
+                  margin: const EdgeInsets.only(top: 20),
+                  child: newPostsAvailable(
+                      name: "new posts",
+                      onPressed: () {
+                        _integrateNewNotes();
+                      }),
+                ),
             ],
-          ),
-        ),
-
-        // if it is top
-        if (_newPostsAvailable)
-          Positioned(
-              top: 20,
-              width: MediaQuery.of(context).size.width,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  Container(
-                      width: 120,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(20),
-                        color: Palette.primary,
-                      ),
-                      child: TextButton(
-                        onPressed: () {
-                          setState(() {
-                            _newPostsAvailable = false;
-                          });
-                          // animate to top
-                          _scrollControllerFeed.animateTo(
-                              _scrollControllerFeed.position.minScrollExtent -
-                                  50,
-                              duration: const Duration(milliseconds: 300),
-                              curve: Curves.easeOut);
-                        },
-                        child: const Text(
-                          "new posts",
-                          style: TextStyle(color: Palette.white),
-                        ),
-                      ))
-                ],
-              )),
-      ],
+          );
+        }
+        return const Center(child: Text('Error'));
+      },
     );
   }
 }

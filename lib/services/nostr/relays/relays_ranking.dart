@@ -1,8 +1,6 @@
 import 'package:camelus/services/nostr/relays/relay_tracker.dart';
 import 'package:camelus/services/nostr/relays/relays_injector.dart';
-import 'package:flutter/foundation.dart';
 import 'dart:math';
-import 'dart:developer' as developer;
 
 class RelaysRanking {
   late RelayTracker relayTracker;
@@ -60,7 +58,7 @@ class RelaysRanking {
     });
 
     final rankedRelaysList = rankedRelays() as List<Map<String, dynamic>>;
-    final numRelaysPerPerson = 2; //todo: move this to settings
+    const numRelaysPerPerson = 2; //todo: move this to settings
 
     // If we can't get enough of them, extend with some of our relays
     // at whatever the lowest score of their last one was

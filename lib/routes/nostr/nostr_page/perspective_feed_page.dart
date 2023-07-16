@@ -1,42 +1,42 @@
 import 'package:camelus/config/palette.dart';
+import 'package:camelus/providers/metadata_provider.dart';
 import 'package:camelus/routes/nostr/nostr_page/user_feed_original_view.dart';
-import 'package:camelus/services/nostr/nostr_injector.dart';
-import 'package:camelus/services/nostr/nostr_service.dart';
+import 'package:camelus/services/nostr/metadata/user_metadata.dart';
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:matomo_tracker/matomo_tracker.dart';
 
-class PerspectiveFeedPage extends StatefulWidget {
+class PerspectiveFeedPage extends ConsumerStatefulWidget {
   late String pubkey;
-  late NostrService _nostrService;
-  PerspectiveFeedPage({Key? key, required this.pubkey}) : super(key: key) {
-    NostrServiceInjector injector = NostrServiceInjector();
-    _nostrService = injector.nostrService;
-  }
+
+  PerspectiveFeedPage({Key? key, required this.pubkey}) : super(key: key);
 
   @override
-  State<PerspectiveFeedPage> createState() => _PerspectiveFeedPageState();
+  ConsumerState<PerspectiveFeedPage> createState() =>
+      _PerspectiveFeedPageState();
 }
 
-class _PerspectiveFeedPageState extends State<PerspectiveFeedPage>
+class _PerspectiveFeedPageState extends ConsumerState<PerspectiveFeedPage>
     with TraceableClientMixin {
+  late UserMetadata _metadata;
   @override
   String get traceName => 'Created PerspectiveFeedPage'; // optional
 
   @override
   String get traceTitle => "perspective_feed_page";
 
+  void _initNostrService() {
+    _metadata = ref.read(metadataProvider);
+  }
+
   @override
   void initState() {
     super.initState();
-    //clear user feed cache
-    widget._nostrService.clearCache();
-    widget._nostrService.userFeedObj.feed = [];
+    _initNostrService();
   }
 
   @override
   void dispose() {
-    widget._nostrService.clearCache();
-    widget._nostrService.userFeedObj.feed = [];
     super.dispose();
   }
 
@@ -45,7 +45,7 @@ class _PerspectiveFeedPageState extends State<PerspectiveFeedPage>
     return Scaffold(
       appBar: AppBar(
         title: FutureBuilder(
-          future: widget._nostrService.getUserMetadata(widget.pubkey),
+          future: _metadata.getMetadataByPubkey(widget.pubkey),
           builder: (BuildContext context, AsyncSnapshot snapshot) {
             if (snapshot.hasData) {
               return Text("perspective of ${snapshot.data['name']}");

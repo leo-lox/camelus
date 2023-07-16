@@ -1,10 +1,19 @@
-import 'dart:developer';
-
 import 'package:camelus/helpers/nprofile_helper.dart';
-import 'package:test/test.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:mockito/mockito.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+//import 'package:test/test.dart';
+
+class MockSharedPreferences extends Mock implements SharedPreferences {}
 
 void main() {
+  SharedPreferences.setMockInitialValues({});
+
+  //WidgetsFlutterBinding.ensureInitialized();
+  TestWidgetsFlutterBinding.ensureInitialized();
   group('main', () {
+    final mockSharedPreferences = MockSharedPreferences();
+    when(mockSharedPreferences.getString('')).thenReturn('mock');
     test('decode', () {
       var nprofileHelper = NprofileHelper();
 

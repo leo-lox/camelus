@@ -1,35 +1,39 @@
 import 'dart:convert';
-import 'dart:developer';
 
+import 'package:camelus/providers/key_pair_provider.dart';
+import 'package:camelus/providers/nostr_service_provider.dart';
+import 'package:camelus/routes/home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:camelus/config/palette.dart';
 import 'package:camelus/helpers/bip340.dart';
 import 'package:flutter/services.dart';
 import 'package:camelus/helpers/helpers.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:camelus/services/nostr/nostr_injector.dart';
 import 'package:camelus/services/nostr/nostr_service.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class NostrOnboarding extends StatefulWidget {
-  late NostrService _nostrService;
-  NostrOnboarding({Key? key}) : super(key: key) {
-    NostrServiceInjector injector = NostrServiceInjector();
-    _nostrService = injector.nostrService;
-  }
+class NostrOnboarding extends ConsumerStatefulWidget {
+  const NostrOnboarding({Key? key}) : super(key: key);
 
   @override
-  State<NostrOnboarding> createState() => _NostrOnboardingState();
+  ConsumerState<NostrOnboarding> createState() => _NostrOnboardingState();
 }
 
-class _NostrOnboardingState extends State<NostrOnboarding> {
+class _NostrOnboardingState extends ConsumerState<NostrOnboarding> {
+  late NostrService _nostrService;
   var myKeys = Bip340().generatePrivateKey();
 
   bool _termsAndConditions = false;
 
+  void _initNostrService() {
+    _nostrService = ref.read(nostrServiceProvider);
+  }
+
   @override
   void initState() {
     super.initState();
+    _initNostrService();
   }
 
   @override
@@ -76,7 +80,7 @@ class _NostrOnboardingState extends State<NostrOnboarding> {
     );
   }
 
-  _onSubmit() {
+  _onSubmit() async {
     if (!_termsAndConditions) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -90,10 +94,19 @@ class _NostrOnboardingState extends State<NostrOnboarding> {
     // store in secure storage
     const storage = FlutterSecureStorage();
     storage.write(key: "nostrKeys", value: json.encode(myKeys.toJson()));
+    // save in provider
 
-    widget._nostrService.finishedOnboarding();
+    var provider = await ref.watch(keyPairProvider.future);
+    provider.setKeyPair(myKeys);
 
-    Navigator.popAndPushNamed(context, '/');
+    setState(() {});
+
+    // ignore: use_build_context_synchronously
+    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
+      return HomePage(pubkey: myKeys.publicKey);
+    }));
+
+    //Navigator.popAndPushNamed(context, '/');
   }
 
   @override

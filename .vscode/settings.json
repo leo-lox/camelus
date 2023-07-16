@@ -12,5 +12,6 @@
         "prefs",
         "pubkey",
         "Pubkeys"
-    ]
+    ],
+    "java.configuration.updateBuildConfiguration": "interactive"
 }

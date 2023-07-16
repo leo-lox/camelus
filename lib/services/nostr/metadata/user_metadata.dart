@@ -1,10 +1,11 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:camelus/db/database.dart';
 import 'package:camelus/helpers/helpers.dart';
-import 'package:camelus/models/socket_control.dart';
-import 'package:camelus/services/nostr/relays/relays.dart';
-import 'package:camelus/services/nostr/relays/relays_injector.dart';
+import 'package:camelus/models/nostr_note.dart';
+import 'package:camelus/models/nostr_request_query.dart';
+import 'package:camelus/services/nostr/relays/relay_coordinator.dart';
 import 'package:cross_local_storage/cross_local_storage.dart';
 import 'package:json_cache/json_cache.dart';
 
@@ -20,7 +21,9 @@ class UserMetadata {
   Map<String, dynamic> usersMetadata = {};
   var metadataLastFetch = <String, int>{};
 
-  late Relays _relays;
+  final RelayCoordinator relays;
+  final Future<AppDatabase> dbFuture;
+  late AppDatabase _db;
 
   late JsonCache _jsonCache;
 
@@ -29,9 +32,12 @@ class UserMetadata {
   var _metadataWaitingPoolTimerRunning = false;
   Map<String, Completer<Map>> _metadataFutureHolder = {};
 
-  UserMetadata() {
-    RelaysInjector injector = RelaysInjector();
-    _relays = injector.relays;
+  final Completer _serviceRdy = Completer();
+
+  UserMetadata({
+    required this.relays,
+    required this.dbFuture,
+  }) {
     _init();
   }
 
@@ -39,6 +45,16 @@ class UserMetadata {
     LocalStorageInterface prefs = await LocalStorage.getInstance();
     _jsonCache = JsonCacheCrossLocalStorage(prefs);
     _restoreCache().then((_) => {_removeOldData()});
+    _db = await dbFuture;
+    _initDb();
+    _serviceRdy.complete();
+  }
+
+  _initDb() {
+    _db.noteDao.findAllNotesByKindStream(0).listen((event) {
+      List<NostrNote> notes = event.map((e) => e.toNostrNote()).toList();
+      _receiveNostrEvents(notes);
+    });
   }
 
   Future<void> _restoreCache() async {
@@ -49,19 +65,12 @@ class UserMetadata {
       metadataLastFetch = Map<String, int>.from(cache);
     }
 
-    // restore metadata
-    // load cached users metadata
-    final Map<String, dynamic>? cachedUsersMetadata =
-        await _jsonCache.value('usersMetadata');
-    if (cachedUsersMetadata != null) {
-      usersMetadata = cachedUsersMetadata;
-    }
     return;
   }
 
   _removeOldData() {
-    // 4 hours //todo move magic number to settings
-    int timeBarrier = 60 * 60 * 4;
+    // 12 hours //todo move magic number to settings
+    int timeBarrier = 60 * 60 * 12;
     var now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
     var oldData = <String, int>{};
     for (var key in metadataLastFetch.keys) {
@@ -71,13 +80,12 @@ class UserMetadata {
     }
     for (var key in oldData.keys) {
       metadataLastFetch.remove(key);
-      usersMetadata.remove(key);
     }
     _jsonCache.refresh('metadataLastFetch', metadataLastFetch);
-    _jsonCache.refresh('usersMetadata', usersMetadata);
   }
 
   Future<Map> getMetadataByPubkey(String pubkey, {bool force = false}) async {
+    await _serviceRdy.future;
     var now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
     if (pubkey.isEmpty) {
       return Future(() => {});
@@ -155,51 +163,45 @@ class UserMetadata {
   /// prepare metadata request
   Future<Map> _prepareMetadataRequest() async {
     // gets notified when first or last (on no data) request is received
-    Completer completer = Completer();
 
     var requestId = "metadata-${Helpers().getRandomString(4)}";
 
     List<String> poolCopy = [..._metadataWaitingPool];
 
-    _requestMetadata(poolCopy, requestId, completer);
+    await _requestMetadata(poolCopy, requestId);
 
     // free pool
     _metadataWaitingPool = [];
 
-    return completer.future.then((value) async {
-      // wait 300ms for the contacts to be received
-      await Future.delayed(const Duration(milliseconds: 300));
-      return usersMetadata;
-    });
+    // wait 300ms for the contacts to be received
+    await Future.delayed(const Duration(milliseconds: 300));
+    return usersMetadata;
   }
 
-  void _requestMetadata(List<String> users, requestId, Completer? completer) {
-    var data = [
-      "REQ",
-      requestId,
-      {
-        "authors": users,
-        "kinds": [0],
-        "limit": users.length
-      },
-    ];
-
-    _relays.requestEvents(data, completer: completer);
+  Future _requestMetadata(List<String> users, requestId) async {
+    var body = NostrRequestQueryBody(
+      authors: users,
+      kinds: [0, 10002], // + nip 65
+      limit: users.length,
+    );
+    var request = NostrRequestQuery(subscriptionId: requestId, body: body);
+    await relays.request(request: request, timeout: const Duration(seconds: 2));
+    relays.closeSubscription(requestId);
+    return;
   }
 
-  receiveNostrEvent(event, SocketControl socketControl) {
-    var eventMap = event[2];
+  _receiveNostrEvents(List<NostrNote> notes) {
+    for (var note in notes) {
+      String pubkey = note.pubkey;
+      try {
+        usersMetadata[pubkey] = jsonDecode(note.content);
+      } catch (e) {
+        return;
+      }
 
-    var pubkey = eventMap["pubkey"];
-
-    usersMetadata[pubkey] = jsonDecode(eventMap["content"]);
-
-    // add access time
-    int now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
-
-    usersMetadata[pubkey]["accessTime"] = now;
-
-    //update cache
-    _jsonCache.refresh('usersMetadata', usersMetadata);
+      // add access time
+      int now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
+      usersMetadata[pubkey]["accessTime"] = now;
+    }
   }
 }

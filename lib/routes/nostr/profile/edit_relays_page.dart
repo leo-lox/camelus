@@ -1,121 +1,23 @@
 import 'dart:convert';
-import 'dart:developer';
+
+import 'package:camelus/components/edit_relays_view.dart';
+import 'package:camelus/models/nostr_tag.dart';
+import 'package:camelus/providers/following_provider.dart';
+import 'package:camelus/services/nostr/relays/relay_address_parser.dart';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:camelus/config/palette.dart';
-import 'package:camelus/services/nostr/nostr_injector.dart';
-import 'package:camelus/services/nostr/nostr_service.dart';
 
-class EditRelaysPage extends StatefulWidget {
-  late NostrService _nostrService;
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-  EditRelaysPage({Key? key}) : super(key: key) {
-    NostrServiceInjector injector = NostrServiceInjector();
-    _nostrService = injector.nostrService;
-  }
+class EditRelaysPage extends ConsumerStatefulWidget {
+  const EditRelaysPage({Key? key}) : super(key: key);
+
   @override
-  State<EditRelaysPage> createState() => _EditRelaysPageState();
+  ConsumerState<EditRelaysPage> createState() => _EditRelaysPageState();
 }
 
-class _EditRelaysPageState extends State<EditRelaysPage> {
-  // copy of relays from nostr service
-  late var myRelays = widget._nostrService.relays.manualRelays;
-
-  final TextEditingController _relayNameController = TextEditingController();
-
-  bool reconnecting = false;
-  bool touched = false;
-
-  void _addRelay() {
-    setState(() {
-      touched = true;
-    });
-    String relayName = _relayNameController.text;
-    if (relayName.isEmpty) {
-      return;
-    }
-
-    // check if relay begins with wss://
-    if (!relayName.startsWith("wss://")) {
-      // add wss:// to relay name
-      relayName = "wss://$relayName";
-      log("added");
-    }
-
-    // check if relay already exists
-    if (myRelays.containsKey(relayName)) {
-      // show dialog
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text("Relay already exists"),
-            content: const Text("A relay with this name already exists."),
-            actions: [
-              TextButton(
-                child: const Text("OK"),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          );
-        },
-      );
-      return;
-    }
-
-    setState(() {
-      myRelays[relayName] =
-          // ignore: unnecessary_cast
-          {"read": true, "write": true} as Map<String, bool>;
-    });
-
-    _relayNameController.clear();
-  }
-
-  // get called when going back
-  _closeView() async {
-    if (touched == false) {
-      Navigator.of(context).pop();
-      return;
-    }
-    setState(() {
-      reconnecting = true;
-    });
-    await _saveRelays();
-    setState(() {
-      reconnecting = false;
-    });
-
-    // ignore: use_build_context_synchronously
-    Navigator.of(context).pop();
-  }
-
-  _saveRelays() async {
-    widget._nostrService.relays.setManualRelays(myRelays);
-    // publish relays to nostr service
-
-    String relaysJson = jsonEncode(myRelays);
-    log(relaysJson);
-    var following =
-        widget._nostrService.following[widget._nostrService.myKeys.publicKey];
-
-    // add to cache
-
-    // todo write event
-    await widget._nostrService.writeEvent(relaysJson, 3, following as List);
-
-    await _reconnect();
-  }
-
-  Future<void> _reconnect() async {
-    await widget._nostrService.relays.closeRelays();
-    await widget._nostrService.relays.connectToRelays();
-    return;
-  }
-
+class _EditRelaysPageState extends ConsumerState<EditRelaysPage> {
   @override
   void initState() {
     super.initState();
@@ -123,189 +25,84 @@ class _EditRelaysPageState extends State<EditRelaysPage> {
 
   @override
   void dispose() {
-    _relayNameController.dispose();
     super.dispose();
+  }
+
+  Future onSave(Map<String, Map<String, bool>> changedRelays) async {
+    Map<String, Map<String, bool>> parsedMap = {};
+    // parse all relays
+    for (var relay in changedRelays.entries) {
+      var parsedKey = RelayAddressParser.parseAddress(relay.key);
+      parsedMap[parsedKey] = relay.value;
+    }
+
+    var contacts = _saveInContacts(parsedMap);
+    var nip65 = _saveNip65(parsedMap);
+
+    await Future.wait([contacts, nip65]);
+
+    return;
+  }
+
+  Future _saveInContacts(Map<String, Map<String, bool>> changedRelays) async {
+    var followingService = ref.read(followingProvider);
+
+    String myUpdatedContent = jsonEncode(changedRelays);
+
+    await followingService.updateContent(myUpdatedContent);
+  }
+
+  Future _saveNip65(Map<String, Map<String, bool>> changedRelays) async {
+    //["r", "wss://alicerelay.example.com"],
+    //["r", "wss://brando-relay.com"],
+    //["r", "wss://expensive-relay.example2.com", "write"],
+    //["r", "wss://nostr-relay.example.com", "read"],
+
+    var newNip65Tags = List<NostrTag>.empty(growable: true);
+
+    for (var relay in changedRelays.entries) {
+      if (relay.value['read'] == true && relay.value['write'] == true) {
+        newNip65Tags.add(NostrTag(
+          type: 'r',
+          value: relay.key,
+        ));
+      } else if (relay.value['read'] == true) {
+        newNip65Tags.add(NostrTag(
+          type: 'r',
+          value: relay.key,
+          recommended_relay: 'read',
+        ));
+      } else if (relay.value['write'] == true) {
+        newNip65Tags.add(NostrTag(
+          type: 'w',
+          value: relay.key,
+          recommended_relay: 'write',
+        ));
+      }
+    }
+    var followingService = ref.read(followingProvider);
+    await followingService.publishNip65(newNip65Tags);
+
+    return;
   }
 
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async {
-        await _closeView();
-        return false;
+        return true;
       },
       child: Scaffold(
         backgroundColor: Palette.background,
         appBar: AppBar(
           title: const Text('Edit Relays'),
           backgroundColor: Palette.background,
+          foregroundColor: Palette.lightGray,
         ),
         // show loading indicator when reconnecting
-        body: reconnecting
-            ? Center(
-                child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: const [
-                  CircularProgressIndicator(),
-                  SizedBox(height: 20),
-                  Text(
-                    "reconnecting to relays...",
-                    style: TextStyle(color: Colors.white),
-                  ),
-                ],
-              ))
-            : ListView(
-                children: [
-                  for (var relay in myRelays.entries)
-                    Container(
-                      margin: const EdgeInsets.only(bottom: 10),
-                      //round corners
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        color: Palette.extraDarkGray,
-                      ),
-                      height: 100,
-                      width: double.infinity,
-
-                      child: Row(
-                        children: [
-                          Text(
-                            relay.key,
-                            style: const TextStyle(color: Colors.white),
-                          ),
-                          const Spacer(),
-                          // switch button read
-                          Column(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              Switch(
-                                thumbColor:
-                                    MaterialStateProperty.all(Palette.primary),
-                                value: relay.value["read"],
-                                onChanged: (value) {
-                                  setState(() {
-                                    touched = true;
-                                    relay.value["read"] = !relay.value["read"];
-                                  });
-                                },
-                                activeTrackColor: Palette.darkGray,
-                                activeColor: Palette.primary,
-                              ),
-                              const Text(
-                                'read',
-                                style: TextStyle(color: Colors.white),
-                              ),
-                            ],
-                          ),
-                          // switch button write
-                          Column(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              Switch(
-                                thumbColor:
-                                    MaterialStateProperty.all(Palette.primary),
-                                value: relay.value["write"],
-                                onChanged: (value) {
-                                  setState(() {
-                                    touched = true;
-                                    relay.value["write"] =
-                                        !relay.value["write"];
-                                  });
-                                },
-                                activeTrackColor: Palette.darkGray,
-                                activeColor: Palette.primary,
-                              ),
-                              const Text(
-                                'write',
-                                style: TextStyle(color: Colors.white),
-                              ),
-                            ],
-                          ),
-                          // delete button
-                          Column(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              IconButton(
-                                icon: const Icon(
-                                  Icons.delete,
-                                  color: Palette.lightGray,
-                                ),
-                                onPressed: () {
-                                  // confirm dialog
-                                  showDialog(
-                                    context: context,
-                                    builder: (BuildContext context) {
-                                      return AlertDialog(
-                                        title: const Text("Delete relay"),
-                                        content: const Text(
-                                            "Are you sure you want to delete this relay?"),
-                                        actions: [
-                                          TextButton(
-                                            child: const Text("Cancel"),
-                                            onPressed: () {
-                                              Navigator.of(context).pop();
-                                            },
-                                          ),
-                                          TextButton(
-                                            child: const Text("Delete"),
-                                            onPressed: () {
-                                              setState(() {
-                                                touched = true;
-                                                myRelays.remove(relay.key);
-                                              });
-                                              Navigator.of(context).pop();
-                                            },
-                                          ),
-                                        ],
-                                      );
-                                    },
-                                  );
-                                },
-                              ),
-                              const Text(
-                                'delete',
-                                style: TextStyle(color: Colors.white),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                  const SizedBox(height: 20),
-                  TextField(
-                    controller: _relayNameController,
-                    decoration: const InputDecoration(
-                      labelText: 'Relay name',
-                      labelStyle: TextStyle(color: Palette.lightGray),
-                      enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Palette.lightGray),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Palette.primary),
-                      ),
-                    ),
-                    style: const TextStyle(color: Colors.white),
-                  ),
-                  // add relay button
-                  Container(
-                    margin: const EdgeInsets.only(top: 10),
-                    child: ElevatedButton(
-                      onPressed: () {
-                        _addRelay();
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Palette.primary,
-                        foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
-                      child: const Text('Add relay'),
-                    ),
-                  ),
-                ],
-              ),
+        body: EditRelaysView(
+          onSave: onSave,
+        ),
       ),
     );
   }

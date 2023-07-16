@@ -11,7 +11,6 @@ import 'package:camelus/services/nostr/relays/relays_picker.dart';
 import 'package:cross_local_storage/cross_local_storage.dart';
 
 import 'package:json_cache/json_cache.dart';
-import 'dart:convert';
 
 class Relays {
   final Map<String, Map<String, bool>> initRelays = {
@@ -84,7 +83,7 @@ class Relays {
   }
 
   Future<void> start(List<String> pubkeys) async {
-    log("start relays with pubkeys $pubkeys");
+    return;
     //clean up
     relayAssignments = [];
 
@@ -135,7 +134,6 @@ class Relays {
 
   Future<void> connectToRelays({bool useDefault = false}) async {
     var usedRelays = useDefault ? initRelays : relays;
-    log("connect to relays $usedRelays");
 
     for (var relay in usedRelays.entries) {
       Future<WebSocket>? socket;
@@ -160,10 +158,10 @@ class Relays {
                       "event": eventJson,
                       "socketControl": socketControl,
                     });
-                    relayTracker.analyzeNostrEvent(eventJson, socketControl);
+                    //relayTracker.analyzeNostrEvent(eventJson, socketControl);
                   }, onDone: () {
                     // if pick and connect don't try to reconnect
-                    log("onDone: $id");
+
                     try {
                       // on disconnect
                       connectedRelaysRead[id]!.socketIsRdy = false;
@@ -182,7 +180,7 @@ class Relays {
                 })
             .catchError((e) {
           failingRelays[relay.key] = {...relay.value, "error": e.toString()};
-          return Future(() => {log("error connecting to relay $e")});
+          return Future(() => {log("OLDerror connecting to relay $e")});
         });
       }
 
@@ -211,13 +209,10 @@ class Relays {
           failingRelays[relay.key] = {...relay.value, "error": e.toString()};
         });
       }
-
-      log("connected to ${relay.key}");
     }
     // wait check if relays promise is resolved //todo currently hotfix
     await Future.delayed(const Duration(seconds: 2));
 
-    log("connected relays: ${connectedRelaysRead.length} ${connectedRelaysWrite.length} => all connected");
     try {
       isNostrServiceConnectedCompleter.complete(true);
     } catch (e) {
@@ -234,7 +229,7 @@ class Relays {
     // wait
 
     await Future.delayed(Duration(seconds: waitTime));
-    log("reconnect to relay read ${socketControl.connectionUrl}, attempt: ${socketControl.socketFailingAttempts}");
+
     // try to reconnect
     WebSocket? socket;
     try {
@@ -328,7 +323,6 @@ class Relays {
       // remove from array
       connectedRelaysWrite.remove(relay);
     }
-    log("connected relays: ${connectedRelaysRead.length} => all closed");
 
     //manualRelays = {};
 
@@ -378,10 +372,8 @@ class Relays {
         break;
       }
     }
-    for (var relay in foundRelays) {
-      log("relay: ${relay.relayUrl}, pubkey: ${relay.pubkeys}");
-    }
-    log("found relays: $foundRelays");
+    for (var relay in foundRelays) {}
+
     return foundRelays;
   }
 
@@ -390,6 +382,7 @@ class Relays {
       {dynamic additionalData,
       StreamController? streamController,
       Completer? completer}) {
+    return;
     Map<String, dynamic> splitRequest = _splitRequestByRelays(request);
 
     String reqId = request[1];

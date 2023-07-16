@@ -7,12 +7,36 @@ final Map<String, ThemeData> themeMap = {
 
 final ThemeData darkTheme = ThemeData(
   primaryColor: Colors.white70,
-  backgroundColor: Colors.black,
+  colorScheme: const ColorScheme(
+    background: Colors.black,
+    brightness: Brightness.dark,
+    error: Colors.red,
+    onBackground: Colors.black,
+    onError: Colors.orange,
+    onPrimary: Colors.blue,
+    onSecondary: Colors.blueAccent,
+    onSurface: Colors.teal,
+    primary: Colors.blue,
+    secondary: Colors.blueAccent,
+    surface: Colors.teal,
+  ),
 );
 
 final ThemeData lightTheme = ThemeData(
   primaryColor: Colors.black,
-  backgroundColor: Colors.white,
+  colorScheme: const ColorScheme(
+    background: Colors.white,
+    brightness: Brightness.light,
+    error: Colors.red,
+    onBackground: Colors.white,
+    onError: Colors.orange,
+    onPrimary: Colors.blue,
+    onSecondary: Colors.blueAccent,
+    onSurface: Colors.teal,
+    primary: Colors.blue,
+    secondary: Colors.blueAccent,
+    surface: Colors.teal,
+  ),
 );
 
 const TextStyle smallTextStyle =

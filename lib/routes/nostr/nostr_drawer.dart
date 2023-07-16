@@ -1,27 +1,27 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:camelus/helpers/nprofile_helper.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:camelus/models/nostr_tag.dart';
+import 'package:camelus/providers/following_provider.dart';
+import 'package:camelus/providers/metadata_provider.dart';
+import 'package:camelus/services/nostr/metadata/following_pubkeys.dart';
+import 'package:camelus/services/nostr/metadata/user_metadata.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/painting.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:camelus/atoms/my_profile_picture.dart';
 import 'package:camelus/config/palette.dart';
-import 'package:camelus/services/nostr/nostr_injector.dart';
-import 'package:camelus/services/nostr/nostr_service.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
 
-class NostrDrawer extends StatelessWidget {
-  late NostrService _nostrService;
+class NostrDrawer extends ConsumerWidget {
+  final String pubkey;
 
-  NostrDrawer({Key? key}) : super(key: key) {
-    NostrServiceInjector injector = NostrServiceInjector();
-    _nostrService = injector.nostrService;
-  }
+  //late NostrService _nostrService;
+
+  const NostrDrawer({Key? key, required this.pubkey}) : super(key: key);
 
   void navigateToProfile(BuildContext context) {
-    Navigator.pushNamed(context, "/nostr/profile",
-        arguments: _nostrService.myKeys.publicKey);
+    Navigator.pushNamed(context, "/nostr/profile", arguments: pubkey);
   }
 
   void _copyToClipboard(BuildContext context, String text) {
@@ -32,9 +32,10 @@ class NostrDrawer extends StatelessWidget {
   }
 
   void openQrShareDialog(BuildContext context) async {
-    String nprofile =
-        await NprofileHelper().getNprofile(_nostrService.myKeys.publicKey);
+    String nprofile = await NprofileHelper()
+        .getNprofile(pubkey, []); //todo: get recommended relays
 
+    // ignore: use_build_context_synchronously
     showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -57,7 +58,7 @@ class NostrDrawer extends StatelessWidget {
                   ),
                   const SizedBox(height: 40),
                   QrImage(
-                    data: "nostr:${nprofile}",
+                    data: "nostr:$nprofile",
                     version: QrVersions.auto,
                     size: 300.0,
                     backgroundColor: Colors.white,
@@ -68,17 +69,11 @@ class NostrDrawer extends StatelessWidget {
                   GestureDetector(
                     onTap: () => _copyToClipboard(context, nprofile),
                     child: Text(
-                      "nostr:${nprofile}",
+                      "nostr:$nprofile",
                       style: const TextStyle(color: Palette.lightGray),
                     ),
                   ),
                   const SizedBox(height: 20),
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    child: const Text("close"),
-                  ),
                 ],
               ),
             ),
@@ -86,7 +81,8 @@ class NostrDrawer extends StatelessWidget {
         });
   }
 
-  Widget _drawerHeader(context) {
+  Widget _drawerHeader(
+      context, UserMetadata metadata, FollowingPubkeys followingService) {
     return DrawerHeader(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -101,25 +97,26 @@ class NostrDrawer extends StatelessWidget {
                   shape: BoxShape.circle,
                 ),
                 child: FutureBuilder<Map>(
-                    future: _nostrService
-                        .getUserMetadata(_nostrService.myKeys.publicKey),
+                    future: metadata.getMetadataByPubkey(pubkey),
                     builder:
                         (BuildContext context, AsyncSnapshot<Map> snapshot) {
                       var picture = "";
 
                       if (snapshot.hasData) {
                         picture = snapshot.data?["picture"] ??
-                            "https://avatars.dicebear.com/api/personas/${_nostrService.myKeys.publicKey}.svg";
+                            "https://avatars.dicebear.com/api/personas/$pubkey.svg";
                       } else if (snapshot.hasError) {
                         picture =
-                            "https://avatars.dicebear.com/api/personas/${_nostrService.myKeys.publicKey}.svg";
+                            "https://avatars.dicebear.com/api/personas/$pubkey.svg";
                       } else {
                         // loading
                         picture =
-                            "https://avatars.dicebear.com/api/personas/${_nostrService.myKeys.publicKey}.svg";
+                            "https://avatars.dicebear.com/api/personas/$pubkey.svg";
                       }
                       return myProfilePicture(
-                          picture, _nostrService.myKeys.publicKey);
+                          pictureUrl: picture,
+                          pubkey: pubkey,
+                          filterQuality: FilterQuality.medium);
                     }),
               ),
             ),
@@ -137,8 +134,7 @@ class NostrDrawer extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     FutureBuilder<Map>(
-                        future: _nostrService
-                            .getUserMetadata(_nostrService.myKeys.publicKey),
+                        future: metadata.getMetadataByPubkey(pubkey),
                         builder: (BuildContext context,
                             AsyncSnapshot<Map> snapshot) {
                           var name = "";
@@ -194,22 +190,28 @@ class NostrDrawer extends StatelessWidget {
           ),
           Row(
             children: [
-              RichText(
-                  text: const TextSpan(
-                      text: 'n.a.',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Palette.extraLightGray,
-                      ),
-                      children: [
-                    TextSpan(
-                      text: 'Following  ',
-                      style: TextStyle(
-                          color: Palette.gray,
-                          fontSize: 13,
-                          fontWeight: FontWeight.normal),
-                    )
-                  ])),
+              FutureBuilder<List<NostrTag>>(
+                  future: followingService.getFollowingPubkeys(pubkey),
+                  builder: (context, snapshot) {
+                    return RichText(
+                        text: TextSpan(
+                            text: snapshot.hasData
+                                ? snapshot.data?.length.toString()
+                                : 'n.a.',
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Palette.extraLightGray,
+                            ),
+                            children: const [
+                          TextSpan(
+                            text: ' Following  ',
+                            style: TextStyle(
+                                color: Palette.gray,
+                                fontSize: 13,
+                                fontWeight: FontWeight.normal),
+                          )
+                        ]));
+                  }),
               const SizedBox(
                 width: 6,
               ),
@@ -266,7 +268,10 @@ class NostrDrawer extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    var metadata = ref.watch(metadataProvider);
+    var followingService = ref.watch(followingProvider);
+
     return Drawer(
       child: Container(
         color: Palette.background,
@@ -274,7 +279,7 @@ class NostrDrawer extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _drawerHeader(context),
+            _drawerHeader(context, metadata, followingService),
             _divider(),
             _drawerItem(
                 label: 'Profile',
@@ -322,7 +327,13 @@ class NostrDrawer extends StatelessWidget {
             const SizedBox(height: 10),
             Padding(
                 padding: const EdgeInsets.fromLTRB(20, 10, 15, 20),
-                child: _textButton(text: 'contact', onPressed: () {})),
+                child: _textButton(
+                    text: 'terms of service',
+                    onPressed: () {
+                      // lauch url
+                      Uri url = Uri.parse("https://camelus.app/terms");
+                      launchUrl(url, mode: LaunchMode.externalApplication);
+                    })),
             const Spacer(),
             _divider(),
             Padding(

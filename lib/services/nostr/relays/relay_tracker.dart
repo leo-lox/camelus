@@ -1,9 +1,10 @@
 import 'dart:convert';
-import 'dart:developer';
 
-import 'package:camelus/models/socket_control.dart';
+import 'package:camelus/models/nostr_note.dart';
+import 'package:camelus/models/nostr_tag.dart';
 import 'package:camelus/services/nostr/metadata/metadata_injector.dart';
 import 'package:camelus/services/nostr/metadata/nip_05.dart';
+import 'package:camelus/services/nostr/relays/relay_address_parser.dart';
 import 'package:cross_local_storage/cross_local_storage.dart';
 import 'package:json_cache/json_cache.dart';
 
@@ -55,23 +56,16 @@ class RelayTracker {
     _updateCache();
   }
 
-  Future<void> analyzeNostrEvent(event, SocketControl socketControl) async {
-    // catch EOSE events etc.
-    if (event[0] != "EVENT") {
-      return;
-    }
-
-    Map eventMap = event[2];
-
+  Future<void> analyzeNostrEvent(NostrNote event, String socketUrl) async {
     // lastFetched
-    var personPubkey = eventMap["pubkey"];
+    var personPubkey = event.pubkey;
     var now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
-    var myRelayUrl = socketControl.connectionUrl;
+    var myRelayUrl = RelayAddressParser.parseAddress(socketUrl);
     trackRelays(
         personPubkey, [myRelayUrl], RelayTrackerAdvType.lastFetched, now);
 
     // kind 3
-    if (eventMap["kind"] == 3) {
+    if (event.kind == 3) {
       /* EXAMPLE
       "tags": [
           ["p", "91cf9..4e5ca", "wss://alicerelay.com/", "alice"],
@@ -79,24 +73,28 @@ class RelayTracker {
           ["p", "612ae..e610f", "ws://carolrelay.com/ws", "carol"]
         ],
         */
-      List<List> tags =
-          (eventMap["tags"] as List).map((e) => e as List).toList();
 
-      for (var tag in tags) {
-        if (tag[0] == "p" && tag.length >= 3 && tag[2] != null) {
-          trackRelays(tag[1], [tag[2]], RelayTrackerAdvType.kind03,
-              eventMap["created_at"]);
+      List<NostrTag> nostrTags = event.tags ?? [];
+
+      for (var tag in nostrTags) {
+        if (tag.type == "p" && tag.recommended_relay != null) {
+          trackRelays(
+            tag.value,
+            [tag.recommended_relay!],
+            RelayTrackerAdvType.kind03,
+            event.created_at,
+          );
         }
       }
 
-      if (eventMap["content"] == "") {
+      if (event.content == "") {
         return;
       }
 
       // own adv
-      Map content = jsonDecode(eventMap["content"]);
+      Map content = jsonDecode(event.content);
       List<String> writeRelays = [];
-      String personPubkey = eventMap["pubkey"] ?? "";
+      String personPubkey = event.pubkey ?? "";
 
       if (personPubkey.isEmpty) {
         return;
@@ -109,14 +107,14 @@ class RelayTracker {
         }
       }
       trackRelays(personPubkey, writeRelays, RelayTrackerAdvType.kind03,
-          eventMap["created_at"]);
+          event.created_at);
     }
 
     // nip05
-    if (eventMap["kind"] == 0) {
-      Map metadata = jsonDecode(eventMap["content"]);
+    if (event.kind == 0) {
+      Map metadata = jsonDecode(event.content);
       String nip05 = metadata["nip05"] ?? "";
-      String pubkey = eventMap["pubkey"] ?? "";
+      String pubkey = event.pubkey;
       if (nip05.isEmpty || pubkey.isEmpty) {
         return;
       }
@@ -138,11 +136,11 @@ class RelayTracker {
 
       List<String> resultRelays = List<String>.from(result["relays"]);
 
-      trackRelays(pubkey, resultRelays, RelayTrackerAdvType.nip05,
-          eventMap["created_at"]);
+      trackRelays(
+          pubkey, resultRelays, RelayTrackerAdvType.nip05, event.created_at);
     }
     // by tag
-    if (eventMap["kind"] == 1) {
+    if (event.kind == 1) {
       /* EXAMPLE
       "tags": [
           ["e", <event-id>, <relay-url>, <marker>]
@@ -150,14 +148,12 @@ class RelayTracker {
         ],
         */
 
-      //cast to List<List> to avoid type error
-      List<List> tags =
-          (eventMap["tags"] as List).map((e) => e as List).toList();
+      List<NostrTag> nostrTags = event.tags ?? [];
 
-      for (var tag in tags) {
-        if (tag[0] == "p" && tag.length >= 3 && tag[2] != null) {
-          trackRelays(tag[1], [tag[2]], RelayTrackerAdvType.tag,
-              eventMap["created_at"]);
+      for (var tag in nostrTags) {
+        if (tag.type == "p" && tag.recommended_relay != null) {
+          trackRelays(tag.value, [tag.recommended_relay!],
+              RelayTrackerAdvType.tag, event.created_at);
         }
       }
     }
@@ -167,30 +163,34 @@ class RelayTracker {
   /// timestamp can be a string or int
   void trackRelays(String personPubkey, List<String> relayUrls,
       RelayTrackerAdvType nip, dynamic timestamp) {
+    var relayUrlsCleaned = <String>[];
+
+    for (var relay in relayUrls) {
+      try {
+        var cleaned = RelayAddressParser.parseAddress(relay);
+        relayUrlsCleaned.add(cleaned);
+      } catch (e) {
+        continue;
+      }
+    }
+
     if (timestamp.runtimeType == String) {
       timestamp = int.parse(timestamp);
     }
 
-    if (personPubkey.isEmpty || relayUrls.isEmpty) {
+    if (personPubkey.isEmpty || relayUrlsCleaned.isEmpty) {
       return;
     }
 
-    for (var relayUrl in relayUrls) {
+    for (var relayUrl in relayUrlsCleaned) {
       _populateTracker(personPubkey, relayUrl);
     }
 
-    for (var relayUrl in relayUrls) {
+    for (var relayUrl in relayUrlsCleaned) {
       if (relayUrl.isEmpty) {
         continue;
       }
       if (personPubkey.isEmpty) {
-        continue;
-      }
-      //clean relay url
-
-      RegExp exp = RegExp(r'^(?:https?|wss?):\/\/[^\/]+');
-      String? wssDomain = exp.firstMatch(relayUrl)?.group(0);
-      if (wssDomain == null) {
         continue;
       }
 

@@ -1,5 +1,4 @@
 import 'package:camelus/config/palette.dart';
-import 'package:camelus/routes/nostr/nostr_page/user_feed_original_view.dart';
 
 import 'package:flutter/material.dart';
 
@@ -18,11 +17,10 @@ class _NotificationPageState extends State<NotificationPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return const Scaffold(
       backgroundColor: Palette.background,
       body: Center(
-        child: const Text('work in progress',
-            style: TextStyle(color: Colors.white)),
+        child: Text('work in progress', style: TextStyle(color: Colors.white)),
       ),
     );
   }

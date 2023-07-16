@@ -1,25 +1,29 @@
 import 'dart:convert';
 import 'dart:developer';
 
+import 'package:camelus/atoms/long_button.dart';
+import 'package:camelus/models/nostr_request_event.dart';
+import 'package:camelus/providers/key_pair_provider.dart';
+import 'package:camelus/providers/metadata_provider.dart';
+import 'package:camelus/providers/nostr_service_provider.dart';
+import 'package:camelus/providers/relay_provider.dart';
+import 'package:camelus/services/nostr/metadata/user_metadata.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:camelus/config/palette.dart';
-import 'package:camelus/services/nostr/nostr_injector.dart';
 import 'package:camelus/services/nostr/nostr_service.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-class EditProfilePage extends StatefulWidget {
-  late NostrService _nostrService;
-
-  EditProfilePage({Key? key}) : super(key: key) {
-    NostrServiceInjector injector = NostrServiceInjector();
-    _nostrService = injector.nostrService;
-  }
+class EditProfilePage extends ConsumerStatefulWidget {
+  const EditProfilePage({Key? key}) : super(key: key);
 
   @override
-  State<EditProfilePage> createState() => _EditProfilePageState();
+  ConsumerState<EditProfilePage> createState() => _EditProfilePageState();
 }
 
-class _EditProfilePageState extends State<EditProfilePage> {
+class _EditProfilePageState extends ConsumerState<EditProfilePage> {
+  late NostrService _nostrService;
+  late UserMetadata _metadataService;
   // create text input controllers
   TextEditingController pictureController = TextEditingController(text: "");
   TextEditingController bannerController = TextEditingController(text: "");
@@ -29,19 +33,26 @@ class _EditProfilePageState extends State<EditProfilePage> {
   TextEditingController websiteController = TextEditingController(text: "");
 
   // scroll controller
-  ScrollController _scrollController = ScrollController();
+  final ScrollController _scrollController = ScrollController();
 
   late String pubkey;
 
   bool loading = true;
+  bool submitLoading = false;
 
   bool isKeysExpanded = false;
+  void _initServices() {
+    _nostrService = ref.read(nostrServiceProvider);
+    _metadataService = ref.read(metadataProvider);
+  }
 
   @override
   void initState() {
     super.initState();
+
+    _initServices();
     // get user public key
-    pubkey = widget._nostrService.myKeys.publicKey;
+    pubkey = _nostrService.myKeys.publicKey;
 
     // set initial values of text input controllers
     _loadProfileValues();
@@ -77,7 +88,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
   }
 
   Future<void> _loadProfileValues() async {
-    var profileData = await widget._nostrService.getUserMetadata(pubkey);
+    var profileData = await _metadataService.getMetadataByPubkey(pubkey);
     setState(() {
       loading = false;
     });
@@ -96,9 +107,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
     websiteController.text = profileData["website"] ?? "";
   }
 
-  void _submitData() {
+  void _submitData() async {
     setState(() {
-      loading = true;
+      submitLoading = true;
     });
 
     // create content object
@@ -124,11 +135,21 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
     var contentString = json.encode(content);
 
-    widget._nostrService.writeEvent(contentString, 0, []);
+    var relays = ref.watch(relayServiceProvider);
+    var keyPair = await ref.watch(keyPairProvider.future);
 
-    // update cache
-    widget._nostrService.usersMetadata[pubkey] = content;
+    var myBody = NostrRequestEventBody(
+        pubkey: keyPair.keyPair!.publicKey,
+        privateKey: keyPair.keyPair!.privateKey,
+        tags: [],
+        content: contentString,
+        kind: 0);
+    var myRequest = NostrRequestEvent(body: myBody);
+    await relays.write(request: myRequest);
 
+    setState(() {
+      submitLoading = false;
+    });
     Navigator.pop(context, "updated");
   }
 
@@ -137,7 +158,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Edit Profile'),
-        backgroundColor: Palette.primary,
+        backgroundColor: Palette.background,
+        foregroundColor: Palette.lightGray,
       ),
       body: loading
           ? const Center(child: CircularProgressIndicator())
@@ -246,16 +268,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   // button to save changes
                   Container(
                     margin: const EdgeInsets.all(10),
-                    child: ElevatedButton(
-                      style: ButtonStyle(
-                        backgroundColor: MaterialStateProperty.all<Color>(
-                          Palette.primary,
-                        ),
-                      ),
-                      onPressed: () async {
-                        _submitData();
-                      },
-                      child: const Text('Save'),
+                    child: longButton(
+                      name: "save",
+                      onPressed: _submitData,
+                      loading: submitLoading,
                     ),
                   ),
                   // expandable information
@@ -297,11 +313,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                 padding: const EdgeInsets.all(5),
                                 child: GestureDetector(
                                   onTap: () {
-                                    copyToClipboard(widget
-                                        ._nostrService.myKeys.publicKeyHr);
+                                    copyToClipboard(
+                                        _nostrService.myKeys.publicKeyHr);
                                   },
-                                  child: Text(
-                                      widget._nostrService.myKeys.publicKeyHr),
+                                  child: Text(_nostrService.myKeys.publicKeyHr),
                                 ),
                               ),
                               // private key
@@ -310,11 +325,11 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                 padding: const EdgeInsets.all(5),
                                 child: GestureDetector(
                                   onTap: () {
-                                    copyToClipboard(widget
-                                        ._nostrService.myKeys.privateKeyHr);
+                                    copyToClipboard(
+                                        _nostrService.myKeys.privateKeyHr);
                                   },
-                                  child: Text(
-                                      widget._nostrService.myKeys.privateKeyHr),
+                                  child:
+                                      Text(_nostrService.myKeys.privateKeyHr),
                                 ),
                               ),
                             ],

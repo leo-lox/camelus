@@ -1,124 +1,90 @@
 import 'dart:convert';
-import 'dart:developer';
 import 'dart:typed_data';
-
 import 'package:camelus/helpers/helpers.dart';
 import 'package:camelus/helpers/tlv_helpers.dart';
-import 'package:camelus/services/nostr/relays/relays_injector.dart';
-import 'package:camelus/services/nostr/relays/relays_ranking.dart';
 import 'package:hex/hex.dart';
 
 class NprofileHelper {
-  late RelaysRanking _relayRanking;
+  NprofileHelper();
 
-  NprofileHelper() {
-    RelaysInjector injector = RelaysInjector();
-    _relayRanking = injector.relaysRanking;
+  /// finds relays and [returns] a bech32 encoded nprofile with relay hints
+  Future<String> getNprofile(String pubkey, List<String> userRelays) async {
+    return mapToBech32({"pubkey": pubkey, "relays": userRelays});
   }
 
-  // return nprofile in bech32 populated with user relays
-  Future<String> getNprofile(String pubkey) async {
-    // get user relays
-    List<String> userRelays = await getUserBestRelays(pubkey);
-
-    var nProfile = NprofileHelper().mapToBech32({
-      "pubkey": pubkey,
-      "relays": userRelays,
-    });
-
-    return nProfile;
-  }
-
-  Future<List<String>> getUserBestRelays(pubkey) async {
-    List userRelaysTmp =
-        await _relayRanking.getBestRelays(pubkey, Direction.read);
-
-    // turn list of map {relay: url, score: s} into list of url strings with only the 5 best scores
-    List<String> userRelays = [];
-    for (var i = 0; i < userRelaysTmp.length; i++) {
-      if (i > 4) break;
-      try {
-        userRelays.add(userRelaysTmp[i]["relay"]);
-      } catch (e) {
-        log(e.toString());
-      }
-    }
-
-    return userRelays;
-  }
-
-  /// {pubkey: 02b0e, relays: [relay1, relay2]} => nprofile1qdfdf:qdfdf
+  /// [returns] a short version nprofile1:sdf54e:ewfd54
   String mapToBech32Hr(Map<String, dynamic> map) {
-    String bech32 = mapToBech32(map);
-
-    return bech32toHr(bech32);
+    return bech32toHr(mapToBech32(map));
   }
 
-  String bech32toHr(String bech32) {
-    var length = bech32.length;
-    // split in first 20 chars and last 20 chars
-    String first = bech32.substring(0, 15);
-    String last = bech32.substring(length - 15, length);
-
+  /// [returns] a short version nprofile1:sdf54e:ewfd54
+  String bech32toHr(String bech32, {int cutLength = 15}) {
+    final int length = bech32.length;
+    final String first = bech32.substring(0, cutLength);
+    final String last = bech32.substring(length - cutLength, length);
     return "$first:$last";
   }
 
+  /// [returns] a map with pubkey and relays
   Map<String, dynamic> bech32toMap(String bech32) {
-    var helper = Helpers();
-    var decodedBech32 = helper.decodeBech32(bech32);
+    final Helpers helper = Helpers();
+    final List<String> decodedBech32 = helper.decodeBech32(bech32);
+    final String dataString = decodedBech32[0];
+    final List<int> data = HEX.decode(dataString);
 
-    String dataString = decodedBech32[0];
-    List<int> data = HEX.decode(dataString);
-    String hrp = decodedBech32[1];
+    final List<TLV> tlvList = TlvUtils.decode(Uint8List.fromList(data));
+    final Map<String, dynamic> resultMap = _parseTlvList(tlvList);
 
-    // convert data string to bytes using utf8
-
-    Uint8List bytes = Uint8List.fromList(data);
-    List<TLV> tlvList = TlvUtils.decode(bytes);
-
-    String pubkey = "";
-    var relays = [];
-    for (int i = 0; i < tlvList.length; i++) {
-      if (tlvList[i].type == 0) {
-        var value = tlvList[i].value;
-        pubkey = HEX.encode(value);
-      } else if (tlvList[i].type == 1) {
-        var decoded = ascii.decode(tlvList[i].value);
-        relays.add(decoded);
-      }
-    }
-    if (pubkey.length != 64) {
+    if (resultMap["pubkey"].length != 64) {
       throw Exception("Invalid pubkey length");
     }
 
-    return {
-      "pubkey": pubkey,
-      "relays": relays,
-    };
+    return resultMap;
   }
 
+  /// expects a map with pubkey and relays and [returns] a bech32 encoded nprofile
   String mapToBech32(Map<String, dynamic> map) {
-    var helper = Helpers();
-    String pubkey = map["pubkey"];
-    List<String> relays = List<String>.from(map['relays']);
+    final Helpers helper = Helpers();
+    final String pubkey = map["pubkey"];
+    final List<String> relays = List<String>.from(map['relays']);
 
-    List<int> pubkeyInt = HEX.decode(pubkey);
-    Uint8List pubkeyBytes = Uint8List.fromList(pubkeyInt);
+    final List<TLV> tlvList = _generateTlvList(pubkey, relays);
+    final Uint8List bytes = TlvUtils.encode(tlvList);
+    final String dataString = HEX.encode(bytes);
 
-    List<TLV> tlvList = [];
-    tlvList.add(TLV(type: 0, length: 32, value: pubkeyBytes));
+    return helper.encodeBech32(dataString, "nprofile");
+  }
 
-    for (int i = 0; i < relays.length; i++) {
-      var relay = relays[i];
-      var relayBytes = Uint8List.fromList(ascii.encode(relay));
+  Map<String, dynamic> _parseTlvList(List<TLV> tlvList) {
+    String pubkey = "";
+    List<String> relays = [];
+    for (TLV tlv in tlvList) {
+      if (tlv.type == 0) {
+        pubkey = HEX.encode(tlv.value);
+      } else if (tlv.type == 1) {
+        relays.add(ascii.decode(tlv.value));
+      }
+    }
+    return {"pubkey": pubkey, "relays": relays};
+  }
+
+  List<TLV> _generateTlvList(String pubkey, List<String> relays) {
+    final Uint8List pubkeyBytes = _hexDecodeToUint8List(pubkey);
+    List<TLV> tlvList = [TLV(type: 0, length: 32, value: pubkeyBytes)];
+
+    for (String relay in relays) {
+      final Uint8List relayBytes = _asciiEncodeToUint8List(relay);
       tlvList.add(TLV(type: 1, length: relayBytes.length, value: relayBytes));
     }
 
-    Uint8List bytes = TlvUtils.encode(tlvList);
-    String dataString = HEX.encode(bytes);
+    return tlvList;
+  }
 
-    String bech32 = helper.encodeBech32(dataString, "nprofile");
+  Uint8List _hexDecodeToUint8List(String hexString) {
+    return Uint8List.fromList(HEX.decode(hexString));
+  }
 
-    return bech32;
+  Uint8List _asciiEncodeToUint8List(String asciiString) {
+    return Uint8List.fromList(ascii.encode(asciiString));
   }
 }
