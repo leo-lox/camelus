@@ -169,8 +169,7 @@ class _NoteCardContainerState extends ConsumerState<NoteCardContainer> {
               )
               .toList(),
         if (myNote.getTagPubkeys.length > 2)
-          SizedBox(
-            width: MediaQuery.of(context).size.width - 130,
+          Expanded(
             child: Wrap(
               children: [
                 linkedUsername(

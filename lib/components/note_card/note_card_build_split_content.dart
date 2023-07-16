@@ -10,6 +10,8 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
+final profilePattern = RegExp(r"nostr:(nprofile|npub)[a-zA-Z0-9]+");
+
 /// this class is responsible for building the content of a note
 class NoteCardSplitContent {
   final NostrNote _note;
@@ -39,8 +41,6 @@ class NoteCardSplitContent {
     _buildContentStream();
   }
 
-  Future<List<TextSpan>> get _textSpans => _buildTextSpans(_note.content);
-
   Widget get content => _buildUnparsedContent();
   Stream<Widget> get contentStream => _contentStreamController.stream;
 
@@ -56,23 +56,47 @@ class NoteCardSplitContent {
   }
 
   _buildContentStream() async {
-    var result = await _textSpans;
-
-    _contentStreamController.add(RichText(
-      text: TextSpan(
-        children: result,
+    _contentStreamController.add(
+      Wrap(
+        spacing: 0,
+        runSpacing: 4,
+        direction: Axis.horizontal,
+        verticalDirection: VerticalDirection.down,
+        children: _buildContent(),
       ),
-    ));
+    );
   }
 
-  Future<List<TextSpan>> _buildTextSpans(String content) async {
-    var urlSpans = _buildUrlSpans(content);
-    var hashtagLegacyMentionSpans = _buildLegacyMentionHashtagSpans(urlSpans);
-    var nprofileSpans = _buildNprofileSpans(hashtagLegacyMentionSpans);
+  List<Widget> _buildContent() {
+    List<Widget> widgets = [];
+    List<String> lines = _note.content.split("\n");
+    for (var line in lines) {
+      if (line == "") {
+        //widgets.add(_buildText("\n"));
+        widgets.add(const SizedBox(height: 7, width: 1000));
+        continue;
+      }
+      List<String> words = line.split(" ");
+      for (var word in words) {
+        if (profilePattern.hasMatch(word)) {
+          widgets.add(_buildProfileLink(word));
+        } else if (word.startsWith("#[")) {
+          widgets.add(_buildLegacyMentionHashtag(word));
+        } else if (word.startsWith("#")) {
+          widgets.add(_buildHashtagLink(word));
+        } else if (word.startsWith("http")) {
+          widgets.add(_buildLink(word));
+        } else {
+          widgets.add(_buildText(word));
+        }
+        widgets.add(_buildText(" "));
+      }
+      widgets.removeLast(); // remove last space
+      //widgets.add(_buildText("\n")); // add back the original line break
+      widgets.add(const SizedBox(height: 7, width: 1000));
+    }
 
-    var hashtagSpans = _buildHashtagSpans(nprofileSpans, _hashtagCallback);
-
-    return hashtagSpans;
+    return widgets;
   }
 
   List<String> _extractImages(NostrNote note) {
@@ -93,280 +117,132 @@ class NoteCardSplitContent {
     return imageLinks;
   }
 
-  /// removes the given strings from the input
-  String _removeStrings(String input, List<String> strings) {
-    for (var string in strings) {
-      input = input.replaceAll(string, "");
+  Widget _buildProfileLink(String word) {
+    var group = profilePattern.allMatches(word);
+    var match = group.first;
+    var cleaned = match.group(0);
+
+    if (cleaned == "") return const SizedBox(height: 0, width: 0);
+
+    final myMatch = cleaned!.replaceAll("nostr:", "");
+    String myPubkeyHex = "";
+    String pubkeyBech = "";
+
+    if (myMatch.contains("nprofile")) {
+      // remove the "nostr:" part
+
+      Map<String, dynamic> nProfileDecode =
+          NprofileHelper().bech32toMap(myMatch);
+
+      final List<String> myRelays = nProfileDecode['relays'];
+      myPubkeyHex = nProfileDecode['pubkey'];
+      pubkeyBech = Helpers().encodeBech32(myPubkeyHex, "npub");
     }
-    return input;
-  }
 
-  List<TextSpan> _buildUrlSpans(String input) {
-    // remove image links from input
-    input = _removeStrings(input, imageLinks);
-
-    final spans = <TextSpan>[];
-    final linkRegex = RegExp(
-        r"(https?|ftp|file)://[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]");
-    final linkMatches = linkRegex.allMatches(input);
-    int lastMatchEnd = 0;
-    for (final match in linkMatches) {
-      if (match.start > lastMatchEnd) {
-        spans.add(
-          TextSpan(
-            text: input.substring(lastMatchEnd, match.start),
-            style: const TextStyle(
-                color: Palette.lightGray, fontSize: 17, height: 1.3),
-          ),
-        );
-      }
-      spans.add(TextSpan(
-        text: match.group(0),
-        style: const TextStyle(
-            color: Palette.primary,
-            fontSize: 17,
-            height: 1.3,
-            decoration: TextDecoration.underline),
-        recognizer: TapGestureRecognizer()
-          ..onTap = () {
-            if (match.group(0) == null) return;
-
-            // Open the URL in a browser
-            launchUrlString(match.group(0)!,
-                mode: LaunchMode.externalApplication);
-            log(match.group(0)!);
-          },
-      ));
-      lastMatchEnd = match.end;
+    if (myMatch.contains("npub")) {
+      final List decode = Helpers().decodeBech32(myMatch);
+      myPubkeyHex = decode[0];
+      pubkeyBech = myMatch;
     }
-    if (lastMatchEnd < input.length) {
-      spans.add(TextSpan(
-          text: input.substring(lastMatchEnd),
-          style: const TextStyle(
-              color: Palette.lightGray, fontSize: 17, height: 1.3)));
-    }
-    return spans;
-  }
 
-  List<TextSpan> _buildLegacyMentionHashtagSpans(List<TextSpan> spans) {
-    var finalSpans = <TextSpan>[];
+    final String pubkeyHr =
+        "${pubkeyBech.substring(0, 5)}...${pubkeyBech.substring(pubkeyBech.length - 5)}";
 
-    for (var span in spans) {
-      if (span.text!.contains("#[")) {
-        final pattern = RegExp(r"#\[\d+\]");
-        final hashMatches = pattern.allMatches(span.text!);
-        int lastMatchEnd = 0;
-        for (final match in hashMatches) {
-          if (match.start > lastMatchEnd) {
-            finalSpans.add(
-              TextSpan(
-                text: span.text!.substring(lastMatchEnd, match.start),
-                style: const TextStyle(
-                    color: Palette.lightGray, fontSize: 17, height: 1.3),
-              ),
+    var metadata = _metadataProvider.getMetadataByPubkey(myPubkeyHex);
+
+    return GestureDetector(
+      onTap: () {
+        _profileCallback(myPubkeyHex);
+      },
+      child: FutureBuilder<Map<dynamic, dynamic>>(
+          future: metadata,
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              return Text(
+                "@${snapshot.data!['name'] ?? pubkeyHr}",
+                style: const TextStyle(color: Palette.primary, fontSize: 17),
+              );
+            }
+            return Text(
+              "@$pubkeyHr",
+              style: const TextStyle(color: Palette.primary, fontSize: 17),
             );
-          }
-          var indexString =
-              match.group(0)!.replaceAll("#[", "").replaceAll("]", "");
-          var index = int.parse(indexString);
-
-          if (index >= _note.tags.length) continue;
-          var tag = _note.tags[index];
-
-          if (tag.type == 'p' && _tagsMetadata[tag.value] == null) {
-            var pubkeyBech = Helpers().encodeBech32(tag.value, "npub");
-            // first 5 chars then ... then last 5 chars
-            var pubkeyHr =
-                "${pubkeyBech.substring(0, 5)}...${pubkeyBech.substring(pubkeyBech.length - 5)}";
-            _tagsMetadata[tag.value] = pubkeyHr;
-            var metadata = _metadataProvider.getMetadataByPubkey(tag.value);
-
-            metadata.then((value) {
-              // check if mounted
-
-              _tagsMetadata[tag.value] = value["name"] ?? pubkeyHr;
-              _stateCallback();
-            });
-          }
-          finalSpans.add(TextSpan(
-              text: "@${_tagsMetadata[tag.value]}",
-              style: const TextStyle(
-                  color: Palette.primary, fontSize: 17, height: 1.3),
-              recognizer: TapGestureRecognizer()
-                ..onTap = () {
-                  _profileCallback(tag.value);
-                }));
-          lastMatchEnd = match.end;
-        }
-        if (lastMatchEnd < span.text!.length) {
-          finalSpans.add(
-            TextSpan(
-              text: span.text!.substring(lastMatchEnd),
-              style: const TextStyle(
-                  color: Palette.lightGray, fontSize: 17, height: 1.3),
-            ),
-          );
-        }
-      } else {
-        finalSpans.add(span);
-      }
-    }
-
-    return finalSpans;
+          }),
+    );
   }
 
-  List<TextSpan> _buildNprofileSpans(List<TextSpan> spans) {
-    final finalSpans = <TextSpan>[];
+  Widget _buildLegacyMentionHashtag(String word) {
+    var indexString = word.replaceAll("#[", "").replaceAll("]", "");
+    var index = int.parse(indexString);
 
-    for (final span in spans) {
-      // only edit my spans and not the ones that are already edited
-      if (!span.text!.contains("nostr:nprofile") &&
-          !span.text!.contains("nostr:npub")) {
-        finalSpans.add(span);
-        continue;
-      }
+    var tag = _note.tags[index];
 
-      final pattern = RegExp(r"nostr:(nprofile|npub)[a-zA-Z0-9]+");
-      final hashMatches = pattern.allMatches(span.text!);
-      var lastMatchEnd = 0;
-
-      for (final match in hashMatches) {
-        if (match.start > lastMatchEnd) {
-          finalSpans.add(TextSpan(
-            text: span.text!.substring(lastMatchEnd, match.start),
-            style: const TextStyle(
-              color: Palette.lightGray,
-              fontSize: 17,
-              height: 1.3,
-            ),
-          ));
-        }
-
-        final myMatch = match.group(0)!.replaceAll("nostr:", "");
-        String myPubkeyHex = "";
-        String pubkeyBech = "";
-        if (myMatch.contains("nprofile")) {
-          // remove the "nostr:" part
-
-          Map<String, dynamic> nProfileDecode =
-              NprofileHelper().bech32toMap(myMatch);
-
-          final List<String> myRelays = nProfileDecode['relays'];
-          myPubkeyHex = nProfileDecode['pubkey'];
-          pubkeyBech = Helpers().encodeBech32(myPubkeyHex, "npub");
-        }
-
-        if (myMatch.contains("npub")) {
-          final List decode = Helpers().decodeBech32(myMatch);
-          myPubkeyHex = decode[0];
-          pubkeyBech = myMatch;
-        }
-
-        final String pubkeyHr =
-            "${pubkeyBech.substring(0, 5)}...${pubkeyBech.substring(pubkeyBech.length - 5)}";
-
-        var metadata = _metadataProvider.getMetadataByPubkey(myPubkeyHex);
-
-        if (_tagsMetadata[myPubkeyHex] == null) {
-          _tagsMetadata[myPubkeyHex] = pubkeyHr;
-
-          metadata.then((value) {
-            _tagsMetadata[myPubkeyHex] = value["name"];
-          });
-        }
-
-        finalSpans.add(TextSpan(
-          text: "@${_tagsMetadata[myPubkeyHex]}",
-          style: const TextStyle(
-            color: Palette.primary,
-            fontSize: 17,
-            height: 1.3,
-            decoration: TextDecoration.underline,
-          ),
-          recognizer: TapGestureRecognizer()
-            ..onTap = () {
-              if (match.group(0) == null) return;
-              // log(match.group(0)!);
-              _profileCallback(myPubkeyHex);
-            },
-        ));
-
-        lastMatchEnd = match.end;
-      }
-
-      if (lastMatchEnd < span.text!.length) {
-        finalSpans.add(TextSpan(
-          text: span.text!.substring(lastMatchEnd),
-          style: const TextStyle(
-            color: Palette.lightGray,
-            fontSize: 17,
-            height: 1.3,
-          ),
-        ));
-      }
+    if (tag.type != 'p') {
+      return const SizedBox(height: 0, width: 0);
     }
 
-    return finalSpans;
-  }
-}
+    var pubkeyBech = Helpers().encodeBech32(tag.value, "npub");
+    // first 5 chars then ... then last 5 chars
+    var pubkeyHr =
+        "${pubkeyBech.substring(0, 5)}...${pubkeyBech.substring(pubkeyBech.length - 5)}";
+    _tagsMetadata[tag.value] = pubkeyHr;
+    var metadata = _metadataProvider.getMetadataByPubkey(tag.value);
 
-List<TextSpan> _buildHashtagSpans(
-    List<TextSpan> spans, Function(String) hashtagCallback) {
-  final finalSpans = <TextSpan>[];
-
-  for (final span in spans) {
-    if (!span.text!.contains("#")) {
-      finalSpans.add(span);
-      continue;
-    }
-
-    final pattern = RegExp(r"#\w+");
-    final hashMatches = pattern.allMatches(span.text!);
-
-    var lastMatchEnd = 0;
-
-    for (final match in hashMatches) {
-      if (match.start > lastMatchEnd) {
-        finalSpans.add(TextSpan(
-          text: span.text!.substring(lastMatchEnd, match.start),
-          style: const TextStyle(
-            color: Palette.lightGray,
-            fontSize: 17,
-            height: 1.3,
-          ),
-        ));
-      }
-
-      finalSpans.add(TextSpan(
-        text: match.group(0)!,
-        style: const TextStyle(
-          color: Palette.primary,
-          fontSize: 17,
-          height: 1.3,
-          decoration: TextDecoration.none,
-        ),
-        recognizer: TapGestureRecognizer()
-          ..onTap = () {
-            // log(match.group(0)!);
-            var cleanedHashtag = match.group(0)!.replaceAll("#", "");
-            hashtagCallback(cleanedHashtag);
-          },
-      ));
-
-      lastMatchEnd = match.end;
-    }
-
-    if (lastMatchEnd < span.text!.length) {
-      finalSpans.add(TextSpan(
-        text: span.text!.substring(lastMatchEnd),
-        style: const TextStyle(
-          color: Palette.lightGray,
-          fontSize: 17,
-          height: 1.3,
-        ),
-      ));
-    }
+    return GestureDetector(
+      onTap: () {
+        _profileCallback(tag.value);
+      },
+      child: FutureBuilder<Map<dynamic, dynamic>>(
+          future: metadata,
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              return Text(
+                "@${snapshot.data!['name'] ?? pubkeyHr}",
+                style: const TextStyle(color: Palette.primary, fontSize: 17),
+              );
+            }
+            return Text(
+              "@$pubkeyHr",
+              style: const TextStyle(color: Palette.primary, fontSize: 17),
+            );
+          }),
+    );
   }
 
-  return finalSpans;
+  Widget _buildHashtagLink(String word) {
+    String hashtag = word.substring(1);
+
+    return GestureDetector(
+      onTap: () {
+        _hashtagCallback(hashtag);
+      },
+      child: Text(
+        word,
+        style: const TextStyle(color: Palette.primary, fontSize: 17),
+      ),
+    );
+  }
+
+  _buildLink(String word) {
+    if (imageLinks.contains(word)) {
+      return const SizedBox(height: 0, width: 0);
+    }
+
+    return GestureDetector(
+      onTap: () {
+        launchUrlString(word, mode: LaunchMode.externalApplication);
+      },
+      child: Text(
+        word,
+        style: const TextStyle(color: Palette.primary, fontSize: 17),
+      ),
+    );
+  }
+
+  _buildText(String word) {
+    return Text(
+      word,
+      style: const TextStyle(color: Palette.lightGray, fontSize: 17),
+    );
+  }
 }
