@@ -37,19 +37,14 @@ class _NoteCardState extends ConsumerState<NoteCard> {
     Navigator.pushNamed(context, "/nostr/hastag", arguments: hashtag);
   }
 
-  void _splitContentStateUpdate() {
-    if (!mounted) return;
-    setState(() {});
-  }
-
   late NostrService myNostrService;
   late UserMetadata metadata;
   late Future<Map<dynamic, dynamic>> myMetadata;
   late NoteCardSplitContent splitContent;
 
   void _splitContent() {
-    splitContent = NoteCardSplitContent(widget.note, metadata, _openProfile,
-        _openHashtag, _splitContentStateUpdate);
+    splitContent =
+        NoteCardSplitContent(widget.note, metadata, _openProfile, _openHashtag);
 
     setState(() {});
   }
@@ -128,18 +123,7 @@ class _NoteCardState extends ConsumerState<NoteCard> {
                             ),
 
                             const SizedBox(height: 10),
-                            StreamBuilder<Widget>(
-                                stream: splitContent.contentStream,
-                                initialData: splitContent.content,
-                                builder: (context, snapshot) {
-                                  if (snapshot.hasError) {
-                                    return Text("Error: ${snapshot.error}");
-                                  }
-                                  if (!snapshot.hasData) {
-                                    return const Text("Loading...");
-                                  }
-                                  return snapshot.data!;
-                                }),
+                            splitContent.content,
 
                             const SizedBox(height: 6),
                             if (splitContent.imageLinks.isNotEmpty)

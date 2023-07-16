@@ -6,6 +6,7 @@ import 'package:camelus/helpers/helpers.dart';
 import 'package:camelus/helpers/nprofile_helper.dart';
 import 'package:camelus/models/nostr_note.dart';
 import 'package:camelus/services/nostr/metadata/user_metadata.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher_string.dart';
@@ -19,57 +20,39 @@ class NoteCardSplitContent {
   final Function(String) _profileCallback;
   final Function(String) _hashtagCallback;
 
-  final Function _stateCallback;
-
   final Map<String, dynamic> _tagsMetadata = {};
 
   final UserMetadata _metadataProvider;
 
   List<String> imageLinks = [];
 
-  final StreamController<Widget> _contentStreamController =
-      StreamController<Widget>();
+  late Widget _content;
 
   NoteCardSplitContent(
     this._note,
     this._metadataProvider,
     this._profileCallback,
     this._hashtagCallback,
-    this._stateCallback,
   ) {
     imageLinks.addAll(_extractImages(_note));
-    _buildContentStream();
+    _content = _buildContentHousing();
   }
 
-  Widget get content => _buildUnparsedContent();
-  Stream<Widget> get contentStream => _contentStreamController.stream;
+  Widget get content => _content;
 
-  Widget _buildUnparsedContent() {
-    return Text(
-      _note.content,
-      style: const TextStyle(
-        color: Palette.lightGray,
-        fontSize: 17,
-        height: 1.3,
-      ),
+  _buildContentHousing() {
+    return Wrap(
+      spacing: 0,
+      runSpacing: 4,
+      direction: Axis.horizontal,
+      verticalDirection: VerticalDirection.down,
+      children: _buildContent(_note.content),
     );
   }
 
-  _buildContentStream() async {
-    _contentStreamController.add(
-      Wrap(
-        spacing: 0,
-        runSpacing: 4,
-        direction: Axis.horizontal,
-        verticalDirection: VerticalDirection.down,
-        children: _buildContent(),
-      ),
-    );
-  }
-
-  List<Widget> _buildContent() {
+  List<Widget> _buildContent(String content) {
     List<Widget> widgets = [];
-    List<String> lines = _note.content.split("\n");
+    List<String> lines = content.split("\n");
     for (var line in lines) {
       if (line == "") {
         //widgets.add(_buildText("\n"));
@@ -140,13 +123,14 @@ class NoteCardSplitContent {
     }
 
     if (myMatch.contains("npub")) {
-      final List decode = Helpers().decodeBech32(myMatch);
-      myPubkeyHex = decode[0];
       pubkeyBech = myMatch;
+      final List decode = Helpers().decodeBech32(myMatch);
+
+      myPubkeyHex = decode[0];
     }
 
     final String pubkeyHr =
-        "${pubkeyBech.substring(0, 5)}...${pubkeyBech.substring(pubkeyBech.length - 5)}";
+        "${pubkeyBech.substring(0, 5)}:${pubkeyBech.substring(pubkeyBech.length - 5)}";
 
     var metadata = _metadataProvider.getMetadataByPubkey(myPubkeyHex);
 
@@ -156,10 +140,10 @@ class NoteCardSplitContent {
       },
       child: FutureBuilder<Map<dynamic, dynamic>>(
           future: metadata,
-          builder: (context, snapshot) {
-            if (snapshot.hasData) {
+          builder: (context, metadataSnp) {
+            if (metadataSnp.hasData) {
               return Text(
-                "@${snapshot.data!['name'] ?? pubkeyHr}",
+                "@${metadataSnp.data!['name'] ?? pubkeyHr}",
                 style: const TextStyle(color: Palette.primary, fontSize: 17),
               );
             }
@@ -173,7 +157,12 @@ class NoteCardSplitContent {
 
   Widget _buildLegacyMentionHashtag(String word) {
     var indexString = word.replaceAll("#[", "").replaceAll("]", "");
-    var index = int.parse(indexString);
+    int index;
+    try {
+      index = int.parse(indexString);
+    } catch (e) {
+      return const SizedBox(height: 0, width: 0);
+    }
 
     var tag = _note.tags[index];
 
