@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
 
-import 'package:camelus/db/database.dart';
+import 'package:camelus/db/entities/db_note.dart';
 import 'package:camelus/helpers/bip340.dart';
 import 'package:camelus/models/nostr_note.dart';
 import 'package:camelus/models/nostr_request_event.dart';
@@ -18,12 +18,11 @@ import 'package:isar/isar.dart';
 
 class RelayCoordinator {
   final _maxTmpRelayCount = 5; // move magic number to settings
-  final Future<AppDatabase> dbFuture;
-  final Future<Isar> isarDbFuture;
+  final Future<Isar> dbFuture;
+
   final Future<KeyPairWrapper> keyPairFuture;
 
-  late AppDatabase _db;
-  late Isar _isarDb;
+  late Isar _db;
   late KeyPair _keyPair;
 
   final List<RelaySubscriptionHolder> _activeSubscriptions = [];
@@ -43,7 +42,6 @@ class RelayCoordinator {
 
   RelayCoordinator({
     required this.dbFuture,
-    required this.isarDbFuture,
     required this.keyPairFuture,
   }) {
     _init();
@@ -51,7 +49,6 @@ class RelayCoordinator {
 
   _init() async {
     _db = await dbFuture;
-    _isarDb = await isarDbFuture;
     _keyPair = (await keyPairFuture).keyPair!;
 
     await _initStreamOwnContacts(_keyPair.publicKey);
@@ -65,7 +62,14 @@ class RelayCoordinator {
 
   // following provider cant be used because circular dependency
   Future _initStreamOwnContacts(String myPubkey) async {
-    _db.noteDao.findPubkeyNotesByKindStream([myPubkey], 3).listen((dbList) {
+    Query<DbNote> kindPubkeyQuery = _db.dbNotes
+        .filter()
+        .pubkeyEqualTo(myPubkey)
+        .and()
+        .kindEqualTo(3)
+        .build();
+
+    kindPubkeyQuery.watch(fireImmediately: true).listen((dbList) {
       if (dbList.isEmpty) {
         //_contactsController.add([]);
         return;
@@ -515,7 +519,11 @@ class RelayCoordinator {
 
   Future<Map<String, Map<String, bool>>> _getUserManualRelays(
       String pubkey) async {
-    var kind3 = await _db.noteDao.findPubkeyNotesByKind([pubkey], 3);
+    Query<DbNote> kindPubkeyQuery =
+        _db.dbNotes.filter().pubkeyEqualTo(pubkey).and().kindEqualTo(3).build();
+
+    var kind3 = await kindPubkeyQuery.findAll();
+
     if (kind3.isEmpty) {
       throw Exception("No relays found for this user");
     }
@@ -556,7 +564,6 @@ class RelayCoordinator {
 
     var relay = MyRelay(
         database: _db,
-        isarDatabase: _isarDb,
         relayUrl: relayUrl,
         read: read,
         write: write,

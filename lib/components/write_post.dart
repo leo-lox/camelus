@@ -2,7 +2,6 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:camelus/atoms/picture.dart';
-import 'package:camelus/db/database.dart';
 import 'package:camelus/helpers/nprofile_helper.dart';
 import 'package:camelus/helpers/search.dart';
 import 'package:camelus/models/nostr_request_event.dart';

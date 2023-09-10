@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
 
-import 'package:camelus/db/database.dart';
 import 'package:camelus/models/nostr_note.dart';
 import 'package:camelus/models/nostr_request.dart';
 import 'package:camelus/models/nostr_request_close.dart';
@@ -16,8 +15,8 @@ import 'package:web_socket_channel/web_socket_channel.dart';
 import '../../../db/entities/db_note.dart';
 
 class MyRelay {
-  final AppDatabase database;
-  final Isar isarDatabase;
+  final Isar database;
+
   final RelayPersistance persistance;
   final String relayUrl;
   final bool read;
@@ -42,7 +41,6 @@ class MyRelay {
 
   MyRelay({
     required this.database,
-    required this.isarDatabase,
     required this.persistance,
     required this.relayUrl,
     required this.read,
@@ -192,24 +190,26 @@ class MyRelay {
   }
 
   _insertNoteIntoDb(NostrNote note) {
-    database.noteDao.stackInsertNotes([note]);
-    final myIsarNote = DbNote()
-      ..nostr_id = note.id
-      ..created_at = note.created_at
-      ..kind = note.kind
-      ..pubkey = note.pubkey
-      ..content = note.content
-      ..sig = note.sig
-      ..tags = note.tags
-          .map((e) => Tag()
-            ..type = e.type
-            ..value = e.value
-            ..recommended_relay = e.recommended_relay
-            ..marker = e.marker)
-          .toList();
+    // database.noteDao.stackInsertNotes([note]);
+    final myIsarNote = DbNote(
+      nostr_id: note.id,
+      created_at: note.created_at,
+      kind: note.kind,
+      pubkey: note.pubkey,
+      content: note.content,
+      sig: note.sig,
+      tags: note.tags
+          .map((e) => DbTag(
+                type: e.type,
+                value: e.value,
+                recommended_relay: e.recommended_relay,
+                marker: e.marker,
+              ))
+          .toList(),
+    );
 
-    isarDatabase.writeTxn(() async {
-      isarDatabase.dbNotes.put(myIsarNote);
+    database.writeTxn(() async {
+      database.dbNotes.put(myIsarNote);
       //recipes.put(pancakes);
     });
   }
