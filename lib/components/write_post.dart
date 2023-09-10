@@ -20,6 +20,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_mentions/flutter_mentions.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:isar/isar.dart';
 import 'package:lottie/lottie.dart';
 import 'package:camelus/config/palette.dart';
 import 'package:camelus/helpers/helpers.dart';
@@ -37,7 +38,7 @@ class WritePost extends ConsumerStatefulWidget {
 
 class _WritePostState extends ConsumerState<WritePost> {
   late NostrService _nostrService;
-  late AppDatabase _db;
+  late Isar _db;
   late Search _search;
 
   final TextEditingController _textEditingController = TextEditingController();

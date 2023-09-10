@@ -5,7 +5,7 @@ import 'package:camelus/db/entities/db_note.dart';
 import 'package:isar/isar.dart';
 import 'package:riverpod/riverpod.dart';
 
-final isarDatabaseProvider = FutureProvider<Isar>((ref) async {
+final databaseProvider = FutureProvider<Isar>((ref) async {
   final dir = await getApplicationDocumentsDirectory();
   final isar = await Isar.open(
     directory: dir.path,

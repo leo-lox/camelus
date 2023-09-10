@@ -1,13 +1,14 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
-
-import 'package:camelus/db/database.dart';
+import 'package:camelus/db/entities/db_note.dart';
 import 'package:camelus/models/nostr_note.dart';
 import 'package:camelus/services/nostr/metadata/nip_05.dart';
 import 'package:http/http.dart' as http;
+import 'package:isar/isar.dart';
 
 class Search {
-  final AppDatabase _db;
+  final Isar _db;
 
   late Map<String, dynamic> _usersMetadata;
 
@@ -20,7 +21,9 @@ class Search {
 
   // keep memory up to date with db
   void _initStream() {
-    _db.noteDao.findAllNotesByKindStream(0).listen((event) {
+    Query<DbNote> kindZero = _db.dbNotes.filter().kindEqualTo(0).build();
+
+    kindZero.watch(fireImmediately: true).listen((event) {
       List<NostrNote> notesMetadata =
           event.map((e) => e.toNostrNote()).toList();
 
@@ -36,7 +39,9 @@ class Search {
 
   void _init() async {
     // keep users metadata in memory
-    var notesDb = await _db.noteDao.findAllNotesByKind(0);
+    Query<DbNote> kindZero = _db.dbNotes.filter().kindEqualTo(0).build();
+
+    var notesDb = await kindZero.findAll();
     List<NostrNote> notesMetadata =
         notesDb.map((e) => e.toNostrNote()).toList();
 

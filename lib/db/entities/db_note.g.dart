@@ -56,7 +56,7 @@ const DbNoteSchema = CollectionSchema(
       id: 7,
       name: r'tags',
       type: IsarType.objectList,
-      target: r'Tag',
+      target: r'DbTag',
     )
   },
   estimateSize: _dbNoteEstimateSize,
@@ -132,7 +132,7 @@ const DbNoteSchema = CollectionSchema(
     )
   },
   links: {},
-  embeddedSchemas: {r'Tag': TagSchema},
+  embeddedSchemas: {r'DbTag': DbTagSchema},
   getId: _dbNoteGetId,
   getLinks: _dbNoteGetLinks,
   attach: _dbNoteAttach,
@@ -158,33 +158,18 @@ int _dbNoteEstimateSize(
       bytesCount += value.length * 3;
     }
   }
-  {
-    final value = object.nostr_id;
-    if (value != null) {
-      bytesCount += 3 + value.length * 3;
-    }
-  }
-  {
-    final value = object.pubkey;
-    if (value != null) {
-      bytesCount += 3 + value.length * 3;
-    }
-  }
-  {
-    final value = object.sig;
-    if (value != null) {
-      bytesCount += 3 + value.length * 3;
-    }
-  }
+  bytesCount += 3 + object.nostr_id.length * 3;
+  bytesCount += 3 + object.pubkey.length * 3;
+  bytesCount += 3 + object.sig.length * 3;
   {
     final list = object.tags;
     if (list != null) {
       bytesCount += 3 + list.length * 3;
       {
-        final offsets = allOffsets[Tag]!;
+        final offsets = allOffsets[DbTag]!;
         for (var i = 0; i < list.length; i++) {
           final value = list[i];
-          bytesCount += TagSchema.estimateSize(value, offsets, allOffsets);
+          bytesCount += DbTagSchema.estimateSize(value, offsets, allOffsets);
         }
       }
     }
@@ -205,10 +190,10 @@ void _dbNoteSerialize(
   writer.writeString(offsets[4], object.nostr_id);
   writer.writeString(offsets[5], object.pubkey);
   writer.writeString(offsets[6], object.sig);
-  writer.writeObjectList<Tag>(
+  writer.writeObjectList<DbTag>(
     offsets[7],
     allOffsets,
-    TagSchema.serialize,
+    DbTagSchema.serialize,
     object.tags,
   );
 }
@@ -219,20 +204,21 @@ DbNote _dbNoteDeserialize(
   List<int> offsets,
   Map<Type, List<int>> allOffsets,
 ) {
-  final object = DbNote();
-  object.content = reader.readStringOrNull(offsets[0]);
-  object.created_at = reader.readLongOrNull(offsets[2]);
-  object.id = id;
-  object.kind = reader.readLongOrNull(offsets[3]);
-  object.nostr_id = reader.readStringOrNull(offsets[4]);
-  object.pubkey = reader.readStringOrNull(offsets[5]);
-  object.sig = reader.readStringOrNull(offsets[6]);
-  object.tags = reader.readObjectList<Tag>(
-    offsets[7],
-    TagSchema.deserialize,
-    allOffsets,
-    Tag(),
+  final object = DbNote(
+    content: reader.readStringOrNull(offsets[0]),
+    created_at: reader.readLong(offsets[2]),
+    kind: reader.readLong(offsets[3]),
+    nostr_id: reader.readString(offsets[4]),
+    pubkey: reader.readString(offsets[5]),
+    sig: reader.readString(offsets[6]),
+    tags: reader.readObjectList<DbTag>(
+      offsets[7],
+      DbTagSchema.deserialize,
+      allOffsets,
+      DbTag(),
+    ),
   );
+  object.id = id;
   return object;
 }
 
@@ -248,21 +234,21 @@ P _dbNoteDeserializeProp<P>(
     case 1:
       return (reader.readStringList(offset) ?? []) as P;
     case 2:
-      return (reader.readLongOrNull(offset)) as P;
+      return (reader.readLong(offset)) as P;
     case 3:
-      return (reader.readLongOrNull(offset)) as P;
+      return (reader.readLong(offset)) as P;
     case 4:
-      return (reader.readStringOrNull(offset)) as P;
+      return (reader.readString(offset)) as P;
     case 5:
-      return (reader.readStringOrNull(offset)) as P;
+      return (reader.readString(offset)) as P;
     case 6:
-      return (reader.readStringOrNull(offset)) as P;
+      return (reader.readString(offset)) as P;
     case 7:
-      return (reader.readObjectList<Tag>(
+      return (reader.readObjectList<DbTag>(
         offset,
-        TagSchema.deserialize,
+        DbTagSchema.deserialize,
         allOffsets,
-        Tag(),
+        DbTag(),
       )) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -282,38 +268,38 @@ void _dbNoteAttach(IsarCollection<dynamic> col, Id id, DbNote object) {
 }
 
 extension DbNoteByIndex on IsarCollection<DbNote> {
-  Future<DbNote?> getByNostr_id(String? nostr_id) {
+  Future<DbNote?> getByNostr_id(String nostr_id) {
     return getByIndex(r'nostr_id', [nostr_id]);
   }
 
-  DbNote? getByNostr_idSync(String? nostr_id) {
+  DbNote? getByNostr_idSync(String nostr_id) {
     return getByIndexSync(r'nostr_id', [nostr_id]);
   }
 
-  Future<bool> deleteByNostr_id(String? nostr_id) {
+  Future<bool> deleteByNostr_id(String nostr_id) {
     return deleteByIndex(r'nostr_id', [nostr_id]);
   }
 
-  bool deleteByNostr_idSync(String? nostr_id) {
+  bool deleteByNostr_idSync(String nostr_id) {
     return deleteByIndexSync(r'nostr_id', [nostr_id]);
   }
 
-  Future<List<DbNote?>> getAllByNostr_id(List<String?> nostr_idValues) {
+  Future<List<DbNote?>> getAllByNostr_id(List<String> nostr_idValues) {
     final values = nostr_idValues.map((e) => [e]).toList();
     return getAllByIndex(r'nostr_id', values);
   }
 
-  List<DbNote?> getAllByNostr_idSync(List<String?> nostr_idValues) {
+  List<DbNote?> getAllByNostr_idSync(List<String> nostr_idValues) {
     final values = nostr_idValues.map((e) => [e]).toList();
     return getAllByIndexSync(r'nostr_id', values);
   }
 
-  Future<int> deleteAllByNostr_id(List<String?> nostr_idValues) {
+  Future<int> deleteAllByNostr_id(List<String> nostr_idValues) {
     final values = nostr_idValues.map((e) => [e]).toList();
     return deleteAllByIndex(r'nostr_id', values);
   }
 
-  int deleteAllByNostr_idSync(List<String?> nostr_idValues) {
+  int deleteAllByNostr_idSync(List<String> nostr_idValues) {
     final values = nostr_idValues.map((e) => [e]).toList();
     return deleteAllByIndexSync(r'nostr_id', values);
   }
@@ -433,28 +419,8 @@ extension DbNoteQueryWhere on QueryBuilder<DbNote, DbNote, QWhereClause> {
     });
   }
 
-  QueryBuilder<DbNote, DbNote, QAfterWhereClause> nostr_idIsNull() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addWhereClause(IndexWhereClause.equalTo(
-        indexName: r'nostr_id',
-        value: [null],
-      ));
-    });
-  }
-
-  QueryBuilder<DbNote, DbNote, QAfterWhereClause> nostr_idIsNotNull() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addWhereClause(IndexWhereClause.between(
-        indexName: r'nostr_id',
-        lower: [null],
-        includeLower: false,
-        upper: [],
-      ));
-    });
-  }
-
   QueryBuilder<DbNote, DbNote, QAfterWhereClause> nostr_idEqualTo(
-      String? nostr_id) {
+      String nostr_id) {
     return QueryBuilder.apply(this, (query) {
       return query.addWhereClause(IndexWhereClause.equalTo(
         indexName: r'nostr_id',
@@ -464,7 +430,7 @@ extension DbNoteQueryWhere on QueryBuilder<DbNote, DbNote, QWhereClause> {
   }
 
   QueryBuilder<DbNote, DbNote, QAfterWhereClause> nostr_idNotEqualTo(
-      String? nostr_id) {
+      String nostr_id) {
     return QueryBuilder.apply(this, (query) {
       if (query.whereSort == Sort.asc) {
         return query
@@ -498,28 +464,7 @@ extension DbNoteQueryWhere on QueryBuilder<DbNote, DbNote, QWhereClause> {
     });
   }
 
-  QueryBuilder<DbNote, DbNote, QAfterWhereClause> pubkeyIsNull() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addWhereClause(IndexWhereClause.equalTo(
-        indexName: r'pubkey',
-        value: [null],
-      ));
-    });
-  }
-
-  QueryBuilder<DbNote, DbNote, QAfterWhereClause> pubkeyIsNotNull() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addWhereClause(IndexWhereClause.between(
-        indexName: r'pubkey',
-        lower: [null],
-        includeLower: false,
-        upper: [],
-      ));
-    });
-  }
-
-  QueryBuilder<DbNote, DbNote, QAfterWhereClause> pubkeyEqualTo(
-      String? pubkey) {
+  QueryBuilder<DbNote, DbNote, QAfterWhereClause> pubkeyEqualTo(String pubkey) {
     return QueryBuilder.apply(this, (query) {
       return query.addWhereClause(IndexWhereClause.equalTo(
         indexName: r'pubkey',
@@ -529,7 +474,7 @@ extension DbNoteQueryWhere on QueryBuilder<DbNote, DbNote, QWhereClause> {
   }
 
   QueryBuilder<DbNote, DbNote, QAfterWhereClause> pubkeyNotEqualTo(
-      String? pubkey) {
+      String pubkey) {
     return QueryBuilder.apply(this, (query) {
       if (query.whereSort == Sort.asc) {
         return query
@@ -563,28 +508,8 @@ extension DbNoteQueryWhere on QueryBuilder<DbNote, DbNote, QWhereClause> {
     });
   }
 
-  QueryBuilder<DbNote, DbNote, QAfterWhereClause> created_atIsNull() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addWhereClause(IndexWhereClause.equalTo(
-        indexName: r'created_at',
-        value: [null],
-      ));
-    });
-  }
-
-  QueryBuilder<DbNote, DbNote, QAfterWhereClause> created_atIsNotNull() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addWhereClause(IndexWhereClause.between(
-        indexName: r'created_at',
-        lower: [null],
-        includeLower: false,
-        upper: [],
-      ));
-    });
-  }
-
   QueryBuilder<DbNote, DbNote, QAfterWhereClause> created_atEqualTo(
-      int? created_at) {
+      int created_at) {
     return QueryBuilder.apply(this, (query) {
       return query.addWhereClause(IndexWhereClause.equalTo(
         indexName: r'created_at',
@@ -594,7 +519,7 @@ extension DbNoteQueryWhere on QueryBuilder<DbNote, DbNote, QWhereClause> {
   }
 
   QueryBuilder<DbNote, DbNote, QAfterWhereClause> created_atNotEqualTo(
-      int? created_at) {
+      int created_at) {
     return QueryBuilder.apply(this, (query) {
       if (query.whereSort == Sort.asc) {
         return query
@@ -629,7 +554,7 @@ extension DbNoteQueryWhere on QueryBuilder<DbNote, DbNote, QWhereClause> {
   }
 
   QueryBuilder<DbNote, DbNote, QAfterWhereClause> created_atGreaterThan(
-    int? created_at, {
+    int created_at, {
     bool include = false,
   }) {
     return QueryBuilder.apply(this, (query) {
@@ -643,7 +568,7 @@ extension DbNoteQueryWhere on QueryBuilder<DbNote, DbNote, QWhereClause> {
   }
 
   QueryBuilder<DbNote, DbNote, QAfterWhereClause> created_atLessThan(
-    int? created_at, {
+    int created_at, {
     bool include = false,
   }) {
     return QueryBuilder.apply(this, (query) {
@@ -657,8 +582,8 @@ extension DbNoteQueryWhere on QueryBuilder<DbNote, DbNote, QWhereClause> {
   }
 
   QueryBuilder<DbNote, DbNote, QAfterWhereClause> created_atBetween(
-    int? lowerCreated_at,
-    int? upperCreated_at, {
+    int lowerCreated_at,
+    int upperCreated_at, {
     bool includeLower = true,
     bool includeUpper = true,
   }) {
@@ -673,27 +598,7 @@ extension DbNoteQueryWhere on QueryBuilder<DbNote, DbNote, QWhereClause> {
     });
   }
 
-  QueryBuilder<DbNote, DbNote, QAfterWhereClause> kindIsNull() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addWhereClause(IndexWhereClause.equalTo(
-        indexName: r'kind',
-        value: [null],
-      ));
-    });
-  }
-
-  QueryBuilder<DbNote, DbNote, QAfterWhereClause> kindIsNotNull() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addWhereClause(IndexWhereClause.between(
-        indexName: r'kind',
-        lower: [null],
-        includeLower: false,
-        upper: [],
-      ));
-    });
-  }
-
-  QueryBuilder<DbNote, DbNote, QAfterWhereClause> kindEqualTo(int? kind) {
+  QueryBuilder<DbNote, DbNote, QAfterWhereClause> kindEqualTo(int kind) {
     return QueryBuilder.apply(this, (query) {
       return query.addWhereClause(IndexWhereClause.equalTo(
         indexName: r'kind',
@@ -702,7 +607,7 @@ extension DbNoteQueryWhere on QueryBuilder<DbNote, DbNote, QWhereClause> {
     });
   }
 
-  QueryBuilder<DbNote, DbNote, QAfterWhereClause> kindNotEqualTo(int? kind) {
+  QueryBuilder<DbNote, DbNote, QAfterWhereClause> kindNotEqualTo(int kind) {
     return QueryBuilder.apply(this, (query) {
       if (query.whereSort == Sort.asc) {
         return query
@@ -737,7 +642,7 @@ extension DbNoteQueryWhere on QueryBuilder<DbNote, DbNote, QWhereClause> {
   }
 
   QueryBuilder<DbNote, DbNote, QAfterWhereClause> kindGreaterThan(
-    int? kind, {
+    int kind, {
     bool include = false,
   }) {
     return QueryBuilder.apply(this, (query) {
@@ -751,7 +656,7 @@ extension DbNoteQueryWhere on QueryBuilder<DbNote, DbNote, QWhereClause> {
   }
 
   QueryBuilder<DbNote, DbNote, QAfterWhereClause> kindLessThan(
-    int? kind, {
+    int kind, {
     bool include = false,
   }) {
     return QueryBuilder.apply(this, (query) {
@@ -765,8 +670,8 @@ extension DbNoteQueryWhere on QueryBuilder<DbNote, DbNote, QWhereClause> {
   }
 
   QueryBuilder<DbNote, DbNote, QAfterWhereClause> kindBetween(
-    int? lowerKind,
-    int? upperKind, {
+    int lowerKind,
+    int upperKind, {
     bool includeLower = true,
     bool includeUpper = true,
   }) {
@@ -1289,24 +1194,8 @@ extension DbNoteQueryFilter on QueryBuilder<DbNote, DbNote, QFilterCondition> {
     });
   }
 
-  QueryBuilder<DbNote, DbNote, QAfterFilterCondition> created_atIsNull() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(const FilterCondition.isNull(
-        property: r'created_at',
-      ));
-    });
-  }
-
-  QueryBuilder<DbNote, DbNote, QAfterFilterCondition> created_atIsNotNull() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(const FilterCondition.isNotNull(
-        property: r'created_at',
-      ));
-    });
-  }
-
   QueryBuilder<DbNote, DbNote, QAfterFilterCondition> created_atEqualTo(
-      int? value) {
+      int value) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
         property: r'created_at',
@@ -1316,7 +1205,7 @@ extension DbNoteQueryFilter on QueryBuilder<DbNote, DbNote, QFilterCondition> {
   }
 
   QueryBuilder<DbNote, DbNote, QAfterFilterCondition> created_atGreaterThan(
-    int? value, {
+    int value, {
     bool include = false,
   }) {
     return QueryBuilder.apply(this, (query) {
@@ -1329,7 +1218,7 @@ extension DbNoteQueryFilter on QueryBuilder<DbNote, DbNote, QFilterCondition> {
   }
 
   QueryBuilder<DbNote, DbNote, QAfterFilterCondition> created_atLessThan(
-    int? value, {
+    int value, {
     bool include = false,
   }) {
     return QueryBuilder.apply(this, (query) {
@@ -1342,8 +1231,8 @@ extension DbNoteQueryFilter on QueryBuilder<DbNote, DbNote, QFilterCondition> {
   }
 
   QueryBuilder<DbNote, DbNote, QAfterFilterCondition> created_atBetween(
-    int? lower,
-    int? upper, {
+    int lower,
+    int upper, {
     bool includeLower = true,
     bool includeUpper = true,
   }) {
@@ -1410,23 +1299,7 @@ extension DbNoteQueryFilter on QueryBuilder<DbNote, DbNote, QFilterCondition> {
     });
   }
 
-  QueryBuilder<DbNote, DbNote, QAfterFilterCondition> kindIsNull() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(const FilterCondition.isNull(
-        property: r'kind',
-      ));
-    });
-  }
-
-  QueryBuilder<DbNote, DbNote, QAfterFilterCondition> kindIsNotNull() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(const FilterCondition.isNotNull(
-        property: r'kind',
-      ));
-    });
-  }
-
-  QueryBuilder<DbNote, DbNote, QAfterFilterCondition> kindEqualTo(int? value) {
+  QueryBuilder<DbNote, DbNote, QAfterFilterCondition> kindEqualTo(int value) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
         property: r'kind',
@@ -1436,7 +1309,7 @@ extension DbNoteQueryFilter on QueryBuilder<DbNote, DbNote, QFilterCondition> {
   }
 
   QueryBuilder<DbNote, DbNote, QAfterFilterCondition> kindGreaterThan(
-    int? value, {
+    int value, {
     bool include = false,
   }) {
     return QueryBuilder.apply(this, (query) {
@@ -1449,7 +1322,7 @@ extension DbNoteQueryFilter on QueryBuilder<DbNote, DbNote, QFilterCondition> {
   }
 
   QueryBuilder<DbNote, DbNote, QAfterFilterCondition> kindLessThan(
-    int? value, {
+    int value, {
     bool include = false,
   }) {
     return QueryBuilder.apply(this, (query) {
@@ -1462,8 +1335,8 @@ extension DbNoteQueryFilter on QueryBuilder<DbNote, DbNote, QFilterCondition> {
   }
 
   QueryBuilder<DbNote, DbNote, QAfterFilterCondition> kindBetween(
-    int? lower,
-    int? upper, {
+    int lower,
+    int upper, {
     bool includeLower = true,
     bool includeUpper = true,
   }) {
@@ -1478,24 +1351,8 @@ extension DbNoteQueryFilter on QueryBuilder<DbNote, DbNote, QFilterCondition> {
     });
   }
 
-  QueryBuilder<DbNote, DbNote, QAfterFilterCondition> nostr_idIsNull() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(const FilterCondition.isNull(
-        property: r'nostr_id',
-      ));
-    });
-  }
-
-  QueryBuilder<DbNote, DbNote, QAfterFilterCondition> nostr_idIsNotNull() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(const FilterCondition.isNotNull(
-        property: r'nostr_id',
-      ));
-    });
-  }
-
   QueryBuilder<DbNote, DbNote, QAfterFilterCondition> nostr_idEqualTo(
-    String? value, {
+    String value, {
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
@@ -1508,7 +1365,7 @@ extension DbNoteQueryFilter on QueryBuilder<DbNote, DbNote, QFilterCondition> {
   }
 
   QueryBuilder<DbNote, DbNote, QAfterFilterCondition> nostr_idGreaterThan(
-    String? value, {
+    String value, {
     bool include = false,
     bool caseSensitive = true,
   }) {
@@ -1523,7 +1380,7 @@ extension DbNoteQueryFilter on QueryBuilder<DbNote, DbNote, QFilterCondition> {
   }
 
   QueryBuilder<DbNote, DbNote, QAfterFilterCondition> nostr_idLessThan(
-    String? value, {
+    String value, {
     bool include = false,
     bool caseSensitive = true,
   }) {
@@ -1538,8 +1395,8 @@ extension DbNoteQueryFilter on QueryBuilder<DbNote, DbNote, QFilterCondition> {
   }
 
   QueryBuilder<DbNote, DbNote, QAfterFilterCondition> nostr_idBetween(
-    String? lower,
-    String? upper, {
+    String lower,
+    String upper, {
     bool includeLower = true,
     bool includeUpper = true,
     bool caseSensitive = true,
@@ -1624,24 +1481,8 @@ extension DbNoteQueryFilter on QueryBuilder<DbNote, DbNote, QFilterCondition> {
     });
   }
 
-  QueryBuilder<DbNote, DbNote, QAfterFilterCondition> pubkeyIsNull() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(const FilterCondition.isNull(
-        property: r'pubkey',
-      ));
-    });
-  }
-
-  QueryBuilder<DbNote, DbNote, QAfterFilterCondition> pubkeyIsNotNull() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(const FilterCondition.isNotNull(
-        property: r'pubkey',
-      ));
-    });
-  }
-
   QueryBuilder<DbNote, DbNote, QAfterFilterCondition> pubkeyEqualTo(
-    String? value, {
+    String value, {
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
@@ -1654,7 +1495,7 @@ extension DbNoteQueryFilter on QueryBuilder<DbNote, DbNote, QFilterCondition> {
   }
 
   QueryBuilder<DbNote, DbNote, QAfterFilterCondition> pubkeyGreaterThan(
-    String? value, {
+    String value, {
     bool include = false,
     bool caseSensitive = true,
   }) {
@@ -1669,7 +1510,7 @@ extension DbNoteQueryFilter on QueryBuilder<DbNote, DbNote, QFilterCondition> {
   }
 
   QueryBuilder<DbNote, DbNote, QAfterFilterCondition> pubkeyLessThan(
-    String? value, {
+    String value, {
     bool include = false,
     bool caseSensitive = true,
   }) {
@@ -1684,8 +1525,8 @@ extension DbNoteQueryFilter on QueryBuilder<DbNote, DbNote, QFilterCondition> {
   }
 
   QueryBuilder<DbNote, DbNote, QAfterFilterCondition> pubkeyBetween(
-    String? lower,
-    String? upper, {
+    String lower,
+    String upper, {
     bool includeLower = true,
     bool includeUpper = true,
     bool caseSensitive = true,
@@ -1770,24 +1611,8 @@ extension DbNoteQueryFilter on QueryBuilder<DbNote, DbNote, QFilterCondition> {
     });
   }
 
-  QueryBuilder<DbNote, DbNote, QAfterFilterCondition> sigIsNull() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(const FilterCondition.isNull(
-        property: r'sig',
-      ));
-    });
-  }
-
-  QueryBuilder<DbNote, DbNote, QAfterFilterCondition> sigIsNotNull() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(const FilterCondition.isNotNull(
-        property: r'sig',
-      ));
-    });
-  }
-
   QueryBuilder<DbNote, DbNote, QAfterFilterCondition> sigEqualTo(
-    String? value, {
+    String value, {
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
@@ -1800,7 +1625,7 @@ extension DbNoteQueryFilter on QueryBuilder<DbNote, DbNote, QFilterCondition> {
   }
 
   QueryBuilder<DbNote, DbNote, QAfterFilterCondition> sigGreaterThan(
-    String? value, {
+    String value, {
     bool include = false,
     bool caseSensitive = true,
   }) {
@@ -1815,7 +1640,7 @@ extension DbNoteQueryFilter on QueryBuilder<DbNote, DbNote, QFilterCondition> {
   }
 
   QueryBuilder<DbNote, DbNote, QAfterFilterCondition> sigLessThan(
-    String? value, {
+    String value, {
     bool include = false,
     bool caseSensitive = true,
   }) {
@@ -1830,8 +1655,8 @@ extension DbNoteQueryFilter on QueryBuilder<DbNote, DbNote, QFilterCondition> {
   }
 
   QueryBuilder<DbNote, DbNote, QAfterFilterCondition> sigBetween(
-    String? lower,
-    String? upper, {
+    String lower,
+    String upper, {
     bool includeLower = true,
     bool includeUpper = true,
     bool caseSensitive = true,
@@ -2017,7 +1842,7 @@ extension DbNoteQueryFilter on QueryBuilder<DbNote, DbNote, QFilterCondition> {
 
 extension DbNoteQueryObject on QueryBuilder<DbNote, DbNote, QFilterCondition> {
   QueryBuilder<DbNote, DbNote, QAfterFilterCondition> tagsElement(
-      FilterQuery<Tag> q) {
+      FilterQuery<DbTag> q) {
     return QueryBuilder.apply(this, (query) {
       return query.object(q, r'tags');
     });
@@ -2253,37 +2078,37 @@ extension DbNoteQueryProperty on QueryBuilder<DbNote, DbNote, QQueryProperty> {
     });
   }
 
-  QueryBuilder<DbNote, int?, QQueryOperations> created_atProperty() {
+  QueryBuilder<DbNote, int, QQueryOperations> created_atProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'created_at');
     });
   }
 
-  QueryBuilder<DbNote, int?, QQueryOperations> kindProperty() {
+  QueryBuilder<DbNote, int, QQueryOperations> kindProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'kind');
     });
   }
 
-  QueryBuilder<DbNote, String?, QQueryOperations> nostr_idProperty() {
+  QueryBuilder<DbNote, String, QQueryOperations> nostr_idProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'nostr_id');
     });
   }
 
-  QueryBuilder<DbNote, String?, QQueryOperations> pubkeyProperty() {
+  QueryBuilder<DbNote, String, QQueryOperations> pubkeyProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'pubkey');
     });
   }
 
-  QueryBuilder<DbNote, String?, QQueryOperations> sigProperty() {
+  QueryBuilder<DbNote, String, QQueryOperations> sigProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'sig');
     });
   }
 
-  QueryBuilder<DbNote, List<Tag>?, QQueryOperations> tagsProperty() {
+  QueryBuilder<DbNote, List<DbTag>?, QQueryOperations> tagsProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'tags');
     });
@@ -2297,9 +2122,9 @@ extension DbNoteQueryProperty on QueryBuilder<DbNote, DbNote, QQueryProperty> {
 // coverage:ignore-file
 // ignore_for_file: duplicate_ignore, non_constant_identifier_names, constant_identifier_names, invalid_use_of_protected_member, unnecessary_cast, prefer_const_constructors, lines_longer_than_80_chars, require_trailing_commas, inference_failure_on_function_invocation, unnecessary_parenthesis, unnecessary_raw_strings, unnecessary_null_checks, join_return_with_assignment, prefer_final_locals, avoid_js_rounded_ints, avoid_positional_boolean_parameters, always_specify_types
 
-const TagSchema = Schema(
-  name: r'Tag',
-  id: 4007045862261149568,
+const DbTagSchema = Schema(
+  name: r'DbTag',
+  id: 570407730445455127,
   properties: {
     r'marker': PropertySchema(
       id: 0,
@@ -2322,14 +2147,14 @@ const TagSchema = Schema(
       type: IsarType.string,
     )
   },
-  estimateSize: _tagEstimateSize,
-  serialize: _tagSerialize,
-  deserialize: _tagDeserialize,
-  deserializeProp: _tagDeserializeProp,
+  estimateSize: _dbTagEstimateSize,
+  serialize: _dbTagSerialize,
+  deserialize: _dbTagDeserialize,
+  deserializeProp: _dbTagDeserializeProp,
 );
 
-int _tagEstimateSize(
-  Tag object,
+int _dbTagEstimateSize(
+  DbTag object,
   List<int> offsets,
   Map<Type, List<int>> allOffsets,
 ) {
@@ -2361,8 +2186,8 @@ int _tagEstimateSize(
   return bytesCount;
 }
 
-void _tagSerialize(
-  Tag object,
+void _dbTagSerialize(
+  DbTag object,
   IsarWriter writer,
   List<int> offsets,
   Map<Type, List<int>> allOffsets,
@@ -2373,21 +2198,22 @@ void _tagSerialize(
   writer.writeString(offsets[3], object.value);
 }
 
-Tag _tagDeserialize(
+DbTag _dbTagDeserialize(
   Id id,
   IsarReader reader,
   List<int> offsets,
   Map<Type, List<int>> allOffsets,
 ) {
-  final object = Tag();
-  object.marker = reader.readStringOrNull(offsets[0]);
-  object.recommended_relay = reader.readStringOrNull(offsets[1]);
-  object.type = reader.readStringOrNull(offsets[2]);
-  object.value = reader.readStringOrNull(offsets[3]);
+  final object = DbTag(
+    marker: reader.readStringOrNull(offsets[0]),
+    recommended_relay: reader.readStringOrNull(offsets[1]),
+    type: reader.readStringOrNull(offsets[2]),
+    value: reader.readStringOrNull(offsets[3]),
+  );
   return object;
 }
 
-P _tagDeserializeProp<P>(
+P _dbTagDeserializeProp<P>(
   IsarReader reader,
   int propertyId,
   int offset,
@@ -2407,8 +2233,8 @@ P _tagDeserializeProp<P>(
   }
 }
 
-extension TagQueryFilter on QueryBuilder<Tag, Tag, QFilterCondition> {
-  QueryBuilder<Tag, Tag, QAfterFilterCondition> markerIsNull() {
+extension DbTagQueryFilter on QueryBuilder<DbTag, DbTag, QFilterCondition> {
+  QueryBuilder<DbTag, DbTag, QAfterFilterCondition> markerIsNull() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(const FilterCondition.isNull(
         property: r'marker',
@@ -2416,7 +2242,7 @@ extension TagQueryFilter on QueryBuilder<Tag, Tag, QFilterCondition> {
     });
   }
 
-  QueryBuilder<Tag, Tag, QAfterFilterCondition> markerIsNotNull() {
+  QueryBuilder<DbTag, DbTag, QAfterFilterCondition> markerIsNotNull() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(const FilterCondition.isNotNull(
         property: r'marker',
@@ -2424,7 +2250,7 @@ extension TagQueryFilter on QueryBuilder<Tag, Tag, QFilterCondition> {
     });
   }
 
-  QueryBuilder<Tag, Tag, QAfterFilterCondition> markerEqualTo(
+  QueryBuilder<DbTag, DbTag, QAfterFilterCondition> markerEqualTo(
     String? value, {
     bool caseSensitive = true,
   }) {
@@ -2437,7 +2263,7 @@ extension TagQueryFilter on QueryBuilder<Tag, Tag, QFilterCondition> {
     });
   }
 
-  QueryBuilder<Tag, Tag, QAfterFilterCondition> markerGreaterThan(
+  QueryBuilder<DbTag, DbTag, QAfterFilterCondition> markerGreaterThan(
     String? value, {
     bool include = false,
     bool caseSensitive = true,
@@ -2452,7 +2278,7 @@ extension TagQueryFilter on QueryBuilder<Tag, Tag, QFilterCondition> {
     });
   }
 
-  QueryBuilder<Tag, Tag, QAfterFilterCondition> markerLessThan(
+  QueryBuilder<DbTag, DbTag, QAfterFilterCondition> markerLessThan(
     String? value, {
     bool include = false,
     bool caseSensitive = true,
@@ -2467,7 +2293,7 @@ extension TagQueryFilter on QueryBuilder<Tag, Tag, QFilterCondition> {
     });
   }
 
-  QueryBuilder<Tag, Tag, QAfterFilterCondition> markerBetween(
+  QueryBuilder<DbTag, DbTag, QAfterFilterCondition> markerBetween(
     String? lower,
     String? upper, {
     bool includeLower = true,
@@ -2486,7 +2312,7 @@ extension TagQueryFilter on QueryBuilder<Tag, Tag, QFilterCondition> {
     });
   }
 
-  QueryBuilder<Tag, Tag, QAfterFilterCondition> markerStartsWith(
+  QueryBuilder<DbTag, DbTag, QAfterFilterCondition> markerStartsWith(
     String value, {
     bool caseSensitive = true,
   }) {
@@ -2499,7 +2325,7 @@ extension TagQueryFilter on QueryBuilder<Tag, Tag, QFilterCondition> {
     });
   }
 
-  QueryBuilder<Tag, Tag, QAfterFilterCondition> markerEndsWith(
+  QueryBuilder<DbTag, DbTag, QAfterFilterCondition> markerEndsWith(
     String value, {
     bool caseSensitive = true,
   }) {
@@ -2512,7 +2338,7 @@ extension TagQueryFilter on QueryBuilder<Tag, Tag, QFilterCondition> {
     });
   }
 
-  QueryBuilder<Tag, Tag, QAfterFilterCondition> markerContains(String value,
+  QueryBuilder<DbTag, DbTag, QAfterFilterCondition> markerContains(String value,
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.contains(
@@ -2523,7 +2349,8 @@ extension TagQueryFilter on QueryBuilder<Tag, Tag, QFilterCondition> {
     });
   }
 
-  QueryBuilder<Tag, Tag, QAfterFilterCondition> markerMatches(String pattern,
+  QueryBuilder<DbTag, DbTag, QAfterFilterCondition> markerMatches(
+      String pattern,
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.matches(
@@ -2534,7 +2361,7 @@ extension TagQueryFilter on QueryBuilder<Tag, Tag, QFilterCondition> {
     });
   }
 
-  QueryBuilder<Tag, Tag, QAfterFilterCondition> markerIsEmpty() {
+  QueryBuilder<DbTag, DbTag, QAfterFilterCondition> markerIsEmpty() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
         property: r'marker',
@@ -2543,7 +2370,7 @@ extension TagQueryFilter on QueryBuilder<Tag, Tag, QFilterCondition> {
     });
   }
 
-  QueryBuilder<Tag, Tag, QAfterFilterCondition> markerIsNotEmpty() {
+  QueryBuilder<DbTag, DbTag, QAfterFilterCondition> markerIsNotEmpty() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.greaterThan(
         property: r'marker',
@@ -2552,7 +2379,7 @@ extension TagQueryFilter on QueryBuilder<Tag, Tag, QFilterCondition> {
     });
   }
 
-  QueryBuilder<Tag, Tag, QAfterFilterCondition> recommended_relayIsNull() {
+  QueryBuilder<DbTag, DbTag, QAfterFilterCondition> recommended_relayIsNull() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(const FilterCondition.isNull(
         property: r'recommended_relay',
@@ -2560,7 +2387,8 @@ extension TagQueryFilter on QueryBuilder<Tag, Tag, QFilterCondition> {
     });
   }
 
-  QueryBuilder<Tag, Tag, QAfterFilterCondition> recommended_relayIsNotNull() {
+  QueryBuilder<DbTag, DbTag, QAfterFilterCondition>
+      recommended_relayIsNotNull() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(const FilterCondition.isNotNull(
         property: r'recommended_relay',
@@ -2568,7 +2396,7 @@ extension TagQueryFilter on QueryBuilder<Tag, Tag, QFilterCondition> {
     });
   }
 
-  QueryBuilder<Tag, Tag, QAfterFilterCondition> recommended_relayEqualTo(
+  QueryBuilder<DbTag, DbTag, QAfterFilterCondition> recommended_relayEqualTo(
     String? value, {
     bool caseSensitive = true,
   }) {
@@ -2581,7 +2409,8 @@ extension TagQueryFilter on QueryBuilder<Tag, Tag, QFilterCondition> {
     });
   }
 
-  QueryBuilder<Tag, Tag, QAfterFilterCondition> recommended_relayGreaterThan(
+  QueryBuilder<DbTag, DbTag, QAfterFilterCondition>
+      recommended_relayGreaterThan(
     String? value, {
     bool include = false,
     bool caseSensitive = true,
@@ -2596,7 +2425,7 @@ extension TagQueryFilter on QueryBuilder<Tag, Tag, QFilterCondition> {
     });
   }
 
-  QueryBuilder<Tag, Tag, QAfterFilterCondition> recommended_relayLessThan(
+  QueryBuilder<DbTag, DbTag, QAfterFilterCondition> recommended_relayLessThan(
     String? value, {
     bool include = false,
     bool caseSensitive = true,
@@ -2611,7 +2440,7 @@ extension TagQueryFilter on QueryBuilder<Tag, Tag, QFilterCondition> {
     });
   }
 
-  QueryBuilder<Tag, Tag, QAfterFilterCondition> recommended_relayBetween(
+  QueryBuilder<DbTag, DbTag, QAfterFilterCondition> recommended_relayBetween(
     String? lower,
     String? upper, {
     bool includeLower = true,
@@ -2630,7 +2459,7 @@ extension TagQueryFilter on QueryBuilder<Tag, Tag, QFilterCondition> {
     });
   }
 
-  QueryBuilder<Tag, Tag, QAfterFilterCondition> recommended_relayStartsWith(
+  QueryBuilder<DbTag, DbTag, QAfterFilterCondition> recommended_relayStartsWith(
     String value, {
     bool caseSensitive = true,
   }) {
@@ -2643,7 +2472,7 @@ extension TagQueryFilter on QueryBuilder<Tag, Tag, QFilterCondition> {
     });
   }
 
-  QueryBuilder<Tag, Tag, QAfterFilterCondition> recommended_relayEndsWith(
+  QueryBuilder<DbTag, DbTag, QAfterFilterCondition> recommended_relayEndsWith(
     String value, {
     bool caseSensitive = true,
   }) {
@@ -2656,7 +2485,7 @@ extension TagQueryFilter on QueryBuilder<Tag, Tag, QFilterCondition> {
     });
   }
 
-  QueryBuilder<Tag, Tag, QAfterFilterCondition> recommended_relayContains(
+  QueryBuilder<DbTag, DbTag, QAfterFilterCondition> recommended_relayContains(
       String value,
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
@@ -2668,7 +2497,7 @@ extension TagQueryFilter on QueryBuilder<Tag, Tag, QFilterCondition> {
     });
   }
 
-  QueryBuilder<Tag, Tag, QAfterFilterCondition> recommended_relayMatches(
+  QueryBuilder<DbTag, DbTag, QAfterFilterCondition> recommended_relayMatches(
       String pattern,
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
@@ -2680,7 +2509,7 @@ extension TagQueryFilter on QueryBuilder<Tag, Tag, QFilterCondition> {
     });
   }
 
-  QueryBuilder<Tag, Tag, QAfterFilterCondition> recommended_relayIsEmpty() {
+  QueryBuilder<DbTag, DbTag, QAfterFilterCondition> recommended_relayIsEmpty() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
         property: r'recommended_relay',
@@ -2689,7 +2518,8 @@ extension TagQueryFilter on QueryBuilder<Tag, Tag, QFilterCondition> {
     });
   }
 
-  QueryBuilder<Tag, Tag, QAfterFilterCondition> recommended_relayIsNotEmpty() {
+  QueryBuilder<DbTag, DbTag, QAfterFilterCondition>
+      recommended_relayIsNotEmpty() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.greaterThan(
         property: r'recommended_relay',
@@ -2698,7 +2528,7 @@ extension TagQueryFilter on QueryBuilder<Tag, Tag, QFilterCondition> {
     });
   }
 
-  QueryBuilder<Tag, Tag, QAfterFilterCondition> typeIsNull() {
+  QueryBuilder<DbTag, DbTag, QAfterFilterCondition> typeIsNull() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(const FilterCondition.isNull(
         property: r'type',
@@ -2706,7 +2536,7 @@ extension TagQueryFilter on QueryBuilder<Tag, Tag, QFilterCondition> {
     });
   }
 
-  QueryBuilder<Tag, Tag, QAfterFilterCondition> typeIsNotNull() {
+  QueryBuilder<DbTag, DbTag, QAfterFilterCondition> typeIsNotNull() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(const FilterCondition.isNotNull(
         property: r'type',
@@ -2714,7 +2544,7 @@ extension TagQueryFilter on QueryBuilder<Tag, Tag, QFilterCondition> {
     });
   }
 
-  QueryBuilder<Tag, Tag, QAfterFilterCondition> typeEqualTo(
+  QueryBuilder<DbTag, DbTag, QAfterFilterCondition> typeEqualTo(
     String? value, {
     bool caseSensitive = true,
   }) {
@@ -2727,7 +2557,7 @@ extension TagQueryFilter on QueryBuilder<Tag, Tag, QFilterCondition> {
     });
   }
 
-  QueryBuilder<Tag, Tag, QAfterFilterCondition> typeGreaterThan(
+  QueryBuilder<DbTag, DbTag, QAfterFilterCondition> typeGreaterThan(
     String? value, {
     bool include = false,
     bool caseSensitive = true,
@@ -2742,7 +2572,7 @@ extension TagQueryFilter on QueryBuilder<Tag, Tag, QFilterCondition> {
     });
   }
 
-  QueryBuilder<Tag, Tag, QAfterFilterCondition> typeLessThan(
+  QueryBuilder<DbTag, DbTag, QAfterFilterCondition> typeLessThan(
     String? value, {
     bool include = false,
     bool caseSensitive = true,
@@ -2757,7 +2587,7 @@ extension TagQueryFilter on QueryBuilder<Tag, Tag, QFilterCondition> {
     });
   }
 
-  QueryBuilder<Tag, Tag, QAfterFilterCondition> typeBetween(
+  QueryBuilder<DbTag, DbTag, QAfterFilterCondition> typeBetween(
     String? lower,
     String? upper, {
     bool includeLower = true,
@@ -2776,7 +2606,7 @@ extension TagQueryFilter on QueryBuilder<Tag, Tag, QFilterCondition> {
     });
   }
 
-  QueryBuilder<Tag, Tag, QAfterFilterCondition> typeStartsWith(
+  QueryBuilder<DbTag, DbTag, QAfterFilterCondition> typeStartsWith(
     String value, {
     bool caseSensitive = true,
   }) {
@@ -2789,7 +2619,7 @@ extension TagQueryFilter on QueryBuilder<Tag, Tag, QFilterCondition> {
     });
   }
 
-  QueryBuilder<Tag, Tag, QAfterFilterCondition> typeEndsWith(
+  QueryBuilder<DbTag, DbTag, QAfterFilterCondition> typeEndsWith(
     String value, {
     bool caseSensitive = true,
   }) {
@@ -2802,7 +2632,7 @@ extension TagQueryFilter on QueryBuilder<Tag, Tag, QFilterCondition> {
     });
   }
 
-  QueryBuilder<Tag, Tag, QAfterFilterCondition> typeContains(String value,
+  QueryBuilder<DbTag, DbTag, QAfterFilterCondition> typeContains(String value,
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.contains(
@@ -2813,7 +2643,7 @@ extension TagQueryFilter on QueryBuilder<Tag, Tag, QFilterCondition> {
     });
   }
 
-  QueryBuilder<Tag, Tag, QAfterFilterCondition> typeMatches(String pattern,
+  QueryBuilder<DbTag, DbTag, QAfterFilterCondition> typeMatches(String pattern,
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.matches(
@@ -2824,7 +2654,7 @@ extension TagQueryFilter on QueryBuilder<Tag, Tag, QFilterCondition> {
     });
   }
 
-  QueryBuilder<Tag, Tag, QAfterFilterCondition> typeIsEmpty() {
+  QueryBuilder<DbTag, DbTag, QAfterFilterCondition> typeIsEmpty() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
         property: r'type',
@@ -2833,7 +2663,7 @@ extension TagQueryFilter on QueryBuilder<Tag, Tag, QFilterCondition> {
     });
   }
 
-  QueryBuilder<Tag, Tag, QAfterFilterCondition> typeIsNotEmpty() {
+  QueryBuilder<DbTag, DbTag, QAfterFilterCondition> typeIsNotEmpty() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.greaterThan(
         property: r'type',
@@ -2842,7 +2672,7 @@ extension TagQueryFilter on QueryBuilder<Tag, Tag, QFilterCondition> {
     });
   }
 
-  QueryBuilder<Tag, Tag, QAfterFilterCondition> valueIsNull() {
+  QueryBuilder<DbTag, DbTag, QAfterFilterCondition> valueIsNull() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(const FilterCondition.isNull(
         property: r'value',
@@ -2850,7 +2680,7 @@ extension TagQueryFilter on QueryBuilder<Tag, Tag, QFilterCondition> {
     });
   }
 
-  QueryBuilder<Tag, Tag, QAfterFilterCondition> valueIsNotNull() {
+  QueryBuilder<DbTag, DbTag, QAfterFilterCondition> valueIsNotNull() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(const FilterCondition.isNotNull(
         property: r'value',
@@ -2858,7 +2688,7 @@ extension TagQueryFilter on QueryBuilder<Tag, Tag, QFilterCondition> {
     });
   }
 
-  QueryBuilder<Tag, Tag, QAfterFilterCondition> valueEqualTo(
+  QueryBuilder<DbTag, DbTag, QAfterFilterCondition> valueEqualTo(
     String? value, {
     bool caseSensitive = true,
   }) {
@@ -2871,7 +2701,7 @@ extension TagQueryFilter on QueryBuilder<Tag, Tag, QFilterCondition> {
     });
   }
 
-  QueryBuilder<Tag, Tag, QAfterFilterCondition> valueGreaterThan(
+  QueryBuilder<DbTag, DbTag, QAfterFilterCondition> valueGreaterThan(
     String? value, {
     bool include = false,
     bool caseSensitive = true,
@@ -2886,7 +2716,7 @@ extension TagQueryFilter on QueryBuilder<Tag, Tag, QFilterCondition> {
     });
   }
 
-  QueryBuilder<Tag, Tag, QAfterFilterCondition> valueLessThan(
+  QueryBuilder<DbTag, DbTag, QAfterFilterCondition> valueLessThan(
     String? value, {
     bool include = false,
     bool caseSensitive = true,
@@ -2901,7 +2731,7 @@ extension TagQueryFilter on QueryBuilder<Tag, Tag, QFilterCondition> {
     });
   }
 
-  QueryBuilder<Tag, Tag, QAfterFilterCondition> valueBetween(
+  QueryBuilder<DbTag, DbTag, QAfterFilterCondition> valueBetween(
     String? lower,
     String? upper, {
     bool includeLower = true,
@@ -2920,7 +2750,7 @@ extension TagQueryFilter on QueryBuilder<Tag, Tag, QFilterCondition> {
     });
   }
 
-  QueryBuilder<Tag, Tag, QAfterFilterCondition> valueStartsWith(
+  QueryBuilder<DbTag, DbTag, QAfterFilterCondition> valueStartsWith(
     String value, {
     bool caseSensitive = true,
   }) {
@@ -2933,7 +2763,7 @@ extension TagQueryFilter on QueryBuilder<Tag, Tag, QFilterCondition> {
     });
   }
 
-  QueryBuilder<Tag, Tag, QAfterFilterCondition> valueEndsWith(
+  QueryBuilder<DbTag, DbTag, QAfterFilterCondition> valueEndsWith(
     String value, {
     bool caseSensitive = true,
   }) {
@@ -2946,7 +2776,7 @@ extension TagQueryFilter on QueryBuilder<Tag, Tag, QFilterCondition> {
     });
   }
 
-  QueryBuilder<Tag, Tag, QAfterFilterCondition> valueContains(String value,
+  QueryBuilder<DbTag, DbTag, QAfterFilterCondition> valueContains(String value,
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.contains(
@@ -2957,7 +2787,7 @@ extension TagQueryFilter on QueryBuilder<Tag, Tag, QFilterCondition> {
     });
   }
 
-  QueryBuilder<Tag, Tag, QAfterFilterCondition> valueMatches(String pattern,
+  QueryBuilder<DbTag, DbTag, QAfterFilterCondition> valueMatches(String pattern,
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.matches(
@@ -2968,7 +2798,7 @@ extension TagQueryFilter on QueryBuilder<Tag, Tag, QFilterCondition> {
     });
   }
 
-  QueryBuilder<Tag, Tag, QAfterFilterCondition> valueIsEmpty() {
+  QueryBuilder<DbTag, DbTag, QAfterFilterCondition> valueIsEmpty() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
         property: r'value',
@@ -2977,7 +2807,7 @@ extension TagQueryFilter on QueryBuilder<Tag, Tag, QFilterCondition> {
     });
   }
 
-  QueryBuilder<Tag, Tag, QAfterFilterCondition> valueIsNotEmpty() {
+  QueryBuilder<DbTag, DbTag, QAfterFilterCondition> valueIsNotEmpty() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.greaterThan(
         property: r'value',
@@ -2987,4 +2817,4 @@ extension TagQueryFilter on QueryBuilder<Tag, Tag, QFilterCondition> {
   }
 }
 
-extension TagQueryObject on QueryBuilder<Tag, Tag, QFilterCondition> {}
+extension DbTagQueryObject on QueryBuilder<DbTag, DbTag, QFilterCondition> {}
