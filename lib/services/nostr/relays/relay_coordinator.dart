@@ -14,13 +14,16 @@ import 'package:camelus/services/nostr/relays/my_relay.dart';
 import 'package:camelus/services/nostr/relays/relay_address_parser.dart';
 import 'package:camelus/services/nostr/relays/relay_subscription_holder.dart';
 import 'package:camelus/services/nostr/relays/relays_picker.dart';
+import 'package:isar/isar.dart';
 
 class RelayCoordinator {
   final _maxTmpRelayCount = 5; // move magic number to settings
   final Future<AppDatabase> dbFuture;
+  final Future<Isar> isarDbFuture;
   final Future<KeyPairWrapper> keyPairFuture;
 
   late AppDatabase _db;
+  late Isar _isarDb;
   late KeyPair _keyPair;
 
   final List<RelaySubscriptionHolder> _activeSubscriptions = [];
@@ -40,6 +43,7 @@ class RelayCoordinator {
 
   RelayCoordinator({
     required this.dbFuture,
+    required this.isarDbFuture,
     required this.keyPairFuture,
   }) {
     _init();
@@ -47,6 +51,7 @@ class RelayCoordinator {
 
   _init() async {
     _db = await dbFuture;
+    _isarDb = await isarDbFuture;
     _keyPair = (await keyPairFuture).keyPair!;
 
     await _initStreamOwnContacts(_keyPair.publicKey);
@@ -551,6 +556,7 @@ class RelayCoordinator {
 
     var relay = MyRelay(
         database: _db,
+        isarDatabase: _isarDb,
         relayUrl: relayUrl,
         read: read,
         write: write,

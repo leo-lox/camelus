@@ -66,10 +66,13 @@ dependencies:
   web_socket_channel: ^2.4.0
   http_parser: ^4.0.2
   drift: ^2.9.0
+  isar: ^3.1.0+1
+  isar_flutter_libs: ^3.1.0+1
+  path_provider: ^2.1.1
 
 dev_dependencies:
   floor_generator: ^1.4.2
-  build_runner: ^2.1.2
+  build_runner: ^2.4.6
   flutter_test:
     sdk: flutter
   integration_test:
@@ -83,6 +86,7 @@ dev_dependencies:
   # rules and activating additional ones.
   flutter_lints: ^2.0.0
   test: ^1.21.4
+  isar_generator: ^3.1.0+1
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
