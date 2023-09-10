@@ -1,12 +1,13 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:camelus/db/database.dart';
+import 'package:camelus/db/queries/db_note_queries.dart';
 import 'package:camelus/helpers/helpers.dart';
 import 'package:camelus/models/nostr_note.dart';
 import 'package:camelus/models/nostr_request_query.dart';
 import 'package:camelus/services/nostr/relays/relay_coordinator.dart';
 import 'package:cross_local_storage/cross_local_storage.dart';
+import 'package:isar/isar.dart';
 import 'package:json_cache/json_cache.dart';
 
 ///
@@ -22,8 +23,8 @@ class UserMetadata {
   var metadataLastFetch = <String, int>{};
 
   final RelayCoordinator relays;
-  final Future<AppDatabase> dbFuture;
-  late AppDatabase _db;
+  final Future<Isar> dbFuture;
+  late Isar _db;
 
   late JsonCache _jsonCache;
 
@@ -51,7 +52,7 @@ class UserMetadata {
   }
 
   _initDb() {
-    _db.noteDao.findAllNotesByKindStream(0).listen((event) {
+    DbNoteQueries.kindStream(_db, kind: 0).listen((event) {
       List<NostrNote> notes = event.map((e) => e.toNostrNote()).toList();
       _receiveNostrEvents(notes);
     });
