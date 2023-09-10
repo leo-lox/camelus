@@ -58,14 +58,11 @@ dependencies:
   qr_flutter: ^4.0.0
   matomo_tracker: ^2.0.0
   shared_preferences: ^2.1.1
-  floor: ^1.4.2
-  sqflite: ^2.2.8+4
   riverpod: ^2.3.6
   custom_refresh_indicator: ^2.2.1
   flutter_cache_manager: ^3.3.0
   web_socket_channel: ^2.4.0
   http_parser: ^4.0.2
-  drift: ^2.9.0
   isar: ^3.1.0+1
   isar_flutter_libs: ^3.1.0+1
   path_provider: ^2.1.1
