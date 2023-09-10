@@ -3,9 +3,8 @@
 import 'dart:developer';
 
 import 'package:camelus/config/palette.dart';
-import 'package:camelus/db/isar_entities/db_note.dart';
+import 'package:camelus/db/entities/db_note.dart';
 import 'package:camelus/providers/database_provider.dart';
-import 'package:camelus/providers/isar_database_provider.dart';
 import 'package:camelus/providers/nostr_service_provider.dart';
 import 'package:camelus/services/nostr/nostr_service.dart';
 import 'package:flutter/material.dart';

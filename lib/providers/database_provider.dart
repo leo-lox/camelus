@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
 
-import 'package:camelus/db/isar_entities/db_note.dart';
+import 'package:camelus/db/entities/db_note.dart';
 import 'package:isar/isar.dart';
 import 'package:riverpod/riverpod.dart';
 

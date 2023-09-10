@@ -13,7 +13,7 @@ import 'package:camelus/services/nostr/relays/relays_injector.dart';
 import 'package:isar/isar.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
-import '../../../db/isar_entities/db_note.dart';
+import '../../../db/entities/db_note.dart';
 
 class MyRelay {
   final AppDatabase database;

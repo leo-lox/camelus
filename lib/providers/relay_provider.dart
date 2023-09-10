@@ -1,5 +1,4 @@
 import 'package:camelus/providers/database_provider.dart';
-import 'package:camelus/providers/isar_database_provider.dart';
 import 'package:camelus/providers/key_pair_provider.dart';
 import 'package:camelus/services/nostr/relays/relay_coordinator.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
