@@ -68,7 +68,7 @@ abstract class DbNoteQueries {
   ///
   /// findPubkeyRootNotesByKind
   ///
-  static Query<DbNote> findPubkeysRootNotesByKind(Isar db,
+  static Query<DbNote> findPubkeysRootNotesByKindQuery(Isar db,
       {required List<String> pubkeys, required int kind}) {
     return db.dbNotes
         .filter()
@@ -82,16 +82,19 @@ abstract class DbNoteQueries {
 
   static Future<List<DbNote>> findPubkeyRootNotesByKindFuture(Isar db,
       {required List<String> pubkeys, required int kind}) {
-    return findPubkeysRootNotesByKind(db, pubkeys: pubkeys, kind: kind)
+    return findPubkeysRootNotesByKindQuery(db, pubkeys: pubkeys, kind: kind)
         .findAll();
   }
 
   static Stream<List<DbNote>> findPubkeyRootNotesByKindStream(Isar db,
       {required List<String> pubkeys, required int kind}) {
-    return findPubkeysRootNotesByKind(db, pubkeys: pubkeys, kind: kind)
+    return findPubkeysRootNotesByKindQuery(db, pubkeys: pubkeys, kind: kind)
         .watch(fireImmediately: true);
   }
 
+  ///
+  /// findHashtagNotesByKind
+  ///
   static Query<DbNote> findHashtagNotesByKindQuery(Isar db,
       {required String hashtag, required int kind}) {
     return db.dbNotes
@@ -114,7 +117,10 @@ abstract class DbNoteQueries {
         .watch(fireImmediately: true);
   }
 
-  static Query<DbNote> findRepliesByIdAndByKind(Isar db,
+  ///
+  /// findRepliesByIdAndByKind
+  ///
+  static Query<DbNote> findRepliesByIdAndByKindQuery(Isar db,
       {required String id, required int kind}) {
     return db.dbNotes
         .filter()
@@ -125,12 +131,12 @@ abstract class DbNoteQueries {
 
   static Future<List<DbNote>> findRepliesByIdAndByKindFuture(Isar db,
       {required String id, required int kind}) {
-    return findRepliesByIdAndByKind(db, id: id, kind: kind).findAll();
+    return findRepliesByIdAndByKindQuery(db, id: id, kind: kind).findAll();
   }
 
   static Stream<List<DbNote>> findRepliesByIdAndByKindStream(Isar db,
       {required String id, required int kind}) {
-    return findRepliesByIdAndByKind(db, id: id, kind: kind)
+    return findRepliesByIdAndByKindQuery(db, id: id, kind: kind)
         .watch(fireImmediately: true);
   }
 }
