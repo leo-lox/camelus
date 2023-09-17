@@ -6,7 +6,7 @@ abstract class DbNoteQueries {
   /// kindQuery
   ///
   static Query<DbNote> kindQuery(Isar db, {required int kind}) {
-    return db.dbNotes.filter().kindEqualTo(kind).build();
+    return db.dbNotes.filter().kindEqualTo(kind).sortByCreated_atDesc().build();
   }
 
   static Future<List<DbNote>> kindFuture(Isar db, {required int kind}) {
@@ -27,6 +27,7 @@ abstract class DbNoteQueries {
         .pubkeyEqualTo(pubkey)
         .and()
         .kindEqualTo(kind)
+        .sortByCreated_atDesc()
         .build();
   }
 
@@ -51,6 +52,7 @@ abstract class DbNoteQueries {
         .anyOf(pubkeys, (q, String myPub) => q.pubkeyEqualTo(myPub))
         .and()
         .kindEqualTo(kind)
+        .sortByCreated_atDesc()
         .build();
   }
 
@@ -76,7 +78,9 @@ abstract class DbNoteQueries {
         .and()
         .kindEqualTo(kind)
         .and()
-        .tagsElement((t) => t.not().typeEqualTo("e"))
+        .not()
+        .tagsElement((q) => q.typeEqualTo("e"))
+        .sortByCreated_atDesc()
         .build();
   }
 
@@ -102,6 +106,7 @@ abstract class DbNoteQueries {
         .kindEqualTo(kind)
         .and()
         .tagsElement((t) => t.typeEqualTo("t").and().valueEqualTo(hashtag))
+        .sortByCreated_atDesc()
         .build();
   }
 
@@ -126,6 +131,7 @@ abstract class DbNoteQueries {
         .filter()
         .kindEqualTo(kind)
         .tagsElement((t) => t.typeEqualTo("e").and().valueEqualTo(id))
+        .sortByCreated_atDesc()
         .build();
   }
 
