@@ -209,7 +209,8 @@ class MyRelay {
     );
 
     database.writeTxn(() async {
-      database.dbNotes.put(myIsarNote);
+      database.dbNotes.putByNostr_id(myIsarNote);
+      //database.dbNotes.put(myIsarNote);
       //recipes.put(pancakes);
     });
   }
