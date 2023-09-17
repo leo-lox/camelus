@@ -1,14 +1,14 @@
 import 'dart:async';
 import 'dart:developer';
-
-import 'package:camelus/db/database.dart';
-import 'package:camelus/db/entities/db_note_view.dart';
+import 'package:camelus/db/entities/db_note.dart';
+import 'package:camelus/db/queries/db_note_queries.dart';
 import 'package:camelus/models/nostr_note.dart';
 import 'package:camelus/models/nostr_request_query.dart';
 import 'package:camelus/services/nostr/relays/relay_coordinator.dart';
+import 'package:isar/isar.dart';
 
 class HashtagFeed {
-  final AppDatabase _db;
+  final Isar _db;
   final RelayCoordinator _relays;
   final String _hashtag;
 
@@ -70,7 +70,8 @@ class HashtagFeed {
 
   Future<void> _initFeed() async {
     _feed = [];
-    var notesTmp = await _db.noteDao.findTagByKind(1, '%,$_hashtag,%');
+    var notesTmp = await DbNoteQueries.findHashtagNotesByKindFuture(_db,
+        hashtag: _hashtag, kind: 1);
     var notes = notesTmp.map((e) => e.toNostrNote()).toList();
     // set latest note ("fixed" stream after this)
 
@@ -81,8 +82,10 @@ class HashtagFeed {
   }
 
   void _streamFeed() {
-    Stream<List<DbNoteView>> stream =
-        _db.noteDao.findTagByKindStream(1, '%,$_hashtag,%');
+    Stream<List<DbNote>> stream = DbNoteQueries.findHashtagNotesByKindStream(
+        _db,
+        hashtag: _hashtag,
+        kind: 1);
     _subscriptions.add(
       stream.listen((event) {
         var notes = event.map((e) => e.toNostrNote()).toList();

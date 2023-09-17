@@ -1,14 +1,15 @@
 import 'dart:async';
 import 'dart:developer';
 
-import 'package:camelus/db/database.dart';
-import 'package:camelus/db/entities/db_note_view.dart';
+import 'package:camelus/db/entities/db_note.dart';
+import 'package:camelus/db/queries/db_note_queries.dart';
 import 'package:camelus/models/nostr_note.dart';
 import 'package:camelus/models/nostr_request_query.dart';
 import 'package:camelus/services/nostr/relays/relay_coordinator.dart';
+import 'package:isar/isar.dart';
 
 class UserFeedAndRepliesFeed {
-  final AppDatabase _db;
+  final Isar _db;
   final List<String> _followingPubkeys;
   final RelayCoordinator _relays;
   final List<String> _requestIds = [];
@@ -98,15 +99,15 @@ class UserFeedAndRepliesFeed {
   }
 
   Future<List<NostrNote>> _getCurrentNotes() async {
-    var getresult =
-        await _db.noteDao.findPubkeyNotesByKind(_followingPubkeys, 1);
+    var getresult = await DbNoteQueries.kindPubkeysFuture(_db,
+        pubkeys: _followingPubkeys, kind: 1);
 
     return getresult.map((e) => e.toNostrNote()).toList();
   }
 
   _streamFeed() async {
-    Stream<List<DbNoteView>> stream =
-        _db.noteDao.findPubkeyNotesByKindStreamNotifyOnly(_followingPubkeys, 1);
+    Stream<List<DbNote>> stream = DbNoteQueries.kindPubkeysStream(_db,
+        pubkeys: _followingPubkeys, kind: 1);
 
     _subscriptions.add(
       stream.listen((event) async {

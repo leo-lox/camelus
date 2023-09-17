@@ -1,14 +1,14 @@
 import 'dart:async';
 import 'dart:developer';
-
-import 'package:camelus/db/database.dart';
-import 'package:camelus/db/entities/db_note_view.dart';
+import 'package:camelus/db/entities/db_note.dart';
+import 'package:camelus/db/queries/db_note_queries.dart';
 import 'package:camelus/models/nostr_note.dart';
 import 'package:camelus/models/nostr_request_query.dart';
 import 'package:camelus/services/nostr/relays/relay_coordinator.dart';
+import 'package:isar/isar.dart';
 
 class EventFeed {
-  final AppDatabase _db;
+  final Isar _db;
   final String _rootNoteId;
   final RelayCoordinator _relays;
   final List<String> _requestIds = [];
@@ -66,14 +66,18 @@ class EventFeed {
   }
 
   Future<List<NostrNote>> _getCurrentNotes() async {
-    var getresult = await _db.noteDao.findRepliesByIdAndByKind(_rootNoteId, 1);
+    var getresult = await DbNoteQueries.findRepliesByIdAndByKindFuture(_db,
+        id: _rootNoteId, kind: 1);
 
     return getresult.map((e) => e.toNostrNote()).toList();
   }
 
   _streamFeed() async {
-    Stream<List<DbNoteView>> stream =
-        _db.noteDao.findRepliesByIdAndByKindStream(_rootNoteId, 1);
+    Stream<List<DbNote>> stream = DbNoteQueries.findRepliesByIdAndByKindStream(
+        _db,
+        id: _rootNoteId,
+        kind: 1);
+    ;
 
     _subscriptions.add(
       stream.listen((event) async {

@@ -91,4 +91,46 @@ abstract class DbNoteQueries {
     return findPubkeysRootNotesByKind(db, pubkeys: pubkeys, kind: kind)
         .watch(fireImmediately: true);
   }
+
+  static Query<DbNote> findHashtagNotesByKindQuery(Isar db,
+      {required String hashtag, required int kind}) {
+    return db.dbNotes
+        .filter()
+        .kindEqualTo(kind)
+        .and()
+        .tagsElement((t) => t.typeEqualTo("t").and().valueEqualTo(hashtag))
+        .build();
+  }
+
+  static Future<List<DbNote>> findHashtagNotesByKindFuture(Isar db,
+      {required String hashtag, required int kind}) {
+    return findHashtagNotesByKindQuery(db, hashtag: hashtag, kind: kind)
+        .findAll();
+  }
+
+  static Stream<List<DbNote>> findHashtagNotesByKindStream(Isar db,
+      {required String hashtag, required int kind}) {
+    return findHashtagNotesByKindQuery(db, hashtag: hashtag, kind: kind)
+        .watch(fireImmediately: true);
+  }
+
+  static Query<DbNote> findRepliesByIdAndByKind(Isar db,
+      {required String id, required int kind}) {
+    return db.dbNotes
+        .filter()
+        .kindEqualTo(kind)
+        .tagsElement((t) => t.typeEqualTo("e").and().valueEqualTo(id))
+        .build();
+  }
+
+  static Future<List<DbNote>> findRepliesByIdAndByKindFuture(Isar db,
+      {required String id, required int kind}) {
+    return findRepliesByIdAndByKind(db, id: id, kind: kind).findAll();
+  }
+
+  static Stream<List<DbNote>> findRepliesByIdAndByKindStream(Isar db,
+      {required String id, required int kind}) {
+    return findRepliesByIdAndByKind(db, id: id, kind: kind)
+        .watch(fireImmediately: true);
+  }
 }
