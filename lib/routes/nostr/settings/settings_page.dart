@@ -31,30 +31,12 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     initNostrService();
   }
 
-  void _clearSqlDb() async {
+  void _clearDb() async {
     var db = await ref.watch(databaseProvider.future);
-    db.database.delete(
-      "Note",
-      where: null,
-    );
-    log("cleared sql db");
+    db.clear();
   }
 
-  void _deleteKind01() async {
-    var db = await ref.watch(databaseProvider.future);
-    db.noteDao.deleteNotesByKind(1);
-    log("deleted kind 01");
-  }
-
-  void _mytest() async {
-    var isar = await ref.watch(isarDatabaseProvider.future);
-    final result = await isar.dbNotes
-        .filter()
-        .tagsElement((q) => q.valueEqualTo(
-            '20d29810d6a5f92b045ade02ebbadc9036d741cc686b00415c42b4236fe4ad2f'))
-        .findAll();
-    log(result.toString());
-  }
+  void _mytest() async {}
 
   @override
   Widget build(BuildContext context) {
@@ -85,14 +67,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
             title: const Text('Clear sql db!',
                 style: TextStyle(color: Colors.white)),
             onTap: () {
-              _clearSqlDb();
-            },
-          ),
-          ListTile(
-            title: const Text('delete all kind01!',
-                style: TextStyle(color: Colors.white)),
-            onTap: () {
-              _deleteKind01();
+              _clearDb();
             },
           ),
           ListTile(

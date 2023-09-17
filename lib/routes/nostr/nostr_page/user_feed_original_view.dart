@@ -4,7 +4,6 @@ import 'package:camelus/atoms/new_posts_available.dart';
 import 'package:camelus/atoms/refresh_indicator_no_need.dart';
 import 'package:camelus/components/note_card/note_card_container.dart';
 import 'package:camelus/config/palette.dart';
-import 'package:camelus/db/database.dart';
 import 'package:camelus/models/nostr_note.dart';
 import 'package:camelus/providers/database_provider.dart';
 import 'package:camelus/providers/following_provider.dart';
@@ -14,6 +13,7 @@ import 'package:camelus/scroll_controller/retainable_scroll_controller.dart';
 import 'package:camelus/services/nostr/feeds/user_feed.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:isar/isar.dart';
 
 class UserFeedOriginalView extends ConsumerStatefulWidget {
   final String pubkey;
@@ -27,7 +27,7 @@ class UserFeedOriginalView extends ConsumerStatefulWidget {
 }
 
 class _UserFeedOriginalViewState extends ConsumerState<UserFeedOriginalView> {
-  late AppDatabase db;
+  late Isar db;
   final List<StreamSubscription> _subscriptions = [];
   late List<String> _followingPubkeys;
   late UserFeed _userFeed;

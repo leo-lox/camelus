@@ -6,7 +6,6 @@ import 'package:camelus/atoms/back_button_round.dart';
 import 'package:camelus/atoms/follow_button.dart';
 import 'package:camelus/atoms/long_button.dart';
 import 'package:camelus/components/note_card/note_card_container.dart';
-import 'package:camelus/db/database.dart';
 import 'package:camelus/helpers/bip340.dart';
 import 'package:camelus/helpers/nprofile_helper.dart';
 import 'package:camelus/models/nostr_note.dart';
@@ -33,6 +32,7 @@ import 'package:camelus/routes/nostr/profile/follower_page.dart';
 
 import 'package:camelus/services/nostr/nostr_service.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:isar/isar.dart';
 import 'package:matomo_tracker/matomo_tracker.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -68,7 +68,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
     with TickerProviderStateMixin, TraceableClientMixin {
   late NostrService _nostrService;
   final ScrollController _scrollController = ScrollController();
-  late AppDatabase _db;
+  late Isar _db;
   late UserFeedAndRepliesFeed _userFeedAndRepliesFeed;
 
   final List<StreamSubscription> _subscriptions = [];

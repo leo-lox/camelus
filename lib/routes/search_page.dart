@@ -5,6 +5,7 @@ import 'dart:developer';
 import 'package:camelus/atoms/hashtag_card.dart';
 import 'package:camelus/atoms/person_card.dart';
 import 'package:camelus/config/palette.dart';
+import 'package:camelus/db/queries/db_note_queries.dart';
 import 'package:camelus/helpers/helpers.dart';
 import 'package:camelus/helpers/nprofile_helper.dart';
 import 'package:camelus/helpers/search.dart';
@@ -269,9 +270,9 @@ class _SearchPageState extends ConsumerState<SearchPage> {
     var mykeys = await ref.watch(keyPairProvider.future);
     var db = await ref.watch(databaseProvider.future);
 
-    var myLastNote =
-        (await db.noteDao.findPubkeyNotesByKind([mykeys.keyPair!.publicKey], 3))
-            .first;
+    var myLastNote = (await DbNoteQueries.kindPubkeyFuture(db,
+            pubkey: mykeys.keyPair!.publicKey, kind: 3))
+        .first;
 
     List<NostrTag> newContacts = [...currentOwnContacts];
 
@@ -284,7 +285,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
     _writeContacts(
       publicKey: mykeys.keyPair!.publicKey,
       privateKey: mykeys.keyPair!.privateKey,
-      content: myLastNote.content,
+      content: myLastNote.content ?? '',
       updatedContacts: newContacts,
     );
   }
