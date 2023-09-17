@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:camelus/providers/key_pair_provider.dart';
 import 'package:camelus/routes/nostr/blockedUsers/blocked_users.dart';
 import 'package:camelus/routes/nostr/hashtag_view/hashtag_view_page.dart';
@@ -45,6 +47,13 @@ class MyApp extends StatelessWidget {
     return Portal(
       child: ProviderScope(
         child: MaterialApp(
+          scrollBehavior: const MaterialScrollBehavior().copyWith(
+            scrollbars: false,
+            dragDevices: {
+              PointerDeviceKind.touch,
+              PointerDeviceKind.mouse,
+            },
+          ),
           debugShowCheckedModeBanner: false,
           title: 'camelus',
           theme: theme.themeMap["DARK"],
