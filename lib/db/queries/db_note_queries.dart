@@ -40,4 +40,55 @@ abstract class DbNoteQueries {
     return kindPubkeyQuery(db, pubkey: pubkey, kind: kind)
         .watch(fireImmediately: true);
   }
+
+  ///
+  /// kindPubkeysQuery
+  ///
+  static Query<DbNote> kindPubkeysQuery(Isar db,
+      {required List<String> pubkeys, required int kind}) {
+    return db.dbNotes
+        .filter()
+        .anyOf(pubkeys, (q, String myPub) => q.pubkeyEqualTo(myPub))
+        .and()
+        .kindEqualTo(kind)
+        .build();
+  }
+
+  static Future<List<DbNote>> kindPubkeysFuture(Isar db,
+      {required List<String> pubkeys, required int kind}) {
+    return kindPubkeysQuery(db, pubkeys: pubkeys, kind: kind).findAll();
+  }
+
+  static Stream<List<DbNote>> kindPubkeysStream(Isar db,
+      {required List<String> pubkeys, required int kind}) {
+    return kindPubkeysQuery(db, pubkeys: pubkeys, kind: kind)
+        .watch(fireImmediately: true);
+  }
+
+  ///
+  /// findPubkeyRootNotesByKind
+  ///
+  static Query<DbNote> findPubkeysRootNotesByKind(Isar db,
+      {required List<String> pubkeys, required int kind}) {
+    return db.dbNotes
+        .filter()
+        .anyOf(pubkeys, (q, String myPub) => q.pubkeyEqualTo(myPub))
+        .and()
+        .kindEqualTo(kind)
+        .and()
+        .tagsElement((t) => t.not().typeEqualTo("e"))
+        .build();
+  }
+
+  static Future<List<DbNote>> findPubkeyRootNotesByKindFuture(Isar db,
+      {required List<String> pubkeys, required int kind}) {
+    return findPubkeysRootNotesByKind(db, pubkeys: pubkeys, kind: kind)
+        .findAll();
+  }
+
+  static Stream<List<DbNote>> findPubkeyRootNotesByKindStream(Isar db,
+      {required List<String> pubkeys, required int kind}) {
+    return findPubkeysRootNotesByKind(db, pubkeys: pubkeys, kind: kind)
+        .watch(fireImmediately: true);
+  }
 }
