@@ -1,13 +1,14 @@
 import 'dart:developer';
 
-import 'package:camelus/db/database.dart';
+import 'package:camelus/db/queries/db_note_queries.dart';
 import 'package:camelus/models/nostr_note.dart';
 import 'package:camelus/models/nostr_request_query.dart';
 import 'package:camelus/services/nostr/relays/relay_address_parser.dart';
 import 'package:camelus/services/nostr/relays/relays_picker.dart';
+import 'package:isar/isar.dart';
 
 class Nip65 {
-  final AppDatabase _db;
+  final Isar _db;
 
   Nip65(this._db);
 
@@ -24,8 +25,8 @@ class Nip65 {
       pubkeyCounts[pubkey] = desiredCoverage;
     }
 
-    var relayMetadataTmp =
-        await _db.noteDao.findPubkeyNotesByKind(pubkeys, 10002);
+    var relayMetadataTmp = await DbNoteQueries.kindPubkeysFuture(_db,
+        kind: 10002, pubkeys: pubkeys);
 
     var relayMetadata = relayMetadataTmp.map((e) => e.toNostrNote()).toList();
 

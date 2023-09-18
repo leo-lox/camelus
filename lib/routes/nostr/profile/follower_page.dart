@@ -1,4 +1,5 @@
 import 'package:camelus/atoms/person_card.dart';
+import 'package:camelus/db/queries/db_note_queries.dart';
 import 'package:camelus/models/nostr_request_event.dart';
 import 'package:camelus/models/nostr_tag.dart';
 import 'package:camelus/providers/database_provider.dart';
@@ -32,9 +33,9 @@ class _FollowerPageState extends ConsumerState<FollowerPage> {
     var mykeys = await ref.watch(keyPairProvider.future);
     var db = await ref.watch(databaseProvider.future);
 
-    var myLastNote =
-        (await db.noteDao.findPubkeyNotesByKind([mykeys.keyPair!.publicKey], 3))
-            .first;
+    var myLastNote = (await DbNoteQueries.kindPubkeyFuture(db,
+            pubkey: mykeys.keyPair!.publicKey, kind: 3))
+        .first;
 
     List<NostrTag> newContacts = [...currentOwnContacts];
 
@@ -47,7 +48,7 @@ class _FollowerPageState extends ConsumerState<FollowerPage> {
     _writeContacts(
       publicKey: mykeys.keyPair!.publicKey,
       privateKey: mykeys.keyPair!.privateKey,
-      content: myLastNote.content,
+      content: myLastNote.content ?? "",
       updatedContacts: newContacts,
     );
   }

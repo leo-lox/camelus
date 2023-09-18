@@ -4,7 +4,7 @@ import 'dart:developer';
 import 'package:camelus/atoms/refresh_indicator_no_need.dart';
 import 'package:camelus/components/note_card/note_card_container.dart';
 import 'package:camelus/config/palette.dart';
-import 'package:camelus/db/database.dart';
+
 import 'package:camelus/models/nostr_note.dart';
 import 'package:camelus/providers/database_provider.dart';
 import 'package:camelus/providers/relay_provider.dart';
@@ -13,6 +13,7 @@ import 'package:camelus/services/nostr/feeds/event_feed.dart';
 import 'package:flutter/material.dart';
 
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:isar/isar.dart';
 
 class EventViewPage extends ConsumerStatefulWidget {
   final String _rootId;
@@ -29,7 +30,7 @@ class EventViewPage extends ConsumerStatefulWidget {
 }
 
 class _EventViewPageState extends ConsumerState<EventViewPage> {
-  late AppDatabase db;
+  late Isar db;
   late EventFeed _eventFeed;
   late final RetainableScrollController _scrollControllerFeed =
       RetainableScrollController();
@@ -161,7 +162,8 @@ class _EventViewPageState extends ConsumerState<EventViewPage> {
                         child: ElevatedButton(
                       onPressed: () {},
                       child: Text(snapshot.error.toString(),
-                          style: const TextStyle(fontSize: 20, color: Colors.white)),
+                          style: const TextStyle(
+                              fontSize: 20, color: Colors.white)),
                     ));
                   }
                   return const Text("waiting for stream trigger ",

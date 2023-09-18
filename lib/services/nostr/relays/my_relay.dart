@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
 
-import 'package:camelus/db/database.dart';
 import 'package:camelus/models/nostr_note.dart';
 import 'package:camelus/models/nostr_request.dart';
 import 'package:camelus/models/nostr_request_close.dart';
@@ -10,10 +9,14 @@ import 'package:camelus/models/nostr_request_event.dart';
 import 'package:camelus/models/nostr_request_query.dart';
 import 'package:camelus/services/nostr/relays/relay_tracker.dart';
 import 'package:camelus/services/nostr/relays/relays_injector.dart';
+import 'package:isar/isar.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
+import '../../../db/entities/db_note.dart';
+
 class MyRelay {
-  final AppDatabase database;
+  final Isar database;
+
   final RelayPersistance persistance;
   final String relayUrl;
   final bool read;
@@ -187,7 +190,29 @@ class MyRelay {
   }
 
   _insertNoteIntoDb(NostrNote note) {
-    database.noteDao.stackInsertNotes([note]);
+    // database.noteDao.stackInsertNotes([note]);
+    final myIsarNote = DbNote(
+      nostr_id: note.id,
+      created_at: note.created_at,
+      kind: note.kind,
+      pubkey: note.pubkey,
+      content: note.content,
+      sig: note.sig,
+      tags: note.tags
+          .map((e) => DbTag(
+                type: e.type,
+                value: e.value,
+                recommended_relay: e.recommended_relay,
+                marker: e.marker,
+              ))
+          .toList(),
+    );
+
+    database.writeTxn(() async {
+      database.dbNotes.putByNostr_id(myIsarNote);
+      //database.dbNotes.put(myIsarNote);
+      //recipes.put(pancakes);
+    });
   }
 
   @override

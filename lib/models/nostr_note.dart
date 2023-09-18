@@ -1,5 +1,3 @@
-import 'package:camelus/db/entities/db_note.dart';
-import 'package:camelus/db/entities/db_tag.dart';
 import 'package:camelus/models/nostr_tag.dart';
 
 class NostrNote {
@@ -78,25 +76,6 @@ class NostrNote {
   @override
   String toString() {
     return 'NostrNote{id: $id, pubkey: $pubkey, created_at: $created_at, kind: $kind, content: $content, sig: $sig, tags: $tags}';
-  }
-
-  DbNote toDbNote() {
-    return DbNote(id, pubkey, created_at, kind, content, sig);
-  }
-
-  // ignore: non_constant_identifier_names
-  List<DbTag> toDbTag() {
-    List<DbTag> tags = [];
-    for (int i = 0; i < this.tags.length; i++) {
-      tags.add(DbTag(
-          note_id: id,
-          tag_index: i,
-          type: this.tags[i].type,
-          value: this.tags[i].value,
-          recommended_relay: this.tags[i].recommended_relay,
-          marker: this.tags[i].marker));
-    }
-    return tags;
   }
 
   List<NostrTag> get getTagPubkeys {

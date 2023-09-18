@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
 
-import 'package:camelus/db/database.dart';
 import 'package:camelus/models/nostr_note.dart';
 import 'package:camelus/providers/key_pair_provider.dart';
 
@@ -26,8 +25,6 @@ import 'package:cross_local_storage/cross_local_storage.dart';
 import 'package:camelus/models/socket_control.dart';
 
 class NostrService {
-  final Future<AppDatabase> database;
-
   final Future<KeyPairWrapper> keyPairWrapper;
 
   late Future isNostrServiceConnected;
@@ -54,7 +51,7 @@ class NostrService {
   Map<String, dynamic> get usersMetadata => {};
   Map<String, List<List<dynamic>>> get following => userContactsObj.following;
 
-  NostrService({required this.database, required this.keyPairWrapper}) {
+  NostrService({required this.keyPairWrapper}) {
     RelaysInjector relaysInjector = RelaysInjector();
     MetadataInjector metadataInjector = MetadataInjector();
 
@@ -161,119 +158,7 @@ class NostrService {
   }
 
   _receiveEvent(event, SocketControl socketControl) async {
-    if (event[0] != "EVENT") {
-      log("not an event: $event");
-    }
-
-    if (event[0] == "NOTICE") {
-      log("notice: $event, socket: ${socketControl.connectionUrl}, url: ${socketControl.connectionUrl}");
-      return;
-    }
-
-    if (event[0] == "OK") {
-      log("ok: $event");
-      return;
-    }
-
-    // blocked users
-
-    if (event.length >= 3) {
-      if (event[2] != null) {
-        var eventMap = event[2];
-        if (blockedUsers.contains(eventMap["pubkey"])) {
-          log("blocked user: ${eventMap["pubkey"]}");
-          return;
-        }
-      }
-    }
-
-    // ! debug only
-    if (event[0] == "EVENT") {
-      var eventBody = event[2];
-      // check if its already in the db
-      await database
-          .then(
-            (db) => db.noteDao.insertNostrNote(NostrNote.fromJson(eventBody)),
-          )
-          .onError((error, stackTrace) => {
-                // probably already in db
-              });
-    }
-
-    // filter by subscription id
-
-    if (event[1] == ownPubkeySubscriptionId) {
-      if (event[0] == "EOSE") {}
-
-      Map eventMap = event[2];
-      // metadata
-      if (eventMap["kind"] == 0) {
-        // goes through to normal metadata cache
-      }
-      // recommended relays
-      if (eventMap["kind"] == 2) {
-        // todo
-      }
-    }
-
-    var eventMap = {};
-    try {
-      eventMap = event[2]; //json.decode(event[2])
-    } catch (e) {}
-
-    /// global following / contacts
-    if (eventMap["kind"] == 3) {
-      userContactsObj.receiveNostrEvent(event, socketControl);
-    }
-
-    // global EOSE
-    if (event[0] == "EOSE") {
-      var now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
-
-      if (socketControl.requestInFlight[event[1]] != null) {
-        var requestsLeft = _howManyRequestsLeft(
-            event[1], socketControl, relays.connectedRelaysRead);
-        if (requestsLeft < 2) {
-          // callback
-          if (socketControl.completers.containsKey(event[1])) {
-            // wait 200ms for other events to arrive
-            Future.delayed(const Duration(milliseconds: 200)).then((value) {
-              if (!socketControl.completers[event[1]]!.isCompleted) {
-                socketControl.completers[event[1]]!.complete();
-              }
-            });
-          }
-        }
-
-        // send close request
-        var req = ["CLOSE", event[1]];
-        var reqJson = jsonEncode(req);
-
-        // close the stream
-        socketControl.socket.add(reqJson);
-        socketControl.requestInFlight.remove(event[1]);
-        log("CLOSE request sent to socket Metadata: ${socketControl.id}");
-      }
-
-      // contacts
-      if (socketControl.requestInFlight[event[1]] != null) {
-        // callback
-        if (socketControl.completers.containsKey(event[1])) {
-          if (!socketControl.completers[event[1]]!.isCompleted) {
-            socketControl.completers[event[1]]!.complete();
-          }
-        }
-
-        // send close request
-        var req = ["CLOSE", event[1]];
-        var reqJson = jsonEncode(req);
-        socketControl.socket.add(reqJson);
-        socketControl.requestInFlight.remove(event[1]);
-        log("CLOSE request sent to socket Contacts: ${socketControl.id}");
-      }
-
-      return;
-    }
+    log("this schould not happen");
   }
 
   writeEvent(String content, int kind, List tags) {

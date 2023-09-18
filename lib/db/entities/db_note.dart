@@ -1,34 +1,98 @@
-import 'package:floor/floor.dart';
+// ignore_for_file: non_constant_identifier_names
 
-@Entity(tableName: 'Note', indices: [
-  Index(value: ['kind']),
-  Index(value: ['pubkey']),
-  Index(value: ['created_at'])
-])
+import 'package:camelus/models/nostr_note.dart';
+import 'package:camelus/models/nostr_tag.dart';
+import 'package:isar/isar.dart';
+
+part 'db_note.g.dart';
+
+@collection
 class DbNote {
-  @primaryKey
-  final String id;
+  Id id = Isar
+      .autoIncrement; // Für auto-increment kannst du auch id = null zuweisen
 
-  final String pubkey;
+  @Index(unique: true, type: IndexType.value)
+  String nostr_id;
 
-  // ignore: non_constant_identifier_names
-  final int created_at;
+  @Index()
+  String pubkey;
 
-  @ColumnInfo(name: 'kind')
-  final int kind;
+  @Index()
+  int created_at;
 
-  //final List<String> tags;
-  /// => forin key @see tag.dart
+  @Index()
+  int kind;
 
-  final String content;
+  String? content;
 
-  final String sig;
+  // used for full text search
+  @Index(type: IndexType.value, caseSensitive: false)
+  List<String> get contentWords => Isar.splitWords(content ?? '');
 
-  DbNote(
-      this.id, this.pubkey, this.created_at, this.kind, this.content, this.sig);
+  String sig;
+
+  List<DbTag>? tags;
+
+  DbNote({
+    required this.nostr_id,
+    required this.pubkey,
+    required this.created_at,
+    required this.kind,
+    this.content,
+    required this.sig,
+    this.tags,
+  });
 
   @override
   String toString() {
-    return 'DbNote{id: $id, pubkey: $pubkey, created_at: $created_at, kind: $kind, content: $content, sig: $sig}';
+    return '{"id": "$id", "nostr_id": "$nostr_id", "pubkey": "$pubkey", "created_at": "$created_at", "kind": "$kind", "content": "$content", "sig": "$sig", "tags": "$tags"}';
+  }
+
+  NostrNote toNostrNote() {
+    return NostrNote(
+      id: nostr_id,
+      pubkey: pubkey,
+      created_at: created_at,
+      kind: kind,
+      content: content ?? '',
+      sig: sig,
+      tags: toNostrTags(),
+    );
+  }
+
+  List<NostrTag> toNostrTags() {
+    return tags?.map((e) => e.toNostrTag()).toList() ?? [];
+  }
+}
+
+@embedded
+class DbTag {
+  String? type;
+
+  String? value;
+
+  String? recommended_relay;
+
+  String? marker;
+
+  DbTag({
+    this.type,
+    this.value,
+    this.recommended_relay,
+    this.marker,
+  });
+
+  @override
+  String toString() {
+    return '{"type": "$type", "value": "$value", "recommended_relay": "$recommended_relay", "marker": "$marker"}';
+  }
+
+  NostrTag toNostrTag() {
+    return NostrTag(
+      type: type ?? '',
+      value: value ?? '',
+      recommended_relay: recommended_relay,
+      marker: marker,
+    );
   }
 }

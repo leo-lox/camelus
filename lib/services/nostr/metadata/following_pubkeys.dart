@@ -1,7 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:camelus/db/database.dart';
+import 'package:camelus/db/entities/db_note.dart';
+import 'package:camelus/db/queries/db_note_queries.dart';
 import 'package:camelus/helpers/helpers.dart';
 import 'package:camelus/models/nostr_request_event.dart';
 import 'package:camelus/models/nostr_request_query.dart';
@@ -9,14 +10,15 @@ import 'package:camelus/models/nostr_tag.dart';
 import 'package:camelus/providers/key_pair_provider.dart';
 import 'package:camelus/services/nostr/relays/relay_coordinator.dart';
 import 'package:cross_local_storage/cross_local_storage.dart';
+import 'package:isar/isar.dart';
 import 'package:json_cache/json_cache.dart';
 
 class FollowingPubkeys {
   final Future<KeyPairWrapper> keyPair;
   late String _myPubkey;
   late String _myPrivkey;
-  final Future<AppDatabase> db;
-  late AppDatabase _db;
+  final Future<Isar> db;
+  late Isar _db;
   final RelayCoordinator relays;
 
   final List<StreamSubscription> _subscriptions = [];
@@ -105,7 +107,8 @@ class FollowingPubkeys {
     // fill with inital data
 
     _subscriptions.add(
-        _db.noteDao.findPubkeyNotesByKindStream([pubkey], 3).listen((dbList) {
+        DbNoteQueries.kindPubkeyStream(_db, pubkey: pubkey, kind: 3)
+            .listen((dbList) {
       if (dbList.isEmpty) {
         //_contactsController.add([]);
         return;
@@ -143,7 +146,7 @@ class FollowingPubkeys {
     }));
 
     _subscriptions.add(
-      _db.noteDao.findPubkeyNotesByKindStream([pubkey], 10002).listen(
+      DbNoteQueries.kindPubkeyStream(_db, pubkey: pubkey, kind: 10002).listen(
         (dbList) {
           if (dbList.isEmpty) {
             return;
@@ -165,7 +168,9 @@ class FollowingPubkeys {
   /// gets the data directly from the db without dispaching a request
   Future<List<NostrTag>> getFollowingPubkeysDb(String pubkey) async {
     await _servicesReady.future;
-    var dbList = (await _db.noteDao.findPubkeyNotesByKind([pubkey], 3));
+
+    var dbList =
+        (await DbNoteQueries.kindPubkeyFuture(_db, pubkey: pubkey, kind: 3));
     if (dbList.isEmpty) {
       return [];
     }
@@ -178,7 +183,9 @@ class FollowingPubkeys {
   /// get the data from the db and disposes a network request if needed
   Future<List<NostrTag>> getFollowingPubkeys(String pubkey) async {
     await _servicesReady.future;
-    var dbList = (await _db.noteDao.findPubkeyNotesByKind([pubkey], 3));
+
+    var dbList =
+        (await DbNoteQueries.kindPubkeyFuture(_db, pubkey: pubkey, kind: 3));
 
     int? lastFetch = followingLastFetch[pubkey];
 
@@ -233,7 +240,9 @@ class FollowingPubkeys {
     await _jsonCache.refresh('followingLastFetch', followingLastFetch);
     // wait 500 ms
     await Future.delayed(const Duration(milliseconds: 500));
-    var dbListNew = (await _db.noteDao.findPubkeyNotesByKind([pubkey], 3));
+
+    var dbListNew =
+        (await DbNoteQueries.kindPubkeyFuture(_db, pubkey: pubkey, kind: 3));
     if (dbListNew.isEmpty) {
       return []; // nothing found
     }
@@ -254,14 +263,15 @@ class FollowingPubkeys {
     String toFollow,
   ) async {
     var myLastNote =
-        (await _db.noteDao.findPubkeyNotesByKind([_myPubkey], 3)).first;
+        (await DbNoteQueries.kindPubkeyFuture(_db, pubkey: _myPubkey, kind: 3))
+            .first;
 
     List<NostrTag> newContacts = [..._ownContacts];
     newContacts.add(NostrTag(type: 'p', value: toFollow));
     await _writeContacts(
       publicKey: _myPubkey,
       privateKey: _myPrivkey,
-      content: myLastNote.content,
+      content: myLastNote.content ?? "",
       updatedContacts: newContacts,
     );
     return;
@@ -269,7 +279,8 @@ class FollowingPubkeys {
 
   Future unfollow(String toUnfollow) async {
     var myLastNote =
-        (await _db.noteDao.findPubkeyNotesByKind([_myPubkey], 3)).first;
+        (await DbNoteQueries.kindPubkeyFuture(_db, pubkey: _myPubkey, kind: 3))
+            .first;
 
     List<NostrTag> newContacts = [..._ownContacts];
 
@@ -278,7 +289,7 @@ class FollowingPubkeys {
     await _writeContacts(
       publicKey: _myPubkey,
       privateKey: _myPrivkey,
-      content: myLastNote.content,
+      content: myLastNote.content ?? "",
       updatedContacts: newContacts,
     );
     return;
