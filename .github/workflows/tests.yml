@@ -1,7 +1,17 @@
-steps:
-  - uses: actions/checkout@v3
-  - uses: subosito/flutter-action@v2
-    with:
-      channel: 'stable' # or: 'beta', 'dev' or 'master'
-  - run: flutter --version
-  - run: flutter test
+name: flutter CI
+
+on:
+  push:
+    branches: [ dev ]
+  pull_request:
+    branches: [ dev ]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable' # or: 'beta', 'dev' or 'master'
+      - run: flutter --version
+      - run: flutter test
