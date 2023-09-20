@@ -1,12 +1,12 @@
 import 'dart:convert';
 
+import 'package:camelus/db/entities/db_relay_tracker.dart';
 import 'package:camelus/models/nostr_note.dart';
 import 'package:camelus/models/nostr_tag.dart';
 import 'package:camelus/services/nostr/metadata/metadata_injector.dart';
 import 'package:camelus/services/nostr/metadata/nip_05.dart';
 import 'package:camelus/services/nostr/relays/relay_address_parser.dart';
-import 'package:cross_local_storage/cross_local_storage.dart';
-import 'package:json_cache/json_cache.dart';
+import 'package:isar/isar.dart';
 
 enum RelayTrackerAdvType {
   kind03,
@@ -17,43 +17,17 @@ enum RelayTrackerAdvType {
 
 class RelayTracker {
   /// pubkey,relayUrl :{, lastSuggestedKind3, lastSuggestedNip05, lastSuggestedBytag}
-  Map<String, Map<String, dynamic>> tracker = {};
+  //Map<String, Map<String, dynamic>> tracker = {};
 
   late Nip05 nip05service;
-  late JsonCache jsonCache;
+  Isar db;
 
-  RelayTracker() {
+  RelayTracker({required this.db}) {
     nip05service = MetadataInjector().nip05;
-
-    _initJsonCache();
-  }
-
-  void _initJsonCache() async {
-    LocalStorageInterface prefs = await LocalStorage.getInstance();
-    jsonCache = JsonCacheCrossLocalStorage(prefs);
-    _restoreFromCache();
-  }
-
-  void _restoreFromCache() async {
-    var cache = await jsonCache.value('tracker');
-    // cast to Map<String, Map<String, dynamic>>
-
-    if (cache != null) {
-      // cast to Map<String, Map<String, dynamic>>
-      var cacheMap = Map.fromEntries(cache.entries.map(
-          (entry) => MapEntry(entry.key, entry.value as Map<String, dynamic>)));
-
-      tracker = cacheMap;
-    }
-  }
-
-  void _updateCache() async {
-    await jsonCache.refresh('tracker', tracker);
   }
 
   void clear() {
-    tracker = {};
-    _updateCache();
+    db.dbRelayTrackers.clear();
   }
 
   Future<void> analyzeNostrEvent(NostrNote event, String socketUrl) async {
@@ -182,10 +156,7 @@ class RelayTracker {
       return;
     }
 
-    for (var relayUrl in relayUrlsCleaned) {
-      _populateTracker(personPubkey, relayUrl);
-    }
-
+    List<DbRelayTrackerRelay> trackedRelays = [];
     for (var relayUrl in relayUrlsCleaned) {
       if (relayUrl.isEmpty) {
         continue;
@@ -194,30 +165,31 @@ class RelayTracker {
         continue;
       }
 
+      var relay = DbRelayTrackerRelay(
+        relayUrl: relayUrl,
+      );
       switch (nip) {
         case RelayTrackerAdvType.kind03:
-          tracker[personPubkey]![relayUrl]!["lastSuggestedKind3"] = timestamp;
+          relay.lastSuggestedKind3 = timestamp;
           break;
         case RelayTrackerAdvType.nip05:
-          tracker[personPubkey]![relayUrl]!["lastSuggestedNip05"] = timestamp;
+          relay.lastSuggestedNip05 = timestamp;
           break;
         case RelayTrackerAdvType.tag:
-          tracker[personPubkey]![relayUrl]!["lastSuggestedBytag"] = timestamp;
+          relay.lastSuggestedTag = timestamp;
           break;
         case RelayTrackerAdvType.lastFetched:
-          tracker[personPubkey]![relayUrl]!["lastFetched"] = timestamp;
+          relay.lastFetched = timestamp;
           break;
       }
+      trackedRelays.add(relay);
     }
-    _updateCache();
-  }
 
-  _populateTracker(String personPubkey, String relayUrl) {
-    if (tracker[personPubkey] == null) {
-      tracker[personPubkey] = {};
-    }
-    if (tracker[personPubkey]![relayUrl] == null) {
-      tracker[personPubkey]![relayUrl] = {};
-    }
+    var finalObj = DbRelayTracker(pubkey: personPubkey, relays: trackedRelays);
+
+    db.writeTxn(() async {
+      // also updates the object if it already exists
+      db.dbRelayTrackers.putByPubkey(finalObj);
+    });
   }
 }

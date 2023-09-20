@@ -73,7 +73,7 @@ const DbNoteSchema = CollectionSchema(
       properties: [
         IndexPropertySchema(
           name: r'nostr_id',
-          type: IndexType.hash,
+          type: IndexType.value,
           caseSensitive: true,
         )
       ],
@@ -328,6 +328,14 @@ extension DbNoteQueryWhereSort on QueryBuilder<DbNote, DbNote, QWhere> {
     });
   }
 
+  QueryBuilder<DbNote, DbNote, QAfterWhere> anyNostr_id() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(
+        const IndexWhereClause.any(indexName: r'nostr_id'),
+      );
+    });
+  }
+
   QueryBuilder<DbNote, DbNote, QAfterWhere> anyCreated_at() {
     return QueryBuilder.apply(this, (query) {
       return query.addWhereClause(
@@ -459,6 +467,97 @@ extension DbNoteQueryWhere on QueryBuilder<DbNote, DbNote, QWhereClause> {
               lower: [],
               upper: [nostr_id],
               includeUpper: false,
+            ));
+      }
+    });
+  }
+
+  QueryBuilder<DbNote, DbNote, QAfterWhereClause> nostr_idGreaterThan(
+    String nostr_id, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.between(
+        indexName: r'nostr_id',
+        lower: [nostr_id],
+        includeLower: include,
+        upper: [],
+      ));
+    });
+  }
+
+  QueryBuilder<DbNote, DbNote, QAfterWhereClause> nostr_idLessThan(
+    String nostr_id, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.between(
+        indexName: r'nostr_id',
+        lower: [],
+        upper: [nostr_id],
+        includeUpper: include,
+      ));
+    });
+  }
+
+  QueryBuilder<DbNote, DbNote, QAfterWhereClause> nostr_idBetween(
+    String lowerNostr_id,
+    String upperNostr_id, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.between(
+        indexName: r'nostr_id',
+        lower: [lowerNostr_id],
+        includeLower: includeLower,
+        upper: [upperNostr_id],
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
+  QueryBuilder<DbNote, DbNote, QAfterWhereClause> nostr_idStartsWith(
+      String Nostr_idPrefix) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.between(
+        indexName: r'nostr_id',
+        lower: [Nostr_idPrefix],
+        upper: ['$Nostr_idPrefix\u{FFFFF}'],
+      ));
+    });
+  }
+
+  QueryBuilder<DbNote, DbNote, QAfterWhereClause> nostr_idIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.equalTo(
+        indexName: r'nostr_id',
+        value: [''],
+      ));
+    });
+  }
+
+  QueryBuilder<DbNote, DbNote, QAfterWhereClause> nostr_idIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      if (query.whereSort == Sort.asc) {
+        return query
+            .addWhereClause(IndexWhereClause.lessThan(
+              indexName: r'nostr_id',
+              upper: [''],
+            ))
+            .addWhereClause(IndexWhereClause.greaterThan(
+              indexName: r'nostr_id',
+              lower: [''],
+            ));
+      } else {
+        return query
+            .addWhereClause(IndexWhereClause.greaterThan(
+              indexName: r'nostr_id',
+              lower: [''],
+            ))
+            .addWhereClause(IndexWhereClause.lessThan(
+              indexName: r'nostr_id',
+              upper: [''],
             ));
       }
     });
