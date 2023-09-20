@@ -47,7 +47,7 @@ class MyRelay {
     required this.write,
   }) {
     RelaysInjector injector = RelaysInjector();
-    relayTracker = injector.relayTracker;
+    relayTracker = RelayTracker(db: database);
   }
 
   /// connects to the relay and listens for events

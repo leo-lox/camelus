@@ -9,11 +9,11 @@ class DbRelayTracker {
   @Index(unique: true, type: IndexType.value)
   String pubkey;
 
-  List<DbRelayTrackerRelay>? relays;
+  List<DbRelayTrackerRelay> relays;
 
   DbRelayTracker({
     required this.pubkey,
-    this.relays,
+    this.relays = const [],
   });
 }
 

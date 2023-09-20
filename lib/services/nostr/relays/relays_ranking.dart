@@ -1,18 +1,22 @@
-import 'package:camelus/services/nostr/relays/relay_tracker.dart';
-import 'package:camelus/services/nostr/relays/relays_injector.dart';
+import 'package:camelus/db/entities/db_relay_tracker.dart';
 import 'dart:math';
 
-class RelaysRanking {
-  late RelayTracker relayTracker;
+import 'package:isar/isar.dart';
 
-  RelaysRanking() {
-    relayTracker = RelaysInjector().relayTracker;
-  }
+class RelaysRanking {
+  Isar db;
+
+  RelaysRanking({required this.db});
 
   Future<List<dynamic>> getBestRelays(String pubkeyHex, Direction dir) async {
-    var tracker = relayTracker.tracker;
+    var personRelays =
+        await db.dbRelayTrackers.filter().pubkeyEqualTo(pubkeyHex).findFirst();
 
-    if (tracker[pubkeyHex] == null) {
+    if (personRelays == null) {
+      return [];
+    }
+
+    if (personRelays.relays.isEmpty) {
       return [];
     }
 
@@ -27,14 +31,14 @@ class RelaysRanking {
       //tracker to dbprs
       List<DbPersonRelay> dbprs = [];
 
-      for (var entry in tracker[pubkeyHex]!.entries) {
+      for (var entry in personRelays.relays) {
         var d = DbPersonRelay(
             person: pubkeyHex,
-            relay: entry.key,
-            lastFetched: entry.value["lastFetched"] ?? 0,
-            lastSuggestedKind3: entry.value["lastSuggestedKind3"] ?? 0,
-            lastSuggestedNip05: entry.value["lastSuggestedNip05"] ?? 0,
-            lastSuggestedBytag: entry.value["lastSuggestedBytag"] ?? 0,
+            relay: entry.relayUrl ?? "",
+            lastFetched: entry.lastFetched ?? 0,
+            lastSuggestedKind3: entry.lastSuggestedKind3 ?? 0,
+            lastSuggestedNip05: entry.lastSuggestedNip05 ?? 0,
+            lastSuggestedBytag: entry.lastSuggestedTag ?? 0,
             read: true,
             write: false,
             manuallyPairedRead: false,
