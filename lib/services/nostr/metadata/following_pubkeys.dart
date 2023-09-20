@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:camelus/db/entities/db_note.dart';
 import 'package:camelus/db/queries/db_note_queries.dart';
 import 'package:camelus/helpers/helpers.dart';
 import 'package:camelus/models/nostr_request_event.dart';
@@ -9,9 +8,7 @@ import 'package:camelus/models/nostr_request_query.dart';
 import 'package:camelus/models/nostr_tag.dart';
 import 'package:camelus/providers/key_pair_provider.dart';
 import 'package:camelus/services/nostr/relays/relay_coordinator.dart';
-import 'package:cross_local_storage/cross_local_storage.dart';
 import 'package:isar/isar.dart';
-import 'package:json_cache/json_cache.dart';
 
 class FollowingPubkeys {
   final Future<KeyPairWrapper> keyPair;
@@ -59,9 +56,6 @@ class FollowingPubkeys {
 
   Future<void> get servicesReady => _servicesReady.future;
 
-  var followingLastFetch = <String, int>{};
-  late JsonCache _jsonCache;
-
   FollowingPubkeys({
     required this.keyPair,
     required this.db,
@@ -75,22 +69,9 @@ class FollowingPubkeys {
     _myPrivkey = (await keyPair).keyPair!.privateKey;
     _db = await db;
     _initStream(_myPubkey);
-    await _restoreCache();
 
     await _dbStreamReady.future;
     _servicesReady.complete();
-  }
-
-  Future<void> _restoreCache() async {
-    LocalStorageInterface prefs = await LocalStorage.getInstance();
-    _jsonCache = JsonCacheCrossLocalStorage(prefs);
-
-    var cache = await _jsonCache.value(
-      'followingLastFetch',
-    );
-    if (cache != null) {
-      followingLastFetch = Map<String, int>.from(cache);
-    }
   }
 
   void cleanup() {
@@ -187,7 +168,8 @@ class FollowingPubkeys {
     var dbList =
         (await DbNoteQueries.kindPubkeyFuture(_db, pubkey: pubkey, kind: 3));
 
-    int? lastFetch = followingLastFetch[pubkey];
+    int? lastFetch = dbList.first.last_fetch;
+    ;
 
     int now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
 
@@ -236,8 +218,7 @@ class FollowingPubkeys {
       required String requestId,
       required int now}) async {
     await _requestContacts(pubkeys: [pubkey], requestId: requestId);
-    followingLastFetch[pubkey] = now;
-    await _jsonCache.refresh('followingLastFetch', followingLastFetch);
+
     // wait 500 ms
     await Future.delayed(const Duration(milliseconds: 500));
 

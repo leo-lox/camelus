@@ -4,7 +4,6 @@ import 'package:camelus/db/entities/db_nip05.dart';
 import 'package:camelus/db/entities/db_relay_tracker.dart';
 import 'package:camelus/models/nostr_note.dart';
 import 'package:camelus/models/nostr_tag.dart';
-import 'package:camelus/services/nostr/metadata/metadata_injector.dart';
 import 'package:camelus/services/nostr/metadata/nip_05.dart';
 import 'package:camelus/services/nostr/relays/relay_address_parser.dart';
 import 'package:isar/isar.dart';
@@ -24,7 +23,7 @@ class RelayTracker {
   Isar db;
 
   RelayTracker({required this.db}) {
-    nip05service = MetadataInjector().nip05;
+    nip05service = Nip05(db: db);
   }
 
   void clear() {

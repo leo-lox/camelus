@@ -188,8 +188,10 @@ class MyRelay {
   }
 
   _insertNoteIntoDb(NostrNote note) {
+    var now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
     // database.noteDao.stackInsertNotes([note]);
     final myIsarNote = DbNote(
+      last_fetch: now,
       nostr_id: note.id,
       created_at: note.created_at,
       kind: note.kind,
