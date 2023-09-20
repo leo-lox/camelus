@@ -583,7 +583,7 @@ class RelayCoordinator {
   }
 
   Future<List<RelayAssignment>> _getOptimalRelays(List<String> pubkeys) async {
-    var relaysPicker = RelaysPicker();
+    var relaysPicker = RelaysPicker(db: _db);
     await relaysPicker.init(
         pubkeys: pubkeys,
         coverageCount: 2); //todo: move coverageCount to settings

@@ -1,9 +1,9 @@
-import 'package:camelus/services/nostr/relays/relay_tracker.dart';
-import 'package:camelus/services/nostr/relays/relays_injector.dart';
 import 'package:camelus/services/nostr/relays/relays_ranking.dart';
+import 'package:isar/isar.dart';
+import 'package:camelus/db/entities/db_relay_tracker.dart';
 
 class RelaysPicker {
-  late RelayTracker relayTracker;
+  Isar db;
   late RelaysRanking relaysRanking;
 
   Map<String, int> pubkeyCounts = {
@@ -26,10 +26,8 @@ class RelaysPicker {
     //'relay2': DateTime.now().add(Duration(hours: 2)).millisecondsSinceEpoch,
   };
 
-  RelaysPicker() {
-    RelaysInjector relaysInjector = RelaysInjector();
-    relayTracker = relaysInjector.relayTracker;
-    relaysRanking = relaysInjector.relaysRanking;
+  RelaysPicker({required this.db}) {
+    relaysRanking = RelaysRanking(db: db);
   }
 
   Future<void> init(
@@ -64,7 +62,24 @@ class RelaysPicker {
   }
 
   String pick(List<String> pubkeys, {int? limit}) {
-    var tracker = relayTracker.tracker;
+    List<String> pubkeysToPickFrom = [];
+    //todo debug if sync impacts performace
+    var rawResults =
+        db.dbRelayTrackers.filter().pubkeyIsNotEmpty().findAllSync();
+    for (var entry in rawResults) {
+      if (entry.relays.isEmpty) {
+        continue;
+      }
+      for (var relay in entry.relays) {
+        if (relay.relayUrl == null) {
+          continue;
+        }
+        if (relay.relayUrl!.isEmpty) {
+          continue;
+        }
+        pubkeysToPickFrom.add(relay.relayUrl!);
+      }
+    }
 
     bool atMaxRelays = relayAssignments.length >=
         15; //todo move to settings  hooks.getMaxRelays();
@@ -78,7 +93,7 @@ class RelaysPicker {
     }
 
     // combine list of maps into one list containing the map
-    List allRelays = tracker.values.expand((element) => element.keys).toList();
+    List allRelays = pubkeysToPickFrom;
     //List allRelays = tracker.values.; //hooks.getAllRelays();
 
     if (allRelays.isEmpty) {
