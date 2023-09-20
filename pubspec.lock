@@ -33,14 +33,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.4.1"
-  asn1lib:
-    dependency: transitive
-    description:
-      name: asn1lib
-      sha256: ab96a1cb3beeccf8145c52e449233fe68364c9641623acd3adad66f8184f1039
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.4.0"
   async:
     dependency: transitive
     description:
@@ -233,14 +225,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.6.3"
-  cross_local_storage:
-    dependency: "direct main"
-    description:
-      name: cross_local_storage
-      sha256: "4ea71b66c9c10bac6ae1a287620e48eeb611c63d1fd70b15940195b3f84305bd"
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.0.1"
   crypto:
     dependency: "direct main"
     description:
@@ -297,22 +281,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "7.0.0"
-  encrypt:
-    dependency: transitive
-    description:
-      name: encrypt
-      sha256: "4fd4e4fdc21b9d7d4141823e1e6515cd94e7b8d84749504c232999fba25d9bbb"
-      url: "https://pub.dev"
-    source: hosted
-    version: "5.0.1"
-  encrypted_shared_preferences:
-    dependency: transitive
-    description:
-      name: encrypted_shared_preferences
-      sha256: f4109e4d176a81b203ee120b79b30c1ab93dfd9eee03cac5b8c10a888c231639
-      url: "https://pub.dev"
-    source: hosted
-    version: "3.0.1"
   fake_async:
     dependency: transitive
     description:
@@ -554,14 +522,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.2.0"
-  hive:
-    dependency: transitive
-    description:
-      name: hive
-      sha256: "8dcf6db979d7933da8217edcec84e9df1bdb4e4edc7fc77dbd5aa74356d6d941"
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.2.3"
   hooks_riverpod:
     dependency: "direct main"
     description:
@@ -663,14 +623,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.8.1"
-  json_cache:
-    dependency: "direct main"
-    description:
-      name: json_cache
-      sha256: "3cc2818270596d31f9291481916b8060e34be502c1a6257ad99f7efd94382aac"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.5.0"
   lints:
     dependency: transitive
     description:
@@ -687,14 +639,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.1"
-  localstorage:
-    dependency: transitive
-    description:
-      name: localstorage
-      sha256: "1b5304491c85250b90807e0e2b3a6217d2739caea4871b820d42782572f880f4"
-      url: "https://pub.dev"
-    source: hosted
-    version: "4.0.1+2"
   logging:
     dependency: transitive
     description:
@@ -759,14 +703,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "5.4.0"
-  mutex:
-    dependency: transitive
-    description:
-      name: mutex
-      sha256: "03116a4e46282a671b46c12de649d72c0ed18188ffe12a8d0fc63e83f4ad88f4"
-      url: "https://pub.dev"
-    source: hosted
-    version: "3.0.1"
   node_preamble:
     dependency: transitive
     description:
@@ -1023,14 +959,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.2.0"
-  shared_preferences_macos:
-    dependency: transitive
-    description:
-      name: shared_preferences_macos
-      sha256: "81b6a60b2d27020eb0fc41f4cebc91353047309967901a79ee8203e40c42ed46"
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.0.5"
   shared_preferences_platform_interface:
     dependency: transitive
     description:
