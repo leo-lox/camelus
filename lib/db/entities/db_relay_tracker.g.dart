@@ -64,18 +64,13 @@ int _dbRelayTrackerEstimateSize(
 ) {
   var bytesCount = offsets.last;
   bytesCount += 3 + object.pubkey.length * 3;
+  bytesCount += 3 + object.relays.length * 3;
   {
-    final list = object.relays;
-    if (list != null) {
-      bytesCount += 3 + list.length * 3;
-      {
-        final offsets = allOffsets[DbRelayTrackerRelay]!;
-        for (var i = 0; i < list.length; i++) {
-          final value = list[i];
-          bytesCount += DbRelayTrackerRelaySchema.estimateSize(
-              value, offsets, allOffsets);
-        }
-      }
+    final offsets = allOffsets[DbRelayTrackerRelay]!;
+    for (var i = 0; i < object.relays.length; i++) {
+      final value = object.relays[i];
+      bytesCount +=
+          DbRelayTrackerRelaySchema.estimateSize(value, offsets, allOffsets);
     }
   }
   return bytesCount;
@@ -105,11 +100,12 @@ DbRelayTracker _dbRelayTrackerDeserialize(
   final object = DbRelayTracker(
     pubkey: reader.readString(offsets[0]),
     relays: reader.readObjectList<DbRelayTrackerRelay>(
-      offsets[1],
-      DbRelayTrackerRelaySchema.deserialize,
-      allOffsets,
-      DbRelayTrackerRelay(),
-    ),
+          offsets[1],
+          DbRelayTrackerRelaySchema.deserialize,
+          allOffsets,
+          DbRelayTrackerRelay(),
+        ) ??
+        const [],
   );
   object.id = id;
   return object;
@@ -126,11 +122,12 @@ P _dbRelayTrackerDeserializeProp<P>(
       return (reader.readString(offset)) as P;
     case 1:
       return (reader.readObjectList<DbRelayTrackerRelay>(
-        offset,
-        DbRelayTrackerRelaySchema.deserialize,
-        allOffsets,
-        DbRelayTrackerRelay(),
-      )) as P;
+            offset,
+            DbRelayTrackerRelaySchema.deserialize,
+            allOffsets,
+            DbRelayTrackerRelay(),
+          ) ??
+          const []) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
   }
@@ -627,24 +624,6 @@ extension DbRelayTrackerQueryFilter
   }
 
   QueryBuilder<DbRelayTracker, DbRelayTracker, QAfterFilterCondition>
-      relaysIsNull() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(const FilterCondition.isNull(
-        property: r'relays',
-      ));
-    });
-  }
-
-  QueryBuilder<DbRelayTracker, DbRelayTracker, QAfterFilterCondition>
-      relaysIsNotNull() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(const FilterCondition.isNotNull(
-        property: r'relays',
-      ));
-    });
-  }
-
-  QueryBuilder<DbRelayTracker, DbRelayTracker, QAfterFilterCondition>
       relaysLengthEqualTo(int length) {
     return QueryBuilder.apply(this, (query) {
       return query.listLength(
@@ -815,7 +794,7 @@ extension DbRelayTrackerQueryProperty
     });
   }
 
-  QueryBuilder<DbRelayTracker, List<DbRelayTrackerRelay>?, QQueryOperations>
+  QueryBuilder<DbRelayTracker, List<DbRelayTrackerRelay>, QQueryOperations>
       relaysProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'relays');

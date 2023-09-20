@@ -1,0 +1,20 @@
+import 'package:camelus/db/entities/db_user_metadata.dart';
+import 'package:isar/isar.dart';
+
+abstract class DbUserMetadataQueries {
+  ///
+  /// pubkeyQuery
+  ///
+  static Query<DbUserMetadata> pubkeyQuery(Isar db, {required String pubkey}) {
+    return db.dbUserMetadatas
+        .filter()
+        .pubkeyEqualTo(pubkey)
+        .sortByLast_fetchDesc()
+        .build();
+  }
+
+  static Future<DbUserMetadata?> pubkeyLastFuture(Isar db,
+      {required String pubkey}) {
+    return pubkeyQuery(db, pubkey: pubkey).findFirst();
+  }
+}

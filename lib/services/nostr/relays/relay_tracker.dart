@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:camelus/db/entities/db_nip05.dart';
 import 'package:camelus/db/entities/db_relay_tracker.dart';
 import 'package:camelus/models/nostr_note.dart';
 import 'package:camelus/models/nostr_tag.dart';
@@ -93,22 +94,21 @@ class RelayTracker {
         return;
       }
 
-      Map<String, dynamic> result =
-          await nip05service.checkNip05(nip05, pubkey);
+      DbNip05? result = await nip05service.checkNip05(nip05, pubkey);
 
-      if (result.isEmpty) {
+      if (result == null) {
         return;
       }
 
-      if (!result["valid"]) {
+      if (!result.valid!) {
         return;
       }
 
-      if (result["relays"] == null) {
+      if (result.relays == null) {
         return;
       }
 
-      List<String> resultRelays = List<String>.from(result["relays"]);
+      List<String> resultRelays = List<String>.from(result.relays!);
 
       trackRelays(
           pubkey, resultRelays, RelayTrackerAdvType.nip05, event.created_at);

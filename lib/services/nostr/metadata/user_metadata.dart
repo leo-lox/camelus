@@ -1,14 +1,14 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:camelus/db/entities/db_user_metadata.dart';
 import 'package:camelus/db/queries/db_note_queries.dart';
+import 'package:camelus/db/queries/db_user_metadata_queries.dart';
 import 'package:camelus/helpers/helpers.dart';
 import 'package:camelus/models/nostr_note.dart';
 import 'package:camelus/models/nostr_request_query.dart';
 import 'package:camelus/services/nostr/relays/relay_coordinator.dart';
-import 'package:cross_local_storage/cross_local_storage.dart';
 import 'package:isar/isar.dart';
-import 'package:json_cache/json_cache.dart';
 
 ///
 /// how metadata request works
@@ -20,13 +20,11 @@ import 'package:json_cache/json_cache.dart';
 
 class UserMetadata {
   Map<String, dynamic> usersMetadata = {};
-  var metadataLastFetch = <String, int>{};
+  //var metadataLastFetch = <String, int>{};
 
   final RelayCoordinator relays;
   final Future<Isar> dbFuture;
   late Isar _db;
-
-  late JsonCache _jsonCache;
 
   List<String> _metadataWaitingPool = [];
   late Timer _metadataWaitingPoolTimer;
@@ -43,8 +41,6 @@ class UserMetadata {
   }
 
   _init() async {
-    LocalStorageInterface prefs = await LocalStorage.getInstance();
-    _jsonCache = JsonCacheCrossLocalStorage(prefs);
     _restoreCache().then((_) => {_removeOldData()});
     _db = await dbFuture;
     _initDb();
@@ -59,30 +55,18 @@ class UserMetadata {
   }
 
   Future<void> _restoreCache() async {
-    var cache = await _jsonCache.value(
-      'metadataLastFetch',
-    );
-    if (cache != null) {
-      metadataLastFetch = Map<String, int>.from(cache);
-    }
-
     return;
   }
 
   _removeOldData() {
-    // 12 hours //todo move magic number to settings
-    int timeBarrier = 60 * 60 * 12;
+    // 2 weeks //todo move magic number to settings
+    int timeOffset = 60 * 60 * 24 * 2;
     var now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
-    var oldData = <String, int>{};
-    for (var key in metadataLastFetch.keys) {
-      if (now - metadataLastFetch[key]! > timeBarrier) {
-        oldData[key] = metadataLastFetch[key]!;
-      }
-    }
-    for (var key in oldData.keys) {
-      metadataLastFetch.remove(key);
-    }
-    _jsonCache.refresh('metadataLastFetch', metadataLastFetch);
+    var timeBarrier = now - timeOffset;
+
+    _db.writeTxn(() async {
+      _db.dbUserMetadatas.filter().last_fetchLessThan(timeBarrier).deleteAll();
+    });
   }
 
   Future<Map> getMetadataByPubkey(String pubkey, {bool force = false}) async {
@@ -91,22 +75,6 @@ class UserMetadata {
     if (pubkey.isEmpty) {
       return Future(() => {});
     }
-
-    if (usersMetadata.containsKey(pubkey) && !force) {
-      // check if no relation
-      if (metadataLastFetch[pubkey] == null) {
-        // update in background
-        getMetadataByPubkey(pubkey, force: true);
-      }
-
-      // return from cache
-      return Future(() => usersMetadata[pubkey]);
-    }
-
-    //set relation
-    metadataLastFetch[pubkey] = now;
-    //update cache
-    _jsonCache.refresh('metadataLastFetch', metadataLastFetch);
 
     // check if pubkey is already in waiting pool
     if (!(_metadataWaitingPool.contains(pubkey))) {
@@ -193,16 +161,39 @@ class UserMetadata {
 
   _receiveNostrEvents(List<NostrNote> notes) {
     for (var note in notes) {
-      String pubkey = note.pubkey;
+      int now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
+
       try {
-        usersMetadata[pubkey] = jsonDecode(note.content);
+        var json = jsonDecode(note.content);
+
+        var newMetadata = DbUserMetadata(
+          nostr_id: note.id,
+          pubkey: note.pubkey,
+          last_fetch: now,
+          picture: json['picture'],
+          banner: json['banner'],
+          name: json['name'],
+          nip05: json['nip05'],
+          about: json['about'],
+          website: json['website'],
+          lud06: json['lud06'],
+          lud16: json['lud16'],
+        );
+
+        _db.writeTxn(() async {
+          var latestMeta = await DbUserMetadataQueries.pubkeyLastFuture(_db,
+              pubkey: newMetadata.pubkey);
+          // dont update if latest metadata is newer
+          if (latestMeta != null &&
+              latestMeta.last_fetch > newMetadata.last_fetch) {
+            return;
+          }
+
+          _db.dbUserMetadatas.put(newMetadata);
+        });
       } catch (e) {
         return;
       }
-
-      // add access time
-      int now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
-      usersMetadata[pubkey]["accessTime"] = now;
     }
   }
 }
