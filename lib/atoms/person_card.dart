@@ -1,8 +1,8 @@
-
 import 'package:camelus/atoms/follow_button.dart';
 import 'package:camelus/atoms/my_profile_picture.dart';
 import 'package:camelus/config/palette.dart';
-import 'package:camelus/providers/nostr_service_provider.dart';
+import 'package:camelus/providers/nip05_provider.dart';
+
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -29,12 +29,12 @@ class PersonCard extends ConsumerWidget {
   }) : super(key: key);
 
   Future<String> checkNip05(String nip05, String pubkey, WidgetRef ref) async {
-    var nostrService = ref.watch(nostrServiceProvider);
+    var nip05service = await ref.read(nip05provider.future);
     try {
-      var check = await nostrService.checkNip05(nip05, pubkey);
+      var check = await nip05service.checkNip05(nip05, pubkey);
 
-      if (check["valid"] == true) {
-        return check["nip05"];
+      if (check != null && check.valid) {
+        return check.nip05;
       }
       // ignore: empty_catches
     } catch (e) {}

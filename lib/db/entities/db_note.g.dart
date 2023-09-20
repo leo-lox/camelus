@@ -37,23 +37,28 @@ const DbNoteSchema = CollectionSchema(
       name: r'kind',
       type: IsarType.long,
     ),
-    r'nostr_id': PropertySchema(
+    r'last_fetch': PropertySchema(
       id: 4,
+      name: r'last_fetch',
+      type: IsarType.long,
+    ),
+    r'nostr_id': PropertySchema(
+      id: 5,
       name: r'nostr_id',
       type: IsarType.string,
     ),
     r'pubkey': PropertySchema(
-      id: 5,
+      id: 6,
       name: r'pubkey',
       type: IsarType.string,
     ),
     r'sig': PropertySchema(
-      id: 6,
+      id: 7,
       name: r'sig',
       type: IsarType.string,
     ),
     r'tags': PropertySchema(
-      id: 7,
+      id: 8,
       name: r'tags',
       type: IsarType.objectList,
       target: r'DbTag',
@@ -187,11 +192,12 @@ void _dbNoteSerialize(
   writer.writeStringList(offsets[1], object.contentWords);
   writer.writeLong(offsets[2], object.created_at);
   writer.writeLong(offsets[3], object.kind);
-  writer.writeString(offsets[4], object.nostr_id);
-  writer.writeString(offsets[5], object.pubkey);
-  writer.writeString(offsets[6], object.sig);
+  writer.writeLong(offsets[4], object.last_fetch);
+  writer.writeString(offsets[5], object.nostr_id);
+  writer.writeString(offsets[6], object.pubkey);
+  writer.writeString(offsets[7], object.sig);
   writer.writeObjectList<DbTag>(
-    offsets[7],
+    offsets[8],
     allOffsets,
     DbTagSchema.serialize,
     object.tags,
@@ -208,11 +214,12 @@ DbNote _dbNoteDeserialize(
     content: reader.readStringOrNull(offsets[0]),
     created_at: reader.readLong(offsets[2]),
     kind: reader.readLong(offsets[3]),
-    nostr_id: reader.readString(offsets[4]),
-    pubkey: reader.readString(offsets[5]),
-    sig: reader.readString(offsets[6]),
+    last_fetch: reader.readLongOrNull(offsets[4]),
+    nostr_id: reader.readString(offsets[5]),
+    pubkey: reader.readString(offsets[6]),
+    sig: reader.readString(offsets[7]),
     tags: reader.readObjectList<DbTag>(
-      offsets[7],
+      offsets[8],
       DbTagSchema.deserialize,
       allOffsets,
       DbTag(),
@@ -238,12 +245,14 @@ P _dbNoteDeserializeProp<P>(
     case 3:
       return (reader.readLong(offset)) as P;
     case 4:
-      return (reader.readString(offset)) as P;
+      return (reader.readLongOrNull(offset)) as P;
     case 5:
       return (reader.readString(offset)) as P;
     case 6:
       return (reader.readString(offset)) as P;
     case 7:
+      return (reader.readString(offset)) as P;
+    case 8:
       return (reader.readObjectList<DbTag>(
         offset,
         DbTagSchema.deserialize,
@@ -1450,6 +1459,75 @@ extension DbNoteQueryFilter on QueryBuilder<DbNote, DbNote, QFilterCondition> {
     });
   }
 
+  QueryBuilder<DbNote, DbNote, QAfterFilterCondition> last_fetchIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'last_fetch',
+      ));
+    });
+  }
+
+  QueryBuilder<DbNote, DbNote, QAfterFilterCondition> last_fetchIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'last_fetch',
+      ));
+    });
+  }
+
+  QueryBuilder<DbNote, DbNote, QAfterFilterCondition> last_fetchEqualTo(
+      int? value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'last_fetch',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<DbNote, DbNote, QAfterFilterCondition> last_fetchGreaterThan(
+    int? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'last_fetch',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<DbNote, DbNote, QAfterFilterCondition> last_fetchLessThan(
+    int? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'last_fetch',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<DbNote, DbNote, QAfterFilterCondition> last_fetchBetween(
+    int? lower,
+    int? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'last_fetch',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
   QueryBuilder<DbNote, DbNote, QAfterFilterCondition> nostr_idEqualTo(
     String value, {
     bool caseSensitive = true,
@@ -1987,6 +2065,18 @@ extension DbNoteQuerySortBy on QueryBuilder<DbNote, DbNote, QSortBy> {
     });
   }
 
+  QueryBuilder<DbNote, DbNote, QAfterSortBy> sortByLast_fetch() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'last_fetch', Sort.asc);
+    });
+  }
+
+  QueryBuilder<DbNote, DbNote, QAfterSortBy> sortByLast_fetchDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'last_fetch', Sort.desc);
+    });
+  }
+
   QueryBuilder<DbNote, DbNote, QAfterSortBy> sortByNostr_id() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'nostr_id', Sort.asc);
@@ -2073,6 +2163,18 @@ extension DbNoteQuerySortThenBy on QueryBuilder<DbNote, DbNote, QSortThenBy> {
     });
   }
 
+  QueryBuilder<DbNote, DbNote, QAfterSortBy> thenByLast_fetch() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'last_fetch', Sort.asc);
+    });
+  }
+
+  QueryBuilder<DbNote, DbNote, QAfterSortBy> thenByLast_fetchDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'last_fetch', Sort.desc);
+    });
+  }
+
   QueryBuilder<DbNote, DbNote, QAfterSortBy> thenByNostr_id() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'nostr_id', Sort.asc);
@@ -2136,6 +2238,12 @@ extension DbNoteQueryWhereDistinct on QueryBuilder<DbNote, DbNote, QDistinct> {
     });
   }
 
+  QueryBuilder<DbNote, DbNote, QDistinct> distinctByLast_fetch() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'last_fetch');
+    });
+  }
+
   QueryBuilder<DbNote, DbNote, QDistinct> distinctByNostr_id(
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
@@ -2186,6 +2294,12 @@ extension DbNoteQueryProperty on QueryBuilder<DbNote, DbNote, QQueryProperty> {
   QueryBuilder<DbNote, int, QQueryOperations> kindProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'kind');
+    });
+  }
+
+  QueryBuilder<DbNote, int?, QQueryOperations> last_fetchProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'last_fetch');
     });
   }
 

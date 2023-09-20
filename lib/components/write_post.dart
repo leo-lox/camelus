@@ -9,7 +9,6 @@ import 'package:camelus/models/nostr_tag.dart';
 import 'package:camelus/providers/database_provider.dart';
 import 'package:camelus/providers/key_pair_provider.dart';
 import 'package:camelus/providers/metadata_provider.dart';
-import 'package:camelus/providers/nostr_service_provider.dart';
 import 'package:camelus/providers/relay_provider.dart';
 import 'package:camelus/services/external/nostr_build_file_upload.dart';
 import 'package:camelus/services/nostr/metadata/user_metadata.dart';
@@ -24,7 +23,6 @@ import 'package:lottie/lottie.dart';
 import 'package:camelus/config/palette.dart';
 import 'package:camelus/helpers/helpers.dart';
 import 'package:camelus/models/post_context.dart';
-import 'package:camelus/services/nostr/nostr_service.dart';
 
 class WritePost extends ConsumerStatefulWidget {
   final PostContext? context;
@@ -36,7 +34,6 @@ class WritePost extends ConsumerStatefulWidget {
 }
 
 class _WritePostState extends ConsumerState<WritePost> {
-  late NostrService _nostrService;
   late Isar _db;
   late Search _search;
 
@@ -233,8 +230,8 @@ class _WritePostState extends ConsumerState<WritePost> {
       if (mentionKeys.isNotEmpty) {
         for (int i = 0; i < mentionKeys.length; i++) {
           var pubkey = mentionKeys[i];
-          var potentialRelays =
-              await RelaysRanking().getBestRelays(pubkey, Direction.read);
+          var potentialRelays = await RelaysRanking(db: _db)
+              .getBestRelays(pubkey, Direction.read);
           tags.add(NostrTag(
             type: "p",
             value: pubkey,
@@ -338,7 +335,6 @@ class _WritePostState extends ConsumerState<WritePost> {
   }
 
   void _initServices() async {
-    _nostrService = ref.read(nostrServiceProvider);
     _db = await ref.watch(databaseProvider.future);
     _search = Search(_db);
   }

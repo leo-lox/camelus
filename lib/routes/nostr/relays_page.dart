@@ -1,7 +1,5 @@
 import 'package:camelus/config/palette.dart';
-import 'package:camelus/providers/nostr_service_provider.dart';
 import 'package:camelus/providers/relay_provider.dart';
-import 'package:camelus/services/nostr/nostr_service.dart';
 import 'package:camelus/services/nostr/relays/my_relay.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -15,16 +13,9 @@ class RelaysPage extends ConsumerStatefulWidget {
 }
 
 class _RelaysPageState extends ConsumerState<RelaysPage> {
-  late NostrService _nostrService;
-
-  void _initNostrService() {
-    _nostrService = ref.read(nostrServiceProvider);
-  }
-
   @override
   void initState() {
     super.initState();
-    _initNostrService();
   }
 
   @override

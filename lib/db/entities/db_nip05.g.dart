@@ -27,8 +27,13 @@ const DbNip05Schema = CollectionSchema(
       name: r'nip05',
       type: IsarType.string,
     ),
-    r'valid': PropertySchema(
+    r'relays': PropertySchema(
       id: 2,
+      name: r'relays',
+      type: IsarType.stringList,
+    ),
+    r'valid': PropertySchema(
+      id: 3,
       name: r'valid',
       type: IsarType.bool,
     )
@@ -68,6 +73,18 @@ int _dbNip05EstimateSize(
 ) {
   var bytesCount = offsets.last;
   bytesCount += 3 + object.nip05.length * 3;
+  {
+    final list = object.relays;
+    if (list != null) {
+      bytesCount += 3 + list.length * 3;
+      {
+        for (var i = 0; i < list.length; i++) {
+          final value = list[i];
+          bytesCount += value.length * 3;
+        }
+      }
+    }
+  }
   return bytesCount;
 }
 
@@ -79,7 +96,8 @@ void _dbNip05Serialize(
 ) {
   writer.writeLong(offsets[0], object.lastCheck);
   writer.writeString(offsets[1], object.nip05);
-  writer.writeBool(offsets[2], object.valid);
+  writer.writeStringList(offsets[2], object.relays);
+  writer.writeBool(offsets[3], object.valid);
 }
 
 DbNip05 _dbNip05Deserialize(
@@ -91,7 +109,8 @@ DbNip05 _dbNip05Deserialize(
   final object = DbNip05(
     lastCheck: reader.readLongOrNull(offsets[0]),
     nip05: reader.readString(offsets[1]),
-    valid: reader.readBoolOrNull(offsets[2]),
+    relays: reader.readStringList(offsets[2]),
+    valid: reader.readBoolOrNull(offsets[3]) ?? false,
   );
   object.id = id;
   return object;
@@ -109,7 +128,9 @@ P _dbNip05DeserializeProp<P>(
     case 1:
       return (reader.readString(offset)) as P;
     case 2:
-      return (reader.readBoolOrNull(offset)) as P;
+      return (reader.readStringList(offset)) as P;
+    case 3:
+      return (reader.readBoolOrNull(offset) ?? false) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
   }
@@ -652,24 +673,240 @@ extension DbNip05QueryFilter
     });
   }
 
-  QueryBuilder<DbNip05, DbNip05, QAfterFilterCondition> validIsNull() {
+  QueryBuilder<DbNip05, DbNip05, QAfterFilterCondition> relaysIsNull() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(const FilterCondition.isNull(
-        property: r'valid',
+        property: r'relays',
       ));
     });
   }
 
-  QueryBuilder<DbNip05, DbNip05, QAfterFilterCondition> validIsNotNull() {
+  QueryBuilder<DbNip05, DbNip05, QAfterFilterCondition> relaysIsNotNull() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(const FilterCondition.isNotNull(
-        property: r'valid',
+        property: r'relays',
       ));
+    });
+  }
+
+  QueryBuilder<DbNip05, DbNip05, QAfterFilterCondition> relaysElementEqualTo(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'relays',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<DbNip05, DbNip05, QAfterFilterCondition>
+      relaysElementGreaterThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'relays',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<DbNip05, DbNip05, QAfterFilterCondition> relaysElementLessThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'relays',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<DbNip05, DbNip05, QAfterFilterCondition> relaysElementBetween(
+    String lower,
+    String upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'relays',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<DbNip05, DbNip05, QAfterFilterCondition> relaysElementStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'relays',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<DbNip05, DbNip05, QAfterFilterCondition> relaysElementEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'relays',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<DbNip05, DbNip05, QAfterFilterCondition> relaysElementContains(
+      String value,
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'relays',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<DbNip05, DbNip05, QAfterFilterCondition> relaysElementMatches(
+      String pattern,
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'relays',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<DbNip05, DbNip05, QAfterFilterCondition> relaysElementIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'relays',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<DbNip05, DbNip05, QAfterFilterCondition>
+      relaysElementIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'relays',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<DbNip05, DbNip05, QAfterFilterCondition> relaysLengthEqualTo(
+      int length) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'relays',
+        length,
+        true,
+        length,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<DbNip05, DbNip05, QAfterFilterCondition> relaysIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'relays',
+        0,
+        true,
+        0,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<DbNip05, DbNip05, QAfterFilterCondition> relaysIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'relays',
+        0,
+        false,
+        999999,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<DbNip05, DbNip05, QAfterFilterCondition> relaysLengthLessThan(
+    int length, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'relays',
+        0,
+        true,
+        length,
+        include,
+      );
+    });
+  }
+
+  QueryBuilder<DbNip05, DbNip05, QAfterFilterCondition> relaysLengthGreaterThan(
+    int length, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'relays',
+        length,
+        include,
+        999999,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<DbNip05, DbNip05, QAfterFilterCondition> relaysLengthBetween(
+    int lower,
+    int upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'relays',
+        lower,
+        includeLower,
+        upper,
+        includeUpper,
+      );
     });
   }
 
   QueryBuilder<DbNip05, DbNip05, QAfterFilterCondition> validEqualTo(
-      bool? value) {
+      bool value) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
         property: r'valid',
@@ -789,6 +1026,12 @@ extension DbNip05QueryWhereDistinct
     });
   }
 
+  QueryBuilder<DbNip05, DbNip05, QDistinct> distinctByRelays() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'relays');
+    });
+  }
+
   QueryBuilder<DbNip05, DbNip05, QDistinct> distinctByValid() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'valid');
@@ -816,7 +1059,13 @@ extension DbNip05QueryProperty
     });
   }
 
-  QueryBuilder<DbNip05, bool?, QQueryOperations> validProperty() {
+  QueryBuilder<DbNip05, List<String>?, QQueryOperations> relaysProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'relays');
+    });
+  }
+
+  QueryBuilder<DbNip05, bool, QQueryOperations> validProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'valid');
     });

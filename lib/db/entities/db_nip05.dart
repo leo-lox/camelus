@@ -10,13 +10,13 @@ class DbNip05 {
   @Index(unique: true, type: IndexType.value)
   String nip05;
 
-  bool? valid;
+  bool valid;
   int? lastCheck;
   List<String>? relays;
 
   DbNip05({
     required this.nip05,
-    this.valid,
+    this.valid = false,
     this.lastCheck,
     this.relays = const [],
   });

@@ -33,12 +33,12 @@ class _NoteCardNameRowState extends ConsumerState<NoteCardNameRow> {
     if (nip05.isEmpty) return;
     if (nip05verified.isNotEmpty) return;
     try {
-      var nip05Service = ref.watch(nip05provider);
+      var nip05Service = await ref.watch(nip05provider.future);
       var check = await nip05Service.checkNip05(nip05, pubkey);
 
-      if (check["valid"] == true) {
+      if (check != null && check.valid) {
         setState(() {
-          nip05verified = check["nip05"];
+          nip05verified = check.nip05;
         });
       }
       // ignore: empty_catches

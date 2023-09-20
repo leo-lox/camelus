@@ -5,13 +5,11 @@ import 'package:camelus/atoms/long_button.dart';
 import 'package:camelus/models/nostr_request_event.dart';
 import 'package:camelus/providers/key_pair_provider.dart';
 import 'package:camelus/providers/metadata_provider.dart';
-import 'package:camelus/providers/nostr_service_provider.dart';
 import 'package:camelus/providers/relay_provider.dart';
 import 'package:camelus/services/nostr/metadata/user_metadata.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:camelus/config/palette.dart';
-import 'package:camelus/services/nostr/nostr_service.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class EditProfilePage extends ConsumerStatefulWidget {
@@ -22,8 +20,8 @@ class EditProfilePage extends ConsumerStatefulWidget {
 }
 
 class _EditProfilePageState extends ConsumerState<EditProfilePage> {
-  late NostrService _nostrService;
   late UserMetadata _metadataService;
+  late KeyPairWrapper _keyPairService;
   // create text input controllers
   TextEditingController pictureController = TextEditingController(text: "");
   TextEditingController bannerController = TextEditingController(text: "");
@@ -41,9 +39,13 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
   bool submitLoading = false;
 
   bool isKeysExpanded = false;
-  void _initServices() {
-    _nostrService = ref.read(nostrServiceProvider);
+  void _initServices() async {
     _metadataService = ref.read(metadataProvider);
+    _keyPairService = await ref.read(keyPairProvider.future);
+    pubkey = _keyPairService.keyPair!.publicKey;
+
+    // set initial values of text input controllers
+    _loadProfileValues();
   }
 
   @override
@@ -51,11 +53,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
     super.initState();
 
     _initServices();
-    // get user public key
-    pubkey = _nostrService.myKeys.publicKey;
 
-    // set initial values of text input controllers
-    _loadProfileValues();
     // listen to changes in text input controllers
     pictureController.addListener(() {
       setState(() {});
@@ -314,9 +312,10 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                                 child: GestureDetector(
                                   onTap: () {
                                     copyToClipboard(
-                                        _nostrService.myKeys.publicKeyHr);
+                                        _keyPairService.keyPair!.publicKeyHr);
                                   },
-                                  child: Text(_nostrService.myKeys.publicKeyHr),
+                                  child: Text(
+                                      _keyPairService.keyPair!.publicKeyHr),
                                 ),
                               ),
                               // private key
@@ -326,10 +325,10 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                                 child: GestureDetector(
                                   onTap: () {
                                     copyToClipboard(
-                                        _nostrService.myKeys.privateKeyHr);
+                                        _keyPairService.keyPair!.privateKeyHr);
                                   },
-                                  child:
-                                      Text(_nostrService.myKeys.privateKeyHr),
+                                  child: Text(
+                                      _keyPairService.keyPair!.privateKeyHr),
                                 ),
                               ),
                             ],
