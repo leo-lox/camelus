@@ -173,6 +173,7 @@ void main() {
 }
 
 openIsar() async {
+  Isar.initializeIsarCore(download: true);
   //final dir = await getApplicationDocumentsDirectory();
   final isar = await Isar.open(
     directory: "./", //dir.path,
