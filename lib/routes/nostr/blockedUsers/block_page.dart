@@ -42,6 +42,11 @@ class _BlockPageState extends ConsumerState<BlockPage> {
   late final Isar db;
   late final KeyPairWrapper keyService;
 
+  final TextEditingController _textController = TextEditingController();
+  String _reportReason = "";
+  bool _postReported = false;
+  bool _reportLoading = false;
+
   @override
   void initState() {
     super.initState();
@@ -155,6 +160,44 @@ class _BlockPageState extends ConsumerState<BlockPage> {
     });
   }
 
+  void _setReportReason(String reason) {
+    if (reason == _reportReason) {
+      reason = "";
+    }
+    setState(() {
+      _reportReason = reason;
+    });
+  }
+
+  Future _reportPost() async {
+    setState(() {
+      _reportLoading = true;
+    });
+
+    List<NostrTag> reportTags = [
+      NostrTag(type: "p", value: widget.userPubkey),
+      NostrTag(type: "e", value: widget.postId!, marker: _reportReason),
+    ];
+
+    final NostrRequestEventBody newReportBody = NostrRequestEventBody(
+      pubkey: keyService.keyPair!.publicKey,
+      kind: 1984,
+      tags: reportTags,
+      content: _textController.text,
+      privateKey: keyService.keyPair!.privateKey,
+    );
+
+    var myReport = NostrRequestEvent(body: newReportBody);
+    var relays = ref.watch(relayServiceProvider);
+    List<String> results = await relays.write(request: myReport);
+
+    setState(() {
+      _reportLoading = false;
+      _postReported = true;
+    });
+    return results;
+  }
+
   @override
   Widget build(BuildContext context) {
     var metadata = ref.watch(metadataProvider);
@@ -220,6 +263,7 @@ class _BlockPageState extends ConsumerState<BlockPage> {
                           width: MediaQuery.of(context).size.width * 0.75,
                           child: longButton(
                               name: isUserBlocked ? "unblock" : "block",
+                              inverted: !isUserBlocked,
                               loading: requestLoading,
                               onPressed: () {
                                 if (isUserBlocked) {
@@ -234,11 +278,104 @@ class _BlockPageState extends ConsumerState<BlockPage> {
                         );
                       }),
                   const SizedBox(height: 10),
-                  // SizedBox(
-                  //   height: 40,
-                  //   width: MediaQuery.of(context).size.width * 0.75,
-                  //   child: longButton(name: "report", onPressed: () => {}),
-                  // ),
+                  if (widget.postId != null && !_postReported)
+                    Column(
+                      children: [
+                        const SizedBox(height: 100),
+                        //text user input
+
+                        GridView.count(
+                            crossAxisCount: 2,
+                            childAspectRatio: 4.5 / 1,
+                            shrinkWrap: true,
+                            mainAxisSpacing: 10,
+                            crossAxisSpacing: 10,
+                            children: [
+                              longButton(
+                                name: "impersonation",
+                                onPressed: () =>
+                                    {_setReportReason("impersonation")},
+                                inverted: _reportReason == "impersonation",
+                              ),
+                              longButton(
+                                name: "spam",
+                                onPressed: () => {_setReportReason("spam")},
+                                inverted: _reportReason == "spam",
+                              ),
+                              longButton(
+                                name: "illegal",
+                                onPressed: () => {_setReportReason("illegal")},
+                                inverted: _reportReason == "illegal",
+                              ),
+                              longButton(
+                                name: "profanity",
+                                onPressed: () =>
+                                    {_setReportReason("profanity")},
+                                inverted: _reportReason == "profanity",
+                              ),
+                              longButton(
+                                name: "nudity",
+                                onPressed: () => {_setReportReason("nudity")},
+                                inverted: _reportReason == "nudity",
+                              ),
+                            ]),
+
+                        const SizedBox(height: 20),
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width * 0.90,
+                          child: TextField(
+                            controller: _textController,
+                            decoration: const InputDecoration(
+                              border: OutlineInputBorder(),
+                              labelText: 'what is wrong with this post?',
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+
+                        SizedBox(
+                          height: 40,
+                          width: MediaQuery.of(context).size.width * 0.75,
+                          child: longButton(
+                              name: "report post",
+                              inverted: true,
+                              loading: _reportLoading,
+                              onPressed: () => {_reportPost()}),
+                        ),
+                      ],
+                    ),
+                  if (_postReported)
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const SizedBox(height: 100),
+                        const Text(
+                          "post reported",
+                          style: TextStyle(
+                              color: Palette.white,
+                              fontSize: 30,
+                              fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(height: 20),
+                        const Text(
+                          "thank you for reporting this post",
+                          style:
+                              TextStyle(color: Palette.lightGray, fontSize: 20),
+                        ),
+                        const SizedBox(height: 20),
+                        SizedBox(
+                          height: 40,
+                          width: MediaQuery.of(context).size.width * 0.75,
+                          child: longButton(
+                              inverted: true,
+                              name: "go back",
+                              onPressed: () => {
+                                    Navigator.pop(context),
+                                  }),
+                        ),
+                      ],
+                    )
                 ],
               ),
             )

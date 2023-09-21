@@ -83,7 +83,7 @@ void openBottomSheetMore(context, NostrNote note) {
                               ),
                               const SizedBox(width: 15),
                               const Text(
-                                "mute/block",
+                                "block/report",
                                 style: TextStyle(
                                     color: Palette.lightGray, fontSize: 17),
                               ),
