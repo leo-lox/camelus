@@ -624,10 +624,11 @@ class RelayCoordinator {
     var myBody = NostrRequestQueryBody(
       authors: [pubkey],
       kinds: [
-        0,
-        1,
-        3,
-        10002,
+        0, // metadata
+        1, // posts
+        3, // contacts
+        10000, // mute list
+        10002, //nip 65
       ],
       limit: 5,
     );
