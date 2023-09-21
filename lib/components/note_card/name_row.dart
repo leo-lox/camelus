@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:camelus/config/palette.dart';
+import 'package:camelus/db/entities/db_user_metadata.dart';
 import 'package:camelus/helpers/helpers.dart';
 import 'package:camelus/providers/nip05_provider.dart';
 import 'package:flutter/material.dart';
@@ -9,7 +10,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 class NoteCardNameRow extends ConsumerStatefulWidget {
-  final Future<Map<dynamic, dynamic>> myMetadata;
+  final Future<DbUserMetadata?> myMetadata;
   final String pubkey;
   final int created_at;
   final Function openMore;
@@ -33,12 +34,12 @@ class _NoteCardNameRowState extends ConsumerState<NoteCardNameRow> {
     if (nip05.isEmpty) return;
     if (nip05verified.isNotEmpty) return;
     try {
-      var nip05Service = ref.watch(nip05provider);
+      var nip05Service = await ref.watch(nip05provider.future);
       var check = await nip05Service.checkNip05(nip05, pubkey);
 
-      if (check["valid"] == true) {
+      if (check != null && check.valid) {
         setState(() {
-          nip05verified = check["nip05"];
+          nip05verified = check.nip05;
         });
       }
       // ignore: empty_catches
@@ -47,7 +48,7 @@ class _NoteCardNameRowState extends ConsumerState<NoteCardNameRow> {
 
   void _initSqeuence() async {
     var metadata = await widget.myMetadata;
-    _checkNip05(metadata["nip05"] ?? "", widget.pubkey);
+    _checkNip05(metadata?.nip05 ?? "", widget.pubkey);
 
     var npubHr = Helpers().encodeBech32(widget.pubkey, "npub");
     npubHrShort =
@@ -66,13 +67,14 @@ class _NoteCardNameRowState extends ConsumerState<NoteCardNameRow> {
         //mainAxisAlignment: MainAxisAlignment.end,
         //crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          FutureBuilder<Map>(
+          FutureBuilder<DbUserMetadata?>(
               future: widget.myMetadata,
-              builder: (BuildContext context, AsyncSnapshot<Map> snapshot) {
+              builder: (BuildContext context,
+                  AsyncSnapshot<DbUserMetadata?> snapshot) {
                 var name = "";
 
                 if (snapshot.hasData) {
-                  name = snapshot.data?["name"] ?? npubHrShort;
+                  name = snapshot.data?.name ?? npubHrShort;
                 } else if (snapshot.hasError) {
                   name = "error";
                 } else {

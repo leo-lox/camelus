@@ -25,13 +25,17 @@ class DbNote {
 
   String? content;
 
+  String sig;
+
+  List<DbTag>? tags;
+
+  // not nostr related fields
+
   // used for full text search
   @Index(type: IndexType.value, caseSensitive: false)
   List<String> get contentWords => Isar.splitWords(content ?? '');
 
-  String sig;
-
-  List<DbTag>? tags;
+  int? last_fetch;
 
   DbNote({
     required this.nostr_id,
@@ -41,6 +45,7 @@ class DbNote {
     this.content,
     required this.sig,
     this.tags,
+    this.last_fetch,
   });
 
   @override

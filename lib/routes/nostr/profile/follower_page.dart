@@ -1,4 +1,5 @@
 import 'package:camelus/atoms/person_card.dart';
+import 'package:camelus/db/entities/db_user_metadata.dart';
 import 'package:camelus/db/queries/db_note_queries.dart';
 import 'package:camelus/models/nostr_request_event.dart';
 import 'package:camelus/models/nostr_tag.dart';
@@ -104,15 +105,15 @@ class _FollowerPageState extends ConsumerState<FollowerPage> {
                 itemCount: widget.contacts.length,
                 itemBuilder: (context, index) {
                   var displayPubkey = widget.contacts[index].value;
-                  return FutureBuilder<Map<dynamic, dynamic>>(
+                  return FutureBuilder<DbUserMetadata?>(
                       future: metadata.getMetadataByPubkey(displayPubkey),
                       builder: (BuildContext context, metadataSnapshot) {
                         return PersonCard(
                           pubkey: displayPubkey,
-                          name: metadataSnapshot.data?["name"] ?? "",
-                          pictureUrl: metadataSnapshot.data?["picture"] ?? "",
-                          about: metadataSnapshot.data?["about"] ?? "",
-                          nip05: metadataSnapshot.data?["nip05"] ?? "",
+                          name: metadataSnapshot.data?.name ?? "",
+                          pictureUrl: metadataSnapshot.data?.picture ?? "",
+                          about: metadataSnapshot.data?.about ?? "",
+                          nip05: metadataSnapshot.data?.nip05 ?? "",
                           isFollowing: ownFollowingSnapshot.data!
                               .any((element) => element.value == displayPubkey),
                           onTap: () {

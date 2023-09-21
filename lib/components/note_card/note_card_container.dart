@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:camelus/components/note_card/note_card.dart';
 import 'package:camelus/config/palette.dart';
+import 'package:camelus/db/entities/db_user_metadata.dart';
 import 'package:camelus/helpers/helpers.dart';
 import 'package:camelus/models/nostr_note.dart';
 import 'package:camelus/models/nostr_tag.dart';
@@ -195,12 +196,12 @@ Widget linkedUsername(
       Navigator.pushNamed(context, "/nostr/profile", arguments: pubkey);
     },
     child: FutureBuilder(
-      builder: (context, AsyncSnapshot<Map> snapshot) {
+      builder: (context, AsyncSnapshot<DbUserMetadata?> snapshot) {
         var pubkeyBech = Helpers().encodeBech32(pubkey, "npub");
         var pubkeyHr =
             "${pubkeyBech.substring(0, 4)}:${pubkeyBech.substring(pubkeyBech.length - 5)}";
         if (snapshot.hasData) {
-          return Text('@${snapshot.data?['name'] ?? pubkeyHr} ',
+          return Text('@${snapshot.data?.name ?? pubkeyHr} ',
               style: const TextStyle(
                   color: Palette.primary, fontSize: 16, height: 1.3));
         } else {

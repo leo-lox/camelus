@@ -1,32 +1,39 @@
 import 'dart:developer';
 
 import 'package:camelus/config/palette.dart';
-import 'package:camelus/models/tweet.dart';
+import 'package:camelus/models/nostr_note.dart';
+import 'package:camelus/providers/database_provider.dart';
 import 'package:camelus/services/nostr/relays/relay_tracker.dart';
-import 'package:camelus/services/nostr/relays/relays_injector.dart';
+
 import 'package:camelus/services/nostr/relays/relays_ranking.dart';
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
-class SeenOnRelaysPage extends StatefulWidget {
-  Tweet tweet;
+class SeenOnRelaysPage extends ConsumerStatefulWidget {
+  NostrNote myNote;
+
+  SeenOnRelaysPage({Key? key, required this.myNote}) : super(key: key) {}
+
+  @override
+  ConsumerState<SeenOnRelaysPage> createState() => _SeenOnRelaysPageState();
+}
+
+class _SeenOnRelaysPageState extends ConsumerState<SeenOnRelaysPage> {
   late RelaysRanking _relaysRanking;
   late RelayTracker _relayTracker;
-  SeenOnRelaysPage({Key? key, required this.tweet}) : super(key: key) {
-    RelaysInjector injector = RelaysInjector();
-    _relaysRanking = injector.relaysRanking;
-    _relayTracker = injector.relayTracker;
+
+  void _initServices() async {
+    var db = await ref.watch(databaseProvider.future);
+    _relaysRanking = RelaysRanking(db: db);
+    _relayTracker = RelayTracker(db: db);
   }
 
   @override
-  State<SeenOnRelaysPage> createState() => _SeenOnRelaysPageState();
-}
-
-class _SeenOnRelaysPageState extends State<SeenOnRelaysPage> {
-  @override
   void initState() {
-    log(widget.tweet.relayHints.toString());
+    log(widget.myNote.relayHints.toString());
     super.initState();
+    _initServices();
   }
 
   String _timeago(int time) {
@@ -53,18 +60,14 @@ class _SeenOnRelaysPageState extends State<SeenOnRelaysPage> {
                 ListView.builder(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
-                  itemCount: widget.tweet.relayHints.length,
+                  itemCount: widget.myNote.relayHints.length,
                   itemBuilder: (context, index) {
                     return ListTile(
                       title: Text(
-                        widget.tweet.relayHints.keys.elementAt(index),
+                        widget.myNote.relayHints.elementAt(index),
                         style: const TextStyle(
                             color: Palette.white, fontWeight: FontWeight.bold),
                       ),
-                      subtitle: Text(
-                          _timeago(widget.tweet.relayHints.values
-                              .elementAt(index)['lastFetched']),
-                          style: const TextStyle(color: Palette.white)),
                     );
                   },
                 ),
@@ -72,8 +75,8 @@ class _SeenOnRelaysPageState extends State<SeenOnRelaysPage> {
                 const Text('author gossip hints',
                     style: TextStyle(color: Palette.white, fontSize: 35)),
                 FutureBuilder<List>(
-                  future: widget._relaysRanking
-                      .getBestRelays(widget.tweet.pubkey, Direction.read),
+                  future: _relaysRanking.getBestRelays(
+                      widget.myNote.pubkey, Direction.read),
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
                       return ListView.builder(
@@ -107,52 +110,53 @@ class _SeenOnRelaysPageState extends State<SeenOnRelaysPage> {
                 ListView.builder(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
-                  itemCount:
-                      widget._relayTracker.tracker[widget.tweet.pubkey]?.length,
+                  itemCount: 0,
                   itemBuilder: (context, index) {
-                    return ListTile(
-                        title: Text(
-                          widget._relayTracker.tracker[widget.tweet.pubkey]
-                                  ?.keys
-                                  .elementAt(index) ??
-                              "not found",
-                          style: const TextStyle(
-                              color: Palette.white,
-                              fontWeight: FontWeight.bold),
-                        ),
-                        subtitle: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            if (widget._relayTracker
-                                    .tracker[widget.tweet.pubkey]?.values
-                                    .elementAt(index)['lastSuggestedKind3'] !=
-                                null)
-                              Text(
-                                  "lastSuggestedKind3: ${_timeago(widget._relayTracker.tracker[widget.tweet.pubkey]?.values.elementAt(index)['lastSuggestedKind3'])}",
-                                  style: const TextStyle(color: Palette.white)),
-                            if (widget._relayTracker
-                                    .tracker[widget.tweet.pubkey]?.values
-                                    .elementAt(index)['lastSuggestedNip05'] !=
-                                null)
-                              Text(
-                                  "lastSuggestedNip05: ${_timeago(widget._relayTracker.tracker[widget.tweet.pubkey]?.values.elementAt(index)['lastSuggestedNip05'])}",
-                                  style: const TextStyle(color: Palette.white)),
-                            if (widget._relayTracker
-                                    .tracker[widget.tweet.pubkey]?.values
-                                    .elementAt(index)['lastSuggestedBytag'] !=
-                                null)
-                              Text(
-                                  "lastSuggestedBytag: ${_timeago(widget._relayTracker.tracker[widget.tweet.pubkey]?.values.elementAt(index)['lastSuggestedBytag'])}",
-                                  style: const TextStyle(color: Palette.white)),
-                            if (widget._relayTracker
-                                    .tracker[widget.tweet.pubkey]?.values
-                                    .elementAt(index)['lastFetched'] !=
-                                null)
-                              Text(
-                                  "lastFetched: ${_timeago(widget._relayTracker.tracker[widget.tweet.pubkey]?.values.elementAt(index)['lastFetched'])}",
-                                  style: const TextStyle(color: Palette.white)),
-                          ],
-                        ));
+                    // todo: implement this
+                    return null;
+                    // return ListTile(
+                    //     title: Text(
+                    //       widget._relayTracker.tracker[widget.myNote.pubkey]
+                    //               ?.keys
+                    //               .elementAt(index) ??
+                    //           "not found",
+                    //       style: const TextStyle(
+                    //           color: Palette.white,
+                    //           fontWeight: FontWeight.bold),
+                    //     ),
+                    //     subtitle: Column(
+                    //       crossAxisAlignment: CrossAxisAlignment.start,
+                    //       children: [
+                    //         if (widget._relayTracker
+                    //                 .tracker[widget.myNote.pubkey]?.values
+                    //                 .elementAt(index)['lastSuggestedKind3'] !=
+                    //             null)
+                    //           Text(
+                    //               "lastSuggestedKind3: ${_timeago(widget._relayTracker.tracker[widget.myNote.pubkey]?.values.elementAt(index)['lastSuggestedKind3'])}",
+                    //               style: const TextStyle(color: Palette.white)),
+                    //         if (widget._relayTracker
+                    //                 .tracker[widget.myNote.pubkey]?.values
+                    //                 .elementAt(index)['lastSuggestedNip05'] !=
+                    //             null)
+                    //           Text(
+                    //               "lastSuggestedNip05: ${_timeago(widget._relayTracker.tracker[widget.myNote.pubkey]?.values.elementAt(index)['lastSuggestedNip05'])}",
+                    //               style: const TextStyle(color: Palette.white)),
+                    //         if (widget._relayTracker
+                    //                 .tracker[widget.myNote.pubkey]?.values
+                    //                 .elementAt(index)['lastSuggestedBytag'] !=
+                    //             null)
+                    //           Text(
+                    //               "lastSuggestedBytag: ${_timeago(widget._relayTracker.tracker[widget.myNote.pubkey]?.values.elementAt(index)['lastSuggestedBytag'])}",
+                    //               style: const TextStyle(color: Palette.white)),
+                    //         if (widget._relayTracker
+                    //                 .tracker[widget.myNote.pubkey]?.values
+                    //                 .elementAt(index)['lastFetched'] !=
+                    //             null)
+                    //           Text(
+                    //               "lastFetched: ${_timeago(widget._relayTracker.tracker[widget.myNote.pubkey]?.values.elementAt(index)['lastFetched'])}",
+                    //               style: const TextStyle(color: Palette.white)),
+                    //       ],
+                    //     ));
                   },
                 ),
               ],

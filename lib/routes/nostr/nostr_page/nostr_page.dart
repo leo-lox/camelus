@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:camelus/db/entities/db_user_metadata.dart';
 import 'package:camelus/providers/metadata_provider.dart';
 import 'package:camelus/providers/relay_provider.dart';
 import 'package:camelus/routes/nostr/nostr_page/user_feed_and_replies_view.dart';
@@ -95,7 +96,8 @@ class _NostrPageState extends ConsumerState<NostrPage>
   _openRelaysView() {
     Navigator.of(context).push(
       PageRouteBuilder(
-        pageBuilder: (context, animation, secondaryAnimation) => const RelaysPage(),
+        pageBuilder: (context, animation, secondaryAnimation) =>
+            const RelaysPage(),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
           var begin = const Offset(0.0, 0.2);
           var end = Offset.zero;
@@ -180,16 +182,15 @@ class _NostrPageState extends ConsumerState<NostrPage>
                       color: Palette.primary,
                       shape: BoxShape.circle,
                     ),
-                    child: FutureBuilder<Map>(
+                    child: FutureBuilder<DbUserMetadata?>(
                         future: metadata.getMetadataByPubkey(widget.pubkey),
                         builder: (BuildContext context,
-                            AsyncSnapshot<Map> snapshot) {
+                            AsyncSnapshot<DbUserMetadata?> snapshot) {
                           var picture = "";
                           var defaultPicture =
                               "https://avatars.dicebear.com/api/personas/${widget.pubkey}.svg";
                           if (snapshot.hasData) {
-                            picture =
-                                snapshot.data?["picture"] ?? defaultPicture;
+                            picture = snapshot.data?.picture ?? defaultPicture;
                           } else if (snapshot.hasError) {
                             picture = defaultPicture;
                           } else {

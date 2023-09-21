@@ -1,8 +1,7 @@
 import 'package:camelus/atoms/long_button.dart';
 import 'package:camelus/config/palette.dart';
+import 'package:camelus/db/entities/db_user_metadata.dart';
 import 'package:camelus/providers/metadata_provider.dart';
-import 'package:camelus/providers/nostr_service_provider.dart';
-import 'package:camelus/services/nostr/nostr_service.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -17,17 +16,11 @@ class BlockPage extends ConsumerStatefulWidget {
 }
 
 class _BlockPageState extends ConsumerState<BlockPage> {
-  late NostrService _nostrService;
   bool isUserBlocked = false;
-
-  void _initNostrService() {
-    _nostrService = ref.read(nostrServiceProvider);
-  }
 
   @override
   void initState() {
     super.initState();
-    _initNostrService();
   }
 
   @override
@@ -55,13 +48,13 @@ class _BlockPageState extends ConsumerState<BlockPage> {
                           style: TextStyle(
                               color: Palette.lightGray, fontSize: 20)),
                       const SizedBox(width: 10),
-                      FutureBuilder<Map>(
+                      FutureBuilder<DbUserMetadata?>(
                         future:
                             metadata.getMetadataByPubkey(widget.userPubkey!),
                         builder: (context, snapshot) {
                           if (snapshot.hasData) {
                             return Text(
-                              snapshot.data?['name'] ?? widget.userPubkey,
+                              snapshot.data?.name ?? widget.userPubkey!,
                               style: const TextStyle(
                                   color: Palette.white,
                                   fontSize: 30,
@@ -80,12 +73,13 @@ class _BlockPageState extends ConsumerState<BlockPage> {
                     child: longButton(
                         name: isUserBlocked ? "unblock" : "block",
                         onPressed: () {
-                          if (isUserBlocked) {
-                            _nostrService
-                                .removeFromBlocklist(widget.userPubkey!);
-                          } else {
-                            _nostrService.addToBlocklist(widget.userPubkey!);
-                          }
+                          //! todo: block user
+                          // if (isUserBlocked) {
+                          //   _nostrService
+                          //       .removeFromBlocklist(widget.userPubkey!);
+                          // } else {
+                          //   _nostrService.addToBlocklist(widget.userPubkey!);
+                          // }
                           setState(() {
                             isUserBlocked = !isUserBlocked;
                           });

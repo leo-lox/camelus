@@ -1,14 +1,16 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:math';
 
+import 'package:camelus/db/entities/db_note.dart';
+import 'package:camelus/db/entities/db_user_metadata.dart';
 import 'package:camelus/db/queries/db_note_queries.dart';
+import 'package:camelus/db/queries/db_user_metadata_queries.dart';
 import 'package:camelus/helpers/helpers.dart';
 import 'package:camelus/models/nostr_note.dart';
 import 'package:camelus/models/nostr_request_query.dart';
 import 'package:camelus/services/nostr/relays/relay_coordinator.dart';
-import 'package:cross_local_storage/cross_local_storage.dart';
 import 'package:isar/isar.dart';
-import 'package:json_cache/json_cache.dart';
 
 ///
 /// how metadata request works
@@ -19,19 +21,18 @@ import 'package:json_cache/json_cache.dart';
 ///
 
 class UserMetadata {
-  Map<String, dynamic> usersMetadata = {};
-  var metadataLastFetch = <String, int>{};
+  //Map<String, dynamic> usersMetadata = {};
+  List<DbUserMetadata> usersMetadata = [];
+  //var metadataLastFetch = <String, int>{};
 
   final RelayCoordinator relays;
   final Future<Isar> dbFuture;
   late Isar _db;
 
-  late JsonCache _jsonCache;
-
   List<String> _metadataWaitingPool = [];
   late Timer _metadataWaitingPoolTimer;
   var _metadataWaitingPoolTimerRunning = false;
-  Map<String, Completer<Map>> _metadataFutureHolder = {};
+  Map<String, Completer<List<DbUserMetadata?>>> _metadataFutureHolder = {};
 
   final Completer _serviceRdy = Completer();
 
@@ -42,12 +43,17 @@ class UserMetadata {
     _init();
   }
 
+  _setupDbMetadataListener() {
+    DbUserMetadataQueries.getAllStream(_db).listen((event) {
+      usersMetadata = event;
+    });
+  }
+
   _init() async {
-    LocalStorageInterface prefs = await LocalStorage.getInstance();
-    _jsonCache = JsonCacheCrossLocalStorage(prefs);
-    _restoreCache().then((_) => {_removeOldData()});
     _db = await dbFuture;
+    _restoreCache().then((_) => {_removeOldData()});
     _initDb();
+    _setupDbMetadataListener();
     _serviceRdy.complete();
   }
 
@@ -59,61 +65,47 @@ class UserMetadata {
   }
 
   Future<void> _restoreCache() async {
-    var cache = await _jsonCache.value(
-      'metadataLastFetch',
-    );
-    if (cache != null) {
-      metadataLastFetch = Map<String, int>.from(cache);
-    }
-
     return;
   }
 
   _removeOldData() {
-    // 12 hours //todo move magic number to settings
-    int timeBarrier = 60 * 60 * 12;
+    // 2 weeks //todo move magic number to settings
+    int timeOffset = 60 * 60 * 24 * 2;
     var now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
-    var oldData = <String, int>{};
-    for (var key in metadataLastFetch.keys) {
-      if (now - metadataLastFetch[key]! > timeBarrier) {
-        oldData[key] = metadataLastFetch[key]!;
-      }
-    }
-    for (var key in oldData.keys) {
-      metadataLastFetch.remove(key);
-    }
-    _jsonCache.refresh('metadataLastFetch', metadataLastFetch);
+    var timeBarrier = now - timeOffset;
+
+    _db.writeTxn(() async {
+      _db.dbUserMetadatas.filter().last_fetchLessThan(timeBarrier).deleteAll();
+      _db.dbNotes
+          .filter()
+          .kindEqualTo(0)
+          .last_fetchLessThan(timeBarrier)
+          .deleteAll();
+    });
   }
 
-  Future<Map> getMetadataByPubkey(String pubkey, {bool force = false}) async {
+  Future<DbUserMetadata?> getMetadataByPubkey(String pubkey,
+      {bool force = false}) async {
     await _serviceRdy.future;
     var now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
     if (pubkey.isEmpty) {
-      return Future(() => {});
+      return Future(() => null);
     }
 
-    if (usersMetadata.containsKey(pubkey) && !force) {
-      // check if no relation
-      if (metadataLastFetch[pubkey] == null) {
-        // update in background
-        getMetadataByPubkey(pubkey, force: true);
-      }
+    // return from cache if available
+    var cachedMetadata =
+        usersMetadata.where((element) => element.pubkey == pubkey).firstOrNull;
 
-      // return from cache
-      return Future(() => usersMetadata[pubkey]);
+    if (cachedMetadata != null && !force) {
+      return cachedMetadata;
     }
-
-    //set relation
-    metadataLastFetch[pubkey] = now;
-    //update cache
-    _jsonCache.refresh('metadataLastFetch', metadataLastFetch);
 
     // check if pubkey is already in waiting pool
     if (!(_metadataWaitingPool.contains(pubkey))) {
       _metadataWaitingPool.add(pubkey);
     }
 
-    Completer<Map> metadataResult = Completer();
+    Completer<List<DbUserMetadata?>> metadataResult = Completer();
 
     // if pool is full submit request
     if (_metadataWaitingPool.length >= 50) {
@@ -146,23 +138,42 @@ class UserMetadata {
 
     // don't add to future holder if already in there (double requests from future builder)
     if (_metadataFutureHolder[pubkey] == null) {
-      _metadataFutureHolder[pubkey] = Completer<Map>();
+      _metadataFutureHolder[pubkey] = Completer<List<DbUserMetadata?>>();
     }
 
     metadataResult.future.then((value) => {
           for (var key in _metadataFutureHolder.keys)
             {
-              _metadataFutureHolder[key]!.complete(value[key] ?? {}),
+              _metadataFutureHolder[key]!.complete(value)
               // remove
             },
           _metadataFutureHolder = {},
         });
 
-    return _metadataFutureHolder[pubkey]!.future;
+    //return await DbUserMetadataQueries.pubkeyLastFuture(_db, pubkey: pubkey);
+
+    // return metadataResult.future.then((value) => value
+    //     .where((element) => element != null && element.pubkey == pubkey)
+    //     .firstOrNull);
+
+    var myResult = _metadataFutureHolder[pubkey]!.future;
+
+    return myResult.then((value) {
+      DbUserMetadata? result;
+      for (var element in value) {
+        if (element != null && element.pubkey == pubkey) {
+          result = element;
+          continue;
+        }
+      }
+      return result;
+    });
+
+    //return _metadataFutureHolder[pubkey]!.future;
   }
 
   /// prepare metadata request
-  Future<Map> _prepareMetadataRequest() async {
+  Future<List<DbUserMetadata>> _prepareMetadataRequest() async {
     // gets notified when first or last (on no data) request is received
 
     var requestId = "metadata-${Helpers().getRandomString(4)}";
@@ -175,7 +186,7 @@ class UserMetadata {
     _metadataWaitingPool = [];
 
     // wait 300ms for the contacts to be received
-    await Future.delayed(const Duration(milliseconds: 300));
+    await Future.delayed(const Duration(milliseconds: 500));
     return usersMetadata;
   }
 
@@ -193,16 +204,39 @@ class UserMetadata {
 
   _receiveNostrEvents(List<NostrNote> notes) {
     for (var note in notes) {
-      String pubkey = note.pubkey;
+      int now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
+
       try {
-        usersMetadata[pubkey] = jsonDecode(note.content);
+        var json = jsonDecode(note.content);
+
+        var newMetadata = DbUserMetadata(
+          nostr_id: note.id,
+          pubkey: note.pubkey,
+          last_fetch: now,
+          picture: json['picture'],
+          banner: json['banner'],
+          name: json['name'],
+          nip05: json['nip05'],
+          about: json['about'],
+          website: json['website'],
+          lud06: json['lud06'],
+          lud16: json['lud16'],
+        );
+
+        _db.writeTxn(() async {
+          var latestMeta = await DbUserMetadataQueries.pubkeyLastFuture(_db,
+              pubkey: newMetadata.pubkey);
+          // dont update if latest metadata is newer
+          if (latestMeta != null &&
+              latestMeta.last_fetch > newMetadata.last_fetch) {
+            return;
+          }
+
+          _db.dbUserMetadatas.putByPubkey(newMetadata);
+        });
       } catch (e) {
         return;
       }
-
-      // add access time
-      int now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
-      usersMetadata[pubkey]["accessTime"] = now;
     }
   }
 }

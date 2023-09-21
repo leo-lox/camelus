@@ -38,8 +38,6 @@ dependencies:
   http: ^0.13.5
   flutter_svg: ^1.1.6
   timeago_flutter: ^1.2.0
-  json_cache: ^1.5.0
-  cross_local_storage: ^2.0.1
   badges: ^2.0.3
   uuid: ^3.0.7
   cached_network_image: ^3.2.3

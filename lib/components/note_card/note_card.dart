@@ -9,12 +9,11 @@ import 'package:camelus/components/note_card/name_row.dart';
 import 'package:camelus/components/note_card/note_card_build_split_content.dart';
 import 'package:camelus/components/write_post.dart';
 import 'package:camelus/config/palette.dart';
+import 'package:camelus/db/entities/db_user_metadata.dart';
 import 'package:camelus/models/nostr_note.dart';
 import 'package:camelus/models/post_context.dart';
 import 'package:camelus/providers/metadata_provider.dart';
-import 'package:camelus/providers/nostr_service_provider.dart';
 import 'package:camelus/services/nostr/metadata/user_metadata.dart';
-import 'package:camelus/services/nostr/nostr_service.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:timeago/timeago.dart' as timeago;
@@ -37,9 +36,8 @@ class _NoteCardState extends ConsumerState<NoteCard> {
     Navigator.pushNamed(context, "/nostr/hastag", arguments: hashtag);
   }
 
-  late NostrService myNostrService;
   late UserMetadata metadata;
-  late Future<Map<dynamic, dynamic>> myMetadata;
+  late Future<DbUserMetadata?> myMetadata;
   late NoteCardSplitContent splitContent;
 
   void _splitContent() {
@@ -69,8 +67,6 @@ class _NoteCardState extends ConsumerState<NoteCard> {
 
   @override
   Widget build(BuildContext context) {
-    myNostrService = ref.watch(nostrServiceProvider);
-
     if (widget.note.pubkey == 'missing') {
       return SizedBox(
         height: 50,

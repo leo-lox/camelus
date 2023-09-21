@@ -2,12 +2,12 @@ import 'dart:async';
 
 import 'package:camelus/atoms/my_profile_picture.dart';
 import 'package:camelus/config/palette.dart';
+import 'package:camelus/db/entities/db_user_metadata.dart';
 import 'package:camelus/helpers/helpers.dart';
 import 'package:camelus/providers/metadata_provider.dart';
-import 'package:camelus/providers/nostr_service_provider.dart';
+
 import 'package:camelus/services/nostr/metadata/user_metadata.dart';
 
-import 'package:camelus/services/nostr/nostr_service.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -21,16 +21,9 @@ class BlockedUsers extends ConsumerStatefulWidget {
 class _BlockedUsersState extends ConsumerState<BlockedUsers> {
   final StreamController _streamController = StreamController();
 
-  late NostrService _nostrService;
-
-  void _initNostrService() {
-    _nostrService = ref.read(nostrServiceProvider);
-  }
-
   @override
   void initState() {
     super.initState();
-    _initNostrService();
     _streamController.stream.listen((event) {
       setState(() {});
     });
@@ -56,13 +49,13 @@ class _BlockedUsersState extends ConsumerState<BlockedUsers> {
             SliverList(
               delegate: SliverChildBuilderDelegate(
                 (context, index) {
-                  return _profile(_nostrService.blockedUsers[index],
-                      _streamController, widget, metadata, metadata);
+                  return _profile("pubkeyTODO", _streamController, widget,
+                      metadata, metadata); //_nostrService.blockedUsers[index]
                 },
-                childCount: _nostrService.blockedUsers.length,
+                childCount: 0, //_nostrService.blockedUsers.length
               ),
             ),
-            if (_nostrService.blockedUsers.isEmpty)
+            if (false) // is empty
               const SliverFillRemaining(
                 child: Center(
                   child: Text(
@@ -78,19 +71,18 @@ class _BlockedUsersState extends ConsumerState<BlockedUsers> {
 
 Widget _profile(String pubkey, StreamController streamController, widget,
     UserMetadata nostrService, UserMetadata userMetadata) {
-  return FutureBuilder<Map>(
+  return FutureBuilder<DbUserMetadata?>(
       future: userMetadata.getMetadataByPubkey(pubkey),
-      builder: (BuildContext context, AsyncSnapshot<Map> snapshot) {
+      builder: (BuildContext context, AsyncSnapshot<DbUserMetadata?> snapshot) {
         String picture = "";
         String name = "";
         String about = "";
 
         if (snapshot.hasData) {
-          picture = snapshot.data?["picture"] ??
+          picture = snapshot.data?.picture ??
               "https://avatars.dicebear.com/api/personas/$pubkey.svg";
-          name =
-              snapshot.data?["name"] ?? Helpers().encodeBech32(pubkey, "npub");
-          about = snapshot.data?["about"] ?? "";
+          name = snapshot.data?.name ?? Helpers().encodeBech32(pubkey, "npub");
+          about = snapshot.data?.about ?? "";
         } else if (snapshot.hasError) {
           picture = "https://avatars.dicebear.com/api/personas/$pubkey.svg";
           name = Helpers().encodeBech32(pubkey, "npub");

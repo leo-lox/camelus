@@ -6,6 +6,7 @@ import 'package:camelus/atoms/back_button_round.dart';
 import 'package:camelus/atoms/follow_button.dart';
 import 'package:camelus/atoms/long_button.dart';
 import 'package:camelus/components/note_card/note_card_container.dart';
+import 'package:camelus/db/entities/db_user_metadata.dart';
 import 'package:camelus/helpers/bip340.dart';
 import 'package:camelus/helpers/nprofile_helper.dart';
 import 'package:camelus/models/nostr_note.dart';
@@ -14,7 +15,7 @@ import 'package:camelus/providers/database_provider.dart';
 import 'package:camelus/providers/following_provider.dart';
 import 'package:camelus/providers/key_pair_provider.dart';
 import 'package:camelus/providers/metadata_provider.dart';
-import 'package:camelus/providers/nostr_service_provider.dart';
+import 'package:camelus/providers/nip05_provider.dart';
 import 'package:camelus/providers/relay_provider.dart';
 import 'package:camelus/routes/nostr/nostr_page/perspective_feed_page.dart';
 import 'package:camelus/services/nostr/feeds/user_and_replies_feed.dart';
@@ -30,7 +31,6 @@ import 'package:camelus/routes/nostr/profile/edit_profile_page.dart';
 import 'package:camelus/routes/nostr/profile/edit_relays_page.dart';
 import 'package:camelus/routes/nostr/profile/follower_page.dart';
 
-import 'package:camelus/services/nostr/nostr_service.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:isar/isar.dart';
 import 'package:matomo_tracker/matomo_tracker.dart';
@@ -66,7 +66,6 @@ class ProfilePage extends ConsumerStatefulWidget {
 
 class _ProfilePageState extends ConsumerState<ProfilePage>
     with TickerProviderStateMixin, TraceableClientMixin {
-  late NostrService _nostrService;
   final ScrollController _scrollController = ScrollController();
   late Isar _db;
   late UserFeedAndRepliesFeed _userFeedAndRepliesFeed;
@@ -83,11 +82,12 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
     if (nip05.isEmpty) return;
     if (nip05verified.isNotEmpty) return;
     try {
-      var check = await _nostrService.checkNip05(nip05, pubkey);
+      var nip05Ref = await ref.watch(nip05provider.future);
+      var check = await nip05Ref.checkNip05(nip05, pubkey);
 
-      if (check["valid"] == true) {
+      if (check != null && check.valid == true) {
         setState(() {
-          nip05verified = check["nip05"];
+          nip05verified = check.nip05;
         });
       }
       // ignore: empty_catches
@@ -135,7 +135,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
     if (!result) return;
 
     // add to blocked list
-    await _nostrService.addToBlocklist(widget.pubkey);
+    //! todo: implement block list
 
     Navigator.pop(context);
   }
@@ -244,10 +244,6 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
     ).then((value) => {});
   }
 
-  void _initNostrService() {
-    _nostrService = ref.read(nostrServiceProvider);
-  }
-
   final Completer<void> _feedReady = Completer<void>();
   Future<void> _initSequence() async {
     _db = await ref.read(databaseProvider.future);
@@ -334,7 +330,6 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
   void initState() {
     super.initState();
     _initSequence();
-    _initNostrService();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _onNavigateAway();
     });
@@ -424,7 +419,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                   ],
                 );
               }),
-          _profileImage(_scrollController, widget, _nostrService, metadata),
+          _profileImage(_scrollController, widget, metadata),
           SafeArea(
             child: SizedBox(
               height: 55,
@@ -438,14 +433,14 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                         ? 1.0
                         : 0.0,
                     duration: const Duration(milliseconds: 200),
-                    child: FutureBuilder<Map>(
+                    child: FutureBuilder<DbUserMetadata?>(
                         future: metadata.getMetadataByPubkey(widget.pubkey),
                         builder: (BuildContext context,
-                            AsyncSnapshot<Map> snapshot) {
+                            AsyncSnapshot<DbUserMetadata?> snapshot) {
                           var name = "";
 
                           if (snapshot.hasData) {
-                            name = snapshot.data?["name"] ??
+                            name = snapshot.data?.name ??
                                 '${widget.nProfile.substring(0, 10)}...${widget.nProfile.substring(widget.pubkey.length - 10)}';
                           } else if (snapshot.hasError) {
                             name = "error";
@@ -669,19 +664,20 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
   Container _profileInformation(UserMetadata metadata) {
     return Container(
       transform: Matrix4.translationValues(0.0, -10.0, 0.0),
-      child: FutureBuilder<Map>(
+      child: FutureBuilder<DbUserMetadata?>(
         future: metadata.getMetadataByPubkey(widget.pubkey),
-        builder: (BuildContext context, AsyncSnapshot<Map> snapshot) {
+        builder:
+            (BuildContext context, AsyncSnapshot<DbUserMetadata?> snapshot) {
           var name = "";
           var nip05 = "";
           var picture = "";
           var about = "";
 
           if (snapshot.hasData) {
-            name = snapshot.data?["name"] ?? "";
-            nip05 = snapshot.data?["nip05"] ?? "";
-            picture = snapshot.data?["picture"] ?? "";
-            about = snapshot.data?["about"] ?? "";
+            name = snapshot.data?.name ?? "";
+            nip05 = snapshot.data?.nip05 ?? "";
+            picture = snapshot.data?.picture ?? "";
+            about = snapshot.data?.about ?? "";
 
             _checkNip05(nip05, widget.pubkey);
           } else if (snapshot.hasError) {
@@ -839,15 +835,16 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
           ),
 
         // round message button with icon and white border
-        FutureBuilder<Map>(
+        FutureBuilder<DbUserMetadata?>(
             future: metadata.getMetadataByPubkey(widget.pubkey),
-            builder: (BuildContext context, AsyncSnapshot<Map> snapshot) {
+            builder: (BuildContext context,
+                AsyncSnapshot<DbUserMetadata?> snapshot) {
               String lud06 = "";
               String lud16 = "";
 
               if (snapshot.hasData) {
-                lud06 = snapshot.data?["lud06"] ?? "";
-                lud16 = snapshot.data?["lud16"] ?? "";
+                lud06 = snapshot.data?.lud06 ?? "";
+                lud16 = snapshot.data?.lud16 ?? "";
               }
 
               if (lud06.isNotEmpty || lud16.isNotEmpty) {
@@ -950,12 +947,12 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
 
   FlexibleSpaceBar _bannerImage(UserMetadata metadata) {
     return FlexibleSpaceBar(
-        background: FutureBuilder<Map<dynamic, dynamic>>(
+        background: FutureBuilder<DbUserMetadata?>(
       future: metadata.getMetadataByPubkey(widget.pubkey),
       builder: (context, snapshot) {
-        if (snapshot.hasData && snapshot.data?["banner"] != null) {
+        if (snapshot.hasData && snapshot.data?.banner != null) {
           return CachedNetworkImage(
-            imageUrl: snapshot.data?["banner"],
+            imageUrl: snapshot.data?.banner ?? "",
             filterQuality: FilterQuality.high,
             progressIndicatorBuilder: (context, url, downloadProgress) =>
                 // progress indicator with download progress
@@ -986,8 +983,8 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
   }
 }
 
-Widget _profileImage(ScrollController sController, widget,
-    NostrService nostrService, UserMetadata metadata) {
+Widget _profileImage(
+    ScrollController sController, widget, UserMetadata metadata) {
   const double defaultMargin = 125;
   const double defaultStart = 125;
   const double defaultEnd = defaultStart / 2;
@@ -1042,13 +1039,14 @@ Widget _profileImage(ScrollController sController, widget,
           border: Border.all(color: Palette.background, width: 3),
           shape: BoxShape.circle,
         ),
-        child: FutureBuilder<Map>(
+        child: FutureBuilder<DbUserMetadata?>(
             future: metadata.getMetadataByPubkey(widget.pubkey),
-            builder: (BuildContext context, AsyncSnapshot<Map> snapshot) {
+            builder: (BuildContext context,
+                AsyncSnapshot<DbUserMetadata?> snapshot) {
               var picture = "";
 
               if (snapshot.hasData) {
-                picture = snapshot.data?["picture"] ??
+                picture = snapshot.data?.picture ??
                     "https://avatars.dicebear.com/api/personas/${widget.pubkey}.svg";
               } else if (snapshot.hasError) {
                 picture =
