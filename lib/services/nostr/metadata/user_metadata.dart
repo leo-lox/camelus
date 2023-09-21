@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:math';
 
+import 'package:camelus/db/entities/db_note.dart';
 import 'package:camelus/db/entities/db_user_metadata.dart';
 import 'package:camelus/db/queries/db_note_queries.dart';
 import 'package:camelus/db/queries/db_user_metadata_queries.dart';
@@ -19,7 +21,8 @@ import 'package:isar/isar.dart';
 ///
 
 class UserMetadata {
-  Map<String, dynamic> usersMetadata = {};
+  //Map<String, dynamic> usersMetadata = {};
+  List<DbUserMetadata> usersMetadata = [];
   //var metadataLastFetch = <String, int>{};
 
   final RelayCoordinator relays;
@@ -29,7 +32,7 @@ class UserMetadata {
   List<String> _metadataWaitingPool = [];
   late Timer _metadataWaitingPoolTimer;
   var _metadataWaitingPoolTimerRunning = false;
-  Map<String, Completer<Map>> _metadataFutureHolder = {};
+  Map<String, Completer<List<DbUserMetadata?>>> _metadataFutureHolder = {};
 
   final Completer _serviceRdy = Completer();
 
@@ -40,10 +43,17 @@ class UserMetadata {
     _init();
   }
 
+  _setupDbMetadataListener() {
+    DbUserMetadataQueries.getAllStream(_db).listen((event) {
+      usersMetadata = event;
+    });
+  }
+
   _init() async {
-    _restoreCache().then((_) => {_removeOldData()});
     _db = await dbFuture;
+    _restoreCache().then((_) => {_removeOldData()});
     _initDb();
+    _setupDbMetadataListener();
     _serviceRdy.complete();
   }
 
@@ -66,14 +76,28 @@ class UserMetadata {
 
     _db.writeTxn(() async {
       _db.dbUserMetadatas.filter().last_fetchLessThan(timeBarrier).deleteAll();
+      _db.dbNotes
+          .filter()
+          .kindEqualTo(0)
+          .last_fetchLessThan(timeBarrier)
+          .deleteAll();
     });
   }
 
-  Future<Map> getMetadataByPubkey(String pubkey, {bool force = false}) async {
+  Future<DbUserMetadata?> getMetadataByPubkey(String pubkey,
+      {bool force = false}) async {
     await _serviceRdy.future;
     var now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
     if (pubkey.isEmpty) {
-      return Future(() => {});
+      return Future(() => null);
+    }
+
+    // return from cache if available
+    var cachedMetadata =
+        usersMetadata.where((element) => element.pubkey == pubkey).firstOrNull;
+
+    if (cachedMetadata != null && !force) {
+      return cachedMetadata;
     }
 
     // check if pubkey is already in waiting pool
@@ -81,7 +105,7 @@ class UserMetadata {
       _metadataWaitingPool.add(pubkey);
     }
 
-    Completer<Map> metadataResult = Completer();
+    Completer<List<DbUserMetadata?>> metadataResult = Completer();
 
     // if pool is full submit request
     if (_metadataWaitingPool.length >= 50) {
@@ -114,23 +138,34 @@ class UserMetadata {
 
     // don't add to future holder if already in there (double requests from future builder)
     if (_metadataFutureHolder[pubkey] == null) {
-      _metadataFutureHolder[pubkey] = Completer<Map>();
+      _metadataFutureHolder[pubkey] = Completer<List<DbUserMetadata?>>();
     }
 
     metadataResult.future.then((value) => {
           for (var key in _metadataFutureHolder.keys)
             {
-              _metadataFutureHolder[key]!.complete(value[key] ?? {}),
+              _metadataFutureHolder[key]!.complete(value)
               // remove
             },
           _metadataFutureHolder = {},
         });
 
-    return _metadataFutureHolder[pubkey]!.future;
+    //return await DbUserMetadataQueries.pubkeyLastFuture(_db, pubkey: pubkey);
+
+    // return metadataResult.future.then((value) => value
+    //     .where((element) => element != null && element.pubkey == pubkey)
+    //     .firstOrNull);
+
+    var myResult = _metadataFutureHolder[pubkey]!.future;
+
+    return myResult.then(
+        (value) => value.firstWhere((element) => element!.pubkey == pubkey));
+
+    //return _metadataFutureHolder[pubkey]!.future;
   }
 
   /// prepare metadata request
-  Future<Map> _prepareMetadataRequest() async {
+  Future<List<DbUserMetadata>> _prepareMetadataRequest() async {
     // gets notified when first or last (on no data) request is received
 
     var requestId = "metadata-${Helpers().getRandomString(4)}";
@@ -189,7 +224,7 @@ class UserMetadata {
             return;
           }
 
-          _db.dbUserMetadatas.put(newMetadata);
+          _db.dbUserMetadatas.putByPubkey(newMetadata);
         });
       } catch (e) {
         return;

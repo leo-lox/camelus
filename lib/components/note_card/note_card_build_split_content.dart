@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:developer';
 
 import 'package:camelus/config/palette.dart';
+import 'package:camelus/db/entities/db_user_metadata.dart';
 import 'package:camelus/helpers/helpers.dart';
 import 'package:camelus/helpers/nprofile_helper.dart';
 import 'package:camelus/models/nostr_note.dart';
@@ -138,12 +139,12 @@ class NoteCardSplitContent {
       onTap: () {
         _profileCallback(myPubkeyHex);
       },
-      child: FutureBuilder<Map<dynamic, dynamic>>(
+      child: FutureBuilder<DbUserMetadata?>(
           future: metadata,
           builder: (context, metadataSnp) {
             if (metadataSnp.hasData) {
               return Text(
-                "@${metadataSnp.data!['name'] ?? pubkeyHr}",
+                "@${metadataSnp.data!.name ?? pubkeyHr}",
                 style: const TextStyle(color: Palette.primary, fontSize: 17),
               );
             }
@@ -181,12 +182,12 @@ class NoteCardSplitContent {
       onTap: () {
         _profileCallback(tag.value);
       },
-      child: FutureBuilder<Map<dynamic, dynamic>>(
+      child: FutureBuilder<DbUserMetadata?>(
           future: metadata,
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               return Text(
-                "@${snapshot.data!['name'] ?? pubkeyHr}",
+                "@${snapshot.data!.name ?? pubkeyHr}",
                 style: const TextStyle(color: Palette.primary, fontSize: 17),
               );
             }

@@ -9,6 +9,7 @@ import 'package:camelus/components/note_card/name_row.dart';
 import 'package:camelus/components/note_card/note_card_build_split_content.dart';
 import 'package:camelus/components/write_post.dart';
 import 'package:camelus/config/palette.dart';
+import 'package:camelus/db/entities/db_user_metadata.dart';
 import 'package:camelus/models/nostr_note.dart';
 import 'package:camelus/models/post_context.dart';
 import 'package:camelus/providers/metadata_provider.dart';
@@ -36,7 +37,7 @@ class _NoteCardState extends ConsumerState<NoteCard> {
   }
 
   late UserMetadata metadata;
-  late Future<Map<dynamic, dynamic>> myMetadata;
+  late Future<DbUserMetadata?> myMetadata;
   late NoteCardSplitContent splitContent;
 
   void _splitContent() {

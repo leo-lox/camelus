@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:camelus/atoms/my_profile_picture.dart';
 import 'package:camelus/config/palette.dart';
+import 'package:camelus/db/entities/db_user_metadata.dart';
 import 'package:camelus/helpers/helpers.dart';
 import 'package:camelus/providers/metadata_provider.dart';
 
@@ -70,19 +71,18 @@ class _BlockedUsersState extends ConsumerState<BlockedUsers> {
 
 Widget _profile(String pubkey, StreamController streamController, widget,
     UserMetadata nostrService, UserMetadata userMetadata) {
-  return FutureBuilder<Map>(
+  return FutureBuilder<DbUserMetadata?>(
       future: userMetadata.getMetadataByPubkey(pubkey),
-      builder: (BuildContext context, AsyncSnapshot<Map> snapshot) {
+      builder: (BuildContext context, AsyncSnapshot<DbUserMetadata?> snapshot) {
         String picture = "";
         String name = "";
         String about = "";
 
         if (snapshot.hasData) {
-          picture = snapshot.data?["picture"] ??
+          picture = snapshot.data?.picture ??
               "https://avatars.dicebear.com/api/personas/$pubkey.svg";
-          name =
-              snapshot.data?["name"] ?? Helpers().encodeBech32(pubkey, "npub");
-          about = snapshot.data?["about"] ?? "";
+          name = snapshot.data?.name ?? Helpers().encodeBech32(pubkey, "npub");
+          about = snapshot.data?.about ?? "";
         } else if (snapshot.hasError) {
           picture = "https://avatars.dicebear.com/api/personas/$pubkey.svg";
           name = Helpers().encodeBech32(pubkey, "npub");

@@ -16,7 +16,14 @@ extension GetDbSettingsCollection on Isar {
 const DbSettingsSchema = CollectionSchema(
   name: r'DbSettings',
   id: 1097994837175927760,
-  properties: {},
+  properties: {
+    r'manualRelays': PropertySchema(
+      id: 0,
+      name: r'manualRelays',
+      type: IsarType.objectList,
+      target: r'DbManualRelay',
+    )
+  },
   estimateSize: _dbSettingsEstimateSize,
   serialize: _dbSettingsSerialize,
   deserialize: _dbSettingsDeserialize,
@@ -24,7 +31,7 @@ const DbSettingsSchema = CollectionSchema(
   idName: r'id',
   indexes: {},
   links: {},
-  embeddedSchemas: {},
+  embeddedSchemas: {r'DbManualRelay': DbManualRelaySchema},
   getId: _dbSettingsGetId,
   getLinks: _dbSettingsGetLinks,
   attach: _dbSettingsAttach,
@@ -37,6 +44,20 @@ int _dbSettingsEstimateSize(
   Map<Type, List<int>> allOffsets,
 ) {
   var bytesCount = offsets.last;
+  {
+    final list = object.manualRelays;
+    if (list != null) {
+      bytesCount += 3 + list.length * 3;
+      {
+        final offsets = allOffsets[DbManualRelay]!;
+        for (var i = 0; i < list.length; i++) {
+          final value = list[i];
+          bytesCount +=
+              DbManualRelaySchema.estimateSize(value, offsets, allOffsets);
+        }
+      }
+    }
+  }
   return bytesCount;
 }
 
@@ -45,7 +66,15 @@ void _dbSettingsSerialize(
   IsarWriter writer,
   List<int> offsets,
   Map<Type, List<int>> allOffsets,
-) {}
+) {
+  writer.writeObjectList<DbManualRelay>(
+    offsets[0],
+    allOffsets,
+    DbManualRelaySchema.serialize,
+    object.manualRelays,
+  );
+}
+
 DbSettings _dbSettingsDeserialize(
   Id id,
   IsarReader reader,
@@ -54,6 +83,12 @@ DbSettings _dbSettingsDeserialize(
 ) {
   final object = DbSettings();
   object.id = id;
+  object.manualRelays = reader.readObjectList<DbManualRelay>(
+    offsets[0],
+    DbManualRelaySchema.deserialize,
+    allOffsets,
+    DbManualRelay(),
+  );
   return object;
 }
 
@@ -64,6 +99,13 @@ P _dbSettingsDeserializeProp<P>(
   Map<Type, List<int>> allOffsets,
 ) {
   switch (propertyId) {
+    case 0:
+      return (reader.readObjectList<DbManualRelay>(
+        offset,
+        DbManualRelaySchema.deserialize,
+        allOffsets,
+        DbManualRelay(),
+      )) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
   }
@@ -212,10 +254,124 @@ extension DbSettingsQueryFilter
       ));
     });
   }
+
+  QueryBuilder<DbSettings, DbSettings, QAfterFilterCondition>
+      manualRelaysIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'manualRelays',
+      ));
+    });
+  }
+
+  QueryBuilder<DbSettings, DbSettings, QAfterFilterCondition>
+      manualRelaysIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'manualRelays',
+      ));
+    });
+  }
+
+  QueryBuilder<DbSettings, DbSettings, QAfterFilterCondition>
+      manualRelaysLengthEqualTo(int length) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'manualRelays',
+        length,
+        true,
+        length,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<DbSettings, DbSettings, QAfterFilterCondition>
+      manualRelaysIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'manualRelays',
+        0,
+        true,
+        0,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<DbSettings, DbSettings, QAfterFilterCondition>
+      manualRelaysIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'manualRelays',
+        0,
+        false,
+        999999,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<DbSettings, DbSettings, QAfterFilterCondition>
+      manualRelaysLengthLessThan(
+    int length, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'manualRelays',
+        0,
+        true,
+        length,
+        include,
+      );
+    });
+  }
+
+  QueryBuilder<DbSettings, DbSettings, QAfterFilterCondition>
+      manualRelaysLengthGreaterThan(
+    int length, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'manualRelays',
+        length,
+        include,
+        999999,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<DbSettings, DbSettings, QAfterFilterCondition>
+      manualRelaysLengthBetween(
+    int lower,
+    int upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'manualRelays',
+        lower,
+        includeLower,
+        upper,
+        includeUpper,
+      );
+    });
+  }
 }
 
 extension DbSettingsQueryObject
-    on QueryBuilder<DbSettings, DbSettings, QFilterCondition> {}
+    on QueryBuilder<DbSettings, DbSettings, QFilterCondition> {
+  QueryBuilder<DbSettings, DbSettings, QAfterFilterCondition>
+      manualRelaysElement(FilterQuery<DbManualRelay> q) {
+    return QueryBuilder.apply(this, (query) {
+      return query.object(q, r'manualRelays');
+    });
+  }
+}
 
 extension DbSettingsQueryLinks
     on QueryBuilder<DbSettings, DbSettings, QFilterCondition> {}
@@ -246,6 +402,13 @@ extension DbSettingsQueryProperty
   QueryBuilder<DbSettings, int, QQueryOperations> idProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'id');
+    });
+  }
+
+  QueryBuilder<DbSettings, List<DbManualRelay>?, QQueryOperations>
+      manualRelaysProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'manualRelays');
     });
   }
 }

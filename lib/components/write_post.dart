@@ -2,6 +2,7 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:camelus/atoms/picture.dart';
+import 'package:camelus/db/entities/db_user_metadata.dart';
 import 'package:camelus/helpers/nprofile_helper.dart';
 import 'package:camelus/helpers/search.dart';
 import 'package:camelus/models/nostr_request_event.dart';
@@ -635,14 +636,15 @@ class _WritePostState extends ConsumerState<WritePost> {
           Column(
             children: [
               // get metadata
-              FutureBuilder<Map>(
+              FutureBuilder<DbUserMetadata?>(
                   future: metadata
                       .getMetadataByPubkey(widget.context!.replyToNote.pubkey),
-                  builder: (BuildContext context, AsyncSnapshot<Map> snapshot) {
+                  builder: (BuildContext context,
+                      AsyncSnapshot<DbUserMetadata?> snapshot) {
                     var name = "";
 
                     if (snapshot.hasData) {
-                      name = snapshot.data?["name"] ?? "";
+                      name = snapshot.data?.name ?? "";
                     } else if (snapshot.hasError) {
                       name = "";
                     } else {

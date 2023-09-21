@@ -1,5 +1,6 @@
 import 'package:camelus/atoms/long_button.dart';
 import 'package:camelus/config/palette.dart';
+import 'package:camelus/db/entities/db_user_metadata.dart';
 import 'package:camelus/providers/metadata_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -47,13 +48,13 @@ class _BlockPageState extends ConsumerState<BlockPage> {
                           style: TextStyle(
                               color: Palette.lightGray, fontSize: 20)),
                       const SizedBox(width: 10),
-                      FutureBuilder<Map>(
+                      FutureBuilder<DbUserMetadata?>(
                         future:
                             metadata.getMetadataByPubkey(widget.userPubkey!),
                         builder: (context, snapshot) {
                           if (snapshot.hasData) {
                             return Text(
-                              snapshot.data?['name'] ?? widget.userPubkey,
+                              snapshot.data?.name ?? widget.userPubkey!,
                               style: const TextStyle(
                                   color: Palette.white,
                                   fontSize: 30,

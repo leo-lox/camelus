@@ -6,7 +6,7 @@ part 'db_user_metadata.g.dart';
 class DbUserMetadata {
   Id id = Isar.autoIncrement;
 
-  @Index(unique: true, type: IndexType.value)
+  //@Index(unique: true, type: IndexType.value)
   String nostr_id;
 
   @Index(unique: true, type: IndexType.value)

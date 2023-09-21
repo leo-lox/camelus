@@ -17,4 +17,19 @@ abstract class DbUserMetadataQueries {
       {required String pubkey}) {
     return pubkeyQuery(db, pubkey: pubkey).findFirst();
   }
+
+  ///
+  /// getAllQuery
+  ///
+  static Query<DbUserMetadata> getAllQuery(
+    Isar db,
+  ) {
+    return db.dbUserMetadatas.filter().nostr_idIsNotEmpty().build();
+  }
+
+  static Stream<List<DbUserMetadata>> getAllStream(
+    Isar db,
+  ) {
+    return getAllQuery(db).watch();
+  }
 }

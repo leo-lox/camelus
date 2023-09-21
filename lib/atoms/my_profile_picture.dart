@@ -1,3 +1,4 @@
+import 'package:camelus/db/entities/db_user_metadata.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:camelus/config/palette.dart';
@@ -73,19 +74,20 @@ class UserImage extends StatelessWidget {
     required this.pubkey,
   });
 
-  final Future<Map> myMetadata;
+  final Future<DbUserMetadata?> myMetadata;
   final String pubkey;
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<Map>(
+    return FutureBuilder<DbUserMetadata?>(
         future: myMetadata,
-        builder: (BuildContext context, AsyncSnapshot<Map> snapshot) {
+        builder:
+            (BuildContext context, AsyncSnapshot<DbUserMetadata?> snapshot) {
           var picture = "";
           var defaultPicture =
               "https://avatars.dicebear.com/api/personas/${pubkey}.svg";
           if (snapshot.hasData) {
-            picture = snapshot.data?["picture"] ?? defaultPicture;
+            picture = snapshot.data?.picture ?? defaultPicture;
           } else if (snapshot.hasError) {
             picture = defaultPicture;
           } else {

@@ -5,6 +5,8 @@ part 'db_settings.g.dart';
 @collection
 class DbSettings {
   Id id = Isar.autoIncrement;
+
+  List<DbManualRelay>? manualRelays;
 }
 
 @embedded

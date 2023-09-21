@@ -79,19 +79,6 @@ const DbUserMetadataSchema = CollectionSchema(
   deserializeProp: _dbUserMetadataDeserializeProp,
   idName: r'id',
   indexes: {
-    r'nostr_id': IndexSchema(
-      id: 3163867815246860709,
-      name: r'nostr_id',
-      unique: true,
-      replace: false,
-      properties: [
-        IndexPropertySchema(
-          name: r'nostr_id',
-          type: IndexType.value,
-          caseSensitive: true,
-        )
-      ],
-    ),
     r'pubkey': IndexSchema(
       id: -5440107494565194882,
       name: r'pubkey',
@@ -263,59 +250,6 @@ void _dbUserMetadataAttach(
 }
 
 extension DbUserMetadataByIndex on IsarCollection<DbUserMetadata> {
-  Future<DbUserMetadata?> getByNostr_id(String nostr_id) {
-    return getByIndex(r'nostr_id', [nostr_id]);
-  }
-
-  DbUserMetadata? getByNostr_idSync(String nostr_id) {
-    return getByIndexSync(r'nostr_id', [nostr_id]);
-  }
-
-  Future<bool> deleteByNostr_id(String nostr_id) {
-    return deleteByIndex(r'nostr_id', [nostr_id]);
-  }
-
-  bool deleteByNostr_idSync(String nostr_id) {
-    return deleteByIndexSync(r'nostr_id', [nostr_id]);
-  }
-
-  Future<List<DbUserMetadata?>> getAllByNostr_id(List<String> nostr_idValues) {
-    final values = nostr_idValues.map((e) => [e]).toList();
-    return getAllByIndex(r'nostr_id', values);
-  }
-
-  List<DbUserMetadata?> getAllByNostr_idSync(List<String> nostr_idValues) {
-    final values = nostr_idValues.map((e) => [e]).toList();
-    return getAllByIndexSync(r'nostr_id', values);
-  }
-
-  Future<int> deleteAllByNostr_id(List<String> nostr_idValues) {
-    final values = nostr_idValues.map((e) => [e]).toList();
-    return deleteAllByIndex(r'nostr_id', values);
-  }
-
-  int deleteAllByNostr_idSync(List<String> nostr_idValues) {
-    final values = nostr_idValues.map((e) => [e]).toList();
-    return deleteAllByIndexSync(r'nostr_id', values);
-  }
-
-  Future<Id> putByNostr_id(DbUserMetadata object) {
-    return putByIndex(r'nostr_id', object);
-  }
-
-  Id putByNostr_idSync(DbUserMetadata object, {bool saveLinks = true}) {
-    return putByIndexSync(r'nostr_id', object, saveLinks: saveLinks);
-  }
-
-  Future<List<Id>> putAllByNostr_id(List<DbUserMetadata> objects) {
-    return putAllByIndex(r'nostr_id', objects);
-  }
-
-  List<Id> putAllByNostr_idSync(List<DbUserMetadata> objects,
-      {bool saveLinks = true}) {
-    return putAllByIndexSync(r'nostr_id', objects, saveLinks: saveLinks);
-  }
-
   Future<DbUserMetadata?> getByPubkey(String pubkey) {
     return getByIndex(r'pubkey', [pubkey]);
   }
@@ -375,14 +309,6 @@ extension DbUserMetadataQueryWhereSort
   QueryBuilder<DbUserMetadata, DbUserMetadata, QAfterWhere> anyId() {
     return QueryBuilder.apply(this, (query) {
       return query.addWhereClause(const IdWhereClause.any());
-    });
-  }
-
-  QueryBuilder<DbUserMetadata, DbUserMetadata, QAfterWhere> anyNostr_id() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addWhereClause(
-        const IndexWhereClause.any(indexName: r'nostr_id'),
-      );
     });
   }
 
@@ -463,147 +389,6 @@ extension DbUserMetadataQueryWhere
         upper: upperId,
         includeUpper: includeUpper,
       ));
-    });
-  }
-
-  QueryBuilder<DbUserMetadata, DbUserMetadata, QAfterWhereClause>
-      nostr_idEqualTo(String nostr_id) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addWhereClause(IndexWhereClause.equalTo(
-        indexName: r'nostr_id',
-        value: [nostr_id],
-      ));
-    });
-  }
-
-  QueryBuilder<DbUserMetadata, DbUserMetadata, QAfterWhereClause>
-      nostr_idNotEqualTo(String nostr_id) {
-    return QueryBuilder.apply(this, (query) {
-      if (query.whereSort == Sort.asc) {
-        return query
-            .addWhereClause(IndexWhereClause.between(
-              indexName: r'nostr_id',
-              lower: [],
-              upper: [nostr_id],
-              includeUpper: false,
-            ))
-            .addWhereClause(IndexWhereClause.between(
-              indexName: r'nostr_id',
-              lower: [nostr_id],
-              includeLower: false,
-              upper: [],
-            ));
-      } else {
-        return query
-            .addWhereClause(IndexWhereClause.between(
-              indexName: r'nostr_id',
-              lower: [nostr_id],
-              includeLower: false,
-              upper: [],
-            ))
-            .addWhereClause(IndexWhereClause.between(
-              indexName: r'nostr_id',
-              lower: [],
-              upper: [nostr_id],
-              includeUpper: false,
-            ));
-      }
-    });
-  }
-
-  QueryBuilder<DbUserMetadata, DbUserMetadata, QAfterWhereClause>
-      nostr_idGreaterThan(
-    String nostr_id, {
-    bool include = false,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addWhereClause(IndexWhereClause.between(
-        indexName: r'nostr_id',
-        lower: [nostr_id],
-        includeLower: include,
-        upper: [],
-      ));
-    });
-  }
-
-  QueryBuilder<DbUserMetadata, DbUserMetadata, QAfterWhereClause>
-      nostr_idLessThan(
-    String nostr_id, {
-    bool include = false,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addWhereClause(IndexWhereClause.between(
-        indexName: r'nostr_id',
-        lower: [],
-        upper: [nostr_id],
-        includeUpper: include,
-      ));
-    });
-  }
-
-  QueryBuilder<DbUserMetadata, DbUserMetadata, QAfterWhereClause>
-      nostr_idBetween(
-    String lowerNostr_id,
-    String upperNostr_id, {
-    bool includeLower = true,
-    bool includeUpper = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addWhereClause(IndexWhereClause.between(
-        indexName: r'nostr_id',
-        lower: [lowerNostr_id],
-        includeLower: includeLower,
-        upper: [upperNostr_id],
-        includeUpper: includeUpper,
-      ));
-    });
-  }
-
-  QueryBuilder<DbUserMetadata, DbUserMetadata, QAfterWhereClause>
-      nostr_idStartsWith(String Nostr_idPrefix) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addWhereClause(IndexWhereClause.between(
-        indexName: r'nostr_id',
-        lower: [Nostr_idPrefix],
-        upper: ['$Nostr_idPrefix\u{FFFFF}'],
-      ));
-    });
-  }
-
-  QueryBuilder<DbUserMetadata, DbUserMetadata, QAfterWhereClause>
-      nostr_idIsEmpty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addWhereClause(IndexWhereClause.equalTo(
-        indexName: r'nostr_id',
-        value: [''],
-      ));
-    });
-  }
-
-  QueryBuilder<DbUserMetadata, DbUserMetadata, QAfterWhereClause>
-      nostr_idIsNotEmpty() {
-    return QueryBuilder.apply(this, (query) {
-      if (query.whereSort == Sort.asc) {
-        return query
-            .addWhereClause(IndexWhereClause.lessThan(
-              indexName: r'nostr_id',
-              upper: [''],
-            ))
-            .addWhereClause(IndexWhereClause.greaterThan(
-              indexName: r'nostr_id',
-              lower: [''],
-            ));
-      } else {
-        return query
-            .addWhereClause(IndexWhereClause.greaterThan(
-              indexName: r'nostr_id',
-              lower: [''],
-            ))
-            .addWhereClause(IndexWhereClause.lessThan(
-              indexName: r'nostr_id',
-              upper: [''],
-            ));
-      }
     });
   }
 

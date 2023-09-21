@@ -1,3 +1,4 @@
+import 'package:camelus/db/entities/db_user_metadata.dart';
 import 'package:camelus/helpers/nprofile_helper.dart';
 import 'package:camelus/models/nostr_tag.dart';
 import 'package:camelus/providers/following_provider.dart';
@@ -96,14 +97,14 @@ class NostrDrawer extends ConsumerWidget {
                   color: Palette.primary,
                   shape: BoxShape.circle,
                 ),
-                child: FutureBuilder<Map>(
+                child: FutureBuilder<DbUserMetadata?>(
                     future: metadata.getMetadataByPubkey(pubkey),
-                    builder:
-                        (BuildContext context, AsyncSnapshot<Map> snapshot) {
+                    builder: (BuildContext context,
+                        AsyncSnapshot<DbUserMetadata?> snapshot) {
                       var picture = "";
 
                       if (snapshot.hasData) {
-                        picture = snapshot.data?["picture"] ??
+                        picture = snapshot.data?.picture ??
                             "https://avatars.dicebear.com/api/personas/$pubkey.svg";
                       } else if (snapshot.hasError) {
                         picture =
@@ -133,16 +134,16 @@ class NostrDrawer extends ConsumerWidget {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    FutureBuilder<Map>(
+                    FutureBuilder<DbUserMetadata?>(
                         future: metadata.getMetadataByPubkey(pubkey),
                         builder: (BuildContext context,
-                            AsyncSnapshot<Map> snapshot) {
+                            AsyncSnapshot<DbUserMetadata?> snapshot) {
                           var name = "";
                           var nip05 = "";
 
                           if (snapshot.hasData) {
-                            name = snapshot.data?["name"] ?? "";
-                            nip05 = snapshot.data?["nip05"] ?? "";
+                            name = snapshot.data?.name ?? "";
+                            nip05 = snapshot.data?.nip05 ?? "";
                           } else if (snapshot.hasError) {
                             name = "error";
                             nip05 = "error";
