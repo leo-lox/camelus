@@ -85,7 +85,7 @@ class UserImage extends StatelessWidget {
             (BuildContext context, AsyncSnapshot<DbUserMetadata?> snapshot) {
           var picture = "";
           var defaultPicture =
-              "https://avatars.dicebear.com/api/personas/${pubkey}.svg";
+              "https://avatars.dicebear.com/api/personas/$pubkey.svg";
           if (snapshot.hasData) {
             picture = snapshot.data?.picture ?? defaultPicture;
           } else if (snapshot.hasError) {

@@ -16,7 +16,6 @@ import 'package:camelus/providers/metadata_provider.dart';
 import 'package:camelus/services/nostr/metadata/user_metadata.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:timeago/timeago.dart' as timeago;
 
 class NoteCard extends ConsumerStatefulWidget {
   final NostrNote note;

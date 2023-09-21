@@ -13,7 +13,7 @@ import 'package:timeago/timeago.dart' as timeago;
 class SeenOnRelaysPage extends ConsumerStatefulWidget {
   NostrNote myNote;
 
-  SeenOnRelaysPage({Key? key, required this.myNote}) : super(key: key) {}
+  SeenOnRelaysPage({Key? key, required this.myNote}) : super(key: key);
 
   @override
   ConsumerState<SeenOnRelaysPage> createState() => _SeenOnRelaysPageState();

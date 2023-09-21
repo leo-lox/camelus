@@ -97,12 +97,12 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
     }
 
     // set initial values of text input controllers
-    pictureController.text = profileData?.picture ?? "";
-    bannerController.text = profileData?.banner ?? "";
-    nameController.text = profileData?.name ?? "";
-    nip05Controller.text = profileData?.nip05 ?? "";
-    aboutController.text = profileData?.about ?? "";
-    websiteController.text = profileData?.website ?? "";
+    pictureController.text = profileData.picture ?? "";
+    bannerController.text = profileData.banner ?? "";
+    nameController.text = profileData.name ?? "";
+    nip05Controller.text = profileData.nip05 ?? "";
+    aboutController.text = profileData.about ?? "";
+    websiteController.text = profileData.website ?? "";
   }
 
   void _submitData() async {

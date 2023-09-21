@@ -77,7 +77,6 @@ class EventFeed {
         _db,
         id: _rootNoteId,
         kind: 1);
-    ;
 
     _subscriptions.add(
       stream.listen((event) async {

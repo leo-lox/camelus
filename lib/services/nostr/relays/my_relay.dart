@@ -12,7 +12,6 @@ import 'package:camelus/services/nostr/relays/relay_tracker.dart';
 import 'package:isar/isar.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
-import '../../../db/entities/db_note.dart';
 
 class MyRelay {
   final Isar database;

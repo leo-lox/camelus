@@ -99,7 +99,7 @@ class RelayTracker {
         return;
       }
 
-      if (!result.valid!) {
+      if (!result.valid) {
         return;
       }
 

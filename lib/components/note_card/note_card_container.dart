@@ -1,4 +1,3 @@
-import 'dart:developer';
 
 import 'package:camelus/components/note_card/note_card.dart';
 import 'package:camelus/config/palette.dart';

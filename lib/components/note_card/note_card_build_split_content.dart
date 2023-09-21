@@ -1,5 +1,3 @@
-import 'dart:async';
-import 'dart:developer';
 
 import 'package:camelus/config/palette.dart';
 import 'package:camelus/db/entities/db_user_metadata.dart';
@@ -7,8 +5,6 @@ import 'package:camelus/helpers/helpers.dart';
 import 'package:camelus/helpers/nprofile_helper.dart';
 import 'package:camelus/models/nostr_note.dart';
 import 'package:camelus/services/nostr/metadata/user_metadata.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
