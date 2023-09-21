@@ -18,7 +18,9 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
 
   void _clearDb() async {
     var db = await ref.watch(databaseProvider.future);
-    db.clear();
+    await db.writeTxn(() async {
+      await db.clear();
+    });
   }
 
   @override
