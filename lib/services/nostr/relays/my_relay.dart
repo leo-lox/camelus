@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
 
+import 'package:camelus/db/custom_inserts/db_note_stack_insert.dart';
 import 'package:camelus/models/nostr_note.dart';
 import 'package:camelus/models/nostr_request.dart';
 import 'package:camelus/models/nostr_request_close.dart';
@@ -38,6 +39,8 @@ class MyRelay {
 
   late RelayTracker relayTracker;
 
+  late DbNoteStackInsert stackInsertNotes;
+
   MyRelay({
     required this.database,
     required this.persistance,
@@ -46,6 +49,7 @@ class MyRelay {
     required this.write,
   }) {
     relayTracker = RelayTracker(db: database);
+    stackInsertNotes = DbNoteStackInsert(db: database);
   }
 
   /// connects to the relay and listens for events
@@ -188,31 +192,7 @@ class MyRelay {
   }
 
   _insertNoteIntoDb(NostrNote note) {
-    var now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
-    // database.noteDao.stackInsertNotes([note]);
-    final myIsarNote = DbNote(
-      last_fetch: now,
-      nostr_id: note.id,
-      created_at: note.created_at,
-      kind: note.kind,
-      pubkey: note.pubkey,
-      content: note.content,
-      sig: note.sig,
-      tags: note.tags
-          .map((e) => DbTag(
-                type: e.type,
-                value: e.value,
-                recommended_relay: e.recommended_relay,
-                marker: e.marker,
-              ))
-          .toList(),
-    );
-
-    database.writeTxn(() async {
-      database.dbNotes.putByNostr_id(myIsarNote);
-      //database.dbNotes.put(myIsarNote);
-      //recipes.put(pancakes);
-    });
+    stackInsertNotes.stackInsertNotes([note]);
   }
 
   @override

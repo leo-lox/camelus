@@ -6,7 +6,7 @@ part 'db_relay_tracker.g.dart';
 class DbRelayTracker {
   Id id = Isar.autoIncrement;
 
-  @Index(unique: true, type: IndexType.value)
+  @Index(unique: true, type: IndexType.value, replace: true)
   String pubkey;
 
   List<DbRelayTrackerRelay> relays;

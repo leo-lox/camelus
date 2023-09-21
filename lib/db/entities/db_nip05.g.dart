@@ -48,7 +48,7 @@ const DbNip05Schema = CollectionSchema(
       id: 8096380905031948307,
       name: r'nip05',
       unique: true,
-      replace: false,
+      replace: true,
       properties: [
         IndexPropertySchema(
           name: r'nip05',

@@ -168,11 +168,7 @@ class FollowingPubkeys {
     var dbList =
         (await DbNoteQueries.kindPubkeyFuture(_db, pubkey: pubkey, kind: 3));
 
-    int? lastFetch = dbList.first.last_fetch;
-    ;
-
     int now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
-
     String requestId = "contacts-${Helpers().getRandomString(4)}";
 
     if (dbList.isEmpty) {
@@ -180,6 +176,8 @@ class FollowingPubkeys {
 
       return _checkIfFetching(pubkey, requestId, now);
     }
+
+    int? lastFetch = dbList.first.last_fetch;
 
     // check how fresh the data is / 4 hours
     if (lastFetch != null && now - lastFetch < 14400) {

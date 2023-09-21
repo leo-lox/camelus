@@ -7,7 +7,7 @@ class DbNip05 {
   Id id = Isar
       .autoIncrement; // Für auto-increment kannst du auch id = null zuweisen
 
-  @Index(unique: true, type: IndexType.value)
+  @Index(unique: true, type: IndexType.value, replace: true)
   String nip05;
 
   bool valid;

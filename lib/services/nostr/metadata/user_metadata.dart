@@ -158,8 +158,16 @@ class UserMetadata {
 
     var myResult = _metadataFutureHolder[pubkey]!.future;
 
-    return myResult.then(
-        (value) => value.firstWhere((element) => element!.pubkey == pubkey));
+    return myResult.then((value) {
+      DbUserMetadata? result;
+      for (var element in value) {
+        if (element != null && element.pubkey == pubkey) {
+          result = element;
+          continue;
+        }
+      }
+      return result;
+    });
 
     //return _metadataFutureHolder[pubkey]!.future;
   }
@@ -178,7 +186,7 @@ class UserMetadata {
     _metadataWaitingPool = [];
 
     // wait 300ms for the contacts to be received
-    await Future.delayed(const Duration(milliseconds: 300));
+    await Future.delayed(const Duration(milliseconds: 500));
     return usersMetadata;
   }
 

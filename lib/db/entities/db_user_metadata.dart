@@ -9,7 +9,7 @@ class DbUserMetadata {
   //@Index(unique: true, type: IndexType.value)
   String nostr_id;
 
-  @Index(unique: true, type: IndexType.value)
+  @Index(unique: true, type: IndexType.value, replace: true)
   String pubkey;
 
   int last_fetch;

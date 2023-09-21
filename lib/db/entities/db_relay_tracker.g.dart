@@ -39,7 +39,7 @@ const DbRelayTrackerSchema = CollectionSchema(
       id: -5440107494565194882,
       name: r'pubkey',
       unique: true,
-      replace: false,
+      replace: true,
       properties: [
         IndexPropertySchema(
           name: r'pubkey',
