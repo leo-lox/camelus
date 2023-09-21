@@ -1,10 +1,17 @@
+import 'package:camelus/db/entities/db_nip05.dart';
+import 'package:camelus/db/entities/db_note.dart';
+import 'package:camelus/db/entities/db_relay_tracker.dart';
+import 'package:camelus/db/entities/db_settings.dart';
+import 'package:camelus/db/entities/db_user_metadata.dart';
 import 'package:camelus/services/nostr/metadata/nip_05.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:http/testing.dart';
+import 'package:isar/isar.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
+
 import 'package:shared_preferences/shared_preferences.dart';
 
 //class MockClient extends Mock implements http.Client {}
@@ -14,11 +21,21 @@ class MockSharedPreferences extends Mock implements SharedPreferences {}
 @GenerateMocks([http.Client])
 void main() {
   SharedPreferences.setMockInitialValues({}); //set values here
+  Isar? db;
 
   //TestWidgetsFlutterBinding.ensureInitialized();
   final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   binding.framePolicy = LiveTestWidgetsFlutterBindingFramePolicy.fullyLive;
+
+  setUpAll(() async {
+    db = await openIsar();
+  });
+
+  tearDownAll(() {
+    db?.close();
+  });
+
   group('Nip05', () {
     Future<http.Response> requestHandler(http.Request request) async {
       const apiResponse =
@@ -44,23 +61,24 @@ void main() {
       //         '{"names": {"username": "pubkey"}, "relays": {"pubkey": ["relay1", "relay2"]}}',
       //         200));
 
-      Nip05 nip05 = Nip05();
+      Nip05 nip05 = Nip05(db: db!);
       await Future.delayed(const Duration(milliseconds: 500));
 
       // insert mock http client
       nip05.client = client;
 
-      expect(await nip05.checkNip05('username@lox.de', 'pubkey'),
-          isA<Map<String, dynamic>>());
+      expect(
+          await nip05.checkNip05('username@lox.de', 'pubkey'), isA<DbNip05>());
     });
 
-    test('throws an exception if the http call completes with an error',
-        () async {
+    test('return null if the http call completes with an error', () async {
       final client = MockClient(requestHandlerErr);
       final mockSharedPreferences = MockSharedPreferences();
       when(mockSharedPreferences.getString('')).thenReturn('mock');
 
-      var nip05 = Nip05(); // Initialize your class
+      await db!.writeTxn(() async => {await db!.clear()});
+
+      var nip05 = Nip05(db: db!); // Initialize your class
 
       // Comment out the following lines if you have implemented dependency injection for http.Client in your class
       // And pass the mock client to your class like this: var nip05 = Nip05(client: client);
@@ -68,14 +86,18 @@ void main() {
       nip05.client =
           client; // Make sure to add this line in your class for testing purposes
 
-      expect(nip05.checkNip05('username@url', 'pubkey'), throwsException);
+      var result = await nip05.checkNip05('username@url.test', 'pubkey');
+
+      expect(result, null);
     });
     test('result is invalid', () async {
       final client = MockClient(requestHandler);
       final mockSharedPreferences = MockSharedPreferences();
       when(mockSharedPreferences.getString('')).thenReturn('mock');
 
-      var nip05 = Nip05(); // Initialize your class
+      await db!.writeTxn(() async => {await db!.clear()});
+
+      var nip05 = Nip05(db: db!); // Initialize your class
 
       // Comment out the following lines if you have implemented dependency injection for http.Client in your class
       // And pass the mock client to your class like this: var nip05 = Nip05(client: client);
@@ -84,16 +106,17 @@ void main() {
           client; // Make sure to add this line in your class for testing purposes
 
       var result =
-          await nip05.checkNip05('username@url', 'non-existing-pubkey');
+          await nip05.checkNip05('username@url.test', 'non-existing-pubkey');
 
-      expect(result['valid'], false);
+      expect(result!.valid, false);
     });
     test('result is valid', () async {
       final client = MockClient(requestHandler);
       final mockSharedPreferences = MockSharedPreferences();
       when(mockSharedPreferences.getString('')).thenReturn('mock');
 
-      var nip05 = Nip05(); // Initialize your class
+      await db!.writeTxn(() async => {await db!.clear()});
+      var nip05 = Nip05(db: db!); // Initialize your class
 
       // Comment out the following lines if you have implemented dependency injection for http.Client in your class
       // And pass the mock client to your class like this: var nip05 = Nip05(client: client);
@@ -101,9 +124,9 @@ void main() {
       nip05.client =
           client; // Make sure to add this line in your class for testing purposes
 
-      var result = await nip05.checkNip05('username@url', 'pubkey');
+      var result = await nip05.checkNip05('username@url.test', 'pubkey');
 
-      expect(result['valid'], true);
+      expect(result!.valid, true);
     });
   });
 
@@ -147,4 +170,19 @@ void main() {
       print(response.body);
     });
   });
+}
+
+openIsar() async {
+  //final dir = await getApplicationDocumentsDirectory();
+  final isar = await Isar.open(
+    directory: "./", //dir.path,
+    [
+      DbNoteSchema,
+      DbNip05Schema,
+      DbRelayTrackerSchema,
+      DbSettingsSchema,
+      DbUserMetadataSchema,
+    ],
+  );
+  return isar;
 }

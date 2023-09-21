@@ -2,7 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
-Widget simplePicture(String pictureUrl, String? pubkey) {
+Widget simplePicture(String? pictureUrl, String? pubkey) {
   if (pictureUrl == null) {
     return SvgPicture.network(
         "https://avatars.dicebear.com/api/personas/$pubkey.svg");

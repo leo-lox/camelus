@@ -1,4 +1,3 @@
-
 import 'package:camelus/config/palette.dart';
 import 'package:camelus/db/entities/db_user_metadata.dart';
 import 'package:camelus/helpers/helpers.dart';
