@@ -812,69 +812,70 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
         if (widget.pubkey != myKeyPair.publicKey)
-          SizedBox(
-            width: 35,
-            height: 35,
-            child: ElevatedButton(
-              onPressed: () {
-                _launchPerspectiveFeed(widget.pubkey);
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Palette.background,
-                padding: const EdgeInsets.all(0),
-                enableFeedback: true,
-                shape: const CircleBorder(
-                    side: BorderSide(color: Palette.white, width: 1)),
-              ),
-              child: SvgPicture.asset(
-                "assets/icons/eye.svg",
-                height: 25,
-                color: Palette.white,
-              ),
-            ),
-          ),
+          // disabled because of low usage && not well implemented
+          // SizedBox(
+          //   width: 35,
+          //   height: 35,
+          //   child: ElevatedButton(
+          //     onPressed: () {
+          //       _launchPerspectiveFeed(widget.pubkey);
+          //     },
+          //     style: ElevatedButton.styleFrom(
+          //       backgroundColor: Palette.background,
+          //       padding: const EdgeInsets.all(0),
+          //       enableFeedback: true,
+          //       shape: const CircleBorder(
+          //           side: BorderSide(color: Palette.white, width: 1)),
+          //     ),
+          //     child: SvgPicture.asset(
+          //       "assets/icons/eye.svg",
+          //       height: 25,
+          //       color: Palette.white,
+          //     ),
+          //   ),
+          // ),
 
-        // round message button with icon and white border
-        FutureBuilder<DbUserMetadata?>(
-            future: metadata.getMetadataByPubkey(widget.pubkey),
-            builder: (BuildContext context,
-                AsyncSnapshot<DbUserMetadata?> snapshot) {
-              String lud06 = "";
-              String lud16 = "";
+          // round message button with icon and white border
+          FutureBuilder<DbUserMetadata?>(
+              future: metadata.getMetadataByPubkey(widget.pubkey),
+              builder: (BuildContext context,
+                  AsyncSnapshot<DbUserMetadata?> snapshot) {
+                String lud06 = "";
+                String lud16 = "";
 
-              if (snapshot.hasData) {
-                lud06 = snapshot.data?.lud06 ?? "";
-                lud16 = snapshot.data?.lud16 ?? "";
-              }
+                if (snapshot.hasData) {
+                  lud06 = snapshot.data?.lud06 ?? "";
+                  lud16 = snapshot.data?.lud16 ?? "";
+                }
 
-              if (lud06.isNotEmpty || lud16.isNotEmpty) {
-                return Container(
-                  margin: const EdgeInsets.only(top: 0, right: 0, left: 0),
-                  child: ElevatedButton(
-                    onPressed: () {
-                      if (lud06.isNotEmpty) {
-                        _openLightningAddress(lud06);
-                      } else if (lud16.isNotEmpty) {
-                        _openLightningAddress(lud16);
-                      }
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Palette.background,
-                      padding: const EdgeInsets.all(0),
-                      shape: const CircleBorder(
-                          side: BorderSide(color: Palette.white, width: 1)),
+                if (lud06.isNotEmpty || lud16.isNotEmpty) {
+                  return Container(
+                    margin: const EdgeInsets.only(top: 0, right: 0, left: 0),
+                    child: ElevatedButton(
+                      onPressed: () {
+                        if (lud06.isNotEmpty) {
+                          _openLightningAddress(lud06);
+                        } else if (lud16.isNotEmpty) {
+                          _openLightningAddress(lud16);
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Palette.background,
+                        padding: const EdgeInsets.all(0),
+                        shape: const CircleBorder(
+                            side: BorderSide(color: Palette.white, width: 1)),
+                      ),
+                      child: SvgPicture.asset(
+                        "assets/icons/lightning-fill.svg",
+                        height: 25,
+                        color: Palette.white,
+                      ),
                     ),
-                    child: SvgPicture.asset(
-                      "assets/icons/lightning-fill.svg",
-                      height: 25,
-                      color: Palette.white,
-                    ),
-                  ),
-                );
-              } else {
-                return Container();
-              }
-            }),
+                  );
+                } else {
+                  return Container();
+                }
+              }),
 
         // follow button black with white border
 
