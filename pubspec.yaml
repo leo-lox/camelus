@@ -64,6 +64,9 @@ dependencies:
   isar: ^3.1.0+1
   isar_flutter_libs: ^3.1.0+1
   path_provider: ^2.1.1
+  pointycastle: ^3.7.3
+  encrypt: ^5.0.3
+  kepler: ^1.0.3
 
 dev_dependencies:
   floor_generator: ^1.4.2
