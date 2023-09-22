@@ -131,6 +131,8 @@ abstract class DbNoteQueries {
         .filter()
         .kindEqualTo(kind)
         .tagsElement((t) => t.typeEqualTo("e").and().valueEqualTo(id))
+        .or()
+        .nostr_idEqualTo(id)
         .sortByCreated_atDesc()
         .build();
   }

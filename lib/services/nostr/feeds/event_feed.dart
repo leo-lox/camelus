@@ -74,9 +74,10 @@ class EventFeed {
 
   _streamFeed() async {
     Stream<List<DbNote>> stream = DbNoteQueries.findRepliesByIdAndByKindStream(
-        _db,
-        id: _rootNoteId,
-        kind: 1);
+      _db,
+      id: _rootNoteId,
+      kind: 1,
+    );
 
     _subscriptions.add(
       stream.listen((event) async {
