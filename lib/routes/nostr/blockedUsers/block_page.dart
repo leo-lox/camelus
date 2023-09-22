@@ -1,20 +1,15 @@
 import 'dart:async';
-import 'dart:convert';
-import 'dart:developer';
-
 import 'package:camelus/atoms/long_button.dart';
 import 'package:camelus/config/palette.dart';
-import 'package:camelus/db/entities/db_note.dart';
 import 'package:camelus/db/entities/db_user_metadata.dart';
-import 'package:camelus/db/queries/db_note_queries.dart';
-import 'package:camelus/helpers/nip04_encryption.dart';
-import 'package:camelus/models/nostr_note.dart';
 import 'package:camelus/models/nostr_request_event.dart';
 import 'package:camelus/models/nostr_tag.dart';
-import 'package:camelus/providers/database_provider.dart';
+import 'package:camelus/providers/block_mute_provider.dart';
 import 'package:camelus/providers/key_pair_provider.dart';
 import 'package:camelus/providers/metadata_provider.dart';
 import 'package:camelus/providers/relay_provider.dart';
+import 'package:camelus/services/nostr/metadata/block_mute_service.dart';
+import 'package:camelus/services/nostr/relays/relay_coordinator.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:isar/isar.dart';
@@ -34,12 +29,13 @@ class _BlockPageState extends ConsumerState<BlockPage> {
   bool isUserBlocked = false;
   bool requestLoading = false;
 
-  List<NostrTag> tags = [];
-  List<NostrTag> contentObj = [];
+  List<NostrTag> contentTags = [];
 
   Completer initDone = Completer();
 
-  late final Isar db;
+  /// services
+  late final BlockMuteService blockMuteService;
+  late final RelayCoordinator relayService;
   late final KeyPairWrapper keyService;
 
   final TextEditingController _textController = TextEditingController();
@@ -50,80 +46,40 @@ class _BlockPageState extends ConsumerState<BlockPage> {
   @override
   void initState() {
     super.initState();
-    _initBlockState();
+    _initListener();
   }
 
-  // gets the current state and who is blocked
-  Future _initBlockState() async {
-    db = await ref.read(databaseProvider.future);
+  void _initListener() async {
+    blockMuteService = await ref.read(blockMuteProvider.future);
+    relayService = ref.read(relayServiceProvider);
     keyService = await ref.read(keyPairProvider.future);
-    final existingListDb = await DbNoteQueries.kindPubkeyFuture(
-      db,
-      pubkey: keyService.keyPair!.publicKey,
-      kind: 10000,
-    );
 
-    if (existingListDb.isNotEmpty) {
-      final existingList = existingListDb.first.toNostrNote();
-      tags = existingList.tags;
-      // decrypt content
-      final nip04 = Nip04Encryption();
-      try {
-        final oldContentObj = nip04.decrypt(keyService.keyPair!.privateKey,
-            keyService.keyPair!.publicKey, existingList.content);
+    // get current state
+    contentTags = blockMuteService.contentObj;
 
-        final List<List<String>> contentJson = json
-            .decode(oldContentObj)
-            .map<List<String>>((e) => List<String>.from(e))
-            .toList();
+    initDone.complete();
+    _checkBlockMuteState();
 
-        List<NostrTag> convertedList = [];
-        // convert to NostrTag
-        for (var element in contentJson) {
-          convertedList.add(NostrTag.fromJson(element));
-        }
+    // listen to state changes
+    blockMuteService.blockListStream.listen((event) {
+      contentTags = event;
+      _checkBlockMuteState();
+    });
+  }
 
-        contentObj = convertedList;
-      } catch (e) {
-        log("error decrypting encrypted blocklist: $e");
+  _checkBlockMuteState() {
+    for (var tag in contentTags) {
+      if (tag.value == widget.userPubkey) {
+        setState(() {
+          isUserBlocked = true;
+        });
+
+        return;
       }
     }
-
-    // change state if user is blocked
-    if (contentObj.any((element) => element.value == widget.userPubkey)) {
-      setState(() {
-        isUserBlocked = true;
-      });
-    }
-    initDone.complete();
-
-    return;
-  }
-
-  /// write the new state to nostr
-  writeNewBlockState() async {
-    await initDone.future;
-
-    final String newContent =
-        json.encode(contentObj.map((e) => e.toList()).toList());
-
-    final nip04 = Nip04Encryption();
-
-    final encryptedContent = nip04.encrypt(keyService.keyPair!.privateKey,
-        keyService.keyPair!.publicKey, newContent);
-
-    final NostrRequestEventBody newNoteBody = NostrRequestEventBody(
-      pubkey: keyService.keyPair!.publicKey,
-      kind: 10000,
-      tags: tags,
-      content: encryptedContent,
-      privateKey: keyService.keyPair!.privateKey,
-    );
-
-    var myRequest = NostrRequestEvent(body: newNoteBody);
-    var relays = ref.watch(relayServiceProvider);
-    List<String> results = await relays.write(request: myRequest);
-    return results;
+    setState(() {
+      isUserBlocked = false;
+    });
   }
 
   void _blockUser(
@@ -132,17 +88,11 @@ class _BlockPageState extends ConsumerState<BlockPage> {
     setState(() {
       requestLoading = true;
     });
-    // add blocked user to tags
-    contentObj.add(NostrTag(type: "p", value: pubkey));
-    await writeNewBlockState();
+
+    await blockMuteService.blockUser(
+        pubkey: pubkey, relayService: relayService);
     setState(() {
       requestLoading = false;
-    });
-
-    // delete post if it exists
-    await db.writeTxn(() async {
-      final q = DbNoteQueries.kindPubkeyQuery(db, pubkey: pubkey, kind: 1);
-      await q.deleteAll();
     });
   }
 
@@ -152,9 +102,8 @@ class _BlockPageState extends ConsumerState<BlockPage> {
     setState(() {
       requestLoading = true;
     });
-    // remove blocked user from content
-    contentObj.removeWhere((element) => element.value == pubkey);
-    await writeNewBlockState();
+    await blockMuteService.unBlockUser(
+        pubkey: pubkey, relayService: relayService);
     setState(() {
       requestLoading = false;
     });

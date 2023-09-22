@@ -4,6 +4,7 @@ import 'package:camelus/providers/key_pair_provider.dart';
 import 'package:camelus/routes/nostr/blockedUsers/blocked_users.dart';
 import 'package:camelus/routes/nostr/hashtag_view/hashtag_view_page.dart';
 import 'package:camelus/routes/nostr/settings/settings_page.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:camelus/routes/nostr/event_view/event_view_page.dart';
 import 'package:camelus/routes/nostr/onboarding/onboarding.dart';
@@ -61,13 +62,9 @@ class MyApp extends StatelessWidget {
           onGenerateRoute: (RouteSettings settings) {
             switch (settings.name) {
               case '/':
-                return MaterialPageRoute(
-                  builder: (context) =>
-                      //HomePage(pubkey: snapshot.data![1]),
-                      HomePage(
-                          pubkey:
-                              pubkey), //snapshot.data![1]), //pubkey: snapshot.data![1]
-                );
+                return CupertinoPageRoute(builder: (context) {
+                  return HomePage(pubkey: pubkey);
+                });
 
               case '/onboarding':
                 return MaterialPageRoute(
@@ -79,7 +76,7 @@ class MyApp extends StatelessWidget {
                   builder: (context) => const SettingsPage(),
                 );
               case '/nostr/event':
-                return MaterialPageRoute(
+                return CupertinoPageRoute(
                   builder: (context) => EventViewPage(
                       rootId: (settings.arguments
                           as Map<String, dynamic>)['root'] as String,
@@ -87,6 +84,7 @@ class MyApp extends StatelessWidget {
                               as Map<String, dynamic>)['scrollIntoView']
                           as String?),
                 );
+
               case '/nostr/profile':
                 return MaterialPageRoute(
                   builder: (context) =>
