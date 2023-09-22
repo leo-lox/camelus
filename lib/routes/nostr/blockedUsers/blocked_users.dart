@@ -1,13 +1,16 @@
 import 'dart:async';
-
 import 'package:camelus/atoms/my_profile_picture.dart';
+import 'package:camelus/atoms/spinner_center.dart';
 import 'package:camelus/config/palette.dart';
 import 'package:camelus/db/entities/db_user_metadata.dart';
 import 'package:camelus/helpers/helpers.dart';
+import 'package:camelus/models/nostr_tag.dart';
+import 'package:camelus/providers/block_mute_provider.dart';
 import 'package:camelus/providers/metadata_provider.dart';
-
+import 'package:camelus/providers/relay_provider.dart';
+import 'package:camelus/services/nostr/metadata/block_mute_service.dart';
 import 'package:camelus/services/nostr/metadata/user_metadata.dart';
-
+import 'package:camelus/services/nostr/relays/relay_coordinator.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -19,20 +22,31 @@ class BlockedUsers extends ConsumerStatefulWidget {
 }
 
 class _BlockedUsersState extends ConsumerState<BlockedUsers> {
-  final StreamController _streamController = StreamController();
+  late final BlockMuteService blockMuteService;
+  late final RelayCoordinator relayService;
+
+  Completer initDone = Completer();
+
+  List<NostrTag> contentTags = [];
 
   @override
   void initState() {
     super.initState();
-    _streamController.stream.listen((event) {
-      setState(() {});
-    });
+    _initState();
   }
 
   @override
   void dispose() {
-    _streamController.close();
     super.dispose();
+  }
+
+  void _initState() async {
+    blockMuteService = await ref.read(blockMuteProvider.future);
+    relayService = ref.read(relayServiceProvider);
+
+    // get current state
+    contentTags = blockMuteService.contentObj;
+    initDone.complete();
   }
 
   @override
@@ -44,33 +58,55 @@ class _BlockedUsersState extends ConsumerState<BlockedUsers> {
           backgroundColor: Palette.background,
           title: const Text('Blocked Users'),
         ),
-        body: CustomScrollView(
-          slivers: [
-            SliverList(
-              delegate: SliverChildBuilderDelegate(
-                (context, index) {
-                  return _profile("pubkeyTODO", _streamController, widget,
-                      metadata, metadata); //_nostrService.blockedUsers[index]
-                },
-                childCount: 0, //_nostrService.blockedUsers.length
-              ),
-            ),
-            if (false) // is empty
-              const SliverFillRemaining(
-                child: Center(
-                  child: Text(
-                    "No blocked users",
-                    style: TextStyle(color: Palette.gray, fontSize: 24),
-                  ),
-                ),
-              ),
-          ],
-        ));
+        body: FutureBuilder(
+            future: initDone.future,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return spinnerCenter();
+              }
+
+              return StreamBuilder<List<NostrTag>>(
+                  stream: blockMuteService.blockListStream,
+                  initialData: blockMuteService.contentObj,
+                  builder: (context, snapshot) {
+                    if (snapshot.data == null) {
+                      return spinnerCenter();
+                    }
+                    return CustomScrollView(
+                      slivers: [
+                        SliverList(
+                          delegate: SliverChildBuilderDelegate(
+                            (context, index) {
+                              return _profile(
+                                snapshot.data![index].value,
+                                widget,
+                                blockMuteService,
+                                metadata,
+                                relayService,
+                              );
+                            },
+                            childCount: snapshot.data!.length,
+                          ),
+                        ),
+                        if (snapshot.data!.isEmpty) // is empty
+                          const SliverFillRemaining(
+                            child: Center(
+                              child: Text(
+                                "No blocked users",
+                                style: TextStyle(
+                                    color: Palette.gray, fontSize: 24),
+                              ),
+                            ),
+                          ),
+                      ],
+                    );
+                  });
+            }));
   }
 }
 
-Widget _profile(String pubkey, StreamController streamController, widget,
-    UserMetadata nostrService, UserMetadata userMetadata) {
+Widget _profile(String pubkey, widget, BlockMuteService muteService,
+    UserMetadata userMetadata, RelayCoordinator relayService) {
   return FutureBuilder<DbUserMetadata?>(
       future: userMetadata.getMetadataByPubkey(pubkey),
       builder: (BuildContext context, AsyncSnapshot<DbUserMetadata?> snapshot) {
@@ -120,8 +156,8 @@ Widget _profile(String pubkey, StreamController streamController, widget,
                 icon: const Icon(Icons.block_flipped),
                 color: Palette.white,
                 onPressed: () {
-                  //nostrService.removeFromBlocklist(pubkey);
-                  streamController.add(true);
+                  muteService.unBlockUser(
+                      pubkey: pubkey, relayService: relayService);
                 },
               ),
             ],

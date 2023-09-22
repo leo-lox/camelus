@@ -77,9 +77,11 @@ class _BlockPageState extends ConsumerState<BlockPage> {
         return;
       }
     }
-    setState(() {
-      isUserBlocked = false;
-    });
+    if (mounted) {
+      setState(() {
+        isUserBlocked = false;
+      });
+    }
   }
 
   void _blockUser(
