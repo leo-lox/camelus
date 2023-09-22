@@ -95,8 +95,16 @@ class _NoteCardState extends ConsumerState<NoteCard> {
                       Navigator.pushNamed(context, "/nostr/profile",
                           arguments: widget.note.pubkey);
                     },
-                    child: UserImage(
-                        myMetadata: myMetadata, pubkey: widget.note.pubkey),
+                    child: StreamBuilder<DbUserMetadata?>(
+                        stream: metadata
+                            .getMetadataByPubkeyStream(widget.note.pubkey),
+                        initialData: metadata
+                            .getMetadataByPubkeyInitial(widget.note.pubkey),
+                        builder: (context, snapshot) {
+                          return UserImage(
+                              myMetadata: snapshot.data,
+                              pubkey: widget.note.pubkey);
+                        }),
                   ),
                   Expanded(
                     // click container

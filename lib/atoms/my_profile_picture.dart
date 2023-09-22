@@ -74,32 +74,16 @@ class UserImage extends StatelessWidget {
     required this.pubkey,
   });
 
-  final Future<DbUserMetadata?> myMetadata;
+  final DbUserMetadata? myMetadata;
   final String pubkey;
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<DbUserMetadata?>(
-        future: myMetadata,
-        builder:
-            (BuildContext context, AsyncSnapshot<DbUserMetadata?> snapshot) {
-          var picture = "";
-          var defaultPicture =
-              "https://avatars.dicebear.com/api/personas/$pubkey.svg";
-          if (snapshot.hasData) {
-            picture = snapshot.data?.picture ?? defaultPicture;
-          } else if (snapshot.hasError) {
-            picture = defaultPicture;
-          } else {
-            // loading
-            picture = defaultPicture;
-          }
-
-          return myProfilePicture(
-            pictureUrl: picture,
-            pubkey: pubkey,
-            filterQuality: FilterQuality.medium,
-          );
-        });
+    return myProfilePicture(
+      pictureUrl: myMetadata?.picture ??
+          "https://avatars.dicebear.com/api/personas/$pubkey.svg",
+      pubkey: pubkey,
+      filterQuality: FilterQuality.medium,
+    );
   }
 }

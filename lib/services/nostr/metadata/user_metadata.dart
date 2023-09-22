@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:camelus/db/entities/db_note.dart';
 import 'package:camelus/db/entities/db_user_metadata.dart';
@@ -35,6 +36,8 @@ class UserMetadata {
 
   final Completer _serviceRdy = Completer();
 
+  late Stream<List<DbUserMetadata>> dbStream;
+
   UserMetadata({
     required this.relays,
     required this.dbFuture,
@@ -53,6 +56,7 @@ class UserMetadata {
     _restoreCache().then((_) => {_removeOldData()});
     _initDb();
     _setupDbMetadataListener();
+    _setupDbLisener(_db);
     _serviceRdy.complete();
   }
 
@@ -81,6 +85,38 @@ class UserMetadata {
           .last_fetchLessThan(timeBarrier)
           .deleteAll();
     });
+  }
+
+  _setupDbLisener(Isar db) {
+    dbStream = DbUserMetadataQueries.getAllStream(_db);
+  }
+
+  DbUserMetadata? getMetadataByPubkeyInitial(String pubkey) {
+    DbUserMetadata? result;
+    try {
+      result = usersMetadata.where((element) => element.pubkey == pubkey)
+          as DbUserMetadata?;
+    } catch (e) {
+      //
+    }
+
+    return result;
+  }
+
+  Stream<DbUserMetadata?> getMetadataByPubkeyStream(String pubkey) async* {
+    await for (var i in dbStream) {
+      if (i.any((element) => element.pubkey == pubkey)) {
+        log("found metadata in stream");
+        //yield i.firstWhere((element) => element.pubkey == pubkey);
+      } else {
+        // check if pubkey is already in waiting pool
+        if ((_metadataWaitingPool.contains(pubkey))) {
+          //continue;
+        }
+        //_metadataWaitingPool.add(pubkey);
+        //_requestMetadata([pubkey], "requestId");
+      }
+    }
   }
 
   Future<DbUserMetadata?> getMetadataByPubkey(String pubkey,
