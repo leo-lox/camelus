@@ -69,6 +69,10 @@ class BlockMuteService {
     initDone.complete();
   }
 
+  bool isPubkeyBlocked(String pubkey) {
+    return _contentObj.any((element) => element.value == pubkey);
+  }
+
   ///
   /// writes the current blocklist to the relays
   ///

@@ -9,6 +9,7 @@ import 'package:camelus/models/nostr_request_event.dart';
 import 'package:camelus/models/nostr_request_query.dart';
 import 'package:camelus/models/nostr_tag.dart';
 import 'package:camelus/providers/key_pair_provider.dart';
+import 'package:camelus/services/nostr/metadata/block_mute_service.dart';
 import 'package:camelus/services/nostr/metadata/nip_65.dart';
 import 'package:camelus/services/nostr/relays/my_relay.dart';
 import 'package:camelus/services/nostr/relays/relay_address_parser.dart';
@@ -40,9 +41,13 @@ class RelayCoordinator {
   final StreamController<List<MyRelay>> _relaysStreamController =
       StreamController<List<MyRelay>>.broadcast();
 
+  Future<BlockMuteService> blockMuteServiceFuture;
+  late BlockMuteService _blockMuteService;
+
   RelayCoordinator({
     required this.dbFuture,
     required this.keyPairFuture,
+    required this.blockMuteServiceFuture,
   }) {
     _init();
   }
@@ -50,6 +55,8 @@ class RelayCoordinator {
   _init() async {
     _db = await dbFuture;
     _keyPair = (await keyPairFuture).keyPair!;
+
+    _blockMuteService = await blockMuteServiceFuture;
 
     await _initStreamOwnContacts(_keyPair.publicKey);
 
@@ -563,11 +570,13 @@ class RelayCoordinator {
     _currentlyConnectingRelays.add(relayUrl);
 
     var relay = MyRelay(
-        database: _db,
-        relayUrl: relayUrl,
-        read: read,
-        write: write,
-        persistance: persistance);
+      database: _db,
+      relayUrl: relayUrl,
+      read: read,
+      write: write,
+      persistance: persistance,
+      blockMuteService: _blockMuteService,
+    );
     try {
       await relay.connect();
     } catch (e) {

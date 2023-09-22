@@ -8,10 +8,10 @@ import 'package:camelus/models/nostr_request.dart';
 import 'package:camelus/models/nostr_request_close.dart';
 import 'package:camelus/models/nostr_request_event.dart';
 import 'package:camelus/models/nostr_request_query.dart';
+import 'package:camelus/services/nostr/metadata/block_mute_service.dart';
 import 'package:camelus/services/nostr/relays/relay_tracker.dart';
 import 'package:isar/isar.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
-
 
 class MyRelay {
   final Isar database;
@@ -40,12 +40,15 @@ class MyRelay {
 
   late DbNoteStackInsert stackInsertNotes;
 
+  BlockMuteService blockMuteService;
+
   MyRelay({
     required this.database,
     required this.persistance,
     required this.relayUrl,
     required this.read,
     required this.write,
+    required this.blockMuteService,
   }) {
     relayTracker = RelayTracker(db: database);
     stackInsertNotes = DbNoteStackInsert(db: database);
@@ -190,7 +193,11 @@ class MyRelay {
     log("unknown event: $eventJson");
   }
 
-  _insertNoteIntoDb(NostrNote note) {
+  _insertNoteIntoDb(NostrNote note) async {
+    if (blockMuteService.isPubkeyBlocked(note.pubkey)) {
+      return;
+    }
+
     stackInsertNotes.stackInsertNotes([note]);
   }
 
