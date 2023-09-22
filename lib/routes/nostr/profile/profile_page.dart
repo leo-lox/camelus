@@ -198,9 +198,10 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
 
   _perspectiveFeedTrackAndLaunch(String pubkey, bool feedback) async {
     MatomoTracker.instance.trackEvent(
-      eventCategory: 'perspectiveFeed',
-      action: 'perspectiveFeedLaunch',
-      eventValue: feedback ? 1 : 0,
+      eventInfo: EventInfo(
+          category: "perspectiveFeed",
+          action: "perspectiveFeedLaunch",
+          value: feedback ? 1 : 0),
     );
 
     log("launching perspective feed for $pubkey, feedback: $feedback");

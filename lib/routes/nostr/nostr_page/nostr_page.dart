@@ -210,10 +210,8 @@ class _NostrPageState extends ConsumerState<NostrPage>
                 title: GestureDetector(
                   onTap: () => {},
                   child: badges.Badge(
-                      animationType: badges.BadgeAnimationType.fade,
-                      toAnimate: false,
+                      badgeAnimation: const badges.BadgeAnimation.fade(),
                       showBadge: false,
-                      badgeColor: Palette.primary,
                       badgeContent: const Text(
                         "",
                         style: TextStyle(color: Colors.white),

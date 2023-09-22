@@ -58,7 +58,7 @@ class NostrDrawer extends ConsumerWidget {
                     style: TextStyle(color: Colors.white),
                   ),
                   const SizedBox(height: 40),
-                  QrImage(
+                  QrImageView(
                     data: "nostr:$nprofile",
                     version: QrVersions.auto,
                     size: 300.0,
