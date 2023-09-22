@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:camelus/components/seen_on_relays.dart';
 import 'package:camelus/config/palette.dart';
 import 'package:camelus/models/nostr_note.dart';
 import 'package:camelus/routes/nostr/blockedUsers/block_page.dart';
@@ -27,14 +28,13 @@ void openBottomSheetMore(context, NostrNote note) {
                         onTap: () {
                           // push Seen on relays
 
-                          //Navigator.push(
-                          //  context,
-                          //  MaterialPageRoute(
-                          //    builder: (context) =>
-                          //        SeenOnRelaysPage(note: note),
-                          //  ),
-                          //);
-                          //! todo: push seen on relays
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  SeenOnRelaysPage(myNote: note),
+                            ),
+                          );
                         },
                         child: Container(
                           color: Palette.background,

@@ -135,8 +135,10 @@ class RelayTracker {
   /// get called when a event advertises a relay pubkey connection
   /// timestamp can be a string or int
   void trackRelays(String personPubkey, List<String> relayUrls,
-      RelayTrackerAdvType nip, dynamic timestamp) {
+      RelayTrackerAdvType nip, dynamic timestamp) async {
     var relayUrlsCleaned = <String>[];
+
+    var oldObj = await db.dbRelayTrackers.getByPubkey(personPubkey);
 
     for (var relay in relayUrls) {
       try {
@@ -156,6 +158,7 @@ class RelayTracker {
     }
 
     List<DbRelayTrackerRelay> trackedRelays = [];
+
     for (var relayUrl in relayUrlsCleaned) {
       if (relayUrl.isEmpty) {
         continue;
@@ -167,6 +170,13 @@ class RelayTracker {
       var relay = DbRelayTrackerRelay(
         relayUrl: relayUrl,
       );
+
+      if (oldObj != null &&
+          oldObj.relays.any((element) => element.relayUrl == relayUrl)) {
+        relay =
+            oldObj.relays.firstWhere((element) => element.relayUrl == relayUrl);
+      }
+
       switch (nip) {
         case RelayTrackerAdvType.kind03:
           relay.lastSuggestedKind3 = timestamp;
@@ -186,8 +196,7 @@ class RelayTracker {
 
     var finalObj = DbRelayTracker(pubkey: personPubkey, relays: trackedRelays);
 
-    db.writeTxn(() async {
-      // also updates the object if it already exists
+    await db.writeTxn(() async {
       db.dbRelayTrackers.putByPubkey(finalObj);
     });
   }
