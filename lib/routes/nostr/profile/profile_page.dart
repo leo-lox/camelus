@@ -17,6 +17,7 @@ import 'package:camelus/providers/key_pair_provider.dart';
 import 'package:camelus/providers/metadata_provider.dart';
 import 'package:camelus/providers/nip05_provider.dart';
 import 'package:camelus/providers/relay_provider.dart';
+import 'package:camelus/routes/nostr/blockedUsers/block_page.dart';
 import 'package:camelus/routes/nostr/nostr_page/perspective_feed_page.dart';
 import 'package:camelus/services/nostr/feeds/user_and_replies_feed.dart';
 import 'package:camelus/services/nostr/metadata/following_pubkeys.dart';
@@ -99,45 +100,15 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
   }
 
   _blockUser() async {
-    // open dialog
-    var result = await showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text("Block user"),
-            content: const Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text("Are you sure you want to block this user?"),
-                SizedBox(height: 20),
-                Text("You will no longer see their posts."),
-                SizedBox(height: 10),
-                Text(
-                    "This happens only locally if you login on another client you will see their posts again.")
-              ],
-            ),
-            actions: [
-              TextButton(
-                child: const Text("Cancel"),
-                onPressed: () {
-                  Navigator.of(context).pop(false);
-                },
-              ),
-              TextButton(
-                child: const Text("Block"),
-                onPressed: () {
-                  Navigator.of(context).pop(true);
-                },
-              ),
-            ],
-          );
+    // navigate to block page
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => BlockPage(userPubkey: widget.pubkey),
+      ),
+    ).then((value) => {
+          Navigator.pop(context),
         });
-    if (!result) return;
-
-    // add to blocked list
-    //! todo: implement block list
-
-    Navigator.pop(context);
   }
 
   _openLightningAddress(String lu06) async {
