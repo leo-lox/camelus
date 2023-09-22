@@ -35,10 +35,6 @@ class _PerspectiveFeedPageState extends ConsumerState<PerspectiveFeedPage>
     _initNostrService();
   }
 
-  @override
-  void dispose() {
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {

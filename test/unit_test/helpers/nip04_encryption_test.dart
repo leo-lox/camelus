@@ -1,8 +1,6 @@
 import 'dart:convert';
-import 'dart:developer';
 
 import 'package:camelus/helpers/nip04_encryption.dart';
-import 'package:hex/hex.dart';
 import 'package:test/test.dart';
 
 void main() {

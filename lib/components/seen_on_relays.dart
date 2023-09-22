@@ -6,9 +6,7 @@ import 'package:camelus/config/palette.dart';
 import 'package:camelus/db/entities/db_relay_tracker.dart';
 import 'package:camelus/models/nostr_note.dart';
 import 'package:camelus/providers/database_provider.dart';
-import 'package:camelus/services/nostr/relays/relay_tracker.dart';
 
-import 'package:camelus/services/nostr/relays/relays_ranking.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:isar/isar.dart';

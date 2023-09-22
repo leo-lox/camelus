@@ -12,7 +12,6 @@ import 'package:camelus/services/nostr/metadata/block_mute_service.dart';
 import 'package:camelus/services/nostr/relays/relay_coordinator.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:isar/isar.dart';
 
 class BlockPage extends ConsumerStatefulWidget {
   String userPubkey;
@@ -177,11 +176,11 @@ class _BlockPageState extends ConsumerState<BlockPage> {
                       const SizedBox(width: 10),
                       FutureBuilder<DbUserMetadata?>(
                         future:
-                            metadata.getMetadataByPubkey(widget.userPubkey!),
+                            metadata.getMetadataByPubkey(widget.userPubkey),
                         builder: (context, snapshot) {
                           if (snapshot.hasData) {
                             return Text(
-                              snapshot.data?.name ?? widget.userPubkey!,
+                              snapshot.data?.name ?? widget.userPubkey,
                               style: const TextStyle(
                                   color: Palette.white,
                                   fontSize: 30,
