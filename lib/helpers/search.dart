@@ -1,8 +1,7 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:developer';
-import 'package:camelus/db/entities/db_note.dart';
-import 'package:camelus/models/nostr_note.dart';
+import 'package:camelus/db/entities/db_user_metadata.dart';
+import 'package:camelus/db/queries/db_user_metadata_queries.dart';
 import 'package:camelus/services/nostr/metadata/nip_05.dart';
 import 'package:http/http.dart' as http;
 import 'package:isar/isar.dart';
@@ -10,7 +9,7 @@ import 'package:isar/isar.dart';
 class Search {
   final Isar _db;
 
-  late Map<String, dynamic> _usersMetadata;
+  List<DbUserMetadata> _usersMetadata = [];
 
   Search(
     this._db,
@@ -21,55 +20,31 @@ class Search {
 
   // keep memory up to date with db
   void _initStream() {
-    Query<DbNote> kindZero = _db.dbNotes.filter().kindEqualTo(0).build();
-
-    kindZero.watch(fireImmediately: true).listen((event) {
-      List<NostrNote> notesMetadata =
-          event.map((e) => e.toNostrNote()).toList();
-
-      for (var note in notesMetadata) {
-        try {
-          _usersMetadata[note.pubkey] = jsonDecode(note.content);
-        } catch (e) {
-          log("error decoding user metadata: $e");
-        }
-      }
+    DbUserMetadataQueries.getAllStream(_db).listen((event) {
+      _usersMetadata = event;
     });
   }
 
   void _init() async {
     // keep users metadata in memory
-    Query<DbNote> kindZero = _db.dbNotes.filter().kindEqualTo(0).build();
-
-    var notesDb = await kindZero.findAll();
-    List<NostrNote> notesMetadata =
-        notesDb.map((e) => e.toNostrNote()).toList();
-
-    _usersMetadata = {};
-    for (var note in notesMetadata) {
-      try {
-        _usersMetadata[note.pubkey] = jsonDecode(note.content);
-      } catch (e) {
-        log("error decoding user metadata: $e");
-      }
-    }
+    _usersMetadata = await DbUserMetadataQueries.getAllFuture(_db);
   }
 
-  List<Map<String, dynamic>> searchUsersMetadata(String query) {
+  List<DbUserMetadata> searchUsersMetadata(String query) {
     //search in notes title and content
-    List<Map<String, dynamic>> results = [];
+    List<DbUserMetadata> results = [];
 
-    for (var entry in _usersMetadata.entries) {
-      var name = entry.value['name'] ?? '';
-      var nip05 = entry.value['nip05'] ?? '';
+    for (var entry in _usersMetadata) {
+      final name = entry.name ?? '';
+      final nip05 = entry.nip05 ?? '';
 
       if (name.toLowerCase().contains(query.toLowerCase()) ||
           nip05.toLowerCase().contains(query.toLowerCase())) {
         // check if already in results
-        if (results.any((element) => element['pubkey'] == entry.key)) {
+        if (results.any((element) => element.pubkey == entry.pubkey)) {
           continue;
         }
-        results.add({...entry.value, "pubkey": entry.key});
+        results.add(entry);
       }
     }
 

@@ -5,6 +5,7 @@ import 'dart:developer';
 import 'package:camelus/atoms/hashtag_card.dart';
 import 'package:camelus/atoms/person_card.dart';
 import 'package:camelus/config/palette.dart';
+import 'package:camelus/db/entities/db_user_metadata.dart';
 import 'package:camelus/db/queries/db_note_queries.dart';
 import 'package:camelus/helpers/helpers.dart';
 import 'package:camelus/helpers/nprofile_helper.dart';
@@ -43,7 +44,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
 
   bool _isSearching = false;
 
-  List<Map<String, dynamic>> _searchResults = [];
+  List<DbUserMetadata> _searchResultsUsers = [];
 
   _listenToNavigationBar() {
     // listen to home bar
@@ -147,12 +148,12 @@ class _SearchPageState extends ConsumerState<SearchPage> {
   void _onSearchChanged(String value) async {
     if (value.length <= 1) {
       setState(() {
-        _searchResults = [];
+        _searchResultsUsers = [];
       });
       return;
     }
     var metadata = ref.watch(metadataProvider);
-    List<Map<String, dynamic>> workingMetadata = [];
+    List<DbUserMetadata> workingMetadata = [];
 
     workingMetadata.addAll(_search.searchUsersMetadata(value));
 
@@ -198,14 +199,12 @@ class _SearchPageState extends ConsumerState<SearchPage> {
       var personMetadata = await metadata.getMetadataByPubkey(hex);
 
       if (personMetadata != null) {
-        workingMetadata.add(personMetadata as Map<String, dynamic>);
+        workingMetadata.add(personMetadata);
         personMetadata.pubkey = hex;
       } else {
-        workingMetadata.add({
-          'pubkey': value,
-          'name': value,
-          'relays': [],
-        });
+        final mockUser = DbUserMetadata(
+            pubkey: value, nostr_id: "", last_fetch: 0, name: value);
+        workingMetadata.add(mockUser);
       }
     }
 
@@ -230,15 +229,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
         var personMetadata = await metadata.getMetadataByPubkey(nipPubkey);
         personMetadata!.pubkey = nipPubkey;
 
-        if (personMetadata != null) {
-          workingMetadata.add(personMetadata as Map<String, dynamic>);
-        } else {
-          workingMetadata.add({
-            'pubkey': nipPubkey,
-            'name': value,
-            'relays': nipRelays,
-          });
-        }
+        workingMetadata.add(personMetadata);
       }
     }
 
@@ -254,7 +245,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
     }
 
     setState(() {
-      _searchResults = workingMetadata;
+      _searchResultsUsers = workingMetadata;
     });
   }
 
@@ -350,23 +341,23 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                         Column(
                           children: [
                             // search results
-                            for (var result in _searchResults)
+                            for (var result in _searchResultsUsers)
                               PersonCard(
-                                name: result['name'] ?? '',
-                                nip05: result['nip05'] ?? '',
-                                pictureUrl: result['picture'] ?? '',
-                                about: result['about'] ?? '',
-                                pubkey: result['pubkey'] ?? '',
+                                name: result.name ?? '',
+                                nip05: result.nip05 ?? '',
+                                pictureUrl: result.picture ?? '',
+                                about: result.about ?? '',
+                                pubkey: result.pubkey,
                                 isFollowing: ownFollowingSnapshot.data!.any(
                                     (element) =>
-                                        element.value == result['pubkey']),
+                                        element.value == result.pubkey),
                                 onTap: () {
                                   // navigate to profile page
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
                                       builder: (context) => ProfilePage(
-                                        pubkey: result['pubkey'],
+                                        pubkey: result.pubkey,
                                       ),
                                     ),
                                   );
@@ -374,7 +365,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                                 onFollowTab: (followState) {
                                   _changeFollowing(
                                     followState,
-                                    result['pubkey'],
+                                    result.pubkey,
                                     ownFollowingSnapshot.data!,
                                   );
                                 },

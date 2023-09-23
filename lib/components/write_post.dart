@@ -1,6 +1,5 @@
 import 'dart:developer';
 import 'dart:io';
-
 import 'package:camelus/atoms/picture.dart';
 import 'package:camelus/db/entities/db_user_metadata.dart';
 import 'package:camelus/helpers/nprofile_helper.dart';
@@ -68,23 +67,17 @@ class _WritePostState extends ConsumerState<WritePost> {
   _searchMentions(search) async {
     List<Map<String, dynamic>> results = [];
 
-    results = _search.searchUsersMetadata(search);
-
-    for (var result in results) {
-      result['id'] = result['pubkey'];
-      if (result['picture'] == null) {
-        result['picture'] = "";
-      }
-
-      if (result['nip05'] == null) {
-        result['nip05'] = "";
-      }
-
-      if (result['name'] == null) {
-        result['display'] = "";
-      }
-      // rename name to display
-      result['display'] = result['name'];
+    var rawResults = _search.searchUsersMetadata(search);
+    for (var rawResult in rawResults) {
+      var result = {
+        "id": rawResult.pubkey,
+        "pubkey": rawResult.pubkey,
+        "display": rawResult.name ?? "",
+        "name": rawResult.name ?? "",
+        "picture": rawResult.picture ?? "",
+        "nip05": rawResult.nip05 ?? "",
+      };
+      results.add(result);
     }
 
     // keep data from already mentioned users

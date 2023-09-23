@@ -27,6 +27,12 @@ abstract class DbUserMetadataQueries {
     return db.dbUserMetadatas.filter().nostr_idIsNotEmpty().build();
   }
 
+  static Future<List<DbUserMetadata>> getAllFuture(
+    Isar db,
+  ) {
+    return getAllQuery(db).findAll();
+  }
+
   static Stream<List<DbUserMetadata>> getAllStream(
     Isar db,
   ) {
