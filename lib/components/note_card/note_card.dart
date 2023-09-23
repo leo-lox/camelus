@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:ui';
 
 import 'package:camelus/atoms/my_profile_picture.dart';
@@ -36,7 +37,7 @@ class _NoteCardState extends ConsumerState<NoteCard> {
   }
 
   late UserMetadata metadata;
-  late Future<DbUserMetadata?> myMetadata;
+
   late NoteCardSplitContent splitContent;
 
   void _splitContent() {
@@ -50,7 +51,6 @@ class _NoteCardState extends ConsumerState<NoteCard> {
   void initState() {
     super.initState();
     metadata = ref.read(metadataProvider);
-    myMetadata = metadata.getMetadataByPubkey(widget.note.pubkey);
     _splitContent();
   }
 
@@ -60,7 +60,6 @@ class _NoteCardState extends ConsumerState<NoteCard> {
     if (oldWidget.note.id != widget.note.id) {
       _splitContent();
       metadata = ref.watch(metadataProvider);
-      myMetadata = metadata.getMetadataByPubkey(widget.note.pubkey);
     }
   }
 
@@ -98,12 +97,23 @@ class _NoteCardState extends ConsumerState<NoteCard> {
                     child: StreamBuilder<DbUserMetadata?>(
                         stream: metadata
                             .getMetadataByPubkeyStream(widget.note.pubkey),
-                        initialData: metadata
-                            .getMetadataByPubkeyInitial(widget.note.pubkey),
-                        builder: (context, snapshot) {
-                          return UserImage(
+                        //initialData: metadata
+                        //    .getMetadataByPubkeyInitial(widget.note.pubkey),
+                        builder:
+                            (context, AsyncSnapshot<DbUserMetadata?> snapshot) {
+                          if (snapshot.hasData) {
+                            return UserImage(
                               myMetadata: snapshot.data,
-                              pubkey: widget.note.pubkey);
+                              pubkey: widget.note.pubkey,
+                            );
+                          } else if (snapshot.hasError) {
+                            return Text('Error: ${snapshot.error}');
+                          } else {
+                            return UserImage(
+                              myMetadata: null,
+                              pubkey: widget.note.pubkey,
+                            );
+                          }
                         }),
                   ),
                   Expanded(
@@ -119,7 +129,8 @@ class _NoteCardState extends ConsumerState<NoteCard> {
                           children: [
                             NoteCardNameRow(
                               created_at: widget.note.created_at,
-                              myMetadata: myMetadata,
+                              myMetadata: metadata.getMetadataByPubkeyStream(
+                                  widget.note.pubkey),
                               pubkey: widget.note.pubkey,
                               openMore: () =>
                                   openBottomSheetMore(context, widget.note),

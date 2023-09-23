@@ -128,7 +128,10 @@ class NoteCardSplitContent {
     final String pubkeyHr =
         "${pubkeyBech.substring(0, 5)}:${pubkeyBech.substring(pubkeyBech.length - 5)}";
 
-    var metadata = _metadataProvider.getMetadataByPubkey(myPubkeyHex);
+    var metadata =
+        _metadataProvider.getMetadataByPubkeyStream(myPubkeyHex).first.timeout(
+              const Duration(seconds: 2),
+            );
 
     return GestureDetector(
       onTap: () {
@@ -171,7 +174,10 @@ class NoteCardSplitContent {
     var pubkeyHr =
         "${pubkeyBech.substring(0, 5)}...${pubkeyBech.substring(pubkeyBech.length - 5)}";
     _tagsMetadata[tag.value] = pubkeyHr;
-    var metadata = _metadataProvider.getMetadataByPubkey(tag.value);
+    var metadata =
+        _metadataProvider.getMetadataByPubkeyStream(tag.value).first.timeout(
+              const Duration(seconds: 2),
+            );
 
     return GestureDetector(
       onTap: () {

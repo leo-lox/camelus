@@ -88,7 +88,7 @@ class UserMetadata {
   }
 
   _setupDbLisener(Isar db) {
-    dbStream = DbUserMetadataQueries.getAllStream(_db);
+    dbStream = DbUserMetadataQueries.getAllStream(_db).asBroadcastStream();
   }
 
   DbUserMetadata? getMetadataByPubkeyInitial(String pubkey) {
@@ -103,36 +103,38 @@ class UserMetadata {
     return result;
   }
 
-  Stream<DbUserMetadata?> getMetadataByPubkeyStream(String pubkey) async* {
+  Stream<DbUserMetadata?> getMetadataByPubkeyStream(String pubkey) {
+    return _getMetadataByPubkeyStream(pubkey).asBroadcastStream();
+  }
+
+  Stream<DbUserMetadata?> _getMetadataByPubkeyStream(String pubkey) async* {
+    await _serviceRdy.future;
+    try {
+      final result =
+          usersMetadata.firstWhere((element) => element.pubkey == pubkey);
+
+      yield result;
+    } catch (e) {
+      // fetch from nostr network
+      _getMetadataByPubkeyFromNetwork(pubkey);
+    }
+
+    // setup listener
     await for (var i in dbStream) {
       if (i.any((element) => element.pubkey == pubkey)) {
-        log("found metadata in stream");
-        //yield i.firstWhere((element) => element.pubkey == pubkey);
-      } else {
-        // check if pubkey is already in waiting pool
-        if ((_metadataWaitingPool.contains(pubkey))) {
-          //continue;
-        }
-        //_metadataWaitingPool.add(pubkey);
-        //_requestMetadata([pubkey], "requestId");
+        final result = i.firstWhere((element) => element.pubkey == pubkey);
+
+        yield result;
+        return; // output only once
       }
     }
   }
 
-  Future<DbUserMetadata?> getMetadataByPubkey(String pubkey,
-      {bool force = false}) async {
+  Future _getMetadataByPubkeyFromNetwork(String pubkey) async {
     await _serviceRdy.future;
     var now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
     if (pubkey.isEmpty) {
       return Future(() => null);
-    }
-
-    // return from cache if available
-    var cachedMetadata =
-        usersMetadata.where((element) => element.pubkey == pubkey).firstOrNull;
-
-    if (cachedMetadata != null && !force) {
-      return cachedMetadata;
     }
 
     // check if pubkey is already in waiting pool

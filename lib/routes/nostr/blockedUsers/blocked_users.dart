@@ -107,8 +107,8 @@ class _BlockedUsersState extends ConsumerState<BlockedUsers> {
 
 Widget _profile(String pubkey, widget, BlockMuteService muteService,
     UserMetadata userMetadata, RelayCoordinator relayService) {
-  return FutureBuilder<DbUserMetadata?>(
-      future: userMetadata.getMetadataByPubkey(pubkey),
+  return StreamBuilder<DbUserMetadata?>(
+      stream: userMetadata.getMetadataByPubkeyStream(pubkey),
       builder: (BuildContext context, AsyncSnapshot<DbUserMetadata?> snapshot) {
         String picture = "";
         String name = "";
@@ -126,7 +126,7 @@ Widget _profile(String pubkey, widget, BlockMuteService muteService,
         } else {
           // loading
           picture = "https://avatars.dicebear.com/api/personas/$pubkey.svg";
-          name = "loading...";
+          name = Helpers().encodeBech32(pubkey, "npub");
           about = "";
         }
 

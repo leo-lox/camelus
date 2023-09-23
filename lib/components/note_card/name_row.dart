@@ -1,4 +1,3 @@
-
 import 'package:camelus/config/palette.dart';
 import 'package:camelus/db/entities/db_user_metadata.dart';
 import 'package:camelus/helpers/helpers.dart';
@@ -9,7 +8,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 class NoteCardNameRow extends ConsumerStatefulWidget {
-  final Future<DbUserMetadata?> myMetadata;
+  final Stream<DbUserMetadata?> myMetadata;
   final String pubkey;
   final int created_at;
   final Function openMore;
@@ -46,9 +45,6 @@ class _NoteCardNameRowState extends ConsumerState<NoteCardNameRow> {
   }
 
   void _initSqeuence() async {
-    var metadata = await widget.myMetadata;
-    _checkNip05(metadata?.nip05 ?? "", widget.pubkey);
-
     var npubHr = Helpers().encodeBech32(widget.pubkey, "npub");
     npubHrShort =
         "${npubHr.substring(0, 4)}...${npubHr.substring(npubHr.length - 4)}";
@@ -66,19 +62,21 @@ class _NoteCardNameRowState extends ConsumerState<NoteCardNameRow> {
         //mainAxisAlignment: MainAxisAlignment.end,
         //crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          FutureBuilder<DbUserMetadata?>(
-              future: widget.myMetadata,
+          StreamBuilder<DbUserMetadata?>(
+              stream: widget.myMetadata,
               builder: (BuildContext context,
                   AsyncSnapshot<DbUserMetadata?> snapshot) {
                 var name = "";
 
                 if (snapshot.hasData) {
                   name = snapshot.data?.name ?? npubHrShort;
+                  if (snapshot.data?.nip05 != null) {
+                    _checkNip05(snapshot.data!.nip05!, widget.pubkey);
+                  }
                 } else if (snapshot.hasError) {
                   name = "error";
                 } else {
-                  // loading
-                  name = "loading";
+                  name = snapshot.data?.name ?? npubHrShort;
                 }
 
                 return Row(

@@ -1,4 +1,3 @@
-
 import 'package:camelus/components/note_card/note_card.dart';
 import 'package:camelus/config/palette.dart';
 import 'package:camelus/db/entities/db_user_metadata.dart';
@@ -194,7 +193,7 @@ Widget linkedUsername(
     onTap: () {
       Navigator.pushNamed(context, "/nostr/profile", arguments: pubkey);
     },
-    child: FutureBuilder(
+    child: StreamBuilder(
       builder: (context, AsyncSnapshot<DbUserMetadata?> snapshot) {
         var pubkeyBech = Helpers().encodeBech32(pubkey, "npub");
         var pubkeyHr =
@@ -209,7 +208,7 @@ Widget linkedUsername(
                   color: Palette.primary, fontSize: 16, height: 1.3));
         }
       },
-      future: metadata.getMetadataByPubkey(pubkey),
+      stream: metadata.getMetadataByPubkeyStream(pubkey),
     ),
   );
 }
