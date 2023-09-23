@@ -280,8 +280,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                       animationDuration: const Duration(milliseconds: 100),
                       expansionCallback: (int index, bool isExpanded) {
                         setState(() {
-                          isExpanded = !isExpanded;
-                          isKeysExpanded = isExpanded;
+                          isKeysExpanded = !isKeysExpanded;
                         });
                         if (isKeysExpanded) {
                           // wait for expansion animation to finish
