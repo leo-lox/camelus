@@ -223,11 +223,16 @@ class _EditRelaysViewState extends ConsumerState<EditRelaysView> {
                               Checkbox(
                                 activeColor: Palette.lightGray,
                                 checkColor: Palette.black,
-                                value: relay.value["read"]!,
+                                value: relay.value["read"] ?? false,
                                 onChanged: (value) {
                                   setState(() {
                                     touched = true;
-                                    relay.value["read"] = !relay.value["read"]!;
+                                    if (relay.value["read"] != null) {
+                                      relay.value["read"] =
+                                          !relay.value["read"]!;
+                                    } else {
+                                      relay.value["read"] = true;
+                                    }
                                   });
                                 },
 
@@ -246,12 +251,16 @@ class _EditRelaysViewState extends ConsumerState<EditRelaysView> {
                               Checkbox(
                                 activeColor: Palette.lightGray,
                                 checkColor: Palette.black,
-                                value: relay.value["write"]!,
+                                value: relay.value["write"] ?? false,
                                 onChanged: (value) {
                                   setState(() {
                                     touched = true;
-                                    relay.value["write"] =
-                                        !relay.value["write"]!;
+                                    if (relay.value["write"] != null) {
+                                      relay.value["write"] =
+                                          !relay.value["write"]!;
+                                    } else {
+                                      relay.value["write"] = true;
+                                    }
                                   });
                                 },
                               ),
@@ -314,7 +323,8 @@ class _EditRelaysViewState extends ConsumerState<EditRelaysView> {
                   ),
                 const SizedBox(height: 10),
                 Padding(
-                  padding: const EdgeInsets.only(left: 20, right: 20, bottom: 10),
+                  padding:
+                      const EdgeInsets.only(left: 20, right: 20, bottom: 10),
                   child: longButton(
                     name: "save",
                     onPressed: _saveRelays,
