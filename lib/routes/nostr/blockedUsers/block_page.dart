@@ -174,9 +174,9 @@ class _BlockPageState extends ConsumerState<BlockPage> {
                           style: TextStyle(
                               color: Palette.lightGray, fontSize: 20)),
                       const SizedBox(width: 10),
-                      FutureBuilder<DbUserMetadata?>(
-                        future:
-                            metadata.getMetadataByPubkey(widget.userPubkey),
+                      StreamBuilder<DbUserMetadata?>(
+                        stream: metadata
+                            .getMetadataByPubkeyStream(widget.userPubkey),
                         builder: (context, snapshot) {
                           if (snapshot.hasData) {
                             return Text(

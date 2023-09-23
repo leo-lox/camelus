@@ -196,7 +196,10 @@ class _SearchPageState extends ConsumerState<SearchPage> {
         hex = value;
       }
 
-      var personMetadata = await metadata.getMetadataByPubkey(hex);
+      var personMetadata =
+          await metadata.getMetadataByPubkeyStream(hex).first.timeout(
+                const Duration(seconds: 1),
+              );
 
       if (personMetadata != null) {
         workingMetadata.add(personMetadata);
@@ -226,7 +229,10 @@ class _SearchPageState extends ConsumerState<SearchPage> {
         final String nipPubkey = nip05Metadata['pubkey'];
         final List nipRelays = nip05Metadata['relays'];
 
-        var personMetadata = await metadata.getMetadataByPubkey(nipPubkey);
+        var personMetadata = await metadata
+            .getMetadataByPubkeyStream(nipPubkey)
+            .first
+            .timeout(Duration(seconds: 1));
         personMetadata!.pubkey = nipPubkey;
 
         workingMetadata.add(personMetadata);

@@ -182,8 +182,9 @@ class _NostrPageState extends ConsumerState<NostrPage>
                       color: Palette.primary,
                       shape: BoxShape.circle,
                     ),
-                    child: FutureBuilder<DbUserMetadata?>(
-                        future: metadata.getMetadataByPubkey(widget.pubkey),
+                    child: StreamBuilder<DbUserMetadata?>(
+                        stream:
+                            metadata.getMetadataByPubkeyStream(widget.pubkey),
                         builder: (BuildContext context,
                             AsyncSnapshot<DbUserMetadata?> snapshot) {
                           var picture = "";

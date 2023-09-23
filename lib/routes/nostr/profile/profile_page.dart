@@ -405,8 +405,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                         ? 1.0
                         : 0.0,
                     duration: const Duration(milliseconds: 200),
-                    child: FutureBuilder<DbUserMetadata?>(
-                        future: metadata.getMetadataByPubkey(widget.pubkey),
+                    child: StreamBuilder<DbUserMetadata?>(
+                        stream:
+                            metadata.getMetadataByPubkeyStream(widget.pubkey),
                         builder: (BuildContext context,
                             AsyncSnapshot<DbUserMetadata?> snapshot) {
                           var name = "";
@@ -417,8 +418,8 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                           } else if (snapshot.hasError) {
                             name = "error";
                           } else {
-                            // loading
-                            name = "loading";
+                            name = snapshot.data?.name ??
+                                '${widget.nProfile.substring(0, 10)}...${widget.nProfile.substring(widget.pubkey.length - 10)}';
                           }
 
                           return Text(
@@ -636,8 +637,8 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
   Container _profileInformation(UserMetadata metadata) {
     return Container(
       transform: Matrix4.translationValues(0.0, -10.0, 0.0),
-      child: FutureBuilder<DbUserMetadata?>(
-        future: metadata.getMetadataByPubkey(widget.pubkey),
+      child: StreamBuilder<DbUserMetadata?>(
+        stream: metadata.getMetadataByPubkeyStream(widget.pubkey),
         builder:
             (BuildContext context, AsyncSnapshot<DbUserMetadata?> snapshot) {
           var name = "";
@@ -659,10 +660,10 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
             about = "error";
           } else {
             // loading
-            name = "loading";
-            nip05 = "loading";
-            picture = "";
-            about = "loading";
+            name = snapshot.data?.name ?? "";
+            nip05 = snapshot.data?.nip05 ?? "";
+            picture = snapshot.data?.picture ?? "";
+            about = snapshot.data?.about ?? "";
           }
 
           return Column(
@@ -808,8 +809,8 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
           // ),
 
           // round message button with icon and white border
-          FutureBuilder<DbUserMetadata?>(
-              future: metadata.getMetadataByPubkey(widget.pubkey),
+          StreamBuilder<DbUserMetadata?>(
+              stream: metadata.getMetadataByPubkeyStream(widget.pubkey),
               builder: (BuildContext context,
                   AsyncSnapshot<DbUserMetadata?> snapshot) {
                 String lud06 = "";
@@ -866,7 +867,6 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                     builder: (context) => const EditProfilePage(),
                   ),
                 ).then((value) => {
-                      metadata.getMetadataByPubkey(widget.pubkey),
                       setState(() {
                         // refresh
                       })
@@ -920,8 +920,8 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
 
   FlexibleSpaceBar _bannerImage(UserMetadata metadata) {
     return FlexibleSpaceBar(
-        background: FutureBuilder<DbUserMetadata?>(
-      future: metadata.getMetadataByPubkey(widget.pubkey),
+        background: StreamBuilder<DbUserMetadata?>(
+      stream: metadata.getMetadataByPubkeyStream(widget.pubkey),
       builder: (context, snapshot) {
         if (snapshot.hasData && snapshot.data?.banner != null) {
           return CachedNetworkImage(
@@ -1012,8 +1012,8 @@ Widget _profileImage(
           border: Border.all(color: Palette.background, width: 3),
           shape: BoxShape.circle,
         ),
-        child: FutureBuilder<DbUserMetadata?>(
-            future: metadata.getMetadataByPubkey(widget.pubkey),
+        child: StreamBuilder<DbUserMetadata?>(
+            stream: metadata.getMetadataByPubkeyStream(widget.pubkey),
             builder: (BuildContext context,
                 AsyncSnapshot<DbUserMetadata?> snapshot) {
               var picture = "";

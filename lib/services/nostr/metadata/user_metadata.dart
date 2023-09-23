@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:camelus/db/entities/db_note.dart';
 import 'package:camelus/db/entities/db_user_metadata.dart';
@@ -35,6 +36,8 @@ class UserMetadata {
 
   final Completer _serviceRdy = Completer();
 
+  late Stream<List<DbUserMetadata>> dbStream;
+
   UserMetadata({
     required this.relays,
     required this.dbFuture,
@@ -53,6 +56,7 @@ class UserMetadata {
     _restoreCache().then((_) => {_removeOldData()});
     _initDb();
     _setupDbMetadataListener();
+    _setupDbLisener(_db);
     _serviceRdy.complete();
   }
 
@@ -83,20 +87,54 @@ class UserMetadata {
     });
   }
 
-  Future<DbUserMetadata?> getMetadataByPubkey(String pubkey,
-      {bool force = false}) async {
+  _setupDbLisener(Isar db) {
+    dbStream = DbUserMetadataQueries.getAllStream(_db).asBroadcastStream();
+  }
+
+  DbUserMetadata? getMetadataByPubkeyInitial(String pubkey) {
+    DbUserMetadata? result;
+    try {
+      result = usersMetadata.where((element) => element.pubkey == pubkey)
+          as DbUserMetadata?;
+    } catch (e) {
+      //
+    }
+
+    return result;
+  }
+
+  Stream<DbUserMetadata?> getMetadataByPubkeyStream(String pubkey) {
+    return _getMetadataByPubkeyStream(pubkey).asBroadcastStream();
+  }
+
+  Stream<DbUserMetadata?> _getMetadataByPubkeyStream(String pubkey) async* {
+    await _serviceRdy.future;
+    try {
+      final result =
+          usersMetadata.firstWhere((element) => element.pubkey == pubkey);
+
+      yield result;
+    } catch (e) {
+      // fetch from nostr network
+      _getMetadataByPubkeyFromNetwork(pubkey);
+    }
+
+    // setup listener
+    await for (var i in dbStream) {
+      if (i.any((element) => element.pubkey == pubkey)) {
+        final result = i.firstWhere((element) => element.pubkey == pubkey);
+
+        yield result;
+        return; // output only once
+      }
+    }
+  }
+
+  Future _getMetadataByPubkeyFromNetwork(String pubkey) async {
     await _serviceRdy.future;
     var now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
     if (pubkey.isEmpty) {
       return Future(() => null);
-    }
-
-    // return from cache if available
-    var cachedMetadata =
-        usersMetadata.where((element) => element.pubkey == pubkey).firstOrNull;
-
-    if (cachedMetadata != null && !force) {
-      return cachedMetadata;
     }
 
     // check if pubkey is already in waiting pool

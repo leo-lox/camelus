@@ -35,13 +35,12 @@ class _PerspectiveFeedPageState extends ConsumerState<PerspectiveFeedPage>
     _initNostrService();
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: FutureBuilder(
-          future: _metadata.getMetadataByPubkey(widget.pubkey),
+        title: StreamBuilder(
+          stream: _metadata.getMetadataByPubkeyStream(widget.pubkey),
           builder: (BuildContext context, AsyncSnapshot snapshot) {
             if (snapshot.hasData) {
               return Text("perspective of ${snapshot.data['name']}");

@@ -86,7 +86,8 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
   }
 
   Future<void> _loadProfileValues() async {
-    var profileData = await _metadataService.getMetadataByPubkey(pubkey);
+    var profileData =
+        await _metadataService.getMetadataByPubkeyStream(pubkey).first;
     setState(() {
       loading = false;
     });

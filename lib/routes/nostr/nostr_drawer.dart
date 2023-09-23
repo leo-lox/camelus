@@ -97,8 +97,8 @@ class NostrDrawer extends ConsumerWidget {
                   color: Palette.primary,
                   shape: BoxShape.circle,
                 ),
-                child: FutureBuilder<DbUserMetadata?>(
-                    future: metadata.getMetadataByPubkey(pubkey),
+                child: StreamBuilder<DbUserMetadata?>(
+                    stream: metadata.getMetadataByPubkeyStream(pubkey),
                     builder: (BuildContext context,
                         AsyncSnapshot<DbUserMetadata?> snapshot) {
                       var picture = "";
@@ -134,8 +134,8 @@ class NostrDrawer extends ConsumerWidget {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    FutureBuilder<DbUserMetadata?>(
-                        future: metadata.getMetadataByPubkey(pubkey),
+                    StreamBuilder<DbUserMetadata?>(
+                        stream: metadata.getMetadataByPubkeyStream(pubkey),
                         builder: (BuildContext context,
                             AsyncSnapshot<DbUserMetadata?> snapshot) {
                           var name = "";
@@ -149,8 +149,8 @@ class NostrDrawer extends ConsumerWidget {
                             nip05 = "error";
                           } else {
                             // loading
-                            name = "loading";
-                            nip05 = "loading";
+                            name = snapshot.data?.name ?? "";
+                            nip05 = snapshot.data?.nip05 ?? "";
                           }
 
                           return Column(

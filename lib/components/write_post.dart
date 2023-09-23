@@ -629,9 +629,9 @@ class _WritePostState extends ConsumerState<WritePost> {
           Column(
             children: [
               // get metadata
-              FutureBuilder<DbUserMetadata?>(
-                  future: metadata
-                      .getMetadataByPubkey(widget.context!.replyToNote.pubkey),
+              StreamBuilder<DbUserMetadata?>(
+                  stream: metadata.getMetadataByPubkeyStream(
+                      widget.context!.replyToNote.pubkey),
                   builder: (BuildContext context,
                       AsyncSnapshot<DbUserMetadata?> snapshot) {
                     var name = "";

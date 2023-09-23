@@ -105,39 +105,55 @@ class _FollowerPageState extends ConsumerState<FollowerPage> {
                 itemCount: widget.contacts.length,
                 itemBuilder: (context, index) {
                   var displayPubkey = widget.contacts[index].value;
-                  return FutureBuilder<DbUserMetadata?>(
-                      future: metadata.getMetadataByPubkey(displayPubkey),
+                  return StreamBuilder<DbUserMetadata?>(
+                      stream: metadata.getMetadataByPubkeyStream(displayPubkey),
                       builder: (BuildContext context, metadataSnapshot) {
-                        return PersonCard(
-                          pubkey: displayPubkey,
-                          name: metadataSnapshot.data?.name ?? "",
-                          pictureUrl: metadataSnapshot.data?.picture ?? "",
-                          about: metadataSnapshot.data?.about ?? "",
-                          nip05: metadataSnapshot.data?.nip05 ?? "",
-                          isFollowing: ownFollowingSnapshot.data!
-                              .any((element) => element.value == displayPubkey),
-                          onTap: () {
-                            // navigate to profile page
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => ProfilePage(
-                                  pubkey: displayPubkey,
-                                ),
-                              ),
-                            );
-                          },
-                          onFollowTab: (followState) {
-                            _changeFollowing(
-                              followState,
-                              displayPubkey,
-                              ownFollowingSnapshot.data!,
-                            );
-                          },
-                        );
+                        if (metadataSnapshot.hasData) {
+                          return personCard(displayPubkey, metadataSnapshot,
+                              ownFollowingSnapshot, context);
+                        } else if (metadataSnapshot.hasError) {
+                          return Text('Error: ${metadataSnapshot.error}');
+                        } else {
+                          return personCard(displayPubkey, metadataSnapshot,
+                              ownFollowingSnapshot, context);
+                        }
                       });
                 });
           }),
+    );
+  }
+
+  PersonCard personCard(
+      String displayPubkey,
+      AsyncSnapshot<DbUserMetadata?> metadataSnapshot,
+      AsyncSnapshot<List<NostrTag>> ownFollowingSnapshot,
+      BuildContext context) {
+    return PersonCard(
+      pubkey: displayPubkey,
+      name: metadataSnapshot.data?.name ?? "",
+      pictureUrl: metadataSnapshot.data?.picture ?? "",
+      about: metadataSnapshot.data?.about ?? "",
+      nip05: metadataSnapshot.data?.nip05 ?? "",
+      isFollowing: ownFollowingSnapshot.data!
+          .any((element) => element.value == displayPubkey),
+      onTap: () {
+        // navigate to profile page
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ProfilePage(
+              pubkey: displayPubkey,
+            ),
+          ),
+        );
+      },
+      onFollowTab: (followState) {
+        _changeFollowing(
+          followState,
+          displayPubkey,
+          ownFollowingSnapshot.data!,
+        );
+      },
     );
   }
 }
