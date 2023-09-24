@@ -68,20 +68,29 @@ class NoteCardSplitContent {
       List<String> words = line.split(" ");
       for (var word in words) {
         if (profilePattern.hasMatch(word)) {
-          widgets.add(_buildProfileLink(word));
+          widgets.add(ProfileLink(
+            metadataProvider: _metadataProvider,
+            profileCallback: _profileCallback,
+            word: word,
+          ));
         } else if (notePattern.hasMatch(word)) {
-          //widgets.add(_buildText("TEXTBUILD"));
           widgets.add(NoteCardReference(word: word));
         } else if (word.startsWith("#[")) {
-          widgets.add(_buildLegacyMentionHashtag(word));
+          widgets.add(LegacyMentionHashtag(
+              note: _note,
+              tagsMetadata: _tagsMetadata,
+              metadataProvider: _metadataProvider,
+              profileCallback: _profileCallback,
+              word: word));
         } else if (word.startsWith("#")) {
-          widgets.add(_buildHashtagLink(word));
+          widgets
+              .add(HashtagLink(hashtagCallback: _hashtagCallback, word: word));
         } else if (word.startsWith("http")) {
-          widgets.add(_buildLink(word));
+          widgets.add(HttpLink(imageLinks: imageLinks, word: word));
         } else {
-          widgets.add(_buildText(word));
+          widgets.add(DisplayText(word: word));
         }
-        widgets.add(_buildText(" "));
+        widgets.add(DisplayText(word: " "));
       }
       widgets.removeLast(); // remove last space
       //widgets.add(_buildText("\n")); // add back the original line break
@@ -108,8 +117,161 @@ class NoteCardSplitContent {
 
     return imageLinks;
   }
+}
 
-  Widget _buildProfileLink(String word) {
+class DisplayText extends StatelessWidget {
+  const DisplayText({
+    super.key,
+    required this.word,
+  });
+
+  final String word;
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      word,
+      style: const TextStyle(color: Palette.lightGray, fontSize: 17),
+    );
+  }
+}
+
+class HttpLink extends StatelessWidget {
+  const HttpLink({
+    super.key,
+    required this.imageLinks,
+    required this.word,
+  });
+
+  final List<String> imageLinks;
+  final String word;
+
+  @override
+  Widget build(BuildContext context) {
+    if (imageLinks.contains(word)) {
+      return const SizedBox(height: 0, width: 0);
+    }
+
+    return GestureDetector(
+      onTap: () {
+        launchUrlString(word, mode: LaunchMode.externalApplication);
+      },
+      child: Text(
+        word,
+        style: const TextStyle(color: Palette.primary, fontSize: 17),
+      ),
+    );
+  }
+}
+
+class HashtagLink extends StatelessWidget {
+  const HashtagLink({
+    super.key,
+    required Function(String p1) hashtagCallback,
+    required this.word,
+  }) : _hashtagCallback = hashtagCallback;
+
+  final Function(String p1) _hashtagCallback;
+  final String word;
+
+  @override
+  Widget build(BuildContext context) {
+    String hashtag = word.substring(1);
+
+    return GestureDetector(
+      onTap: () {
+        _hashtagCallback(hashtag);
+      },
+      child: Text(
+        word,
+        style: const TextStyle(color: Palette.primary, fontSize: 17),
+      ),
+    );
+  }
+}
+
+class LegacyMentionHashtag extends StatelessWidget {
+  const LegacyMentionHashtag({
+    super.key,
+    required NostrNote note,
+    required Map<String, dynamic> tagsMetadata,
+    required UserMetadata metadataProvider,
+    required Function(String p1) profileCallback,
+    required this.word,
+  })  : _note = note,
+        _tagsMetadata = tagsMetadata,
+        _metadataProvider = metadataProvider,
+        _profileCallback = profileCallback;
+
+  final NostrNote _note;
+  final Map<String, dynamic> _tagsMetadata;
+  final UserMetadata _metadataProvider;
+  final Function(String p1) _profileCallback;
+  final String word;
+
+  @override
+  Widget build(BuildContext context) {
+    var indexString = word.replaceAll("#[", "").replaceAll("]", "");
+    int index;
+    try {
+      index = int.parse(indexString);
+    } catch (e) {
+      return const SizedBox(height: 0, width: 0);
+    }
+
+    var tag = _note.tags[index];
+
+    if (tag.type != 'p') {
+      return const SizedBox(height: 0, width: 0);
+    }
+
+    var pubkeyBech = Helpers().encodeBech32(tag.value, "npub");
+    // first 5 chars then ... then last 5 chars
+    var pubkeyHr =
+        "${pubkeyBech.substring(0, 5)}...${pubkeyBech.substring(pubkeyBech.length - 5)}";
+    _tagsMetadata[tag.value] = pubkeyHr;
+    var metadata =
+        _metadataProvider.getMetadataByPubkeyStream(tag.value).first.timeout(
+              const Duration(seconds: 2),
+            );
+
+    return GestureDetector(
+      onTap: () {
+        _profileCallback(tag.value);
+      },
+      child: FutureBuilder<DbUserMetadata?>(
+          future: metadata,
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              return Text(
+                "@${snapshot.data!.name ?? pubkeyHr}",
+                style: const TextStyle(color: Palette.primary, fontSize: 17),
+              );
+            }
+            return Text(
+              "@$pubkeyHr",
+              style: const TextStyle(color: Palette.primary, fontSize: 17),
+            );
+          }),
+    );
+  }
+}
+
+class ProfileLink extends StatelessWidget {
+  const ProfileLink({
+    super.key,
+    required UserMetadata metadataProvider,
+    required Function(String p1) profileCallback,
+    required this.word,
+  })  : _metadataProvider = metadataProvider,
+        _profileCallback = profileCallback;
+
+  final UserMetadata _metadataProvider;
+  final Function(String p1) _profileCallback;
+  final String word;
+
+  @override
+  Widget build(BuildContext context) {
     var group = profilePattern.allMatches(word);
     var match = group.first;
     var cleaned = match.group(0);
@@ -164,89 +326,6 @@ class NoteCardSplitContent {
               style: const TextStyle(color: Palette.primary, fontSize: 17),
             );
           }),
-    );
-  }
-
-  Widget _buildLegacyMentionHashtag(String word) {
-    var indexString = word.replaceAll("#[", "").replaceAll("]", "");
-    int index;
-    try {
-      index = int.parse(indexString);
-    } catch (e) {
-      return const SizedBox(height: 0, width: 0);
-    }
-
-    var tag = _note.tags[index];
-
-    if (tag.type != 'p') {
-      return const SizedBox(height: 0, width: 0);
-    }
-
-    var pubkeyBech = Helpers().encodeBech32(tag.value, "npub");
-    // first 5 chars then ... then last 5 chars
-    var pubkeyHr =
-        "${pubkeyBech.substring(0, 5)}...${pubkeyBech.substring(pubkeyBech.length - 5)}";
-    _tagsMetadata[tag.value] = pubkeyHr;
-    var metadata =
-        _metadataProvider.getMetadataByPubkeyStream(tag.value).first.timeout(
-              const Duration(seconds: 2),
-            );
-
-    return GestureDetector(
-      onTap: () {
-        _profileCallback(tag.value);
-      },
-      child: FutureBuilder<DbUserMetadata?>(
-          future: metadata,
-          builder: (context, snapshot) {
-            if (snapshot.hasData) {
-              return Text(
-                "@${snapshot.data!.name ?? pubkeyHr}",
-                style: const TextStyle(color: Palette.primary, fontSize: 17),
-              );
-            }
-            return Text(
-              "@$pubkeyHr",
-              style: const TextStyle(color: Palette.primary, fontSize: 17),
-            );
-          }),
-    );
-  }
-
-  Widget _buildHashtagLink(String word) {
-    String hashtag = word.substring(1);
-
-    return GestureDetector(
-      onTap: () {
-        _hashtagCallback(hashtag);
-      },
-      child: Text(
-        word,
-        style: const TextStyle(color: Palette.primary, fontSize: 17),
-      ),
-    );
-  }
-
-  _buildLink(String word) {
-    if (imageLinks.contains(word)) {
-      return const SizedBox(height: 0, width: 0);
-    }
-
-    return GestureDetector(
-      onTap: () {
-        launchUrlString(word, mode: LaunchMode.externalApplication);
-      },
-      child: Text(
-        word,
-        style: const TextStyle(color: Palette.primary, fontSize: 17),
-      ),
-    );
-  }
-
-  _buildText(String word) {
-    return Text(
-      word,
-      style: const TextStyle(color: Palette.lightGray, fontSize: 17),
     );
   }
 }
