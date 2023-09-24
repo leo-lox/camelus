@@ -46,35 +46,16 @@ class _NoteCardState extends ConsumerState<NoteCard> {
   late final UserMetadata metadata;
   late final Future<Isar> dbFuture;
 
-  late NoteCardSplitContent splitContent;
-
-  void _splitContent() {
-    splitContent = NoteCardSplitContent(
-      widget.note,
-      metadata,
-      dbFuture,
-      _openProfile,
-      _openHashtag,
-    );
-
-    setState(() {});
-  }
-
   @override
   void initState() {
     super.initState();
     metadata = ref.read(metadataProvider);
     dbFuture = ref.read(databaseProvider.future);
-    _splitContent();
   }
 
   @override
   void didUpdateWidget(covariant NoteCard oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.note.id != widget.note.id) {
-      _splitContent();
-      metadata = ref.watch(metadataProvider);
-    }
   }
 
   @override
@@ -151,14 +132,14 @@ class _NoteCardState extends ConsumerState<NoteCard> {
                             ),
 
                             const SizedBox(height: 10),
-                            splitContent.content,
+                            NoteCardSplitContent(
+                              note: widget.note,
+                              profileCallback: _openProfile,
+                              hashtagCallback: _openHashtag,
+                            ),
 
                             const SizedBox(height: 6),
-                            if (splitContent.imageLinks.isNotEmpty)
-                              ImagesTileView(
-                                images: splitContent.imageLinks,
-                                //galleryBottomWidget: splitContent.content,
-                              ),
+
                             if (!widget.hideBottomBar)
                               Padding(
                                 padding: const EdgeInsets.only(top: 10.0),
@@ -185,10 +166,11 @@ class _NoteCardState extends ConsumerState<NoteCard> {
             ],
           ),
         ),
-        const Divider(
-          thickness: 0.3,
-          color: Palette.darkGray,
-        )
+        if (!widget.hideBottomBar)
+          const Divider(
+            thickness: 0.3,
+            color: Palette.darkGray,
+          )
       ],
     );
   }

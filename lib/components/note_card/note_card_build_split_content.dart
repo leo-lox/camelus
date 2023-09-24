@@ -1,58 +1,66 @@
-import 'dart:developer';
-
-import 'package:camelus/components/note_card/note_card.dart';
+import 'package:camelus/components/images_tile_view.dart';
 import 'package:camelus/components/note_card/note_card_reference.dart';
 import 'package:camelus/config/palette.dart';
-import 'package:camelus/db/entities/db_note.dart';
 import 'package:camelus/db/entities/db_user_metadata.dart';
-import 'package:camelus/db/queries/db_note_queries.dart';
 import 'package:camelus/helpers/helpers.dart';
 import 'package:camelus/helpers/nprofile_helper.dart';
 import 'package:camelus/models/nostr_note.dart';
+import 'package:camelus/providers/metadata_provider.dart';
 import 'package:camelus/services/nostr/metadata/user_metadata.dart';
 import 'package:flutter/material.dart';
-import 'package:isar/isar.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 final profilePattern = RegExp(r"nostr:(nprofile|npub)[a-zA-Z0-9]+");
 final notePattern = RegExp(r"nostr:(note)[a-zA-Z0-9]+");
 
 /// this class is responsible for building the content of a note
-class NoteCardSplitContent {
-  final NostrNote _note;
+class NoteCardSplitContent extends ConsumerStatefulWidget {
+  final NostrNote note;
+  final Function(String) profileCallback;
+  final Function(String) hashtagCallback;
 
-  final Function(String) _profileCallback;
-  final Function(String) _hashtagCallback;
+  const NoteCardSplitContent({
+    Key? key,
+    required this.note,
+    required this.hashtagCallback,
+    required this.profileCallback,
+  }) : super(key: key);
 
+  @override
+  ConsumerState<NoteCardSplitContent> createState() =>
+      _NoteCardSplitContentState();
+}
+
+class _NoteCardSplitContentState extends ConsumerState<NoteCardSplitContent> {
   final Map<String, dynamic> _tagsMetadata = {};
 
-  final UserMetadata _metadataProvider;
-  final Future<Isar> _dbFuture;
+  late final UserMetadata _metadataProvider;
 
   List<String> imageLinks = [];
 
-  late Widget _content;
+  _NoteCardSplitContentState();
 
-  NoteCardSplitContent(
-    this._note,
-    this._metadataProvider,
-    this._dbFuture,
-    this._profileCallback,
-    this._hashtagCallback,
-  ) {
-    imageLinks.addAll(_extractImages(_note));
-    _content = _buildContentHousing();
+  @override
+  void initState() {
+    super.initState();
+    _metadataProvider = ref.read(metadataProvider);
+    imageLinks.addAll(_extractImages(widget.note));
   }
 
-  Widget get content => _content;
+  @override
+  void dispose() {
+    super.dispose();
+  }
 
-  _buildContentHousing() {
+  @override
+  Widget build(BuildContext context) {
     return Wrap(
       spacing: 0,
       runSpacing: 4,
       direction: Axis.horizontal,
       verticalDirection: VerticalDirection.down,
-      children: _buildContent(_note.content),
+      children: _buildContent(widget.note.content),
     );
   }
 
@@ -70,21 +78,21 @@ class NoteCardSplitContent {
         if (profilePattern.hasMatch(word)) {
           widgets.add(ProfileLink(
             metadataProvider: _metadataProvider,
-            profileCallback: _profileCallback,
+            profileCallback: widget.profileCallback,
             word: word,
           ));
         } else if (notePattern.hasMatch(word)) {
           widgets.add(NoteCardReference(word: word));
         } else if (word.startsWith("#[")) {
           widgets.add(LegacyMentionHashtag(
-              note: _note,
+              note: widget.note,
               tagsMetadata: _tagsMetadata,
               metadataProvider: _metadataProvider,
-              profileCallback: _profileCallback,
+              profileCallback: widget.profileCallback,
               word: word));
         } else if (word.startsWith("#")) {
-          widgets
-              .add(HashtagLink(hashtagCallback: _hashtagCallback, word: word));
+          widgets.add(
+              HashtagLink(hashtagCallback: widget.hashtagCallback, word: word));
         } else if (word.startsWith("http")) {
           widgets.add(HttpLink(imageLinks: imageLinks, word: word));
         } else {
@@ -94,7 +102,18 @@ class NoteCardSplitContent {
       }
       widgets.removeLast(); // remove last space
       //widgets.add(_buildText("\n")); // add back the original line break
-      widgets.add(const SizedBox(height: 7, width: 1000));
+      widgets.add(const SizedBox(
+        height: 7,
+      ));
+    }
+
+    if (imageLinks.isNotEmpty) {
+      widgets.add(
+        ImagesTileView(
+          images: imageLinks,
+          //galleryBottomWidget: splitContent.content,
+        ),
+      );
     }
 
     return widgets;
