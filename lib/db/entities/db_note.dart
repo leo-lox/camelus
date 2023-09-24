@@ -11,7 +11,7 @@ class DbNote {
   Id id = Isar
       .autoIncrement; // Für auto-increment kannst du auch id = null zuweisen
 
-  @Index(unique: true, type: IndexType.value)
+  @Index(unique: true, type: IndexType.value, replace: false)
   String nostr_id;
 
   @Index()
@@ -26,6 +26,8 @@ class DbNote {
   String? content;
 
   String sig;
+
+  bool? sig_verified;
 
   List<DbTag>? tags;
 

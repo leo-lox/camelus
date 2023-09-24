@@ -2,6 +2,8 @@ import 'dart:async';
 import 'dart:developer';
 
 import 'package:camelus/db/entities/db_note.dart';
+import 'package:camelus/db/queries/db_note_queries.dart';
+import 'package:camelus/helpers/bip340.dart';
 import 'package:camelus/models/nostr_note.dart';
 import 'package:isar/isar.dart';
 
@@ -65,14 +67,37 @@ class DbNoteStackInsert {
       dbNotes.add(myIsarNote);
     }
 
-    log('inserting ${dbNotes.length} notes');
-
     await db.writeTxn(() async {
       try {
-        await db.dbNotes.putAllByNostr_id(dbNotes);
+        final res = await db.dbNotes.putAllByNostr_id(dbNotes);
+        log('inserted ${res.length} notes');
+        _checkForUnverifiedNotes(res);
       } catch (e) {
         log("error: $e");
       }
     });
+  }
+
+  _checkForUnverifiedNotes(List<int> noteDbIds) async {
+    final insertedNotes =
+        await DbNoteQueries.findNotesByDbIdsFuture(db, dbIds: noteDbIds);
+
+    for (var note in insertedNotes) {
+      if (note.sig_verified == null) {
+        verifyNote(note);
+      }
+    }
+  }
+
+  final Bip340 _bip340 = Bip340();
+  verifyNote(DbNote note) async {
+    final verified = _bip340.verify(
+      note.content!,
+      note.sig,
+      note.pubkey,
+    );
+    log('verified: $verified');
+    // update note
+    //db.dbNotes.put(note..sig_verified = verified);
   }
 }

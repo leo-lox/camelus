@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
+import 'dart:isolate';
 
 import 'package:camelus/db/custom_inserts/db_note_stack_insert.dart';
 import 'package:camelus/models/nostr_note.dart';
@@ -38,20 +39,19 @@ class MyRelay {
 
   late RelayTracker relayTracker;
 
-  late DbNoteStackInsert stackInsertNotes;
+  late SendPort dbWorkerSendPort;
 
   BlockMuteService blockMuteService;
 
-  MyRelay({
-    required this.database,
-    required this.persistance,
-    required this.relayUrl,
-    required this.read,
-    required this.write,
-    required this.blockMuteService,
-  }) {
+  MyRelay(
+      {required this.database,
+      required this.persistance,
+      required this.relayUrl,
+      required this.read,
+      required this.write,
+      required this.blockMuteService,
+      required this.dbWorkerSendPort}) {
     relayTracker = RelayTracker(db: database);
-    stackInsertNotes = DbNoteStackInsert(db: database);
   }
 
   /// connects to the relay and listens for events
@@ -198,7 +198,8 @@ class MyRelay {
       return;
     }
 
-    stackInsertNotes.stackInsertNotes([note]);
+    // insert into db via isolate
+    dbWorkerSendPort.send(note);
   }
 
   @override
