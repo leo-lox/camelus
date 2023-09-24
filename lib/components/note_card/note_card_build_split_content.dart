@@ -41,16 +41,27 @@ class _NoteCardSplitContentState extends ConsumerState<NoteCardSplitContent> {
 
   _NoteCardSplitContentState();
 
+  List<Widget> body = [];
+
   @override
   void initState() {
     super.initState();
     _metadataProvider = ref.read(metadataProvider);
     imageLinks.addAll(_extractImages(widget.note));
+    body = _buildContent(widget.note.content);
   }
 
   @override
   void dispose() {
     super.dispose();
+  }
+
+  @override
+  void didUpdateWidget(NoteCardSplitContent oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.note.id != widget.note.id) {
+      body = _buildContent(widget.note.content);
+    }
   }
 
   @override
@@ -60,7 +71,7 @@ class _NoteCardSplitContentState extends ConsumerState<NoteCardSplitContent> {
       runSpacing: 4,
       direction: Axis.horizontal,
       verticalDirection: VerticalDirection.down,
-      children: _buildContent(widget.note.content),
+      children: body,
     );
   }
 
