@@ -13,15 +13,22 @@ import 'package:camelus/config/palette.dart';
 import 'package:camelus/db/entities/db_user_metadata.dart';
 import 'package:camelus/models/nostr_note.dart';
 import 'package:camelus/models/post_context.dart';
+import 'package:camelus/providers/database_provider.dart';
 import 'package:camelus/providers/metadata_provider.dart';
 import 'package:camelus/services/nostr/metadata/user_metadata.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:isar/isar.dart';
 
 class NoteCard extends ConsumerStatefulWidget {
   final NostrNote note;
+  final bool hideBottomBar;
 
-  const NoteCard({Key? key, required this.note}) : super(key: key);
+  const NoteCard({
+    Key? key,
+    required this.note,
+    this.hideBottomBar = false,
+  }) : super(key: key);
 
   @override
   ConsumerState<NoteCard> createState() => _NoteCardState();
@@ -36,13 +43,19 @@ class _NoteCardState extends ConsumerState<NoteCard> {
     Navigator.pushNamed(context, "/nostr/hastag", arguments: hashtag);
   }
 
-  late UserMetadata metadata;
+  late final UserMetadata metadata;
+  late final Future<Isar> dbFuture;
 
   late NoteCardSplitContent splitContent;
 
   void _splitContent() {
-    splitContent =
-        NoteCardSplitContent(widget.note, metadata, _openProfile, _openHashtag);
+    splitContent = NoteCardSplitContent(
+      widget.note,
+      metadata,
+      dbFuture,
+      _openProfile,
+      _openHashtag,
+    );
 
     setState(() {});
   }
@@ -51,6 +64,7 @@ class _NoteCardState extends ConsumerState<NoteCard> {
   void initState() {
     super.initState();
     metadata = ref.read(metadataProvider);
+    dbFuture = ref.read(databaseProvider.future);
     _splitContent();
   }
 
@@ -145,19 +159,20 @@ class _NoteCardState extends ConsumerState<NoteCard> {
                                 images: splitContent.imageLinks,
                                 //galleryBottomWidget: splitContent.content,
                               ),
-                            Padding(
-                              padding: const EdgeInsets.only(top: 10.0),
-                              child: BottomActionRow(
-                                onComment: () {
-                                  _writeReply(context, widget.note);
-                                },
-                                onLike: () {},
-                                onRetweet: () {},
-                                onShare: () {
-                                  openBottomSheetShare(context, widget.note);
-                                },
+                            if (!widget.hideBottomBar)
+                              Padding(
+                                padding: const EdgeInsets.only(top: 10.0),
+                                child: BottomActionRow(
+                                  onComment: () {
+                                    _writeReply(context, widget.note);
+                                  },
+                                  onLike: () {},
+                                  onRetweet: () {},
+                                  onShare: () {
+                                    openBottomSheetShare(context, widget.note);
+                                  },
+                                ),
                               ),
-                            ),
                             const SizedBox(height: 20),
                             // show text if replies > 0
                           ],

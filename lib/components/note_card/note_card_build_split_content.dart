@@ -1,13 +1,20 @@
+import 'dart:developer';
+
+import 'package:camelus/components/note_card/note_card.dart';
 import 'package:camelus/config/palette.dart';
+import 'package:camelus/db/entities/db_note.dart';
 import 'package:camelus/db/entities/db_user_metadata.dart';
+import 'package:camelus/db/queries/db_note_queries.dart';
 import 'package:camelus/helpers/helpers.dart';
 import 'package:camelus/helpers/nprofile_helper.dart';
 import 'package:camelus/models/nostr_note.dart';
 import 'package:camelus/services/nostr/metadata/user_metadata.dart';
 import 'package:flutter/material.dart';
+import 'package:isar/isar.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 final profilePattern = RegExp(r"nostr:(nprofile|npub)[a-zA-Z0-9]+");
+final notePattern = RegExp(r"nostr:(note)[a-zA-Z0-9]+");
 
 /// this class is responsible for building the content of a note
 class NoteCardSplitContent {
@@ -19,6 +26,7 @@ class NoteCardSplitContent {
   final Map<String, dynamic> _tagsMetadata = {};
 
   final UserMetadata _metadataProvider;
+  final Future<Isar> _dbFuture;
 
   List<String> imageLinks = [];
 
@@ -27,6 +35,7 @@ class NoteCardSplitContent {
   NoteCardSplitContent(
     this._note,
     this._metadataProvider,
+    this._dbFuture,
     this._profileCallback,
     this._hashtagCallback,
   ) {
@@ -59,6 +68,9 @@ class NoteCardSplitContent {
       for (var word in words) {
         if (profilePattern.hasMatch(word)) {
           widgets.add(_buildProfileLink(word));
+        } else if (notePattern.hasMatch(word)) {
+          //widgets.add(_buildText("TEXTBUILD"));
+          widgets.add(ReferencedNote(dbFuture: _dbFuture, word: word));
         } else if (word.startsWith("#[")) {
           widgets.add(_buildLegacyMentionHashtag(word));
         } else if (word.startsWith("#")) {
@@ -234,6 +246,92 @@ class NoteCardSplitContent {
     return Text(
       word,
       style: const TextStyle(color: Palette.lightGray, fontSize: 17),
+    );
+  }
+}
+
+class ReferencedNote extends StatelessWidget {
+  const ReferencedNote({
+    super.key,
+    required Future<Isar> dbFuture,
+    required this.word,
+  }) : _dbFuture = dbFuture;
+
+  final Future<Isar> _dbFuture;
+  final String word;
+
+  @override
+  Widget build(BuildContext context) {
+    //return Text("OKKKKK", style: const TextStyle(color: Palette.primary));
+    final cleanedWord = word.replaceAll("nostr:", "");
+    final String nostrId;
+    try {
+      nostrId = Helpers().decodeBech32(cleanedWord)[0];
+    } catch (e) {
+      return const Text("Error decoding note ref");
+    }
+
+    return Column(
+      children: [
+        const SizedBox(height: 20),
+        FutureBuilder(
+            future: _dbFuture,
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                final db = snapshot.data as Isar;
+                final noteStream =
+                    DbNoteQueries.findNotebyIdStream(db, id: nostrId);
+
+                return StreamBuilder<List<DbNote?>>(
+                    stream: noteStream,
+                    builder: ((context, snapshotStream) {
+                      if (snapshotStream.hasData &&
+                          snapshotStream.data!.isNotEmpty) {
+                        final NostrNote note =
+                            snapshotStream.data![0]!.toNostrNote();
+                        final Key key = UniqueKey();
+                        return GestureDetector(
+                            onTap: () {
+                              Navigator.pushNamed(context, "/nostr/event",
+                                  arguments: {
+                                    "root": note.id,
+                                    "scrollIntoView": note.id,
+                                  });
+                            },
+                            child: Container(
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(10),
+                                  border: Border.all(
+                                      color: Palette.darkGray, width: 1.0),
+                                ),
+                                child: NoteCard(
+                                  note: note,
+                                  key: key,
+                                  hideBottomBar: true,
+                                )));
+                      }
+                      return Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          border:
+                              Border.all(color: Palette.darkGray, width: 1.0),
+                        ),
+                        child: const Center(
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 0, vertical: 20),
+                            child: Text("note not found",
+                                style: TextStyle(
+                                    color: Palette.white, fontSize: 17)),
+                          ),
+                        ),
+                      );
+                    }));
+              }
+              return const Text("database not ready",
+                  style: TextStyle(color: Palette.white, fontSize: 20));
+            }),
+      ],
     );
   }
 }
