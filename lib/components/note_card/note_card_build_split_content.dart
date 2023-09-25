@@ -12,7 +12,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 final profilePattern = RegExp(r"nostr:(nprofile|npub)[a-zA-Z0-9]+");
-final notePattern = RegExp(r"nostr:(note)[a-zA-Z0-9]+");
+final notePattern = RegExp(r"nostr:(note|nevent)[a-zA-Z0-9]+");
 
 /// this class is responsible for building the content of a note
 class NoteCardSplitContent extends ConsumerStatefulWidget {

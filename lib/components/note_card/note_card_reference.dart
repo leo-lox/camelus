@@ -5,6 +5,7 @@ import 'package:camelus/config/palette.dart';
 import 'package:camelus/db/entities/db_note.dart';
 import 'package:camelus/db/queries/db_note_queries.dart';
 import 'package:camelus/helpers/helpers.dart';
+import 'package:camelus/helpers/nevent_helper.dart';
 import 'package:camelus/models/nostr_note.dart';
 import 'package:camelus/models/nostr_request_query.dart';
 import 'package:camelus/providers/database_provider.dart';
@@ -66,13 +67,26 @@ class _NoteCardReferenceState extends ConsumerState<NoteCardReference> {
   String? _getNostrId(String word) {
     final cleanedWord = widget.word.replaceAll("nostr:", "");
 
-    final String res;
-    try {
-      res = Helpers().decodeBech32(cleanedWord)[0];
-    } catch (e) {
-      return null;
+    if (cleanedWord.startsWith("note")) {
+      final String res;
+      try {
+        res = Helpers().decodeBech32(cleanedWord)[0];
+      } catch (e) {
+        return null;
+      }
+      return res;
     }
-    return res;
+    if (cleanedWord.startsWith("nevent")) {
+      final String res;
+      try {
+        final map = NeventHelper().bech32ToMap(cleanedWord);
+        res = map["eventId"];
+      } catch (e) {
+        return null;
+      }
+      return res;
+    }
+    return null;
   }
 
   @override

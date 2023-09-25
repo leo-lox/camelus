@@ -56,4 +56,49 @@ class NeventHelper {
         Uint8List.fromList(HEX.decode(authorPubkey));
     return TLV(type: 2, length: 32, value: authorPubkeyBytes);
   }
+
+  /// Decodes a bech32 string into a map
+  /// throws if bech32 string is invalid
+  ///
+  Map<String, dynamic> bech32ToMap(String bech32) {
+    final List<String> dataString = _helper.decodeBech32(bech32);
+    final Uint8List dataBytes = Uint8List.fromList(HEX.decode(dataString[0]));
+    final List<TLV> tlvList = TlvUtils.decode(dataBytes);
+
+    final Map<String, dynamic> map = _generateMapFromTlvList(tlvList);
+
+    return map;
+  }
+
+  /// Generates a map from a list of TLV objects
+  Map<String, dynamic> _generateMapFromTlvList(List<TLV> tlvList) {
+    final Map<String, dynamic> map = {};
+
+    for (var i = 0; i < tlvList.length; i++) {
+      final TLV tlv = tlvList[i];
+      if (tlv.type == 0) {
+        map['eventId'] = HEX.encode(tlv.value);
+      } else if (tlv.type == 1) {
+        map['relays'] = _generateRelaysFromTlvList(tlvList);
+      } else if (tlv.type == 2) {
+        map['authorPubkey'] = HEX.encode(tlv.value);
+      }
+    }
+
+    return map;
+  }
+
+  /// Generates a list of relays from a list of TLV objects
+  List<String> _generateRelaysFromTlvList(List<TLV> tlvList) {
+    final List<String> relays = [];
+
+    for (var i = 0; i < tlvList.length; i++) {
+      final TLV tlv = tlvList[i];
+      if (tlv.type == 1) {
+        relays.add(ascii.decode(tlv.value));
+      }
+    }
+
+    return relays;
+  }
 }
