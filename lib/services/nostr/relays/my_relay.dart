@@ -2,15 +2,13 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:isolate';
-
-import 'package:camelus/db/custom_inserts/db_note_stack_insert.dart';
+import 'package:camelus/models/isolate_note_transport.dart';
 import 'package:camelus/models/nostr_note.dart';
 import 'package:camelus/models/nostr_request.dart';
 import 'package:camelus/models/nostr_request_close.dart';
 import 'package:camelus/models/nostr_request_event.dart';
 import 'package:camelus/models/nostr_request_query.dart';
 import 'package:camelus/services/nostr/metadata/block_mute_service.dart';
-import 'package:camelus/services/nostr/relays/relay_tracker.dart';
 import 'package:isar/isar.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
@@ -37,8 +35,6 @@ class MyRelay {
 
   final Map<String, Completer<String>> _completers = {};
 
-  late RelayTracker relayTracker;
-
   late SendPort dbWorkerSendPort;
 
   BlockMuteService blockMuteService;
@@ -50,9 +46,7 @@ class MyRelay {
       required this.read,
       required this.write,
       required this.blockMuteService,
-      required this.dbWorkerSendPort}) {
-    relayTracker = RelayTracker(db: database);
-  }
+      required this.dbWorkerSendPort});
 
   /// connects to the relay and listens for events
   Future<void> connect() async {
@@ -167,8 +161,8 @@ class MyRelay {
         log("efeed-tmp-unresolvedLoop-WORKS: ${note.id}");
       }
 
-      _insertNoteIntoDb(note);
-      relayTracker.analyzeNostrEvent(note, relayUrl);
+      _insertNoteIntoDb(note, relayUrl);
+
       return;
     }
     if (eventJson[0] == 'EOSE') {
@@ -193,13 +187,18 @@ class MyRelay {
     log("unknown event: $eventJson");
   }
 
-  _insertNoteIntoDb(NostrNote note) async {
+  _insertNoteIntoDb(NostrNote note, String? relayUrl) async {
     if (blockMuteService.isPubkeyBlocked(note.pubkey)) {
       return;
     }
 
+    final transport = IsolateNoteTransport(
+      note: note,
+      relayUrl: relayUrl,
+    );
+
     // insert into db via isolate
-    dbWorkerSendPort.send(note);
+    dbWorkerSendPort.send(transport);
   }
 
   @override

@@ -9,7 +9,9 @@ import 'package:camelus/db/entities/db_settings.dart';
 import 'package:camelus/db/entities/db_user_metadata.dart';
 import 'package:camelus/db/migrations/migrations.dart';
 import 'package:camelus/helpers/bip340.dart';
+import 'package:camelus/models/isolate_note_transport.dart';
 import 'package:camelus/models/nostr_note.dart';
+import 'package:camelus/services/nostr/relays/relay_tracker.dart';
 import 'package:flutter/services.dart';
 import 'package:isar/isar.dart';
 import 'package:path_provider/path_provider.dart';
@@ -56,14 +58,17 @@ void dbWorker(List initMsg) async {
   );
   await performMigrationIfNeeded(db);
 
-  DbNoteStackInsert stackInsertNotes = DbNoteStackInsert(db: db);
-  Bip340 bip340 = Bip340();
+  final DbNoteStackInsert stackInsertNotes = DbNoteStackInsert(db: db);
+  final RelayTracker relayTracker = RelayTracker(db: db);
 
   /// setup receivePort to listen for messages from main isolate
   var receivePort = ReceivePort();
   receivePort.listen((message) {
-    if (message is NostrNote) {
-      stackInsertNotes.stackInsertNotes([message]);
+    if (message is IsolateNoteTransport) {
+      stackInsertNotes.stackInsertNotes([message.note]);
+      if (message.relayUrl != null) {
+        relayTracker.analyzeNostrEvent(message.note, message.relayUrl!);
+      }
     }
   });
   sendPort.send(receivePort.sendPort);
