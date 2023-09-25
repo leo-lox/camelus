@@ -57,7 +57,7 @@ class _NostrPageState extends ConsumerState<NostrPage>
 
     var updateInfo = jsonDecode(response.body);
 
-    if (updateInfo["version"] <= 22) {
+    if (updateInfo["version"] <= 23) {
       // <-- current version
 
       return;
