@@ -7,6 +7,7 @@ import 'package:camelus/db/entities/db_note.dart';
 import 'package:camelus/db/entities/db_relay_tracker.dart';
 import 'package:camelus/db/entities/db_settings.dart';
 import 'package:camelus/db/entities/db_user_metadata.dart';
+import 'package:camelus/db/migrations/migrations.dart';
 import 'package:camelus/helpers/bip340.dart';
 import 'package:camelus/models/nostr_note.dart';
 import 'package:flutter/services.dart';
@@ -53,6 +54,7 @@ void dbWorker(List initMsg) async {
     ],
     inspector: false,
   );
+  await performMigrationIfNeeded(db);
 
   DbNoteStackInsert stackInsertNotes = DbNoteStackInsert(db: db);
   Bip340 bip340 = Bip340();

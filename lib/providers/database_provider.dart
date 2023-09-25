@@ -2,6 +2,7 @@ import 'package:camelus/db/entities/db_nip05.dart';
 import 'package:camelus/db/entities/db_relay_tracker.dart';
 import 'package:camelus/db/entities/db_settings.dart';
 import 'package:camelus/db/entities/db_user_metadata.dart';
+import 'package:camelus/db/migrations/migrations.dart';
 import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:camelus/db/entities/db_note.dart';
@@ -21,5 +22,6 @@ final databaseProvider = FutureProvider<Isar>((ref) async {
     ],
     inspector: kDebugMode,
   );
+  await performMigrationIfNeeded(isar);
   return isar;
 });
