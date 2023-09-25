@@ -93,6 +93,8 @@ class NostrDrawer extends ConsumerWidget {
             child: GestureDetector(
               onTap: () => navigateToProfile(context),
               child: Container(
+                width: 50,
+                height: 50,
                 decoration: const BoxDecoration(
                   color: Palette.primary,
                   shape: BoxShape.circle,

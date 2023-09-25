@@ -173,6 +173,7 @@ class _NostrPageState extends ConsumerState<NostrPage>
                 pinned: false,
                 elevation: 1.0,
                 backgroundColor: Palette.background,
+                leadingWidth: 52,
                 leading: InkWell(
                   onTap: () =>
                       widget.parentScaffoldKey.currentState!.openDrawer(),
