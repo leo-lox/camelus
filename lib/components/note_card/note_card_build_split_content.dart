@@ -60,6 +60,7 @@ class _NoteCardSplitContentState extends ConsumerState<NoteCardSplitContent> {
   void didUpdateWidget(NoteCardSplitContent oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.note.id != widget.note.id) {
+      imageLinks.addAll(_extractImages(widget.note));
       body = _buildContent(widget.note.content);
     }
   }
