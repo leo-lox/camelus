@@ -68,27 +68,28 @@ class DbNoteStackInsert {
       dbNotes.add(myIsarNote);
     }
 
-    List<int> res = [];
-    await db.writeTxn(() async {
+    final List<Future> futures = [];
+    for (var note in dbNotes) {
+      futures.add(_insertSingleNote(note));
+    }
+    await Future.wait(futures);
+  }
+
+  Future _insertSingleNote(DbNote note) async {
+    return await db.writeTxn(() async {
       try {
-        res = await db.dbNotes.putAllByNostr_id(dbNotes);
-        log('inserted ${res.length} notes');
+        DbNote? oldNote = await db.dbNotes.getByNostr_id(note.nostr_id);
+        if (oldNote != null) {
+          return;
+        }
+
+        final valid = await verifyNote(note);
+
+        await db.dbNotes.put(note..sig_valid = valid);
       } catch (e) {
         log("error: $e");
       }
     });
-    _checkForUnverifiedNotes(res);
-  }
-
-  _checkForUnverifiedNotes(List<int> noteDbIds) async {
-    final insertedNotes =
-        await DbNoteQueries.findNotesByDbIdsFuture(db, dbIds: noteDbIds);
-
-    for (var note in insertedNotes) {
-      if (note.sig_valid == null) {
-        verifyNote(note);
-      }
-    }
   }
 
   final Bip340 _bip340 = Bip340();
@@ -103,10 +104,6 @@ class DbNoteStackInsert {
     } catch (e) {
       log("error: $e");
     }
-
-    // update note
-    await db.writeTxn(() async {
-      db.dbNotes.put(note..sig_valid = valid);
-    });
+    return valid;
   }
 }
