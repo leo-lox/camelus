@@ -57,9 +57,9 @@ const DbNoteSchema = CollectionSchema(
       name: r'sig',
       type: IsarType.string,
     ),
-    r'sig_verified': PropertySchema(
+    r'sig_valid': PropertySchema(
       id: 8,
-      name: r'sig_verified',
+      name: r'sig_valid',
       type: IsarType.bool,
     ),
     r'tags': PropertySchema(
@@ -201,7 +201,7 @@ void _dbNoteSerialize(
   writer.writeString(offsets[5], object.nostr_id);
   writer.writeString(offsets[6], object.pubkey);
   writer.writeString(offsets[7], object.sig);
-  writer.writeBool(offsets[8], object.sig_verified);
+  writer.writeBool(offsets[8], object.sig_valid);
   writer.writeObjectList<DbTag>(
     offsets[9],
     allOffsets,
@@ -232,7 +232,7 @@ DbNote _dbNoteDeserialize(
     ),
   );
   object.id = id;
-  object.sig_verified = reader.readBoolOrNull(offsets[8]);
+  object.sig_valid = reader.readBoolOrNull(offsets[8]);
   return object;
 }
 
@@ -1925,27 +1925,27 @@ extension DbNoteQueryFilter on QueryBuilder<DbNote, DbNote, QFilterCondition> {
     });
   }
 
-  QueryBuilder<DbNote, DbNote, QAfterFilterCondition> sig_verifiedIsNull() {
+  QueryBuilder<DbNote, DbNote, QAfterFilterCondition> sig_validIsNull() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(const FilterCondition.isNull(
-        property: r'sig_verified',
+        property: r'sig_valid',
       ));
     });
   }
 
-  QueryBuilder<DbNote, DbNote, QAfterFilterCondition> sig_verifiedIsNotNull() {
+  QueryBuilder<DbNote, DbNote, QAfterFilterCondition> sig_validIsNotNull() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(const FilterCondition.isNotNull(
-        property: r'sig_verified',
+        property: r'sig_valid',
       ));
     });
   }
 
-  QueryBuilder<DbNote, DbNote, QAfterFilterCondition> sig_verifiedEqualTo(
+  QueryBuilder<DbNote, DbNote, QAfterFilterCondition> sig_validEqualTo(
       bool? value) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'sig_verified',
+        property: r'sig_valid',
         value: value,
       ));
     });
@@ -2148,15 +2148,15 @@ extension DbNoteQuerySortBy on QueryBuilder<DbNote, DbNote, QSortBy> {
     });
   }
 
-  QueryBuilder<DbNote, DbNote, QAfterSortBy> sortBySig_verified() {
+  QueryBuilder<DbNote, DbNote, QAfterSortBy> sortBySig_valid() {
     return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'sig_verified', Sort.asc);
+      return query.addSortBy(r'sig_valid', Sort.asc);
     });
   }
 
-  QueryBuilder<DbNote, DbNote, QAfterSortBy> sortBySig_verifiedDesc() {
+  QueryBuilder<DbNote, DbNote, QAfterSortBy> sortBySig_validDesc() {
     return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'sig_verified', Sort.desc);
+      return query.addSortBy(r'sig_valid', Sort.desc);
     });
   }
 }
@@ -2258,15 +2258,15 @@ extension DbNoteQuerySortThenBy on QueryBuilder<DbNote, DbNote, QSortThenBy> {
     });
   }
 
-  QueryBuilder<DbNote, DbNote, QAfterSortBy> thenBySig_verified() {
+  QueryBuilder<DbNote, DbNote, QAfterSortBy> thenBySig_valid() {
     return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'sig_verified', Sort.asc);
+      return query.addSortBy(r'sig_valid', Sort.asc);
     });
   }
 
-  QueryBuilder<DbNote, DbNote, QAfterSortBy> thenBySig_verifiedDesc() {
+  QueryBuilder<DbNote, DbNote, QAfterSortBy> thenBySig_validDesc() {
     return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'sig_verified', Sort.desc);
+      return query.addSortBy(r'sig_valid', Sort.desc);
     });
   }
 }
@@ -2324,9 +2324,9 @@ extension DbNoteQueryWhereDistinct on QueryBuilder<DbNote, DbNote, QDistinct> {
     });
   }
 
-  QueryBuilder<DbNote, DbNote, QDistinct> distinctBySig_verified() {
+  QueryBuilder<DbNote, DbNote, QDistinct> distinctBySig_valid() {
     return QueryBuilder.apply(this, (query) {
-      return query.addDistinctBy(r'sig_verified');
+      return query.addDistinctBy(r'sig_valid');
     });
   }
 }
@@ -2386,9 +2386,9 @@ extension DbNoteQueryProperty on QueryBuilder<DbNote, DbNote, QQueryProperty> {
     });
   }
 
-  QueryBuilder<DbNote, bool?, QQueryOperations> sig_verifiedProperty() {
+  QueryBuilder<DbNote, bool?, QQueryOperations> sig_validProperty() {
     return QueryBuilder.apply(this, (query) {
-      return query.addPropertyName(r'sig_verified');
+      return query.addPropertyName(r'sig_valid');
     });
   }
 

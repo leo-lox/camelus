@@ -27,7 +27,7 @@ class DbNote {
 
   String sig;
 
-  bool? sig_verified;
+  bool? sig_valid;
 
   List<DbTag>? tags;
 

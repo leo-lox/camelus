@@ -5,6 +5,7 @@ import 'package:camelus/db/entities/db_note.dart';
 import 'package:camelus/db/queries/db_note_queries.dart';
 import 'package:camelus/helpers/bip340.dart';
 import 'package:camelus/models/nostr_note.dart';
+import 'package:hex/hex.dart';
 import 'package:isar/isar.dart';
 
 class DbNoteStackInsert {
@@ -67,15 +68,16 @@ class DbNoteStackInsert {
       dbNotes.add(myIsarNote);
     }
 
+    List<int> res = [];
     await db.writeTxn(() async {
       try {
-        final res = await db.dbNotes.putAllByNostr_id(dbNotes);
+        res = await db.dbNotes.putAllByNostr_id(dbNotes);
         log('inserted ${res.length} notes');
-        _checkForUnverifiedNotes(res);
       } catch (e) {
         log("error: $e");
       }
     });
+    _checkForUnverifiedNotes(res);
   }
 
   _checkForUnverifiedNotes(List<int> noteDbIds) async {
@@ -83,7 +85,7 @@ class DbNoteStackInsert {
         await DbNoteQueries.findNotesByDbIdsFuture(db, dbIds: noteDbIds);
 
     for (var note in insertedNotes) {
-      if (note.sig_verified == null) {
+      if (note.sig_valid == null) {
         verifyNote(note);
       }
     }
@@ -91,13 +93,20 @@ class DbNoteStackInsert {
 
   final Bip340 _bip340 = Bip340();
   verifyNote(DbNote note) async {
-    final verified = _bip340.verify(
-      note.content!,
-      note.sig,
-      note.pubkey,
-    );
-    log('verified: $verified');
+    bool valid = false;
+    try {
+      valid = _bip340.verify(
+        note.nostr_id,
+        note.sig,
+        note.pubkey,
+      );
+    } catch (e) {
+      log("error: $e");
+    }
+
     // update note
-    //db.dbNotes.put(note..sig_verified = verified);
+    await db.writeTxn(() async {
+      db.dbNotes.put(note..sig_valid = valid);
+    });
   }
 }
