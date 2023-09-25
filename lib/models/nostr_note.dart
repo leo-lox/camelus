@@ -8,6 +8,8 @@ class NostrNote {
   final int kind;
   final String content;
   final String sig;
+  // ignore: non_constant_identifier_names
+  final bool? sig_valid;
   final List<NostrTag> tags;
 
   NostrNote({
@@ -19,6 +21,7 @@ class NostrNote {
     required this.content,
     required this.sig,
     required this.tags,
+    this.sig_valid,
   });
 
   List<String> get relayHints => _extractRelayHints();

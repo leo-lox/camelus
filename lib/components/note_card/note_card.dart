@@ -75,6 +75,20 @@ class _NoteCardState extends ConsumerState<NoteCard> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        if (widget.note.sig_valid != true)
+          Center(
+            child: Container(
+              decoration: const BoxDecoration(
+                color: Colors.red,
+                borderRadius: BorderRadius.all(Radius.circular(25)),
+              ),
+              child: const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 25, vertical: 8),
+                child:
+                    Text("Invalid signature!", style: TextStyle(fontSize: 15)),
+              ),
+            ),
+          ),
         Padding(
           padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
           child: Column(
@@ -170,7 +184,7 @@ class _NoteCardState extends ConsumerState<NoteCard> {
           const Divider(
             thickness: 0.3,
             color: Palette.darkGray,
-          )
+          ),
       ],
     );
   }

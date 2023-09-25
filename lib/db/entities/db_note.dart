@@ -63,6 +63,7 @@ class DbNote {
       kind: kind,
       content: content ?? '',
       sig: sig,
+      sig_valid: sig_valid,
       tags: toNostrTags(),
     );
   }
