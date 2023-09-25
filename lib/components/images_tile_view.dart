@@ -54,7 +54,7 @@ class ImagesTileView extends StatelessWidget {
                       transitionOnUserGestures: true,
                       tag: 'image-${images[index]}-$_tileViewId',
                       child: Image.network(
-                        cacheHeight: 500,
+                        cacheHeight: 850,
                         images[index],
                         fit: BoxFit.cover,
                         alignment: Alignment.center,
@@ -81,7 +81,8 @@ class ImagesTileView extends StatelessWidget {
                         child: Center(
                           child: Text(
                             '+$additionalImages',
-                            style: const TextStyle(color: Colors.white, fontSize: 38),
+                            style: const TextStyle(
+                                color: Colors.white, fontSize: 38),
                           ),
                         ),
                       ),
