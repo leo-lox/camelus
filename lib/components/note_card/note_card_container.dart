@@ -137,7 +137,7 @@ class _NoteCardContainerState extends ConsumerState<NoteCardContainer> {
                     _onNoteTab(context, note);
                   },
                   child: Container(
-                    //color: Palette.background,
+                    //color: Palette.purple,
                     child: NoteCard(note: note),
                   ),
                 ),

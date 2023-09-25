@@ -2,7 +2,10 @@ import 'dart:async';
 import 'dart:developer';
 
 import 'package:camelus/db/entities/db_note.dart';
+import 'package:camelus/db/queries/db_note_queries.dart';
+import 'package:camelus/helpers/bip340.dart';
 import 'package:camelus/models/nostr_note.dart';
+import 'package:hex/hex.dart';
 import 'package:isar/isar.dart';
 
 class DbNoteStackInsert {
@@ -65,14 +68,42 @@ class DbNoteStackInsert {
       dbNotes.add(myIsarNote);
     }
 
-    log('inserting ${dbNotes.length} notes');
+    final List<Future> futures = [];
+    for (var note in dbNotes) {
+      futures.add(_insertSingleNote(note));
+    }
+    await Future.wait(futures);
+  }
 
-    await db.writeTxn(() async {
+  Future _insertSingleNote(DbNote note) async {
+    return await db.writeTxn(() async {
       try {
-        await db.dbNotes.putAllByNostr_id(dbNotes);
+        DbNote? oldNote = await db.dbNotes.getByNostr_id(note.nostr_id);
+        if (oldNote != null) {
+          return;
+        }
+
+        final valid = await verifyNote(note);
+
+        await db.dbNotes.put(note..sig_valid = valid);
       } catch (e) {
         log("error: $e");
       }
     });
+  }
+
+  final Bip340 _bip340 = Bip340();
+  verifyNote(DbNote note) async {
+    bool valid = false;
+    try {
+      valid = _bip340.verify(
+        note.nostr_id,
+        note.sig,
+        note.pubkey,
+      );
+    } catch (e) {
+      log("error: $e");
+    }
+    return valid;
   }
 }

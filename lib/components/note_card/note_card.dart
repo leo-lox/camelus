@@ -13,15 +13,22 @@ import 'package:camelus/config/palette.dart';
 import 'package:camelus/db/entities/db_user_metadata.dart';
 import 'package:camelus/models/nostr_note.dart';
 import 'package:camelus/models/post_context.dart';
+import 'package:camelus/providers/database_provider.dart';
 import 'package:camelus/providers/metadata_provider.dart';
 import 'package:camelus/services/nostr/metadata/user_metadata.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:isar/isar.dart';
 
 class NoteCard extends ConsumerStatefulWidget {
   final NostrNote note;
+  final bool hideBottomBar;
 
-  const NoteCard({Key? key, required this.note}) : super(key: key);
+  const NoteCard({
+    Key? key,
+    required this.note,
+    this.hideBottomBar = false,
+  }) : super(key: key);
 
   @override
   ConsumerState<NoteCard> createState() => _NoteCardState();
@@ -36,31 +43,19 @@ class _NoteCardState extends ConsumerState<NoteCard> {
     Navigator.pushNamed(context, "/nostr/hastag", arguments: hashtag);
   }
 
-  late UserMetadata metadata;
-
-  late NoteCardSplitContent splitContent;
-
-  void _splitContent() {
-    splitContent =
-        NoteCardSplitContent(widget.note, metadata, _openProfile, _openHashtag);
-
-    setState(() {});
-  }
+  late final UserMetadata metadata;
+  late final Future<Isar> dbFuture;
 
   @override
   void initState() {
     super.initState();
     metadata = ref.read(metadataProvider);
-    _splitContent();
+    dbFuture = ref.read(databaseProvider.future);
   }
 
   @override
   void didUpdateWidget(covariant NoteCard oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.note.id != widget.note.id) {
-      _splitContent();
-      metadata = ref.watch(metadataProvider);
-    }
   }
 
   @override
@@ -80,6 +75,20 @@ class _NoteCardState extends ConsumerState<NoteCard> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        if (widget.note.sig_valid != true)
+          Center(
+            child: Container(
+              decoration: const BoxDecoration(
+                color: Colors.red,
+                borderRadius: BorderRadius.all(Radius.circular(25)),
+              ),
+              child: const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 25, vertical: 8),
+                child:
+                    Text("Invalid signature!", style: TextStyle(fontSize: 15)),
+              ),
+            ),
+          ),
         Padding(
           padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
           child: Column(
@@ -137,27 +146,28 @@ class _NoteCardState extends ConsumerState<NoteCard> {
                             ),
 
                             const SizedBox(height: 10),
-                            splitContent.content,
+                            NoteCardSplitContent(
+                              note: widget.note,
+                              profileCallback: _openProfile,
+                              hashtagCallback: _openHashtag,
+                            ),
 
                             const SizedBox(height: 6),
-                            if (splitContent.imageLinks.isNotEmpty)
-                              ImagesTileView(
-                                images: splitContent.imageLinks,
-                                //galleryBottomWidget: splitContent.content,
+
+                            if (!widget.hideBottomBar)
+                              Padding(
+                                padding: const EdgeInsets.only(top: 10.0),
+                                child: BottomActionRow(
+                                  onComment: () {
+                                    _writeReply(context, widget.note);
+                                  },
+                                  onLike: () {},
+                                  onRetweet: () {},
+                                  onShare: () {
+                                    openBottomSheetShare(context, widget.note);
+                                  },
+                                ),
                               ),
-                            Padding(
-                              padding: const EdgeInsets.only(top: 10.0),
-                              child: BottomActionRow(
-                                onComment: () {
-                                  _writeReply(context, widget.note);
-                                },
-                                onLike: () {},
-                                onRetweet: () {},
-                                onShare: () {
-                                  openBottomSheetShare(context, widget.note);
-                                },
-                              ),
-                            ),
                             const SizedBox(height: 20),
                             // show text if replies > 0
                           ],
@@ -170,10 +180,11 @@ class _NoteCardState extends ConsumerState<NoteCard> {
             ],
           ),
         ),
-        const Divider(
-          thickness: 0.3,
-          color: Palette.darkGray,
-        )
+        if (!widget.hideBottomBar)
+          const Divider(
+            thickness: 0.3,
+            color: Palette.darkGray,
+          ),
       ],
     );
   }

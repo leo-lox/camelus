@@ -147,4 +147,38 @@ abstract class DbNoteQueries {
     return findRepliesByIdAndByKindQuery(db, id: id, kind: kind)
         .watch(fireImmediately: true);
   }
+
+  ///
+  /// findNotebyId
+  ///
+
+  static Query<DbNote> findNotebyIdQuery(Isar db, {required String id}) {
+    return db.dbNotes.filter().nostr_idEqualTo(id).build();
+  }
+
+  static Future<DbNote?> findNotebyIdFuture(Isar db, {required String id}) {
+    return findNotebyIdQuery(db, id: id).findFirst();
+  }
+
+  static Stream<List<DbNote?>> findNotebyIdStream(Isar db,
+      {required String id}) {
+    return findNotebyIdQuery(db, id: id).watch(fireImmediately: true);
+  }
+
+  ///
+  /// find by dbIds
+  ///
+
+  static Query<DbNote> findNotesByDbIdsQuery(Isar db,
+      {required List<int> dbIds}) {
+    return db.dbNotes
+        .filter()
+        .anyOf<int, DbNote>(dbIds, (q, element) => q.idEqualTo(element))
+        .build();
+  }
+
+  static Future<List<DbNote>> findNotesByDbIdsFuture(Isar db,
+      {required List<int> dbIds}) {
+    return findNotesByDbIdsQuery(db, dbIds: dbIds).findAll();
+  }
 }

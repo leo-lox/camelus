@@ -57,8 +57,13 @@ const DbNoteSchema = CollectionSchema(
       name: r'sig',
       type: IsarType.string,
     ),
-    r'tags': PropertySchema(
+    r'sig_valid': PropertySchema(
       id: 8,
+      name: r'sig_valid',
+      type: IsarType.bool,
+    ),
+    r'tags': PropertySchema(
+      id: 9,
       name: r'tags',
       type: IsarType.objectList,
       target: r'DbTag',
@@ -196,8 +201,9 @@ void _dbNoteSerialize(
   writer.writeString(offsets[5], object.nostr_id);
   writer.writeString(offsets[6], object.pubkey);
   writer.writeString(offsets[7], object.sig);
+  writer.writeBool(offsets[8], object.sig_valid);
   writer.writeObjectList<DbTag>(
-    offsets[8],
+    offsets[9],
     allOffsets,
     DbTagSchema.serialize,
     object.tags,
@@ -219,13 +225,14 @@ DbNote _dbNoteDeserialize(
     pubkey: reader.readString(offsets[6]),
     sig: reader.readString(offsets[7]),
     tags: reader.readObjectList<DbTag>(
-      offsets[8],
+      offsets[9],
       DbTagSchema.deserialize,
       allOffsets,
       DbTag(),
     ),
   );
   object.id = id;
+  object.sig_valid = reader.readBoolOrNull(offsets[8]);
   return object;
 }
 
@@ -253,6 +260,8 @@ P _dbNoteDeserializeProp<P>(
     case 7:
       return (reader.readString(offset)) as P;
     case 8:
+      return (reader.readBoolOrNull(offset)) as P;
+    case 9:
       return (reader.readObjectList<DbTag>(
         offset,
         DbTagSchema.deserialize,
@@ -1916,6 +1925,32 @@ extension DbNoteQueryFilter on QueryBuilder<DbNote, DbNote, QFilterCondition> {
     });
   }
 
+  QueryBuilder<DbNote, DbNote, QAfterFilterCondition> sig_validIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'sig_valid',
+      ));
+    });
+  }
+
+  QueryBuilder<DbNote, DbNote, QAfterFilterCondition> sig_validIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'sig_valid',
+      ));
+    });
+  }
+
+  QueryBuilder<DbNote, DbNote, QAfterFilterCondition> sig_validEqualTo(
+      bool? value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'sig_valid',
+        value: value,
+      ));
+    });
+  }
+
   QueryBuilder<DbNote, DbNote, QAfterFilterCondition> tagsIsNull() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(const FilterCondition.isNull(
@@ -2112,6 +2147,18 @@ extension DbNoteQuerySortBy on QueryBuilder<DbNote, DbNote, QSortBy> {
       return query.addSortBy(r'sig', Sort.desc);
     });
   }
+
+  QueryBuilder<DbNote, DbNote, QAfterSortBy> sortBySig_valid() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'sig_valid', Sort.asc);
+    });
+  }
+
+  QueryBuilder<DbNote, DbNote, QAfterSortBy> sortBySig_validDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'sig_valid', Sort.desc);
+    });
+  }
 }
 
 extension DbNoteQuerySortThenBy on QueryBuilder<DbNote, DbNote, QSortThenBy> {
@@ -2210,6 +2257,18 @@ extension DbNoteQuerySortThenBy on QueryBuilder<DbNote, DbNote, QSortThenBy> {
       return query.addSortBy(r'sig', Sort.desc);
     });
   }
+
+  QueryBuilder<DbNote, DbNote, QAfterSortBy> thenBySig_valid() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'sig_valid', Sort.asc);
+    });
+  }
+
+  QueryBuilder<DbNote, DbNote, QAfterSortBy> thenBySig_validDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'sig_valid', Sort.desc);
+    });
+  }
 }
 
 extension DbNoteQueryWhereDistinct on QueryBuilder<DbNote, DbNote, QDistinct> {
@@ -2262,6 +2321,12 @@ extension DbNoteQueryWhereDistinct on QueryBuilder<DbNote, DbNote, QDistinct> {
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'sig', caseSensitive: caseSensitive);
+    });
+  }
+
+  QueryBuilder<DbNote, DbNote, QDistinct> distinctBySig_valid() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'sig_valid');
     });
   }
 }
@@ -2318,6 +2383,12 @@ extension DbNoteQueryProperty on QueryBuilder<DbNote, DbNote, QQueryProperty> {
   QueryBuilder<DbNote, String, QQueryOperations> sigProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'sig');
+    });
+  }
+
+  QueryBuilder<DbNote, bool?, QQueryOperations> sig_validProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'sig_valid');
     });
   }
 

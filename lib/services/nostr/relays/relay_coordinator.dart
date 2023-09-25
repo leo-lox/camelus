@@ -1,9 +1,11 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
+import 'dart:isolate';
 
 import 'package:camelus/db/entities/db_note.dart';
 import 'package:camelus/helpers/bip340.dart';
+import 'package:camelus/isolates/db_worker.dart';
 import 'package:camelus/models/nostr_note.dart';
 import 'package:camelus/models/nostr_request_event.dart';
 import 'package:camelus/models/nostr_request_query.dart';
@@ -25,6 +27,7 @@ class RelayCoordinator {
 
   late Isar _db;
   late KeyPair _keyPair;
+  late SendPort _dbWorkerSendPort;
 
   final List<RelaySubscriptionHolder> _activeSubscriptions = [];
   final List<MyRelay> _relays = [];
@@ -53,6 +56,8 @@ class RelayCoordinator {
   }
 
   _init() async {
+    _dbWorkerSendPort = await initIsolate();
+
     _db = await dbFuture;
     _keyPair = (await keyPairFuture).keyPair!;
 
@@ -576,6 +581,7 @@ class RelayCoordinator {
       write: write,
       persistance: persistance,
       blockMuteService: _blockMuteService,
+      dbWorkerSendPort: _dbWorkerSendPort,
     );
     try {
       await relay.connect();
