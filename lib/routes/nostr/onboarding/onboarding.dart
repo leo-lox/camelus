@@ -1,7 +1,10 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:camelus/providers/key_pair_provider.dart';
 import 'package:camelus/routes/home_page.dart';
+import 'package:camelus/routes/nostr/onboarding/page01.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:camelus/config/palette.dart';
 import 'package:camelus/helpers/bip340.dart';
@@ -9,6 +12,7 @@ import 'package:flutter/services.dart';
 import 'package:camelus/helpers/helpers.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:intro_slider/intro_slider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class NostrOnboarding extends ConsumerStatefulWidget {
@@ -103,219 +107,12 @@ class _NostrOnboardingState extends ConsumerState<NostrOnboarding> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: null,
-      backgroundColor: Palette.background,
-      body: SafeArea(
-        // input for the user to enter their private key, should be visible on a dark background.
-        child: Container(
-          width: MediaQuery.of(context).size.width,
-          height: MediaQuery.of(context).size.height,
-          padding: const EdgeInsets.all(30),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              const Spacer(),
-              // the logo
-              const Text(
-                "camelus",
-                style: TextStyle(
-                    color: Palette.white,
-                    fontSize: 45,
-                    fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 20),
-              // the title
-              const Text(
-                "early preview",
-                style: TextStyle(
-                  color: Palette.white,
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 20),
-              // the subtitle
-
-              const SizedBox(height: 20),
-              // the input field
-
-              const Text(
-                "This is your private key:",
-                style: TextStyle(
-                  color: Palette.white,
-                  fontSize: 24,
-                  fontWeight: FontWeight.normal,
-                ),
-              ),
-              const SizedBox(height: 20),
-              Container(
-                width: MediaQuery.of(context).size.width,
-                height: 60,
-                decoration: BoxDecoration(
-                  color: Palette.white,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Center(
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: GestureDetector(
-                      onTap: () {
-                        copyToClipboard(myKeys.privateKeyHr);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('private key copied to clipboard'),
-                            duration: Duration(seconds: 3),
-                          ),
-                        );
-                      },
-                      child: Text(
-                        myKeys.privateKeyHr,
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(
-                          color: Colors.black,
-                          fontSize: 15,
-                          fontWeight: FontWeight.normal,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 10),
-              const Text(
-                "keep it safe and secret!",
-                style: TextStyle(
-                  color: Palette.white,
-                  fontSize: 12,
-                  fontWeight: FontWeight.normal,
-                ),
-              ),
-              const SizedBox(height: 50),
-              // checkbox to accept the privacy policy
-
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  ElevatedButton(
-                    onPressed: () {
-                      _pasteFromClipboard();
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Palette.background,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
-                        side: const BorderSide(color: Palette.white, width: 1),
-                      ),
-                    ),
-                    child: const Text(
-                      'paste',
-                      style: TextStyle(
-                        color: Palette.white,
-                        fontSize: 16,
-                      ),
-                    ),
-                  ),
-                  ElevatedButton(
-                    onPressed: () {
-                      _onSubmit();
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Palette.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
-                        side: const BorderSide(
-                            color: Palette.background, width: 1),
-                      ),
-                    ),
-                    child: const Text(
-                      'next',
-                      style: TextStyle(
-                        color: Palette.background,
-                        fontSize: 16,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 15),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Checkbox(
-                    value: _termsAndConditions,
-                    onChanged: (value) {
-                      setState(() {
-                        _termsAndConditions = value!;
-                      });
-                    },
-                    activeColor: Palette.white,
-                    checkColor: Palette.black,
-                    fillColor: MaterialStateProperty.all(Palette.white),
-                    //overlayColor: MaterialStateProperty.all(Palette.primary),
-                  ),
-                  const Text(
-                    "I have read and accept the ",
-                    style: TextStyle(
-                      color: Palette.white,
-                      fontSize: 12,
-                      fontWeight: FontWeight.normal,
-                    ),
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      Uri url = Uri.parse("https://camelus.app/terms/");
-                      launchUrl(url, mode: LaunchMode.externalApplication);
-                    },
-                    child: const Text(
-                      "terms and conditions",
-                      style: TextStyle(
-                        color: Palette.white,
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                        decoration: TextDecoration.underline,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 5),
-              GestureDetector(
-                onTap: () {
-                  Uri url = Uri.parse("https://camelus.app/privacy/");
-                  launchUrl(url, mode: LaunchMode.externalApplication);
-                },
-                child: const Text(
-                  "privacy policy",
-                  style: TextStyle(
-                    color: Palette.white,
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                    decoration: TextDecoration.underline,
-                  ),
-                ),
-              ),
-
-              const Spacer(),
-
-              // the bottom text
-              const Text(
-                "This is a very early version of the app, use at your own risk. \n\nI would not recommend using this app with your personal keys. Just use the generated ones for testing.",
-                style: TextStyle(
-                  color: Palette.gray,
-                  fontSize: 12,
-                  fontWeight: FontWeight.normal,
-                ),
-              ),
-              const SizedBox(height: 20),
-            ],
-          ),
-        ),
-      ),
+    return IntroSlider(
+      listCustomTabs: [
+        OnboardingPage01(),
+        Text("page2"),
+        Text("page3"),
+      ],
     );
   }
 }
