@@ -8,14 +8,17 @@ import 'package:flutter/widgets.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class OnboardingPage01 extends ConsumerStatefulWidget {
-  const OnboardingPage01({Key? key}) : super(key: key);
+  Function loginCallback;
+
+  OnboardingPage01({
+    Key? key,
+    required this.loginCallback,
+  }) : super(key: key);
   @override
   ConsumerState<OnboardingPage01> createState() => _OnboardingPage01State();
 }
 
 class _OnboardingPage01State extends ConsumerState<OnboardingPage01> {
-  void _navigateToLogin(BuildContext context) {}
-
   @override
   Widget build(BuildContext context) {
     return Center(
@@ -63,7 +66,7 @@ class _OnboardingPage01State extends ConsumerState<OnboardingPage01> {
             child: longButton(
               name: "login",
               onPressed: (() {
-                _navigateToLogin(context);
+                widget.loginCallback();
               }),
               inverted: false,
             ),

@@ -56,6 +56,11 @@ class _NostrOnboardingState extends ConsumerState<NostrOnboarding>
     });
   }
 
+  _navigateToLogin() {
+    _horizontalPageController.animateToPage(0,
+        duration: Duration(milliseconds: 500), curve: Curves.easeInOut);
+  }
+
   @override
   void initState() {
     super.initState();
@@ -153,7 +158,9 @@ class _NostrOnboardingState extends ConsumerState<NostrOnboarding>
             TabBarView(
               controller: _tabController,
               children: [
-                OnboardingPage01(),
+                OnboardingPage01(
+                  loginCallback: _navigateToLogin,
+                ),
                 Text("page2"),
                 Text("page3"),
               ],
