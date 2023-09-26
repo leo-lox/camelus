@@ -3,8 +3,10 @@ import 'dart:developer';
 
 import 'package:camelus/providers/key_pair_provider.dart';
 import 'package:camelus/routes/home_page.dart';
+import 'package:camelus/routes/nostr/onboarding/onboarding_login.dart';
+
 import 'package:camelus/routes/nostr/onboarding/onboarding_page01.dart';
-import 'package:flutter/cupertino.dart';
+
 import 'package:flutter/material.dart';
 import 'package:camelus/config/palette.dart';
 import 'package:camelus/helpers/bip340.dart';
@@ -30,6 +32,30 @@ class _NostrOnboardingState extends ConsumerState<NostrOnboarding>
 
   late TabController _tabController;
 
+  PageController _horizontalPageController =
+      PageController(initialPage: 1, keepPage: true);
+  bool horizontalScrollLock = false;
+
+  void _setupTabLiseners() {
+    // listen to changes of tabs
+    _tabController.addListener(() {
+      if (_tabController.index >= 1) {
+        setState(() {
+          horizontalScrollLock = true;
+        });
+      } else {
+        setState(() {
+          horizontalScrollLock = false;
+        });
+      }
+    });
+    _horizontalPageController.addListener(() {
+      if (horizontalScrollLock) {
+        _horizontalPageController.jumpToPage(1);
+      }
+    });
+  }
+
   @override
   void initState() {
     super.initState();
@@ -38,6 +64,7 @@ class _NostrOnboardingState extends ConsumerState<NostrOnboarding>
       initialIndex: 0,
       vsync: this,
     );
+    _setupTabLiseners();
   }
 
   @override
@@ -118,12 +145,19 @@ class _NostrOnboardingState extends ConsumerState<NostrOnboarding>
     return Scaffold(
       backgroundColor: Palette.background,
       body: SafeArea(
-        child: TabBarView(
-          controller: _tabController,
+        child: PageView(
+          controller: _horizontalPageController,
+          scrollDirection: Axis.vertical,
           children: [
-            OnboardingPage01(),
-            Text("page2"),
-            Text("page3"),
+            OnboardingLoginPage(),
+            TabBarView(
+              controller: _tabController,
+              children: [
+                OnboardingPage01(),
+                Text("page2"),
+                Text("page3"),
+              ],
+            ),
           ],
         ),
       ),

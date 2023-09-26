@@ -2,6 +2,8 @@ import 'dart:developer';
 
 import 'package:camelus/atoms/long_button.dart';
 import 'package:camelus/config/palette.dart';
+import 'package:camelus/routes/nostr/onboarding/onboarding_login.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -12,6 +14,8 @@ class OnboardingPage01 extends ConsumerStatefulWidget {
 }
 
 class _OnboardingPage01State extends ConsumerState<OnboardingPage01> {
+  void _navigateToLogin(BuildContext context) {}
+
   @override
   Widget build(BuildContext context) {
     return Center(
@@ -59,7 +63,7 @@ class _OnboardingPage01State extends ConsumerState<OnboardingPage01> {
             child: longButton(
               name: "login",
               onPressed: (() {
-                log("login");
+                _navigateToLogin(context);
               }),
               inverted: false,
             ),
