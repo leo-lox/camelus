@@ -26,4 +26,8 @@ class KeyPairWrapper {
   setKeyPair(KeyPair myKeyPair) {
     keyPair = myKeyPair;
   }
+
+  removeKeyPair() {
+    keyPair = null;
+  }
 }

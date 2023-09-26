@@ -68,6 +68,7 @@ dependencies:
   encrypt: ^5.0.3
   kepler: ^1.0.3
   intro_slider: ^4.2.1
+  device_preview: ^1.1.0
 
 dev_dependencies:
   floor_generator: ^1.4.2

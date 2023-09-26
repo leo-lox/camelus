@@ -3,7 +3,7 @@ import 'dart:developer';
 
 import 'package:camelus/providers/key_pair_provider.dart';
 import 'package:camelus/routes/home_page.dart';
-import 'package:camelus/routes/nostr/onboarding/page01.dart';
+import 'package:camelus/routes/nostr/onboarding/onboarding_page01.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:camelus/config/palette.dart';
@@ -107,12 +107,19 @@ class _NostrOnboardingState extends ConsumerState<NostrOnboarding> {
 
   @override
   Widget build(BuildContext context) {
-    return IntroSlider(
-      listCustomTabs: [
-        OnboardingPage01(),
-        Text("page2"),
-        Text("page3"),
-      ],
+    return Scaffold(
+      backgroundColor: Palette.background,
+      body: SafeArea(
+        child: IntroSlider(
+          isShowSkipBtn: false,
+          isShowNextBtn: false,
+          listCustomTabs: [
+            OnboardingPage01(),
+            Text("page2"),
+            Text("page3"),
+          ],
+        ),
+      ),
     );
   }
 }
