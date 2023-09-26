@@ -67,6 +67,7 @@ dependencies:
   pointycastle: ^3.7.3
   encrypt: ^5.0.3
   kepler: ^1.0.3
+  intro_slider: ^4.2.1
 
 dev_dependencies:
   floor_generator: ^1.4.2
@@ -114,12 +115,12 @@ flutter:
   # "family" key with the font family name, and a "fonts" key with a
   # list giving the asset and other descriptors for the font. For
   # example:
-  # fonts:
-  #   - family: Schyler
-  #     fonts:
-  #       - asset: fonts/Schyler-Regular.ttf
-  #       - asset: fonts/Schyler-Italic.ttf
-  #         style: italic
+  fonts:
+    - family: Poppins
+      fonts:
+        - asset: fonts/Poppins/Poppins-Regular.ttf
+        - asset: fonts/Poppins/Poppins-Italic.ttf
+          style: italic
   #   - family: Trajan Pro
   #     fonts:
   #       - asset: fonts/TrajanPro.ttf
