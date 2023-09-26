@@ -12,7 +12,7 @@ import 'package:flutter/services.dart';
 import 'package:camelus/helpers/helpers.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:intro_slider/intro_slider.dart';
+
 import 'package:url_launcher/url_launcher.dart';
 
 class NostrOnboarding extends ConsumerStatefulWidget {
@@ -22,14 +22,22 @@ class NostrOnboarding extends ConsumerStatefulWidget {
   ConsumerState<NostrOnboarding> createState() => _NostrOnboardingState();
 }
 
-class _NostrOnboardingState extends ConsumerState<NostrOnboarding> {
+class _NostrOnboardingState extends ConsumerState<NostrOnboarding>
+    with TickerProviderStateMixin {
   var myKeys = Bip340().generatePrivateKey();
 
   bool _termsAndConditions = false;
 
+  late TabController _tabController;
+
   @override
   void initState() {
     super.initState();
+    _tabController = TabController(
+      length: 3,
+      initialIndex: 0,
+      vsync: this,
+    );
   }
 
   @override
@@ -110,10 +118,9 @@ class _NostrOnboardingState extends ConsumerState<NostrOnboarding> {
     return Scaffold(
       backgroundColor: Palette.background,
       body: SafeArea(
-        child: IntroSlider(
-          isShowSkipBtn: false,
-          isShowNextBtn: false,
-          listCustomTabs: [
+        child: TabBarView(
+          controller: _tabController,
+          children: [
             OnboardingPage01(),
             Text("page2"),
             Text("page3"),

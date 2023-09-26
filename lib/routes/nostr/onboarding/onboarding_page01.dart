@@ -40,6 +40,7 @@ class _OnboardingPage01State extends ConsumerState<OnboardingPage01> {
             flex: 10,
           ),
           Container(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
             width: 400,
             height: 40,
             child: longButton(
@@ -52,6 +53,7 @@ class _OnboardingPage01State extends ConsumerState<OnboardingPage01> {
             height: 30,
           ),
           Container(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
             width: 400,
             height: 40,
             child: longButton(
