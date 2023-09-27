@@ -32,8 +32,10 @@ class _NostrOnboardingState extends ConsumerState<NostrOnboarding>
 
   late TabController _tabController;
 
-  PageController _horizontalPageController =
-      PageController(initialPage: 1, keepPage: true);
+  final PageController _horizontalPageController = PageController(
+    initialPage: 1,
+    keepPage: true,
+  );
   bool horizontalScrollLock = false;
 
   void _setupTabLiseners() {

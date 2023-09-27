@@ -81,6 +81,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.2.0"
+  bip39_mnemonic:
+    dependency: "direct main"
+    description:
+      name: bip39_mnemonic
+      sha256: "24855a62fb9dd930f697063a274e084b0a574e1cc55ec270ca4756f579ab512c"
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.0.6"
   boolean_selector:
     dependency: transitive
     description:
@@ -1273,6 +1281,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.3.1"
+  unorm_dart:
+    dependency: transitive
+    description:
+      name: unorm_dart
+      sha256: "5b35bff83fce4d76467641438f9e867dc9bcfdb8c1694854f230579d68cd8f4b"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.2.0"
   url_launcher:
     dependency: "direct main"
     description:
