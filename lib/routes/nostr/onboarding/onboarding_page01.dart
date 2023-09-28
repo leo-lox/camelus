@@ -23,62 +23,65 @@ class OnboardingPage01 extends ConsumerStatefulWidget {
 class _OnboardingPage01State extends ConsumerState<OnboardingPage01> {
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Spacer(
-            flex: 10,
-          ),
-          Text(
-            "welcome to",
-            style: TextStyle(
-              color: Palette.extraLightGray,
-              fontSize: MediaQuery.of(context).size.width / 22,
+    return Scaffold(
+      backgroundColor: Palette.background,
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Spacer(
+              flex: 10,
             ),
-          ),
-          Text(
-            "camelus",
-            style: TextStyle(
-              color: Palette.white,
-              fontSize: MediaQuery.of(context).size.width / 7,
-              fontFamily: 'Poppins',
+            Text(
+              "welcome to",
+              style: TextStyle(
+                color: Palette.extraLightGray,
+                fontSize: MediaQuery.of(context).size.width / 22,
+              ),
             ),
-          ),
-          const Spacer(
-            flex: 10,
-          ),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            width: 400,
-            height: 40,
-            child: longButton(
-              name: "join the conversation",
-              onPressed: (() {
-                widget.registerCallback();
-              }),
-              inverted: true,
+            Text(
+              "camelus",
+              style: TextStyle(
+                color: Palette.white,
+                fontSize: MediaQuery.of(context).size.width / 7,
+                fontFamily: 'Poppins',
+              ),
             ),
-          ),
-          const SizedBox(
-            height: 30,
-          ),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            width: 400,
-            height: 40,
-            child: longButton(
-              name: "login",
-              onPressed: (() {
-                widget.loginCallback();
-              }),
-              inverted: false,
+            const Spacer(
+              flex: 10,
             ),
-          ),
-          const Spacer(
-            flex: 2,
-          ),
-        ],
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              width: 400,
+              height: 40,
+              child: longButton(
+                name: "join the conversation",
+                onPressed: (() {
+                  widget.registerCallback();
+                }),
+                inverted: true,
+              ),
+            ),
+            const SizedBox(
+              height: 30,
+            ),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              width: 400,
+              height: 40,
+              child: longButton(
+                name: "login",
+                onPressed: (() {
+                  widget.loginCallback();
+                }),
+                inverted: false,
+              ),
+            ),
+            const Spacer(
+              flex: 2,
+            ),
+          ],
+        ),
       ),
     );
   }

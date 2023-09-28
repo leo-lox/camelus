@@ -4,6 +4,7 @@ import 'dart:developer';
 import 'package:camelus/providers/key_pair_provider.dart';
 import 'package:camelus/routes/home_page.dart';
 import 'package:camelus/routes/nostr/onboarding/onboarding_login.dart';
+import 'package:camelus/routes/nostr/onboarding/onboarding_name.dart';
 
 import 'package:camelus/routes/nostr/onboarding/onboarding_page01.dart';
 
@@ -120,34 +121,32 @@ class _NostrOnboardingState extends ConsumerState<NostrOnboarding>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Palette.background,
-      resizeToAvoidBottomInset: false,
-      body: SafeArea(
-        child: PageView(
-          controller: _horizontalPageController,
-          scrollDirection: Axis.vertical,
-          children: [
-            OnboardingLoginPage(),
-            TabBarView(
-              controller: _tabController,
-              children: [
-                OnboardingPage01(
-                  loginCallback: _navigateToLogin,
-                  registerCallback: () {
-                    _tabController.animateTo(
-                      1,
-                      curve: Curves.easeInOut,
-                      duration: const Duration(milliseconds: 500),
-                    );
-                  },
-                ),
-                Text("page2"),
-                Text("page3"),
-              ],
-            ),
-          ],
-        ),
+    return SafeArea(
+      child: PageView(
+        controller: _horizontalPageController,
+        scrollDirection: Axis.vertical,
+        children: [
+          OnboardingLoginPage(),
+          TabBarView(
+            controller: _tabController,
+            children: [
+              OnboardingPage01(
+                loginCallback: _navigateToLogin,
+                registerCallback: () {
+                  _tabController.animateTo(
+                    1,
+                    curve: Curves.easeInOut,
+                    duration: const Duration(milliseconds: 500),
+                  );
+                },
+              ),
+              OnboardingName(
+                nameCallback: () {},
+              ),
+              Text("page3"),
+            ],
+          ),
+        ],
       ),
     );
   }
