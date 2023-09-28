@@ -9,10 +9,12 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class OnboardingPage01 extends ConsumerStatefulWidget {
   Function loginCallback;
+  Function registerCallback;
 
   OnboardingPage01({
     Key? key,
     required this.loginCallback,
+    required this.registerCallback,
   }) : super(key: key);
   @override
   ConsumerState<OnboardingPage01> createState() => _OnboardingPage01State();
@@ -52,7 +54,9 @@ class _OnboardingPage01State extends ConsumerState<OnboardingPage01> {
             height: 40,
             child: longButton(
               name: "join the conversation",
-              onPressed: (() {}),
+              onPressed: (() {
+                widget.registerCallback();
+              }),
               inverted: true,
             ),
           ),

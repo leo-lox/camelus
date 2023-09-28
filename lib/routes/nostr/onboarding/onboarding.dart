@@ -60,7 +60,7 @@ class _NostrOnboardingState extends ConsumerState<NostrOnboarding>
 
   _navigateToLogin() {
     _horizontalPageController.animateToPage(0,
-        duration: Duration(milliseconds: 500), curve: Curves.easeInOut);
+        duration: const Duration(milliseconds: 500), curve: Curves.easeInOut);
   }
 
   @override
@@ -162,6 +162,13 @@ class _NostrOnboardingState extends ConsumerState<NostrOnboarding>
               children: [
                 OnboardingPage01(
                   loginCallback: _navigateToLogin,
+                  registerCallback: () {
+                    _tabController.animateTo(
+                      1,
+                      curve: Curves.easeInOut,
+                      duration: const Duration(milliseconds: 500),
+                    );
+                  },
                 ),
                 Text("page2"),
                 Text("page3"),

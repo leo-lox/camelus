@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:hex/hex.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:bip39_mnemonic/bip39_mnemonic.dart';
@@ -28,26 +29,19 @@ class _OnboardingLoginPageState extends ConsumerState<OnboardingLoginPage> {
   KeyPair? myKeys;
 
   final TextEditingController _inputController = TextEditingController();
+  final FocusNode _inputFocusNode = FocusNode();
 
   List<String> _userWords = [];
+  String? _userNsec = "";
 
   void _pasteFromClipboard() async {
     final data = await Clipboard.getData(Clipboard.kTextPlain);
     //check if data starts not with with nsec
-    if (data == null || !(data.text!.startsWith('nsec'))) {
+    if (data == null) {
       showPasteError();
       return;
     }
-
-    var privkey = Helpers().decodeBech32(data.text!)[0];
-    var pubkey = Bip340().getPublicKey(privkey);
-    var privKeyHr = data.text!;
-    var publicKeyHr = Helpers().encodeBech32(pubkey, 'npub');
-
-    setState(() {
-      myKeys = KeyPair(privkey, pubkey, privKeyHr, publicKeyHr);
-    });
-    showPasteSuccess();
+    _addWords(data.text!);
   }
 
   void showPasteSuccess() {
@@ -66,6 +60,38 @@ class _OnboardingLoginPageState extends ConsumerState<OnboardingLoginPage> {
     );
   }
 
+  bool _setNsec(String nsec) {
+    try {
+      var privkey = Helpers().decodeBech32(nsec)[0];
+      var pubkey = Bip340().getPublicKey(privkey);
+      var privKeyHr = nsec;
+      var publicKeyHr = Helpers().encodeBech32(pubkey, 'npub');
+
+      setState(() {
+        myKeys = KeyPair(privkey, pubkey, privKeyHr, publicKeyHr);
+      });
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  void _getPrivkeyFromSeed(String seed) {
+    final mnemonic3 = Mnemonic.fromSentence(seed, Language.english);
+
+    // todo: m/44'/1237'/<account>'/0/0
+
+    final privkeyHex = HEX.encode(mnemonic3.seed);
+
+    var pubkey = Bip340().getPublicKey(privkeyHex);
+    var privKeyHr = Helpers().encodeBech32(privkeyHex, 'nsec');
+    var publicKeyHr = Helpers().encodeBech32(pubkey, 'npub');
+
+    setState(() {
+      myKeys = KeyPair(privkeyHex, pubkey, privKeyHr, publicKeyHr);
+    });
+  }
+
   _onSubmit() async {
     if (!_termsAndConditions) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -75,6 +101,10 @@ class _OnboardingLoginPageState extends ConsumerState<OnboardingLoginPage> {
         ),
       );
       return;
+    }
+
+    if (_userWords.isNotEmpty) {
+      _getPrivkeyFromSeed(_userWords.join(" "));
     }
 
     if (myKeys == null) {
@@ -125,8 +155,16 @@ class _OnboardingLoginPageState extends ConsumerState<OnboardingLoginPage> {
   void _addWord(String word) {
     word = word.toLowerCase();
     if (word.startsWith("nsec")) {
-      throw Exception("Todo implement nsec1");
+      setState(() {
+        _userWords = [];
+        _userNsec = word;
+      });
+      _setNsec(word);
+      return;
     }
+    setState(() {
+      _userNsec = null;
+    });
 
     if (word.startsWith("npub")) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -142,7 +180,12 @@ class _OnboardingLoginPageState extends ConsumerState<OnboardingLoginPage> {
 
     if (_checkWord(word)) {
       _userWords.add(word);
-    }
+    } else {}
+  }
+
+  @override
+  void initState() {
+    super.initState();
   }
 
   @override
@@ -161,82 +204,121 @@ class _OnboardingLoginPageState extends ConsumerState<OnboardingLoginPage> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               const SizedBox(height: 20),
-              Container(
-                width: MediaQuery.of(context).size.width,
-                height: 200,
-                decoration: BoxDecoration(
-                  color: Palette.extraDarkGray,
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(
-                    color: Palette.darkGray,
-                    width: 1,
-                  ),
-                ),
-                child: Center(
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: GridView.count(
-                      crossAxisSpacing: 10,
-                      mainAxisSpacing: 5,
-                      crossAxisCount: 3,
-                      childAspectRatio: (20 / 9),
-                      dragStartBehavior: DragStartBehavior.start,
-                      children: List.generate(
-                        _userWords.length,
-                        (index) {
-                          return Center(
-                            child: Center(
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.baseline,
-                                textBaseline: TextBaseline.alphabetic,
-                                children: [
-                                  Text(
-                                    (index + 1).toString(),
-                                    style: const TextStyle(
-                                      color: Palette.gray,
-                                      fontSize: 12,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 5),
-                                  Text(
-                                    _userWords[index],
-                                    style: const TextStyle(
-                                      color: Palette.extraLightGray,
-                                      fontSize: 16,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          );
-                        },
+
+              if (_userWords.isNotEmpty)
+                Column(
+                  children: [
+                    Container(
+                      width: MediaQuery.of(context).size.width,
+                      height: 200,
+                      decoration: BoxDecoration(
+                        color: Palette.extraDarkGray,
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(
+                          color: Palette.darkGray,
+                          width: 1,
+                        ),
                       ),
+                      child: seedPhraseCheck(),
                     ),
+                    const SizedBox(height: 5),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Text(
+                          "${_userWords.length}/${(_userWords.length <= 12 ? "12" : "24")}",
+                          style: TextStyle(
+                            color: (_userWords.length > 24)
+                                ? Palette.error
+                                : Palette.white,
+                            fontSize: 12,
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                      ],
+                    )
+                  ],
+                ),
+              if (_userWords.isEmpty)
+                SizedBox(
+                  height: 200,
+                  width: MediaQuery.of(context).size.width,
+                  child: const Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        "login",
+                        style: TextStyle(
+                          color: Palette.white,
+                          fontSize: 40,
+                          fontFamily: "Poppins",
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-              ),
 
               const SizedBox(height: 10),
-              Spacer(flex: 1),
+
+              AnimatedOpacity(
+                opacity: (_userNsec != null && myKeys != null) ? 1 : 0,
+                duration: const Duration(milliseconds: 300),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    const Text("your public key is:"),
+                    const SizedBox(height: 10),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Palette.extraDarkGray,
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(
+                          color: Palette.darkGray,
+                          width: 1,
+                        ),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: SizedBox(
+                          height: 40,
+                          child: Text(myKeys?.publicKeyHr ?? ""),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 15),
+                  ],
+                ),
+              ),
               Container(
                 child: TextField(
+                  onSubmitted: (value) {
+                    _addWords(value);
+                    _inputFocusNode.requestFocus();
+                  },
+                  focusNode: _inputFocusNode,
                   autofillHints: Language.english.list,
                   controller: _inputController,
+                  enableIMEPersonalizedLearning: false,
+                  textCapitalization: TextCapitalization.none,
                   decoration: const InputDecoration(
                     isDense: true,
                     hintText: 'enter your seed phrase or nsec1',
-                    hintStyle: const TextStyle(
-                        color: Palette.white, letterSpacing: 1.1),
+                    hintStyle:
+                        TextStyle(color: Palette.white, letterSpacing: 1.1),
                     filled: true,
                     fillColor: Palette.extraDarkGray,
-                    enabledBorder: const OutlineInputBorder(
+                    enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.all(Radius.circular(10)),
                       borderSide: BorderSide(color: Palette.extraDarkGray),
                     ),
-                    focusedBorder: const OutlineInputBorder(
+                    focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.all(Radius.circular(10)),
-                      borderSide: BorderSide(color: Palette.background),
+                      borderSide: BorderSide(color: Palette.gray),
+                    ),
+                    errorBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(10)),
+                      borderSide: BorderSide(color: Palette.purple),
                     ),
                   ),
                 ),
@@ -372,6 +454,107 @@ class _OnboardingLoginPageState extends ConsumerState<OnboardingLoginPage> {
 
               const SizedBox(height: 20),
             ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget seedPhraseCheck() {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: GridView.count(
+          crossAxisSpacing: 10,
+          mainAxisSpacing: 5,
+          crossAxisCount: 3,
+          childAspectRatio: (20 / 9),
+          dragStartBehavior: DragStartBehavior.start,
+          children: List.generate(
+            _userWords.length,
+            (index) {
+              return LongPressDraggable<int>(
+                data: index,
+                feedback: Material(
+                  color: Colors.transparent,
+                  child: Center(
+                    child: Container(
+                      width: 100,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        color: Palette.extraDarkGray,
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(
+                          color: Palette.darkGray,
+                          width: 1,
+                        ),
+                      ),
+                      child: Center(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.baseline,
+                          textBaseline: TextBaseline.alphabetic,
+                          children: [
+                            Text(
+                              (index + 1).toString(),
+                              style: const TextStyle(
+                                color: Palette.gray,
+                                fontSize: 12,
+                              ),
+                            ),
+                            const SizedBox(width: 5),
+                            Text(
+                              _userWords[index],
+                              style: const TextStyle(
+                                color: Palette.extraLightGray,
+                                fontSize: 16,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                child: DragTarget<int>(
+                  builder: (BuildContext context, List<int?> candidateData,
+                      List<dynamic> rejectedData) {
+                    return Center(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.baseline,
+                        textBaseline: TextBaseline.alphabetic,
+                        children: [
+                          Text(
+                            (index + 1).toString(),
+                            style: const TextStyle(
+                              color: Palette.gray,
+                              fontSize: 12,
+                            ),
+                          ),
+                          const SizedBox(width: 5),
+                          Text(
+                            _userWords[index],
+                            style: const TextStyle(
+                              color: Palette.extraLightGray,
+                              fontSize: 16,
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                  onWillAccept: (data) => data != index,
+                  onAccept: (data) {
+                    setState(() {
+                      String temp = _userWords[data];
+                      _userWords[data] = _userWords[index];
+                      _userWords[index] = temp;
+                    });
+                  },
+                ),
+              );
+            },
           ),
         ),
       ),
