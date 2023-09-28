@@ -1,5 +1,7 @@
 import 'dart:convert';
+import 'dart:developer';
 
+import 'package:bip32/bip32.dart' as bip32;
 import 'package:camelus/atoms/long_button.dart';
 import 'package:camelus/config/palette.dart';
 import 'package:camelus/helpers/bip340.dart';
@@ -32,6 +34,7 @@ class _OnboardingLoginPageState extends ConsumerState<OnboardingLoginPage> {
   final FocusNode _inputFocusNode = FocusNode();
 
   List<String> _userWords = [];
+  String? mneonicError;
   String? _userNsec = "";
 
   void _pasteFromClipboard() async {
@@ -44,18 +47,10 @@ class _OnboardingLoginPageState extends ConsumerState<OnboardingLoginPage> {
     _addWords(data.text!);
   }
 
-  void showPasteSuccess() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Private key successfully imported'),
-      ),
-    );
-  }
-
   void showPasteError() {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
-        content: Text('Invalid private key'),
+        content: Text('Invalid private key or seed phrase'),
       ),
     );
   }
@@ -76,20 +71,34 @@ class _OnboardingLoginPageState extends ConsumerState<OnboardingLoginPage> {
     }
   }
 
-  void _getPrivkeyFromSeed(String seed) {
-    final mnemonic3 = Mnemonic.fromSentence(seed, Language.english);
+  bool _getPrivkeyFromSeed(String seed) {
+    try {
+      final mnemonic3 = Mnemonic.fromSentence(seed, Language.english);
 
-    // todo: m/44'/1237'/<account>'/0/0
+      // list int to bytes
 
-    final privkeyHex = HEX.encode(mnemonic3.seed);
+      final Uint8List seedBytes = Uint8List.fromList(mnemonic3.entropy);
+      bip32.BIP32 node = bip32.BIP32.fromSeed(seedBytes);
 
-    var pubkey = Bip340().getPublicKey(privkeyHex);
-    var privKeyHr = Helpers().encodeBech32(privkeyHex, 'nsec');
-    var publicKeyHr = Helpers().encodeBech32(pubkey, 'npub');
+      //  m/44'/1237'/<account>'/0/0
+      bip32.BIP32 child = node.derivePath("m/44'/1237'/0'/0/0");
 
-    setState(() {
-      myKeys = KeyPair(privkeyHex, pubkey, privKeyHr, publicKeyHr);
-    });
+      final privkeyHex = HEX.encode(child.privateKey!);
+
+      var pubkey = Bip340().getPublicKey(privkeyHex);
+      var privKeyHr = Helpers().encodeBech32(privkeyHex, 'nsec');
+      var publicKeyHr = Helpers().encodeBech32(pubkey, 'npub');
+
+      setState(() {
+        myKeys = KeyPair(privkeyHex, pubkey, privKeyHr, publicKeyHr);
+      });
+      return true;
+    } catch (e) {
+      setState(() {
+        mneonicError = e.toString();
+      });
+      return false;
+    }
   }
 
   _onSubmit() async {
@@ -180,7 +189,19 @@ class _OnboardingLoginPageState extends ConsumerState<OnboardingLoginPage> {
 
     if (_checkWord(word)) {
       _userWords.add(word);
-    } else {}
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+              'word: $word is not valid, check if it is spelled correctly'),
+        ),
+      );
+    }
+
+    mneonicError = null;
+    if (_userWords.length == 12 || _userWords.length == 24) {
+      _getPrivkeyFromSeed(_userWords.join(" "));
+    }
   }
 
   @override
@@ -222,20 +243,27 @@ class _OnboardingLoginPageState extends ConsumerState<OnboardingLoginPage> {
                       child: seedPhraseCheck(),
                     ),
                     const SizedBox(height: 5),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        Text(
-                          "${_userWords.length}/${(_userWords.length <= 12 ? "12" : "24")}",
-                          style: TextStyle(
-                            color: (_userWords.length > 24)
-                                ? Palette.error
-                                : Palette.white,
-                            fontSize: 12,
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(mneonicError ?? "",
+                              style: const TextStyle(
+                                color: Palette.error,
+                                fontSize: 12,
+                              )),
+                          Text(
+                            "${_userWords.length}/${(_userWords.length <= 12 ? "12" : "24")}",
+                            style: TextStyle(
+                              color: (_userWords.length > 24)
+                                  ? Palette.error
+                                  : Palette.white,
+                              fontSize: 12,
+                            ),
                           ),
-                        ),
-                        const SizedBox(width: 10),
-                      ],
+                        ],
+                      ),
                     )
                   ],
                 ),

@@ -118,35 +118,6 @@ class _NostrOnboardingState extends ConsumerState<NostrOnboarding>
     );
   }
 
-  _onSubmit() async {
-    if (!_termsAndConditions) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content:
-              Text('Please read and accept the terms and conditions first'),
-        ),
-      );
-      return;
-    }
-
-    // store in secure storage
-    const storage = FlutterSecureStorage();
-    storage.write(key: "nostrKeys", value: json.encode(myKeys.toJson()));
-    // save in provider
-
-    var provider = await ref.watch(keyPairProvider.future);
-    provider.setKeyPair(myKeys);
-
-    setState(() {});
-
-    // ignore: use_build_context_synchronously
-    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
-      return HomePage(pubkey: myKeys.publicKey);
-    }));
-
-    //Navigator.popAndPushNamed(context, '/');
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
