@@ -122,6 +122,7 @@ class _NostrOnboardingState extends ConsumerState<NostrOnboarding>
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Palette.background,
+      resizeToAvoidBottomInset: false,
       body: SafeArea(
         child: PageView(
           controller: _horizontalPageController,

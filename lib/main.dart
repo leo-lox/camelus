@@ -19,6 +19,8 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'routes/home_page.dart';
 import 'theme.dart' as theme;
 
+const devDeviceFrame = false;
+
 //! first is route, second is pubkey
 Future<List<String>> _getInitialData() async {
   var wrapper = await ProviderContainer().read(keyPairProvider.future);
@@ -35,15 +37,18 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   var initalData = await _getInitialData();
 
-  runApp(
-    DevicePreview(
-      enabled: kDebugMode,
-      builder: (context) =>
-          MyApp(initialRoute: initalData[0], pubkey: initalData[1]),
-    ),
-  );
+  if (kDebugMode && devDeviceFrame) {
+    runApp(
+      DevicePreview(
+        enabled: kDebugMode,
+        builder: (context) =>
+            MyApp(initialRoute: initalData[0], pubkey: initalData[1]),
+      ),
+    );
+    return;
+  }
 
-  //runApp(MyApp(initialRoute: initalData[0], pubkey: initalData[1]));
+  runApp(MyApp(initialRoute: initalData[0], pubkey: initalData[1]));
 }
 
 class MyApp extends StatelessWidget {
@@ -58,7 +63,6 @@ class MyApp extends StatelessWidget {
     return Portal(
       child: ProviderScope(
         child: MaterialApp(
-          locale: DevicePreview.locale(context),
           scrollBehavior: const MaterialScrollBehavior().copyWith(
             scrollbars: false,
             dragDevices: {

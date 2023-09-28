@@ -214,6 +214,7 @@ class _OnboardingLoginPageState extends ConsumerState<OnboardingLoginPage> {
     return Scaffold(
       appBar: null,
       backgroundColor: Palette.background,
+      resizeToAvoidBottomInset: false,
       body: SafeArea(
         // input for the user to enter their private key, should be visible on a dark background.
         child: Container(
