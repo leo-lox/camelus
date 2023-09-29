@@ -15,7 +15,20 @@ class OnboardingName extends ConsumerStatefulWidget {
 }
 
 class _OnboardingNameState extends ConsumerState<OnboardingName> {
-  TextEditingController _nameController = TextEditingController();
+  final TextEditingController _nameController = TextEditingController();
+  final FocusNode _nameFocusNode = FocusNode();
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _nameFocusNode.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -38,6 +51,7 @@ class _OnboardingNameState extends ConsumerState<OnboardingName> {
                 maxLines: 2,
                 textAlignVertical: TextAlignVertical.center,
                 autofocus: true,
+                focusNode: _nameFocusNode,
                 controller: _nameController,
                 autofillHints: const [AutofillHints.name],
                 decoration: const InputDecoration(
@@ -70,6 +84,7 @@ class _OnboardingNameState extends ConsumerState<OnboardingName> {
               child: longButton(
                 name: "next",
                 onPressed: (() {
+                  _nameFocusNode.unfocus();
                   widget.nameCallback(_nameController.text);
                 }),
                 inverted: true,

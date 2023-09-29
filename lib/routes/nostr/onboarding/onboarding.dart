@@ -3,6 +3,7 @@ import 'dart:developer';
 
 import 'package:camelus/providers/key_pair_provider.dart';
 import 'package:camelus/routes/home_page.dart';
+import 'package:camelus/routes/nostr/onboarding/onboarding_image.dart';
 import 'package:camelus/routes/nostr/onboarding/onboarding_login.dart';
 import 'package:camelus/routes/nostr/onboarding/onboarding_name.dart';
 
@@ -119,6 +120,14 @@ class _NostrOnboardingState extends ConsumerState<NostrOnboarding>
     );
   }
 
+  _nextTab() {
+    _tabController.animateTo(
+      _tabController.index + 1,
+      curve: Curves.easeInOut,
+      duration: const Duration(milliseconds: 500),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -141,9 +150,12 @@ class _NostrOnboardingState extends ConsumerState<NostrOnboarding>
                 },
               ),
               OnboardingName(
-                nameCallback: () {},
+                nameCallback: (name) {
+                  log('nameCallback $name');
+                  _nextTab();
+                },
               ),
-              Text("page3"),
+              OnboardingImage(imageCallback: () {})
             ],
           ),
         ],
