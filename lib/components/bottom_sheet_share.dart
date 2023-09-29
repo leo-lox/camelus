@@ -63,7 +63,7 @@ void openBottomSheetShare(context, NostrNote note) {
                           Column(
                             children: [
                               IconButton(
-                                tooltip: 'nostr.com',
+                                tooltip: 'njump.me',
                                 onPressed: () {
                                   var bech32nevent =
                                       NeventHelper().mapToBech32({
@@ -72,7 +72,7 @@ void openBottomSheetShare(context, NostrNote note) {
                                     "relays": note.relayHints,
                                   });
                                   _copyToClipboard(
-                                      'https://nostr.com/$bech32nevent');
+                                      'https://njump.me/$bech32nevent');
                                 },
                                 icon: const Icon(
                                   Icons.link,
