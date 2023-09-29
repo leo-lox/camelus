@@ -55,3 +55,15 @@ NOTES.md
 default.isar
 default.isar-lck
 isar.dll
+
+# fastlane specific
+**/fastlane/report.xml
+
+# deliver temporary files
+**/fastlane/Preview.html
+
+# snapshot generated screenshots
+**/fastlane/screenshots
+
+# scan temporary files
+**/fastlane/test_output

@@ -1,0 +1,5 @@
+On camelus you can follow people to read their posts or write your own posts.
+You can decide where you want to publish your posts, or from which relays posts are received.
+
+
+You stay in control.

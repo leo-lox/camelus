@@ -1,0 +1,1 @@
+camelus connects you to the nostr network
