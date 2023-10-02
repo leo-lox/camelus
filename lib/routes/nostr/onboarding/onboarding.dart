@@ -7,6 +7,7 @@ import 'package:camelus/routes/nostr/onboarding/onboarding_login.dart';
 import 'package:camelus/routes/nostr/onboarding/onboarding_name.dart';
 
 import 'package:camelus/routes/nostr/onboarding/onboarding_page01.dart';
+import 'package:camelus/routes/nostr/onboarding/onboarding_picture.dart';
 
 import 'package:flutter/material.dart';
 import 'package:camelus/config/palette.dart';
@@ -143,7 +144,9 @@ class _NostrOnboardingState extends ConsumerState<NostrOnboarding>
               OnboardingName(
                 nameCallback: () {},
               ),
-              Text("page3"),
+              OnboardingPicture(
+                pictureCallback: () {},
+              )
             ],
           ),
         ],
