@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 import 'dart:typed_data';
 
@@ -42,7 +43,11 @@ class _OnboardingPictureState extends ConsumerState<OnboardingPicture> {
           imageData: imageData,
         ),
       ),
-    );
+    ).then((value) {
+      if (value != null) {
+        widget.pictureCallback(value);
+      }
+    });
   }
 
   @override
