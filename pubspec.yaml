@@ -70,6 +70,7 @@ dependencies:
   device_preview: ^1.1.0
   bip39_mnemonic: ^3.0.6
   bip32: ^2.0.0
+  crop_your_image: ^0.7.5
 
 dev_dependencies:
   floor_generator: ^1.4.2

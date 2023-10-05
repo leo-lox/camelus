@@ -19,7 +19,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'routes/home_page.dart';
 import 'theme.dart' as theme;
 
-const devDeviceFrame = false;
+const devDeviceFrame = true;
 
 //! first is route, second is pubkey
 Future<List<String>> _getInitialData() async {
