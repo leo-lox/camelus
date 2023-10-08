@@ -107,14 +107,14 @@ class NostrDrawer extends ConsumerWidget {
 
                       if (snapshot.hasData) {
                         picture = snapshot.data?.picture ??
-                            "https://avatars.dicebear.com/api/personas/$pubkey.svg";
+                            "https://api.dicebear.com/7.x/personas/svg?seed=$pubkey";
                       } else if (snapshot.hasError) {
                         picture =
-                            "https://avatars.dicebear.com/api/personas/$pubkey.svg";
+                            "https://api.dicebear.com/7.x/personas/svg?seed=$pubkey";
                       } else {
                         // loading
                         picture =
-                            "https://avatars.dicebear.com/api/personas/$pubkey.svg";
+                            "https://api.dicebear.com/7.x/personas/svg?seed=$pubkey";
                       }
                       return myProfilePicture(
                           pictureUrl: picture,

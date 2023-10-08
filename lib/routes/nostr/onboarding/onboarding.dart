@@ -1,24 +1,12 @@
-import 'dart:convert';
 import 'dart:developer';
-
-import 'package:camelus/providers/key_pair_provider.dart';
-import 'package:camelus/routes/home_page.dart';
-import 'package:camelus/routes/nostr/onboarding/onboarding_image.dart';
+import 'package:camelus/models/onboarding_user_info.dart';
 import 'package:camelus/routes/nostr/onboarding/onboarding_login.dart';
 import 'package:camelus/routes/nostr/onboarding/onboarding_name.dart';
-
 import 'package:camelus/routes/nostr/onboarding/onboarding_page01.dart';
 import 'package:camelus/routes/nostr/onboarding/onboarding_picture.dart';
-
 import 'package:flutter/material.dart';
-import 'package:camelus/config/palette.dart';
 import 'package:camelus/helpers/bip340.dart';
-import 'package:flutter/services.dart';
-import 'package:camelus/helpers/helpers.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-
-import 'package:url_launcher/url_launcher.dart';
 
 class NostrOnboarding extends ConsumerStatefulWidget {
   const NostrOnboarding({Key? key}) : super(key: key);
@@ -29,10 +17,6 @@ class NostrOnboarding extends ConsumerStatefulWidget {
 
 class _NostrOnboardingState extends ConsumerState<NostrOnboarding>
     with TickerProviderStateMixin {
-  var myKeys = Bip340().generatePrivateKey();
-
-  bool _termsAndConditions = false;
-
   late TabController _tabController;
 
   final PageController _horizontalPageController = PageController(
@@ -40,6 +24,10 @@ class _NostrOnboardingState extends ConsumerState<NostrOnboarding>
     keepPage: true,
   );
   bool horizontalScrollLock = false;
+
+  OnboardingUserInfo signUpInfo = OnboardingUserInfo(
+    keyPair: Bip340().generatePrivateKey(),
+  );
 
   void _setupTabLiseners() {
     // listen to changes of tabs
@@ -74,51 +62,13 @@ class _NostrOnboardingState extends ConsumerState<NostrOnboarding>
       initialIndex: 0,
       vsync: this,
     );
+
     _setupTabLiseners();
   }
 
   @override
   void dispose() {
     super.dispose();
-  }
-
-  Future<void> copyToClipboard(String data) async {
-    await Clipboard.setData(ClipboardData(text: data));
-  }
-
-  void _pasteFromClipboard() async {
-    final data = await Clipboard.getData(Clipboard.kTextPlain);
-    //check if data starts not with with nsec
-    if (data == null || !(data.text!.startsWith('nsec'))) {
-      showPasteError();
-      return;
-    }
-
-    var privkey = Helpers().decodeBech32(data.text!)[0];
-    var pubkey = Bip340().getPublicKey(privkey);
-    var privKeyHr = data.text!;
-    var publicKeyHr = Helpers().encodeBech32(pubkey, 'npub');
-
-    setState(() {
-      myKeys = KeyPair(privkey, pubkey, privKeyHr, publicKeyHr);
-    });
-    showPasteSuccess();
-  }
-
-  void showPasteSuccess() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Private key successfully imported'),
-      ),
-    );
-  }
-
-  void showPasteError() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Invalid private key'),
-      ),
-    );
   }
 
   _nextTab() {
@@ -151,8 +101,8 @@ class _NostrOnboardingState extends ConsumerState<NostrOnboarding>
                 },
               ),
               OnboardingName(
-                nameCallback: (name) {
-                  log('nameCallback $name');
+                userInfo: signUpInfo,
+                submitCallback: (_) {
                   _nextTab();
                 },
               ),

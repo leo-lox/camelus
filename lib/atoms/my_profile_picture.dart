@@ -63,7 +63,7 @@ Widget myProfilePicture({
       shape: BoxShape.circle,
     ),
     child: SvgPicture.network(
-        "https://avatars.dicebear.com/api/personas/$pubkey.svg"),
+        "https://api.dicebear.com/7.x/personas/svg?seed=$pubkey"),
   );
 }
 
@@ -81,7 +81,7 @@ class UserImage extends StatelessWidget {
   Widget build(BuildContext context) {
     return myProfilePicture(
       pictureUrl: myMetadata?.picture ??
-          "https://avatars.dicebear.com/api/personas/$pubkey.svg",
+          "https://api.dicebear.com/7.x/personas/svg?seed=$pubkey",
       pubkey: pubkey,
       filterQuality: FilterQuality.medium,
     );

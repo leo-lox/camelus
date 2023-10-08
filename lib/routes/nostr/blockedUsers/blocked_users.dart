@@ -116,16 +116,16 @@ Widget _profile(String pubkey, widget, BlockMuteService muteService,
 
         if (snapshot.hasData) {
           picture = snapshot.data?.picture ??
-              "https://avatars.dicebear.com/api/personas/$pubkey.svg";
+              "https://api.dicebear.com/7.x/personas/svg?seed=$pubkey";
           name = snapshot.data?.name ?? Helpers().encodeBech32(pubkey, "npub");
           about = snapshot.data?.about ?? "";
         } else if (snapshot.hasError) {
-          picture = "https://avatars.dicebear.com/api/personas/$pubkey.svg";
+          picture = "https://api.dicebear.com/7.x/personas/svg?seed=$pubkey";
           name = Helpers().encodeBech32(pubkey, "npub");
           about = "";
         } else {
           // loading
-          picture = "https://avatars.dicebear.com/api/personas/$pubkey.svg";
+          picture = "https://api.dicebear.com/7.x/personas/svg?seed=$pubkey";
           name = Helpers().encodeBech32(pubkey, "npub");
           about = "";
         }

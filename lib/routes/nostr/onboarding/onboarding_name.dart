@@ -1,14 +1,18 @@
 import 'package:camelus/atoms/long_button.dart';
 import 'package:camelus/config/palette.dart';
+import 'package:camelus/models/onboarding_user_info.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class OnboardingName extends ConsumerStatefulWidget {
-  final Function nameCallback;
+  final Function submitCallback;
 
-  const OnboardingName({
+  OnboardingUserInfo userInfo;
+
+  OnboardingName({
     Key? key,
-    required this.nameCallback,
+    required this.submitCallback,
+    required this.userInfo,
   }) : super(key: key);
   @override
   ConsumerState<OnboardingName> createState() => _OnboardingNameState();
@@ -21,6 +25,7 @@ class _OnboardingNameState extends ConsumerState<OnboardingName> {
   @override
   void initState() {
     super.initState();
+    _nameController.text = widget.userInfo.name ?? '';
   }
 
   @override
@@ -64,6 +69,9 @@ class _OnboardingNameState extends ConsumerState<OnboardingName> {
                   alignLabelWithHint: true,
                   border: InputBorder.none,
                 ),
+                onChanged: (value) {
+                  widget.userInfo.name = value;
+                },
                 style: const TextStyle(
                   color: Palette.lightGray,
                   letterSpacing: 1.1,
@@ -85,7 +93,7 @@ class _OnboardingNameState extends ConsumerState<OnboardingName> {
                 name: "next",
                 onPressed: (() {
                   _nameFocusNode.unfocus();
-                  widget.nameCallback(_nameController.text);
+                  widget.submitCallback(_nameController.text);
                 }),
                 inverted: true,
               ),
