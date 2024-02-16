@@ -18,7 +18,7 @@ publish_to: "none" # Remove this line if you wish to publish to pub.dev
 version: 1.0.23+23
 
 environment:
-  sdk: ">=2.17.6 <3.0.0"
+  sdk: ">=2.17.6 <4.0.0"
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -35,7 +35,7 @@ dependencies:
   cupertino_icons: ^1.0.2
   flutter_hooks: ^0.20.1
   hooks_riverpod: ^2.0.2
-  http: ^1.1.0
+  http: ^1.2.1
   flutter_svg: ^2.0.7
   timeago_flutter: ^3.5.0
   badges: ^3.1.2
@@ -54,12 +54,12 @@ dependencies:
   flutter_mentions: ^2.0.1
   photo_view: ^0.14.0
   qr_flutter: ^4.0.0
-  matomo_tracker: ^4.1.0
+  matomo_tracker: ^4.1.1
   shared_preferences: ^2.1.1
   riverpod: ^2.3.6
   custom_refresh_indicator: ^3.0.0
   flutter_cache_manager: ^3.3.0
-  web_socket_channel: ^2.4.0
+  web_socket_channel: ^2.4.4
   http_parser: ^4.0.2
   isar: ^3.1.0+1
   isar_flutter_libs: ^3.1.0+1
@@ -75,10 +75,10 @@ dependencies:
 dev_dependencies:
   floor_generator: ^1.4.2
   build_runner: ^2.4.6
-  flutter_test:
-    sdk: flutter
-  integration_test:
-    sdk: flutter
+  #flutter_test:
+  #  sdk: flutter
+  #integration_test:
+  #  sdk: flutter
   mockito: ^5.4.0
 
   # The "flutter_lints" package below contains a set of recommended lints to
@@ -87,7 +87,7 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^3.0.1
-  test: ^1.21.4
+  test: ^1.25.2
   isar_generator: ^3.1.0+1
 
 # For information on the generic Dart part of this file, see the
