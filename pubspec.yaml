@@ -47,9 +47,9 @@ dependencies:
   flutter_secure_storage: ^9.0.0
   crypto: ^3.0.2
   url_launcher: ^6.1.7
-  lottie: ^2.2.0
+  lottie: ^3.0.0
   flutter_launcher_icons: ^0.13.1
-  file_picker: ^5.2.5
+  file_picker: ^6.1.1
   mime: ^1.0.4
   flutter_mentions: ^2.0.1
   photo_view: ^0.14.0
@@ -57,7 +57,7 @@ dependencies:
   matomo_tracker: ^4.1.0
   shared_preferences: ^2.1.1
   riverpod: ^2.3.6
-  custom_refresh_indicator: ^2.2.1
+  custom_refresh_indicator: ^3.0.0
   flutter_cache_manager: ^3.3.0
   web_socket_channel: ^2.4.0
   http_parser: ^4.0.2
@@ -70,7 +70,7 @@ dependencies:
   device_preview: ^1.1.0
   bip39_mnemonic: ^3.0.6
   bip32: ^2.0.0
-  crop_your_image: ^0.7.5
+  crop_your_image: ^1.0.1
 
 dev_dependencies:
   floor_generator: ^1.4.2
@@ -86,7 +86,7 @@ dev_dependencies:
   # activated in the `analysis_options.yaml` file located at the root of your
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
-  flutter_lints: ^2.0.0
+  flutter_lints: ^3.0.1
   test: ^1.21.4
   isar_generator: ^3.1.0+1
 
