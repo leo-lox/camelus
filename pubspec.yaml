@@ -40,7 +40,7 @@ dependencies:
   timeago_flutter: ^3.5.0
   badges: ^3.1.2
   uuid: ^3.0.7
-  cached_network_image: ^3.2.3
+  cached_network_image: ^3.3.1
   bip340: ^0.2.0
   bech32: ^0.2.1
   hex: ^0.2.0
