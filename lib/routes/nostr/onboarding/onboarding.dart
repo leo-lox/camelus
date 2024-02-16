@@ -108,6 +108,7 @@ class _NostrOnboardingState extends ConsumerState<NostrOnboarding>
               ),
               OnboardingPicture(
                 pictureCallback: () {},
+                signUpInfo: signUpInfo,
               )
             ],
           ),

@@ -3,7 +3,9 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:camelus/atoms/crop_avatar.dart';
+import 'package:camelus/atoms/my_profile_picture.dart';
 import 'package:camelus/config/palette.dart';
+import 'package:camelus/models/onboarding_user_info.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -11,9 +13,12 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 class OnboardingPicture extends ConsumerStatefulWidget {
   final Function pictureCallback;
 
-  const OnboardingPicture({
+  OnboardingUserInfo signUpInfo;
+
+  OnboardingPicture({
     Key? key,
     required this.pictureCallback,
+    required this.signUpInfo,
   }) : super(key: key);
   @override
   ConsumerState<OnboardingPicture> createState() => _OnboardingPictureState();
@@ -45,7 +50,9 @@ class _OnboardingPictureState extends ConsumerState<OnboardingPicture> {
       ),
     ).then((value) {
       if (value != null) {
-        widget.pictureCallback(value);
+        setState(() {
+          widget.signUpInfo.picture = value;
+        });
       }
     });
   }
@@ -62,7 +69,17 @@ class _OnboardingPictureState extends ConsumerState<OnboardingPicture> {
               onPressed: () {
                 _pickFile();
               },
-              child: Text("test"))
+              child: Text("test")),
+          if (widget.signUpInfo.picture == null)
+            myProfilePicture(
+              pubkey: widget.signUpInfo.keyPair.publicKey,
+              pictureUrl: "",
+            ),
+          if (widget.signUpInfo.picture != null)
+            SizedBox.fromSize(
+              size: const Size.fromRadius(30), // Image radius
+              child: Image(image: MemoryImage(widget.signUpInfo.picture!)),
+            )
         ],
       ),
     );
