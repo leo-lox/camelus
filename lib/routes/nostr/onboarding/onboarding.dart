@@ -4,6 +4,7 @@ import 'package:camelus/routes/nostr/onboarding/onboarding_login.dart';
 import 'package:camelus/routes/nostr/onboarding/onboarding_name.dart';
 import 'package:camelus/routes/nostr/onboarding/onboarding_page01.dart';
 import 'package:camelus/routes/nostr/onboarding/onboarding_picture.dart';
+import 'package:camelus/routes/nostr/onboarding/onboarding_summary.dart';
 import 'package:flutter/material.dart';
 import 'package:camelus/helpers/bip340.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -109,7 +110,8 @@ class _NostrOnboardingState extends ConsumerState<NostrOnboarding>
               OnboardingPicture(
                 pictureCallback: () {},
                 signUpInfo: signUpInfo,
-              )
+              ),
+              OnboardingSummary(),
             ],
           ),
         ],
