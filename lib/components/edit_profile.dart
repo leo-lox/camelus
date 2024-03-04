@@ -37,15 +37,14 @@ class _EditProfileState extends ConsumerState<EditProfile> {
               SizedBox(
                 width: double.infinity,
                 child: Container(
-                 /// color: Colors.red,
+                  /// color: Colors.red,
                   child: Text(
                     "Name",
                     textAlign: TextAlign.left,
                     style: TextStyle(
-              color: const Color.fromARGB(213, 245, 248, 250),
-              fontSize: MediaQuery.of(context).size.width / 28,
-            ),
-                    
+                      color: const Color.fromARGB(213, 245, 248, 250),
+                      fontSize: MediaQuery.of(context).size.width / 28,
+                    ),
                   ),
                 ),
               ),
@@ -62,19 +61,157 @@ class _EditProfileState extends ConsumerState<EditProfile> {
               ),
             ),
           ),
+          
+          Column(
+            children: <Widget>[
+              SizedBox(
+                width: double.infinity,
+                child: Container(
+                  /// color: Colors.red,
+                  child: Text(
+                    "Bio",
+                    textAlign: TextAlign.left,
+                    style: TextStyle(
+                      color: const Color.fromARGB(213, 245, 248, 250),
+                      fontSize: MediaQuery.of(context).size.width / 28,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
           TextField(
-            controller: myController,
-            decoration: const InputDecoration(
-              hintText: "Please Type in",
-              border: OutlineInputBorder(),
-            ),
-          ),
-          const TextField(
             decoration: InputDecoration(
-              hintText: "Please Type in",
-              border: OutlineInputBorder(),
+              hintText: "",
+              enabledBorder: UnderlineInputBorder(
+                borderSide: BorderSide(
+                  width: 1, //<-- SEE HERE
+                  color: Colors.grey,
+                ),
+              ),
             ),
           ),
+
+ Column(
+            children: <Widget>[
+              SizedBox(
+                width: double.infinity,
+                child: Container(
+                  /// color: Colors.red,
+                  child: Text(
+                    "Location",
+                    textAlign: TextAlign.left,
+                    style: TextStyle(
+                      color: const Color.fromARGB(213, 245, 248, 250),
+                      fontSize: MediaQuery.of(context).size.width / 28,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          TextField(
+            decoration: InputDecoration(
+              hintText: "",
+              enabledBorder: UnderlineInputBorder(
+                borderSide: BorderSide(
+                  width: 1, //<-- SEE HERE
+                  color: Colors.grey,
+                ),
+              ),
+            ),
+          ),
+
+           Column(
+            children: <Widget>[
+              SizedBox(
+                width: double.infinity,
+                child: Container(
+                  /// color: Colors.red,
+                  child: Text(
+                    "Website",
+                    textAlign: TextAlign.left,
+                    style: TextStyle(
+                      color: const Color.fromARGB(213, 245, 248, 250),
+                      fontSize: MediaQuery.of(context).size.width / 28,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          TextField(
+            decoration: InputDecoration(
+              hintText: "",
+              enabledBorder: UnderlineInputBorder(
+                borderSide: BorderSide(
+                  width: 1, //<-- SEE HERE
+                  color: Colors.grey,
+                ),
+              ),
+            ),
+          ),
+
+           Column(
+            children: <Widget>[
+              SizedBox(
+                width: double.infinity,
+                child: Container(
+                  /// color: Colors.red,
+                  child: Text(
+                    "Birth date",
+                    textAlign: TextAlign.left,
+                    style: TextStyle(
+                      color: const Color.fromARGB(213, 245, 248, 250),
+                      fontSize: MediaQuery.of(context).size.width / 28,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          TextField(
+            decoration: InputDecoration(
+              hintText: "",
+              enabledBorder: UnderlineInputBorder(
+                borderSide: BorderSide(
+                  width: 1, //<-- SEE HERE
+                  color: Colors.grey,
+                ),
+              ),
+            ),
+          ),
+
+           Column(
+            children: <Widget>[
+              SizedBox(
+                width: double.infinity,
+                child: Container(
+                  /// color: Colors.red,
+                  child: Text(
+                    "Pronouns",
+                    textAlign: TextAlign.left,
+                    style: TextStyle(
+                      color: const Color.fromARGB(213, 245, 248, 250),
+                      fontSize: MediaQuery.of(context).size.width / 28,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          TextField(
+            decoration: InputDecoration(
+              hintText: "",
+              enabledBorder: UnderlineInputBorder(
+                borderSide: BorderSide(
+                  width: 1, //<-- SEE HERE
+                  color: Colors.grey,
+                ),
+              ),
+            ),
+          ),
+          
           TextButton(onPressed: () => {readText()}, child: const Text("Go"))
         ],
       ),
