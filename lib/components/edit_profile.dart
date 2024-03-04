@@ -41,6 +41,10 @@ class _EditProfileState extends ConsumerState<EditProfile> {
                   child: Text(
                     "Name",
                     textAlign: TextAlign.left,
+                    style: TextStyle(
+              color: const Color.fromARGB(213, 245, 248, 250),
+              fontSize: MediaQuery.of(context).size.width / 28,
+            ),
                     
                   ),
                 ),
