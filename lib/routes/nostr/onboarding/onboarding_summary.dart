@@ -15,7 +15,7 @@ class _OnboardingSummaryState extends ConsumerState<OnboardingSummary> {
   Widget build(BuildContext context) {
 
     return Scaffold(
-      backgroundColor: Palette.background,
+      backgroundColor: Colors.black,
       body: EditProfile(),
     );
   

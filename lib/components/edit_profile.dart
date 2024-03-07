@@ -4,6 +4,7 @@ import 'package:camelus/config/palette.dart';
 import 'package:custom_refresh_indicator/custom_refresh_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class EditProfile extends ConsumerStatefulWidget {
@@ -25,13 +26,108 @@ class _EditProfileState extends ConsumerState<EditProfile> {
       padding: const EdgeInsets.all(3),
       child: Column(
         children: [
-          Text(
-            "welcome to",
-            style: TextStyle(
-              color: Palette.extraLightGray,
-              fontSize: MediaQuery.of(context).size.width / 33,
+          /*InkWell(
+            onTap: () {
+              log("CircleButtonPressed");
+            },
+            child: Container(
+              
+              width: 100.0,
+              height: 100.0,
+'assets/images/default_header.jpg',
+/*image: DecorationImage(
+      image: NetworkImage('<https://example.com/image.jpg>'),
+      fit: BoxFit.cover,*/
+
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Color.fromARGB(218, 33, 149, 243),
+              ),
+              child: Icon(Icons.add),
+            ),
+          ),*/
+
+          SizedBox(
+            height: (MediaQuery.of(context).size.height / 6) + 60,
+            child: Stack(
+              children: <Widget>[
+                InkWell(
+                  onTap: () {
+                    log("Header Pressed");
+                  },
+                  child: Container(
+                    width: MediaQuery.of(context).size.width,
+                    height: MediaQuery.of(context).size.height / 6,
+                    decoration: BoxDecoration(
+                      //shape: BoxShape.circle,
+                      image: DecorationImage(
+                        image:
+                            new AssetImage("assets/images/default_header.jpg"),
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ),
+                ),
+                Positioned(
+                  top: 90,
+                  left: MediaQuery.of(context).size.width / 6,
+                  child: InkWell(
+                    onTap: () {
+                      log("CircleButtonPressed");
+                    },
+                    child: Container(
+                      //padding: const EdgeInsets.only(bottom: 20.0),
+                      alignment: Alignment.bottomLeft,
+                      width: 100.0,
+                      height: 100.0,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        image: DecorationImage(
+                          image: new AssetImage(
+                              "assets/images/default_header.jpg"),
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
+
+          /* InkWell(
+            onTap: () {
+              log("Header Pressed");
+            },
+            child: Container(
+              width: MediaQuery.of(context).size.width,
+              height: MediaQuery.of(context).size.height / 6,
+              decoration: BoxDecoration(
+                //shape: BoxShape.circle,
+                image: DecorationImage(
+                  image: new AssetImage("assets/images/default_header.jpg"),
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
+          ),
+          InkWell(
+            onTap: () {
+              log("CircleButtonPressed");
+            },
+            child: Container(
+              alignment: Alignment.bottomLeft,
+              width: 100.0,
+              height: 100.0,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                image: DecorationImage(
+                  image: new AssetImage("assets/images/default_header.jpg"),
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
+          ),*/
           Column(
             children: <Widget>[
               SizedBox(
@@ -61,7 +157,6 @@ class _EditProfileState extends ConsumerState<EditProfile> {
               ),
             ),
           ),
-          
           Column(
             children: <Widget>[
               SizedBox(
@@ -91,8 +186,7 @@ class _EditProfileState extends ConsumerState<EditProfile> {
               ),
             ),
           ),
-
- Column(
+          Column(
             children: <Widget>[
               SizedBox(
                 width: double.infinity,
@@ -121,8 +215,7 @@ class _EditProfileState extends ConsumerState<EditProfile> {
               ),
             ),
           ),
-
-           Column(
+          Column(
             children: <Widget>[
               SizedBox(
                 width: double.infinity,
@@ -151,8 +244,7 @@ class _EditProfileState extends ConsumerState<EditProfile> {
               ),
             ),
           ),
-
-           Column(
+          Column(
             children: <Widget>[
               SizedBox(
                 width: double.infinity,
@@ -181,8 +273,7 @@ class _EditProfileState extends ConsumerState<EditProfile> {
               ),
             ),
           ),
-
-           Column(
+          Column(
             children: <Widget>[
               SizedBox(
                 width: double.infinity,
@@ -211,7 +302,6 @@ class _EditProfileState extends ConsumerState<EditProfile> {
               ),
             ),
           ),
-          
           TextButton(onPressed: () => {readText()}, child: const Text("Go"))
         ],
       ),
