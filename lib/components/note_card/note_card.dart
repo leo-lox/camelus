@@ -1,9 +1,7 @@
-import 'dart:developer';
 import 'dart:ui';
 
 import 'package:camelus/atoms/my_profile_picture.dart';
 import 'package:camelus/components/bottom_sheet_share.dart';
-import 'package:camelus/components/images_tile_view.dart';
 import 'package:camelus/components/note_card/bottom_action_row.dart';
 import 'package:camelus/components/note_card/bottom_sheet_more.dart';
 import 'package:camelus/components/note_card/name_row.dart';
@@ -25,10 +23,10 @@ class NoteCard extends ConsumerStatefulWidget {
   final bool hideBottomBar;
 
   const NoteCard({
-    Key? key,
+    super.key,
     required this.note,
     this.hideBottomBar = false,
-  }) : super(key: key);
+  });
 
   @override
   ConsumerState<NoteCard> createState() => _NoteCardState();

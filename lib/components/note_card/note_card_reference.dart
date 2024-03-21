@@ -1,4 +1,3 @@
-import 'dart:developer';
 
 import 'package:camelus/components/note_card/note_card.dart';
 import 'package:camelus/config/palette.dart';
@@ -18,9 +17,9 @@ class NoteCardReference extends ConsumerStatefulWidget {
   final String word;
 
   const NoteCardReference({
-    Key? key,
+    super.key,
     required this.word,
-  }) : super(key: key);
+  });
 
   @override
   ConsumerState<NoteCardReference> createState() => _NoteCardReferenceState();

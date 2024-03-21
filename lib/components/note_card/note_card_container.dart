@@ -18,8 +18,7 @@ class NoteCardContainer extends ConsumerStatefulWidget {
   final List<NoteCardContainer> otherContainers;
 
   const NoteCardContainer(
-      {Key? key, required this.notes, this.otherContainers = const []})
-      : super(key: key);
+      {super.key, required this.notes, this.otherContainers = const []});
 
   @override
   ConsumerState<NoteCardContainer> createState() => _NoteCardContainerState();
@@ -166,7 +165,7 @@ class _NoteCardContainerState extends ConsumerState<NoteCardContainer> {
               .map(
                 (tag) => linkedUsername(tag.value, metadata, context),
               )
-              .toList(),
+              ,
         if (myNote.getTagPubkeys.length > 2)
           Expanded(
             child: Wrap(

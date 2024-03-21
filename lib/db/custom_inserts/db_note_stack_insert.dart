@@ -2,10 +2,8 @@ import 'dart:async';
 import 'dart:developer';
 
 import 'package:camelus/db/entities/db_note.dart';
-import 'package:camelus/db/queries/db_note_queries.dart';
 import 'package:camelus/helpers/bip340.dart';
 import 'package:camelus/models/nostr_note.dart';
-import 'package:hex/hex.dart';
 import 'package:isar/isar.dart';
 
 class DbNoteStackInsert {

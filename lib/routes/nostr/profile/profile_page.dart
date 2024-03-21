@@ -44,7 +44,7 @@ class ProfilePage extends ConsumerStatefulWidget {
   late final String nProfileHr;
   late final String pubkeyBech32;
 
-  ProfilePage({Key? key, required this.pubkey}) : super(key: key) {
+  ProfilePage({super.key, required this.pubkey}) {
     nProfile = NprofileHelper().mapToBech32({
       "pubkey": pubkey,
       "relays": [],
@@ -1020,14 +1020,14 @@ Widget _profileImage(
 
               if (snapshot.hasData) {
                 picture = snapshot.data?.picture ??
-                    "https://avatars.dicebear.com/api/personas/${widget.pubkey}.svg";
+                    "https://api.dicebear.com/7.x/personas/svg?seed=${widget.pubkey}";
               } else if (snapshot.hasError) {
                 picture =
-                    "https://avatars.dicebear.com/api/personas/${widget.pubkey}.svg";
+                    "https://api.dicebear.com/7.x/personas/svg?seed=${widget.pubkey}";
               } else {
                 // loading
                 picture =
-                    "https://avatars.dicebear.com/api/personas/${widget.pubkey}.svg";
+                    "https://api.dicebear.com/7.x/personas/svg?seed=${widget.pubkey}";
               }
               return GestureDetector(
                   onTap: (() {

@@ -9,7 +9,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 class EditRelaysView extends ConsumerStatefulWidget {
   // async function with Map<String, Map<String, bool>> as parameter
   final Function(Map<String, Map<String, bool>>) onSave;
-  const EditRelaysView({Key? key, required this.onSave}) : super(key: key);
+  const EditRelaysView({super.key, required this.onSave});
 
   @override
   ConsumerState<EditRelaysView> createState() => _EditRelaysViewState();

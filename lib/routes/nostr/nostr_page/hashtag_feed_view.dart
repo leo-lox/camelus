@@ -17,7 +17,7 @@ import 'package:isar/isar.dart';
 class HashtagFeedView extends ConsumerStatefulWidget {
   final String hashtag;
 
-  const HashtagFeedView({Key? key, required this.hashtag}) : super(key: key);
+  const HashtagFeedView({super.key, required this.hashtag});
 
   @override
   ConsumerState<HashtagFeedView> createState() => _HashtagFeedViewState();

@@ -21,11 +21,11 @@ class NoteCardSplitContent extends ConsumerStatefulWidget {
   final Function(String) hashtagCallback;
 
   const NoteCardSplitContent({
-    Key? key,
+    super.key,
     required this.note,
     required this.hashtagCallback,
     required this.profileCallback,
-  }) : super(key: key);
+  });
 
   @override
   ConsumerState<NoteCardSplitContent> createState() =>
@@ -111,7 +111,7 @@ class _NoteCardSplitContentState extends ConsumerState<NoteCardSplitContent> {
         } else {
           widgets.add(DisplayText(word: word));
         }
-        widgets.add(DisplayText(word: " "));
+        widgets.add(const DisplayText(word: " "));
       }
       widgets.removeLast(); // remove last space
       //widgets.add(_buildText("\n")); // add back the original line break

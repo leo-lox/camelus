@@ -19,8 +19,7 @@ import 'package:isar/isar.dart';
 class UserFeedAndRepliesView extends ConsumerStatefulWidget {
   final String pubkey;
 
-  const UserFeedAndRepliesView({Key? key, required this.pubkey})
-      : super(key: key);
+  const UserFeedAndRepliesView({super.key, required this.pubkey});
 
   @override
   UserFeedAndRepliesViewState createState() => UserFeedAndRepliesViewState();

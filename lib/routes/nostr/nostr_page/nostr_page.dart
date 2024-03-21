@@ -27,8 +27,7 @@ class NostrPage extends ConsumerStatefulWidget {
   final String pubkey;
 
   const NostrPage(
-      {Key? key, required this.parentScaffoldKey, required this.pubkey})
-      : super(key: key);
+      {super.key, required this.parentScaffoldKey, required this.pubkey});
   @override
   ConsumerState<NostrPage> createState() => _NostrPageState();
 }
@@ -190,7 +189,7 @@ class _NostrPageState extends ConsumerState<NostrPage>
                             AsyncSnapshot<DbUserMetadata?> snapshot) {
                           var picture = "";
                           var defaultPicture =
-                              "https://avatars.dicebear.com/api/personas/${widget.pubkey}.svg";
+                              "https://api.dicebear.com/7.x/personas/svg?seed=${widget.pubkey}";
                           if (snapshot.hasData) {
                             picture = snapshot.data?.picture ?? defaultPicture;
                           } else if (snapshot.hasError) {

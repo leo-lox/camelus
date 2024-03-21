@@ -17,8 +17,7 @@ class BlockPage extends ConsumerStatefulWidget {
   String userPubkey;
   String? postId;
 
-  BlockPage({Key? key, required this.userPubkey, this.postId})
-      : super(key: key);
+  BlockPage({super.key, required this.userPubkey, this.postId});
 
   @override
   ConsumerState<BlockPage> createState() => _BlockPageState();

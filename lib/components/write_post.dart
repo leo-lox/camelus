@@ -27,7 +27,7 @@ import 'package:camelus/models/post_context.dart';
 class WritePost extends ConsumerStatefulWidget {
   final PostContext? context;
 
-  const WritePost({Key? key, this.context}) : super(key: key);
+  const WritePost({super.key, this.context});
 
   @override
   ConsumerState<WritePost> createState() => _WritePostState();

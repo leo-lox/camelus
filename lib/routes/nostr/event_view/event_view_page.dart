@@ -20,10 +20,9 @@ class EventViewPage extends ConsumerStatefulWidget {
   final String? _scrollIntoView;
 
   const EventViewPage(
-      {Key? key, required String rootId, String? scrollIntoView})
+      {super.key, required String rootId, String? scrollIntoView})
       : _scrollIntoView = scrollIntoView,
-        _rootId = rootId,
-        super(key: key);
+        _rootId = rootId;
 
   @override
   _EventViewPageState createState() => _EventViewPageState();

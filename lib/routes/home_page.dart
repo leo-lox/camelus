@@ -16,7 +16,7 @@ import 'package:matomo_tracker/matomo_tracker.dart';
 
 class HomePage extends ConsumerStatefulWidget {
   final String pubkey;
-  const HomePage({Key? key, required this.pubkey}) : super(key: key);
+  const HomePage({super.key, required this.pubkey});
 
   @override
   ConsumerState<HomePage> createState() => _HomePageState();
