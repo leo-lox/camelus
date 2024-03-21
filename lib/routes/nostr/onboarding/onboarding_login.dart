@@ -574,8 +574,8 @@ class _OnboardingLoginPageState extends ConsumerState<OnboardingLoginPage> {
                   onWillAcceptWithDetails: (data) => data != index,
                   onAcceptWithDetails: (data) {
                     setState(() {
-                      String temp = _userWords[data];
-                      _userWords[data] = _userWords[index];
+                      String temp = _userWords[data.data];
+                      _userWords[data.data] = _userWords[index];
                       _userWords[index] = temp;
                     });
                   },
