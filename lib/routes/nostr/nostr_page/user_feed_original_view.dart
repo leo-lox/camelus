@@ -8,9 +8,14 @@ import 'package:camelus/models/nostr_note.dart';
 import 'package:camelus/providers/database_provider.dart';
 import 'package:camelus/providers/following_provider.dart';
 import 'package:camelus/providers/navigation_bar_provider.dart';
+import 'package:camelus/providers/ndk_provider.dart';
 import 'package:camelus/providers/relay_provider.dart';
 import 'package:camelus/scroll_controller/retainable_scroll_controller.dart';
 import 'package:camelus/services/nostr/feeds/user_feed.dart';
+import 'package:dart_ndk/nips/nip01/bip340_event_verifier.dart';
+import 'package:dart_ndk/nips/nip01/filter.dart';
+import 'package:dart_ndk/relay_jit_manager/relay_jit_manager.dart';
+import 'package:dart_ndk/relay_jit_manager/request_jit.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:isar/isar.dart';
@@ -27,6 +32,7 @@ class UserFeedOriginalView extends ConsumerStatefulWidget {
 
 class _UserFeedOriginalViewState extends ConsumerState<UserFeedOriginalView> {
   late Isar db;
+  late RelayJitManager ndk;
   final List<StreamSubscription> _subscriptions = [];
   late List<String> _followingPubkeys;
   late UserFeed _userFeed;
@@ -166,11 +172,30 @@ class _UserFeedOriginalViewState extends ConsumerState<UserFeedOriginalView> {
     return;
   }
 
+  Future<void> _initNdk() async {
+    ndk = ref.read(ndkProvider);
+    return;
+  }
+
   Future<void> _initSequence() async {
     await _initDb();
     await _getFollowingPubkeys();
+    await _initNdk();
 
     var relayCoordinator = ref.watch(relayServiceProvider);
+
+    var verifier = Bip340EventVerifier();
+    NostrRequestJit _feedRequest = NostrRequestJit.subscription("ndk_feed",
+        eventVerifier: verifier,
+        filters: [
+          Filter(authors: _followingPubkeys, kinds: [1])
+        ]);
+
+    ndk.handleRequest(_feedRequest, desiredCoverage: 2);
+
+    _feedRequest.responseStream.listen((event) {
+      //log("NDK: feed response event $event");
+    });
 
     _userFeed = UserFeed(db, _followingPubkeys, relayCoordinator);
     await _userFeed.feedRdy;
