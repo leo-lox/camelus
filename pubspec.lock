@@ -9,6 +9,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "61.0.0"
+  amberflutter:
+    dependency: transitive
+    description:
+      name: amberflutter
+      sha256: "5101b36419a93e0620a227ada25690286efc93ab9de59dc80e7c3a0c29ccd348"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.9"
   analyzer:
     dependency: transitive
     description:
@@ -305,6 +313,13 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.0.0"
+  dart_ndk:
+    dependency: "direct main"
+    description:
+      path: "../dart_ndk"
+      relative: true
+    source: path
+    version: "0.1.0-dev8"
   dart_style:
     dependency: transitive
     description:
@@ -732,6 +747,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.0.0"
+  logger:
+    dependency: transitive
+    description:
+      name: logger
+      sha256: b3ff55aeb08d9d8901b767650285872cb1bb8f508373b3e348d60268b0c7f770
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.1.0"
   logging:
     dependency: transitive
     description:

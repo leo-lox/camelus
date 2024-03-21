@@ -68,6 +68,8 @@ dependencies:
   bip39_mnemonic: ^3.0.6
   bip32: ^2.0.0
   crop_your_image: ^1.0.1
+  dart_ndk: 
+    path: ../dart_ndk
 
 dev_dependencies:
   build_runner: ^2.4.6
