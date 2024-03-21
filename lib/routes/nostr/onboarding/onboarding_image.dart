@@ -9,9 +9,9 @@ class OnboardingImage extends ConsumerStatefulWidget {
   final Function imageCallback;
 
   const OnboardingImage({
-    Key? key,
+    super.key,
     required this.imageCallback,
-  }) : super(key: key);
+  });
   @override
   ConsumerState<OnboardingImage> createState() => _OnboardingImageState();
 }

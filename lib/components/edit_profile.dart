@@ -1,14 +1,10 @@
 import 'dart:developer';
 
-import 'package:camelus/config/palette.dart';
-import 'package:custom_refresh_indicator/custom_refresh_indicator.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class EditProfile extends ConsumerStatefulWidget {
-  const EditProfile({Key? key}) : super(key: key);
+  const EditProfile({super.key});
 
   @override
   ConsumerState<EditProfile> createState() => _EditProfileState();
@@ -58,11 +54,11 @@ class _EditProfileState extends ConsumerState<EditProfile> {
                   child: Container(
                     width: MediaQuery.of(context).size.width,
                     height: MediaQuery.of(context).size.height / 6,
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                       //shape: BoxShape.circle,
                       image: DecorationImage(
                         image:
-                            new AssetImage("assets/images/default_header.jpg"),
+                            AssetImage("assets/images/default_header.jpg"),
                         fit: BoxFit.cover,
                       ),
                     ),
@@ -80,10 +76,10 @@ class _EditProfileState extends ConsumerState<EditProfile> {
                       alignment: Alignment.bottomLeft,
                       width: 100.0,
                       height: 100.0,
-                      decoration: BoxDecoration(
+                      decoration: const BoxDecoration(
                         shape: BoxShape.circle,
                         image: DecorationImage(
-                          image: new AssetImage(
+                          image: AssetImage(
                               "assets/images/default_header.jpg"),
                           fit: BoxFit.cover,
                         ),
@@ -146,7 +142,7 @@ class _EditProfileState extends ConsumerState<EditProfile> {
               ),
             ],
           ),
-          TextField(
+          const TextField(
             decoration: InputDecoration(
               hintText: "",
               enabledBorder: UnderlineInputBorder(
@@ -175,7 +171,7 @@ class _EditProfileState extends ConsumerState<EditProfile> {
               ),
             ],
           ),
-          TextField(
+          const TextField(
             decoration: InputDecoration(
               hintText: "",
               enabledBorder: UnderlineInputBorder(
@@ -204,7 +200,7 @@ class _EditProfileState extends ConsumerState<EditProfile> {
               ),
             ],
           ),
-          TextField(
+          const TextField(
             decoration: InputDecoration(
               hintText: "",
               enabledBorder: UnderlineInputBorder(
@@ -233,7 +229,7 @@ class _EditProfileState extends ConsumerState<EditProfile> {
               ),
             ],
           ),
-          TextField(
+          const TextField(
             decoration: InputDecoration(
               hintText: "",
               enabledBorder: UnderlineInputBorder(
@@ -262,7 +258,7 @@ class _EditProfileState extends ConsumerState<EditProfile> {
               ),
             ],
           ),
-          TextField(
+          const TextField(
             decoration: InputDecoration(
               hintText: "",
               enabledBorder: UnderlineInputBorder(
@@ -291,7 +287,7 @@ class _EditProfileState extends ConsumerState<EditProfile> {
               ),
             ],
           ),
-          TextField(
+          const TextField(
             decoration: InputDecoration(
               hintText: "",
               enabledBorder: UnderlineInputBorder(

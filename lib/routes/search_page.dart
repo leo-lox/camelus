@@ -28,7 +28,7 @@ import 'package:camelus/providers/database_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class SearchPage extends ConsumerStatefulWidget {
-  const SearchPage({Key? key}) : super(key: key);
+  const SearchPage({super.key});
 
   @override
   ConsumerState<SearchPage> createState() => _SearchPageState();
@@ -232,7 +232,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
         var personMetadata = await metadata
             .getMetadataByPubkeyStream(nipPubkey)
             .first
-            .timeout(Duration(seconds: 1));
+            .timeout(const Duration(seconds: 1));
         personMetadata!.pubkey = nipPubkey;
 
         workingMetadata.add(personMetadata);

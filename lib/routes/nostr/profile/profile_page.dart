@@ -44,7 +44,7 @@ class ProfilePage extends ConsumerStatefulWidget {
   late final String nProfileHr;
   late final String pubkeyBech32;
 
-  ProfilePage({Key? key, required this.pubkey}) : super(key: key) {
+  ProfilePage({super.key, required this.pubkey}) {
     nProfile = NprofileHelper().mapToBech32({
       "pubkey": pubkey,
       "relays": [],

@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'package:camelus/models/onboarding_user_info.dart';
 import 'package:camelus/routes/nostr/onboarding/onboarding_login.dart';
 import 'package:camelus/routes/nostr/onboarding/onboarding_name.dart';
@@ -10,7 +9,7 @@ import 'package:camelus/helpers/bip340.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class NostrOnboarding extends ConsumerStatefulWidget {
-  const NostrOnboarding({Key? key}) : super(key: key);
+  const NostrOnboarding({super.key});
 
   @override
   ConsumerState<NostrOnboarding> createState() => _NostrOnboardingState();
@@ -67,10 +66,6 @@ class _NostrOnboardingState extends ConsumerState<NostrOnboarding>
     _setupTabLiseners();
   }
 
-  @override
-  void dispose() {
-    super.dispose();
-  }
 
   _nextTab() {
     _tabController.animateTo(
@@ -87,7 +82,7 @@ class _NostrOnboardingState extends ConsumerState<NostrOnboarding>
         controller: _horizontalPageController,
         scrollDirection: Axis.vertical,
         children: [
-          OnboardingLoginPage(),
+          const OnboardingLoginPage(),
           TabBarView(
             controller: _tabController,
             children: [
@@ -111,7 +106,7 @@ class _NostrOnboardingState extends ConsumerState<NostrOnboarding>
                 pictureCallback: () {},
                 signUpInfo: signUpInfo,
               ),
-              OnboardingSummary(),
+              const OnboardingSummary(),
             ],
           ),
         ],

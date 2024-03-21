@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:developer';
 
 import 'package:bip32/bip32.dart' as bip32;
 import 'package:camelus/atoms/long_button.dart';
@@ -11,7 +10,6 @@ import 'package:camelus/routes/home_page.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:hex/hex.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -19,7 +17,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:bip39_mnemonic/bip39_mnemonic.dart';
 
 class OnboardingLoginPage extends ConsumerStatefulWidget {
-  const OnboardingLoginPage({Key? key}) : super(key: key);
+  const OnboardingLoginPage({super.key});
   @override
   ConsumerState<OnboardingLoginPage> createState() =>
       _OnboardingLoginPageState();
@@ -573,8 +571,8 @@ class _OnboardingLoginPageState extends ConsumerState<OnboardingLoginPage> {
                       ),
                     );
                   },
-                  onWillAccept: (data) => data != index,
-                  onAccept: (data) {
+                  onWillAcceptWithDetails: (data) => data != index,
+                  onAcceptWithDetails: (data) {
                     setState(() {
                       String temp = _userWords[data];
                       _userWords[data] = _userWords[index];

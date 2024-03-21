@@ -6,7 +6,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class RelaysPage extends ConsumerStatefulWidget {
-  const RelaysPage({Key? key}) : super(key: key);
+  const RelaysPage({super.key});
 
   @override
   ConsumerState<RelaysPage> createState() => _RelaysPageState();

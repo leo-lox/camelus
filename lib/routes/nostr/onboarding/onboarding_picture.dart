@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'dart:io';
 import 'dart:typed_data';
 
@@ -16,10 +15,10 @@ class OnboardingPicture extends ConsumerStatefulWidget {
   OnboardingUserInfo signUpInfo;
 
   OnboardingPicture({
-    Key? key,
+    super.key,
     required this.pictureCallback,
     required this.signUpInfo,
-  }) : super(key: key);
+  });
   @override
   ConsumerState<OnboardingPicture> createState() => _OnboardingPictureState();
 }
@@ -69,7 +68,7 @@ class _OnboardingPictureState extends ConsumerState<OnboardingPicture> {
               onPressed: () {
                 _pickFile();
               },
-              child: Text("test")),
+              child: const Text("test")),
           if (widget.signUpInfo.picture == null)
             myProfilePicture(
               pubkey: widget.signUpInfo.keyPair.publicKey,

@@ -17,7 +17,7 @@ class PersonCard extends ConsumerWidget {
   final Function(bool) onFollowTab;
 
   const PersonCard({
-    Key? key,
+    super.key,
     required this.pubkey,
     required this.name,
     required this.pictureUrl,
@@ -26,7 +26,7 @@ class PersonCard extends ConsumerWidget {
     required this.onTap,
     required this.onFollowTab,
     this.nip05,
-  }) : super(key: key);
+  });
 
   Future<String> checkNip05(String nip05, String pubkey, WidgetRef ref) async {
     var nip05service = await ref.read(nip05provider.future);

@@ -11,10 +11,9 @@ class CropAvatar extends StatelessWidget {
   Uint8List _croppedImageData = Uint8List(0);
 
   CropAvatar({
-    Key? key,
+    super.key,
     required Uint8List imageData,
-  })  : _imageData = imageData,
-        super(key: key);
+  })  : _imageData = imageData;
 
   final _controller = CropController();
 

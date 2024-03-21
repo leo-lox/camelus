@@ -18,10 +18,10 @@ class FollowerPage extends ConsumerStatefulWidget {
   final List<NostrTag> contacts;
 
   const FollowerPage({
-    Key? key,
+    super.key,
     required this.title,
     required this.contacts,
-  }) : super(key: key);
+  });
 
   @override
   ConsumerState<FollowerPage> createState() => _FollowerPageState();

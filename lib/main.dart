@@ -54,8 +54,7 @@ Future<void> main() async {
 class MyApp extends StatelessWidget {
   final String initialRoute;
   final String pubkey;
-  const MyApp({Key? key, required this.initialRoute, required this.pubkey})
-      : super(key: key);
+  const MyApp({super.key, required this.initialRoute, required this.pubkey});
 
   // This widget is the root of your application.
   @override

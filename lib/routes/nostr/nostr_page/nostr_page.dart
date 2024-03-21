@@ -27,8 +27,7 @@ class NostrPage extends ConsumerStatefulWidget {
   final String pubkey;
 
   const NostrPage(
-      {Key? key, required this.parentScaffoldKey, required this.pubkey})
-      : super(key: key);
+      {super.key, required this.parentScaffoldKey, required this.pubkey});
   @override
   ConsumerState<NostrPage> createState() => _NostrPageState();
 }

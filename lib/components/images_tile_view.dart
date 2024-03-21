@@ -6,8 +6,7 @@ import 'package:flutter/material.dart';
 class ImagesTileView extends StatelessWidget {
   final List<String> images;
   final Widget? galleryBottomWidget;
-  ImagesTileView({Key? key, required this.images, this.galleryBottomWidget})
-      : super(key: key);
+  ImagesTileView({super.key, required this.images, this.galleryBottomWidget});
 
   final String _tileViewId = Helpers().getRandomString(4);
 

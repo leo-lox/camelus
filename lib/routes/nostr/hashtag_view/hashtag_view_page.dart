@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 class HastagViewPage extends StatelessWidget {
   final String hashtag;
 
-  const HastagViewPage({Key? key, required this.hashtag}) : super(key: key);
+  const HastagViewPage({super.key, required this.hashtag});
 
   @override
   Widget build(BuildContext context) {

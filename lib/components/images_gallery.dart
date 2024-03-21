@@ -11,13 +11,13 @@ class ImageGallery extends StatefulWidget {
   final Widget? bottomBarWidget;
 
   const ImageGallery({
-    Key? key,
+    super.key,
     required this.imageUrls,
     required this.defaultImageIndex,
     required this.topBarTitle,
     this.bottomBarWidget,
     this.heroTag,
-  }) : super(key: key);
+  });
 
   @override
   _ImageGalleryState createState() => _ImageGalleryState();

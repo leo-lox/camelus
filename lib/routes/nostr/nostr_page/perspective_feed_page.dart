@@ -9,7 +9,7 @@ import 'package:matomo_tracker/matomo_tracker.dart';
 class PerspectiveFeedPage extends ConsumerStatefulWidget {
   late String pubkey;
 
-  PerspectiveFeedPage({Key? key, required this.pubkey}) : super(key: key);
+  PerspectiveFeedPage({super.key, required this.pubkey});
 
   @override
   ConsumerState<PerspectiveFeedPage> createState() =>

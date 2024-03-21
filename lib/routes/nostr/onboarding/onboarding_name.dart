@@ -10,10 +10,10 @@ class OnboardingName extends ConsumerStatefulWidget {
   OnboardingUserInfo userInfo;
 
   OnboardingName({
-    Key? key,
+    super.key,
     required this.submitCallback,
     required this.userInfo,
-  }) : super(key: key);
+  });
   @override
   ConsumerState<OnboardingName> createState() => _OnboardingNameState();
 }
@@ -44,7 +44,7 @@ class _OnboardingNameState extends ConsumerState<OnboardingName> {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Spacer(
+            const Spacer(
               flex: 20,
             ),
             Container(
@@ -82,7 +82,7 @@ class _OnboardingNameState extends ConsumerState<OnboardingName> {
             const SizedBox(
               height: 10,
             ),
-            Spacer(
+            const Spacer(
               flex: 1,
             ),
             Container(

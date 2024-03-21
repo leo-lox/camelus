@@ -1,10 +1,7 @@
-import 'dart:developer';
 
 import 'package:camelus/atoms/long_button.dart';
 import 'package:camelus/config/palette.dart';
-import 'package:camelus/routes/nostr/onboarding/onboarding_login.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class OnboardingPage01 extends ConsumerStatefulWidget {
@@ -12,10 +9,10 @@ class OnboardingPage01 extends ConsumerStatefulWidget {
   Function registerCallback;
 
   OnboardingPage01({
-    Key? key,
+    super.key,
     required this.loginCallback,
     required this.registerCallback,
-  }) : super(key: key);
+  });
   @override
   ConsumerState<OnboardingPage01> createState() => _OnboardingPage01State();
 }

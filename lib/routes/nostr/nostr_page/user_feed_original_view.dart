@@ -18,8 +18,7 @@ import 'package:isar/isar.dart';
 class UserFeedOriginalView extends ConsumerStatefulWidget {
   final String pubkey;
 
-  const UserFeedOriginalView({Key? key, required this.pubkey})
-      : super(key: key);
+  const UserFeedOriginalView({super.key, required this.pubkey});
 
   @override
   ConsumerState<UserFeedOriginalView> createState() =>

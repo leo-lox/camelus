@@ -19,7 +19,7 @@ class NostrDrawer extends ConsumerWidget {
 
   //late NostrService _nostrService;
 
-  const NostrDrawer({Key? key, required this.pubkey}) : super(key: key);
+  const NostrDrawer({super.key, required this.pubkey});
 
   void navigateToProfile(BuildContext context) {
     Navigator.pushNamed(context, "/nostr/profile", arguments: pubkey);
