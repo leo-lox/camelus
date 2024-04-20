@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:developer';
-import 'package:camelus/db/entities/db_nip05.dart';
-import 'package:camelus/db/queries/db_nip05_queries.dart';
+import 'package:camelus/data_layer/db/entities/db_nip05.dart';
+import 'package:camelus/data_layer/db/queries/db_nip05_queries.dart';
 import 'package:isar/isar.dart';
 import 'package:http/http.dart' as http;
 

@@ -1,14 +1,14 @@
 import 'dart:async';
 import 'dart:isolate';
 
-import 'package:camelus/db/custom_inserts/db_note_stack_insert.dart';
-import 'package:camelus/db/entities/db_nip05.dart';
-import 'package:camelus/db/entities/db_note.dart';
-import 'package:camelus/db/entities/db_relay_tracker.dart';
-import 'package:camelus/db/entities/db_settings.dart';
-import 'package:camelus/db/entities/db_user_metadata.dart';
-import 'package:camelus/db/migrations/migrations.dart';
-import 'package:camelus/models/isolate_note_transport.dart';
+import 'package:camelus/data_layer/db/custom_inserts/db_note_stack_insert.dart';
+import 'package:camelus/data_layer/db/entities/db_nip05.dart';
+import 'package:camelus/data_layer/db/entities/db_note.dart';
+import 'package:camelus/data_layer/db/entities/db_relay_tracker.dart';
+import 'package:camelus/data_layer/db/entities/db_settings.dart';
+import 'package:camelus/data_layer/db/entities/db_user_metadata.dart';
+import 'package:camelus/data_layer/db/migrations/migrations.dart';
+import 'package:camelus/domain/models/isolate_note_transport.dart';
 import 'package:camelus/services/nostr/relays/relay_tracker.dart';
 import 'package:flutter/services.dart';
 import 'package:isar/isar.dart';

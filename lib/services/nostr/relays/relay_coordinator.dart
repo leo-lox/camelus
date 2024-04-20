@@ -3,13 +3,13 @@ import 'dart:convert';
 import 'dart:developer';
 import 'dart:isolate';
 
-import 'package:camelus/db/entities/db_note.dart';
+import 'package:camelus/data_layer/db/entities/db_note.dart';
 import 'package:camelus/helpers/bip340.dart';
 import 'package:camelus/isolates/db_worker.dart';
-import 'package:camelus/models/nostr_note.dart';
-import 'package:camelus/models/nostr_request_event.dart';
-import 'package:camelus/models/nostr_request_query.dart';
-import 'package:camelus/models/nostr_tag.dart';
+import 'package:camelus/domain/models/nostr_note.dart';
+import 'package:camelus/domain/models/nostr_request_event.dart';
+import 'package:camelus/domain/models/nostr_request_query.dart';
+import 'package:camelus/domain/models/nostr_tag.dart';
 import 'package:camelus/providers/key_pair_provider.dart';
 import 'package:camelus/services/nostr/metadata/block_mute_service.dart';
 import 'package:camelus/services/nostr/metadata/nip_65.dart';

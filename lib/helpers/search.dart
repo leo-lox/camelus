@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:developer';
-import 'package:camelus/db/entities/db_user_metadata.dart';
-import 'package:camelus/db/queries/db_user_metadata_queries.dart';
+import 'package:camelus/data_layer/db/entities/db_user_metadata.dart';
+import 'package:camelus/data_layer/db/queries/db_user_metadata_queries.dart';
 import 'package:camelus/services/nostr/metadata/nip_05.dart';
 import 'package:http/http.dart' as http;
 import 'package:isar/isar.dart';

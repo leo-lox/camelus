@@ -1,6 +1,6 @@
 import 'package:camelus/services/nostr/relays/relays_ranking.dart';
 import 'package:isar/isar.dart';
-import 'package:camelus/db/entities/db_relay_tracker.dart';
+import 'package:camelus/data_layer/db/entities/db_relay_tracker.dart';
 
 class RelaysPicker {
   Isar db;

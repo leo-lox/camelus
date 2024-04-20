@@ -2,10 +2,10 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
 
-import 'package:camelus/db/queries/db_note_queries.dart';
+import 'package:camelus/data_layer/db/queries/db_note_queries.dart';
 import 'package:camelus/helpers/nip04_encryption.dart';
-import 'package:camelus/models/nostr_request_event.dart';
-import 'package:camelus/models/nostr_tag.dart';
+import 'package:camelus/domain/models/nostr_request_event.dart';
+import 'package:camelus/domain/models/nostr_tag.dart';
 import 'package:camelus/providers/key_pair_provider.dart';
 import 'package:camelus/services/nostr/relays/relay_coordinator.dart';
 import 'package:isar/isar.dart';

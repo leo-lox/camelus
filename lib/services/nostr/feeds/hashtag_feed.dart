@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'dart:developer';
-import 'package:camelus/db/entities/db_note.dart';
-import 'package:camelus/db/queries/db_note_queries.dart';
-import 'package:camelus/models/nostr_note.dart';
-import 'package:camelus/models/nostr_request_query.dart';
+import 'package:camelus/data_layer/db/entities/db_note.dart';
+import 'package:camelus/data_layer/db/queries/db_note_queries.dart';
+import 'package:camelus/domain/models/nostr_note.dart';
+import 'package:camelus/domain/models/nostr_request_query.dart';
 import 'package:camelus/services/nostr/relays/relay_coordinator.dart';
 import 'package:isar/isar.dart';
 

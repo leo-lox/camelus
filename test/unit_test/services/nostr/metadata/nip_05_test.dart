@@ -1,8 +1,8 @@
-import 'package:camelus/db/entities/db_nip05.dart';
-import 'package:camelus/db/entities/db_note.dart';
-import 'package:camelus/db/entities/db_relay_tracker.dart';
-import 'package:camelus/db/entities/db_settings.dart';
-import 'package:camelus/db/entities/db_user_metadata.dart';
+import 'package:camelus/data_layer/db/entities/db_nip05.dart';
+import 'package:camelus/data_layer/db/entities/db_note.dart';
+import 'package:camelus/data_layer/db/entities/db_relay_tracker.dart';
+import 'package:camelus/data_layer/db/entities/db_settings.dart';
+import 'package:camelus/data_layer/db/entities/db_user_metadata.dart';
 import 'package:camelus/services/nostr/metadata/nip_05.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_test/flutter_test.dart';
