@@ -1,4 +1,4 @@
-import 'package:camelus/domain/models/nostr_tag.dart';
+import 'package:camelus/data_layer/models/nostr_tag.dart';
 
 class NostrNote {
   final String id;

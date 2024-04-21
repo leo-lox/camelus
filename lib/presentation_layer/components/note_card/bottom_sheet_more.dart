@@ -2,7 +2,7 @@ import 'dart:ui';
 
 import 'package:camelus/presentation_layer/components/seen_on_relays.dart';
 import 'package:camelus/config/palette.dart';
-import 'package:camelus/domain/models/nostr_note.dart';
+import 'package:camelus/data_layer/models/nostr_note.dart';
 import 'package:camelus/presentation_layer/routes/nostr/blockedUsers/block_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';

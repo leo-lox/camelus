@@ -4,8 +4,8 @@ import 'package:camelus/presentation_layer/atoms/picture.dart';
 import 'package:camelus/data_layer/db/entities/db_user_metadata.dart';
 import 'package:camelus/helpers/nprofile_helper.dart';
 import 'package:camelus/helpers/search.dart';
-import 'package:camelus/domain/models/nostr_request_event.dart';
-import 'package:camelus/domain/models/nostr_tag.dart';
+import 'package:camelus/data_layer/models/nostr_request_event.dart';
+import 'package:camelus/data_layer/models/nostr_tag.dart';
 import 'package:camelus/providers/database_provider.dart';
 import 'package:camelus/providers/key_pair_provider.dart';
 import 'package:camelus/providers/metadata_provider.dart';
@@ -22,7 +22,7 @@ import 'package:isar/isar.dart';
 import 'package:lottie/lottie.dart';
 import 'package:camelus/config/palette.dart';
 import 'package:camelus/helpers/helpers.dart';
-import 'package:camelus/domain/models/post_context.dart';
+import 'package:camelus/data_layer/models/post_context.dart';
 
 class WritePost extends ConsumerStatefulWidget {
   final PostContext? context;

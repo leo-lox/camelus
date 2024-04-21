@@ -5,7 +5,7 @@ import 'package:camelus/presentation_layer/atoms/new_posts_available.dart';
 import 'package:camelus/presentation_layer/atoms/refresh_indicator_no_need.dart';
 import 'package:camelus/presentation_layer/components/note_card/note_card_container.dart';
 import 'package:camelus/config/palette.dart';
-import 'package:camelus/domain/models/nostr_note.dart';
+import 'package:camelus/data_layer/models/nostr_note.dart';
 import 'package:camelus/providers/database_provider.dart';
 import 'package:camelus/providers/relay_provider.dart';
 import 'package:camelus/scroll_controller/retainable_scroll_controller.dart';

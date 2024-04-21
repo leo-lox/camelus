@@ -10,10 +10,10 @@ import 'package:camelus/data_layer/db/queries/db_note_queries.dart';
 import 'package:camelus/helpers/helpers.dart';
 import 'package:camelus/helpers/nprofile_helper.dart';
 import 'package:camelus/helpers/search.dart';
-import 'package:camelus/domain/models/api_nostr_band_hashtags.dart';
-import 'package:camelus/domain/models/api_nostr_band_people.dart';
-import 'package:camelus/domain/models/nostr_request_event.dart';
-import 'package:camelus/domain/models/nostr_tag.dart';
+import 'package:camelus/data_layer/models/nostr_band_hashtags_model.dart';
+import 'package:camelus/data_layer/models/nostr_band_people_model.dart';
+import 'package:camelus/data_layer/models/nostr_request_event.dart';
+import 'package:camelus/data_layer/models/nostr_tag.dart';
 import 'package:camelus/providers/following_provider.dart';
 import 'package:camelus/providers/key_pair_provider.dart';
 import 'package:camelus/providers/metadata_provider.dart';
@@ -111,7 +111,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
     }
   }
 
-  Future<ApiNostrBandPeople?> _getTrendingProfiles() async {
+  Future<NostrBandPeopleModel?> _getTrendingProfiles() async {
     // cached network request from https://api.nostr.band/v0/trending/profiles
 
     var file = await DefaultCacheManager().getSingleFile(
@@ -126,10 +126,10 @@ class _SearchPageState extends ConsumerState<SearchPage> {
     }
     var json = jsonDecode(result);
 
-    return ApiNostrBandPeople.fromJson(json);
+    return NostrBandPeopleModel.fromJson(json);
   }
 
-  Future<ApiNostrBandHashtags?> _getTrendingHashtags() async {
+  Future<NostrBandHashtagsModel?> _getTrendingHashtags() async {
     //var file = await DefaultCacheManager().getSingleFile(url);
     var file = await DefaultCacheManager().getSingleFile(
       'https://camelus.app/api/v1/nostr-band-cache?type=hashtags&limit=10',
@@ -142,7 +142,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
       return null;
     }
     var json = jsonDecode(result);
-    return ApiNostrBandHashtags.fromJson(json);
+    return NostrBandHashtagsModel.fromJson(json);
   }
 
   void _onSearchChanged(String value) async {
@@ -416,10 +416,10 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                 ),
               ],
             ),
-            FutureBuilder<ApiNostrBandHashtags?>(
+            FutureBuilder<NostrBandHashtagsModel?>(
                 future: _getTrendingHashtags(),
                 builder:
-                    (context, AsyncSnapshot<ApiNostrBandHashtags?> snapshot) {
+                    (context, AsyncSnapshot<NostrBandHashtagsModel?> snapshot) {
                   if (snapshot.hasError) {
                     log(snapshot.error.toString());
                     return const Text('Something went wrong');
@@ -446,10 +446,10 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                   fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 10),
-            FutureBuilder<ApiNostrBandPeople?>(
+            FutureBuilder<NostrBandPeopleModel?>(
                 future: _getTrendingProfiles(),
                 builder:
-                    (context, AsyncSnapshot<ApiNostrBandPeople?> snapshot) {
+                    (context, AsyncSnapshot<NostrBandPeopleModel?> snapshot) {
                   if (snapshot.hasError) {
                     log(snapshot.error.toString());
                     return const Text('Something went wrong');
@@ -468,7 +468,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
         ));
   }
 
-  Widget _trendingHashtags({required ApiNostrBandHashtags api, int? limit}) {
+  Widget _trendingHashtags({required NostrBandHashtagsModel api, int? limit}) {
     var myHashtags = api.hashtags;
 
     List<Widget> hashtagWidgets = [];
@@ -498,7 +498,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
   }
 
   Widget _trendingPeople(
-      ApiNostrBandPeople api, int limit, List<NostrTag> currentFollowing) {
+      NostrBandPeopleModel api, int limit, List<NostrTag> currentFollowing) {
     List<PersonCard> personCards = [];
 
     for (int i = 0; i < api.profiles.length; i++) {

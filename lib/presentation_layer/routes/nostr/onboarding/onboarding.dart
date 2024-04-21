@@ -1,4 +1,4 @@
-import 'package:camelus/domain/models/onboarding_user_info.dart';
+import 'package:camelus/data_layer/models/onboarding_user_info.dart';
 import 'package:camelus/presentation_layer/routes/nostr/onboarding/onboarding_login.dart';
 import 'package:camelus/presentation_layer/routes/nostr/onboarding/onboarding_name.dart';
 import 'package:camelus/presentation_layer/routes/nostr/onboarding/onboarding_page01.dart';

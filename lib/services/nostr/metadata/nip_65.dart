@@ -1,8 +1,8 @@
 import 'dart:developer';
 
 import 'package:camelus/data_layer/db/queries/db_note_queries.dart';
-import 'package:camelus/domain/models/nostr_note.dart';
-import 'package:camelus/domain/models/nostr_request_query.dart';
+import 'package:camelus/data_layer/models/nostr_note.dart';
+import 'package:camelus/data_layer/models/nostr_request_query.dart';
 import 'package:camelus/services/nostr/relays/relay_address_parser.dart';
 import 'package:camelus/services/nostr/relays/relays_picker.dart';
 import 'package:isar/isar.dart';

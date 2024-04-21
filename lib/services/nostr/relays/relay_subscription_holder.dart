@@ -1,7 +1,7 @@
 import 'dart:async';
 
-import 'package:camelus/domain/models/nostr_request_query.dart';
-import 'package:camelus/domain/models/nostr_request_close.dart';
+import 'package:camelus/data_layer/models/nostr_request_query.dart';
+import 'package:camelus/data_layer/models/nostr_request_close.dart';
 import 'package:camelus/services/nostr/relays/my_relay.dart';
 
 class RelaySubscriptionHolder {

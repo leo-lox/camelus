@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:camelus/presentation_layer/atoms/long_button.dart';
-import 'package:camelus/domain/models/nostr_request_event.dart';
+import 'package:camelus/data_layer/models/nostr_request_event.dart';
 import 'package:camelus/providers/key_pair_provider.dart';
 import 'package:camelus/providers/metadata_provider.dart';
 import 'package:camelus/providers/relay_provider.dart';

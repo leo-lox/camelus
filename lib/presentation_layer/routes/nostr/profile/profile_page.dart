@@ -9,8 +9,8 @@ import 'package:camelus/presentation_layer/components/note_card/note_card_contai
 import 'package:camelus/data_layer/db/entities/db_user_metadata.dart';
 import 'package:camelus/helpers/bip340.dart';
 import 'package:camelus/helpers/nprofile_helper.dart';
-import 'package:camelus/domain/models/nostr_note.dart';
-import 'package:camelus/domain/models/nostr_tag.dart';
+import 'package:camelus/data_layer/models/nostr_note.dart';
+import 'package:camelus/data_layer/models/nostr_tag.dart';
 import 'package:camelus/providers/database_provider.dart';
 import 'package:camelus/providers/following_provider.dart';
 import 'package:camelus/providers/key_pair_provider.dart';

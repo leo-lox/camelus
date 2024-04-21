@@ -2,7 +2,7 @@ import 'dart:ui';
 
 import 'package:camelus/config/palette.dart';
 import 'package:camelus/helpers/nevent_helper.dart';
-import 'package:camelus/domain/models/nostr_note.dart';
+import 'package:camelus/data_layer/models/nostr_note.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 

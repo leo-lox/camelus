@@ -4,7 +4,7 @@ import 'package:camelus/config/palette.dart';
 import 'package:camelus/data_layer/db/entities/db_user_metadata.dart';
 import 'package:camelus/helpers/helpers.dart';
 import 'package:camelus/helpers/nprofile_helper.dart';
-import 'package:camelus/domain/models/nostr_note.dart';
+import 'package:camelus/data_layer/models/nostr_note.dart';
 import 'package:camelus/providers/metadata_provider.dart';
 import 'package:camelus/services/nostr/metadata/user_metadata.dart';
 import 'package:flutter/material.dart';

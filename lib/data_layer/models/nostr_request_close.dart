@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:camelus/domain/models/nostr_request.dart';
+import 'package:camelus/data_layer/models/nostr_request.dart';
 
 class NostrRequestClose implements NostrRequest {
   final String type = "CLOSE";

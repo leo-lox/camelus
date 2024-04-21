@@ -9,8 +9,8 @@ import 'package:camelus/presentation_layer/components/note_card/note_card_build_
 import 'package:camelus/presentation_layer/components/write_post.dart';
 import 'package:camelus/config/palette.dart';
 import 'package:camelus/data_layer/db/entities/db_user_metadata.dart';
-import 'package:camelus/domain/models/nostr_note.dart';
-import 'package:camelus/domain/models/post_context.dart';
+import 'package:camelus/data_layer/models/nostr_note.dart';
+import 'package:camelus/data_layer/models/post_context.dart';
 import 'package:camelus/providers/database_provider.dart';
 import 'package:camelus/providers/metadata_provider.dart';
 import 'package:camelus/services/nostr/metadata/user_metadata.dart';

@@ -8,7 +8,7 @@ import 'package:camelus/data_layer/db/entities/db_relay_tracker.dart';
 import 'package:camelus/data_layer/db/entities/db_settings.dart';
 import 'package:camelus/data_layer/db/entities/db_user_metadata.dart';
 import 'package:camelus/data_layer/db/migrations/migrations.dart';
-import 'package:camelus/domain/models/isolate_note_transport.dart';
+import 'package:camelus/data_layer/models/isolate_note_transport.dart';
 import 'package:camelus/services/nostr/relays/relay_tracker.dart';
 import 'package:flutter/services.dart';
 import 'package:isar/isar.dart';

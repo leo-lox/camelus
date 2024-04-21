@@ -4,7 +4,7 @@ import 'package:camelus/presentation_layer/atoms/spinner_center.dart';
 import 'package:camelus/config/palette.dart';
 import 'package:camelus/data_layer/db/entities/db_user_metadata.dart';
 import 'package:camelus/helpers/helpers.dart';
-import 'package:camelus/domain/models/nostr_tag.dart';
+import 'package:camelus/data_layer/models/nostr_tag.dart';
 import 'package:camelus/providers/block_mute_provider.dart';
 import 'package:camelus/providers/metadata_provider.dart';
 import 'package:camelus/providers/relay_provider.dart';

@@ -1,4 +1,4 @@
-import 'package:camelus/domain/models/nostr_note.dart';
+import 'package:camelus/data_layer/models/nostr_note.dart';
 
 class PostContext {
   NostrNote replyToNote;

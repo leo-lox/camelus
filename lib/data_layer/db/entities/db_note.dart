@@ -1,7 +1,7 @@
 // ignore_for_file: non_constant_identifier_names
 
-import 'package:camelus/domain/models/nostr_note.dart';
-import 'package:camelus/domain/models/nostr_tag.dart';
+import 'package:camelus/data_layer/models/nostr_note.dart';
+import 'package:camelus/data_layer/models/nostr_tag.dart';
 import 'package:isar/isar.dart';
 
 part 'db_note.g.dart';

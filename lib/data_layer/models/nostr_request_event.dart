@@ -3,8 +3,8 @@
 import 'dart:convert';
 
 import 'package:camelus/helpers/bip340.dart';
-import 'package:camelus/domain/models/nostr_request.dart';
-import 'package:camelus/domain/models/nostr_tag.dart';
+import 'package:camelus/data_layer/models/nostr_request.dart';
+import 'package:camelus/data_layer/models/nostr_tag.dart';
 import 'package:crypto/crypto.dart';
 import 'package:hex/hex.dart';
 
