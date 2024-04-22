@@ -7,10 +7,11 @@ import 'package:camelus/helpers/search.dart';
 import 'package:camelus/data_layer/models/nostr_request_event.dart';
 import 'package:camelus/data_layer/models/nostr_tag.dart';
 import 'package:camelus/presentation_layer/providers/database_provider.dart';
+import 'package:camelus/presentation_layer/providers/file_upload_provider.dart';
 import 'package:camelus/presentation_layer/providers/key_pair_provider.dart';
 import 'package:camelus/presentation_layer/providers/metadata_provider.dart';
 import 'package:camelus/presentation_layer/providers/relay_provider.dart';
-import 'package:camelus/services/external/nostr_build_file_upload.dart';
+import 'package:camelus/data_layer/data_sources/nostr_build_file_upload.dart';
 import 'package:camelus/services/nostr/metadata/user_metadata.dart';
 import 'package:camelus/services/nostr/relays/relays_ranking.dart';
 import 'package:file_picker/file_picker.dart';
@@ -258,7 +259,7 @@ class _WritePostState extends ConsumerState<WritePost> {
     List<String> imageUrls = [];
     for (var image in _images) {
       try {
-        var url = await NostrBuildFileUpload.uploadImage(image);
+        var url = await ref.watch(fileUploadProvider).uploadImage(image);
         imageUrls.add(url);
       } catch (e) {
         log("errUploadImage:  ${e.toString()}");

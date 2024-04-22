@@ -5,7 +5,7 @@ import 'package:http_parser/http_parser.dart';
 import 'package:mime/mime.dart';
 
 class NostrBuildFileUpload {
-  static Future<String> uploadImage(File file) async {
+  Future<String> uploadImage(File file) async {
     final uri = Uri.parse('https://nostr.build/upload.php');
     var request = http.MultipartRequest('POST', uri);
 
