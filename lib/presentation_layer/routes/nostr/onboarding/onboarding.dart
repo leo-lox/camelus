@@ -1,11 +1,10 @@
-import 'package:camelus/data_layer/models/onboarding_user_info.dart';
+import 'package:camelus/presentation_layer/providers/onboarding_provider.dart';
 import 'package:camelus/presentation_layer/routes/nostr/onboarding/onboarding_login.dart';
 import 'package:camelus/presentation_layer/routes/nostr/onboarding/onboarding_name.dart';
 import 'package:camelus/presentation_layer/routes/nostr/onboarding/onboarding_page01.dart';
 import 'package:camelus/presentation_layer/routes/nostr/onboarding/onboarding_picture.dart';
 import 'package:camelus/presentation_layer/routes/nostr/onboarding/onboarding_summary.dart';
 import 'package:flutter/material.dart';
-import 'package:camelus/helpers/bip340.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class NostrOnboarding extends ConsumerStatefulWidget {
@@ -24,10 +23,6 @@ class _NostrOnboardingState extends ConsumerState<NostrOnboarding>
     keepPage: true,
   );
   bool horizontalScrollLock = false;
-
-  OnboardingUserInfo signUpInfo = OnboardingUserInfo(
-    keyPair: Bip340().generatePrivateKey(),
-  );
 
   void _setupTabLiseners() {
     // listen to changes of tabs
@@ -58,7 +53,7 @@ class _NostrOnboardingState extends ConsumerState<NostrOnboarding>
   void initState() {
     super.initState();
     _tabController = TabController(
-      length: 3,
+      length: 4,
       initialIndex: 0,
       vsync: this,
     );
@@ -96,14 +91,14 @@ class _NostrOnboardingState extends ConsumerState<NostrOnboarding>
                 },
               ),
               OnboardingName(
-                userInfo: signUpInfo,
+                userInfo: ref.watch(onboardingProvider).signUpInfo,
                 submitCallback: (_) {
                   _nextTab();
                 },
               ),
               OnboardingPicture(
                 pictureCallback: () {},
-                signUpInfo: signUpInfo,
+                signUpInfo: ref.watch(onboardingProvider).signUpInfo,
               ),
               const OnboardingSummary(),
             ],

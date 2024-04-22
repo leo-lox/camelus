@@ -4,7 +4,7 @@ import 'dart:typed_data';
 import 'package:camelus/presentation_layer/atoms/crop_avatar.dart';
 import 'package:camelus/presentation_layer/atoms/my_profile_picture.dart';
 import 'package:camelus/config/palette.dart';
-import 'package:camelus/data_layer/models/onboarding_user_info.dart';
+import 'package:camelus/domain_layer/entities/onboarding_user_info.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';

@@ -1,6 +1,6 @@
 import 'package:camelus/presentation_layer/atoms/long_button.dart';
 import 'package:camelus/config/palette.dart';
-import 'package:camelus/data_layer/models/onboarding_user_info.dart';
+import 'package:camelus/domain_layer/entities/onboarding_user_info.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 

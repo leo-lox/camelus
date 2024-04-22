@@ -9,6 +9,7 @@ class OnboardingUserInfo {
   String? about = '';
   String? nip05;
   String? website = '';
+  bool nip46 = false;
   KeyPair keyPair;
 
   OnboardingUserInfo({

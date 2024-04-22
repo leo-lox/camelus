@@ -191,7 +191,7 @@ class _UserFeedOriginalViewState extends ConsumerState<UserFeedOriginalView> {
           Filter(authors: _followingPubkeys, kinds: [1])
         ]);
 
-    ndk.handleRequest(_feedRequest, desiredCoverage: 2);
+    ndk.handleRequest(_feedRequest);
 
     _feedRequest.responseStream.listen((event) {
       //log("NDK: feed response event $event");
