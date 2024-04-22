@@ -1,4 +1,4 @@
-import 'package:camelus/providers/database_provider.dart';
+import 'package:camelus/presentation_layer/providers/database_provider.dart';
 import 'package:camelus/services/nostr/metadata/nip_05.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 

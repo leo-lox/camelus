@@ -1,5 +1,5 @@
 import 'package:camelus/config/palette.dart';
-import 'package:camelus/providers/metadata_provider.dart';
+import 'package:camelus/presentation_layer/providers/metadata_provider.dart';
 import 'package:camelus/presentation_layer/routes/nostr/nostr_page/user_feed_original_view.dart';
 import 'package:camelus/services/nostr/metadata/user_metadata.dart';
 import 'package:flutter/material.dart';

@@ -5,7 +5,7 @@ import 'package:camelus/presentation_layer/atoms/long_button.dart';
 import 'package:camelus/config/palette.dart';
 import 'package:camelus/helpers/bip340.dart';
 import 'package:camelus/helpers/helpers.dart';
-import 'package:camelus/providers/key_pair_provider.dart';
+import 'package:camelus/presentation_layer/providers/key_pair_provider.dart';
 import 'package:camelus/presentation_layer/routes/home_page.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';

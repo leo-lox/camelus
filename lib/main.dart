@@ -1,6 +1,6 @@
 import 'dart:ui';
 
-import 'package:camelus/providers/key_pair_provider.dart';
+import 'package:camelus/presentation_layer/providers/key_pair_provider.dart';
 import 'package:camelus/presentation_layer/routes/nostr/blockedUsers/blocked_users.dart';
 import 'package:camelus/presentation_layer/routes/nostr/hashtag_view/hashtag_view_page.dart';
 import 'package:camelus/presentation_layer/routes/nostr/settings/settings_page.dart';
@@ -21,7 +21,7 @@ import 'theme.dart' as theme;
 
 const devDeviceFrame = true;
 
-//! first is route, second is pubkey
+/// first is route, second is pubkey
 Future<List<String>> _getInitialData() async {
   var wrapper = await ProviderContainer().read(keyPairProvider.future);
 

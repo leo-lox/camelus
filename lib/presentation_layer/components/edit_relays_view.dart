@@ -1,7 +1,7 @@
 import 'dart:developer';
 import 'package:camelus/presentation_layer/atoms/long_button.dart';
 import 'package:camelus/config/palette.dart';
-import 'package:camelus/providers/following_provider.dart';
+import 'package:camelus/presentation_layer/providers/following_provider.dart';
 import 'package:camelus/services/nostr/relays/relay_address_parser.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';

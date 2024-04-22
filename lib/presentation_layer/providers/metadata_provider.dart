@@ -1,5 +1,5 @@
-import 'package:camelus/providers/database_provider.dart';
-import 'package:camelus/providers/relay_provider.dart';
+import 'package:camelus/presentation_layer/providers/database_provider.dart';
+import 'package:camelus/presentation_layer/providers/relay_provider.dart';
 import 'package:camelus/services/nostr/metadata/user_metadata.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 

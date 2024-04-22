@@ -2,6 +2,8 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
 
+import 'package:camelus/domain_layer/entities/nostr_band_hashtags.dart';
+import 'package:camelus/domain_layer/entities/nostr_band_people.dart';
 import 'package:camelus/presentation_layer/atoms/hashtag_card.dart';
 import 'package:camelus/presentation_layer/atoms/person_card.dart';
 import 'package:camelus/config/palette.dart';
@@ -10,21 +12,19 @@ import 'package:camelus/data_layer/db/queries/db_note_queries.dart';
 import 'package:camelus/helpers/helpers.dart';
 import 'package:camelus/helpers/nprofile_helper.dart';
 import 'package:camelus/helpers/search.dart';
-import 'package:camelus/data_layer/models/nostr_band_hashtags_model.dart';
-import 'package:camelus/data_layer/models/nostr_band_people_model.dart';
 import 'package:camelus/data_layer/models/nostr_request_event.dart';
 import 'package:camelus/data_layer/models/nostr_tag.dart';
-import 'package:camelus/providers/following_provider.dart';
-import 'package:camelus/providers/key_pair_provider.dart';
-import 'package:camelus/providers/metadata_provider.dart';
-import 'package:camelus/providers/navigation_bar_provider.dart';
-import 'package:camelus/providers/relay_provider.dart';
+import 'package:camelus/presentation_layer/providers/following_provider.dart';
+import 'package:camelus/presentation_layer/providers/key_pair_provider.dart';
+import 'package:camelus/presentation_layer/providers/metadata_provider.dart';
+import 'package:camelus/presentation_layer/providers/navigation_bar_provider.dart';
+import 'package:camelus/presentation_layer/providers/nostr_band_provider.dart';
+import 'package:camelus/presentation_layer/providers/relay_provider.dart';
 import 'package:camelus/presentation_layer/routes/nostr/profile/profile_page.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:camelus/providers/database_provider.dart';
+import 'package:camelus/presentation_layer/providers/database_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class SearchPage extends ConsumerStatefulWidget {
@@ -109,40 +109,6 @@ class _SearchPageState extends ConsumerState<SearchPage> {
     for (var s in _subscriptions) {
       s.cancel();
     }
-  }
-
-  Future<NostrBandPeopleModel?> _getTrendingProfiles() async {
-    // cached network request from https://api.nostr.band/v0/trending/profiles
-
-    var file = await DefaultCacheManager().getSingleFile(
-      'https://camelus.app/api/v1/nostr-band-cache?type=profiles&limit=10',
-      key: 'trending_profiles_nostr_band',
-      // 2 hours
-      headers: {'Cache-Control': 'max-age=7200'},
-    );
-    var result = await file.readAsString();
-    if (result.isEmpty) {
-      return null;
-    }
-    var json = jsonDecode(result);
-
-    return NostrBandPeopleModel.fromJson(json);
-  }
-
-  Future<NostrBandHashtagsModel?> _getTrendingHashtags() async {
-    //var file = await DefaultCacheManager().getSingleFile(url);
-    var file = await DefaultCacheManager().getSingleFile(
-      'https://camelus.app/api/v1/nostr-band-cache?type=hashtags&limit=10',
-      key: 'trending_hashtags_nostr_band',
-      // 2 hours min
-      headers: {'Cache-Control': 'max-age=7200'},
-    );
-    var result = await file.readAsString();
-    if (result.isEmpty) {
-      return null;
-    }
-    var json = jsonDecode(result);
-    return NostrBandHashtagsModel.fromJson(json);
   }
 
   void _onSearchChanged(String value) async {
@@ -416,10 +382,9 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                 ),
               ],
             ),
-            FutureBuilder<NostrBandHashtagsModel?>(
-                future: _getTrendingHashtags(),
-                builder:
-                    (context, AsyncSnapshot<NostrBandHashtagsModel?> snapshot) {
+            FutureBuilder<NostrBandHashtags?>(
+                future: ref.watch(nostrBandProvider).getTrendingHashtags(),
+                builder: (context, AsyncSnapshot<NostrBandHashtags?> snapshot) {
                   if (snapshot.hasError) {
                     log(snapshot.error.toString());
                     return const Text('Something went wrong');
@@ -446,10 +411,9 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                   fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 10),
-            FutureBuilder<NostrBandPeopleModel?>(
-                future: _getTrendingProfiles(),
-                builder:
-                    (context, AsyncSnapshot<NostrBandPeopleModel?> snapshot) {
+            FutureBuilder<NostrBandPeople?>(
+                future: ref.watch(nostrBandProvider).getTrendingPeople(),
+                builder: (context, AsyncSnapshot<NostrBandPeople?> snapshot) {
                   if (snapshot.hasError) {
                     log(snapshot.error.toString());
                     return const Text('Something went wrong');
@@ -468,7 +432,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
         ));
   }
 
-  Widget _trendingHashtags({required NostrBandHashtagsModel api, int? limit}) {
+  Widget _trendingHashtags({required NostrBandHashtags api, int? limit}) {
     var myHashtags = api.hashtags;
 
     List<Widget> hashtagWidgets = [];
@@ -498,7 +462,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
   }
 
   Widget _trendingPeople(
-      NostrBandPeopleModel api, int limit, List<NostrTag> currentFollowing) {
+      NostrBandPeople api, int limit, List<NostrTag> currentFollowing) {
     List<PersonCard> personCards = [];
 
     for (int i = 0; i < api.profiles.length; i++) {

@@ -6,8 +6,8 @@ import 'package:camelus/presentation_layer/components/note_card/note_card_contai
 import 'package:camelus/config/palette.dart';
 
 import 'package:camelus/data_layer/models/nostr_note.dart';
-import 'package:camelus/providers/database_provider.dart';
-import 'package:camelus/providers/relay_provider.dart';
+import 'package:camelus/presentation_layer/providers/database_provider.dart';
+import 'package:camelus/presentation_layer/providers/relay_provider.dart';
 import 'package:camelus/scroll_controller/retainable_scroll_controller.dart';
 import 'package:camelus/services/nostr/feeds/event_feed.dart';
 import 'package:flutter/material.dart';

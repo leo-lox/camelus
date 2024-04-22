@@ -5,7 +5,7 @@ import 'package:camelus/presentation_layer/atoms/spinner_center.dart';
 import 'package:camelus/config/palette.dart';
 import 'package:camelus/data_layer/db/entities/db_relay_tracker.dart';
 import 'package:camelus/data_layer/models/nostr_note.dart';
-import 'package:camelus/providers/database_provider.dart';
+import 'package:camelus/presentation_layer/providers/database_provider.dart';
 
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';

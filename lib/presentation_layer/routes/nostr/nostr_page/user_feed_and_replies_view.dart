@@ -6,10 +6,10 @@ import 'package:camelus/presentation_layer/atoms/refresh_indicator_no_need.dart'
 import 'package:camelus/presentation_layer/components/note_card/note_card_container.dart';
 import 'package:camelus/config/palette.dart';
 import 'package:camelus/data_layer/models/nostr_note.dart';
-import 'package:camelus/providers/database_provider.dart';
-import 'package:camelus/providers/following_provider.dart';
-import 'package:camelus/providers/navigation_bar_provider.dart';
-import 'package:camelus/providers/relay_provider.dart';
+import 'package:camelus/presentation_layer/providers/database_provider.dart';
+import 'package:camelus/presentation_layer/providers/following_provider.dart';
+import 'package:camelus/presentation_layer/providers/navigation_bar_provider.dart';
+import 'package:camelus/presentation_layer/providers/relay_provider.dart';
 import 'package:camelus/scroll_controller/retainable_scroll_controller.dart';
 import 'package:camelus/services/nostr/feeds/user_and_replies_feed.dart';
 import 'package:flutter/material.dart';

@@ -1,6 +1,6 @@
-import 'package:camelus/providers/database_provider.dart';
-import 'package:camelus/providers/key_pair_provider.dart';
-import 'package:camelus/providers/relay_provider.dart';
+import 'package:camelus/presentation_layer/providers/database_provider.dart';
+import 'package:camelus/presentation_layer/providers/key_pair_provider.dart';
+import 'package:camelus/presentation_layer/providers/relay_provider.dart';
 import 'package:camelus/services/nostr/metadata/following_pubkeys.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 

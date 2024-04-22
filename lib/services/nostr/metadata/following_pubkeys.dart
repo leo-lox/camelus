@@ -6,7 +6,7 @@ import 'package:camelus/helpers/helpers.dart';
 import 'package:camelus/data_layer/models/nostr_request_event.dart';
 import 'package:camelus/data_layer/models/nostr_request_query.dart';
 import 'package:camelus/data_layer/models/nostr_tag.dart';
-import 'package:camelus/providers/key_pair_provider.dart';
+import 'package:camelus/presentation_layer/providers/key_pair_provider.dart';
 import 'package:camelus/services/nostr/relays/relay_coordinator.dart';
 import 'package:isar/isar.dart';
 

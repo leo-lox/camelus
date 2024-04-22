@@ -1,4 +1,4 @@
-import 'package:camelus/providers/key_pair_provider.dart';
+import 'package:camelus/presentation_layer/providers/key_pair_provider.dart';
 import 'package:camelus/services/nostr/metadata/block_mute_service.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 

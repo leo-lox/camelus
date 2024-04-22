@@ -1,7 +1,7 @@
 import 'package:camelus/presentation_layer/atoms/follow_button.dart';
 import 'package:camelus/presentation_layer/atoms/my_profile_picture.dart';
 import 'package:camelus/config/palette.dart';
-import 'package:camelus/providers/nip05_provider.dart';
+import 'package:camelus/presentation_layer/providers/nip05_provider.dart';
 
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';

@@ -1,7 +1,7 @@
 import 'package:camelus/config/palette.dart';
 import 'package:camelus/data_layer/db/entities/db_user_metadata.dart';
 import 'package:camelus/helpers/helpers.dart';
-import 'package:camelus/providers/nip05_provider.dart';
+import 'package:camelus/presentation_layer/providers/nip05_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';

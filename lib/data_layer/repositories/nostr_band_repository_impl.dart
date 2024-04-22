@@ -4,13 +4,19 @@ import 'package:camelus/domain_layer/entities/nostr_band_people.dart';
 import 'package:camelus/domain_layer/repositories/nostr_band_repository.dart';
 
 class NostrBandRepositoryImpl implements NostrBandRepository {
+  final ApiNostrBandDataSource apiNostrBandDataSource;
+
+  NostrBandRepositoryImpl({
+    required this.apiNostrBandDataSource,
+  });
+
   @override
   Future<NostrBandPeople?> getTrendingProfiles() async {
-    return await ApiNostrBandDataSource.getTrendingProfiles();
+    return await apiNostrBandDataSource.getTrendingProfiles();
   }
 
   @override
   Future<NostrBandHashtags?> getTrendingHashtags() async {
-    return await ApiNostrBandDataSource.getTrendingHashtags();
+    return await apiNostrBandDataSource.getTrendingHashtags();
   }
 }

@@ -1,5 +1,5 @@
 import 'package:camelus/config/palette.dart';
-import 'package:camelus/providers/relay_provider.dart';
+import 'package:camelus/presentation_layer/providers/relay_provider.dart';
 import 'package:camelus/services/nostr/relays/my_relay.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';

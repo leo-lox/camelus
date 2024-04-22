@@ -2,8 +2,8 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:camelus/data_layer/db/entities/db_user_metadata.dart';
-import 'package:camelus/providers/metadata_provider.dart';
-import 'package:camelus/providers/relay_provider.dart';
+import 'package:camelus/presentation_layer/providers/metadata_provider.dart';
+import 'package:camelus/presentation_layer/providers/relay_provider.dart';
 import 'package:camelus/presentation_layer/routes/nostr/nostr_page/user_feed_and_replies_view.dart';
 import 'package:camelus/presentation_layer/routes/nostr/nostr_page/user_feed_original_view.dart';
 import 'package:camelus/presentation_layer/routes/nostr/relays_page.dart';

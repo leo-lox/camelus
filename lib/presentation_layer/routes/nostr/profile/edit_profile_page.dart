@@ -3,9 +3,9 @@ import 'dart:developer';
 
 import 'package:camelus/presentation_layer/atoms/long_button.dart';
 import 'package:camelus/data_layer/models/nostr_request_event.dart';
-import 'package:camelus/providers/key_pair_provider.dart';
-import 'package:camelus/providers/metadata_provider.dart';
-import 'package:camelus/providers/relay_provider.dart';
+import 'package:camelus/presentation_layer/providers/key_pair_provider.dart';
+import 'package:camelus/presentation_layer/providers/metadata_provider.dart';
+import 'package:camelus/presentation_layer/providers/relay_provider.dart';
 import 'package:camelus/services/nostr/metadata/user_metadata.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';

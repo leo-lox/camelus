@@ -10,7 +10,7 @@ import 'package:camelus/data_layer/models/nostr_note.dart';
 import 'package:camelus/data_layer/models/nostr_request_event.dart';
 import 'package:camelus/data_layer/models/nostr_request_query.dart';
 import 'package:camelus/data_layer/models/nostr_tag.dart';
-import 'package:camelus/providers/key_pair_provider.dart';
+import 'package:camelus/presentation_layer/providers/key_pair_provider.dart';
 import 'package:camelus/services/nostr/metadata/block_mute_service.dart';
 import 'package:camelus/services/nostr/metadata/nip_65.dart';
 import 'package:camelus/services/nostr/relays/my_relay.dart';
