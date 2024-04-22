@@ -10,7 +10,7 @@ import 'package:camelus/presentation_layer/providers/following_provider.dart';
 import 'package:camelus/presentation_layer/providers/navigation_bar_provider.dart';
 import 'package:camelus/presentation_layer/providers/ndk_provider.dart';
 import 'package:camelus/presentation_layer/providers/relay_provider.dart';
-import 'package:camelus/scroll_controller/retainable_scroll_controller.dart';
+import 'package:camelus/presentation_layer/scroll_controller/retainable_scroll_controller.dart';
 import 'package:camelus/services/nostr/feeds/user_feed.dart';
 import 'package:dart_ndk/nips/nip01/bip340_event_verifier.dart';
 import 'package:dart_ndk/nips/nip01/filter.dart';
