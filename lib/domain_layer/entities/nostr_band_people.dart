@@ -1,4 +1,4 @@
-import 'package:camelus/data_layer/models/nostr_note.dart';
+import 'package:camelus/domain_layer/entities/nostr_note.dart';
 
 class NostrBandPeople {
   final List<Profiles> profiles;

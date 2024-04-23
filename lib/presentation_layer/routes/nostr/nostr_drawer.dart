@@ -1,6 +1,6 @@
 import 'package:camelus/data_layer/db/entities/db_user_metadata.dart';
 import 'package:camelus/helpers/nprofile_helper.dart';
-import 'package:camelus/data_layer/models/nostr_tag.dart';
+import 'package:camelus/domain_layer/entities/nostr_tag.dart';
 import 'package:camelus/presentation_layer/providers/following_provider.dart';
 import 'package:camelus/presentation_layer/providers/metadata_provider.dart';
 import 'package:camelus/services/nostr/metadata/following_pubkeys.dart';

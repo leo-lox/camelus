@@ -4,7 +4,7 @@ import 'package:camelus/data_layer/db/entities/db_note.dart';
 import 'package:camelus/data_layer/db/queries/db_note_queries.dart';
 import 'package:camelus/helpers/helpers.dart';
 import 'package:camelus/helpers/nevent_helper.dart';
-import 'package:camelus/data_layer/models/nostr_note.dart';
+import 'package:camelus/domain_layer/entities/nostr_note.dart';
 import 'package:camelus/data_layer/models/nostr_request_query.dart';
 import 'package:camelus/presentation_layer/providers/database_provider.dart';
 import 'package:camelus/presentation_layer/providers/relay_provider.dart';

@@ -2,8 +2,8 @@ import 'dart:convert';
 
 import 'package:camelus/data_layer/db/entities/db_nip05.dart';
 import 'package:camelus/data_layer/db/entities/db_relay_tracker.dart';
-import 'package:camelus/data_layer/models/nostr_note.dart';
-import 'package:camelus/data_layer/models/nostr_tag.dart';
+import 'package:camelus/domain_layer/entities/nostr_note.dart';
+import 'package:camelus/domain_layer/entities/nostr_tag.dart';
 import 'package:camelus/services/nostr/metadata/nip_05.dart';
 import 'package:camelus/services/nostr/relays/relay_address_parser.dart';
 import 'package:isar/isar.dart';

@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'dart:developer';
 import 'dart:isolate';
 import 'package:camelus/data_layer/models/isolate_note_transport.dart';
-import 'package:camelus/data_layer/models/nostr_note.dart';
+import 'package:camelus/domain_layer/entities/nostr_note.dart';
 import 'package:camelus/data_layer/models/nostr_request.dart';
 import 'package:camelus/data_layer/models/nostr_request_close.dart';
 import 'package:camelus/data_layer/models/nostr_request_event.dart';

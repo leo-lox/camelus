@@ -1,4 +1,5 @@
-import 'package:camelus/data_layer/models/nostr_note.dart';
+import 'package:camelus/data_layer/models/nostr_note_model.dart';
+import 'package:camelus/domain_layer/entities/nostr_note.dart';
 
 import '../../domain_layer/entities/nostr_band_people.dart';
 
@@ -55,7 +56,7 @@ class ProfilesModel extends Profiles {
       pubkey: json['pubkey'],
       newFollowersCount: json['new_followers_count'],
       relays: relays,
-      profile: NostrNote.fromJson(json['profile']),
+      profile: NostrNoteModel.fromJson(json['profile']),
     );
   }
 
@@ -64,7 +65,15 @@ class ProfilesModel extends Profiles {
     data['pubkey'] = pubkey;
     data['new_followers_count'] = newFollowersCount;
     data['relays'] = relays;
-    data['profile'] = profile.toJson();
+    data['profile'] = NostrNoteModel(
+      id: super.profile.id,
+      pubkey: super.profile.pubkey,
+      created_at: super.profile.created_at,
+      kind: super.profile.kind,
+      content: super.profile.content,
+      sig: super.profile.sig,
+      tags: super.profile.tags,
+    ).toJson();
     return data;
   }
 }

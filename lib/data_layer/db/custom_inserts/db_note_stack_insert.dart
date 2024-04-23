@@ -3,7 +3,7 @@ import 'dart:developer';
 
 import 'package:camelus/data_layer/db/entities/db_note.dart';
 import 'package:camelus/helpers/bip340.dart';
-import 'package:camelus/data_layer/models/nostr_note.dart';
+import 'package:camelus/domain_layer/entities/nostr_note.dart';
 import 'package:isar/isar.dart';
 
 class DbNoteStackInsert {

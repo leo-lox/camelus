@@ -1,4 +1,4 @@
-import 'package:camelus/data_layer/models/nostr_tag.dart';
+import 'package:camelus/domain_layer/entities/nostr_tag.dart';
 
 class NostrNote {
   final String id;
@@ -46,35 +46,6 @@ class NostrNote {
         sig: '',
         tags: []);
   }
-
-  factory NostrNote.fromJson(Map<String, dynamic> json) {
-    List<dynamic> tagsJson = json['tags'] ?? [];
-    List<List<String>> tags = [];
-    //cast using for loop
-    for (List tag in tagsJson) {
-      tags.add(tag.cast<String>());
-    }
-
-    return NostrNote(
-      id: json['id'],
-      pubkey: json['pubkey'],
-      created_at: json['created_at'],
-      kind: json['kind'],
-      content: json['content'],
-      sig: json['sig'],
-      tags: tags.map((tag) => NostrTag.fromJson(tag)).toList(),
-    );
-  }
-
-  Map<String, dynamic> toJson() => {
-        'id': id,
-        'pubkey': pubkey,
-        'created_at': created_at,
-        'kind': kind,
-        'content': content,
-        'sig': sig,
-        'tags': tags
-      };
 
   @override
   String toString() {

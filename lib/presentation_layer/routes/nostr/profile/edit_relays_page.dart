@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:camelus/presentation_layer/components/edit_relays_view.dart';
-import 'package:camelus/data_layer/models/nostr_tag.dart';
+import 'package:camelus/domain_layer/entities/nostr_tag.dart';
 import 'package:camelus/presentation_layer/providers/following_provider.dart';
 import 'package:camelus/services/nostr/relays/relay_address_parser.dart';
 

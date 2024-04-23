@@ -2,7 +2,7 @@ import 'package:camelus/presentation_layer/atoms/person_card.dart';
 import 'package:camelus/data_layer/db/entities/db_user_metadata.dart';
 import 'package:camelus/data_layer/db/queries/db_note_queries.dart';
 import 'package:camelus/data_layer/models/nostr_request_event.dart';
-import 'package:camelus/data_layer/models/nostr_tag.dart';
+import 'package:camelus/domain_layer/entities/nostr_tag.dart';
 import 'package:camelus/presentation_layer/providers/database_provider.dart';
 import 'package:camelus/presentation_layer/providers/following_provider.dart';
 import 'package:camelus/presentation_layer/providers/key_pair_provider.dart';
