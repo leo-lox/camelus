@@ -1,5 +1,6 @@
 import 'package:camelus/data_layer/models/nostr_note_model.dart';
 import 'package:camelus/domain_layer/entities/nostr_note.dart';
+import 'package:camelus/domain_layer/entities/user_metadata.dart';
 import 'package:camelus/domain_layer/repositories/note_repository.dart';
 import 'package:dart_ndk/nips/nip01/event_verifier.dart';
 import 'package:dart_ndk/nips/nip01/filter.dart';
@@ -26,8 +27,12 @@ class NoteRepositoryImpl implements NoteRepository {
     );
     dartNdkSource.relayJitManager.handleRequest(request);
     return request.responseStream.map(
-      //! this is problematic (performance?)
       (event) => NostrNoteModel.fromNDKEvent(event),
     );
+  }
+
+  @override
+  Stream<UserMetadata> getMetadataByPubkey(String pubkey) {
+    throw UnimplementedError();
   }
 }
