@@ -12,7 +12,7 @@ class HttpRequestDataSource {
 
     if (response.statusCode != 200) {
       return throw Exception(
-          "error fetching nip05.json STATUS: ${response.statusCode}, Link: $url");
+          "error fetching STATUS: ${response.statusCode}, Link: $url");
     }
     return jsonDecode(response.body);
   }
