@@ -33,6 +33,7 @@ class Nip05RepositoryImpl implements Nip05Repository {
       nip05: nip05,
       valid: valid,
       lastCheck: DateTime.now().millisecondsSinceEpoch ~/ 1000,
+      relays: pRelays,
     );
 
     return result;
