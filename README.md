@@ -33,4 +33,4 @@ Otherwise wait for testflight to be available.
 
 4. run `flutter pub get`
 
-5. run `flutter build apk --release`
+5. run `flutter build apk --release` or `flutter run` to run directly on your device in debug mode
