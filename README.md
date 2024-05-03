@@ -21,3 +21,16 @@ or use the [apk](https://camelus.app/), it is signed with my key so you will nee
 I don't have an iOS device so I can't test it, if you have an iOS device and want to test it, you can build it yourself, I will be happy to help you.
 
 Otherwise wait for testflight to be available.
+
+
+# How to build
+
+1. make sure flutter is installed
+
+2. clone the repo
+
+3. clone [dart_ndk](https://github.com/relaystr/dart_ndk) and depending on your folder structure edit pubspec.yaml to point to the correct path
+
+4. run `flutter pub get`
+
+5. run `flutter build apk --release`
