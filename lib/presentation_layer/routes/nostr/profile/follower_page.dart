@@ -1,4 +1,4 @@
-import 'package:camelus/presentation_layer/atoms/person_card.dart';
+import 'package:camelus/presentation_layer/components/person_card.dart';
 import 'package:camelus/data_layer/db/entities/db_user_metadata.dart';
 import 'package:camelus/data_layer/db/queries/db_note_queries.dart';
 import 'package:camelus/data_layer/models/nostr_request_event.dart';

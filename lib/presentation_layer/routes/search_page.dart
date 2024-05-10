@@ -5,7 +5,7 @@ import 'dart:developer';
 import 'package:camelus/domain_layer/entities/nostr_band_hashtags.dart';
 import 'package:camelus/domain_layer/entities/nostr_band_people.dart';
 import 'package:camelus/presentation_layer/atoms/hashtag_card.dart';
-import 'package:camelus/presentation_layer/atoms/person_card.dart';
+import 'package:camelus/presentation_layer/components/person_card.dart';
 import 'package:camelus/config/palette.dart';
 import 'package:camelus/data_layer/db/entities/db_user_metadata.dart';
 import 'package:camelus/data_layer/db/queries/db_note_queries.dart';
