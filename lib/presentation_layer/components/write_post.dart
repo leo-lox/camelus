@@ -1,10 +1,12 @@
 import 'dart:developer';
 import 'dart:io';
+import 'package:camelus/domain_layer/entities/user_metadata.dart';
+import 'package:camelus/domain_layer/usecases/get_user_metadata.dart';
 import 'package:camelus/presentation_layer/atoms/picture.dart';
 import 'package:camelus/helpers/nprofile_helper.dart';
 import 'package:camelus/helpers/search.dart';
-import 'package:camelus/data_layer/models/nostr_request_event.dart';
 import 'package:camelus/domain_layer/entities/nostr_tag.dart';
+import 'package:camelus/presentation_layer/providers/edit_relays_provider.dart';
 import 'package:camelus/presentation_layer/providers/file_upload_provider.dart';
 import 'package:camelus/presentation_layer/providers/key_pair_provider.dart';
 import 'package:camelus/presentation_layer/providers/metadata_provider.dart';
@@ -29,7 +31,6 @@ class WritePost extends ConsumerStatefulWidget {
 }
 
 class _WritePostState extends ConsumerState<WritePost> {
-  late Isar _db;
   late Search _search;
 
   final TextEditingController _textEditingController = TextEditingController();
@@ -219,12 +220,15 @@ class _WritePostState extends ConsumerState<WritePost> {
       if (mentionKeys.isNotEmpty) {
         for (int i = 0; i < mentionKeys.length; i++) {
           var pubkey = mentionKeys[i];
-          var potentialRelays = await RelaysRanking(db: _db)
-              .getBestRelays(pubkey, Direction.read);
+          final editRelayProvider = ref.watch(editRelaysProvider);
+
+          var potentialRelays =
+              await editRelayProvider.getRelayHintsInbox(pubkey);
+
           tags.add(NostrTag(
             type: "p",
             value: pubkey,
-            recommended_relay: potentialRelays.firstOrNull ?? "",
+            recommended_relay: potentialRelays.firstOrNull?.url ?? "",
             marker: "mention",
           ));
         }
@@ -269,31 +273,8 @@ class _WritePostState extends ConsumerState<WritePost> {
     log("content: $content");
     //_nostrService.writeEvent(content, 1, tags);
 
-    var relays = ref.watch(relayServiceProvider);
-    var keyService = await ref.watch(keyPairProvider.future);
-
-    var keyPair = keyService.keyPair!;
-
-    var myBody = NostrRequestEventBody(
-      pubkey: keyPair.publicKey,
-      privateKey: keyPair.privateKey,
-      kind: 1,
-      content: content,
-      tags: tags,
-    );
-    var myRequest = NostrRequestEvent(body: myBody);
-    List<String> results = await relays.write(request: myRequest);
-
-    // check if all are timeout
-    var timeouts = results.where((element) => element == 'timeout');
-    if (timeouts.length == results.length || results == []) {
-      log("error sending msg");
-      setState(() {
-        submitLoading = false;
-      });
-      _showErrorMsg("all relays timed out 😥");
-      return;
-    }
+    //! todo implement writeEvent
+    throw UnimplementedError();
 
     // wait for x seconds
     Future.delayed(const Duration(milliseconds: 100), () {
@@ -323,10 +304,7 @@ class _WritePostState extends ConsumerState<WritePost> {
     );
   }
 
-  void _initServices() async {
-    _db = await ref.watch(databaseProvider.future);
-    _search = Search(_db);
-  }
+  void _initServices() async {}
 
   @override
   void initState() {
@@ -597,7 +575,7 @@ class _WritePostState extends ConsumerState<WritePost> {
     );
   }
 
-  Row _topBar(BuildContext context, UserMetadata metadata) {
+  Row _topBar(BuildContext context, GetUserMetadata metadata) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -624,11 +602,11 @@ class _WritePostState extends ConsumerState<WritePost> {
           Column(
             children: [
               // get metadata
-              StreamBuilder<DbUserMetadata?>(
-                  stream: metadata.getMetadataByPubkeyStream(
-                      widget.context!.replyToNote.pubkey),
+              StreamBuilder<UserMetadata?>(
+                  stream: metadata
+                      .getMetadataByPubkey(widget.context!.replyToNote.pubkey),
                   builder: (BuildContext context,
-                      AsyncSnapshot<DbUserMetadata?> snapshot) {
+                      AsyncSnapshot<UserMetadata?> snapshot) {
                     var name = "";
 
                     if (snapshot.hasData) {
