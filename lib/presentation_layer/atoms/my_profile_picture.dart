@@ -1,4 +1,4 @@
-import 'package:camelus/data_layer/db/entities/db_user_metadata.dart';
+import 'package:camelus/config/dicebear.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:camelus/config/palette.dart';
@@ -62,26 +62,24 @@ Widget myProfilePicture({
       color: Palette.primary,
       shape: BoxShape.circle,
     ),
-    child: SvgPicture.network(
-        "https://api.dicebear.com/7.x/personas/svg?seed=$pubkey"),
+    child: SvgPicture.network("${Dicebear.baseUrl}$pubkey"),
   );
 }
 
 class UserImage extends StatelessWidget {
   const UserImage({
     super.key,
-    required this.myMetadata,
+    required this.imageUrl,
     required this.pubkey,
   });
 
-  final DbUserMetadata? myMetadata;
+  final String? imageUrl;
   final String pubkey;
 
   @override
   Widget build(BuildContext context) {
     return myProfilePicture(
-      pictureUrl: myMetadata?.picture ??
-          "https://api.dicebear.com/7.x/personas/svg?seed=$pubkey",
+      pictureUrl: imageUrl ?? "${Dicebear.baseUrl}$pubkey",
       pubkey: pubkey,
       filterQuality: FilterQuality.medium,
     );
