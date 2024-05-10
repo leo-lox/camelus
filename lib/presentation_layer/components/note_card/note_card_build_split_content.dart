@@ -1,12 +1,12 @@
+import 'package:camelus/domain_layer/entities/user_metadata.dart';
+import 'package:camelus/domain_layer/usecases/get_user_metadata.dart';
 import 'package:camelus/presentation_layer/components/images_tile_view.dart';
 import 'package:camelus/presentation_layer/components/note_card/note_card_reference.dart';
 import 'package:camelus/config/palette.dart';
-import 'package:camelus/data_layer/db/entities/db_user_metadata.dart';
 import 'package:camelus/helpers/helpers.dart';
 import 'package:camelus/helpers/nprofile_helper.dart';
 import 'package:camelus/domain_layer/entities/nostr_note.dart';
 import 'package:camelus/presentation_layer/providers/metadata_provider.dart';
-import 'package:camelus/services/nostr/metadata/user_metadata.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:url_launcher/url_launcher_string.dart';
@@ -35,7 +35,7 @@ class NoteCardSplitContent extends ConsumerStatefulWidget {
 class _NoteCardSplitContentState extends ConsumerState<NoteCardSplitContent> {
   final Map<String, dynamic> _tagsMetadata = {};
 
-  late final UserMetadata _metadataProvider;
+  late final GetUserMetadata _metadataProvider;
 
   List<String> imageLinks = [];
 
@@ -227,7 +227,7 @@ class LegacyMentionHashtag extends StatelessWidget {
     super.key,
     required NostrNote note,
     required Map<String, dynamic> tagsMetadata,
-    required UserMetadata metadataProvider,
+    required GetUserMetadata metadataProvider,
     required Function(String p1) profileCallback,
     required this.word,
   })  : _note = note,
@@ -237,7 +237,7 @@ class LegacyMentionHashtag extends StatelessWidget {
 
   final NostrNote _note;
   final Map<String, dynamic> _tagsMetadata;
-  final UserMetadata _metadataProvider;
+  final GetUserMetadata _metadataProvider;
   final Function(String p1) _profileCallback;
   final String word;
 
@@ -263,7 +263,7 @@ class LegacyMentionHashtag extends StatelessWidget {
         "${pubkeyBech.substring(0, 5)}...${pubkeyBech.substring(pubkeyBech.length - 5)}";
     _tagsMetadata[tag.value] = pubkeyHr;
     var metadata =
-        _metadataProvider.getMetadataByPubkeyStream(tag.value).first.timeout(
+        _metadataProvider.getMetadataByPubkey(tag.value).first.timeout(
               const Duration(seconds: 2),
             );
 
@@ -271,7 +271,7 @@ class LegacyMentionHashtag extends StatelessWidget {
       onTap: () {
         _profileCallback(tag.value);
       },
-      child: FutureBuilder<DbUserMetadata?>(
+      child: FutureBuilder<UserMetadata?>(
           future: metadata,
           builder: (context, snapshot) {
             if (snapshot.hasData) {
@@ -292,13 +292,13 @@ class LegacyMentionHashtag extends StatelessWidget {
 class ProfileLink extends StatelessWidget {
   const ProfileLink({
     super.key,
-    required UserMetadata metadataProvider,
+    required GetUserMetadata metadataProvider,
     required Function(String p1) profileCallback,
     required this.word,
   })  : _metadataProvider = metadataProvider,
         _profileCallback = profileCallback;
 
-  final UserMetadata _metadataProvider;
+  final GetUserMetadata _metadataProvider;
   final Function(String p1) _profileCallback;
   final String word;
 
@@ -336,7 +336,7 @@ class ProfileLink extends StatelessWidget {
         "${pubkeyBech.substring(0, 5)}:${pubkeyBech.substring(pubkeyBech.length - 5)}";
 
     var metadata =
-        _metadataProvider.getMetadataByPubkeyStream(myPubkeyHex).first.timeout(
+        _metadataProvider.getMetadataByPubkey(myPubkeyHex).first.timeout(
               const Duration(seconds: 2),
             );
 
@@ -344,7 +344,7 @@ class ProfileLink extends StatelessWidget {
       onTap: () {
         _profileCallback(myPubkeyHex);
       },
-      child: FutureBuilder<DbUserMetadata?>(
+      child: FutureBuilder<UserMetadata?>(
           future: metadata,
           builder: (context, metadataSnp) {
             if (metadataSnp.hasData) {

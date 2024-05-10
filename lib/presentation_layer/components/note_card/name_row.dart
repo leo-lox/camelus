@@ -1,5 +1,5 @@
 import 'package:camelus/config/palette.dart';
-import 'package:camelus/data_layer/db/entities/db_user_metadata.dart';
+import 'package:camelus/domain_layer/entities/user_metadata.dart';
 import 'package:camelus/helpers/helpers.dart';
 import 'package:camelus/presentation_layer/providers/nip05_provider.dart';
 import 'package:flutter/material.dart';
@@ -8,7 +8,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 class NoteCardNameRow extends ConsumerStatefulWidget {
-  final Stream<DbUserMetadata?> myMetadata;
+  final Stream<UserMetadata?> myMetadata;
   final String pubkey;
   final int created_at;
   final Function openMore;
@@ -33,7 +33,7 @@ class _NoteCardNameRowState extends ConsumerState<NoteCardNameRow> {
     if (nip05verified.isNotEmpty) return;
     try {
       var nip05Service = await ref.watch(nip05provider.future);
-      var check = await nip05Service.checkNip05(nip05, pubkey);
+      var check = await nip05Service.check(nip05, pubkey);
 
       if (check != null && check.valid) {
         setState(() {
@@ -62,10 +62,10 @@ class _NoteCardNameRowState extends ConsumerState<NoteCardNameRow> {
         //mainAxisAlignment: MainAxisAlignment.end,
         //crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          StreamBuilder<DbUserMetadata?>(
+          StreamBuilder<UserMetadata?>(
               stream: widget.myMetadata,
               builder: (BuildContext context,
-                  AsyncSnapshot<DbUserMetadata?> snapshot) {
+                  AsyncSnapshot<UserMetadata?> snapshot) {
                 var name = "";
 
                 if (snapshot.hasData) {

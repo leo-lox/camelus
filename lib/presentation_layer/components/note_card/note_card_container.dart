@@ -1,11 +1,11 @@
+import 'package:camelus/domain_layer/entities/user_metadata.dart';
+import 'package:camelus/domain_layer/usecases/get_user_metadata.dart';
 import 'package:camelus/presentation_layer/components/note_card/note_card.dart';
 import 'package:camelus/config/palette.dart';
-import 'package:camelus/data_layer/db/entities/db_user_metadata.dart';
 import 'package:camelus/helpers/helpers.dart';
 import 'package:camelus/domain_layer/entities/nostr_note.dart';
 import 'package:camelus/domain_layer/entities/nostr_tag.dart';
 import 'package:camelus/presentation_layer/providers/metadata_provider.dart';
-import 'package:camelus/services/nostr/metadata/user_metadata.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -93,7 +93,7 @@ class _NoteCardContainerState extends ConsumerState<NoteCardContainer> {
   }
 
   List<Widget> _buildContainerNotes(
-      UserMetadata metadata, BuildContext context) {
+      GetUserMetadata metadata, BuildContext context) {
     List<Widget> widgets = [];
     for (int i = 0; i < widget.notes.length; i++) {
       var note = widget.notes[i];
@@ -149,7 +149,7 @@ class _NoteCardContainerState extends ConsumerState<NoteCardContainer> {
     return widgets;
   }
 
-  Row _buildInReplyTo(NostrNote myNote, UserMetadata metadata,
+  Row _buildInReplyTo(NostrNote myNote, GetUserMetadata metadata,
       BuildContext context, int index, List<NostrNote> notes) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -185,13 +185,13 @@ class _NoteCardContainerState extends ConsumerState<NoteCardContainer> {
 }
 
 Widget linkedUsername(
-    String pubkey, UserMetadata metadata, BuildContext context) {
+    String pubkey, GetUserMetadata metadata, BuildContext context) {
   return GestureDetector(
     onTap: () {
       Navigator.pushNamed(context, "/nostr/profile", arguments: pubkey);
     },
     child: StreamBuilder(
-      builder: (context, AsyncSnapshot<DbUserMetadata?> snapshot) {
+      builder: (context, AsyncSnapshot<UserMetadata?> snapshot) {
         var pubkeyBech = Helpers().encodeBech32(pubkey, "npub");
         var pubkeyHr =
             "${pubkeyBech.substring(0, 4)}:${pubkeyBech.substring(pubkeyBech.length - 5)}";
@@ -205,7 +205,7 @@ Widget linkedUsername(
                   color: Palette.primary, fontSize: 16, height: 1.3));
         }
       },
-      stream: metadata.getMetadataByPubkeyStream(pubkey),
+      stream: metadata.getMetadataByPubkey(pubkey),
     ),
   );
 }

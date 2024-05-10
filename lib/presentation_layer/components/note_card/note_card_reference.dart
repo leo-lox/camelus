@@ -1,13 +1,9 @@
 import 'package:camelus/presentation_layer/components/note_card/note_card.dart';
 import 'package:camelus/config/palette.dart';
-import 'package:camelus/data_layer/db/entities/db_note.dart';
-import 'package:camelus/data_layer/db/queries/db_note_queries.dart';
 import 'package:camelus/helpers/helpers.dart';
 import 'package:camelus/helpers/nevent_helper.dart';
 import 'package:camelus/domain_layer/entities/nostr_note.dart';
 import 'package:camelus/data_layer/models/nostr_request_query.dart';
-import 'package:camelus/presentation_layer/providers/database_provider.dart';
-import 'package:camelus/presentation_layer/providers/relay_provider.dart';
 import 'package:flutter/widgets.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:isar/isar.dart';

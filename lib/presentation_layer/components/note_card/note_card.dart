@@ -1,5 +1,7 @@
 import 'dart:ui';
 
+import 'package:camelus/domain_layer/entities/user_metadata.dart';
+import 'package:camelus/domain_layer/usecases/get_user_metadata.dart';
 import 'package:camelus/presentation_layer/atoms/my_profile_picture.dart';
 import 'package:camelus/presentation_layer/components/bottom_sheet_share.dart';
 import 'package:camelus/presentation_layer/components/note_card/bottom_action_row.dart';
@@ -8,15 +10,11 @@ import 'package:camelus/presentation_layer/components/note_card/name_row.dart';
 import 'package:camelus/presentation_layer/components/note_card/note_card_build_split_content.dart';
 import 'package:camelus/presentation_layer/components/write_post.dart';
 import 'package:camelus/config/palette.dart';
-import 'package:camelus/data_layer/db/entities/db_user_metadata.dart';
 import 'package:camelus/domain_layer/entities/nostr_note.dart';
 import 'package:camelus/data_layer/models/post_context.dart';
-import 'package:camelus/presentation_layer/providers/database_provider.dart';
 import 'package:camelus/presentation_layer/providers/metadata_provider.dart';
-import 'package:camelus/services/nostr/metadata/user_metadata.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:isar/isar.dart';
 
 class NoteCard extends ConsumerStatefulWidget {
   final NostrNote note;
@@ -41,14 +39,12 @@ class _NoteCardState extends ConsumerState<NoteCard> {
     Navigator.pushNamed(context, "/nostr/hastag", arguments: hashtag);
   }
 
-  late final UserMetadata metadata;
-  late final Future<Isar> dbFuture;
+  late final GetUserMetadata metadata;
 
   @override
   void initState() {
     super.initState();
     metadata = ref.read(metadataProvider);
-    dbFuture = ref.read(databaseProvider.future);
   }
 
   @override
@@ -101,23 +97,23 @@ class _NoteCardState extends ConsumerState<NoteCard> {
                       Navigator.pushNamed(context, "/nostr/profile",
                           arguments: widget.note.pubkey);
                     },
-                    child: StreamBuilder<DbUserMetadata?>(
-                        stream: metadata
-                            .getMetadataByPubkeyStream(widget.note.pubkey),
+                    child: StreamBuilder<UserMetadata?>(
+                        stream:
+                            metadata.getMetadataByPubkey(widget.note.pubkey),
                         //initialData: metadata
                         //    .getMetadataByPubkeyInitial(widget.note.pubkey),
                         builder:
-                            (context, AsyncSnapshot<DbUserMetadata?> snapshot) {
+                            (context, AsyncSnapshot<UserMetadata?> snapshot) {
                           if (snapshot.hasData) {
                             return UserImage(
-                              myMetadata: snapshot.data,
+                              imageUrl: snapshot.data?.picture,
                               pubkey: widget.note.pubkey,
                             );
                           } else if (snapshot.hasError) {
                             return Text('Error: ${snapshot.error}');
                           } else {
                             return UserImage(
-                              myMetadata: null,
+                              imageUrl: null,
                               pubkey: widget.note.pubkey,
                             );
                           }
@@ -136,8 +132,8 @@ class _NoteCardState extends ConsumerState<NoteCard> {
                           children: [
                             NoteCardNameRow(
                               created_at: widget.note.created_at,
-                              myMetadata: metadata.getMetadataByPubkeyStream(
-                                  widget.note.pubkey),
+                              myMetadata: metadata
+                                  .getMetadataByPubkey(widget.note.pubkey),
                               pubkey: widget.note.pubkey,
                               openMore: () =>
                                   openBottomSheetMore(context, widget.note),
