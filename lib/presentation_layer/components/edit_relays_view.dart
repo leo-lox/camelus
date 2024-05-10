@@ -39,8 +39,6 @@ class _EditRelaysViewState extends ConsumerState<EditRelaysView> {
       log("added");
     }
 
-    relayName = RelayAddressParser.parseAddress(relayName);
-
     // check if relay already exists
     if (myRelays.containsKey(relayName)) {
       // show dialog
