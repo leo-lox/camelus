@@ -1,7 +1,7 @@
 class Relay {
   final String url;
-  final bool read;
-  final bool write;
+  bool read;
+  bool write;
 
   Relay({
     required this.url,

@@ -11,6 +11,10 @@ class EditRelays {
     return _relayRepository.getRelays(pubkey);
   }
 
+  Future<List<Relay>> getRelaysSelf() async {
+    return getRelays(selfPubkey);
+  }
+
   Future<bool> saveRelays(String pubkey, List<Relay> relays) async {
     return _relayRepository.saveRelays(pubkey, relays);
   }

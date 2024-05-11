@@ -1,13 +1,14 @@
 import 'dart:developer';
+import 'package:camelus/domain_layer/entities/relay.dart';
 import 'package:camelus/presentation_layer/atoms/long_button.dart';
 import 'package:camelus/config/palette.dart';
-import 'package:camelus/presentation_layer/providers/following_provider.dart';
+import 'package:camelus/presentation_layer/providers/edit_relays_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class EditRelaysView extends ConsumerStatefulWidget {
   // async function with Map<String, Map<String, bool>> as parameter
-  final Function(Map<String, Map<String, bool>>) onSave;
+  final Function(List<Relay>) onSave;
   const EditRelaysView({super.key, required this.onSave});
 
   @override
@@ -21,7 +22,7 @@ class _EditRelaysViewState extends ConsumerState<EditRelaysView> {
   bool touched = false;
   bool loading = false;
 
-  late Map<String, Map<String, bool>> myRelays = {};
+  late List<Relay> myRelays;
 
   void _addRelay() {
     setState(() {
@@ -40,7 +41,7 @@ class _EditRelaysViewState extends ConsumerState<EditRelaysView> {
     }
 
     // check if relay already exists
-    if (myRelays.containsKey(relayName)) {
+    if (myRelays.any((element) => element.url == relayName)) {
       // show dialog
       showDialog(
         context: context,
@@ -63,9 +64,7 @@ class _EditRelaysViewState extends ConsumerState<EditRelaysView> {
     }
 
     setState(() {
-      myRelays[relayName] =
-          // ignore: unnecessary_cast
-          {"read": true, "write": true} as Map<String, bool>;
+      myRelays.add(Relay(url: relayName, read: false, write: false));
     });
 
     _relayNameController.clear();
@@ -85,17 +84,12 @@ class _EditRelaysViewState extends ConsumerState<EditRelaysView> {
   }
 
   void _initSequence() async {
-    var followingPubkeys = ref.read(followingProvider);
-    await followingPubkeys.servicesReady;
-    var relays = followingPubkeys.ownRelays;
-    Map<String, Map<String, bool>> relaysMap = {};
+    var relaysProvider = ref.read(editRelaysProvider);
 
-    for (var relay in relays.entries) {
-      // cast to Map<String, bool>
-      relaysMap[relay.key] = relay.value.cast<String, bool>();
-    }
+    var relays = await relaysProvider.getRelaysSelf();
+
     setState(() {
-      myRelays = Map.from(relaysMap);
+      myRelays = relays;
     });
     return;
   }
@@ -188,7 +182,7 @@ class _EditRelaysViewState extends ConsumerState<EditRelaysView> {
                   ),
                 ),
                 const SizedBox(height: 20),
-                for (var relay in myRelays.entries)
+                for (var relay in myRelays)
                   Padding(
                     padding: const EdgeInsets.only(
                       left: 10,
@@ -209,7 +203,7 @@ class _EditRelaysViewState extends ConsumerState<EditRelaysView> {
                         children: [
                           const SizedBox(width: 15),
                           Text(
-                            relay.key,
+                            relay.url,
                             style: const TextStyle(color: Colors.white),
                           ),
                           const Spacer(),
@@ -220,16 +214,11 @@ class _EditRelaysViewState extends ConsumerState<EditRelaysView> {
                               Checkbox(
                                 activeColor: Palette.lightGray,
                                 checkColor: Palette.black,
-                                value: relay.value["read"] ?? false,
+                                value: relay.read,
                                 onChanged: (value) {
                                   setState(() {
                                     touched = true;
-                                    if (relay.value["read"] != null) {
-                                      relay.value["read"] =
-                                          !relay.value["read"]!;
-                                    } else {
-                                      relay.value["read"] = true;
-                                    }
+                                    relay.read = !relay.read;
                                   });
                                 },
 
@@ -248,16 +237,11 @@ class _EditRelaysViewState extends ConsumerState<EditRelaysView> {
                               Checkbox(
                                 activeColor: Palette.lightGray,
                                 checkColor: Palette.black,
-                                value: relay.value["write"] ?? false,
+                                value: relay.write,
                                 onChanged: (value) {
                                   setState(() {
                                     touched = true;
-                                    if (relay.value["write"] != null) {
-                                      relay.value["write"] =
-                                          !relay.value["write"]!;
-                                    } else {
-                                      relay.value["write"] = true;
-                                    }
+                                    relay.write = !relay.write;
                                   });
                                 },
                               ),
@@ -297,7 +281,7 @@ class _EditRelaysViewState extends ConsumerState<EditRelaysView> {
                                             onPressed: () {
                                               setState(() {
                                                 touched = true;
-                                                myRelays.remove(relay.key);
+                                                myRelays.remove(relay);
                                               });
                                               Navigator.of(context).pop();
                                             },
