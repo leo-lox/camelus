@@ -1,15 +1,16 @@
 import 'package:camelus/config/palette.dart';
+import 'package:camelus/domain_layer/usecases/get_user_metadata.dart';
 import 'package:camelus/presentation_layer/providers/metadata_provider.dart';
 import 'package:camelus/presentation_layer/routes/nostr/nostr_page/user_feed_original_view.dart';
-import 'package:camelus/services/nostr/metadata/user_metadata.dart';
+
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:matomo_tracker/matomo_tracker.dart';
 
 class PerspectiveFeedPage extends ConsumerStatefulWidget {
-  late String pubkey;
+  final String pubkey;
 
-  PerspectiveFeedPage({super.key, required this.pubkey});
+  const PerspectiveFeedPage({super.key, required this.pubkey});
 
   @override
   ConsumerState<PerspectiveFeedPage> createState() =>
@@ -18,7 +19,7 @@ class PerspectiveFeedPage extends ConsumerStatefulWidget {
 
 class _PerspectiveFeedPageState extends ConsumerState<PerspectiveFeedPage>
     with TraceableClientMixin {
-  late UserMetadata _metadata;
+  late GetUserMetadata _metadata;
   @override
   String get traceName => 'Created PerspectiveFeedPage'; // optional
 
@@ -40,7 +41,7 @@ class _PerspectiveFeedPageState extends ConsumerState<PerspectiveFeedPage>
     return Scaffold(
       appBar: AppBar(
         title: StreamBuilder(
-          stream: _metadata.getMetadataByPubkeyStream(widget.pubkey),
+          stream: _metadata.getMetadataByPubkey(widget.pubkey),
           builder: (BuildContext context, AsyncSnapshot snapshot) {
             if (snapshot.hasData) {
               return Text("perspective of ${snapshot.data['name']}");
