@@ -5,20 +5,11 @@ import 'package:camelus/presentation_layer/atoms/refresh_indicator_no_need.dart'
 import 'package:camelus/presentation_layer/components/note_card/note_card_container.dart';
 import 'package:camelus/config/palette.dart';
 import 'package:camelus/domain_layer/entities/nostr_note.dart';
-import 'package:camelus/presentation_layer/providers/database_provider.dart';
-import 'package:camelus/presentation_layer/providers/following_provider.dart';
+import 'package:camelus/presentation_layer/providers/get_notes_provider.dart';
 import 'package:camelus/presentation_layer/providers/navigation_bar_provider.dart';
-import 'package:camelus/presentation_layer/providers/ndk_provider.dart';
-import 'package:camelus/presentation_layer/providers/relay_provider.dart';
 import 'package:camelus/presentation_layer/scroll_controller/retainable_scroll_controller.dart';
-import 'package:camelus/services/nostr/feeds/user_feed.dart';
-import 'package:dart_ndk/nips/nip01/bip340_event_verifier.dart';
-import 'package:dart_ndk/nips/nip01/filter.dart';
-import 'package:dart_ndk/relay_jit_manager/relay_jit_manager.dart';
-import 'package:dart_ndk/relay_jit_manager/request_jit.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:isar/isar.dart';
 
 class UserFeedOriginalView extends ConsumerStatefulWidget {
   final String pubkey;
@@ -31,11 +22,9 @@ class UserFeedOriginalView extends ConsumerStatefulWidget {
 }
 
 class _UserFeedOriginalViewState extends ConsumerState<UserFeedOriginalView> {
-  late Isar db;
-  late RelayJitManager ndk;
   final List<StreamSubscription> _subscriptions = [];
   late List<String> _followingPubkeys;
-  late UserFeed _userFeed;
+
   final Completer<void> _servicesReady = Completer<void>();
 
   late final RetainableScrollController _scrollControllerFeed =
@@ -53,9 +42,7 @@ class _UserFeedOriginalViewState extends ConsumerState<UserFeedOriginalView> {
           _scrollControllerFeed.position.maxScrollExtent) {
         log("reached end of scroll");
 
-        var latest = _userFeed.feed.last.created_at; //- 86400 * 7; // -1 week
-
-        _userFeedLoadMore(latest);
+        // todo: load more
       }
 
       if (_scrollControllerFeed.position.pixels < 100) {
@@ -70,8 +57,11 @@ class _UserFeedOriginalViewState extends ConsumerState<UserFeedOriginalView> {
   }
 
   void _setupNewNotesListener() {
+    final notesProvider = ref.read(getNotesProvider);
     _subscriptions.add(
-      _userFeed.newNotesStream.listen((event) {
+      notesProvider
+          .getNpubFeed(npub: widget.pubkey, requestId: "userFeedFreshId")
+          .listen((event) {
         log("new notes stream event");
         setState(() {
           _newPostsAvailable = true;
@@ -103,7 +93,6 @@ class _UserFeedOriginalViewState extends ConsumerState<UserFeedOriginalView> {
   }
 
   void _integrateNewNotes() {
-    _userFeed.integrateNewNotes();
     _scrollControllerFeed.animateTo(
       _scrollControllerFeed.position.minScrollExtent,
       duration: const Duration(milliseconds: 300),
@@ -119,13 +108,9 @@ class _UserFeedOriginalViewState extends ConsumerState<UserFeedOriginalView> {
     int now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
 
     int latestTweet = now - 86400; // -1 day
+    final notesProvider = ref.read(getNotesProvider);
 
-    _userFeed.requestRelayUserFeed(
-      users: _followingPubkeys,
-      requestId: userFeedFreshId,
-      limit: 15,
-      since: latestTweet,
-    );
+    // todo: first fetch
   }
 
   void _userFeedLoadMore(int? until) async {
@@ -140,66 +125,10 @@ class _UserFeedOriginalViewState extends ConsumerState<UserFeedOriginalView> {
     // schould not be needed
     int defaultUntil = now - 86400 * 1; // -1 day
 
-    _userFeed.requestRelayUserFeed(
-      users: _followingPubkeys,
-      requestId: userFeedTimelineFetchId,
-      limit: 5,
-      until: until ?? defaultUntil,
-    );
-  }
-
-  void _userFeedCheckForNewData(NostrNote currentBuilNote) {
-    var latestSessionNote = _userFeed.oldestNoteInSession;
-    if (latestSessionNote == null) {
-      return;
-    }
-    if (latestSessionNote.id == currentBuilNote.id) {
-      _userFeedLoadMore(currentBuilNote.created_at);
-    }
-  }
-
-  Future<void> _getFollowingPubkeys() async {
-    var followingP = ref.read(followingProvider);
-    await followingP.servicesReady;
-
-    _followingPubkeys = followingP.ownContacts.map((e) => e.value).toList();
-    _followingPubkeys = [..._followingPubkeys, widget.pubkey]; // add own pubkey
-    return;
-  }
-
-  Future<void> _initDb() async {
-    db = await ref.read(databaseProvider.future);
-    return;
-  }
-
-  Future<void> _initNdk() async {
-    ndk = ref.read(ndkProvider);
-    return;
+    // todo: stream more
   }
 
   Future<void> _initSequence() async {
-    await _initDb();
-    await _getFollowingPubkeys();
-    await _initNdk();
-
-    var relayCoordinator = ref.watch(relayServiceProvider);
-
-    var verifier = Bip340EventVerifier();
-    NostrRequestJit _feedRequest = NostrRequestJit.subscription("ndk_feed",
-        eventVerifier: verifier,
-        filters: [
-          Filter(authors: _followingPubkeys, kinds: [1])
-        ]);
-
-    ndk.handleRequest(_feedRequest);
-
-    _feedRequest.responseStream.listen((event) {
-      //log("NDK: feed response event $event");
-    });
-
-    _userFeed = UserFeed(db, _followingPubkeys, relayCoordinator);
-    await _userFeed.feedRdy;
-
     _servicesReady.complete();
 
     // reset home bar new notes count
@@ -221,7 +150,6 @@ class _UserFeedOriginalViewState extends ConsumerState<UserFeedOriginalView> {
 
   @override
   void dispose() {
-    _userFeed.cleanup();
     _disposeSubscriptions();
     super.dispose();
   }
@@ -255,8 +183,8 @@ class _UserFeedOriginalViewState extends ConsumerState<UserFeedOriginalView> {
                   return Future.delayed(const Duration(milliseconds: 0));
                 },
                 child: StreamBuilder<List<NostrNote>>(
-                  stream: _userFeed.feedStream,
-                  initialData: _userFeed.feed,
+                  stream: Stream.empty(), // todo: stream
+
                   builder: (BuildContext context,
                       AsyncSnapshot<List<NostrNote>> snapshot) {
                     if (snapshot.hasData) {
@@ -280,7 +208,7 @@ class _UserFeedOriginalViewState extends ConsumerState<UserFeedOriginalView> {
                             delegate: SliverChildBuilderDelegate(
                               (context, index) {
                                 var note = notes[index];
-                                _userFeedCheckForNewData(note);
+                                //_userFeedCheckForNewData(note); //todo: check if needed
                                 return NoteCardContainer(notes: [note]);
                               },
                               childCount: notes.length,
