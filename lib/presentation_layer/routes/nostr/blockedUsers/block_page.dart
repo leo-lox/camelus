@@ -1,15 +1,8 @@
 import 'dart:async';
 import 'package:camelus/presentation_layer/atoms/long_button.dart';
 import 'package:camelus/config/palette.dart';
-import 'package:camelus/data_layer/db/entities/db_user_metadata.dart';
-import 'package:camelus/data_layer/models/nostr_request_event.dart';
 import 'package:camelus/domain_layer/entities/nostr_tag.dart';
-import 'package:camelus/presentation_layer/providers/block_mute_provider.dart';
-import 'package:camelus/presentation_layer/providers/key_pair_provider.dart';
 import 'package:camelus/presentation_layer/providers/metadata_provider.dart';
-import 'package:camelus/presentation_layer/providers/relay_provider.dart';
-import 'package:camelus/services/nostr/metadata/block_mute_service.dart';
-import 'package:camelus/services/nostr/relays/relay_coordinator.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -29,13 +22,6 @@ class _BlockPageState extends ConsumerState<BlockPage> {
 
   List<NostrTag> contentTags = [];
 
-  Completer initDone = Completer();
-
-  /// services
-  late final BlockMuteService blockMuteService;
-  late final RelayCoordinator relayService;
-  late final KeyPairWrapper keyService;
-
   final TextEditingController _textController = TextEditingController();
   String _reportReason = "";
   bool _postReported = false;
@@ -44,69 +30,18 @@ class _BlockPageState extends ConsumerState<BlockPage> {
   @override
   void initState() {
     super.initState();
-    _initListener();
-  }
-
-  void _initListener() async {
-    blockMuteService = await ref.read(blockMuteProvider.future);
-    relayService = ref.read(relayServiceProvider);
-    keyService = await ref.read(keyPairProvider.future);
-
-    // get current state
-    contentTags = blockMuteService.contentObj;
-
-    initDone.complete();
-    _checkBlockMuteState();
-
-    // listen to state changes
-    blockMuteService.blockListStream.listen((event) {
-      contentTags = event;
-      _checkBlockMuteState();
-    });
-  }
-
-  _checkBlockMuteState() {
-    for (var tag in contentTags) {
-      if (tag.value == widget.userPubkey) {
-        setState(() {
-          isUserBlocked = true;
-        });
-
-        return;
-      }
-    }
-    if (mounted) {
-      setState(() {
-        isUserBlocked = false;
-      });
-    }
   }
 
   void _blockUser(
     String pubkey,
   ) async {
-    setState(() {
-      requestLoading = true;
-    });
-
-    await blockMuteService.blockUser(
-        pubkey: pubkey, relayService: relayService);
-    setState(() {
-      requestLoading = false;
-    });
+    throw UnimplementedError();
   }
 
   void _unblockUser(
     String pubkey,
   ) async {
-    setState(() {
-      requestLoading = true;
-    });
-    await blockMuteService.unBlockUser(
-        pubkey: pubkey, relayService: relayService);
-    setState(() {
-      requestLoading = false;
-    });
+    throw UnimplementedError();
   }
 
   void _setReportReason(String reason) {
@@ -119,32 +54,7 @@ class _BlockPageState extends ConsumerState<BlockPage> {
   }
 
   Future _reportPost() async {
-    setState(() {
-      _reportLoading = true;
-    });
-
-    List<NostrTag> reportTags = [
-      NostrTag(type: "p", value: widget.userPubkey),
-      NostrTag(type: "e", value: widget.postId!, marker: _reportReason),
-    ];
-
-    final NostrRequestEventBody newReportBody = NostrRequestEventBody(
-      pubkey: keyService.keyPair!.publicKey,
-      kind: 1984,
-      tags: reportTags,
-      content: _textController.text,
-      privateKey: keyService.keyPair!.privateKey,
-    );
-
-    var myReport = NostrRequestEvent(body: newReportBody);
-    var relays = ref.watch(relayServiceProvider);
-    List<String> results = await relays.write(request: myReport);
-
-    setState(() {
-      _reportLoading = false;
-      _postReported = true;
-    });
-    return results;
+    throw UnimplementedError();
   }
 
   @override
@@ -173,27 +83,16 @@ class _BlockPageState extends ConsumerState<BlockPage> {
                           style: TextStyle(
                               color: Palette.lightGray, fontSize: 20)),
                       const SizedBox(width: 10),
-                      StreamBuilder<DbUserMetadata?>(
-                        stream: metadata
-                            .getMetadataByPubkeyStream(widget.userPubkey),
-                        builder: (context, snapshot) {
-                          if (snapshot.hasData) {
-                            return Text(
-                              snapshot.data?.name ?? widget.userPubkey,
-                              style: const TextStyle(
-                                  color: Palette.white,
-                                  fontSize: 30,
-                                  fontWeight: FontWeight.bold),
-                            );
-                          }
-                          return Container();
-                        },
-                      ),
+                      Text("unimplemented",
+                          style: TextStyle(
+                              color: Palette.white,
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold)),
                     ],
                   ),
                   const SizedBox(height: 20),
                   FutureBuilder(
-                      future: initDone.future,
+                      future: Future.delayed(Duration(seconds: 1)),
                       builder: (context, snapshot) {
                         if (snapshot.connectionState ==
                             ConnectionState.waiting) {

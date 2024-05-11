@@ -11,6 +11,7 @@ class Moderation {
     throw UnimplementedError();
   }
 
+  /// returns a stream of mutet users by given npub
   Stream<List<String>> getMuted(String npub) {
     throw UnimplementedError();
   }
