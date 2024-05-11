@@ -1,6 +1,4 @@
 import 'dart:ui';
-
-import 'package:camelus/presentation_layer/components/seen_on_relays.dart';
 import 'package:camelus/config/palette.dart';
 import 'package:camelus/domain_layer/entities/nostr_note.dart';
 import 'package:camelus/presentation_layer/routes/nostr/blockedUsers/block_page.dart';
@@ -24,40 +22,6 @@ void openBottomSheetMore(context, NostrNote note) {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      GestureDetector(
-                        onTap: () {
-                          // push Seen on relays
-
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  SeenOnRelaysPage(myNote: note),
-                            ),
-                          );
-                        },
-                        child: Container(
-                          color: Palette.background,
-                          padding: const EdgeInsets.all(5),
-                          child: Row(
-                            children: [
-                              // svg icon
-                              SvgPicture.asset(
-                                height: 30,
-                                width: 30,
-                                'assets/icons/target.svg',
-                                color: Palette.gray,
-                              ),
-                              const SizedBox(width: 15),
-                              const Text(
-                                "seen on relays",
-                                style: TextStyle(
-                                    color: Palette.lightGray, fontSize: 17),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
                       const SizedBox(height: 20),
                       GestureDetector(
                         onTap: () {
