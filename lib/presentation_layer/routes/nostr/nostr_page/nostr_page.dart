@@ -1,20 +1,17 @@
 import 'dart:async';
 import 'dart:convert';
-
-import 'package:camelus/data_layer/db/entities/db_user_metadata.dart';
+import 'package:camelus/domain_layer/entities/app_update.dart';
+import 'package:camelus/domain_layer/usecases/check_app_update.dart';
+import 'package:camelus/presentation_layer/providers/app_update_provider.dart';
 import 'package:camelus/presentation_layer/providers/metadata_provider.dart';
-import 'package:camelus/presentation_layer/providers/relay_provider.dart';
 import 'package:camelus/presentation_layer/routes/nostr/nostr_page/user_feed_and_replies_view.dart';
 import 'package:camelus/presentation_layer/routes/nostr/nostr_page/user_feed_original_view.dart';
 import 'package:camelus/presentation_layer/routes/nostr/relays_page.dart';
-import 'package:camelus/services/nostr/relays/my_relay.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:http/http.dart' as http;
-import 'package:http/http.dart';
+
 import 'package:camelus/presentation_layer/atoms/my_profile_picture.dart';
 
 import 'package:badges/badges.dart' as badges;
@@ -46,32 +43,20 @@ class _NostrPageState extends ConsumerState<NostrPage>
   void _betaCheckForUpdates() async {
     await Future.delayed(const Duration(seconds: 15));
 
-    // network get request to check for updates
-    Response response = await http
-        .get(Uri.parse("https://lox.de/.well-known/app-update-beta.json"));
+    final CheckAppUpdate appUpdate = ref.read(appUpdateProvider);
 
-    if (response.statusCode != 200) {
-      return;
-    }
+    final AppUpdate updateInfo = await appUpdate.call();
 
-    var updateInfo = jsonDecode(response.body);
+    if (!updateInfo.isUpdateAvailable) return;
 
-    if (updateInfo["version"] <= 23) {
-      // <-- current version
-
-      return;
-    }
-
-    var title = updateInfo["title"];
-    var body = updateInfo["body"];
-    var url = updateInfo["url"];
+    if (!mounted) return;
 
     showDialog(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text(title),
-            content: Text(body),
+            title: Text(updateInfo.title),
+            content: Text(updateInfo.body),
             actions: <Widget>[
               TextButton(
                 child: const Text("cancel"),
@@ -82,7 +67,7 @@ class _NostrPageState extends ConsumerState<NostrPage>
               TextButton(
                 child: const Text("update"),
                 onPressed: () {
-                  var u = Uri.parse(url);
+                  var u = Uri.parse(updateInfo.url);
                   launchUrl(u, mode: LaunchMode.externalApplication);
                   Navigator.of(context).pop();
                 },

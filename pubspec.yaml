@@ -70,6 +70,7 @@ dependencies:
   crop_your_image: ^1.0.1
   dart_ndk: 
     path: ../dart_ndk
+  package_info_plus: ^4.2.0
 
 dev_dependencies:
   build_runner: ^2.4.6
