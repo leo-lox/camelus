@@ -1,19 +1,14 @@
 import 'dart:async';
 import 'dart:developer';
-
+import 'package:camelus/domain_layer/usecases/get_notes.dart';
 import 'package:camelus/presentation_layer/atoms/refresh_indicator_no_need.dart';
 import 'package:camelus/presentation_layer/components/note_card/note_card_container.dart';
 import 'package:camelus/config/palette.dart';
-
 import 'package:camelus/domain_layer/entities/nostr_note.dart';
-import 'package:camelus/presentation_layer/providers/database_provider.dart';
-import 'package:camelus/presentation_layer/providers/relay_provider.dart';
+import 'package:camelus/presentation_layer/providers/get_notes_provider.dart';
 import 'package:camelus/presentation_layer/scroll_controller/retainable_scroll_controller.dart';
-import 'package:camelus/services/nostr/feeds/event_feed.dart';
 import 'package:flutter/material.dart';
-
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:isar/isar.dart';
 
 class EventViewPage extends ConsumerStatefulWidget {
   final String _rootId;
@@ -29,8 +24,10 @@ class EventViewPage extends ConsumerStatefulWidget {
 }
 
 class _EventViewPageState extends ConsumerState<EventViewPage> {
-  late Isar db;
-  late EventFeed _eventFeed;
+  late GetNotes _getNotes;
+
+  Stream<List<NostrNote>> notesStream = Stream.empty();
+
   late final RetainableScrollController _scrollControllerFeed =
       RetainableScrollController();
 
@@ -60,20 +57,8 @@ class _EventViewPageState extends ConsumerState<EventViewPage> {
     });
   }
 
-  Future<void> _initDb() async {
-    db = await ref.read(databaseProvider.future);
-    return;
-  }
-
   Future<void> _initSequence() async {
-    await _initDb();
-
-    var relayCoordinator = ref.watch(relayServiceProvider);
-
-    _eventFeed = EventFeed(db, widget._rootId, relayCoordinator);
-    await _eventFeed.feedRdy;
-    _servicesReady.complete();
-
+    _getNotes = ref.read(getNotesProvider);
     _initUserFeed();
     _setupScrollListener();
   }
@@ -86,12 +71,11 @@ class _EventViewPageState extends ConsumerState<EventViewPage> {
 
   @override
   void dispose() {
-    _eventFeed.cleanup();
     super.dispose();
   }
 
   void _initUserFeed() {
-    _eventFeed.requestRelayEventFeed(
+    notesStream = _getNotes.getThreadFeed(
       eventIds: [widget._rootId],
       requestId: eventFeedFreshId,
       limit: 5,
@@ -105,7 +89,7 @@ class _EventViewPageState extends ConsumerState<EventViewPage> {
     // schould not be needed
     int defaultUntil = now - 86400 * 7; // -1 week
 
-    _eventFeed.requestRelayEventFeed(
+    notesStream = _getNotes.getThreadFeed(
       eventIds: [widget._rootId],
       requestId: eventFeedFreshId,
       limit: 5,
@@ -140,8 +124,7 @@ class _EventViewPageState extends ConsumerState<EventViewPage> {
                 return Future.delayed(const Duration(milliseconds: 0));
               },
               child: StreamBuilder(
-                stream: _eventFeed.feedStream,
-                initialData: _eventFeed.feed,
+                stream: notesStream,
                 builder: (BuildContext context,
                     AsyncSnapshot<List<NostrNote>> snapshot) {
                   if (snapshot.hasData) {
@@ -350,17 +333,18 @@ class _EventViewPageState extends ConsumerState<EventViewPage> {
     myAuthorPubkeys = myAuthorPubkeys.toSet().toList();
     myEventIds = myEventIds.toSet().toList();
 
-    var result = await _eventFeed.requestRelayEventFeedFixedRelays(
-        pubkeys: myAuthorPubkeys,
-        eventIds: myEventIds,
-        relayCandidates: myRelayCandidates,
-        requestId: "efeed-tmp-unresolvedLoop",
-        timeout: const Duration(seconds: 1),
-        limit: 5,
-        until: rootNote.created_at // root note
-        );
-    log("resultRelay: $result");
-    _eventFeed.closeRelaySubscription("efeed-tmp-unresolvedLoop");
+    throw UnimplementedError();
+    // var result = await _eventFeed.requestRelayEventFeedFixedRelays(
+    //     pubkeys: myAuthorPubkeys,
+    //     eventIds: myEventIds,
+    //     relayCandidates: myRelayCandidates,
+    //     requestId: "efeed-tmp-unresolvedLoop",
+    //     timeout: const Duration(seconds: 1),
+    //     limit: 5,
+    //     until: rootNote.created_at // root note
+    //     );
+    // log("resultRelay: $result");
+    // _eventFeed.closeRelaySubscription("efeed-tmp-unresolvedLoop");
     return;
   }
 }
