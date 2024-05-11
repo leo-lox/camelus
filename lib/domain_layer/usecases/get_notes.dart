@@ -14,6 +14,15 @@ class GetNotes {
     throw UnimplementedError();
   }
 
+  // todo: check if possible to close the subscription when the stream closes
+  Stream<NostrNote> getNote(String noteId) {
+    return _noteRepository.getNote(noteId);
+  }
+
+  Future<void> closeNote() {
+    throw UnimplementedError();
+  }
+
   /// returns a stream of notes for given events (usually the root note id)
   Stream<List<NostrNote>> getThreadFeed({
     required List<String> eventIds,
