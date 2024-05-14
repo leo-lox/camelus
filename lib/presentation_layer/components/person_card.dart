@@ -1,6 +1,6 @@
 import 'package:camelus/presentation_layer/atoms/follow_button.dart';
-import 'package:camelus/presentation_layer/atoms/my_profile_picture.dart';
 import 'package:camelus/config/palette.dart';
+import 'package:camelus/presentation_layer/atoms/my_profile_picture.dart';
 import 'package:camelus/presentation_layer/providers/nip05_provider.dart';
 
 import 'package:flutter/material.dart';
@@ -52,11 +52,8 @@ class PersonCard extends ConsumerWidget {
         child: Row(
           // profile
           children: [
-            myProfilePicture(
-                pictureUrl: pictureUrl,
-                pubkey: pubkey,
-                filterQuality: FilterQuality.medium,
-                disableGif: true),
+            UserImage(imageUrl: pictureUrl, pubkey: pubkey),
+
             const SizedBox(width: 16),
             //text section
             Expanded(
