@@ -4,6 +4,52 @@ import 'package:flutter_svg/svg.dart';
 import 'package:camelus/config/palette.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
+class UserImage extends StatefulWidget {
+  const UserImage({
+    super.key,
+    required this.imageUrl,
+    required this.pubkey,
+  });
+
+  final String? imageUrl;
+  final String pubkey;
+
+  @override
+  UserImageState createState() => UserImageState();
+}
+
+class UserImageState extends State<UserImage> {
+  late Widget profilePicture;
+
+  @override
+  void initState() {
+    super.initState();
+    profilePicture = _myProfilePicture(
+      pictureUrl: widget.imageUrl ?? "${Dicebear.baseUrl}${widget.pubkey}",
+      pubkey: widget.pubkey,
+      filterQuality: FilterQuality.medium,
+    );
+  }
+
+  @override
+  void didUpdateWidget(UserImage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.imageUrl != oldWidget.imageUrl ||
+        widget.pubkey != oldWidget.pubkey) {
+      profilePicture = _myProfilePicture(
+        pictureUrl: widget.imageUrl ?? "${Dicebear.baseUrl}${widget.pubkey}",
+        pubkey: widget.pubkey,
+        filterQuality: FilterQuality.medium,
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return profilePicture;
+  }
+}
+
 Widget _myProfilePicture({
   required String pictureUrl,
   required String pubkey,
@@ -64,24 +110,4 @@ Widget _myProfilePicture({
     ),
     child: SvgPicture.network("${Dicebear.baseUrl}$pubkey"),
   );
-}
-
-class UserImage extends StatelessWidget {
-  const UserImage({
-    super.key,
-    required this.imageUrl,
-    required this.pubkey,
-  });
-
-  final String? imageUrl;
-  final String pubkey;
-
-  @override
-  Widget build(BuildContext context) {
-    return _myProfilePicture(
-      pictureUrl: imageUrl ?? "${Dicebear.baseUrl}$pubkey",
-      pubkey: pubkey,
-      filterQuality: FilterQuality.medium,
-    );
-  }
 }
