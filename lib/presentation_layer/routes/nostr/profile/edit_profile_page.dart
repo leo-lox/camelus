@@ -1,12 +1,9 @@
 import 'dart:convert';
 import 'dart:developer';
-
+import 'package:camelus/domain_layer/usecases/get_user_metadata.dart';
 import 'package:camelus/presentation_layer/atoms/long_button.dart';
-import 'package:camelus/data_layer/models/nostr_request_event.dart';
 import 'package:camelus/presentation_layer/providers/key_pair_provider.dart';
 import 'package:camelus/presentation_layer/providers/metadata_provider.dart';
-import 'package:camelus/presentation_layer/providers/relay_provider.dart';
-import 'package:camelus/services/nostr/metadata/user_metadata.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:camelus/config/palette.dart';
@@ -20,7 +17,7 @@ class EditProfilePage extends ConsumerStatefulWidget {
 }
 
 class _EditProfilePageState extends ConsumerState<EditProfilePage> {
-  late UserMetadata _metadataService;
+  late GetUserMetadata _metadataProvider;
   late KeyPairWrapper _keyPairService;
   // create text input controllers
   TextEditingController pictureController = TextEditingController(text: "");
@@ -40,7 +37,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
 
   bool isKeysExpanded = false;
   void _initServices() async {
-    _metadataService = ref.read(metadataProvider);
+    _metadataProvider = ref.read(metadataProvider);
     _keyPairService = await ref.read(keyPairProvider.future);
     pubkey = _keyPairService.keyPair!.publicKey;
 
@@ -86,8 +83,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
   }
 
   Future<void> _loadProfileValues() async {
-    var profileData =
-        await _metadataService.getMetadataByPubkeyStream(pubkey).first;
+    var profileData = await _metadataProvider.getMetadataByPubkey(pubkey).first;
     setState(() {
       loading = false;
     });
@@ -134,17 +130,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
 
     var contentString = json.encode(content);
 
-    var relays = ref.watch(relayServiceProvider);
-    var keyPair = await ref.watch(keyPairProvider.future);
-
-    var myBody = NostrRequestEventBody(
-        pubkey: keyPair.keyPair!.publicKey,
-        privateKey: keyPair.keyPair!.privateKey,
-        tags: [],
-        content: contentString,
-        kind: 0);
-    var myRequest = NostrRequestEvent(body: myBody);
-    await relays.write(request: myRequest);
+    throw UnimplementedError("publish data to nostr");
 
     setState(() {
       submitLoading = false;
