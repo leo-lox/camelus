@@ -40,7 +40,7 @@ class NoteRepositoryImpl implements NoteRepository {
   Stream<NostrNote> getNote(String noteId) {
     Filter filter = Filter(ids: [noteId]);
     NostrRequestJit request = NostrRequestJit.query(
-      'allNotes',
+      'getNote',
       eventVerifier: eventVerifier,
       filters: [filter],
     );
