@@ -1,4 +1,10 @@
+import '../entities/nostr_tag.dart';
+
 class Follow {
+  final String selfPubkey;
+
+  Follow({required this.selfPubkey});
+
   Future<void> followUser(String npub) async {
     throw UnimplementedError();
   }
@@ -7,11 +13,27 @@ class Follow {
     throw UnimplementedError();
   }
 
+  Future<void> setFollowing(List<NostrTag> contacts) async {
+    throw UnimplementedError();
+  }
+
   Future<bool> isFollowing(String npub) async {
     throw UnimplementedError();
   }
 
-  Stream<List<String>> getFollowers(String npub) {
+  Stream<List<NostrTag>> getFollowing(String npub) {
     throw UnimplementedError();
+  }
+
+  Stream<List<NostrTag>> getFollowingSelf() {
+    return getFollowing(selfPubkey);
+  }
+
+  Stream<List<NostrTag>> getFollowers(String npub) {
+    throw UnimplementedError();
+  }
+
+  Stream<List<NostrTag>> getFollowersSelf() {
+    return getFollowers(selfPubkey);
   }
 }

@@ -1,13 +1,8 @@
+import 'package:camelus/domain_layer/entities/user_metadata.dart';
 import 'package:camelus/presentation_layer/components/person_card.dart';
-import 'package:camelus/data_layer/db/entities/db_user_metadata.dart';
-import 'package:camelus/data_layer/db/queries/db_note_queries.dart';
-import 'package:camelus/data_layer/models/nostr_request_event.dart';
 import 'package:camelus/domain_layer/entities/nostr_tag.dart';
-import 'package:camelus/presentation_layer/providers/database_provider.dart';
 import 'package:camelus/presentation_layer/providers/following_provider.dart';
-import 'package:camelus/presentation_layer/providers/key_pair_provider.dart';
 import 'package:camelus/presentation_layer/providers/metadata_provider.dart';
-import 'package:camelus/presentation_layer/providers/relay_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:camelus/config/palette.dart';
 import 'package:camelus/presentation_layer/routes/nostr/profile/profile_page.dart';
@@ -31,13 +26,6 @@ class _FollowerPageState extends ConsumerState<FollowerPage> {
   /// follow Change - true to add, false to remove
   void _changeFollowing(bool followChange, String pubkey,
       List<NostrTag> currentOwnContacts) async {
-    var mykeys = await ref.watch(keyPairProvider.future);
-    var db = await ref.watch(databaseProvider.future);
-
-    var myLastNote = (await DbNoteQueries.kindPubkeyFuture(db,
-            pubkey: mykeys.keyPair!.publicKey, kind: 3))
-        .first;
-
     List<NostrTag> newContacts = [...currentOwnContacts];
 
     if (followChange) {
@@ -46,33 +34,7 @@ class _FollowerPageState extends ConsumerState<FollowerPage> {
       newContacts.removeWhere((element) => element.value == pubkey);
     }
 
-    _writeContacts(
-      publicKey: mykeys.keyPair!.publicKey,
-      privateKey: mykeys.keyPair!.privateKey,
-      content: myLastNote.content ?? "",
-      updatedContacts: newContacts,
-    );
-  }
-
-  Future _writeContacts({
-    required String publicKey,
-    required String privateKey,
-    required String content,
-    required List<NostrTag> updatedContacts,
-  }) async {
-    var relays = ref.watch(relayServiceProvider);
-    NostrRequestEventBody body = NostrRequestEventBody(
-      pubkey: publicKey,
-      privateKey: privateKey,
-      content: content,
-      kind: 3,
-      tags: updatedContacts,
-    );
-    NostrRequestEvent myEvent = NostrRequestEvent(body: body);
-
-    await relays.write(request: myEvent);
-
-    return;
+    ref.read(followingProvider).setFollowing(newContacts);
   }
 
   @override
@@ -97,16 +59,15 @@ class _FollowerPageState extends ConsumerState<FollowerPage> {
         foregroundColor: Palette.white,
       ),
       body: StreamBuilder<List<NostrTag>>(
-          stream: followingService.ownPubkeyContactsStreamDb,
-          initialData: followingService.ownContacts,
+          stream: followingService.getFollowingSelf(),
           builder: (context, ownFollowingSnapshot) {
             return ListView.builder(
                 physics: const BouncingScrollPhysics(),
                 itemCount: widget.contacts.length,
                 itemBuilder: (context, index) {
                   var displayPubkey = widget.contacts[index].value;
-                  return StreamBuilder<DbUserMetadata?>(
-                      stream: metadata.getMetadataByPubkeyStream(displayPubkey),
+                  return StreamBuilder<UserMetadata?>(
+                      stream: metadata.getMetadataByPubkey(displayPubkey),
                       builder: (BuildContext context, metadataSnapshot) {
                         if (metadataSnapshot.hasData) {
                           return personCard(displayPubkey, metadataSnapshot,
@@ -125,7 +86,7 @@ class _FollowerPageState extends ConsumerState<FollowerPage> {
 
   PersonCard personCard(
       String displayPubkey,
-      AsyncSnapshot<DbUserMetadata?> metadataSnapshot,
+      AsyncSnapshot<UserMetadata?> metadataSnapshot,
       AsyncSnapshot<List<NostrTag>> ownFollowingSnapshot,
       BuildContext context) {
     return PersonCard(
