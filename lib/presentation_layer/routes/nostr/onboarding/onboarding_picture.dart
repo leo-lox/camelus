@@ -70,9 +70,9 @@ class _OnboardingPictureState extends ConsumerState<OnboardingPicture> {
               },
               child: const Text("test")),
           if (widget.signUpInfo.picture == null)
-            myProfilePicture(
+            UserImage(
+              imageUrl: null,
               pubkey: widget.signUpInfo.keyPair.publicKey,
-              pictureUrl: "",
             ),
           if (widget.signUpInfo.picture != null)
             SizedBox.fromSize(
