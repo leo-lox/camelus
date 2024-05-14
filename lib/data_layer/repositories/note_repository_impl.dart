@@ -35,4 +35,18 @@ class NoteRepositoryImpl implements NoteRepository {
   Stream<UserMetadata> getMetadataByPubkey(String pubkey) {
     throw UnimplementedError();
   }
+
+  @override
+  Stream<NostrNote> getNote(String noteId) {
+    Filter filter = Filter(ids: [noteId]);
+    NostrRequestJit request = NostrRequestJit.query(
+      'allNotes',
+      eventVerifier: eventVerifier,
+      filters: [filter],
+    );
+    dartNdkSource.relayJitManager.handleRequest(request);
+    return request.responseStream.map(
+      (event) => NostrNoteModel.fromNDKEvent(event),
+    );
+  }
 }
