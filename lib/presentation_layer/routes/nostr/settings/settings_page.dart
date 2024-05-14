@@ -24,6 +24,10 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     var provider = await ref.watch(keyPairProvider.future);
     provider.removeKeyPair();
 
+    if (!mounted) {
+      return;
+    }
+
     Navigator.pushNamedAndRemoveUntil(context, '/onboarding', (route) => false);
   }
 
