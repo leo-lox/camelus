@@ -131,13 +131,13 @@ class _UserFeedOriginalViewState extends ConsumerState<UserFeedOriginalView> {
   Future<void> _initSequence() async {
     _servicesReady.complete();
 
-    // reset home bar new notes count
-    ref.watch(navigationBarProvider).resetNewNotesCount();
-
     _initUserFeed();
     _setupScrollListener();
     _setupNewNotesListener();
     _setupNavBarHomeListener();
+
+    // reset home bar new notes count
+    ref.watch(navigationBarProvider).resetNewNotesCount();
 
     return;
   }
