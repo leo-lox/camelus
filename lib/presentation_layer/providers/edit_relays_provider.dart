@@ -1,7 +1,9 @@
 import 'package:camelus/data_layer/data_sources/dart_ndk_source.dart';
-import 'package:camelus/domain_layer/repositories/edit_relay_repository.dart';
+import 'package:camelus/data_layer/repositories/edit_relays_repository_impl.dart';
+import 'package:camelus/domain_layer/repositories/edit_relays_repository.dart';
 import 'package:camelus/domain_layer/usecases/edit_relays.dart';
 import 'package:camelus/presentation_layer/providers/event_verifier.dart';
+import 'package:camelus/presentation_layer/providers/key_pair_provider.dart';
 import 'package:camelus/presentation_layer/providers/ndk_provider.dart';
 import 'package:riverpod/riverpod.dart';
 
@@ -10,12 +12,18 @@ final editRelaysProvider = Provider<EditRelays>((ref) {
 
   final eventVerifier = ref.watch(eventVerifierProvider);
 
-  final EditRelayRepository editRelayRepository = EditRelayRepositoryImpl(
+  final EditRelaysRepository editRelayRepository = EditRelaysRepositoryImpl(
     dartNdkSource: DartNdkSource(ndk),
     eventVerifier: eventVerifier,
   );
 
-  final String selfPubkey = "";
+  final EditRelays editRelays = EditRelays(editRelayRepository, null);
 
-  final EditRelays editRelays = EditRelays(editRelayRepository, selfPubkey);
+  final myKeyPair = ref.watch(keyPairProvider.future);
+
+  myKeyPair.then((value) => {
+        editRelays.selfPubkey = value.keyPair!.publicKey,
+      });
+
+  return editRelays;
 });
