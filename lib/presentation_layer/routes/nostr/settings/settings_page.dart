@@ -1,5 +1,4 @@
 import 'package:camelus/config/palette.dart';
-import 'package:camelus/presentation_layer/providers/database_provider.dart';
 import 'package:camelus/presentation_layer/providers/key_pair_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -16,13 +15,6 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
   @override
   void initState() {
     super.initState();
-  }
-
-  void _clearDb() async {
-    var db = await ref.watch(databaseProvider.future);
-    await db.writeTxn(() async {
-      await db.clear();
-    });
   }
 
   void _logout() async {
@@ -45,13 +37,6 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
       ),
       body: ListView(
         children: [
-          ListTile(
-            title:
-                const Text('Clear db!', style: TextStyle(color: Colors.white)),
-            onTap: () {
-              _clearDb();
-            },
-          ),
           ListTile(
             title: const Text('logout', style: TextStyle(color: Colors.white)),
             onTap: () {
