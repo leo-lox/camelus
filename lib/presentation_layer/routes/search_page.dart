@@ -10,7 +10,6 @@ import 'package:camelus/presentation_layer/components/person_card.dart';
 import 'package:camelus/config/palette.dart';
 import 'package:camelus/helpers/helpers.dart';
 import 'package:camelus/helpers/nprofile_helper.dart';
-import 'package:camelus/helpers/search.dart';
 import 'package:camelus/domain_layer/entities/nostr_tag.dart';
 import 'package:camelus/presentation_layer/providers/following_provider.dart';
 import 'package:camelus/presentation_layer/providers/key_pair_provider.dart';
@@ -35,8 +34,6 @@ class _SearchPageState extends ConsumerState<SearchPage> {
   final FocusNode _searchFocusNode = FocusNode();
 
   final List<StreamSubscription> _subscriptions = [];
-
-  late Search _search;
 
   bool _isSearching = false;
 
@@ -102,8 +99,6 @@ class _SearchPageState extends ConsumerState<SearchPage> {
   void _onSearchChanged(String value) async {
     var metadata = ref.watch(metadataProvider);
     List<UserMetadata> workingMetadata = [];
-
-    workingMetadata.addAll(_search.searchUsersMetadata(value));
 
     final pattern = RegExp(r"nostr:(nprofile|npub)[a-zA-Z0-9]+");
 
@@ -171,7 +166,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
     }
     if (finalNip05 != null) {
       log('finalNip05 $finalNip05');
-      var nip05Metadata = await _search.searchNip05(finalNip05);
+      var nip05Metadata = {}; //await _search.searchNip05(finalNip05);
 
       if (nip05Metadata != null) {
         final String nipPubkey = nip05Metadata['pubkey'];

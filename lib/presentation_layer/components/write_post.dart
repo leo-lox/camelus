@@ -4,7 +4,6 @@ import 'package:camelus/domain_layer/entities/user_metadata.dart';
 import 'package:camelus/domain_layer/usecases/get_user_metadata.dart';
 import 'package:camelus/presentation_layer/atoms/picture.dart';
 import 'package:camelus/helpers/nprofile_helper.dart';
-import 'package:camelus/helpers/search.dart';
 import 'package:camelus/domain_layer/entities/nostr_tag.dart';
 import 'package:camelus/presentation_layer/providers/edit_relays_provider.dart';
 import 'package:camelus/presentation_layer/providers/file_upload_provider.dart';
@@ -31,8 +30,6 @@ class WritePost extends ConsumerStatefulWidget {
 }
 
 class _WritePostState extends ConsumerState<WritePost> {
-  late Search _search;
-
   final TextEditingController _textEditingController = TextEditingController();
   final GlobalKey<FlutterMentionsState> _textEditingControllerKey =
       GlobalKey<FlutterMentionsState>();
@@ -63,7 +60,7 @@ class _WritePostState extends ConsumerState<WritePost> {
   _searchMentions(search) async {
     List<Map<String, dynamic>> results = [];
 
-    var rawResults = _search.searchUsersMetadata(search);
+    var rawResults = []; //_search.searchUsersMetadata(search);
     for (var rawResult in rawResults) {
       var result = {
         "id": rawResult.pubkey,
