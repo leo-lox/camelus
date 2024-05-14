@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:camelus/domain_layer/entities/app_update.dart';
+import 'package:camelus/domain_layer/entities/user_metadata.dart';
 import 'package:camelus/domain_layer/usecases/check_app_update.dart';
 import 'package:camelus/presentation_layer/providers/app_update_provider.dart';
 import 'package:camelus/presentation_layer/providers/metadata_provider.dart';
@@ -142,7 +143,6 @@ class _NostrPageState extends ConsumerState<NostrPage>
   Widget build(BuildContext context) {
     super.build(context);
     var metadata = ref.watch(metadataProvider);
-    var myRelays = ref.watch(relayServiceProvider);
 
     return Scaffold(
       backgroundColor: Palette.background,
@@ -167,27 +167,13 @@ class _NostrPageState extends ConsumerState<NostrPage>
                       color: Palette.primary,
                       shape: BoxShape.circle,
                     ),
-                    child: StreamBuilder<DbUserMetadata?>(
-                        stream:
-                            metadata.getMetadataByPubkeyStream(widget.pubkey),
+                    child: StreamBuilder<UserMetadata?>(
+                        stream: metadata.getMetadataByPubkey(widget.pubkey),
                         builder: (BuildContext context,
-                            AsyncSnapshot<DbUserMetadata?> snapshot) {
-                          var picture = "";
-                          var defaultPicture =
-                              "https://api.dicebear.com/7.x/personas/svg?seed=${widget.pubkey}";
-                          if (snapshot.hasData) {
-                            picture = snapshot.data?.picture ?? defaultPicture;
-                          } else if (snapshot.hasError) {
-                            picture = defaultPicture;
-                          } else {
-                            // loading
-                            picture = defaultPicture;
-                          }
-
-                          return myProfilePicture(
-                            pictureUrl: picture,
+                            AsyncSnapshot<UserMetadata?> snapshot) {
+                          return UserImage(
+                            imageUrl: snapshot.data?.picture, // can be null
                             pubkey: widget.pubkey,
-                            filterQuality: FilterQuality.medium,
                           );
                         }),
                   ),
@@ -217,9 +203,8 @@ class _NostrPageState extends ConsumerState<NostrPage>
                 actions: [
                   GestureDetector(
                     onTap: () => _openRelaysView(),
-                    child: StreamBuilder<List<MyRelay>>(
-                        stream: myRelays.relaysStream,
-                        initialData: myRelays.relays,
+                    child: StreamBuilder<List<void>>(
+                        stream: Stream.empty(), // todo: implement get relays
                         builder: (context, snapshot) {
                           if (!snapshot.hasData || snapshot.data!.isEmpty) {
                             return Row(
@@ -254,10 +239,7 @@ class _NostrPageState extends ConsumerState<NostrPage>
                                 if (!kReleaseMode)
                                   Text(
                                     // count how many relays are ready
-                                    snapshot.data!
-                                        .where((element) => element.connected)
-                                        .length
-                                        .toString(),
+                                    "0",
                                     style: const TextStyle(
                                         color: Palette.lightGray),
                                   ),
