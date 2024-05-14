@@ -2,26 +2,21 @@ import 'dart:async';
 import 'dart:developer';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:camelus/domain_layer/entities/user_metadata.dart';
+import 'package:camelus/domain_layer/usecases/follow.dart';
+import 'package:camelus/domain_layer/usecases/get_user_metadata.dart';
 import 'package:camelus/presentation_layer/atoms/back_button_round.dart';
 import 'package:camelus/presentation_layer/atoms/follow_button.dart';
 import 'package:camelus/presentation_layer/atoms/long_button.dart';
-import 'package:camelus/presentation_layer/components/note_card/note_card_container.dart';
-import 'package:camelus/data_layer/db/entities/db_user_metadata.dart';
 import 'package:camelus/helpers/bip340.dart';
 import 'package:camelus/helpers/nprofile_helper.dart';
-import 'package:camelus/domain_layer/entities/nostr_note.dart';
 import 'package:camelus/domain_layer/entities/nostr_tag.dart';
-import 'package:camelus/presentation_layer/providers/database_provider.dart';
 import 'package:camelus/presentation_layer/providers/following_provider.dart';
 import 'package:camelus/presentation_layer/providers/key_pair_provider.dart';
 import 'package:camelus/presentation_layer/providers/metadata_provider.dart';
 import 'package:camelus/presentation_layer/providers/nip05_provider.dart';
-import 'package:camelus/presentation_layer/providers/relay_provider.dart';
 import 'package:camelus/presentation_layer/routes/nostr/blockedUsers/block_page.dart';
 import 'package:camelus/presentation_layer/routes/nostr/nostr_page/perspective_feed_page.dart';
-import 'package:camelus/services/nostr/feeds/user_and_replies_feed.dart';
-import 'package:camelus/services/nostr/metadata/following_pubkeys.dart';
-import 'package:camelus/services/nostr/metadata/user_metadata.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
@@ -31,9 +26,7 @@ import 'package:camelus/helpers/helpers.dart';
 import 'package:camelus/presentation_layer/routes/nostr/profile/edit_profile_page.dart';
 import 'package:camelus/presentation_layer/routes/nostr/profile/edit_relays_page.dart';
 import 'package:camelus/presentation_layer/routes/nostr/profile/follower_page.dart';
-
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:isar/isar.dart';
 import 'package:matomo_tracker/matomo_tracker.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -68,13 +61,8 @@ class ProfilePage extends ConsumerStatefulWidget {
 class _ProfilePageState extends ConsumerState<ProfilePage>
     with TickerProviderStateMixin, TraceableClientMixin {
   final ScrollController _scrollController = ScrollController();
-  late Isar _db;
-  late UserFeedAndRepliesFeed _userFeedAndRepliesFeed;
 
   final List<StreamSubscription> _subscriptions = [];
-
-  @override
-  String get traceTitle => "profilePage";
 
   String nip05verified = "";
   String requestId = Helpers().getRandomString(14);
@@ -84,7 +72,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
     if (nip05verified.isNotEmpty) return;
     try {
       var nip05Ref = await ref.watch(nip05provider.future);
-      var check = await nip05Ref.checkNip05(nip05, pubkey);
+      var check = await nip05Ref.check(nip05, pubkey);
 
       if (check != null && check.valid == true) {
         setState(() {
@@ -216,101 +204,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
     ).then((value) => {});
   }
 
-  final Completer<void> _feedReady = Completer<void>();
-  Future<void> _initSequence() async {
-    _db = await ref.read(databaseProvider.future);
-    var relayCoordinator = ref.watch(relayServiceProvider);
-    _userFeedAndRepliesFeed =
-        UserFeedAndRepliesFeed(_db, [widget.pubkey], relayCoordinator);
-    await _userFeedAndRepliesFeed.feedRdy;
-    _feedReady.complete();
-
-    _initUserFeed();
-    _setupScrollListener();
-
-    return;
-  }
-
-  void _initUserFeed() {
-    int now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
-
-    int latestTweet = now - 86400; // -1 day
-
-    _userFeedAndRepliesFeed.requestRelayUserFeedAndReplies(
-      users: [widget.pubkey],
-      requestId: "profilePage-${widget.pubkey.substring(5, 15)}",
-      limit: 10,
-      since: latestTweet,
-    );
-  }
-
-  bool timelineFetchLock = false;
-  void _setupScrollListener() {
-    _scrollController.addListener(() async {
-      setState(() {});
-      if (_scrollController.position.pixels >=
-          _scrollController.position.maxScrollExtent - 100) {
-        var latest = _userFeedAndRepliesFeed.feed.last.created_at;
-        if (timelineFetchLock) return;
-        timelineFetchLock = true;
-        // load more tweets
-        await _userFeedLoadMore(latest);
-        timelineFetchLock = false;
-      }
-    });
-  }
-
-  Future _userFeedLoadMore(int? until) async {
-    log("load more called");
-    int now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
-    // schould not be needed
-    int defaultUntil = now - 86400 * 1; // -1 day
-
-    await _userFeedAndRepliesFeed.requestRelayUserFeedAndReplies(
-      users: [widget.pubkey],
-      requestId: "profilePage-timeLine-${widget.pubkey.substring(5, 15)}",
-      limit: 5,
-      until: until ?? defaultUntil,
-    );
-
-    return;
-  }
-
-  //! disabled does not work with how @build is called now (on every frame on scroll)
-  void _userFeedCheckForNewData(NostrNote currentBuilNote) async {
-    return;
-    var latestSessionNote = _userFeedAndRepliesFeed.oldestNoteInSession;
-    if (latestSessionNote == null) {
-      return;
-    }
-    var difference = currentBuilNote.created_at - latestSessionNote.created_at;
-    log("${latestSessionNote.created_at} -- ${currentBuilNote.created_at} -- $difference");
-    if (latestSessionNote.id == currentBuilNote.id) {
-      await _userFeedLoadMore(currentBuilNote.created_at);
-    }
-  }
-
-  void _onNavigateAway() async {
-    try {
-      _userFeedAndRepliesFeed.cleanup();
-    } catch (e) {
-      log("error in navigate away");
-    }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _initSequence();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _onNavigateAway();
-    });
-  }
-
   @override
   void dispose() {
     _scrollController.dispose();
-    _userFeedAndRepliesFeed.cleanup();
     _closeSubscriptions();
     super.dispose();
   }
@@ -405,11 +301,10 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                         ? 1.0
                         : 0.0,
                     duration: const Duration(milliseconds: 200),
-                    child: StreamBuilder<DbUserMetadata?>(
-                        stream:
-                            metadata.getMetadataByPubkeyStream(widget.pubkey),
+                    child: StreamBuilder<UserMetadata?>(
+                        stream: metadata.getMetadataByPubkey(widget.pubkey),
                         builder: (BuildContext context,
-                            AsyncSnapshot<DbUserMetadata?> snapshot) {
+                            AsyncSnapshot<UserMetadata?> snapshot) {
                           var name = "";
 
                           if (snapshot.hasData) {
@@ -442,93 +337,11 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
   }
 
   _feed() {
-    return FutureBuilder(
-        future: _feedReady.future,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return SliverList(
-                delegate: SliverChildListDelegate([
-              const Column(
-                children: [
-                  SizedBox(height: 100),
-                  Center(
-                      child: CircularProgressIndicator(
-                    color: Palette.white,
-                  )),
-                ],
-              )
-            ]));
-          }
-          if (snapshot.hasError) {
-            return SliverList(
-                delegate: SliverChildListDelegate([
-              const Center(
-                child: Text('Error'),
-              )
-            ]));
-          }
-          return StreamBuilder<List<NostrNote>>(
-            stream: _userFeedAndRepliesFeed.feedStream,
-            initialData: _userFeedAndRepliesFeed.feed,
-            builder: (BuildContext context,
-                AsyncSnapshot<List<NostrNote>> snapshot) {
-              if (snapshot.hasData) {
-                var notes = snapshot.data!;
-
-                if (notes.isEmpty) {
-                  return SliverList(
-                    delegate: SliverChildListDelegate(
-                      [
-                        const Column(
-                          children: [
-                            SizedBox(height: 100),
-                            Text("no notes found",
-                                style: TextStyle(
-                                    fontSize: 20, color: Palette.white))
-                          ],
-                        ),
-                      ],
-                    ),
-                  );
-                }
-
-                return SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (context, index) {
-                      var note = notes[index];
-                      _userFeedCheckForNewData(note);
-                      return NoteCardContainer(
-                        notes: [note],
-                        key: ValueKey(note.id),
-                      );
-                    },
-                    childCount: notes.length,
-                  ),
-                );
-              }
-              if (snapshot.hasError) {
-                return SliverList(
-                  delegate: SliverChildListDelegate([
-                    Center(
-                        //button
-                        child: ElevatedButton(
-                      onPressed: () {},
-                      child: Text(snapshot.error.toString(),
-                          style: const TextStyle(
-                              fontSize: 20, color: Colors.white)),
-                    ))
-                  ]),
-                );
-              }
-              return const Text("waiting for stream trigger ",
-                  style: TextStyle(fontSize: 20));
-            },
-          );
-        });
+    return Text("feed not iplemented yet");
   }
 
-  Row _bottomInformationBar(BuildContext context,
-      FollowingPubkeys followingService, KeyPair myKeyPair) {
+  Row _bottomInformationBar(
+      BuildContext context, Follow followingService, KeyPair myKeyPair) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
@@ -537,7 +350,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
             const Icon(Icons.people, color: Palette.white, size: 17),
             const SizedBox(width: 5),
             FutureBuilder<List<NostrTag>>(
-                future: followingService.getFollowingPubkeys(widget.pubkey),
+                future: followingService.getFollowers(widget.pubkey).first,
                 builder: (BuildContext context,
                     AsyncSnapshot<List<NostrTag>> snapshot) {
                   var contactsCountString = "";
@@ -595,8 +408,8 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
     );
   }
 
-  GestureDetector _relaysInfo(FollowingPubkeys followingService,
-      KeyPair myKeyPair, BuildContext context) {
+  GestureDetector _relaysInfo(
+      Follow followingService, KeyPair myKeyPair, BuildContext context) {
     return GestureDetector(
       onTap: () {
         if (widget.pubkey == myKeyPair.publicKey) {
@@ -615,7 +428,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
           const SizedBox(width: 5),
           if (widget.pubkey == myKeyPair.publicKey)
             Text(
-              "${followingService.ownRelays.entries.length} relays",
+              "todo: relays",
               style: const TextStyle(
                 color: Palette.white,
                 fontSize: 14,
@@ -634,13 +447,12 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
     );
   }
 
-  Container _profileInformation(UserMetadata metadata) {
+  Container _profileInformation(GetUserMetadata metadata) {
     return Container(
       transform: Matrix4.translationValues(0.0, -10.0, 0.0),
-      child: StreamBuilder<DbUserMetadata?>(
-        stream: metadata.getMetadataByPubkeyStream(widget.pubkey),
-        builder:
-            (BuildContext context, AsyncSnapshot<DbUserMetadata?> snapshot) {
+      child: StreamBuilder<UserMetadata?>(
+        stream: metadata.getMetadataByPubkey(widget.pubkey),
+        builder: (BuildContext context, AsyncSnapshot<UserMetadata?> snapshot) {
           var name = "";
           var nip05 = "";
           var picture = "";
@@ -779,8 +591,8 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
     );
   }
 
-  Row _actionRow(KeyPair myKeyPair, FollowingPubkeys followingService,
-      UserMetadata metadata, BuildContext context) {
+  Row _actionRow(KeyPair myKeyPair, Follow followingService,
+      GetUserMetadata metadata, BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
@@ -809,10 +621,10 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
           // ),
 
           // round message button with icon and white border
-          StreamBuilder<DbUserMetadata?>(
-              stream: metadata.getMetadataByPubkeyStream(widget.pubkey),
+          StreamBuilder<UserMetadata?>(
+              stream: metadata.getMetadataByPubkey(widget.pubkey),
               builder: (BuildContext context,
-                  AsyncSnapshot<DbUserMetadata?> snapshot) {
+                  AsyncSnapshot<UserMetadata?> snapshot) {
                 String lud06 = "";
                 String lud16 = "";
 
@@ -892,10 +704,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
     );
   }
 
-  Widget _followButton(FollowingPubkeys followingService) {
+  Widget _followButton(Follow followingService) {
     return StreamBuilder<List<NostrTag>>(
-        stream: followingService.ownPubkeyContactsStreamDb,
-        initialData: followingService.ownContacts,
+        stream: followingService.getFollowingSelf(),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             var followingList = snapshot.data!.map((e) => e.value).toList();
@@ -904,13 +715,13 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
               return followButton(
                   isFollowing: true,
                   onPressed: () {
-                    followingService.unfollow(widget.pubkey);
+                    followingService.unfollowUser(widget.pubkey);
                   });
             } else {
               return followButton(
                   isFollowing: false,
                   onPressed: () {
-                    followingService.follow(widget.pubkey);
+                    followingService.followUser(widget.pubkey);
                   });
             }
           }
@@ -918,10 +729,10 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
         });
   }
 
-  FlexibleSpaceBar _bannerImage(UserMetadata metadata) {
+  FlexibleSpaceBar _bannerImage(GetUserMetadata metadata) {
     return FlexibleSpaceBar(
-        background: StreamBuilder<DbUserMetadata?>(
-      stream: metadata.getMetadataByPubkeyStream(widget.pubkey),
+        background: StreamBuilder<UserMetadata?>(
+      stream: metadata.getMetadataByPubkey(widget.pubkey),
       builder: (context, snapshot) {
         if (snapshot.hasData && snapshot.data?.banner != null) {
           return CachedNetworkImage(
@@ -957,7 +768,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
 }
 
 Widget _profileImage(
-    ScrollController sController, widget, UserMetadata metadata) {
+    ScrollController sController, widget, GetUserMetadata metadata) {
   const double defaultMargin = 125;
   const double defaultStart = 125;
   const double defaultEnd = defaultStart / 2;
@@ -1012,31 +823,19 @@ Widget _profileImage(
           border: Border.all(color: Palette.background, width: 3),
           shape: BoxShape.circle,
         ),
-        child: StreamBuilder<DbUserMetadata?>(
-            stream: metadata.getMetadataByPubkeyStream(widget.pubkey),
-            builder: (BuildContext context,
-                AsyncSnapshot<DbUserMetadata?> snapshot) {
+        child: StreamBuilder<UserMetadata?>(
+            stream: metadata.getMetadataByPubkey(widget.pubkey),
+            builder:
+                (BuildContext context, AsyncSnapshot<UserMetadata?> snapshot) {
               var picture = "";
 
-              if (snapshot.hasData) {
-                picture = snapshot.data?.picture ??
-                    "https://api.dicebear.com/7.x/personas/svg?seed=${widget.pubkey}";
-              } else if (snapshot.hasError) {
-                picture =
-                    "https://api.dicebear.com/7.x/personas/svg?seed=${widget.pubkey}";
-              } else {
-                // loading
-                picture =
-                    "https://api.dicebear.com/7.x/personas/svg?seed=${widget.pubkey}";
-              }
               return GestureDetector(
                   onTap: (() {
                     openImage(NetworkImage(picture), context);
                   }),
-                  child: myProfilePicture(
-                    pictureUrl: picture,
+                  child: UserImage(
+                    imageUrl: snapshot.data?.picture,
                     pubkey: widget.pubkey,
-                    filterQuality: FilterQuality.high,
                   ));
             }),
       ),

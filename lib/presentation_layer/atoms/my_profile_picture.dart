@@ -4,7 +4,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:camelus/config/palette.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
-Widget myProfilePicture({
+Widget _myProfilePicture({
   required String pictureUrl,
   required String pubkey,
   FilterQuality filterQuality = FilterQuality.medium,
@@ -78,7 +78,7 @@ class UserImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return myProfilePicture(
+    return _myProfilePicture(
       pictureUrl: imageUrl ?? "${Dicebear.baseUrl}$pubkey",
       pubkey: pubkey,
       filterQuality: FilterQuality.medium,
