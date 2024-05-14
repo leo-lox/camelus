@@ -1,14 +1,14 @@
-import 'package:camelus/data_layer/db/entities/db_user_metadata.dart';
+import 'package:camelus/domain_layer/entities/user_metadata.dart';
+import 'package:camelus/domain_layer/usecases/follow.dart';
+import 'package:camelus/domain_layer/usecases/get_user_metadata.dart';
 import 'package:camelus/helpers/nprofile_helper.dart';
 import 'package:camelus/domain_layer/entities/nostr_tag.dart';
+import 'package:camelus/presentation_layer/atoms/my_profile_picture.dart';
 import 'package:camelus/presentation_layer/providers/following_provider.dart';
 import 'package:camelus/presentation_layer/providers/metadata_provider.dart';
-import 'package:camelus/services/nostr/metadata/following_pubkeys.dart';
-import 'package:camelus/services/nostr/metadata/user_metadata.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:camelus/presentation_layer/atoms/my_profile_picture.dart';
 import 'package:camelus/config/palette.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:qr_flutter/qr_flutter.dart';
@@ -83,7 +83,7 @@ class NostrDrawer extends ConsumerWidget {
   }
 
   Widget _drawerHeader(
-      context, UserMetadata metadata, FollowingPubkeys followingService) {
+      context, GetUserMetadata metadata, Follow followingService) {
     return DrawerHeader(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -99,27 +99,14 @@ class NostrDrawer extends ConsumerWidget {
                   color: Palette.primary,
                   shape: BoxShape.circle,
                 ),
-                child: StreamBuilder<DbUserMetadata?>(
-                    stream: metadata.getMetadataByPubkeyStream(pubkey),
+                child: StreamBuilder<UserMetadata?>(
+                    stream: metadata.getMetadataByPubkey(pubkey),
                     builder: (BuildContext context,
-                        AsyncSnapshot<DbUserMetadata?> snapshot) {
-                      var picture = "";
-
-                      if (snapshot.hasData) {
-                        picture = snapshot.data?.picture ??
-                            "https://api.dicebear.com/7.x/personas/svg?seed=$pubkey";
-                      } else if (snapshot.hasError) {
-                        picture =
-                            "https://api.dicebear.com/7.x/personas/svg?seed=$pubkey";
-                      } else {
-                        // loading
-                        picture =
-                            "https://api.dicebear.com/7.x/personas/svg?seed=$pubkey";
-                      }
-                      return myProfilePicture(
-                          pictureUrl: picture,
-                          pubkey: pubkey,
-                          filterQuality: FilterQuality.medium);
+                        AsyncSnapshot<UserMetadata?> snapshot) {
+                      return UserImage(
+                        imageUrl: snapshot.data?.picture,
+                        pubkey: pubkey,
+                      );
                     }),
               ),
             ),
@@ -136,10 +123,10 @@ class NostrDrawer extends ConsumerWidget {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    StreamBuilder<DbUserMetadata?>(
-                        stream: metadata.getMetadataByPubkeyStream(pubkey),
+                    StreamBuilder<UserMetadata?>(
+                        stream: metadata.getMetadataByPubkey(pubkey),
                         builder: (BuildContext context,
-                            AsyncSnapshot<DbUserMetadata?> snapshot) {
+                            AsyncSnapshot<UserMetadata?> snapshot) {
                           var name = "";
                           var nip05 = "";
 
@@ -194,7 +181,7 @@ class NostrDrawer extends ConsumerWidget {
           Row(
             children: [
               FutureBuilder<List<NostrTag>>(
-                  future: followingService.getFollowingPubkeys(pubkey),
+                  future: followingService.getFollowing(pubkey).first,
                   builder: (context, snapshot) {
                     return RichText(
                         text: TextSpan(

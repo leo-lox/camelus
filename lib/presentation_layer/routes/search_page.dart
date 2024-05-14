@@ -4,27 +4,23 @@ import 'dart:developer';
 
 import 'package:camelus/domain_layer/entities/nostr_band_hashtags.dart';
 import 'package:camelus/domain_layer/entities/nostr_band_people.dart';
+import 'package:camelus/domain_layer/entities/user_metadata.dart';
 import 'package:camelus/presentation_layer/atoms/hashtag_card.dart';
 import 'package:camelus/presentation_layer/components/person_card.dart';
 import 'package:camelus/config/palette.dart';
-import 'package:camelus/data_layer/db/entities/db_user_metadata.dart';
-import 'package:camelus/data_layer/db/queries/db_note_queries.dart';
 import 'package:camelus/helpers/helpers.dart';
 import 'package:camelus/helpers/nprofile_helper.dart';
 import 'package:camelus/helpers/search.dart';
-import 'package:camelus/data_layer/models/nostr_request_event.dart';
 import 'package:camelus/domain_layer/entities/nostr_tag.dart';
 import 'package:camelus/presentation_layer/providers/following_provider.dart';
 import 'package:camelus/presentation_layer/providers/key_pair_provider.dart';
 import 'package:camelus/presentation_layer/providers/metadata_provider.dart';
 import 'package:camelus/presentation_layer/providers/navigation_bar_provider.dart';
 import 'package:camelus/presentation_layer/providers/nostr_band_provider.dart';
-import 'package:camelus/presentation_layer/providers/relay_provider.dart';
 import 'package:camelus/presentation_layer/routes/nostr/profile/profile_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:camelus/presentation_layer/providers/database_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class SearchPage extends ConsumerStatefulWidget {
@@ -43,8 +39,6 @@ class _SearchPageState extends ConsumerState<SearchPage> {
   late Search _search;
 
   bool _isSearching = false;
-
-  List<DbUserMetadata> _searchResultsUsers = [];
 
   _listenToNavigationBar() {
     // listen to home bar
@@ -75,12 +69,6 @@ class _SearchPageState extends ConsumerState<SearchPage> {
     FocusScope.of(context).requestFocus(_searchFocusNode);
   }
 
-  void _setupSearchObj() async {
-    var database = await ref.watch(databaseProvider.future);
-
-    _search = Search(database);
-  }
-
   void _initSequence() async {
     // wait 1 second with then
     await Future.delayed(const Duration(milliseconds: 200)).then((value) {
@@ -89,7 +77,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
         _listenToNavigationBar();
       }
     });
-    _setupSearchObj();
+
     _setupFocusNodeListener();
   }
 
@@ -112,14 +100,8 @@ class _SearchPageState extends ConsumerState<SearchPage> {
   }
 
   void _onSearchChanged(String value) async {
-    if (value.length <= 1) {
-      setState(() {
-        _searchResultsUsers = [];
-      });
-      return;
-    }
     var metadata = ref.watch(metadataProvider);
-    List<DbUserMetadata> workingMetadata = [];
+    List<UserMetadata> workingMetadata = [];
 
     workingMetadata.addAll(_search.searchUsersMetadata(value));
 
@@ -163,7 +145,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
       }
 
       var personMetadata =
-          await metadata.getMetadataByPubkeyStream(hex).first.timeout(
+          await metadata.getMetadataByPubkey(hex).first.timeout(
                 const Duration(seconds: 1),
               );
 
@@ -171,8 +153,8 @@ class _SearchPageState extends ConsumerState<SearchPage> {
         workingMetadata.add(personMetadata);
         personMetadata.pubkey = hex;
       } else {
-        final mockUser = DbUserMetadata(
-            pubkey: value, nostr_id: "", last_fetch: 0, name: value);
+        final mockUser =
+            UserMetadata(pubkey: value, eventId: "", lastFetch: 0, name: value);
         workingMetadata.add(mockUser);
       }
     }
@@ -196,7 +178,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
         final List nipRelays = nip05Metadata['relays'];
 
         var personMetadata = await metadata
-            .getMetadataByPubkeyStream(nipPubkey)
+            .getMetadataByPubkey(nipPubkey)
             .first
             .timeout(const Duration(seconds: 1));
         personMetadata!.pubkey = nipPubkey;
@@ -217,7 +199,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
     }
 
     setState(() {
-      _searchResultsUsers = workingMetadata;
+      //_searchResultsUsers = workingMetadata;
     });
   }
 
@@ -231,11 +213,6 @@ class _SearchPageState extends ConsumerState<SearchPage> {
   void _changeFollowing(bool followChange, String pubkey,
       List<NostrTag> currentOwnContacts) async {
     var mykeys = await ref.watch(keyPairProvider.future);
-    var db = await ref.watch(databaseProvider.future);
-
-    var myLastNote = (await DbNoteQueries.kindPubkeyFuture(db,
-            pubkey: mykeys.keyPair!.publicKey, kind: 3))
-        .first;
 
     List<NostrTag> newContacts = [...currentOwnContacts];
 
@@ -245,33 +222,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
       newContacts.removeWhere((element) => element.value == pubkey);
     }
 
-    _writeContacts(
-      publicKey: mykeys.keyPair!.publicKey,
-      privateKey: mykeys.keyPair!.privateKey,
-      content: myLastNote.content ?? '',
-      updatedContacts: newContacts,
-    );
-  }
-
-  Future _writeContacts({
-    required String publicKey,
-    required String privateKey,
-    required String content,
-    required List<NostrTag> updatedContacts,
-  }) async {
-    var relays = ref.watch(relayServiceProvider);
-    NostrRequestEventBody body = NostrRequestEventBody(
-      pubkey: publicKey,
-      privateKey: privateKey,
-      content: content,
-      kind: 3,
-      tags: updatedContacts,
-    );
-    NostrRequestEvent myEvent = NostrRequestEvent(body: body);
-
-    await relays.write(request: myEvent);
-
-    return;
+    throw UnimplementedError("save contacts");
   }
 
   @override
@@ -292,8 +243,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
         backgroundColor: Palette.background,
         // scrollable column
         body: StreamBuilder<List<NostrTag>>(
-          stream: followingService.ownPubkeyContactsStreamDb,
-          initialData: followingService.ownContacts,
+          stream: followingService.getFollowingSelf(),
           builder: (context, ownFollowingSnapshot) {
             return Column(
               children: [
@@ -313,35 +263,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                         Column(
                           children: [
                             // search results
-                            for (var result in _searchResultsUsers)
-                              PersonCard(
-                                name: result.name ?? '',
-                                nip05: result.nip05 ?? '',
-                                pictureUrl: result.picture ?? '',
-                                about: result.about ?? '',
-                                pubkey: result.pubkey,
-                                isFollowing: ownFollowingSnapshot.data!.any(
-                                    (element) =>
-                                        element.value == result.pubkey),
-                                onTap: () {
-                                  // navigate to profile page
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => ProfilePage(
-                                        pubkey: result.pubkey,
-                                      ),
-                                    ),
-                                  );
-                                },
-                                onFollowTab: (followState) {
-                                  _changeFollowing(
-                                    followState,
-                                    result.pubkey,
-                                    ownFollowingSnapshot.data!,
-                                  );
-                                },
-                              ),
+                            Text("todo: search results")
                           ],
                         )
                     ],
