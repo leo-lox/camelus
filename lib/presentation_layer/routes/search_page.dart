@@ -22,6 +22,8 @@ import 'package:flutter_svg/svg.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../domain_layer/entities/contact_list.dart';
+
 class SearchPage extends ConsumerStatefulWidget {
   const SearchPage({super.key});
 
@@ -205,16 +207,16 @@ class _SearchPageState extends ConsumerState<SearchPage> {
     }
   }
 
-  void _changeFollowing(bool followChange, String pubkey,
-      List<NostrTag> currentOwnContacts) async {
+  void _changeFollowing(
+      bool followChange, String pubkey, ContactList currentOwnContacts) async {
     var mykeys = await ref.watch(keyPairProvider.future);
 
-    List<NostrTag> newContacts = [...currentOwnContacts];
+    List<String> newContacts = [...currentOwnContacts.contacts];
 
     if (followChange) {
-      newContacts.add(NostrTag(type: 'p', value: pubkey));
+      newContacts.add(pubkey);
     } else {
-      newContacts.removeWhere((element) => element.value == pubkey);
+      newContacts.removeWhere((element) => element == pubkey);
     }
 
     throw UnimplementedError("save contacts");
@@ -237,8 +239,8 @@ class _SearchPageState extends ConsumerState<SearchPage> {
       child: Scaffold(
         backgroundColor: Palette.background,
         // scrollable column
-        body: StreamBuilder<List<NostrTag>>(
-          stream: followingService.getContactsSelf(),
+        body: StreamBuilder<ContactList>(
+          stream: followingService.getContactsStreamSelf(),
           builder: (context, ownFollowingSnapshot) {
             return Column(
               children: [
@@ -272,7 +274,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
     );
   }
 
-  Container _defaultView(List<NostrTag> currentFollowing) {
+  Container _defaultView(ContactList currentFollowing) {
     return Container(
         padding: const EdgeInsets.only(left: 20, top: 20, bottom: 10),
         child: Column(
@@ -379,7 +381,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
   }
 
   Widget _trendingPeople(
-      NostrBandPeople api, int limit, List<NostrTag> currentFollowing) {
+      NostrBandPeople api, int limit, ContactList currentFollowing) {
     List<PersonCard> personCards = [];
 
     for (int i = 0; i < api.profiles.length; i++) {
@@ -394,8 +396,8 @@ class _SearchPageState extends ConsumerState<SearchPage> {
         pictureUrl: metadata['picture'] ?? '',
         about: metadata['about'] ?? '',
         nip05: metadata['nip05'] ?? '',
-        isFollowing:
-            currentFollowing.any((element) => element.value == profile.pubkey),
+        isFollowing: currentFollowing.contacts
+            .any((element) => element == profile.pubkey),
         onTap: () {
           Navigator.push(
             context,
