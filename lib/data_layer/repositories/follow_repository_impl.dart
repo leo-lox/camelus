@@ -1,0 +1,72 @@
+import 'package:camelus/data_layer/models/contact_list_model.dart';
+import 'package:camelus/domain_layer/entities/contact_list.dart';
+import 'package:dart_ndk/nips/nip01/event_verifier.dart';
+import 'package:dart_ndk/nips/nip01/filter.dart';
+import 'package:dart_ndk/nips/nip02/contact_list.dart' as ndk_nip02;
+import 'package:dart_ndk/relay_jit_manager/request_jit.dart';
+
+import '../../domain_layer/repositories/follow_repository.dart';
+import '../data_sources/dart_ndk_source.dart';
+
+class FollowRepositoryImpl implements FollowRepository {
+  final DartNdkSource dartNdkSource;
+  final EventVerifier eventVerifier;
+
+  FollowRepositoryImpl({
+    required this.dartNdkSource,
+    required this.eventVerifier,
+  });
+
+  @override
+  Future<void> followUser(String npub) {
+    // TODO: implement followUser
+    throw UnimplementedError();
+  }
+
+  @override
+  Stream<ContactList> getContacts(String npub) {
+    Filter filter = Filter(
+      authors: [],
+      kinds: [ndk_nip02.ContactList.KIND],
+    );
+    NostrRequestJit request = NostrRequestJit.query(
+      'allNotes',
+      eventVerifier: eventVerifier,
+      filters: [filter],
+    );
+    dartNdkSource.relayJitManager.handleRequest(request);
+
+    final contactListStream = request.responseStream.map((event) {
+      // Convert the event to a ndk_nip02.ContactList object.
+      final ndkContactList = ndk_nip02.ContactList.fromEvent(event);
+      // Convert the ndk_nip02.ContactList object to a ContactListModel object.
+      return ContactListModel.fromNdk(ndkContactList);
+    });
+
+    return contactListStream;
+  }
+
+  @override
+  Stream<List<String>> getFollowers(String npub) {
+    // TODO: implement getFollowers
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<bool> isFollowing(String npub) {
+    // TODO: implement isFollowing
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<void> setFollowing(ContactList contactList) {
+    // TODO: implement setFollowing
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<void> unfollowUser(String npub) {
+    // TODO: implement unfollowUser
+    throw UnimplementedError();
+  }
+}

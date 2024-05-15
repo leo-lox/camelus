@@ -1,9 +1,17 @@
+import 'package:camelus/domain_layer/entities/contact_list.dart';
+
 import '../entities/nostr_tag.dart';
+import '../repositories/follow_repository.dart';
 
 class Follow {
   final String? selfPubkey;
 
-  Follow({this.selfPubkey});
+  final FollowRepository followRepository;
+
+  Follow({
+    this.selfPubkey,
+    required this.followRepository,
+  });
 
   set selfPubkey(String? value) {
     selfPubkey = value;
@@ -31,11 +39,11 @@ class Follow {
     throw UnimplementedError();
   }
 
-  Stream<List<NostrTag>> getContacts(String npub) {
-    throw UnimplementedError();
+  Stream<ContactList> getContacts(String npub) {
+    return followRepository.getContacts(npub);
   }
 
-  Stream<List<NostrTag>> getContactsSelf() {
+  Stream<ContactList> getContactsSelf() {
     _checkSelfPubkey();
     return getContacts(selfPubkey!);
   }
