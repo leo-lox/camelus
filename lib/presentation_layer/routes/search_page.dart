@@ -238,7 +238,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
         backgroundColor: Palette.background,
         // scrollable column
         body: StreamBuilder<List<NostrTag>>(
-          stream: followingService.getFollowingSelf(),
+          stream: followingService.getContactsSelf(),
           builder: (context, ownFollowingSnapshot) {
             return Column(
               children: [

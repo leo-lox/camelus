@@ -706,7 +706,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
 
   Widget _followButton(Follow followingService) {
     return StreamBuilder<List<NostrTag>>(
-        stream: followingService.getFollowingSelf(),
+        stream: followingService.getContactsSelf(),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             var followingList = snapshot.data!.map((e) => e.value).toList();

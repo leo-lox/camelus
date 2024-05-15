@@ -31,13 +31,13 @@ class Follow {
     throw UnimplementedError();
   }
 
-  Stream<List<NostrTag>> getFollowing(String npub) {
+  Stream<List<NostrTag>> getContacts(String npub) {
     throw UnimplementedError();
   }
 
-  Stream<List<NostrTag>> getFollowingSelf() {
+  Stream<List<NostrTag>> getContactsSelf() {
     _checkSelfPubkey();
-    return getFollowing(selfPubkey!);
+    return getContacts(selfPubkey!);
   }
 
   Stream<List<NostrTag>> getFollowers(String npub) {

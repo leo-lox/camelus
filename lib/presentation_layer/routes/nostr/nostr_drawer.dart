@@ -181,7 +181,7 @@ class NostrDrawer extends ConsumerWidget {
           Row(
             children: [
               FutureBuilder<List<NostrTag>>(
-                  future: followingService.getFollowing(pubkey).first,
+                  future: followingService.getContacts(pubkey).first,
                   builder: (context, snapshot) {
                     return RichText(
                         text: TextSpan(

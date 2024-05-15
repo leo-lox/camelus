@@ -59,7 +59,7 @@ class _FollowerPageState extends ConsumerState<FollowerPage> {
         foregroundColor: Palette.white,
       ),
       body: StreamBuilder<List<NostrTag>>(
-          stream: followingService.getFollowingSelf(),
+          stream: followingService.getContactsSelf(),
           builder: (context, ownFollowingSnapshot) {
             return ListView.builder(
                 physics: const BouncingScrollPhysics(),
