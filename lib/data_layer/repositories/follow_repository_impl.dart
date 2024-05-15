@@ -26,17 +26,32 @@ class FollowRepositoryImpl implements FollowRepository {
   @override
   Stream<ContactList> getContacts(String npub) {
     Filter filter = Filter(
-      authors: [],
+      authors: [npub],
       kinds: [ndk_nip02.ContactList.KIND],
     );
     NostrRequestJit request = NostrRequestJit.query(
-      'allNotes',
+      'get_contacts',
       eventVerifier: eventVerifier,
       filters: [filter],
     );
     dartNdkSource.relayJitManager.handleRequest(request);
 
-    final contactListStream = request.responseStream.map((event) {
+    var lastReceived = 0;
+    final contactListStream = request.responseStream.where((event) {
+      // Extract the timestamp from the event.
+      final eventTimestamp = event.createdAt;
+
+      // Check if the event is older than the last received timestamp.
+      final isOlder = eventTimestamp < lastReceived;
+
+      // Update the last received timestamp if the event is newer.
+      if (!isOlder) {
+        lastReceived = eventTimestamp;
+      }
+
+      // Return true to keep the event if it's older, false to discard it.
+      return isOlder;
+    }).map((event) {
       // Convert the event to a ndk_nip02.ContactList object.
       final ndkContactList = ndk_nip02.ContactList.fromEvent(event);
       // Convert the ndk_nip02.ContactList object to a ContactListModel object.
