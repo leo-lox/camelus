@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:developer';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:camelus/domain_layer/entities/contact_list.dart';
 import 'package:camelus/domain_layer/entities/user_metadata.dart';
 import 'package:camelus/domain_layer/usecases/follow.dart';
 import 'package:camelus/domain_layer/usecases/get_user_metadata.dart';
@@ -705,11 +706,11 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
   }
 
   Widget _followButton(Follow followingService) {
-    return StreamBuilder<List<NostrTag>>(
-        stream: followingService.getContactsSelf(),
+    return StreamBuilder<ContactList>(
+        stream: followingService.getContactsStreamSelf(),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
-            var followingList = snapshot.data!.map((e) => e.value).toList();
+            var followingList = snapshot.data!.contacts;
 
             if (followingList.contains(widget.pubkey)) {
               return followButton(
