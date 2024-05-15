@@ -9,7 +9,7 @@ class NostrTagModel extends NostrTag {
   });
 
   // ["e", <32-bytes hex of the id of another event>, <recommended relay URL>, <marker>]
-  factory NostrTagModel.fromJson(List<String> json) {
+  factory NostrTagModel.fromJson(List<dynamic> json) {
     // chec
 
     Map newTag = {
