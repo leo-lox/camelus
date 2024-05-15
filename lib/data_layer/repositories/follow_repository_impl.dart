@@ -24,13 +24,34 @@ class FollowRepositoryImpl implements FollowRepository {
   }
 
   @override
-  Stream<ContactList> getContacts(String npub) {
+  Future<ContactList> getContacts(String npub) async {
     Filter filter = Filter(
       authors: [npub],
       kinds: [ndk_nip02.ContactList.KIND],
     );
     NostrRequestJit request = NostrRequestJit.query(
       'get_contacts',
+      eventVerifier: eventVerifier,
+      filters: [filter],
+    );
+    dartNdkSource.relayJitManager.handleRequest(request);
+
+    final responseList = await request.responseList;
+
+    responseList.sort((a, b) => a.createdAt.compareTo(b.createdAt));
+
+    final ndkContactList = ndk_nip02.ContactList.fromEvent(responseList.first);
+
+    return ContactListModel.fromNdk(ndkContactList);
+  }
+
+  Stream<ContactList> getContactsStream(String npub) {
+    Filter filter = Filter(
+      authors: [npub],
+      kinds: [ndk_nip02.ContactList.KIND],
+    );
+    NostrRequestJit request = NostrRequestJit.subscription(
+      'get_contacts_stream',
       eventVerifier: eventVerifier,
       filters: [filter],
     );

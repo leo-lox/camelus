@@ -1,10 +1,13 @@
+import 'package:camelus/domain_layer/usecases/follow.dart';
+
 import '../entities/nostr_note.dart';
 import '../repositories/note_repository.dart';
 
 class GetNotes {
   final NoteRepository _noteRepository;
+  final Follow _follow;
 
-  GetNotes(this._noteRepository);
+  GetNotes(this._noteRepository, this._follow);
 
   Stream<NostrNote> getAllNotes() {
     return _noteRepository.getAllNotes();
@@ -42,6 +45,9 @@ class GetNotes {
     int? until,
     int? limit,
   }) {
+    // get contacts of user
+    _follow.getContactsSelf();
+
     return _noteRepository.getTextNotesByAuthors(
       authors: [
         '3e55516cb1a695926f007468b0558e1f6b5415ff481aa52d083abea461405f97',

@@ -39,11 +39,11 @@ class Follow {
     throw UnimplementedError();
   }
 
-  Stream<ContactList> getContacts(String npub) {
+  Future<ContactList> getContacts(String npub) {
     return followRepository.getContacts(npub);
   }
 
-  Stream<ContactList> getContactsSelf() {
+  Future<ContactList> getContactsSelf() {
     _checkSelfPubkey();
     return getContacts(selfPubkey!);
   }
