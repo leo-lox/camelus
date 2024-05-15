@@ -58,9 +58,10 @@ class _UserFeedOriginalViewState extends ConsumerState<UserFeedOriginalView> {
 
   void _setupNewNotesListener() {
     final notesProvider = ref.read(getNotesProvider);
+    final now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
     _subscriptions.add(
       notesProvider
-          .getNpubFeed(npub: widget.pubkey, requestId: "userFeedFreshId")
+          .getNpubFeed(npub: widget.pubkey, requestId: "userFeedFreshId", since: now)
           .listen((event) {
         log("new notes stream event");
         setState(() {
