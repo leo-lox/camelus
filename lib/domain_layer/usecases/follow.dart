@@ -31,7 +31,7 @@ class Follow {
     throw UnimplementedError();
   }
 
-  Future<void> setFollowing(List<NostrTag> contacts) async {
+  Future<void> setContacts(List<String> contacts) async {
     throw UnimplementedError();
   }
 
@@ -46,6 +46,15 @@ class Follow {
   Future<ContactList> getContactsSelf() {
     _checkSelfPubkey();
     return getContacts(selfPubkey!);
+  }
+
+  Stream<ContactList> getContactsStream(String npub) {
+    return followRepository.getContactsStream(npub);
+  }
+
+  Stream<ContactList> getContactsStreamSelf() {
+    _checkSelfPubkey();
+    return getContactsStream(selfPubkey!);
   }
 
   Stream<List<NostrTag>> getFollowers(String npub) {

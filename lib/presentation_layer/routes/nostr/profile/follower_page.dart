@@ -1,3 +1,4 @@
+import 'package:camelus/domain_layer/entities/contact_list.dart';
 import 'package:camelus/domain_layer/entities/user_metadata.dart';
 import 'package:camelus/presentation_layer/components/person_card.dart';
 import 'package:camelus/domain_layer/entities/nostr_tag.dart';
@@ -24,17 +25,17 @@ class FollowerPage extends ConsumerStatefulWidget {
 
 class _FollowerPageState extends ConsumerState<FollowerPage> {
   /// follow Change - true to add, false to remove
-  void _changeFollowing(bool followChange, String pubkey,
-      List<NostrTag> currentOwnContacts) async {
-    List<NostrTag> newContacts = [...currentOwnContacts];
+  void _changeFollowing(
+      bool followChange, String pubkey, ContactList currentOwnContacts) async {
+    List<String> newContacts = [...currentOwnContacts.contacts];
 
     if (followChange) {
-      newContacts.add(NostrTag(type: 'p', value: pubkey));
+      newContacts.add(pubkey);
     } else {
-      newContacts.removeWhere((element) => element.value == pubkey);
+      newContacts.removeWhere((element) => element == pubkey);
     }
 
-    ref.read(followingProvider).setFollowing(newContacts);
+    ref.read(followingProvider).setContacts(newContacts);
   }
 
   @override
@@ -58,8 +59,8 @@ class _FollowerPageState extends ConsumerState<FollowerPage> {
         title: Text(widget.title),
         foregroundColor: Palette.white,
       ),
-      body: StreamBuilder<List<NostrTag>>(
-          stream: followingService.getContactsSelf(),
+      body: StreamBuilder<ContactList>(
+          stream: followingService.getContactsStreamSelf(),
           builder: (context, ownFollowingSnapshot) {
             return ListView.builder(
                 physics: const BouncingScrollPhysics(),
@@ -87,7 +88,7 @@ class _FollowerPageState extends ConsumerState<FollowerPage> {
   PersonCard personCard(
       String displayPubkey,
       AsyncSnapshot<UserMetadata?> metadataSnapshot,
-      AsyncSnapshot<List<NostrTag>> ownFollowingSnapshot,
+      AsyncSnapshot<ContactList> ownFollowingSnapshot,
       BuildContext context) {
     return PersonCard(
       pubkey: displayPubkey,
@@ -95,8 +96,8 @@ class _FollowerPageState extends ConsumerState<FollowerPage> {
       pictureUrl: metadataSnapshot.data?.picture ?? "",
       about: metadataSnapshot.data?.about ?? "",
       nip05: metadataSnapshot.data?.nip05 ?? "",
-      isFollowing: ownFollowingSnapshot.data!
-          .any((element) => element.value == displayPubkey),
+      isFollowing: ownFollowingSnapshot.data!.contacts
+          .any((element) => element == displayPubkey),
       onTap: () {
         // navigate to profile page
         Navigator.push(

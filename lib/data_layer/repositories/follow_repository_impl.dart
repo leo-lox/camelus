@@ -45,6 +45,7 @@ class FollowRepositoryImpl implements FollowRepository {
     return ContactListModel.fromNdk(ndkContactList);
   }
 
+  @override
   Stream<ContactList> getContactsStream(String npub) {
     Filter filter = Filter(
       authors: [npub],

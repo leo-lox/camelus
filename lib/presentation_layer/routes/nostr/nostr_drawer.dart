@@ -1,3 +1,4 @@
+import 'package:camelus/domain_layer/entities/contact_list.dart';
 import 'package:camelus/domain_layer/entities/user_metadata.dart';
 import 'package:camelus/domain_layer/usecases/follow.dart';
 import 'package:camelus/domain_layer/usecases/get_user_metadata.dart';
@@ -180,13 +181,13 @@ class NostrDrawer extends ConsumerWidget {
           ),
           Row(
             children: [
-              FutureBuilder<List<NostrTag>>(
-                  future: followingService.getContacts(pubkey).first,
+              FutureBuilder<ContactList>(
+                  future: followingService.getContacts(pubkey),
                   builder: (context, snapshot) {
                     return RichText(
                         text: TextSpan(
                             text: snapshot.hasData
-                                ? snapshot.data?.length.toString()
+                                ? snapshot.data?.contacts.length.toString()
                                 : 'n.a.',
                             style: const TextStyle(
                               fontWeight: FontWeight.bold,

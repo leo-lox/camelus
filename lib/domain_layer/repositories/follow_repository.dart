@@ -13,5 +13,7 @@ abstract class FollowRepository {
 
   Future<ContactList> getContacts(String npub);
 
+  Stream<ContactList> getContactsStream(String npub);
+
   Stream<List<String>> getFollowers(String npub);
 }
