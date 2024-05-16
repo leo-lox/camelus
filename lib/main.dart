@@ -4,7 +4,7 @@ import 'package:camelus/presentation_layer/providers/key_pair_provider.dart';
 import 'package:camelus/presentation_layer/routes/nostr/blockedUsers/blocked_users.dart';
 import 'package:camelus/presentation_layer/routes/nostr/hashtag_view/hashtag_view_page.dart';
 import 'package:camelus/presentation_layer/routes/nostr/settings/settings_page.dart';
-import 'package:device_preview/device_preview.dart';
+//import 'package:device_preview/device_preview.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -37,16 +37,17 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   var initalData = await _getInitialData();
 
-  if (kDebugMode && devDeviceFrame) {
-    runApp(
-      DevicePreview(
-        enabled: kDebugMode,
-        builder: (context) =>
-            MyApp(initialRoute: initalData[0], pubkey: initalData[1]),
-      ),
-    );
-    return;
-  }
+  // currently incompatible with recent flutter sdk https://github.com/aloisdeniel/flutter_device_preview/issues/244
+  // if (kDebugMode && devDeviceFrame) {
+  //   runApp(
+  //     DevicePreview(
+  //       enabled: kDebugMode,
+  //       builder: (context) =>
+  //           MyApp(initialRoute: initalData[0], pubkey: initalData[1]),
+  //     ),
+  //   );
+  //   return;
+  // }
 
   runApp(MyApp(initialRoute: initalData[0], pubkey: initalData[1]));
 }

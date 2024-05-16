@@ -64,7 +64,7 @@ dependencies:
   pointycastle: ^3.7.3
   encrypt: ^5.0.3
   kepler: ^1.0.3
-  device_preview: ^1.1.0
+  #device_preview: ^1.1.0
   bip39_mnemonic: ^3.0.6
   bip32: ^2.0.0
   crop_your_image: ^1.0.1
