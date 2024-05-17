@@ -9,13 +9,9 @@ class Follow {
   final FollowRepository followRepository;
 
   Follow({
-    this.selfPubkey,
+    required this.selfPubkey,
     required this.followRepository,
   });
-
-  set selfPubkey(String? value) {
-    selfPubkey = value;
-  }
 
   _checkSelfPubkey() {
     if (selfPubkey == null) {

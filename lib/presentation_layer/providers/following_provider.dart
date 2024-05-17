@@ -18,13 +18,12 @@ final followingProvider = Provider<Follow>((ref) {
   final FollowRepository _followRepository = FollowRepositoryImpl(
       dartNdkSource: dartNdkSource, eventVerifier: eventVerifier);
 
-  final follow = Follow(followRepository: _followRepository);
+  final myKeyPair = ref.watch(keyPairProvider);
 
-  final myKeyPair = ref.watch(keyPairProvider.future);
-
-  myKeyPair.then((value) => {
-        follow.selfPubkey = value.keyPair!.publicKey,
-      });
+  final follow = Follow(
+    followRepository: _followRepository,
+    selfPubkey: myKeyPair.keyPair?.publicKey,
+  );
 
   return follow;
 });

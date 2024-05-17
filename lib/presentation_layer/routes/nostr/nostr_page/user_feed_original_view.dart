@@ -61,7 +61,8 @@ class _UserFeedOriginalViewState extends ConsumerState<UserFeedOriginalView> {
     final now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
     _subscriptions.add(
       notesProvider
-          .getNpubFeed(npub: widget.pubkey, requestId: "userFeedFreshId", since: now)
+          .getNpubFeed(
+              npub: widget.pubkey, requestId: "userFeedFreshId", since: now)
           .listen((event) {
         log("new notes stream event");
         setState(() {
@@ -184,7 +185,9 @@ class _UserFeedOriginalViewState extends ConsumerState<UserFeedOriginalView> {
                   return Future.delayed(const Duration(milliseconds: 0));
                 },
                 child: StreamBuilder<List<NostrNote>>(
-                  stream: Stream.empty(), // todo: stream
+                  stream: ref.read(getNotesProvider).getNpubFeed(
+                      npub: widget.pubkey,
+                      requestId: userFeedFreshId), // todo: stream
 
                   builder: (BuildContext context,
                       AsyncSnapshot<List<NostrNote>> snapshot) {

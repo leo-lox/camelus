@@ -222,14 +222,14 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
   Widget build(BuildContext context) {
     var metadata = ref.watch(metadataProvider);
     var followingService = ref.watch(followingProvider);
-    var myKeyPairWrapper = ref.watch(keyPairProvider.future);
+    var myKeyPairWrapper = ref.watch(keyPairProvider);
 
     return Scaffold(
       backgroundColor: Palette.background,
       body: Stack(
         children: [
           FutureBuilder<KeyPairWrapper>(
-              future: myKeyPairWrapper,
+              future: Future.value(myKeyPairWrapper),
               builder: (context, keyPairSnapshot) {
                 if (!keyPairSnapshot.hasData) {
                   return const SizedBox();

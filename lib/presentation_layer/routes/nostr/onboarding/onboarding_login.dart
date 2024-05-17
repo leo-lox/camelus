@@ -61,7 +61,12 @@ class _OnboardingLoginPageState extends ConsumerState<OnboardingLoginPage> {
       var publicKeyHr = Helpers().encodeBech32(pubkey, 'npub');
 
       setState(() {
-        myKeys = KeyPair(privkey, pubkey, privKeyHr, publicKeyHr);
+        myKeys = KeyPair(
+          privateKey: privkey,
+          publicKey: pubkey,
+          privateKeyHr: privKeyHr,
+          publicKeyHr: publicKeyHr,
+        );
       });
       return true;
     } catch (e) {
@@ -88,7 +93,12 @@ class _OnboardingLoginPageState extends ConsumerState<OnboardingLoginPage> {
       var publicKeyHr = Helpers().encodeBech32(pubkey, 'npub');
 
       setState(() {
-        myKeys = KeyPair(privkeyHex, pubkey, privKeyHr, publicKeyHr);
+        myKeys = KeyPair(
+          privateKey: privkeyHex,
+          publicKey: pubkey,
+          privateKeyHr: privKeyHr,
+          publicKeyHr: publicKeyHr,
+        );
       });
       return true;
     } catch (e) {
@@ -128,7 +138,7 @@ class _OnboardingLoginPageState extends ConsumerState<OnboardingLoginPage> {
     storage.write(key: "nostrKeys", value: json.encode(myKeys!.toJson()));
     // save in provider
 
-    var provider = await ref.watch(keyPairProvider.future);
+    var provider = ref.watch(keyPairProvider);
     provider.setKeyPair(myKeys!);
 
     setState(() {});

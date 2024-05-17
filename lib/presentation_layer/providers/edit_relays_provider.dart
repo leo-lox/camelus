@@ -17,13 +17,10 @@ final editRelaysProvider = Provider<EditRelays>((ref) {
     eventVerifier: eventVerifier,
   );
 
-  final EditRelays editRelays = EditRelays(editRelayRepository, null);
+  final myKeyPair = ref.watch(keyPairProvider);
 
-  final myKeyPair = ref.watch(keyPairProvider.future);
-
-  myKeyPair.then((value) => {
-        editRelays.selfPubkey = value.keyPair!.publicKey,
-      });
+  final EditRelays editRelays =
+      EditRelays(editRelayRepository, myKeyPair.keyPair?.publicKey);
 
   return editRelays;
 });

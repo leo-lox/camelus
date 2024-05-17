@@ -21,7 +21,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     const storage = FlutterSecureStorage();
     storage.write(key: "nostrKeys", value: null);
     // save in provider
-    var provider = await ref.watch(keyPairProvider.future);
+    var provider = ref.watch(keyPairProvider);
     provider.removeKeyPair();
 
     if (!mounted) {

@@ -38,7 +38,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
   bool isKeysExpanded = false;
   void _initServices() async {
     _metadataProvider = ref.read(metadataProvider);
-    _keyPairService = await ref.read(keyPairProvider.future);
+    _keyPairService = ref.read(keyPairProvider);
     pubkey = _keyPairService.keyPair!.publicKey;
 
     // set initial values of text input controllers

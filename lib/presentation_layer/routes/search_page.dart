@@ -209,7 +209,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
 
   void _changeFollowing(
       bool followChange, String pubkey, ContactList currentOwnContacts) async {
-    var mykeys = await ref.watch(keyPairProvider.future);
+    var mykeys = ref.watch(keyPairProvider);
 
     List<String> newContacts = [...currentOwnContacts.contacts];
 

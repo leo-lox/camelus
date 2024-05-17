@@ -7,10 +7,6 @@ class EditRelays {
 
   EditRelays(this._relayRepository, this.selfPubkey);
 
-  set selfPubkey(String? value) {
-    selfPubkey = value;
-  }
-
   _checkSelfPubkey() {
     if (selfPubkey == null) {
       throw Exception("selfPubkey is null");

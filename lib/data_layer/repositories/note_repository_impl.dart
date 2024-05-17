@@ -100,9 +100,9 @@ class NoteRepositoryImpl implements NoteRepository {
     final myStream = request.responseStream.map(
       (event) => NostrNoteModel.fromNDKEvent(event),
     );
-    myStream.listen((event) {
-      log('NoteRepositoryImpl.getTextNotesByAuthors: $event');
-    });
+    // myStream.listen((event) {
+    //   log('NoteRepositoryImpl.getTextNotesByAuthors: $event');
+    // });
 
     return myStream.toList().asStream();
   }
