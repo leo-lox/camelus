@@ -139,9 +139,8 @@ class _UserFeedOriginalViewState extends ConsumerState<UserFeedOriginalView> {
     _setupNavBarHomeListener();
 
     // reset home bar new notes count
-    ref.watch(navigationBarProvider).resetNewNotesCount();
-
-    return;
+    // todo: bug on first launch
+    //ref.watch(navigationBarProvider).resetNewNotesCount();
   }
 
   @override

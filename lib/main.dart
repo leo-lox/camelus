@@ -46,7 +46,8 @@ Future<List<dynamic>> _getInitialData() async {
 
   if (myKeyPairWrapper.keyPair == null) {
     var initialRoute = '/onboarding';
-    return [initialRoute, ""];
+    KeyPairWrapper emptyKeyPair = KeyPairWrapper(keyPair: null);
+    return [initialRoute, emptyKeyPair];
   }
 
   return ['/', myKeyPairWrapper];

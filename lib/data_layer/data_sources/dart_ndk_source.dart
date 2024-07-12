@@ -1,4 +1,4 @@
-import 'package:dart_ndk/relay_jit_manager/relay_jit_manager.dart';
+import 'package:dart_ndk/dart_ndk.dart';
 
 class DartNdkSource {
   final RelayJitManager relayJitManager;

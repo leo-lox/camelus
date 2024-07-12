@@ -71,6 +71,9 @@ dependencies:
   dart_ndk: 
     path: ../dart_ndk
   package_info_plus: ^4.2.0
+  rust_lib_dart_ndk:
+    path: ../dart_ndk/rust_builder
+  flutter_rust_bridge: 2.0.0
 
 dev_dependencies:
   build_runner: ^2.4.6

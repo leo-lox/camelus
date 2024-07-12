@@ -1,16 +1,16 @@
-import 'package:camelus/data_layer/models/contact_list_model.dart';
-import 'package:camelus/domain_layer/entities/contact_list.dart';
-import 'package:dart_ndk/nips/nip01/event_verifier.dart';
-import 'package:dart_ndk/nips/nip01/filter.dart';
-import 'package:dart_ndk/nips/nip02/contact_list.dart' as ndk_nip02;
+import 'package:dart_ndk/domain_layer/entities/filter.dart';
+import 'package:dart_ndk/domain_layer/repositories/event_verifier_repository.dart';
 import 'package:dart_ndk/relay_jit_manager/request_jit.dart';
+import 'package:dart_ndk/domain_layer/entities/contact_list.dart' as ndk_nip02;
 
+import '../../domain_layer/entities/contact_list.dart';
 import '../../domain_layer/repositories/follow_repository.dart';
 import '../data_sources/dart_ndk_source.dart';
+import '../models/contact_list_model.dart';
 
 class FollowRepositoryImpl implements FollowRepository {
   final DartNdkSource dartNdkSource;
-  final EventVerifier eventVerifier;
+  final EventVerifierRepository eventVerifier;
 
   FollowRepositoryImpl({
     required this.dartNdkSource,

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:camelus/domain_layer/usecases/follow.dart';
 
 import '../entities/nostr_note.dart';
@@ -46,7 +48,9 @@ class GetNotes {
     int? limit,
   }) async* {
     // get contacts of user
+    log("getting contacts...");
     final contactList = await _follow.getContactsSelf();
+    log("got contacts 🤼");
 
     yield* _noteRepository.getTextNotesByAuthors(
       authors: contactList.contacts,

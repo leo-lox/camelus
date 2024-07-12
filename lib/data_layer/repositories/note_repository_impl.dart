@@ -5,18 +5,19 @@ import 'package:camelus/data_layer/models/user_metadata_model.dart';
 import 'package:camelus/domain_layer/entities/nostr_note.dart';
 import 'package:camelus/domain_layer/entities/user_metadata.dart';
 import 'package:camelus/domain_layer/repositories/note_repository.dart';
-import 'package:dart_ndk/nips/nip01/event.dart' as ndk_event;
-import 'package:dart_ndk/nips/nip01/event_verifier.dart';
-import 'package:dart_ndk/nips/nip01/filter.dart';
-import 'package:dart_ndk/nips/nip01/metadata.dart' as ndk_metadata;
-import 'package:dart_ndk/nips/nip02/contact_list.dart' as ndk_contact_list;
+import 'package:dart_ndk/domain_layer/entities/filter.dart';
+import 'package:dart_ndk/domain_layer/entities/nip_01_event.dart' as ndk_event;
+import 'package:dart_ndk/domain_layer/repositories/event_verifier_repository.dart';
+
+import 'package:dart_ndk/domain_layer/entities/metadata.dart' as ndk_metadata;
+
 import 'package:dart_ndk/relay_jit_manager/request_jit.dart';
 
 import '../data_sources/dart_ndk_source.dart';
 
 class NoteRepositoryImpl implements NoteRepository {
   final DartNdkSource dartNdkSource;
-  final EventVerifier eventVerifier;
+  final EventVerifierRepository eventVerifier;
 
   NoteRepositoryImpl({
     required this.dartNdkSource,
@@ -97,13 +98,24 @@ class NoteRepositoryImpl implements NoteRepository {
       filters: [filter],
     );
     dartNdkSource.relayJitManager.handleRequest(request);
+
     final myStream = request.responseStream.map(
       (event) => NostrNoteModel.fromNDKEvent(event),
     );
-    // myStream.listen((event) {
-    //   log('NoteRepositoryImpl.getTextNotesByAuthors: $event');
-    // });
+
+    //final Stream<NostrNoteModel> myStream =
+    //    request.responseStream.asyncMap((ndk_event.Nip01Event event) async {
+    //  return await compute(_toNostrNote, event);
+    //});
+
+    myStream.listen((event) {
+      log('NoteRepositoryImpl.getTextNotesByAuthors: $event');
+    });
 
     return myStream.toList().asStream();
+  }
+
+  NostrNoteModel _toNostrNote(ndk_event.Nip01Event event) {
+    return NostrNoteModel.fromNDKEvent(event);
   }
 }
