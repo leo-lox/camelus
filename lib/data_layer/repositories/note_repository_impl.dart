@@ -78,7 +78,7 @@ class NoteRepositoryImpl implements NoteRepository {
   }
 
   @override
-  Stream<List<NostrNote>> getTextNotesByAuthors({
+  Stream<NostrNote> getTextNotesByAuthors({
     required List<String> authors,
     required String requestId,
     int? since,
@@ -108,11 +108,12 @@ class NoteRepositoryImpl implements NoteRepository {
     //  return await compute(_toNostrNote, event);
     //});
 
+    myStream.asBroadcastStream();
     myStream.listen((event) {
       log('NoteRepositoryImpl.getTextNotesByAuthors: $event');
     });
 
-    return myStream.toList().asStream();
+    return myStream;
   }
 
   NostrNoteModel _toNostrNote(ndk_event.Nip01Event event) {

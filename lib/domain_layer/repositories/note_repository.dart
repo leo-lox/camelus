@@ -8,7 +8,7 @@ abstract class NoteRepository {
 
   Stream<UserMetadata> getMetadataByPubkey(String pubkey);
 
-  Stream<List<NostrNote>> getTextNotesByAuthors({
+  Stream<NostrNote> getTextNotesByAuthors({
     required List<String> authors,
     required String requestId,
     int? since,

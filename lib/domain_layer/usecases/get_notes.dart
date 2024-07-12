@@ -52,13 +52,16 @@ class GetNotes {
     final contactList = await _follow.getContactsSelf();
     log("got contacts 🤼");
 
-    yield* _noteRepository.getTextNotesByAuthors(
-      authors: contactList.contacts,
-      requestId: requestId,
-      since: since,
-      until: until,
-      limit: limit,
-    );
+    yield* _noteRepository
+        .getTextNotesByAuthors(
+          authors: contactList.contacts,
+          requestId: requestId,
+          since: since,
+          until: until,
+          limit: limit,
+        )
+        .toList()
+        .asStream();
   }
 
   /// returns a stream of notes for a given npub (follows of that npub) with replies
