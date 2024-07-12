@@ -35,6 +35,18 @@ class NostrNoteModel extends NostrNote {
   }
 
   factory NostrNoteModel.fromNDKEvent(Nip01Event nip01event) {
+    // sanitize tags
+    final sanitizedTags = nip01event.tags.where((tags) {
+      // Assuming tags are in 'tags' key
+
+      if (tags == null) return false; // Or handle null tags differently
+
+      return tags is List && tags.isNotEmpty;
+    }).toList();
+
+    final myTags =
+        sanitizedTags.map((tag) => NostrTagModel.fromJson(tag)).toList();
+
     return NostrNoteModel(
       id: nip01event.id,
       pubkey: nip01event.pubKey,
@@ -42,7 +54,7 @@ class NostrNoteModel extends NostrNote {
       kind: nip01event.kind,
       content: nip01event.content,
       sig: nip01event.sig,
-      tags: nip01event.tags.map((tag) => NostrTagModel.fromJson(tag)).toList(),
+      tags: myTags,
       sig_valid: nip01event.validSig,
     );
   }

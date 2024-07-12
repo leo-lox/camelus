@@ -58,8 +58,9 @@ dependencies:
   flutter_cache_manager: ^3.3.0
   web_socket_channel: ^2.4.4
   http_parser: ^4.0.2
-  isar: ^3.1.0+1
-  isar_flutter_libs: ^3.1.0+1
+  #isar: ^3.1.0+1
+  #isar_flutter_libs: ^3.1.0+1
+  #isar_generator: ^3.1.0+1
   path_provider: ^2.1.1
   pointycastle: ^3.7.3
   encrypt: ^5.0.3
@@ -71,8 +72,8 @@ dependencies:
   dart_ndk: 
     path: ../dart_ndk
   package_info_plus: ^4.2.0
-  rust_lib_dart_ndk:
-    path: ../dart_ndk/rust_builder
+  #rust_lib_dart_ndk:
+  #  path: ../dart_ndk/rust_builder
   flutter_rust_bridge: 2.0.0
 
 dev_dependencies:
@@ -86,7 +87,7 @@ dev_dependencies:
 
   flutter_lints: ^3.0.1
 
-  isar_generator: ^3.1.0+1
+  
   #layerlens: ^1.0.17
 
 # For information on the generic Dart part of this file, see the
