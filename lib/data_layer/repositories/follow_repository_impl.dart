@@ -1,7 +1,7 @@
 import 'package:dart_ndk/relay_jit_manager/request_jit.dart';
 
 import 'package:dart_ndk/entities.dart' as ndk_entities;
-import 'package:dart_ndk/dart_ndk.dart';
+import 'package:dart_ndk/dart_ndk.dart' as dart_ndk;
 
 import '../../domain_layer/entities/contact_list.dart';
 import '../../domain_layer/repositories/follow_repository.dart';
@@ -10,7 +10,7 @@ import '../models/contact_list_model.dart';
 
 class FollowRepositoryImpl implements FollowRepository {
   final DartNdkSource dartNdkSource;
-  final EventVerifier eventVerifier;
+  final dart_ndk.EventVerifier eventVerifier;
 
   FollowRepositoryImpl({
     required this.dartNdkSource,
@@ -25,7 +25,7 @@ class FollowRepositoryImpl implements FollowRepository {
 
   @override
   Future<ContactList> getContacts(String npub) async {
-    Filter filter = Filter(
+    dart_ndk.Filter filter = dart_ndk.Filter(
       authors: [npub],
       kinds: [ndk_entities.ContactList.KIND],
     );
@@ -48,7 +48,7 @@ class FollowRepositoryImpl implements FollowRepository {
 
   @override
   Stream<ContactList> getContactsStream(String npub) {
-    Filter filter = Filter(
+    dart_ndk.Filter filter = dart_ndk.Filter(
       authors: [npub],
       kinds: [ndk_entities.ContactList.KIND],
     );
