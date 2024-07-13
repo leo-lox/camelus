@@ -1,15 +1,22 @@
 import 'dart:async';
 import 'dart:developer';
+import 'package:camelus/domain_layer/repositories/follow_repository.dart';
+import 'package:camelus/domain_layer/usecases/main_feed.dart';
 import 'package:camelus/presentation_layer/atoms/new_posts_available.dart';
 import 'package:camelus/presentation_layer/atoms/refresh_indicator_no_need.dart';
 import 'package:camelus/presentation_layer/components/note_card/note_card_container.dart';
 import 'package:camelus/config/palette.dart';
 import 'package:camelus/domain_layer/entities/nostr_note.dart';
+import 'package:camelus/presentation_layer/providers/following_provider.dart';
 import 'package:camelus/presentation_layer/providers/get_notes_provider.dart';
 import 'package:camelus/presentation_layer/providers/navigation_bar_provider.dart';
 import 'package:camelus/presentation_layer/scroll_controller/retainable_scroll_controller.dart';
+import 'package:dart_ndk/nostr.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:rxdart/rxdart.dart';
+
+import '../../../providers/main_feed_provider.dart';
 
 class UserFeedOriginalView extends ConsumerStatefulWidget {
   final String pubkey;
@@ -36,6 +43,10 @@ class _UserFeedOriginalViewState extends ConsumerState<UserFeedOriginalView> {
 
   NostrNote? _lastNoteInFeed;
 
+  // new #########
+  final List<NostrNote> timelineEvents = [];
+  late final Stream<List<NostrNote>> _eventStreamBuffer;
+
   void _setupScrollListener() {
     _scrollControllerFeed.addListener(() {
       if (_scrollControllerFeed.position.pixels ==
@@ -54,6 +65,26 @@ class _UserFeedOriginalViewState extends ConsumerState<UserFeedOriginalView> {
         // }
       }
     });
+  }
+
+  void _setupMainFeedListener() {
+    final mainFeedProvider = ref.read(getMainFeedProvider);
+    _eventStreamBuffer = mainFeedProvider.stream.bufferTime(const Duration(
+      milliseconds: 500,
+    ));
+
+    _eventStreamBuffer.listen((event) {
+      setState(() {
+        timelineEvents.addAll(event);
+        timelineEvents.sort((a, b) => b.created_at.compareTo(a.created_at));
+      });
+    });
+
+    mainFeedProvider.fetchFeedEvents(
+      npub: widget.pubkey,
+      requestId: "my-test",
+      limit: 10,
+    );
   }
 
   void _setupNewNotesListener() {
@@ -135,7 +166,8 @@ class _UserFeedOriginalViewState extends ConsumerState<UserFeedOriginalView> {
 
     _initUserFeed();
     _setupScrollListener();
-    _setupNewNotesListener();
+    _setupMainFeedListener();
+    //_setupNewNotesListener();
     _setupNavBarHomeListener();
 
     // reset home bar new notes count
@@ -183,55 +215,15 @@ class _UserFeedOriginalViewState extends ConsumerState<UserFeedOriginalView> {
                 onRefresh: () {
                   return Future.delayed(const Duration(milliseconds: 0));
                 },
-                child: StreamBuilder<List<NostrNote>>(
-                  stream: ref.read(getNotesProvider).getNpubFeed(
-                      npub: widget.pubkey,
-                      requestId: userFeedFreshId), // todo: stream
-
-                  builder: (BuildContext context,
-                      AsyncSnapshot<List<NostrNote>> snapshot) {
-                    if (snapshot.hasData) {
-                      var notes = snapshot.data!;
-
-                      if (notes.isEmpty) {
-                        return const Center(
-                          child: Text("no notes found",
-                              style: TextStyle(
-                                  fontSize: 20, color: Palette.white)),
-                        );
-                      }
-
-                      _lastNoteInFeed = notes.last;
-
-                      return CustomScrollView(
-                        physics: const BouncingScrollPhysics(),
-                        controller: _scrollControllerFeed,
-                        slivers: [
-                          SliverList(
-                            delegate: SliverChildBuilderDelegate(
-                              (context, index) {
-                                var note = notes[index];
-                                //_userFeedCheckForNewData(note); //todo: check if needed
-                                return NoteCardContainer(notes: [note]);
-                              },
-                              childCount: notes.length,
-                            ),
-                          ),
-                        ],
-                      );
-                    }
-                    if (snapshot.hasError) {
-                      return Center(
-                          //button
-                          child: ElevatedButton(
-                        onPressed: () {},
-                        child: Text(snapshot.error.toString(),
-                            style: const TextStyle(
-                                fontSize: 20, color: Colors.white)),
-                      ));
-                    }
-                    return const Text("waiting for stream trigger ",
-                        style: TextStyle(fontSize: 20));
+                child: ListView.builder(
+                  controller: _scrollControllerFeed,
+                  itemCount: timelineEvents.length,
+                  itemBuilder: (context, index) {
+                    final event = timelineEvents[index];
+                    return NoteCardContainer(
+                      key: ValueKey(event.id),
+                      notes: [event],
+                    );
                   },
                 ),
               ),
