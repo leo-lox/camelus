@@ -1,17 +1,13 @@
 import 'dart:async';
 import 'dart:developer';
-import 'package:camelus/domain_layer/repositories/follow_repository.dart';
-import 'package:camelus/domain_layer/usecases/main_feed.dart';
 import 'package:camelus/presentation_layer/atoms/new_posts_available.dart';
 import 'package:camelus/presentation_layer/atoms/refresh_indicator_no_need.dart';
 import 'package:camelus/presentation_layer/components/note_card/note_card_container.dart';
 import 'package:camelus/config/palette.dart';
 import 'package:camelus/domain_layer/entities/nostr_note.dart';
-import 'package:camelus/presentation_layer/providers/following_provider.dart';
 import 'package:camelus/presentation_layer/providers/get_notes_provider.dart';
 import 'package:camelus/presentation_layer/providers/navigation_bar_provider.dart';
 import 'package:camelus/presentation_layer/scroll_controller/retainable_scroll_controller.dart';
-import 'package:dart_ndk/nostr.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:rxdart/rxdart.dart';
@@ -30,7 +26,6 @@ class UserFeedOriginalView extends ConsumerStatefulWidget {
 
 class _UserFeedOriginalViewState extends ConsumerState<UserFeedOriginalView> {
   final List<StreamSubscription> _subscriptions = [];
-  late List<String> _followingPubkeys;
 
   final Completer<void> _servicesReady = Completer<void>();
 
@@ -38,14 +33,10 @@ class _UserFeedOriginalViewState extends ConsumerState<UserFeedOriginalView> {
       RetainableScrollController();
   bool _newPostsAvailable = false;
 
-  final String userFeedFreshId = "fresh";
-  final String userFeedTimelineFetchId = "timeline";
-
-  NostrNote? _lastNoteInFeed;
-
   // new #########
   final List<NostrNote> timelineEvents = [];
   late final Stream<List<NostrNote>> _eventStreamBuffer;
+  NostrNote get latestNote => timelineEvents.last;
 
   void _setupScrollListener() {
     _scrollControllerFeed.addListener(() {
@@ -53,7 +44,8 @@ class _UserFeedOriginalViewState extends ConsumerState<UserFeedOriginalView> {
           _scrollControllerFeed.position.maxScrollExtent) {
         log("reached end of scroll");
 
-        // todo: load more
+        final mainFeedProvider = ref.read(getMainFeedProvider);
+        mainFeedProvider.loadMore(latestNote.created_at);
       }
 
       if (_scrollControllerFeed.position.pixels < 100) {
@@ -68,6 +60,7 @@ class _UserFeedOriginalViewState extends ConsumerState<UserFeedOriginalView> {
   }
 
   void _setupMainFeedListener() {
+    /// buffers an integrates notes into feed
     final mainFeedProvider = ref.read(getMainFeedProvider);
     _eventStreamBuffer = mainFeedProvider.stream.bufferTime(const Duration(
       milliseconds: 500,
@@ -83,26 +76,22 @@ class _UserFeedOriginalViewState extends ConsumerState<UserFeedOriginalView> {
     mainFeedProvider.fetchFeedEvents(
       npub: widget.pubkey,
       requestId: "my-test",
-      limit: 10,
     );
   }
 
   void _setupNewNotesListener() {
-    final notesProvider = ref.read(getNotesProvider);
-    final now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
-    _subscriptions.add(
-      notesProvider
-          .getNpubFeed(
-              npub: widget.pubkey, requestId: "userFeedFreshId", since: now)
-          .listen((event) {
-        log("new notes stream event");
-        setState(() {
-          _newPostsAvailable = true;
-        });
-        // notify navigation bar
-        ref.read(navigationBarProvider).newNotesCount = event.length;
-      }),
-    );
+    final mainFeedProvider = ref.read(getMainFeedProvider);
+
+    mainFeedProvider.newNotesStream
+        .bufferTime(const Duration(seconds: 5))
+        .listen((event) {
+      log("new notes stream event");
+      setState(() {
+        _newPostsAvailable = true;
+      });
+      // notify navigation bar
+      ref.read(navigationBarProvider).newNotesCount = event.length;
+    });
   }
 
   void _setupNavBarHomeListener() {
@@ -115,6 +104,7 @@ class _UserFeedOriginalViewState extends ConsumerState<UserFeedOriginalView> {
   void _handleHomeBarTab() {
     if (_newPostsAvailable) {
       _integrateNewNotes();
+      return;
     }
     ref.watch(navigationBarProvider).resetNewNotesCount();
     // scroll to top
@@ -146,31 +136,16 @@ class _UserFeedOriginalViewState extends ConsumerState<UserFeedOriginalView> {
     // todo: first fetch
   }
 
-  void _userFeedLoadMore(int? until) async {
-    log("load more called");
-
-    if (_followingPubkeys.isEmpty) {
-      log("!!! no following users found !!!");
-      return;
-    }
-
-    int now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
-    // schould not be needed
-    int defaultUntil = now - 86400 * 1; // -1 day
-
-    // todo: stream more
-  }
-
   Future<void> _initSequence() async {
     _servicesReady.complete();
 
     _initUserFeed();
     _setupScrollListener();
     _setupMainFeedListener();
-    //_setupNewNotesListener();
+    _setupNewNotesListener();
+
     _setupNavBarHomeListener();
 
-    // reset home bar new notes count
     // todo: bug on first launch
     //ref.watch(navigationBarProvider).resetNewNotesCount();
   }

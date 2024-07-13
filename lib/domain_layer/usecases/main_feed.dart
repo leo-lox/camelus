@@ -16,11 +16,34 @@ class MainFeed {
   final NoteRepository _noteRepository;
   final Follow _follow;
 
-  StreamController<NostrNote> _controller = StreamController<NostrNote>();
+  final String userFeedFreshId = "fresh";
+  final String userFeedTimelineFetchId = "timeline";
 
+  // streams
+  final StreamController<NostrNote> _controller = StreamController<NostrNote>();
   Stream<NostrNote> get stream => _controller.stream;
 
+  final StreamController<NostrNote> _newNotesController =
+      StreamController<NostrNote>();
+  Stream<NostrNote> get newNotesStream => _newNotesController.stream;
+
   MainFeed(this._noteRepository, this._follow);
+
+  Future<void> subscribeToFreshNotes({
+    required String npub,
+  }) async {
+    final contactList = await _follow.getContactsSelf();
+
+    final now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
+    final newNotesStream = _noteRepository.getTextNotesByAuthors(
+      authors: contactList.contacts,
+      requestId: userFeedFreshId,
+      since: now,
+    );
+  }
+
+  /// load later timelineevents then
+  void loadMore(int oltherThen) {}
 
   void fetchFeedEvents({
     required String npub,
@@ -28,6 +51,7 @@ class MainFeed {
     int? since,
     int? until,
     int? limit,
+    List<String>? eTags,
   }) async {
     // get contacts of user
 
@@ -39,6 +63,7 @@ class MainFeed {
       since: since,
       until: until,
       limit: limit,
+      eTags: eTags,
     );
 
     _controller.addStream(mynotesStream);

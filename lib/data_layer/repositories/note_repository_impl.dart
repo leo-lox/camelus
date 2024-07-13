@@ -82,6 +82,7 @@ class NoteRepositoryImpl implements NoteRepository {
     int? since,
     int? until,
     int? limit,
+    List<String>? eTags,
   }) {
     Filter filter = Filter(
       authors: authors,
@@ -89,6 +90,7 @@ class NoteRepositoryImpl implements NoteRepository {
       since: since,
       until: until,
       limit: limit,
+      eTags: eTags,
     );
     NostrRequestJit request = NostrRequestJit.subscription(
       requestId,

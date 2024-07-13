@@ -14,5 +14,6 @@ abstract class NoteRepository {
     int? since,
     int? until,
     int? limit,
+    List<String>? eTags,
   });
 }
