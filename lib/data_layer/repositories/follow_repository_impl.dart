@@ -1,7 +1,7 @@
-import 'package:dart_ndk/domain_layer/entities/filter.dart';
-import 'package:dart_ndk/domain_layer/repositories/event_verifier_repository.dart';
 import 'package:dart_ndk/relay_jit_manager/request_jit.dart';
-import 'package:dart_ndk/domain_layer/entities/contact_list.dart' as ndk_nip02;
+
+import 'package:dart_ndk/entities.dart' as ndk_entities;
+import 'package:dart_ndk/dart_ndk.dart';
 
 import '../../domain_layer/entities/contact_list.dart';
 import '../../domain_layer/repositories/follow_repository.dart';
@@ -10,7 +10,7 @@ import '../models/contact_list_model.dart';
 
 class FollowRepositoryImpl implements FollowRepository {
   final DartNdkSource dartNdkSource;
-  final EventVerifierRepository eventVerifier;
+  final EventVerifier eventVerifier;
 
   FollowRepositoryImpl({
     required this.dartNdkSource,
@@ -27,7 +27,7 @@ class FollowRepositoryImpl implements FollowRepository {
   Future<ContactList> getContacts(String npub) async {
     Filter filter = Filter(
       authors: [npub],
-      kinds: [ndk_nip02.ContactList.KIND],
+      kinds: [ndk_entities.ContactList.KIND],
     );
     NostrRequestJit request = NostrRequestJit.query(
       'get_contacts',
@@ -40,7 +40,8 @@ class FollowRepositoryImpl implements FollowRepository {
 
     responseList.sort((a, b) => a.createdAt.compareTo(b.createdAt));
 
-    final ndkContactList = ndk_nip02.ContactList.fromEvent(responseList.first);
+    final ndkContactList =
+        ndk_entities.ContactList.fromEvent(responseList.first);
 
     return ContactListModel.fromNdk(ndkContactList);
   }
@@ -49,7 +50,7 @@ class FollowRepositoryImpl implements FollowRepository {
   Stream<ContactList> getContactsStream(String npub) {
     Filter filter = Filter(
       authors: [npub],
-      kinds: [ndk_nip02.ContactList.KIND],
+      kinds: [ndk_entities.ContactList.KIND],
     );
     NostrRequestJit request = NostrRequestJit.subscription(
       'get_contacts_stream',
@@ -75,7 +76,7 @@ class FollowRepositoryImpl implements FollowRepository {
       return isOlder;
     }).map((event) {
       // Convert the event to a ndk_nip02.ContactList object.
-      final ndkContactList = ndk_nip02.ContactList.fromEvent(event);
+      final ndkContactList = ndk_entities.ContactList.fromEvent(event);
       // Convert the ndk_nip02.ContactList object to a ContactListModel object.
       return ContactListModel.fromNdk(ndkContactList);
     });

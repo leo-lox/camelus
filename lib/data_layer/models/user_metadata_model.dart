@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'package:dart_ndk/domain_layer/entities/nip_01_event.dart';
+import 'package:dart_ndk/entities.dart';
 
 import '../../domain_layer/entities/user_metadata.dart';
 

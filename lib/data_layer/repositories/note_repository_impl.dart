@@ -5,11 +5,9 @@ import 'package:camelus/data_layer/models/user_metadata_model.dart';
 import 'package:camelus/domain_layer/entities/nostr_note.dart';
 import 'package:camelus/domain_layer/entities/user_metadata.dart';
 import 'package:camelus/domain_layer/repositories/note_repository.dart';
-import 'package:dart_ndk/domain_layer/entities/filter.dart';
-import 'package:dart_ndk/domain_layer/entities/nip_01_event.dart' as ndk_event;
-import 'package:dart_ndk/domain_layer/repositories/event_verifier_repository.dart';
 
-import 'package:dart_ndk/domain_layer/entities/metadata.dart' as ndk_metadata;
+import 'package:dart_ndk/entities.dart' as ndk_entities;
+import 'package:dart_ndk/dart_ndk.dart';
 
 import 'package:dart_ndk/relay_jit_manager/request_jit.dart';
 
@@ -17,7 +15,7 @@ import '../data_sources/dart_ndk_source.dart';
 
 class NoteRepositoryImpl implements NoteRepository {
   final DartNdkSource dartNdkSource;
-  final EventVerifierRepository eventVerifier;
+  final EventVerifier eventVerifier;
 
   NoteRepositoryImpl({
     required this.dartNdkSource,
@@ -28,7 +26,7 @@ class NoteRepositoryImpl implements NoteRepository {
   Stream<NostrNote> getAllNotes() {
     Filter filter = Filter(
       authors: [],
-      kinds: [ndk_event.Nip01Event.TEXT_NODE_KIND],
+      kinds: [ndk_entities.Nip01Event.TEXT_NODE_KIND],
     );
     NostrRequestJit request = NostrRequestJit.query(
       'allNotes',
@@ -45,7 +43,7 @@ class NoteRepositoryImpl implements NoteRepository {
   Stream<UserMetadata> getMetadataByPubkey(String pubkey) {
     Filter filter = Filter(
       authors: [pubkey],
-      kinds: [ndk_metadata.Metadata.KIND],
+      kinds: [ndk_entities.Metadata.KIND],
     );
     NostrRequestJit request = NostrRequestJit.query(
       'getMetadataByPubkey',
@@ -64,7 +62,7 @@ class NoteRepositoryImpl implements NoteRepository {
   Stream<NostrNote> getTextNote(String noteId) {
     Filter filter = Filter(
       ids: [noteId],
-      kinds: [ndk_event.Nip01Event.TEXT_NODE_KIND],
+      kinds: [ndk_entities.Nip01Event.TEXT_NODE_KIND],
     );
     NostrRequestJit request = NostrRequestJit.query(
       'getNote',
@@ -87,7 +85,7 @@ class NoteRepositoryImpl implements NoteRepository {
   }) {
     Filter filter = Filter(
       authors: authors,
-      kinds: [ndk_event.Nip01Event.TEXT_NODE_KIND],
+      kinds: [ndk_entities.Nip01Event.TEXT_NODE_KIND],
       since: since,
       until: until,
       limit: limit,
@@ -116,7 +114,7 @@ class NoteRepositoryImpl implements NoteRepository {
     return myStream;
   }
 
-  NostrNoteModel _toNostrNote(ndk_event.Nip01Event event) {
+  NostrNoteModel _toNostrNote(ndk_entities.Nip01Event event) {
     return NostrNoteModel.fromNDKEvent(event);
   }
 }

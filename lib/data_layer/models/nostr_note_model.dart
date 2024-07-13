@@ -1,4 +1,4 @@
-import 'package:dart_ndk/domain_layer/entities/nip_01_event.dart';
+import 'package:dart_ndk/entities.dart';
 
 import '../../domain_layer/entities/nostr_note.dart';
 import 'nostr_tag_model.dart';

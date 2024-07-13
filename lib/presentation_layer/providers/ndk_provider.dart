@@ -1,5 +1,4 @@
-import 'package:dart_ndk/data_layer/repositories/cache_manager/mem_cache_manager.dart';
-import 'package:dart_ndk/domain_layer/usecases/relay_jit_manager.dart';
+import 'package:dart_ndk/dart_ndk.dart';
 import 'package:riverpod/riverpod.dart';
 
 final ndkProvider = Provider<RelayJitManager>((ref) {
@@ -13,7 +12,7 @@ final ndkProvider = Provider<RelayJitManager>((ref) {
       "wss://offchain.pub",
       "wss://relay.mostr.pub"
     ],
-    cacheManager: MemCacheManagerRepositoryImpl(),
+    cacheManager: MemCacheManager(),
   );
   return ndk;
 });
