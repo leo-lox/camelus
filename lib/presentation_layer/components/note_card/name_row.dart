@@ -8,7 +8,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 class NoteCardNameRow extends ConsumerStatefulWidget {
-  final Stream<UserMetadata?> myMetadata;
+  final UserMetadata? myMetadata;
   final String pubkey;
   final int created_at;
   final Function openMore;
@@ -62,52 +62,33 @@ class _NoteCardNameRowState extends ConsumerState<NoteCardNameRow> {
         //mainAxisAlignment: MainAxisAlignment.end,
         //crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          StreamBuilder<UserMetadata?>(
-              stream: widget.myMetadata,
-              builder: (BuildContext context,
-                  AsyncSnapshot<UserMetadata?> snapshot) {
-                var name = "";
-
-                if (snapshot.hasData) {
-                  name = snapshot.data?.name ?? npubHrShort;
-                  if (snapshot.data?.nip05 != null) {
-                    _checkNip05(snapshot.data!.nip05!, widget.pubkey);
-                  }
-                } else if (snapshot.hasError) {
-                  name = "error";
-                } else {
-                  name = snapshot.data?.name ?? npubHrShort;
-                }
-
-                return Row(
-                  children: [
-                    Container(
-                      constraints:
-                          const BoxConstraints(minWidth: 5, maxWidth: 150),
-                      child: RichText(
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        text: TextSpan(
-                          text: name,
-                          style: const TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 17),
-                        ),
-                      ),
-                    ),
-                    if (nip05verified.isNotEmpty)
-                      Container(
-                        margin: const EdgeInsets.only(top: 0, left: 5),
-                        child: const Icon(
-                          Icons.verified,
-                          color: Palette.white,
-                          size: 15,
-                        ),
-                      ),
-                  ],
-                );
-              }),
+          Row(
+            children: [
+              Container(
+                constraints: const BoxConstraints(minWidth: 5, maxWidth: 150),
+                child: RichText(
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  text: TextSpan(
+                    text: widget.myMetadata?.name,
+                    style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 17),
+                  ),
+                ),
+              ),
+              if (nip05verified.isNotEmpty)
+                Container(
+                  margin: const EdgeInsets.only(top: 0, left: 5),
+                  child: const Icon(
+                    Icons.verified,
+                    color: Palette.white,
+                    size: 15,
+                  ),
+                ),
+            ],
+          ),
           const SizedBox(width: 10),
           Container(
             height: 3,

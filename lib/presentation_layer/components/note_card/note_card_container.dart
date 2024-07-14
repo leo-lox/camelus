@@ -139,6 +139,7 @@ class _NoteCardContainerState extends ConsumerState<NoteCardContainer> {
                     //color: Palette.purple,
                     child: NoteCard(
                       note: note,
+                      myMetadata: null,
                       key: ValueKey('note-${note.id}'),
                     ),
                   ),

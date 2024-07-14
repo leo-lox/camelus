@@ -51,7 +51,8 @@ class NoteRepositoryImpl implements NoteRepository {
       filters: [filter],
     );
 
-    dartNdkSource.relayJitManager.handleRequest(request);
+    log("DEBUG: getMetadataByPubkey: $pubkey");
+    //dartNdkSource.relayJitManager.handleRequest(request);
 
     return request.responseStream.map(
       (event) => UserMetadataModel.fromNDKEvent(event),

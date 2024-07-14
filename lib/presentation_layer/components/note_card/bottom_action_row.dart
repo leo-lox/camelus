@@ -21,7 +21,7 @@ class BottomActionRow extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        InkWell(
+        GestureDetector(
           onTap: () => onComment(),
           child: Container(
             padding:

@@ -12,6 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:rxdart/rxdart.dart';
 
+import '../../../components/note_card/note_card.dart';
 import '../../../providers/main_feed_provider.dart';
 
 class UserFeedOriginalView extends ConsumerStatefulWidget {
@@ -76,6 +77,7 @@ class _UserFeedOriginalViewState extends ConsumerState<UserFeedOriginalView> {
     mainFeedProvider.fetchFeedEvents(
       npub: widget.pubkey,
       requestId: "my-test",
+      limit: 10,
     );
   }
 
@@ -195,6 +197,7 @@ class _UserFeedOriginalViewState extends ConsumerState<UserFeedOriginalView> {
                   itemCount: timelineEvents.length,
                   itemBuilder: (context, index) {
                     final event = timelineEvents[index];
+
                     return NoteCardContainer(
                       key: ValueKey(event.id),
                       notes: [event],

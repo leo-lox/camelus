@@ -118,6 +118,7 @@ class _NoteCardReferenceState extends ConsumerState<NoteCardReference> {
                       ),
                       child: NoteCard(
                         note: note,
+                        myMetadata: null,
                         key: key,
                         hideBottomBar: true,
                       )));

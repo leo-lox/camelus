@@ -12,54 +12,36 @@ import 'package:camelus/presentation_layer/components/write_post.dart';
 import 'package:camelus/config/palette.dart';
 import 'package:camelus/domain_layer/entities/nostr_note.dart';
 import 'package:camelus/data_layer/models/post_context.dart';
-import 'package:camelus/presentation_layer/providers/metadata_provider.dart';
 import 'package:flutter/material.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-class NoteCard extends ConsumerStatefulWidget {
+class NoteCard extends StatelessWidget {
   final NostrNote note;
+  final UserMetadata? myMetadata;
   final bool hideBottomBar;
 
   const NoteCard({
     super.key,
     required this.note,
+    required this.myMetadata,
     this.hideBottomBar = false,
   });
 
   @override
-  ConsumerState<NoteCard> createState() => _NoteCardState();
-}
-
-class _NoteCardState extends ConsumerState<NoteCard> {
-  _openProfile(String pubkey) {
-    Navigator.pushNamed(context, "/nostr/profile", arguments: pubkey);
-  }
-
-  _openHashtag(String hashtag) {
-    Navigator.pushNamed(context, "/nostr/hastag", arguments: hashtag);
-  }
-
-  late final GetUserMetadata metadata;
-
-  @override
-  void initState() {
-    super.initState();
-    metadata = ref.read(metadataProvider);
-  }
-
-  @override
-  void didUpdateWidget(covariant NoteCard oldWidget) {
-    super.didUpdateWidget(oldWidget);
-  }
-
-  @override
   Widget build(BuildContext context) {
-    if (widget.note.pubkey == 'missing') {
+    _openProfile(String pubkey) {
+      Navigator.pushNamed(context, "/nostr/profile", arguments: pubkey);
+    }
+
+    _openHashtag(String hashtag) {
+      Navigator.pushNamed(context, "/nostr/hastag", arguments: hashtag);
+    }
+
+    if (note.pubkey == 'missing') {
       return SizedBox(
         height: 50,
         child: Center(
           child: Text(
-            "Missing note:  ${widget.note.getDirectReply?.recommended_relay},  ${widget.note.getRootReply?.recommended_relay}",
+            "Missing note:  ${note.getDirectReply?.recommended_relay},  ${note.getRootReply?.recommended_relay}",
             style: const TextStyle(color: Colors.purple, fontSize: 20),
           ),
         ),
@@ -67,9 +49,8 @@ class _NoteCardState extends ConsumerState<NoteCard> {
     }
 
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        if (widget.note.sig_valid != true)
+        if (note.sig_valid != true)
           Center(
             child: Container(
               decoration: const BoxDecoration(
@@ -85,96 +66,74 @@ class _NoteCardState extends ConsumerState<NoteCard> {
           ),
         Padding(
           padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
-          child: Column(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.pushNamed(context, "/nostr/profile",
-                          arguments: widget.note.pubkey);
-                    },
-                    child: StreamBuilder<UserMetadata?>(
-                        stream:
-                            metadata.getMetadataByPubkey(widget.note.pubkey),
-                        //initialData: metadata
-                        //    .getMetadataByPubkeyInitial(widget.note.pubkey),
-                        builder:
-                            (context, AsyncSnapshot<UserMetadata?> snapshot) {
-                          if (snapshot.hasData) {
-                            return UserImage(
-                              imageUrl: snapshot.data?.picture,
-                              pubkey: widget.note.pubkey,
-                            );
-                          } else if (snapshot.hasError) {
-                            return Text('Error: ${snapshot.error}');
-                          } else {
-                            return UserImage(
-                              imageUrl: null,
-                              pubkey: widget.note.pubkey,
-                            );
-                          }
-                        }),
-                  ),
-                  Expanded(
-                    // click container
-                    child: Container(
-                      margin: const EdgeInsets.only(left: 5, right: 10),
-                      color: Palette.background,
-                      child: Padding(
-                        padding: const EdgeInsets.only(left: 10.0),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            NoteCardNameRow(
-                              created_at: widget.note.created_at,
-                              myMetadata: metadata
-                                  .getMetadataByPubkey(widget.note.pubkey),
-                              pubkey: widget.note.pubkey,
-                              openMore: () =>
-                                  openBottomSheetMore(context, widget.note),
-                            ),
-
-                            const SizedBox(height: 10),
-                            NoteCardSplitContent(
-                              note: widget.note,
-                              profileCallback: _openProfile,
-                              hashtagCallback: _openHashtag,
-                            ),
-
-                            const SizedBox(height: 6),
-
-                            if (!widget.hideBottomBar)
-                              Padding(
-                                padding: const EdgeInsets.only(top: 10.0),
-                                child: BottomActionRow(
-                                  onComment: () {
-                                    _writeReply(context, widget.note);
-                                  },
-                                  onLike: () {},
-                                  onRetweet: () {},
-                                  onShare: () {
-                                    openBottomSheetShare(context, widget.note);
-                                  },
-                                ),
-                              ),
-                            const SizedBox(height: 20),
-                            // show text if replies > 0
-                          ],
-                        ),
+              GestureDetector(
+                onTap: () {
+                  Navigator.pushNamed(context, "/nostr/profile",
+                      arguments: note.pubkey);
+                },
+                child: UserImage(
+                  imageUrl: myMetadata?.picture,
+                  pubkey: note.pubkey,
+                ),
+              ),
+              Container(
+                width: MediaQuery.of(context).size.width - 95,
+                margin: const EdgeInsets.only(left: 5, right: 10),
+                color: Palette.background,
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 10.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      NoteCardNameRow(
+                        created_at: note.created_at,
+                        myMetadata: myMetadata,
+                        pubkey: note.pubkey,
+                        openMore: () => openBottomSheetMore(context, note),
                       ),
-                    ),
+
+                      const SizedBox(height: 10),
+
+                      LayoutBuilder(builder: (context, constraints) {
+                        return NoteCardSplitContent(
+                          note: note,
+                          profileCallback: _openProfile,
+                          hashtagCallback: _openHashtag,
+                        );
+                      }),
+
+                      const SizedBox(height: 6),
+
+                      if (!hideBottomBar)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 10.0),
+                          child: BottomActionRow(
+                            key: ValueKey("${note.id}bottom_action_row"),
+                            onComment: () {
+                              _writeReply(context, note);
+                            },
+                            onLike: () {},
+                            onRetweet: () {},
+                            onShare: () {
+                              openBottomSheetShare(context, note);
+                            },
+                          ),
+                        ),
+                      const SizedBox(height: 20),
+                      // show text if replies > 0
+                    ],
                   ),
-                ],
+                ),
               ),
             ],
           ),
         ),
-        if (!widget.hideBottomBar)
+        if (!hideBottomBar)
           const Divider(
             thickness: 0.3,
             color: Palette.darkGray,
