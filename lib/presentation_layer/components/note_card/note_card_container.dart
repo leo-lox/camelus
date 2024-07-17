@@ -132,6 +132,7 @@ class _NoteCardContainerState extends ConsumerState<NoteCardContainer> {
                 if (note.getTagEvents.isNotEmpty)
                   // for myNote.getTagPubkeys
                   InReplyTo(
+                    key: ValueKey('in-reply-to-${note.id}'),
                     myNote: note,
                     metadata: metadata,
                   ),
