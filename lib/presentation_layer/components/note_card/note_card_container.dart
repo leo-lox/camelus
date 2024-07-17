@@ -9,6 +9,8 @@ import 'package:camelus/presentation_layer/providers/metadata_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
+import 'in_reply_to.dart';
+
 /// this is a container for the note cards
 /// its purpose is to hold connected notes (mostly replies) and paint connections between them
 /// it also handles the logic on what to show => button to show more replies, etc
@@ -129,19 +131,19 @@ class _NoteCardContainerState extends ConsumerState<NoteCardContainer> {
                 // check if reply
                 if (note.getTagEvents.isNotEmpty)
                   // for myNote.getTagPubkeys
-                  _buildInReplyTo(note, metadata, context, i, widget.notes),
+                  InReplyTo(
+                    myNote: note,
+                    metadata: metadata,
+                  ),
 
                 GestureDetector(
                   onTap: () {
                     _onNoteTab(context, note);
                   },
-                  child: Container(
-                    //color: Palette.purple,
-                    child: NoteCard(
-                      note: note,
-                      myMetadata: null,
-                      key: ValueKey('note-${note.id}'),
-                    ),
+                  child: NoteCard(
+                    note: note,
+                    myMetadata: null,
+                    key: ValueKey('note-${note.id}'),
                   ),
                 ),
               ],
@@ -152,64 +154,4 @@ class _NoteCardContainerState extends ConsumerState<NoteCardContainer> {
     }
     return widgets;
   }
-
-  Row _buildInReplyTo(NostrNote myNote, GetUserMetadata metadata,
-      BuildContext context, int index, List<NostrNote> notes) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        if (index != 0) SizedBox(width: notes.length > 1 ? 70 : 30),
-        if (index == 0) const SizedBox(width: 30),
-        const Text(
-          "reply to ",
-          style: TextStyle(fontSize: 16, color: Palette.gray),
-        ),
-        if (myNote.getTagPubkeys.length < 3)
-          ...myNote.getTagPubkeys.map(
-            (tag) => linkedUsername(tag.value, metadata, context),
-          ),
-        if (myNote.getTagPubkeys.length > 2)
-          Expanded(
-            child: Wrap(
-              children: [
-                linkedUsername(
-                    myNote.getTagPubkeys[0].value, metadata, context),
-                linkedUsername(
-                    myNote.getTagPubkeys[1].value, metadata, context),
-                Text(
-                  " and ${myNote.getTagPubkeys.length - 2} ${myNote.getTagPubkeys.length > 3 ? 'others' : 'other'}",
-                  style: const TextStyle(fontSize: 16, color: Palette.gray),
-                )
-              ],
-            ),
-          ),
-      ],
-    );
-  }
-}
-
-Widget linkedUsername(
-    String pubkey, GetUserMetadata metadata, BuildContext context) {
-  return GestureDetector(
-    onTap: () {
-      Navigator.pushNamed(context, "/nostr/profile", arguments: pubkey);
-    },
-    child: StreamBuilder(
-      builder: (context, AsyncSnapshot<UserMetadata?> snapshot) {
-        var pubkeyBech = Helpers().encodeBech32(pubkey, "npub");
-        var pubkeyHr =
-            "${pubkeyBech.substring(0, 4)}:${pubkeyBech.substring(pubkeyBech.length - 5)}";
-        if (snapshot.hasData) {
-          return Text('@${snapshot.data?.name ?? pubkeyHr} ',
-              style: const TextStyle(
-                  color: Palette.primary, fontSize: 16, height: 1.3));
-        } else {
-          return Text(pubkeyHr,
-              style: const TextStyle(
-                  color: Palette.primary, fontSize: 16, height: 1.3));
-        }
-      },
-      stream: metadata.getMetadataByPubkey(pubkey),
-    ),
-  );
 }
