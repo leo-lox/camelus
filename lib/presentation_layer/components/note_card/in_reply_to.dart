@@ -62,7 +62,7 @@ class _InReplyToState extends ConsumerState<InReplyTo> {
     if (pubkeyFirst.isEmpty) return;
     final firstFuture = metadata.getMetadataByPubkey(pubkeyFirst).toList();
     firstFuture.then((value) => {
-          valueFirst = value[0].name ?? valueFirst,
+          if (value.isNotEmpty) {valueFirst = value[0].name ?? valueFirst},
           setState(() {
             valueFirst = valueFirst;
           })
@@ -71,7 +71,7 @@ class _InReplyToState extends ConsumerState<InReplyTo> {
     if (pubkeySecond.isEmpty) return;
     final secondFuture = metadata.getMetadataByPubkey(pubkeySecond).toList();
     secondFuture.then((value) => {
-          valueSecond = value[0].name ?? valueSecond,
+          if (value.isNotEmpty) {valueSecond = value[0].name ?? valueSecond},
           setState(() {
             valueSecond = valueSecond;
           })
