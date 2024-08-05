@@ -1,4 +1,4 @@
-import 'package:dart_ndk/relay_jit_manager/request_jit.dart';
+import 'package:dart_ndk/presentation_layer/ndk_request.dart';
 
 import 'package:dart_ndk/entities.dart' as ndk_entities;
 import 'package:dart_ndk/dart_ndk.dart' as dart_ndk;
@@ -29,14 +29,14 @@ class FollowRepositoryImpl implements FollowRepository {
       authors: [npub],
       kinds: [ndk_entities.ContactList.KIND],
     );
-    NostrRequestJit request = NostrRequestJit.query(
+    NdkRequest request = NdkRequest.query(
       'get_contacts',
-      eventVerifier: eventVerifier,
       filters: [filter],
     );
-    dartNdkSource.relayJitManager.handleRequest(request);
 
-    final responseList = await request.responseList;
+    final response = dartNdkSource.dartNdk.requestNostrEvent(request);
+
+    final responseList = await response.stream.toList();
 
     responseList.sort((a, b) => a.createdAt.compareTo(b.createdAt));
 
@@ -52,15 +52,15 @@ class FollowRepositoryImpl implements FollowRepository {
       authors: [npub],
       kinds: [ndk_entities.ContactList.KIND],
     );
-    NostrRequestJit request = NostrRequestJit.subscription(
+    NdkRequest request = NdkRequest.subscription(
       'get_contacts_stream',
-      eventVerifier: eventVerifier,
       filters: [filter],
     );
-    dartNdkSource.relayJitManager.handleRequest(request);
+
+    final response = dartNdkSource.dartNdk.requestNostrEvent(request);
 
     var lastReceived = 0;
-    final contactListStream = request.responseStream.where((event) {
+    final contactListStream = response.stream.where((event) {
       // Extract the timestamp from the event.
       final eventTimestamp = event.createdAt;
 

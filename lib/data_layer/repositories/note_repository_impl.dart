@@ -9,8 +9,6 @@ import 'package:camelus/domain_layer/repositories/note_repository.dart';
 import 'package:dart_ndk/entities.dart' as ndk_entities;
 import 'package:dart_ndk/dart_ndk.dart';
 
-import 'package:dart_ndk/relay_jit_manager/request_jit.dart';
-
 import '../data_sources/dart_ndk_source.dart';
 
 class NoteRepositoryImpl implements NoteRepository {
@@ -28,13 +26,14 @@ class NoteRepositoryImpl implements NoteRepository {
       authors: [],
       kinds: [ndk_entities.Nip01Event.TEXT_NODE_KIND],
     );
-    NostrRequestJit request = NostrRequestJit.query(
+
+    NdkRequest request = NdkRequest.query(
       'allNotes',
-      eventVerifier: eventVerifier,
       filters: [filter],
     );
-    dartNdkSource.relayJitManager.handleRequest(request);
-    return request.responseStream.map(
+    final response = dartNdkSource.dartNdk.requestNostrEvent(request);
+
+    return response.stream.map(
       (event) => NostrNoteModel.fromNDKEvent(event),
     );
   }
@@ -45,16 +44,19 @@ class NoteRepositoryImpl implements NoteRepository {
       authors: [pubkey],
       kinds: [ndk_entities.Metadata.KIND],
     );
-    NostrRequestJit request = NostrRequestJit.query(
+    NdkRequest request = NdkRequest.query(
       'getMetadataByPubkey',
-      eventVerifier: eventVerifier,
       filters: [filter],
     );
 
     log("DEBUG: getMetadataByPubkey: $pubkey");
-    //dartNdkSource.relayJitManager.handleRequest(request);
 
-    return request.responseStream.map(
+    //! disabled
+    return Stream.empty();
+
+    final response = dartNdkSource.dartNdk.requestNostrEvent(request);
+
+    return response.stream.map(
       (event) => UserMetadataModel.fromNDKEvent(event),
     );
   }
@@ -65,13 +67,13 @@ class NoteRepositoryImpl implements NoteRepository {
       ids: [noteId],
       kinds: [ndk_entities.Nip01Event.TEXT_NODE_KIND],
     );
-    NostrRequestJit request = NostrRequestJit.query(
+    NdkRequest request = NdkRequest.query(
       'getNote',
-      eventVerifier: eventVerifier,
       filters: [filter],
     );
-    dartNdkSource.relayJitManager.handleRequest(request);
-    return request.responseStream.map(
+    final response = dartNdkSource.dartNdk.requestNostrEvent(request);
+
+    return response.stream.map(
       (event) => NostrNoteModel.fromNDKEvent(event),
     );
   }
@@ -93,31 +95,16 @@ class NoteRepositoryImpl implements NoteRepository {
       limit: limit,
       eTags: eTags,
     );
-    NostrRequestJit request = NostrRequestJit.subscription(
+
+    NdkRequest request = NdkRequest.subscription(
       requestId,
-      eventVerifier: eventVerifier,
       filters: [filter],
     );
-    dartNdkSource.relayJitManager.handleRequest(request);
 
-    final myStream = request.responseStream.map(
+    final response = dartNdkSource.dartNdk.requestNostrEvent(request);
+
+    return response.stream.map(
       (event) => NostrNoteModel.fromNDKEvent(event),
     );
-
-    //final Stream<NostrNoteModel> myStream =
-    //    request.responseStream.asyncMap((ndk_event.Nip01Event event) async {
-    //  return await compute(_toNostrNote, event);
-    //});
-
-    myStream.asBroadcastStream();
-    myStream.listen((event) {
-      log('NoteRepositoryImpl.getTextNotesByAuthors: $event');
-    });
-
-    return myStream;
-  }
-
-  NostrNoteModel _toNostrNote(ndk_entities.Nip01Event event) {
-    return NostrNoteModel.fromNDKEvent(event);
   }
 }

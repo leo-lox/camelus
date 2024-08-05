@@ -1,7 +1,7 @@
 import 'package:dart_ndk/dart_ndk.dart';
 
 class DartNdkSource {
-  final RelayJitManager relayJitManager;
+  final OurApi dartNdk;
 
-  DartNdkSource(this.relayJitManager);
+  DartNdkSource(this.dartNdk);
 }
