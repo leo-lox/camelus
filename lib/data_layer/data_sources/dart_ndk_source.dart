@@ -1,7 +1,7 @@
-import 'package:dart_ndk/dart_ndk.dart';
+import 'package:ndk/ndk.dart';
 
 class DartNdkSource {
-  final OurApi dartNdk;
+  final Ndk dartNdk;
 
   DartNdkSource(this.dartNdk);
 }

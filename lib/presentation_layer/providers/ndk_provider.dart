@@ -1,7 +1,7 @@
-import 'package:dart_ndk/dart_ndk.dart';
+import 'package:ndk/ndk.dart';
 import 'package:riverpod/riverpod.dart';
 
-final ndkProvider = Provider<OurApi>((ref) {
+final ndkProvider = Provider<Ndk>((ref) {
   final EventSigner eventSigner = Bip340EventSigner("privateKey", "publicKey");
   final EventVerifier eventVerifier = Bip340EventVerifier();
 
@@ -13,6 +13,6 @@ final ndkProvider = Provider<OurApi>((ref) {
     eventVerifier: eventVerifier,
   );
 
-  final ndk = OurApi(ndkConfig);
+  final ndk = Ndk(ndkConfig);
   return ndk;
 });

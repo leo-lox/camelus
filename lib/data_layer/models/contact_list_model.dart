@@ -1,5 +1,5 @@
 import 'package:camelus/domain_layer/entities/contact_list.dart';
-import 'package:dart_ndk/entities.dart' as ndk_entities;
+import 'package:ndk/entities.dart' as ndk_entities;
 
 class ContactListModel extends ContactList {
   ContactListModel({

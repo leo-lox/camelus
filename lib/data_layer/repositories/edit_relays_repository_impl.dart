@@ -1,4 +1,4 @@
-import 'package:dart_ndk/dart_ndk.dart';
+import 'package:ndk/ndk.dart';
 
 import '../../domain_layer/entities/relay.dart';
 import '../../domain_layer/repositories/edit_relays_repository.dart';

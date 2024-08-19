@@ -1,5 +1,5 @@
-import 'package:dart_ndk/dart_ndk.dart';
-import 'package:dart_ndk/entities.dart' as ndk_entities;
+import 'package:ndk/ndk.dart';
+import 'package:ndk/entities.dart' as ndk_entities;
 import 'package:riverpod/riverpod.dart';
 
 final eventVerifierProvider = Provider<EventVerifier>((ref) {

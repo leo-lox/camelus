@@ -1,4 +1,4 @@
-import 'package:dart_ndk/entities.dart';
+import 'package:ndk/entities.dart';
 
 import '../../domain_layer/entities/nostr_note.dart';
 import 'nostr_tag_model.dart';

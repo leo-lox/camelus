@@ -6,8 +6,8 @@ import 'package:camelus/domain_layer/entities/nostr_note.dart';
 import 'package:camelus/domain_layer/entities/user_metadata.dart';
 import 'package:camelus/domain_layer/repositories/note_repository.dart';
 
-import 'package:dart_ndk/entities.dart' as ndk_entities;
-import 'package:dart_ndk/dart_ndk.dart';
+import 'package:ndk/entities.dart' as ndk_entities;
+import 'package:ndk/ndk.dart';
 
 import '../data_sources/dart_ndk_source.dart';
 

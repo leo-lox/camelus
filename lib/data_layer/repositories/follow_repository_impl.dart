@@ -1,7 +1,7 @@
-import 'package:dart_ndk/presentation_layer/ndk_request.dart';
+import 'package:ndk/presentation_layer/ndk_request.dart';
 
-import 'package:dart_ndk/entities.dart' as ndk_entities;
-import 'package:dart_ndk/dart_ndk.dart' as dart_ndk;
+import 'package:ndk/entities.dart' as ndk_entities;
+import 'package:ndk/ndk.dart' as dart_ndk;
 
 import '../../domain_layer/entities/contact_list.dart';
 import '../../domain_layer/repositories/follow_repository.dart';

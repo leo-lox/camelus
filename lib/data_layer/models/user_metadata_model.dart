@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'package:dart_ndk/entities.dart';
+import 'package:ndk/entities.dart';
 
 import '../../domain_layer/entities/user_metadata.dart';
 
