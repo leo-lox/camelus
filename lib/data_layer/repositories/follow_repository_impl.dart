@@ -1,5 +1,3 @@
-import 'package:ndk/presentation_layer/ndk_request.dart';
-
 import 'package:ndk/entities.dart' as ndk_entities;
 import 'package:ndk/ndk.dart' as dart_ndk;
 
@@ -29,12 +27,9 @@ class FollowRepositoryImpl implements FollowRepository {
       authors: [npub],
       kinds: [ndk_entities.ContactList.KIND],
     );
-    NdkRequest request = NdkRequest.query(
-      'get_contacts',
-      filters: [filter],
-    );
 
-    final response = dartNdkSource.dartNdk.requestNostrEvent(request);
+    final response = dartNdkSource.dartNdk.requests
+        .query(filters: [filter], idPrefix: 'get_contacts');
 
     final responseList = await response.stream.toList();
 
@@ -52,12 +47,9 @@ class FollowRepositoryImpl implements FollowRepository {
       authors: [npub],
       kinds: [ndk_entities.ContactList.KIND],
     );
-    NdkRequest request = NdkRequest.subscription(
-      'get_contacts_stream',
-      filters: [filter],
-    );
 
-    final response = dartNdkSource.dartNdk.requestNostrEvent(request);
+    final response = dartNdkSource.dartNdk.requests
+        .subscription(filters: [filter], id: 'get_contact_stream');
 
     var lastReceived = 0;
     final contactListStream = response.stream.where((event) {

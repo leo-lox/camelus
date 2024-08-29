@@ -56,7 +56,7 @@ dependencies:
   riverpod: ^2.3.6
   custom_refresh_indicator: ^3.0.0
   flutter_cache_manager: ^3.4.1
-  web_socket_channel: ^2.4.4
+  web_socket_channel: ^3.0.1
   http_parser: ^4.0.2
   #isar: ^3.1.0+1
   #isar_flutter_libs: ^3.1.0+1
@@ -82,7 +82,6 @@ dev_dependencies:
   mockito: ^5.4.0
   flutter_test:
     sdk: flutter
-  test: ^1.24.9
   integration_test: 
     sdk: flutter
 

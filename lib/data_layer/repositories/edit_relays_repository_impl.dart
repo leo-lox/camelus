@@ -1,4 +1,4 @@
-import 'package:ndk/ndk.dart';
+import 'package:ndk/ndk.dart' as ndk;
 
 import '../../domain_layer/entities/relay.dart';
 import '../../domain_layer/repositories/edit_relays_repository.dart';
@@ -6,7 +6,7 @@ import '../data_sources/dart_ndk_source.dart';
 
 class EditRelaysRepositoryImpl implements EditRelaysRepository {
   final DartNdkSource dartNdkSource;
-  final EventVerifier eventVerifier;
+  final ndk.EventVerifier eventVerifier;
 
   EditRelaysRepositoryImpl({
     required this.dartNdkSource,

@@ -27,11 +27,8 @@ class NoteRepositoryImpl implements NoteRepository {
       kinds: [ndk_entities.Nip01Event.TEXT_NODE_KIND],
     );
 
-    NdkRequest request = NdkRequest.query(
-      'allNotes',
-      filters: [filter],
-    );
-    final response = dartNdkSource.dartNdk.requestNostrEvent(request);
+    final response = dartNdkSource.dartNdk.requests
+        .query(filters: [filter], idPrefix: 'getAllNotes-');
 
     return response.stream.map(
       (event) => NostrNoteModel.fromNDKEvent(event),
@@ -54,7 +51,8 @@ class NoteRepositoryImpl implements NoteRepository {
     //! disabled
     return Stream.empty();
 
-    final response = dartNdkSource.dartNdk.requestNostrEvent(request);
+    final response = dartNdkSource.dartNdk.requests
+        .query(filters: [filter], idPrefix: 'metadataPubkey-');
 
     return response.stream.map(
       (event) => UserMetadataModel.fromNDKEvent(event),
@@ -67,11 +65,9 @@ class NoteRepositoryImpl implements NoteRepository {
       ids: [noteId],
       kinds: [ndk_entities.Nip01Event.TEXT_NODE_KIND],
     );
-    NdkRequest request = NdkRequest.query(
-      'getNote',
-      filters: [filter],
-    );
-    final response = dartNdkSource.dartNdk.requestNostrEvent(request);
+
+    final response = dartNdkSource.dartNdk.requests
+        .query(filters: [filter], idPrefix: 'getTextNote-');
 
     return response.stream.map(
       (event) => NostrNoteModel.fromNDKEvent(event),
@@ -96,12 +92,8 @@ class NoteRepositoryImpl implements NoteRepository {
       eTags: eTags,
     );
 
-    NdkRequest request = NdkRequest.subscription(
-      requestId,
-      filters: [filter],
-    );
-
-    final response = dartNdkSource.dartNdk.requestNostrEvent(request);
+    final response = dartNdkSource.dartNdk.requests
+        .subscription(filters: [filter], id: requestId);
 
     return response.stream.map(
       (event) => NostrNoteModel.fromNDKEvent(event),

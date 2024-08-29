@@ -57,7 +57,7 @@ class _HomePageState extends ConsumerState<HomePage> {
       try {
         //todo: fix onboarding
         await MatomoTracker.instance.initialize(
-          siteId: 3,
+          siteId: "3",
           url: 'https://customer.beonde.de/matomo/matomo.php',
           visitorId: myVisitorId,
         );
