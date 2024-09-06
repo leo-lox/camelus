@@ -60,18 +60,24 @@ class _InReplyToState extends ConsumerState<InReplyTo> {
     final firstFuture = metadata.getMetadataByPubkey(pubkeyFirst).toList();
     firstFuture.then((value) => {
           if (value.isNotEmpty) {valueFirst = value[0].name ?? valueFirst},
-          setState(() {
-            valueFirst = valueFirst;
-          })
+          if (mounted)
+            {
+              setState(() {
+                valueFirst = valueFirst;
+              })
+            }
         });
 
     if (pubkeySecond.isEmpty) return;
     final secondFuture = metadata.getMetadataByPubkey(pubkeySecond).toList();
     secondFuture.then((value) => {
           if (value.isNotEmpty) {valueSecond = value[0].name ?? valueSecond},
-          setState(() {
-            valueSecond = valueSecond;
-          })
+          if (mounted)
+            {
+              setState(() {
+                valueSecond = valueSecond;
+              })
+            }
         });
   }
 

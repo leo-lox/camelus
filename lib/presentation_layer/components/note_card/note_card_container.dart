@@ -65,9 +65,11 @@ class _NoteCardContainerState extends ConsumerState<NoteCardContainer> {
   void initState() {
     super.initState();
     _getMetadata(widget.note.pubkey).then((data) {
-      setState(() {
-        myUserNoteMetadata = data;
-      });
+      if (mounted) {
+        setState(() {
+          myUserNoteMetadata = data;
+        });
+      }
     });
   }
 
