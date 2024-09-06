@@ -212,24 +212,24 @@ class _EventViewPageState extends ConsumerState<EventViewPage> {
 
     List<NoteCardContainer> rootLevelRepliesContainers = rootLevelReplies
         .map((e) => NoteCardContainer(
-              notes: [e],
+              note: e,
             ))
         .toList();
 
     // add remaining replies to containers
     var foundNotes = <NostrNote>[];
-    for (var container in rootLevelRepliesContainers) {
-      for (var note in workingList) {
-        for (var tag in note.getTagEvents) {
-          if (container.notes.map((e) => e.id).contains(tag.value)) {
-            container.notes.add(note);
-            // remove note from working list
-            foundNotes.add(note);
-            break;
-          } else {}
-        }
-      }
-    }
+    // for (var container in rootLevelRepliesContainers) {
+    //   for (var note in workingList) {
+    //     for (var tag in note.getTagEvents) {
+    //       if (container.notes.map((e) => e.id).contains(tag.value)) {
+    //         container.note.add(note);
+    //         // remove note from working list
+    //         foundNotes.add(note);
+    //         break;
+    //       } else {}
+    //     }
+    //   }
+    // }
     // remove found notes from working list
     for (var note in foundNotes) {
       workingList.removeWhere((e) => e.id == note.id);
@@ -243,15 +243,13 @@ class _EventViewPageState extends ConsumerState<EventViewPage> {
 
     for (var note in workingList) {
       rootLevelRepliesContainers.add(NoteCardContainer(
-        notes: [NostrNote.empty(id: note.getDirectReply?.value ?? ""), note],
+        note: note,
       ));
     }
 
     return NoteCardContainer(
-      notes: [
-        rootNote,
-      ],
-      otherContainers: rootLevelRepliesContainers,
+      note: rootNote,
+      //otherContainers: rootLevelRepliesContainers,
     );
   }
 

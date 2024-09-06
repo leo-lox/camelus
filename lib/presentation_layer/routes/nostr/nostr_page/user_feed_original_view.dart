@@ -200,7 +200,7 @@ class _UserFeedOriginalViewState extends ConsumerState<UserFeedOriginalView> {
 
                     return NoteCardContainer(
                       key: ValueKey(event.id),
-                      notes: [event],
+                      note: event,
                     );
                   },
                 ),

@@ -3,7 +3,6 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../../config/palette.dart';
 import '../../../domain_layer/entities/nostr_note.dart';
-import '../../../domain_layer/usecases/get_user_metadata.dart';
 import '../../../helpers/helpers.dart';
 import '../../providers/metadata_provider.dart';
 
@@ -11,11 +10,9 @@ class InReplyTo extends ConsumerStatefulWidget {
   const InReplyTo({
     super.key,
     required this.myNote,
-    required this.metadata,
   });
 
   final NostrNote myNote;
-  final GetUserMetadata metadata;
 
   @override
   ConsumerState<InReplyTo> createState() => _InReplyToState();

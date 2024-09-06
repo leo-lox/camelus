@@ -49,7 +49,7 @@ class NoteRepositoryImpl implements NoteRepository {
     log("DEBUG: getMetadataByPubkey: $pubkey");
 
     //! disabled
-    return Stream.empty();
+    //return Stream.empty();
 
     final response = dartNdkSource.dartNdk.requests
         .query(filters: [filter], idPrefix: 'metadataPubkey-');
