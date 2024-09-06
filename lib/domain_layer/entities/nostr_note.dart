@@ -112,4 +112,18 @@ class NostrNote {
     }
     return null;
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! NostrNote) return false;
+
+    final NostrNote otherNote = other;
+    return id == otherNote.id;
+  }
+
+  @override
+  int get hashCode {
+    return id.hashCode;
+  }
 }
