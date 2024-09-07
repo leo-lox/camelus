@@ -63,15 +63,19 @@ class _UserFeedOriginalViewState extends ConsumerState<UserFeedOriginalView> {
   void _setupMainFeedListener() {
     /// buffers an integrates notes into feed
     final mainFeedProvider = ref.read(getMainFeedProvider);
-    _eventStreamBuffer = mainFeedProvider.stream.bufferTime(const Duration(
-      milliseconds: 500,
-    ));
+    _eventStreamBuffer = mainFeedProvider.stream
+        .bufferTime(const Duration(
+          milliseconds: 500,
+        ))
+        .where((events) => events.isNotEmpty);
 
-    _eventStreamBuffer.listen((event) {
-      setState(() {
-        timelineEvents.addAll(event);
-        timelineEvents.sort((a, b) => b.created_at.compareTo(a.created_at));
-      });
+    _eventStreamBuffer.listen((events) {
+      if (mounted) {
+        setState(() {
+          timelineEvents.addAll(events);
+          timelineEvents.sort((a, b) => b.created_at.compareTo(a.created_at));
+        });
+      }
     });
 
     mainFeedProvider.fetchFeedEvents(
@@ -85,14 +89,20 @@ class _UserFeedOriginalViewState extends ConsumerState<UserFeedOriginalView> {
     final mainFeedProvider = ref.read(getMainFeedProvider);
 
     mainFeedProvider.newNotesStream
-        .bufferTime(const Duration(seconds: 5))
-        .listen((event) {
+        .bufferTime(const Duration(
+          seconds: 5,
+        ))
+        .where((events) => events.isNotEmpty)
+        .listen((events) {
       log("new notes stream event");
-      setState(() {
-        _newPostsAvailable = true;
-      });
+      if (mounted) {
+        setState(() {
+          _newPostsAvailable = true;
+        });
+      }
+
       // notify navigation bar
-      ref.read(navigationBarProvider).newNotesCount = event.length;
+      ref.read(navigationBarProvider).newNotesCount = events.length;
     });
   }
 

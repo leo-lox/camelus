@@ -92,8 +92,12 @@ class NoteRepositoryImpl implements NoteRepository {
       eTags: eTags,
     );
 
-    final response = dartNdkSource.dartNdk.requests
-        .subscription(filters: [filter], id: requestId);
+    final response = dartNdkSource.dartNdk.requests.subscription(
+      filters: [filter],
+      id: requestId,
+      cacheRead: true,
+      cacheWrite: true,
+    );
 
     return response.stream.map(
       (event) => NostrNoteModel.fromNDKEvent(event),

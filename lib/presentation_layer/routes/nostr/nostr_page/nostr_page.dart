@@ -279,7 +279,10 @@ class _NostrPageState extends ConsumerState<NostrPage>
             controller: _tabController,
             physics: const BouncingScrollPhysics(),
             children: [
-              UserFeedOriginalView(pubkey: widget.pubkey),
+              UserFeedOriginalView(
+                key: GlobalKey(debugLabel: "userFeedOriginalView"),
+                pubkey: widget.pubkey,
+              ),
               UserFeedAndRepliesView(pubkey: widget.pubkey),
             ],
           ),
