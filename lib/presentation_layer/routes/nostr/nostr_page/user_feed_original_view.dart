@@ -203,7 +203,7 @@ class _UserFeedOriginalViewState extends ConsumerState<UserFeedOriginalView> {
                   return Future.delayed(const Duration(milliseconds: 0));
                 },
                 child: ListView.builder(
-                  controller: _scrollControllerFeed,
+                  //controller: _scrollControllerFeed, //todo: move controller upstream to be able to use floating nav
                   itemCount: timelineEvents.length,
                   itemBuilder: (context, index) {
                     final event = timelineEvents[index];

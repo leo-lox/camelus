@@ -21,17 +21,17 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../config/palette.dart';
 
-class NostrPage extends ConsumerStatefulWidget {
+class NostrPageDebug extends ConsumerStatefulWidget {
   final GlobalKey<ScaffoldState> parentScaffoldKey;
   final String pubkey;
 
-  const NostrPage(
+  const NostrPageDebug(
       {super.key, required this.parentScaffoldKey, required this.pubkey});
   @override
-  ConsumerState<NostrPage> createState() => _NostrPageState();
+  ConsumerState<NostrPageDebug> createState() => _NostrPageState();
 }
 
-class _NostrPageState extends ConsumerState<NostrPage>
+class _NostrPageState extends ConsumerState<NostrPageDebug>
     with TickerProviderStateMixin, AutomaticKeepAliveClientMixin {
   @override
   bool get wantKeepAlive => true;
@@ -151,15 +151,15 @@ class _NostrPageState extends ConsumerState<NostrPage>
 
     return SafeArea(
       child: NestedScrollView(
+        floatHeaderSlivers: true,
         controller: _scrollControllerPage,
-        headerSliverBuilder: (context, value) {
+        headerSliverBuilder: (context, innerBoxIsScrolled) {
           return <Widget>[
             SliverAppBar(
               floating: true,
               snap: false,
               pinned: false,
-              expandedHeight: 160.0,
-              forceElevated: true,
+              forceElevated: innerBoxIsScrolled,
               backgroundColor: Palette.background,
               leadingWidth: 52,
               leading: InkWell(
@@ -287,28 +287,21 @@ class _NostrPageState extends ConsumerState<NostrPage>
               key: GlobalKey(debugLabel: "userFeedOriginalView"),
               pubkey: widget.pubkey,
             ),
-            NestedScrollView(
-              controller: _scrollControllerPage,
-              headerSliverBuilder:
-                  (BuildContext context, bool innerBoxIsScrolled) {
-                return <Widget>[];
-              },
-              body: ListView.builder(
-                itemBuilder: (BuildContext context, int index) {
-                  Color color = getRandomColor();
-                  return Container(
-                    height: 150.0,
-                    color: color,
-                    child: Text(
-                      "",
-                      style: TextStyle(
-                        color: Colors.white,
-                      ),
+            ListView.builder(
+              itemBuilder: (BuildContext context, int index) {
+                Color color = getRandomColor();
+                return Container(
+                  height: 150.0,
+                  color: color,
+                  child: Text(
+                    "",
+                    style: TextStyle(
+                      color: Colors.white,
                     ),
-                  );
-                },
-                //physics: NeverScrollableScrollPhysics(), //This may come in handy if you have issues with scrolling in the future
-              ),
+                  ),
+                );
+              },
+              //physics: NeverScrollableScrollPhysics(), //This may come in handy if you have issues with scrolling in the future
             ),
           ],
         ),

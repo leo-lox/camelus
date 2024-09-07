@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:camelus/helpers/helpers.dart';
 import 'package:camelus/presentation_layer/providers/navigation_bar_provider.dart';
+import 'package:camelus/presentation_layer/routes/nostr/nostr_page/nostr_page_debug.dart';
 import 'package:camelus/presentation_layer/routes/notification_page.dart';
 import 'package:camelus/presentation_layer/routes/search_page.dart';
 import 'package:flutter/material.dart';
@@ -105,7 +106,9 @@ class _HomePageState extends ConsumerState<HomePage> {
           controller: _myPage,
           physics: const NeverScrollableScrollPhysics(),
           children: <Widget>[
-            NostrPage(parentScaffoldKey: _scaffoldKey, pubkey: widget.pubkey),
+            //NostrPage(parentScaffoldKey: _scaffoldKey, pubkey: widget.pubkey),
+            NostrPageDebug(
+                parentScaffoldKey: _scaffoldKey, pubkey: widget.pubkey),
             const SearchPage(),
             const NotificationPage(),
             const Center(
