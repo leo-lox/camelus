@@ -66,6 +66,8 @@ class MainFeed {
       eTags: eTags,
     );
 
-    _controller.addStream(mynotesStream);
+    final filterRootNotes = mynotesStream.where((event) => event.isRoot);
+
+    _controller.addStream(filterRootNotes);
   }
 }
