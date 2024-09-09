@@ -6,7 +6,6 @@ import 'package:camelus/presentation_layer/components/note_card/note_card_contai
 import 'package:camelus/config/palette.dart';
 import 'package:camelus/domain_layer/entities/nostr_note.dart';
 import 'package:camelus/presentation_layer/providers/get_notes_provider.dart';
-import 'package:camelus/presentation_layer/scroll_controller/retainable_scroll_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -28,8 +27,7 @@ class _EventViewPageState extends ConsumerState<EventViewPage> {
 
   Stream<List<NostrNote>> notesStream = Stream.empty();
 
-  late final RetainableScrollController _scrollControllerFeed =
-      RetainableScrollController();
+  late final ScrollController _scrollControllerFeed = ScrollController();
 
   final Completer<void> _servicesReady = Completer<void>();
 
