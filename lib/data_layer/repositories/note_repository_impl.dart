@@ -80,9 +80,9 @@ class NoteRepositoryImpl implements NoteRepository {
       eTags: eTags,
     );
 
-    final response = dartNdkSource.dartNdk.requests.subscription(
+    final response = dartNdkSource.dartNdk.requests.query(
       filters: [filter],
-      id: requestId,
+      idPrefix: requestId,
       cacheRead: true,
       cacheWrite: true,
     );

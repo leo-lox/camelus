@@ -10,6 +10,7 @@ import 'package:camelus/presentation_layer/providers/navigation_bar_provider.dar
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:rxdart/rxdart.dart';
+import '../../../components/note_card/sceleton_note.dart';
 import '../../../providers/main_feed_provider.dart';
 
 class UserFeedOriginalView extends ConsumerStatefulWidget {
@@ -41,10 +42,11 @@ class _UserFeedOriginalViewState extends ConsumerState<UserFeedOriginalView> {
   _scrollListener() {
     if (widget.scrollControllerFeed.position.pixels ==
         widget.scrollControllerFeed.position.maxScrollExtent) {
-      log("reached end of scroll");
-
       final mainFeedProvider = ref.read(getMainFeedProvider);
-      mainFeedProvider.loadMore(latestNote.created_at);
+      // mainFeedProvider.loadMore(
+      //   oltherThen: latestNote.created_at,
+      //   pubkey: widget.pubkey,
+      // );
     }
 
     if (widget.scrollControllerFeed.position.pixels < 100) {
@@ -55,6 +57,16 @@ class _UserFeedOriginalViewState extends ConsumerState<UserFeedOriginalView> {
       //   });
       // }
     }
+  }
+
+  _loadMore() {
+    if (timelineEvents.length < 2) return;
+    log("_loadMore()");
+    final mainFeedProvider = ref.read(getMainFeedProvider);
+    mainFeedProvider.loadMore(
+      oltherThen: latestNote.created_at,
+      pubkey: widget.pubkey,
+    );
   }
 
   void _setupScrollListener() {
@@ -82,7 +94,7 @@ class _UserFeedOriginalViewState extends ConsumerState<UserFeedOriginalView> {
     mainFeedProvider.fetchFeedEvents(
       npub: widget.pubkey,
       requestId: "my-test",
-      limit: 10,
+      limit: 20,
     );
   }
 
@@ -207,8 +219,12 @@ class _UserFeedOriginalViewState extends ConsumerState<UserFeedOriginalView> {
                 },
                 child: ListView.builder(
                   controller: PrimaryScrollController.of(context),
-                  itemCount: timelineEvents.length,
+                  itemCount: timelineEvents.length + 1,
                   itemBuilder: (context, index) {
+                    if (index == timelineEvents.length) {
+                      return SkeletonNote(renderCallback: _loadMore());
+                    }
+
                     final event = timelineEvents[index];
 
                     return NoteCardContainer(

@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:math';
+import 'dart:developer' as developer;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -35,7 +36,7 @@ class _NostrPageState extends ConsumerState<NostrPage>
 
   List<String> followingPubkeys = [];
 
-  late final ScrollController _scrollControllerPage = ScrollController();
+  final ScrollController _scrollControllerPage = ScrollController();
 
   late TabController _tabController;
 

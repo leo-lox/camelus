@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 
 import '../entities/nostr_note.dart';
 import '../repositories/note_repository.dart';
@@ -43,7 +44,17 @@ class MainFeed {
   }
 
   /// load later timelineevents then
-  void loadMore(int oltherThen) {}
+  void loadMore({
+    required int oltherThen,
+    required String pubkey,
+  }) {
+    fetchFeedEvents(
+      npub: pubkey,
+      requestId: "loadMore-",
+      limit: 1,
+      until: oltherThen + 1, // +1 to not get dublicates
+    );
+  }
 
   void fetchFeedEvents({
     required String npub,
@@ -55,7 +66,7 @@ class MainFeed {
   }) async {
     // get contacts of user
 
-    final contactList = await _follow.getContactsSelf();
+    final contactList = await _follow.getContacts(npub);
 
     final mynotesStream = _noteRepository.getTextNotesByAuthors(
       authors: contactList.contacts,
