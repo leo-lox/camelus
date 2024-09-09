@@ -51,8 +51,8 @@ class MainFeed {
     fetchFeedEvents(
       npub: pubkey,
       requestId: "loadMore-",
-      limit: 1,
-      until: oltherThen + 1, // +1 to not get dublicates
+      limit: 20,
+      until: oltherThen - 1, // -1 to not get dublicates
     );
   }
 
@@ -77,8 +77,13 @@ class MainFeed {
       eTags: eTags,
     );
 
+    // filter root notes
     final filterRootNotes = mynotesStream.where((event) => event.isRoot);
 
-    _controller.addStream(filterRootNotes);
+    filterRootNotes.listen((event) {
+      _controller.add(event);
+    });
+
+    //_controller.addStream(filterRootNotes);
   }
 }

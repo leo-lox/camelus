@@ -93,7 +93,7 @@ class _UserFeedOriginalViewState extends ConsumerState<UserFeedOriginalView> {
 
     mainFeedProvider.fetchFeedEvents(
       npub: widget.pubkey,
-      requestId: "my-test",
+      requestId: "startupLoad",
       limit: 20,
     );
   }
