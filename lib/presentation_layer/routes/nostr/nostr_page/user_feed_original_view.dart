@@ -38,25 +38,27 @@ class _UserFeedOriginalViewState extends ConsumerState<UserFeedOriginalView> {
   late final Stream<List<NostrNote>> _eventStreamBuffer;
   NostrNote get latestNote => timelineEvents.last;
 
+  _scrollListener() {
+    if (widget.scrollControllerFeed.position.pixels ==
+        widget.scrollControllerFeed.position.maxScrollExtent) {
+      log("reached end of scroll");
+
+      final mainFeedProvider = ref.read(getMainFeedProvider);
+      mainFeedProvider.loadMore(latestNote.created_at);
+    }
+
+    if (widget.scrollControllerFeed.position.pixels < 100) {
+      // disable after sroll
+      // if (_newPostsAvailable) {
+      //   setState(() {
+      //     _newPostsAvailable = false;
+      //   });
+      // }
+    }
+  }
+
   void _setupScrollListener() {
-    widget.scrollControllerFeed.addListener(() {
-      if (widget.scrollControllerFeed.position.pixels ==
-          widget.scrollControllerFeed.position.maxScrollExtent) {
-        log("reached end of scroll");
-
-        final mainFeedProvider = ref.read(getMainFeedProvider);
-        mainFeedProvider.loadMore(latestNote.created_at);
-      }
-
-      if (widget.scrollControllerFeed.position.pixels < 100) {
-        // disable after sroll
-        // if (_newPostsAvailable) {
-        //   setState(() {
-        //     _newPostsAvailable = false;
-        //   });
-        // }
-      }
-    });
+    widget.scrollControllerFeed.addListener(_scrollListener);
   }
 
   void _setupMainFeedListener() {
@@ -149,6 +151,7 @@ class _UserFeedOriginalViewState extends ConsumerState<UserFeedOriginalView> {
 
   Future<void> _initSequence() async {
     _servicesReady.complete();
+    if (!mounted) return;
 
     _initUserFeed();
     _setupScrollListener();
@@ -170,6 +173,7 @@ class _UserFeedOriginalViewState extends ConsumerState<UserFeedOriginalView> {
   @override
   void dispose() {
     _disposeSubscriptions();
+    widget.scrollControllerFeed.removeListener(_scrollListener);
     super.dispose();
   }
 
