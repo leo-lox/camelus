@@ -1,25 +1,22 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:math';
-import 'package:camelus/domain_layer/entities/app_update.dart';
-import 'package:camelus/domain_layer/entities/user_metadata.dart';
-import 'package:camelus/domain_layer/usecases/check_app_update.dart';
-import 'package:camelus/presentation_layer/providers/app_update_provider.dart';
-import 'package:camelus/presentation_layer/providers/metadata_provider.dart';
-import 'package:camelus/presentation_layer/routes/nostr/nostr_page/user_feed_and_replies_view.dart';
-import 'package:camelus/presentation_layer/routes/nostr/nostr_page/user_feed_original_view.dart';
-import 'package:camelus/presentation_layer/routes/nostr/relays_page.dart';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-
-import 'package:camelus/presentation_layer/atoms/my_profile_picture.dart';
-
 import 'package:badges/badges.dart' as badges;
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../config/palette.dart';
+import '../../../../domain_layer/entities/app_update.dart';
+import '../../../../domain_layer/entities/user_metadata.dart';
+import '../../../../domain_layer/usecases/check_app_update.dart';
+import '../../../atoms/my_profile_picture.dart';
+import '../../../providers/app_update_provider.dart';
+import '../../../providers/metadata_provider.dart';
+import '../relays_page.dart';
+import 'user_feed_original_view.dart';
 
 class NostrPage extends ConsumerStatefulWidget {
   final GlobalKey<ScaffoldState> parentScaffoldKey;
@@ -151,15 +148,15 @@ class _NostrPageState extends ConsumerState<NostrPage>
 
     return SafeArea(
       child: NestedScrollView(
+        floatHeaderSlivers: true,
         controller: _scrollControllerPage,
-        headerSliverBuilder: (context, value) {
+        headerSliverBuilder: (context, innerBoxIsScrolled) {
           return <Widget>[
             SliverAppBar(
               floating: true,
               snap: false,
               pinned: false,
-              expandedHeight: 160.0,
-              forceElevated: true,
+              forceElevated: innerBoxIsScrolled,
               backgroundColor: Palette.background,
               leadingWidth: 52,
               leading: InkWell(
@@ -286,29 +283,23 @@ class _NostrPageState extends ConsumerState<NostrPage>
             UserFeedOriginalView(
               key: GlobalKey(debugLabel: "userFeedOriginalView"),
               pubkey: widget.pubkey,
+              scrollControllerFeed: _scrollControllerPage,
             ),
-            NestedScrollView(
-              controller: _scrollControllerPage,
-              headerSliverBuilder:
-                  (BuildContext context, bool innerBoxIsScrolled) {
-                return <Widget>[];
-              },
-              body: ListView.builder(
-                itemBuilder: (BuildContext context, int index) {
-                  Color color = getRandomColor();
-                  return Container(
-                    height: 150.0,
-                    color: color,
-                    child: Text(
-                      "",
-                      style: TextStyle(
-                        color: Colors.white,
-                      ),
+            ListView.builder(
+              itemBuilder: (BuildContext context, int index) {
+                Color color = getRandomColor();
+                return Container(
+                  height: 150.0,
+                  color: color,
+                  child: Text(
+                    "",
+                    style: TextStyle(
+                      color: Colors.white,
                     ),
-                  );
-                },
-                //physics: NeverScrollableScrollPhysics(), //This may come in handy if you have issues with scrolling in the future
-              ),
+                  ),
+                );
+              },
+              //physics: NeverScrollableScrollPhysics(), //This may come in handy if you have issues with scrolling in the future
             ),
           ],
         ),

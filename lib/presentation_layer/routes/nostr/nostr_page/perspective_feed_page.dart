@@ -53,7 +53,10 @@ class _PerspectiveFeedPageState extends ConsumerState<PerspectiveFeedPage>
         backgroundColor: Palette.background,
       ),
       backgroundColor: Palette.background,
-      body: UserFeedOriginalView(pubkey: widget.pubkey),
+      body: UserFeedOriginalView(
+        pubkey: widget.pubkey,
+        scrollControllerFeed: ScrollController(),
+      ),
     );
   }
 }

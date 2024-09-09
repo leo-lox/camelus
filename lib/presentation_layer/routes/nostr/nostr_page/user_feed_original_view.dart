@@ -7,18 +7,19 @@ import 'package:camelus/config/palette.dart';
 import 'package:camelus/domain_layer/entities/nostr_note.dart';
 import 'package:camelus/presentation_layer/providers/get_notes_provider.dart';
 import 'package:camelus/presentation_layer/providers/navigation_bar_provider.dart';
-import 'package:camelus/presentation_layer/scroll_controller/retainable_scroll_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:rxdart/rxdart.dart';
-
-import '../../../components/note_card/note_card.dart';
 import '../../../providers/main_feed_provider.dart';
 
 class UserFeedOriginalView extends ConsumerStatefulWidget {
   final String pubkey;
 
-  const UserFeedOriginalView({super.key, required this.pubkey});
+  final ScrollController scrollControllerFeed;
+
+  // attaches from outside, used for scroll animation
+  const UserFeedOriginalView(
+      {super.key, required this.pubkey, required this.scrollControllerFeed});
 
   @override
   ConsumerState<UserFeedOriginalView> createState() =>
@@ -30,8 +31,6 @@ class _UserFeedOriginalViewState extends ConsumerState<UserFeedOriginalView> {
 
   final Completer<void> _servicesReady = Completer<void>();
 
-  late final RetainableScrollController _scrollControllerFeed =
-      RetainableScrollController();
   bool _newPostsAvailable = false;
 
   // new #########
@@ -40,16 +39,16 @@ class _UserFeedOriginalViewState extends ConsumerState<UserFeedOriginalView> {
   NostrNote get latestNote => timelineEvents.last;
 
   void _setupScrollListener() {
-    _scrollControllerFeed.addListener(() {
-      if (_scrollControllerFeed.position.pixels ==
-          _scrollControllerFeed.position.maxScrollExtent) {
+    widget.scrollControllerFeed.addListener(() {
+      if (widget.scrollControllerFeed.position.pixels ==
+          widget.scrollControllerFeed.position.maxScrollExtent) {
         log("reached end of scroll");
 
         final mainFeedProvider = ref.read(getMainFeedProvider);
         mainFeedProvider.loadMore(latestNote.created_at);
       }
 
-      if (_scrollControllerFeed.position.pixels < 100) {
+      if (widget.scrollControllerFeed.position.pixels < 100) {
         // disable after sroll
         // if (_newPostsAvailable) {
         //   setState(() {
@@ -120,16 +119,16 @@ class _UserFeedOriginalViewState extends ConsumerState<UserFeedOriginalView> {
     }
     ref.watch(navigationBarProvider).resetNewNotesCount();
     // scroll to top
-    _scrollControllerFeed.animateTo(
-      _scrollControllerFeed.position.minScrollExtent,
+    widget.scrollControllerFeed.animateTo(
+      widget.scrollControllerFeed.position.minScrollExtent,
       duration: const Duration(milliseconds: 500),
       curve: Curves.easeOutCubic,
     );
   }
 
   void _integrateNewNotes() {
-    _scrollControllerFeed.animateTo(
-      _scrollControllerFeed.position.minScrollExtent,
+    widget.scrollControllerFeed.animateTo(
+      widget.scrollControllerFeed.position.minScrollExtent,
       duration: const Duration(milliseconds: 300),
       curve: Curves.easeOut,
     );
@@ -203,7 +202,7 @@ class _UserFeedOriginalViewState extends ConsumerState<UserFeedOriginalView> {
                   return Future.delayed(const Duration(milliseconds: 0));
                 },
                 child: ListView.builder(
-                  //controller: _scrollControllerFeed, //todo: move controller upstream to be able to use floating nav
+                  controller: PrimaryScrollController.of(context),
                   itemCount: timelineEvents.length,
                   itemBuilder: (context, index) {
                     final event = timelineEvents[index];
