@@ -37,26 +37,14 @@ class NoteRepositoryImpl implements NoteRepository {
 
   @override
   Stream<UserMetadata> getMetadataByPubkey(String pubkey) {
-    Filter filter = Filter(
-      authors: [pubkey],
-      kinds: [ndk_entities.Metadata.KIND],
-    );
-    NdkRequest request = NdkRequest.query(
-      'getMetadataByPubkey',
-      filters: [filter],
-    );
+    final myMetadata = dartNdkSource.dartNdk.getSingleMetadata(pubkey);
 
-    log("DEBUG: getMetadataByPubkey: $pubkey");
+    final Stream<ndk_entities.Metadata?> myMetadataStream =
+        myMetadata.asStream();
 
-    //! disabled
-    //return Stream.empty();
-
-    final response = dartNdkSource.dartNdk.requests
-        .query(filters: [filter], idPrefix: 'metadataPubkey-');
-
-    return response.stream.map(
-      (event) => UserMetadataModel.fromNDKEvent(event),
-    );
+    return myMetadataStream.where((event) => event != null).map(
+          (event) => UserMetadataModel.fromNDKMetadata(event!),
+        );
   }
 
   @override

@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'package:ndk/entities.dart';
+import 'package:ndk/entities.dart' as ndk_entities;
 
 import '../../domain_layer/entities/user_metadata.dart';
 
@@ -18,7 +18,7 @@ class UserMetadataModel extends UserMetadata {
     super.lud16,
   });
 
-  factory UserMetadataModel.fromNDKEvent(Nip01Event event) {
+  factory UserMetadataModel.fromNDKEvent(ndk_entities.Nip01Event event) {
     final int now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
 
     final contentJson = jsonDecode(event.content);
@@ -35,6 +35,22 @@ class UserMetadataModel extends UserMetadata {
       website: contentJson['website'],
       lud06: contentJson['lud06'],
       lud16: contentJson['lud16'],
+    );
+  }
+
+  factory UserMetadataModel.fromNDKMetadata(ndk_entities.Metadata metadata) {
+    return UserMetadataModel(
+      eventId: metadata.hashCode.toString(),
+      pubkey: metadata.pubKey,
+      lastFetch: metadata.refreshedTimestamp ?? 0,
+      picture: metadata.picture,
+      banner: metadata.banner,
+      name: metadata.name,
+      nip05: metadata.nip05,
+      about: metadata.about,
+      website: metadata.website,
+      lud06: metadata.lud06,
+      lud16: metadata.lud16,
     );
   }
 }
