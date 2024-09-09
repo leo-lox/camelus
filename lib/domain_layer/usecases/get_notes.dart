@@ -39,31 +39,6 @@ class GetNotes {
     throw UnimplementedError();
   }
 
-  /// returns a stream of notes for a given npub (follows of that npub)
-  Stream<List<NostrNote>> getNpubFeed({
-    required String npub,
-    required String requestId,
-    int? since,
-    int? until,
-    int? limit,
-  }) async* {
-    // get contacts of user
-    log("getting contacts...");
-    final contactList = await _follow.getContactsSelf();
-    log("got contacts 🤼");
-
-    yield* _noteRepository
-        .getTextNotesByAuthors(
-          authors: contactList.contacts,
-          requestId: requestId,
-          since: since,
-          until: until,
-          limit: limit,
-        )
-        .toList()
-        .asStream();
-  }
-
   /// returns a stream of notes for a given npub (follows of that npub) with replies
   Stream<List<NostrNote>> getNpubWithRepliesFeed({
     required String npub,
