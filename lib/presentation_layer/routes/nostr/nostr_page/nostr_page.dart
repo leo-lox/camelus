@@ -282,7 +282,6 @@ class _NostrPageState extends ConsumerState<NostrPage>
           physics: const BouncingScrollPhysics(),
           children: [
             UserFeedOriginalView(
-              key: GlobalKey(debugLabel: "userFeedOriginalView"),
               pubkey: widget.pubkey,
               scrollControllerFeed: _scrollControllerPage,
             ),
