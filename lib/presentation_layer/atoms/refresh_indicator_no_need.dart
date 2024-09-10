@@ -13,13 +13,19 @@ Widget RefreshIndicatorNoNeed(
       return Stack(
         children: <Widget>[
           myIndicator(
-              value: controller.value, loading: controller.state.isLoading),
-          Transform.scale(
-            scale: (controller.value * 0.2) < 0.1
-                ? 1.0 - (controller.value * 0.2)
-                : 0.90,
+            value: controller.value,
+            loading: controller.state.isLoading,
+          ),
+          Transform.translate(
+            offset: Offset(0, controller.value * 50),
             child: child,
           ),
+          // Transform.scale(
+          //   scale: (controller.value * 0.2) < 0.1
+          //       ? 1.0 - (controller.value * 0.2)
+          //       : 0.90,
+          //   child: child,
+          // ),
         ],
       );
     },
