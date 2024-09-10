@@ -152,25 +152,16 @@ class _UserFeedOriginalViewState extends ConsumerState<UserFeedOriginalView> {
     ref.watch(navigationBarProvider).resetNewNotesCount();
   }
 
-  void _initUserFeed() {
-    int now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
-
-    int latestTweet = now - 86400; // -1 day
-    final notesProvider = ref.read(getNotesProvider);
-
-    // todo: first fetch
-  }
-
   Future<void> _initSequence() async {
-    _servicesReady.complete();
     if (!mounted) return;
 
-    _initUserFeed();
     _setupScrollListener();
     _setupMainFeedListener();
     _setupNewNotesListener();
 
     _setupNavBarHomeListener();
+
+    _servicesReady.complete();
 
     // todo: bug on first launch
     //ref.watch(navigationBarProvider).resetNewNotesCount();
@@ -228,7 +219,7 @@ class _UserFeedOriginalViewState extends ConsumerState<UserFeedOriginalView> {
                     final event = timelineEvents[index];
 
                     return NoteCardContainer(
-                      key: ValueKey(event.id),
+                      key: PageStorageKey(event.id),
                       note: event,
                     );
                   },

@@ -82,7 +82,7 @@ class _HomePageState extends ConsumerState<HomePage> {
     final navBarProvider = ref.watch(navigationBarProvider);
 
     return Scaffold(
-      key: _scaffoldKey,
+      //key: _scaffoldKey,
       drawer: NostrDrawer(pubkey: widget.pubkey),
       backgroundColor: Palette.background,
       floatingActionButton: AnimatedOpacity(
@@ -107,7 +107,10 @@ class _HomePageState extends ConsumerState<HomePage> {
           physics: const NeverScrollableScrollPhysics(),
           children: <Widget>[
             //NostrPage(parentScaffoldKey: _scaffoldKey, pubkey: widget.pubkey),
-            NostrPage(parentScaffoldKey: _scaffoldKey, pubkey: widget.pubkey),
+            NostrPage(
+                key: GlobalKey(),
+                parentScaffoldKey: _scaffoldKey,
+                pubkey: widget.pubkey),
             const SearchPage(),
             const NotificationPage(),
             const Center(
