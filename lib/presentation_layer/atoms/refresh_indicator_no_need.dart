@@ -2,7 +2,7 @@ import 'package:camelus/config/palette.dart';
 import 'package:custom_refresh_indicator/custom_refresh_indicator.dart';
 import 'package:flutter/material.dart';
 
-Widget RefreshIndicatorNoNeed(
+Widget refreshIndicatorNoNeed(
     {required Widget child, required Future<void> Function() onRefresh}) {
   return CustomRefreshIndicator(
     builder: (

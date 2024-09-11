@@ -117,7 +117,7 @@ class _EventViewPageState extends ConsumerState<EventViewPage> {
             return const Center(child: Text('Error'));
           }
           if (snapshot.connectionState == ConnectionState.done) {
-            return RefreshIndicatorNoNeed(
+            return refreshIndicatorNoNeed(
               onRefresh: () {
                 return Future.delayed(const Duration(milliseconds: 0));
               },

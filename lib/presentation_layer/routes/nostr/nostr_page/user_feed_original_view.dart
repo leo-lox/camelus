@@ -1,17 +1,57 @@
 import 'dart:async';
 import 'dart:developer';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+
 import 'package:camelus/presentation_layer/atoms/new_posts_available.dart';
 import 'package:camelus/presentation_layer/atoms/refresh_indicator_no_need.dart';
 import 'package:camelus/presentation_layer/components/note_card/note_card_container.dart';
 import 'package:camelus/config/palette.dart';
 import 'package:camelus/domain_layer/entities/nostr_note.dart';
-import 'package:camelus/presentation_layer/providers/get_notes_provider.dart';
 import 'package:camelus/presentation_layer/providers/navigation_bar_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:rxdart/rxdart.dart';
 import '../../../components/note_card/sceleton_note.dart';
 import '../../../providers/main_feed_provider.dart';
+
+part 'user_feed_original_view.g.dart';
+
+//! todo: crete feed state obj with start() stop()
+
+@Riverpod(keepAlive: true)
+class UserFeedState extends _$UserFeedState {
+  UserFeedState();
+  @override
+  List<NostrNote> build() {
+    init();
+    return [];
+  }
+
+  void init() {
+    final mainFeedProvider = ref.read(getMainFeedProvider);
+    final eventStreamBuffer = mainFeedProvider.stream
+        .bufferTime(const Duration(
+          milliseconds: 500,
+        ))
+        .where((events) => events.isNotEmpty);
+
+    eventStreamBuffer.listen((events) {
+      addEvents(events);
+      //ref.read(userFeedStateProvider.notifier).addEvents(events);
+    });
+
+    mainFeedProvider.fetchFeedEvents(
+      npub: null,
+      requestId: "startupLoad",
+      limit: 20,
+    );
+  }
+
+  void addEvents(List<NostrNote> events) {
+    state = [...state, ...events]
+      ..sort((a, b) => b.created_at.compareTo(a.created_at));
+  }
+}
 
 class UserFeedOriginalView extends ConsumerStatefulWidget {
   final String pubkey;
@@ -35,9 +75,10 @@ class _UserFeedOriginalViewState extends ConsumerState<UserFeedOriginalView> {
   bool _newPostsAvailable = false;
 
   // new #########
-  final List<NostrNote> timelineEvents = [];
+  // final List<NostrNote> timelineEvents = []; // Removed this line
   late final Stream<List<NostrNote>> _eventStreamBuffer;
-  NostrNote get latestNote => timelineEvents.last;
+  NostrNote get latestNote =>
+      ref.watch(userFeedStateProvider).last; // Updated this line
 
   _scrollListener() {
     if (widget.scrollControllerFeed.position.pixels ==
@@ -60,7 +101,7 @@ class _UserFeedOriginalViewState extends ConsumerState<UserFeedOriginalView> {
   }
 
   _loadMore() {
-    if (timelineEvents.length < 2) return;
+    if (ref.watch(userFeedStateProvider).length < 2) return;
     log("_loadMore()");
     final mainFeedProvider = ref.read(getMainFeedProvider);
     mainFeedProvider.loadMore(
@@ -74,6 +115,8 @@ class _UserFeedOriginalViewState extends ConsumerState<UserFeedOriginalView> {
   }
 
   void _setupMainFeedListener() {
+    return;
+
     /// buffers an integrates notes into feed
     final mainFeedProvider = ref.read(getMainFeedProvider);
     _eventStreamBuffer = mainFeedProvider.stream
@@ -84,10 +127,13 @@ class _UserFeedOriginalViewState extends ConsumerState<UserFeedOriginalView> {
 
     _eventStreamBuffer.listen((events) {
       if (mounted) {
-        setState(() {
-          timelineEvents.addAll(events);
-          timelineEvents.sort((a, b) => b.created_at.compareTo(a.created_at));
-        });
+        // setState(() { // Removed setState
+        ref
+            .read(userFeedStateProvider.notifier)
+            .addEvents(events); // Updated this line
+        // timelineEvents.addAll(events); // Removed this line
+        // timelineEvents.sort((a, b) => b.created_at.compareTo(a.created_at)); // Removed this line
+        // });
       }
     });
 
@@ -99,6 +145,8 @@ class _UserFeedOriginalViewState extends ConsumerState<UserFeedOriginalView> {
   }
 
   void _setupNewNotesListener() {
+    return;
+
     final mainFeedProvider = ref.read(getMainFeedProvider);
 
     mainFeedProvider.newNotesStream
@@ -188,6 +236,7 @@ class _UserFeedOriginalViewState extends ConsumerState<UserFeedOriginalView> {
 
   @override
   Widget build(BuildContext context) {
+    final timelineEvents = ref.watch(userFeedStateProvider);
     return FutureBuilder(
       future: _servicesReady.future,
       builder: (context, snapshot) {
@@ -204,19 +253,20 @@ class _UserFeedOriginalViewState extends ConsumerState<UserFeedOriginalView> {
         if (snapshot.connectionState == ConnectionState.done) {
           return Stack(
             children: [
-              RefreshIndicatorNoNeed(
+              refreshIndicatorNoNeed(
                 onRefresh: () {
                   return Future.delayed(const Duration(milliseconds: 0));
                 },
                 child: ListView.builder(
                   controller: PrimaryScrollController.of(context),
-                  itemCount: timelineEvents.length + 1,
+                  itemCount: timelineEvents.length + 1, // Updated this line
                   itemBuilder: (context, index) {
                     if (index == timelineEvents.length) {
+                      // Updated this line
                       return SkeletonNote(renderCallback: _loadMore());
                     }
 
-                    final event = timelineEvents[index];
+                    final event = timelineEvents[index]; // Updated this line
 
                     return NoteCardContainer(
                       key: PageStorageKey(event.id),

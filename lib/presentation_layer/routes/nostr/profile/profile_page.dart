@@ -277,14 +277,14 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                           _actionRow(
                               myKeyPair, followingService, metadata, context),
 
-                          // move up the profile info by 110
+                          // // move up the profile info by 110
                           _profileInformation(metadata),
-                          _bottomInformationBar(
-                              context, followingService, myKeyPair)
+                          //_bottomInformationBar(
+                          //    context, followingService, myKeyPair)
                         ],
                       ),
                     ),
-                    _feed(),
+                    //_feed(),
                   ],
                 );
               }),
