@@ -14,45 +14,6 @@ import 'package:rxdart/rxdart.dart';
 import '../../../components/note_card/sceleton_note.dart';
 import '../../../providers/main_feed_provider.dart';
 
-part 'user_feed_original_view.g.dart';
-
-//! todo: crete feed state obj with start() stop()
-
-@Riverpod(keepAlive: true)
-class UserFeedState extends _$UserFeedState {
-  UserFeedState();
-  @override
-  List<NostrNote> build() {
-    init();
-    return [];
-  }
-
-  void init() {
-    final mainFeedProvider = ref.read(getMainFeedProvider);
-    final eventStreamBuffer = mainFeedProvider.stream
-        .bufferTime(const Duration(
-          milliseconds: 500,
-        ))
-        .where((events) => events.isNotEmpty);
-
-    eventStreamBuffer.listen((events) {
-      addEvents(events);
-      //ref.read(userFeedStateProvider.notifier).addEvents(events);
-    });
-
-    mainFeedProvider.fetchFeedEvents(
-      npub: null,
-      requestId: "startupLoad",
-      limit: 20,
-    );
-  }
-
-  void addEvents(List<NostrNote> events) {
-    state = [...state, ...events]
-      ..sort((a, b) => b.created_at.compareTo(a.created_at));
-  }
-}
-
 class UserFeedOriginalView extends ConsumerStatefulWidget {
   final String pubkey;
 
@@ -78,7 +39,7 @@ class _UserFeedOriginalViewState extends ConsumerState<UserFeedOriginalView> {
   // final List<NostrNote> timelineEvents = []; // Removed this line
   late final Stream<List<NostrNote>> _eventStreamBuffer;
   NostrNote get latestNote =>
-      ref.watch(userFeedStateProvider).last; // Updated this line
+      ref.watch(mainFeedStateProvider(widget.pubkey)).last; // Updated this line
 
   _scrollListener() {
     if (widget.scrollControllerFeed.position.pixels ==
@@ -101,7 +62,7 @@ class _UserFeedOriginalViewState extends ConsumerState<UserFeedOriginalView> {
   }
 
   _loadMore() {
-    if (ref.watch(userFeedStateProvider).length < 2) return;
+    if (ref.watch(mainFeedStateProvider(widget.pubkey)).length < 2) return;
     log("_loadMore()");
     final mainFeedProvider = ref.read(getMainFeedProvider);
     mainFeedProvider.loadMore(
@@ -112,36 +73,6 @@ class _UserFeedOriginalViewState extends ConsumerState<UserFeedOriginalView> {
 
   void _setupScrollListener() {
     widget.scrollControllerFeed.addListener(_scrollListener);
-  }
-
-  void _setupMainFeedListener() {
-    return;
-
-    /// buffers an integrates notes into feed
-    final mainFeedProvider = ref.read(getMainFeedProvider);
-    _eventStreamBuffer = mainFeedProvider.stream
-        .bufferTime(const Duration(
-          milliseconds: 500,
-        ))
-        .where((events) => events.isNotEmpty);
-
-    _eventStreamBuffer.listen((events) {
-      if (mounted) {
-        // setState(() { // Removed setState
-        ref
-            .read(userFeedStateProvider.notifier)
-            .addEvents(events); // Updated this line
-        // timelineEvents.addAll(events); // Removed this line
-        // timelineEvents.sort((a, b) => b.created_at.compareTo(a.created_at)); // Removed this line
-        // });
-      }
-    });
-
-    mainFeedProvider.fetchFeedEvents(
-      npub: widget.pubkey,
-      requestId: "startupLoad",
-      limit: 20,
-    );
   }
 
   void _setupNewNotesListener() {
@@ -204,7 +135,6 @@ class _UserFeedOriginalViewState extends ConsumerState<UserFeedOriginalView> {
     if (!mounted) return;
 
     _setupScrollListener();
-    _setupMainFeedListener();
     _setupNewNotesListener();
 
     _setupNavBarHomeListener();
@@ -236,7 +166,7 @@ class _UserFeedOriginalViewState extends ConsumerState<UserFeedOriginalView> {
 
   @override
   Widget build(BuildContext context) {
-    final timelineEvents = ref.watch(userFeedStateProvider);
+    final timelineEvents = ref.watch(mainFeedStateProvider(widget.pubkey));
     return FutureBuilder(
       future: _servicesReady.future,
       builder: (context, snapshot) {
