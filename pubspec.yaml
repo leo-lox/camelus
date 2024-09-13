@@ -78,7 +78,7 @@ dependencies:
   package_info_plus: ^8.0.2
   #rust_lib_dart_ndk:
   #  path: ../dart_ndk/rust_builder
-  flutter_rust_bridge: ^2.3.0
+  # flutter_rust_bridge: ^2.3.0
   rxdart: ^0.28.0
   shimmer: ^3.0.0
  
