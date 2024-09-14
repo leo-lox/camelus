@@ -1,2 +1,2 @@
-json_key_file("./.keys/camelus-fastlane-key-pc-api-6763441511596794922-935-073a1d8f1718.json") # Path to the json secret file - Follow https://docs.fastlane.tools/actions/supply/#setup to get one
+json_key_file("./.keys/camelus-fastlane-key.json") # Path to the json secret file - Follow https://docs.fastlane.tools/actions/supply/#setup to get one
 package_name("de.lox.dev.camelus") # e.g. com.krausefx.app
