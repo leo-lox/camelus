@@ -43,6 +43,10 @@ class FollowRepositoryImpl implements FollowRepository {
 
   @override
   Stream<ContactList> getContactsStream(String npub) {
+    final ndkResponse = dartNdkSource.dartNdk.follows.getContactList(npub);
+
+    //! todo: use new api
+
     dart_ndk.Filter filter = dart_ndk.Filter(
       authors: [npub],
       kinds: [ndk_entities.ContactList.KIND],

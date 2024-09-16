@@ -142,6 +142,7 @@ class _NoteCardSplitContentState extends ConsumerState<NoteCardSplitContent> {
           link.endsWith(".jpeg") ||
           link.endsWith(".png") ||
           link.endsWith(".webp") ||
+          link.contains(".avif") ||
           link.endsWith(".gif")) {
         imageLinks.add(link);
       }

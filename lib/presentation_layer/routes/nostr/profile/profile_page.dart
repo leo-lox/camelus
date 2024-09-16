@@ -279,12 +279,21 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
 
                           // // move up the profile info by 110
                           _profileInformation(metadata),
-                          //_bottomInformationBar(
-                          //    context, followingService, myKeyPair)
+                          _bottomInformationBar(
+                              context, followingService, myKeyPair)
                         ],
                       ),
                     ),
-                    //_feed(),
+
+                    SliverList(
+                      delegate: SliverChildListDelegate(
+                        [
+                          const SizedBox(height: 20),
+                          _feed(),
+                        ],
+                      ),
+                    ),
+                    // sliver list with random colors
                   ],
                 );
               }),
@@ -338,7 +347,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
   }
 
   _feed() {
-    return Text("feed not iplemented yet");
+    return Text("feed not implemented yet");
   }
 
   Row _bottomInformationBar(
@@ -350,14 +359,14 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
           children: [
             const Icon(Icons.people, color: Palette.white, size: 17),
             const SizedBox(width: 5),
-            FutureBuilder<List<NostrTag>>(
-                future: followingService.getFollowers(widget.pubkey).first,
+            FutureBuilder<ContactList>(
+                future: followingService.getContacts(widget.pubkey),
                 builder: (BuildContext context,
-                    AsyncSnapshot<List<NostrTag>> snapshot) {
+                    AsyncSnapshot<ContactList> snapshot) {
                   var contactsCountString = "";
 
                   if (snapshot.hasData) {
-                    var count = snapshot.data?.length;
+                    var count = snapshot.data?.contacts.length;
                     contactsCountString = "$count following";
                   } else if (snapshot.hasError) {
                     contactsCountString = "n.a. following";
@@ -368,7 +377,8 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
 
                   return GestureDetector(
                     onTap: () {
-                      if (snapshot.data == null || snapshot.data!.isEmpty) {
+                      if (snapshot.data == null ||
+                          snapshot.data!.contacts.isEmpty) {
                         return;
                       }
 
@@ -376,7 +386,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                         context,
                         MaterialPageRoute(
                           builder: (context) => FollowerPage(
-                            contacts: snapshot.data ?? [],
+                            contacts: snapshot.data?.contacts ?? [],
                             title: "Following",
                           ),
                         ),

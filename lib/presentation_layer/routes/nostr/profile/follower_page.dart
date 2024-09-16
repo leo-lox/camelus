@@ -11,7 +11,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class FollowerPage extends ConsumerStatefulWidget {
   final String title;
-  final List<NostrTag> contacts;
+  final List<String> contacts;
 
   const FollowerPage({
     super.key,
@@ -62,22 +62,29 @@ class _FollowerPageState extends ConsumerState<FollowerPage> {
       body: StreamBuilder<ContactList>(
           stream: followingService.getContactsStreamSelf(),
           builder: (context, ownFollowingSnapshot) {
+            if (ownFollowingSnapshot.hasError) {
+              return Text('Error: ${ownFollowingSnapshot.error}');
+            }
+            if (!ownFollowingSnapshot.hasData) {
+              return const Center(child: CircularProgressIndicator());
+            }
+
             return ListView.builder(
                 physics: const BouncingScrollPhysics(),
                 itemCount: widget.contacts.length,
                 itemBuilder: (context, index) {
-                  var displayPubkey = widget.contacts[index].value;
+                  var displayPubkey = widget.contacts[index];
                   return StreamBuilder<UserMetadata?>(
                       stream: metadata.getMetadataByPubkey(displayPubkey),
                       builder: (BuildContext context, metadataSnapshot) {
                         if (metadataSnapshot.hasData) {
                           return personCard(displayPubkey, metadataSnapshot,
-                              ownFollowingSnapshot, context);
+                              ownFollowingSnapshot.data!, context);
                         } else if (metadataSnapshot.hasError) {
                           return Text('Error: ${metadataSnapshot.error}');
                         } else {
                           return personCard(displayPubkey, metadataSnapshot,
-                              ownFollowingSnapshot, context);
+                              ownFollowingSnapshot.data!, context);
                         }
                       });
                 });
@@ -88,7 +95,7 @@ class _FollowerPageState extends ConsumerState<FollowerPage> {
   PersonCard personCard(
       String displayPubkey,
       AsyncSnapshot<UserMetadata?> metadataSnapshot,
-      AsyncSnapshot<ContactList> ownFollowingSnapshot,
+      ContactList ownContactList,
       BuildContext context) {
     return PersonCard(
       pubkey: displayPubkey,
@@ -96,8 +103,8 @@ class _FollowerPageState extends ConsumerState<FollowerPage> {
       pictureUrl: metadataSnapshot.data?.picture ?? "",
       about: metadataSnapshot.data?.about ?? "",
       nip05: metadataSnapshot.data?.nip05 ?? "",
-      isFollowing: ownFollowingSnapshot.data!.contacts
-          .any((element) => element == displayPubkey),
+      isFollowing:
+          ownContactList.contacts.any((element) => element == displayPubkey),
       onTap: () {
         // navigate to profile page
         Navigator.push(
@@ -113,7 +120,7 @@ class _FollowerPageState extends ConsumerState<FollowerPage> {
         _changeFollowing(
           followState,
           displayPubkey,
-          ownFollowingSnapshot.data!,
+          ownContactList,
         );
       },
     );

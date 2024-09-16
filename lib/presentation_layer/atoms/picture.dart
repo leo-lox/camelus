@@ -15,6 +15,8 @@ Widget simplePicture(String? pictureUrl, String? pubkey) {
   if (pictureUrl.contains(".png") ||
       pictureUrl.contains(".jpg") ||
       pictureUrl.contains(".jpeg") ||
+      pictureUrl.endsWith(".webp") ||
+      pictureUrl.contains(".avif") ||
       pictureUrl.contains(".gif")) {
     return CachedNetworkImage(
       imageUrl: pictureUrl,
