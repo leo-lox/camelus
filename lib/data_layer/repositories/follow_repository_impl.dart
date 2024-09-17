@@ -29,7 +29,7 @@ class FollowRepositoryImpl implements FollowRepository {
     );
 
     final response = dartNdkSource.dartNdk.requests
-        .query(filters: [filter], idPrefix: 'get_contacts');
+        .query(filters: [filter], name: 'get_contacts');
 
     final responseList = await response.stream.toList();
 

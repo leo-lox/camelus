@@ -3,17 +3,17 @@ import 'dart:developer';
 import 'package:camelus/data_layer/models/nostr_note_model.dart';
 import 'package:camelus/data_layer/models/user_metadata_model.dart';
 import 'package:camelus/domain_layer/entities/nostr_note.dart';
-import 'package:camelus/domain_layer/entities/user_metadata.dart';
 import 'package:camelus/domain_layer/repositories/note_repository.dart';
 
 import 'package:ndk/entities.dart' as ndk_entities;
-import 'package:ndk/ndk.dart';
+import 'package:ndk/ndk.dart' as ndk;
 
+import '../../domain_layer/entities/user_metadata.dart';
 import '../data_sources/dart_ndk_source.dart';
 
 class NoteRepositoryImpl implements NoteRepository {
   final DartNdkSource dartNdkSource;
-  final EventVerifier eventVerifier;
+  final ndk.EventVerifier eventVerifier;
 
   NoteRepositoryImpl({
     required this.dartNdkSource,
@@ -22,13 +22,13 @@ class NoteRepositoryImpl implements NoteRepository {
 
   @override
   Stream<NostrNote> getAllNotes() {
-    Filter filter = Filter(
+    ndk.Filter filter = ndk.Filter(
       authors: [],
       kinds: [ndk_entities.Nip01Event.TEXT_NODE_KIND],
     );
 
     final response = dartNdkSource.dartNdk.requests
-        .query(filters: [filter], idPrefix: 'getAllNotes-');
+        .query(filters: [filter], name: 'getAllNotes-');
 
     return response.stream.map(
       (event) => NostrNoteModel.fromNDKEvent(event),
@@ -37,9 +37,9 @@ class NoteRepositoryImpl implements NoteRepository {
 
   @override
   Stream<UserMetadata> getMetadataByPubkey(String pubkey) {
-    final myMetadata = dartNdkSource.dartNdk.getSingleMetadata(pubkey);
+    final myMetadata = dartNdkSource.dartNdk.metadata.loadMetadata(pubkey);
 
-    final Stream<ndk_entities.Metadata?> myMetadataStream =
+    final Stream<ndk_entities.UserMetadata?> myMetadataStream =
         myMetadata.asStream();
 
     return myMetadataStream.where((event) => event != null).map(
@@ -49,13 +49,13 @@ class NoteRepositoryImpl implements NoteRepository {
 
   @override
   Stream<NostrNote> getTextNote(String noteId) {
-    Filter filter = Filter(
+    ndk.Filter filter = ndk.Filter(
       ids: [noteId],
       kinds: [ndk_entities.Nip01Event.TEXT_NODE_KIND],
     );
 
     final response = dartNdkSource.dartNdk.requests
-        .query(filters: [filter], idPrefix: 'getTextNote-');
+        .query(filters: [filter], name: 'getTextNote-');
 
     return response.stream.map(
       (event) => NostrNoteModel.fromNDKEvent(event),
@@ -71,7 +71,7 @@ class NoteRepositoryImpl implements NoteRepository {
     int? limit,
     List<String>? eTags,
   }) {
-    Filter filter = Filter(
+    ndk.Filter filter = ndk.Filter(
       authors: authors,
       kinds: [ndk_entities.Nip01Event.TEXT_NODE_KIND],
       since: since,
@@ -82,7 +82,7 @@ class NoteRepositoryImpl implements NoteRepository {
 
     final response = dartNdkSource.dartNdk.requests.query(
       filters: [filter],
-      idPrefix: requestId,
+      name: requestId,
       cacheRead: true,
       cacheWrite: true,
     );
