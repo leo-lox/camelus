@@ -1,66 +1,107 @@
+import 'dart:convert';
+import 'dart:developer';
 import 'dart:ui';
 
-import 'package:camelus/providers/key_pair_provider.dart';
-import 'package:camelus/routes/nostr/blockedUsers/blocked_users.dart';
-import 'package:camelus/routes/nostr/hashtag_view/hashtag_view_page.dart';
-import 'package:camelus/routes/nostr/settings/settings_page.dart';
-import 'package:device_preview/device_preview.dart';
+import 'package:camelus/helpers/bip340.dart';
+import 'package:camelus/presentation_layer/providers/key_pair_provider.dart';
+import 'package:camelus/presentation_layer/routes/nostr/blockedUsers/blocked_users.dart';
+import 'package:camelus/presentation_layer/routes/nostr/hashtag_view/hashtag_view_page.dart';
+import 'package:camelus/presentation_layer/routes/nostr/settings/settings_page.dart';
+//import 'package:device_preview/device_preview.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:camelus/routes/nostr/event_view/event_view_page.dart';
-import 'package:camelus/routes/nostr/onboarding/onboarding.dart';
-import 'package:camelus/routes/nostr/profile/profile_page.dart';
+import 'package:camelus/presentation_layer/routes/nostr/event_view/event_view_page.dart';
+import 'package:camelus/presentation_layer/routes/nostr/onboarding/onboarding.dart';
+import 'package:camelus/presentation_layer/routes/nostr/profile/profile_page.dart';
 
 import 'package:flutter_mentions/flutter_mentions.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import 'routes/home_page.dart';
+import 'presentation_layer/routes/home_page.dart';
 import 'theme.dart' as theme;
 
 const devDeviceFrame = true;
 
-//! first is route, second is pubkey
-Future<List<String>> _getInitialData() async {
-  var wrapper = await ProviderContainer().read(keyPairProvider.future);
-
-  if (wrapper.keyPair == null) {
-    var initialRoute = '/onboarding';
-    return [initialRoute, ""];
+/// returns the pubkey if keys could be loaded from storage, otherwise returns null
+Future<KeyPairWrapper> _setupKeys() async {
+  FlutterSecureStorage storage = const FlutterSecureStorage();
+  var nostrKeysString = await storage.read(key: "nostrKeys");
+  KeyPairWrapper keyPairWrapper;
+  if (nostrKeysString == null) {
+    keyPairWrapper = KeyPairWrapper(keyPair: null);
+    return keyPairWrapper;
   }
 
-  return ['/', wrapper.keyPair!.publicKey];
+  var myKeyPair = KeyPair.fromJson(json.decode(nostrKeysString));
+  keyPairWrapper = KeyPairWrapper(keyPair: myKeyPair);
+
+  return keyPairWrapper;
+}
+
+/// first is route, second is pubkey
+Future<List<dynamic>> _getInitialData() async {
+  final myKeyPairWrapper = await _setupKeys();
+
+  if (myKeyPairWrapper.keyPair == null) {
+    var initialRoute = '/onboarding';
+    KeyPairWrapper emptyKeyPair = KeyPairWrapper(keyPair: null);
+    return [initialRoute, emptyKeyPair];
+  }
+
+  return ['/', myKeyPairWrapper];
 }
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   var initalData = await _getInitialData();
 
-  if (kDebugMode && devDeviceFrame) {
-    runApp(
-      DevicePreview(
-        enabled: kDebugMode,
-        builder: (context) =>
-            MyApp(initialRoute: initalData[0], pubkey: initalData[1]),
-      ),
-    );
-    return;
-  }
+  // currently incompatible with recent flutter sdk https://github.com/aloisdeniel/flutter_device_preview/issues/244
+  // if (kDebugMode && devDeviceFrame) {
+  //   runApp(
+  //     DevicePreview(
+  //       enabled: kDebugMode,
+  //       builder: (context) =>
+  //           MyApp(initialRoute: initalData[0], pubkey: initalData[1]),
+  //     ),
+  //   );
+  //   return;
+  // }
 
-  runApp(MyApp(initialRoute: initalData[0], pubkey: initalData[1]));
+  final myKeyPairWrapper = initalData[1] as KeyPairWrapper;
+
+  runApp(
+    MyApp(
+      initialRoute: initalData[0],
+      pubkey: myKeyPairWrapper.keyPair?.publicKey ?? '',
+      myKeyPairWrapper: myKeyPairWrapper,
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
   final String initialRoute;
   final String pubkey;
-  const MyApp({super.key, required this.initialRoute, required this.pubkey});
+  final KeyPairWrapper myKeyPairWrapper;
+
+  const MyApp({
+    super.key,
+    required this.initialRoute,
+    required this.pubkey,
+    required this.myKeyPairWrapper,
+  });
 
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return Portal(
       child: ProviderScope(
+        overrides: [
+          keyPairProvider.overrideWith((_) {
+            return myKeyPairWrapper;
+          })
+        ],
         child: MaterialApp(
           scrollBehavior: const MaterialScrollBehavior().copyWith(
             scrollbars: false,

@@ -34,7 +34,11 @@ class Bip340 {
     final privKeyHr = _helpers.encodeBech32(privKey, 'nsec');
     final pubKeyHr = _helpers.encodeBech32(pubKey, 'npub');
 
-    return KeyPair(privKey, pubKey, privKeyHr, pubKeyHr);
+    return KeyPair(
+        privateKey: privKey,
+        publicKey: pubKey,
+        privateKeyHr: privKeyHr,
+        publicKeyHr: pubKeyHr);
   }
 }
 
@@ -51,7 +55,12 @@ class KeyPair {
   /// [publicKeyHr] is a human readable public key e.g. npub
   final String publicKeyHr;
 
-  KeyPair(this.privateKey, this.publicKey, this.privateKeyHr, this.publicKeyHr);
+  KeyPair({
+    required this.privateKey,
+    required this.publicKey,
+    required this.privateKeyHr,
+    required this.publicKeyHr,
+  });
 
   Map<String, dynamic> toJson() => {
         'privateKey': privateKey,
@@ -61,9 +70,9 @@ class KeyPair {
       };
 
   factory KeyPair.fromJson(Map<String, dynamic> json) => KeyPair(
-        json['privateKey'],
-        json['publicKey'],
-        json['privateKeyHr'],
-        json['publicKeyHr'],
+        privateKey: json['privateKey'],
+        publicKey: json['publicKey'],
+        privateKeyHr: json['privateKeyHr'],
+        publicKeyHr: json['publicKeyHr'],
       );
 }
