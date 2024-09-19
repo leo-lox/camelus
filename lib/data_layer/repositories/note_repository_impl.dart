@@ -37,9 +37,9 @@ class NoteRepositoryImpl implements NoteRepository {
 
   @override
   Stream<UserMetadata> getMetadataByPubkey(String pubkey) {
-    final myMetadata = dartNdkSource.dartNdk.metadata.loadMetadata(pubkey);
+    final myMetadata = dartNdkSource.dartNdk.metadatas.loadMetadata(pubkey);
 
-    final Stream<ndk_entities.UserMetadata?> myMetadataStream =
+    final Stream<ndk_entities.Metadata?> myMetadataStream =
         myMetadata.asStream();
 
     return myMetadataStream.where((event) => event != null).map(

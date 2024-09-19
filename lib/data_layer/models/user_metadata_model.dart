@@ -39,7 +39,7 @@ class UserMetadataModel extends UserMetadata {
   }
 
   factory UserMetadataModel.fromNDKMetadata(
-    ndk_entities.UserMetadata metadata,
+    ndk_entities.Metadata metadata,
   ) {
     return UserMetadataModel(
       eventId: metadata.hashCode.toString(),

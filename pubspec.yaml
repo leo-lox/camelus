@@ -63,8 +63,8 @@ dependencies:
   #isar: ^3.1.0+1
   #isar_flutter_libs: ^3.1.0+1
   #isar_generator: ^3.1.0+1
-  isar: ^4.0.0-dev.14
-  isar_flutter_libs: ^4.0.0-dev.14
+  #isar: ^4.0.0-dev.14
+  #isar_flutter_libs: ^4.0.0-dev.14
   path_provider: ^2.1.1
   pointycastle: ^3.7.3
   encrypt: ^5.0.3
@@ -73,14 +73,11 @@ dependencies:
   bip39_mnemonic: ^3.0.6
   bip32: ^2.0.0
   crop_your_image: ^1.0.1
-  ndk: 
-    path: ../dart_ndk
   package_info_plus: ^8.0.2
-  #rust_lib_dart_ndk:
-  #  path: ../dart_ndk/rust_builder
-  # flutter_rust_bridge: ^2.3.0
   rxdart: ^0.28.0
   shimmer: ^3.0.0
+  ndk: 
+    path: ../dart_ndk
  
 
 
