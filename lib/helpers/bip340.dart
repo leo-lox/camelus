@@ -17,6 +17,7 @@ class Bip340 {
   /// [publicKey] is a 32-bytes hex-encoded string
   /// true if the signature is valid otherwise false
   bool verify(String message, String signature, String? publicKey) {
+    if (publicKey == null) return false;
     return bip340.verify(publicKey, message, signature);
   }
 

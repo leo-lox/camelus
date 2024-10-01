@@ -40,7 +40,7 @@ dependencies:
   badges: ^3.1.2
   uuid: ^4.4.2
   cached_network_image: ^3.3.1
-  bip340: ^0.2.0
+  bip340: ^0.3.0
   bech32: ^0.2.1
   hex: ^0.2.0
   flutter_secure_storage: ^9.0.0
@@ -77,7 +77,7 @@ dependencies:
   rxdart: ^0.28.0
   shimmer: ^3.0.0
   ndk: 
-    path: ../dart_ndk
+    path: ../ndk
  
 
 
@@ -93,6 +93,7 @@ dev_dependencies:
   custom_lint: ^0.6.7
   riverpod_lint: ^2.3.13
   riverpod_generator: ^2.4.3
+  test: ^1.25.7
 
   
   #layerlens: ^1.0.17
