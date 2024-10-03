@@ -157,7 +157,7 @@ class _NostrPageState extends ConsumerState<NostrPage>
               floating: true,
               snap: false,
               pinned: false,
-              forceElevated: innerBoxIsScrolled,
+              forceElevated: true,
               backgroundColor: Palette.background,
               leadingWidth: 52,
               leading: InkWell(
