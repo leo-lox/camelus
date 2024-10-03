@@ -20,7 +20,7 @@ class Follow {
   }
 
   Future<void> followUser(String npub) async {
-    throw UnimplementedError();
+    return followRepository.followUser(npub);
   }
 
   Future<void> unfollowUser(String npub) async {

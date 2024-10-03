@@ -29,4 +29,22 @@ class ContactListModel extends ContactList {
       loadedTimestamp: ndkContactList.loadedTimestamp,
     );
   }
+
+  ndk_entities.ContactList toNdk() {
+    final ndkContactList = ndk_entities.ContactList(
+      pubKey: pubKey,
+      contacts: contacts,
+    );
+
+    ndkContactList.contactRelays = contactRelays;
+    ndkContactList.petnames = petnames;
+    ndkContactList.followedTags = followedTags;
+    ndkContactList.followedCommunities = followedCommunities;
+    ndkContactList.followedEvents = followedEvents;
+    ndkContactList.sources = sources;
+    ndkContactList.createdAt = createdAt;
+    ndkContactList.loadedTimestamp = loadedTimestamp;
+
+    return ndkContactList;
+  }
 }

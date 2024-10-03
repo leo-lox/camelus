@@ -9,17 +9,13 @@ import '../models/contact_list_model.dart';
 class FollowRepositoryImpl implements FollowRepository {
   final DartNdkSource dartNdkSource;
   final dart_ndk.EventVerifier eventVerifier;
+  final dart_ndk.EventSigner eventSigner;
 
   FollowRepositoryImpl({
     required this.dartNdkSource,
     required this.eventVerifier,
+    required this.eventSigner,
   });
-
-  @override
-  Future<void> followUser(String npub) {
-    // TODO: implement followUser
-    throw UnimplementedError();
-  }
 
   @override
   Future<ContactList> getContacts(String npub) async {
@@ -94,7 +90,14 @@ class FollowRepositoryImpl implements FollowRepository {
 
   @override
   Future<void> setFollowing(ContactList contactList) {
-    // TODO: implement setFollowing
+    final ndkContactList = (contactList as ContactListModel).toNdk();
+    return dartNdkSource.dartNdk.follows
+        .broadcastSetContacts(ndkContactList, [], eventSigner);
+  }
+
+  @override
+  Future<void> followUser(String npub) {
+    dartNdkSource.dartNdk.follows.broadcastAddContact(npub, [], eventSigner);
     throw UnimplementedError();
   }
 
