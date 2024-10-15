@@ -757,7 +757,8 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                 LinearProgressIndicator(
                   minHeight: 2,
                   value: downloadProgress.progress,
-                  color: Palette.lightGray,
+                  color: Palette.gray,
+                  backgroundColor: Palette.black,
                 ),
               ],
             ),
