@@ -28,15 +28,16 @@ class _FollowerPageState extends ConsumerState<FollowerPage> {
   /// follow Change - true to add, false to remove
   void _changeFollowing(
       bool followChange, String pubkey, ContactList currentOwnContacts) async {
+    final followService = ref.read(followingProvider);
     List<String> newContacts = [...currentOwnContacts.contacts];
 
     if (followChange) {
       newContacts.add(pubkey);
+      followService.followUser(pubkey);
     } else {
       newContacts.removeWhere((element) => element == pubkey);
+      followService.unfollowUser(pubkey);
     }
-
-    ref.read(followingProvider).setContacts(newContacts);
   }
 
   @override
