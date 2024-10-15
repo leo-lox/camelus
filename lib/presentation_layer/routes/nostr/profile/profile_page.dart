@@ -769,9 +769,10 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
             fit: BoxFit.cover,
           );
         }
-        return Image.asset(
-          'assets/images/default_header.jpg',
-          fit: BoxFit.cover,
+
+        /// default header
+        return Container(
+          decoration: const BoxDecoration(color: Palette.darkGray),
         );
       },
     ));
