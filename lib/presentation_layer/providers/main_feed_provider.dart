@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:camelus/data_layer/data_sources/dart_ndk_source.dart';
 import 'package:camelus/data_layer/repositories/note_repository_impl.dart';
 import 'package:camelus/domain_layer/repositories/note_repository.dart';
@@ -25,9 +27,9 @@ final getMainFeedProvider = Provider<MainFeed>((ref) {
 
   final Follow followProvider = ref.watch(followingProvider);
 
-  final MainFeed getNotes = MainFeed(noteRepository, followProvider);
+  final MainFeed mainFeed = MainFeed(noteRepository, followProvider);
 
-  return getNotes;
+  return mainFeed;
 });
 
 final mainFeedStateProvider =
@@ -35,18 +37,21 @@ final mainFeedStateProvider =
         MainFeedState.new);
 
 class MainFeedState extends FamilyNotifier<List<NostrNote>, String> {
+  StreamSubscription<List<NostrNote>>? mainFeedSub;
+
   @override
   List<NostrNote> build(String arg) {
-    init(arg);
+    start(arg);
     return [];
   }
 
-  void addEvents(List<NostrNote> events) {
+  void _addEvents(List<NostrNote> events) {
     state = [...state, ...events]
       ..sort((a, b) => b.created_at.compareTo(a.created_at));
   }
 
-  void init(String pubkey) {
+  /// gets called on init
+  void start(String pubkey) {
     final mainFeedProvider = ref.read(getMainFeedProvider);
     final eventStreamBuffer = mainFeedProvider.stream
         .bufferTime(const Duration(
@@ -54,8 +59,8 @@ class MainFeedState extends FamilyNotifier<List<NostrNote>, String> {
         ))
         .where((events) => events.isNotEmpty);
 
-    eventStreamBuffer.listen((events) {
-      addEvents(events);
+    mainFeedSub = eventStreamBuffer.listen((events) {
+      _addEvents(events);
       //ref.read(userFeedStateProvider.notifier).addEvents(events);
     });
 
@@ -64,5 +69,14 @@ class MainFeedState extends FamilyNotifier<List<NostrNote>, String> {
       requestId: "startupLoad",
       limit: 20,
     );
+  }
+
+  Future<void> stop() async {
+    //! todo: stop feed
+    final mainFeedProvider = ref.read(getMainFeedProvider);
+
+    mainFeedSub?.cancel();
+    mainFeedSub = null;
+    state = [];
   }
 }
