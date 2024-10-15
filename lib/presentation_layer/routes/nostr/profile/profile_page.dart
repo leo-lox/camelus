@@ -386,7 +386,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                         context,
                         MaterialPageRoute(
                           builder: (context) => FollowerPage(
-                            contacts: snapshot.data?.contacts ?? [],
+                            contactList: snapshot.data!,
                             title: "Following",
                           ),
                         ),

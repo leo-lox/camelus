@@ -11,12 +11,13 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class FollowerPage extends ConsumerStatefulWidget {
   final String title;
-  final List<String> contacts;
+
+  final ContactList contactList;
 
   const FollowerPage({
     super.key,
+    required this.contactList,
     required this.title,
-    required this.contacts,
   });
 
   @override
@@ -60,31 +61,41 @@ class _FollowerPageState extends ConsumerState<FollowerPage> {
         foregroundColor: Palette.white,
       ),
       body: StreamBuilder<ContactList>(
+
+          /// get self contacts to display follow state
           stream: followingService.getContactsStreamSelf(),
-          builder: (context, ownFollowingSnapshot) {
-            if (ownFollowingSnapshot.hasError) {
-              return Text('Error: ${ownFollowingSnapshot.error}');
+          builder: (context, contactsSnapshot) {
+            if (contactsSnapshot.hasError) {
+              return Text('Error: ${contactsSnapshot.error}');
             }
-            if (!ownFollowingSnapshot.hasData) {
+            if (!contactsSnapshot.hasData) {
               return const Center(child: CircularProgressIndicator());
             }
 
             return ListView.builder(
                 physics: const BouncingScrollPhysics(),
-                itemCount: widget.contacts.length,
+                itemCount: widget.contactList.contacts.length,
                 itemBuilder: (context, index) {
-                  var displayPubkey = widget.contacts[index];
+                  var displayPubkey = widget.contactList.contacts[index];
                   return StreamBuilder<UserMetadata?>(
                       stream: metadata.getMetadataByPubkey(displayPubkey),
                       builder: (BuildContext context, metadataSnapshot) {
                         if (metadataSnapshot.hasData) {
-                          return personCard(displayPubkey, metadataSnapshot,
-                              ownFollowingSnapshot.data!, context);
+                          return personCard(
+                            displayPubkey,
+                            metadataSnapshot,
+                            contactsSnapshot.data!,
+                            context,
+                          );
                         } else if (metadataSnapshot.hasError) {
                           return Text('Error: ${metadataSnapshot.error}');
                         } else {
-                          return personCard(displayPubkey, metadataSnapshot,
-                              ownFollowingSnapshot.data!, context);
+                          return personCard(
+                            displayPubkey,
+                            metadataSnapshot,
+                            contactsSnapshot.data!,
+                            context,
+                          );
                         }
                       });
                 });
