@@ -78,6 +78,7 @@ dependencies:
   shimmer: ^3.0.0
   ndk: 
     path: ../ndk
+  flutter_force_directed_graph: ^1.0.7
  
 
 

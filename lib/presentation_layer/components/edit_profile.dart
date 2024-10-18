@@ -3,6 +3,8 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
+import '../../config/palette.dart';
+
 class EditProfile extends ConsumerStatefulWidget {
   const EditProfile({super.key});
 
@@ -56,11 +58,7 @@ class _EditProfileState extends ConsumerState<EditProfile> {
                     height: MediaQuery.of(context).size.height / 6,
                     decoration: const BoxDecoration(
                       //shape: BoxShape.circle,
-                      image: DecorationImage(
-                        image:
-                            AssetImage("assets/images/default_header.jpg"),
-                        fit: BoxFit.cover,
-                      ),
+                      color: Palette.darkGray,
                     ),
                   ),
                 ),
@@ -78,11 +76,7 @@ class _EditProfileState extends ConsumerState<EditProfile> {
                       height: 100.0,
                       decoration: const BoxDecoration(
                         shape: BoxShape.circle,
-                        image: DecorationImage(
-                          image: AssetImage(
-                              "assets/images/default_header.jpg"),
-                          fit: BoxFit.cover,
-                        ),
+                        color: Palette.darkGray,
                       ),
                     ),
                   ),

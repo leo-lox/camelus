@@ -9,7 +9,7 @@ import '../models/contact_list_model.dart';
 class FollowRepositoryImpl implements FollowRepository {
   final DartNdkSource dartNdkSource;
   final dart_ndk.EventVerifier eventVerifier;
-  final dart_ndk.EventSigner eventSigner;
+  final dart_ndk.EventSigner? eventSigner;
 
   FollowRepositoryImpl({
     required this.dartNdkSource,

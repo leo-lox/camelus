@@ -1,5 +1,5 @@
 import 'package:camelus/presentation_layer/providers/onboarding_provider.dart';
-import 'package:camelus/presentation_layer/routes/nostr/onboarding/onboarding_follow_graph.dart';
+import 'package:camelus/presentation_layer/routes/nostr/onboarding/onboarding_follow_graph/onboarding_follow_graph.dart';
 import 'package:camelus/presentation_layer/routes/nostr/onboarding/onboarding_login.dart';
 import 'package:camelus/presentation_layer/routes/nostr/onboarding/onboarding_name.dart';
 import 'package:camelus/presentation_layer/routes/nostr/onboarding/onboarding_page01.dart';
