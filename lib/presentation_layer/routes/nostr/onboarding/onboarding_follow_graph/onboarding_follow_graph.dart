@@ -36,7 +36,10 @@ class _OnboardingFollowGraphState extends ConsumerState<OnboardingFollowGraph> {
 
   late final ForceDirectedGraphController<GraphNodeData> _graphController =
       ForceDirectedGraphController(
-    graph: ForceDirectedGraph(),
+    graph: ForceDirectedGraph(
+        config: const GraphConfig(
+      length: 200,
+    )),
   )..setOnScaleChange((scale) {
           // can use to optimize the performance
           // if scale is too small, can use simple node and edge builder to improve performance
@@ -227,6 +230,14 @@ class _OnboardingFollowGraphState extends ConsumerState<OnboardingFollowGraph> {
             ),
             const SizedBox(
               height: 10,
+            ),
+            Slider(
+              value: _scale,
+              min: _graphController.minScale,
+              max: _graphController.maxScale,
+              onChanged: (value) {
+                _graphController.scale = value;
+              },
             ),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 20),
