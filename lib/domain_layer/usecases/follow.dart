@@ -24,7 +24,7 @@ class Follow {
   }
 
   Future<void> unfollowUser(String npub) async {
-    throw UnimplementedError();
+    return followRepository.unfollowUser(npub);
   }
 
   Future<void> setContacts(List<String> contacts) async {

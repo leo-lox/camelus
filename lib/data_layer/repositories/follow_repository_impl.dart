@@ -75,8 +75,9 @@ class FollowRepositoryImpl implements FollowRepository {
   }
 
   @override
-  Future<void> unfollowUser(String npub) {
-    // TODO: implement unfollowUser
-    throw UnimplementedError();
+  Future<void> unfollowUser(String npub) async {
+    final newContactList =
+        await dartNdkSource.dartNdk.follows.broadcastRemoveContact(npub);
+    print(newContactList?.contacts);
   }
 }

@@ -6,8 +6,8 @@ import 'package:riverpod/riverpod.dart';
 final eventSignerProvider = StateProvider<EventSigner>((ref) {
   final keypair = ref.watch(keyPairProvider);
   final EventSigner signer = Bip340EventSigner(
-    keypair.keyPair!.publicKey,
-    keypair.keyPair!.privateKey,
+    privateKey: keypair.keyPair!.privateKey,
+    publicKey: keypair.keyPair!.publicKey,
   );
 
   return signer;
