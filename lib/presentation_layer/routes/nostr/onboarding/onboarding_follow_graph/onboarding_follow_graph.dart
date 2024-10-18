@@ -52,14 +52,14 @@ class _OnboardingFollowGraphState extends ConsumerState<OnboardingFollowGraph> {
   int _locatedTo = 0;
   GraphNodeData? _draggingData;
 
-  addNode(GraphNodeData data) {
+  addNode(GraphNodeData data) async {
     // add data
 
     _graphController.addNode(data);
 
     // add edges
-    for (final node in _nodes) {
-      final contacts = node.contactList.contacts;
+    for (final existingNode in _nodes) {
+      final contacts = existingNode.contactList.contacts;
 
       // check if pubkey data.pubkey is in contacts
 
@@ -68,12 +68,13 @@ class _OnboardingFollowGraphState extends ConsumerState<OnboardingFollowGraph> {
       // check if the edge already exists
 
       final exists = _edges.entries.any((e) =>
-          e.key == data.pubkey && e.value == node.pubkey ||
-          e.key == node.pubkey && e.value == data.pubkey);
+          e.key == data.pubkey && e.value == existingNode.pubkey ||
+          e.key == existingNode.pubkey && e.value == data.pubkey);
 
-      if (!exists && match) {
-        _graphController.addEdgeByData(data, node);
-        _edges[data.pubkey] = node.pubkey;
+      if (match && !exists) {
+        _graphController.addEdgeByData(data, existingNode);
+
+        _edges[data.pubkey] = existingNode.pubkey;
       }
     }
 
@@ -123,7 +124,7 @@ class _OnboardingFollowGraphState extends ConsumerState<OnboardingFollowGraph> {
       backgroundColor: Palette.background,
       body: Center(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Expanded(
@@ -187,10 +188,13 @@ class _OnboardingFollowGraphState extends ConsumerState<OnboardingFollowGraph> {
                     },
                     child: Container(
                       width: distance,
-                      height: 16,
+                      height: 20,
                       color: Palette.purple,
                       alignment: Alignment.center,
-                      child: _scale > 0.5 ? Text('$a <-> $b') : null,
+                      child: _scale > 0.5
+                          ? Text(
+                              '${a.userMetadata.name} <-> ${b.userMetadata.name}')
+                          : null,
                     ),
                   );
                 },
