@@ -1,4 +1,5 @@
 import 'package:camelus/presentation_layer/providers/onboarding_provider.dart';
+import 'package:camelus/presentation_layer/routes/nostr/onboarding/onboarding_follow_graph.dart';
 import 'package:camelus/presentation_layer/routes/nostr/onboarding/onboarding_login.dart';
 import 'package:camelus/presentation_layer/routes/nostr/onboarding/onboarding_name.dart';
 import 'package:camelus/presentation_layer/routes/nostr/onboarding/onboarding_page01.dart';
@@ -53,7 +54,7 @@ class _NostrOnboardingState extends ConsumerState<NostrOnboarding>
   void initState() {
     super.initState();
     _tabController = TabController(
-      length: 4,
+      length: 5,
       initialIndex: 0,
       vsync: this,
     );
@@ -101,6 +102,10 @@ class _NostrOnboardingState extends ConsumerState<NostrOnboarding>
                 signUpInfo: ref.watch(onboardingProvider).signUpInfo,
               ),
               const OnboardingSummary(),
+              OnboardingFollowGraph(
+                submitCallback: () {},
+                userInfo: ref.watch(onboardingProvider).signUpInfo,
+              )
             ],
           ),
         ],
