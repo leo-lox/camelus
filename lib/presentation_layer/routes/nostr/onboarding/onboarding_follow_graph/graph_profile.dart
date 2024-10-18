@@ -22,6 +22,8 @@ class GraphProfile extends StatelessWidget {
         UserImage(
           imageUrl: _userMetadata.picture,
           pubkey: _userMetadata.pubkey,
+          filterQuality: FilterQuality.low,
+          disableGif: true,
         ),
         const SizedBox(
           width: 10,

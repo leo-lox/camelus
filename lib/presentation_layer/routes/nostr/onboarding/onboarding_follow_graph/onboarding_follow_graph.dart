@@ -1,6 +1,9 @@
+import 'dart:math';
+
 import 'package:camelus/presentation_layer/atoms/long_button.dart';
 import 'package:camelus/config/palette.dart';
 import 'package:camelus/domain_layer/entities/onboarding_user_info.dart';
+import 'package:camelus/presentation_layer/atoms/my_profile_picture.dart';
 import 'package:camelus/presentation_layer/providers/following_provider.dart';
 import 'package:camelus/presentation_layer/providers/metadata_provider.dart';
 import 'package:camelus/presentation_layer/routes/nostr/onboarding/onboarding_follow_graph/graph_profile.dart';
@@ -34,11 +37,17 @@ class _OnboardingFollowGraphState extends ConsumerState<OnboardingFollowGraph> {
     '76c71aae3a491f1d9eec47cba17e229cda4113a0bbb6e6ae1776d7643e29cafa'
   ];
 
+  final followedList = <String>[];
+  final int followTarget = 5;
+
   late final ForceDirectedGraphController<GraphNodeData> _graphController =
       ForceDirectedGraphController(
     graph: ForceDirectedGraph(
         config: const GraphConfig(
       length: 200,
+      elasticity: 0.1,
+      maxStaticFriction: 10,
+      repulsionRange: 750,
     )),
   )..setOnScaleChange((scale) {
           // can use to optimize the performance
@@ -86,6 +95,49 @@ class _OnboardingFollowGraphState extends ConsumerState<OnboardingFollowGraph> {
     _nodes.add(data);
   }
 
+  /// adds all the contacts (with cutoff) from a given pubkey (from node)
+  addContactsOfPubkey(String pubkey, {int cutoff = 5}) async {
+    final List<String> contacts =
+        _nodes.firstWhere((n) => n.pubkey == pubkey).contactList.contacts;
+
+    for (int i = 0; i < contacts.length; i++) {
+      if (i > cutoff) {
+        break;
+      }
+
+      // skip if node already exists
+      if (_nodes.any((n) => n.pubkey == contacts[i])) {
+        continue;
+      }
+
+      // add node to graph
+
+      await addPubkeyNode(contacts[i]);
+      setState(() {
+        _scale = max(0.1, _scale * 0.99);
+        _graphController.scale = _scale;
+      });
+    }
+  }
+
+  removeContactsOfPubkey(String pubkey) {
+    final List<String> contacts =
+        _nodes.firstWhere((n) => n.pubkey == pubkey).contactList.contacts;
+
+    for (final contact in contacts) {
+      try {
+        final foundNode = _nodes.firstWhere((n) => n.pubkey == contact);
+        _nodes.remove(foundNode);
+      } catch (_) {}
+
+      try {
+        final graphNode = _graphController.graph.nodes
+            .firstWhere((n) => n.data.pubkey == contact);
+        _graphController.deleteNode(graphNode);
+      } catch (_) {}
+    }
+  }
+
   /// fetches and adds a node to the graph
   addPubkeyNode(String pubkey) async {
     final mynode = await _fetchNodePubkeyData(pubkey);
@@ -126,8 +178,8 @@ class _OnboardingFollowGraphState extends ConsumerState<OnboardingFollowGraph> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       _graphController.needUpdate();
+      _addRecommendations();
     });
-    //_addRecommendations();
   }
 
   @override
@@ -138,6 +190,7 @@ class _OnboardingFollowGraphState extends ConsumerState<OnboardingFollowGraph> {
 
   @override
   Widget build(BuildContext context) {
+    const double miniViewCutoff = 0.35;
     return Scaffold(
       backgroundColor: Palette.background,
       body: Center(
@@ -161,10 +214,9 @@ class _OnboardingFollowGraphState extends ConsumerState<OnboardingFollowGraph> {
                 onDraggingUpdate: (data) {},
                 nodesBuilder: (context, data) {
                   final Color color;
-                  bool _isLarge = false;
+
                   if (_draggingData == data) {
                     color = Colors.yellow;
-                    _isLarge = true;
                   } else if (_nodes.contains(data)) {
                     color = Colors.green;
                   } else {
@@ -176,32 +228,39 @@ class _OnboardingFollowGraphState extends ConsumerState<OnboardingFollowGraph> {
                       print("onTap $data");
                       setState(() {
                         data.selected = !data.selected;
-                        // if (_nodes.contains(data)) {
-                        //   _nodes.remove(data);
-                        // } else {
-                        //   _nodes.add(data);
-                        // }
+                        if (data.selected) {
+                          followedList.add(data.pubkey);
+                          addContactsOfPubkey(data.pubkey, cutoff: 3);
+                        } else {
+                          followedList.remove(data.pubkey);
+                          removeContactsOfPubkey(data.pubkey);
+                        }
                       });
                     },
                     child: AnimatedContainer(
-                      width: 250,
-                      height: 84,
-                      duration: const Duration(milliseconds: 250),
-                      curve: Curves.easeInOut,
-                      decoration: BoxDecoration(
-                        color: Palette.extraDarkGray,
-                        border: Border.all(
-                          color:
-                              data.selected ? Colors.white : Colors.transparent,
-                          width: 2,
+                        width: _scale > miniViewCutoff ? 250 : 60,
+                        height: _scale > miniViewCutoff ? 84 : 60,
+                        duration: const Duration(milliseconds: 250),
+                        curve: Curves.easeInOut,
+                        decoration: BoxDecoration(
+                          color: Palette.extraDarkGray,
+                          border: Border.all(
+                            color: data.selected
+                                ? Colors.white
+                                : Colors.transparent,
+                            width: 2,
+                          ),
+                          borderRadius: BorderRadius.circular(12),
                         ),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      alignment: Alignment.center,
-                      child: _scale > 0.5
-                          ? GraphProfile(metadata: data.userMetadata)
-                          : null,
-                    ),
+                        alignment: Alignment.center,
+                        child: _scale > miniViewCutoff
+                            ? GraphProfile(metadata: data.userMetadata)
+                            : UserImage(
+                                imageUrl: data.userMetadata.picture,
+                                pubkey: data.userMetadata.pubkey,
+                                filterQuality: FilterQuality.low,
+                                disableGif: true,
+                              )),
                   );
                 },
                 edgesBuilder: (context, a, b, distance) {
@@ -244,9 +303,9 @@ class _OnboardingFollowGraphState extends ConsumerState<OnboardingFollowGraph> {
               width: 400,
               height: 40,
               child: longButton(
-                name: "next",
+                disabled: followedList.length < followTarget,
+                name: "follow ${followedList.length}/$followTarget",
                 onPressed: (() {
-                  _addRecommendations();
                   widget.submitCallback();
                 }),
                 inverted: true,
