@@ -1,8 +1,10 @@
 import 'package:ndk/ndk.dart';
 import 'package:riverpod/riverpod.dart';
 
+import 'event_signer_provider.dart';
+
 final ndkProvider = Provider<Ndk>((ref) {
-  final EventSigner eventSigner = Bip340EventSigner("privateKey", "publicKey");
+  final eventSigner = ref.watch(eventSignerProvider);
   final EventVerifier eventVerifier = RustEventVerifier();
 
   final CacheManager cache = MemCacheManager();
