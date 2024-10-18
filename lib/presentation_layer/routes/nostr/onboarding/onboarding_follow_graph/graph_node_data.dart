@@ -5,7 +5,7 @@ class GraphNodeData {
   final String pubkey;
   final UserMetadata userMetadata;
   final ContactList contactList;
-  final bool selected;
+  bool selected;
 
   GraphNodeData({
     required this.pubkey,

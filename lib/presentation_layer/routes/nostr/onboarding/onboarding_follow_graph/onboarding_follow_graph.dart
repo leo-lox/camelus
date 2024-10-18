@@ -45,7 +45,7 @@ class _OnboardingFollowGraphState extends ConsumerState<OnboardingFollowGraph> {
             _scale = scale;
           });
         });
-  int _nodeCount = 5;
+
   final Set<GraphNodeData> _nodes = {};
   final Map<String, String> _edges = {};
   double _scale = 1.0;
@@ -74,6 +74,7 @@ class _OnboardingFollowGraphState extends ConsumerState<OnboardingFollowGraph> {
       if (match && !exists) {
         _graphController.addEdgeByData(data, existingNode);
 
+        // update outside representation
         _edges[data.pubkey] = existingNode.pubkey;
       }
     }
@@ -82,25 +83,39 @@ class _OnboardingFollowGraphState extends ConsumerState<OnboardingFollowGraph> {
     _nodes.add(data);
   }
 
-  _addRecommendations() async {
-    final metadataP = ref.watch(metadataProvider);
-    final followP = ref.watch(followingProvider);
+  /// fetches and adds a node to the graph
+  addPubkeyNode(String pubkey) async {
+    final mynode = await _fetchNodePubkeyData(pubkey);
+    addNode(mynode);
+  }
 
+  _addRecommendations() async {
     final List<GraphNodeData> recommendationsNodes = [];
 
     for (final pubkey in recommendations) {
-      final metadata =
-          (await metadataP.getMetadataByPubkey(pubkey).toList()).first;
-      final followInfo = await followP.getContacts(pubkey);
-
-      final GraphNodeData mynode = GraphNodeData(
-          pubkey: pubkey, userMetadata: metadata, contactList: followInfo);
+      final GraphNodeData mynode = await _fetchNodePubkeyData(pubkey);
 
       recommendationsNodes.add(mynode);
     }
     for (final node in recommendationsNodes) {
       addNode(node);
     }
+  }
+
+  Future<GraphNodeData> _fetchNodePubkeyData(String pubkey) async {
+    final metadataP = ref.watch(metadataProvider);
+    final followP = ref.watch(followingProvider);
+
+    final metadata =
+        (await metadataP.getMetadataByPubkey(pubkey).toList()).first;
+    final followInfo = await followP.getContacts(pubkey);
+
+    final GraphNodeData mynode = GraphNodeData(
+      pubkey: pubkey,
+      userMetadata: metadata,
+      contactList: followInfo,
+    );
+    return mynode;
   }
 
   @override
@@ -143,8 +158,10 @@ class _OnboardingFollowGraphState extends ConsumerState<OnboardingFollowGraph> {
                 onDraggingUpdate: (data) {},
                 nodesBuilder: (context, data) {
                   final Color color;
+                  bool _isLarge = false;
                   if (_draggingData == data) {
                     color = Colors.yellow;
+                    _isLarge = true;
                   } else if (_nodes.contains(data)) {
                     color = Colors.green;
                   } else {
@@ -155,18 +172,26 @@ class _OnboardingFollowGraphState extends ConsumerState<OnboardingFollowGraph> {
                     onTap: () {
                       print("onTap $data");
                       setState(() {
-                        if (_nodes.contains(data)) {
-                          _nodes.remove(data);
-                        } else {
-                          _nodes.add(data);
-                        }
+                        data.selected = !data.selected;
+                        // if (_nodes.contains(data)) {
+                        //   _nodes.remove(data);
+                        // } else {
+                        //   _nodes.add(data);
+                        // }
                       });
                     },
-                    child: Container(
-                      width: 80,
-                      height: 80,
+                    child: AnimatedContainer(
+                      width: 250,
+                      height: 84,
+                      duration: const Duration(milliseconds: 250),
+                      curve: Curves.easeInOut,
                       decoration: BoxDecoration(
-                        color: color,
+                        color: Palette.extraDarkGray,
+                        border: Border.all(
+                          color:
+                              data.selected ? Colors.white : Colors.transparent,
+                          width: 2,
+                        ),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       alignment: Alignment.center,
@@ -188,8 +213,8 @@ class _OnboardingFollowGraphState extends ConsumerState<OnboardingFollowGraph> {
                     },
                     child: Container(
                       width: distance,
-                      height: 20,
-                      color: Palette.purple,
+                      height: 2,
+                      color: Palette.gray,
                       alignment: Alignment.center,
                       child: _scale > 0.5
                           ? Text(
