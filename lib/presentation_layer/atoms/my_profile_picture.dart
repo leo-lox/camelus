@@ -4,70 +4,38 @@ import 'package:flutter_svg/svg.dart';
 import 'package:camelus/config/palette.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
-class UserImage extends StatefulWidget {
+class UserImage extends StatelessWidget {
   const UserImage({
-    super.key,
+    Key? key,
     required this.imageUrl,
     required this.pubkey,
-  });
+    this.size = 60,
+    this.filterQuality = FilterQuality.medium,
+    this.cacheHeight,
+    this.disableGif = false,
+  }) : super(key: key);
 
   final String? imageUrl;
   final String pubkey;
-
-  @override
-  UserImageState createState() => UserImageState();
-}
-
-class UserImageState extends State<UserImage> {
-  late Widget profilePicture;
-
-  @override
-  void initState() {
-    super.initState();
-    profilePicture = _myProfilePicture(
-      pictureUrl: widget.imageUrl ?? "${Dicebear.baseUrl}${widget.pubkey}",
-      pubkey: widget.pubkey,
-      filterQuality: FilterQuality.medium,
-    );
-  }
-
-  @override
-  void didUpdateWidget(UserImage oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (widget.imageUrl != oldWidget.imageUrl ||
-        widget.pubkey != oldWidget.pubkey) {
-      profilePicture = _myProfilePicture(
-        pictureUrl: widget.imageUrl ?? "${Dicebear.baseUrl}${widget.pubkey}",
-        pubkey: widget.pubkey,
-        filterQuality: FilterQuality.medium,
-      );
-    }
-  }
+  final double size;
+  final FilterQuality filterQuality;
+  final int? cacheHeight;
+  final bool disableGif;
 
   @override
   Widget build(BuildContext context) {
-    return profilePicture;
-  }
-}
+    final pictureUrl = imageUrl ?? "${Dicebear.baseUrl}$pubkey";
 
-Widget _myProfilePicture({
-  required String pictureUrl,
-  required String pubkey,
-  FilterQuality filterQuality = FilterQuality.medium,
-  int? cacheHeight,
-  bool disableGif = false,
-}) {
-  // all other image types
-  if (pictureUrl.contains(".png") ||
-      pictureUrl.contains(".jpg") ||
-      pictureUrl.contains(".jpeg") ||
-      (!disableGif && pictureUrl.contains(".gif")) ||
-      pictureUrl.contains(".webp") ||
-      pictureUrl.contains(".avif")) {
-    return ClipOval(
-      child: SizedBox.fromSize(
-        size: const Size.fromRadius(30), // Image radius
-        child: Container(
+    if (pictureUrl.contains(".png") ||
+        pictureUrl.contains(".jpg") ||
+        pictureUrl.contains(".jpeg") ||
+        (!disableGif && pictureUrl.contains(".gif")) ||
+        pictureUrl.contains(".webp") ||
+        pictureUrl.contains(".avif")) {
+      return ClipOval(
+        child: SizedBox.fromSize(
+          size: Size.fromRadius(size / 2),
+          child: Container(
             color: Palette.background,
             child: CachedNetworkImage(
               imageUrl: pictureUrl,
@@ -77,37 +45,37 @@ Widget _myProfilePicture({
                 color: Palette.darkGray,
               ),
               errorWidget: (context, url, error) => const Icon(Icons.error),
-              //memCacheHeight: cacheHeight ?? 200,
-              memCacheWidth: cacheHeight ?? 150, //cacheHeight ?? 200,
+              memCacheWidth: cacheHeight ?? 150,
               maxHeightDiskCache: cacheHeight ?? 150,
               maxWidthDiskCache: cacheHeight ?? 150,
               alignment: Alignment.center,
               fit: BoxFit.cover,
-            )),
-      ),
-    );
-  }
+            ),
+          ),
+        ),
+      );
+    }
 
-  //if svg
-  if (pictureUrl.contains(".svg")) {
+    if (pictureUrl.contains(".svg")) {
+      return Container(
+        height: size,
+        width: size,
+        decoration: const BoxDecoration(
+          color: Palette.primary,
+          shape: BoxShape.circle,
+        ),
+        child: SvgPicture.network(pictureUrl),
+      );
+    }
+
     return Container(
-      height: 60,
-      width: 60,
+      height: size,
+      width: size,
       decoration: const BoxDecoration(
         color: Palette.primary,
         shape: BoxShape.circle,
       ),
-      child: SvgPicture.network(pictureUrl),
+      child: SvgPicture.network("${Dicebear.baseUrl}$pubkey"),
     );
   }
-  // default
-  return Container(
-    height: 60,
-    width: 60,
-    decoration: const BoxDecoration(
-      color: Palette.primary,
-      shape: BoxShape.circle,
-    ),
-    child: SvgPicture.network("${Dicebear.baseUrl}$pubkey"),
-  );
 }
