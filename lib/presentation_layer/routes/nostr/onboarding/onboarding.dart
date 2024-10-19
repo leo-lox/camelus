@@ -24,6 +24,7 @@ class _NostrOnboardingState extends ConsumerState<NostrOnboarding>
     keepPage: true,
   );
   bool horizontalScrollLock = false;
+  bool pageLock = false;
 
   void _setupTabLiseners() {
     // listen to changes of tabs
@@ -35,6 +36,15 @@ class _NostrOnboardingState extends ConsumerState<NostrOnboarding>
       } else {
         setState(() {
           horizontalScrollLock = false;
+        });
+      }
+      if (_tabController.index == 4) {
+        setState(() {
+          pageLock = true;
+        });
+      } else {
+        setState(() {
+          pageLock = false;
         });
       }
     });
@@ -80,6 +90,7 @@ class _NostrOnboardingState extends ConsumerState<NostrOnboarding>
           const OnboardingLoginPage(),
           TabBarView(
             controller: _tabController,
+            physics: pageLock ? const NeverScrollableScrollPhysics() : null,
             children: [
               OnboardingPage01(
                 loginCallback: _navigateToLogin,
