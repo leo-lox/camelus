@@ -9,7 +9,10 @@ import '../entities/generated_private_key.dart';
 
 class GeneratePrivateKey {
   static GeneratedPrivateKey generateKey() {
-    final mnemonic = Mnemonic.generate(Language.english, entropyLength: 256);
+    final mnemonic = Mnemonic.generate(
+      Language.english,
+      entropyLength: 256,
+    );
 
     final sentence = mnemonic.sentence;
     final words = mnemonic.words;

@@ -1,6 +1,10 @@
+import 'dart:convert';
+
 import 'package:camelus/presentation_layer/atoms/mnemonic_grid.dart';
+import 'package:camelus/presentation_layer/providers/key_pair_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -8,7 +12,9 @@ import '../../../../config/palette.dart';
 import '../../../../domain_layer/entities/generated_private_key.dart';
 import '../../../../domain_layer/entities/onboarding_user_info.dart';
 import '../../../../domain_layer/usecases/generate_private_key.dart';
+import '../../../../helpers/bip340.dart';
 import '../../../atoms/long_button.dart';
+import '../../home_page.dart';
 
 class OnboardingDone extends ConsumerStatefulWidget {
   final Function() submitCallback;
@@ -43,7 +49,20 @@ class _OnboardingDoneState extends ConsumerState<OnboardingDone> {
   }
 
   void _copyKey() {
-    Clipboard.setData(ClipboardData(text: _privateKey.mnemonicSentence));
+    final clipData = """
+Public Key:
+${_privateKey.publicKeyHr}
+
+
+Private Key:
+${_privateKey.privKeyHr}
+
+
+SeedPhrase:
+${_privateKey.mnemonicSentence}
+    """;
+
+    Clipboard.setData(ClipboardData(text: clipData));
   }
 
   @override
@@ -67,6 +86,27 @@ class _OnboardingDoneState extends ConsumerState<OnboardingDone> {
       );
       return;
     }
+
+    final myKeyPair = KeyPair(
+      privateKey: _privateKey.privateKey,
+      publicKey: _privateKey.publicKey,
+      privateKeyHr: _privateKey.privKeyHr,
+      publicKeyHr: _privateKey.publicKeyHr,
+    );
+
+    final keyPairP = ref.watch(keyPairProvider);
+    keyPairP.setKeyPair(myKeyPair);
+
+    // save in storage
+    const storage = FlutterSecureStorage();
+    storage.write(key: "nostrKeys", value: json.encode(myKeyPair.toJson()));
+
+    //! todo: broadcast data to nostr network
+
+    // naviage to /
+    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
+      return HomePage(pubkey: myKeyPair.publicKey);
+    }));
   }
 
   @override
@@ -76,50 +116,64 @@ class _OnboardingDoneState extends ConsumerState<OnboardingDone> {
       backgroundColor: Palette.background,
       body: Column(
         children: [
-          const SizedBox(height: 10),
+          const SizedBox(height: 20),
           const Text(
-            "Recovery Keys",
+            "recovery phrase",
             style: TextStyle(
               color: Palette.white,
-              fontSize: 20,
+              fontSize: 22,
               fontWeight: FontWeight.bold,
             ),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 25),
           MnemonicSentenceGrid(
             words: _privateKey.mnemonicWords,
             isVisible: _isVisible,
           ),
-          const SizedBox(height: 10),
-          Container(
-            child: Text(_privateKey.publicKeyHr),
-          ),
-          const SizedBox(height: 15),
+          const SizedBox(height: 25),
           Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.all(10.0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 ElevatedButton.icon(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Palette.lightGray,
-                    foregroundColor: Palette.black,
-                  ),
-                  onPressed: () => _copyKey(),
-                  icon: const Icon(Icons.copy),
-                  label: const Text('copy'),
-                ),
-                const SizedBox(width: 16),
-                ElevatedButton.icon(
-                  style: ElevatedButton.styleFrom(
                     backgroundColor: Palette.black,
                     foregroundColor: Palette.white,
                   ),
-                  onPressed: () => _generateKey(),
+                  onPressed: () => {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        duration: Duration(seconds: 2),
+                        content: Text('a new seed phrase has been generated',
+                            style: TextStyle(color: Palette.black)),
+                      ),
+                    ),
+                    _generateKey()
+                  },
                   icon: const Icon(Icons.refresh),
                   label: const Text('regenerate'),
                 ),
-                const SizedBox(width: 16),
+                const SizedBox(width: 5),
+                ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Palette.lightGray,
+                    foregroundColor: Palette.black,
+                  ),
+                  onPressed: () => {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        duration: Duration(seconds: 2),
+                        content: Text('copied seed phrase to clipboard',
+                            style: TextStyle(color: Palette.black)),
+                      ),
+                    ),
+                    _copyKey()
+                  },
+                  icon: const Icon(Icons.copy),
+                  label: const Text('copy'),
+                ),
+                const SizedBox(width: 5),
                 IconButton(
                   onPressed: _toggleVisibility,
                   icon: Icon(
@@ -128,6 +182,11 @@ class _OnboardingDoneState extends ConsumerState<OnboardingDone> {
                 ),
               ],
             ),
+          ),
+          const Padding(
+            padding: EdgeInsets.all(16),
+            child: Text(
+                "You need the recovery phrase to login again. Make sure to keep it safe!"),
           ),
           const Spacer(flex: 1),
           Row(

@@ -19,7 +19,7 @@ class MnemonicSentenceGrid extends StatelessWidget {
       width: 500,
       child: GridView.builder(
         gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-          maxCrossAxisExtent: 220,
+          maxCrossAxisExtent: 150,
           mainAxisExtent: 50,
           childAspectRatio: 10 / 4,
           crossAxisSpacing: 0,
