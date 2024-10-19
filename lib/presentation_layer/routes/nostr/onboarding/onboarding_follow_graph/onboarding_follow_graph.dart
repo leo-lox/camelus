@@ -14,7 +14,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'graph_node_data.dart';
 
 class OnboardingFollowGraph extends ConsumerStatefulWidget {
-  final Function submitCallback;
+  final Function(List<String>) submitCallback;
 
   final OnboardingUserInfo userInfo;
 
@@ -29,6 +29,8 @@ class OnboardingFollowGraph extends ConsumerStatefulWidget {
 }
 
 class _OnboardingFollowGraphState extends ConsumerState<OnboardingFollowGraph> {
+  bool _loading = true;
+
   // npubs in hex
   final List<String> recommendations = [
     '717ff238f888273f5d5ee477097f2b398921503769303a0c518d06a952f2a75e',
@@ -45,9 +47,10 @@ class _OnboardingFollowGraphState extends ConsumerState<OnboardingFollowGraph> {
     graph: ForceDirectedGraph(
         config: const GraphConfig(
       length: 200,
-      elasticity: 1.0,
-      maxStaticFriction: 10,
-      repulsionRange: 300,
+      elasticity: 0.5,
+      // maxStaticFriction: 20,
+      repulsionRange: 250,
+      repulsion: 70,
     )),
   )..setOnScaleChange((scale) {
           // can use to optimize the performance
@@ -84,7 +87,7 @@ class _OnboardingFollowGraphState extends ConsumerState<OnboardingFollowGraph> {
   }
 
   /// adds all the contacts (with cutoff) from a given pubkey (from node)
-  addContactsOfPubkey(String pubkey, {int cutoff = 5}) async {
+  addContactsOfPubkey(String pubkey, {int cutoff = 3}) async {
     final List<String> contacts =
         _nodes.firstWhere((n) => n.pubkey == pubkey).contactList.contacts;
 
@@ -148,6 +151,9 @@ class _OnboardingFollowGraphState extends ConsumerState<OnboardingFollowGraph> {
     for (final node in recommendationsNodes) {
       addNode(node);
     }
+    setState(() {
+      _loading = false;
+    });
   }
 
   Future<GraphNodeData> _fetchNodePubkeyData(String pubkey) async {
@@ -284,6 +290,8 @@ class _OnboardingFollowGraphState extends ConsumerState<OnboardingFollowGraph> {
               height: 10,
             ),
             Slider(
+              inactiveColor: Palette.extraDarkGray,
+              activeColor: Palette.lightGray,
               value: _scale,
               min: _graphController.minScale,
               max: _graphController.maxScale,
@@ -296,10 +304,11 @@ class _OnboardingFollowGraphState extends ConsumerState<OnboardingFollowGraph> {
               width: 400,
               height: 40,
               child: longButton(
+                loading: _loading,
                 disabled: followedList.length < followTarget,
                 name: "follow ${followedList.length}/$followTarget",
                 onPressed: (() {
-                  widget.submitCallback();
+                  widget.submitCallback(followedList);
                 }),
                 inverted: true,
               ),

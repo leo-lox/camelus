@@ -38,7 +38,7 @@ class _NostrOnboardingState extends ConsumerState<NostrOnboarding>
           horizontalScrollLock = false;
         });
       }
-      if (_tabController.index == 4) {
+      if (_tabController.index == 4 || _tabController.index == 5) {
         setState(() {
           pageLock = true;
         });
@@ -114,7 +114,7 @@ class _NostrOnboardingState extends ConsumerState<NostrOnboarding>
               ),
               const OnboardingSummary(),
               OnboardingFollowGraph(
-                submitCallback: () {},
+                submitCallback: (followPubkeys) {},
                 userInfo: ref.watch(onboardingProvider).signUpInfo,
               )
             ],
