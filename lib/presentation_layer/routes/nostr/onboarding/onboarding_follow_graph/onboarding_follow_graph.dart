@@ -45,9 +45,9 @@ class _OnboardingFollowGraphState extends ConsumerState<OnboardingFollowGraph> {
     graph: ForceDirectedGraph(
         config: const GraphConfig(
       length: 200,
-      elasticity: 0.1,
+      elasticity: 1.0,
       maxStaticFriction: 10,
-      repulsionRange: 750,
+      repulsionRange: 300,
     )),
   )..setOnScaleChange((scale) {
           // can use to optimize the performance
@@ -64,34 +64,22 @@ class _OnboardingFollowGraphState extends ConsumerState<OnboardingFollowGraph> {
   int _locatedTo = 0;
   GraphNodeData? _draggingData;
 
-  addNode(GraphNodeData data) async {
+  /// if addedBy Pubkey drawas a edge to the old and new node
+  addNode(GraphNodeData data, {String? addedByPubkey}) async {
     // add data
 
     _graphController.addNode(data);
 
-    // add edges
-    for (final existingNode in _nodes) {
-      final contacts = existingNode.contactList.contacts;
+    if (addedByPubkey != null) {
+      try {
+        final rootNode = _graphController.graph.nodes
+            .firstWhere((data) => data.data.pubkey == addedByPubkey);
 
-      // check if pubkey data.pubkey is in contacts
-
-      final match = contacts.any((c) => c == data.pubkey);
-
-      // check if the edge already exists
-
-      final exists = _edges.entries.any((e) =>
-          e.key == data.pubkey && e.value == existingNode.pubkey ||
-          e.key == existingNode.pubkey && e.value == data.pubkey);
-
-      if (match && !exists) {
-        _graphController.addEdgeByData(data, existingNode);
-
-        // update outside representation
-        _edges[data.pubkey] = existingNode.pubkey;
-      }
+        _graphController.addEdgeByData(data, rootNode.data);
+        _edges[data.pubkey] = rootNode.data.pubkey;
+      } catch (_) {}
     }
 
-    // update outside representation
     _nodes.add(data);
   }
 
@@ -112,36 +100,41 @@ class _OnboardingFollowGraphState extends ConsumerState<OnboardingFollowGraph> {
 
       // add node to graph
 
-      await addPubkeyNode(contacts[i]);
-      setState(() {
-        _scale = max(0.1, _scale * 0.99);
-        _graphController.scale = _scale;
-      });
+      await addPubkeyNode(contacts[i], addedByPubkey: pubkey);
     }
   }
 
-  removeContactsOfPubkey(String pubkey) {
-    final List<String> contacts =
-        _nodes.firstWhere((n) => n.pubkey == pubkey).contactList.contacts;
+  /// removes the subtree
+  removeAncestors(String pubkey) {
+    final pubkeyNode = _nodes.firstWhere((n) => n.pubkey == pubkey);
 
-    for (final contact in contacts) {
-      try {
-        final foundNode = _nodes.firstWhere((n) => n.pubkey == contact);
-        _nodes.remove(foundNode);
-      } catch (_) {}
+    final List<GraphNodeData> ancestors = [];
 
-      try {
-        final graphNode = _graphController.graph.nodes
-            .firstWhere((n) => n.data.pubkey == contact);
-        _graphController.deleteNode(graphNode);
-      } catch (_) {}
+    // delete by traversing through the subgraph using a for loop in _edges
+    for (final edge in _edges.entries) {
+      if (edge.value == pubkey) {
+        ancestors.add(_nodes.firstWhere((n) => n.pubkey == edge.key));
+      }
+    }
+
+    // delete all edges and nodes
+    // delete the edges first, then the nodes
+    // delete the edges in reverse order to avoid deleting edges that are not in the graph anymore
+    ancestors.sort((a, b) => b.pubkey.compareTo(a.pubkey));
+
+    for (final ancestorNode in ancestors) {
+      if (ancestorNode.selected) continue;
+      _graphController.deleteEdgeByData(pubkeyNode, ancestorNode);
+
+      _graphController.deleteNodeByData(ancestorNode);
+      _nodes.remove(ancestorNode);
     }
   }
 
   /// fetches and adds a node to the graph
-  addPubkeyNode(String pubkey) async {
+  addPubkeyNode(String pubkey, {String? addedByPubkey}) async {
     final mynode = await _fetchNodePubkeyData(pubkey);
-    addNode(mynode);
+    addNode(mynode, addedByPubkey: addedByPubkey);
   }
 
   _addRecommendations() async {
@@ -233,7 +226,7 @@ class _OnboardingFollowGraphState extends ConsumerState<OnboardingFollowGraph> {
                           addContactsOfPubkey(data.pubkey, cutoff: 3);
                         } else {
                           followedList.remove(data.pubkey);
-                          removeContactsOfPubkey(data.pubkey);
+                          removeAncestors(data.pubkey);
                         }
                       });
                     },
@@ -276,7 +269,7 @@ class _OnboardingFollowGraphState extends ConsumerState<OnboardingFollowGraph> {
                     child: Container(
                       width: distance,
                       height: 2,
-                      color: Palette.gray,
+                      color: Palette.darkGray,
                       alignment: Alignment.center,
                       child: _scale > 0.5
                           ? Text(
