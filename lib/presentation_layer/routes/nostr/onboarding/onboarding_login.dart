@@ -113,8 +113,8 @@ class _OnboardingLoginPageState extends ConsumerState<OnboardingLoginPage> {
     if (!_termsAndConditions) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content:
-              Text('Please read and accept the terms and conditions first'),
+          content: Text('Please read and accept the terms and conditions first',
+              style: TextStyle(color: Palette.black)),
         ),
       );
       return;

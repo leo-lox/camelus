@@ -11,6 +11,7 @@ class OnboardingUserInfo {
   String? website = '';
   bool nip46 = false;
   KeyPair keyPair;
+  List<String> followPubkeys = [];
 
   OnboardingUserInfo({
     this.name,

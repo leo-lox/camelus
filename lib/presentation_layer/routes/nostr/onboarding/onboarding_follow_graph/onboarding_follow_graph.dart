@@ -294,7 +294,7 @@ class _OnboardingFollowGraphState extends ConsumerState<OnboardingFollowGraph> {
               activeColor: Palette.lightGray,
               value: _scale,
               min: _graphController.minScale,
-              max: _graphController.maxScale,
+              max: 1.0,
               onChanged: (value) {
                 _graphController.scale = value;
               },
