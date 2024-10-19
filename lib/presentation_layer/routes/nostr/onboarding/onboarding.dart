@@ -4,7 +4,7 @@ import 'package:camelus/presentation_layer/routes/nostr/onboarding/onboarding_lo
 import 'package:camelus/presentation_layer/routes/nostr/onboarding/onboarding_name.dart';
 import 'package:camelus/presentation_layer/routes/nostr/onboarding/onboarding_page01.dart';
 import 'package:camelus/presentation_layer/routes/nostr/onboarding/onboarding_picture.dart';
-import 'package:camelus/presentation_layer/routes/nostr/onboarding/onboarding_summary.dart';
+import 'package:camelus/presentation_layer/routes/nostr/onboarding/onboarding_profile.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -112,7 +112,7 @@ class _NostrOnboardingState extends ConsumerState<NostrOnboarding>
                 pictureCallback: () {},
                 signUpInfo: ref.watch(onboardingProvider).signUpInfo,
               ),
-              const OnboardingSummary(),
+              const OnboardingProfile(),
               OnboardingFollowGraph(
                 submitCallback: (followPubkeys) {},
                 userInfo: ref.watch(onboardingProvider).signUpInfo,

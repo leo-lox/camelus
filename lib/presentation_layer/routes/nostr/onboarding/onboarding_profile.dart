@@ -2,14 +2,14 @@ import 'package:camelus/presentation_layer/components/edit_profile.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-class OnboardingSummary extends ConsumerStatefulWidget {
-  const OnboardingSummary({super.key});
+class OnboardingProfile extends ConsumerStatefulWidget {
+  const OnboardingProfile({super.key});
 
   @override
-  ConsumerState<OnboardingSummary> createState() => _OnboardingSummaryState();
+  ConsumerState<OnboardingProfile> createState() => _OnboardingProfileState();
 }
 
-class _OnboardingSummaryState extends ConsumerState<OnboardingSummary> {
+class _OnboardingProfileState extends ConsumerState<OnboardingProfile> {
   @override
   Widget build(BuildContext context) {
     return const Scaffold(
