@@ -32,21 +32,29 @@ class GraphProfile extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(
-              _userMetadata.name ?? _userMetadata.pubkey,
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
+            SizedBox(
+              width: 170, // Set your desired max width
+              child: Text(
+                _userMetadata.name ?? _userMetadata.pubkey,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                ),
+                overflow: TextOverflow.ellipsis,
               ),
             ),
             const SizedBox(
               height: 5,
             ),
-            Text(
-              _userMetadata.nip05 ?? '',
-              style: const TextStyle(
-                fontSize: 12,
+            SizedBox(
+              width: 170, // Set your desired max width
+              child: Text(
+                _userMetadata.nip05 ?? '',
+                style: const TextStyle(
+                  fontSize: 12,
+                ),
+                overflow: TextOverflow.ellipsis,
               ),
-            ),
+            )
           ],
         )
       ],
