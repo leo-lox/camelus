@@ -224,8 +224,8 @@ class _OnboardingFollowGraphState extends ConsumerState<OnboardingFollowGraph> {
                   }
 
                   return GestureDetector(
+                    key: ValueKey(data.pubkey),
                     onTap: () {
-                      print("onTap $data");
                       setState(() {
                         data.selected = !data.selected;
                         if (data.selected) {
