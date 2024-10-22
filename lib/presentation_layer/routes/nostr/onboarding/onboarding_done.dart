@@ -250,7 +250,7 @@ ${_privateKey.mnemonicSentence}
             width: 400,
             height: 40,
             child: longButton(
-              name: "create account",
+              name: "publish account",
               inverted: true,
               onPressed: () => _onSubmit(),
             ),
