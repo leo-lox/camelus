@@ -5,8 +5,9 @@ import 'package:riverpod/riverpod.dart';
 final eventVerifierProvider = Provider<EventVerifier>((ref) {
   final EventVerifier eventVerifier = Bip340EventVerifier();
   final EventVerifier mockEventVerifier = MockEventVerifier();
+  final RustEventVerifier rustEventVerifier = RustEventVerifier();
 
-  return mockEventVerifier;
+  return rustEventVerifier;
 });
 
 class MockEventVerifier implements EventVerifier {
