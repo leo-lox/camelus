@@ -1,12 +1,12 @@
 import '../entities/user_metadata.dart';
-import '../repositories/note_repository.dart';
+import '../repositories/metadata_repository.dart';
 
 class GetUserMetadata {
-  final NoteRepository _noteRepository;
+  final MetadataRepository _metadataRepository;
 
-  GetUserMetadata(this._noteRepository);
+  GetUserMetadata(this._metadataRepository);
 
   Stream<UserMetadata> getMetadataByPubkey(String pubkey) {
-    return _noteRepository.getMetadataByPubkey(pubkey);
+    return _metadataRepository.getMetadataByPubkey(pubkey);
   }
 }
