@@ -26,4 +26,14 @@ class MetadataRepositoryImpl implements MetadataRepository {
           (event) => UserMetadataModel.fromNDKMetadata(event!),
         );
   }
+
+  @override
+  Future<UserMetadata> broadcastMetadata(UserMetadata metadata) async {
+    final myMetadataModel = metadata as UserMetadataModel;
+    final ndkMetadata = myMetadataModel.toNDKMetadata();
+
+    final result =
+        await dartNdkSource.dartNdk.metadata.broadcastMetadata(ndkMetadata);
+    return UserMetadataModel.fromNDKMetadata(result);
+  }
 }

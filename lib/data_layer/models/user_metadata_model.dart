@@ -55,4 +55,18 @@ class UserMetadataModel extends UserMetadata {
       lud16: metadata.lud16,
     );
   }
+
+  ndk_entities.Metadata toNDKMetadata() {
+    return ndk_entities.Metadata(
+      pubKey: pubkey,
+      picture: picture,
+      banner: banner,
+      name: name,
+      nip05: nip05,
+      about: about,
+      website: website,
+      lud06: lud06,
+      lud16: lud16,
+    );
+  }
 }

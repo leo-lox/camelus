@@ -9,4 +9,8 @@ class GetUserMetadata {
   Stream<UserMetadata> getMetadataByPubkey(String pubkey) {
     return _metadataRepository.getMetadataByPubkey(pubkey);
   }
+
+  Future<UserMetadata> broadcastMetadata(UserMetadata metadata) {
+    return _metadataRepository.broadcastMetadata(metadata);
+  }
 }
