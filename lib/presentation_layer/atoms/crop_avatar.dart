@@ -29,7 +29,9 @@ class CropAvatar extends StatelessWidget {
           baseColor: Palette.background,
           aspectRatio: aspectRatio,
           //radius: 150,
-          interactive: false,
+
+          interactive: true,
+
           withCircleUi: true,
           image: _imageData,
           controller: _controller,
@@ -47,6 +49,7 @@ class CropAvatar extends StatelessWidget {
                 width: 250,
                 height: 40,
                 child: longButton(
+                  inverted: true,
                   name: "apply",
                   onPressed: () {
                     _controller.crop();

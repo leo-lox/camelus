@@ -110,7 +110,9 @@ class _NostrOnboardingState extends ConsumerState<NostrOnboarding>
                 },
               ),
               OnboardingPicture(
-                pictureCallback: () {},
+                pictureCallback: () {
+                  _nextTab();
+                },
                 signUpInfo: ref.watch(onboardingProvider).signUpInfo,
               ),
               const OnboardingProfile(),

@@ -11,12 +11,15 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:mime/mime.dart';
 
+import '../../../atoms/camer_upload.dart';
+import '../../../atoms/long_button.dart';
+
 class OnboardingPicture extends ConsumerStatefulWidget {
   final Function pictureCallback;
 
-  OnboardingUserInfo signUpInfo;
+  final OnboardingUserInfo signUpInfo;
 
-  OnboardingPicture({
+  const OnboardingPicture({
     super.key,
     required this.pictureCallback,
     required this.signUpInfo,
@@ -26,6 +29,8 @@ class OnboardingPicture extends ConsumerStatefulWidget {
 }
 
 class _OnboardingPictureState extends ConsumerState<OnboardingPicture> {
+  bool pictureSelected = false;
+
   _pickFile() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles();
 
@@ -64,35 +69,92 @@ class _OnboardingPictureState extends ConsumerState<OnboardingPicture> {
       if (value != null) {
         setState(() {
           widget.signUpInfo.picture!.bytes = value;
+          pictureSelected = true;
         });
       }
     });
   }
 
   @override
+  void initState() {
+    super.initState();
+    if (widget.signUpInfo.picture != null) {
+      pictureSelected = true;
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Palette.background,
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          TextButton(
-              onPressed: () {
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            const Spacer(
+              flex: 1,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.baseline,
+              textBaseline: TextBaseline.alphabetic,
+              children: [
+                const Text("Welcome ", style: TextStyle(fontSize: 20)),
+                const SizedBox(
+                  width: 5,
+                ),
+                Text(
+                  widget.signUpInfo.name ?? '',
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 23,
+                  ),
+                ),
+              ],
+            ),
+            const Spacer(
+              flex: 1,
+            ),
+            InkWell(
+              borderRadius: BorderRadius.all(Radius.circular(50)),
+              onTap: () {
                 _pickFile();
               },
-              child: const Text("test")),
-          if (widget.signUpInfo.picture == null)
-            UserImage(
-              imageUrl: null,
-              pubkey: widget.signUpInfo.keyPair.publicKey,
+              child: widget.signUpInfo.picture == null
+                  ? const CameraUpload(
+                      size: 125,
+                    )
+                  : ClipOval(
+                      child: SizedBox.fromSize(
+                        size: const Size.square(125),
+                        child: Container(
+                            color: Palette.background,
+                            child:
+                                Image.memory(widget.signUpInfo.picture!.bytes)),
+                      ),
+                    ),
             ),
-          if (widget.signUpInfo.picture?.bytes != null)
-            SizedBox.fromSize(
-              size: const Size.fromRadius(30), // Image radius
-              child: Image.memory(widget.signUpInfo.picture!.bytes),
+            const Spacer(
+              flex: 1,
             ),
-        ],
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              width: 400,
+              height: 40,
+              child: longButton(
+                name: pictureSelected ? "next" : "skip",
+                onPressed: (() {
+                  widget.pictureCallback();
+                }),
+                inverted: pictureSelected,
+              ),
+            ),
+            const SizedBox(
+              height: 15,
+            ),
+          ],
+        ),
       ),
     );
   }

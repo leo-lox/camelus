@@ -22,10 +22,18 @@ class _OnboardingNameState extends ConsumerState<OnboardingName> {
   final TextEditingController _nameController = TextEditingController();
   final FocusNode _nameFocusNode = FocusNode();
 
+  bool nameSelected = false;
+
   @override
   void initState() {
     super.initState();
     _nameController.text = widget.userInfo.name ?? '';
+
+    _nameController.addListener(() {
+      setState(() {
+        nameSelected = _nameController.text.isNotEmpty;
+      });
+    });
   }
 
   @override
@@ -90,12 +98,12 @@ class _OnboardingNameState extends ConsumerState<OnboardingName> {
               width: 400,
               height: 40,
               child: longButton(
-                name: "next",
+                name: nameSelected ? "next" : "skip",
                 onPressed: (() {
                   _nameFocusNode.unfocus();
                   widget.submitCallback(_nameController.text);
                 }),
-                inverted: true,
+                inverted: nameSelected,
               ),
             ),
             const SizedBox(
