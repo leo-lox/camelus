@@ -1,17 +1,18 @@
-import 'dart:typed_data';
-
-import 'package:camelus/helpers/bip340.dart';
+import '../../helpers/bip340.dart';
+import 'mem_file.dart';
 
 class OnboardingUserInfo {
   String? name = '';
-  Uint8List? picture;
-  Uint8List? banner;
+  MemFile? picture;
+  MemFile? banner;
   String? about = '';
   String? nip05;
   String? website = '';
   bool nip46 = false;
   KeyPair keyPair;
   List<String> followPubkeys = [];
+  String lud06 = '';
+  String lud16 = '';
 
   OnboardingUserInfo({
     this.name,
@@ -20,6 +21,9 @@ class OnboardingUserInfo {
     this.about,
     this.nip05,
     this.website,
+    this.nip46 = false,
+    this.lud06 = '',
+    this.lud16 = '',
     required this.keyPair,
   });
 }

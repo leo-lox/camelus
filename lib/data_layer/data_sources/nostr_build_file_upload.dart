@@ -1,20 +1,20 @@
 import 'dart:convert';
-import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
-import 'package:mime/mime.dart';
+
+import '../../domain_layer/entities/mem_file.dart';
 
 class NostrBuildFileUpload {
-  Future<String> uploadImage(File file) async {
+  Future<String> uploadImage(MemFile file) async {
     final uri = Uri.parse('https://nostr.build/upload.php');
     var request = http.MultipartRequest('POST', uri);
 
-    var bytes = await file.readAsBytes();
-    var mimeType = lookupMimeType(file.path);
-    var filename = file.path.split('/').last;
-
-    final httpImage = http.MultipartFile.fromBytes("fileToUpload", bytes,
-        contentType: MediaType.parse(mimeType!), filename: filename);
+    final httpImage = http.MultipartFile.fromBytes(
+      "fileToUpload",
+      file.bytes,
+      contentType: MediaType.parse(file.mimeType),
+      filename: file.name,
+    );
     request.files.add(httpImage);
 
     final response = await request.send();

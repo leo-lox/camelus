@@ -1,7 +1,5 @@
 import 'dart:convert';
 
-import 'package:camelus/presentation_layer/atoms/mnemonic_grid.dart';
-import 'package:camelus/presentation_layer/providers/key_pair_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -11,9 +9,15 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../../../config/palette.dart';
 import '../../../../domain_layer/entities/generated_private_key.dart';
 import '../../../../domain_layer/entities/onboarding_user_info.dart';
+import '../../../../domain_layer/entities/user_metadata.dart';
 import '../../../../domain_layer/usecases/generate_private_key.dart';
 import '../../../../helpers/bip340.dart';
 import '../../../atoms/long_button.dart';
+import '../../../atoms/mnemonic_grid.dart';
+import '../../../providers/file_upload_provider.dart';
+import '../../../providers/following_provider.dart';
+import '../../../providers/key_pair_provider.dart';
+import '../../../providers/metadata_provider.dart';
 import '../../home_page.dart';
 
 class OnboardingDone extends ConsumerStatefulWidget {
@@ -65,6 +69,40 @@ ${_privateKey.mnemonicSentence}
     Clipboard.setData(ClipboardData(text: clipData));
   }
 
+  Future<void> _broadcastAcc() async {
+    String? uploadedPicture;
+    String? uploadedBanner;
+    final fileUploadP = ref.watch(fileUploadProvider);
+
+    if (widget.userInfo.picture != null) {
+      uploadedPicture = await fileUploadP.uploadImage(widget.userInfo.picture!);
+    }
+    if (widget.userInfo.banner != null) {
+      uploadedBanner = await fileUploadP.uploadImage(widget.userInfo.banner!);
+    }
+
+    //! todo: broadcast data to nostr network
+    final metadataP = ref.watch(metadataProvider);
+    final followP = ref.watch(followingProvider);
+
+    final UserMetadata userMetadata = UserMetadata(
+      eventId: '',
+      lastFetch: 0,
+      pubkey: _privateKey.publicKey,
+      name: widget.userInfo.name,
+      picture: uploadedPicture,
+      banner: uploadedBanner,
+      about: widget.userInfo.about,
+      website: widget.userInfo.website,
+      nip05: widget.userInfo.nip05,
+      lud06: widget.userInfo.lud06,
+      lud16: widget.userInfo.lud16,
+    );
+
+    metadataP.broadcastMetadata(userMetadata);
+    followP.setContacts(widget.userInfo.followPubkeys);
+  }
+
   @override
   void initState() {
     super.initState();
@@ -101,7 +139,9 @@ ${_privateKey.mnemonicSentence}
     const storage = FlutterSecureStorage();
     storage.write(key: "nostrKeys", value: json.encode(myKeyPair.toJson()));
 
-    //! todo: broadcast data to nostr network
+    await _broadcastAcc();
+
+    if (!mounted) return;
 
     // naviage to /
     Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {

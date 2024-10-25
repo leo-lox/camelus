@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:camelus/domain_layer/entities/mem_file.dart';
 import 'package:camelus/presentation_layer/atoms/crop_avatar.dart';
 import 'package:camelus/presentation_layer/atoms/my_profile_picture.dart';
 import 'package:camelus/config/palette.dart';
@@ -8,6 +9,7 @@ import 'package:camelus/domain_layer/entities/onboarding_user_info.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:mime/mime.dart';
 
 class OnboardingPicture extends ConsumerStatefulWidget {
   final Function pictureCallback;
@@ -31,18 +33,29 @@ class _OnboardingPictureState extends ConsumerState<OnboardingPicture> {
       File file = File(result.files.single.path!);
 
       Uint8List imageData = file.readAsBytesSync();
-      _openCropImagePopup(imageData);
+      String imageMimeType = lookupMimeType(file.path) ?? '';
+      String imageName = file.path.split('/').last;
+
+      MemFile memFile = MemFile(
+        bytes: imageData,
+        mimeType: imageMimeType,
+        name: imageName,
+      );
+      widget.signUpInfo.picture = memFile;
+      _openCropImagePopup(memFile.bytes);
     } else {
       // User canceled the picker
       return;
     }
   }
 
+  Uint8List? _displayImage;
+
   _openCropImagePopup(Uint8List imageData) {
     // push fullscreen widget
     Navigator.push(
       context,
-      MaterialPageRoute(
+      MaterialPageRoute<Uint8List>(
         builder: (context) => CropAvatar(
           imageData: imageData,
         ),
@@ -50,7 +63,7 @@ class _OnboardingPictureState extends ConsumerState<OnboardingPicture> {
     ).then((value) {
       if (value != null) {
         setState(() {
-          widget.signUpInfo.picture = value;
+          widget.signUpInfo.picture!.bytes = value;
         });
       }
     });
@@ -74,11 +87,11 @@ class _OnboardingPictureState extends ConsumerState<OnboardingPicture> {
               imageUrl: null,
               pubkey: widget.signUpInfo.keyPair.publicKey,
             ),
-          if (widget.signUpInfo.picture != null)
+          if (widget.signUpInfo.picture?.bytes != null)
             SizedBox.fromSize(
               size: const Size.fromRadius(30), // Image radius
-              child: Image(image: MemoryImage(widget.signUpInfo.picture!)),
-            )
+              child: Image.memory(widget.signUpInfo.picture!.bytes),
+            ),
         ],
       ),
     );

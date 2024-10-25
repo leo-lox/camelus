@@ -27,8 +27,23 @@ class Follow {
     return followRepository.unfollowUser(npub);
   }
 
-  Future<void> setContacts(List<String> contacts) async {
-    throw UnimplementedError();
+  /// overrides the previous contact list and sets a new one with the given pubkeys
+  Future<void> setContacts(List<String> pubkeys) async {
+    _checkSelfPubkey();
+    return followRepository.setFollowing(
+      ContactList(
+        pubKey: selfPubkey!,
+        contacts: pubkeys,
+        contactRelays: [],
+        createdAt: 0,
+        followedCommunities: [],
+        followedEvents: [],
+        followedTags: [],
+        petnames: [],
+        sources: [],
+        loadedTimestamp: null,
+      ),
+    );
   }
 
   Future<bool> isFollowing(String npub) async {

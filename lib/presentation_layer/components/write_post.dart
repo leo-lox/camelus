@@ -252,7 +252,7 @@ class _WritePostState extends ConsumerState<WritePost> {
     List<String> imageUrls = [];
     for (var image in _images) {
       try {
-        var url = await ref.watch(fileUploadProvider).uploadImage(image);
+        var url = await ref.watch(fileUploadProvider).uploadImageFile(image);
         imageUrls.add(url);
       } catch (e) {
         log("errUploadImage:  ${e.toString()}");

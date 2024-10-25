@@ -8,12 +8,16 @@ import 'package:crop_your_image/crop_your_image.dart';
 class CropAvatar extends StatelessWidget {
   final Uint8List _imageData;
 
-  Uint8List _croppedImageData = Uint8List(0);
+  Uint8List? _croppedImageData;
+
+  double aspectRatio;
 
   CropAvatar({
     super.key,
+    this.aspectRatio = 1,
     required Uint8List imageData,
-  }) : _imageData = imageData;
+  })  : _imageData = imageData,
+        _croppedImageData = imageData; // init data if cropping does not work
 
   final _controller = CropController();
 
@@ -23,7 +27,7 @@ class CropAvatar extends StatelessWidget {
       children: [
         Crop(
           baseColor: Palette.background,
-          aspectRatio: 1,
+          aspectRatio: aspectRatio,
           //radius: 150,
           interactive: false,
           withCircleUi: true,
@@ -32,6 +36,7 @@ class CropAvatar extends StatelessWidget {
 
           onCropped: (image) {
             _croppedImageData = image;
+            Navigator.pop<Uint8List>(context, _croppedImageData);
           },
         ),
         Column(
@@ -44,7 +49,7 @@ class CropAvatar extends StatelessWidget {
                 child: longButton(
                   name: "apply",
                   onPressed: () {
-                    Navigator.pop(context, _croppedImageData);
+                    _controller.crop();
                   },
                 ),
               ),
