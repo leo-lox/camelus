@@ -83,6 +83,8 @@ class _NostrOnboardingState extends ConsumerState<NostrOnboarding>
 
   @override
   Widget build(BuildContext context) {
+    final signUpInfo = ref.watch(onboardingProvider).signUpInfo;
+
     return SafeArea(
       child: PageView(
         controller: _horizontalPageController,
@@ -104,7 +106,7 @@ class _NostrOnboardingState extends ConsumerState<NostrOnboarding>
                 },
               ),
               OnboardingName(
-                userInfo: ref.watch(onboardingProvider).signUpInfo,
+                userInfo: signUpInfo,
                 submitCallback: (_) {
                   _nextTab();
                 },
@@ -113,20 +115,22 @@ class _NostrOnboardingState extends ConsumerState<NostrOnboarding>
                 pictureCallback: () {
                   _nextTab();
                 },
-                signUpInfo: ref.watch(onboardingProvider).signUpInfo,
+                signUpInfo: signUpInfo,
               ),
-              const OnboardingProfile(),
+              OnboardingProfile(
+                profileCallback: () {
+                  _nextTab();
+                },
+                signUpInfo: signUpInfo,
+              ),
               OnboardingFollowGraph(
                 submitCallback: (followPubkeys) {
-                  final signUpInfo = ref.watch(onboardingProvider).signUpInfo;
                   signUpInfo.followPubkeys = followPubkeys;
                   _nextTab();
                 },
-                userInfo: ref.watch(onboardingProvider).signUpInfo,
+                userInfo: signUpInfo,
               ),
-              OnboardingDone(
-                  submitCallback: () {},
-                  userInfo: ref.watch(onboardingProvider).signUpInfo)
+              OnboardingDone(submitCallback: () {}, userInfo: signUpInfo)
             ],
           ),
         ],
