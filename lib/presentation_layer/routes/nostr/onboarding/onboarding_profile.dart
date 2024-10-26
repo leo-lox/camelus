@@ -177,6 +177,7 @@ class _OnboardingProfileState extends ConsumerState<OnboardingProfile> {
                   child: longButton(
                     name: "next",
                     onPressed: (() {
+                      FocusScope.of(context).unfocus();
                       widget.profileCallback();
                     }),
                     inverted: true,

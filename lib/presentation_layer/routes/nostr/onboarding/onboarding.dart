@@ -39,6 +39,7 @@ class _NostrOnboardingState extends ConsumerState<NostrOnboarding>
           horizontalScrollLock = false;
         });
       }
+
       if (_tabController.index == 4 || _tabController.index == 5) {
         setState(() {
           pageLock = true;
@@ -47,6 +48,9 @@ class _NostrOnboardingState extends ConsumerState<NostrOnboarding>
         setState(() {
           pageLock = false;
         });
+      }
+      if (_tabController.index != 1) {
+        FocusScope.of(context).unfocus();
       }
     });
     _horizontalPageController.addListener(() {
