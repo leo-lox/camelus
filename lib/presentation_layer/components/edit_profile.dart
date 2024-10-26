@@ -6,6 +6,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../config/palette.dart';
 import '../atoms/camer_upload.dart';
+import '../atoms/round_image_border.dart';
 
 class EditProfile extends ConsumerStatefulWidget {
   final String initialName;
@@ -115,7 +116,6 @@ class _EditProfileState extends ConsumerState<EditProfile> {
         children: <Widget>[
           InkWell(
             onTap: () {
-              log("Header Pressed");
               widget.bannerCallback();
             },
             child: Container(
@@ -134,15 +134,17 @@ class _EditProfileState extends ConsumerState<EditProfile> {
           ),
           Positioned(
             bottom: 0,
-            left: MediaQuery.of(context).size.width / 6,
+            left: MediaQuery.of(context).size.width / 8,
             child: InkWell(
               onTap: () {
-                log("Profile Picture Pressed");
                 widget.pictureCallback();
               },
-              child: CameraUpload(
-                size: 100,
-              ),
+              child: widget.initialPicture == null
+                  ? const CameraUpload(
+                      size: 100,
+                    )
+                  : RoundImageWithBorder(
+                      image: widget.initialPicture!, size: 102),
             ),
           ),
         ],

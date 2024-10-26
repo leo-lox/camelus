@@ -1,8 +1,15 @@
+import 'dart:io';
+import 'dart:typed_data';
+
 import 'package:camelus/presentation_layer/components/edit_profile.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:mime/mime.dart';
 
+import '../../../../domain_layer/entities/mem_file.dart';
 import '../../../../domain_layer/entities/onboarding_user_info.dart';
+import '../../../atoms/crop_avatar.dart';
 import '../../../atoms/long_button.dart';
 
 class OnboardingProfile extends ConsumerStatefulWidget {
@@ -20,6 +27,92 @@ class OnboardingProfile extends ConsumerStatefulWidget {
 }
 
 class _OnboardingProfileState extends ConsumerState<OnboardingProfile> {
+  Future<MemFile?> _pickFile() async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles();
+
+    if (result != null) {
+      File file = File(result.files.single.path!);
+
+      Uint8List imageData = file.readAsBytesSync();
+      String imageMimeType = lookupMimeType(file.path) ?? '';
+      String imageName = file.path.split('/').last;
+
+      MemFile memFile = MemFile(
+        bytes: imageData,
+        mimeType: imageMimeType,
+        name: imageName,
+      );
+
+      return memFile;
+    } else {
+      // User canceled the picker
+      return null;
+    }
+  }
+
+  _openCropImagePopup({
+    required Uint8List imageData,
+    required Function(Uint8List) callback,
+    double aspectRatio = 1,
+    bool roundUi = true,
+  }) {
+    // push fullscreen widget
+    Navigator.push(
+      context,
+      MaterialPageRoute<Uint8List>(
+        builder: (context) => CropAvatar(
+          roundUi: roundUi,
+          aspectRatio: aspectRatio,
+          imageData: imageData,
+        ),
+      ),
+    ).then((value) {
+      if (value != null) {
+        callback(value);
+      }
+    });
+  }
+
+  /// pick a new picture and crop
+  _onClickPicture() async {
+    final file = await _pickFile();
+    if (file == null) return;
+
+    _openCropImagePopup(
+      imageData: file.bytes,
+      callback: (croppedData) => {
+        setState(() {
+          widget.signUpInfo.picture = MemFile(
+            bytes: croppedData,
+            mimeType: file.mimeType,
+            name: file.name,
+          );
+        }),
+      },
+    );
+  }
+
+  /// pick a new banner and crop
+  _onClickBanner() async {
+    final file = await _pickFile();
+    if (file == null) return;
+
+    _openCropImagePopup(
+      aspectRatio: 16 / 9,
+      imageData: file.bytes,
+      roundUi: false,
+      callback: (croppedData) => {
+        setState(() {
+          widget.signUpInfo.banner = MemFile(
+            bytes: croppedData,
+            mimeType: file.mimeType,
+            name: file.name,
+          );
+        })
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -29,17 +122,16 @@ class _OnboardingProfileState extends ConsumerState<OnboardingProfile> {
           children: [
             SingleChildScrollView(
               child: Padding(
-                padding: EdgeInsets.only(
-                    bottom: 80), // Add padding to avoid overlap with the button
+                padding: const EdgeInsets.only(bottom: 80),
                 child: EditProfile(
                   initialName: widget.signUpInfo.name ?? '',
                   onNameChanged: (value) {
                     widget.signUpInfo.name = value;
                   },
                   initialPicture: widget.signUpInfo.picture?.bytes,
-                  pictureCallback: () {},
+                  pictureCallback: () => _onClickPicture(),
                   initialBanner: widget.signUpInfo.banner?.bytes,
-                  bannerCallback: () {},
+                  bannerCallback: () => _onClickBanner(),
                   initialAbout: widget.signUpInfo.about ?? '',
                   onAboutChanged: (value) {
                     widget.signUpInfo.about = value;
