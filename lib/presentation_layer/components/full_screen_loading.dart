@@ -90,7 +90,7 @@ class _FullScreenLoadingState extends State<FullScreenLoading>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: Colors.transparent,
       body: Stack(
         children: [
           AnimatedBuilder(
@@ -115,6 +115,7 @@ class _FullScreenLoadingState extends State<FullScreenLoading>
                     style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
+                      fontFamily: 'Poppins',
                       color: _showSuccessMessage ? Colors.green : Colors.white,
                     ),
                   ),
