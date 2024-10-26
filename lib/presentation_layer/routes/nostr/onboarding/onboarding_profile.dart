@@ -98,7 +98,7 @@ class _OnboardingProfileState extends ConsumerState<OnboardingProfile> {
     if (file == null) return;
 
     _openCropImagePopup(
-      aspectRatio: 16 / 9,
+      aspectRatio: 16 / 6,
       imageData: file.bytes,
       roundUi: false,
       callback: (croppedData) => {

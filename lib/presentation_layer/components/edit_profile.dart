@@ -158,7 +158,7 @@ class _EditProfileState extends ConsumerState<EditProfile> {
       child: Column(
         children: [
           _buildInputField('Name', _controllers['name']!),
-          _buildInputField('Bio', _controllers['about']!),
+          _buildInputField('Bio', _controllers['about']!, isMultiline: true),
           _buildInputField('Website', _controllers['website']!),
           _buildInputField('nip05', _controllers['nip05']!),
           _buildInputField('lud06', _controllers['lud06']!),
@@ -168,12 +168,13 @@ class _EditProfileState extends ConsumerState<EditProfile> {
     );
   }
 
-  Widget _buildInputField(String label, TextEditingController controller) {
+  Widget _buildInputField(String label, TextEditingController controller,
+      {bool isMultiline = false}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.only(top: 16.0, bottom: 8.0),
+          padding: const EdgeInsets.only(top: 16.0, bottom: 8.0, left: 8.0),
           child: Text(
             label,
             style: TextStyle(
@@ -182,9 +183,14 @@ class _EditProfileState extends ConsumerState<EditProfile> {
             ),
           ),
         ),
-        TextField(
+        TextFormField(
           controller: controller,
           decoration: textEditInputDecoration,
+          maxLines: isMultiline
+              ? null
+              : 1, // Set to null for multiline, 1 for single line
+          keyboardType:
+              isMultiline ? TextInputType.multiline : TextInputType.text,
         ),
       ],
     );
@@ -193,7 +199,7 @@ class _EditProfileState extends ConsumerState<EditProfile> {
 
 const textEditInputDecoration = InputDecoration(
   hintText: "",
-  contentPadding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),
+  contentPadding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 8.0),
   enabledBorder: UnderlineInputBorder(
     borderSide: BorderSide(
       width: 1,
