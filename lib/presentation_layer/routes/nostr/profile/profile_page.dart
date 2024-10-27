@@ -9,9 +9,7 @@ import 'package:camelus/domain_layer/usecases/get_user_metadata.dart';
 import 'package:camelus/presentation_layer/atoms/back_button_round.dart';
 import 'package:camelus/presentation_layer/atoms/follow_button.dart';
 import 'package:camelus/presentation_layer/atoms/long_button.dart';
-import 'package:camelus/helpers/bip340.dart';
 import 'package:camelus/helpers/nprofile_helper.dart';
-import 'package:camelus/domain_layer/entities/nostr_tag.dart';
 import 'package:camelus/presentation_layer/providers/following_provider.dart';
 import 'package:camelus/presentation_layer/providers/key_pair_provider.dart';
 import 'package:camelus/presentation_layer/providers/metadata_provider.dart';
@@ -31,6 +29,8 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:matomo_tracker/matomo_tracker.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:url_launcher/url_launcher.dart';
+
+import '../../../../domain_layer/entities/key_pair.dart';
 
 class ProfilePage extends ConsumerStatefulWidget {
   final String pubkey;

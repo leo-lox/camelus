@@ -9,10 +9,10 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../config/palette.dart';
 import '../../../../domain_layer/entities/generated_private_key.dart';
+import '../../../../domain_layer/entities/key_pair.dart';
 import '../../../../domain_layer/entities/onboarding_user_info.dart';
 import '../../../../domain_layer/entities/user_metadata.dart';
 import '../../../../domain_layer/usecases/generate_private_key.dart';
-import '../../../../helpers/bip340.dart';
 import '../../../atoms/long_button.dart';
 import '../../../atoms/mnemonic_grid.dart';
 import '../../../providers/file_upload_provider.dart';

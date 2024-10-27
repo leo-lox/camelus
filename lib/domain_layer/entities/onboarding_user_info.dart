@@ -1,4 +1,4 @@
-import '../../helpers/bip340.dart';
+import 'key_pair.dart';
 import 'mem_file.dart';
 
 class OnboardingUserInfo {

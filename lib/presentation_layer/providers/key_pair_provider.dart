@@ -1,6 +1,8 @@
 import 'package:camelus/helpers/bip340.dart';
 import 'package:riverpod/riverpod.dart';
 
+import '../../domain_layer/entities/key_pair.dart';
+
 final keyPairProvider = StateProvider<KeyPairWrapper>((ref) {
   KeyPairWrapper keyPairWrapper;
 

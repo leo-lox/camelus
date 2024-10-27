@@ -19,6 +19,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
+import 'domain_layer/entities/key_pair.dart';
 import 'presentation_layer/routes/home_page.dart';
 import 'theme.dart' as theme;
 
