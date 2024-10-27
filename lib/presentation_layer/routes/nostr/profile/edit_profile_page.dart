@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:developer';
 import 'package:camelus/domain_layer/usecases/get_user_metadata.dart';
 import 'package:camelus/presentation_layer/atoms/long_button.dart';
-import 'package:camelus/presentation_layer/providers/key_pair_provider.dart';
+
 import 'package:camelus/presentation_layer/providers/metadata_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -18,7 +18,7 @@ class EditProfilePage extends ConsumerStatefulWidget {
 
 class _EditProfilePageState extends ConsumerState<EditProfilePage> {
   late GetUserMetadata _metadataProvider;
-  late KeyPairWrapper _keyPairService;
+
   // create text input controllers
   TextEditingController pictureController = TextEditingController(text: "");
   TextEditingController bannerController = TextEditingController(text: "");
@@ -38,8 +38,6 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
   bool isKeysExpanded = false;
   void _initServices() async {
     _metadataProvider = ref.read(metadataProvider);
-    _keyPairService = ref.read(keyPairProvider);
-    pubkey = _keyPairService.keyPair!.publicKey;
 
     // set initial values of text input controllers
     _loadProfileValues();
@@ -291,32 +289,32 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                           },
                           body: Column(
                             children: [
-                              // public key
-                              Container(
-                                margin: const EdgeInsets.all(10),
-                                padding: const EdgeInsets.all(5),
-                                child: GestureDetector(
-                                  onTap: () {
-                                    copyToClipboard(
-                                        _keyPairService.keyPair!.publicKeyHr);
-                                  },
-                                  child: Text(
-                                      _keyPairService.keyPair!.publicKeyHr),
-                                ),
-                              ),
-                              // private key
-                              Container(
-                                margin: const EdgeInsets.all(10),
-                                padding: const EdgeInsets.all(5),
-                                child: GestureDetector(
-                                  onTap: () {
-                                    copyToClipboard(
-                                        _keyPairService.keyPair!.privateKeyHr);
-                                  },
-                                  child: Text(
-                                      _keyPairService.keyPair!.privateKeyHr),
-                                ),
-                              ),
+                              // // public key
+                              // Container(
+                              //   margin: const EdgeInsets.all(10),
+                              //   padding: const EdgeInsets.all(5),
+                              //   child: GestureDetector(
+                              //     onTap: () {
+                              //       copyToClipboard(
+                              //           _keyPairService.keyPair!.publicKeyHr);
+                              //     },
+                              //     child: Text(
+                              //         _keyPairService.keyPair!.publicKeyHr),
+                              //   ),
+                              // ),
+                              // // private key
+                              // Container(
+                              //   margin: const EdgeInsets.all(10),
+                              //   padding: const EdgeInsets.all(5),
+                              //   child: GestureDetector(
+                              //     onTap: () {
+                              //       copyToClipboard(
+                              //           _keyPairService.keyPair!.privateKeyHr);
+                              //     },
+                              //     child: Text(
+                              //         _keyPairService.keyPair!.privateKeyHr),
+                              //   ),
+                              // ),
                             ],
                           ),
                           isExpanded: isKeysExpanded,

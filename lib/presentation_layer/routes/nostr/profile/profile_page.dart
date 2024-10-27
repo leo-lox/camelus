@@ -11,7 +11,6 @@ import 'package:camelus/presentation_layer/atoms/follow_button.dart';
 import 'package:camelus/presentation_layer/atoms/long_button.dart';
 import 'package:camelus/helpers/nprofile_helper.dart';
 import 'package:camelus/presentation_layer/providers/following_provider.dart';
-import 'package:camelus/presentation_layer/providers/key_pair_provider.dart';
 import 'package:camelus/presentation_layer/providers/metadata_provider.dart';
 import 'package:camelus/presentation_layer/providers/nip05_provider.dart';
 import 'package:camelus/presentation_layer/routes/nostr/blockedUsers/block_page.dart';
@@ -30,7 +29,7 @@ import 'package:matomo_tracker/matomo_tracker.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../../../../domain_layer/entities/key_pair.dart';
+import '../../../providers/event_signer_provider.dart';
 
 class ProfilePage extends ConsumerStatefulWidget {
   final String pubkey;
@@ -220,83 +219,75 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
 
   @override
   Widget build(BuildContext context) {
-    var metadata = ref.watch(metadataProvider);
-    var followingService = ref.watch(followingProvider);
-    var myKeyPairWrapper = ref.watch(keyPairProvider);
+    final metadata = ref.watch(metadataProvider);
+    final followingService = ref.watch(followingProvider);
+    final signerP = ref.watch(eventSignerProvider);
+
+    final pubkey = signerP!.getPublicKey();
 
     return Scaffold(
       backgroundColor: Palette.background,
       body: Stack(
         children: [
-          FutureBuilder<KeyPairWrapper>(
-              future: Future.value(myKeyPairWrapper),
-              builder: (context, keyPairSnapshot) {
-                if (!keyPairSnapshot.hasData) {
-                  return const SizedBox();
-                }
-                KeyPair myKeyPair = keyPairSnapshot.data!.keyPair!;
-                return CustomScrollView(
-                  controller: _scrollController,
-                  slivers: [
-                    SliverAppBar(
-                      expandedHeight: 150,
-                      //toolbarHeight: 10,
-                      backgroundColor: Palette.background,
-                      pinned: true,
-                      flexibleSpace: _bannerImage(metadata),
+          CustomScrollView(
+            controller: _scrollController,
+            slivers: [
+              SliverAppBar(
+                expandedHeight: 150,
+                //toolbarHeight: 10,
+                backgroundColor: Palette.background,
+                pinned: true,
+                flexibleSpace: _bannerImage(metadata),
 
-                      actions: [
-                        PopupMenuButton<String>(
-                          tooltip: "More",
-                          onSelected: (e) => {
-                            //log(e),
-                            // toast
-                            if (e == "block") _blockUser()
-                          },
-                          itemBuilder: (BuildContext context) {
-                            return {'block'}.map((String choice) {
-                              return PopupMenuItem<String>(
-                                value: choice,
-                                child: Text(choice),
-                              );
-                            }).toList();
-                          },
-                        ),
-                      ],
-                      // rounded back button
-                      leading: const BackButtonRound(),
-                      bottom: PreferredSize(
-                        preferredSize: const Size.fromHeight(0),
-                        child: Container(),
-                      ),
-                    ),
-                    SliverList(
-                      delegate: SliverChildListDelegate(
-                        [
-                          const SizedBox(height: 10),
-                          _actionRow(
-                              myKeyPair, followingService, metadata, context),
+                actions: [
+                  PopupMenuButton<String>(
+                    tooltip: "More",
+                    onSelected: (e) => {
+                      //log(e),
+                      // toast
+                      if (e == "block") _blockUser()
+                    },
+                    itemBuilder: (BuildContext context) {
+                      return {'block'}.map((String choice) {
+                        return PopupMenuItem<String>(
+                          value: choice,
+                          child: Text(choice),
+                        );
+                      }).toList();
+                    },
+                  ),
+                ],
+                // rounded back button
+                leading: const BackButtonRound(),
+                bottom: PreferredSize(
+                  preferredSize: const Size.fromHeight(0),
+                  child: Container(),
+                ),
+              ),
+              SliverList(
+                delegate: SliverChildListDelegate(
+                  [
+                    const SizedBox(height: 10),
+                    _actionRow(pubkey, followingService, metadata, context),
 
-                          // // move up the profile info by 110
-                          _profileInformation(metadata),
-                          _bottomInformationBar(
-                              context, followingService, myKeyPair)
-                        ],
-                      ),
-                    ),
-
-                    SliverList(
-                      delegate: SliverChildListDelegate(
-                        [
-                          const SizedBox(height: 20),
-                          _feed(),
-                        ],
-                      ),
-                    ),
-                    // sliver list with random colors
+                    // // move up the profile info by 110
+                    _profileInformation(metadata),
+                    _bottomInformationBar(context, followingService, pubkey)
                   ],
-                );
-              }),
+                ),
+              ),
+
+              SliverList(
+                delegate: SliverChildListDelegate(
+                  [
+                    const SizedBox(height: 20),
+                    _feed(),
+                  ],
+                ),
+              ),
+              // sliver list with random colors
+            ],
+          ),
           _profileImage(_scrollController, widget, metadata),
           SafeArea(
             child: SizedBox(
@@ -351,7 +342,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
   }
 
   Row _bottomInformationBar(
-      BuildContext context, Follow followingService, KeyPair myKeyPair) {
+      BuildContext context, Follow followingService, String pubkey) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
@@ -414,16 +405,16 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                 )),
           ],
         ),
-        _relaysInfo(followingService, myKeyPair, context),
+        _relaysInfo(followingService, pubkey, context),
       ],
     );
   }
 
   GestureDetector _relaysInfo(
-      Follow followingService, KeyPair myKeyPair, BuildContext context) {
+      Follow followingService, String pubkey, BuildContext context) {
     return GestureDetector(
       onTap: () {
-        if (widget.pubkey == myKeyPair.publicKey) {
+        if (widget.pubkey == pubkey) {
           Navigator.push(
             context,
             MaterialPageRoute(
@@ -437,7 +428,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
           const Icon(Icons.connect_without_contact,
               color: Palette.white, size: 17),
           const SizedBox(width: 5),
-          if (widget.pubkey == myKeyPair.publicKey)
+          if (widget.pubkey == pubkey)
             Text(
               "todo: relays",
               style: const TextStyle(
@@ -445,7 +436,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                 fontSize: 14,
               ),
             ),
-          if (widget.pubkey != myKeyPair.publicKey)
+          if (widget.pubkey != pubkey)
             const Text(
               "n.a. relays", //nip 65 relays
               style: TextStyle(
@@ -602,12 +593,12 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
     );
   }
 
-  Row _actionRow(KeyPair myKeyPair, Follow followingService,
+  Row _actionRow(String pubkey, Follow followingService,
       GetUserMetadata metadata, BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
-        if (widget.pubkey != myKeyPair.publicKey)
+        if (widget.pubkey != pubkey)
           // disabled because of low usage && not well implemented
           // SizedBox(
           //   width: 35,
@@ -675,11 +666,10 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
 
         // follow button black with white border
 
-        if (widget.pubkey != myKeyPair.publicKey)
-          _followButton(followingService),
+        if (widget.pubkey != pubkey) _followButton(followingService),
 
         // edit button
-        if (widget.pubkey == myKeyPair.publicKey)
+        if (widget.pubkey == pubkey)
           Container(
             margin: const EdgeInsets.only(top: 0, right: 10),
             child: ElevatedButton(

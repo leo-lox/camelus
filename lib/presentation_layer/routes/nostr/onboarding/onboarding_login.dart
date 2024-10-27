@@ -5,7 +5,6 @@ import 'package:camelus/presentation_layer/atoms/long_button.dart';
 import 'package:camelus/config/palette.dart';
 import 'package:camelus/helpers/bip340.dart';
 import 'package:camelus/helpers/helpers.dart';
-import 'package:camelus/presentation_layer/providers/key_pair_provider.dart';
 import 'package:camelus/presentation_layer/routes/home_page.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -13,10 +12,12 @@ import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:hex/hex.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:ndk/ndk.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:bip39_mnemonic/bip39_mnemonic.dart';
 
 import '../../../../domain_layer/entities/key_pair.dart';
+import '../../../providers/event_signer_provider.dart';
 
 class OnboardingLoginPage extends ConsumerStatefulWidget {
   const OnboardingLoginPage({super.key});
@@ -140,8 +141,12 @@ class _OnboardingLoginPageState extends ConsumerState<OnboardingLoginPage> {
     storage.write(key: "nostrKeys", value: json.encode(myKeys!.toJson()));
     // save in provider
 
-    var provider = ref.watch(keyPairProvider);
-    provider.setKeyPair(myKeys!);
+    final bip340Signer = Bip340EventSigner(
+      privateKey: myKeys!.privateKey,
+      publicKey: myKeys!.publicKey,
+    );
+
+    ref.read(eventSignerProvider.notifier).setSigner(bip340Signer);
 
     setState(() {});
 

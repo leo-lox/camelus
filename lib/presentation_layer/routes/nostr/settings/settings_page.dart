@@ -1,8 +1,9 @@
-import 'package:camelus/config/palette.dart';
-import 'package:camelus/presentation_layer/providers/key_pair_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+
+import '../../../../config/palette.dart';
+import '../../../providers/event_signer_provider.dart';
 
 class SettingsPage extends ConsumerStatefulWidget {
   const SettingsPage({super.key});
@@ -20,9 +21,9 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
   void _logout() async {
     const storage = FlutterSecureStorage();
     storage.write(key: "nostrKeys", value: null);
+
     // save in provider
-    var provider = ref.watch(keyPairProvider);
-    provider.removeKeyPair();
+    ref.read(eventSignerProvider.notifier).clearSigner();
 
     if (!mounted) {
       return;

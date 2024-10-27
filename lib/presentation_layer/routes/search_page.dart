@@ -10,9 +10,7 @@ import 'package:camelus/presentation_layer/components/person_card.dart';
 import 'package:camelus/config/palette.dart';
 import 'package:camelus/helpers/helpers.dart';
 import 'package:camelus/helpers/nprofile_helper.dart';
-import 'package:camelus/domain_layer/entities/nostr_tag.dart';
 import 'package:camelus/presentation_layer/providers/following_provider.dart';
-import 'package:camelus/presentation_layer/providers/key_pair_provider.dart';
 import 'package:camelus/presentation_layer/providers/metadata_provider.dart';
 import 'package:camelus/presentation_layer/providers/navigation_bar_provider.dart';
 import 'package:camelus/presentation_layer/providers/nostr_band_provider.dart';
@@ -209,8 +207,6 @@ class _SearchPageState extends ConsumerState<SearchPage> {
 
   void _changeFollowing(
       bool followChange, String pubkey, ContactList currentOwnContacts) async {
-    var mykeys = ref.watch(keyPairProvider);
-
     List<String> newContacts = [...currentOwnContacts.contacts];
 
     if (followChange) {

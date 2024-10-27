@@ -1,9 +1,7 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:ui';
-
-import 'package:camelus/helpers/bip340.dart';
-import 'package:camelus/presentation_layer/providers/key_pair_provider.dart';
+import 'package:camelus/presentation_layer/providers/event_signer_provider.dart';
 import 'package:camelus/presentation_layer/routes/nostr/blockedUsers/blocked_users.dart';
 import 'package:camelus/presentation_layer/routes/nostr/hashtag_view/hashtag_view_page.dart';
 import 'package:camelus/presentation_layer/routes/nostr/settings/settings_page.dart';
@@ -18,6 +16,7 @@ import 'package:flutter_mentions/flutter_mentions.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:ndk/ndk.dart';
 
 import 'domain_layer/entities/key_pair.dart';
 import 'presentation_layer/routes/home_page.dart';
@@ -26,32 +25,27 @@ import 'theme.dart' as theme;
 const devDeviceFrame = true;
 
 /// returns the pubkey if keys could be loaded from storage, otherwise returns null
-Future<KeyPairWrapper> _setupKeys() async {
+Future<KeyPair?> _setupKeys() async {
   FlutterSecureStorage storage = const FlutterSecureStorage();
   var nostrKeysString = await storage.read(key: "nostrKeys");
-  KeyPairWrapper keyPairWrapper;
   if (nostrKeysString == null) {
-    keyPairWrapper = KeyPairWrapper(keyPair: null);
-    return keyPairWrapper;
+    return null;
   }
-
-  var myKeyPair = KeyPair.fromJson(json.decode(nostrKeysString));
-  keyPairWrapper = KeyPairWrapper(keyPair: myKeyPair);
-
-  return keyPairWrapper;
+  final myKeyPair = KeyPair.fromJson(json.decode(nostrKeysString));
+  return myKeyPair;
 }
 
 /// first is route, second is pubkey
 Future<List<dynamic>> _getInitialData() async {
-  final myKeyPairWrapper = await _setupKeys();
+  final myKeyPair = await _setupKeys();
 
-  if (myKeyPairWrapper.keyPair == null) {
+  if (myKeyPair == null) {
     var initialRoute = '/onboarding';
-    KeyPairWrapper emptyKeyPair = KeyPairWrapper(keyPair: null);
-    return [initialRoute, emptyKeyPair];
+
+    return [initialRoute, null];
   }
 
-  return ['/', myKeyPairWrapper];
+  return ['/', myKeyPair];
 }
 
 Future<void> main() async {
@@ -70,13 +64,28 @@ Future<void> main() async {
   //   return;
   // }
 
-  final myKeyPairWrapper = initalData[1] as KeyPairWrapper;
+  final myKeyPair = initalData[1] as KeyPair?;
+
+  // Create a ProviderContainer
+  final providerContainer = ProviderContainer();
+
+  // If we have a valid KeyPair, create and set the EventSigner
+  if (myKeyPair != null) {
+    final signer = Bip340EventSigner(
+      privateKey: myKeyPair.privateKey,
+      publicKey: myKeyPair.publicKey,
+    );
+    providerContainer.read(eventSignerProvider.notifier).setSigner(signer);
+  }
 
   runApp(
-    MyApp(
-      initialRoute: initalData[0],
-      pubkey: myKeyPairWrapper.keyPair?.publicKey ?? '',
-      myKeyPairWrapper: myKeyPairWrapper,
+    UncontrolledProviderScope(
+      container: providerContainer,
+      child: MyApp(
+        initialRoute: initalData[0],
+        pubkey: myKeyPair?.publicKey ?? '',
+        myKeyPair: myKeyPair,
+      ),
     ),
   );
 }
@@ -84,82 +93,74 @@ Future<void> main() async {
 class MyApp extends StatelessWidget {
   final String initialRoute;
   final String pubkey;
-  final KeyPairWrapper myKeyPairWrapper;
+  final KeyPair? myKeyPair;
 
   const MyApp({
     super.key,
     required this.initialRoute,
     required this.pubkey,
-    required this.myKeyPairWrapper,
+    required this.myKeyPair,
   });
 
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return Portal(
-      child: ProviderScope(
-        overrides: [
-          keyPairProvider.overrideWith((_) {
-            return myKeyPairWrapper;
-          })
-        ],
-        child: MaterialApp(
-          scrollBehavior: const MaterialScrollBehavior().copyWith(
-            scrollbars: false,
-            dragDevices: {
-              PointerDeviceKind.touch,
-              PointerDeviceKind.mouse,
-            },
-          ),
-          debugShowCheckedModeBanner: false,
-          title: 'camelus',
-          theme: theme.themeMap["DARK"],
-          initialRoute: initialRoute,
-          onGenerateRoute: (RouteSettings settings) {
-            switch (settings.name) {
-              case '/':
-                return CupertinoPageRoute(builder: (context) {
-                  return HomePage(pubkey: pubkey);
-                });
-
-              case '/onboarding':
-                return MaterialPageRoute(
-                  builder: (context) => const NostrOnboarding(),
-                );
-
-              case '/settings':
-                return MaterialPageRoute(
-                  builder: (context) => const SettingsPage(),
-                );
-              case '/nostr/event':
-                return CupertinoPageRoute(
-                  builder: (context) => EventViewPage(
-                      rootId: (settings.arguments
-                          as Map<String, dynamic>)['root'] as String,
-                      scrollIntoView: (settings.arguments
-                              as Map<String, dynamic>)['scrollIntoView']
-                          as String?),
-                );
-
-              case '/nostr/profile':
-                return MaterialPageRoute(
-                  builder: (context) =>
-                      ProfilePage(pubkey: settings.arguments as String),
-                );
-              case '/nostr/hastag':
-                return MaterialPageRoute(
-                  builder: (context) =>
-                      HastagViewPage(hashtag: settings.arguments as String),
-                );
-              case '/nostr/blockedUsers':
-                return MaterialPageRoute(
-                  builder: (context) => const BlockedUsers(),
-                );
-            }
-            assert(false, 'Need to implement ${settings.name}');
-            return null;
+      child: MaterialApp(
+        scrollBehavior: const MaterialScrollBehavior().copyWith(
+          scrollbars: false,
+          dragDevices: {
+            PointerDeviceKind.touch,
+            PointerDeviceKind.mouse,
           },
         ),
+        debugShowCheckedModeBanner: false,
+        title: 'camelus',
+        theme: theme.themeMap["DARK"],
+        initialRoute: initialRoute,
+        onGenerateRoute: (RouteSettings settings) {
+          switch (settings.name) {
+            case '/':
+              return CupertinoPageRoute(builder: (context) {
+                return HomePage(pubkey: pubkey);
+              });
+
+            case '/onboarding':
+              return MaterialPageRoute(
+                builder: (context) => const NostrOnboarding(),
+              );
+
+            case '/settings':
+              return MaterialPageRoute(
+                builder: (context) => const SettingsPage(),
+              );
+            case '/nostr/event':
+              return CupertinoPageRoute(
+                builder: (context) => EventViewPage(
+                    rootId: (settings.arguments as Map<String, dynamic>)['root']
+                        as String,
+                    scrollIntoView: (settings.arguments
+                        as Map<String, dynamic>)['scrollIntoView'] as String?),
+              );
+
+            case '/nostr/profile':
+              return MaterialPageRoute(
+                builder: (context) =>
+                    ProfilePage(pubkey: settings.arguments as String),
+              );
+            case '/nostr/hastag':
+              return MaterialPageRoute(
+                builder: (context) =>
+                    HastagViewPage(hashtag: settings.arguments as String),
+              );
+            case '/nostr/blockedUsers':
+              return MaterialPageRoute(
+                builder: (context) => const BlockedUsers(),
+              );
+          }
+          assert(false, 'Need to implement ${settings.name}');
+          return null;
+        },
       ),
     );
   }
