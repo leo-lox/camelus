@@ -69,4 +69,20 @@ class UserMetadataModel extends UserMetadata {
       lud16: lud16,
     );
   }
+
+  factory UserMetadataModel.fromUserMetadata(UserMetadata metadata) {
+    return UserMetadataModel(
+      eventId: metadata.eventId,
+      pubkey: metadata.pubkey,
+      lastFetch: metadata.lastFetch,
+      picture: metadata.picture,
+      banner: metadata.banner,
+      name: metadata.name,
+      nip05: metadata.nip05,
+      about: metadata.about,
+      website: metadata.website,
+      lud06: metadata.lud06,
+      lud16: metadata.lud16,
+    );
+  }
 }

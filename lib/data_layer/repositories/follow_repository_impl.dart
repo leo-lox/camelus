@@ -60,7 +60,8 @@ class FollowRepositoryImpl implements FollowRepository {
 
   @override
   Future<void> setFollowing(ContactList contactList) {
-    final ndkContactList = (contactList as ContactListModel).toNdk();
+    final contactListModel = ContactListModel.fromContactList(contactList);
+    final ndkContactList = contactListModel.toNdk();
 
     return dartNdkSource.dartNdk.follows
         .broadcastSetContactList(ndkContactList);

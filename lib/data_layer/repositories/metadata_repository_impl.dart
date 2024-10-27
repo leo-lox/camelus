@@ -29,7 +29,8 @@ class MetadataRepositoryImpl implements MetadataRepository {
 
   @override
   Future<UserMetadata> broadcastMetadata(UserMetadata metadata) async {
-    final myMetadataModel = metadata as UserMetadataModel;
+    final myMetadataModel = UserMetadataModel.fromUserMetadata(metadata);
+
     final ndkMetadata = myMetadataModel.toNDKMetadata();
 
     final result =

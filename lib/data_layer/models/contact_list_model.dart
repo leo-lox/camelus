@@ -47,4 +47,19 @@ class ContactListModel extends ContactList {
 
     return ndkContactList;
   }
+
+  factory ContactListModel.fromContactList(ContactList contactList) {
+    return ContactListModel(
+      pubKey: contactList.pubKey,
+      contacts: contactList.contacts,
+      contactRelays: contactList.contactRelays,
+      petnames: contactList.petnames,
+      followedTags: contactList.followedTags,
+      followedCommunities: contactList.followedCommunities,
+      followedEvents: contactList.followedEvents,
+      sources: contactList.sources,
+      createdAt: contactList.createdAt,
+      loadedTimestamp: contactList.loadedTimestamp,
+    );
+  }
 }
