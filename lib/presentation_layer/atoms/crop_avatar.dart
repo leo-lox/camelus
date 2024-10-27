@@ -5,7 +5,7 @@ import 'package:camelus/config/palette.dart';
 import 'package:flutter/material.dart';
 import 'package:crop_your_image/crop_your_image.dart';
 
-class CropAvatar extends StatelessWidget {
+class CropAvatar extends StatefulWidget {
   final Uint8List _imageData;
 
   final double aspectRatio;
@@ -19,7 +19,13 @@ class CropAvatar extends StatelessWidget {
     required Uint8List imageData,
   }) : _imageData = imageData;
 
+  @override
+  State<CropAvatar> createState() => _CropAvatarState();
+}
+
+class _CropAvatarState extends State<CropAvatar> {
   final _controller = CropController();
+  bool _loading = false;
 
   @override
   build(context) {
@@ -27,16 +33,19 @@ class CropAvatar extends StatelessWidget {
       children: [
         Crop(
           baseColor: Palette.background,
-          aspectRatio: aspectRatio,
+          aspectRatio: widget.aspectRatio,
           //radius: 150,
 
           interactive: true,
 
-          withCircleUi: roundUi,
-          image: _imageData,
+          withCircleUi: widget.roundUi,
+          image: widget._imageData,
           controller: _controller,
 
           onCropped: (image) {
+            setState(() {
+              _loading = false;
+            });
             Navigator.pop<Uint8List>(context, image);
           },
         ),
@@ -48,9 +57,13 @@ class CropAvatar extends StatelessWidget {
                 width: 250,
                 height: 40,
                 child: longButton(
+                  loading: _loading,
                   inverted: true,
                   name: "apply",
                   onPressed: () {
+                    setState(() {
+                      _loading = true;
+                    });
                     _controller.crop();
                   },
                 ),
