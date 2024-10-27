@@ -1,19 +1,26 @@
-import 'package:camelus/presentation_layer/providers/key_pair_provider.dart';
+import 'package:riverpod/riverpod.dart';
 import 'package:ndk/ndk.dart';
 
-import 'package:riverpod/riverpod.dart';
+final eventSignerProvider =
+    StateNotifierProvider<EventSignerNotifier, EventSigner?>((ref) {
+  return EventSignerNotifier();
+});
 
-final eventSignerProvider = StateProvider<EventSigner?>((ref) {
-  final keypair = ref.watch(keyPairProvider);
+class EventSignerNotifier extends StateNotifier<EventSigner?> {
+  EventSignerNotifier() : super(null);
 
-  if (keypair.keyPair == null) {
-    return null;
+  void setSigner(EventSigner signer) {
+    state = signer;
   }
 
-  final EventSigner signer = Bip340EventSigner(
-    privateKey: keypair.keyPair!.privateKey,
-    publicKey: keypair.keyPair!.publicKey,
-  );
+  void clearSigner() {
+    state = null;
+  }
+}
 
-  return signer;
-});
+/* usage
+
+ref.read(eventSignerProvider.notifier).setSigner(bip340Signer);
+ref.read(eventSignerProvider.notifier).clearSigner();
+
+*/
