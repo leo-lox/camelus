@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:camelus/presentation_layer/components/full_screen_loading.dart';
 import 'package:flutter/material.dart';
@@ -40,6 +41,14 @@ class _OnboardingDoneState extends ConsumerState<OnboardingDone> {
   bool _termsAndConditions = false;
   bool _isVisible = false;
   bool _isLoading = false;
+  double _loadingOpacity = 0.0;
+
+  List<String> loadingTexts = [
+    "setting up your account",
+    "following people",
+    "moving data",
+    "cleaning up"
+  ];
 
   void _toggleVisibility() {
     setState(() {
@@ -78,6 +87,10 @@ ${_privateKey.mnemonicSentence}
     final fileUploadP = ref.watch(fileUploadProvider);
 
     if (widget.userInfo.picture != null) {
+      setState(() {
+        // add to start
+        loadingTexts.insert(0, "uploading profile picture");
+      });
       uploadedPicture = await fileUploadP.uploadImage(widget.userInfo.picture!);
     }
     if (widget.userInfo.banner != null) {
@@ -127,6 +140,10 @@ ${_privateKey.mnemonicSentence}
       );
       return;
     }
+    setState(() {
+      _isLoading = true;
+      _loadingOpacity = 1.0;
+    });
 
     final myKeyPair = KeyPair(
       privateKey: _privateKey.privateKey,
@@ -144,9 +161,12 @@ ${_privateKey.mnemonicSentence}
 
     // save in storage
     const storage = FlutterSecureStorage();
-    storage.write(key: "nostrKeys", value: json.encode(myKeyPair.toJson()));
+    await storage.write(
+        key: "nostrKeys", value: json.encode(myKeyPair.toJson()));
 
     await _broadcastAcc();
+
+    await Future.delayed(const Duration(seconds: 3));
 
     if (!mounted) return;
 
@@ -162,165 +182,173 @@ ${_privateKey.mnemonicSentence}
       backgroundColor: Palette.background,
       body: Stack(
         children: [
-          Column(
-            children: [
-              const SizedBox(height: 20),
-              const Text(
-                "recovery phrase",
-                style: TextStyle(
-                  color: Palette.white,
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
+          AnimatedOpacity(
+            duration: const Duration(seconds: 3),
+            opacity: max(1 - _loadingOpacity, 0.07),
+            curve: Curves.easeOut,
+            child: Column(
+              children: [
+                const SizedBox(height: 20),
+                const Text(
+                  "recovery phrase",
+                  style: TextStyle(
+                    color: Palette.white,
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 25),
-              MnemonicSentenceGrid(
-                words: _privateKey.mnemonicWords,
-                isVisible: _isVisible,
-              ),
-              const SizedBox(height: 25),
-              Padding(
-                padding: const EdgeInsets.all(10.0),
-                child: Row(
+                const SizedBox(height: 25),
+                MnemonicSentenceGrid(
+                  words: _privateKey.mnemonicWords,
+                  isVisible: _isVisible,
+                ),
+                const SizedBox(height: 25),
+                Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      ElevatedButton.icon(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Palette.black,
+                          foregroundColor: Palette.white,
+                        ),
+                        onPressed: () => {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              duration: Duration(seconds: 2),
+                              content: Text(
+                                  'a new seed phrase has been generated',
+                                  style: TextStyle(color: Palette.black)),
+                            ),
+                          ),
+                          _generateKey()
+                        },
+                        icon: const Icon(Icons.refresh),
+                        label: const Text('regenerate'),
+                      ),
+                      const SizedBox(width: 5),
+                      ElevatedButton.icon(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Palette.lightGray,
+                          foregroundColor: Palette.black,
+                        ),
+                        onPressed: () => {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              duration: Duration(seconds: 2),
+                              content: Text('copied seed phrase to clipboard',
+                                  style: TextStyle(color: Palette.black)),
+                            ),
+                          ),
+                          _copyKey()
+                        },
+                        icon: const Icon(Icons.copy),
+                        label: const Text('copy'),
+                      ),
+                      const SizedBox(width: 5),
+                      IconButton(
+                        onPressed: _toggleVisibility,
+                        icon: Icon(_isVisible
+                            ? Icons.visibility
+                            : Icons.visibility_off),
+                        tooltip: _isVisible ? 'Hide words' : 'Show words',
+                      ),
+                    ],
+                  ),
+                ),
+                const Padding(
+                  padding: EdgeInsets.all(16),
+                  child: Text(
+                      "You need the recovery phrase to login again. Make sure to keep it safe!"),
+                ),
+                const Spacer(flex: 1),
+                Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    ElevatedButton.icon(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Palette.black,
-                        foregroundColor: Palette.white,
-                      ),
-                      onPressed: () => {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            duration: Duration(seconds: 2),
-                            content: Text(
-                                'a new seed phrase has been generated',
-                                style: TextStyle(color: Palette.black)),
-                          ),
-                        ),
-                        _generateKey()
+                    Checkbox(
+                      value: _termsAndConditions,
+                      onChanged: (value) {
+                        setState(() {
+                          _termsAndConditions = value!;
+                        });
                       },
-                      icon: const Icon(Icons.refresh),
-                      label: const Text('regenerate'),
+                      activeColor: Palette.white,
+                      checkColor: Palette.black,
+                      fillColor: WidgetStateProperty.all(Palette.white),
+                      //overlayColor: MaterialStateProperty.all(Palette.primary),
                     ),
-                    const SizedBox(width: 5),
-                    ElevatedButton.icon(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Palette.lightGray,
-                        foregroundColor: Palette.black,
-                      ),
-                      onPressed: () => {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            duration: Duration(seconds: 2),
-                            content: Text('copied seed phrase to clipboard',
-                                style: TextStyle(color: Palette.black)),
-                          ),
-                        ),
-                        _copyKey()
-                      },
-                      icon: const Icon(Icons.copy),
-                      label: const Text('copy'),
-                    ),
-                    const SizedBox(width: 5),
-                    IconButton(
-                      onPressed: _toggleVisibility,
-                      icon: Icon(
-                          _isVisible ? Icons.visibility : Icons.visibility_off),
-                      tooltip: _isVisible ? 'Hide words' : 'Show words',
-                    ),
-                  ],
-                ),
-              ),
-              const Padding(
-                padding: EdgeInsets.all(16),
-                child: Text(
-                    "You need the recovery phrase to login again. Make sure to keep it safe!"),
-              ),
-              const Spacer(flex: 1),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Checkbox(
-                    value: _termsAndConditions,
-                    onChanged: (value) {
-                      setState(() {
-                        _termsAndConditions = value!;
-                      });
-                    },
-                    activeColor: Palette.white,
-                    checkColor: Palette.black,
-                    fillColor: WidgetStateProperty.all(Palette.white),
-                    //overlayColor: MaterialStateProperty.all(Palette.primary),
-                  ),
-                  const Text(
-                    "I have read and accept the ",
-                    style: TextStyle(
-                      color: Palette.white,
-                      fontSize: 12,
-                      fontWeight: FontWeight.normal,
-                    ),
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      Uri url = Uri.parse("https://camelus.app/terms/");
-                      launchUrl(url, mode: LaunchMode.externalApplication);
-                    },
-                    child: const Text(
-                      "terms and conditions",
+                    const Text(
+                      "I have read and accept the ",
                       style: TextStyle(
                         color: Palette.white,
                         fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                        decoration: TextDecoration.underline,
+                        fontWeight: FontWeight.normal,
                       ),
                     ),
-                  ),
-                ],
-              ),
-              GestureDetector(
-                onTap: () {
-                  Uri url = Uri.parse("https://camelus.app/privacy/");
-                  launchUrl(url, mode: LaunchMode.externalApplication);
-                },
-                child: const Text(
-                  "privacy policy",
-                  style: TextStyle(
-                    color: Palette.white,
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                    decoration: TextDecoration.underline,
+                    GestureDetector(
+                      onTap: () {
+                        Uri url = Uri.parse("https://camelus.app/terms/");
+                        launchUrl(url, mode: LaunchMode.externalApplication);
+                      },
+                      child: const Text(
+                        "terms and conditions",
+                        style: TextStyle(
+                          color: Palette.white,
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          decoration: TextDecoration.underline,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                GestureDetector(
+                  onTap: () {
+                    Uri url = Uri.parse("https://camelus.app/privacy/");
+                    launchUrl(url, mode: LaunchMode.externalApplication);
+                  },
+                  child: const Text(
+                    "privacy policy",
+                    style: TextStyle(
+                      color: Palette.white,
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                      decoration: TextDecoration.underline,
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 50),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                width: 400,
-                height: 40,
-                child: longButton(
-                  name: "publish account",
-                  inverted: true,
-                  onPressed: () => _onSubmit(),
+                const SizedBox(height: 50),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  width: 400,
+                  height: 40,
+                  child: longButton(
+                    name: "publish account",
+                    inverted: true,
+                    onPressed: () => _onSubmit(),
+                  ),
                 ),
-              ),
-              const SizedBox(height: 20),
-            ],
+                const SizedBox(height: 20),
+              ],
+            ),
           ),
           if (_isLoading)
-            Container(
-              color: Colors.black.withOpacity(0.9),
-              child: Center(
-                child: FullScreenLoading(
-                  loadingTexts: [
-                    "setting up your account",
-                    "uploading pictures",
-                    "following people",
-                    "🏗️"
-                  ],
-                  updateState: (function) => {},
-                ),
-              ),
+            AnimatedOpacity(
+              opacity: _loadingOpacity,
+              curve: Curves.easeInOut,
+              duration: const Duration(seconds: 2), // Adjust duration as needed
+              child: _isLoading
+                  ? Container(
+                      //color: Colors.black.withOpacity(0.5),
+                      child: Center(
+                        child: FullScreenLoading(
+                          loadingTexts: loadingTexts,
+                          updateState: (function) => {},
+                        ),
+                      ),
+                    )
+                  : const SizedBox.shrink(),
             ),
         ],
       ),
