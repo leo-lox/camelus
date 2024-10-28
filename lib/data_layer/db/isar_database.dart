@@ -50,26 +50,12 @@ class IsarDatabase implements CacheManager {
   @override
   Future<Nip01Event?> loadEvent(String id) async {
     await _isarRdy;
-    final existingEvent = await _isar.dbNip01Events
-        .filter()
-        .nostrIdEqualTo(id)
-        .sortByCreatedAtDesc()
-        .findFirst();
+    final existingEvent =
+        await _isar.dbNip01Events.filter().nostrIdEqualTo(id).findFirst();
     if (existingEvent == null) {
       return null;
     }
     return existingEvent.toNdk();
-  }
-
-  Query<DbNip01Event> kindPubkeyQuery(
-      {required String pubkey, required int kind}) {
-    return _isar.dbNip01Events
-        .filter()
-        .pubKeyEqualTo(pubkey)
-        .and()
-        .kindEqualTo(kind)
-        .sortByCreatedAtDesc()
-        .build();
   }
 
   @override
@@ -81,18 +67,39 @@ class IsarDatabase implements CacheManager {
     int? until,
   }) async {
     await _isarRdy;
-    final List<DbNip01Event> found = [];
+    final List<DbNip01Event> foundDb = [];
+    final List<DbNip01Event> foundValid = [];
 
     if (pubKeys != null && kinds != null) {
-      for (var pubKey in pubKeys) {
-        final t =
-            await kindPubkeyQuery(pubkey: pubKey, kind: kinds[0]).findAll();
-        found.addAll(t);
+      final result = await _isar.dbNip01Events
+          .filter()
+          .anyOf(pubKeys, (q, String pubkey) => q.pubKeyEqualTo(pubkey))
+          .and()
+          .anyOf(kinds, (q, int kind) => q.kindEqualTo(kind))
+          .sortByCreatedAtDesc()
+          .findAll();
+      foundDb.addAll(result);
+    }
+
+    // filter others in memory
+    for (var event in foundDb) {
+      if (pTag != null && !event.pTags.contains(pTag)) {
+        continue;
       }
+
+      if (since != null && event.createdAt < since) {
+        continue;
+      }
+
+      if (until != null && event.createdAt > until) {
+        continue;
+      }
+
+      foundValid.add(event);
     }
 
     // Convert DbNip01Event to Nip01Event
-    return found.map((dbEvent) => dbEvent.toNdk()).toList();
+    return foundValid.map((dbEvent) => dbEvent.toNdk()).toList();
   }
 
   @override
