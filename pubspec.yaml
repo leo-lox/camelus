@@ -60,12 +60,7 @@ dependencies:
   flutter_cache_manager: ^3.4.1
   web_socket_channel: ^3.0.1
   http_parser: ^4.0.2
-  #isar: ^3.1.0+1
-  #isar_flutter_libs: ^3.1.0+1
-  #isar_generator: ^3.1.0+1
-  #isar: ^4.0.0-dev.14
-  #isar_flutter_libs: ^4.0.0-dev.14
-  path_provider: ^2.1.1
+  path_provider: ^2.1.4
   pointycastle: ^3.7.3
   encrypt: ^5.0.3
   kepler: ^1.0.3
@@ -79,6 +74,12 @@ dependencies:
   ndk: 
     path: ../ndk
   flutter_force_directed_graph: ^1.0.7
+  isar: ^3.1.0+1
+  isar_flutter_libs: ^3.1.0+1
+
+  #isar_generator: ^3.1.0+1
+  #isar: ^4.0.0-dev.14
+  #isar_flutter_libs: ^4.0.0-dev.14
  
 
 
@@ -91,10 +92,11 @@ dev_dependencies:
     sdk: flutter
 
   flutter_lints: ^5.0.0
-  custom_lint: ^0.7.0
-  riverpod_lint: ^2.3.13
-  riverpod_generator: ^2.4.3
+  #custom_lint: ^0.7.0
+  #riverpod_lint: ^2.3.13
+  #riverpod_generator: ^2.4.3
   test: ^1.25.7
+  isar_generator: ^3.1.0+1
 
   
   #layerlens: ^1.0.17
