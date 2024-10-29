@@ -74,8 +74,6 @@ dependencies:
   ndk: 
     path: ../ndk
   flutter_force_directed_graph: ^1.0.7
-  isar: ^3.1.0+1
-  isar_flutter_libs: ^3.1.0+1
 
 
 
@@ -90,11 +88,11 @@ dev_dependencies:
     sdk: flutter
 
   flutter_lints: ^5.0.0
-  #custom_lint: ^0.7.0
-  #riverpod_lint: ^2.3.13
-  #riverpod_generator: ^2.4.3
+  custom_lint: ^0.7.0
+  riverpod_lint: ^2.3.13
+  riverpod_generator: ^2.4.3
   test: ^1.25.7
-  isar_generator: ^3.1.0+1
+ 
 
   
   #layerlens: ^1.0.17
