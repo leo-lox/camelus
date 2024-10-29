@@ -74,13 +74,15 @@ dependencies:
   ndk: 
     path: ../ndk
   flutter_force_directed_graph: ^1.0.7
+  objectbox: ^4.0.3
+  objectbox_flutter_libs: any
 
 
 
 
 
 dev_dependencies:
-  build_runner: ^2.4.12
+  build_runner: ^2.4.13
   mockito: ^5.4.0
   flutter_test:
     sdk: flutter
@@ -92,6 +94,7 @@ dev_dependencies:
   riverpod_lint: ^2.3.13
   riverpod_generator: ^2.4.3
   test: ^1.25.7
+  objectbox_generator: any
  
 
   
