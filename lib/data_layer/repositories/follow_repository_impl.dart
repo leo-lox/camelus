@@ -18,14 +18,17 @@ class FollowRepositoryImpl implements FollowRepository {
   });
 
   @override
-  Future<ContactList> getContacts(String npub) async {
+  Future<ContactList> getContacts(String npub, {int? timeout}) async {
     dart_ndk.Filter filter = dart_ndk.Filter(
       authors: [npub],
       kinds: [ndk_entities.ContactList.KIND],
     );
 
-    final response = dartNdkSource.dartNdk.requests
-        .query(filters: [filter], name: 'get_contacts');
+    final response = dartNdkSource.dartNdk.requests.query(
+      filters: [filter],
+      name: 'get_contacts',
+      timeout: timeout,
+    );
 
     final responseList = await response.stream.toList();
 

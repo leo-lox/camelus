@@ -50,8 +50,8 @@ class Follow {
     throw UnimplementedError();
   }
 
-  Future<ContactList> getContacts(String npub) {
-    return followRepository.getContacts(npub);
+  Future<ContactList> getContacts(String npub, {int? timeout}) {
+    return followRepository.getContacts(npub, timeout: timeout);
   }
 
   Future<ContactList> getContactsSelf() {

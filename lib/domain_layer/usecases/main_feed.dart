@@ -66,7 +66,7 @@ class MainFeed {
   }) async {
     // get contacts of user
 
-    final contactList = await _follow.getContacts(npub);
+    final contactList = await _follow.getContacts(npub, timeout: 1);
 
     final mynotesStream = _noteRepository.getTextNotesByAuthors(
       authors: contactList.contacts,
