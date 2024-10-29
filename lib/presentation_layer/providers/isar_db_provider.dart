@@ -1,6 +1,6 @@
 import 'package:riverpod/riverpod.dart';
 
-import '../../data_layer/db/isar_database.dart';
+import '../../data_layer/db/isar/isar_database.dart';
 
 final isarDbProvider = Provider<IsarDatabase>((ref) {
   final IsarDatabase isarDatabase = IsarDatabase();

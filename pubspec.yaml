@@ -77,10 +77,8 @@ dependencies:
   isar: ^3.1.0+1
   isar_flutter_libs: ^3.1.0+1
 
-  #isar_generator: ^3.1.0+1
-  #isar: ^4.0.0-dev.14
-  #isar_flutter_libs: ^4.0.0-dev.14
- 
+
+
 
 
 dev_dependencies:
