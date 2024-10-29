@@ -11,7 +11,7 @@ import 'schema/db_metadata.dart';
 import 'schema/db_nip_01_event.dart';
 
 class DbObjectBox implements CacheManager {
-  Completer _initCompleter = Completer();
+  final Completer _initCompleter = Completer();
   Future get _dbRdy => _initCompleter.future;
   late ObjectBoxInit _objectBox;
 

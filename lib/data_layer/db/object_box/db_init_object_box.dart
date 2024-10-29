@@ -15,7 +15,7 @@ class ObjectBoxInit {
     final docsDir = await getApplicationDocumentsDirectory();
     // Future<Store> openStore() {...} is defined in the generated objectbox.g.dart
     final store =
-        await openStore(directory: p.join(docsDir.path, "obx-default"));
+        await openStore(directory: p.join(docsDir.path, "camelus-obx-default"));
     return ObjectBoxInit._create(store);
   }
 }

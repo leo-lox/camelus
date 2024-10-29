@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  admin:
+    image: objectboxio/admin:latest
+    volumes:
+      - ~/Documents/camelus-obx-default:/db
+    ports:
+      - "8081:8081"
+    user: "${UID}:${GID}"
+    stdin_open: true
+    tty: true
+
+# run:
+# UID=$(id -u) GID=$(id -g) docker-compose up
