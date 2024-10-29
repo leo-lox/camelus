@@ -9,27 +9,17 @@ class DbNip01Event {
   DbNip01Event({
     required this.pubKey,
     required this.kind,
-    required List<DbTag> tags,
+    required this.dbTags,
     required this.content,
     int createdAt = 0,
   }) {
     this.createdAt = (createdAt == 0)
         ? DateTime.now().millisecondsSinceEpoch ~/ 1000
         : createdAt;
-    this.tags = tags; // This will set _tags properly
-    nostrId = _calculateId(
-        pubKey, this.createdAt, kind, _tagsToList(this.tags), content);
-  }
 
-  DbNip01Event._(
-    this.nostrId,
-    this.pubKey,
-    this.createdAt,
-    this.kind,
-    List<String> tags,
-    this.content,
-    this.sig,
-  ) : _tags = tags;
+    nostrId =
+        _calculateId(pubKey, this.createdAt, kind, _tagsToList(tags), content);
+  }
 
   @Id()
   int dbId = 0;
@@ -47,9 +37,6 @@ class DbNip01Event {
   final int kind;
 
   @Property()
-  List<String> sources = [];
-
-  @Property()
   String content;
 
   @Property()
@@ -59,12 +46,15 @@ class DbNip01Event {
   bool? validSig;
 
   @Property()
-  List<String> _tags = [];
+  List<String> sources = [];
 
-  List<DbTag> get tags => _tags.map((tag) => DbTag.fromString(tag)).toList();
+  @Property()
+  List<String> dbTags = [];
+
+  List<DbTag> get tags => dbTags.map((tag) => DbTag.fromString(tag)).toList();
 
   set tags(List<DbTag> value) {
-    _tags = value.map((tag) => tag.toString()).toList();
+    dbTags = value.map((tag) => tag.toString()).toList();
   }
 
   bool get isIdValid {
@@ -74,6 +64,7 @@ class DbNip01Event {
 
   @override
   bool operator ==(other) => other is DbNip01Event && nostrId == other.nostrId;
+
   @override
   int get hashCode => nostrId.hashCode;
 
@@ -145,7 +136,6 @@ class DbNip01Event {
     );
     ndkE.id = nostrId;
     ndkE.sig = sig;
-
     ndkE.validSig = validSig;
     ndkE.sources = sources;
     return ndkE;
@@ -157,7 +147,7 @@ class DbNip01Event {
       content: ndkE.content,
       createdAt: ndkE.createdAt,
       kind: ndkE.kind,
-      tags: _listToTags(ndkE.tags),
+      dbTags: _listToTags(ndkE.tags).map((tag) => tag.toString()).toList(),
     );
     dbE.nostrId = ndkE.id;
     dbE.sig = ndkE.sig;

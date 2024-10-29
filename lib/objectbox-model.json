@@ -1,0 +1,244 @@
+{
+  "_note1": "KEEP THIS FILE! Check it into a version control system (VCS) like git.",
+  "_note2": "ObjectBox manages crucial IDs for your object model. See docs for details.",
+  "_note3": "If you have VCS merge conflicts, you must resolve them according to ObjectBox docs.",
+  "entities": [
+    {
+      "id": "1:2806451883182902305",
+      "lastPropertyId": "11:2242751383943128321",
+      "name": "DbContactList",
+      "properties": [
+        {
+          "id": "1:8374817962340320695",
+          "name": "dbId",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:118913156440761227",
+          "name": "pubKey",
+          "type": 9
+        },
+        {
+          "id": "3:3988977713679332869",
+          "name": "contacts",
+          "type": 30
+        },
+        {
+          "id": "4:7505788900917168131",
+          "name": "contactRelays",
+          "type": 30
+        },
+        {
+          "id": "5:3802357609372255783",
+          "name": "petnames",
+          "type": 30
+        },
+        {
+          "id": "6:9126320631476430358",
+          "name": "followedTags",
+          "type": 30
+        },
+        {
+          "id": "7:6459494981709908887",
+          "name": "followedCommunities",
+          "type": 30
+        },
+        {
+          "id": "8:1170388422710485888",
+          "name": "followedEvents",
+          "type": 30
+        },
+        {
+          "id": "9:6328239475695679116",
+          "name": "createdAt",
+          "type": 6
+        },
+        {
+          "id": "10:3268815470426490725",
+          "name": "loadedTimestamp",
+          "type": 6
+        },
+        {
+          "id": "11:2242751383943128321",
+          "name": "sources",
+          "type": 30
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "2:7045118365482088719",
+      "lastPropertyId": "13:625565655505635253",
+      "name": "DbMetadata",
+      "properties": [
+        {
+          "id": "1:4330169555137470934",
+          "name": "dbId",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:3464231542098784192",
+          "name": "pubKey",
+          "type": 9
+        },
+        {
+          "id": "3:5392082724079921345",
+          "name": "name",
+          "type": 9
+        },
+        {
+          "id": "4:34763608585221932",
+          "name": "displayName",
+          "type": 9
+        },
+        {
+          "id": "5:7195627064586611851",
+          "name": "picture",
+          "type": 9
+        },
+        {
+          "id": "6:6392999448563320747",
+          "name": "banner",
+          "type": 9
+        },
+        {
+          "id": "7:5403911428383475473",
+          "name": "website",
+          "type": 9
+        },
+        {
+          "id": "8:8521496281434389408",
+          "name": "about",
+          "type": 9
+        },
+        {
+          "id": "9:4624017895028219975",
+          "name": "nip05",
+          "type": 9
+        },
+        {
+          "id": "10:2625185019158752804",
+          "name": "lud16",
+          "type": 9
+        },
+        {
+          "id": "11:5133118682109775824",
+          "name": "lud06",
+          "type": 9
+        },
+        {
+          "id": "12:7319656810309498589",
+          "name": "updatedAt",
+          "type": 6
+        },
+        {
+          "id": "13:625565655505635253",
+          "name": "refreshedTimestamp",
+          "type": 6
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "3:5777745579062928149",
+      "lastPropertyId": "10:4549740388197145640",
+      "name": "DbNip01Event",
+      "properties": [
+        {
+          "id": "1:8889142161852307322",
+          "name": "dbId",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:2607671529139599209",
+          "name": "nostrId",
+          "type": 9
+        },
+        {
+          "id": "3:1742261979313979521",
+          "name": "pubKey",
+          "type": 9
+        },
+        {
+          "id": "4:1912458014025441431",
+          "name": "createdAt",
+          "type": 6
+        },
+        {
+          "id": "5:7665287738979309858",
+          "name": "kind",
+          "type": 6
+        },
+        {
+          "id": "6:5998738483503256564",
+          "name": "sources",
+          "type": 30
+        },
+        {
+          "id": "7:3052396182256255852",
+          "name": "content",
+          "type": 9
+        },
+        {
+          "id": "8:2256270652353437209",
+          "name": "sig",
+          "type": 9
+        },
+        {
+          "id": "9:5695875884701701406",
+          "name": "validSig",
+          "type": 1
+        },
+        {
+          "id": "10:4549740388197145640",
+          "name": "dbTags",
+          "type": 30
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "4:1057608640111619122",
+      "lastPropertyId": "4:4009580019178375753",
+      "name": "DbTag",
+      "properties": [
+        {
+          "id": "1:271290166028924796",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:1088413477167386291",
+          "name": "key",
+          "type": 9
+        },
+        {
+          "id": "3:801123517618886949",
+          "name": "value",
+          "type": 9
+        },
+        {
+          "id": "4:4009580019178375753",
+          "name": "marker",
+          "type": 9
+        }
+      ],
+      "relations": []
+    }
+  ],
+  "lastEntityId": "4:1057608640111619122",
+  "lastIndexId": "0:0",
+  "lastRelationId": "0:0",
+  "lastSequenceId": "0:0",
+  "modelVersion": 5,
+  "modelVersionParserMinimum": 5,
+  "retiredEntityUids": [],
+  "retiredIndexUids": [],
+  "retiredPropertyUids": [],
+  "retiredRelationUids": [],
+  "version": 1
+}
