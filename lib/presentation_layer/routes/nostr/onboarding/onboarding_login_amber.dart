@@ -1,7 +1,17 @@
+import 'package:amberflutter/amberflutter.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:ndk/ndk.dart';
+import 'package:ndk/shared/nips/nip19/nip19.dart';
 
+import 'package:url_launcher/url_launcher.dart';
+import 'package:url_launcher/url_launcher_string.dart';
+
+import '../../../../config/amber_url.dart';
 import '../../../../config/palette.dart';
+import '../../../atoms/long_button.dart';
+import '../../../providers/event_signer_provider.dart';
+import '../../home_page.dart';
 
 class OnboardingLoginAmberPage extends ConsumerStatefulWidget {
   const OnboardingLoginAmberPage({super.key});
@@ -12,6 +22,69 @@ class OnboardingLoginAmberPage extends ConsumerStatefulWidget {
 
 class _OnboardingLoginAmberPageState
     extends ConsumerState<OnboardingLoginAmberPage> {
+  final amber = Amberflutter();
+  bool _amberInstalled = false;
+
+  bool _termsAndConditions = false;
+
+  void _checkAmberInstalled() async {
+    final installed = await amber.isAppInstalled();
+    setState(() {
+      _amberInstalled = installed;
+    });
+  }
+
+  void _promtAmberInstall() {
+    launchUrlString(AMBER_INSTANCE_URL, mode: LaunchMode.externalApplication);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _checkAmberInstalled();
+  }
+
+  void _onAmberLogin() async {
+    if (!_termsAndConditions) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please read and accept the terms and conditions first',
+              style: TextStyle(color: Palette.black)),
+        ),
+      );
+      return;
+    }
+
+    final amberValue = await amber.getPublicKey(
+      permissions: [
+        const Permission(
+          type: "nip04_encrypt",
+        ),
+        const Permission(
+          type: "nip04_decrypt",
+        ),
+        const Permission(type: "sign_event"),
+      ],
+    );
+
+    final npub = amberValue['signature'] ?? '';
+    final pubkeyHex = Nip19.decode(npub);
+
+    final amberFlutterDS = AmberFlutterDS(amber);
+    final amberSigner =
+        AmberEventSigner(publicKey: pubkeyHex, amberFlutterDS: amberFlutterDS);
+
+    ref.read(eventSignerProvider.notifier).setSigner(amberSigner);
+
+    setState(() {});
+
+    if (!mounted) return;
+
+    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
+      return HomePage(pubkey: pubkeyHex);
+    }));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -49,7 +122,84 @@ class _OnboardingLoginAmberPageState
               ),
               const Spacer(
                 flex: 1,
-              )
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Checkbox(
+                    value: _termsAndConditions,
+                    onChanged: (value) {
+                      setState(() {
+                        _termsAndConditions = value!;
+                      });
+                    },
+                    activeColor: Palette.white,
+                    checkColor: Palette.black,
+                    fillColor: MaterialStateProperty.all(Palette.white),
+                    //overlayColor: MaterialStateProperty.all(Palette.primary),
+                  ),
+                  const Text(
+                    "I have read and accept the ",
+                    style: TextStyle(
+                      color: Palette.white,
+                      fontSize: 12,
+                      fontWeight: FontWeight.normal,
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      Uri url = Uri.parse("https://camelus.app/terms/");
+                      launchUrl(url, mode: LaunchMode.externalApplication);
+                    },
+                    child: const Text(
+                      "terms and conditions",
+                      style: TextStyle(
+                        color: Palette.white,
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        decoration: TextDecoration.underline,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 5),
+              GestureDetector(
+                onTap: () {
+                  Uri url = Uri.parse("https://camelus.app/privacy/");
+                  launchUrl(url, mode: LaunchMode.externalApplication);
+                },
+                child: const Text(
+                  "privacy policy",
+                  style: TextStyle(
+                    color: Palette.white,
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                    decoration: TextDecoration.underline,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+              if (!_amberInstalled)
+                SizedBox(
+                  width: MediaQuery.of(context).size.width,
+                  height: 40,
+                  child: longButton(
+                    name: "install amber",
+                    inverted: true,
+                    onPressed: () => _promtAmberInstall(),
+                  ),
+                ),
+              if (_amberInstalled)
+                SizedBox(
+                  width: MediaQuery.of(context).size.width,
+                  height: 40,
+                  child: longButton(
+                    name: "authorise amber",
+                    inverted: true,
+                    onPressed: () => _onAmberLogin(),
+                  ),
+                ),
             ],
           ),
         ),

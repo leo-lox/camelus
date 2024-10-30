@@ -76,6 +76,7 @@ dependencies:
   flutter_force_directed_graph: ^1.0.7
   objectbox: ^4.0.3
   objectbox_flutter_libs: any
+  amberflutter: ^0.0.9
 
 
 

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -59,15 +61,16 @@ class _OnboardingLoginSelectPageState
               const Spacer(
                 flex: 1,
               ),
-              SizedBox(
-                width: MediaQuery.of(context).size.width,
-                height: 40,
-                child: longButton(
-                  name: "amber login",
-                  inverted: false,
-                  onPressed: () => widget.onPressedAmberLogin(),
+              if (Platform.isAndroid)
+                SizedBox(
+                  width: MediaQuery.of(context).size.width,
+                  height: 40,
+                  child: longButton(
+                    name: "amber login",
+                    inverted: false,
+                    onPressed: () => widget.onPressedAmberLogin(),
+                  ),
                 ),
-              ),
               const SizedBox(
                 height: 20,
               ),

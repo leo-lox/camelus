@@ -15,7 +15,7 @@ packages:
     source: sdk
     version: "0.3.2"
   amberflutter:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: amberflutter
       sha256: "5101b36419a93e0620a227ada25690286efc93ab9de59dc80e7c3a0c29ccd348"
