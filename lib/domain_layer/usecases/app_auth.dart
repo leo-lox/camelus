@@ -35,7 +35,16 @@ class AppAuth {
         const Permission(
           type: "nip04_decrypt",
         ),
-        const Permission(type: "sign_event"),
+        const Permission(type: "sign_event", kind: 0),
+        const Permission(type: "sign_event", kind: 1),
+        const Permission(type: "sign_event", kind: 2),
+        const Permission(type: "sign_event", kind: 3),
+        const Permission(type: "sign_event", kind: 4),
+        const Permission(type: "sign_event", kind: 5),
+        const Permission(type: "sign_event", kind: 6),
+        const Permission(type: "sign_event", kind: 7),
+        // nip 65
+        const Permission(type: "sign_event", kind: 10002),
       ],
     );
 
