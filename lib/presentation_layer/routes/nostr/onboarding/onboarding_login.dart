@@ -303,8 +303,6 @@ class _OnboardingLoginPageState extends ConsumerState<OnboardingLoginPage> {
                   ),
                 ),
 
-              const SizedBox(height: 10),
-
               AnimatedOpacity(
                 opacity: (_userNsec != null && myKeys != null) ? 1 : 0,
                 duration: const Duration(milliseconds: 300),
@@ -425,6 +423,7 @@ class _OnboardingLoginPageState extends ConsumerState<OnboardingLoginPage> {
               // checkbox to accept the privacy policy
 
               const SizedBox(height: 15),
+
               const Spacer(flex: 1),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -495,8 +494,6 @@ class _OnboardingLoginPageState extends ConsumerState<OnboardingLoginPage> {
                   onPressed: () => _onSubmit(),
                 ),
               ),
-
-              const SizedBox(height: 20),
             ],
           ),
         ),

@@ -19,6 +19,7 @@ class NostrOnboarding extends ConsumerStatefulWidget {
 class _NostrOnboardingState extends ConsumerState<NostrOnboarding>
     with TickerProviderStateMixin {
   late TabController _tabController;
+  late TabController _loginTabController;
 
   final PageController _horizontalPageController = PageController(
     initialPage: 1,
@@ -26,6 +27,8 @@ class _NostrOnboardingState extends ConsumerState<NostrOnboarding>
   );
   bool horizontalScrollLock = false;
   bool pageLock = false;
+
+  bool pageLockLogin = false;
 
   void _setupTabLiseners() {
     // listen to changes of tabs
@@ -53,9 +56,16 @@ class _NostrOnboardingState extends ConsumerState<NostrOnboarding>
         FocusScope.of(context).unfocus();
       }
     });
-    _horizontalPageController.addListener(() {
-      if (horizontalScrollLock) {
-        _horizontalPageController.jumpToPage(1);
+
+    _loginTabController.addListener(() {
+      if (_loginTabController.index == 1) {
+        setState(() {
+          horizontalScrollLock = true;
+        });
+      } else {
+        setState(() {
+          horizontalScrollLock = false;
+        });
       }
     });
   }
@@ -70,6 +80,12 @@ class _NostrOnboardingState extends ConsumerState<NostrOnboarding>
     super.initState();
     _tabController = TabController(
       length: 6,
+      initialIndex: 0,
+      vsync: this,
+    );
+
+    _loginTabController = TabController(
+      length: 2,
       initialIndex: 0,
       vsync: this,
     );
@@ -93,8 +109,19 @@ class _NostrOnboardingState extends ConsumerState<NostrOnboarding>
       child: PageView(
         controller: _horizontalPageController,
         scrollDirection: Axis.vertical,
+        physics: horizontalScrollLock
+            ? const NeverScrollableScrollPhysics()
+            : const AlwaysScrollableScrollPhysics(),
         children: [
-          const OnboardingLoginPage(),
+          TabBarView(
+            controller: _loginTabController,
+            physics:
+                pageLockLogin ? const NeverScrollableScrollPhysics() : null,
+            children: [
+              OnboardingLoginPage(),
+              OnboardingLoginPage(),
+            ],
+          ),
           TabBarView(
             controller: _tabController,
             physics: pageLock ? const NeverScrollableScrollPhysics() : null,
