@@ -36,6 +36,7 @@ final mainFeedStateProvider =
     NotifierProvider.family<MainFeedState, List<NostrNote>, String>(
         MainFeedState.new);
 
+// todo: add stateProvider for new events
 class MainFeedState extends FamilyNotifier<List<NostrNote>, String> {
   StreamSubscription<List<NostrNote>>? mainFeedSub;
 
@@ -52,6 +53,7 @@ class MainFeedState extends FamilyNotifier<List<NostrNote>, String> {
 
   /// gets called on init
   void start(String pubkey) {
+    // read and buffer stream to reduce layout shifts
     final mainFeedProvider = ref.read(getMainFeedProvider);
     final eventStreamBuffer = mainFeedProvider.stream
         .bufferTime(const Duration(
@@ -64,6 +66,7 @@ class MainFeedState extends FamilyNotifier<List<NostrNote>, String> {
       //ref.read(userFeedStateProvider.notifier).addEvents(events);
     });
 
+    // fetch initial events
     mainFeedProvider.fetchFeedEvents(
       npub: pubkey,
       requestId: "startupLoad",
