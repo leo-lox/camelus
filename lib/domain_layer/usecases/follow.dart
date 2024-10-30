@@ -19,11 +19,11 @@ class Follow {
     }
   }
 
-  Future<void> followUser(String npub) async {
+  Future<ContactList?> followUser(String npub) async {
     return followRepository.followUser(npub);
   }
 
-  Future<void> unfollowUser(String npub) async {
+  Future<ContactList?> unfollowUser(String npub) async {
     return followRepository.unfollowUser(npub);
   }
 

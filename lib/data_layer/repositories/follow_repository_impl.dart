@@ -60,16 +60,22 @@ class FollowRepositoryImpl implements FollowRepository {
   }
 
   @override
-  Future<void> followUser(String npub) async {
-    final newContactList =
+  Future<ContactList?> followUser(String npub) async {
+    final ndk_entities.ContactList newContactList =
         await dartNdkSource.dartNdk.follows.broadcastAddContact(npub);
-    print(newContactList.contacts);
+
+    return ContactListModel.fromNdk(newContactList);
   }
 
   @override
-  Future<void> unfollowUser(String npub) async {
-    final newContactList =
+  Future<ContactList?> unfollowUser(String npub) async {
+    final ndk_entities.ContactList? newContactList =
         await dartNdkSource.dartNdk.follows.broadcastRemoveContact(npub);
-    print(newContactList?.contacts);
+
+    if (newContactList == null) {
+      return null;
+    }
+
+    return ContactListModel.fromNdk(newContactList);
   }
 }
