@@ -1,4 +1,5 @@
 import 'package:amberflutter/amberflutter.dart';
+import 'package:camelus/domain_layer/usecases/app_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:ndk/ndk.dart';
@@ -27,6 +28,8 @@ class _OnboardingLoginAmberPageState
 
   bool _termsAndConditions = false;
 
+  bool _amberLoading = false;
+
   void _checkAmberInstalled() async {
     final installed = await amber.isAppInstalled();
     setState(() {
@@ -54,25 +57,11 @@ class _OnboardingLoginAmberPageState
       );
       return;
     }
+    setState(() {
+      _amberLoading = true;
+    });
 
-    final amberValue = await amber.getPublicKey(
-      permissions: [
-        const Permission(
-          type: "nip04_encrypt",
-        ),
-        const Permission(
-          type: "nip04_decrypt",
-        ),
-        const Permission(type: "sign_event"),
-      ],
-    );
-
-    final npub = amberValue['signature'] ?? '';
-    final pubkeyHex = Nip19.decode(npub);
-
-    final amberFlutterDS = AmberFlutterDS(amber);
-    final amberSigner =
-        AmberEventSigner(publicKey: pubkeyHex, amberFlutterDS: amberFlutterDS);
+    final amberSigner = await AppAuth.amberRegister();
 
     ref.read(eventSignerProvider.notifier).setSigner(amberSigner);
 
@@ -81,7 +70,7 @@ class _OnboardingLoginAmberPageState
     if (!mounted) return;
 
     Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
-      return HomePage(pubkey: pubkeyHex);
+      return HomePage(pubkey: amberSigner.publicKey);
     }));
   }
 
@@ -197,6 +186,7 @@ class _OnboardingLoginAmberPageState
                   child: longButton(
                     name: "authorise amber",
                     inverted: true,
+                    loading: _amberLoading,
                     onPressed: () => _onAmberLogin(),
                   ),
                 ),

@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:ui';
+import 'package:camelus/domain_layer/usecases/app_auth.dart';
 import 'package:camelus/presentation_layer/providers/event_signer_provider.dart';
 import 'package:camelus/presentation_layer/routes/nostr/blockedUsers/blocked_users.dart';
 import 'package:camelus/presentation_layer/routes/nostr/hashtag_view/hashtag_view_page.dart';
@@ -24,28 +25,17 @@ import 'theme.dart' as theme;
 
 const devDeviceFrame = true;
 
-/// returns the pubkey if keys could be loaded from storage, otherwise returns null
-Future<KeyPair?> _setupKeys() async {
-  FlutterSecureStorage storage = const FlutterSecureStorage();
-  var nostrKeysString = await storage.read(key: "nostrKeys");
-  if (nostrKeysString == null) {
-    return null;
-  }
-  final myKeyPair = KeyPair.fromJson(json.decode(nostrKeysString));
-  return myKeyPair;
-}
-
 /// first is route, second is pubkey
 Future<List<dynamic>> _getInitialData() async {
-  final myKeyPair = await _setupKeys();
+  final mySigner = await AppAuth.getEventSigner();
 
-  if (myKeyPair == null) {
+  if (mySigner == null) {
     var initialRoute = '/onboarding';
 
     return [initialRoute, null];
   }
 
-  return ['/', myKeyPair];
+  return ['/', mySigner];
 }
 
 Future<void> main() async {
@@ -64,18 +54,14 @@ Future<void> main() async {
   //   return;
   // }
 
-  final myKeyPair = initalData[1] as KeyPair?;
+  final mySigner = initalData[1] as EventSigner?;
 
   // Create a ProviderContainer
   final providerContainer = ProviderContainer();
 
-  // If we have a valid KeyPair, create and set the EventSigner
-  if (myKeyPair != null) {
-    final signer = Bip340EventSigner(
-      privateKey: myKeyPair.privateKey,
-      publicKey: myKeyPair.publicKey,
-    );
-    providerContainer.read(eventSignerProvider.notifier).setSigner(signer);
+  // we have a signer, so we can set it
+  if (mySigner != null) {
+    providerContainer.read(eventSignerProvider.notifier).setSigner(mySigner);
   }
 
   runApp(
@@ -83,8 +69,7 @@ Future<void> main() async {
       container: providerContainer,
       child: MyApp(
         initialRoute: initalData[0],
-        pubkey: myKeyPair?.publicKey ?? '',
-        myKeyPair: myKeyPair,
+        pubkey: mySigner?.getPublicKey() ?? '',
       ),
     ),
   );
@@ -93,13 +78,11 @@ Future<void> main() async {
 class MyApp extends StatelessWidget {
   final String initialRoute;
   final String pubkey;
-  final KeyPair? myKeyPair;
 
   const MyApp({
     super.key,
     required this.initialRoute,
     required this.pubkey,
-    required this.myKeyPair,
   });
 
   // This widget is the root of your application.

@@ -1,5 +1,5 @@
+import 'package:camelus/domain_layer/usecases/app_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../../../config/palette.dart';
@@ -19,8 +19,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
   }
 
   void _logout() async {
-    const storage = FlutterSecureStorage();
-    storage.write(key: "nostrKeys", value: null);
+    await AppAuth.clearKeys();
 
     // save in provider
     ref.read(eventSignerProvider.notifier).clearSigner();
