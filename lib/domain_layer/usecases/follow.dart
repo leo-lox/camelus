@@ -50,11 +50,11 @@ class Follow {
     throw UnimplementedError();
   }
 
-  Future<ContactList> getContacts(String npub, {int? timeout}) {
+  Future<ContactList?> getContacts(String npub, {int? timeout}) {
     return followRepository.getContacts(npub, timeout: timeout);
   }
 
-  Future<ContactList> getContactsSelf() {
+  Future<ContactList?> getContactsSelf() {
     _checkSelfPubkey();
     return getContacts(selfPubkey!);
   }

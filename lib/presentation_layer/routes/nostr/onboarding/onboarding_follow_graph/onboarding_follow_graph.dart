@@ -164,6 +164,10 @@ class _OnboardingFollowGraphState extends ConsumerState<OnboardingFollowGraph> {
         (await metadataP.getMetadataByPubkey(pubkey).toList()).first;
     final followInfo = await followP.getContacts(pubkey);
 
+    if (followInfo == null) {
+      throw Exception("followInfo is null");
+    }
+
     final GraphNodeData mynode = GraphNodeData(
       pubkey: pubkey,
       userMetadata: metadata,

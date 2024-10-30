@@ -35,6 +35,11 @@ class MainFeed {
   }) async {
     final contactList = await _follow.getContactsSelf();
 
+    if (contactList == null) {
+      log("no contact list found for $npub");
+      return;
+    }
+
     final now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
     final newNotesStream = _noteRepository.getTextNotesByAuthors(
       authors: contactList.contacts,
@@ -66,7 +71,12 @@ class MainFeed {
   }) async {
     // get contacts of user
 
-    final contactList = await _follow.getContacts(npub, timeout: 1);
+    final contactList = await _follow.getContacts(npub, timeout: 10);
+
+    if (contactList == null) {
+      log("no contact list found for $npub");
+      return;
+    }
 
     final mynotesStream = _noteRepository.getTextNotesByAuthors(
       authors: contactList.contacts,

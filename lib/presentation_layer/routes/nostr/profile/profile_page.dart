@@ -350,10 +350,10 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
           children: [
             const Icon(Icons.people, color: Palette.white, size: 17),
             const SizedBox(width: 5),
-            FutureBuilder<ContactList>(
+            FutureBuilder<ContactList?>(
                 future: followingService.getContacts(widget.pubkey),
                 builder: (BuildContext context,
-                    AsyncSnapshot<ContactList> snapshot) {
+                    AsyncSnapshot<ContactList?> snapshot) {
                   var contactsCountString = "";
 
                   if (snapshot.hasData) {
