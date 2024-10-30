@@ -90,26 +90,24 @@ class NostrDrawer extends ConsumerWidget {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Expanded(
-            child: GestureDetector(
-              onTap: () => navigateToProfile(context),
-              child: Container(
-                width: 50,
-                height: 50,
-                decoration: const BoxDecoration(
-                  color: Palette.primary,
-                  shape: BoxShape.circle,
-                ),
-                child: StreamBuilder<UserMetadata?>(
-                    stream: metadata.getMetadataByPubkey(pubkey),
-                    builder: (BuildContext context,
-                        AsyncSnapshot<UserMetadata?> snapshot) {
-                      return UserImage(
-                        imageUrl: snapshot.data?.picture,
-                        pubkey: pubkey,
-                      );
-                    }),
+          GestureDetector(
+            onTap: () => navigateToProfile(context),
+            child: Container(
+              width: 35,
+              height: 35,
+              decoration: const BoxDecoration(
+                color: Palette.primary,
+                shape: BoxShape.circle,
               ),
+              child: StreamBuilder<UserMetadata?>(
+                  stream: metadata.getMetadataByPubkey(pubkey),
+                  builder: (BuildContext context,
+                      AsyncSnapshot<UserMetadata?> snapshot) {
+                    return UserImage(
+                      imageUrl: snapshot.data?.picture,
+                      pubkey: pubkey,
+                    );
+                  }),
             ),
           ),
           const SizedBox(

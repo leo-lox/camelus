@@ -6,14 +6,14 @@ import 'package:cached_network_image/cached_network_image.dart';
 
 class UserImage extends StatelessWidget {
   const UserImage({
-    Key? key,
+    super.key,
     required this.imageUrl,
     required this.pubkey,
     this.size = 60,
     this.filterQuality = FilterQuality.medium,
     this.cacheHeight,
     this.disableGif = false,
-  }) : super(key: key);
+  });
 
   final String? imageUrl;
   final String pubkey;
