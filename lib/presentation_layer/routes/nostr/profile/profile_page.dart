@@ -717,12 +717,14 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                   isFollowing: true,
                   onPressed: () {
                     followingService.unfollowUser(widget.pubkey);
+                    setState(() {});
                   });
             } else {
               return followButton(
                   isFollowing: false,
                   onPressed: () {
                     followingService.followUser(widget.pubkey);
+                    setState(() {});
                   });
             }
           }
