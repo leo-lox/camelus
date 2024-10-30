@@ -1,15 +1,12 @@
 import 'package:amberflutter/amberflutter.dart';
-import 'package:camelus/domain_layer/usecases/app_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:ndk/ndk.dart';
-import 'package:ndk/shared/nips/nip19/nip19.dart';
-
 import 'package:url_launcher/url_launcher.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 import '../../../../config/amber_url.dart';
 import '../../../../config/palette.dart';
+import '../../../../domain_layer/usecases/app_auth.dart';
 import '../../../atoms/long_button.dart';
 import '../../../providers/event_signer_provider.dart';
 import '../../home_page.dart';
