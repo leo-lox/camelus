@@ -2,12 +2,15 @@ import 'package:camelus/presentation_layer/providers/onboarding_provider.dart';
 import 'package:camelus/presentation_layer/routes/nostr/onboarding/onboarding_done.dart';
 import 'package:camelus/presentation_layer/routes/nostr/onboarding/onboarding_follow_graph/onboarding_follow_graph.dart';
 import 'package:camelus/presentation_layer/routes/nostr/onboarding/onboarding_login.dart';
+import 'package:camelus/presentation_layer/routes/nostr/onboarding/onboarding_login_amber.dart';
 import 'package:camelus/presentation_layer/routes/nostr/onboarding/onboarding_name.dart';
 import 'package:camelus/presentation_layer/routes/nostr/onboarding/onboarding_page01.dart';
 import 'package:camelus/presentation_layer/routes/nostr/onboarding/onboarding_picture.dart';
 import 'package:camelus/presentation_layer/routes/nostr/onboarding/onboarding_profile.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+
+import 'onboarding_login_select.dart';
 
 class NostrOnboarding extends ConsumerStatefulWidget {
   const NostrOnboarding({super.key});
@@ -85,7 +88,7 @@ class _NostrOnboardingState extends ConsumerState<NostrOnboarding>
     );
 
     _loginTabController = TabController(
-      length: 2,
+      length: 3,
       initialIndex: 0,
       vsync: this,
     );
@@ -118,8 +121,24 @@ class _NostrOnboardingState extends ConsumerState<NostrOnboarding>
             physics:
                 pageLockLogin ? const NeverScrollableScrollPhysics() : null,
             children: [
+              OnboardingLoginSelectPage(
+                onPressedAmberLogin: () {
+                  _loginTabController.animateTo(
+                    2,
+                    curve: Curves.easeInOut,
+                    duration: const Duration(milliseconds: 500),
+                  );
+                },
+                onPressedSeedPhraseLogin: () {
+                  _loginTabController.animateTo(
+                    1,
+                    curve: Curves.easeInOut,
+                    duration: const Duration(milliseconds: 500),
+                  );
+                },
+              ),
               OnboardingLoginPage(),
-              OnboardingLoginPage(),
+              OnboardingLoginAmberPage(),
             ],
           ),
           TabBarView(
