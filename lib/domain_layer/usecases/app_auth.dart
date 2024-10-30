@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:amberflutter/amberflutter.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -69,6 +70,10 @@ class AppAuth {
       return signer;
     }
 
+    // no amber on other platforms
+    if (!Platform.isAndroid) {
+      return null;
+    }
     // check if amber is used
     final amberInstalled = await amber.isAppInstalled();
 
