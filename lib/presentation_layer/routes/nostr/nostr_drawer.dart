@@ -258,9 +258,10 @@ class NostrDrawer extends ConsumerWidget {
   }
 
   // Add method to get version
-  Future<String> _getAppVersion() async {
+  Future<PackageInfo> _getPackageInfo() async {
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
-    return packageInfo.version;
+
+    return packageInfo;
   }
 
   @override
@@ -334,14 +335,33 @@ class NostrDrawer extends ConsumerWidget {
             Padding(
               padding: EdgeInsets.only(left: 20),
               child: FutureBuilder(
-                  future: _getAppVersion(),
+                  future: _getPackageInfo(),
                   builder: (context, snapshot) {
-                    return Text(
-                      'v${snapshot.data}',
-                      style: const TextStyle(
-                        color: Palette.extraLightGray,
-                        fontSize: 10,
-                      ),
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'v${snapshot.data?.version}',
+                          style: const TextStyle(
+                            color: Palette.extraLightGray,
+                            fontSize: 10,
+                          ),
+                        ),
+                        Text(
+                          'build ${snapshot.data?.buildNumber}',
+                          style: const TextStyle(
+                            color: Palette.extraLightGray,
+                            fontSize: 8,
+                          ),
+                        ),
+                        Text(
+                          '${snapshot.data?.buildSignature}',
+                          style: const TextStyle(
+                            color: Palette.extraLightGray,
+                            fontSize: 6,
+                          ),
+                        ),
+                      ],
                     );
                   }),
             ),
