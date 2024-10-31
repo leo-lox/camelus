@@ -12,6 +12,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:camelus/config/palette.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -256,6 +257,12 @@ class NostrDrawer extends ConsumerWidget {
     );
   }
 
+  // Add method to get version
+  Future<String> _getAppVersion() async {
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    return packageInfo.version;
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     var metadata = ref.watch(metadataProvider);
@@ -317,13 +324,27 @@ class NostrDrawer extends ConsumerWidget {
             Padding(
                 padding: const EdgeInsets.fromLTRB(20, 10, 15, 20),
                 child: _textButton(
-                    text: 'terms of service',
+                    text: 'Terms of Service',
                     onPressed: () {
                       // lauch url
                       Uri url = Uri.parse("https://camelus.app/terms");
                       launchUrl(url, mode: LaunchMode.externalApplication);
                     })),
             const Spacer(),
+            Padding(
+              padding: EdgeInsets.only(left: 20),
+              child: FutureBuilder(
+                  future: _getAppVersion(),
+                  builder: (context, snapshot) {
+                    return Text(
+                      'v${snapshot.data}',
+                      style: const TextStyle(
+                        color: Palette.extraLightGray,
+                        fontSize: 10,
+                      ),
+                    );
+                  }),
+            ),
             _divider(),
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 10, 15, 20),
@@ -349,7 +370,7 @@ class NostrDrawer extends ConsumerWidget {
                   ),
                 ],
               ),
-            )
+            ),
           ],
         ),
       ),
