@@ -228,10 +228,36 @@
         }
       ],
       "relations": []
+    },
+    {
+      "id": "5:6462764810841603998",
+      "lastPropertyId": "3:7709695228344755827",
+      "name": "DbKeyValue",
+      "properties": [
+        {
+          "id": "1:9167192968750793916",
+          "name": "dbId",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:2800279101748505891",
+          "name": "key",
+          "type": 9,
+          "flags": 2080,
+          "indexId": "1:6758634951668169698"
+        },
+        {
+          "id": "3:7709695228344755827",
+          "name": "value",
+          "type": 9
+        }
+      ],
+      "relations": []
     }
   ],
-  "lastEntityId": "4:1057608640111619122",
-  "lastIndexId": "0:0",
+  "lastEntityId": "5:6462764810841603998",
+  "lastIndexId": "1:6758634951668169698",
   "lastRelationId": "0:0",
   "lastSequenceId": "0:0",
   "modelVersion": 5,
