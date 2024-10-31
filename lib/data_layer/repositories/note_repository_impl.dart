@@ -1,15 +1,12 @@
 import 'dart:developer';
 
-import 'package:camelus/data_layer/models/nostr_note_model.dart';
-import 'package:camelus/data_layer/models/user_metadata_model.dart';
-import 'package:camelus/domain_layer/entities/nostr_note.dart';
-import 'package:camelus/domain_layer/repositories/note_repository.dart';
-
 import 'package:ndk/entities.dart' as ndk_entities;
 import 'package:ndk/ndk.dart' as ndk;
 
-import '../../domain_layer/entities/user_metadata.dart';
+import '../../domain_layer/entities/nostr_note.dart';
+import '../../domain_layer/repositories/note_repository.dart';
 import '../data_sources/dart_ndk_source.dart';
+import '../models/nostr_note_model.dart';
 
 class NoteRepositoryImpl implements NoteRepository {
   final DartNdkSource dartNdkSource;
@@ -33,18 +30,6 @@ class NoteRepositoryImpl implements NoteRepository {
     return response.stream.map(
       (event) => NostrNoteModel.fromNDKEvent(event),
     );
-  }
-
-  @override
-  Stream<UserMetadata> getMetadataByPubkey(String pubkey) {
-    final myMetadata = dartNdkSource.dartNdk.metadata.loadMetadata(pubkey);
-
-    final Stream<ndk_entities.Metadata?> myMetadataStream =
-        myMetadata.asStream();
-
-    return myMetadataStream.where((event) => event != null).map(
-          (event) => UserMetadataModel.fromNDKMetadata(event!),
-        );
   }
 
   @override
