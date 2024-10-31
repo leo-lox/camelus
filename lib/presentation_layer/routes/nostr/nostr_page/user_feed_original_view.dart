@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:developer';
-import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import 'package:camelus/presentation_layer/atoms/new_posts_available.dart';
 import 'package:camelus/presentation_layer/atoms/refresh_indicator_no_need.dart';
@@ -32,8 +31,6 @@ class _UserFeedOriginalViewState extends ConsumerState<UserFeedOriginalView> {
   final List<StreamSubscription> _subscriptions = [];
 
   final Completer<void> _servicesReady = Completer<void>();
-
-  bool _newPostsAvailable = false;
 
   // new #########
   // final List<NostrNote> timelineEvents = []; // Removed this line
@@ -75,29 +72,6 @@ class _UserFeedOriginalViewState extends ConsumerState<UserFeedOriginalView> {
     widget.scrollControllerFeed.addListener(_scrollListener);
   }
 
-  void _setupNewNotesListener() {
-    return;
-
-    final mainFeedProvider = ref.read(getMainFeedProvider);
-
-    mainFeedProvider.newNotesStream
-        .bufferTime(const Duration(
-          seconds: 5,
-        ))
-        .where((events) => events.isNotEmpty)
-        .listen((events) {
-      log("new notes stream event");
-      if (mounted) {
-        setState(() {
-          _newPostsAvailable = true;
-        });
-      }
-
-      // notify navigation bar
-      ref.read(navigationBarProvider).newNotesCount = events.length;
-    });
-  }
-
   void _setupNavBarHomeListener() {
     var provider = ref.read(navigationBarProvider);
     _subscriptions.add(provider.onTabHome.listen((event) {
@@ -106,7 +80,10 @@ class _UserFeedOriginalViewState extends ConsumerState<UserFeedOriginalView> {
   }
 
   void _handleHomeBarTab() {
-    if (_newPostsAvailable) {
+    final newNotesLenth =
+        ref.watch(mainFeedNewNotesStateProvider(widget.pubkey)).length;
+    print("new notes length: $newNotesLenth");
+    if (newNotesLenth > 0) {
       _integrateNewNotes();
       return;
     }
@@ -125,9 +102,15 @@ class _UserFeedOriginalViewState extends ConsumerState<UserFeedOriginalView> {
       duration: const Duration(milliseconds: 300),
       curve: Curves.easeOut,
     );
-    setState(() {
-      _newPostsAvailable = false;
-    });
+
+    final newNotesP = ref.watch(mainFeedNewNotesStateProvider(widget.pubkey));
+
+    final notesToIntegrate = newNotesP;
+    ref.watch(getMainFeedProvider).integrateNotes(notesToIntegrate);
+
+    // delte new notes in FeedNew
+    newNotesP.clear();
+
     ref.watch(navigationBarProvider).resetNewNotesCount();
   }
 
@@ -135,7 +118,6 @@ class _UserFeedOriginalViewState extends ConsumerState<UserFeedOriginalView> {
     if (!mounted) return;
 
     _setupScrollListener();
-    _setupNewNotesListener();
 
     _setupNavBarHomeListener();
 
@@ -167,6 +149,11 @@ class _UserFeedOriginalViewState extends ConsumerState<UserFeedOriginalView> {
   @override
   Widget build(BuildContext context) {
     final timelineEvents = ref.watch(mainFeedStateProvider(widget.pubkey));
+    final newNotesEvents =
+        ref.watch(mainFeedNewNotesStateProvider(widget.pubkey));
+
+    ref.watch(navigationBarProvider).newNotesCount = newNotesEvents.length;
+
     return FutureBuilder(
       future: _servicesReady.future,
       builder: (context, snapshot) {
@@ -205,11 +192,11 @@ class _UserFeedOriginalViewState extends ConsumerState<UserFeedOriginalView> {
                   },
                 ),
               ),
-              if (_newPostsAvailable)
+              if (newNotesEvents.isNotEmpty)
                 Container(
                   margin: const EdgeInsets.only(top: 20),
                   child: newPostsAvailable(
-                      name: "new posts",
+                      name: "${newNotesEvents.length} new posts",
                       onPressed: () {
                         _integrateNewNotes();
                       }),

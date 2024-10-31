@@ -1,6 +1,7 @@
 import 'package:ndk/ndk.dart';
 import 'package:riverpod/riverpod.dart';
 
+import '../../config/default_relays.dart';
 import 'db_object_box_provider.dart';
 import 'event_signer_provider.dart';
 import 'event_verifier.dart';
@@ -18,6 +19,7 @@ final ndkProvider = Provider<Ndk>((ref) {
     cache: dbObjectBox,
     eventSigner: eventSigner,
     eventVerifier: eventVerifier,
+    bootstrapRelays: CAMELUS_BOOTSTRAP_RELAYS,
   );
 
   final ndk = Ndk(ndkConfig);

@@ -34,7 +34,13 @@ final getMainFeedProvider = Provider<MainFeed>((ref) {
 
 final mainFeedStateProvider =
     NotifierProvider.family<MainFeedState, List<NostrNote>, String>(
-        MainFeedState.new);
+  MainFeedState.new,
+);
+
+final mainFeedNewNotesStateProvider =
+    NotifierProvider.family<MainFeedNewNotesState, List<NostrNote>, String>(
+  MainFeedNewNotesState.new,
+);
 
 // todo: add stateProvider for new events
 class MainFeedState extends FamilyNotifier<List<NostrNote>, String> {
@@ -81,5 +87,33 @@ class MainFeedState extends FamilyNotifier<List<NostrNote>, String> {
     mainFeedSub?.cancel();
     mainFeedSub = null;
     state = [];
+  }
+}
+
+class MainFeedNewNotesState extends FamilyNotifier<List<NostrNote>, String> {
+  @override
+  List<NostrNote> build(String arg) {
+    start(arg);
+    return [];
+  }
+
+  void _addEvents(List<NostrNote> events) {
+    state = [...state, ...events]
+      ..sort((a, b) => b.created_at.compareTo(a.created_at));
+  }
+
+  start(String pubkey) {
+    final mainFeedProvider = ref.read(getMainFeedProvider);
+    final eventStreamBuffer = mainFeedProvider.newNotesStream
+        .bufferTime(const Duration(
+          milliseconds: 500,
+        ))
+        .where((events) => events.isNotEmpty);
+
+    eventStreamBuffer.listen((events) {
+      _addEvents(events);
+    });
+
+    mainFeedProvider.subscribeToFreshNotes(npub: pubkey);
   }
 }

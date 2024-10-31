@@ -62,6 +62,7 @@ class NoteRepositoryImpl implements NoteRepository {
     );
   }
 
+  /// Get all notes by a list of authors using a query
   @override
   Stream<NostrNote> getTextNotesByAuthors({
     required List<String> authors,
@@ -81,6 +82,37 @@ class NoteRepositoryImpl implements NoteRepository {
     );
 
     final response = dartNdkSource.dartNdk.requests.query(
+      filters: [filter],
+      name: requestId,
+      cacheRead: true,
+      cacheWrite: true,
+    );
+
+    return response.stream.map(
+      (event) => NostrNoteModel.fromNDKEvent(event),
+    );
+  }
+
+  /// Get all notes by a list of authors using a subscription
+  @override
+  Stream<NostrNote> subscribeTextNotesByAuthors({
+    required List<String> authors,
+    required String requestId,
+    int? since,
+    int? until,
+    int? limit,
+    List<String>? eTags,
+  }) {
+    ndk.Filter filter = ndk.Filter(
+      authors: authors,
+      kinds: [ndk_entities.Nip01Event.TEXT_NODE_KIND],
+      since: since,
+      until: until,
+      limit: limit,
+      eTags: eTags,
+    );
+
+    final response = dartNdkSource.dartNdk.requests.subscription(
       filters: [filter],
       name: requestId,
       cacheRead: true,

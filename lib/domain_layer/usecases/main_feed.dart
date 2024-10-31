@@ -41,11 +41,17 @@ class MainFeed {
     }
 
     final now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
-    final newNotesStream = _noteRepository.getTextNotesByAuthors(
+    final newNotesStream = _noteRepository.subscribeTextNotesByAuthors(
       authors: contactList.contacts,
       requestId: userFeedFreshId,
       since: now,
     );
+
+    final filterRootNotes = newNotesStream.where((event) => event.isRoot);
+
+    filterRootNotes.listen((event) {
+      _newNotesController.add(event);
+    });
   }
 
   /// load later timelineevents then
@@ -93,7 +99,12 @@ class MainFeed {
     filterRootNotes.listen((event) {
       _controller.add(event);
     });
+  }
 
-    //_controller.addStream(filterRootNotes);
+  /// integrate new notes into main feed
+  void integrateNotes(List<NostrNote> events) {
+    for (final event in events) {
+      _controller.add(event);
+    }
   }
 }
