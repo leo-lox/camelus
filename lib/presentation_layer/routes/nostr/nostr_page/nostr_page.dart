@@ -195,6 +195,7 @@ class _NostrPageState extends ConsumerState<NostrPage>
                       child: const Text(
                         "camelus",
                         style: TextStyle(
+                          letterSpacing: 1.2,
                           color: Palette.lightGray,
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
