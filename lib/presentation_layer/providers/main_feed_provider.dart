@@ -67,7 +67,7 @@ class MainFeedState extends FamilyNotifier<FeedViewModel, String> {
     } else {
       cutoff = now;
     }
-    //
+    // Save the current time as the new cutoff
     appDbP.save(key: 'main_feed_cache_cutoff', value: now.toString());
 
     // Timeline subscription

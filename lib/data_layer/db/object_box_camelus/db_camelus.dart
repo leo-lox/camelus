@@ -53,6 +53,23 @@ class DbAppImpl implements AppDb {
   @override
   Future<void> save({required String key, required String value}) async {
     await _dbRdy;
-    _objectBox.store.box<DbKeyValue>().put(DbKeyValue(key: key, value: value));
+
+    _objectBox.store.runInTransaction(TxMode.write, () {
+      // check if key already exists
+      final keyBox = _objectBox.store.box<DbKeyValue>();
+      final DbKeyValue? keyValue =
+          keyBox.query(DbKeyValue_.key.equals(key)).build().findFirst();
+      // update
+      if (keyValue != null) {
+        keyValue.value = value;
+        _objectBox.store.box<DbKeyValue>().put(keyValue, mode: PutMode.update);
+      } else {
+        // insert
+        final newKeyValue = DbKeyValue(key: key, value: value);
+        _objectBox.store
+            .box<DbKeyValue>()
+            .put(newKeyValue, mode: PutMode.insert);
+      }
+    });
   }
 }
