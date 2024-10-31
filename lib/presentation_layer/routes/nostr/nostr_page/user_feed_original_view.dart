@@ -35,8 +35,10 @@ class _UserFeedOriginalViewState extends ConsumerState<UserFeedOriginalView> {
   // new #########
   // final List<NostrNote> timelineEvents = []; // Removed this line
   late final Stream<List<NostrNote>> _eventStreamBuffer;
-  NostrNote get latestNote =>
-      ref.watch(mainFeedStateProvider(widget.pubkey)).last; // Updated this line
+  NostrNote get latestNote => ref
+      .watch(mainFeedStateProvider(widget.pubkey))
+      .timelineNotes
+      .last; // Updated this line
 
   _scrollListener() {
     if (widget.scrollControllerFeed.position.pixels ==
@@ -59,7 +61,8 @@ class _UserFeedOriginalViewState extends ConsumerState<UserFeedOriginalView> {
   }
 
   _loadMore() {
-    if (ref.watch(mainFeedStateProvider(widget.pubkey)).length < 2) return;
+    if (ref.watch(mainFeedStateProvider(widget.pubkey)).timelineNotes.length <
+        2) return;
     log("_loadMore()");
     final mainFeedProvider = ref.read(getMainFeedProvider);
     mainFeedProvider.loadMore(
@@ -81,7 +84,7 @@ class _UserFeedOriginalViewState extends ConsumerState<UserFeedOriginalView> {
 
   void _handleHomeBarTab() {
     final newNotesLenth =
-        ref.watch(mainFeedNewNotesStateProvider(widget.pubkey)).length;
+        ref.watch(mainFeedStateProvider(widget.pubkey)).newNotes.length;
     print("new notes length: $newNotesLenth");
     if (newNotesLenth > 0) {
       _integrateNewNotes();
@@ -103,13 +106,13 @@ class _UserFeedOriginalViewState extends ConsumerState<UserFeedOriginalView> {
       curve: Curves.easeOut,
     );
 
-    final newNotesP = ref.watch(mainFeedNewNotesStateProvider(widget.pubkey));
+    final newNotesP = ref.watch(mainFeedStateProvider(widget.pubkey));
 
     final notesToIntegrate = newNotesP;
-    ref.watch(getMainFeedProvider).integrateNotes(notesToIntegrate);
+    ref.watch(getMainFeedProvider).integrateNotes(notesToIntegrate.newNotes);
 
     // delte new notes in FeedNew
-    newNotesP.clear();
+    newNotesP.newNotes.clear();
 
     ref.watch(navigationBarProvider).resetNewNotesCount();
   }
@@ -148,11 +151,10 @@ class _UserFeedOriginalViewState extends ConsumerState<UserFeedOriginalView> {
 
   @override
   Widget build(BuildContext context) {
-    final timelineEvents = ref.watch(mainFeedStateProvider(widget.pubkey));
-    final newNotesEvents =
-        ref.watch(mainFeedNewNotesStateProvider(widget.pubkey));
+    final mainFeedStateP = ref.watch(mainFeedStateProvider(widget.pubkey));
 
-    ref.watch(navigationBarProvider).newNotesCount = newNotesEvents.length;
+    ref.watch(navigationBarProvider).newNotesCount =
+        mainFeedStateP.newNotes.length;
 
     return FutureBuilder(
       future: _servicesReady.future,
@@ -176,14 +178,16 @@ class _UserFeedOriginalViewState extends ConsumerState<UserFeedOriginalView> {
                 },
                 child: ListView.builder(
                   controller: PrimaryScrollController.of(context),
-                  itemCount: timelineEvents.length + 1, // Updated this line
+                  itemCount: mainFeedStateP.timelineNotes.length +
+                      1, // Updated this line
                   itemBuilder: (context, index) {
-                    if (index == timelineEvents.length) {
+                    if (index == mainFeedStateP.timelineNotes.length) {
                       // Updated this line
                       return SkeletonNote(renderCallback: _loadMore());
                     }
 
-                    final event = timelineEvents[index]; // Updated this line
+                    final event = mainFeedStateP
+                        .timelineNotes[index]; // Updated this line
 
                     return NoteCardContainer(
                       key: PageStorageKey(event.id),
@@ -192,11 +196,11 @@ class _UserFeedOriginalViewState extends ConsumerState<UserFeedOriginalView> {
                   },
                 ),
               ),
-              if (newNotesEvents.isNotEmpty)
+              if (mainFeedStateP.newNotes.isNotEmpty)
                 Container(
                   margin: const EdgeInsets.only(top: 20),
                   child: newPostsAvailable(
-                      name: "${newNotesEvents.length} new posts",
+                      name: "${mainFeedStateP.newNotes.length} new posts",
                       onPressed: () {
                         _integrateNewNotes();
                       }),

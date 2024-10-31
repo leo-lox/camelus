@@ -10,6 +10,7 @@ import 'package:camelus/presentation_layer/providers/ndk_provider.dart';
 import 'package:riverpod/riverpod.dart';
 import 'package:rxdart/rxdart.dart';
 
+import '../../domain_layer/entities/feed_view_model.dart';
 import '../../domain_layer/entities/nostr_note.dart';
 import '../../domain_layer/usecases/main_feed.dart';
 
@@ -33,87 +34,49 @@ final getMainFeedProvider = Provider<MainFeed>((ref) {
 });
 
 final mainFeedStateProvider =
-    NotifierProvider.family<MainFeedState, List<NostrNote>, String>(
+    NotifierProvider.family<MainFeedState, FeedViewModel, String>(
   MainFeedState.new,
 );
 
-final mainFeedNewNotesStateProvider =
-    NotifierProvider.family<MainFeedNewNotesState, List<NostrNote>, String>(
-  MainFeedNewNotesState.new,
-);
-
-// todo: add stateProvider for new events
-class MainFeedState extends FamilyNotifier<List<NostrNote>, String> {
-  StreamSubscription<List<NostrNote>>? mainFeedSub;
+class MainFeedState extends FamilyNotifier<FeedViewModel, String> {
+  StreamSubscription? _mainFeedSub;
+  StreamSubscription? _newNotesSub;
 
   @override
-  List<NostrNote> build(String arg) {
-    start(arg);
-    return [];
+  FeedViewModel build(String arg) {
+    _initSubscriptions(arg);
+    return FeedViewModel(timelineNotes: [], newNotes: []);
   }
 
-  void _addEvents(List<NostrNote> events) {
-    state = [...state, ...events]
-      ..sort((a, b) => b.created_at.compareTo(a.created_at));
+  void _initSubscriptions(String pubkey) {
+    final mainFeed = ref.read(getMainFeedProvider);
+
+    // Timeline subscription
+    _mainFeedSub = mainFeed.stream
+        .bufferTime(const Duration(milliseconds: 500))
+        .where((events) => events.isNotEmpty)
+        .listen(_addTimelineEvents);
+
+    // New notes subscription
+    _newNotesSub = mainFeed.newNotesStream
+        .bufferTime(const Duration(seconds: 1))
+        .where((events) => events.isNotEmpty)
+        .listen(_addNewEvents);
+
+    // Initial fetch
+    mainFeed.fetchFeedEvents(npub: pubkey, requestId: "startup", limit: 20);
+    mainFeed.subscribeToFreshNotes(npub: pubkey);
   }
 
-  /// gets called on init
-  void start(String pubkey) {
-    // read and buffer stream to reduce layout shifts
-    final mainFeedProvider = ref.read(getMainFeedProvider);
-    final eventStreamBuffer = mainFeedProvider.stream
-        .bufferTime(const Duration(
-          milliseconds: 500,
-        ))
-        .where((events) => events.isNotEmpty);
-
-    mainFeedSub = eventStreamBuffer.listen((events) {
-      _addEvents(events);
-      //ref.read(userFeedStateProvider.notifier).addEvents(events);
-    });
-
-    // fetch initial events
-    mainFeedProvider.fetchFeedEvents(
-      npub: pubkey,
-      requestId: "startupLoad",
-      limit: 20,
-    );
+  void _addTimelineEvents(List<NostrNote> events) {
+    state = state.copyWith(
+        timelineNotes: [...state.timelineNotes, ...events]
+          ..sort((a, b) => b.created_at.compareTo(a.created_at)));
   }
 
-  Future<void> stop() async {
-    //! todo: stop feed
-    final mainFeedProvider = ref.read(getMainFeedProvider);
-
-    mainFeedSub?.cancel();
-    mainFeedSub = null;
-    state = [];
-  }
-}
-
-class MainFeedNewNotesState extends FamilyNotifier<List<NostrNote>, String> {
-  @override
-  List<NostrNote> build(String arg) {
-    start(arg);
-    return [];
-  }
-
-  void _addEvents(List<NostrNote> events) {
-    state = [...state, ...events]
-      ..sort((a, b) => b.created_at.compareTo(a.created_at));
-  }
-
-  start(String pubkey) {
-    final mainFeedProvider = ref.read(getMainFeedProvider);
-    final eventStreamBuffer = mainFeedProvider.newNotesStream
-        .bufferTime(const Duration(
-          milliseconds: 500,
-        ))
-        .where((events) => events.isNotEmpty);
-
-    eventStreamBuffer.listen((events) {
-      _addEvents(events);
-    });
-
-    mainFeedProvider.subscribeToFreshNotes(npub: pubkey);
+  void _addNewEvents(List<NostrNote> events) {
+    state = state.copyWith(
+        newNotes: [...state.newNotes, ...events]
+          ..sort((a, b) => b.created_at.compareTo(a.created_at)));
   }
 }
