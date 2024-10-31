@@ -13,6 +13,7 @@ import 'package:rxdart/rxdart.dart';
 import '../../domain_layer/entities/feed_view_model.dart';
 import '../../domain_layer/entities/nostr_note.dart';
 import '../../domain_layer/usecases/main_feed.dart';
+import 'db_app_provider.dart';
 
 final getMainFeedProvider = Provider<MainFeed>((ref) {
   final ndk = ref.watch(ndkProvider);
@@ -52,8 +53,22 @@ class MainFeedState extends FamilyNotifier<FeedViewModel, String> {
     return FeedViewModel(timelineNotes: [], newNotes: []);
   }
 
-  void _initSubscriptions(String pubkey) {
+  void _initSubscriptions(String pubkey) async {
     final mainFeed = ref.read(getMainFeedProvider);
+    final appDbP = ref.read(dbAppProvider);
+
+    // [cutoff] is seperates the feed into old and new notes
+    // basically marking the cache point
+    final lastFetch = await appDbP.read('main_feed_cache_cutoff');
+    int cutoff = 0;
+    final int now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
+    if (lastFetch != null) {
+      cutoff = int.parse(lastFetch);
+    } else {
+      cutoff = now;
+    }
+    //
+    appDbP.save(key: 'main_feed_cache_cutoff', value: now.toString());
 
     // Timeline subscription
     _mainFeedSub = mainFeed.stream
@@ -72,9 +87,9 @@ class MainFeedState extends FamilyNotifier<FeedViewModel, String> {
       npub: pubkey,
       requestId: "startup",
       limit: 20,
-      //until: // todo insert last fetch date here
+      until: cutoff,
     );
-    mainFeed.subscribeToFreshNotes(npub: pubkey);
+    mainFeed.subscribeToFreshNotes(npub: pubkey, since: cutoff);
   }
 
   void _addTimelineEvents(List<NostrNote> events) {

@@ -32,6 +32,7 @@ class MainFeed {
 
   Future<void> subscribeToFreshNotes({
     required String npub,
+    required int since,
   }) async {
     final contactList = await _follow.getContactsSelf();
 
@@ -40,11 +41,10 @@ class MainFeed {
       return;
     }
 
-    final now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
     final newNotesStream = _noteRepository.subscribeTextNotesByAuthors(
       authors: contactList.contacts,
       requestId: userFeedFreshId,
-      since: now,
+      since: since,
     );
 
     final filterRootNotes = newNotesStream.where((event) => event.isRoot);
