@@ -193,11 +193,12 @@ class _NostrPageState extends ConsumerState<NostrPage>
                     child: GestureDetector(
                       onTap: () {},
                       child: const Text(
-                        "camelus - nostr",
+                        "camelus",
                         style: TextStyle(
                           color: Palette.lightGray,
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
+                          fontFamily: "Poppins",
                         ),
                       ),
                     )),
