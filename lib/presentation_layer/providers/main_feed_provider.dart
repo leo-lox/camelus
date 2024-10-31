@@ -42,6 +42,10 @@ class MainFeedState extends FamilyNotifier<FeedViewModel, String> {
   StreamSubscription? _mainFeedSub;
   StreamSubscription? _newNotesSub;
 
+  void resetState() {
+    state = FeedViewModel(timelineNotes: [], newNotes: []);
+  }
+
   @override
   FeedViewModel build(String arg) {
     _initSubscriptions(arg);
@@ -64,7 +68,12 @@ class MainFeedState extends FamilyNotifier<FeedViewModel, String> {
         .listen(_addNewEvents);
 
     // Initial fetch
-    mainFeed.fetchFeedEvents(npub: pubkey, requestId: "startup", limit: 20);
+    mainFeed.fetchFeedEvents(
+      npub: pubkey,
+      requestId: "startup",
+      limit: 20,
+      //until: // todo insert last fetch date here
+    );
     mainFeed.subscribeToFreshNotes(npub: pubkey);
   }
 

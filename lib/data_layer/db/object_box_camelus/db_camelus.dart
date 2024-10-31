@@ -5,12 +5,12 @@ import '../../../objectbox.g.dart';
 import 'db_camelus_init.dart';
 import 'schema/db_key_value.dart';
 
-class DbObjectBox implements AppDb {
+class DbAppImpl implements AppDb {
   final Completer _initCompleter = Completer();
   Future get _dbRdy => _initCompleter.future;
   late DbCamelusInit _objectBox;
 
-  DbObjectBox() {
+  DbAppImpl() {
     _init();
   }
 

@@ -14,10 +14,10 @@ import 'package:objectbox/internal.dart'
 import 'package:objectbox/objectbox.dart' as obx;
 import 'package:objectbox_flutter_libs/objectbox_flutter_libs.dart';
 
-import 'data_layer/db/object_box/schema/db_contact_list.dart';
-import 'data_layer/db/object_box/schema/db_metadata.dart';
-import 'data_layer/db/object_box/schema/db_nip_01_event.dart';
 import 'data_layer/db/object_box_camelus/schema/db_key_value.dart';
+import 'data_layer/db/object_box_ndk/schema/db_contact_list.dart';
+import 'data_layer/db/object_box_ndk/schema/db_metadata.dart';
+import 'data_layer/db/object_box_ndk/schema/db_nip_01_event.dart';
 
 export 'package:objectbox/objectbox.dart'; // so that callers only have to import this file
 
