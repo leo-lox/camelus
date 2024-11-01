@@ -114,10 +114,16 @@ class MainFeed {
     });
   }
 
-  /// integrate new notes into main feed
-  void integrateNotes(List<NostrNote> events) {
+  /// integrate new root notes into main feed
+  void integrateRootNotes(List<NostrNote> events) {
     for (final event in events) {
       _rootNotesController.add(event);
+    }
+  }
+
+  void integrateRootAndReplyNotes(List<NostrNote> events) {
+    for (final event in events) {
+      _rootAndReplyNotesController.add(event);
     }
   }
 

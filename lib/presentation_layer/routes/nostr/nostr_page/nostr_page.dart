@@ -17,6 +17,7 @@ import '../../../atoms/my_profile_picture.dart';
 import '../../../providers/app_update_provider.dart';
 import '../../../providers/metadata_provider.dart';
 import '../relays_page.dart';
+import 'user_feed_and_replies_view.dart';
 import 'user_feed_original_view.dart';
 
 class NostrPage extends ConsumerStatefulWidget {
@@ -287,21 +288,9 @@ class _NostrPageState extends ConsumerState<NostrPage>
               pubkey: widget.pubkey,
               scrollControllerFeed: _scrollControllerPage,
             ),
-            ListView.builder(
-              itemBuilder: (BuildContext context, int index) {
-                Color color = getRandomColor();
-                return Container(
-                  height: 150.0,
-                  color: color,
-                  child: Text(
-                    "",
-                    style: TextStyle(
-                      color: Colors.white,
-                    ),
-                  ),
-                );
-              },
-              //physics: NeverScrollableScrollPhysics(), //This may come in handy if you have issues with scrolling in the future
+            UserFeedAndRepliesView(
+              pubkey: widget.pubkey,
+              scrollControllerFeed: _scrollControllerPage,
             ),
           ],
         ),

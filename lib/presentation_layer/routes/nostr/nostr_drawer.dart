@@ -343,21 +343,21 @@ class NostrDrawer extends ConsumerWidget {
                         Text(
                           'v${snapshot.data?.version}',
                           style: const TextStyle(
-                            color: Palette.extraLightGray,
+                            color: Palette.gray,
                             fontSize: 10,
                           ),
                         ),
                         Text(
                           'build ${snapshot.data?.buildNumber}',
                           style: const TextStyle(
-                            color: Palette.extraLightGray,
+                            color: Palette.gray,
                             fontSize: 8,
                           ),
                         ),
                         Text(
                           '${snapshot.data?.buildSignature}',
                           style: const TextStyle(
-                            color: Palette.extraLightGray,
+                            color: Palette.gray,
                             fontSize: 6,
                           ),
                         ),

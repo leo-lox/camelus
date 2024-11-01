@@ -19,8 +19,11 @@ class UserFeedOriginalView extends ConsumerStatefulWidget {
   final ScrollController scrollControllerFeed;
 
   // attaches from outside, used for scroll animation
-  const UserFeedOriginalView(
-      {super.key, required this.pubkey, required this.scrollControllerFeed});
+  const UserFeedOriginalView({
+    super.key,
+    required this.pubkey,
+    required this.scrollControllerFeed,
+  });
 
   @override
   ConsumerState<UserFeedOriginalView> createState() =>
@@ -35,10 +38,8 @@ class _UserFeedOriginalViewState extends ConsumerState<UserFeedOriginalView> {
   // new #########
   // final List<NostrNote> timelineEvents = []; // Removed this line
   late final Stream<List<NostrNote>> _eventStreamBuffer;
-  NostrNote get latestNote => ref
-      .watch(mainFeedStateProvider(widget.pubkey))
-      .timelineRootNotes
-      .last; // Updated this line
+  NostrNote get latestNote =>
+      ref.watch(mainFeedStateProvider(widget.pubkey)).timelineRootNotes.last;
 
   _scrollListener() {
     if (widget.scrollControllerFeed.position.pixels ==
@@ -107,7 +108,7 @@ class _UserFeedOriginalViewState extends ConsumerState<UserFeedOriginalView> {
     final notesToIntegrate = newNotesP;
     ref
         .watch(getMainFeedProvider)
-        .integrateNotes(notesToIntegrate.newRootNotes);
+        .integrateRootNotes(notesToIntegrate.newRootNotes);
 
     // delte new notes in FeedNew
     newNotesP.newRootNotes.clear();
@@ -182,11 +183,9 @@ class _UserFeedOriginalViewState extends ConsumerState<UserFeedOriginalView> {
                 },
                 child: ListView.builder(
                   controller: PrimaryScrollController.of(context),
-                  itemCount: mainFeedStateP.timelineRootNotes.length +
-                      1, // Updated this line
+                  itemCount: mainFeedStateP.timelineRootNotes.length + 1,
                   itemBuilder: (context, index) {
                     if (index == mainFeedStateP.timelineRootNotes.length) {
-                      // Updated this line
                       return SkeletonNote(renderCallback: _loadMore());
                     }
 
