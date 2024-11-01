@@ -8,14 +8,12 @@ import '../../data_layer/repositories/note_repository_impl.dart';
 import '../../domain_layer/entities/feed_view_model.dart';
 import '../../domain_layer/entities/nostr_note.dart';
 import '../../domain_layer/repositories/note_repository.dart';
-import '../../domain_layer/usecases/follow.dart';
-import '../../domain_layer/usecases/main_feed.dart';
+import '../../domain_layer/usecases/profile_feed.dart';
 import 'db_app_provider.dart';
 import 'event_verifier.dart';
-import 'following_provider.dart';
 import 'ndk_provider.dart';
 
-final getMainFeedProvider = Provider<MainFeed>((ref) {
+final profileFeedProvider = Provider<ProfileFeed>((ref) {
   final ndk = ref.watch(ndkProvider);
 
   final eventVerifier = ref.watch(eventVerifierProvider);
@@ -27,19 +25,17 @@ final getMainFeedProvider = Provider<MainFeed>((ref) {
     eventVerifier: eventVerifier,
   );
 
-  final Follow followProvider = ref.watch(followingProvider);
+  final ProfileFeed profileFeed = ProfileFeed(noteRepository);
 
-  final MainFeed mainFeed = MainFeed(noteRepository, followProvider);
-
-  return mainFeed;
+  return profileFeed;
 });
 
-final mainFeedStateProvider =
-    NotifierProvider.family<MainFeedState, FeedViewModel, String>(
-  MainFeedState.new,
+final profileFeedStateProvider =
+    NotifierProvider.family<ProfileFeedState, FeedViewModel, String>(
+  ProfileFeedState.new,
 );
 
-class MainFeedState extends FamilyNotifier<FeedViewModel, String> {
+class ProfileFeedState extends FamilyNotifier<FeedViewModel, String> {
   StreamSubscription? _rootNotesSub;
   StreamSubscription? _newRootNotesSub;
   StreamSubscription? _rootAndReplySub;
@@ -47,7 +43,7 @@ class MainFeedState extends FamilyNotifier<FeedViewModel, String> {
 
   /// closes everthing and resets the state
   Future<void> resetStateDispose() async {
-    final mainFeed = ref.read(getMainFeedProvider);
+    final profileFeed = ref.read(profileFeedProvider);
     state = FeedViewModel(
       timelineRootNotes: [],
       newRootNotes: [],
@@ -59,7 +55,7 @@ class MainFeedState extends FamilyNotifier<FeedViewModel, String> {
     _newRootNotesSub?.cancel();
     _rootAndReplySub?.cancel();
     _newRootAndReplySub?.cancel();
-    await mainFeed.dispose();
+    await profileFeed.dispose();
   }
 
   @override
@@ -74,12 +70,14 @@ class MainFeedState extends FamilyNotifier<FeedViewModel, String> {
   }
 
   void _initSubscriptions(String pubkey) async {
-    final mainFeed = ref.read(getMainFeedProvider);
+    final profileFeed = ref.read(profileFeedProvider);
     final appDbP = ref.read(dbAppProvider);
+
+    final dbCutOffKey = 'profile_feed_cache_cutoff_$pubkey';
 
     // [cutoff] is seperates the feed into old and new notes
     // basically marking the cache point
-    final lastFetch = await appDbP.read('main_feed_cache_cutoff');
+    final lastFetch = await appDbP.read(dbCutOffKey);
     int cutoff = 0;
     final int now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
     if (lastFetch != null) {
@@ -88,38 +86,38 @@ class MainFeedState extends FamilyNotifier<FeedViewModel, String> {
       cutoff = now;
     }
     // Save the current time as the new cutoff
-    appDbP.save(key: 'main_feed_cache_cutoff', value: now.toString());
+    appDbP.save(key: dbCutOffKey, value: now.toString());
 
     // Timeline subscription
-    _rootNotesSub = mainFeed.rootNotesStream
+    _rootNotesSub = profileFeed.rootNotesStream
         .bufferTime(const Duration(milliseconds: 500))
         .where((events) => events.isNotEmpty)
         .listen(_addRootTimelineEvents);
 
     // New notes subscription
-    _newRootNotesSub = mainFeed.newRootNotesStream
+    _newRootNotesSub = profileFeed.newRootNotesStream
         .bufferTime(const Duration(seconds: 1))
         .where((events) => events.isNotEmpty)
         .listen(_addNewRootEvents);
 
-    _rootAndReplySub = mainFeed.rootAndReplyNotesStream
+    _rootAndReplySub = profileFeed.rootAndReplyNotesStream
         .bufferTime(const Duration(milliseconds: 500))
         .where((events) => events.isNotEmpty)
         .listen(_addRootAndReplyTimelineEvents);
 
-    _newRootAndReplySub = mainFeed.newRootAndReplyNotesStream
+    _newRootAndReplySub = profileFeed.newRootAndReplyNotesStream
         .bufferTime(const Duration(seconds: 1))
         .where((events) => events.isNotEmpty)
         .listen(_addNewRootAndReplyEvents);
 
     // Initial fetch
-    mainFeed.fetchFeedEvents(
+    profileFeed.fetchFeedEvents(
       npub: pubkey,
-      requestId: "startup",
+      requestId: "startup-profile",
       limit: 20,
       until: cutoff,
     );
-    mainFeed.subscribeToFreshNotes(npub: pubkey, since: cutoff);
+    profileFeed.subscribeToFreshNotes(npub: pubkey, since: cutoff);
   }
 
   void _addRootTimelineEvents(List<NostrNote> events) {
