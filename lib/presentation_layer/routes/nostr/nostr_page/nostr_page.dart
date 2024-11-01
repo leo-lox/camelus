@@ -198,7 +198,7 @@ class _NostrPageState extends ConsumerState<NostrPage>
                           letterSpacing: 1.2,
                           color: Palette.lightGray,
                           fontSize: 20,
-                          fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.normal,
                           fontFamily: "Poppins",
                         ),
                       ),

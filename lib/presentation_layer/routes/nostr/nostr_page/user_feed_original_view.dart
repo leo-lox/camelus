@@ -37,7 +37,7 @@ class _UserFeedOriginalViewState extends ConsumerState<UserFeedOriginalView> {
   late final Stream<List<NostrNote>> _eventStreamBuffer;
   NostrNote get latestNote => ref
       .watch(mainFeedStateProvider(widget.pubkey))
-      .timelineNotes
+      .timelineRootNotes
       .last; // Updated this line
 
   _scrollListener() {
@@ -61,7 +61,10 @@ class _UserFeedOriginalViewState extends ConsumerState<UserFeedOriginalView> {
   }
 
   _loadMore() {
-    if (ref.watch(mainFeedStateProvider(widget.pubkey)).timelineNotes.length <
+    if (ref
+            .watch(mainFeedStateProvider(widget.pubkey))
+            .timelineRootNotes
+            .length <
         2) return;
     log("_loadMore()");
     final mainFeedProvider = ref.read(getMainFeedProvider);
@@ -84,7 +87,7 @@ class _UserFeedOriginalViewState extends ConsumerState<UserFeedOriginalView> {
 
   void _handleHomeBarTab() {
     final newNotesLenth =
-        ref.watch(mainFeedStateProvider(widget.pubkey)).newNotes.length;
+        ref.watch(mainFeedStateProvider(widget.pubkey)).newRootNotes.length;
     if (newNotesLenth > 0) {
       _integrateNewNotes();
       return;
@@ -102,10 +105,12 @@ class _UserFeedOriginalViewState extends ConsumerState<UserFeedOriginalView> {
     final newNotesP = ref.watch(mainFeedStateProvider(widget.pubkey));
 
     final notesToIntegrate = newNotesP;
-    ref.watch(getMainFeedProvider).integrateNotes(notesToIntegrate.newNotes);
+    ref
+        .watch(getMainFeedProvider)
+        .integrateNotes(notesToIntegrate.newRootNotes);
 
     // delte new notes in FeedNew
-    newNotesP.newNotes.clear();
+    newNotesP.newRootNotes.clear();
 
     ref.watch(navigationBarProvider).resetNewNotesCount();
 
@@ -153,7 +158,7 @@ class _UserFeedOriginalViewState extends ConsumerState<UserFeedOriginalView> {
     final mainFeedStateP = ref.watch(mainFeedStateProvider(widget.pubkey));
 
     ref.watch(navigationBarProvider).newNotesCount =
-        mainFeedStateP.newNotes.length;
+        mainFeedStateP.newRootNotes.length;
 
     return FutureBuilder(
       future: _servicesReady.future,
@@ -177,16 +182,15 @@ class _UserFeedOriginalViewState extends ConsumerState<UserFeedOriginalView> {
                 },
                 child: ListView.builder(
                   controller: PrimaryScrollController.of(context),
-                  itemCount: mainFeedStateP.timelineNotes.length +
+                  itemCount: mainFeedStateP.timelineRootNotes.length +
                       1, // Updated this line
                   itemBuilder: (context, index) {
-                    if (index == mainFeedStateP.timelineNotes.length) {
+                    if (index == mainFeedStateP.timelineRootNotes.length) {
                       // Updated this line
                       return SkeletonNote(renderCallback: _loadMore());
                     }
 
-                    final event = mainFeedStateP
-                        .timelineNotes[index]; // Updated this line
+                    final event = mainFeedStateP.timelineRootNotes[index];
 
                     return NoteCardContainer(
                       key: PageStorageKey(event.id),
@@ -195,11 +199,11 @@ class _UserFeedOriginalViewState extends ConsumerState<UserFeedOriginalView> {
                   },
                 ),
               ),
-              if (mainFeedStateP.newNotes.isNotEmpty)
+              if (mainFeedStateP.newRootNotes.isNotEmpty)
                 Container(
                   margin: const EdgeInsets.only(top: 20),
                   child: newPostsAvailable(
-                      name: "${mainFeedStateP.newNotes.length} new posts",
+                      name: "${mainFeedStateP.newRootNotes.length} new posts",
                       onPressed: () {
                         _integrateNewNotes();
                       }),

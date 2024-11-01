@@ -42,11 +42,18 @@ final mainFeedStateProvider =
 class MainFeedState extends FamilyNotifier<FeedViewModel, String> {
   StreamSubscription? _mainFeedSub;
   StreamSubscription? _newNotesSub;
+  StreamSubscription? _rootAndReplySub;
+  StreamSubscription? _newRootAndReplySub;
 
   /// closes everthing and resets the state
   Future<void> resetStateDispose() async {
     final mainFeed = ref.read(getMainFeedProvider);
-    state = FeedViewModel(timelineNotes: [], newNotes: []);
+    state = FeedViewModel(
+      timelineRootNotes: [],
+      newRootNotes: [],
+      timelineRootAndReplyNotes: [],
+      newRootAndReplyNotes: [],
+    );
 
     _mainFeedSub?.cancel();
     _newNotesSub?.cancel();
@@ -56,7 +63,12 @@ class MainFeedState extends FamilyNotifier<FeedViewModel, String> {
   @override
   FeedViewModel build(String arg) {
     _initSubscriptions(arg);
-    return FeedViewModel(timelineNotes: [], newNotes: []);
+    return FeedViewModel(
+      timelineRootNotes: [],
+      newRootNotes: [],
+      timelineRootAndReplyNotes: [],
+      newRootAndReplyNotes: [],
+    );
   }
 
   void _initSubscriptions(String pubkey) async {
@@ -77,16 +89,26 @@ class MainFeedState extends FamilyNotifier<FeedViewModel, String> {
     appDbP.save(key: 'main_feed_cache_cutoff', value: now.toString());
 
     // Timeline subscription
-    _mainFeedSub = mainFeed.stream
+    _mainFeedSub = mainFeed.rootNotesStream
         .bufferTime(const Duration(milliseconds: 500))
         .where((events) => events.isNotEmpty)
-        .listen(_addTimelineEvents);
+        .listen(_addRootTimelineEvents);
 
     // New notes subscription
-    _newNotesSub = mainFeed.newNotesStream
+    _newNotesSub = mainFeed.newRootNotesStream
         .bufferTime(const Duration(seconds: 1))
         .where((events) => events.isNotEmpty)
-        .listen(_addNewEvents);
+        .listen(_addNewRootEvents);
+
+    _rootAndReplySub = mainFeed.rootAndReplyNotesStream
+        .bufferTime(const Duration(milliseconds: 500))
+        .where((events) => events.isNotEmpty)
+        .listen(_addRootAndReplyTimelineEvents);
+
+    _newRootAndReplySub = mainFeed.newRootAndReplyNotesStream
+        .bufferTime(const Duration(seconds: 1))
+        .where((events) => events.isNotEmpty)
+        .listen(_addNewRootAndReplyEvents);
 
     // Initial fetch
     mainFeed.fetchFeedEvents(
@@ -98,15 +120,29 @@ class MainFeedState extends FamilyNotifier<FeedViewModel, String> {
     mainFeed.subscribeToFreshNotes(npub: pubkey, since: cutoff);
   }
 
-  void _addTimelineEvents(List<NostrNote> events) {
+  void _addRootTimelineEvents(List<NostrNote> events) {
     state = state.copyWith(
-        timelineNotes: [...state.timelineNotes, ...events]
+        timelineRootNotes: [...state.timelineRootNotes, ...events]
           ..sort((a, b) => b.created_at.compareTo(a.created_at)));
   }
 
-  void _addNewEvents(List<NostrNote> events) {
+  void _addNewRootEvents(List<NostrNote> events) {
     state = state.copyWith(
-        newNotes: [...state.newNotes, ...events]
+        newRootNotes: [...state.newRootNotes, ...events]
+          ..sort((a, b) => b.created_at.compareTo(a.created_at)));
+  }
+
+  void _addRootAndReplyTimelineEvents(List<NostrNote> events) {
+    state = state.copyWith(
+        timelineRootAndReplyNotes: [
+      ...state.timelineRootAndReplyNotes,
+      ...events
+    ]..sort((a, b) => b.created_at.compareTo(a.created_at)));
+  }
+
+  void _addNewRootAndReplyEvents(List<NostrNote> events) {
+    state = state.copyWith(
+        newRootAndReplyNotes: [...state.newRootAndReplyNotes, ...events]
           ..sort((a, b) => b.created_at.compareTo(a.created_at)));
   }
 }

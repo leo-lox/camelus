@@ -20,13 +20,25 @@ class MainFeed {
   final String userFeedFreshId = "fresh";
   final String userFeedTimelineFetchId = "timeline";
 
-  // streams
-  final StreamController<NostrNote> _controller = StreamController<NostrNote>();
-  Stream<NostrNote> get stream => _controller.stream;
-
-  final StreamController<NostrNote> _newNotesController =
+  // root streams
+  final StreamController<NostrNote> _rootNotesController =
       StreamController<NostrNote>();
-  Stream<NostrNote> get newNotesStream => _newNotesController.stream;
+  Stream<NostrNote> get rootNotesStream => _rootNotesController.stream;
+
+  final StreamController<NostrNote> _newRootNotesController =
+      StreamController<NostrNote>();
+  Stream<NostrNote> get newRootNotesStream => _newRootNotesController.stream;
+
+  // root and reply streams
+  final StreamController<NostrNote> _rootAndReplyNotesController =
+      StreamController<NostrNote>();
+  Stream<NostrNote> get rootAndReplyNotesStream =>
+      _rootAndReplyNotesController.stream;
+
+  final StreamController<NostrNote> _newRootAndReplyNotesController =
+      StreamController<NostrNote>();
+  Stream<NostrNote> get newRootAndReplyNotesStream =>
+      _newRootAndReplyNotesController.stream;
 
   MainFeed(this._noteRepository, this._follow);
 
@@ -47,10 +59,11 @@ class MainFeed {
       since: since,
     );
 
-    final filterRootNotes = newNotesStream.where((event) => event.isRoot);
-
-    filterRootNotes.listen((event) {
-      _newNotesController.add(event);
+    newNotesStream.listen((event) {
+      _newRootAndReplyNotesController.add(event);
+      if (event.isRoot) {
+        _newRootNotesController.add(event);
+      }
     });
   }
 
@@ -93,18 +106,18 @@ class MainFeed {
       eTags: eTags,
     );
 
-    // filter root notes
-    final filterRootNotes = mynotesStream.where((event) => event.isRoot);
-
-    filterRootNotes.listen((event) {
-      _controller.add(event);
+    mynotesStream.listen((event) {
+      _rootAndReplyNotesController.add(event);
+      if (event.isRoot) {
+        _rootNotesController.add(event);
+      }
     });
   }
 
   /// integrate new notes into main feed
   void integrateNotes(List<NostrNote> events) {
     for (final event in events) {
-      _controller.add(event);
+      _rootNotesController.add(event);
     }
   }
 
@@ -112,8 +125,10 @@ class MainFeed {
   Future<void> dispose() async {
     final List<Future> futures = [];
     futures.add(_noteRepository.closeSubscription(userFeedTimelineFetchId));
-    futures.add(_controller.close());
-    futures.add(_newNotesController.close());
+    futures.add(_rootNotesController.close());
+    futures.add(_newRootNotesController.close());
+    futures.add(_rootAndReplyNotesController.close());
+    futures.add(_newRootAndReplyNotesController.close());
 
     await Future.wait(futures);
   }
