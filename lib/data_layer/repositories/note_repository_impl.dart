@@ -108,4 +108,9 @@ class NoteRepositoryImpl implements NoteRepository {
       (event) => NostrNoteModel.fromNDKEvent(event),
     );
   }
+
+  @override
+  Future<void> closeSubscription(String subscriptionId) async {
+    await dartNdkSource.dartNdk.requests.closeSubscription(subscriptionId);
+  }
 }

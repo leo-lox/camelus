@@ -107,4 +107,14 @@ class MainFeed {
       _controller.add(event);
     }
   }
+
+  /// clean up everything including closing subscriptions
+  Future<void> dispose() async {
+    final List<Future> futures = [];
+    futures.add(_noteRepository.closeSubscription(userFeedTimelineFetchId));
+    futures.add(_controller.close());
+    futures.add(_newNotesController.close());
+
+    await Future.wait(futures);
+  }
 }

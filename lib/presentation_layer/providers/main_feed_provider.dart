@@ -43,8 +43,14 @@ class MainFeedState extends FamilyNotifier<FeedViewModel, String> {
   StreamSubscription? _mainFeedSub;
   StreamSubscription? _newNotesSub;
 
-  void resetState() {
+  /// closes everthing and resets the state
+  Future<void> resetStateDispose() async {
+    final mainFeed = ref.read(getMainFeedProvider);
     state = FeedViewModel(timelineNotes: [], newNotes: []);
+
+    _mainFeedSub?.cancel();
+    _newNotesSub?.cancel();
+    await mainFeed.dispose();
   }
 
   @override

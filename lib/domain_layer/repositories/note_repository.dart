@@ -22,4 +22,6 @@ abstract class NoteRepository {
     int? limit,
     List<String>? eTags,
   });
+
+  Future<void> closeSubscription(String subscriptionId);
 }
