@@ -1,19 +1,19 @@
 import 'dart:async';
 
-import 'package:camelus/data_layer/data_sources/dart_ndk_source.dart';
-import 'package:camelus/data_layer/repositories/note_repository_impl.dart';
-import 'package:camelus/domain_layer/repositories/note_repository.dart';
-import 'package:camelus/domain_layer/usecases/follow.dart';
-import 'package:camelus/presentation_layer/providers/event_verifier.dart';
-import 'package:camelus/presentation_layer/providers/following_provider.dart';
-import 'package:camelus/presentation_layer/providers/ndk_provider.dart';
 import 'package:riverpod/riverpod.dart';
 import 'package:rxdart/rxdart.dart';
 
+import '../../data_layer/data_sources/dart_ndk_source.dart';
+import '../../data_layer/repositories/note_repository_impl.dart';
 import '../../domain_layer/entities/feed_view_model.dart';
 import '../../domain_layer/entities/nostr_note.dart';
+import '../../domain_layer/repositories/note_repository.dart';
+import '../../domain_layer/usecases/follow.dart';
 import '../../domain_layer/usecases/main_feed.dart';
 import 'db_app_provider.dart';
+import 'event_verifier.dart';
+import 'following_provider.dart';
+import 'ndk_provider.dart';
 
 final getMainFeedProvider = Provider<MainFeed>((ref) {
   final ndk = ref.watch(ndkProvider);
@@ -57,6 +57,8 @@ class MainFeedState extends FamilyNotifier<FeedViewModel, String> {
 
     _mainFeedSub?.cancel();
     _newNotesSub?.cancel();
+    _rootAndReplySub?.cancel();
+    _newRootAndReplySub?.cancel();
     await mainFeed.dispose();
   }
 
