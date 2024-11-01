@@ -85,7 +85,6 @@ class _UserFeedOriginalViewState extends ConsumerState<UserFeedOriginalView> {
   void _handleHomeBarTab() {
     final newNotesLenth =
         ref.watch(mainFeedStateProvider(widget.pubkey)).newNotes.length;
-    print("new notes length: $newNotesLenth");
     if (newNotesLenth > 0) {
       _integrateNewNotes();
       return;
@@ -100,12 +99,6 @@ class _UserFeedOriginalViewState extends ConsumerState<UserFeedOriginalView> {
   }
 
   void _integrateNewNotes() {
-    widget.scrollControllerFeed.animateTo(
-      widget.scrollControllerFeed.position.minScrollExtent,
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeOut,
-    );
-
     final newNotesP = ref.watch(mainFeedStateProvider(widget.pubkey));
 
     final notesToIntegrate = newNotesP;
@@ -115,6 +108,12 @@ class _UserFeedOriginalViewState extends ConsumerState<UserFeedOriginalView> {
     newNotesP.newNotes.clear();
 
     ref.watch(navigationBarProvider).resetNewNotesCount();
+
+    widget.scrollControllerFeed.animateTo(
+      widget.scrollControllerFeed.position.minScrollExtent,
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeOut,
+    );
   }
 
   Future<void> _initSequence() async {
