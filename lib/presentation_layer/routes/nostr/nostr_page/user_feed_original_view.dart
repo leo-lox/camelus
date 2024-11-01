@@ -33,8 +33,6 @@ class UserFeedOriginalView extends ConsumerStatefulWidget {
 class _UserFeedOriginalViewState extends ConsumerState<UserFeedOriginalView> {
   final List<StreamSubscription> _subscriptions = [];
 
-  final Completer<void> _servicesReady = Completer<void>();
-
   // new #########
   // final List<NostrNote> timelineEvents = []; // Removed this line
   late final Stream<List<NostrNote>> _eventStreamBuffer;
@@ -128,11 +126,6 @@ class _UserFeedOriginalViewState extends ConsumerState<UserFeedOriginalView> {
     _setupScrollListener();
 
     _setupNavBarHomeListener();
-
-    _servicesReady.complete();
-
-    // todo: bug on first launch
-    //ref.watch(navigationBarProvider).resetNewNotesCount();
   }
 
   @override
@@ -161,57 +154,39 @@ class _UserFeedOriginalViewState extends ConsumerState<UserFeedOriginalView> {
     ref.watch(navigationBarProvider).newNotesCount =
         mainFeedStateP.newRootNotes.length;
 
-    return FutureBuilder(
-      future: _servicesReady.future,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(
-              child: CircularProgressIndicator(
-            color: Palette.white,
-          ));
-        }
-        if (snapshot.hasError) {
-          return const Center(child: Text('Error'));
-        }
+    return Stack(
+      children: [
+        refreshIndicatorNoNeed(
+          onRefresh: () {
+            return Future.delayed(const Duration(milliseconds: 0));
+          },
+          child: ListView.builder(
+            controller: PrimaryScrollController.of(context),
+            itemCount: mainFeedStateP.timelineRootNotes.length + 1,
+            itemBuilder: (context, index) {
+              if (index == mainFeedStateP.timelineRootNotes.length) {
+                return SkeletonNote(renderCallback: _loadMore());
+              }
 
-        if (snapshot.connectionState == ConnectionState.done) {
-          return Stack(
-            children: [
-              refreshIndicatorNoNeed(
-                onRefresh: () {
-                  return Future.delayed(const Duration(milliseconds: 0));
-                },
-                child: ListView.builder(
-                  controller: PrimaryScrollController.of(context),
-                  itemCount: mainFeedStateP.timelineRootNotes.length + 1,
-                  itemBuilder: (context, index) {
-                    if (index == mainFeedStateP.timelineRootNotes.length) {
-                      return SkeletonNote(renderCallback: _loadMore());
-                    }
+              final event = mainFeedStateP.timelineRootNotes[index];
 
-                    final event = mainFeedStateP.timelineRootNotes[index];
-
-                    return NoteCardContainer(
-                      key: PageStorageKey(event.id),
-                      note: event,
-                    );
-                  },
-                ),
-              ),
-              if (mainFeedStateP.newRootNotes.isNotEmpty)
-                Container(
-                  margin: const EdgeInsets.only(top: 20),
-                  child: newPostsAvailable(
-                      name: "${mainFeedStateP.newRootNotes.length} new posts",
-                      onPressed: () {
-                        _integrateNewNotes();
-                      }),
-                ),
-            ],
-          );
-        }
-        return const Center(child: Text('Error'));
-      },
+              return NoteCardContainer(
+                key: PageStorageKey(event.id),
+                note: event,
+              );
+            },
+          ),
+        ),
+        if (mainFeedStateP.newRootNotes.isNotEmpty)
+          Container(
+            margin: const EdgeInsets.only(top: 20),
+            child: newPostsAvailable(
+                name: "${mainFeedStateP.newRootNotes.length} new posts",
+                onPressed: () {
+                  _integrateNewNotes();
+                }),
+          ),
+      ],
     );
   }
 }
