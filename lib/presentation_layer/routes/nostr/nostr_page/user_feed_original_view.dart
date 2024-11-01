@@ -1,17 +1,16 @@
 import 'dart:async';
 import 'dart:developer';
 
-import 'package:camelus/presentation_layer/atoms/new_posts_available.dart';
-import 'package:camelus/presentation_layer/atoms/refresh_indicator_no_need.dart';
-import 'package:camelus/presentation_layer/components/note_card/note_card_container.dart';
-import 'package:camelus/config/palette.dart';
-import 'package:camelus/domain_layer/entities/nostr_note.dart';
-import 'package:camelus/presentation_layer/providers/navigation_bar_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:rxdart/rxdart.dart';
+
+import '../../../../domain_layer/entities/nostr_note.dart';
+import '../../../atoms/new_posts_available.dart';
+import '../../../atoms/refresh_indicator_no_need.dart';
+import '../../../components/note_card/note_card_container.dart';
 import '../../../components/note_card/sceleton_note.dart';
 import '../../../providers/main_feed_provider.dart';
+import '../../../providers/navigation_bar_provider.dart';
 
 class UserFeedOriginalView extends ConsumerStatefulWidget {
   final String pubkey;
@@ -35,29 +34,9 @@ class _UserFeedOriginalViewState extends ConsumerState<UserFeedOriginalView> {
 
   // new #########
   // final List<NostrNote> timelineEvents = []; // Removed this line
-  late final Stream<List<NostrNote>> _eventStreamBuffer;
+
   NostrNote get latestNote =>
       ref.watch(mainFeedStateProvider(widget.pubkey)).timelineRootNotes.last;
-
-  _scrollListener() {
-    if (widget.scrollControllerFeed.position.pixels ==
-        widget.scrollControllerFeed.position.maxScrollExtent) {
-      final mainFeedProvider = ref.read(getMainFeedProvider);
-      // mainFeedProvider.loadMore(
-      //   oltherThen: latestNote.created_at,
-      //   pubkey: widget.pubkey,
-      // );
-    }
-
-    if (widget.scrollControllerFeed.position.pixels < 100) {
-      // disable after sroll
-      // if (_newPostsAvailable) {
-      //   setState(() {
-      //     _newPostsAvailable = false;
-      //   });
-      // }
-    }
-  }
 
   _loadMore() {
     if (ref
@@ -71,10 +50,6 @@ class _UserFeedOriginalViewState extends ConsumerState<UserFeedOriginalView> {
       oltherThen: latestNote.created_at,
       pubkey: widget.pubkey,
     );
-  }
-
-  void _setupScrollListener() {
-    widget.scrollControllerFeed.addListener(_scrollListener);
   }
 
   void _setupNavBarHomeListener() {
@@ -120,24 +95,16 @@ class _UserFeedOriginalViewState extends ConsumerState<UserFeedOriginalView> {
     );
   }
 
-  Future<void> _initSequence() async {
-    if (!mounted) return;
-
-    _setupScrollListener();
-
-    _setupNavBarHomeListener();
-  }
-
   @override
   void initState() {
     super.initState();
-    _initSequence();
+    _setupNavBarHomeListener();
   }
 
   @override
   void dispose() {
     _disposeSubscriptions();
-    widget.scrollControllerFeed.removeListener(_scrollListener);
+
     super.dispose();
   }
 
