@@ -1,11 +1,17 @@
 class TreeNode<T> {
   T value;
+  TreeNode<T>? parent;
   List<TreeNode<T>> children;
+
+  bool get isFirstChild => parent?.children.first == this;
+  bool get isLastChild => parent?.children.last == this;
+  bool get hasSiblings => parent != null && parent!.children.length > 1;
 
   TreeNode(this.value) : children = <TreeNode<T>>[];
 
   void addChild(TreeNode<T> child) {
     children.add(child);
+    child.parent = this;
   }
 
   void printTree([String prefix = '']) {
