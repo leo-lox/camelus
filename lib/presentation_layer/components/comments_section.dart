@@ -37,25 +37,33 @@ class _CommentSectionState extends State<CommentSection> {
     List<bool> childAncestorHasSibling = List.from(ancestorHasSibling);
     childAncestorHasSibling.add(node.hasSiblings);
 
+    bool isRepliesExpanded = repliesExpanded[node.value.id] ?? false;
+
+    if (node.children.length < 2) {
+      setState(() {
+        repliesExpanded[node.value.id] = true;
+        isRepliesExpanded = true;
+      });
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Stack(
           clipBehavior: Clip.none,
           children: [
-            // for loop
-            for (int i = 0; i < depth; i++)
-              if (ancestorHasSibling[i])
-                Positioned(
-                  left: 1.0 * i,
-                  top: 0,
-                  bottom: 0,
-                  child: Container(
-                    width: 2.0,
-                    height: 60,
-                    color: Palette.purple,
-                  ),
-                ),
+            // for (int i = 0; i < depth; i++)
+            //   if (ancestorHasSibling[i])
+            //     Positioned(
+            //       left: 13.0 * i,
+            //       top: 0,
+            //       bottom: 0,
+            //       child: Container(
+            //         width: 2.0,
+            //         height: 60,
+            //         color: Palette.purple,
+            //       ),
+            //     ),
 
             Padding(
               padding: EdgeInsets.only(left: depth * 16.0),
@@ -91,10 +99,32 @@ class _CommentSectionState extends State<CommentSection> {
                     Positioned(
                       left: 10.0,
                       top: 60,
+                      bottom: 40,
+                      child: Container(
+                        width: 2.0,
+                        color: lineColor,
+                      ),
+                    ),
+
+                  /// paint the gap that expand button is leaving
+                  if (node.hasChildren && node.children.length == 1)
+                    Positioned(
+                      left: 10.0,
+                      top: 60,
                       bottom: 0,
                       child: Container(
                         width: 2.0,
-                        height: 60,
+                        color: lineColor,
+                      ),
+                    ),
+
+                  if (node.hasChildren && isRepliesExpanded)
+                    Positioned(
+                      left: 10.0,
+                      bottom: 0,
+                      child: Container(
+                        width: 2.0,
+                        height: 22,
                         color: lineColor,
                       ),
                     ),
@@ -103,7 +133,9 @@ class _CommentSectionState extends State<CommentSection> {
                     key: ValueKey(node.value.id),
                     note: node.value,
                   ),
-                  if (node.hasChildren)
+
+                  /// on only one child its expaded already
+                  if (node.hasChildren && node.children.length > 1)
                     // expand replies
                     Positioned(
                       left: 0.0,
@@ -111,26 +143,28 @@ class _CommentSectionState extends State<CommentSection> {
                       bottom: 20,
                       child: GestureDetector(
                         onTap: () {
+                          print("expand replies");
                           setState(() {
                             repliesExpanded[node.value.id] =
                                 !(repliesExpanded[node.value.id] ?? false);
+                            isRepliesExpanded =
+                                repliesExpanded[node.value.id] ?? false;
                           });
                         },
                         child: Container(
-                          padding: const EdgeInsets.all(4.0),
-                          decoration: BoxDecoration(
-                            color: Palette.purple,
-                            borderRadius: BorderRadius.circular(4.0),
-                          ),
-                          child: Text(
-                            repliesExpanded[node.value.id] ?? false
-                                ? "Collapse"
-                                : "Expand",
-                            style: TextStyle(
-                              color: Palette.white,
-                              fontSize: 12.0,
-                            ),
-                          ),
+                          //padding: const EdgeInsets.all(4.0),
+
+                          child: isRepliesExpanded
+                              ? Icon(
+                                  Icons.remove_circle_outline,
+                                  color: Palette.gray,
+                                  size: 22.0,
+                                )
+                              : Icon(
+                                  Icons.add_circle_outline,
+                                  color: Palette.gray,
+                                  size: 22.0,
+                                ),
                         ),
                       ),
                     ),
@@ -139,7 +173,7 @@ class _CommentSectionState extends State<CommentSection> {
             ),
           ],
         ),
-        if (repliesExpanded[node.value.id] ?? false)
+        if (isRepliesExpanded)
           ...node.children.map((child) => _buildCommentTree(
                 child,
                 depth + 1,
