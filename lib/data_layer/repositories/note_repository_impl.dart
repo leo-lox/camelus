@@ -113,4 +113,11 @@ class NoteRepositoryImpl implements NoteRepository {
   Future<void> closeSubscription(String subscriptionId) async {
     await dartNdkSource.dartNdk.requests.closeSubscription(subscriptionId);
   }
+
+  @override
+  Stream<NostrNote> subscribeReplyNotes(
+      {required String rootNoteId, required String requestId}) {
+    // TODO: implement subscribeReplyNotes
+    throw UnimplementedError();
+  }
 }

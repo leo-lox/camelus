@@ -5,6 +5,12 @@ abstract class NoteRepository {
 
   Stream<NostrNote> getTextNote(String noteId);
 
+  /// returns the replies to a root note, without the root note
+  Stream<NostrNote> subscribeReplyNotes({
+    required String rootNoteId,
+    required String requestId,
+  });
+
   Stream<NostrNote> getTextNotesByAuthors({
     required List<String> authors,
     required String requestId,

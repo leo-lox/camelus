@@ -34,7 +34,6 @@ class EventFeed {
 
   Future<void> subscribeToReplyNotes({
     required String rootNoteId,
-    required int since,
   }) async {
     final replyNotes = _noteRepository.subscribeReplyNotes(
       requestId: repliesFetchId,
