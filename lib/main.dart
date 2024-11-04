@@ -116,9 +116,9 @@ class MyApp extends StatelessWidget {
             case '/nostr/event':
               return CupertinoPageRoute(
                 builder: (context) => EventViewPage(
-                    rootId: (settings.arguments as Map<String, dynamic>)['root']
-                        as String,
-                    scrollIntoView: (settings.arguments
+                    rootNoteId: (settings.arguments
+                        as Map<String, dynamic>)['root'] as String,
+                    openNoteId: (settings.arguments
                         as Map<String, dynamic>)['scrollIntoView'] as String?),
               );
 

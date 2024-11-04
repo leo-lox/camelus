@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:developer';
 
+import 'package:camelus/helpers/helpers.dart';
 import 'package:rxdart/rxdart.dart';
 
 import '../entities/nostr_note.dart';
@@ -12,7 +13,7 @@ class EventFeed {
   final NoteRepository _noteRepository;
   final Follow _follow;
 
-  final String repliesFetchId = "replies";
+  final String repliesFetchId = "replies-${Helpers().getRandomString(5)}";
 
   /// the complete build tree of replies => new updates = new state
   final StreamController<List<TreeNode<NostrNote>>> _repliesTreeController =

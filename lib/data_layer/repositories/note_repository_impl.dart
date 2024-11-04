@@ -115,9 +115,24 @@ class NoteRepositoryImpl implements NoteRepository {
   }
 
   @override
-  Stream<NostrNote> subscribeReplyNotes(
-      {required String rootNoteId, required String requestId}) {
-    // TODO: implement subscribeReplyNotes
-    throw UnimplementedError();
+  Stream<NostrNote> subscribeReplyNotes({
+    required String rootNoteId,
+    required String requestId,
+  }) {
+    ndk.Filter filter = ndk.Filter(
+      eTags: [rootNoteId],
+      kinds: [ndk_entities.Nip01Event.TEXT_NODE_KIND],
+    );
+
+    final response = dartNdkSource.dartNdk.requests.subscription(
+      filters: [filter],
+      name: requestId,
+      cacheRead: true,
+      cacheWrite: true,
+    );
+
+    return response.stream.map(
+      (event) => NostrNoteModel.fromNDKEvent(event),
+    );
   }
 }
