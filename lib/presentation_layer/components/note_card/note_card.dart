@@ -80,12 +80,9 @@ class NoteCard extends StatelessWidget {
                   pubkey: note.pubkey,
                 ),
               ),
-              Container(
-                width: MediaQuery.of(context).size.width - 95,
-                margin: const EdgeInsets.only(left: 5, right: 10),
-                color: Palette.background,
+              Expanded(
                 child: Padding(
-                  padding: const EdgeInsets.only(left: 10.0),
+                  padding: const EdgeInsets.only(left: 10.0, right: 10),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.end,
                     crossAxisAlignment: CrossAxisAlignment.start,
