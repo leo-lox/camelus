@@ -72,6 +72,8 @@ class _EventViewPageState extends ConsumerState<EventViewPage> {
 
   @override
   void dispose() {
+    _scrollControllerFeed.dispose();
+
     super.dispose();
   }
 

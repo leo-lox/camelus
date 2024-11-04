@@ -7,11 +7,9 @@ import 'package:rxdart/rxdart.dart';
 import '../entities/nostr_note.dart';
 import '../entities/tree_node.dart';
 import '../repositories/note_repository.dart';
-import 'follow.dart';
 
 class EventFeed {
   final NoteRepository _noteRepository;
-  final Follow _follow;
 
   final String repliesFetchId = "replies-${Helpers().getRandomString(5)}";
 
@@ -31,7 +29,7 @@ class EventFeed {
       StreamController<NostrNote>();
   Stream<NostrNote> get rootNoteStream => _rootNoteController.stream;
 
-  EventFeed(this._noteRepository, this._follow);
+  EventFeed(this._noteRepository);
 
   Future<void> subscribeToReplyNotes({
     required String rootNoteId,
