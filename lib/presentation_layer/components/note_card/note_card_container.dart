@@ -42,7 +42,10 @@ class _NoteCardContainerState extends ConsumerState<NoteCardContainer> {
   }
 
   void _navigateToEventViewPage(
-      BuildContext context, String root, String? scrollIntoView) {
+    BuildContext context,
+    String root,
+    String? scrollIntoView,
+  ) {
     Navigator.pushNamed(context, "/nostr/event", arguments: <String, String?>{
       "root": root,
       "scrollIntoView": scrollIntoView
@@ -81,30 +84,33 @@ class _NoteCardContainerState extends ConsumerState<NoteCardContainer> {
   @override
   Widget build(BuildContext context) {
     final note = widget.note;
-    return Column(
-      children: [
-        // check if reply
-        if (note.getTagEvents.isNotEmpty)
-          // for myNote.getTagPubkeys
-          Padding(
-            padding: const EdgeInsets.only(left: 15.0),
-            child: InReplyTo(
-              key: ValueKey('in-reply-to-${note.id}'),
-              myNote: note,
-            ),
-          ),
+    return GestureDetector(
+      onTap: () {
+        _onNoteTab(context, note);
+      },
+      child: Container(
+        color: Palette.background,
+        child: Column(
+          children: [
+            // check if reply
+            if (note.getTagEvents.isNotEmpty)
+              // for myNote.getTagPubkeys
+              Padding(
+                padding: const EdgeInsets.only(left: 15.0),
+                child: InReplyTo(
+                  key: ValueKey('in-reply-to-${note.id}'),
+                  myNote: note,
+                ),
+              ),
 
-        GestureDetector(
-          onTap: () {
-            _onNoteTab(context, note);
-          },
-          child: NoteCard(
-            note: note,
-            myMetadata: myUserNoteMetadata,
-            key: ValueKey('note-${note.id}'),
-          ),
+            NoteCard(
+              note: note,
+              myMetadata: myUserNoteMetadata,
+              key: ValueKey('note-${note.id}'),
+            ),
+          ],
         ),
-      ],
+      ),
     );
   }
 }
