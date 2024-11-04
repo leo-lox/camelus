@@ -4,6 +4,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
+import '../../../../config/palette.dart';
 import '../../../../domain_layer/entities/nostr_note.dart';
 import '../../../atoms/new_posts_available.dart';
 import '../../../atoms/refresh_indicator_no_need.dart';
@@ -124,21 +125,24 @@ class _UserFeedOriginalViewState extends ConsumerState<UserFeedOriginalView> {
           onRefresh: () {
             return Future.delayed(const Duration(milliseconds: 0));
           },
-          child: ListView.builder(
-            controller: PrimaryScrollController.of(context),
-            itemCount: mainFeedStateP.timelineRootNotes.length + 1,
-            itemBuilder: (context, index) {
-              if (index == mainFeedStateP.timelineRootNotes.length) {
-                return SkeletonNote(renderCallback: _loadMore());
-              }
+          child: Container(
+            color: Palette.black,
+            child: ListView.builder(
+              controller: PrimaryScrollController.of(context),
+              itemCount: mainFeedStateP.timelineRootNotes.length + 1,
+              itemBuilder: (context, index) {
+                if (index == mainFeedStateP.timelineRootNotes.length) {
+                  return SkeletonNote(renderCallback: _loadMore());
+                }
 
-              final event = mainFeedStateP.timelineRootNotes[index];
+                final event = mainFeedStateP.timelineRootNotes[index];
 
-              return NoteCardContainer(
-                key: PageStorageKey(event.id),
-                note: event,
-              );
-            },
+                return NoteCardContainer(
+                  key: PageStorageKey(event.id),
+                  note: event,
+                );
+              },
+            ),
           ),
         ),
         if (mainFeedStateP.newRootNotes.isNotEmpty)
