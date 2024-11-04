@@ -90,12 +90,6 @@ class _EventViewPageState extends ConsumerState<EventViewPage> {
       body: Column(
         children: [
           // Root note
-          eventFeedState.rootNote != null
-              ? NoteCardContainer(
-                  note: eventFeedState.rootNote!,
-                  key: ValueKey(widget._rootNoteId),
-                )
-              : const SkeletonNote(),
 
           // Comments section scroll
           Expanded(
@@ -103,11 +97,16 @@ class _EventViewPageState extends ConsumerState<EventViewPage> {
               controller: _scrollControllerFeed,
               itemCount: eventFeedState.comments.length + 1,
               itemBuilder: (context, index) {
-                if (index == eventFeedState.comments.length) {
-                  return const SkeletonNote();
+                if (index == 0) {
+                  return eventFeedState.rootNote != null
+                      ? NoteCardContainer(
+                          note: eventFeedState.rootNote!,
+                          key: ValueKey(widget._rootNoteId),
+                        )
+                      : const SkeletonNote();
                 }
 
-                final event = eventFeedState.comments[index];
+                final event = eventFeedState.comments[index - 1];
 
                 return CommentSection(
                   key: ObjectKey(event),

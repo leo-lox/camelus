@@ -7,6 +7,9 @@ class TreeNode<T> {
   bool get isLastChild => parent?.children.last == this;
   bool get hasSiblings => parent != null && parent!.children.length > 1;
 
+  bool get hasParent => parent != null;
+
+  bool get parentHasChildren => parent?.hasChildren ?? false;
   bool get hasChildren => _children.isNotEmpty;
   bool get isLeaf => _children.isEmpty;
   List<TreeNode<T>> get children => List.unmodifiable(_children);

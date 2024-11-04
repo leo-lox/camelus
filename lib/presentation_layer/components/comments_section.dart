@@ -1,8 +1,11 @@
+import 'package:camelus/config/palette.dart';
 import 'package:camelus/domain_layer/entities/user_metadata.dart';
+import 'package:camelus/presentation_layer/components/note_card/note_card_container.dart';
 import 'package:flutter/material.dart';
 
 import '../../domain_layer/entities/nostr_note.dart';
 import '../../domain_layer/entities/tree_node.dart';
+import '../atoms/rounded_corner_painer.dart';
 import 'note_card/note_card.dart';
 
 class CommentSection extends StatelessWidget {
@@ -22,54 +25,56 @@ class CommentSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: EdgeInsets.only(left: depth * 16.0),
-          child: NoteCard(
-            note: node.value,
-            myMetadata: UserMetadata(
-                eventId: "eventId", pubkey: "pubkey", lastFetch: 0),
+          padding: EdgeInsets.only(left: depth * 36.0),
+          child: Stack(
+            clipBehavior: Clip.none,
+            children: [
+              // Rounded corner connecting horizontal and vertical lines
+              if (node.hasParent)
+                Positioned(
+                  left: -25.0,
+                  top: 0.0,
+                  child: Column(
+                    children: [
+                      Container(
+                        width: 2.0,
+                        height: 60.0,
+                        color: Palette.gray,
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(left: 15.0),
+                        child: CustomPaint(
+                          size: Size(15.0, 15.0),
+                          painter: RoundedCornerPainter(
+                            color: Palette.gray,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+              if (node.hasChildren)
+                Positioned(
+                  left: 25.0,
+                  top: 50,
+                  bottom: 0,
+                  child: Container(
+                    width: 2.0,
+                    height: 120,
+                    color: Palette.gray,
+                  ),
+                ),
+
+              NoteCardContainer(
+                key: ValueKey(node.value.id),
+                note: node.value,
+              ),
+            ],
           ),
         ),
         ...node.children.map((child) => _buildCommentTree(child, depth + 1)),
       ],
-    );
-  }
-}
-
-/// use this as a widget
-class CommentTreeBuilder extends StatefulWidget {
-  final TreeNode<NostrNote> initialCommentTree;
-
-  const CommentTreeBuilder({Key? key, required this.initialCommentTree})
-      : super(key: key);
-
-  @override
-  _CommentTreeBuilderState createState() => _CommentTreeBuilderState();
-}
-
-class _CommentTreeBuilderState extends State<CommentTreeBuilder> {
-  late TreeNode<NostrNote> commentTree;
-
-  @override
-  void initState() {
-    super.initState();
-    commentTree = widget.initialCommentTree;
-  }
-
-  void _addReply(TreeNode<NostrNote> parentNode, NostrNote reply) {
-    setState(() {
-      parentNode.addChild(TreeNode(reply));
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return CommentSection(
-      commentTree: commentTree,
-      // onReply: (TreeNode<NostrNote> parentNode) {
-      //   // Show a dialog or navigate to a new screen to get the reply content
-      //   // For simplicity, we'll just add a dummy reply here
-      //   _addReply(parentNode, NostrNote(content: "This is a reply"));
-      // },
     );
   }
 }
