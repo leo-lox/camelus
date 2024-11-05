@@ -49,5 +49,7 @@
 		<true/>
 		<key>NSPhotoLibraryUsageDescription</key>
 		<string>Photo access is used to add account profile, include pictures in posts</string>
+		<key>ITSAppUsesNonExemptEncryption</key>
+		<false/>
 	</dict>
 </plist>
