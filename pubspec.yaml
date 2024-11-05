@@ -43,7 +43,7 @@ dependencies:
   bip340: ^0.3.0
   bech32: ^0.2.1
   hex: ^0.2.0
-  flutter_secure_storage: ^9.0.0
+  flutter_secure_storage: ^9.2.2
   crypto: ^3.0.2
   url_launcher: ^6.1.7
   lottie: ^3.0.0
