@@ -1,6 +1,6 @@
 # Uncomment this line to define a global platform for your project
 # minimum iOS version
- platform :ios, '15.6'
+ platform :ios, '12.0'
 
 # CocoaPods analytics sends network stats synchronously affecting flutter build latency.
 ENV['COCOAPODS_DISABLE_STATS'] = 'true'
@@ -40,12 +40,15 @@ post_install do |installer|
     flutter_additional_ios_build_settings(target)
 
     # Set custom iOS target for flutter_secure_storage and flutter_email_sender
+    #target.build_configurations.each do |config|
+    #  if target.name == 'flutter_secure_storage'
+    #    config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '12.0' # Custom iOS target for flutter_secure_storage
+    #   else Gem::Version.new($iOSVersion) > Gem::Version.new(config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'])
+    #    config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = $iOSVersion
+    #  end
+    #end
     target.build_configurations.each do |config|
-      if target.name == 'flutter_secure_storage'
-        config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '12.0' # Custom iOS target for flutter_secure_storage
-       else Gem::Version.new($iOSVersion) > Gem::Version.new(config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'])
-        config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = $iOSVersion
-      end
+      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '12.0'  # Set this to match your platform version
     end
   end
 end
