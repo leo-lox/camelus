@@ -37,5 +37,14 @@ end
 post_install do |installer|
   installer.pods_project.targets.each do |target|
     flutter_additional_ios_build_settings(target)
+
+    # Set custom iOS target for flutter_secure_storage and flutter_email_sender
+    target.build_configurations.each do |config|
+      if target.name == 'flutter_secure_storage'
+        config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '12.0' # Custom iOS target for flutter_secure_storage
+       else Gem::Version.new($iOSVersion) > Gem::Version.new(config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'])
+        config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = $iOSVersion
+      end
+    end
   end
 end
