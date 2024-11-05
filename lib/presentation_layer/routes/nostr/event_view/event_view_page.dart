@@ -89,35 +89,26 @@ class _EventViewPageState extends ConsumerState<EventViewPage> {
         backgroundColor: Palette.background,
         title: const Text("thread"),
       ),
-      body: Column(
-        children: [
-          // Root note
+      body: ListView.builder(
+        controller: _scrollControllerFeed,
+        itemCount: eventFeedState.comments.length + 1,
+        itemBuilder: (context, index) {
+          if (index == 0) {
+            return eventFeedState.rootNote != null
+                ? NoteCardContainer(
+                    note: eventFeedState.rootNote!,
+                    key: ValueKey(widget._rootNoteId),
+                  )
+                : const SkeletonNote();
+          }
 
-          // Comments section scroll
-          Expanded(
-            child: ListView.builder(
-              controller: _scrollControllerFeed,
-              itemCount: eventFeedState.comments.length + 1,
-              itemBuilder: (context, index) {
-                if (index == 0) {
-                  return eventFeedState.rootNote != null
-                      ? NoteCardContainer(
-                          note: eventFeedState.rootNote!,
-                          key: ValueKey(widget._rootNoteId),
-                        )
-                      : const SkeletonNote();
-                }
+          final event = eventFeedState.comments[index - 1];
 
-                final event = eventFeedState.comments[index - 1];
-
-                return CommentSection(
-                  key: ObjectKey(event),
-                  commentTree: event,
-                );
-              },
-            ),
-          ),
-        ],
+          return CommentSection(
+            key: ObjectKey(event),
+            comment: event,
+          );
+        },
       ),
     );
   }
