@@ -38,7 +38,7 @@ if (flutterVersionName == null) {
 
 
 android {
-    compileSdkVersion 34
+    compileSdk 35
     ndkVersion flutter.ndkVersion
 
     compileOptions {
@@ -47,7 +47,7 @@ android {
     }
 
     kotlinOptions {
-        jvmTarget = '1.8'
+        jvmTarget = JavaVersion.VERSION_1_8
     }
 
     sourceSets {
