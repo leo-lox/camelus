@@ -61,7 +61,7 @@ Each provider within the `providers` folder is dedicated to managing a specific 
 
 ## 4. Component Documentation
 
-### 4.1 Login, Registration, and Providers
+### 4.1 Login, Registration and Providers
 
 For handling login, registration and state management a **Provider** is utilized to manage state and share data across widgets. Providers make data easily accessible throughout the app and keep it in sync across different parts of the UI.
 
