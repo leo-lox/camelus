@@ -210,11 +210,10 @@ class _WritePostState extends ConsumerState<WritePost> {
           }
         }
         if (tag.type == "p") {
-          if (tag.marker == 'reply') {
-            var replaceTag = NostrTag(type: 'p', value: tag.value);
-            tags.add(replaceTag);
+          if (tag.marker == "root" || tag.marker == "reply") {
             continue;
           }
+
           tags.add(tag);
         }
       }
