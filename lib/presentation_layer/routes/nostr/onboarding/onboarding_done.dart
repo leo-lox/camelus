@@ -6,12 +6,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:ndk/entities.dart' as ndk_entities;
 import 'package:ndk/ndk.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../../../config/default_relays.dart';
 import '../../../../config/palette.dart';
 import '../../../../domain_layer/entities/generated_private_key.dart';
 import '../../../../domain_layer/entities/key_pair.dart';
+import '../../../../domain_layer/entities/nip_65.dart';
 import '../../../../domain_layer/entities/onboarding_user_info.dart';
 import '../../../../domain_layer/entities/user_metadata.dart';
 import '../../../../domain_layer/usecases/generate_private_key.dart';
@@ -20,6 +23,7 @@ import '../../../atoms/mnemonic_grid.dart';
 import '../../../providers/event_signer_provider.dart';
 import '../../../providers/file_upload_provider.dart';
 import '../../../providers/following_provider.dart';
+import '../../../providers/inbox_outbox_provider.dart';
 import '../../../providers/metadata_provider.dart';
 import '../../home_page.dart';
 
@@ -97,9 +101,20 @@ ${_privateKey.mnemonicSentence}
       uploadedBanner = await fileUploadP.uploadImage(widget.userInfo.banner!);
     }
 
-    //! todo: broadcast data to nostr network
     final metadataP = ref.watch(metadataProvider);
     final followP = ref.watch(followingProvider);
+    final inboxOutboxP = ref.read(inboxOutboxProvider);
+
+    final Nip65 myNip65 = Nip65(
+      pubKey: _privateKey.publicKey,
+      createdAt: DateTime.now().millisecondsSinceEpoch ~/ 1000,
+      relays: DEFAULT_ACCOUNT_CREATION_RELAYS,
+    );
+
+    /// broadcast nip65
+    await inboxOutboxP.setNip65data(myNip65);
+    //! todo: fix ndk broadcast response
+    await Future.delayed(Duration(seconds: 1));
 
     final UserMetadata userMetadata = UserMetadata(
       eventId: '',
