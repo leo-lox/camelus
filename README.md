@@ -1,5 +1,4 @@
-# Social Network App
-## Camelus
+# Social Network App Camelus <br>
 ## User interface documentation
 **Documentation Overview**
 1. Intro
@@ -20,12 +19,11 @@ This documentation is aimed at beginner developers and students interested in mo
 - **Frontend**: Flutter  
 - **Backend**: Decentralized storage via the Nostr protocol  
 
----
+
 
 ## 2. Design System
 The design system provides a cohesive structure for UI elements, ensuring consistency across all screens and interactions. It defines color schemes, typography, spacing and standardized components used throughout the app.
 
----
 
 ## 3. UI Structure
 
@@ -53,7 +51,7 @@ Each provider within the `providers` folder is dedicated to managing a specific 
 
 - **Example**: The `UserProvider` tracks the user’s login state and profile data. It allows to handle all relevant screens and components display the most updated information. With `ChangeNotifier`, any changes to user data are automatically propagated to relevant widgets, providing real-time feedback to users as they interact with the app.
 
----
+
 
 ## 5. Component Documentation
 
@@ -116,7 +114,7 @@ The following diagram outlines the data flow for saving posts:
 2. **Sync with Nostr**: NDK then synchronizes the post with the Nostr Protocol. Then it is available across the decentralized network.
 3. **Feed Updates**: Other devices with the app can view the new post on the feed in real-time as the Nostr Protocol syncs the data across the network.
 
----
+
 
 # 6. Navigation and Routes
 
@@ -159,7 +157,7 @@ class CamelusApp extends StatelessWidget {
   }
 }
 The initialRoute is set to **/**, which loads the HomeScreen. Additional routes like **/login, /profile and /chat** are defined. Each one is mapped to a corresponding screen widget. To navigate between screens, Navigator.pushNamed(context, '/profile') is used, allowing users to move from one screen to another.
----
+
 
 ### 7. Setting up the project
 ### 8. Conclusion
