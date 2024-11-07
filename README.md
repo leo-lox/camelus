@@ -155,7 +155,7 @@ class CamelusApp extends StatelessWidget {
       },
     );
   }
-}
+}```
 The initialRoute is set to **/**, which loads the HomeScreen. Additional routes like **/login, /profile and /chat** are defined. Each one is mapped to a corresponding screen widget. To navigate between screens, Navigator.pushNamed(context, '/profile') is used, allowing users to move from one screen to another.
 
 
