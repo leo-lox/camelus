@@ -160,5 +160,41 @@ The initialRoute is set to **/**, which loads the HomeScreen. Additional routes 
 
 
 ### 7. Setting up the project
+
+## Prerequisites
+
+Before you start, make sure that **Flutter** is installed on your machine. You can check the installation guide and verify the setup at [Flutter Installation](https://flutter.dev/docs/get-started/install).
+
+## Steps to Build
+
+### 1. Clone the Repository
+
+Start by cloning the repository to your local machine:
+
+```bash
+git clone https://github.com/leo-lox/camelus.git
+Clone `dart_ndk`
+
+Clone the **dart_ndk** repository into your project directory. Depending on your folder structure, you may need to modify the `pubspec.yaml` file to point to the correct local path where **dart_ndk** is located.
+
+Example modification in `pubspec.yaml`:
+
+```yaml
+dependencies:
+  dart_ndk:
+    path: ../path/to/dart_ndk
+```
+Install Dependencies
+After ensuring the correct path for dart_ndk, install the dependencies by running:
+
+```bash
+Code kopieren
+flutter pub get
+```
 ### 8. Conclusion
+
+Android
+You can join the test and download it from google play link
+
+or use the apk, it is signed with my key so you will need to enable "install from unknown sources" in your phone settings.
 
