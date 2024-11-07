@@ -165,22 +165,27 @@ class CommentCard extends StatelessWidget {
               ),
               if (node.hasChildren && node.children.length > 1)
                 Positioned(
-                  left: 0.0,
+                  left: -14.0,
                   bottom: 20,
-                  child: GestureDetector(
-                    onTap: onToggleExpand,
-                    child: Container(
-                      child: isExpanded
-                          ? Icon(
-                              Icons.remove_circle_outline,
-                              color: Palette.gray,
-                              size: 22.0,
-                            )
-                          : Icon(
-                              Icons.add_circle_outline,
-                              color: Palette.gray,
-                              size: 22.0,
-                            ),
+                  child: SizedBox(
+                    width: 50.0,
+                    height: 50.0,
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(50.0),
+                      onTap: onToggleExpand,
+                      child: Container(
+                        child: isExpanded
+                            ? Icon(
+                                Icons.remove_circle_outline,
+                                color: Palette.gray,
+                                size: 22.0,
+                              )
+                            : Icon(
+                                Icons.add_circle_outline,
+                                color: Palette.gray,
+                                size: 22.0,
+                              ),
+                      ),
                     ),
                   ),
                 ),
