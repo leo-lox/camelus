@@ -174,6 +174,7 @@ Start by cloning the repository to your local machine:
 
 ```bash
 git clone https://github.com/leo-lox/camelus.git
+```
 Clone `dart_ndk`
 
 Clone the **dart_ndk** repository into your project directory. Depending on your folder structure, you may need to modify the `pubspec.yaml` file to point to the correct local path where **dart_ndk** is located.
