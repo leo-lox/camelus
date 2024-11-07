@@ -70,7 +70,7 @@ class BottomActionRow extends StatelessWidget {
                 icon,
                 height: 23,
                 colorFilter: const ColorFilter.mode(
-                  Palette.gray,
+                  Palette.darkGray,
                   BlendMode.srcIn,
                 ),
               ),

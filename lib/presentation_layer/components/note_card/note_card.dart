@@ -50,16 +50,21 @@ class NoteCard extends StatelessWidget {
                     _buildNameRow(context),
                     const SizedBox(height: 10),
                     _buildNoteContent(context),
-                    if (!hideBottomBar) ...[
-                      const SizedBox(height: 10),
-                      _buildBottomActionRow(context),
-                    ],
                   ],
                 ),
               ),
             ],
           ),
         ),
+        if (!hideBottomBar) ...[
+          const SizedBox(height: 10),
+          Center(
+            child: SizedBox(
+              width: MediaQuery.of(context).size.width * 0.9,
+              child: _buildBottomActionRow(context),
+            ),
+          ),
+        ],
         if (!hideBottomBar)
           const Divider(
             thickness: 0.3,
@@ -109,7 +114,7 @@ class NoteCard extends StatelessWidget {
 
   Widget _buildNameRow(BuildContext context) {
     return NoteCardNameRow(
-      created_at: note.created_at,
+      createdAt: note.created_at,
       myMetadata: myMetadata,
       pubkey: note.pubkey,
       openMore: () => openBottomSheetMore(context, note),
