@@ -15,10 +15,10 @@ final ThemeData darkTheme = ThemeData(
     onError: Colors.orange,
     onPrimary: Colors.blue,
     onSecondary: Colors.blueAccent,
-    onSurface: Colors.teal,
+    onSurface: Colors.white,
     primary: Colors.blue,
     secondary: Colors.blueAccent,
-    surface: Colors.teal,
+    surface: Colors.white12,
   ),
 );
 

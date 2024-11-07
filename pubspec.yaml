@@ -15,10 +15,10 @@ publish_to: "none" # Remove this line if you wish to publish to pub.dev
 # In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 1.0.20+20
+version: 1.1.4+33
 
 environment:
-  sdk: ">=2.17.6 <3.0.0"
+  sdk: ">=3.0.0 <4.0.0"
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -29,65 +29,88 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-
-  # The following adds the Cupertino Icons font to your application.
-  # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
-  flutter_hooks: ^0.18.0
-  hooks_riverpod: ^2.0.2
-  http: ^0.13.5
-  flutter_svg: ^1.1.6
-  timeago_flutter: ^1.2.0
-  json_cache: ^1.5.0
-  cross_local_storage: ^2.0.1
-  badges: ^2.0.3
-  uuid: ^3.0.7
-  cached_network_image: ^3.2.3
-  bip340: ^0.0.4
+  flutter_hooks: ^0.20.5
+  hooks_riverpod: ^2.5.2
+  riverpod: ^2.3.6
+  riverpod_annotation: ^2.3.5
+  http: ^1.2.1
+  flutter_svg: ^2.0.7
+  timeago_flutter: ^3.5.0
+  badges: ^3.1.2
+  uuid: ^4.4.2
+  cached_network_image: ^3.3.1
+  bip340: ^0.3.0
   bech32: ^0.2.1
   hex: ^0.2.0
-  flutter_secure_storage: ^6.1.0
+  flutter_secure_storage: ^9.2.2
   crypto: ^3.0.2
   url_launcher: ^6.1.7
-  lottie: ^2.2.0
-  flutter_launcher_icons: ^0.11.0
-  file_picker: ^5.2.5
-  mime: ^1.0.4
+  lottie: ^3.0.0
+  flutter_launcher_icons: ^0.14.1
+  file_picker: ^8.0.0+1
+  mime: ^2.0.0
   flutter_mentions: ^2.0.1
-  photo_view: ^0.14.0
+  photo_view: ^0.15.0
   qr_flutter: ^4.0.0
-  matomo_tracker: ^2.0.0
+  matomo_tracker: ^5.1.0
   shared_preferences: ^2.1.1
-  floor: ^1.4.2
-  sqflite: ^2.2.8+4
-  riverpod: ^2.3.6
-  custom_refresh_indicator: ^2.2.1
-  flutter_cache_manager: ^3.3.0
-  web_socket_channel: ^2.4.0
+
+  custom_refresh_indicator: ^4.0.1
+  flutter_cache_manager: ^3.4.1
+  web_socket_channel: ^3.0.1
   http_parser: ^4.0.2
-  drift: ^2.9.0
+  path_provider: ^2.1.4
+  pointycastle: ^3.7.3
+  encrypt: ^5.0.3
+  kepler: ^1.0.3
+  #device_preview: ^1.1.0
+  bip39_mnemonic: ^3.0.6
+  bip32: ^2.0.0
+  crop_your_image: ^1.0.1
+  package_info_plus: ^8.0.2
+  rxdart: ^0.28.0
+  shimmer: ^3.0.0
+  ndk: ^0.1.3
+  flutter_force_directed_graph: ^1.0.7
+  objectbox: ^4.0.3
+  objectbox_flutter_libs: any
+  amberflutter: ^0.0.9
+
+
+#dependency_overrides:
+  #ndk:
+    #path: ../ndk
+    #git:
+    #  url: https://github.com/relaystr/ndk.git
+    #  ref: isar
+
+
 
 dev_dependencies:
-  floor_generator: ^1.4.2
-  build_runner: ^2.1.2
+  build_runner: ^2.4.13
+  mockito: ^5.4.0
   flutter_test:
     sdk: flutter
-  integration_test:
+  integration_test: 
     sdk: flutter
-  mockito: ^5.4.0
 
-  # The "flutter_lints" package below contains a set of recommended lints to
-  # encourage good coding practices. The lint set provided by the package is
-  # activated in the `analysis_options.yaml` file located at the root of your
-  # package. See that file for information about deactivating specific lint
-  # rules and activating additional ones.
-  flutter_lints: ^2.0.0
-  test: ^1.21.4
+  flutter_lints: ^5.0.0
+  custom_lint: ^0.7.0
+  riverpod_lint: ^2.3.13
+  #riverpod_generator: ^2.4.3
+  test: ^1.25.7
+  objectbox_generator: any
+ 
+
+  
+  #layerlens: ^1.0.17
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 
 # The following section is specific to Flutter packages.
+
 flutter:
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
@@ -112,12 +135,12 @@ flutter:
   # "family" key with the font family name, and a "fonts" key with a
   # list giving the asset and other descriptors for the font. For
   # example:
-  # fonts:
-  #   - family: Schyler
-  #     fonts:
-  #       - asset: fonts/Schyler-Regular.ttf
-  #       - asset: fonts/Schyler-Italic.ttf
-  #         style: italic
+  fonts:
+    - family: Poppins
+      fonts:
+        - asset: fonts/Poppins/Poppins-Regular.ttf
+        - asset: fonts/Poppins/Poppins-Italic.ttf
+          style: italic
   #   - family: Trajan Pro
   #     fonts:
   #       - asset: fonts/TrajanPro.ttf
@@ -126,3 +149,7 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
+
+
+### run generator:
+# dart run build_runner build

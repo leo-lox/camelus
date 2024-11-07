@@ -1,102 +1,145 @@
-import 'package:camelus/providers/key_pair_provider.dart';
-import 'package:camelus/routes/nostr/blockedUsers/blocked_users.dart';
-import 'package:camelus/routes/nostr/hashtag_view/hashtag_view_page.dart';
-import 'package:camelus/routes/nostr/settings/settings_page.dart';
-import 'package:flutter/material.dart';
-import 'package:camelus/routes/nostr/event_view/event_view_page.dart';
-import 'package:camelus/routes/nostr/onboarding/onboarding.dart';
-import 'package:camelus/routes/nostr/profile/profile_page.dart';
+import 'dart:ui';
 
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_mentions/flutter_mentions.dart';
 
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:ndk/ndk.dart';
+//import 'package:device_preview/device_preview.dart';
 
-import 'routes/home_page.dart';
+import 'domain_layer/usecases/app_auth.dart';
+import 'presentation_layer/providers/event_signer_provider.dart';
+import 'presentation_layer/routes/home_page.dart';
+import 'presentation_layer/routes/nostr/blockedUsers/blocked_users.dart';
+import 'presentation_layer/routes/nostr/event_view/event_view_page.dart';
+import 'presentation_layer/routes/nostr/hashtag_view/hashtag_view_page.dart';
+import 'presentation_layer/routes/nostr/onboarding/onboarding.dart';
+import 'presentation_layer/routes/nostr/profile/profile_page.dart';
+import 'presentation_layer/routes/nostr/settings/settings_page.dart';
 import 'theme.dart' as theme;
 
-//! first is route, second is pubkey
-Future<List<String>> _getInitialData() async {
-  var wrapper = await ProviderContainer().read(keyPairProvider.future);
+const devDeviceFrame = true;
 
-  if (wrapper.keyPair == null) {
+/// first is route, second is pubkey
+Future<List<dynamic>> _getInitialData() async {
+  final mySigner = await AppAuth.getEventSigner();
+
+  if (mySigner == null) {
     var initialRoute = '/onboarding';
-    return [initialRoute, ""];
+
+    return [initialRoute, null];
   }
 
-  return ['/', wrapper.keyPair!.publicKey];
+  return ['/', mySigner];
 }
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   var initalData = await _getInitialData();
 
-  runApp(MyApp(initialRoute: initalData[0], pubkey: initalData[1]));
+  // currently incompatible with recent flutter sdk https://github.com/aloisdeniel/flutter_device_preview/issues/244
+  // if (kDebugMode && devDeviceFrame) {
+  //   runApp(
+  //     DevicePreview(
+  //       enabled: kDebugMode,
+  //       builder: (context) =>
+  //           MyApp(initialRoute: initalData[0], pubkey: initalData[1]),
+  //     ),
+  //   );
+  //   return;
+  // }
+
+  final mySigner = initalData[1] as EventSigner?;
+
+  // Create a ProviderContainer
+  final providerContainer = ProviderContainer();
+
+  // we have a signer, so we can set it
+  if (mySigner != null) {
+    providerContainer.read(eventSignerProvider.notifier).setSigner(mySigner);
+  }
+
+  runApp(
+    UncontrolledProviderScope(
+      container: providerContainer,
+      child: MyApp(
+        initialRoute: initalData[0],
+        pubkey: mySigner?.getPublicKey() ?? '',
+      ),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
   final String initialRoute;
   final String pubkey;
-  const MyApp({Key? key, required this.initialRoute, required this.pubkey})
-      : super(key: key);
+
+  const MyApp({
+    super.key,
+    required this.initialRoute,
+    required this.pubkey,
+  });
 
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return Portal(
-      child: ProviderScope(
-        child: MaterialApp(
-          debugShowCheckedModeBanner: false,
-          title: 'camelus',
-          theme: theme.themeMap["DARK"],
-          initialRoute: initialRoute,
-          onGenerateRoute: (RouteSettings settings) {
-            switch (settings.name) {
-              case '/':
-                return MaterialPageRoute(
-                  builder: (context) =>
-                      //HomePage(pubkey: snapshot.data![1]),
-                      HomePage(
-                          pubkey:
-                              pubkey), //snapshot.data![1]), //pubkey: snapshot.data![1]
-                );
-
-              case '/onboarding':
-                return MaterialPageRoute(
-                  builder: (context) => const NostrOnboarding(),
-                );
-
-              case '/settings':
-                return MaterialPageRoute(
-                  builder: (context) => const SettingsPage(),
-                );
-              case '/nostr/event':
-                return MaterialPageRoute(
-                  builder: (context) => EventViewPage(
-                      rootId: (settings.arguments
-                          as Map<String, dynamic>)['root'] as String,
-                      scrollIntoView: (settings.arguments
-                              as Map<String, dynamic>)['scrollIntoView']
-                          as String?),
-                );
-              case '/nostr/profile':
-                return MaterialPageRoute(
-                  builder: (context) =>
-                      ProfilePage(pubkey: settings.arguments as String),
-                );
-              case '/nostr/hastag':
-                return MaterialPageRoute(
-                  builder: (context) =>
-                      HastagViewPage(hashtag: settings.arguments as String),
-                );
-              case '/nostr/blockedUsers':
-                return MaterialPageRoute(
-                  builder: (context) => const BlockedUsers(),
-                );
-            }
-            assert(false, 'Need to implement ${settings.name}');
-            return null;
+      child: MaterialApp(
+        scrollBehavior: const MaterialScrollBehavior().copyWith(
+          scrollbars: false,
+          dragDevices: {
+            PointerDeviceKind.touch,
+            PointerDeviceKind.mouse,
           },
         ),
+        debugShowCheckedModeBanner: false,
+        title: 'camelus',
+        theme: theme.themeMap["DARK"],
+        initialRoute: initialRoute,
+        onGenerateRoute: (RouteSettings settings) {
+          switch (settings.name) {
+            case '/':
+              return CupertinoPageRoute(builder: (context) {
+                return HomePage(pubkey: pubkey);
+              });
+
+            case '/onboarding':
+              return MaterialPageRoute(
+                builder: (context) => const NostrOnboarding(),
+              );
+
+            case '/settings':
+              return MaterialPageRoute(
+                builder: (context) => const SettingsPage(),
+              );
+            case '/nostr/event':
+              return CupertinoPageRoute(
+                builder: (context) => EventViewPage(
+                    rootNoteId: (settings.arguments
+                        as Map<String, dynamic>)['root'] as String,
+                    openNoteId: (settings.arguments
+                        as Map<String, dynamic>)['scrollIntoView'] as String?),
+              );
+
+            case '/nostr/profile':
+              return MaterialPageRoute(
+                builder: (context) =>
+                    ProfilePage(pubkey: settings.arguments as String),
+              );
+            case '/nostr/hastag':
+              return MaterialPageRoute(
+                builder: (context) =>
+                    HastagViewPage(hashtag: settings.arguments as String),
+              );
+            case '/nostr/blockedUsers':
+              return MaterialPageRoute(
+                builder: (context) => const BlockedUsers(),
+              );
+          }
+          assert(false, 'Need to implement ${settings.name}');
+          return null;
+        },
       ),
     );
   }
