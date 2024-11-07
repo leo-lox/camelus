@@ -97,7 +97,7 @@ class UserModel extends ChangeNotifier {
     notifyListeners(); // Notifies the UI to rebuild with updated state
   }
 }
-
+```
 
 By centralizing state management, the app maintains a clean and consistent UI, with responsive updates across screens, enhancing the overall user experience.
 
