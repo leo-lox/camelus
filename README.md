@@ -125,23 +125,23 @@ The following diagram outlines the data flow for saving posts:
 
 ### Navigation Structure
 
-**Authentication Flow**
-  **Login Screen**: Entry point with key-based login for Nostr.
-  **Registration**: Profile setup for new users.
-**Home / Feed**
-  **Main Feed**: Displays posts from followed users.
-  **Explore**: Option to view trending content or new users.
-**Messaging**
-  **Chat List**: Shows recent conversations.
-  **Chat Interface**: Direct message view with Nostr relay support.
-**User Profile**
-  **Your Profile**: Shows user’s posts, followers, and settings.
-  **Edit Profile**: Allows updates to bio, profile photo, and settings.
-**Notifications**
-  **Activity Feed**: Displays likes, follows, and mentions.
-**Settings**
-  **Account Settings**: Manage security, login preferences, and notifications.
-  **Privacy Settings**: Control visibility and permissions for Nostr interactions.
+**Authentication Flow**<br>
+  **Login Screen**: Entry point with key-based login for Nostr.<br>
+  **Registration**: Profile setup for new users.<br>
+**Home / Feed**<br>
+  **Main Feed**: Displays posts from followed users.<br>
+  **Explore**: Option to view trending content or new users.<br>
+**Messaging**<br>
+  **Chat List**: Shows recent conversations.<br>
+  **Chat Interface**: Direct message view with Nostr relay support.<br>
+**User Profile**<br>
+  **Your Profile**: Shows user’s posts, followers, and settings.<br>
+  **Edit Profile**: Allows updates to bio, profile photo, and settings.<br>
+**Notifications**<br>
+  **Activity Feed**: Displays likes, follows, and mentions.<br>
+**Settings**<br>
+  **Account Settings**: Manage security, login preferences, and notifications.<br>
+  **Privacy Settings**: Control visibility and permissions for Nostr interactions.<br><br>
 
 In Camelus, screen **routing** is handled by defining routes that determine how users navigate between different screens in the app. Flutter’s `Navigator` class makes it easy to handle transitions. Each route is linked to a specific screen component. Below is an example of routing with Flutter’s `MaterialApp`:
 
