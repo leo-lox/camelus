@@ -99,6 +99,36 @@ class UserModel extends ChangeNotifier {
 }
 ```
 
+## Component Documentation
+
+### UserModel Class
+
+**Description**: The `UserModel` class extends `ChangeNotifier`, enabling it to notify any widgets that rely on the user’s authentication state. The `login` and `logout` methods update the user’s state and trigger a UI rebuild by calling `notifyListeners()`. This model is used throughout the app wherever the user's login status needs to be checked, such as in login and profile screens.
+
+
+
+### 4.2 User Profiles
+
+User profiles allow users to create, edit, and view personal information.
+
+In the app users can **create**, **edit** and **view** their personal information. Once the registration form is submitted the information is sent to the Nostr Protocol. Users can update their profiles by navigating to a profile settings screen. Here, they can modify profile details. You can also see a List of followers.
+
+
+### 4.3 Post Creation and Interaction on Feed
+
+The feed enables users to share their thoughts and engage with others' content. A post in the feed has a simple UI element Structure where users can see a profile picture, the text, share button, comments for the posts and a send button. When users are going to tap the send button the data is going to be saved in the **Nostr protocol**. The following diagram demonstrates how a user post is saved locally in the **ndk** and then the **ndk** is sending it to the **Nostr protocol**. It also shows how the devices see other user posts on the feed. Once the user hits the send button, it is instantly displayed in the app’s feed without requiring a page reload. 
+
+
+#### Diagram: Dataflow for Saving Posts on the Feed
+![Unbenanntes Diagramm drawio (1)](https://github.com/user-attachments/assets/9c1359d2-9a2e-4a88-b9f4-f164a30af951)
+
+The following diagram outlines the data flow for saving posts:
+
+1. **Local Storage**: Each post is saved in the local NDK (Nostr Developer Kit) for quick access.
+2. **Sync with Nostr**: NDK then synchronizes the post with the Nostr Protocol, making it available across the decentralized network.
+3. **Feed Updates**: Other devices with the app can view the new post on the feed in real-time as the Nostr Protocol syncs the data across the network.
+
+
 By centralizing state management, the app maintains a clean and consistent UI, with responsive updates across screens, enhancing the overall user experience.
 
 ---
