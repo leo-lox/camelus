@@ -232,271 +232,285 @@ class _OnboardingLoginPageState extends ConsumerState<OnboardingLoginPage> {
       resizeToAvoidBottomInset: false,
       body: SafeArea(
         // input for the user to enter their private key, should be visible on a dark background.
-        child: Container(
-          width: MediaQuery.of(context).size.width,
-          height: MediaQuery.of(context).size.height,
-          padding: const EdgeInsets.all(30),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              const SizedBox(height: 20),
+        child: LayoutBuilder(builder: (context, constraints) {
+          return SingleChildScrollView(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(minHeight: constraints.maxHeight),
+              child: IntrinsicHeight(
+                child: Padding(
+                  padding: const EdgeInsets.all(30),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      const SizedBox(height: 20),
 
-              if (_userWords.isNotEmpty)
-                Column(
-                  children: [
-                    Container(
-                      width: MediaQuery.of(context).size.width,
-                      height: 200,
-                      decoration: BoxDecoration(
-                        color: Palette.extraDarkGray,
-                        borderRadius: BorderRadius.circular(10),
-                        border: Border.all(
-                          color: Palette.darkGray,
-                          width: 1,
+                      if (_userWords.isNotEmpty)
+                        Column(
+                          children: [
+                            Container(
+                              width: MediaQuery.of(context).size.width,
+                              height: 200,
+                              decoration: BoxDecoration(
+                                color: Palette.extraDarkGray,
+                                borderRadius: BorderRadius.circular(10),
+                                border: Border.all(
+                                  color: Palette.darkGray,
+                                  width: 1,
+                                ),
+                              ),
+                              child: seedPhraseCheck(),
+                            ),
+                            const SizedBox(height: 5),
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 10),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(mneonicError ?? "",
+                                      style: const TextStyle(
+                                        color: Palette.error,
+                                        fontSize: 12,
+                                      )),
+                                  Text(
+                                    "${_userWords.length}/${(_userWords.length <= 12 ? "12" : "24")}",
+                                    style: TextStyle(
+                                      color: (_userWords.length > 24)
+                                          ? Palette.error
+                                          : Palette.white,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            )
+                          ],
+                        ),
+                      if (_userWords.isEmpty)
+                        SizedBox(
+                          height: 200,
+                          width: MediaQuery.of(context).size.width,
+                          child: const Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                "login",
+                                style: TextStyle(
+                                  color: Palette.white,
+                                  fontSize: 40,
+                                  fontFamily: "Poppins",
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+
+                      AnimatedOpacity(
+                        opacity: (_userNsec != null && myKeys != null) ? 1 : 0,
+                        duration: const Duration(milliseconds: 300),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            const Text("your public key is:"),
+                            const SizedBox(height: 10),
+                            Container(
+                              decoration: BoxDecoration(
+                                color: Palette.extraDarkGray,
+                                borderRadius: BorderRadius.circular(10),
+                                border: Border.all(
+                                  color: Palette.darkGray,
+                                  width: 1,
+                                ),
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: SizedBox(
+                                  height: 40,
+                                  child: Text(myKeys?.publicKeyHr ?? ""),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 15),
+                          ],
                         ),
                       ),
-                      child: seedPhraseCheck(),
-                    ),
-                    const SizedBox(height: 5),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10),
-                      child: Row(
+                      Container(
+                        child: TextField(
+                          onSubmitted: (value) {
+                            _addWords(value);
+                            _inputFocusNode.requestFocus();
+                          },
+                          focusNode: _inputFocusNode,
+                          autofillHints: Language.english.list,
+                          controller: _inputController,
+                          enableIMEPersonalizedLearning: false,
+                          textCapitalization: TextCapitalization.none,
+                          decoration: const InputDecoration(
+                            isDense: true,
+                            hintText: 'enter your seed phrase or nsec1',
+                            hintStyle: TextStyle(
+                                color: Palette.white, letterSpacing: 1.1),
+                            filled: true,
+                            fillColor: Palette.extraDarkGray,
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(10)),
+                              borderSide:
+                                  BorderSide(color: Palette.extraDarkGray),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(10)),
+                              borderSide: BorderSide(color: Palette.gray),
+                            ),
+                            errorBorder: OutlineInputBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(10)),
+                              borderSide: BorderSide(color: Palette.purple),
+                            ),
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(height: 15),
+                      Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(mneonicError ?? "",
-                              style: const TextStyle(
-                                color: Palette.error,
-                                fontSize: 12,
-                              )),
-                          Text(
-                            "${_userWords.length}/${(_userWords.length <= 12 ? "12" : "24")}",
-                            style: TextStyle(
-                              color: (_userWords.length > 24)
-                                  ? Palette.error
-                                  : Palette.white,
-                              fontSize: 12,
+                          SizedBox(
+                            height: 31,
+                            child: ElevatedButton(
+                              onPressed: () {
+                                _pasteFromClipboard();
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Palette.background,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20),
+                                  side: const BorderSide(
+                                      color: Palette.white, width: 1),
+                                ),
+                              ),
+                              child: const Text(
+                                'paste',
+                                style: TextStyle(
+                                  color: Palette.white,
+                                  fontSize: 16,
+                                ),
+                              ),
+                            ),
+                          ),
+                          SizedBox(
+                            height: 31,
+                            child: ElevatedButton(
+                              onPressed: () {
+                                _addWords(_inputController.text);
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Palette.white,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20),
+                                  side: const BorderSide(
+                                      color: Palette.background, width: 1),
+                                ),
+                              ),
+                              child: const Text(
+                                'add',
+                                style: TextStyle(
+                                  color: Palette.background,
+                                  fontSize: 16,
+                                ),
+                              ),
                             ),
                           ),
                         ],
                       ),
-                    )
-                  ],
-                ),
-              if (_userWords.isEmpty)
-                SizedBox(
-                  height: 200,
-                  width: MediaQuery.of(context).size.width,
-                  child: const Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        "login",
-                        style: TextStyle(
-                          color: Palette.white,
-                          fontSize: 40,
-                          fontFamily: "Poppins",
+
+                      const SizedBox(height: 50),
+                      // checkbox to accept the privacy policy
+
+                      const SizedBox(height: 15),
+
+                      const Spacer(flex: 1),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Checkbox(
+                            value: _termsAndConditions,
+                            onChanged: (value) {
+                              setState(() {
+                                _termsAndConditions = value!;
+                              });
+                            },
+                            activeColor: Palette.white,
+                            checkColor: Palette.black,
+                            fillColor: MaterialStateProperty.all(Palette.white),
+                            //overlayColor: MaterialStateProperty.all(Palette.primary),
+                          ),
+                          const Text(
+                            "I have read and accept the ",
+                            style: TextStyle(
+                              color: Palette.white,
+                              fontSize: 12,
+                              fontWeight: FontWeight.normal,
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              Uri url = Uri.parse("https://camelus.app/terms/");
+                              launchUrl(url,
+                                  mode: LaunchMode.externalApplication);
+                            },
+                            child: const Text(
+                              "terms and conditions",
+                              style: TextStyle(
+                                color: Palette.white,
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                                decoration: TextDecoration.underline,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      const SizedBox(height: 5),
+                      GestureDetector(
+                        onTap: () {
+                          Uri url = Uri.parse("https://camelus.app/privacy/");
+                          launchUrl(url, mode: LaunchMode.externalApplication);
+                        },
+                        child: const Text(
+                          "privacy policy",
+                          style: TextStyle(
+                            color: Palette.white,
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                            decoration: TextDecoration.underline,
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(height: 20),
+
+                      SizedBox(
+                        width: MediaQuery.of(context).size.width,
+                        height: 40,
+                        child: longButton(
+                          name: "login",
+                          inverted: true,
+                          onPressed: () => _onSubmit(),
                         ),
                       ),
                     ],
                   ),
                 ),
-
-              AnimatedOpacity(
-                opacity: (_userNsec != null && myKeys != null) ? 1 : 0,
-                duration: const Duration(milliseconds: 300),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    const Text("your public key is:"),
-                    const SizedBox(height: 10),
-                    Container(
-                      decoration: BoxDecoration(
-                        color: Palette.extraDarkGray,
-                        borderRadius: BorderRadius.circular(10),
-                        border: Border.all(
-                          color: Palette.darkGray,
-                          width: 1,
-                        ),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: SizedBox(
-                          height: 40,
-                          child: Text(myKeys?.publicKeyHr ?? ""),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 15),
-                  ],
-                ),
               ),
-              Container(
-                child: TextField(
-                  onSubmitted: (value) {
-                    _addWords(value);
-                    _inputFocusNode.requestFocus();
-                  },
-                  focusNode: _inputFocusNode,
-                  autofillHints: Language.english.list,
-                  controller: _inputController,
-                  enableIMEPersonalizedLearning: false,
-                  textCapitalization: TextCapitalization.none,
-                  decoration: const InputDecoration(
-                    isDense: true,
-                    hintText: 'enter your seed phrase or nsec1',
-                    hintStyle:
-                        TextStyle(color: Palette.white, letterSpacing: 1.1),
-                    filled: true,
-                    fillColor: Palette.extraDarkGray,
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(10)),
-                      borderSide: BorderSide(color: Palette.extraDarkGray),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(10)),
-                      borderSide: BorderSide(color: Palette.gray),
-                    ),
-                    errorBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(10)),
-                      borderSide: BorderSide(color: Palette.purple),
-                    ),
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 15),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  SizedBox(
-                    height: 31,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        _pasteFromClipboard();
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Palette.background,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20),
-                          side:
-                              const BorderSide(color: Palette.white, width: 1),
-                        ),
-                      ),
-                      child: const Text(
-                        'paste',
-                        style: TextStyle(
-                          color: Palette.white,
-                          fontSize: 16,
-                        ),
-                      ),
-                    ),
-                  ),
-                  SizedBox(
-                    height: 31,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        _addWords(_inputController.text);
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Palette.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20),
-                          side: const BorderSide(
-                              color: Palette.background, width: 1),
-                        ),
-                      ),
-                      child: const Text(
-                        'add',
-                        style: TextStyle(
-                          color: Palette.background,
-                          fontSize: 16,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 50),
-              // checkbox to accept the privacy policy
-
-              const SizedBox(height: 15),
-
-              const Spacer(flex: 1),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Checkbox(
-                    value: _termsAndConditions,
-                    onChanged: (value) {
-                      setState(() {
-                        _termsAndConditions = value!;
-                      });
-                    },
-                    activeColor: Palette.white,
-                    checkColor: Palette.black,
-                    fillColor: MaterialStateProperty.all(Palette.white),
-                    //overlayColor: MaterialStateProperty.all(Palette.primary),
-                  ),
-                  const Text(
-                    "I have read and accept the ",
-                    style: TextStyle(
-                      color: Palette.white,
-                      fontSize: 12,
-                      fontWeight: FontWeight.normal,
-                    ),
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      Uri url = Uri.parse("https://camelus.app/terms/");
-                      launchUrl(url, mode: LaunchMode.externalApplication);
-                    },
-                    child: const Text(
-                      "terms and conditions",
-                      style: TextStyle(
-                        color: Palette.white,
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                        decoration: TextDecoration.underline,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 5),
-              GestureDetector(
-                onTap: () {
-                  Uri url = Uri.parse("https://camelus.app/privacy/");
-                  launchUrl(url, mode: LaunchMode.externalApplication);
-                },
-                child: const Text(
-                  "privacy policy",
-                  style: TextStyle(
-                    color: Palette.white,
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                    decoration: TextDecoration.underline,
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 20),
-
-              SizedBox(
-                width: MediaQuery.of(context).size.width,
-                height: 40,
-                child: longButton(
-                  name: "login",
-                  inverted: true,
-                  onPressed: () => _onSubmit(),
-                ),
-              ),
-            ],
-          ),
-        ),
+            ),
+          );
+        }),
       ),
     );
   }

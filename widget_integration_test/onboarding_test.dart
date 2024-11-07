@@ -2,34 +2,40 @@ import 'package:camelus/presentation_layer/routes/nostr/onboarding/onboarding.da
 import 'package:camelus/presentation_layer/routes/nostr/onboarding/onboarding_login.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 void main() {
   testWidgets('NostrOnboarding widget test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MaterialApp(home: NostrOnboarding()));
+    // Wrap the widget with ProviderScope
 
-    // Check if the "camelus" title appears
+    await tester.pumpWidget(createWidgetUnderTest(child: NostrOnboarding()));
+
+    // Rest of your test...
     expect(find.text('camelus'), findsOneWidget);
-
-    // Check if the "paste" button appears
     expect(find.widgetWithText(ElevatedButton, 'join the conversation'),
         findsOneWidget);
-
-    // Check if the "next" button appears
     expect(find.widgetWithText(ElevatedButton, 'login'), findsOneWidget);
   });
 
   testWidgets('terms not accepted', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MaterialApp(home: OnboardingLoginPage()));
+    await tester
+        .pumpWidget(createWidgetUnderTest(child: OnboardingLoginPage()));
 
-    // Find the 'next' button and tap it
+    // Rest of your test...
     await tester.tap(find.widgetWithText(ElevatedButton, 'login'));
-    await tester.pump(); // Rebuild the widget after the button tap
+    await tester.pumpAndSettle();
 
-    // Check if the Snackbar is displayed with correct message
     expect(find.byType(SnackBar), findsOneWidget);
     expect(find.text('Please read and accept the terms and conditions first'),
         findsOneWidget);
   });
+}
+
+Widget createWidgetUnderTest({required Widget child}) {
+  return ProviderScope(
+    overrides: [
+      // Add any necessary provider overrides here
+    ],
+    child: MaterialApp(home: child),
+  );
 }
