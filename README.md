@@ -188,7 +188,6 @@ Install Dependencies
 After ensuring the correct path for dart_ndk, install the dependencies by running:
 
 ```bash
-Code kopieren
 flutter pub get
 ```
 ### 8. Conclusion
