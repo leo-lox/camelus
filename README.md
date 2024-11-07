@@ -119,8 +119,49 @@ The following diagram outlines the data flow for saving posts:
 2. **Sync with Nostr**: NDK then synchronizes the post with the Nostr Protocol. Then it is available across the decentralized network.
 3. **Feed Updates**: Other devices with the app can view the new post on the feed in real-time as the Nostr Protocol syncs the data across the network.
 
-
-
-
 ---
+
+# 6. Navigation and Routes
+
+### Navigation Structure
+
+**Authentication Flow**
+  **Login Screen**: Entry point with key-based login for Nostr.
+  **Registration**: Profile setup for new users.
+**Home / Feed**
+  **Main Feed**: Displays posts from followed users.
+  **Explore**: Option to view trending content or new users.
+**Messaging**
+  **Chat List**: Shows recent conversations.
+  **Chat Interface**: Direct message view with Nostr relay support.
+**User Profile**
+  **Your Profile**: Shows user’s posts, followers, and settings.
+  **Edit Profile**: Allows updates to bio, profile photo, and settings.
+**Notifications**
+  **Activity Feed**: Displays likes, follows, and mentions.
+**Settings**
+  **Account Settings**: Manage security, login preferences, and notifications.
+  **Privacy Settings**: Control visibility and permissions for Nostr interactions.
+
+In Camelus, screen **routing** is handled by defining routes that determine how users navigate between different screens in the app. Flutter’s `Navigator` class makes it easy to handle transitions. Each route is linked to a specific screen component. Below is an example of routing with Flutter’s `MaterialApp`:
+
+```dart
+void main() => runApp(CamelusApp());
+
+class CamelusApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Camelus',
+      initialRoute: '/',
+      routes: {
+        '/': (context) => HomeScreen(),
+        '/login': (context) => LoginScreen(),
+        '/profile': (context) => ProfileScreen(),
+        '/chat': (context) => ChatScreen(),
+      },
+    );
+  }
+}
+
 
