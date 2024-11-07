@@ -125,23 +125,20 @@ The following diagram outlines the data flow for saving posts:
 
 ### Navigation Structure
 
-**Authentication Flow**<br>
-  **Login Screen**: Entry point with key-based login for Nostr.<br>
-  **Registration**: Profile setup for new users.<br>
-**Home / Feed**<br>
-  **Main Feed**: Displays posts from followed users.<br>
-  **Explore**: Option to view trending content or new users.<br>
-**Messaging**<br>
-  **Chat List**: Shows recent conversations.<br>
-  **Chat Interface**: Direct message view with Nostr relay support.<br>
-**User Profile**<br>
-  **Your Profile**: Shows user’s posts, followers, and settings.<br>
-  **Edit Profile**: Allows updates to bio, profile photo, and settings.<br>
-**Notifications**<br>
-  **Activity Feed**: Displays likes, follows, and mentions.<br>
-**Settings**<br>
-  **Account Settings**: Manage security, login preferences, and notifications.<br>
-  **Privacy Settings**: Control visibility and permissions for Nostr interactions.<br><br>
+1 **Authentication Flow**<br>
+  1.1 **Login Screen**: Entry point with key-based login for Nostr.<br>
+  1.2 **Registration**: Profile setup for new users.<br>
+2 **Home / Feed**<br>
+  2.1 **Main Feed**: Displays posts from followed users.<br>
+  2.2 **Explore**: Option to view trending content or new users.<br>
+3 **User Profile**<br>
+  3.1 **Your Profile**: Shows user’s posts, followers, and settings.<br>
+ 3.2 **Edit Profile**: Allows updates to bio, profile photo, and settings.<br>
+4 **Notifications**<br>
+  4.1 **Activity Feed**: Displays likes, follows, and mentions.<br>
+5 **Settings**<br>
+ 5.1 **Account Settings**: Manage security, login preferences, and notifications.<br>
+ 5.2 **Privacy Settings**: Control visibility and permissions for Nostr interactions.<br><br>
 
 In Camelus, screen **routing** is handled by defining routes that determine how users navigate between different screens in the app. Flutter’s `Navigator` class makes it easy to handle transitions. Each route is linked to a specific screen component. Below is an example of routing with Flutter’s `MaterialApp`:
 
