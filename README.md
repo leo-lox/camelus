@@ -125,7 +125,7 @@ The feed enables users to share their thoughts and engage with others' content. 
 The following diagram outlines the data flow for saving posts:
 
 1. **Local Storage**: Each post is saved in the local NDK (Nostr Developer Kit) for quick access.
-2. **Sync with Nostr**: NDK then synchronizes the post with the Nostr Protocol, making it available across the decentralized network.
+2. **Sync with Nostr**: NDK then synchronizes the post with the Nostr Protocol. Then it is available across the decentralized network.
 3. **Feed Updates**: Other devices with the app can view the new post on the feed in real-time as the Nostr Protocol syncs the data across the network.
 
 
