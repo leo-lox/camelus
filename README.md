@@ -162,13 +162,11 @@ The initialRoute is set to **/**, which loads the HomeScreen. Additional routes 
 
 ### 7. Setting up the project
 
-## Prerequisites
+1 Prerequisites
 
 Before you start, make sure that **Flutter** is installed on your machine. You can check the installation guide and verify the setup at [Flutter Installation](https://flutter.dev/docs/get-started/install).
 
-## Steps to Build
-
-### 1. Clone the Repository
+### 2 Clone the Repository
 
 Start by cloning the repository to your local machine:
 
