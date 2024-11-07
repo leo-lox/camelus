@@ -1,7 +1,18 @@
 # Social Network App
 ## Camelus
+
+**Documentation Overview**
+1. Intro
+2. Design System
+3. UI structure
+4. Component Documentation
+5. Navigation and routing
+6.
+7.
+8.
+
 ## 1. Introduction
-Welcome to our social network app! This mobile application connects users, enabling them to share posts, engage with content, and interact securely. Unlike traditional networks, this app leverages the Nostr protocol for decentralized data storage, enhancing privacy and resilience by distributing data across a network rather than central servers.
+Welcome to our social network app! This mobile application connects users, enabling them to share posts, engage with content and interact securely. Unlike traditional networks, this app leverages the Nostr protocol for decentralized data storage, enhancing privacy and resilience by distributing data across a network rather than central servers.
 
 This documentation is aimed at beginner developers and students interested in mobile UI development, offering hands-on learning with a structured approach to building and managing a secure, decentralized social platform.
 
