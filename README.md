@@ -69,9 +69,9 @@ For handling login, registration and state management a **Provider** is utilized
 
 To manage and propagate authentication data throughout the app, **ChangeNotifier** is used as follows:
 
-1. **UserModel Class**: The app's `UserModel` class likely extends `ChangeNotifier`, holding user authentication data (such as login status and profile information).
-2. **State Updates**: When the user logs in or updates their profile, `UserModel` notifies listening widgets about changes. This approach ensures that parts of the app relying on user data (like the profile or home screen) rebuild automatically to reflect the current state.
-3. **ChangeNotifierProvider**: This provider wraps the `UserModel` and allows any widget dependent on user data to reactively rebuild whenever the user's state changes.
+In my app a **UserModel** class likely extends **ChangeNotifier**. This class holds the user’s authentication data (e.g., login status, user profile information). Whenever the user logs in or updates their profile, the **UserModel** notifies all listening widgets that the data has changed. For instance, when the user logs in, the **UserModel** updates with the new authentication details and any part of the app that relies on this data (like profile screens or home pages) will rebuild automatically to reflect the latest state.
+By using ChangeNotifierProvider the app ensures whenever the UserModel state changes (such as after a successful login) all the widgets that depend on this data can reactively rebuild
+
 
 #### Example: UserModel with ChangeNotifier
 
