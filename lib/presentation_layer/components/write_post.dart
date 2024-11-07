@@ -1,12 +1,15 @@
 import 'dart:developer';
 import 'dart:io';
+import 'package:camelus/domain_layer/entities/nostr_note.dart';
 import 'package:camelus/domain_layer/entities/user_metadata.dart';
 import 'package:camelus/domain_layer/usecases/get_user_metadata.dart';
 import 'package:camelus/presentation_layer/atoms/picture.dart';
 import 'package:camelus/helpers/nprofile_helper.dart';
 import 'package:camelus/domain_layer/entities/nostr_tag.dart';
 import 'package:camelus/presentation_layer/providers/edit_relays_provider.dart';
+import 'package:camelus/presentation_layer/providers/event_signer_provider.dart';
 import 'package:camelus/presentation_layer/providers/file_upload_provider.dart';
+import 'package:camelus/presentation_layer/providers/get_notes_provider.dart';
 import 'package:camelus/presentation_layer/providers/metadata_provider.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -272,11 +275,38 @@ class _WritePostState extends ConsumerState<WritePost> {
     log("content: $content");
     //_nostrService.writeEvent(content, 1, tags);
 
-    //! todo implement writeEvent
-    throw UnimplementedError();
+    final notesP = ref.watch(getNotesProvider);
+
+    final signerP = ref.watch(eventSignerProvider);
+    if (signerP == null) {
+      _showErrorMsg("no signer");
+      return;
+    }
+    final pubkey = signerP.getPublicKey();
+
+    final int now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
+
+    //todo:  await, completer in ndk
+    notesP.broadcastNote(
+      NostrNote(
+        id: '',
+        pubkey: pubkey,
+        created_at: now,
+        kind: 1,
+        content: content,
+        sig: '',
+        tags: tags,
+      ),
+    );
+    await Future.delayed(const Duration(seconds: 2));
+
+    setState(() {
+      submitLoading = false;
+    });
 
     // wait for x seconds
     Future.delayed(const Duration(milliseconds: 100), () {
+      if (!mounted) return;
       // close modal
       Navigator.pop(context);
     });

@@ -60,4 +60,8 @@ class GetNotes {
   }) {
     throw UnimplementedError();
   }
+
+  Future<void> broadcastNote(NostrNote noteToPublish) async {
+    await _noteRepository.broadcastNote(noteToPublish);
+  }
 }

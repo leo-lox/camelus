@@ -3,6 +3,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../../config/palette.dart';
 import '../../../domain_layer/entities/nostr_note.dart';
+import '../../../domain_layer/entities/nostr_tag.dart';
 import '../../../helpers/helpers.dart';
 import '../../providers/metadata_provider.dart';
 
@@ -29,7 +30,10 @@ class _InReplyToState extends ConsumerState<InReplyTo> {
 
   void populateValues() {
     final note = widget.myNote;
-    final notePubkeys = note.getTagPubkeys;
+    List<NostrTag> notePubkeys = note.getTagPubkeys;
+
+    // filter out root pubkey reference
+    notePubkeys.removeWhere((element) => element.marker == 'root');
 
     // populate
     for (var i = 0; i < notePubkeys.length; i++) {

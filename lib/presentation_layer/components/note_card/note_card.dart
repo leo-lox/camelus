@@ -1,10 +1,14 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 
 import '../../../config/palette.dart';
+import '../../../data_layer/models/post_context.dart';
 import '../../../domain_layer/entities/nostr_note.dart';
 import '../../../domain_layer/entities/user_metadata.dart';
 import '../../atoms/my_profile_picture.dart';
 import '../bottom_sheet_share.dart';
+import '../write_post.dart';
 import 'bottom_action_row.dart';
 import 'bottom_sheet_more.dart';
 import 'name_row.dart';
@@ -126,12 +130,29 @@ class NoteCard extends StatelessWidget {
     return BottomActionRow(
       key: ValueKey("${note.id}bottom_action_row"),
       onComment: () {
-        //_writeReply(context, note)
-        print("comment");
+        _writeReply(context, note);
       },
       onLike: () {},
       onRetweet: () {},
       onShare: () => openBottomSheetShare(context, note),
     );
   }
+}
+
+void _writeReply(ctx, NostrNote note) {
+  showModalBottomSheet(
+      isScrollControlled: true,
+      elevation: 10,
+      backgroundColor: Palette.background,
+      isDismissible: false,
+      context: ctx,
+      builder: (ctx) => BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+            child: Padding(
+                padding: EdgeInsets.only(
+                    bottom: MediaQuery.of(ctx).viewInsets.bottom),
+                child: WritePost(
+                  context: PostContext(replyToNote: note),
+                )),
+          ));
 }

@@ -136,4 +136,13 @@ class NoteRepositoryImpl implements NoteRepository {
       (event) => NostrNoteModel.fromNDKEvent(event),
     );
   }
+
+  @override
+  Future<void> broadcastNote(NostrNote noteToPublish) async {
+    NostrNoteModel noteModel = NostrNoteModel.fromEntity(noteToPublish);
+    final response = dartNdkSource.dartNdk.broadcast
+        .broadcast(nostrEvent: noteModel.toNDKEvent());
+
+    await response.publishDone;
+  }
 }

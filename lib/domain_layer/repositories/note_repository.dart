@@ -30,4 +30,6 @@ abstract class NoteRepository {
   });
 
   Future<void> closeSubscription(String subscriptionId);
+
+  Future<void> broadcastNote(NostrNote noteToPublish);
 }

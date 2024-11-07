@@ -59,6 +59,29 @@ class NostrNoteModel extends NostrNote {
     );
   }
 
+  toNDKEvent() {
+    return Nip01Event(
+      content: content,
+      createdAt: created_at,
+      kind: kind,
+      pubKey: pubkey,
+      tags: tags.map((tag) => tag.toList()).toList(),
+    );
+  }
+
+  factory NostrNoteModel.fromEntity(NostrNote nostrNote) {
+    return NostrNoteModel(
+      id: nostrNote.id,
+      pubkey: nostrNote.pubkey,
+      created_at: nostrNote.created_at,
+      kind: nostrNote.kind,
+      content: nostrNote.content,
+      sig: nostrNote.sig,
+      tags: nostrNote.tags,
+      sig_valid: nostrNote.sig_valid,
+    );
+  }
+
   Map<String, dynamic> toJson() => {
         'id': id,
         'pubkey': pubkey,
