@@ -193,9 +193,7 @@ After ensuring the correct path for dart_ndk, install the dependencies by runnin
 flutter pub get
 ```
 
-run flutter pub get
-
-run flutter build apk --release or flutter run to run directly on your device in debug mode
+run ```flutter build apk --release``` or ```flutter run``` to run directly on your device in debug mode
 ### 8. Conclusion
 
 Android
