@@ -234,7 +234,7 @@ class NostrDrawer extends ConsumerWidget {
       leading: SvgPicture.asset(
         icon,
         height: 25,
-        color: Palette.gray,
+        colorFilter: const ColorFilter.mode(Palette.gray, BlendMode.srcIn),
       ),
       title: Text(label,
           style: const TextStyle(color: Palette.lightGray, fontSize: 17)),

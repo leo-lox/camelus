@@ -160,23 +160,24 @@ class _NostrPageState extends ConsumerState<NostrPage>
               pinned: false,
               forceElevated: true,
               backgroundColor: Palette.background,
-              leadingWidth: 52,
-              leading: InkWell(
-                onTap: () =>
-                    widget.parentScaffoldKey.currentState!.openDrawer(),
-                child: Container(
-                  margin: const EdgeInsets.fromLTRB(10, 10, 10, 10),
-                  decoration: const BoxDecoration(
-                    color: Palette.primary,
-                    shape: BoxShape.circle,
-                  ),
+              leadingWidth: 48,
+              leading: SizedBox(
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(100),
+                  onTap: () =>
+                      widget.parentScaffoldKey.currentState!.openDrawer(),
                   child: StreamBuilder<UserMetadata?>(
                       stream: metadata.getMetadataByPubkey(widget.pubkey),
                       builder: (BuildContext context,
                           AsyncSnapshot<UserMetadata?> snapshot) {
-                        return UserImage(
-                          imageUrl: snapshot.data?.picture, // can be null
-                          pubkey: widget.pubkey,
+                        return Padding(
+                          padding: const EdgeInsets.all(
+                            9.0,
+                          ),
+                          child: UserImage(
+                            imageUrl: snapshot.data?.picture, // can be null
+                            pubkey: widget.pubkey,
+                          ),
                         );
                       }),
                 ),
@@ -216,7 +217,8 @@ class _NostrPageState extends ConsumerState<NostrPage>
                             children: [
                               SvgPicture.asset(
                                 'assets/icons/cell-signal-slash.svg',
-                                color: Palette.gray,
+                                colorFilter: const ColorFilter.mode(
+                                    Palette.lightGray, BlendMode.srcIn),
                                 height: 22,
                                 width: 22,
                               ),
@@ -235,7 +237,8 @@ class _NostrPageState extends ConsumerState<NostrPage>
                             children: [
                               SvgPicture.asset(
                                 'assets/icons/cell-signal-full.svg',
-                                color: Palette.gray,
+                                colorFilter: const ColorFilter.mode(
+                                    Palette.lightGray, BlendMode.srcIn),
                                 height: 22,
                                 width: 22,
                               ),
@@ -269,7 +272,7 @@ class _NostrPageState extends ConsumerState<NostrPage>
                       color: Palette.primary,
                     ),
                   ),
-                  indicatorWeight: 5.0,
+                  indicatorWeight: 8.0,
                   tabs: const [
                     Text("feed", style: TextStyle(color: Palette.lightGray)),
                     Text("feed & replies",
