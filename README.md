@@ -53,9 +53,9 @@ Organisms bring multiple molecules together to form complete sections like a pro
 
 ### Using Provider for State Management
 
-Each provider within the `providers` folder is dedicated to managing a specific part of the app state, such as user authentication, feed updates, and message handling. Providers allow widgets across the app to access and respond to these data updates, making the UI dynamic and responsive to user interactions. 
+Each provider within the `providers` folder is dedicated to managing a specific part of the app state, such as user authentication, feed updates and message handling. Providers allow widgets across the app to access and respond to these data updates. It is also making the UI dynamic and responsive to user interactions. 
 
-- **Example**: The `UserProvider` tracks the user’s login state and profile data, ensuring all relevant screens and components display the most updated information. With `ChangeNotifier`, any changes to user data are automatically propagated to relevant widgets, providing real-time feedback to users as they interact with the app.
+- **Example**: The `UserProvider` tracks the user’s login state and profile data. It allows to handle all relevant screens and components display the most updated information. With `ChangeNotifier`, any changes to user data are automatically propagated to relevant widgets, providing real-time feedback to users as they interact with the app.
 
 ---
 
