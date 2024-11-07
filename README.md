@@ -149,13 +149,13 @@ class CamelusApp extends StatelessWidget {
 The initialRoute is set to **/**, which loads the HomeScreen. Additional routes like **/login, /profile and /chat** are defined. Each one is mapped to a corresponding screen widget. To navigate between screens, Navigator.pushNamed(context, '/profile') is used, allowing users to move from one screen to another.
 
 
-### 7. Setting up the project
+# 7. Setting up the project
 
-# 7.1 Prerequisites
+### 7.1 Prerequisites
 
 Before you start, make sure that **Flutter** is installed on your machine. You can check the installation guide and verify the setup at [Flutter Installation](https://flutter.dev/docs/get-started/install).
 
- # 7.2 Clone the Repository
+ ### 7.2 Clone the Repository
 
 Start by cloning the repository to your local machine:
 
