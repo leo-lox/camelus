@@ -1,15 +1,16 @@
 # Social Network App
 ## Camelus
-
+## User interface documentation
 **Documentation Overview**
 1. Intro
 2. Design System
 3. UI structure
-4. Component Documentation
-5. Navigation and routing
-6.
+4. Architecture
+5. Component Documentation
+6. Navigation and routing
 7.
-8.
+8. How to setup and start
+9.
 
 ## 1. Introduction
 Welcome to our social network app! This mobile application connects users, enabling them to share posts, engage with content and interact securely. Unlike traditional networks, this app leverages the Nostr protocol for decentralized data storage, enhancing privacy and resilience by distributing data across a network rather than central servers.
@@ -33,24 +34,15 @@ This section provides a detailed breakdown of the app's user interface architect
 
 ### Folder Overview for UI
 
-In the **lib** folder you can find the main directory housing the core UI logic and overall app functionality. This directory includes the foundational structure and primary components for each screen. In the **routes** folder are defined the app’s navigation pathways. Each route specifies how users move between screens and provides clear navigation logic across the app. The **components** folder contains reusable UI elements that combine basic components (like atoms and molecules) to build cohesive structures such as headers, forms, or buttons that are used across multiple screens.
+In the **lib** folder you can find the main directory housing the core UI logic and overall app functionality. This directory includes the foundational structure and primary components for each screen. In the **routes** folder are defined the app’s navigation pathways. Each route specifies how users move between screens and provides clear navigation logic across the app. The **components** folder contains reusable UI elements that combine basic components (like atoms and molecules) to build cohesive structures such as headers, forms, or buttons that are used across multiple screens. In the **providers** folder you can see how state logic is managed by using Provider to handle and update data across widgets. Providers allow consistent state handling throughout the app.  
 
-In the **providers** folder you can see how state logic is managed by using Provider to handle and update data across widgets. Providers allow consistent state handling throughout the app.  
+## 4. Architecture
+In the app's architecture, components are organized into three primary categories: Atoms, Molecules and Providers. Each category serves a specific purpose to create a scalable and maintainable UI. Atoms are the most basic UI elements used frequently throughout the app. These components are minimal and reusable. In the code you can see a  LongButton for example. 
+Code Example:
+**Molecules**
+Molecules are combinations of atoms (e.g., buttons, text fields) that form more complex UI elements. They are still reusable but typically encapsulate more logic or user interaction.
+**Organisms**  bring multiple molecules together, forming complete sections like a profile page or a feed section, providing a more comprehensive part of the user interface.
   
-
-### UI Component Hierarchy
-
-In the app’s UI design are three primary levels of components that structure each screen effectively:
-
- **Atoms**
- The simplest UI elements like buttons and icons. It is the basic building blocks of the app.
-
-**Molecules**\n
-These are combinations of atoms, creating functional units like search bars or post boxed like we used in our feed to achieve slightly more complex elements.
-
-**Organisms**
-Organisms bring multiple molecules together to form complete sections like a profile page or a feed section. It is providing a more comprehensive part of the user interface.
-
 ### Using Provider for State Management
 
 Each provider within the `providers` folder is dedicated to managing a specific part of the app state, such as user authentication, feed updates and message handling. Providers allow widgets across the app to access and respond to these data updates. It is also making the UI dynamic and responsive to user interactions. 
@@ -129,7 +121,7 @@ The following diagram outlines the data flow for saving posts:
 3. **Feed Updates**: Other devices with the app can view the new post on the feed in real-time as the Nostr Protocol syncs the data across the network.
 
 
-By centralizing state management, the app maintains a clean and consistent UI, with responsive updates across screens, enhancing the overall user experience.
+
 
 ---
 
