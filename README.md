@@ -40,24 +40,24 @@ In the **providers** folder you can see how state logic is managed by using Prov
 
 ### UI Component Hierarchy
 
-In the app’s UI design, there are three primary levels of components that structure each screen effectively:
+In the app’s UI design are three primary levels of components that structure each screen effectively:
 
  **Atoms**
  The simplest UI elements like buttons and icons. It is the basic building blocks of the app.
 
-**Molecules**
+**Molecules**\n
 These are combinations of atoms, creating functional units like search bars or post boxed like we used in our feed to achieve slightly more complex elements.
 
 **Organisms**
 Organisms bring multiple molecules together to form complete sections like a profile page or a feed section. It is providing a more comprehensive part of the user interface.
-
----
 
 ### Using Provider for State Management
 
 Each provider within the `providers` folder is dedicated to managing a specific part of the app state, such as user authentication, feed updates, and message handling. Providers allow widgets across the app to access and respond to these data updates, making the UI dynamic and responsive to user interactions. 
 
 - **Example**: The `UserProvider` tracks the user’s login state and profile data, ensuring all relevant screens and components display the most updated information. With `ChangeNotifier`, any changes to user data are automatically propagated to relevant widgets, providing real-time feedback to users as they interact with the app.
+
+---
 
 ## 4. Component Documentation
 
