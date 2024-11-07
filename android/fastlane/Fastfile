@@ -31,10 +31,11 @@ platform :android do
 
   desc "Deploy a new version to open Testing Track"
   lane :beta do
-    gradle(
-      task: 'bundle',
-      build_type: 'Release'
-    )
+    sh "flutter build appbundle --release" # build the app bundle
+    #gradle(
+    #  task: 'bundle',
+    #  build_type: 'Release'
+    #)
     upload_to_play_store(
       track: 'beta',
       aab: '../build/app/outputs/bundle/release/app-release.aab',
