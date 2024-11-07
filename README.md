@@ -48,7 +48,7 @@ In the app's architecture, components are organized into three primary categorie
 
 Each provider within the `providers` folder is dedicated to managing a specific part of the app state like user authentication, feed updates and message handling. Providers allow widgets across the app to access and respond to these data updates. It is also making the UI dynamic and responsive to user interactions. 
 
-- **Example**: The `UserProvider` tracks the user’s login state and profile data. It allows to handle all relevant screens and components display the most updated information. With `ChangeNotifier`, any changes to user data are automatically propagated to relevant widgets, providing real-time feedback to users as they interact with the app.
+- **Example**: The `UserProvider` tracks the user’s login state and profile data. It allows to handle all relevant screens and components display the most updated information. With `ChangeNotifier` any changes to user data are automatically propagated to relevant widgets, providing real-time feedback to users as they interact with the app.
 
 
 
@@ -56,13 +56,13 @@ Each provider within the `providers` folder is dedicated to managing a specific 
 
 ### 5.1 Login, Registration and Providers
 
-For handling login, registration and state management a **Provider** is utilized to manage state and share data across widgets. Providers make data easily accessible throughout the app and keep it in sync across different parts of the UI.
+For handling login, registration and state management a **Provider** is utilized to manage state and share data across widgets.
 
-**Overview**: The app includes a login and registration flow where users input their credentials. These credentials are validated and authenticated. Once authenticated, the user receives a token which is securely stored locally or in memory. The user is logged in even after restarting the app.
+**Overview**: The app includes a login and registration flow where users input their credentials. These credentials are validated and authenticated. Once authenticated, the user receives a token which is securely stored locally or in memory. The user is logged in even after restarting the app securely.
 
-To manage and propagate authentication data throughout the app, **ChangeNotifier** is used as follows:
+To manage and propagate authentication data throughout the app, **ChangeNotifier** is used as described below:
 
-In my app a **UserModel** class likely extends **ChangeNotifier**. This class holds the user’s authentication data (e.g., login status, user profile information). Whenever the user logs in or updates their profile, the **UserModel** notifies all listening widgets that the data has changed. For instance, when the user logs in, the **UserModel** updates with the new authentication details and any part of the app that relies on this data (like profile screens or home pages) will rebuild automatically to reflect the latest state. The `login` and `logout` methods update the user’s state and trigger a UI rebuild by calling `notifyListeners()`.
+In the app, an **UserModel** class likely extends **ChangeNotifier**. This class holds the user’s authentication data (e.g. login status, user profile information). Whenever the users log in or update their profiles, the **UserModel** notifies all listening widgets that the data has changed. For instance, when the user logs in, the **UserModel** updates with the new authentication details and any part of the app that relies on this data (like profile screens or home pages) will rebuild automatically to reflect the latest state. The `login` and `logout` methods update the user’s state and trigger a UI rebuild by calling `notifyListeners()`.
 By using ChangeNotifierProvider the app ensures whenever the UserModel state changes (such as after a successful login) all the widgets that depend on this data can reactively rebuild
 
 
@@ -94,14 +94,12 @@ class UserModel extends ChangeNotifier {
 
 ### 5.2 User Profiles
 
-User profiles allow users to create, edit, and view personal information.
-
-In the app users can **create**, **edit** and **view** their personal information. Once the registration form is submitted the information is sent to the Nostr Protocol. Users can update their profiles by navigating to a profile settings screen. Here, they can modify profile details. You can also see a List of followers.
+In the app users can **create**, **edit** and **view** their personal information by navigating to profile settings screen. Once the registration form is submitted the information is sent to the Nostr Protocol. You can also see a List of followers.
 
 
-### 5.3 Post Creation and Interaction on Feed
+### 5.3 Post Creation and Interaction on feed
 
-The feed enables users to share their thoughts and engage with others' content. A post in the feed has a simple UI element Structure where users can see a profile picture, the text, share button, comments for the posts and a send button. When users are going to tap the send button the data is going to be saved in the **Nostr protocol**. The following diagram demonstrates how a user post is saved locally in the **ndk** and then the **ndk** is sending it to the **Nostr protocol**. It also shows how the devices see other user posts on the feed. Once the user hits the send button, it is instantly displayed in the app’s feed without requiring a page reload. 
+The feed enables users to share their thoughts and engage with others' content. A post in the feed has a simple UI element Structure where users can see a profile picture, the text, share button, comments for the posts and a send button. When users tap the send button the data is send locally to the ndk and then the **ndk** is sending it to the **Nostr protocol**.  The following diagram is demonstrating that. It also shows how the devices see other user posts on the feed. Once the user hits the send button, it is instantly displayed in the app’s feed without requiring a page reload. 
 
 
 #### Diagram: Dataflow for sending feed post from device to nostr protocol and back
