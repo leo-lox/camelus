@@ -46,7 +46,7 @@ class MainFeed {
     required String npub,
     required int since,
   }) async {
-    final contactList = await _follow.getContactsSelf();
+    final contactList = await _follow.getContacts(npub);
 
     if (contactList == null) {
       log("no contact list found for $npub");
@@ -54,7 +54,7 @@ class MainFeed {
     }
 
     final newNotesStream = _noteRepository.subscribeTextNotesByAuthors(
-      authors: contactList.contacts,
+      authors: [npub, ...contactList.contacts],
       requestId: userFeedFreshId,
       since: since,
     );
@@ -98,7 +98,7 @@ class MainFeed {
     }
 
     final mynotesStream = _noteRepository.getTextNotesByAuthors(
-      authors: contactList.contacts,
+      authors: [npub, ...contactList.contacts],
       requestId: requestId,
       since: since,
       until: until,
