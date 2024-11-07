@@ -1,0 +1,18 @@
+source "https://rubygems.org"
+
+gem "fastlane"
+
+
+
+
+## On your CI, add bundle install as your first build step
+
+
+## how to run fastlane
+# bundle exec fastlane
+
+
+## To update fastlane, just run 
+# bundle update fastlane
+plugins_path = File.join(File.dirname(__FILE__), 'fastlane', 'Pluginfile')
+eval_gemfile(plugins_path) if File.exist?(plugins_path)
