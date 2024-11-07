@@ -33,12 +33,14 @@ This section provides a detailed breakdown of the app's user interface architect
 
 ### Folder Overview for UI
 
-In the **lib** folder you can find the main directory housing the core UI logic and overall app functionality. This directory includes the foundational structure and primary components for each screen. In the **routes** folder are defined the app’s navigation pathways. Each route specifies how users move between screens and provides clear navigation logic across the app. The **components** folder contains reusable UI elements that combine basic components (like atoms and molecules) to build cohesive structures such as headers, forms, or buttons that are used across multiple screens. In the **providers** folder you can see how state logic is managed by using Provider to handle and update data across widgets. Providers allow consistent state handling throughout the app.<br>
-Folder overview:<br>
-- **[lib](./lib)**.
+- **[lib](./lib)**
 - **[routes](./routes)**
 - **[components](./components)**
 - **[providers](./providers)**
+
+In the **lib** folder you can find the main directory housing the core UI logic and overall app functionality. This directory includes the foundational structure and primary components for each screen. In the **routes** folder are defined the app’s navigation pathways. Each route specifies how users move between screens and provides clear navigation logic across the app. The **components** folder contains reusable UI elements that combine basic components (like atoms and molecules) to build cohesive structures such as headers, forms, or buttons that are used across multiple screens. In the **providers** folder you can see how state logic is managed by using Provider to handle and update data across widgets. Providers allow consistent state handling throughout the app.<br>
+Folder overview:<br>
+
 ## 4. Architecture
 In the app's architecture, components are organized into three primary categories: Atoms, Molecules and Providers. Each category serves a specific purpose to create a scalable and maintainable UI. Atoms are the most basic UI elements used frequently throughout the app. These components are minimal and reusable. In the atoms folder you can see a LongButton for example: https://github.com/leo-lox/camelus/blob/dev/lib/presentation_layer/atoms/long_button.dart
 
