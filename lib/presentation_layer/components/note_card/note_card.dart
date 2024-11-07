@@ -132,8 +132,22 @@ class NoteCard extends StatelessWidget {
       onComment: () {
         _writeReply(context, note);
       },
-      onLike: () {},
-      onRetweet: () {},
+      onLike: () {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Not implemented yet',
+                style: TextStyle(color: Palette.black)),
+          ),
+        );
+      },
+      onRetweet: () {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Not implemented yet',
+                style: TextStyle(color: Palette.black)),
+          ),
+        );
+      },
       onShare: () => openBottomSheetShare(context, note),
     );
   }

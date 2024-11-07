@@ -1,12 +1,15 @@
 import 'package:camelus/config/palette.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class BottomActionRow extends StatelessWidget {
-  final Function onComment;
-  final Function onRetweet;
-  final Function onLike;
-  final Function onShare;
+  final VoidCallback onComment;
+  final VoidCallback onRetweet;
+  final VoidCallback onLike;
+  final VoidCallback onShare;
+  final int? commentCount;
+  final int? retweetCount;
+  final int? likeCount;
 
   const BottomActionRow({
     super.key,
@@ -14,6 +17,9 @@ class BottomActionRow extends StatelessWidget {
     required this.onRetweet,
     required this.onLike,
     required this.onShare,
+    this.commentCount,
+    this.retweetCount,
+    this.likeCount,
   });
 
   @override
@@ -21,75 +27,64 @@ class BottomActionRow extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        GestureDetector(
-          onTap: () => onComment(),
-          child: Container(
-            padding:
-                const EdgeInsets.only(left: 10, right: 10, top: 2, bottom: 2),
-            //color: Palette.primary,
-            child: Row(
-              children: [
-                SvgPicture.asset(
-                  height: 23,
-                  'assets/icons/chat-teardrop-text.svg',
-                  color: Palette.darkGray,
-                ),
-                const SizedBox(width: 5),
-                const Text(
-                  // show number of comments if >0
-                  "",
-
-                  style: TextStyle(color: Palette.gray, fontSize: 16),
-                ),
-              ],
-            ),
-          ),
+        _buildActionButton(
+          onTap: onComment,
+          icon: 'assets/icons/chat-teardrop-text.svg',
+          count: commentCount,
         ),
-        GestureDetector(
-          onTap: () => onRetweet(),
-          child: Row(
-            children: [
-              SvgPicture.asset(
-                'assets/icons/retweet.svg',
-                color: Palette.darkGray,
-              ),
-              const SizedBox(width: 5),
-              Text(
-                "" //widget.tweet.retweetsCount
-                    .toString(),
-                style: const TextStyle(color: Palette.gray, fontSize: 16),
-              ),
-            ],
-          ),
+        _buildActionButton(
+          onTap: onRetweet,
+          icon: 'assets/icons/retweet.svg',
+          count: retweetCount,
         ),
-        // like button
-        GestureDetector(
-          onTap: () => onLike(),
-          child: Row(
-            children: [
-              SvgPicture.asset(
-                height: 23,
-                'assets/icons/heart.svg',
-                color: Palette.darkGray,
-              ),
-              const SizedBox(width: 5),
-              Text(
-                "" //widget.tweet.likesCount
-                    .toString(),
-                style: const TextStyle(color: Palette.gray, fontSize: 16),
-              ),
-            ],
-          ),
+        _buildActionButton(
+          onTap: onLike,
+          icon: 'assets/icons/heart.svg',
+          count: likeCount,
         ),
-        GestureDetector(
-          onTap: () => onShare(),
-          child: SvgPicture.asset(
-            height: 23,
-            'assets/icons/share.svg',
-            color: Palette.darkGray,
-          ),
+        _buildActionButton(
+          onTap: onShare,
+          icon: 'assets/icons/share.svg',
         ),
       ],
+    );
+  }
+
+  Widget _buildActionButton({
+    required VoidCallback onTap,
+    required String icon,
+    int? count,
+  }) {
+    return SizedBox(
+      height: 40,
+      width: 70,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(50),
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              SvgPicture.asset(
+                icon,
+                height: 23,
+                colorFilter: const ColorFilter.mode(
+                  Palette.gray,
+                  BlendMode.srcIn,
+                ),
+              ),
+              if (count != null) ...[
+                const SizedBox(width: 5),
+                Text(
+                  count.toString(),
+                  style: const TextStyle(color: Palette.gray, fontSize: 16),
+                ),
+              ],
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
