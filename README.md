@@ -13,7 +13,7 @@
 ## 1. Introduction
 Welcome to our social network app! This mobile application connects users across the globe. The app enables them to share posts and engage with content to interact securely. Unlike traditional networks, this app leverages the Nostr protocol for decentralized data storage. This is enhancing the privacy and resilience by distributing data across a network rather than central servers.
 
-This documentation is aimed at beginner developers and students interested in mobile UI development. It is offering hands-on learning with a structured code snippets from the original camelus code for learning how to build a user interface for apps.
+This documentation is aimed at beginner developers and students interested in mobile UI development. It is offering hands-on learning with structured code snippets from the original camelus code for learning how to build an user interface for apps.
 
 **Technologies**:  
 - **Frontend**: Flutter  
@@ -36,18 +36,17 @@ This section provides a detailed breakdown of the app's user interface architect
 - **[components](./components)**
 - **[providers](./providers)**
 
-In the **lib** folder you can find the main directory housing the core UI logic and overall app functionality. This directory includes the foundational structure and primary components for each screen. In the **routes** folder are defined the app’s navigation pathways. Each route specifies how users move between screens and provides clear navigation logic across the app. The **components** folder contains reusable UI elements that combine basic components (like atoms and molecules) to build cohesive structures such as headers, forms, or buttons that are used across multiple screens. In the **providers** folder you can see how state logic is managed by using Provider to handle and update data across widgets. Providers allow consistent state handling throughout the app.<br>
-Folder overview:<br>
+In the **lib** folder you can find the main directory housing the core UI logic and overall app functionality. This directory includes the foundational structure and primary components for each screen. In the **routes** folder are the defined app’s navigation pathways. Each route specifies how users move between screens and provides clear navigation logic across the app. The **components** folder contains reusable UI elements that combine basic components (like atoms and molecules) to build such as headers or forms that are used across multiple screens. In the **providers** folder you can see how state logic is managed by using provider to handle and update data across widgets. Providers allow consistent state handling throughout the app.<br>
 
 ## 4. Architecture
-In the app's architecture, components are organized into three primary categories: Atoms, Molecules and Providers. Each category serves a specific purpose to create a scalable and maintainable UI. Atoms are the most basic UI elements used frequently throughout the app. These components are minimal and reusable. In the atoms folder you can see a LongButton for example: https://github.com/leo-lox/camelus/blob/dev/lib/presentation_layer/atoms/long_button.dart
+In the app's architecture, components are organized into three primary categories: Atoms, molecules and providers. Each category serves a specific purpose to create a scalable and maintainable ui. Atoms are the most basic ui elements used frequently throughout the app. These components are minimal and reusable. In the atoms folder you can see a LongButton for example: https://github.com/leo-lox/camelus/blob/dev/lib/presentation_layer/atoms/long_button.dart
 
-**Molecules** are combinations of atoms (e.g., buttons, text fields) that form more complex UI elements. They are still reusable but typically encapsulate more logic or user interaction.
-**Organisms**  bring multiple molecules together, forming complete sections like a profile page or a feed section, providing a more comprehensive part of the user interface.
+**Molecules** are combinations of atoms (e.g. buttons, text fields) that form more complex UI elements. They are still reusable but typically show more logic or user interaction.
+**Organisms** bring multiple molecules together, forming complete sections like a profile page or a feed section. 
   
 ### Using Provider for State Management
 
-Each provider within the `providers` folder is dedicated to managing a specific part of the app state, such as user authentication, feed updates and message handling. Providers allow widgets across the app to access and respond to these data updates. It is also making the UI dynamic and responsive to user interactions. 
+Each provider within the `providers` folder is dedicated to managing a specific part of the app state like user authentication, feed updates and message handling. Providers allow widgets across the app to access and respond to these data updates. It is also making the UI dynamic and responsive to user interactions. 
 
 - **Example**: The `UserProvider` tracks the user’s login state and profile data. It allows to handle all relevant screens and components display the most updated information. With `ChangeNotifier`, any changes to user data are automatically propagated to relevant widgets, providing real-time feedback to users as they interact with the app.
 
