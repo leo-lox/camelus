@@ -38,6 +38,7 @@ platform :android do
     upload_to_play_store(
       track: 'beta',
       aab: '../build/app/outputs/bundle/release/app-release.aab'
+      json_key_data: ENV['G_PLAY_FASTLANE_SERVICE_ACCOUNT']
     )
   end
 end
