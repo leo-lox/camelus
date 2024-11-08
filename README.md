@@ -1,5 +1,5 @@
 # Social Network App Camelus <br>
-![Screenshot 2024-11-08 202456](https://github.com/user-attachments/assets/b93fbf04-19d0-48f5-af0d-b47546ae68d6)
+<center>![Screenshot 2024-11-08 202456](https://github.com/user-attachments/assets/b93fbf04-19d0-48f5-af0d-b47546ae68d6)</center>
 
 <center>Nostr Client for Android
 Join the social network you control
