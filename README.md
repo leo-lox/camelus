@@ -11,9 +11,9 @@
 8. Conclusion
 
 ## 1. Introduction
-Welcome to our social network app! This mobile application connects users, enabling them to share posts, engage with content and interact securely. Unlike traditional networks, this app leverages the Nostr protocol for decentralized data storage, enhancing privacy and resilience by distributing data across a network rather than central servers.
+Welcome to our social network app! This mobile application connects users across the globe. The app enables them to share posts and engage with content to interact securely. Unlike traditional networks, this app leverages the Nostr protocol for decentralized data storage. This is enhancing the privacy and resilience by distributing data across a network rather than central servers.
 
-This documentation is aimed at beginner developers and students interested in mobile UI development. It is offering hands-on learning with a structured code snippets from the original camelus code for learning how to build a user interface for apps.
+This documentation is aimed at beginner developers and students interested in mobile UI development. It is offering hands-on learning with structured code snippets from the original camelus code for learning how to build an user interface for apps.
 
 **Technologies**:  
 - **Frontend**: Flutter  
@@ -36,20 +36,19 @@ This section provides a detailed breakdown of the app's user interface architect
 - **[components](./components)**
 - **[providers](./providers)**
 
-In the **lib** folder you can find the main directory housing the core UI logic and overall app functionality. This directory includes the foundational structure and primary components for each screen. In the **routes** folder are defined the app’s navigation pathways. Each route specifies how users move between screens and provides clear navigation logic across the app. The **components** folder contains reusable UI elements that combine basic components (like atoms and molecules) to build cohesive structures such as headers, forms, or buttons that are used across multiple screens. In the **providers** folder you can see how state logic is managed by using Provider to handle and update data across widgets. Providers allow consistent state handling throughout the app.<br>
-Folder overview:<br>
+In the **lib** folder you can find the main directory housing the core UI logic and overall app functionality. This directory includes the foundational structure and primary components for each screen. In the **routes** folder are the defined app’s navigation pathways. Each route specifies how users move between screens and provides clear navigation logic across the app. The **components** folder contains reusable UI elements that combine basic components (like atoms and molecules) to build such as headers or forms that are used across multiple screens. In the **providers** folder you can see how state logic is managed by using provider to handle and update data across widgets. Providers allow consistent state handling throughout the app.<br>
 
 ## 4. Architecture
-In the app's architecture, components are organized into three primary categories: Atoms, Molecules and Providers. Each category serves a specific purpose to create a scalable and maintainable UI. Atoms are the most basic UI elements used frequently throughout the app. These components are minimal and reusable. In the atoms folder you can see a LongButton for example: https://github.com/leo-lox/camelus/blob/dev/lib/presentation_layer/atoms/long_button.dart
+In the app's architecture, components are organized into three primary categories: Atoms, molecules and providers. Each category serves a specific purpose to create a scalable and maintainable ui. Atoms are the most basic ui elements used frequently throughout the app. These components are minimal and reusable. In the atoms folder you can see a LongButton for example: https://github.com/leo-lox/camelus/blob/dev/lib/presentation_layer/atoms/long_button.dart
 
-**Molecules** are combinations of atoms (e.g., buttons, text fields) that form more complex UI elements. They are still reusable but typically encapsulate more logic or user interaction.
-**Organisms**  bring multiple molecules together, forming complete sections like a profile page or a feed section, providing a more comprehensive part of the user interface.
+**Molecules** are combinations of atoms (e.g. buttons, text fields) that form more complex UI elements. They are still reusable but typically show more logic or user interaction.
+**Organisms** bring multiple molecules together, forming complete sections like a profile page or a feed section. 
   
 ### Using Provider for State Management
 
-Each provider within the `providers` folder is dedicated to managing a specific part of the app state, such as user authentication, feed updates and message handling. Providers allow widgets across the app to access and respond to these data updates. It is also making the UI dynamic and responsive to user interactions. 
+Each provider within the `providers` folder is dedicated to managing a specific part of the app state like user authentication, feed updates and message handling. Providers allow widgets across the app to access and respond to these data updates. It is also making the UI dynamic and responsive to user interactions. 
 
-- **Example**: The `UserProvider` tracks the user’s login state and profile data. It allows to handle all relevant screens and components display the most updated information. With `ChangeNotifier`, any changes to user data are automatically propagated to relevant widgets, providing real-time feedback to users as they interact with the app.
+- **Example**: The `UserProvider` tracks the user’s login state and profile data. It allows to handle all relevant screens and components display the most updated information. With `ChangeNotifier` any changes to user data are automatically propagated to relevant widgets, providing real-time feedback to users as they interact with the app.
 
 
 
@@ -57,13 +56,13 @@ Each provider within the `providers` folder is dedicated to managing a specific 
 
 ### 5.1 Login, Registration and Providers
 
-For handling login, registration and state management a **Provider** is utilized to manage state and share data across widgets. Providers make data easily accessible throughout the app and keep it in sync across different parts of the UI.
+For handling login, registration and state management a **Provider** is utilized to manage state and share data across widgets.
 
-**Overview**: The app includes a login and registration flow where users input their credentials. These credentials are validated and authenticated. Once authenticated, the user receives a token which is securely stored locally or in memory. The user is logged in even after restarting the app.
+**Overview**: The app includes a login and registration flow where users input their credentials. These credentials are validated and authenticated. Once authenticated, the user receives a token which is securely stored locally or in memory. The user is logged in even after restarting the app securely.
 
-To manage and propagate authentication data throughout the app, **ChangeNotifier** is used as follows:
+To manage and propagate authentication data throughout the app, **ChangeNotifier** is used as described below:
 
-In my app a **UserModel** class likely extends **ChangeNotifier**. This class holds the user’s authentication data (e.g., login status, user profile information). Whenever the user logs in or updates their profile, the **UserModel** notifies all listening widgets that the data has changed. For instance, when the user logs in, the **UserModel** updates with the new authentication details and any part of the app that relies on this data (like profile screens or home pages) will rebuild automatically to reflect the latest state. The `login` and `logout` methods update the user’s state and trigger a UI rebuild by calling `notifyListeners()`.
+In the app, an **UserModel** class likely extends **ChangeNotifier**. This class holds the user’s authentication data (e.g. login status, user profile information). Whenever the users log in or update their profiles, the **UserModel** notifies all listening widgets that the data has changed. For instance, when the user logs in, the **UserModel** updates with the new authentication details and any part of the app that relies on this data (like profile screens or home pages) will rebuild automatically to reflect the latest state. The `login` and `logout` methods update the user’s state and trigger a UI rebuild by calling `notifyListeners()`.
 By using ChangeNotifierProvider the app ensures whenever the UserModel state changes (such as after a successful login) all the widgets that depend on this data can reactively rebuild
 
 
@@ -95,26 +94,16 @@ class UserModel extends ChangeNotifier {
 
 ### 5.2 User Profiles
 
-User profiles allow users to create, edit, and view personal information.
-
-In the app users can **create**, **edit** and **view** their personal information. Once the registration form is submitted the information is sent to the Nostr Protocol. Users can update their profiles by navigating to a profile settings screen. Here, they can modify profile details. You can also see a List of followers.
+In the app users can **create**, **edit** and **view** their personal information by navigating to profile settings screen. Once the registration form is submitted the information is sent to the Nostr Protocol. You can also see a List of followers.
 
 
-### 5.3 Post Creation and Interaction on Feed
+### 5.3 Post Creation and Interaction on feed
 
-The feed enables users to share their thoughts and engage with others' content. A post in the feed has a simple UI element Structure where users can see a profile picture, the text, share button, comments for the posts and a send button. When users are going to tap the send button the data is going to be saved in the **Nostr protocol**. The following diagram demonstrates how a user post is saved locally in the **ndk** and then the **ndk** is sending it to the **Nostr protocol**. It also shows how the devices see other user posts on the feed. Once the user hits the send button, it is instantly displayed in the app’s feed without requiring a page reload. 
+The feed enables users to share their thoughts and engage with others' content. A post in the feed has a simple UI element Structure where users can see a profile picture, the text, share button, comments for the posts and a send button. When users tap the send button the data is send locally to the ndk and afterwards to the **Nostr protocol** as shown in the diagram. It also shows the transfer of the data from the nostr protocol to users feeds. Once the user hits the send button, the post is instantly displayed in the app’s feed without requiring a page reload. 
 
 
 #### Diagram: Dataflow for sending feed post from device to nostr protocol and back
 ![Unbenanntes Diagramm drawio (1)](https://github.com/user-attachments/assets/9c1359d2-9a2e-4a88-b9f4-f164a30af951)
-
-The following diagram outlines the data flow for saving posts:
-
-1. **Local Storage**: Each post is saved in the local NDK (Nostr Developer Kit) for quick access.
-2. **Sync with Nostr**: NDK then synchronizes the post with the Nostr Protocol. Then it is available across the decentralized network.
-3. **Feed Updates**: Other devices with the app can view the new post on the feed in real-time as the Nostr Protocol syncs the data across the network.
-
-
 
 # 6. Navigation and Routes
 
@@ -160,15 +149,13 @@ class CamelusApp extends StatelessWidget {
 The initialRoute is set to **/**, which loads the HomeScreen. Additional routes like **/login, /profile and /chat** are defined. Each one is mapped to a corresponding screen widget. To navigate between screens, Navigator.pushNamed(context, '/profile') is used, allowing users to move from one screen to another.
 
 
-### 7. Setting up the project
+# 7. Setting up the project
 
-## Prerequisites
+### 7.1 Prerequisites
 
 Before you start, make sure that **Flutter** is installed on your machine. You can check the installation guide and verify the setup at [Flutter Installation](https://flutter.dev/docs/get-started/install).
 
-## Steps to Build
-
-### 1. Clone the Repository
+ ### 7.2 Clone the Repository
 
 Start by cloning the repository to your local machine:
 
@@ -192,6 +179,8 @@ After ensuring the correct path for dart_ndk, install the dependencies by runnin
 ```bash
 flutter pub get
 ```
+
+run ```flutter build apk --release``` or ```flutter run``` to run directly on your device in debug mode
 ### 8. Conclusion
 
 Android
