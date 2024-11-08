@@ -5,14 +5,14 @@
    <h1>User interface documentation</h1>
    
 <h2>Documentation Overview</h2><br>
-<h3>1. Intro</h3><br>
-<h3>2. Design System</h3><br>
-<h3>3. UI structure</h3><br>
-<h3>4. Architecture</h3><br>
-<h3>5. Component Documentation</h3><br>
-<h3>6. Navigation and routing</h3><br>
-<h3>7. Setting up the project</h3><br>
-<h3>8. Conclusion</h3><br>
+<h3>1. Intro</h3>
+<h3>2. Design System</h3>
+<h3>3. UI structure</h3>
+<h3>4. Architecture</h3>
+<h3>5. Component Documentation</h3>
+<h3>6. Navigation and routing</h3>
+<h3>7. Setting up the project</h3>
+<h3>8. Conclusion</h3>
 </div>
 
 
