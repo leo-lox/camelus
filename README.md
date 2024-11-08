@@ -1,12 +1,20 @@
-# Social Network App Camelus <br>
-<center>![Screenshot 2024-11-08 202456](https://github.com/user-attachments/assets/b93fbf04-19d0-48f5-af0d-b47546ae68d6)</center>
+<p align="center">
+  # Social Network App Camelus <br>
+  <img src="https://github.com/user-attachments/assets/b93fbf04-19d0-48f5-af0d-b47546ae68d6" alt="Screenshot 2024-11-08 202456">
+</p>
 
-<center>Nostr Client for Android
-Join the social network you control
-Download and Install the android app
+<p align="center">
+  Nostr Client for Android <br>
+  Join the social network you control <br>
+  Download and Install the Android app
+</p>
 
-[![Alt text](https://github.com/user-attachments/assets/d3236969-c026-4240-8fc8-415cd075f79e)]([link_url](https://play.google.com/store/apps/details?id=de.lox.dev.camelus&hl=de))
-</center>
+<p align="center">
+  <a href="https://play.google.com/store/apps/details?id=de.lox.dev.camelus&hl=de">
+    <img src="https://github.com/user-attachments/assets/d3236969-c026-4240-8fc8-415cd075f79e" alt="Download on Google Play">
+  </a>
+</p>
+
 ## 1. Introduction
 Welcome to our social network app! This mobile application connects users across the globe. The app enables them to share posts and engage with content to interact securely. Unlike traditional networks, this app leverages the Nostr protocol for decentralized data storage. This is enhancing the privacy and resilience by distributing data across a network rather than central servers.
 
