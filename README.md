@@ -152,42 +152,5 @@ class CamelusApp extends StatelessWidget {
 The initialRoute is set to **/**, which loads the HomeScreen. Additional routes like **/login, /profile and /chat** are defined. Each one is mapped to a corresponding screen widget. To navigate between screens, Navigator.pushNamed(context, '/profile') is used, allowing users to move from one screen to another.
 
 
-# 7. Setting up the project
 
-### 7.1 Prerequisites
-
-Before you start, make sure that **Flutter** is installed on your machine. You can check the installation guide and verify the setup at [Flutter Installation](https://flutter.dev/docs/get-started/install).
-
- ### 7.2 Clone the Repository
-
-Start by cloning the repository to your local machine:
-
-```bash
-git clone https://github.com/leo-lox/camelus.git
-```
-Clone `dart_ndk`
-
-Clone the **dart_ndk** repository into your project directory. Depending on your folder structure, you may need to modify the `pubspec.yaml` file to point to the correct local path where **dart_ndk** is located.
-
-Example modification in `pubspec.yaml`:
-
-```yaml
-dependencies:
-  dart_ndk:
-    path: ../path/to/dart_ndk
-```
-Install Dependencies
-After ensuring the correct path for dart_ndk, install the dependencies by running:
-
-```bash
-flutter pub get
-```
-
-run ```flutter build apk --release``` or ```flutter run``` to run directly on your device in debug mode
-### 8. Conclusion
-
-Android
-You can join the test and download it from google play link
-
-or use the apk, it is signed with my key so you will need to enable "install from unknown sources" in your phone settings.
 
