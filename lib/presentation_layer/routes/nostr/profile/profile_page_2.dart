@@ -10,12 +10,12 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../../../config/palette.dart';
 import '../../../../domain_layer/entities/contact_list.dart';
 import '../../../../domain_layer/entities/user_metadata.dart';
-import '../../../../domain_layer/usecases/follow.dart';
 import '../../../../helpers/helpers.dart';
 import '../../../../helpers/nprofile_helper.dart';
 import '../../../atoms/follow_button.dart';
 import '../../../components/note_card/note_card_container.dart';
 import '../../../components/note_card/sceleton_note.dart';
+import '../../../providers/event_signer_provider.dart';
 import '../../../providers/profile_feed_provider.dart';
 import '../blockedUsers/block_page.dart';
 import 'follower_page.dart';
@@ -351,7 +351,13 @@ class _FollowButtonState extends ConsumerState<_FollowButton> {
   @override
   Widget build(BuildContext context) {
     final followingP = ref.watch(followingProvider);
+    final signerP = ref.watch(eventSignerProvider);
+    final ownPubkey = signerP!.getPublicKey();
 
+    // on own profile page, don't show follow button
+    if (widget.pubkey == ownPubkey) {
+      return Container();
+    }
     return StreamBuilder<ContactList>(
       stream: followingP.getContactsStreamSelf(),
       builder: (context, snapshot) {
