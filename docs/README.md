@@ -4,15 +4,15 @@
   <img src="https://github.com/user-attachments/assets/b93fbf04-19d0-48f5-af0d-b47546ae68d6" alt="Screenshot 2024-11-08 202456"><br>
    <h1>User interface documentation</h1>
    
-<h2>Documentation Overview</h2><br>
-<h3>1. Intro</h3>
-<h3>2. Design System</h3>
-<h3>3. UI structure</h3>
-<h3>4. Architecture</h3>
-<h3>5. Component Documentation</h3>
-<h3>6. Navigation and routing</h3>
-<h3>7. Setting up the project</h3>
-<h3>8. Conclusion</h3>
+<h2>Documentation Overview</h2>
+<h4>1. Intro</h4>
+<h4>2. Design System</h4>
+<h4>3. UI structure</h4>
+<h4>4. Architecture</h4>
+<h4>5. Component Documentation</h4>
+<h4>6. Navigation and routing</h4>
+<h4>7. Setting up the project</h4>
+<h4>8. Conclusion</h4>
 </div>
 
 
@@ -63,8 +63,8 @@ Each provider within the `providers` folder is dedicated to managing a specific 
 
 ### 5.1 Login, Registration and Providers
 
-For handling login, registration and state management a **Provider** is utilized to manage state and share data across widgets. To manage authentication data, **ChangeNotifier** is used.
-In the app, an **UserModel** class likely extends **ChangeNotifier**. This class holds the user’s authentication data (login status and user profile information). Whenever the users log in or update their profiles, the **UserModel** notifies all listening widgets that the data has changed. When the user logs in, the **UserModel** updates with the new authentication details. Any part of the app that relies on this data (like profile screens or home pages) will rebuild automatically to reflect the latest state. The `login` and `logout` methods update the user’s state and trigger a UI rebuild by calling `notifyListeners()`. In the app we are using ChangeNotifierProvider which ensures whenever the UserModel state changes (for example after a successful login) all the widgets that depend on this data can rebuild.
+For handling login, registration and state management a **Provider** is managing the state and share data across widgets. To manage authentication data, **ChangeNotifier** is used.
+The **ChangeNotifier** class holds the user’s authentication data (like login status and user profile information). Whenever the users log in or update their profiles, the **UserModel** notifies all listening widgets that the data has changed. When the user logs in, the **UserModel** updates with the new authentication details. Any part of the app that relies on this data (like profile screens or home pages) will rebuild automatically to reflect the latest state. The `login` and `logout` methods update the user’s state. They trigger a UI rebuild by calling `notifyListeners()`. In the app we are using ChangeNotifierProvider which ensures whenever the UserModel state changes (for example after a successful login) all the widgets that depend on this data can rebuild.
 
 #### Example: UserModel with ChangeNotifier
 
@@ -146,7 +146,7 @@ class CamelusApp extends StatelessWidget {
   }
 }
 ```
-The initialRoute is set to **/**, which loads the HomeScreen. Additional routes like **/login, /profile and /chat** are defined. Each one is mapped to a corresponding screen widget. To navigate between screens, Navigator.pushNamed(context, '/profile') is used, allowing users to move from one screen to another.
+The initialRoute is set to **/**, which loads the HomeScreen. Additional routes like **/login, /profile and /chat** are defined. Each one is mapped to a corresponding screen widget. 
 
 
 # 7. Setting up the project
