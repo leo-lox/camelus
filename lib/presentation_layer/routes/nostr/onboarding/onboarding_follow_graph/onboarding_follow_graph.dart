@@ -11,6 +11,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_force_directed_graph/flutter_force_directed_graph.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
+import '../../../../../config/onboard_conf.dart';
+import '../../../../../domain_layer/entities/contact_list.dart';
 import 'graph_node_data.dart';
 
 class OnboardingFollowGraph extends ConsumerStatefulWidget {
@@ -30,14 +32,6 @@ class OnboardingFollowGraph extends ConsumerStatefulWidget {
 
 class _OnboardingFollowGraphState extends ConsumerState<OnboardingFollowGraph> {
   bool _loading = true;
-
-  // npubs in hex
-  final List<String> recommendations = [
-    '717ff238f888273f5d5ee477097f2b398921503769303a0c518d06a952f2a75e',
-    '84dee6e676e5bb67b4ad4e042cf70cbd8681155db535942fcc6a0533858a7240',
-    '30782a8323b7c98b172c5a2af7206bb8283c655be6ddce11133611a03d5f1177',
-    '76c71aae3a491f1d9eec47cba17e229cda4113a0bbb6e6ae1776d7643e29cafa'
-  ];
 
   final followedList = <String>[];
   final int followTarget = 5;
@@ -136,17 +130,24 @@ class _OnboardingFollowGraphState extends ConsumerState<OnboardingFollowGraph> {
 
   /// fetches and adds a node to the graph
   addPubkeyNode(String pubkey, {String? addedByPubkey}) async {
-    final mynode = await _fetchNodePubkeyData(pubkey);
-    addNode(mynode, addedByPubkey: addedByPubkey);
+    try {
+      _fetchNodePubkeyData(pubkey).then((mynode) {
+        addNode(mynode, addedByPubkey: addedByPubkey);
+      });
+    } catch (e) {
+      print("error adding node $pubkey");
+    }
   }
 
   _addRecommendations() async {
     final List<GraphNodeData> recommendationsNodes = [];
 
-    for (final pubkey in recommendations) {
-      final GraphNodeData mynode = await _fetchNodePubkeyData(pubkey);
+    for (final pubkey in ONBOARD_RECOMMANDATIONS) {
+      try {
+        final GraphNodeData mynode = await _fetchNodePubkeyData(pubkey);
 
-      recommendationsNodes.add(mynode);
+        recommendationsNodes.add(mynode);
+      } catch (_) {}
     }
     for (final node in recommendationsNodes) {
       addNode(node);
@@ -162,11 +163,21 @@ class _OnboardingFollowGraphState extends ConsumerState<OnboardingFollowGraph> {
 
     final metadata =
         (await metadataP.getMetadataByPubkey(pubkey).toList()).first;
-    final followInfo = await followP.getContacts(pubkey);
+    ContactList? followInfo = await followP.getContacts(pubkey);
 
-    if (followInfo == null) {
-      throw Exception("followInfo is null");
-    }
+    // replace with empty contact list if null
+    followInfo ??= ContactList(
+      pubKey: pubkey,
+      contacts: [],
+      contactRelays: [],
+      createdAt: 0,
+      followedCommunities: [],
+      followedEvents: [],
+      followedTags: [],
+      loadedTimestamp: 0,
+      petnames: [],
+      sources: [],
+    );
 
     final GraphNodeData mynode = GraphNodeData(
       pubkey: pubkey,
