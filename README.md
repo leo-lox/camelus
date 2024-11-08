@@ -99,11 +99,14 @@ In the app users can **create**, **edit** and **view** their personal informatio
 
 ### 5.3 Post Creation and Interaction on feed
 
-The feed enables users to share their thoughts and engage with others' content. A post in the feed has a simple UI element Structure where users can see a profile picture, the text, share button, comments for the posts and a send button. When users tap the send button the data is send locally to the ndk and afterwards to the **Nostr protocol** as shown in the diagram. It also shows the transfer of the data from the nostr protocol to users feeds. Once the user hits the send button, the post is instantly displayed in the app’s feed without requiring a page reload. 
+A post in the feed has a simple UI element Structure where users can see a profile picture, the text, share button, comments for the posts and a send button. When users tap the send button the data is send locally to the ndk and afterwards to the **Nostr protocol** as shown in the diagram. It also shows the transfer of the data from the whole feed from the nostr protocol to the feed on users devices. Next, it is demonstrating how the feed sending requests to the ndk.  
+
+Once the user hits the send button, the post is instantly displayed in the app’s feed without requiring a page reload. 
 
 
 #### Diagram: Dataflow for sending feed post from device to nostr protocol and back
-![Unbenanntes Diagramm drawio (1)](https://github.com/user-attachments/assets/9c1359d2-9a2e-4a88-b9f4-f164a30af951)
+![Unbenanntes Diagramm2 drawio](https://github.com/user-attachments/assets/b4328d24-2807-48d7-bbed-b769559c4f35)
+
 
 # 6. Navigation and Routes
 
