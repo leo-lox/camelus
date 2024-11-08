@@ -29,7 +29,7 @@ This documentation is aimed at beginner developers and students interested in mo
 
 ## Features
 
-<div style="display: flex; align-items: flex-start;">
+<div style="display: flex; align-items: flex-start; width:20%;">
   <ul style="list-style-type: disc; margin-right: 20px; margin-bottom: 0;">
     <li><strong>Nostr Protocol for Decentralized Data Storage:</strong> Ensures user data privacy and control</li>
     <li><strong>Clean Architecture:</strong> Uses Dart and Flutter</li>
@@ -39,6 +39,8 @@ This documentation is aimed at beginner developers and students interested in mo
     <li><strong>Riverpod for State Management:</strong> Efficient and testable state management</li>
   </ul>
   <img src="https://github.com/user-attachments/assets/4ccff9ea-257d-40cd-912e-92844a0b1bb4" alt="Screenshot_20241107-195828" width="300"/>
+</div>
+<div>  <img src="https://github.com/user-attachments/assets/4ccff9ea-257d-40cd-912e-92844a0b1bb4" alt="Screenshot_20241107-195828" width="300"/>
 </div>
 
 
