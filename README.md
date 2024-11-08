@@ -30,7 +30,7 @@ This documentation is aimed at beginner developers and students interested in mo
 ## Features
 
 <div style="display: flex; align-items: center;">
-  <ul style="list-style-type: disc; margin-right: 20px;">
+  <ul style="list-style-type: disc; margin-right: 20px; margin-bottom: 0;">
     <li><strong>Nostr Protocol for Decentralized Data Storage:</strong> Ensures user data privacy and control</li>
     <li><strong>Clean Architecture:</strong> Uses Dart and Flutter</li>
     <li><strong>Dart_NDK Integration:</strong> Optimized for mobile battery</li>
