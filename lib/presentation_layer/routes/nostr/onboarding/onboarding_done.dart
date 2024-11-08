@@ -112,8 +112,9 @@ ${_privateKey.mnemonicSentence}
     );
 
     /// broadcast nip65
-    await inboxOutboxP.setNip65data(myNip65);
-    //! todo: fix ndk broadcast response
+    //! todo: await, fix ndk broadcast response
+    inboxOutboxP.setNip65data(myNip65);
+
     await Future.delayed(Duration(seconds: 1));
 
     final UserMetadata userMetadata = UserMetadata(
@@ -181,7 +182,7 @@ ${_privateKey.mnemonicSentence}
 
     await _broadcastAcc();
 
-    await Future.delayed(const Duration(seconds: 3));
+    await Future.delayed(const Duration(seconds: 2));
 
     if (!mounted) return;
 
