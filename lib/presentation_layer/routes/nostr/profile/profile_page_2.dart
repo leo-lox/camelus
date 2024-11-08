@@ -1,3 +1,4 @@
+import 'package:camelus/presentation_layer/atoms/back_button_round.dart';
 import 'package:camelus/presentation_layer/atoms/my_profile_picture.dart';
 import 'package:camelus/presentation_layer/providers/following_provider.dart';
 import 'package:camelus/presentation_layer/providers/metadata_provider.dart';
@@ -16,6 +17,7 @@ import '../../../atoms/follow_button.dart';
 import '../../../components/note_card/note_card_container.dart';
 import '../../../components/note_card/sceleton_note.dart';
 import '../../../providers/profile_feed_provider.dart';
+import '../blockedUsers/block_page.dart';
 import 'follower_page.dart';
 
 class ProfilePage2 extends ConsumerWidget {
@@ -43,6 +45,37 @@ class ProfilePage2 extends ConsumerWidget {
                 handle:
                     NestedScrollView.sliverOverlapAbsorberHandleFor(context),
                 sliver: SliverAppBar(
+                  leading: BackButtonRound(),
+                  actions: [
+                    PopupMenuButton<String>(
+                      color: Palette.extraDarkGray,
+                      tooltip: "More",
+                      onSelected: (e) => {
+                        //log(e),
+                        // toast
+                        if (e == "block")
+                          {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    BlockPage(userPubkey: pubkey),
+                              ),
+                            ).then((value) => {
+                                  Navigator.pop(context),
+                                })
+                          }
+                      },
+                      itemBuilder: (BuildContext context) {
+                        return {'block'}.map((String choice) {
+                          return PopupMenuItem<String>(
+                            value: choice,
+                            child: Text(choice),
+                          );
+                        }).toList();
+                      },
+                    ),
+                  ],
                   expandedHeight: 350,
                   pinned: true,
                   floating: true,
