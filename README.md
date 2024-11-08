@@ -13,7 +13,7 @@ This documentation is aimed at beginner developers and students interested in mo
 
 
 
-# 4. Setting up the project
+## 4. Setting up the project
 
 ### 4.1 Prerequisites
 
@@ -45,7 +45,7 @@ flutter pub get
 ```
 
 run ```flutter build apk --release``` or ```flutter run``` to run directly on your device in debug mode
-### 8. Conclusion
+### 8. Download
 
 Android
 You can join the test and download it from google play link
