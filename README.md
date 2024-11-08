@@ -24,7 +24,36 @@ This documentation is aimed at beginner developers and students interested in mo
 
 **Technologies**:  
 - **Frontend**: Flutter  
-- **Backend**: Decentralized storage via the Nostr protocol  
+- **Backend**: Decentralized storage via the Nostr protocol
+
+
+## Features
+
+<div style="display: flex; align-items: center;">
+  <ul style="list-style-type: disc; margin-right: 20px;">
+    <li><strong>Nostr Protocol for Decentralized Data Storage:</strong> Ensures user data privacy and control</li>
+    <li><strong>Clean Architecture:</strong> Uses Dart and Flutter</li>
+    <li><strong>Dart_NDK Integration:</strong> Optimized for mobile battery</li>
+    <li><strong>In-Box and Out-Box Messaging:</strong> Optimized for gossip and database performance</li>
+    <li><strong>Open-Source Development:</strong> Community-driven project</li>
+    <li><strong>Riverpod for State Management:</strong> Efficient and testable state management</li>
+  </ul>
+  <img src="https://github.com/user-attachments/assets/4ccff9ea-257d-40cd-912e-92844a0b1bb4" alt="Screenshot_20241107-195828" width="300"/>
+</div>
+
+
+
+## Features
+![Screenshot_20241107-195828](https://github.com/user-attachments/assets/4ccff9ea-257d-40cd-912e-92844a0b1bb4)
+
+Nostr Protocol for Decentralized Data Storage: Ensures user data privacy and control
+Clean Architecture: Uses Dart and Flutter 
+Dart_NDK Integration: Optimized for mobile battery 
+In-Box and Out-Box Messaging: Optimized for gossip and database performance
+Open-Source Development project
+Riverpod for State Management: Efficient and testable state management.
+
+
 
 
 
