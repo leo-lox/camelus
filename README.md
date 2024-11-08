@@ -1,5 +1,5 @@
-<p align="center">
-  # Social Network App Camelus <br>
+<p align="center" font-size="30">
+  Social Network App Camelus <br>
   <img src="https://github.com/user-attachments/assets/b93fbf04-19d0-48f5-af0d-b47546ae68d6" alt="Screenshot 2024-11-08 202456">
 </p>
 
@@ -11,7 +11,7 @@
 
 <p align="center">
   <a href="https://play.google.com/store/apps/details?id=de.lox.dev.camelus&hl=de">
-    <img src="https://github.com/user-attachments/assets/d3236969-c026-4240-8fc8-415cd075f79e" alt="Download on Google Play">
+    <img src="https://github.com/user-attachments/assets/d3236969-c026-4240-8fc8-415cd075f79e" width="300px" height="150px" alt="Download on Google Play">
   </a>
 </p>
 
