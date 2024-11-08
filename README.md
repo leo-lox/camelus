@@ -47,8 +47,14 @@ This documentation is aimed at beginner developers and students interested in mo
 Camelus ensures user privacy by using the Nostr protocol, which stores data in a decentralized way. This means posts for example are encrypted to protect user privacy. This decentralized system combined with encryption makes the network secure for sharing posts and any kind of data transactions. This is giving users control over their information.
 
 
+## Screenshots
 
-
+<div style="display: flex; justify-content: space-around;">
+  <img src="https://github.com/user-attachments/assets/d3236969-c026-4240-8fc8-415cd075f79e" width="300px" height="120px" alt="Download on Google Play" alt="Image 1" width="200"/>
+   <img src="https://github.com/user-attachments/assets/d3236969-c026-4240-8fc8-415cd075f79e" width="300px" height="120px" alt="Download on Google Play" alt="Image 1" width="200"/>
+  <img src="https://github.com/user-attachments/assets/d3236969-c026-4240-8fc8-415cd075f79e" width="300px" height="120px" alt="Download on Google Play" alt="Image 1" width="200"/>
+   <img src="https://github.com/user-attachments/assets/d3236969-c026-4240-8fc8-415cd075f79e" width="300px" height="120px" alt="Download on Google Play" alt="Image 1" width="200"/>
+</div>
 
 ##  Setting up the project
 
@@ -89,3 +95,5 @@ You can join the test and download it from google play link
 
 or use the apk, it is signed with my key so you will need to enable "install from unknown sources" in your phone settings.
 
+### Contributing
+We welcome contributions from the community. If you'd like to contribute, please write a message. I will reply fast!
