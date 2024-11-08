@@ -50,10 +50,10 @@ Camelus ensures user privacy by using the Nostr protocol, which stores data in a
 ## Screenshots
 
 <div style="display: flex; justify-content: space-around;">
-  <img src="https://github.com/user-attachments/assets/d3236969-c026-4240-8fc8-415cd075f79e" width="300px" height="120px" alt="Download on Google Play" alt="Image 1" width="200"/>
-   <img src="https://github.com/user-attachments/assets/d3236969-c026-4240-8fc8-415cd075f79e" width="300px" height="120px" alt="Download on Google Play" alt="Image 1" width="200"/>
-  <img src="https://github.com/user-attachments/assets/d3236969-c026-4240-8fc8-415cd075f79e" width="300px" height="120px" alt="Download on Google Play" alt="Image 1" width="200"/>
-   <img src="https://github.com/user-attachments/assets/d3236969-c026-4240-8fc8-415cd075f79e" width="300px" height="120px" alt="Download on Google Play" alt="Image 1" width="200"/>
+   <img src="https://github.com/user-attachments/assets/d3236969-c026-4240-8fc8-415cd075f79e" width="200px" height="120px" alt="Download on Google Play">
+   <img src="https://github.com/user-attachments/assets/d3236969-c026-4240-8fc8-415cd075f79e" width="200px" height="120px" alt="Download on Google Play">
+  <img src="https://github.com/user-attachments/assets/d3236969-c026-4240-8fc8-415cd075f79e" width="200px" height="120px" alt="Download on Google Play">
+   <img src="https://github.com/user-attachments/assets/d3236969-c026-4240-8fc8-415cd075f79e" width="200px" height="120px" alt="Download on Google Play">
 </div>
 
 ##  Setting up the project
