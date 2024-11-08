@@ -29,8 +29,8 @@ This documentation is aimed at beginner developers and students interested in mo
 
 ## Features
 
-<div style="display: flex; align-items: center; width:100%;">
-  <ul style="list-style-type: disc; margin-right: 20px; margin-bottom: 0; width:49%; float:left;" >
+<div style="display: flex; align-items: flex-start;">
+  <ul style="list-style-type: disc; margin-right: 20px; margin-bottom: 0;">
     <li><strong>Nostr Protocol for Decentralized Data Storage:</strong> Ensures user data privacy and control</li>
     <li><strong>Clean Architecture:</strong> Uses Dart and Flutter</li>
     <li><strong>Dart_NDK Integration:</strong> Optimized for mobile battery</li>
@@ -38,7 +38,7 @@ This documentation is aimed at beginner developers and students interested in mo
     <li><strong>Open-Source Development:</strong> Community-driven project</li>
     <li><strong>Riverpod for State Management:</strong> Efficient and testable state management</li>
   </ul>
-  <img src="https://github.com/user-attachments/assets/4ccff9ea-257d-40cd-912e-92844a0b1bb4" alt="Screenshot_20241107-195828" width="300" float="left"/>
+  <img src="https://github.com/user-attachments/assets/4ccff9ea-257d-40cd-912e-92844a0b1bb4" alt="Screenshot_20241107-195828" width="300"/>
 </div>
 
 
