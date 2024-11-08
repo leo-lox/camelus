@@ -5,20 +5,20 @@
    <h1>User interface documentation</h1>
    
 <h2>Documentation Overview</h2><br>
-1. Intro<br>
-2. Design System<br>
-3. UI structure<br>
-4. Architecture<br>
-5. Component Documentation<br>
-6. Navigation and routing<br>
-7. Setting up the project<br>
-8. Conclusion<br>
+<h3>1. Intro</h3><br>
+<h3>2. Design System</h3><br>
+<h3>3. UI structure</h3><br>
+<h3>4. Architecture</h3><br>
+<h3>5. Component Documentation</h3><br>
+<h3>6. Navigation and routing</h3><br>
+<h3>7. Setting up the project</h3><br>
+<h3>8. Conclusion</h3><br>
 </div>
 
 
 
 ## 1. Introduction
-Welcome to our social network app! This mobile application connects users across the globe. The app enables them to share posts and engage with content to interact securely. Unlike traditional networks, this app leverages the Nostr protocol for decentralized data storage. This is enhancing the privacy and resilience by distributing data across a network rather than central servers.
+This documentation provides a overview of the user interface (UI) design for Camelus. You will learn about the architechture in our app and how different UI elements work together. It also shows how the state management is working. Next, you will learn how the Nostr technologie is working. We will exactly describe what is going on behind the scene when a user hits the send button and sending a message to the feed for other users.
 
 This documentation is aimed at beginner developers and students interested in mobile UI development. It is offering hands-on learning with structured code snippets from the original camelus code for learning how to build an user interface for apps.
 
