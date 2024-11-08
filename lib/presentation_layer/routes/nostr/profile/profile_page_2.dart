@@ -10,6 +10,7 @@ import '../../../../domain_layer/entities/user_metadata.dart';
 import '../../../../domain_layer/usecases/follow.dart';
 import '../../../../helpers/helpers.dart';
 import '../../../../helpers/nprofile_helper.dart';
+import '../../../atoms/follow_button.dart';
 import '../../../components/note_card/note_card_container.dart';
 import '../../../components/note_card/sceleton_note.dart';
 import '../../../providers/profile_feed_provider.dart';
@@ -168,9 +169,8 @@ class _BuildProfileHeader extends ConsumerWidget {
                         pubkey: userMetadata.pubkey,
                       ),
                     ),
-                    ElevatedButton(
-                      onPressed: () {},
-                      child: Text('Follow'),
+                    _FollowButton(
+                      pubkey: userMetadata.pubkey,
                     ),
                   ],
                 ),
@@ -255,6 +255,57 @@ class _BuildProfileHeader extends ConsumerWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+class _FollowButton extends ConsumerStatefulWidget {
+  final String pubkey;
+
+  const _FollowButton({
+    required this.pubkey,
+  });
+
+  @override
+  _FollowButtonState createState() => _FollowButtonState();
+}
+
+class _FollowButtonState extends ConsumerState<_FollowButton> {
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final followingP = ref.watch(followingProvider);
+
+    return StreamBuilder<ContactList>(
+      stream: followingP.getContactsStreamSelf(),
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          var followingList = snapshot.data!.contacts;
+
+          if (followingList.contains(widget.pubkey)) {
+            return followButton(
+              isFollowing: true,
+              onPressed: () {
+                followingP.unfollowUser(widget.pubkey);
+                setState(() {});
+              },
+            );
+          } else {
+            return followButton(
+              isFollowing: false,
+              onPressed: () {
+                followingP.followUser(widget.pubkey);
+                setState(() {});
+              },
+            );
+          }
+        }
+        return Container();
+      },
     );
   }
 }
