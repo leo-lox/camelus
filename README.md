@@ -8,13 +8,13 @@
 
 <div align="center">
   <h2>Nostr Client for Android</h2> 
- 
+ <a href="https://play.google.com/store/apps/details?id=de.lox.dev.camelus&hl=de">
+    <img src="https://github.com/user-attachments/assets/d3236969-c026-4240-8fc8-415cd075f79e" width="300px" height="120px" alt="Download on Google Play">
+  </a>
 </div>
 
 <div align="center">
-  <a href="https://play.google.com/store/apps/details?id=de.lox.dev.camelus&hl=de">
-    <img src="https://github.com/user-attachments/assets/d3236969-c026-4240-8fc8-415cd075f79e" width="300px" height="120px" alt="Download on Google Play">
-  </a>
+  
 </div>
 
 ## 1. Introduction
