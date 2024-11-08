@@ -1,13 +1,12 @@
 import 'package:camelus/domain_layer/entities/contact_list.dart';
 import 'package:camelus/domain_layer/entities/user_metadata.dart';
 import 'package:camelus/presentation_layer/components/person_card.dart';
-import 'package:camelus/domain_layer/entities/nostr_tag.dart';
 import 'package:camelus/presentation_layer/providers/following_provider.dart';
 import 'package:camelus/presentation_layer/providers/metadata_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:camelus/config/palette.dart';
-import 'package:camelus/presentation_layer/routes/nostr/profile/profile_page.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'profile_page_2.dart';
 
 class FollowerPage extends ConsumerStatefulWidget {
   final String title;
@@ -128,7 +127,7 @@ class _FollowerPageState extends ConsumerState<FollowerPage> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => ProfilePage(
+            builder: (context) => ProfilePage2(
               pubkey: displayPubkey,
             ),
           ),
