@@ -4,12 +4,7 @@
   <img src="https://github.com/user-attachments/assets/b93fbf04-19d0-48f5-af0d-b47546ae68d6" alt="Screenshot 2024-11-08 202456"><br>
    <h1>User interface documentation</h1>
    
-
-</div>
-
-# Social Network App Camelus <br>
-## User interface documentation
-**Documentation Overview**
+<h2>Documentation Overview</h2>
 1. Intro
 2. Design System
 3. UI structure
@@ -18,6 +13,9 @@
 6. Navigation and routing
 7. Setting up the project
 8. Conclusion
+</div>
+
+
 
 ## 1. Introduction
 Welcome to our social network app! This mobile application connects users across the globe. The app enables them to share posts and engage with content to interact securely. Unlike traditional networks, this app leverages the Nostr protocol for decentralized data storage. This is enhancing the privacy and resilience by distributing data across a network rather than central servers.
