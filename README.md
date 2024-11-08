@@ -29,11 +29,11 @@ This documentation is aimed at beginner developers and students interested in mo
 
 ## Features
 
-<div style="display: flex; justify-content: space-between; width: 600px; height: 300px;">
+<div style="display: flex; justify-content: space-between; width: 600px; height: 300px; float: left;">
   <div style="width: 300px; height: 300px;">
     <img src="https://github.com/user-attachments/assets/4ccff9ea-257d-40cd-912e-92844a0b1bb4" alt="Screenshot_20241107-195828" width="300"/>
   </div>
-  <div style="width: 300px; height: 300px;">
+  <div style="width: 300px; height: 300px; float: left;">
    <p>adasd</p>
   </div>
 </div>
