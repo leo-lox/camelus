@@ -2,7 +2,9 @@ import 'package:camelus/presentation_layer/atoms/my_profile_picture.dart';
 import 'package:camelus/presentation_layer/providers/following_provider.dart';
 import 'package:camelus/presentation_layer/providers/metadata_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../config/palette.dart';
 import '../../../../domain_layer/entities/contact_list.dart';
@@ -169,8 +171,45 @@ class _BuildProfileHeader extends ConsumerWidget {
                         pubkey: userMetadata.pubkey,
                       ),
                     ),
-                    _FollowButton(
-                      pubkey: userMetadata.pubkey,
+                    Row(
+                      children: [
+                        if (userMetadata.lud06 != null ||
+                            userMetadata.lud16 != null)
+                          Container(
+                            margin: const EdgeInsets.only(
+                                top: 0, right: 0, left: 0),
+                            child: ElevatedButton(
+                              onPressed: () {
+                                if (userMetadata.lud06 != null &&
+                                    userMetadata.lud06!.isNotEmpty) {
+                                  _openLightningAddress(userMetadata.lud06!);
+                                } else if (userMetadata.lud16 != null &&
+                                    userMetadata.lud16!.isNotEmpty) {
+                                  _openLightningAddress(userMetadata.lud16!);
+                                }
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Palette.background,
+                                padding: const EdgeInsets.all(0),
+                                shape: const CircleBorder(
+                                    side: BorderSide(
+                                        color: Palette.white, width: 1)),
+                              ),
+                              child: SvgPicture.asset(
+                                "assets/icons/lightning-fill.svg",
+                                height: 25,
+                                width: 25,
+                                colorFilter: ColorFilter.mode(
+                                  Palette.white,
+                                  BlendMode.srcIn,
+                                ),
+                              ),
+                            ),
+                          ),
+                        _FollowButton(
+                          pubkey: userMetadata.pubkey,
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -401,4 +440,13 @@ _pubkeyToHrBech32Short(pubkey) {
   final bechShort = NprofileHelper().bech32toHr(bech, cutLength: 11);
 
   return bechShort;
+}
+
+_openLightningAddress(String lu06) async {
+  final Uri lightningLaunchUri = Uri(
+    scheme: 'lightning',
+    path: lu06.toString(),
+  );
+
+  launchUrl(lightningLaunchUri);
 }
