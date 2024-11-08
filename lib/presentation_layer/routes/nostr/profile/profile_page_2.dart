@@ -1,12 +1,16 @@
+import 'package:camelus/presentation_layer/atoms/my_profile_picture.dart';
+import 'package:camelus/presentation_layer/providers/metadata_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../../../config/palette.dart';
+import '../../../../domain_layer/entities/user_metadata.dart';
+import '../../../../domain_layer/usecases/follow.dart';
 import '../../../components/note_card/note_card_container.dart';
 import '../../../components/note_card/sceleton_note.dart';
 import '../../../providers/profile_feed_provider.dart';
 
-class ProfilePage2 extends StatelessWidget {
+class ProfilePage2 extends ConsumerWidget {
   final String pubkey;
   const ProfilePage2({
     super.key,
@@ -14,7 +18,12 @@ class ProfilePage2 extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, ref) {
+    final metadataP = ref.watch(metadataProvider);
+    final myMetadata = metadataP.getMetadataByPubkey(pubkey).first.timeout(
+          const Duration(seconds: 2),
+        );
+
     return DefaultTabController(
       length: 2,
       child: Scaffold(
@@ -32,7 +41,26 @@ class ProfilePage2 extends StatelessWidget {
                   forceElevated: innerBoxIsScrolled,
                   backgroundColor: Palette.black, // Add a background color
                   flexibleSpace: FlexibleSpaceBar(
-                    background: _buildProfileHeader(),
+                    background: FutureBuilder<UserMetadata>(
+                        future: myMetadata,
+                        builder: (context, snap) {
+                          if (snap.data != null) {
+                            return _buildProfileHeader(snap.data!);
+                          }
+                          return _buildProfileHeader(UserMetadata(
+                            pubkey: pubkey,
+                            eventId: '',
+                            lastFetch: 0,
+                            name: null,
+                            picture: null,
+                            banner: null,
+                            nip05: null,
+                            about: null,
+                            website: null,
+                            lud06: null,
+                            lud16: null,
+                          ));
+                        }),
                   ),
                   bottom: PreferredSize(
                     preferredSize: Size.fromHeight(48),
@@ -72,7 +100,7 @@ class ProfilePage2 extends StatelessWidget {
     );
   }
 
-  Widget _buildProfileHeader() {
+  Widget _buildProfileHeader(UserMetadata userMetadata) {
     return Stack(
       children: [
         // Banner Image
@@ -80,16 +108,23 @@ class ProfilePage2 extends StatelessWidget {
           top: 0,
           left: 0,
           right: 0,
-          child: Container(
-            height: 150, // Adjust the height as needed
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                image: NetworkImage(
-                    'https://static.vecteezy.com/system/resources/thumbnails/005/239/318/small/abstract-fluid-blue-wave-banner-background-illustration-vector.jpg'), // Replace with your banner image URL
-                fit: BoxFit.cover,
-              ),
-            ),
-          ),
+          child:
+              (userMetadata.banner != null && userMetadata.banner!.isNotEmpty)
+                  ? Container(
+                      height: 150, // Adjust the height as needed
+                      decoration: BoxDecoration(
+                        image: DecorationImage(
+                          image: NetworkImage(
+                            userMetadata.banner!,
+                          ),
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    )
+                  : Container(
+                      height: 150,
+                      color: Palette.extraDarkGray,
+                    ),
         ),
         // Profile Content
         Positioned(
@@ -105,10 +140,10 @@ class ProfilePage2 extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    CircleAvatar(
-                      radius: 40,
-                      backgroundImage: NetworkImage(
-                          'https://static.vecteezy.com/system/resources/thumbnails/005/239/318/small/abstract-fluid-blue-wave-banner-background-illustration-vector.jpg'),
+                    UserImage(
+                      size: 80,
+                      imageUrl: userMetadata.picture,
+                      pubkey: userMetadata.pubkey,
                     ),
                     ElevatedButton(
                       onPressed: () {},
