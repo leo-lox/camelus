@@ -76,7 +76,7 @@ class ProfilePage2 extends ConsumerWidget {
                       },
                     ),
                   ],
-                  expandedHeight: 410,
+                  expandedHeight: 360,
                   pinned: true,
                   floating: true,
                   forceElevated: innerBoxIsScrolled,
