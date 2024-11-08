@@ -53,7 +53,7 @@ Camelus ensures user privacy by using the Nostr protocol, which stores data in a
   <img src="https://github.com/user-attachments/assets/4ccff9ea-257d-40cd-912e-92844a0b1bb4" alt="Screenshot_20241107-195828" width="200"/>
      <img src="https://github.com/user-attachments/assets/4ccff9ea-257d-40cd-912e-92844a0b1bb4" alt="Screenshot_20241107-195828" width="200"/>
    <img src="https://github.com/user-attachments/assets/4ccff9ea-257d-40cd-912e-92844a0b1bb4" alt="Screenshot_20241107-195828" width="200"/>
-     <ul style="list-style-type: disc; margin-bottom: 0; width: 200;">
+     <ul style="list-style-type: disc; margin-bottom: 0; width: 200 px;">
     <li><strong>Nostr Protocol for Decentralized Data Storage:</strong> Ensures user data privacy and control</li>
     <li><strong>Clean Architecture:</strong> Uses Dart and Flutter</li>
     <li><strong>Dart_NDK Integration:</strong> Optimized for mobile battery</li>
