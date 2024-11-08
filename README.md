@@ -43,7 +43,7 @@ This documentation is aimed at beginner developers and students interested in mo
 </div>
 
 <div style="display: inline-block; width: 50%; vertical-align: top;">
-  <img src="https://github.com/user-attachments/assets/4ccff9ea-257d-40cd-912e-92844a0b1bb4" alt="Screenshot_20241107-195828" width="100%"/>
+  <img src="https://github.com/user-attachments/assets/4ccff9ea-257d-40cd-912e-92844a0b1bb4" alt="Screenshot_20241107-195828" width="300"/>
 </div>
 
 
