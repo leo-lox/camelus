@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../../../config/palette.dart';
+import '../../../components/note_card/note_card_container.dart';
+import '../../../components/note_card/sceleton_note.dart';
+import '../../../providers/profile_feed_provider.dart';
 
 class ProfilePage2 extends StatelessWidget {
   final String pubkey;
@@ -14,6 +18,7 @@ class ProfilePage2 extends StatelessWidget {
     return DefaultTabController(
       length: 2,
       child: Scaffold(
+        backgroundColor: Palette.background,
         body: NestedScrollView(
           headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
             return <Widget>[
@@ -33,14 +38,14 @@ class ProfilePage2 extends StatelessWidget {
                     preferredSize: Size.fromHeight(48),
                     child: Container(
                       color: Palette
-                          .darkGray, // Add a background color to the tab bar
+                          .black, // Add a background color to the tab bar
                       child: TabBar(
                         tabs: [
                           Tab(text: 'Posts'),
                           Tab(text: 'Posts & Replies'),
                         ],
-                        labelColor:
-                            Colors.blue, // Set the color of the selected tab
+                        labelColor: Palette
+                            .lightGray, // Set the color of the selected tab
                         unselectedLabelColor:
                             Colors.grey, // Set the color of unselected tabs
                         indicatorColor:
@@ -54,8 +59,12 @@ class ProfilePage2 extends StatelessWidget {
           },
           body: TabBarView(
             children: [
-              _buildScrollablePostsList(),
-              _buildScrollablePostsAndRepliesList(),
+              ScrollablePostsList(
+                pubkey: pubkey,
+              ),
+              ScrollablePostsAndRepliesList(
+                pubkey: pubkey,
+              )
             ],
           ),
         ),
@@ -136,41 +145,70 @@ class ProfilePage2 extends StatelessWidget {
       ],
     );
   }
+}
 
-  Widget _buildScrollablePostsList() {
-    return _ScrollablePostsList(
-      itemBuilder: (context, index) => ListTile(
-        leading: CircleAvatar(
-          backgroundImage: NetworkImage(
-              'https://static.vecteezy.com/system/resources/thumbnails/005/239/318/small/abstract-fluid-blue-wave-banner-background-illustration-vector.jpg'),
-        ),
-        title: Text('John Doe'),
-        subtitle: Text('This is a sample post ${index + 1}'),
-        trailing: Icon(Icons.more_vert),
-      ),
-    );
-  }
+class ScrollablePostsAndRepliesList extends ConsumerWidget {
+  final String pubkey;
+  const ScrollablePostsAndRepliesList({
+    super.key,
+    required this.pubkey,
+  });
 
-  Widget _buildScrollablePostsAndRepliesList() {
-    return _ScrollablePostsList(
-      itemBuilder: (context, index) => ListTile(
-        leading: CircleAvatar(
-          backgroundImage: NetworkImage(
-              'https://static.vecteezy.com/system/resources/thumbnails/005/239/318/small/abstract-fluid-blue-wave-banner-background-illustration-vector.jpg'),
-        ),
-        title: Text('John Doe'),
-        subtitle: Text('This is a sample post or reply ${index + 1}'),
-        trailing: Icon(Icons.more_vert),
-      ),
+  @override
+  Widget build(BuildContext context, ref) {
+    final profileFeedStateP = ref.watch(profileFeedStateProvider(pubkey));
+
+    return _BuildScrollablePostsList(
+      itemCount: profileFeedStateP.timelineRootAndReplyNotes.length + 1,
+      itemBuilder: (context, index) {
+        if (index == profileFeedStateP.timelineRootAndReplyNotes.length) {
+          return SkeletonNote();
+        }
+        return NoteCardContainer(
+          key: PageStorageKey(
+              profileFeedStateP.timelineRootAndReplyNotes[index].id),
+          note: profileFeedStateP.timelineRootAndReplyNotes[index],
+        );
+      },
     );
   }
 }
 
-class _ScrollablePostsList extends StatelessWidget {
-  final Widget Function(BuildContext, int) itemBuilder;
+class ScrollablePostsList extends ConsumerWidget {
+  final String pubkey;
+  const ScrollablePostsList({
+    super.key,
+    required this.pubkey,
+  });
 
-  const _ScrollablePostsList({Key? key, required this.itemBuilder})
-      : super(key: key);
+  @override
+  Widget build(BuildContext context, ref) {
+    final profileFeedStateP = ref.watch(profileFeedStateProvider(pubkey));
+
+    return _BuildScrollablePostsList(
+      itemCount: profileFeedStateP.timelineRootNotes.length + 1,
+      itemBuilder: (context, index) {
+        if (index == profileFeedStateP.timelineRootNotes.length) {
+          return SkeletonNote();
+        }
+        return NoteCardContainer(
+          key: PageStorageKey(profileFeedStateP.timelineRootNotes[index].id),
+          note: profileFeedStateP.timelineRootNotes[index],
+        );
+      },
+    );
+  }
+}
+
+class _BuildScrollablePostsList extends StatelessWidget {
+  final Widget Function(BuildContext, int) itemBuilder;
+  final int itemCount;
+
+  const _BuildScrollablePostsList({
+    super.key,
+    required this.itemBuilder,
+    required this.itemCount,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -180,13 +218,13 @@ class _ScrollablePostsList extends StatelessWidget {
           handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
         ),
         SliverPadding(
-          padding: EdgeInsets.all(8.0),
+          padding: EdgeInsets.all(0.0),
           sliver: SliverList(
             delegate: SliverChildBuilderDelegate(
               (BuildContext context, int index) {
                 return itemBuilder(context, index);
               },
-              childCount: 30,
+              childCount: itemCount,
             ),
           ),
         ),
