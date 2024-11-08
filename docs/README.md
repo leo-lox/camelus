@@ -18,7 +18,7 @@
 
 
 ## 1. Introduction
-This documentation provides a overview of the user interface (UI) design for Camelus. You will learn about the architechture in our app and how different UI elements work together. It also shows how the state management is working. Next, you will learn how the Nostr technologie is working. We will exactly describe what is going on behind the scene when a user hits the send button and sending a message to the feed for other users.
+This documentation provides a overview of the user interface (UI) design for Camelus. You will learn about the architechture in our app and how different UI elements work together. It also shows how to handle the state management in all UI overviews. Next, you will learn how data exchange between device and Nostr protocol is working. This documentation exactly describe what is going on behind the scene when a user hits the send button for sending a message to the feed for other users.
 
 This documentation is aimed at beginner developers and students interested in mobile UI development. It is offering hands-on learning with structured code snippets from the original camelus code for learning how to build an user interface for apps.
 
