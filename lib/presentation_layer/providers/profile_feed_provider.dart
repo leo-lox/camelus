@@ -13,37 +13,37 @@ import 'db_app_provider.dart';
 import 'event_verifier.dart';
 import 'ndk_provider.dart';
 
-final profileFeedProvider = Provider<ProfileFeed>((ref) {
-  final ndk = ref.watch(ndkProvider);
-
-  final eventVerifier = ref.watch(eventVerifierProvider);
-
-  final DartNdkSource dartNdkSource = DartNdkSource(ndk);
-
-  final NoteRepository noteRepository = NoteRepositoryImpl(
-    dartNdkSource: dartNdkSource,
-    eventVerifier: eventVerifier,
-  );
-
-  final ProfileFeed profileFeed = ProfileFeed(noteRepository);
-
-  return profileFeed;
-});
-
-final profileFeedStateProvider =
-    NotifierProvider.family<ProfileFeedState, FeedViewModel, String>(
+final profileFeedStateProvider = NotifierProvider.autoDispose
+    .family<ProfileFeedState, FeedViewModel, String>(
   ProfileFeedState.new,
 );
 
-class ProfileFeedState extends FamilyNotifier<FeedViewModel, String> {
+class ProfileFeedState
+    extends AutoDisposeFamilyNotifier<FeedViewModel, String> {
   StreamSubscription? _rootNotesSub;
   StreamSubscription? _newRootNotesSub;
   StreamSubscription? _rootAndReplySub;
   StreamSubscription? _newRootAndReplySub;
 
+  late ProfileFeed myProfileFeed;
+
+  _setupProfileFeed() {
+    final ndk = ref.watch(ndkProvider);
+
+    final eventVerifier = ref.watch(eventVerifierProvider);
+
+    final DartNdkSource dartNdkSource = DartNdkSource(ndk);
+
+    final NoteRepository noteRepository = NoteRepositoryImpl(
+      dartNdkSource: dartNdkSource,
+      eventVerifier: eventVerifier,
+    );
+
+    myProfileFeed = ProfileFeed(noteRepository);
+  }
+
   /// closes everthing and resets the state
   Future<void> resetStateDispose() async {
-    final profileFeed = ref.read(profileFeedProvider);
     state = FeedViewModel(
       timelineRootNotes: [],
       newRootNotes: [],
@@ -55,11 +55,16 @@ class ProfileFeedState extends FamilyNotifier<FeedViewModel, String> {
     _newRootNotesSub?.cancel();
     _rootAndReplySub?.cancel();
     _newRootAndReplySub?.cancel();
-    await profileFeed.dispose();
+    await myProfileFeed.dispose();
   }
 
   @override
   FeedViewModel build(String arg) {
+    ref.onDispose(() {
+      resetStateDispose();
+    });
+    _setupProfileFeed();
+
     _initSubscriptions(arg);
     return FeedViewModel(
       timelineRootNotes: [],
@@ -70,7 +75,6 @@ class ProfileFeedState extends FamilyNotifier<FeedViewModel, String> {
   }
 
   void _initSubscriptions(String pubkey) async {
-    final profileFeed = ref.read(profileFeedProvider);
     final appDbP = ref.read(dbAppProvider);
 
     final dbCutOffKey = 'profile_feed_cache_cutoff_$pubkey';
@@ -89,35 +93,35 @@ class ProfileFeedState extends FamilyNotifier<FeedViewModel, String> {
     appDbP.save(key: dbCutOffKey, value: now.toString());
 
     // Timeline subscription
-    _rootNotesSub = profileFeed.rootNotesStream
+    _rootNotesSub = myProfileFeed.rootNotesStream
         .bufferTime(const Duration(milliseconds: 500))
         .where((events) => events.isNotEmpty)
         .listen(_addRootTimelineEvents);
 
     // New notes subscription
-    _newRootNotesSub = profileFeed.newRootNotesStream
+    _newRootNotesSub = myProfileFeed.newRootNotesStream
         .bufferTime(const Duration(seconds: 1))
         .where((events) => events.isNotEmpty)
         .listen(_addNewRootEvents);
 
-    _rootAndReplySub = profileFeed.rootAndReplyNotesStream
+    _rootAndReplySub = myProfileFeed.rootAndReplyNotesStream
         .bufferTime(const Duration(milliseconds: 500))
         .where((events) => events.isNotEmpty)
         .listen(_addRootAndReplyTimelineEvents);
 
-    _newRootAndReplySub = profileFeed.newRootAndReplyNotesStream
+    _newRootAndReplySub = myProfileFeed.newRootAndReplyNotesStream
         .bufferTime(const Duration(seconds: 1))
         .where((events) => events.isNotEmpty)
         .listen(_addNewRootAndReplyEvents);
 
     // Initial fetch
-    profileFeed.fetchFeedEvents(
+    myProfileFeed.fetchFeedEvents(
       npub: pubkey,
       requestId: "startup-profile",
       limit: 20,
       until: cutoff,
     );
-    profileFeed.subscribeToFreshNotes(npub: pubkey, since: cutoff);
+    myProfileFeed.subscribeToFreshNotes(npub: pubkey, since: cutoff);
   }
 
   void _addRootTimelineEvents(List<NostrNote> events) {
