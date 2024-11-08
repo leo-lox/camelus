@@ -29,7 +29,7 @@ This documentation is aimed at beginner developers and students interested in mo
 
 ## Features
 
-<div style="float: left; width: 50%;">
+<div style="display: inline-block; width: 50%; vertical-align: top;">
   <ul style="list-style-type: disc; margin-bottom: 0;">
     <li><strong>Nostr Protocol for Decentralized Data Storage:</strong> Ensures user data privacy and control</li>
     <li><strong>Clean Architecture:</strong> Uses Dart and Flutter</li>
@@ -40,7 +40,7 @@ This documentation is aimed at beginner developers and students interested in mo
   </ul>
 </div>
 
-<div style="float: left; width: 50%;">
+<div style="display: inline-block; width: 50%; vertical-align: top;">
   <img src="https://github.com/user-attachments/assets/4ccff9ea-257d-40cd-912e-92844a0b1bb4" alt="Screenshot_20241107-195828" width="100%"/>
 </div>
 
