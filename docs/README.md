@@ -4,15 +4,15 @@
   <img src="https://github.com/user-attachments/assets/b93fbf04-19d0-48f5-af0d-b47546ae68d6" alt="Screenshot 2024-11-08 202456"><br>
    <h1>User interface documentation</h1>
    
-<h2>Documentation Overview</h2>
-1. Intro
-2. Design System
-3. UI structure
-4. Architecture
-5. Component Documentation
-6. Navigation and routing
-7. Setting up the project
-8. Conclusion
+<h2>Documentation Overview</h2><br>
+1. Intro<br>
+2. Design System<br>
+3. UI structure<br>
+4. Architecture<br>
+5. Component Documentation<br>
+6. Navigation and routing<br>
+7. Setting up the project<br>
+8. Conclusion<br>
 </div>
 
 
