@@ -1,3 +1,12 @@
+<div align="center" font-size="30">
+  
+  
+  <img src="https://github.com/user-attachments/assets/b93fbf04-19d0-48f5-af0d-b47546ae68d6" alt="Screenshot 2024-11-08 202456"><br>
+   <h1>User interface documentation</h1>
+   
+
+</div>
+
 # Social Network App Camelus <br>
 ## User interface documentation
 **Documentation Overview**
