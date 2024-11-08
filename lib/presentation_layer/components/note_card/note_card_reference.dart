@@ -60,6 +60,8 @@ class _NoteCardReferenceState extends ConsumerState<NoteCardReference> {
       try {
         final map = NeventHelper().bech32ToMap(cleanedWord);
         res = map["eventId"];
+        final relays = map["relays"];
+        final authorPubkey = map["authorPubkey"];
       } catch (e) {
         return null;
       }
