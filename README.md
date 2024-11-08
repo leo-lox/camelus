@@ -3,17 +3,17 @@
   <img src="https://github.com/user-attachments/assets/b93fbf04-19d0-48f5-af0d-b47546ae68d6" alt="Screenshot 2024-11-08 202456">
 </div>
 
-<p align="center">
+<div align="center">
   <h2>Nostr Client for Android</h2> <br>
   Join the social network you control <br>
   Download and Install the Android app
-</p>
+</div>
 
-<p align="center">
+<div align="center">
   <a href="https://play.google.com/store/apps/details?id=de.lox.dev.camelus&hl=de">
-    <img src="https://github.com/user-attachments/assets/d3236969-c026-4240-8fc8-415cd075f79e" width="300px" height="150px" alt="Download on Google Play">
+    <img src="https://github.com/user-attachments/assets/d3236969-c026-4240-8fc8-415cd075f79e" width="300px" height="120px" alt="Download on Google Play">
   </a>
-</p>
+</div>
 
 ## 1. Introduction
 Welcome to our social network app! This mobile application connects users across the globe. The app enables them to share posts and engage with content to interact securely. Unlike traditional networks, this app leverages the Nostr protocol for decentralized data storage. This is enhancing the privacy and resilience by distributing data across a network rather than central servers.
