@@ -1,7 +1,7 @@
-<p align="center" font-size="30">
+<div align="center" font-size="30">
   <h1>Social Network App Camelus</h1> <br>
   <img src="https://github.com/user-attachments/assets/b93fbf04-19d0-48f5-af0d-b47546ae68d6" alt="Screenshot 2024-11-08 202456">
-</p>
+</div>
 
 <p align="center">
   <h2>Nostr Client for Android</h2> <br>
