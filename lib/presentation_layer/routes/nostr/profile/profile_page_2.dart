@@ -1,14 +1,19 @@
 import 'package:camelus/presentation_layer/atoms/my_profile_picture.dart';
+import 'package:camelus/presentation_layer/providers/following_provider.dart';
 import 'package:camelus/presentation_layer/providers/metadata_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../../../config/palette.dart';
+import '../../../../domain_layer/entities/contact_list.dart';
 import '../../../../domain_layer/entities/user_metadata.dart';
 import '../../../../domain_layer/usecases/follow.dart';
+import '../../../../helpers/helpers.dart';
+import '../../../../helpers/nprofile_helper.dart';
 import '../../../components/note_card/note_card_container.dart';
 import '../../../components/note_card/sceleton_note.dart';
 import '../../../providers/profile_feed_provider.dart';
+import 'follower_page.dart';
 
 class ProfilePage2 extends ConsumerWidget {
   final String pubkey;
@@ -45,9 +50,11 @@ class ProfilePage2 extends ConsumerWidget {
                         future: myMetadata,
                         builder: (context, snap) {
                           if (snap.data != null) {
-                            return _buildProfileHeader(snap.data!);
+                            return _BuildProfileHeader(
+                                userMetadata: snap.data!);
                           }
-                          return _buildProfileHeader(UserMetadata(
+                          return _BuildProfileHeader(
+                              userMetadata: UserMetadata(
                             pubkey: pubkey,
                             eventId: '',
                             lastFetch: 0,
@@ -99,8 +106,18 @@ class ProfilePage2 extends ConsumerWidget {
       ),
     );
   }
+}
 
-  Widget _buildProfileHeader(UserMetadata userMetadata) {
+class _BuildProfileHeader extends ConsumerWidget {
+  const _BuildProfileHeader({
+    required this.userMetadata,
+  });
+
+  final UserMetadata userMetadata;
+
+  @override
+  Widget build(BuildContext context, ref) {
+    final followP = ref.watch(followingProvider);
     return Stack(
       children: [
         // Banner Image
@@ -140,10 +157,16 @@ class ProfilePage2 extends ConsumerWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    UserImage(
-                      size: 80,
-                      imageUrl: userMetadata.picture,
-                      pubkey: userMetadata.pubkey,
+                    Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Palette.background, width: 2),
+                        shape: BoxShape.circle,
+                      ),
+                      child: UserImage(
+                        size: 82,
+                        imageUrl: userMetadata.picture,
+                        pubkey: userMetadata.pubkey,
+                      ),
                     ),
                     ElevatedButton(
                       onPressed: () {},
@@ -153,23 +176,77 @@ class ProfilePage2 extends ConsumerWidget {
                 ),
                 SizedBox(height: 16),
                 Text(
-                  'John Doe',
+                  userMetadata.name ??
+                      _pubkeyToHrBech32Short(userMetadata.pubkey),
                   style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
                       color: Colors.white),
                 ),
-                Text('@johndoe', style: TextStyle(color: Colors.grey)),
+                if (userMetadata.nip05 != null)
+                  Text('@${userMetadata.nip05}',
+                      style: TextStyle(color: Colors.grey)),
                 SizedBox(height: 8),
-                Text('Flutter developer | Coffee enthusiast | Nature lover',
-                    style: TextStyle(color: Colors.white)),
-                SizedBox(height: 8),
+                // bio with fixed height
+                SizedBox(
+                  height: 50,
+                  child: SelectableText(
+                    userMetadata.about ?? '',
+                    style: TextStyle(
+                      color: Colors.white,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    //maxLines: 2, // Adjust this value based on your needs
+                  ),
+                ),
+                SizedBox(height: 5),
                 Row(
                   children: [
-                    Text('1,234 Following',
-                        style: TextStyle(color: Colors.white)),
+                    FutureBuilder<ContactList?>(
+                        future: followP.getContacts(userMetadata.pubkey),
+                        builder: (context, snap) {
+                          if (snap.data == null ||
+                              snap.data!.contacts.isEmpty) {
+                            return Text('0 Following',
+                                style: TextStyle(color: Colors.white));
+                          }
+
+                          return GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => FollowerPage(
+                                      contactList: snap.data!,
+                                      title: "Following",
+                                    ),
+                                  ),
+                                );
+                              },
+                              child: RichText(
+                                text: TextSpan(
+                                  children: [
+                                    TextSpan(
+                                      text: '${snap.data!.contacts.length}',
+                                      style: const TextStyle(
+                                        color: Palette.lightGray,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                    const TextSpan(
+                                      text: ' Following',
+                                      style: TextStyle(
+                                        color: Palette.gray,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ));
+                        }),
                     SizedBox(width: 16),
-                    Text('5,678 Followers',
+                    Text('n.a Followers',
                         style: TextStyle(color: Colors.white)),
                   ],
                 ),
@@ -266,4 +343,11 @@ class _BuildScrollablePostsList extends StatelessWidget {
       ],
     );
   }
+}
+
+_pubkeyToHrBech32Short(pubkey) {
+  final bech = Helpers().encodeBech32(pubkey, "npub");
+  final bechShort = NprofileHelper().bech32toHr(bech, cutLength: 11);
+
+  return bechShort;
 }
