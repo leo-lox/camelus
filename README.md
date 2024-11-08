@@ -28,21 +28,23 @@ This documentation is aimed at beginner developers and students interested in mo
 
 
 ## Features
-<div width="600" height="300"> 
-<div style="display: inline-block; width:300; height: 300; ">
-  <img src="https://github.com/user-attachments/assets/4ccff9ea-257d-40cd-912e-92844a0b1bb4" alt="Screenshot_20241107-195828" width="300"/>
+
+<div style="display: flex; justify-content: space-between; width: 600px; height: 300px;">
+  <div style="width: 300px; height: 300px;">
+    <img src="https://github.com/user-attachments/assets/4ccff9ea-257d-40cd-912e-92844a0b1bb4" alt="Screenshot_20241107-195828" width="300"/>
+  </div>
+  <div style="width: 300px; height: 300px;">
+    <ul style="list-style-type: disc; margin-bottom: 0;">
+      <li><strong>Nostr Protocol for Decentralized Data Storage:</strong> Ensures user data privacy and control</li>
+      <li><strong>Clean Architecture:</strong> Uses Dart and Flutter</li>
+      <li><strong>Dart_NDK Integration:</strong> Optimized for mobile battery</li>
+      <li><strong>In-Box and Out-Box Messaging:</strong> Optimized for gossip and database performance</li>
+      <li><strong>Open-Source Development:</strong> Community-driven project</li>
+      <li><strong>Riverpod for State Management:</strong> Efficient and testable state management</li>
+    </ul>
+  </div>
 </div>
-<div style="display: inline-block; width: 300; height: 300; ">
-  <ul style="list-style-type: disc; margin-bottom: 0;">
-    <li><strong>Nostr Protocol for Decentralized Data Storage:</strong> Ensures user data privacy and control</li>
-    <li><strong>Clean Architecture:</strong> Uses Dart and Flutter</li>
-    <li><strong>Dart_NDK Integration:</strong> Optimized for mobile battery</li>
-    <li><strong>In-Box and Out-Box Messaging:</strong> Optimized for gossip and database performance</li>
-    <li><strong>Open-Source Development:</strong> Community-driven project</li>
-    <li><strong>Riverpod for State Management:</strong> Efficient and testable state management</li>
-  </ul>
-</div>
-</div>
+
 ## Security
 
 Camelus ensures user privacy by using the Nostr protocol, which stores data in a decentralized way. This means posts for example are encrypted to protect user privacy. This decentralized system combined with encryption makes the network secure for sharing posts and any kind of data transactions. This is giving users control over their information.
