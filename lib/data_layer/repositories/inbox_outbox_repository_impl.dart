@@ -24,4 +24,16 @@ class InboxOutboxRepositoryImpl implements InboxOutboxRepository {
 
     return newNip65;
   }
+
+  @override
+  Future<Nip65?> getNip65data(String npub, {bool forceRefresh = false}) async {
+    final ndkData = await dartNdkSource.dartNdk.inboxOutbox.getNip65(
+      pubkeys: [npub],
+      forceRefresh: forceRefresh,
+    );
+    if (ndkData.isEmpty) return null;
+
+    final data = Nip65Model.fromNdk(ndkData.first);
+    return data;
+  }
 }

@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:camelus/presentation_layer/providers/inbox_outbox_provider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mentions/flutter_mentions.dart';
@@ -15,7 +16,7 @@ import 'presentation_layer/routes/nostr/blockedUsers/blocked_users.dart';
 import 'presentation_layer/routes/nostr/event_view/event_view_page.dart';
 import 'presentation_layer/routes/nostr/hashtag_view/hashtag_view_page.dart';
 import 'presentation_layer/routes/nostr/onboarding/onboarding.dart';
-import 'presentation_layer/routes/nostr/profile/profile_page.dart';
+import 'presentation_layer/routes/nostr/profile/profile_page_2.dart';
 import 'presentation_layer/routes/nostr/settings/settings_page.dart';
 import 'theme.dart' as theme;
 
@@ -58,6 +59,14 @@ Future<void> main() async {
   // we have a signer, so we can set it
   if (mySigner != null) {
     providerContainer.read(eventSignerProvider.notifier).setSigner(mySigner);
+
+    /// get fresh nip65 data on startup
+    final myPubkey = mySigner.getPublicKey();
+    final inboxOutboxP = providerContainer.read(inboxOutboxProvider);
+    inboxOutboxP.getNip65data(
+      myPubkey,
+      forceRefresh: true,
+    );
   }
 
   runApp(
@@ -125,7 +134,7 @@ class MyApp extends StatelessWidget {
             case '/nostr/profile':
               return MaterialPageRoute(
                 builder: (context) =>
-                    ProfilePage(pubkey: settings.arguments as String),
+                    ProfilePage2(pubkey: settings.arguments as String),
               );
             case '/nostr/hastag':
               return MaterialPageRoute(

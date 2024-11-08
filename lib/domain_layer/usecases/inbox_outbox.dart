@@ -13,4 +13,9 @@ class InboxOutbox {
   Future<Nip65> setNip65data(Nip65 newNip65) {
     return _inboxOutboxRepository.setNip65data(newNip65);
   }
+
+  Future<Nip65?> getNip65data(String npub, {bool forceRefresh = false}) {
+    return _inboxOutboxRepository.getNip65data(npub,
+        forceRefresh: forceRefresh);
+  }
 }

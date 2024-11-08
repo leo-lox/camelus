@@ -15,4 +15,12 @@ class Nip65Model extends Nip65 {
       relays: super.relays,
     );
   }
+
+  factory Nip65Model.fromNdk(ndk_entities.Nip65 ndkNip65) {
+    return Nip65Model(
+      createdAt: ndkNip65.createdAt,
+      pubKey: ndkNip65.pubKey,
+      relays: ndkNip65.relays,
+    );
+  }
 }
