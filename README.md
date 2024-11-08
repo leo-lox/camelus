@@ -42,17 +42,21 @@ This documentation is aimed at beginner developers and students interested in mo
   </ul>
 </div>
 
+## Security
+
+Camelus ensures user privacy by using the Nostr protocol, which stores data in a decentralized way. This means posts for example are encrypted to protect user privacy. This decentralized system combined with encryption makes the network secure for sharing posts and any kind of data transactions. This is giving users control over their information.
 
 
 
 
-## 4. Setting up the project
 
-### 4.1 Prerequisites
+##  Setting up the project
+
+###  Prerequisites
 
 Before you start, make sure that **Flutter** is installed on your machine. You can check the installation guide and verify the setup at [Flutter Installation](https://flutter.dev/docs/get-started/install).
 
- ### 4.2 Clone the Repository
+ ### Clone the Repository
 
 Start by cloning the repository to your local machine:
 
