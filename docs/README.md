@@ -45,28 +45,21 @@ This section provides a detailed breakdown of the app's user interface architect
 In the **lib** folder you can find the main directory housing the core UI logic and overall app functionality. This directory includes the foundational structure and primary components for each screen. In the **routes** folder are the defined app’s navigation pathways. Each route specifies how users move between screens and provides clear navigation logic across the app. The **components** folder contains reusable UI elements that combine basic components (like atoms and molecules) to build such as headers or forms that are used across multiple screens. In the **providers** folder you can see how state logic is managed by using provider to handle and update data across widgets. Providers allow consistent state handling throughout the app.<br>
 
 ## 4. Architecture
-In the app's architecture, components are organized into three primary categories: Atoms, molecules and providers. Each category serves a specific purpose to create a scalable and maintainable ui. Atoms are the most basic ui elements used frequently throughout the app.
+In the app's architecture, components are organized into three primary categories: Atoms, molecules and providers. Atoms are the most basic ui elements used frequently throughout the app. In this picture is a feed with two posts in it. It shows the components.
 ![Unbenanntes Diagramm5 drawio](https://github.com/user-attachments/assets/5249797c-5053-40f5-8c26-5ea6c15bf6ef)
 
-In the atoms folder you can see a LongButton for example: https://github.com/leo-lox/camelus/blob/dev/lib/presentation_layer/atoms/long_button.dart
+[Here](https://github.com/leo-lox/camelus) you can see code for a LongButton which is an atom
 
-**Molecules** are combinations of atoms (e.g. buttons, text fields) that form more complex UI elements. They are still reusable but typically show more logic or user interaction.
-**Organisms** bring multiple molecules together, forming complete sections like a profile page or a feed section. 
-  
 ### Using Provider for State Management
 
 Each provider within the `providers` folder is dedicated to managing a specific part of the app state like user authentication, feed updates and message handling. Providers allow widgets across the app to access and respond to these data updates.
-
-- **Example**: The `UserProvider` tracks the user’s login state and profile data. It allows to handle all relevant screens and components display the most updated information. With `ChangeNotifier` any changes to user data are automatically propagated to relevant widgets, providing real-time feedback to users as they interact with the app.
-
-
 
 ## 5. Component Documentation
 
 ### 5.1 Login, Registration and Providers
 
-For handling login, registration and state management a **Provider** is managing the state and share data across widgets. To manage authentication data, **ChangeNotifier** is used.
-The **ChangeNotifier** class holds the user’s authentication data (like login status and user profile information). Whenever the users log in or update their profiles, the **UserModel** notifies all listening widgets that the data has changed. When the user logs in, the **UserModel** updates with the new authentication details. Any part of the app that relies on this data (like profile screens or home pages) will rebuild automatically to reflect the latest state. The `login` and `logout` methods update the user’s state. They trigger a UI rebuild by calling `notifyListeners()`. In the app we are using ChangeNotifierProvider which ensures whenever the UserModel state changes (for example after a successful login) all the widgets that depend on this data can rebuild.
+For handling login, registration and state management a **Provider** is managing the state and share data across widgets. To manage authentication data **ChangeNotifier** is used.
+The **ChangeNotifier** class holds the user’s authentication data (like login status and user profile information). Whenever the users log in or update their profiles, the **UserModel** notifies to all listening widgets that the data has changed. When the user logs in, the **UserModel** updates with the new authentication details. Any part of the app that relies on this data (like profile screens or home pages) will rebuild automatically to reflect the latest state. The `login` and `logout` methods update the user’s state. They trigger a UI rebuild by calling `notifyListeners()`. In the app we are using ChangeNotifierProvider which ensures whenever the UserModel state changes (for example after a successful login) all the widgets that depend on this data can rebuild.
 
 #### Example: UserModel with ChangeNotifier
 
@@ -188,7 +181,8 @@ flutter pub get
 run ```flutter build apk --release``` or ```flutter run``` to run directly on your device in debug mode
 ### 8. Conclusion
 
-Android
-You can join the test and download it from google play link
+### 8. Conclusion
 
-or use the apk, it is signed with my key so you will need to enable "install from unknown sources" in your phone settings.
+The Camelus UI is developed to provide a user-friendly platform. Camelus is designed to offer secure social networking experience. Users are in control of their data through the Nostr protocol. This application is built with a focus on privacy. Contributions, feedback and ideas from the community are welcome to help shape and improve the app’s future.
+
+
