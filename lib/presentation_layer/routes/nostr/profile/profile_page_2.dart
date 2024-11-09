@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../config/palette.dart';
@@ -15,7 +16,7 @@ import '../../../atoms/follow_button.dart';
 import '../../../atoms/my_profile_picture.dart';
 import '../../../components/note_card/no_more_notes.dart';
 import '../../../components/note_card/note_card_container.dart';
-import '../../../components/note_card/sceleton_note.dart';
+import '../../../components/note_card/skeleton_note.dart';
 import '../../../providers/event_signer_provider.dart';
 import '../../../providers/following_provider.dart';
 import '../../../providers/metadata_provider.dart';
@@ -79,7 +80,7 @@ class ProfilePage2 extends ConsumerWidget {
                       },
                     ),
                   ],
-                  expandedHeight: 360,
+                  expandedHeight: 370,
                   pinned: true,
                   floating: true,
                   forceElevated: innerBoxIsScrolled,
@@ -147,6 +148,12 @@ class ProfilePage2 extends ConsumerWidget {
   }
 }
 
+final _userContactsProvider =
+    FutureProvider.family<ContactList?, String>((ref, pubkey) async {
+  final followP = ref.watch(followingProvider);
+  return followP.getContacts(pubkey);
+});
+
 class _BuildProfileHeader extends ConsumerWidget {
   const _BuildProfileHeader({
     required this.userMetadata,
@@ -157,6 +164,9 @@ class _BuildProfileHeader extends ConsumerWidget {
   @override
   Widget build(BuildContext context, ref) {
     final followP = ref.watch(followingProvider);
+    final contactsAsyncValue =
+        ref.watch(_userContactsProvider(userMetadata.pubkey));
+
     return Stack(
       children: [
         // Banner Image
@@ -184,8 +194,7 @@ class _BuildProfileHeader extends ConsumerWidget {
         ),
         // Profile Content
         Positioned(
-          top:
-              100, // Adjust this value to position the content below the banner
+          top: 85, // Adjust this value to position the content below the banner
           left: 0,
           right: 0,
           child: Container(
@@ -202,7 +211,7 @@ class _BuildProfileHeader extends ConsumerWidget {
                         shape: BoxShape.circle,
                       ),
                       child: UserImage(
-                        size: 82,
+                        size: 100,
                         imageUrl: userMetadata.picture,
                         pubkey: userMetadata.pubkey,
                       ),
@@ -264,7 +273,7 @@ class _BuildProfileHeader extends ConsumerWidget {
                 SizedBox(height: 8),
                 // bio with fixed height
                 SizedBox(
-                  height: 50,
+                  height: 60, // height of bio
                   child: SelectableText(
                     userMetadata.about ?? '',
                     style: TextStyle(
@@ -277,49 +286,7 @@ class _BuildProfileHeader extends ConsumerWidget {
                 SizedBox(height: 5),
                 Row(
                   children: [
-                    FutureBuilder<ContactList?>(
-                        future: followP.getContacts(userMetadata.pubkey),
-                        builder: (context, snap) {
-                          if (snap.data == null ||
-                              snap.data!.contacts.isEmpty) {
-                            return Text('0 Following',
-                                style: TextStyle(color: Colors.white));
-                          }
-
-                          return GestureDetector(
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => FollowerPage(
-                                      contactList: snap.data!,
-                                      title: "Following",
-                                    ),
-                                  ),
-                                );
-                              },
-                              child: RichText(
-                                text: TextSpan(
-                                  children: [
-                                    TextSpan(
-                                      text: '${snap.data!.contacts.length}',
-                                      style: const TextStyle(
-                                        color: Palette.lightGray,
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 14,
-                                      ),
-                                    ),
-                                    const TextSpan(
-                                      text: ' Following',
-                                      style: TextStyle(
-                                        color: Palette.gray,
-                                        fontSize: 14,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ));
-                        }),
+                    _display_following(contactsAsyncValue, context),
                     SizedBox(width: 16),
                     Text('n.a Followers',
                         style: TextStyle(color: Colors.white)),
@@ -330,6 +297,69 @@ class _BuildProfileHeader extends ConsumerWidget {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _display_following(
+      AsyncValue<ContactList?> contactsAsyncValue, BuildContext context) {
+    return contactsAsyncValue.when(
+      loading: () => Row(
+        children: [
+          Shimmer.fromColors(
+            baseColor: Palette.extraDarkGray,
+            highlightColor: Palette.darkGray,
+            child: Text("_"),
+          ),
+          SizedBox(width: 7),
+          Text(
+            "Following",
+            style: TextStyle(
+              color: Palette.gray,
+              fontSize: 14,
+            ),
+          )
+        ],
+      ),
+      error: (err, stack) => Text('err'),
+      data: (contacts) {
+        final followingCount = contacts?.contacts.length ?? 0;
+        return GestureDetector(
+          onTap: () {
+            if (contacts != null) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => FollowerPage(
+                    contactList: contacts,
+                    title: "Following",
+                  ),
+                ),
+              );
+            }
+          },
+          child: RichText(
+            text: TextSpan(
+              children: [
+                TextSpan(
+                  text: '$followingCount',
+                  style: const TextStyle(
+                    color: Palette.lightGray,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                  ),
+                ),
+                const TextSpan(
+                  text: ' Following',
+                  style: TextStyle(
+                    color: Palette.gray,
+                    fontSize: 14,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }

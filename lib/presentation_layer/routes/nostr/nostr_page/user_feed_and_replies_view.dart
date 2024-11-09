@@ -9,7 +9,7 @@ import '../../../../domain_layer/entities/nostr_note.dart';
 import '../../../atoms/new_posts_available.dart';
 import '../../../atoms/refresh_indicator_no_need.dart';
 import '../../../components/note_card/note_card_container.dart';
-import '../../../components/note_card/sceleton_note.dart';
+import '../../../components/note_card/skeleton_note.dart';
 import '../../../providers/main_feed_provider.dart';
 import '../../../providers/navigation_bar_provider.dart';
 
