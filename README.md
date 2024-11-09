@@ -39,20 +39,16 @@ This documentation is aimed at beginner developers and students interested in mo
   </ul>
 </div>
 
-<div style="display: inline-block; width: 50%; vertical-align: top;">
-  <img src="https://github.com/user-attachments/assets/4ccff9ea-257d-40cd-912e-92844a0b1bb4" alt="Screenshot_20241107-195828" width="300"/>
-</div>
-
 ## Screenshots
 
 <div style="display: flex; justify-content: space-around;">
 
-<img width="200" alt="1_en-GB" src="https://github.com/user-attachments/assets/53c981cd-e762-4efd-892a-2387ba4ad18e">
-<img width="200" alt="3_en-GB" src="https://github.com/user-attachments/assets/1445aabf-4120-4fd2-b33e-9b3a26c9c2a5">
-<img width="200" alt="2_en-GB" src="https://github.com/user-attachments/assets/099a50bc-d846-4aa9-9c33-68abf825d465">
-<img width="200" alt="4_en-GB" src="https://github.com/user-attachments/assets/40d48701-ec43-4b04-aba4-4428be60dae4">
-<img width="200" alt="5_en-GB" src="https://github.com/user-attachments/assets/9930eac2-7cc2-49dc-bbc2-b503cdb0b7f6">
-<img width="200" alt="5_en-GB" src="https://github.com/user-attachments/assets/1c6108d0-b243-4779-8eb1-7f0ef1c6b070">
+<img width="190" alt="1_en-GB" src="https://github.com/user-attachments/assets/53c981cd-e762-4efd-892a-2387ba4ad18e">
+<img width="190" alt="3_en-GB" src="https://github.com/user-attachments/assets/1445aabf-4120-4fd2-b33e-9b3a26c9c2a5">
+<img width="190" alt="2_en-GB" src="https://github.com/user-attachments/assets/099a50bc-d846-4aa9-9c33-68abf825d465">
+<img width="190" alt="4_en-GB" src="https://github.com/user-attachments/assets/40d48701-ec43-4b04-aba4-4428be60dae4">
+<img width="190" alt="5_en-GB" src="https://github.com/user-attachments/assets/9930eac2-7cc2-49dc-bbc2-b503cdb0b7f6">
+
 
 
 
