@@ -2,10 +2,10 @@
 
   
   <img src="https://github.com/user-attachments/assets/b93fbf04-19d0-48f5-af0d-b47546ae68d6" alt="Screenshot 2024-11-08 202456"><br>
-   <h1>User interface documentation</h1>
+   <h1>User Interface documentation</h1>
    
 <h2>Documentation Overview</h2>
-<h4>1. Intro</h4>
+<h4>1. Introduction</h4>
 <h4>2. Design System</h4>
 <h4>3. UI structure</h4>
 <h4>4. Architecture</h4>
@@ -18,9 +18,9 @@
 
 
 ## 1. Introduction
-This documentation provides a overview of the user interface (UI) design for Camelus. You will learn about the architechture in our app and how different UI elements work together. It also shows how to handle the state management in all UI overviews. Next, you will learn how data exchange between device and Nostr protocol is working. This documentation exactly describe what is going on behind the scene when a user hits the send button for sending a message to the feed for other users.
+This documentation provides an overview of the user interface (UI) design for Camelus. You will learn about the architechture in our app and how different UI elements work together. It also shows how to handle the state management in all UI overviews. Next, the documentation is demonstrating how data exchange between device and Nostr protocol works. This documentation describes exactly happens in the background when an user hits the send button to send a post to the feed. 
 
-This documentation is aimed at beginner developers and students interested in mobile UI development. It is offering hands-on learning with structured code snippets from the original camelus code for learning how to build an user interface for apps.
+This documentation is aimed at beginner developers and students interested in mobile UI development. It offers structured code snippets from the original camelus code for learning how to build an user interface for apps.
 
 **Technologies**:  
 - **Frontend**: Flutter  
@@ -47,7 +47,7 @@ In the **lib** folder you can find the main directory housing the core UI logic 
 ## 4. Architecture
 
 ![Unbenanntes Diagramm5 drawio](https://github.com/user-attachments/assets/5249797c-5053-40f5-8c26-5ea6c15bf6ef)
-In the app's architecture, components are organized into three primary categories: Atoms, molecules and providers. Atoms are the most basic ui elements used frequently throughout the app. In this picture is a feed with two posts in it. It shows the components.
+In the app's architecture, components are organized into three primary categories: Atoms, molecules and providers as shown in the picture. It shows two posts on the feed from camelus.
 
    
 
@@ -61,7 +61,7 @@ Each provider within the `providers` folder is dedicated to managing a specific 
 
 ### 5.1 Login, Registration and Providers
 
-For handling login, registration and state management a **Provider** is managing the state and share data across widgets. To manage authentication data **ChangeNotifier** is used.
+For handling login, registration and state management a **Provider** is managing the state and share data across widgets. To manage authentication data, **ChangeNotifier** is used.
 The **ChangeNotifier** class holds the user’s authentication data (like login status and user profile information). Whenever the users log in or update their profiles, the **UserModel** notifies to all listening widgets that the data has changed. When the user logs in, the **UserModel** updates with the new authentication details. Any part of the app that relies on this data (like profile screens or home pages) will rebuild automatically to reflect the latest state. The `login` and `logout` methods update the user’s state. They trigger a UI rebuild by calling `notifyListeners()`. In the app we are using ChangeNotifierProvider which ensures whenever the UserModel state changes (for example after a successful login) all the widgets that depend on this data can rebuild.
 
 #### Example: UserModel with ChangeNotifier
