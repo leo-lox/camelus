@@ -133,7 +133,7 @@ class ProfileFeedState
     );
 
     /// because the stream is buffered we need to wait a bit
-    await Future.delayed(Duration(milliseconds: rootBufferTimeMilis + 100));
+    await Future.delayed(Duration(milliseconds: rootBufferTimeMilis + 200));
     if (rootNoteLengthBefore < state.timelineRootNotes.length) {
       // all good found new notes
       return;
@@ -146,7 +146,7 @@ class ProfileFeedState
     );
 
     /// because the stream is buffered we need to wait a bit
-    await Future.delayed(Duration(milliseconds: rootBufferTimeMilis + 100));
+    await Future.delayed(Duration(milliseconds: rootBufferTimeMilis + 200));
     if (rootNoteLengthBefore < state.timelineRootNotes.length) {
       // all good found new notes
       return;
