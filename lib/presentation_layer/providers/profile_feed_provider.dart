@@ -176,6 +176,14 @@ class ProfileFeedState
   }
 
   void _addRootAndReplyTimelineEvents(List<NostrNote> events) {
+    /// filter out notes that are already in the timelineRootAndReplyNotes
+    /// this happens because of the repeated fetch root notes
+    events = events.where((event) {
+      return !state.timelineRootAndReplyNotes.any((element) {
+        return element.id == event.id;
+      });
+    }).toList();
+
     state = state.copyWith(
         timelineRootAndReplyNotes: [
       ...state.timelineRootAndReplyNotes,

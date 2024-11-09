@@ -401,12 +401,33 @@ class ScrollablePostsAndRepliesList extends ConsumerWidget {
   @override
   Widget build(BuildContext context, ref) {
     final profileFeedStateP = ref.watch(profileFeedStateProvider(pubkey));
+    final profileFeedStateNoti =
+        ref.watch(profileFeedStateProvider(pubkey).notifier);
 
     return _BuildScrollablePostsList(
       itemCount: profileFeedStateP.timelineRootAndReplyNotes.length + 1,
       itemBuilder: (context, index) {
         if (index == profileFeedStateP.timelineRootAndReplyNotes.length) {
-          return SkeletonNote();
+          if (profileFeedStateP.endOfRootAndReplyNotes) {
+            return NoMoreNotes();
+          }
+          return SkeletonNote(
+            renderCallback: () {
+              final now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
+              int fetchTime;
+              if (profileFeedStateP.timelineRootAndReplyNotes.isNotEmpty) {
+                fetchTime =
+                    profileFeedStateP.timelineRootAndReplyNotes.last.created_at;
+              } else {
+                fetchTime = now;
+              }
+
+              profileFeedStateNoti.loadMore(
+                olderThen: fetchTime,
+                pubkey: pubkey,
+              );
+            },
+          );
         }
         return NoteCardContainer(
           key: PageStorageKey(

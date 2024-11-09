@@ -1,7 +1,4 @@
-import 'package:camelus/presentation_layer/components/note_card/bottom_action_row.dart';
 import 'package:flutter/material.dart';
-import 'package:shimmer/shimmer.dart';
-
 import '../../../config/palette.dart';
 
 class NoMoreNotes extends StatelessWidget {
@@ -20,12 +17,7 @@ class NoMoreNotes extends StatelessWidget {
 
     return Column(
       children: [
-        // horizontal line
-        const Divider(
-          color: Palette.darkGray,
-          thickness: 1,
-        ),
-        const SizedBox(height: 10),
+        const SizedBox(height: 20),
         Center(
           child: Text(
             "No more notes to show",
@@ -34,7 +26,8 @@ class NoMoreNotes extends StatelessWidget {
               fontSize: 16,
             ),
           ),
-        )
+        ),
+        const SizedBox(height: 50),
       ],
     );
   }
