@@ -17,7 +17,7 @@
   
 </div>
 
-## 1. Introduction
+## 1 Introduction
 Welcome to our social network app! This mobile application connects users across the globe. The app enables them to share posts and engage with content to interact securely. Unlike traditional networks, this app leverages the Nostr protocol for decentralized data storage. This is enhancing the privacy and resilience by distributing data across a network rather than central servers.
 
 This documentation is aimed at beginner developers and students interested in mobile UI development. It is offering hands-on learning with structured code snippets from the original camelus code for learning how to build an user interface for apps.
@@ -26,10 +26,7 @@ This documentation is aimed at beginner developers and students interested in mo
 - **Frontend**: Flutter  
 - **Backend**: Decentralized storage via the Nostr protocol
 
-
-## Features
-
-## Features
+## 2 Features
 
 <div style="display: inline-block; width: 50%; vertical-align: top;">
   <ul style="list-style-type: disc; margin-bottom: 0;">
@@ -47,12 +44,12 @@ This documentation is aimed at beginner developers and students interested in mo
 </div>
 
 
-## Security
+## 3 Security
 
 Camelus ensures user privacy by using the Nostr protocol, which stores data in a decentralized way. This means posts for example are encrypted to protect user privacy. This decentralized system combined with encryption makes the network secure for sharing posts and any kind of data transactions. This is giving users control over their information.
 
 
-## Screenshots
+## 4 Screenshots
 
 <div style="display: flex; justify-content: space-around;">
   <img src="https://github.com/user-attachments/assets/4ccff9ea-257d-40cd-912e-92844a0b1bb4" alt="Screenshot_20241107-195828" width="200"/>
@@ -61,13 +58,13 @@ Camelus ensures user privacy by using the Nostr protocol, which stores data in a
      <img src="https://github.com/user-attachments/assets/4ccff9ea-257d-40cd-912e-92844a0b1bb4" alt="Screenshot_20241107-195828" width="200"/>
 </div>
 
-##  Setting up the project
+##  5 Setting up the project
 
-###  Prerequisites
+###  5.1 Prerequisites
 
 Before you start, make sure that **Flutter** is installed on your machine. You can check the installation guide and verify the setup at [Flutter Installation](https://flutter.dev/docs/get-started/install).
 
- ### Clone the Repository
+ ### 5.2 Clone the Repository
 
 Start by cloning the repository to your local machine:
 
@@ -93,12 +90,12 @@ flutter pub get
 ```
 
 run ```flutter build apk --release``` or ```flutter run``` to run directly on your device in debug mode
-### 8. Download
+### 6 Download
 
 Android
 You can join the test and download it from google play link
 
 or use the apk, it is signed with my key so you will need to enable "install from unknown sources" in your phone settings.
 
-### Contributing
-We welcome contributions from the community. If you'd like to contribute, please write a message. I will reply fast!
+### 7 Conclusion
+Camelus is designed to offer secure social networking experience. Users are in control of their data through the Nostr protocol. This application is built with a focus on privacy. Contributions, feedback and ideas from the community are welcome to help shape and improve the app’s future.
