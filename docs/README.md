@@ -92,9 +92,9 @@ class UserModel extends ChangeNotifier {
 
 ### 5.2 User Profiles
 
-In the app users can **create**, **edit** and **view** their personal information by navigating to profile settings screen. Once the registration form is submitted the information is send to the Nostr Protocol. You can also see a List of followers. The picture is showing the profile
-<img width="200" alt="3_en-GB" src="https://github.com/user-attachments/assets/37bbbb45-1e13-4ba7-b52f-db33eb58176a">
 
+<img width="200" alt="3_en-GB" src="https://github.com/user-attachments/assets/37bbbb45-1e13-4ba7-b52f-db33eb58176a">
+In the app users can **create**, **edit** and **view** their personal information by navigating to profile settings screen. Once the registration form is submitted the information is send to the Nostr Protocol. You can also see a List of followers. The picture is showing the profile
 
 ### 5.3 Post Creation and Interaction on feed
 The feed enables users to share their thoughts and engage with others' content. A post in the feed has a simple UI element structure where users can see a profile picture, the text, share button, comments for the posts and a send button. When users tap the send button the data is send locally to the ndk and afterwards to the **Nostr protocol** as shown in the diagram. It also show the transfer of the data from the nostr protocol to users feeds. Once the user hits the send button, the post is instantly displayed in the app’s feed without requiring a page reload. 
