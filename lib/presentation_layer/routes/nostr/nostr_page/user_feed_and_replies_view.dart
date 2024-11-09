@@ -115,7 +115,7 @@ class UserFeedAndRepliesViewState
         mainFeedStateP.newRootNotes.length;
     return Stack(
       children: [
-        refreshIndicatorNoNeed(
+        RefreshIndicatorNoNeed(
           onRefresh: () {
             return Future.delayed(const Duration(milliseconds: 0));
           },
