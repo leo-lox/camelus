@@ -45,8 +45,11 @@ This section provides a detailed breakdown of the app's user interface architect
 In the **lib** folder you can find the main directory housing the core UI logic and overall app functionality. This directory includes the foundational structure and primary components for each screen. In the **routes** folder are the defined app’s navigation pathways. Each route specifies how users move between screens and provides clear navigation logic across the app. The **components** folder contains reusable UI elements that combine basic components (like atoms and molecules) to build such as headers or forms that are used across multiple screens. In the **providers** folder you can see how state logic is managed by using provider to handle and update data across widgets. Providers allow consistent state handling throughout the app.<br>
 
 ## 4. Architecture
+
+    <img src="https://github.com/user-attachments/assets/5249797c-5053-40f5-8c26-5ea6c15bf6ef" alt="Screenshot" >
+
 In the app's architecture, components are organized into three primary categories: Atoms, molecules and providers. Atoms are the most basic ui elements used frequently throughout the app. In this picture is a feed with two posts in it. It shows the components.
-![Unbenanntes Diagramm5 drawio](https://github.com/user-attachments/assets/5249797c-5053-40f5-8c26-5ea6c15bf6ef)
+
 
 [Here](https://github.com/leo-lox/camelus) you can see code for a LongButton which is an atom
 
