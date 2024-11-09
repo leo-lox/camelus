@@ -19,6 +19,7 @@
 
 ## 1 Introduction
 Welcome to our social network app! This mobile application connects users across the globe. The app enables them to share posts and engage with content to interact securely. Unlike traditional networks, this app leverages the Nostr protocol for decentralized data storage. This is enhancing the privacy for users.  
+
 **Technologies**:  
 - **Frontend**: Flutter  
 - **Backend**: Decentralized storage via the Nostr protocol
@@ -43,20 +44,12 @@ Welcome to our social network app! This mobile application connects users across
 <img width="190" alt="2_en-GB" src="https://github.com/user-attachments/assets/099a50bc-d846-4aa9-9c33-68abf825d465">
 <img width="190" alt="4_en-GB" src="https://github.com/user-attachments/assets/40d48701-ec43-4b04-aba4-4428be60dae4">
 <img width="190" alt="5_en-GB" src="https://github.com/user-attachments/assets/9930eac2-7cc2-49dc-bbc2-b503cdb0b7f6">
-
-
-
-
 </div>
 
 
 ## 3 Security
 
-Camelus ensures user privacy by using the Nostr protocol, which stores data in a decentralized way. This means posts for example are encrypted to protect user privacy. This decentralized system combined with encryption makes the network secure for sharing posts and any kind of data transactions. This is giving users control over their information.
-
-
-
-
+Camelus ensures user privacy by using the Nostr protocol, which stores data in a decentralized way. This means posts, for example, are encrypted to protect user privacy. This decentralized system combined with encryption makes the network secure for sharing posts and any kind of data transactions. This is gives users control over their information.
 
 ##  4 Setting up the project
 
