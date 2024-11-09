@@ -43,32 +43,36 @@ This documentation is aimed at beginner developers and students interested in mo
   <img src="https://github.com/user-attachments/assets/4ccff9ea-257d-40cd-912e-92844a0b1bb4" alt="Screenshot_20241107-195828" width="300"/>
 </div>
 
+## Screenshots
+
+<div style="display: flex; justify-content: space-around;">
+
+<img width="200" alt="1_en-GB" src="https://github.com/user-attachments/assets/53c981cd-e762-4efd-892a-2387ba4ad18e">
+<img width="200" alt="3_en-GB" src="https://github.com/user-attachments/assets/1445aabf-4120-4fd2-b33e-9b3a26c9c2a5">
+<img width="200" alt="2_en-GB" src="https://github.com/user-attachments/assets/099a50bc-d846-4aa9-9c33-68abf825d465">
+<img width="200" alt="4_en-GB" src="https://github.com/user-attachments/assets/40d48701-ec43-4b04-aba4-4428be60dae4">
+<img width="200" alt="5_en-GB" src="https://github.com/user-attachments/assets/9930eac2-7cc2-49dc-bbc2-b503cdb0b7f6">
+<img width="200" alt="5_en-GB" src="https://github.com/user-attachments/assets/1c6108d0-b243-4779-8eb1-7f0ef1c6b070">
+
+
+
+</div>
 
 ## 3 Security
 
 Camelus ensures user privacy by using the Nostr protocol, which stores data in a decentralized way. This means posts for example are encrypted to protect user privacy. This decentralized system combined with encryption makes the network secure for sharing posts and any kind of data transactions. This is giving users control over their information.
 
 
-## 4 Screenshots
-
-<div style="display: flex; justify-content: space-around;">
-
-<img width="200" alt="1_en-GB" src="https://github.com/user-attachments/assets/53c981cd-e762-4efd-892a-2387ba4ad18e">
-<img width="200" alt="2_en-GB" src="https://github.com/user-attachments/assets/099a50bc-d846-4aa9-9c33-68abf825d465">
-<img width="200" alt="3_en-GB" src="https://github.com/user-attachments/assets/1445aabf-4120-4fd2-b33e-9b3a26c9c2a5">
-<img width="200" alt="4_en-GB" src="https://github.com/user-attachments/assets/40d48701-ec43-4b04-aba4-4428be60dae4">
-<img width="200" alt="5_en-GB" src="https://github.com/user-attachments/assets/9930eac2-7cc2-49dc-bbc2-b503cdb0b7f6">
-
-</div>
 
 
-##  5 Setting up the project
 
-###  5.1 Prerequisites
+##  4 Setting up the project
+
+###  4.1 Prerequisites
 
 Before you start, make sure that **Flutter** is installed on your machine. You can check the installation guide and verify the setup at [Flutter Installation](https://flutter.dev/docs/get-started/install).
 
- ### 5.2 Clone the Repository
+ ### 4.2 Clone the Repository
 
 Start by cloning the repository to your local machine:
 
@@ -94,12 +98,12 @@ flutter pub get
 ```
 
 run ```flutter build apk --release``` or ```flutter run``` to run directly on your device in debug mode
-## 6 Download
+## 5 Download
 
 Android
 You can join the test and download it from google play link
 
 or use the apk, it is signed with my key so you will need to enable "install from unknown sources" in your phone settings.
 
-## 7 Conclusion
+## 6 Conclusion
 Camelus is designed to offer secure social networking experience. Users are in control of their data through the Nostr protocol. This application is built with a focus on privacy. Contributions, feedback and ideas from the community are welcome to help shape and improve the app’s future.
