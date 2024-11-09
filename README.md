@@ -52,13 +52,13 @@ Camelus ensures user privacy by using the Nostr protocol, which stores data in a
 ## 4 Screenshots
 
 <div style="display: flex; justify-content: space-around;">
-![following](https://github.com/user-attachments/assets/098c3d5b-154b-4e79-a367-35e80084f965)
-<img width="1280" alt="1_en-GB" src="https://github.com/user-attachments/assets/53c981cd-e762-4efd-892a-2387ba4ad18e">
-<img width="1280" alt="2_en-GB" src="https://github.com/user-attachments/assets/099a50bc-d846-4aa9-9c33-68abf825d465">
-<img width="1280" alt="3_en-GB" src="https://github.com/user-attachments/assets/1445aabf-4120-4fd2-b33e-9b3a26c9c2a5">
-<img width="1280" alt="4_en-GB" src="https://github.com/user-attachments/assets/40d48701-ec43-4b04-aba4-4428be60dae4">
-<img width="1280" alt="5_en-GB" src="https://github.com/user-attachments/assets/9930eac2-7cc2-49dc-bbc2-b503cdb0b7f6">
-![featureGraphic](https://github.com/user-attachments/assets/1c008221-52b5-495d-869c-3cc18e852fa2)
+
+<img width="200" alt="1_en-GB" src="https://github.com/user-attachments/assets/53c981cd-e762-4efd-892a-2387ba4ad18e">
+<img width="200" alt="2_en-GB" src="https://github.com/user-attachments/assets/099a50bc-d846-4aa9-9c33-68abf825d465">
+<img width="200" alt="3_en-GB" src="https://github.com/user-attachments/assets/1445aabf-4120-4fd2-b33e-9b3a26c9c2a5">
+<img width="200" alt="4_en-GB" src="https://github.com/user-attachments/assets/40d48701-ec43-4b04-aba4-4428be60dae4">
+<img width="200" alt="5_en-GB" src="https://github.com/user-attachments/assets/9930eac2-7cc2-49dc-bbc2-b503cdb0b7f6">
+
 </div>
 
 
