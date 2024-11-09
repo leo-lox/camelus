@@ -46,10 +46,10 @@ In the **lib** folder you can find the main directory housing the core UI logic 
 
 ## 4. Architecture
 
-    <img src="https://github.com/user-attachments/assets/5249797c-5053-40f5-8c26-5ea6c15bf6ef" alt="Screenshotss">
 ![Unbenanntes Diagramm5 drawio](https://github.com/user-attachments/assets/5249797c-5053-40f5-8c26-5ea6c15bf6ef)
 In the app's architecture, components are organized into three primary categories: Atoms, molecules and providers. Atoms are the most basic ui elements used frequently throughout the app. In this picture is a feed with two posts in it. It shows the components.
 
+    <img src="https://github.com/user-attachments/assets/5249797c-5053-40f5-8c26-5ea6c15bf6ef" alt="Screenshotss">
 
 [Here](https://github.com/leo-lox/camelus) you can see code for a LongButton which is an atom
 
