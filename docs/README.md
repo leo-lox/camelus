@@ -110,7 +110,7 @@ When a user hits a send button the app is going to send the data like in this di
      <img src="https://github.com/user-attachments/assets/ec5d4b52-dcfa-4a6c-bd3a-e48c9685408c" alt="Screenshot 2024-11-08 20245677" >#### Diagram: Feed is sending requests 
   </div>
 This are messages on the feed
-<img width="1280" alt="1_en-GB" src="https://github.com/user-attachments/assets/89905bba-a95b-4bfc-8102-b87f7c6b01e9">
+<img width="200" alt="1_en-GB" src="https://github.com/user-attachments/assets/89905bba-a95b-4bfc-8102-b87f7c6b01e9">
 
 
 
