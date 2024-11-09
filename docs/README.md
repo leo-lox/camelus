@@ -197,6 +197,6 @@ run ```flutter build apk --release``` or ```flutter run``` to run directly on yo
 
 ### 8. Conclusion
 
-The Camelus UI is developed to provide a user-friendly platform. Camelus is designed to offer secure social networking experience. Users are in control of their data through the Nostr protocol. This application is built with a focus on privacy. Contributions, feedback and ideas from the community are welcome to help shape and improve the app’s future.
+The Camelus UI is developed to provide an user-friendly platform. Camelus is designed to offer secure social networking experience. Users are in control of their data through the Nostr protocol. This application is built with focus on privacy. Contributions, feedback and ideas from the community are welcome to help shape and improve the app’s future.
 
 
