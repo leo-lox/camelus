@@ -2,121 +2,146 @@ import 'package:camelus/presentation_layer/components/images_gallery.dart';
 import 'package:camelus/config/palette.dart';
 import 'package:camelus/helpers/helpers.dart';
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class ImagesTileView extends StatelessWidget {
   final List<String> images;
   final Widget? galleryBottomWidget;
-  ImagesTileView({super.key, required this.images, this.galleryBottomWidget});
-
   final String _tileViewId = Helpers().getRandomString(4);
+  final double maxHeight;
+
+  ImagesTileView({
+    super.key,
+    required this.images,
+    this.galleryBottomWidget,
+    this.maxHeight = 200,
+  });
 
   @override
   Widget build(BuildContext context) {
     int imageCount = images.length;
-    int additionalImages = imageCount - 4;
 
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(10),
-      child: SizedBox(
-        width: double.infinity,
-        child: GridView.count(
-          childAspectRatio: (16 / 10),
-          crossAxisSpacing: 2,
-          mainAxisSpacing: 2,
-          physics: const NeverScrollableScrollPhysics(),
-          shrinkWrap: true,
-          crossAxisCount: imageCount > 1 ? 2 : 1,
-          children: List.generate(
-            imageCount > 4 ? 4 : imageCount,
-            (index) {
-              return GestureDetector(
-                onTap: () {
-                  // new route with image gallery
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        double aspectRatio = imageCount > 1 ? 1 : 16 / 9;
+        double widgetHeight = constraints.maxWidth / aspectRatio;
 
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => ImageGallery(
-                        imageUrls: images,
-                        defaultImageIndex: index,
-                        topBarTitle: 'close',
-                        bottomBarWidget: galleryBottomWidget,
-                        heroTag: _tileViewId,
-                      ),
-                    ),
-                  );
-                },
-                child: Stack(
-                  fit: StackFit.expand,
-                  children: [
-                    Hero(
-                      transitionOnUserGestures: true,
-                      tag: 'image-${images[index]}-$_tileViewId',
-                      child: Image.network(
-                        cacheHeight: 850,
-                        images[index],
-                        fit: BoxFit.cover,
-                        alignment: Alignment.center,
-                        filterQuality: FilterQuality.medium,
-                        scale: 1.0,
-                        loadingBuilder: (BuildContext context, Widget child,
-                            ImageChunkEvent? loadingProgress) {
-                          if (loadingProgress == null) return child;
-                          return _imageLoading(loadingProgress);
-                        },
-                      ),
-                    ),
-                    if (index == 3 && additionalImages > 0)
-                      Container(
-                        decoration: BoxDecoration(
-                            gradient: RadialGradient(
-                              colors: [
-                                Palette.black.withOpacity(0.8),
-                                Palette.extraDarkGray.withOpacity(0.5),
-                              ],
-                              stops: const [0.0, 1.0],
-                            ),
-                            color: Palette.extraDarkGray.withOpacity(0.5)),
-                        child: Center(
-                          child: Text(
-                            '+$additionalImages',
-                            style: const TextStyle(
-                                color: Colors.white, fontSize: 38),
-                          ),
-                        ),
-                      ),
-                  ],
-                ),
-              );
-            },
+        widgetHeight = widgetHeight > maxHeight ? maxHeight : widgetHeight;
+
+        return ClipRRect(
+          borderRadius: BorderRadius.circular(10),
+          child: SizedBox(
+            height: widgetHeight,
+            child: _buildImageGrid(imageCount, constraints.maxWidth, context),
           ),
+        );
+      },
+    );
+  }
+
+  Widget _buildImageGrid(
+      int imageCount, double maxWidth, BuildContext context) {
+    if (imageCount == 1) {
+      return _buildImageTile(0, 0, context);
+    }
+
+    return Column(
+      children: [
+        Expanded(
+          child: Row(
+            children: [
+              Expanded(child: _buildImageTile(0, 0, context)),
+              if (imageCount > 1) SizedBox(width: 2),
+              if (imageCount > 1)
+                Expanded(child: _buildImageTile(1, 0, context)),
+            ],
+          ),
+        ),
+        if (imageCount > 2) SizedBox(height: 2),
+        if (imageCount > 2)
+          Expanded(
+            child: Row(
+              children: [
+                Expanded(child: _buildImageTile(2, 0, context)),
+                if (imageCount > 3) SizedBox(width: 2),
+                if (imageCount > 3)
+                  Expanded(child: _buildImageTile(3, imageCount - 4, context)),
+              ],
+            ),
+          ),
+      ],
+    );
+  }
+
+  Widget _buildImageTile(
+      int index, int additionalImages, BuildContext context) {
+    return GestureDetector(
+      onTap: () => _openGallery(context, index),
+      child: Hero(
+        tag: 'image-${images[index]}-$_tileViewId',
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            CachedNetworkImage(
+              imageUrl: images[index],
+              fit: BoxFit.cover,
+              placeholder: (context, url) => _imageLoading(),
+              errorWidget: (context, url, error) => const Icon(Icons.error),
+            ),
+            if (index == 3 && additionalImages > 0)
+              _buildAdditionalImagesOverlay(additionalImages),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAdditionalImagesOverlay(int additionalImages) {
+    return Container(
+      decoration: BoxDecoration(
+        gradient: RadialGradient(
+          colors: [
+            Palette.black.withOpacity(0.8),
+            Palette.extraDarkGray.withOpacity(0.5),
+          ],
+          stops: const [0.0, 1.0],
+        ),
+      ),
+      child: Center(
+        child: Text(
+          '+$additionalImages',
+          style: const TextStyle(color: Colors.white, fontSize: 38),
+        ),
+      ),
+    );
+  }
+
+  void _openGallery(BuildContext context, int index) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ImageGallery(
+          imageUrls: images,
+          defaultImageIndex: index,
+          topBarTitle: 'close',
+          bottomBarWidget: galleryBottomWidget,
+          heroTag: _tileViewId,
         ),
       ),
     );
   }
 }
 
-Widget _imageLoading(ImageChunkEvent loadingProgress) {
-  return Stack(
-    children: [
-      // pulsating background
-      Container(
-        // round corners
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(8),
-          color: Palette.extraDarkGray.withOpacity(0.5),
-        ),
+Widget _imageLoading() {
+  return Container(
+    decoration: BoxDecoration(
+      borderRadius: BorderRadius.circular(8),
+      color: Palette.extraDarkGray.withOpacity(0.5),
+    ),
+    child: Center(
+      child: CircularProgressIndicator(
+        color: Palette.extraLightGray,
       ),
-
-      Center(
-        child: CircularProgressIndicator(
-          color: Palette.extraLightGray,
-          value: loadingProgress.expectedTotalBytes != null
-              ? loadingProgress.cumulativeBytesLoaded /
-                  loadingProgress.expectedTotalBytes!
-              : null,
-        ),
-      ),
-    ],
+    ),
   );
 }
