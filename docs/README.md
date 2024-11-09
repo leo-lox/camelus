@@ -29,7 +29,6 @@ This documentation is aimed at beginner developers and students interested in mo
 
 
 ## 2. Design System
-The design system provides a cohesive structure for UI elements, ensuring consistency across all screens and interactions. It defines color schemes, typography, spacing and standardized components used throughout the app.
 
 
 ## 3. UI Structure
@@ -46,7 +45,10 @@ This section provides a detailed breakdown of the app's user interface architect
 In the **lib** folder you can find the main directory housing the core UI logic and overall app functionality. This directory includes the foundational structure and primary components for each screen. In the **routes** folder are the defined app’s navigation pathways. Each route specifies how users move between screens and provides clear navigation logic across the app. The **components** folder contains reusable UI elements that combine basic components (like atoms and molecules) to build such as headers or forms that are used across multiple screens. In the **providers** folder you can see how state logic is managed by using provider to handle and update data across widgets. Providers allow consistent state handling throughout the app.<br>
 
 ## 4. Architecture
-In the app's architecture, components are organized into three primary categories: Atoms, molecules and providers. Each category serves a specific purpose to create a scalable and maintainable ui. Atoms are the most basic ui elements used frequently throughout the app. In the atoms folder you can see a LongButton for example: https://github.com/leo-lox/camelus/blob/dev/lib/presentation_layer/atoms/long_button.dart
+In the app's architecture, components are organized into three primary categories: Atoms, molecules and providers. Each category serves a specific purpose to create a scalable and maintainable ui. Atoms are the most basic ui elements used frequently throughout the app.
+![Unbenanntes Diagramm5 drawio](https://github.com/user-attachments/assets/5249797c-5053-40f5-8c26-5ea6c15bf6ef)
+
+In the atoms folder you can see a LongButton for example: https://github.com/leo-lox/camelus/blob/dev/lib/presentation_layer/atoms/long_button.dart
 
 **Molecules** are combinations of atoms (e.g. buttons, text fields) that form more complex UI elements. They are still reusable but typically show more logic or user interaction.
 **Organisms** bring multiple molecules together, forming complete sections like a profile page or a feed section. 
