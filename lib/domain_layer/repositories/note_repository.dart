@@ -1,3 +1,5 @@
+import 'package:rxdart/subjects.dart';
+
 import '../entities/nostr_note.dart';
 
 abstract class NoteRepository {
@@ -11,7 +13,7 @@ abstract class NoteRepository {
     required String requestId,
   });
 
-  Stream<NostrNote> getTextNotesByAuthors({
+  ReplaySubject<NostrNote> getTextNotesByAuthors({
     required List<String> authors,
     required String requestId,
     int? since,

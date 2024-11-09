@@ -52,20 +52,28 @@ class ProfileFeed {
     });
   }
 
-  /// load later timelineevents then
-  void loadMore({
+  /// load later timelineevents then \
+  /// [oltherThen] is the timestamp of the last event \
+  /// [pubkey] is the user for which the feed is loaded \
+  /// [limit] is the number of events to load, set to null to load all \
+  /// [return] a future that completes when the fetch is done
+  Future<void> loadMore({
     required int oltherThen,
     required String pubkey,
+    int? limit,
   }) {
-    fetchFeedEvents(
+    return fetchFeedEvents(
       npub: pubkey,
       requestId: "loadMore-profile-",
-      limit: 20,
+      limit: limit,
       until: oltherThen - 1, // -1 to not get dublicates
     );
   }
 
-  void fetchFeedEvents({
+  /// fetch the feed events for a user
+  /// add the events to the respective streams
+  /// [return] a future that completes when the fetch is done
+  Future<void> fetchFeedEvents({
     required String npub,
     required String requestId,
     int? since,
@@ -73,6 +81,7 @@ class ProfileFeed {
     int? limit,
     List<String>? eTags,
   }) async {
+    final completer = Completer<void>();
     // get contacts of user
     final mynotesStream = _noteRepository.getTextNotesByAuthors(
       authors: [npub],
@@ -88,7 +97,11 @@ class ProfileFeed {
       if (event.isRoot) {
         _rootNotesController.add(event);
       }
+    }).onDone(() {
+      completer.complete();
     });
+
+    return completer.future;
   }
 
   /// integrate new root notes into main feed

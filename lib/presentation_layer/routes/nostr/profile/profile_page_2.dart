@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -11,6 +13,7 @@ import '../../../../helpers/nprofile_helper.dart';
 import '../../../atoms/back_button_round.dart';
 import '../../../atoms/follow_button.dart';
 import '../../../atoms/my_profile_picture.dart';
+import '../../../components/note_card/no_more_notes.dart';
 import '../../../components/note_card/note_card_container.dart';
 import '../../../components/note_card/sceleton_note.dart';
 import '../../../providers/event_signer_provider.dart';
@@ -425,12 +428,32 @@ class ScrollablePostsList extends ConsumerWidget {
   @override
   Widget build(BuildContext context, ref) {
     final profileFeedStateP = ref.watch(profileFeedStateProvider(pubkey));
+    final profileFeedStateNoti =
+        ref.watch(profileFeedStateProvider(pubkey).notifier);
 
     return _BuildScrollablePostsList(
       itemCount: profileFeedStateP.timelineRootNotes.length + 1,
       itemBuilder: (context, index) {
         if (index == profileFeedStateP.timelineRootNotes.length) {
-          return SkeletonNote();
+          if (profileFeedStateP.endOfRootNotes) {
+            return NoMoreNotes();
+          }
+          return SkeletonNote(
+            renderCallback: () {
+              final now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
+              int fetchTime;
+              if (profileFeedStateP.timelineRootNotes.isNotEmpty) {
+                fetchTime = profileFeedStateP.timelineRootNotes.last.created_at;
+              } else {
+                fetchTime = now;
+              }
+
+              profileFeedStateNoti.loadMore(
+                olderThen: fetchTime,
+                pubkey: pubkey,
+              );
+            },
+          );
         }
         return NoteCardContainer(
           key: PageStorageKey(profileFeedStateP.timelineRootNotes[index].id),

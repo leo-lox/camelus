@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:ndk/entities.dart' as ndk_entities;
 import 'package:ndk/ndk.dart' as ndk;
+import 'package:rxdart/rxdart.dart';
 
 import '../../domain_layer/entities/nostr_note.dart';
 import '../../domain_layer/repositories/note_repository.dart';
@@ -49,7 +50,7 @@ class NoteRepositoryImpl implements NoteRepository {
 
   /// Get all notes by a list of authors using a query
   @override
-  Stream<NostrNote> getTextNotesByAuthors({
+  ReplaySubject<NostrNote> getTextNotesByAuthors({
     required List<String> authors,
     required String requestId,
     int? since,
@@ -73,9 +74,18 @@ class NoteRepositoryImpl implements NoteRepository {
       cacheWrite: true,
     );
 
-    return response.stream.map(
+    ReplaySubject<NostrNote> subject = ReplaySubject<NostrNote>();
+
+    response.stream
+        .map(
       (event) => NostrNoteModel.fromNDKEvent(event),
-    );
+    )
+        .listen((event) {
+      subject.add(event);
+    }).onDone(() {
+      subject.close();
+    });
+    return subject;
   }
 
   /// Get all notes by a list of authors using a subscription

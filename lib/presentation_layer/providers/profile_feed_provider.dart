@@ -25,6 +25,8 @@ class ProfileFeedState
   StreamSubscription? _rootAndReplySub;
   StreamSubscription? _newRootAndReplySub;
 
+  final int rootBufferTimeMilis = 200;
+
   late ProfileFeed myProfileFeed;
 
   _setupProfileFeed() {
@@ -75,37 +77,26 @@ class ProfileFeedState
   }
 
   void _initSubscriptions(String pubkey) async {
-    final appDbP = ref.read(dbAppProvider);
-
-    final dbCutOffKey = 'profile_feed_cache_cutoff_$pubkey';
-
-    // [cutoff] is seperates the feed into old and new notes
-    // basically marking the cache point
-    final lastFetch = await appDbP.read(dbCutOffKey);
+    // show latest notes direclty
     int cutoff = 0;
     final int now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
-    if (lastFetch != null) {
-      cutoff = int.parse(lastFetch);
-    } else {
-      cutoff = now;
-    }
-    // Save the current time as the new cutoff
-    appDbP.save(key: dbCutOffKey, value: now.toString());
+
+    cutoff = now;
 
     // Timeline subscription
     _rootNotesSub = myProfileFeed.rootNotesStream
-        .bufferTime(const Duration(milliseconds: 500))
+        .bufferTime(Duration(milliseconds: rootBufferTimeMilis))
         .where((events) => events.isNotEmpty)
         .listen(_addRootTimelineEvents);
 
     // New notes subscription
     _newRootNotesSub = myProfileFeed.newRootNotesStream
-        .bufferTime(const Duration(seconds: 1))
+        .bufferTime(const Duration(seconds: 200))
         .where((events) => events.isNotEmpty)
         .listen(_addNewRootEvents);
 
     _rootAndReplySub = myProfileFeed.rootAndReplyNotesStream
-        .bufferTime(const Duration(milliseconds: 500))
+        .bufferTime(Duration(milliseconds: rootBufferTimeMilis))
         .where((events) => events.isNotEmpty)
         .listen(_addRootAndReplyTimelineEvents);
 
@@ -114,14 +105,62 @@ class ProfileFeedState
         .where((events) => events.isNotEmpty)
         .listen(_addNewRootAndReplyEvents);
 
+    /// not needed anymore, handled by SkeletonNote render callback
     // Initial fetch
-    myProfileFeed.fetchFeedEvents(
-      npub: pubkey,
-      requestId: "startup-profile",
-      limit: 20,
-      until: cutoff,
-    );
+    // myProfileFeed.fetchFeedEvents(
+    //   npub: pubkey,
+    //   requestId: "startup-profile",
+    //   limit: 20,
+    //   until: cutoff,
+    // );
+
+    loadMore(pubkey: pubkey, olderThen: cutoff);
+
     myProfileFeed.subscribeToFreshNotes(npub: pubkey, since: cutoff);
+  }
+
+  void loadMore({
+    required String pubkey,
+    required int olderThen,
+  }) async {
+    final rootNoteLengthBefore = state.timelineRootNotes.length;
+    final rootAndReplyNoteLengthBefore = state.timelineRootAndReplyNotes.length;
+
+    await myProfileFeed.loadMore(
+      pubkey: pubkey,
+      oltherThen: olderThen,
+      limit: 20,
+    );
+
+    /// because the stream is buffered we need to wait a bit
+    await Future.delayed(Duration(milliseconds: rootBufferTimeMilis + 100));
+    if (rootNoteLengthBefore < state.timelineRootNotes.length) {
+      // all good found new notes
+      return;
+    }
+
+    // second try with no limit
+    await myProfileFeed.loadMore(
+      pubkey: pubkey,
+      oltherThen: olderThen,
+    );
+
+    /// because the stream is buffered we need to wait a bit
+    await Future.delayed(Duration(milliseconds: rootBufferTimeMilis + 100));
+    if (rootNoteLengthBefore < state.timelineRootNotes.length) {
+      // all good found new notes
+      return;
+    }
+
+    // no new notes found
+    state = state.copyWith(endOfRootNotes: true);
+
+    if (rootAndReplyNoteLengthBefore < state.timelineRootAndReplyNotes.length) {
+      // all good found new notes
+      return;
+    }
+
+    state = state.copyWith(endOfRootAndReplyNotes: true);
   }
 
   void _addRootTimelineEvents(List<NostrNote> events) {
