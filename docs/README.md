@@ -97,9 +97,8 @@ The feed enables users to share their thoughts and engage with others' content. 
 
 
 Here you can see a message ready to send to the feed and a send button
-  <div align="center">
+ 
     <img src="https://github.com/user-attachments/assets/25d78115-391d-41f9-afba-735ecea3ca42" alt="Screenshot" width="200">
-  </div>
 
 When a user hits a send button the app is going to send the data like in this diagram described.
    
