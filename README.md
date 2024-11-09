@@ -90,12 +90,12 @@ flutter pub get
 ```
 
 run ```flutter build apk --release``` or ```flutter run``` to run directly on your device in debug mode
-### 6 Download
+## 6 Download
 
 Android
 You can join the test and download it from google play link
 
 or use the apk, it is signed with my key so you will need to enable "install from unknown sources" in your phone settings.
 
-### 7 Conclusion
+## 7 Conclusion
 Camelus is designed to offer secure social networking experience. Users are in control of their data through the Nostr protocol. This application is built with a focus on privacy. Contributions, feedback and ideas from the community are welcome to help shape and improve the app’s future.
