@@ -1,1 +1,1 @@
-camelus connects you to the nostr network
+camelus your gateway to the nostr network
