@@ -21,4 +21,5 @@ final Map<String, ndk_entities.ReadWriteMarker>
   "wss://relay.damus.io": ndk_entities.ReadWriteMarker.readWrite,
   "wss://strfry.iris.to": ndk_entities.ReadWriteMarker.readWrite,
   "wss://relay.snort.social": ndk_entities.ReadWriteMarker.readWrite,
+  "wss://countries.fiatjaf.com": ndk_entities.ReadWriteMarker.readWrite,
 };
