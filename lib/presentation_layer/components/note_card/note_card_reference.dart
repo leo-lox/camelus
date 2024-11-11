@@ -30,6 +30,7 @@ final noteAndMetadataProvider =
   return (note, metadata);
 });
 
+/// embed, inline post
 class NoteCardReference extends ConsumerStatefulWidget {
   final String word;
 
@@ -92,7 +93,10 @@ class _NoteCardReferenceState extends ConsumerState<NoteCardReference> {
             ref.watch(noteAndMetadataProvider(nostrId!));
 
         return noteAndMetadataAsync.when(
-          loading: () => const Center(child: SkeletonNote()),
+          loading: () => const Center(
+              child: SkeletonNote(
+            hideBottomAction: true,
+          )),
           error: (error, stack) => Container(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(10),

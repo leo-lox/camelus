@@ -6,8 +6,13 @@ import '../../../config/palette.dart';
 
 class SkeletonNote extends StatelessWidget {
   final Function? renderCallback;
+  final bool hideBottomAction;
 
-  const SkeletonNote({super.key, this.renderCallback});
+  const SkeletonNote({
+    super.key,
+    this.renderCallback,
+    this.hideBottomAction = false,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -93,16 +98,16 @@ class SkeletonNote extends StatelessWidget {
                       ),
 
                       const SizedBox(height: 6),
-
-                      Padding(
-                        padding: const EdgeInsets.only(top: 10.0),
-                        child: BottomActionRow(
-                          onComment: () {},
-                          onLike: () {},
-                          onRetweet: () {},
-                          onShare: () {},
+                      if (!hideBottomAction)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 10.0),
+                          child: BottomActionRow(
+                            onComment: () {},
+                            onLike: () {},
+                            onRetweet: () {},
+                            onShare: () {},
+                          ),
                         ),
-                      ),
                       const SizedBox(height: 20),
                       // show text if replies > 0
                     ],
