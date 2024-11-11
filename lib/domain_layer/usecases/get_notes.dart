@@ -24,7 +24,7 @@ class GetNotes {
     return _noteRepository.getTextNote(noteId);
   }
 
-  Future<List<NostrNote>> genericNostrQuery({
+  Stream<NostrNote> genericNostrQuery({
     required String requestId,
     List<String>? authors,
     List<int>? kinds,
@@ -32,10 +32,9 @@ class GetNotes {
     int? until,
     int? limit,
     List<String>? eTags,
-  }) async {
-    return await _noteRepository.genericNostrQuery(
+  }) {
+    return _noteRepository.genericNostrQuery(
       requestId: requestId,
-      // make copy of the list to avoid mutation
       authors: authors,
       kinds: kinds,
       since: since,

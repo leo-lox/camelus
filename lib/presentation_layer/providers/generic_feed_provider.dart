@@ -1,5 +1,6 @@
 import 'package:camelus/presentation_layer/providers/get_notes_provider.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:rxdart/rxdart.dart';
 
 import '../../domain_layer/entities/feed_filter.dart';
 import '../../domain_layer/entities/feed_view_model.dart';
@@ -51,10 +52,10 @@ class GenericFeedState
     await appDbP.save(key: 'feed-$feedId', value: now.toString());
   }
 
-  Future<List<NostrNote>> _fetchNetworkNotes(FeedFilter filter, int cutoff,
-      {int? limit}) async {
+  Stream<NostrNote> _fetchNetworkNotes(FeedFilter filter, int cutoff,
+      {int? limit}) {
     final notesP = ref.watch(getNotesProvider);
-    return await notesP.genericNostrQuery(
+    return notesP.genericNostrQuery(
       requestId: filter.feedId,
       kinds: filter.kinds,
       authors: filter.authors,
@@ -82,16 +83,24 @@ class GenericFeedState
       cutoff = state.timelineRootAndReplyNotes.last.created_at;
     }
 
-    final networkNotes = await _fetchNetworkNotes(arg, cutoff, limit: 20);
+    final rootNotesBeforeCount = state.timelineRootNotes.length;
+    final rootAndReplyNotesBeforeCount = state.timelineRootAndReplyNotes.length;
+
+    final networkNotesStream = _fetchNetworkNotes(arg, cutoff, limit: 20);
+
+    /// display  as they stream in
+    networkNotesStream
+        .bufferTime(const Duration(milliseconds: 100))
+        .where((events) => events.isNotEmpty)
+        .listen(_processNotes);
+
+    // wait for the stream to finish
+    final networkNotes = await networkNotesStream.toList();
 
     if (networkNotes.isEmpty) {
       state = state.copyWith(endOfRootNotes: true);
       return;
     }
-
-    final rootNotesBeforeCount = state.timelineRootNotes.length;
-    final rootAndReplyNotesBeforeCount = state.timelineRootAndReplyNotes.length;
-    await _processNotes(networkNotes);
 
     await Future.delayed(Duration(milliseconds: 200));
 
@@ -108,10 +117,18 @@ class GenericFeedState
       state = state.copyWith(endOfRootAndReplyNotes: true);
     }
 
-    /// try again without limit
-    final networkNotes2 = await _fetchNetworkNotes(arg, cutoff, limit: 500);
     final rootNotesBeforeCount2 = state.timelineRootNotes.length;
-    await _processNotes(networkNotes2);
+
+    /// try again without limit
+    final networkNotesStream2 = _fetchNetworkNotes(arg, cutoff, limit: null);
+
+    networkNotesStream2
+        .bufferTime(const Duration(milliseconds: 200))
+        .where((events) => events.isNotEmpty)
+        .listen(_processNotes);
+
+    /// wait for the stream to finish
+    final networkNotes2 = await networkNotesStream2.toList();
     await Future.delayed(Duration(milliseconds: 200));
     final rootNotesAfterCount2 = state.timelineRootNotes.length;
     if (rootNotesAfterCount2 == rootNotesBeforeCount2) {

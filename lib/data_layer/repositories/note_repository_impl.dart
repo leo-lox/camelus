@@ -89,7 +89,7 @@ class NoteRepositoryImpl implements NoteRepository {
   }
 
   @override
-  Future<List<NostrNote>> genericNostrQuery({
+  Stream<NostrNote> genericNostrQuery({
     required String requestId,
     List<String>? authors,
     List<int>? kinds,
@@ -97,7 +97,7 @@ class NoteRepositoryImpl implements NoteRepository {
     int? until,
     int? limit,
     List<String>? eTags,
-  }) async {
+  }) {
     ndk.Filter filter = ndk.Filter(
       authors: authors,
       kinds: kinds,
@@ -112,17 +112,12 @@ class NoteRepositoryImpl implements NoteRepository {
       name: requestId,
       cacheRead: true,
       cacheWrite: true,
+      timeout: 5,
     );
 
-    final rsp = await response.future;
-
-    List<NostrNote> notes = rsp
-        .map(
-          (event) => NostrNoteModel.fromNDKEvent(event),
-        )
-        .toList();
-
-    return notes;
+    return response.stream.map(
+      (event) => NostrNoteModel.fromNDKEvent(event),
+    );
   }
 
   /// Get all notes by a list of authors using a subscription

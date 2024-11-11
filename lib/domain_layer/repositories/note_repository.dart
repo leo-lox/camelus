@@ -31,7 +31,7 @@ abstract class NoteRepository {
     List<String>? eTags,
   });
 
-  Future<List<NostrNote>> genericNostrQuery({
+  Stream<NostrNote> genericNostrQuery({
     required String requestId,
     List<String>? authors,
     int? since,
