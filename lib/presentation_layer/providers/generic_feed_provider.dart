@@ -40,13 +40,11 @@ class GenericFeedState
   }
 
   void integrateNewNotes() {
+    _addRootTimelineEvents(state.newRootNotes);
+    _addRootAndReplyTimelineEvents(state.newRootAndReplyNotes);
+
     state = state.copyWith(
-      timelineRootNotes: [...state.newRootNotes, ...state.timelineRootNotes],
       newRootNotes: [],
-      timelineRootAndReplyNotes: [
-        ...state.newRootAndReplyNotes,
-        ...state.timelineRootAndReplyNotes
-      ],
       newRootAndReplyNotes: [],
     );
   }
@@ -120,7 +118,7 @@ class GenericFeedState
 
     /// already have somting in timeline
     if (state.timelineRootAndReplyNotes.isNotEmpty) {
-      cutoff = state.timelineRootAndReplyNotes.last.created_at;
+      cutoff = state.timelineRootAndReplyNotes.last.created_at - 1;
     }
 
     final rootNotesBeforeCount = state.timelineRootNotes.length;
