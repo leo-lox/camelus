@@ -287,8 +287,13 @@ class _BuildProfileHeader extends ConsumerWidget {
                   children: [
                     _display_following(contactsAsyncValue, context),
                     SizedBox(width: 16),
-                    Text('n.a Followers',
-                        style: TextStyle(color: Colors.white)),
+                    Text(
+                      'n.a Followers',
+                      style: TextStyle(
+                        color: Palette.gray,
+                        fontSize: 14,
+                      ),
+                    ),
                   ],
                 ),
               ],
