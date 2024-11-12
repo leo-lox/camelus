@@ -41,6 +41,16 @@ abstract class NoteRepository {
     List<String>? eTags,
   });
 
+  Stream<NostrNote> genericNostrSubscription({
+    required String subscriptionId,
+    List<String>? authors,
+    int? since,
+    List<int>? kinds,
+    int? until,
+    int? limit,
+    List<String>? eTags,
+  });
+
   Future<void> closeSubscription(String subscriptionId);
 
   Future<void> broadcastNote(NostrNote noteToPublish);

@@ -44,6 +44,30 @@ class GetNotes {
     );
   }
 
+  Stream<NostrNote> genericNostrSubscription({
+    required String subscriptionId,
+    List<String>? authors,
+    List<int>? kinds,
+    int? since,
+    int? until,
+    int? limit,
+    List<String>? eTags,
+  }) {
+    return _noteRepository.genericNostrSubscription(
+      subscriptionId: subscriptionId,
+      authors: authors,
+      kinds: kinds,
+      since: since,
+      until: until,
+      limit: limit,
+      eTags: eTags,
+    );
+  }
+
+  Future<void> closeSubscription(String subscriptionId) {
+    return _noteRepository.closeSubscription(subscriptionId);
+  }
+
   Future<void> closeNote() {
     throw UnimplementedError();
   }

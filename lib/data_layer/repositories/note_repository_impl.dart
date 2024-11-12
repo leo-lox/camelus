@@ -120,6 +120,37 @@ class NoteRepositoryImpl implements NoteRepository {
     );
   }
 
+  @override
+  Stream<NostrNote> genericNostrSubscription({
+    required String subscriptionId,
+    List<String>? authors,
+    int? since,
+    List<int>? kinds,
+    int? until,
+    int? limit,
+    List<String>? eTags,
+  }) {
+    ndk.Filter filter = ndk.Filter(
+      authors: authors,
+      kinds: kinds,
+      since: since,
+      until: until,
+      limit: limit,
+      eTags: eTags,
+    );
+
+    final response = dartNdkSource.dartNdk.requests.subscription(
+      filters: [filter],
+      name: subscriptionId,
+      cacheRead: false,
+      cacheWrite: true,
+    );
+
+    return response.stream.map(
+      (event) => NostrNoteModel.fromNDKEvent(event),
+    );
+  }
+
   /// Get all notes by a list of authors using a subscription
   @override
   Stream<NostrNote> subscribeTextNotesByAuthors({

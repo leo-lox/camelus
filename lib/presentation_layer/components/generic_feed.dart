@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../domain_layer/entities/feed_filter.dart';
+import '../atoms/new_posts_available.dart';
+import '../atoms/refresh_indicator_no_need.dart';
 import '../providers/generic_feed_provider.dart';
 import 'note_card/no_more_notes.dart';
 import 'note_card/note_card_container.dart';
 import 'note_card/skeleton_note.dart';
 
-class GenericFeed extends ConsumerWidget {
+class GenericFeed extends ConsumerStatefulWidget {
   final FeedFilter feedFilter;
 
   const GenericFeed({
@@ -16,10 +18,43 @@ class GenericFeed extends ConsumerWidget {
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<GenericFeed> createState() => _GenericFeedState();
+}
+
+class _GenericFeedState extends ConsumerState<GenericFeed> {
+  late ScrollController _scrollController;
+
+  _scrollToTop() {
+    _scrollController.animateTo(
+      0,
+      duration: const Duration(milliseconds: 500),
+      curve: Curves.easeOutCubic,
+    );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController = ScrollController();
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final genericFeedStateP =
+        ref.watch(genericFeedStateProvider(widget.feedFilter));
+    final genericFeedStateNotifier =
+        ref.watch(genericFeedStateProvider(widget.feedFilter).notifier);
+
     return DefaultTabController(
       length: 2,
       child: NestedScrollView(
+        controller: _scrollController,
         headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
           return <Widget>[
             SliverOverlapAbsorber(
@@ -41,8 +76,55 @@ class GenericFeed extends ConsumerWidget {
         },
         body: TabBarView(
           children: [
-            ScrollablePostsList(feedFilter: feedFilter),
-            ScrollablePostsAndRepliesList(feedFilter: feedFilter),
+            Stack(
+              children: [
+                RefreshIndicatorNoNeed(
+                  onRefresh: () async {
+                    await Future.delayed(Duration.zero);
+                  },
+                  child: ScrollablePostsList(feedFilter: widget.feedFilter),
+                ),
+                if (genericFeedStateP.newRootNotes.isNotEmpty)
+                  Positioned(
+                    top: 20,
+                    left: 0,
+                    right: 0,
+                    child: newPostsAvailable(
+                      name:
+                          "${genericFeedStateP.newRootNotes.length} new posts",
+                      onPressed: () {
+                        genericFeedStateNotifier.integrateNewNotes();
+                        _scrollToTop();
+                      },
+                    ),
+                  ),
+              ],
+            ),
+            Stack(
+              children: [
+                RefreshIndicatorNoNeed(
+                  onRefresh: () async {
+                    await Future.delayed(Duration.zero);
+                  },
+                  child: ScrollablePostsAndRepliesList(
+                      feedFilter: widget.feedFilter),
+                ),
+                if (genericFeedStateP.newRootAndReplyNotes.isNotEmpty)
+                  Positioned(
+                    top: 20,
+                    left: 0,
+                    right: 0,
+                    child: newPostsAvailable(
+                      name:
+                          "${genericFeedStateP.newRootAndReplyNotes.length} new posts",
+                      onPressed: () {
+                        genericFeedStateNotifier.integrateNewNotes();
+                        _scrollToTop();
+                      },
+                    ),
+                  ),
+              ],
+            ),
           ],
         ),
       ),
@@ -113,7 +195,8 @@ class ScrollablePostsAndRepliesList extends ConsumerWidget {
         }
         return NoteCardContainer(
           key: PageStorageKey(
-              profileFeedStateP.timelineRootAndReplyNotes[index].id),
+            profileFeedStateP.timelineRootAndReplyNotes[index].id,
+          ),
           note: profileFeedStateP.timelineRootAndReplyNotes[index],
         );
       },

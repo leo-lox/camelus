@@ -15,6 +15,8 @@ final genericFeedStateProvider = NotifierProvider.autoDispose
 class GenericFeedState
     extends AutoDisposeFamilyNotifier<FeedViewModel, FeedFilter> {
   Future<void> _resetStateDispose() async {
+    final notesP = ref.watch(getNotesProvider);
+    await notesP.closeSubscription("sub-${arg.feedId}");
     state = FeedViewModel(
       timelineRootNotes: [],
       newRootNotes: [],
@@ -28,12 +30,50 @@ class GenericFeedState
     ref.onDispose(() {
       _resetStateDispose();
     });
+    _setupSubscription(arg);
     return FeedViewModel(
       timelineRootNotes: [],
       newRootNotes: [],
       timelineRootAndReplyNotes: [],
       newRootAndReplyNotes: [],
     );
+  }
+
+  void integrateNewNotes() {
+    state = state.copyWith(
+      timelineRootNotes: [...state.newRootNotes, ...state.timelineRootNotes],
+      newRootNotes: [],
+      timelineRootAndReplyNotes: [
+        ...state.newRootAndReplyNotes,
+        ...state.timelineRootAndReplyNotes
+      ],
+      newRootAndReplyNotes: [],
+    );
+  }
+
+  Future<void> _setupSubscription(FeedFilter filter) async {
+    int cutoff = await _getCutoffTime(filter.feedId);
+    final notesP = ref.watch(getNotesProvider);
+    final sub = notesP.genericNostrSubscription(
+      since: cutoff,
+      subscriptionId: "sub-${filter.feedId}",
+      kinds: filter.kinds,
+      authors: filter.authors,
+      eTags: filter.eTags,
+    );
+
+    sub
+        .bufferTime(const Duration(seconds: 1))
+        .where((events) => events.isNotEmpty)
+        .listen(_processFreshNotes);
+  }
+
+  Future<void> _processFreshNotes(List<NostrNote> networkNotes) async {
+    final rootNotes = networkNotes.where((note) => note.isRoot).toList();
+    final rootAndReplyNotes = networkNotes;
+
+    _addNewRootEvents(rootNotes);
+    _addNewRootAndReplyEvents(rootAndReplyNotes);
   }
 
   // [cutoff] is seperates the feed into old and new notes
@@ -66,7 +106,7 @@ class GenericFeedState
   }
 
   /// filters the notes and adds them to the state
-  Future<void> _processNotes(List<NostrNote> networkNotes) async {
+  Future<void> _processTimelineNotes(List<NostrNote> networkNotes) async {
     final rootNotes = networkNotes.where((note) => note.isRoot).toList();
     final rootAndReplyNotes = networkNotes;
 
@@ -92,7 +132,7 @@ class GenericFeedState
     networkNotesStream
         .bufferTime(const Duration(milliseconds: 100))
         .where((events) => events.isNotEmpty)
-        .listen(_processNotes);
+        .listen(_processTimelineNotes);
 
     // wait for the stream to finish
     final networkNotes = await networkNotesStream.toList();
@@ -125,7 +165,7 @@ class GenericFeedState
     networkNotesStream2
         .bufferTime(const Duration(milliseconds: 200))
         .where((events) => events.isNotEmpty)
-        .listen(_processNotes);
+        .listen(_processTimelineNotes);
 
     /// wait for the stream to finish
     final networkNotes2 = await networkNotesStream2.toList();
