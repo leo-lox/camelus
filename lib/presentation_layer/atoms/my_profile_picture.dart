@@ -1,8 +1,8 @@
 import 'package:camelus/config/dicebear.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:camelus/config/palette.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class UserImage extends StatelessWidget {
   const UserImage({
@@ -24,7 +24,19 @@ class UserImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final pictureUrl = imageUrl ?? "${Dicebear.baseUrl}$pubkey";
+    if (imageUrl == null) {
+      return Container(
+        height: size,
+        width: size,
+        decoration: const BoxDecoration(
+          color: Palette.primary,
+          shape: BoxShape.circle,
+        ),
+        child: SvgPicture.network("${Dicebear.baseUrl}$pubkey"),
+      );
+    }
+
+    final pictureUrl = imageUrl!;
 
     // Check if it's a GIF and should be disabled
     if (disableGif && pictureUrl.toLowerCase().endsWith('.gif')) {
@@ -50,7 +62,8 @@ class UserImage extends StatelessWidget {
             imageUrl: pictureUrl,
             filterQuality: filterQuality,
             progressIndicatorBuilder: (context, url, downloadProgress) =>
-                const CircularProgressIndicator(
+                CircularProgressIndicator(
+              value: downloadProgress.progress,
               color: Palette.darkGray,
             ),
             errorWidget: (context, url, error) => const Icon(Icons.error),
