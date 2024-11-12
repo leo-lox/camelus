@@ -31,7 +31,7 @@ platform :android do
 
   desc "Deploy a new version to open Testing Track"
   lane :beta do
-    sh "flutter build appbundle --release" # build the app bundle
+    sh "flutter build appbundle --release --obfuscate --split-debug-info=/myBuilds/obfuscate" # build the app bundle
     #gradle(
     #  task: 'bundle',
     #  build_type: 'Release'
