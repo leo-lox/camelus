@@ -7,6 +7,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:badges/badges.dart' as badges;
 
 import '../../../../config/palette.dart';
+import '../../../../domain_layer/entities/contact_list.dart';
 import '../../../../domain_layer/entities/feed_filter.dart';
 import '../../../../domain_layer/entities/user_metadata.dart';
 
@@ -16,7 +17,7 @@ import '../../../providers/following_provider.dart';
 import '../../../providers/metadata_provider.dart';
 import '../relays_page.dart';
 
-class NostrPage extends ConsumerWidget {
+class NostrPage extends ConsumerStatefulWidget {
   final GlobalKey<ScaffoldState> parentScaffoldKey;
   final String pubkey;
 
@@ -25,6 +26,24 @@ class NostrPage extends ConsumerWidget {
     required this.parentScaffoldKey,
     required this.pubkey,
   });
+
+  @override
+  ConsumerState<NostrPage> createState() => _NostrPageState();
+}
+
+class _NostrPageState extends ConsumerState<NostrPage>
+    with AutomaticKeepAliveClientMixin {
+  late Future<ContactList?> _contactsFuture;
+
+  @override
+  bool get wantKeepAlive => true;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _contactsFuture = ref.read(followingProvider).getContactsSelf();
+  }
 
   void _openRelaysView(BuildContext context) {
     Navigator.of(context).push(
@@ -49,17 +68,18 @@ class NostrPage extends ConsumerWidget {
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final followP = ref.watch(followingProvider);
+  Widget build(BuildContext context) {
+    super.build(context);
 
     return SafeArea(
       child: FutureBuilder(
-        future: followP.getContactsSelf(),
+        future: _contactsFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());
           } else {
             return GenericFeed(
+              key: PageStorageKey('homeFeed-${widget.pubkey}'),
               floatHeaderSlivers: true,
               customHeaderSliverBuilder:
                   (BuildContext context, bool innerBoxIsScrolled) {
@@ -75,8 +95,8 @@ class NostrPage extends ConsumerWidget {
                       backgroundColor: Palette.background,
                       leadingWidth: 48,
                       leading: LeadingWidget(
-                        parentScaffoldKey: parentScaffoldKey,
-                        pubkey: pubkey,
+                        parentScaffoldKey: widget.parentScaffoldKey,
+                        pubkey: widget.pubkey,
                       ),
                       centerTitle: true,
                       title: const TitleWidget(),
@@ -100,7 +120,7 @@ class NostrPage extends ConsumerWidget {
                 feedId: "testfeed",
                 kinds: [1],
                 authors: snapshot.data?.contacts != null
-                    ? [...snapshot.data!.contacts, pubkey]
+                    ? [...snapshot.data!.contacts, widget.pubkey]
                     : [],
               ),
             );
@@ -201,31 +221,6 @@ class RelaysWidget extends StatelessWidget {
           );
         },
       ),
-    );
-  }
-}
-
-class TabBarWidget extends StatelessWidget {
-  final TabController controller;
-
-  const TabBarWidget({super.key, required this.controller});
-
-  @override
-  Widget build(BuildContext context) {
-    return TabBar(
-      controller: controller,
-      indicatorColor: Palette.primary,
-      indicatorSize: TabBarIndicatorSize.label,
-      automaticIndicatorColorAdjustment: true,
-      indicator: const UnderlineTabIndicator(
-        borderRadius: BorderRadius.all(Radius.circular(10)),
-        borderSide: BorderSide(width: 2, color: Palette.primary),
-      ),
-      indicatorWeight: 8.0,
-      tabs: const [
-        Text("feed", style: TextStyle(color: Palette.lightGray)),
-        Text("feed & replies", style: TextStyle(color: Palette.lightGray)),
-      ],
     );
   }
 }

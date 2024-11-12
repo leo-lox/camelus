@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -6,6 +8,7 @@ import '../../domain_layer/entities/feed_filter.dart';
 import '../atoms/new_posts_available.dart';
 import '../atoms/refresh_indicator_no_need.dart';
 import '../providers/generic_feed_provider.dart';
+import '../providers/navigation_bar_provider.dart';
 import 'note_card/no_more_notes.dart';
 import 'note_card/note_card_container.dart';
 import 'note_card/skeleton_note.dart';
@@ -29,6 +32,7 @@ class GenericFeed extends ConsumerStatefulWidget {
 
 class _GenericFeedState extends ConsumerState<GenericFeed> {
   late ScrollController _scrollController;
+  late StreamSubscription<void> _homeBarSub;
 
   _scrollToTop() {
     _scrollController.animateTo(
@@ -42,11 +46,21 @@ class _GenericFeedState extends ConsumerState<GenericFeed> {
   void initState() {
     super.initState();
     _scrollController = ScrollController();
+
+    final navBarP = ref.read(navigationBarProvider);
+    final genericFeedStateNotifier =
+        ref.read(genericFeedStateProvider(widget.feedFilter).notifier);
+
+    _homeBarSub = navBarP.onTabHome.listen((_) {
+      genericFeedStateNotifier.integrateNewNotes();
+      _scrollToTop();
+    });
   }
 
   @override
   void dispose() {
     _scrollController.dispose();
+    _homeBarSub.cancel();
     super.dispose();
   }
 
@@ -147,7 +161,7 @@ class ScrollablePostsList extends ConsumerWidget {
   Widget build(BuildContext context, ref) {
     final profileFeedStateP = ref.watch(genericFeedStateProvider(feedFilter));
     final profileFeedStateNoti =
-        ref.watch(genericFeedStateProvider(feedFilter).notifier);
+        ref.read(genericFeedStateProvider(feedFilter).notifier);
 
     return _BuildScrollablePostsList(
       itemCount: profileFeedStateP.timelineRootNotes.length + 1,
@@ -182,7 +196,7 @@ class ScrollablePostsAndRepliesList extends ConsumerWidget {
   Widget build(BuildContext context, ref) {
     final profileFeedStateP = ref.watch(genericFeedStateProvider(feedFilter));
     final profileFeedStateNoti =
-        ref.watch(genericFeedStateProvider(feedFilter).notifier);
+        ref.read(genericFeedStateProvider(feedFilter).notifier);
 
     return _BuildScrollablePostsList(
       itemCount: profileFeedStateP.timelineRootAndReplyNotes.length + 1,

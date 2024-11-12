@@ -129,7 +129,6 @@ class _HomePageState extends ConsumerState<HomePage> {
           controller: _myPage,
           physics: const NeverScrollableScrollPhysics(),
           children: <Widget>[
-            //NostrPage(parentScaffoldKey: _scaffoldKey, pubkey: widget.pubkey),
             NostrPage(
               parentScaffoldKey: _scaffoldKey,
               pubkey: widget.pubkey,

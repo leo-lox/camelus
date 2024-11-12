@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+
 class FeedFilter {
   // feed id is included in the query to better track errors
   String feedId;
@@ -39,4 +41,24 @@ class FeedFilter {
     this.aTags,
     this.dTags,
   });
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+
+    return other is FeedFilter &&
+        other.feedId == feedId &&
+        listEquals(other.ids, ids) &&
+        listEquals(other.authors, authors) &&
+        listEquals(other.kinds, kinds) &&
+        other.search == search &&
+        listEquals(other.eTags, eTags) &&
+        listEquals(other.pTags, pTags) &&
+        listEquals(other.tTags, tTags) &&
+        listEquals(other.aTags, aTags) &&
+        listEquals(other.dTags, dTags);
+  }
+
+  @override
+  int get hashCode => feedId.hashCode;
 }
