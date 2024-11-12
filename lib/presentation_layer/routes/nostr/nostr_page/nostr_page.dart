@@ -5,21 +5,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:badges/badges.dart' as badges;
-import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../config/palette.dart';
-import '../../../../domain_layer/entities/app_update.dart';
 import '../../../../domain_layer/entities/feed_filter.dart';
 import '../../../../domain_layer/entities/user_metadata.dart';
 
 import '../../../atoms/my_profile_picture.dart';
 import '../../../components/generic_feed.dart';
-import '../../../providers/app_update_provider.dart';
 import '../../../providers/following_provider.dart';
 import '../../../providers/metadata_provider.dart';
 import '../relays_page.dart';
 
-class NostrPage extends ConsumerStatefulWidget {
+class NostrPage extends ConsumerWidget {
   final GlobalKey<ScaffoldState> parentScaffoldKey;
   final String pubkey;
 
@@ -29,47 +26,7 @@ class NostrPage extends ConsumerStatefulWidget {
     required this.pubkey,
   });
 
-  @override
-  ConsumerState<NostrPage> createState() => _NostrPageState();
-}
-
-class _NostrPageState extends ConsumerState<NostrPage>
-    with TickerProviderStateMixin, AutomaticKeepAliveClientMixin {
-  @override
-  bool get wantKeepAlive => true;
-
-  @override
-  void initState() {
-    super.initState();
-
-    _checkForUpdates();
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-  }
-
-  Future<void> _checkForUpdates() async {
-    await Future.delayed(const Duration(seconds: 15));
-    if (!mounted) return;
-
-    final appUpdate = ref.read(appUpdateProvider);
-    final updateInfo = await appUpdate.call();
-
-    if (updateInfo.isUpdateAvailable && mounted) {
-      _showUpdateDialog(updateInfo);
-    }
-  }
-
-  void _showUpdateDialog(AppUpdate updateInfo) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) => UpdateDialog(updateInfo: updateInfo),
-    );
-  }
-
-  void _openRelaysView() {
+  void _openRelaysView(BuildContext context) {
     Navigator.of(context).push(
       PageRouteBuilder(
         pageBuilder: (context, animation, secondaryAnimation) =>
@@ -92,8 +49,7 @@ class _NostrPageState extends ConsumerState<NostrPage>
   }
 
   @override
-  Widget build(BuildContext context) {
-    super.build(context);
+  Widget build(BuildContext context, WidgetRef ref) {
     final followP = ref.watch(followingProvider);
 
     return SafeArea(
@@ -112,12 +68,12 @@ class _NostrPageState extends ConsumerState<NostrPage>
                 backgroundColor: Palette.background,
                 leadingWidth: 48,
                 leading: LeadingWidget(
-                  parentScaffoldKey: widget.parentScaffoldKey,
-                  pubkey: widget.pubkey,
+                  parentScaffoldKey: parentScaffoldKey,
+                  pubkey: pubkey,
                 ),
                 centerTitle: true,
                 title: const TitleWidget(),
-                actions: [RelaysWidget(onTap: _openRelaysView)],
+                actions: [RelaysWidget(onTap: () => _openRelaysView(context))],
                 bottom: PreferredSize(
                   preferredSize: const Size.fromHeight(40),
                   child: TabBar(
@@ -132,41 +88,13 @@ class _NostrPageState extends ConsumerState<NostrPage>
                 feedId: "testfeed",
                 kinds: [1],
                 authors: snapshot.data?.contacts != null
-                    ? [...snapshot.data!.contacts, widget.pubkey]
+                    ? [...snapshot.data!.contacts, pubkey]
                     : [],
               ),
             );
           }
         },
       ),
-    );
-  }
-}
-
-class UpdateDialog extends StatelessWidget {
-  final AppUpdate updateInfo;
-
-  const UpdateDialog({super.key, required this.updateInfo});
-
-  @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      title: Text(updateInfo.title),
-      content: Text(updateInfo.body),
-      actions: <Widget>[
-        TextButton(
-          child: const Text("Cancel"),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-        TextButton(
-          child: const Text("Update"),
-          onPressed: () {
-            launchUrl(Uri.parse(updateInfo.url),
-                mode: LaunchMode.externalApplication);
-            Navigator.of(context).pop();
-          },
-        ),
-      ],
     );
   }
 }

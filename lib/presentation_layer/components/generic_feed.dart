@@ -12,7 +12,6 @@ import 'note_card/skeleton_note.dart';
 
 class GenericFeed extends ConsumerStatefulWidget {
   final FeedFilter feedFilter;
-
   final SliverAppBar? customAppBar;
 
   const GenericFeed({

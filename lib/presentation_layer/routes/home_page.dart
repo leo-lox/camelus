@@ -11,9 +11,12 @@ import 'package:flutter_svg/svg.dart';
 import 'package:camelus/presentation_layer/components/write_post.dart';
 import 'package:camelus/config/palette.dart';
 import 'package:camelus/presentation_layer/routes/nostr/nostr_drawer.dart';
-import 'package:camelus/presentation_layer/routes/nostr/nostr_page/nostr_page.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:matomo_tracker/matomo_tracker.dart';
+import 'package:url_launcher/url_launcher.dart';
+
+import '../../domain_layer/entities/app_update.dart';
+import '../providers/app_update_provider.dart';
 
 class HomePage extends ConsumerStatefulWidget {
   final String pubkey;
@@ -27,6 +30,25 @@ class _HomePageState extends ConsumerState<HomePage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   int _selectedIndex = 0;
   final PageController _myPage = PageController(initialPage: 0);
+
+  Future<void> _checkForUpdates() async {
+    await Future.delayed(const Duration(seconds: 15));
+    if (!mounted) return;
+
+    final appUpdate = ref.read(appUpdateProvider);
+    final updateInfo = await appUpdate.call();
+
+    if (updateInfo.isUpdateAvailable && mounted) {
+      _showUpdateDialog(updateInfo);
+    }
+  }
+
+  void _showUpdateDialog(AppUpdate updateInfo) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) => UpdateDialog(updateInfo: updateInfo),
+    );
+  }
 
   void _show(BuildContext ctx) {
     showModalBottomSheet(
@@ -70,6 +92,7 @@ class _HomePageState extends ConsumerState<HomePage> {
   void initState() {
     super.initState();
     _initMatomo();
+    _checkForUpdates();
   }
 
   @override
@@ -154,9 +177,12 @@ class _HomePageState extends ConsumerState<HomePage> {
                     SvgPicture.asset(
                       height: 23,
                       'assets/icons/house.svg',
-                      color: _selectedIndex == 0
-                          ? Palette.primary
-                          : Palette.darkGray,
+                      colorFilter: ColorFilter.mode(
+                        _selectedIndex == 0
+                            ? Palette.primary
+                            : Palette.darkGray,
+                        BlendMode.srcIn,
+                      ),
                     ),
                     StreamBuilder<int>(
                         stream: navBarProvider.newNotesCountStream,
@@ -213,6 +239,34 @@ class _HomePageState extends ConsumerState<HomePage> {
           ),
         ],
       ),
+    );
+  }
+}
+
+class UpdateDialog extends StatelessWidget {
+  final AppUpdate updateInfo;
+
+  const UpdateDialog({super.key, required this.updateInfo});
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text(updateInfo.title),
+      content: Text(updateInfo.body),
+      actions: <Widget>[
+        TextButton(
+          child: const Text("Cancel"),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+        TextButton(
+          child: const Text("Update"),
+          onPressed: () {
+            launchUrl(Uri.parse(updateInfo.url),
+                mode: LaunchMode.externalApplication);
+            Navigator.of(context).pop();
+          },
+        ),
+      ],
     );
   }
 }

@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 final navigationBarProvider = Provider<NavigationBarControls>((ref) {
-  var navigationBarControls = NavigationBarControls();
+  final navigationBarControls = NavigationBarControls();
 
   return navigationBarControls;
 });
