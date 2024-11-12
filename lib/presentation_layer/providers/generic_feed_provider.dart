@@ -179,6 +179,13 @@ class GenericFeedState
   ///  modify the state with the new events
 
   void _addRootTimelineEvents(List<NostrNote> events) {
+    /// filter out notes that are already in the timelineRootNotes
+    //todo: find out why this happens
+    events = events.where((event) {
+      return !state.timelineRootNotes.any((element) {
+        return element.id == event.id;
+      });
+    }).toList();
     state = state.copyWith(
         timelineRootNotes: [...state.timelineRootNotes, ...events]
           ..sort((a, b) => b.created_at.compareTo(a.created_at)));

@@ -12,11 +12,14 @@ import 'note_card/skeleton_note.dart';
 
 class GenericFeed extends ConsumerStatefulWidget {
   final FeedFilter feedFilter;
-  final SliverAppBar? customAppBar;
+
+  final List<Widget> Function(BuildContext, bool)? customHeaderSliverBuilder;
+  final bool floatHeaderSlivers;
 
   const GenericFeed({
     super.key,
-    this.customAppBar,
+    this.customHeaderSliverBuilder,
+    this.floatHeaderSlivers = false,
     required this.feedFilter,
   });
 
@@ -57,14 +60,15 @@ class _GenericFeedState extends ConsumerState<GenericFeed> {
     return DefaultTabController(
       length: 2,
       child: NestedScrollView(
-        floatHeaderSlivers: true,
+        floatHeaderSlivers: widget.floatHeaderSlivers,
         controller: _scrollController,
-        headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
-          return <Widget>[
-            SliverOverlapAbsorber(
-              handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
-              sliver: widget.customAppBar ??
-                  SliverAppBar(
+        headerSliverBuilder: widget.customHeaderSliverBuilder ??
+            (BuildContext context, bool innerBoxIsScrolled) {
+              return <Widget>[
+                SliverOverlapAbsorber(
+                  handle:
+                      NestedScrollView.sliverOverlapAbsorberHandleFor(context),
+                  sliver: SliverAppBar(
                     backgroundColor: Palette.background,
                     toolbarHeight: 0,
                     floating: true,
@@ -77,9 +81,9 @@ class _GenericFeedState extends ConsumerState<GenericFeed> {
                       ],
                     ),
                   ),
-            ),
-          ];
-        },
+                ),
+              ];
+            },
         body: TabBarView(
           children: [
             Stack(
@@ -91,18 +95,12 @@ class _GenericFeedState extends ConsumerState<GenericFeed> {
                   child: ScrollablePostsList(feedFilter: widget.feedFilter),
                 ),
                 if (genericFeedStateP.newRootNotes.isNotEmpty)
-                  Positioned(
-                    top: 20,
-                    left: 0,
-                    right: 0,
-                    child: newPostsAvailable(
-                      name:
-                          "${genericFeedStateP.newRootNotes.length} new posts",
-                      onPressed: () {
-                        genericFeedStateNotifier.integrateNewNotes();
-                        _scrollToTop();
-                      },
-                    ),
+                  newPostsAvailable(
+                    name: "${genericFeedStateP.newRootNotes.length} new posts",
+                    onPressed: () {
+                      genericFeedStateNotifier.integrateNewNotes();
+                      _scrollToTop();
+                    },
                   ),
               ],
             ),

@@ -60,30 +60,42 @@ class NostrPage extends ConsumerWidget {
             return Center(child: CircularProgressIndicator());
           } else {
             return GenericFeed(
-              customAppBar: SliverAppBar(
-                floating: true,
-                snap: false,
-                pinned: false,
-                forceElevated: true,
-                backgroundColor: Palette.background,
-                leadingWidth: 48,
-                leading: LeadingWidget(
-                  parentScaffoldKey: parentScaffoldKey,
-                  pubkey: pubkey,
-                ),
-                centerTitle: true,
-                title: const TitleWidget(),
-                actions: [RelaysWidget(onTap: () => _openRelaysView(context))],
-                bottom: PreferredSize(
-                  preferredSize: const Size.fromHeight(40),
-                  child: TabBar(
-                    tabs: [
-                      Tab(text: "Posts"),
-                      Tab(text: "Posts and Replies"),
-                    ],
+              floatHeaderSlivers: true,
+              customHeaderSliverBuilder:
+                  (BuildContext context, bool innerBoxIsScrolled) {
+                return <Widget>[
+                  SliverOverlapAbsorber(
+                    handle: NestedScrollView.sliverOverlapAbsorberHandleFor(
+                        context),
+                    sliver: SliverAppBar(
+                      floating: true,
+                      snap: false,
+                      pinned: false,
+                      forceElevated: true,
+                      backgroundColor: Palette.background,
+                      leadingWidth: 48,
+                      leading: LeadingWidget(
+                        parentScaffoldKey: parentScaffoldKey,
+                        pubkey: pubkey,
+                      ),
+                      centerTitle: true,
+                      title: const TitleWidget(),
+                      actions: [
+                        RelaysWidget(onTap: () => _openRelaysView(context))
+                      ],
+                      bottom: PreferredSize(
+                        preferredSize: const Size.fromHeight(40),
+                        child: TabBar(
+                          tabs: [
+                            Tab(text: "Posts"),
+                            Tab(text: "Posts and Replies"),
+                          ],
+                        ),
+                      ),
+                    ),
                   ),
-                ),
-              ),
+                ];
+              },
               feedFilter: FeedFilter(
                 feedId: "testfeed",
                 kinds: [1],

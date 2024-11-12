@@ -1,5 +1,7 @@
 import 'dart:developer';
 
+import 'package:camelus/domain_layer/entities/feed_filter.dart';
+import 'package:camelus/presentation_layer/components/generic_feed.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -42,13 +44,20 @@ class ProfilePage2 extends ConsumerWidget {
       length: 2,
       child: Scaffold(
         backgroundColor: Palette.background,
-        body: NestedScrollView(
-          headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
+        body: GenericFeed(
+          feedFilter: FeedFilter(
+            authors: [pubkey],
+            kinds: [1],
+            feedId: 'profile-${pubkey.substring(10, 20)}',
+          ),
+          customHeaderSliverBuilder:
+              (BuildContext context, bool innerBoxIsScrolled) {
             return <Widget>[
               SliverOverlapAbsorber(
                 handle:
                     NestedScrollView.sliverOverlapAbsorberHandleFor(context),
                 sliver: SliverAppBar(
+                  surfaceTintColor: Palette.background,
                   leading: BackButtonRound(),
                   actions: [
                     PopupMenuButton<String>(
@@ -132,16 +141,6 @@ class ProfilePage2 extends ConsumerWidget {
               ),
             ];
           },
-          body: TabBarView(
-            children: [
-              ScrollablePostsList(
-                pubkey: pubkey,
-              ),
-              ScrollablePostsAndRepliesList(
-                pubkey: pubkey,
-              )
-            ],
-          ),
         ),
       ),
     );
