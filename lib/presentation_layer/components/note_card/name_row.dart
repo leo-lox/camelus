@@ -5,6 +5,7 @@ import 'package:camelus/presentation_layer/providers/nip05_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:intl/intl.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 class NoteCardNameRow extends ConsumerStatefulWidget {
@@ -28,11 +29,25 @@ class NoteCardNameRow extends ConsumerStatefulWidget {
 class _NoteCardNameRowState extends ConsumerState<NoteCardNameRow> {
   String nip05verified = "";
   late String npubHrShort;
+  late String dateText;
 
   @override
   void initState() {
     super.initState();
     _initSequence();
+
+    final now = DateTime.now();
+    final postDateTime =
+        DateTime.fromMillisecondsSinceEpoch(widget.createdAt * 1000);
+    final difference = now.difference(postDateTime);
+
+    if (difference.inDays < 2) {
+      // Use timeago for posts less than 2 days old
+      dateText = timeago.format(postDateTime);
+    } else {
+      // Use a human-readable date format for posts 2 days or older
+      dateText = DateFormat('MMM d, yyyy').format(postDateTime);
+    }
   }
 
   void _initSequence() {
@@ -79,9 +94,7 @@ class _NoteCardNameRowState extends ConsumerState<NoteCardNameRow> {
                       const TextSpan(text: '  '),
                       const TextSpan(text: ' · '),
                       TextSpan(
-                        text: timeago.format(
-                            DateTime.fromMillisecondsSinceEpoch(
-                                widget.createdAt * 1000)),
+                        text: dateText,
                         style:
                             const TextStyle(color: Palette.gray, fontSize: 14),
                       ),
