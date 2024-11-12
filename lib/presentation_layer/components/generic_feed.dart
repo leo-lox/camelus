@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
+import '../../config/palette.dart';
 import '../../domain_layer/entities/feed_filter.dart';
 import '../atoms/new_posts_available.dart';
 import '../atoms/refresh_indicator_no_need.dart';
@@ -12,8 +13,11 @@ import 'note_card/skeleton_note.dart';
 class GenericFeed extends ConsumerStatefulWidget {
   final FeedFilter feedFilter;
 
+  final SliverAppBar? customAppBar;
+
   const GenericFeed({
     super.key,
+    this.customAppBar,
     required this.feedFilter,
   });
 
@@ -54,23 +58,26 @@ class _GenericFeedState extends ConsumerState<GenericFeed> {
     return DefaultTabController(
       length: 2,
       child: NestedScrollView(
+        floatHeaderSlivers: true,
         controller: _scrollController,
         headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
           return <Widget>[
             SliverOverlapAbsorber(
               handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
-              sliver: SliverAppBar(
-                toolbarHeight: 0,
-                floating: true,
-                snap: true,
-                forceElevated: innerBoxIsScrolled,
-                bottom: TabBar(
-                  tabs: [
-                    Tab(text: "Posts"),
-                    Tab(text: "Posts and Replies"),
-                  ],
-                ),
-              ),
+              sliver: widget.customAppBar ??
+                  SliverAppBar(
+                    backgroundColor: Palette.background,
+                    toolbarHeight: 0,
+                    floating: true,
+                    snap: true,
+                    forceElevated: innerBoxIsScrolled,
+                    bottom: TabBar(
+                      tabs: [
+                        Tab(text: "Posts"),
+                        Tab(text: "Posts and Replies"),
+                      ],
+                    ),
+                  ),
             ),
           ];
         },

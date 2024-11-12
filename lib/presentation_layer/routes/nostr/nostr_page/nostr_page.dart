@@ -9,14 +9,15 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../config/palette.dart';
 import '../../../../domain_layer/entities/app_update.dart';
+import '../../../../domain_layer/entities/feed_filter.dart';
 import '../../../../domain_layer/entities/user_metadata.dart';
-import '../../../../domain_layer/usecases/check_app_update.dart';
+
 import '../../../atoms/my_profile_picture.dart';
+import '../../../components/generic_feed.dart';
 import '../../../providers/app_update_provider.dart';
+import '../../../providers/following_provider.dart';
 import '../../../providers/metadata_provider.dart';
 import '../relays_page.dart';
-import 'user_feed_and_replies_view.dart';
-import 'user_feed_original_view.dart';
 
 class NostrPage extends ConsumerStatefulWidget {
   final GlobalKey<ScaffoldState> parentScaffoldKey;
@@ -37,20 +38,15 @@ class _NostrPageState extends ConsumerState<NostrPage>
   @override
   bool get wantKeepAlive => true;
 
-  late final TabController _tabController;
-  final ScrollController _scrollControllerPage = ScrollController();
-
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
+
     _checkForUpdates();
   }
 
   @override
   void dispose() {
-    _scrollControllerPage.dispose();
-    _tabController.dispose();
     super.dispose();
   }
 
@@ -98,46 +94,50 @@ class _NostrPageState extends ConsumerState<NostrPage>
   @override
   Widget build(BuildContext context) {
     super.build(context);
+    final followP = ref.watch(followingProvider);
 
     return SafeArea(
-      child: NestedScrollView(
-        floatHeaderSlivers: true,
-        controller: _scrollControllerPage,
-        headerSliverBuilder: (context, innerBoxIsScrolled) => [
-          SliverAppBar(
-            floating: true,
-            snap: false,
-            pinned: false,
-            forceElevated: true,
-            backgroundColor: Palette.background,
-            leadingWidth: 48,
-            leading: LeadingWidget(
-              parentScaffoldKey: widget.parentScaffoldKey,
-              pubkey: widget.pubkey,
-            ),
-            centerTitle: true,
-            title: const TitleWidget(),
-            actions: [RelaysWidget(onTap: _openRelaysView)],
-            bottom: PreferredSize(
-              preferredSize: const Size.fromHeight(20),
-              child: TabBarWidget(controller: _tabController),
-            ),
-          ),
-        ],
-        body: TabBarView(
-          controller: _tabController,
-          physics: const BouncingScrollPhysics(),
-          children: [
-            UserFeedOriginalView(
-              pubkey: widget.pubkey,
-              scrollControllerFeed: _scrollControllerPage,
-            ),
-            UserFeedAndRepliesView(
-              pubkey: widget.pubkey,
-              scrollControllerFeed: _scrollControllerPage,
-            ),
-          ],
-        ),
+      child: FutureBuilder(
+        future: followP.getContactsSelf(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          } else {
+            return GenericFeed(
+              customAppBar: SliverAppBar(
+                floating: true,
+                snap: false,
+                pinned: false,
+                forceElevated: true,
+                backgroundColor: Palette.background,
+                leadingWidth: 48,
+                leading: LeadingWidget(
+                  parentScaffoldKey: widget.parentScaffoldKey,
+                  pubkey: widget.pubkey,
+                ),
+                centerTitle: true,
+                title: const TitleWidget(),
+                actions: [RelaysWidget(onTap: _openRelaysView)],
+                bottom: PreferredSize(
+                  preferredSize: const Size.fromHeight(40),
+                  child: TabBar(
+                    tabs: [
+                      Tab(text: "Posts"),
+                      Tab(text: "Posts and Replies"),
+                    ],
+                  ),
+                ),
+              ),
+              feedFilter: FeedFilter(
+                feedId: "testfeed",
+                kinds: [1],
+                authors: snapshot.data?.contacts != null
+                    ? [...snapshot.data!.contacts, widget.pubkey]
+                    : [],
+              ),
+            );
+          }
+        },
       ),
     );
   }
