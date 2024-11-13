@@ -9,6 +9,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:ndk/ndk.dart';
 //import 'package:device_preview/device_preview.dart';
 
+import 'deep_links.dart';
 import 'domain_layer/usecases/app_auth.dart';
 import 'presentation_layer/providers/event_signer_provider.dart';
 import 'presentation_layer/routes/home_page.dart';
@@ -69,10 +70,17 @@ Future<void> main() async {
     );
   }
 
+  final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
+  listenDeeplinks(
+    navigatorKey: navigatorKey,
+  );
+
   runApp(
     UncontrolledProviderScope(
       container: providerContainer,
       child: MyApp(
+        navigatorKey: navigatorKey,
         initialRoute: initalData[0],
         pubkey: mySigner?.getPublicKey() ?? '',
       ),
@@ -83,9 +91,11 @@ Future<void> main() async {
 class MyApp extends StatelessWidget {
   final String initialRoute;
   final String pubkey;
+  final GlobalKey<NavigatorState> navigatorKey;
 
   const MyApp({
     super.key,
+    required this.navigatorKey,
     required this.initialRoute,
     required this.pubkey,
   });
@@ -95,6 +105,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return Portal(
       child: MaterialApp(
+        navigatorKey: navigatorKey,
         scrollBehavior: const MaterialScrollBehavior().copyWith(
           scrollbars: false,
           dragDevices: {
