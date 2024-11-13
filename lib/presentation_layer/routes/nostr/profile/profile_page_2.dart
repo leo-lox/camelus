@@ -16,13 +16,9 @@ import '../../../../helpers/nprofile_helper.dart';
 import '../../../atoms/back_button_round.dart';
 import '../../../atoms/follow_button.dart';
 import '../../../atoms/my_profile_picture.dart';
-import '../../../components/note_card/no_more_notes.dart';
-import '../../../components/note_card/note_card_container.dart';
-import '../../../components/note_card/skeleton_note.dart';
 import '../../../providers/event_signer_provider.dart';
 import '../../../providers/following_provider.dart';
 import '../../../providers/metadata_provider.dart';
-import '../../../providers/profile_feed_provider.dart';
 import '../blockedUsers/block_page.dart';
 import 'follower_page.dart';
 
@@ -421,133 +417,6 @@ class _FollowButtonState extends ConsumerState<_FollowButton> {
         }
         return Container();
       },
-    );
-  }
-}
-
-class ScrollablePostsAndRepliesList extends ConsumerWidget {
-  final String pubkey;
-  const ScrollablePostsAndRepliesList({
-    super.key,
-    required this.pubkey,
-  });
-
-  @override
-  Widget build(BuildContext context, ref) {
-    final profileFeedStateP = ref.watch(profileFeedStateProvider(pubkey));
-    final profileFeedStateNoti =
-        ref.watch(profileFeedStateProvider(pubkey).notifier);
-
-    return _BuildScrollablePostsList(
-      itemCount: profileFeedStateP.timelineRootAndReplyNotes.length + 1,
-      itemBuilder: (context, index) {
-        if (index == profileFeedStateP.timelineRootAndReplyNotes.length) {
-          if (profileFeedStateP.endOfRootAndReplyNotes) {
-            return NoMoreNotes();
-          }
-          return SkeletonNote(
-            renderCallback: () {
-              final now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
-              int fetchTime;
-              if (profileFeedStateP.timelineRootAndReplyNotes.isNotEmpty) {
-                fetchTime =
-                    profileFeedStateP.timelineRootAndReplyNotes.last.created_at;
-              } else {
-                fetchTime = now;
-              }
-
-              profileFeedStateNoti.loadMore(
-                olderThen: fetchTime,
-                pubkey: pubkey,
-              );
-            },
-          );
-        }
-        return NoteCardContainer(
-          key: PageStorageKey(
-              profileFeedStateP.timelineRootAndReplyNotes[index].id),
-          note: profileFeedStateP.timelineRootAndReplyNotes[index],
-        );
-      },
-    );
-  }
-}
-
-class ScrollablePostsList extends ConsumerWidget {
-  final String pubkey;
-  const ScrollablePostsList({
-    super.key,
-    required this.pubkey,
-  });
-
-  @override
-  Widget build(BuildContext context, ref) {
-    final profileFeedStateP = ref.watch(profileFeedStateProvider(pubkey));
-    final profileFeedStateNoti =
-        ref.watch(profileFeedStateProvider(pubkey).notifier);
-
-    return _BuildScrollablePostsList(
-      itemCount: profileFeedStateP.timelineRootNotes.length + 1,
-      itemBuilder: (context, index) {
-        if (index == profileFeedStateP.timelineRootNotes.length) {
-          if (profileFeedStateP.endOfRootNotes) {
-            return NoMoreNotes();
-          }
-          return SkeletonNote(
-            renderCallback: () {
-              final now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
-              int fetchTime;
-              if (profileFeedStateP.timelineRootNotes.isNotEmpty) {
-                fetchTime = profileFeedStateP.timelineRootNotes.last.created_at;
-              } else {
-                fetchTime = now;
-              }
-
-              profileFeedStateNoti.loadMore(
-                olderThen: fetchTime,
-                pubkey: pubkey,
-              );
-            },
-          );
-        }
-        return NoteCardContainer(
-          key: PageStorageKey(profileFeedStateP.timelineRootNotes[index].id),
-          note: profileFeedStateP.timelineRootNotes[index],
-        );
-      },
-    );
-  }
-}
-
-class _BuildScrollablePostsList extends StatelessWidget {
-  final Widget Function(BuildContext, int) itemBuilder;
-  final int itemCount;
-
-  const _BuildScrollablePostsList({
-    super.key,
-    required this.itemBuilder,
-    required this.itemCount,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return CustomScrollView(
-      slivers: [
-        SliverOverlapInjector(
-          handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
-        ),
-        SliverPadding(
-          padding: EdgeInsets.all(0.0),
-          sliver: SliverList(
-            delegate: SliverChildBuilderDelegate(
-              (BuildContext context, int index) {
-                return itemBuilder(context, index);
-              },
-              childCount: itemCount,
-            ),
-          ),
-        ),
-      ],
     );
   }
 }

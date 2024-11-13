@@ -159,26 +159,26 @@ class ScrollablePostsList extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, ref) {
-    final profileFeedStateP = ref.watch(genericFeedStateProvider(feedFilter));
-    final profileFeedStateNoti =
+    final genericFeedStateP = ref.watch(genericFeedStateProvider(feedFilter));
+    final genericFeedStateNoti =
         ref.read(genericFeedStateProvider(feedFilter).notifier);
 
     return _BuildScrollablePostsList(
-      itemCount: profileFeedStateP.timelineRootNotes.length + 1,
+      itemCount: genericFeedStateP.timelineRootNotes.length + 1,
       itemBuilder: (context, index) {
-        if (index == profileFeedStateP.timelineRootNotes.length) {
-          if (profileFeedStateP.endOfRootNotes) {
+        if (index == genericFeedStateP.timelineRootNotes.length) {
+          if (genericFeedStateP.endOfRootNotes) {
             return NoMoreNotes();
           }
           return SkeletonNote(
             renderCallback: () {
-              profileFeedStateNoti.loadMore();
+              genericFeedStateNoti.loadMore();
             },
           );
         }
         return NoteCardContainer(
-          key: PageStorageKey(profileFeedStateP.timelineRootNotes[index].id),
-          note: profileFeedStateP.timelineRootNotes[index],
+          key: PageStorageKey(genericFeedStateP.timelineRootNotes[index].id),
+          note: genericFeedStateP.timelineRootNotes[index],
         );
       },
     );
@@ -194,28 +194,28 @@ class ScrollablePostsAndRepliesList extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, ref) {
-    final profileFeedStateP = ref.watch(genericFeedStateProvider(feedFilter));
-    final profileFeedStateNoti =
+    final genericFeedStateP = ref.watch(genericFeedStateProvider(feedFilter));
+    final genericFeedStateNoti =
         ref.read(genericFeedStateProvider(feedFilter).notifier);
 
     return _BuildScrollablePostsList(
-      itemCount: profileFeedStateP.timelineRootAndReplyNotes.length + 1,
+      itemCount: genericFeedStateP.timelineRootAndReplyNotes.length + 1,
       itemBuilder: (context, index) {
-        if (index == profileFeedStateP.timelineRootAndReplyNotes.length) {
-          if (profileFeedStateP.endOfRootAndReplyNotes) {
+        if (index == genericFeedStateP.timelineRootAndReplyNotes.length) {
+          if (genericFeedStateP.endOfRootAndReplyNotes) {
             return NoMoreNotes();
           }
           return SkeletonNote(
             renderCallback: () {
-              profileFeedStateNoti.loadMore();
+              genericFeedStateNoti.loadMore();
             },
           );
         }
         return NoteCardContainer(
           key: PageStorageKey(
-            profileFeedStateP.timelineRootAndReplyNotes[index].id,
+            genericFeedStateP.timelineRootAndReplyNotes[index].id,
           ),
-          note: profileFeedStateP.timelineRootAndReplyNotes[index],
+          note: genericFeedStateP.timelineRootAndReplyNotes[index],
         );
       },
     );

@@ -117,7 +117,7 @@ class _NostrPageState extends ConsumerState<NostrPage>
                 ];
               },
               feedFilter: FeedFilter(
-                feedId: "testfeed",
+                feedId: "homeFeed",
                 kinds: [1],
                 authors: snapshot.data?.contacts != null
                     ? [...snapshot.data!.contacts, widget.pubkey]
