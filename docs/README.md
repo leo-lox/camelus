@@ -96,8 +96,7 @@ In the app users can **create**, **edit** and **view** their personal informatio
 <img width="200" alt="3_en-GB" src="https://github.com/user-attachments/assets/37bbbb45-1e13-4ba7-b52f-db33eb58176a">
 
 ### 5.3 Post Creation and Interaction on feed
-The feed enables users to share their thoughts and engage with others' content. A post in the feed has a simple UI element structure where users can see a profile picture, the text, share button, comments for the posts and a send button. When users tap the send button the data is send locally to the ndk and afterwards to the **Nostr protocol** as shown in the diagram. It also show the transfer of the data from the nostr protocol to users feeds. Once the user hits the send button, the post is instantly displayed in the app’s feed without requiring a page reload. 
-
+The feed enables users to share their thoughts and engage with others' content. A post in the feed has a simple UI element structure where users can see a profile picture, the text, share button, comments for the posts and a send button. When users tap the send button the data is send locally to the ndk and afterwards to the **Nostr protocol** as shown in the diagram. It also show the transfer of the data from the nostr protocol to users feeds. Once the user hits the send button, the post is instantly displayed.
 
 Here you can see a message ready to be send to the feed and a send button
  
@@ -114,8 +113,12 @@ When an user hits a send button the app is going to send the data like in this d
 This are messages on the feed
 <img width="200" alt="1_en-GB" src="https://github.com/user-attachments/assets/89905bba-a95b-4bfc-8102-b87f7c6b01e9">
 
+## Rendering on the feed
+The GenericFeed UI component is designed to display list with posts within a tabbed view. It includes a dynamic feed that updates in real-time with new content from a data provider. It allows users to scroll through different types of posts and it's loading very fast and smooth. This component integrates Flutter’s NestedScrollView to allow navigation between different feed views.
 
+ScrollablePostsList and ScrollablePostsAndRepliesList Widgets render the lists of posts displayed within each tab. It's loading more posts when the user reaches the end.
 
+The feed’s state is managed by a GenericFeedState provider, which listens for updates from the getNotesProvider to get all posts. It handles the real-time updating of the feed through streams. It also handles and the integration of new posts into the feed.
 
 # 6. Navigation and Routes
 
