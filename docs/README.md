@@ -119,7 +119,8 @@ The GenericFeed UI component is designed to display list with posts within a tab
 ScrollablePostsList and ScrollablePostsAndRepliesList Widgets render the lists of posts displayed within each tab. It's loading more posts when the user reaches the end. The feed’s state is managed by a GenericFeedState provider, which listens for updates from the getNotesProvider to get all posts. It handles the real-time updating of the feed through streams. It also handles and the integration of new posts into the feed. Below you can see the code how data is getting into the feed like described above.
 
 
-```Widget build(BuildContext context, ref) {
+```
+Widget build(BuildContext context, ref) {
     final genericFeedStateP = ref.watch(genericFeedStateProvider(feedFilter));
     final genericFeedStateNoti =
         ref.read(genericFeedStateProvider(feedFilter).notifier);
