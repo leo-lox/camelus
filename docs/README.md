@@ -116,7 +116,7 @@ This are messages on the feed
 # Rendering on the feed
 The GenericFeed UI component is designed to display list with posts within a tabbed view. It includes a dynamic feed that updates in real-time with new content from a data provider. It allows users to scroll through different types of posts.
 
-ScrollablePostsList and ScrollablePostsAndRepliesList Widgets render the lists of posts displayed within each tab. It's loading more posts when the user reaches the end. The feed’s state is managed by a GenericFeedState provider, which listens for updates from the getNotesProvider to get all posts. It handles the real-time updating of the feed through streams. It also handles and the integration of new posts into the feed. Below you can see the code how data is getting into the feed like described above.
+ScrollablePostsList and ScrollablePostsAndRepliesList Widgets render the lists of posts displayed within each tab. It's loading more posts when the user reaches the end. The feed’s state is managed by a GenericFeedState provider, which listens for updates from the getNotesProvider to get all posts. It handles the real-time updating of the feed through streams. It also handles and the integration of new posts into the feed. Below you can see the code how data is getting into the feed like described above. The return SkeletonNote() returns a userpost to the feed.
 
 
 ```
