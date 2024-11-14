@@ -113,12 +113,38 @@ When an user hits a send button the app is going to send the data like in this d
 This are messages on the feed
 <img width="200" alt="1_en-GB" src="https://github.com/user-attachments/assets/89905bba-a95b-4bfc-8102-b87f7c6b01e9">
 
-## Rendering on the feed
-The GenericFeed UI component is designed to display list with posts within a tabbed view. It includes a dynamic feed that updates in real-time with new content from a data provider. It allows users to scroll through different types of posts and it's loading very fast and smooth. This component integrates Flutter’s NestedScrollView to allow navigation between different feed views.
+# Rendering on the feed
+The GenericFeed UI component is designed to display list with posts within a tabbed view. It includes a dynamic feed that updates in real-time with new content from a data provider. It allows users to scroll through different types of posts.
 
-ScrollablePostsList and ScrollablePostsAndRepliesList Widgets render the lists of posts displayed within each tab. It's loading more posts when the user reaches the end.
+ScrollablePostsList and ScrollablePostsAndRepliesList Widgets render the lists of posts displayed within each tab. It's loading more posts when the user reaches the end. The feed’s state is managed by a GenericFeedState provider, which listens for updates from the getNotesProvider to get all posts. It handles the real-time updating of the feed through streams. It also handles and the integration of new posts into the feed. Below you can see the code how data is getting into the feed like described above.
 
-The feed’s state is managed by a GenericFeedState provider, which listens for updates from the getNotesProvider to get all posts. It handles the real-time updating of the feed through streams. It also handles and the integration of new posts into the feed.
+
+```Widget build(BuildContext context, ref) {
+    final genericFeedStateP = ref.watch(genericFeedStateProvider(feedFilter));
+    final genericFeedStateNoti =
+        ref.read(genericFeedStateProvider(feedFilter).notifier);
+
+    return _BuildScrollablePostsList(
+      itemCount: genericFeedStateP.timelineRootNotes.length + 1,
+      itemBuilder: (context, index) {
+        if (index == genericFeedStateP.timelineRootNotes.length) {
+          if (genericFeedStateP.endOfRootNotes) {
+            return NoMoreNotes();
+          }
+          return SkeletonNote(
+            renderCallback: () {
+              genericFeedStateNoti.loadMore();
+            },
+          );
+        }
+        return NoteCardContainer(
+          key: PageStorageKey(genericFeedStateP.timelineRootNotes[index].id),
+          note: genericFeedStateP.timelineRootNotes[index],
+        );
+      },
+    );
+  }```
+
 
 # 6. Navigation and Routes
 
