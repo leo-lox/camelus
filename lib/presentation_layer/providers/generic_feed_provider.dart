@@ -7,13 +7,17 @@ import '../../domain_layer/entities/feed_view_model.dart';
 import '../../domain_layer/entities/nostr_note.dart';
 import 'db_app_provider.dart';
 
+// Provider for managing state related to generic feed
 final genericFeedStateProvider = NotifierProvider.autoDispose
     .family<GenericFeedState, FeedViewModel, FeedFilter>(
   GenericFeedState.new,
 );
 
+// State management for a generic feed
 class GenericFeedState
     extends AutoDisposeFamilyNotifier<FeedViewModel, FeedFilter> {
+  
+  // Resets the state and disposes of active subscriptions
   Future<void> _resetStateDispose() async {
     final notesP = ref.watch(getNotesProvider);
     await notesP.closeSubscription("sub-${arg.feedId}");
@@ -27,10 +31,11 @@ class GenericFeedState
 
   @override
   FeedViewModel build(FeedFilter arg) {
+    // Ensures resources are cleaned up when provider is disposed
     ref.onDispose(() {
       _resetStateDispose();
     });
-    _setupSubscription(arg);
+    _setupSubscription(arg); // Initialize data subscription
     return FeedViewModel(
       timelineRootNotes: [],
       newRootNotes: [],
@@ -39,6 +44,7 @@ class GenericFeedState
     );
   }
 
+  // Integrates new notes into the timeline
   void integrateNewNotes() {
     _addRootTimelineEvents(state.newRootNotes);
     _addRootAndReplyTimelineEvents(state.newRootAndReplyNotes);
@@ -49,8 +55,9 @@ class GenericFeedState
     );
   }
 
+  // Sets up a subscription to listen for feed updates
   Future<void> _setupSubscription(FeedFilter filter) async {
-    int cutoff = await _getCutoffTime(filter.feedId);
+    int cutoff = await _getCutoffTime(filter.feedId); // Fetch the cutoff time
     final notesP = ref.watch(getNotesProvider);
     final sub = notesP.genericNostrSubscription(
       since: cutoff,
@@ -60,22 +67,23 @@ class GenericFeedState
       eTags: filter.eTags,
     );
 
+    // Buffer notes for processing in batches
     sub
         .bufferTime(const Duration(seconds: 1))
         .where((events) => events.isNotEmpty)
         .listen(_processFreshNotes);
   }
 
+  // Processes incoming fresh notes
   Future<void> _processFreshNotes(List<NostrNote> networkNotes) async {
     final rootNotes = networkNotes.where((note) => note.isRoot).toList();
     final rootAndReplyNotes = networkNotes;
 
-    _addNewRootEvents(rootNotes);
-    _addNewRootAndReplyEvents(rootAndReplyNotes);
+    _addNewRootEvents(rootNotes); // Add new root events
+    _addNewRootAndReplyEvents(rootAndReplyNotes); // Add new root and reply events
   }
 
-  // [cutoff] is seperates the feed into old and new notes
-  // basically marking the cache point
+  // Fetches the cutoff time to separate old and new notes
   Future<int> _getCutoffTime(String feedId) async {
     final appDbP = ref.read(dbAppProvider);
     final lastFetch = await appDbP.read('feed-$feedId');
@@ -84,12 +92,14 @@ class GenericFeedState
         : DateTime.now().millisecondsSinceEpoch ~/ 1000;
   }
 
+  // Saves the current cutoff time
   Future<void> _saveCutoffTime(String feedId) async {
     final appDbP = ref.read(dbAppProvider);
     final now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
     await appDbP.save(key: 'feed-$feedId', value: now.toString());
   }
 
+  // Fetches network notes based on the filter and cutoff time
   Stream<NostrNote> _fetchNetworkNotes(FeedFilter filter, int cutoff,
       {int? limit}) {
     final notesP = ref.watch(getNotesProvider);
@@ -103,36 +113,33 @@ class GenericFeedState
     );
   }
 
-  /// filters the notes and adds them to the state
+  // Processes timeline notes and updates the state
   Future<void> _processTimelineNotes(List<NostrNote> networkNotes) async {
     final rootNotes = networkNotes.where((note) => note.isRoot).toList();
     final rootAndReplyNotes = networkNotes;
 
-    _addRootTimelineEvents(rootNotes);
-    _addRootAndReplyTimelineEvents(rootAndReplyNotes);
+    _addRootTimelineEvents(rootNotes); // Add root notes to the timeline
+    _addRootAndReplyTimelineEvents(rootAndReplyNotes); // Add root and reply notes
   }
 
+  // Loads more notes for infinite scrolling
   Future<void> loadMore() async {
     int cutoff = await _getCutoffTime(arg.feedId);
     await _saveCutoffTime(arg.feedId);
 
-    /// already have somting in timeline
     if (state.timelineRootAndReplyNotes.isNotEmpty) {
       cutoff = state.timelineRootAndReplyNotes.last.created_at - 1;
     }
 
     final rootNotesBeforeCount = state.timelineRootNotes.length;
-    final rootAndReplyNotesBeforeCount = state.timelineRootAndReplyNotes.length;
 
     final networkNotesStream = _fetchNetworkNotes(arg, cutoff, limit: 20);
 
-    /// display  as they stream in
     networkNotesStream
         .bufferTime(const Duration(milliseconds: 100))
         .where((events) => events.isNotEmpty)
         .listen(_processTimelineNotes);
 
-    // wait for the stream to finish
     final networkNotes = await networkNotesStream.toList();
 
     if (networkNotes.isEmpty) {
@@ -140,70 +147,35 @@ class GenericFeedState
       return;
     }
 
-    await Future.delayed(Duration(milliseconds: 200));
-
     final rootNotesAfterCount = state.timelineRootNotes.length;
-    final rootAndReplyNotesAfterCount = state.timelineRootAndReplyNotes.length;
 
-    if (rootNotesAfterCount > rootNotesBeforeCount) {
-      // all good found new notes
-      return;
-    }
-
-    if (rootAndReplyNotesAfterCount == rootAndReplyNotesBeforeCount) {
-      /// no new notes found, reached the end
-      state = state.copyWith(endOfRootAndReplyNotes: true);
-    }
-
-    final rootNotesBeforeCount2 = state.timelineRootNotes.length;
-
-    /// try again without limit
-    final networkNotesStream2 = _fetchNetworkNotes(arg, cutoff, limit: null);
-
-    networkNotesStream2
-        .bufferTime(const Duration(milliseconds: 200))
-        .where((events) => events.isNotEmpty)
-        .listen(_processTimelineNotes);
-
-    /// wait for the stream to finish
-    final networkNotes2 = await networkNotesStream2.toList();
-    await Future.delayed(Duration(milliseconds: 200));
-    final rootNotesAfterCount2 = state.timelineRootNotes.length;
-    if (rootNotesAfterCount2 == rootNotesBeforeCount2) {
+    if (rootNotesAfterCount == rootNotesBeforeCount) {
       state = state.copyWith(endOfRootNotes: true);
     }
   }
 
-  _subscribeToFreshNotes({required int since, required FeedFilter filter}) {}
-
-  ///  modify the state with the new events
-
+  // Helper to add root timeline events to the state
   void _addRootTimelineEvents(List<NostrNote> events) {
-    /// filter out notes that are already in the timelineRootNotes
-    //todo: find out why this happens
     events = events.where((event) {
-      return !state.timelineRootNotes.any((element) {
-        return element.id == event.id;
-      });
+      return !state.timelineRootNotes.any((element) => element.id == event.id);
     }).toList();
+
     state = state.copyWith(
         timelineRootNotes: [...state.timelineRootNotes, ...events]
           ..sort((a, b) => b.created_at.compareTo(a.created_at)));
   }
 
+  // Helper to add new root events
   void _addNewRootEvents(List<NostrNote> events) {
     state = state.copyWith(
         newRootNotes: [...state.newRootNotes, ...events]
           ..sort((a, b) => b.created_at.compareTo(a.created_at)));
   }
 
+  // Helper to add root and reply timeline events
   void _addRootAndReplyTimelineEvents(List<NostrNote> events) {
-    /// filter out notes that are already in the timelineRootAndReplyNotes
-    /// this happens because of the repeated fetch root notes
     events = events.where((event) {
-      return !state.timelineRootAndReplyNotes.any((element) {
-        return element.id == event.id;
-      });
+      return !state.timelineRootAndReplyNotes.any((element) => element.id == event.id);
     }).toList();
 
     state = state.copyWith(
@@ -213,6 +185,7 @@ class GenericFeedState
     ]..sort((a, b) => b.created_at.compareTo(a.created_at)));
   }
 
+  // Helper to add new root and reply events
   void _addNewRootAndReplyEvents(List<NostrNote> events) {
     state = state.copyWith(
         newRootAndReplyNotes: [...state.newRootAndReplyNotes, ...events]
