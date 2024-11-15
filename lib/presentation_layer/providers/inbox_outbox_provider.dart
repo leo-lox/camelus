@@ -6,6 +6,9 @@ import '../../domain_layer/repositories/inbox_outbox_repository.dart';
 import '../../domain_layer/usecases/inbox_outbox.dart';
 import 'ndk_provider.dart';
 
+// Provider for managing the "InboxOutbox" use case.
+// This provider creates and returns an instance of InboxOutbox, 
+// which handles operations related to inbox and outbox functionality.
 final inboxOutboxProvider = Provider<InboxOutbox>((ref) {
   final ndk = ref.watch(ndkProvider);
 
@@ -19,5 +22,6 @@ final inboxOutboxProvider = Provider<InboxOutbox>((ref) {
     repository: inboxOutboxRepository,
   );
 
+  // Returns the InboxOutbox instance
   return inboxOutbox;
 });
