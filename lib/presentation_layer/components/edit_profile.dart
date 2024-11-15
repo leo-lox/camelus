@@ -1,4 +1,4 @@
-import 'dart:developer';
+import 'dart:developer'; 
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
@@ -8,7 +8,9 @@ import '../../config/palette.dart';
 import '../atoms/camer_upload.dart';
 import '../atoms/round_image_border.dart';
 
+/// A screen for editing the user's profile, allowing updates to various fields like name
 class EditProfile extends ConsumerStatefulWidget {
+  // Fields to initialize and update the profile.
   final String initialName;
   final Function(String) onNameChanged;
   final Uint8List? initialPicture;
@@ -51,11 +53,13 @@ class EditProfile extends ConsumerStatefulWidget {
 }
 
 class _EditProfileState extends ConsumerState<EditProfile> {
+  // Controller map to manage form fields.
   late final Map<String, TextEditingController> _controllers;
 
   @override
   void initState() {
     super.initState();
+    // Initializing the controllers with provided initial values.
     _controllers = {
       'name': TextEditingController(text: widget.initialName),
       'about': TextEditingController(text: widget.initialAbout),
@@ -65,6 +69,7 @@ class _EditProfileState extends ConsumerState<EditProfile> {
       'lud16': TextEditingController(text: widget.initialLud16),
     };
 
+    // Adding listeners to each controller to call the corresponding callback when the text changes.
     _controllers.forEach((key, controller) {
       controller.addListener(() {
         switch (key) {
@@ -93,6 +98,7 @@ class _EditProfileState extends ConsumerState<EditProfile> {
 
   @override
   void dispose() {
+    // Disposing of all controllers when the widget is disposed.
     for (var controller in _controllers.values) {
       controller.dispose();
     }
@@ -103,12 +109,13 @@ class _EditProfileState extends ConsumerState<EditProfile> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        _buildHeader(),
-        _buildForm(),
+        _buildHeader(), // Building the header section with profile picture and banner.
+        _buildForm(), // Building the form with input fields for profile details.
       ],
     );
   }
 
+  /// Builds the header section of the profile with banner and profile picture.
   Widget _buildHeader() {
     return SizedBox(
       height: (MediaQuery.of(context).size.height / 6) + 60,
@@ -116,7 +123,7 @@ class _EditProfileState extends ConsumerState<EditProfile> {
         children: <Widget>[
           InkWell(
             onTap: () {
-              widget.bannerCallback();
+              widget.bannerCallback(); // Trigger callback to update banner when clicked.
             },
             child: Container(
               width: MediaQuery.of(context).size.width,
@@ -132,16 +139,17 @@ class _EditProfileState extends ConsumerState<EditProfile> {
               ),
             ),
           ),
+          // Positioned profile picture in the header section.
           Positioned(
             bottom: 0,
             left: MediaQuery.of(context).size.width / 8,
             child: InkWell(
               onTap: () {
-                widget.pictureCallback();
+                widget.pictureCallback(); // Trigger callback to update profile picture when clicked.
               },
               child: widget.initialPicture == null
                   ? const CameraUpload(
-                      size: 100,
+                      size: 100, 
                     )
                   : RoundImageWithBorder(
                       image: widget.initialPicture!, size: 102),
@@ -152,6 +160,7 @@ class _EditProfileState extends ConsumerState<EditProfile> {
     );
   }
 
+  /// Builds the form section with input fields for profile details.
   Widget _buildForm() {
     return Padding(
       padding: const EdgeInsets.all(16.0),
@@ -168,6 +177,7 @@ class _EditProfileState extends ConsumerState<EditProfile> {
     );
   }
 
+  /// Builds a single input field with a label and controller.
   Widget _buildInputField(String label, TextEditingController controller,
       {bool isMultiline = false}) {
     return Column(
@@ -176,7 +186,7 @@ class _EditProfileState extends ConsumerState<EditProfile> {
         Padding(
           padding: const EdgeInsets.only(top: 16.0, bottom: 8.0, left: 8.0),
           child: Text(
-            label,
+            label, // Display the label of the input field.
             style: TextStyle(
               color: const Color.fromARGB(213, 245, 248, 250),
               fontSize: MediaQuery.of(context).size.width / 28,
@@ -184,26 +194,27 @@ class _EditProfileState extends ConsumerState<EditProfile> {
           ),
         ),
         TextFormField(
-          controller: controller,
-          decoration: textEditInputDecoration,
+          controller: controller, // Bind the controller to the input field.
+          decoration: textEditInputDecoration, 
           maxLines: isMultiline
               ? null
-              : 1, // Set to null for multiline, 1 for single line
+              : 1, 
           keyboardType:
-              isMultiline ? TextInputType.multiline : TextInputType.text,
+              isMultiline ? TextInputType.multiline : TextInputType.text, // Set keyboard type.
         ),
       ],
     );
   }
 }
 
+/// Decoration for the text input fields in the form.
 const textEditInputDecoration = InputDecoration(
   hintText: "",
   contentPadding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 8.0),
   enabledBorder: UnderlineInputBorder(
     borderSide: BorderSide(
       width: 1,
-      color: Colors.grey,
+      color: Colors.grey, // Border color for the text field.
     ),
   ),
 );
