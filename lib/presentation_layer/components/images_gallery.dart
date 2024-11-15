@@ -3,11 +3,19 @@ import 'package:flutter/material.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:flutter/services.dart';
 
+/// A widget for displaying an image gallery with swipeable fullscreen images.
 class ImageGallery extends StatefulWidget {
   final List<String> imageUrls;
+  /// Index of the image to show by default when the gallery opens.
   final int defaultImageIndex;
+
+  /// Title displayed on the top bar of the gallery.
   final String topBarTitle;
+
+  /// Optional hero animation tag for image transitions.
   final String? heroTag;
+
+  /// Optional widget to display in the bottom bar.
   final Widget? bottomBarWidget;
 
   const ImageGallery({
@@ -23,27 +31,24 @@ class ImageGallery extends StatefulWidget {
   _ImageGalleryState createState() => _ImageGalleryState();
 }
 
+/// State class for [ImageGallery].
+/// Manages the behavior of the gallery, including swiping between images
+/// and showing/hiding the status bar.
 class _ImageGalleryState extends State<ImageGallery> {
-  late PageController _pageController;
-  bool _hideStatusBarWhileViewing = false;
-  late int _currentPageIndex;
+  late PageController _pageController; 
+  bool _hideStatusBarWhileViewing = false; // Tracks if the status bar is hidden.
+  late int _currentPageIndex; // Tracks the currently displayed image index.
 
+  /// Shows or hides the status bar based on the [show] parameter.
   void _showHideStatusBar(bool show) {
     if (show) {
       SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
-
-      // SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-      //   statusBarColor: Palette.background.withOpacity(0.8),
-      //   statusBarIconBrightness: Brightness.light,
-      //   statusBarBrightness: Brightness.light,
-      //   systemNavigationBarColor: Colors.transparent,
-      //   systemNavigationBarIconBrightness: Brightness.light,
-      // ));
     } else {
       SystemChrome.setEnabledSystemUIMode(SystemUiMode.leanBack);
     }
   }
 
+  /// Resets the status bar visibility to default when the widget is disposed.
   void _resetStatusBar() {
     if (!_hideStatusBarWhileViewing) return;
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
@@ -53,10 +58,11 @@ class _ImageGalleryState extends State<ImageGallery> {
   @override
   void initState() {
     super.initState();
-    _showHideStatusBar(true);
+    _showHideStatusBar(true); // Ensure status bar is visible initially.
     _currentPageIndex = widget.defaultImageIndex;
     _pageController = PageController(initialPage: widget.defaultImageIndex);
-    // notify on page change
+
+    // Update the current page index whenever the page changes.
     _pageController.addListener(() {
       setState(() {
         _currentPageIndex = _pageController.page!.round();
@@ -66,18 +72,19 @@ class _ImageGalleryState extends State<ImageGallery> {
 
   @override
   void dispose() {
-    _resetStatusBar();
-    _pageController.dispose();
+    _resetStatusBar(); // Reset the status bar when the widget is disposed.
+    _pageController.dispose(); // Dispose of the PageController.
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      extendBody: true,
+      extendBody: true, // Allow the body to extend behind the app bar.
       extendBodyBehindAppBar: true,
       backgroundColor: Colors.transparent,
       body: GestureDetector(
+        // Toggle the visibility of the status bar when the screen is tapped.
         onTap: () {
           setState(() {
             _showHideStatusBar(_hideStatusBarWhileViewing);
@@ -86,22 +93,23 @@ class _ImageGalleryState extends State<ImageGallery> {
         },
         child: Stack(
           children: [
-            _imageGallery(),
+            _imageGallery(), // The main image gallery.
             SafeArea(
               child: AnimatedOpacity(
-                opacity: _hideStatusBarWhileViewing ? 0 : 1,
+                opacity: _hideStatusBarWhileViewing ? 0 : 1, // Hide UI if status bar is hidden.
                 duration: const Duration(milliseconds: 100),
                 curve: Curves.easeInOut,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    _topBar(context),
+                    _topBar(context), // Top bar with navigation and title.
                     Center(
                       child: Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 10, vertical: 5),
-                          child: widget.bottomBarWidget),
-                    )
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 5),
+                        child: widget.bottomBarWidget, // Optional bottom bar widget.
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -112,12 +120,14 @@ class _ImageGalleryState extends State<ImageGallery> {
     );
   }
 
+  /// Builds the top bar with a close button, title and image count.
   Container _topBar(BuildContext context) {
     return Container(
       width: MediaQuery.of(context).size.width,
-      color: Palette.background.withOpacity(0.25),
+      color: Palette.background.withOpacity(0.25), // Transparent background color.
       child: Row(
         children: [
+          // Close button to exit the gallery.
           IconButton(
             icon: const Icon(Icons.close, size: 30),
             color: Colors.white,
@@ -125,6 +135,7 @@ class _ImageGalleryState extends State<ImageGallery> {
               Navigator.of(context).pop();
             },
           ),
+          // Title of the gallery.
           Text(
             widget.topBarTitle,
             style: const TextStyle(
@@ -134,7 +145,7 @@ class _ImageGalleryState extends State<ImageGallery> {
             ),
           ),
           const Spacer(),
-          // image count
+          // Current image index out of total images.
           if (widget.imageUrls.length > 1)
             Padding(
               padding: const EdgeInsets.only(right: 10),
@@ -152,24 +163,22 @@ class _ImageGalleryState extends State<ImageGallery> {
     );
   }
 
+  /// Builds the image gallery as a swipeable PageView.
   PageView _imageGallery() {
     return PageView.builder(
       controller: _pageController,
-      itemCount: widget.imageUrls.length,
+      itemCount: widget.imageUrls.length, // Total number of images.
       itemBuilder: (context, index) {
         return PhotoView(
-          imageProvider: NetworkImage(widget.imageUrls[index]),
+          imageProvider: NetworkImage(widget.imageUrls[index]), // Display image from network.
           heroAttributes: widget.heroTag != null
               ? PhotoViewHeroAttributes(
                   tag:
                       'image-${widget.imageUrls[widget.defaultImageIndex]}-${widget.heroTag}')
-              : null,
-          minScale: PhotoViewComputedScale.contained * 1,
-          maxScale: PhotoViewComputedScale.covered * 2,
-          //enablePanAlways: true,
-          disableGestures: false,
-          filterQuality: FilterQuality.high,
-          wantKeepAlive: false,
+              : null, // Optional hero animation.
+          minScale: PhotoViewComputedScale.contained * 1, // Minimum zoom scale.
+          maxScale: PhotoViewComputedScale.covered * 2, // Maximum zoom scale.
+          filterQuality: FilterQuality.high, // High quality image rendering.
         );
       },
     );

@@ -1,5 +1,5 @@
-import 'dart:async';
 
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -13,9 +13,12 @@ import 'note_card/no_more_notes.dart';
 import 'note_card/note_card_container.dart';
 import 'note_card/skeleton_note.dart';
 
+// Main widget for displaying a generic feed
 class GenericFeed extends ConsumerStatefulWidget {
+  // The feed filter determines the scope of the feed
   final FeedFilter feedFilter;
 
+  // Optional custom header and configuration for floating headers
   final List<Widget> Function(BuildContext, bool)? customHeaderSliverBuilder;
   final bool floatHeaderSlivers;
 
@@ -30,10 +33,12 @@ class GenericFeed extends ConsumerStatefulWidget {
   ConsumerState<GenericFeed> createState() => _GenericFeedState();
 }
 
+// State class for GenericFeed, which manages its lifecycle and behavior
 class _GenericFeedState extends ConsumerState<GenericFeed> {
-  late ScrollController _scrollController;
-  late StreamSubscription<void> _homeBarSub;
+  late ScrollController _scrollController; // Controller for scrolling behavior
+  late StreamSubscription<void> _homeBarSub; // Subscription to home tab events
 
+  // Scroll to the top of the feed
   _scrollToTop() {
     _scrollController.animateTo(
       0,
@@ -47,10 +52,12 @@ class _GenericFeedState extends ConsumerState<GenericFeed> {
     super.initState();
     _scrollController = ScrollController();
 
+    // Initialize providers for navigation and feed state
     final navBarP = ref.read(navigationBarProvider);
     final genericFeedStateNotifier =
         ref.read(genericFeedStateProvider(widget.feedFilter).notifier);
 
+    // Listen to home tab events and refresh the feed
     _homeBarSub = navBarP.onTabHome.listen((_) {
       genericFeedStateNotifier.integrateNewNotes();
       _scrollToTop();
@@ -59,6 +66,7 @@ class _GenericFeedState extends ConsumerState<GenericFeed> {
 
   @override
   void dispose() {
+    // Dispose of resources to prevent memory leaks
     _scrollController.dispose();
     _homeBarSub.cancel();
     super.dispose();
@@ -66,13 +74,14 @@ class _GenericFeedState extends ConsumerState<GenericFeed> {
 
   @override
   Widget build(BuildContext context) {
+    // Watch the state of the generic feed and its notifier
     final genericFeedStateP =
         ref.watch(genericFeedStateProvider(widget.feedFilter));
     final genericFeedStateNotifier =
         ref.watch(genericFeedStateProvider(widget.feedFilter).notifier);
 
     return DefaultTabController(
-      length: 2,
+      length: 2, // Two tabs for Posts and Posts with Replies
       child: NestedScrollView(
         floatHeaderSlivers: widget.floatHeaderSlivers,
         controller: _scrollController,
@@ -100,6 +109,7 @@ class _GenericFeedState extends ConsumerState<GenericFeed> {
             },
         body: TabBarView(
           children: [
+            // Tab 1: Display posts
             Stack(
               children: [
                 RefreshIndicatorNoNeed(
@@ -118,6 +128,7 @@ class _GenericFeedState extends ConsumerState<GenericFeed> {
                   ),
               ],
             ),
+            // Tab 2: Display posts with replies
             Stack(
               children: [
                 RefreshIndicatorNoNeed(
@@ -150,8 +161,10 @@ class _GenericFeedState extends ConsumerState<GenericFeed> {
   }
 }
 
+// Widget for rendering a scrollable list of posts
 class ScrollablePostsList extends ConsumerWidget {
   final FeedFilter feedFilter;
+
   const ScrollablePostsList({
     super.key,
     required this.feedFilter,
@@ -185,8 +198,10 @@ class ScrollablePostsList extends ConsumerWidget {
   }
 }
 
+// Widget for rendering a scrollable list of posts with replies
 class ScrollablePostsAndRepliesList extends ConsumerWidget {
   final FeedFilter feedFilter;
+
   const ScrollablePostsAndRepliesList({
     super.key,
     required this.feedFilter,
@@ -222,6 +237,7 @@ class ScrollablePostsAndRepliesList extends ConsumerWidget {
   }
 }
 
+// Common scrollable list builder for posts and replies
 class _BuildScrollablePostsList extends StatelessWidget {
   final Widget Function(BuildContext, int) itemBuilder;
   final int itemCount;
