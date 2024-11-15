@@ -1,10 +1,11 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'; 
 import 'package:camelus/config/palette.dart';
 import 'package:camelus/domain_layer/entities/nostr_note.dart';
 import 'package:camelus/domain_layer/entities/tree_node.dart';
 import 'package:camelus/presentation_layer/components/note_card/note_card_container.dart';
 import 'package:camelus/presentation_layer/atoms/rounded_corner_painer.dart';
 
+/// A widget representing a section of comments 
 class CommentSection extends StatelessWidget {
   final TreeNode<NostrNote> comment;
 
@@ -23,9 +24,15 @@ class CommentSection extends StatelessWidget {
   }
 }
 
+/// A widget that represents an individual comment 
 class CommentTreeItem extends StatefulWidget {
+  /// The current comment node.
   final TreeNode<NostrNote> node;
+
+  /// The depth of the current comment in the tree structure.
   final int depth;
+
+  /// A list indicating if ancestor nodes have siblings.
   final List<bool> ancestorHasSibling;
 
   const CommentTreeItem({
@@ -40,11 +47,13 @@ class CommentTreeItem extends StatefulWidget {
 }
 
 class CommentTreeItemState extends State<CommentTreeItem> {
+  /// Tracks whether the current comment's children are expanded.
   bool isExpanded = false;
 
   @override
   void initState() {
     super.initState();
+    // Automatically expand nodes with fewer than 2 children.
     isExpanded = widget.node.children.length < 2;
   }
 
@@ -53,6 +62,7 @@ class CommentTreeItemState extends State<CommentTreeItem> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // Render the comment card for the current node.
         CommentCard(
           node: widget.node,
           depth: widget.depth,
@@ -78,11 +88,21 @@ class CommentTreeItemState extends State<CommentTreeItem> {
   }
 }
 
+/// A widget representing a single comment card, including its visual elements.
 class CommentCard extends StatelessWidget {
+  /// The current comment node.
   final TreeNode<NostrNote> node;
+
+  /// The depth of the current comment in the tree.
   final int depth;
+
+  /// A list indicating if ancestor nodes have siblings.
   final List<bool> ancestorHasSibling;
+
+
   final bool isExpanded;
+
+  /// Callback to toggle the expansion state of the current comment.
   final VoidCallback onToggleExpand;
 
   const CommentCard({
@@ -106,17 +126,20 @@ class CommentCard extends StatelessWidget {
           child: Stack(
             clipBehavior: Clip.none,
             children: [
+              // Draw lines to indicate the parent-child relationship.
               if (node.hasParent)
                 Positioned(
                   left: -15.0,
                   top: 0.0,
                   child: Column(
                     children: [
+                      // Vertical line connecting to the parent.
                       Container(
                         width: 2.0,
                         height: 60.0,
                         color: lineColor,
                       ),
+                      // Rounded corner at the connection point.
                       Padding(
                         padding: EdgeInsets.only(left: 10.0),
                         child: CustomPaint(
@@ -129,6 +152,7 @@ class CommentCard extends StatelessWidget {
                     ],
                   ),
                 ),
+              // Vertical line for child comments.
               if (node.hasChildren)
                 Positioned(
                   left: 10.0,
@@ -139,6 +163,7 @@ class CommentCard extends StatelessWidget {
                     color: lineColor,
                   ),
                 ),
+              // Adjusted vertical line for nodes with a single child.
               if (node.hasChildren && node.children.length == 1)
                 Positioned(
                   left: 10.0,
@@ -149,6 +174,7 @@ class CommentCard extends StatelessWidget {
                     color: lineColor,
                   ),
                 ),
+              // Short vertical line for expanded nodes.
               if (node.hasChildren && isExpanded)
                 Positioned(
                   left: 10.0,
@@ -159,10 +185,12 @@ class CommentCard extends StatelessWidget {
                     color: lineColor,
                   ),
                 ),
+              // Render the main comment content.
               NoteCardContainer(
                 key: ValueKey(node.value.id),
                 note: node.value,
               ),
+              // Render an expandable icon for nodes with multiple children.
               if (node.hasChildren && node.children.length > 1)
                 Positioned(
                   left: -14.0,

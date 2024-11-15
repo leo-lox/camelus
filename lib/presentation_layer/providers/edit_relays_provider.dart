@@ -7,8 +7,11 @@ import 'package:camelus/presentation_layer/providers/event_verifier.dart';
 import 'package:camelus/presentation_layer/providers/ndk_provider.dart';
 import 'package:riverpod/riverpod.dart';
 
+/// This provider depends on several other providers for its initialization.
 final editRelaysProvider = Provider<EditRelays>((ref) {
+  // Retrieve the NDK 
   final ndk = ref.watch(ndkProvider);
+
 
   final eventVerifier = ref.watch(eventVerifierProvider);
 
@@ -17,10 +20,14 @@ final editRelaysProvider = Provider<EditRelays>((ref) {
     eventVerifier: eventVerifier,
   );
 
+  // Retrieve the event signer instance from its provider.
   final signerP = ref.watch(eventSignerProvider);
 
+  // Create an instance of `EditRelays` use case by providing the repository
+  // and the public key retrieved from the signer.
   final EditRelays editRelays =
       EditRelays(editRelayRepository, signerP?.getPublicKey());
 
+  // Return the initialized use case.
   return editRelays;
 });
