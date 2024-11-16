@@ -7,6 +7,7 @@ class BottomActionRow extends StatelessWidget {
   final VoidCallback onRetweet;
   final VoidCallback onLike;
   final VoidCallback onShare;
+  final VoidCallback onMore;
   final int? commentCount;
   final int? retweetCount;
   final int? likeCount;
@@ -17,6 +18,7 @@ class BottomActionRow extends StatelessWidget {
     required this.onRetweet,
     required this.onLike,
     required this.onShare,
+    required this.onMore,
     this.commentCount,
     this.retweetCount,
     this.likeCount,
@@ -25,7 +27,7 @@ class BottomActionRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
         _buildActionButton(
           onTap: onComment,
@@ -46,6 +48,10 @@ class BottomActionRow extends StatelessWidget {
           onTap: onShare,
           icon: 'assets/icons/share.svg',
         ),
+        _buildActionButton(
+          onTap: onMore,
+          icon: 'assets/icons/tweetSetting.svg',
+        )
       ],
     );
   }
@@ -56,8 +62,8 @@ class BottomActionRow extends StatelessWidget {
     int? count,
   }) {
     return SizedBox(
-      height: 40,
-      width: 70,
+      height: 35,
+      width: 65,
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(50),
@@ -68,7 +74,7 @@ class BottomActionRow extends StatelessWidget {
             children: [
               SvgPicture.asset(
                 icon,
-                height: 23,
+                height: 35,
                 colorFilter: const ColorFilter.mode(
                   Palette.darkGray,
                   BlendMode.srcIn,

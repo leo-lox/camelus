@@ -117,7 +117,6 @@ class NoteCard extends StatelessWidget {
       createdAt: note.created_at,
       myMetadata: myMetadata,
       pubkey: note.pubkey,
-      openMore: () => openBottomSheetMore(context, note),
     );
   }
 
@@ -154,6 +153,7 @@ class NoteCard extends StatelessWidget {
         );
       },
       onShare: () => openBottomSheetShare(context, note),
+      onMore: () => openBottomSheetMore(context, note),
     );
   }
 }

@@ -106,6 +106,7 @@ class SkeletonNote extends StatelessWidget {
                             onLike: () {},
                             onRetweet: () {},
                             onShare: () {},
+                            onMore: () {},
                           ),
                         ),
                       const SizedBox(height: 20),
