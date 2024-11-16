@@ -216,6 +216,7 @@ class NoteRepositoryImpl implements NoteRepository {
     final response = dartNdkSource.dartNdk.broadcast
         .broadcast(nostrEvent: noteModel.toNDKEvent());
 
-    await response.publishDone;
+    //todo: fix in dart_ndk
+    //await response.publishDone;
   }
 }

@@ -15,6 +15,7 @@ class MetadataRepositoryImpl implements MetadataRepository {
     required this.eventVerifier,
   });
 
+  /// nip05 is automatically verified if present and removed if invalid
   @override
   Stream<UserMetadata> getMetadataByPubkey(String pubkey) {
     final myMetadata = dartNdkSource.dartNdk.metadata.loadMetadata(pubkey);
@@ -22,9 +23,26 @@ class MetadataRepositoryImpl implements MetadataRepository {
     final Stream<ndk_entities.Metadata?> myMetadataStream =
         myMetadata.asStream();
 
-    return myMetadataStream.where((event) => event != null).map(
-          (event) => UserMetadataModel.fromNDKMetadata(event!),
-        );
+    return myMetadataStream.where((event) => event != null).asyncMap(
+      (event) async {
+        final metadata = UserMetadataModel.fromNDKMetadata(event!);
+
+        // Check if there's a NIP-05 identifier
+        if (metadata.nip05 != null && metadata.nip05!.isNotEmpty) {
+          // Perform NIP-05 verification
+          final nip05Result = await dartNdkSource.dartNdk.nip05
+              .check(nip05: metadata.nip05!, pubkey: pubkey);
+
+          // If verification fails, set NIP-05 to null
+          if (!nip05Result.valid) {
+            metadata.nip05 = null;
+            return metadata;
+          }
+        }
+
+        return metadata;
+      },
+    );
   }
 
   @override

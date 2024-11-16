@@ -254,9 +254,48 @@
         }
       ],
       "relations": []
+    },
+    {
+      "id": "6:5273186663970464575",
+      "lastPropertyId": "6:5681969525518525911",
+      "name": "DbNip05",
+      "properties": [
+        {
+          "id": "1:7088655004465366886",
+          "name": "dbId",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:3168250410311883614",
+          "name": "pubKey",
+          "type": 9
+        },
+        {
+          "id": "3:5527505727715720917",
+          "name": "nip05",
+          "type": 9
+        },
+        {
+          "id": "4:8071628081619445263",
+          "name": "valid",
+          "type": 1
+        },
+        {
+          "id": "5:7737168682838543815",
+          "name": "networkFetchTime",
+          "type": 6
+        },
+        {
+          "id": "6:5681969525518525911",
+          "name": "relays",
+          "type": 30
+        }
+      ],
+      "relations": []
     }
   ],
-  "lastEntityId": "5:6462764810841603998",
+  "lastEntityId": "6:5273186663970464575",
   "lastIndexId": "1:6758634951668169698",
   "lastRelationId": "0:0",
   "lastSequenceId": "0:0",

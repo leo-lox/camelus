@@ -1,14 +1,15 @@
 import 'dart:async';
 
+import 'package:ndk/domain_layer/entities/nip_05.dart';
 import 'package:ndk/domain_layer/entities/user_relay_list.dart';
 import 'package:ndk/ndk.dart';
-import 'package:ndk/shared/nips/nip05/nip05.dart';
 
 import '../../../objectbox.g.dart';
 import 'db_init_object_box.dart';
 import 'schema/db_contact_list.dart';
 import 'schema/db_metadata.dart';
 import 'schema/db_nip_01_event.dart';
+import 'schema/db_nip_05.dart';
 
 class DbObjectBox implements CacheManager {
   final Completer _initCompleter = Completer();
@@ -219,15 +220,33 @@ class DbObjectBox implements CacheManager {
   }
 
   @override
-  Future<Nip05?> loadNip05(String pubKey) {
-    // TODO: implement loadNip05
-    throw UnimplementedError();
+  Future<Nip05?> loadNip05(String pubKey) async {
+    await _dbRdy;
+    final nip05Box = _objectBox.store.box<DbNip05>();
+    final existingNip05 = nip05Box
+        .query(DbNip05_.pubKey.equals(pubKey))
+        .order(DbNip05_.networkFetchTime, flags: Order.descending)
+        .build()
+        .findFirst();
+
+    if (existingNip05 == null) {
+      return null;
+    }
+
+    return existingNip05.toNdk();
   }
 
   @override
-  Future<List<Nip05?>> loadNip05s(List<String> pubKeys) {
-    // TODO: implement loadNip05s
-    throw UnimplementedError();
+  Future<List<Nip05?>> loadNip05s(List<String> pubKeys) async {
+    await _dbRdy;
+    final nip05Box = _objectBox.store.box<DbNip05>();
+    final existingNip05s = nip05Box
+        .query(DbNip05_.pubKey.oneOf(pubKeys))
+        .order(DbNip05_.networkFetchTime, flags: Order.descending)
+        .build()
+        .find();
+
+    return existingNip05s.map((dbNip05) => dbNip05.toNdk()).toList();
   }
 
   @override
@@ -243,9 +262,10 @@ class DbObjectBox implements CacheManager {
   }
 
   @override
-  Future<void> removeAllNip05s() {
-    // TODO: implement removeAllNip05s
-    throw UnimplementedError();
+  Future<void> removeAllNip05s() async {
+    await _dbRdy;
+    final nip05Box = _objectBox.store.box<DbNip05>();
+    nip05Box.removeAll();
   }
 
   @override
@@ -297,15 +317,25 @@ class DbObjectBox implements CacheManager {
   }
 
   @override
-  Future<void> saveNip05(Nip05 nip05) {
-    // TODO: implement saveNip05
-    throw UnimplementedError();
+  Future<void> saveNip05(Nip05 nip05) async {
+    await _dbRdy;
+    final nip05Box = _objectBox.store.box<DbNip05>();
+    final existingNip05 = nip05Box
+        .query(DbNip05_.pubKey.equals(nip05.pubKey))
+        .order(DbNip05_.networkFetchTime, flags: Order.descending)
+        .build()
+        .findFirst();
+    if (existingNip05 != null) {
+      nip05Box.remove(existingNip05.dbId);
+    }
+    nip05Box.put(DbNip05.fromNdk(nip05));
   }
 
   @override
-  Future<void> saveNip05s(List<Nip05> nip05s) {
-    // TODO: implement saveNip05s
-    throw UnimplementedError();
+  Future<void> saveNip05s(List<Nip05> nip05s) async {
+    await _dbRdy;
+    final nip05Box = _objectBox.store.box<DbNip05>();
+    nip05Box.putMany(nip05s.map((n) => DbNip05.fromNdk(n)).toList());
   }
 
   @override
