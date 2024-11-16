@@ -47,9 +47,23 @@ class NoteCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _buildNameRow(context),
+                    NoteCardNameRow(
+                      key: ValueKey("${note.id}name_row"),
+                      createdAt: note.created_at,
+                      myMetadata: myMetadata,
+                      pubkey: note.pubkey,
+                    ),
                     const SizedBox(height: 10),
-                    _buildNoteContent(context),
+                    NoteCardSplitContent(
+                      key: ValueKey("${note.id}split_content"),
+                      note: note,
+                      profileCallback: (String pubkey) => Navigator.pushNamed(
+                          context, "/nostr/profile",
+                          arguments: pubkey),
+                      hashtagCallback: (String hashtag) => Navigator.pushNamed(
+                          context, "/nostr/hastag",
+                          arguments: hashtag),
+                    ),
                   ],
                 ),
               ),
@@ -109,24 +123,6 @@ class NoteCard extends StatelessWidget {
         imageUrl: myMetadata?.picture,
         pubkey: note.pubkey,
       ),
-    );
-  }
-
-  Widget _buildNameRow(BuildContext context) {
-    return NoteCardNameRow(
-      createdAt: note.created_at,
-      myMetadata: myMetadata,
-      pubkey: note.pubkey,
-    );
-  }
-
-  Widget _buildNoteContent(BuildContext context) {
-    return NoteCardSplitContent(
-      note: note,
-      profileCallback: (String pubkey) =>
-          Navigator.pushNamed(context, "/nostr/profile", arguments: pubkey),
-      hashtagCallback: (String hashtag) =>
-          Navigator.pushNamed(context, "/nostr/hastag", arguments: hashtag),
     );
   }
 

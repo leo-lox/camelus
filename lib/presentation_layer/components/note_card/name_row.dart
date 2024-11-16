@@ -1,13 +1,13 @@
-import 'package:camelus/config/palette.dart';
-import 'package:camelus/domain_layer/entities/user_metadata.dart';
-import 'package:camelus/helpers/helpers.dart';
-import 'package:camelus/presentation_layer/atoms/nip_05_text.dart';
-import 'package:camelus/presentation_layer/providers/nip05_provider.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:timeago/timeago.dart' as timeago;
+
+import '../../../config/palette.dart';
+import '../../../domain_layer/entities/user_metadata.dart';
+import '../../../helpers/helpers.dart';
+import '../../atoms/nip_05_text.dart';
 
 class NoteCardNameRow extends ConsumerStatefulWidget {
   final UserMetadata? myMetadata;
@@ -86,6 +86,7 @@ class _NoteCardNameRowState extends ConsumerState<NoteCardNameRow> {
                 ],
               ),
               Nip05Text(
+                key: widget.key,
                 pubkey: widget.pubkey,
                 nip05verified: widget.myMetadata?.nip05,
               ),
