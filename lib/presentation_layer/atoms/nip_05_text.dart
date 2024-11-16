@@ -13,7 +13,7 @@ class Nip05Text extends StatelessWidget {
       return npubHr;
     }
 
-    return "${npubHr.substring(0, 10)}...${npubHr.substring(npubHr.length - 20)}";
+    return "${npubHr.substring(0, 8)}...${npubHr.substring(npubHr.length - 10)}";
   }
 
   const Nip05Text({
