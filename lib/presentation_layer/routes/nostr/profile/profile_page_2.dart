@@ -1,8 +1,7 @@
 import 'dart:developer';
 
-import 'package:camelus/domain_layer/entities/feed_filter.dart';
-import 'package:camelus/presentation_layer/components/generic_feed.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:shimmer/shimmer.dart';
@@ -10,12 +9,15 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../config/palette.dart';
 import '../../../../domain_layer/entities/contact_list.dart';
+import '../../../../domain_layer/entities/feed_filter.dart';
 import '../../../../domain_layer/entities/user_metadata.dart';
 import '../../../../helpers/helpers.dart';
 import '../../../../helpers/nprofile_helper.dart';
 import '../../../atoms/back_button_round.dart';
 import '../../../atoms/follow_button.dart';
 import '../../../atoms/my_profile_picture.dart';
+import '../../../atoms/nip_05_text.dart';
+import '../../../components/generic_feed.dart';
 import '../../../providers/event_signer_provider.dart';
 import '../../../providers/following_provider.dart';
 import '../../../providers/metadata_provider.dart';
@@ -85,7 +87,7 @@ class ProfilePage2 extends ConsumerWidget {
                       },
                     ),
                   ],
-                  expandedHeight: 370,
+                  expandedHeight: 400,
                   pinned: true,
                   floating: true,
                   forceElevated: innerBoxIsScrolled,
@@ -156,9 +158,12 @@ class _BuildProfileHeader extends ConsumerWidget {
 
   final UserMetadata userMetadata;
 
+  Future<void> _copyToClipboard(String data) async {
+    await Clipboard.setData(ClipboardData(text: data));
+  }
+
   @override
   Widget build(BuildContext context, ref) {
-    final followP = ref.watch(followingProvider);
     final contactsAsyncValue =
         ref.watch(_userContactsProvider(userMetadata.pubkey));
 
@@ -253,7 +258,7 @@ class _BuildProfileHeader extends ConsumerWidget {
                     ),
                   ],
                 ),
-                SizedBox(height: 16),
+                SizedBox(height: 10),
                 Text(
                   userMetadata.name ??
                       _pubkeyToHrBech32Short(userMetadata.pubkey),
@@ -262,10 +267,21 @@ class _BuildProfileHeader extends ConsumerWidget {
                       fontWeight: FontWeight.bold,
                       color: Colors.white),
                 ),
-                if (userMetadata.nip05 != null)
-                  Text('@${userMetadata.nip05}',
-                      style: TextStyle(color: Colors.grey)),
-                SizedBox(height: 8),
+
+                GestureDetector(
+                  onTap: () {
+                    /// copy to clipboard
+                    _copyToClipboard(
+                      Helpers().encodeBech32(userMetadata.pubkey, "npub"),
+                    );
+                  },
+                  child: Nip05Text(
+                    pubkey: userMetadata.pubkey,
+                    nip05verified: userMetadata.nip05,
+                    cutPubkey: false,
+                  ),
+                ),
+                SizedBox(height: 5),
                 // bio with fixed height
                 SizedBox(
                   height: 60, // height of bio
