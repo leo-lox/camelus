@@ -40,12 +40,11 @@ class _BottomActionRowState extends State<BottomActionRow>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _animation;
-  bool _isLiked = false;
 
   @override
   void initState() {
     super.initState();
-    _isLiked = widget.isLiked;
+
     _controller = AnimationController(
       duration: const Duration(milliseconds: 150),
       vsync: this,
@@ -67,9 +66,6 @@ class _BottomActionRowState extends State<BottomActionRow>
   }
 
   void _triggerLike() {
-    setState(() {
-      _isLiked = !_isLiked;
-    });
     _controller.forward();
     widget.onLike();
   }
@@ -129,11 +125,11 @@ class _BottomActionRowState extends State<BottomActionRow>
               ScaleTransition(
                 scale: _animation,
                 child: Icon(
-                  _isLiked
+                  widget.isLiked
                       ? PhosphorIcons.heart(PhosphorIconsStyle.fill)
                       : PhosphorIcons.heart(),
                   size: BottomActionRow.iconSize,
-                  color: _isLiked
+                  color: widget.isLiked
                       ? Palette.likeActive
                       : BottomActionRow.defaultColor,
                 ),

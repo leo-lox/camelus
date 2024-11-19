@@ -103,7 +103,6 @@ class _NoteCardContainerState extends ConsumerState<NoteCardContainer> {
                   myNote: note,
                 ),
               ),
-
             NoteCard(
               note: note,
               myMetadata: myUserNoteMetadata,

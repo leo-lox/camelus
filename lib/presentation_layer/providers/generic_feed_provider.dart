@@ -16,7 +16,6 @@ final genericFeedStateProvider = NotifierProvider.autoDispose
 // State management for a generic feed
 class GenericFeedState
     extends AutoDisposeFamilyNotifier<FeedViewModel, FeedFilter> {
-  
   // Resets the state and disposes of active subscriptions
   Future<void> _resetStateDispose() async {
     final notesP = ref.watch(getNotesProvider);
@@ -80,7 +79,8 @@ class GenericFeedState
     final rootAndReplyNotes = networkNotes;
 
     _addNewRootEvents(rootNotes); // Add new root events
-    _addNewRootAndReplyEvents(rootAndReplyNotes); // Add new root and reply events
+    _addNewRootAndReplyEvents(
+        rootAndReplyNotes); // Add new root and reply events
   }
 
   // Fetches the cutoff time to separate old and new notes
@@ -119,7 +119,8 @@ class GenericFeedState
     final rootAndReplyNotes = networkNotes;
 
     _addRootTimelineEvents(rootNotes); // Add root notes to the timeline
-    _addRootAndReplyTimelineEvents(rootAndReplyNotes); // Add root and reply notes
+    _addRootAndReplyTimelineEvents(
+        rootAndReplyNotes); // Add root and reply notes
   }
 
   // Loads more notes for infinite scrolling
@@ -175,7 +176,8 @@ class GenericFeedState
   // Helper to add root and reply timeline events
   void _addRootAndReplyTimelineEvents(List<NostrNote> events) {
     events = events.where((event) {
-      return !state.timelineRootAndReplyNotes.any((element) => element.id == event.id);
+      return !state.timelineRootAndReplyNotes
+          .any((element) => element.id == event.id);
     }).toList();
 
     state = state.copyWith(

@@ -219,4 +219,42 @@ class NoteRepositoryImpl implements NoteRepository {
     //todo: fix in dart_ndk
     //await response.publishDone;
   }
+
+  @override
+  Future<List<NostrNote>> getReactions({
+    required String postId,
+    required List<String> authors,
+  }) async {
+    ndk.Filter filter = ndk.Filter(
+      eTags: [postId],
+      authors: authors,
+      kinds: [7],
+    );
+
+    final response = dartNdkSource.dartNdk.requests.query(
+      filters: [filter],
+      name: 'getReactions-${postId.substring(5, 10)}',
+      cacheRead: false,
+      cacheWrite: true,
+    );
+
+    return response.stream
+        .map(
+      (event) => NostrNoteModel.fromNDKEvent(event),
+    )
+        .timeout(
+      const Duration(seconds: 2),
+      onTimeout: (sink) {
+        log('getReactions timeout');
+        sink.close();
+      },
+    ).toList();
+  }
+
+  @override
+  Future<void> deleteNote(String eventId) async {
+    final res =
+        dartNdkSource.dartNdk.broadcast.broadcastDeletion(eventId: eventId);
+    // await res.publishDone;
+  }
 }

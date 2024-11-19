@@ -1,12 +1,15 @@
 import 'dart:ui';
 
+import 'package:camelus/presentation_layer/providers/reactions_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../../config/palette.dart';
 import '../../../data_layer/models/post_context.dart';
 import '../../../domain_layer/entities/nostr_note.dart';
 import '../../../domain_layer/entities/user_metadata.dart';
 import '../../atoms/my_profile_picture.dart';
+import '../../providers/reactions_state_provider.dart';
 import '../bottom_sheet_share.dart';
 import '../write_post.dart';
 import 'bottom_action_row.dart';
@@ -14,7 +17,7 @@ import 'bottom_sheet_more.dart';
 import 'name_row.dart';
 import 'note_card_build_split_content.dart';
 
-class NoteCard extends StatelessWidget {
+class NoteCard extends ConsumerWidget {
   final NostrNote note;
   final UserMetadata? myMetadata;
   final bool hideBottomBar;
@@ -27,7 +30,7 @@ class NoteCard extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     if (note.pubkey == 'missing') {
       return _buildMissingNote();
     }
@@ -75,7 +78,27 @@ class NoteCard extends StatelessWidget {
           Center(
             child: SizedBox(
               width: MediaQuery.of(context).size.width * 0.9,
-              child: _buildBottomActionRow(context),
+              child: BottomActionRow(
+                isLiked: ref.watch(postLikeProvider(note)).isLiked,
+                key: ValueKey("${note.id}bottom_action_row"),
+                onComment: () {
+                  _writeReply(context, note);
+                },
+                onLike: () {
+                  print("onLikeInNoteCard");
+                  ref.read(postLikeProvider(note).notifier).toggleLike();
+                },
+                onRetweet: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Not implemented yet',
+                          style: TextStyle(color: Palette.black)),
+                    ),
+                  );
+                },
+                onShare: () => openBottomSheetShare(context, note),
+                onMore: () => openBottomSheetMore(context, note),
+              ),
             ),
           ),
         ],
@@ -123,33 +146,6 @@ class NoteCard extends StatelessWidget {
         imageUrl: myMetadata?.picture,
         pubkey: note.pubkey,
       ),
-    );
-  }
-
-  Widget _buildBottomActionRow(BuildContext context) {
-    return BottomActionRow(
-      key: ValueKey("${note.id}bottom_action_row"),
-      onComment: () {
-        _writeReply(context, note);
-      },
-      onLike: () {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Not implemented yet',
-                style: TextStyle(color: Palette.black)),
-          ),
-        );
-      },
-      onRetweet: () {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Not implemented yet',
-                style: TextStyle(color: Palette.black)),
-          ),
-        );
-      },
-      onShare: () => openBottomSheetShare(context, note),
-      onMore: () => openBottomSheetMore(context, note),
     );
   }
 }
