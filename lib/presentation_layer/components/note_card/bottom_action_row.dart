@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
-class BottomActionRow extends StatelessWidget {
+class BottomActionRow extends StatefulWidget {
   final VoidCallback onComment;
   final VoidCallback onRetweet;
   final VoidCallback onLike;
@@ -12,8 +12,8 @@ class BottomActionRow extends StatelessWidget {
   final int? commentCount;
   final int? retweetCount;
   final int? likeCount;
-  final bool? isRetweeted;
-  final bool? isLiked;
+  final bool isRetweeted;
+  final bool isLiked;
 
   static const iconSize = 24.0;
   static const defaultColor = Palette.darkGray;
@@ -28,9 +28,51 @@ class BottomActionRow extends StatelessWidget {
     this.commentCount,
     this.retweetCount,
     this.likeCount,
-    this.isRetweeted,
-    this.isLiked,
+    this.isRetweeted = false,
+    this.isLiked = false,
   });
+
+  @override
+  _BottomActionRowState createState() => _BottomActionRowState();
+}
+
+class _BottomActionRowState extends State<BottomActionRow>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _animation;
+  bool _isLiked = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _isLiked = widget.isLiked;
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 150),
+      vsync: this,
+    );
+    _animation = Tween<double>(begin: 1.0, end: 1.4).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeInOutCubic),
+    );
+    _animation.addStatusListener((status) {
+      if (status == AnimationStatus.completed) {
+        _controller.reverse();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _triggerLike() {
+    setState(() {
+      _isLiked = !_isLiked;
+    });
+    _controller.forward();
+    widget.onLike();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -38,46 +80,75 @@ class BottomActionRow extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         _buildActionButton(
-          onTap: onComment,
-          //icon: 'assets/icons/chat-teardrop-text.svg',
+          onTap: widget.onComment,
           icon: Icon(
             PhosphorIcons.chatTeardropText(),
-            size: iconSize,
-            color: defaultColor,
+            size: BottomActionRow.iconSize,
+            color: BottomActionRow.defaultColor,
           ),
-          count: commentCount,
+          count: widget.commentCount,
         ),
         _buildActionButton(
-          onTap: onRetweet,
+          onTap: widget.onRetweet,
           svgIcon: 'assets/icons/retweet.svg',
-          count: retweetCount,
+          count: widget.retweetCount,
         ),
+        _buildLikeButton(),
         _buildActionButton(
-          onTap: onLike,
-          icon: Icon(
-            PhosphorIcons.heart(),
-            size: iconSize,
-            color: defaultColor,
-          ),
-          count: likeCount,
-        ),
-        _buildActionButton(
-          onTap: onShare,
+          onTap: widget.onShare,
           icon: Icon(
             PhosphorIcons.share(),
-            size: iconSize,
-            color: defaultColor,
+            size: BottomActionRow.iconSize,
+            color: BottomActionRow.defaultColor,
           ),
         ),
         _buildActionButton(
-          onTap: onMore,
+          onTap: widget.onMore,
           icon: Icon(
-            PhosphorIcons.dotsThree(),
-            size: iconSize,
-            color: defaultColor,
+            PhosphorIcons.dotsThree(PhosphorIconsStyle.bold),
+            size: BottomActionRow.iconSize,
+            color: BottomActionRow.defaultColor,
           ),
         )
       ],
+    );
+  }
+
+  Widget _buildLikeButton() {
+    return SizedBox(
+      height: 35,
+      width: 65,
+      child: InkWell(
+        onTap: _triggerLike,
+        borderRadius: BorderRadius.circular(50),
+        child: Padding(
+          padding: const EdgeInsets.all(6.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              ScaleTransition(
+                scale: _animation,
+                child: Icon(
+                  _isLiked
+                      ? PhosphorIcons.heart(PhosphorIconsStyle.fill)
+                      : PhosphorIcons.heart(),
+                  size: BottomActionRow.iconSize,
+                  color: _isLiked
+                      ? Palette.likeActive
+                      : BottomActionRow.defaultColor,
+                ),
+              ),
+              if (widget.likeCount != null) ...[
+                const SizedBox(width: 5),
+                Text(
+                  widget.likeCount.toString(),
+                  style: const TextStyle(color: Palette.gray, fontSize: 16),
+                ),
+              ],
+            ],
+          ),
+        ),
+      ),
     );
   }
 
@@ -86,8 +157,6 @@ class BottomActionRow extends StatelessWidget {
     Icon? icon,
     String? svgIcon,
     int? count,
-    bool? isToggled,
-    Color? activeColor,
   }) {
     return SizedBox(
       height: 35,
@@ -106,7 +175,7 @@ class BottomActionRow extends StatelessWidget {
                   svgIcon,
                   height: 35,
                   colorFilter: const ColorFilter.mode(
-                    defaultColor,
+                    BottomActionRow.defaultColor,
                     BlendMode.srcATop,
                   ),
                 ),
