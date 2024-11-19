@@ -1,6 +1,7 @@
 import 'package:camelus/config/palette.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 class BottomActionRow extends StatelessWidget {
   final VoidCallback onComment;
@@ -11,6 +12,11 @@ class BottomActionRow extends StatelessWidget {
   final int? commentCount;
   final int? retweetCount;
   final int? likeCount;
+  final bool? isRetweeted;
+  final bool? isLiked;
+
+  static const iconSize = 24.0;
+  static const defaultColor = Palette.darkGray;
 
   const BottomActionRow({
     super.key,
@@ -22,6 +28,8 @@ class BottomActionRow extends StatelessWidget {
     this.commentCount,
     this.retweetCount,
     this.likeCount,
+    this.isRetweeted,
+    this.isLiked,
   });
 
   @override
@@ -31,26 +39,43 @@ class BottomActionRow extends StatelessWidget {
       children: [
         _buildActionButton(
           onTap: onComment,
-          icon: 'assets/icons/chat-teardrop-text.svg',
+          //icon: 'assets/icons/chat-teardrop-text.svg',
+          icon: Icon(
+            PhosphorIcons.chatTeardropText(),
+            size: iconSize,
+            color: defaultColor,
+          ),
           count: commentCount,
         ),
         _buildActionButton(
           onTap: onRetweet,
-          icon: 'assets/icons/retweet.svg',
+          svgIcon: 'assets/icons/retweet.svg',
           count: retweetCount,
         ),
         _buildActionButton(
           onTap: onLike,
-          icon: 'assets/icons/heart.svg',
+          icon: Icon(
+            PhosphorIcons.heart(),
+            size: iconSize,
+            color: defaultColor,
+          ),
           count: likeCount,
         ),
         _buildActionButton(
           onTap: onShare,
-          icon: 'assets/icons/share.svg',
+          icon: Icon(
+            PhosphorIcons.share(),
+            size: iconSize,
+            color: defaultColor,
+          ),
         ),
         _buildActionButton(
           onTap: onMore,
-          icon: 'assets/icons/tweetSetting.svg',
+          icon: Icon(
+            PhosphorIcons.dotsThree(),
+            size: iconSize,
+            color: defaultColor,
+          ),
         )
       ],
     );
@@ -58,8 +83,11 @@ class BottomActionRow extends StatelessWidget {
 
   Widget _buildActionButton({
     required VoidCallback onTap,
-    required String icon,
+    Icon? icon,
+    String? svgIcon,
     int? count,
+    bool? isToggled,
+    Color? activeColor,
   }) {
     return SizedBox(
       height: 35,
@@ -72,14 +100,16 @@ class BottomActionRow extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              SvgPicture.asset(
-                icon,
-                height: 35,
-                colorFilter: const ColorFilter.mode(
-                  Palette.darkGray,
-                  BlendMode.srcIn,
+              if (icon != null) icon,
+              if (svgIcon != null)
+                SvgPicture.asset(
+                  svgIcon,
+                  height: 35,
+                  colorFilter: const ColorFilter.mode(
+                    defaultColor,
+                    BlendMode.srcATop,
+                  ),
                 ),
-              ),
               if (count != null) ...[
                 const SizedBox(width: 5),
                 Text(
