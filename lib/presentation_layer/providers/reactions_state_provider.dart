@@ -36,7 +36,7 @@ class PostLikeNotifier extends StateNotifier<PostLikeState> {
   Future<void> _initializeLikeState() async {
     final isLiked = await _userReactions.isPostSelfLiked(postId: _postId);
 
-    state = PostLikeState(isLiked: isLiked, isLoading: false);
+    state = state.copyWith(isLiked: isLiked, isLoading: false);
   }
 
   Future<void> toggleLike() async {
@@ -46,7 +46,7 @@ class PostLikeNotifier extends StateNotifier<PostLikeState> {
 
     try {
       if (state.isLiked) {
-        await _userReactions.deleteReaction(postId: _postId);
+        _userReactions.deleteReaction(postId: _postId);
       } else {
         await _userReactions.likePost(
           pubkeyOfEventAuthor: _postAuthorPubkey,

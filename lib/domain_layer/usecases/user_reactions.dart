@@ -33,9 +33,16 @@ class UserReactions {
     if (reactions.isEmpty) {
       return null;
     }
-    if (reactions.first.content == "+") {
-      return reactions.first;
+
+    final res = reactions.where((reaction) {
+      return reaction.tags.any((tag) => tag.type == "e" && tag.value == postId);
+    }).first;
+
+    if (res.content != "+") {
+      return null;
     }
+
+    return res;
   }
 
   Future<void> likePost({

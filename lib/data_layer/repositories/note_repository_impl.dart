@@ -232,23 +232,20 @@ class NoteRepositoryImpl implements NoteRepository {
     );
 
     final response = dartNdkSource.dartNdk.requests.query(
+      timeout: 2,
       filters: [filter],
-      name: 'getReactions-${postId.substring(5, 10)}',
+      name: 'getReactions-${postId.substring(5, 10)}-',
       cacheRead: false,
-      cacheWrite: true,
+      cacheWrite: false,
     );
 
-    return response.stream
+    final events = await response.future;
+
+    return events
         .map(
-      (event) => NostrNoteModel.fromNDKEvent(event),
-    )
-        .timeout(
-      const Duration(seconds: 2),
-      onTimeout: (sink) {
-        log('getReactions timeout');
-        sink.close();
-      },
-    ).toList();
+          (event) => NostrNoteModel.fromNDKEvent(event),
+        )
+        .toList();
   }
 
   @override
