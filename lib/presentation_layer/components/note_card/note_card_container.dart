@@ -7,20 +7,12 @@ import '../../providers/metadata_state_provider.dart';
 import 'in_reply_to.dart';
 import 'note_card.dart';
 
-/// this is a container for the note cards
-/// its purpose is to wrap a note with additional information, like reply to
-
-class NoteCardContainer extends ConsumerStatefulWidget {
+class NoteCardContainer extends ConsumerWidget {
   final NostrNote note;
 
   const NoteCardContainer({super.key, required this.note});
 
-  @override
-  ConsumerState<NoteCardContainer> createState() => _NoteCardContainerState();
-}
-
-class _NoteCardContainerState extends ConsumerState<NoteCardContainer> {
-  void _onNoteTab(BuildContext context, NostrNote myNote) {
+  static void _onNoteTab(BuildContext context, NostrNote myNote) {
     var refEvents = myNote.getTagEvents;
 
     if (myNote.isRoot) {
@@ -37,7 +29,7 @@ class _NoteCardContainerState extends ConsumerState<NoteCardContainer> {
     _navigateToEventViewPage(context, root.value, reply?.value ?? myNote.id);
   }
 
-  void _navigateToEventViewPage(
+  static void _navigateToEventViewPage(
     BuildContext context,
     String root,
     String? scrollIntoView,
@@ -49,33 +41,16 @@ class _NoteCardContainerState extends ConsumerState<NoteCardContainer> {
   }
 
   @override
-  void initState() {
-    super.initState();
-  }
+  Widget build(BuildContext context, WidgetRef ref) {
+    final myMetadataState = ref.watch(metadataStateProvider(note.pubkey));
 
-  @override
-  void dispose() {
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final myMetadataState =
-        ref.watch(metadataStateProvider(widget.note.pubkey));
-
-    final note = widget.note;
     return GestureDetector(
-      onTap: () {
-        _onNoteTab(context, note);
-      },
+      onTap: () => _onNoteTab(context, note),
       child: Container(
-        color: Colors
-            .transparent, // needed for comment lines and tab still working
+        color: Colors.transparent,
         child: Column(
           children: [
-            // check if reply
             if (note.getTagEvents.isNotEmpty)
-              // for myNote.getTagPubkeys
               Padding(
                 padding: const EdgeInsets.only(left: 15.0),
                 child: InReplyTo(
