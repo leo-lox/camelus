@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:camelus/presentation_layer/providers/metadata_state_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
@@ -33,10 +34,7 @@ class ProfilePage2 extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, ref) {
-    final metadataP = ref.watch(metadataProvider);
-    final myMetadata = metadataP.getMetadataByPubkey(pubkey).first.timeout(
-          const Duration(seconds: 2),
-        );
+    final myMetadata = ref.watch(metadataStateProvider(pubkey)).userMetadata;
 
     return DefaultTabController(
       length: 2,
@@ -93,28 +91,20 @@ class ProfilePage2 extends ConsumerWidget {
                   forceElevated: innerBoxIsScrolled,
                   backgroundColor: Palette.black, // Add a background color
                   flexibleSpace: FlexibleSpaceBar(
-                    background: FutureBuilder<UserMetadata>(
-                        future: myMetadata,
-                        builder: (context, snap) {
-                          if (snap.data != null) {
-                            return _BuildProfileHeader(
-                                userMetadata: snap.data!);
-                          }
-                          return _BuildProfileHeader(
-                              userMetadata: UserMetadata(
-                            pubkey: pubkey,
-                            eventId: '',
-                            lastFetch: 0,
-                            name: null,
-                            picture: null,
-                            banner: null,
-                            nip05: null,
-                            about: null,
-                            website: null,
-                            lud06: null,
-                            lud16: null,
-                          ));
-                        }),
+                    background: _BuildProfileHeader(
+                        userMetadata: UserMetadata(
+                      pubkey: pubkey,
+                      eventId: '',
+                      lastFetch: myMetadata?.lastFetch ?? 0,
+                      name: myMetadata?.name,
+                      picture: myMetadata?.picture,
+                      banner: myMetadata?.banner,
+                      nip05: myMetadata?.nip05,
+                      about: myMetadata?.about,
+                      website: myMetadata?.website,
+                      lud06: myMetadata?.lud06,
+                      lud16: myMetadata?.lud16,
+                    )),
                   ),
                   bottom: PreferredSize(
                     preferredSize: Size.fromHeight(48),

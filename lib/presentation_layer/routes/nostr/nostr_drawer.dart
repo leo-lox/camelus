@@ -7,6 +7,7 @@ import 'package:camelus/domain_layer/entities/nostr_tag.dart';
 import 'package:camelus/presentation_layer/atoms/my_profile_picture.dart';
 import 'package:camelus/presentation_layer/providers/following_provider.dart';
 import 'package:camelus/presentation_layer/providers/metadata_provider.dart';
+import 'package:camelus/presentation_layer/providers/metadata_state_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -85,7 +86,7 @@ class NostrDrawer extends ConsumerWidget {
   }
 
   Widget _drawerHeader(
-      context, GetUserMetadata metadata, Follow followingService) {
+      context, UserMetadata? metadata, Follow followingService) {
     return DrawerHeader(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -100,15 +101,10 @@ class NostrDrawer extends ConsumerWidget {
                 color: Palette.primary,
                 shape: BoxShape.circle,
               ),
-              child: StreamBuilder<UserMetadata?>(
-                  stream: metadata.getMetadataByPubkey(pubkey),
-                  builder: (BuildContext context,
-                      AsyncSnapshot<UserMetadata?> snapshot) {
-                    return UserImage(
-                      imageUrl: snapshot.data?.picture,
-                      pubkey: pubkey,
-                    );
-                  }),
+              child: UserImage(
+                imageUrl: metadata?.picture,
+                pubkey: pubkey,
+              ),
             ),
           ),
           const SizedBox(
@@ -123,48 +119,28 @@ class NostrDrawer extends ConsumerWidget {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    StreamBuilder<UserMetadata?>(
-                        stream: metadata.getMetadataByPubkey(pubkey),
-                        builder: (BuildContext context,
-                            AsyncSnapshot<UserMetadata?> snapshot) {
-                          var name = "";
-                          var nip05 = "";
-
-                          if (snapshot.hasData) {
-                            name = snapshot.data?.name ?? "";
-                            nip05 = snapshot.data?.nip05 ?? "";
-                          } else if (snapshot.hasError) {
-                            name = "error";
-                            nip05 = "error";
-                          } else {
-                            // loading
-                            name = snapshot.data?.name ?? "";
-                            nip05 = snapshot.data?.nip05 ?? "";
-                          }
-
-                          return Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                name,
-                                style: const TextStyle(
-                                    color: Palette.extraLightGray,
-                                    fontSize: 17,
-                                    fontWeight: FontWeight.bold),
-                              ),
-                              const SizedBox(
-                                height: 3,
-                              ),
-                              Text(
-                                nip05,
-                                style: const TextStyle(
-                                  color: Palette.gray,
-                                  fontSize: 15,
-                                ),
-                              ),
-                            ],
-                          );
-                        }),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          metadata?.name ?? '',
+                          style: const TextStyle(
+                              color: Palette.extraLightGray,
+                              fontSize: 17,
+                              fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(
+                          height: 3,
+                        ),
+                        Text(
+                          metadata?.nip05 ?? '',
+                          style: const TextStyle(
+                            color: Palette.gray,
+                            fontSize: 15,
+                          ),
+                        ),
+                      ],
+                    ),
                   ],
                 ),
                 //Icon(
@@ -266,8 +242,10 @@ class NostrDrawer extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    var metadata = ref.watch(metadataProvider);
-    var followingService = ref.watch(followingProvider);
+    final followingService = ref.watch(followingProvider);
+
+    final myUserMetadata =
+        ref.watch(metadataStateProvider(pubkey)).userMetadata;
 
     return Drawer(
       child: Container(
@@ -276,7 +254,7 @@ class NostrDrawer extends ConsumerWidget {
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _drawerHeader(context, metadata, followingService),
+            _drawerHeader(context, myUserMetadata, followingService),
             _divider(),
             _drawerItem(
                 label: 'Profile',

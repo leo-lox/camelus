@@ -31,7 +31,7 @@ class Nip05Text extends StatelessWidget {
 
     if (nip05verified == null) {
       return Text(
-        shortHr(pubkey),
+        "@${shortHr(pubkey)}",
         style: style,
       );
     } else if (nip05verified!.startsWith("_")) {
