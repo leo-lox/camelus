@@ -7,6 +7,7 @@ import 'package:camelus/helpers/helpers.dart';
 import 'package:camelus/helpers/nprofile_helper.dart';
 import 'package:camelus/domain_layer/entities/nostr_note.dart';
 import 'package:camelus/presentation_layer/providers/metadata_provider.dart';
+import 'package:camelus/presentation_layer/providers/metadata_state_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher_string.dart';
@@ -35,8 +36,6 @@ class NoteCardSplitContent extends ConsumerStatefulWidget {
 class _NoteCardSplitContentState extends ConsumerState<NoteCardSplitContent> {
   final Map<String, dynamic> _tagsMetadata = {};
 
-  late final GetUserMetadata _metadataProvider;
-
   List<String> imageLinks = [];
 
   _NoteCardSplitContentState();
@@ -46,7 +45,6 @@ class _NoteCardSplitContentState extends ConsumerState<NoteCardSplitContent> {
   @override
   void initState() {
     super.initState();
-    _metadataProvider = ref.read(metadataProvider);
 
     imageLinks = _extractImages(widget.note);
     body = _buildContent(widget.note.content);
@@ -90,7 +88,6 @@ class _NoteCardSplitContentState extends ConsumerState<NoteCardSplitContent> {
       for (var word in words) {
         if (profilePattern.hasMatch(word)) {
           widgets.add(ProfileLink(
-            metadataProvider: _metadataProvider,
             profileCallback: widget.profileCallback,
             word: word,
           ));
@@ -100,7 +97,6 @@ class _NoteCardSplitContentState extends ConsumerState<NoteCardSplitContent> {
           widgets.add(LegacyMentionHashtag(
               note: widget.note,
               tagsMetadata: _tagsMetadata,
-              metadataProvider: _metadataProvider,
               profileCallback: widget.profileCallback,
               word: word));
         } else if (word.startsWith("#")) {
@@ -223,27 +219,25 @@ class HashtagLink extends StatelessWidget {
   }
 }
 
-class LegacyMentionHashtag extends StatelessWidget {
+class LegacyMentionHashtag extends ConsumerWidget {
   const LegacyMentionHashtag({
     super.key,
     required NostrNote note,
     required Map<String, dynamic> tagsMetadata,
-    required GetUserMetadata metadataProvider,
     required Function(String p1) profileCallback,
     required this.word,
   })  : _note = note,
         _tagsMetadata = tagsMetadata,
-        _metadataProvider = metadataProvider,
         _profileCallback = profileCallback;
 
   final NostrNote _note;
   final Map<String, dynamic> _tagsMetadata;
-  final GetUserMetadata _metadataProvider;
+
   final Function(String p1) _profileCallback;
   final String word;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     var indexString = word.replaceAll("#[", "").replaceAll("]", "");
     int index;
     try {
@@ -263,48 +257,33 @@ class LegacyMentionHashtag extends StatelessWidget {
     var pubkeyHr =
         "${pubkeyBech.substring(0, 5)}...${pubkeyBech.substring(pubkeyBech.length - 5)}";
     _tagsMetadata[tag.value] = pubkeyHr;
-    var metadata =
-        _metadataProvider.getMetadataByPubkey(tag.value).first.timeout(
-              const Duration(seconds: 2),
-            );
+
+    final metadata = ref.watch(metadataStateProvider(tag.value)).userMetadata;
 
     return GestureDetector(
       onTap: () {
         _profileCallback(tag.value);
       },
-      child: FutureBuilder<UserMetadata?>(
-          future: metadata,
-          builder: (context, snapshot) {
-            if (snapshot.hasData) {
-              return Text(
-                "@${snapshot.data!.name ?? pubkeyHr}",
-                style: const TextStyle(color: Palette.primary, fontSize: 17),
-              );
-            }
-            return Text(
-              "@$pubkeyHr",
-              style: const TextStyle(color: Palette.primary, fontSize: 17),
-            );
-          }),
+      child: Text(
+        metadata != null ? "@${metadata.name ?? pubkeyHr}" : "@$pubkeyHr",
+        style: const TextStyle(color: Palette.primary, fontSize: 17),
+      ),
     );
   }
 }
 
-class ProfileLink extends StatelessWidget {
+class ProfileLink extends ConsumerWidget {
   const ProfileLink({
     super.key,
-    required GetUserMetadata metadataProvider,
     required Function(String p1) profileCallback,
     required this.word,
-  })  : _metadataProvider = metadataProvider,
-        _profileCallback = profileCallback;
+  }) : _profileCallback = profileCallback;
 
-  final GetUserMetadata _metadataProvider;
   final Function(String p1) _profileCallback;
   final String word;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     var group = profilePattern.allMatches(word);
     var match = group.first;
     var cleaned = match.group(0);
@@ -336,29 +315,19 @@ class ProfileLink extends StatelessWidget {
     final String pubkeyHr =
         "${pubkeyBech.substring(0, 5)}:${pubkeyBech.substring(pubkeyBech.length - 5)}";
 
-    var metadata =
-        _metadataProvider.getMetadataByPubkey(myPubkeyHex).first.timeout(
-              const Duration(seconds: 2),
-            );
+    final myUserMetadata =
+        ref.watch(metadataStateProvider(myPubkeyHex)).userMetadata;
 
     return GestureDetector(
       onTap: () {
         _profileCallback(myPubkeyHex);
       },
-      child: FutureBuilder<UserMetadata?>(
-          future: metadata,
-          builder: (context, metadataSnp) {
-            if (metadataSnp.hasData) {
-              return Text(
-                "@${metadataSnp.data!.name ?? pubkeyHr}",
-                style: const TextStyle(color: Palette.primary, fontSize: 17),
-              );
-            }
-            return Text(
-              "@$pubkeyHr",
-              style: const TextStyle(color: Palette.primary, fontSize: 17),
-            );
-          }),
+      child: Text(
+        myUserMetadata != null
+            ? "@${myUserMetadata.name ?? pubkeyHr}"
+            : "@$pubkeyHr",
+        style: const TextStyle(color: Palette.primary, fontSize: 17),
+      ),
     );
   }
 }
