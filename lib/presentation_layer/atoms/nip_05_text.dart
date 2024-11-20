@@ -33,16 +33,22 @@ class Nip05Text extends StatelessWidget {
       return Text(
         "@${shortHr(pubkey)}",
         style: style,
+        overflow: TextOverflow.ellipsis,
+        maxLines: 1,
       );
     } else if (nip05verified!.startsWith("_")) {
       return Text(
         nip05verified!.substring(1),
         style: style,
+        overflow: TextOverflow.ellipsis,
+        maxLines: 1,
       );
     } else {
       return Text(
         '@${nip05verified!}',
         style: style,
+        overflow: TextOverflow.ellipsis,
+        maxLines: 1,
       );
     }
   }
