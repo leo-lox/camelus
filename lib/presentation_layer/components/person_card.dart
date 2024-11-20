@@ -1,6 +1,7 @@
 import 'package:camelus/presentation_layer/atoms/follow_button.dart';
 import 'package:camelus/config/palette.dart';
 import 'package:camelus/presentation_layer/atoms/my_profile_picture.dart';
+import 'package:camelus/presentation_layer/atoms/nip_05_text.dart';
 import 'package:camelus/presentation_layer/providers/nip05_provider.dart';
 
 import 'package:flutter/material.dart';
@@ -80,53 +81,15 @@ class PersonCard extends ConsumerWidget {
                             fontWeight: FontWeight.w600,
                           ),
                         ),
-                        FutureBuilder(
-                            future: checkNip05(nip05 ?? "", pubkey, ref),
-                            builder: (context, snapshot) {
-                              if (snapshot.hasData && snapshot.data != "") {
-                                return Container(
-                                  margin:
-                                      const EdgeInsets.only(top: 0, left: 5),
-                                  child: const Icon(
-                                    Icons.verified,
-                                    color: Palette.white,
-                                    size: 18,
-                                  ),
-                                );
-                              } else {
-                                return Container();
-                              }
-                            }),
                       ],
                     ),
                   // nip 05
-                  if (nip05 != null &&
-                      nip05 != '' &&
-                      nip05!.split('@').length > 1)
-                    Row(
-                      children: [
-                        if (name.split('@')[0] == name ||
-                            nip05!.startsWith("_@"))
-                          Text(
-                            nip05!.split('@')[1],
-                            style: const TextStyle(
-                              color: Palette.white,
-                              fontSize: 12,
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
-                        if (name.split('@')[0] != name &&
-                            !nip05!.startsWith("_@"))
-                          Text(
-                            nip05!,
-                            style: const TextStyle(
-                              color: Palette.white,
-                              fontSize: 12,
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
-                      ],
-                    ),
+
+                  Nip05Text(
+                    pubkey: pubkey,
+                    nip05verified: nip05,
+                  ),
+
                   const SizedBox(height: 4),
                   SizedBox(
                     // 1/3 of screen width

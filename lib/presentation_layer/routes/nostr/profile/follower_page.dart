@@ -3,6 +3,7 @@ import 'package:camelus/domain_layer/entities/user_metadata.dart';
 import 'package:camelus/presentation_layer/components/person_card.dart';
 import 'package:camelus/presentation_layer/providers/following_provider.dart';
 import 'package:camelus/presentation_layer/providers/metadata_provider.dart';
+import 'package:camelus/presentation_layer/providers/metadata_state_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:camelus/config/palette.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -57,7 +58,6 @@ class _FollowerPageState extends ConsumerState<FollowerPage> {
 
   @override
   Widget build(BuildContext context) {
-    var metadata = ref.watch(metadataProvider);
     var followingService = ref.watch(followingProvider);
     return Scaffold(
       backgroundColor: Palette.background,
@@ -82,44 +82,30 @@ class _FollowerPageState extends ConsumerState<FollowerPage> {
                 physics: const BouncingScrollPhysics(),
                 itemCount: widget.contactList.contacts.length,
                 itemBuilder: (context, index) {
-                  var displayPubkey = widget.contactList.contacts[index];
-                  return StreamBuilder<UserMetadata?>(
-                      stream: metadata.getMetadataByPubkey(displayPubkey),
-                      builder: (BuildContext context, metadataSnapshot) {
-                        if (metadataSnapshot.hasData) {
-                          return personCard(
-                            displayPubkey,
-                            metadataSnapshot,
-                            contactsSnapshot.data!,
-                            context,
-                          );
-                        } else if (metadataSnapshot.hasError) {
-                          return Text('Error: ${metadataSnapshot.error}');
-                        } else {
-                          return personCard(
-                            displayPubkey,
-                            metadataSnapshot,
-                            contactsSnapshot.data!,
-                            context,
-                          );
-                        }
-                      });
+                  final displayPubkey = widget.contactList.contacts[index];
+
+                  final displayMetadata = ref
+                      .watch(metadataStateProvider(displayPubkey))
+                      .userMetadata;
+                  return personCard(
+                    displayPubkey,
+                    displayMetadata,
+                    contactsSnapshot.data!,
+                    context,
+                  );
                 });
           }),
     );
   }
 
-  PersonCard personCard(
-      String displayPubkey,
-      AsyncSnapshot<UserMetadata?> metadataSnapshot,
-      ContactList ownContactList,
-      BuildContext context) {
+  PersonCard personCard(String displayPubkey, UserMetadata? metadata,
+      ContactList ownContactList, BuildContext context) {
     return PersonCard(
       pubkey: displayPubkey,
-      name: metadataSnapshot.data?.name ?? "",
-      pictureUrl: metadataSnapshot.data?.picture ?? "",
-      about: metadataSnapshot.data?.about ?? "",
-      nip05: metadataSnapshot.data?.nip05 ?? "",
+      name: metadata?.name ?? "",
+      pictureUrl: metadata?.picture ?? "",
+      about: metadata?.about ?? "",
+      nip05: metadata?.nip05,
       isFollowing:
           ownContactList.contacts.any((element) => element == displayPubkey),
       onTap: () {

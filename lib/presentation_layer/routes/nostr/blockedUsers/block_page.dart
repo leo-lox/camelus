@@ -59,8 +59,6 @@ class _BlockPageState extends ConsumerState<BlockPage> {
 
   @override
   Widget build(BuildContext context) {
-    var metadata = ref.watch(metadataProvider);
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('block/report'),

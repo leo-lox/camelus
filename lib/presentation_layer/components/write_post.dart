@@ -2,7 +2,6 @@ import 'dart:developer';
 import 'dart:io';
 import 'package:camelus/domain_layer/entities/nostr_note.dart';
 import 'package:camelus/domain_layer/entities/user_metadata.dart';
-import 'package:camelus/domain_layer/usecases/get_user_metadata.dart';
 import 'package:camelus/presentation_layer/atoms/picture.dart';
 import 'package:camelus/helpers/nprofile_helper.dart';
 import 'package:camelus/domain_layer/entities/nostr_tag.dart';
@@ -10,7 +9,7 @@ import 'package:camelus/presentation_layer/providers/edit_relays_provider.dart';
 import 'package:camelus/presentation_layer/providers/event_signer_provider.dart';
 import 'package:camelus/presentation_layer/providers/file_upload_provider.dart';
 import 'package:camelus/presentation_layer/providers/get_notes_provider.dart';
-import 'package:camelus/presentation_layer/providers/metadata_provider.dart';
+import 'package:camelus/presentation_layer/providers/metadata_state_provider.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mentions/flutter_mentions.dart';
@@ -356,7 +355,6 @@ class _WritePostState extends ConsumerState<WritePost> {
 
   @override
   Widget build(BuildContext context) {
-    var metadata = ref.watch(metadataProvider);
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -382,7 +380,12 @@ class _WritePostState extends ConsumerState<WritePost> {
               const SizedBox(
                 height: 5,
               ),
-              _topBar(context, metadata),
+
+              _TopBar(
+                replyToPubkey: widget.context?.replyToNote.pubkey,
+                submitLoading: submitLoading,
+                submitPostCallback: _submitPost,
+              ),
               const SizedBox(
                 height: 20,
               ),
@@ -602,8 +605,34 @@ class _WritePostState extends ConsumerState<WritePost> {
       ),
     );
   }
+}
 
-  Row _topBar(BuildContext context, GetUserMetadata metadata) {
+class _TopBar extends ConsumerWidget {
+  final String? replyToPubkey;
+  final bool submitLoading;
+  final Function submitPostCallback;
+
+  const _TopBar({
+    this.replyToPubkey,
+    required this.submitLoading,
+    required this.submitPostCallback,
+  });
+
+  getPubkeyHrShort(String pubkey) {
+    final pubkeyHr = Helpers().encodeBech32(pubkey, "npub");
+    final pubkeyHrShort =
+        "${pubkeyHr.substring(0, 5)}...${pubkeyHr.substring(pubkeyHr.length - 5)}";
+    return pubkeyHrShort;
+  }
+
+  @override
+  build(BuildContext context, WidgetRef ref) {
+    UserMetadata? metadata;
+
+    if (replyToPubkey != null) {
+      metadata = ref.watch(metadataStateProvider(replyToPubkey!)).userMetadata;
+    }
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -617,7 +646,7 @@ class _WritePostState extends ConsumerState<WritePost> {
             color: Palette.gray,
           ),
         ),
-        if (widget.context == null)
+        if (replyToPubkey == null)
           const Text(
             "write a post",
             style: TextStyle(
@@ -626,51 +655,27 @@ class _WritePostState extends ConsumerState<WritePost> {
               fontWeight: FontWeight.bold,
             ),
           ),
-        if (widget.context != null)
+        if (replyToPubkey != null)
           Column(
             children: [
               // get metadata
-              StreamBuilder<UserMetadata?>(
-                  stream: metadata
-                      .getMetadataByPubkey(widget.context!.replyToNote.pubkey),
-                  builder: (BuildContext context,
-                      AsyncSnapshot<UserMetadata?> snapshot) {
-                    var name = "";
 
-                    if (snapshot.hasData) {
-                      name = snapshot.data?.name ?? "";
-                    } else if (snapshot.hasError) {
-                      name = "";
-                    } else {
-                      // loading
-                      name = "...";
-                    }
-                    if (name.isEmpty) {
-                      var pubkey = widget.context!.replyToNote.pubkey;
-                      var pubkeyHr = Helpers().encodeBech32(pubkey, "npub");
-                      var pubkeyHrShort =
-                          "${pubkeyHr.substring(0, 5)}...${pubkeyHr.substring(pubkeyHr.length - 5)}";
-                      name = pubkeyHrShort;
-                    }
-
-                    return SizedBox(
-                      width: MediaQuery.of(context).size.width * 0.6,
-                      child: Container(
-                        margin:
-                            const EdgeInsets.only(left: 10, right: 10, top: 5),
-                        child: Text(
-                          "reply to $name",
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 2,
-                          style: const TextStyle(
-                            color: Palette.lightGray,
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    );
-                  }),
+              SizedBox(
+                width: MediaQuery.of(context).size.width * 0.6,
+                child: Container(
+                  margin: const EdgeInsets.only(left: 10, right: 10, top: 5),
+                  child: Text(
+                    "reply to ${metadata?.name ?? getPubkeyHrShort(replyToPubkey!)}",
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 2,
+                    style: const TextStyle(
+                      color: Palette.lightGray,
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
 
               /// check if replying to multiple people
               // if ((Helpers()
@@ -692,7 +697,7 @@ class _WritePostState extends ConsumerState<WritePost> {
         !submitLoading
             ? TextButton(
                 onPressed: (() {
-                  _submitPost();
+                  submitPostCallback();
                 }),
                 child: SvgPicture.asset(
                   height: 25,
