@@ -6,84 +6,15 @@ import '../../../domain_layer/entities/nostr_note.dart';
 import '../../../domain_layer/entities/nostr_tag.dart';
 import '../../../helpers/helpers.dart';
 import '../../providers/metadata_provider.dart';
+import '../../providers/metadata_state_provider.dart';
 
-class InReplyTo extends ConsumerStatefulWidget {
+class InReplyTo extends ConsumerWidget {
   const InReplyTo({
     super.key,
     required this.myNote,
   });
 
   final NostrNote myNote;
-
-  @override
-  ConsumerState<InReplyTo> createState() => _InReplyToState();
-}
-
-class _InReplyToState extends ConsumerState<InReplyTo> {
-  String valueFirst = "";
-  String pubkeyFirst = "";
-
-  String valueSecond = "";
-  String pubkeySecond = "";
-
-  int othersCount = 0;
-
-  void populateValues() {
-    final note = widget.myNote;
-    List<NostrTag> notePubkeys = note.getTagPubkeys;
-
-    // filter out root pubkey reference
-    notePubkeys.removeWhere((element) => element.marker == 'root');
-
-    // populate
-    for (var i = 0; i < notePubkeys.length; i++) {
-      var tag = notePubkeys[i];
-
-      if (i == 0) {
-        valueFirst = _formatPubkey(tag.value);
-        pubkeyFirst = tag.value;
-      } else if (i == 1) {
-        valueSecond = _formatPubkey(tag.value);
-        pubkeySecond = tag.value;
-      } else {
-        othersCount++;
-      }
-    }
-
-    setState(() {
-      valueFirst = valueFirst;
-      valueSecond = valueSecond;
-      othersCount = othersCount;
-    });
-  }
-
-  void resolveMetadata() async {
-    final metadata = ref.read(metadataProvider);
-
-    if (pubkeyFirst.isEmpty) return;
-    final firstFuture = metadata.getMetadataByPubkey(pubkeyFirst).toList();
-    firstFuture.then((value) => {
-          if (value.isNotEmpty) {valueFirst = value[0].name ?? valueFirst},
-          if (mounted)
-            {
-              setState(() {
-                valueFirst = valueFirst;
-              })
-            }
-        });
-
-    if (pubkeySecond.isEmpty) return;
-    final secondFuture = metadata.getMetadataByPubkey(pubkeySecond).toList();
-    secondFuture.then((value) => {
-          if (value.isNotEmpty) {valueSecond = value[0].name ?? valueSecond},
-          if (mounted)
-            {
-              setState(() {
-                valueSecond = valueSecond;
-              })
-            }
-        });
-  }
 
   String _formatPubkey(String pubkey) {
     final pubkeyBech = Helpers().encodeBech32(pubkey, "npub");
@@ -93,22 +24,41 @@ class _InReplyToState extends ConsumerState<InReplyTo> {
   }
 
   @override
-  void initState() {
-    super.initState();
-    populateValues();
-    resolveMetadata();
-  }
+  Widget build(BuildContext context, WidgetRef ref) {
+    List<NostrTag> notePubkeys = myNote.getTagPubkeys;
 
-  @override
-  void dispose() {
-    super.dispose();
-  }
+    // filter out root pubkey reference
+    notePubkeys.removeWhere((element) => element.marker == 'root');
 
-  @override
-  Widget build(BuildContext context) {
-    if (valueFirst.isEmpty) {
+    if (notePubkeys.isEmpty) {
       return const SizedBox();
     }
+
+    String valueFirst = "";
+    String pubkeyFirst = "";
+    String valueSecond = "";
+    String pubkeySecond = "";
+    int othersCount = 0;
+
+    // populate
+    for (var i = 0; i < notePubkeys.length; i++) {
+      var tag = notePubkeys[i];
+
+      if (i == 0) {
+        pubkeyFirst = tag.value;
+        final myMetadata =
+            ref.watch(metadataStateProvider(pubkeyFirst)).userMetadata;
+        valueFirst = myMetadata?.name ?? _formatPubkey(pubkeyFirst);
+      } else if (i == 1) {
+        pubkeySecond = tag.value;
+        final myMetadata =
+            ref.watch(metadataStateProvider(pubkeySecond)).userMetadata;
+        valueSecond = myMetadata?.name ?? _formatPubkey(pubkeySecond);
+      } else {
+        othersCount++;
+      }
+    }
+
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [

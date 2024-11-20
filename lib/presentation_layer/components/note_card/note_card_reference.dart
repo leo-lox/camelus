@@ -5,60 +5,19 @@ import 'package:camelus/helpers/nevent_helper.dart';
 import 'package:camelus/domain_layer/entities/nostr_note.dart';
 import 'package:camelus/presentation_layer/components/note_card/skeleton_note.dart';
 import 'package:camelus/presentation_layer/providers/get_notes_provider.dart';
-import 'package:camelus/domain_layer/entities/user_metadata.dart';
-import 'package:camelus/presentation_layer/providers/metadata_provider.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:rxdart/rxdart.dart';
 
-final noteAndMetadataProvider =
-    FutureProvider.family<(NostrNote, UserMetadata?), String>(
-        (ref, nostrId) async {
-  final notesProvider = ref.watch(getNotesProvider);
-  final metadataP = ref.watch(metadataProvider);
-
-  final noteStream = notesProvider.getNote(nostrId);
-  final note = await noteStream.first;
-
-  if (note == null) {
-    throw Exception('Note not found');
-  }
-
-  final metadataStream = metadataP.getMetadataByPubkey(note.pubkey);
-  final metadata = await metadataStream.first;
-
-  return (note, metadata);
-});
+import '../../providers/metadata_state_provider.dart';
 
 /// embed, inline post
-class NoteCardReference extends ConsumerStatefulWidget {
+class NoteCardReference extends ConsumerWidget {
   final String word;
 
   const NoteCardReference({
     super.key,
     required this.word,
   });
-
-  @override
-  ConsumerState<NoteCardReference> createState() => _NoteCardReferenceState();
-}
-
-class _NoteCardReferenceState extends ConsumerState<NoteCardReference> {
-  String? nostrId;
-
-  @override
-  void initState() {
-    super.initState();
-    nostrId = _getNostrId(widget.word);
-  }
-
-  @override
-  void didUpdateWidget(NoteCardReference oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.word != widget.word) {
-      nostrId = _getNostrId(widget.word);
-    }
-  }
 
   String? _getNostrId(String word) {
     final cleanedWord = word.replaceAll("nostr:", "");
@@ -82,22 +41,26 @@ class _NoteCardReferenceState extends ConsumerState<NoteCardReference> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final nostrId = _getNostrId(word);
+
     if (nostrId == null) {
       return const SizedBox.shrink();
     }
 
-    return Consumer(
-      builder: (context, ref, child) {
-        final noteAndMetadataAsync =
-            ref.watch(noteAndMetadataProvider(nostrId!));
+    final notesProvider = ref.watch(getNotesProvider);
 
-        return noteAndMetadataAsync.when(
-          loading: () => const Center(
-              child: SkeletonNote(
-            hideBottomAction: true,
-          )),
-          error: (error, stack) => Container(
+    return FutureBuilder<NostrNote?>(
+      future: notesProvider.getNote(nostrId).first,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(
+            child: SkeletonNote(hideBottomAction: true),
+          );
+        }
+
+        if (snapshot.hasError || !snapshot.hasData) {
+          return Container(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(10),
               border: Border.all(color: Palette.darkGray, width: 1.0),
@@ -111,9 +74,16 @@ class _NoteCardReferenceState extends ConsumerState<NoteCardReference> {
                 ),
               ),
             ),
-          ),
-          data: (data) {
-            final (note, metadata) = data;
+          );
+        }
+
+        final note = snapshot.data!;
+
+        return Consumer(
+          builder: (context, ref, child) {
+            final metadata =
+                ref.watch(metadataStateProvider(note.pubkey)).userMetadata;
+
             return Column(
               children: [
                 const SizedBox(height: 20),

@@ -42,7 +42,8 @@ class NoteCardContainer extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final myMetadataState = ref.watch(metadataStateProvider(note.pubkey));
+    final myMetadata =
+        ref.watch(metadataStateProvider(note.pubkey)).userMetadata;
 
     return GestureDetector(
       onTap: () => _onNoteTab(context, note),
@@ -60,7 +61,7 @@ class NoteCardContainer extends ConsumerWidget {
               ),
             NoteCard(
               note: note,
-              myMetadata: myMetadataState.userMetadata,
+              myMetadata: myMetadata,
               key: ValueKey('note-${note.id}'),
             ),
           ],
