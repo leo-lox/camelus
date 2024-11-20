@@ -1,7 +1,6 @@
-
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../config/palette.dart';
 import '../../domain_layer/entities/feed_filter.dart';

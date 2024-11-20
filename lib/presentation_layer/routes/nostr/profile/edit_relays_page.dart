@@ -8,7 +8,7 @@ import 'package:camelus/presentation_layer/providers/following_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:camelus/config/palette.dart';
 
-import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class EditRelaysPage extends ConsumerStatefulWidget {
   const EditRelaysPage({super.key});

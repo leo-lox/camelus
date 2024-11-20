@@ -1,8 +1,8 @@
-import 'dart:developer'; 
+import 'dart:developer';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../config/palette.dart';
 import '../atoms/camer_upload.dart';
@@ -123,7 +123,8 @@ class _EditProfileState extends ConsumerState<EditProfile> {
         children: <Widget>[
           InkWell(
             onTap: () {
-              widget.bannerCallback(); // Trigger callback to update banner when clicked.
+              widget
+                  .bannerCallback(); // Trigger callback to update banner when clicked.
             },
             child: Container(
               width: MediaQuery.of(context).size.width,
@@ -145,11 +146,12 @@ class _EditProfileState extends ConsumerState<EditProfile> {
             left: MediaQuery.of(context).size.width / 8,
             child: InkWell(
               onTap: () {
-                widget.pictureCallback(); // Trigger callback to update profile picture when clicked.
+                widget
+                    .pictureCallback(); // Trigger callback to update profile picture when clicked.
               },
               child: widget.initialPicture == null
                   ? const CameraUpload(
-                      size: 100, 
+                      size: 100,
                     )
                   : RoundImageWithBorder(
                       image: widget.initialPicture!, size: 102),
@@ -195,12 +197,11 @@ class _EditProfileState extends ConsumerState<EditProfile> {
         ),
         TextFormField(
           controller: controller, // Bind the controller to the input field.
-          decoration: textEditInputDecoration, 
-          maxLines: isMultiline
-              ? null
-              : 1, 
-          keyboardType:
-              isMultiline ? TextInputType.multiline : TextInputType.text, // Set keyboard type.
+          decoration: textEditInputDecoration,
+          maxLines: isMultiline ? null : 1,
+          keyboardType: isMultiline
+              ? TextInputType.multiline
+              : TextInputType.text, // Set keyboard type.
         ),
       ],
     );

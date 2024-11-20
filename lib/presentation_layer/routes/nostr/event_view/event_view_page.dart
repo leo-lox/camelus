@@ -8,7 +8,7 @@ import 'package:camelus/domain_layer/entities/nostr_note.dart';
 import 'package:camelus/presentation_layer/components/note_card/skeleton_note.dart';
 import 'package:camelus/presentation_layer/providers/get_notes_provider.dart';
 import 'package:flutter/material.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../components/comments_section.dart';
 import '../../../providers/event_feed_provider.dart';

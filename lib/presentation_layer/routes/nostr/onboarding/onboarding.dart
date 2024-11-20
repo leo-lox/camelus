@@ -8,7 +8,7 @@ import 'package:camelus/presentation_layer/routes/nostr/onboarding/onboarding_pa
 import 'package:camelus/presentation_layer/routes/nostr/onboarding/onboarding_picture.dart';
 import 'package:camelus/presentation_layer/routes/nostr/onboarding/onboarding_profile.dart';
 import 'package:flutter/material.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'onboarding_login_select.dart';
 

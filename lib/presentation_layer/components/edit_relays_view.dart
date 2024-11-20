@@ -4,7 +4,7 @@ import 'package:camelus/presentation_layer/atoms/long_button.dart';
 import 'package:camelus/config/palette.dart';
 import 'package:camelus/presentation_layer/providers/edit_relays_provider.dart';
 import 'package:flutter/material.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class EditRelaysView extends ConsumerStatefulWidget {
   // async function with Map<String, Map<String, bool>> as parameter

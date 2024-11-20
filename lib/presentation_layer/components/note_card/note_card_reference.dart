@@ -8,7 +8,7 @@ import 'package:camelus/presentation_layer/providers/get_notes_provider.dart';
 import 'package:camelus/domain_layer/entities/user_metadata.dart';
 import 'package:camelus/presentation_layer/providers/metadata_provider.dart';
 import 'package:flutter/widgets.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:rxdart/rxdart.dart';
 
 final noteAndMetadataProvider =

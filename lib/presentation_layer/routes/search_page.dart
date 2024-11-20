@@ -16,7 +16,7 @@ import 'package:camelus/presentation_layer/providers/navigation_bar_provider.dar
 import 'package:camelus/presentation_layer/providers/nostr_band_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../domain_layer/entities/contact_list.dart';

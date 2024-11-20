@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:camelus/config/palette.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class OnboardingImage extends ConsumerStatefulWidget {
   final Function imageCallback;

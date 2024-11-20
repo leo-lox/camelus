@@ -11,7 +11,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:camelus/presentation_layer/components/write_post.dart';
 import 'package:camelus/config/palette.dart';
 import 'package:camelus/presentation_layer/routes/nostr/nostr_drawer.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:matomo_tracker/matomo_tracker.dart';
 import 'package:url_launcher/url_launcher.dart';
 

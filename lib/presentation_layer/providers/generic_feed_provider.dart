@@ -1,5 +1,5 @@
 import 'package:camelus/presentation_layer/providers/get_notes_provider.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:rxdart/rxdart.dart';
 
 import '../../domain_layer/entities/feed_filter.dart';

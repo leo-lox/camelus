@@ -1,7 +1,7 @@
 import 'package:camelus/presentation_layer/atoms/long_button.dart';
 import 'package:camelus/config/palette.dart';
 import 'package:flutter/material.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class OnboardingPage01 extends ConsumerStatefulWidget {
   Function loginCallback;

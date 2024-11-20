@@ -3,7 +3,7 @@ import 'package:camelus/data_layer/repositories/nip05_repository_impl.dart';
 import 'package:camelus/domain_layer/repositories/database_repository.dart';
 import 'package:camelus/domain_layer/repositories/nip05_repository.dart';
 import 'package:camelus/domain_layer/usecases/verify_nip05.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart';
 
 import '../../data_layer/data_sources/http_request_data_source.dart';

@@ -1,6 +1,6 @@
 import 'package:camelus/domain_layer/usecases/app_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../config/palette.dart';
 import '../../../providers/event_signer_provider.dart';

@@ -1,7 +1,7 @@
-import 'package:camelus/data_layer/repositories/app_update_repository_impl.dart'; 
+import 'package:camelus/data_layer/repositories/app_update_repository_impl.dart';
 import 'package:camelus/domain_layer/repositories/app_update_repository.dart';
 import 'package:camelus/domain_layer/usecases/check_app_update.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 
 import '../../data_layer/data_sources/http_request_data_source.dart';

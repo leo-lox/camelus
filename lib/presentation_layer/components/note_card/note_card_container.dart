@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../config/palette.dart';
 import '../../../domain_layer/entities/nostr_note.dart';
 import '../../../domain_layer/entities/nostr_tag.dart';
-import '../../../domain_layer/entities/user_metadata.dart';
-import '../../providers/metadata_provider.dart';
+import '../../providers/metadata_state_provider.dart';
 import 'in_reply_to.dart';
 import 'note_card.dart';
 
@@ -22,8 +20,6 @@ class NoteCardContainer extends ConsumerStatefulWidget {
 }
 
 class _NoteCardContainerState extends ConsumerState<NoteCardContainer> {
-  UserMetadata? myUserNoteMetadata;
-
   void _onNoteTab(BuildContext context, NostrNote myNote) {
     var refEvents = myNote.getTagEvents;
 
@@ -52,28 +48,9 @@ class _NoteCardContainerState extends ConsumerState<NoteCardContainer> {
     });
   }
 
-  Future<UserMetadata?> _getMetadata(String pubkey) async {
-    final mProvider = ref.read(metadataProvider);
-
-    final myMetadata = await mProvider.getMetadataByPubkey(pubkey).toList();
-
-    if (myMetadata.isEmpty) {
-      return null;
-    }
-
-    return myMetadata[0];
-  }
-
   @override
   void initState() {
     super.initState();
-    _getMetadata(widget.note.pubkey).then((data) {
-      if (mounted) {
-        setState(() {
-          myUserNoteMetadata = data;
-        });
-      }
-    });
   }
 
   @override
@@ -83,6 +60,9 @@ class _NoteCardContainerState extends ConsumerState<NoteCardContainer> {
 
   @override
   Widget build(BuildContext context) {
+    final myMetadataState =
+        ref.watch(metadataStateProvider(widget.note.pubkey));
+
     final note = widget.note;
     return GestureDetector(
       onTap: () {
@@ -105,7 +85,7 @@ class _NoteCardContainerState extends ConsumerState<NoteCardContainer> {
               ),
             NoteCard(
               note: note,
-              myMetadata: myUserNoteMetadata,
+              myMetadata: myMetadataState.userMetadata,
               key: ValueKey('note-${note.id}'),
             ),
           ],

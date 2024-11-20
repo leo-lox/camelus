@@ -2,7 +2,7 @@ import 'dart:ui';
 
 import 'package:camelus/presentation_layer/providers/reactions_provider.dart';
 import 'package:flutter/material.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../config/palette.dart';
 import '../../../data_layer/models/post_context.dart';

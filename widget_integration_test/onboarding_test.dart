@@ -2,7 +2,7 @@ import 'package:camelus/presentation_layer/routes/nostr/onboarding/onboarding.da
 import 'package:camelus/presentation_layer/routes/nostr/onboarding/onboarding_login.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter/material.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 void main() {
   testWidgets('NostrOnboarding widget test', (WidgetTester tester) async {
