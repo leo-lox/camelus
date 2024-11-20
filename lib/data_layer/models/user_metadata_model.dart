@@ -16,6 +16,8 @@ class UserMetadataModel extends UserMetadata {
     super.website,
     super.lud06,
     super.lud16,
+    super.bot,
+    super.pronouns,
   });
 
   factory UserMetadataModel.fromNDKEvent(ndk_entities.Nip01Event event) {
@@ -35,6 +37,8 @@ class UserMetadataModel extends UserMetadata {
       website: contentJson['website'],
       lud06: contentJson['lud06'],
       lud16: contentJson['lud16'],
+      bot: contentJson['bot'],
+      pronouns: contentJson['pronouns'],
     );
   }
 
@@ -83,6 +87,8 @@ class UserMetadataModel extends UserMetadata {
       website: metadata.website,
       lud06: metadata.lud06,
       lud16: metadata.lud16,
+      bot: metadata.bot,
+      pronouns: metadata.pronouns,
     );
   }
 }

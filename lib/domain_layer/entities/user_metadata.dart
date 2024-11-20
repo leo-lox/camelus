@@ -13,6 +13,8 @@ class UserMetadata {
   String? website;
   String? lud06;
   String? lud16;
+  String? bot;
+  String? pronouns;
 
   UserMetadata({
     required this.eventId,
@@ -26,5 +28,7 @@ class UserMetadata {
     this.website,
     this.lud06,
     this.lud16,
+    this.bot,
+    this.pronouns,
   });
 }
