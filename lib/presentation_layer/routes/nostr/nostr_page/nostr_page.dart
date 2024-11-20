@@ -119,7 +119,7 @@ class _NostrPageState extends ConsumerState<NostrPage>
               },
               feedFilter: FeedFilter(
                 feedId: "homeFeed",
-                kinds: [1],
+                kinds: [1, 6],
                 authors: snapshot.data?.contacts != null
                     ? [...snapshot.data!.contacts, widget.pubkey]
                     : [],

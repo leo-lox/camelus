@@ -43,7 +43,7 @@ class ProfilePage2 extends ConsumerWidget {
         body: GenericFeed(
           feedFilter: FeedFilter(
             authors: [pubkey],
-            kinds: [1],
+            kinds: [1, 6],
             feedId: 'profile-${pubkey.substring(10, 20)}',
           ),
           customHeaderSliverBuilder:

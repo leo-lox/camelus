@@ -29,7 +29,7 @@ class PerspectiveFeedPage extends ConsumerWidget {
               key: PageStorageKey('perspectiveFeed-$perspeciveOfPubkey'),
               feedFilter: FeedFilter(
                 feedId: "testfeed",
-                kinds: [1],
+                kinds: [1, 6],
                 authors: snapshot.data?.contacts != null
                     ? [...snapshot.data!.contacts, perspeciveOfPubkey]
                     : [],

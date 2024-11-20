@@ -10,6 +10,7 @@ import '../providers/generic_feed_provider.dart';
 import '../providers/navigation_bar_provider.dart';
 import 'note_card/no_more_notes.dart';
 import 'note_card/note_card_container.dart';
+import 'note_card/note_card_repost.dart';
 import 'note_card/skeleton_note.dart';
 
 // Main widget for displaying a generic feed
@@ -188,10 +189,19 @@ class ScrollablePostsList extends ConsumerWidget {
             },
           );
         }
-        return NoteCardContainer(
-          key: PageStorageKey(genericFeedStateP.timelineRootNotes[index].id),
-          note: genericFeedStateP.timelineRootNotes[index],
-        );
+        final note = genericFeedStateP.timelineRootNotes[index];
+        if (note.kind == 1) {
+          return NoteCardContainer(
+            key: PageStorageKey(note.id),
+            note: note,
+          );
+        } else if (note.kind == 6) {
+          return NoteCardRepost(
+            key: PageStorageKey(note.id),
+            repostEvent: note,
+          );
+        }
+        return Container();
       },
     );
   }
@@ -225,12 +235,22 @@ class ScrollablePostsAndRepliesList extends ConsumerWidget {
             },
           );
         }
-        return NoteCardContainer(
-          key: PageStorageKey(
-            genericFeedStateP.timelineRootAndReplyNotes[index].id,
-          ),
-          note: genericFeedStateP.timelineRootAndReplyNotes[index],
-        );
+        final note = genericFeedStateP.timelineRootAndReplyNotes[index];
+
+        if (note.kind == 1) {
+          return NoteCardContainer(
+            key: PageStorageKey(
+              note.id,
+            ),
+            note: note,
+          );
+        } else if (note.kind == 6) {
+          return NoteCardRepost(
+            key: PageStorageKey(note.id),
+            repostEvent: note,
+          );
+        }
+        return Container();
       },
     );
   }

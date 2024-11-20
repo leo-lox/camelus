@@ -34,14 +34,20 @@ class NoteRepositoryImpl implements NoteRepository {
   }
 
   @override
-  Stream<NostrNote> getTextNote(String noteId) {
+  Stream<NostrNote> getTextNote(
+    String noteId, {
+    Iterable<String>? explicitRelays,
+  }) {
     ndk.Filter filter = ndk.Filter(
       ids: [noteId],
       kinds: [ndk_entities.Nip01Event.TEXT_NODE_KIND],
     );
 
-    final response = dartNdkSource.dartNdk.requests
-        .query(filters: [filter], name: 'getTextNote-');
+    final response = dartNdkSource.dartNdk.requests.query(
+      filters: [filter],
+      name: 'getTextNote-',
+      explicitRelays: explicitRelays,
+    );
 
     return response.stream.map(
       (event) => NostrNoteModel.fromNDKEvent(event),

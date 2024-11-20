@@ -20,8 +20,11 @@ class GetNotes {
   }
 
   // todo: check if possible to close the subscription when the stream closes
-  Stream<NostrNote> getNote(String noteId) {
-    return _noteRepository.getTextNote(noteId);
+  Stream<NostrNote> getNote(String noteId, {Iterable<String>? explicitRelays}) {
+    return _noteRepository.getTextNote(
+      noteId,
+      explicitRelays: explicitRelays,
+    );
   }
 
   Stream<NostrNote> genericNostrQuery({

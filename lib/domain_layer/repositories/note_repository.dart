@@ -5,7 +5,10 @@ import '../entities/nostr_note.dart';
 abstract class NoteRepository {
   Stream<NostrNote> getAllNotes();
 
-  Stream<NostrNote> getTextNote(String noteId);
+  Stream<NostrNote> getTextNote(
+    String noteId, {
+    Iterable<String>? explicitRelays,
+  });
 
   /// returns the replies to a root note, without the root note
   Stream<NostrNote> subscribeReplyNotes({

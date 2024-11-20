@@ -76,8 +76,14 @@ class NostrNote {
     return mytags;
   }
 
+  /// check if the note is a root note (only works on kind 1)
+  /// all other kinds are root notes
   bool get isRoot {
-    return getRootReply == null && getDirectReply == null;
+    if (kind == 1) {
+      return getRootReply == null && getDirectReply == null;
+    }
+
+    return true;
   }
 
   NostrTag? get getRootReply {
