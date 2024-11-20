@@ -12,6 +12,9 @@ class NostrNote {
   final bool? sig_valid;
   final List<NostrTag> tags;
 
+  /// Relay that an event was received from
+  List<String> sources = [];
+
   NostrNote({
     required this.id,
     required this.pubkey,
@@ -22,6 +25,7 @@ class NostrNote {
     required this.sig,
     required this.tags,
     this.sig_valid,
+    this.sources = const [],
   });
 
   List<String> get relayHints => _extractRelayHints();

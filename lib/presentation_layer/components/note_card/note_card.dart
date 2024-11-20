@@ -1,6 +1,5 @@
 import 'dart:ui';
 
-import 'package:camelus/presentation_layer/providers/reactions_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -10,6 +9,7 @@ import '../../../domain_layer/entities/nostr_note.dart';
 import '../../../domain_layer/entities/user_metadata.dart';
 import '../../atoms/my_profile_picture.dart';
 import '../../providers/reactions_state_provider.dart';
+import '../../providers/reposts_state_provider.dart';
 import '../bottom_sheet_share.dart';
 import '../write_post.dart';
 import 'bottom_action_row.dart';
@@ -85,16 +85,11 @@ class NoteCard extends ConsumerWidget {
                   _writeReply(context, note);
                 },
                 onLike: () {
-                  print("onLikeInNoteCard");
                   ref.read(postLikeProvider(note).notifier).toggleLike();
                 },
+                isRetweeted: ref.watch(postRepostProvider(note)).isReposted,
                 onRetweet: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Not implemented yet',
-                          style: TextStyle(color: Palette.black)),
-                    ),
-                  );
+                  ref.read(postRepostProvider(note).notifier).toggleRepost();
                 },
                 onShare: () => openBottomSheetShare(context, note),
                 onMore: () => openBottomSheetMore(context, note),

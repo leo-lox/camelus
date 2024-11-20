@@ -13,6 +13,7 @@ class NostrNoteModel extends NostrNote {
     required super.sig,
     required super.tags,
     super.sig_valid,
+    super.sources,
   });
 
   factory NostrNoteModel.fromJson(Map<String, dynamic> json) {
@@ -30,6 +31,7 @@ class NostrNoteModel extends NostrNote {
       kind: json['kind'],
       content: json['content'],
       sig: json['sig'],
+      sources: json['sources'],
       tags: tags.map((tag) => NostrTagModel.fromJson(tag)).toList(),
     );
   }
@@ -56,6 +58,7 @@ class NostrNoteModel extends NostrNote {
       sig: nip01event.sig,
       tags: myTags,
       sig_valid: nip01event.validSig,
+      sources: nip01event.sources,
     );
   }
 
@@ -79,6 +82,7 @@ class NostrNoteModel extends NostrNote {
       sig: nostrNote.sig,
       tags: nostrNote.tags,
       sig_valid: nostrNote.sig_valid,
+      sources: nostrNote.sources,
     );
   }
 
@@ -89,6 +93,6 @@ class NostrNoteModel extends NostrNote {
         'kind': kind,
         'content': content,
         'sig': sig,
-        'tags': tags
+        'tags': tags,
       };
 }

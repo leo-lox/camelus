@@ -391,7 +391,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
         name: metadata['name'] ?? '',
         pictureUrl: metadata['picture'] ?? '',
         about: metadata['about'] ?? '',
-        nip05: metadata['nip05'] ?? '',
+        nip05: metadata['nip05'],
         isFollowing: currentFollowing.contacts
             .any((element) => element == profile.pubkey),
         onTap: () {

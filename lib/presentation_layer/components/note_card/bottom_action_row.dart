@@ -88,6 +88,7 @@ class _BottomActionRowState extends State<BottomActionRow>
           onTap: widget.onRetweet,
           svgIcon: 'assets/icons/retweet.svg',
           count: widget.retweetCount,
+          color: widget.isRetweeted ? Palette.repostActive : null,
         ),
         _buildLikeButton(),
         _buildActionButton(
@@ -153,6 +154,7 @@ class _BottomActionRowState extends State<BottomActionRow>
     Icon? icon,
     String? svgIcon,
     int? count,
+    Color? color,
   }) {
     return SizedBox(
       height: 35,
@@ -170,8 +172,8 @@ class _BottomActionRowState extends State<BottomActionRow>
                 SvgPicture.asset(
                   svgIcon,
                   height: 35,
-                  colorFilter: const ColorFilter.mode(
-                    BottomActionRow.defaultColor,
+                  colorFilter: ColorFilter.mode(
+                    color ?? BottomActionRow.defaultColor,
                     BlendMode.srcATop,
                   ),
                 ),

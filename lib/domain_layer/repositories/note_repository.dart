@@ -61,4 +61,9 @@ abstract class NoteRepository {
     required String postId,
     required List<String> authors,
   });
+
+  Future<List<NostrNote>> getReposts({
+    String? postId,
+    required List<String> authors,
+  });
 }
