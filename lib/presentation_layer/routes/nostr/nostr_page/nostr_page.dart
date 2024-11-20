@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:camelus/presentation_layer/providers/metadata_state_provider.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -143,21 +144,16 @@ class LeadingWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final metadataP = ref.watch(metadataProvider);
+    final myMetadata = ref.watch(metadataStateProvider(pubkey)).userMetadata;
     return InkWell(
       borderRadius: BorderRadius.circular(100),
       onTap: () => parentScaffoldKey.currentState!.openDrawer(),
-      child: FutureBuilder<UserMetadata?>(
-        future: metadataP.getMetadataByPubkey(pubkey).first,
-        builder: (context, snapshot) {
-          return Padding(
-            padding: const EdgeInsets.all(9.0),
-            child: UserImage(
-              imageUrl: snapshot.data?.picture,
-              pubkey: pubkey,
-            ),
-          );
-        },
+      child: Padding(
+        padding: const EdgeInsets.all(9.0),
+        child: UserImage(
+          imageUrl: myMetadata?.picture,
+          pubkey: pubkey,
+        ),
       ),
     );
   }
