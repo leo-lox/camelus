@@ -68,5 +68,6 @@ abstract class NoteRepository {
   Future<List<NostrNote>> getReposts({
     String? postId,
     required List<String> authors,
+    bool cacheEnabled = false,
   });
 }

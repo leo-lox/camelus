@@ -268,6 +268,7 @@ class NoteRepositoryImpl implements NoteRepository {
   Future<List<NostrNote>> getReposts({
     String? postId,
     required List<String> authors,
+    bool cacheEnabled = false,
   }) async {
     ndk.Filter filter = ndk.Filter(
       eTags: postId != null ? [postId] : null,
@@ -279,8 +280,8 @@ class NoteRepositoryImpl implements NoteRepository {
       timeout: 3,
       filters: [filter],
       name: 'getReposts',
-      cacheRead: false,
-      cacheWrite: false,
+      cacheRead: cacheEnabled,
+      cacheWrite: cacheEnabled,
     );
 
     final events = await response.future;

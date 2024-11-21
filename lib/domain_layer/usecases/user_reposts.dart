@@ -28,14 +28,17 @@ class UserReposts {
   }
 
   /// Check if a post is liked by a specific user
+  /// cache needs to be disabled because ndk does not support event deletin jet
   /// [returns] the reaction if the post is liked, null otherwise
   Future<NostrNote?> isPostRepostedBy({
     required String repostedByPubkey,
     required String postId,
+    bool cacheEnabled = false,
   }) async {
     final reposts = await _noteRepository.getReposts(
       postId: postId,
       authors: [repostedByPubkey],
+      cacheEnabled: cacheEnabled,
     );
     if (reposts.isEmpty) {
       return null;
@@ -104,8 +107,11 @@ class UserReposts {
     }
 
     // get the repost to delete
-    final myRepostEvent =
-        await isPostRepostedBy(repostedByPubkey: selfPubkey!, postId: postId);
+    final myRepostEvent = await isPostRepostedBy(
+      repostedByPubkey: selfPubkey!,
+      postId: postId,
+      cacheEnabled: true,
+    );
     if (myRepostEvent == null) {
       throw Exception("Repost event not found");
     }

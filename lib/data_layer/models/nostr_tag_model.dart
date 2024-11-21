@@ -26,4 +26,20 @@ class NostrTagModel extends NostrTag {
       marker: marker,
     );
   }
+
+  List<dynamic> toJson() {
+    final List<dynamic> json = [type];
+
+    if (value != null) {
+      json.add(value);
+      if (recommended_relay != null) {
+        json.add(recommended_relay);
+        if (marker != null) {
+          json.add(marker);
+        }
+      }
+    }
+
+    return json;
+  }
 }

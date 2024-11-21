@@ -8,16 +8,20 @@ import 'reposts_provider.dart';
 class PostRepostState {
   final bool isReposted;
   final bool isLoading;
+  final bool toggleRepostLoading;
 
   PostRepostState({
     required this.isReposted,
     required this.isLoading,
+    required this.toggleRepostLoading,
   });
 
-  PostRepostState copyWith({bool? isReposted, bool? isLoading}) {
+  PostRepostState copyWith(
+      {bool? isReposted, bool? isLoading, bool? toggleRepostLoading}) {
     return PostRepostState(
       isReposted: isReposted ?? this.isReposted,
       isLoading: isLoading ?? this.isLoading,
+      toggleRepostLoading: toggleRepostLoading ?? this.toggleRepostLoading,
     );
   }
 }
@@ -37,7 +41,11 @@ class PostRepostNotifier extends StateNotifier<PostRepostState> {
   PostRepostNotifier(
     this._userReposts,
     this._displayNote,
-  ) : super(PostRepostState(isReposted: false, isLoading: true)) {
+  ) : super(PostRepostState(
+          isReposted: false,
+          isLoading: true,
+          toggleRepostLoading: false,
+        )) {
     _initializeRepostState();
   }
 
@@ -51,7 +59,7 @@ class PostRepostNotifier extends StateNotifier<PostRepostState> {
   Future<void> toggleRepost() async {
     if (state.isLoading) return;
 
-    state = state.copyWith(isLoading: true);
+    state = state.copyWith(isLoading: true, toggleRepostLoading: true);
 
     try {
       if (state.isReposted) {
@@ -59,11 +67,15 @@ class PostRepostNotifier extends StateNotifier<PostRepostState> {
       } else {
         await _userReposts.repostPost(postToRepost: _displayNote);
       }
-      state = state.copyWith(isReposted: !state.isReposted, isLoading: false);
+      state = state.copyWith(
+        isReposted: !state.isReposted,
+        isLoading: false,
+        toggleRepostLoading: false,
+      );
     } catch (e) {
       print(e);
       // Handle error
-      state = state.copyWith(isLoading: false);
+      state = state.copyWith(isLoading: false, toggleRepostLoading: false);
     }
   }
 }

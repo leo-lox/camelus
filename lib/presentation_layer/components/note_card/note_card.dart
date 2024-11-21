@@ -87,6 +87,8 @@ class NoteCard extends ConsumerWidget {
                 onLike: () {
                   ref.read(postLikeProvider(note).notifier).toggleLike();
                 },
+                retweetLoading:
+                    ref.watch(postRepostProvider(note)).toggleRepostLoading,
                 isRetweeted: ref.watch(postRepostProvider(note)).isReposted,
                 onRetweet: () {
                   ref.read(postRepostProvider(note).notifier).toggleRepost();
