@@ -1,5 +1,7 @@
-On camelus you can follow people to read their posts or write your own posts.
-You can decide where you want to publish your posts, or from which relays posts are received.
+camelus the decentralized social network build on the nostr protocol.
+You data your control!
 
 
-You stay in control.
+With camelus you can:
+- Post content and participate in public conversations
+- Stay up to date with the latest news and follow your interests

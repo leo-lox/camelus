@@ -1,1 +1,1 @@
-camelus your gateway to the nostr network
+camelus is the truly decentralized social network build on the nostr protocol
