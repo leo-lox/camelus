@@ -8,6 +8,7 @@ import 'package:camelus/helpers/nprofile_helper.dart';
 import 'package:camelus/domain_layer/entities/nostr_note.dart';
 import 'package:camelus/presentation_layer/providers/metadata_provider.dart';
 import 'package:camelus/presentation_layer/providers/metadata_state_provider.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher_string.dart';
@@ -16,6 +17,7 @@ final profilePattern = RegExp(r"nostr:(nprofile|npub)[a-zA-Z0-9]+");
 final notePattern = RegExp(r"nostr:(note|nevent)[a-zA-Z0-9]+");
 
 /// this class is responsible for building the content of a note
+
 class NoteCardSplitContent extends ConsumerStatefulWidget {
   final NostrNote note;
   final Function(String) profileCallback;
@@ -34,98 +36,188 @@ class NoteCardSplitContent extends ConsumerStatefulWidget {
 }
 
 class _NoteCardSplitContentState extends ConsumerState<NoteCardSplitContent> {
-  final Map<String, dynamic> _tagsMetadata = {};
-
-  List<String> imageLinks = [];
-
-  _NoteCardSplitContentState();
-
-  List<Widget> body = [];
+  late List<InlineSpan> _contentSpans;
+  late List<String> _imageLinks;
+  late Set<String> _profileHexIdentifiers;
+  final Map<String, WidgetSpan> _memoizedNoteReferences = {};
 
   @override
   void initState() {
     super.initState();
-
-    imageLinks = _extractImages(widget.note);
-    body = _buildContent(widget.note.content);
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
+    _parseContent();
   }
 
   @override
   void didUpdateWidget(NoteCardSplitContent oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.note.id != widget.note.id) {
-      imageLinks = _extractImages(widget.note);
-      body = _buildContent(widget.note.content);
+      _parseContent();
     }
+  }
+
+  void _parseContent() {
+    _imageLinks = _extractImages(widget.note);
+    _profileHexIdentifiers = _extractProfileHexIdentifiers(widget.note.content);
+    //_contentSpans = _buildContentSpans(widget.note.content, null);
   }
 
   @override
   Widget build(BuildContext context) {
-    return Wrap(
-      spacing: 0,
-      runSpacing: 4,
-      direction: Axis.horizontal,
-      verticalDirection: VerticalDirection.down,
-      children: body,
+    // Watch metadata for all profile links
+    final metadataMap = Map.fromEntries(
+      _profileHexIdentifiers.map((hexId) => MapEntry(
+            hexId,
+            ref.watch(metadataStateProvider(hexId)).userMetadata,
+          )),
+    );
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SelectableText.rich(
+          TextSpan(
+              children: _buildContentSpans(widget.note.content, metadataMap)),
+          style: const TextStyle(color: Palette.lightGray, fontSize: 17),
+        ),
+        if (_imageLinks.isNotEmpty) ...[
+          const SizedBox(height: 8),
+          ImagesTileView(images: _imageLinks),
+        ],
+      ],
     );
   }
 
-  List<Widget> _buildContent(String content) {
-    List<Widget> widgets = [];
-    List<String> lines = content.split("\n");
-    for (var line in lines) {
-      if (line == "") {
-        //widgets.add(_buildText("\n"));
-        widgets.add(const SizedBox(height: 7, width: 1000));
-        continue;
-      }
-      List<String> words = line.split(" ");
-      for (var word in words) {
-        if (profilePattern.hasMatch(word)) {
-          widgets.add(ProfileLink(
-            profileCallback: widget.profileCallback,
-            word: word,
-          ));
-        } else if (notePattern.hasMatch(word)) {
-          widgets.add(NoteCardReference(word: word));
-        } else if (word.startsWith("#[")) {
-          widgets.add(LegacyMentionHashtag(
-              note: widget.note,
-              tagsMetadata: _tagsMetadata,
-              profileCallback: widget.profileCallback,
-              word: word));
-        } else if (word.startsWith("#")) {
-          widgets.add(
-              HashtagLink(hashtagCallback: widget.hashtagCallback, word: word));
-        } else if (word.startsWith("http")) {
-          widgets.add(HttpLink(imageLinks: imageLinks, word: word));
-        } else {
-          widgets.add(DisplayText(word: word));
-        }
-        widgets.add(const DisplayText(word: " "));
-      }
-      widgets.removeLast(); // remove last space
-      //widgets.add(_buildText("\n")); // add back the original line break
-      widgets.add(const SizedBox(
-        height: 7,
-      ));
-    }
+  Set<String> _extractProfileHexIdentifiers(String content) {
+    final profileRegex = RegExp(r'nostr:(nprofile|npub)[a-zA-Z0-9]+');
+    return profileRegex
+        .allMatches(content)
+        .map((match) => _extractHexFromProfileLink(
+            match.group(0)!.replaceAll('nostr:', '')))
+        .toSet();
+  }
 
-    if (imageLinks.isNotEmpty) {
-      widgets.add(
-        ImagesTileView(
-          images: imageLinks,
-          //galleryBottomWidget: splitContent.content,
+  List<InlineSpan> _buildContentSpans(
+      String content, Map<String, UserMetadata?>? metadataMap) {
+    List<InlineSpan> spans = [];
+    RegExp exp = RegExp(
+      r'nostr:(nprofile|npub)[a-zA-Z0-9]+|'
+      r'nostr:(note|nevent)[a-zA-Z0-9]+|'
+      r'(#\$\$\s*[0-9]+\s*\$\$)|'
+      r'(#\w+)|' // Hashtags
+      r'(https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*))', // URLs
+      caseSensitive: false,
+    );
+
+    content.splitMapJoin(
+      exp,
+      onMatch: (Match match) {
+        String? matched = match.group(0);
+        if (matched != null) {
+          if (matched.startsWith('nostr:')) {
+            spans.add(_buildProfileOrNoteSpan(matched, metadataMap));
+          } else if (matched.startsWith('#[')) {
+            spans.add(_buildLegacyMentionSpan(matched));
+          } else if (matched.startsWith('#')) {
+            spans.add(_buildHashtagSpan(matched));
+          } else if (matched.startsWith('http')) {
+            spans.add(_buildUrlSpan(matched));
+          }
+        }
+        return '';
+      },
+      onNonMatch: (String text) {
+        spans.add(TextSpan(text: text));
+        return '';
+      },
+    );
+
+    return spans;
+  }
+
+  InlineSpan _buildProfileOrNoteSpan(
+      String word, Map<String, UserMetadata?>? metadataMap) {
+    final cleanedWord = word.replaceAll('nostr:', '');
+    final isProfile =
+        cleanedWord.startsWith('nprofile') || cleanedWord.startsWith('npub');
+    final isNote =
+        cleanedWord.startsWith('note') || cleanedWord.startsWith('nevent');
+
+    if (isProfile) {
+      final hexIdentifier = _extractHexFromProfileLink(cleanedWord);
+      final displayText = _getProfileDisplayText(hexIdentifier);
+      return TextSpan(
+        text: displayText,
+        style: const TextStyle(color: Palette.primary),
+        recognizer: TapGestureRecognizer()
+          ..onTap = () => widget.profileCallback(hexIdentifier),
+      );
+    } else if (isNote) {
+      return _memoizedNoteReferences.putIfAbsent(
+        word,
+        () => WidgetSpan(
+          child: NoteCardReference(key: ValueKey(word), word: word),
+          alignment: PlaceholderAlignment.middle,
         ),
       );
+    } else {
+      return TextSpan(text: word);
     }
+  }
 
-    return widgets;
+  String _extractHexFromProfileLink(String link) {
+    if (link.startsWith('nprofile')) {
+      final decoded = NprofileHelper().bech32toMap(link);
+      return decoded['pubkey'] ?? '';
+    } else if (link.startsWith('npub')) {
+      final decoded = Helpers().decodeBech32(link);
+      return decoded[0] ?? '';
+    }
+    return '';
+  }
+
+  String _getProfileDisplayText(String hexIdentifier) {
+    final metadata =
+        ref.read(metadataStateProvider(hexIdentifier)).userMetadata;
+    if (metadata?.name != null && metadata!.name!.isNotEmpty) {
+      return '@${metadata.name}';
+    } else {
+      final npub = Helpers().encodeBech32(hexIdentifier, 'npub');
+      return '@${npub.substring(0, 5)}...${npub.substring(npub.length - 5)}';
+    }
+  }
+
+  InlineSpan _buildLegacyMentionSpan(String word) {
+    // Implement logic for legacy mentions
+    return TextSpan(
+      text: word,
+      style: const TextStyle(color: Palette.primary),
+      recognizer: TapGestureRecognizer()
+        ..onTap = () {
+          // Handle legacy mention tap
+        },
+    );
+  }
+
+  InlineSpan _buildHashtagSpan(String word) {
+    return TextSpan(
+      text: word,
+      style: const TextStyle(color: Palette.primary),
+      recognizer: TapGestureRecognizer()
+        ..onTap = () => widget.hashtagCallback(word.substring(1)),
+    );
+  }
+
+  InlineSpan _buildUrlSpan(String url) {
+    if (_imageLinks.contains(url)) {
+      return const TextSpan(text: '');
+    }
+    return TextSpan(
+      text: url,
+      style: const TextStyle(color: Palette.primary),
+      recognizer: TapGestureRecognizer()
+        ..onTap =
+            () => launchUrlString(url, mode: LaunchMode.externalApplication),
+    );
   }
 
   List<String> _extractImages(NostrNote note) {
