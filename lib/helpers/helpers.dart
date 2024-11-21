@@ -116,4 +116,13 @@ class Helpers {
 
     return result;
   }
+
+  String shortHr(String pubkey, {bool cutPubkey = true}) {
+    final npubHr = encodeBech32(pubkey, "npub");
+    if (!cutPubkey) {
+      return npubHr;
+    }
+
+    return "${npubHr.substring(0, 8)}...${npubHr.substring(npubHr.length - 10)}";
+  }
 }

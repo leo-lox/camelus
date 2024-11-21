@@ -47,6 +47,9 @@ class NoteRepositoryImpl implements NoteRepository {
       filters: [filter],
       name: 'getTextNote-',
       explicitRelays: explicitRelays,
+      timeout: 5,
+      cacheRead: true,
+      cacheWrite: true,
     );
 
     return response.stream.map(

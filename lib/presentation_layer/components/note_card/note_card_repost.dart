@@ -7,6 +7,7 @@ import 'package:flutter_svg/svg.dart';
 import '../../../config/palette.dart';
 import '../../../domain_layer/entities/nostr_note.dart';
 import '../../../domain_layer/entities/nostr_tag.dart';
+import '../../../helpers/helpers.dart';
 import 'note_card_container.dart';
 import 'skeleton_note.dart';
 
@@ -69,7 +70,8 @@ class NoteCardRepost extends ConsumerWidget {
                     style: TextStyle(color: Palette.gray),
                     children: [
                       TextSpan(
-                        text: repostedByMetadata?.name ?? repostEvent.pubkey,
+                        text: repostedByMetadata?.name ??
+                            Helpers().shortHr(repostEvent.pubkey),
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 15,
