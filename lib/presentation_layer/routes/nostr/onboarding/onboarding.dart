@@ -177,8 +177,6 @@ class _NostrOnboardingState extends ConsumerState<NostrOnboarding>
                 signUpInfo: signUpInfo,
               ),
               OnboardingStarterPack(
-                invitedByPubkeyStarterPack: CAMELUS_INVITED_BY_PUBKEY,
-                starterPackName: null, // show all starter packs
                 submitCallback: (followPubkeys) {
                   signUpInfo.followPubkeys = followPubkeys;
                   _nextTab();
