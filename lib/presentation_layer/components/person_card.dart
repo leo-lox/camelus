@@ -29,19 +29,6 @@ class PersonCard extends ConsumerWidget {
     this.nip05,
   });
 
-  Future<String> checkNip05(String nip05, String pubkey, WidgetRef ref) async {
-    var nip05service = await ref.read(nip05provider.future);
-    try {
-      var check = await nip05service.check(nip05, pubkey);
-
-      if (check != null && check.valid) {
-        return check.nip05;
-      }
-      // ignore: empty_catches
-    } catch (e) {}
-    return "";
-  }
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return InkWell(
