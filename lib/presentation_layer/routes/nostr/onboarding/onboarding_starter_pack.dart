@@ -87,13 +87,40 @@ class _OnboardingStarterPackState extends ConsumerState<OnboardingStarterPack> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(nostrSet.title ?? nostrSet.name),
-                                Text(
-                                  "by ${recommenderMetadataList[followSetsIndex].userMetadata?.name ?? "Unknown"}",
-                                  style: TextStyle(
-                                    color: Palette.gray,
-                                    fontSize: 12,
+                                Text.rich(
+                                  overflow: TextOverflow.ellipsis,
+                                  TextSpan(
+                                    children: [
+                                      TextSpan(
+                                        text: nostrSet.title ?? nostrSet.name,
+                                        style: const TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                      const TextSpan(text: " "),
+                                      TextSpan(
+                                        text: "(${nostrSet.elements.length}) ",
+                                        style: const TextStyle(
+                                          color: Palette.gray,
+                                          fontSize: 12,
+                                        ),
+                                      ),
+                                      TextSpan(
+                                        text:
+                                            "by ${recommenderMetadataList[followSetsIndex].userMetadata?.name ?? "Unknown"}",
+                                        style: TextStyle(
+                                          color: Palette.gray,
+                                          fontSize: 12,
+                                        ),
+                                      ),
+                                    ],
                                   ),
+                                ),
+                                Text(
+                                  nostrSet.description ?? "",
+                                  style: const TextStyle(fontSize: 12),
+                                  maxLines: 2,
                                 ),
                               ],
                             ),
@@ -213,9 +240,10 @@ class _OnboardingOpenStarterPackState
                       fontWeight: FontWeight.w600,
                     ),
                   ),
+                  const TextSpan(text: " "),
                   TextSpan(
                     text:
-                        " by ${ref.watch(metadataStateProvider(widget.followSet.pubKey)).userMetadata?.name ?? "Unknown"}",
+                        "by ${ref.watch(metadataStateProvider(widget.followSet.pubKey)).userMetadata?.name ?? "Unknown"}",
                     style: TextStyle(
                       color: Palette.gray,
                       fontSize: 12,
