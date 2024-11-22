@@ -10,7 +10,9 @@ import 'package:camelus/presentation_layer/routes/nostr/onboarding/onboarding_pr
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../config/onboard_conf.dart';
 import 'onboarding_login_select.dart';
+import 'onboarding_starter_pack.dart';
 
 class NostrOnboarding extends ConsumerStatefulWidget {
   const NostrOnboarding({super.key});
@@ -47,9 +49,10 @@ class _NostrOnboardingState extends ConsumerState<NostrOnboarding>
       }
 
       if (_tabController.index == 4 || _tabController.index == 5) {
-        setState(() {
-          pageLock = true;
-        });
+        //todo: check implications
+        // setState(() {
+        //   pageLock = true;
+        // });
       } else {
         setState(() {
           pageLock = false;
@@ -173,13 +176,22 @@ class _NostrOnboardingState extends ConsumerState<NostrOnboarding>
                 },
                 signUpInfo: signUpInfo,
               ),
-              OnboardingFollowGraph(
+              OnboardingStarterPack(
+                invitedByPubkeyStarterPack: CAMELUS_INVITED_BY_PUBKEY,
+                starterPackName: null, // show all starter packs
                 submitCallback: (followPubkeys) {
                   signUpInfo.followPubkeys = followPubkeys;
                   _nextTab();
                 },
                 userInfo: signUpInfo,
               ),
+              // OnboardingFollowGraph(
+              //   submitCallback: (followPubkeys) {
+              //     signUpInfo.followPubkeys = followPubkeys;
+              //     _nextTab();
+              //   },
+              //   userInfo: signUpInfo,
+              // ),
               OnboardingDone(submitCallback: () {}, userInfo: signUpInfo)
             ],
           ),
