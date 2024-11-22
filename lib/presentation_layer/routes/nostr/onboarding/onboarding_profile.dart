@@ -140,6 +140,10 @@ class _OnboardingProfileState extends ConsumerState<OnboardingProfile> {
                   onAboutChanged: (value) {
                     widget.signUpInfo.about = value;
                   },
+                  initialPronouns: widget.signUpInfo.pronouns ?? '',
+                  onPronounsChanged: (value) {
+                    widget.signUpInfo.pronouns = value;
+                  },
                   initialNip05: widget.signUpInfo.nip05 ?? '',
                   onNip05Changed: (value) {
                     widget.signUpInfo.nip05 = value;

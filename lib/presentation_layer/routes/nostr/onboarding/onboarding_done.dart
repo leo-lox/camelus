@@ -125,6 +125,7 @@ ${_privateKey.mnemonicSentence}
       picture: uploadedPicture,
       banner: uploadedBanner,
       about: widget.userInfo.about,
+      pronouns: widget.userInfo.pronouns,
       website: widget.userInfo.website,
       nip05: widget.userInfo.nip05,
       lud06: widget.userInfo.lud06,

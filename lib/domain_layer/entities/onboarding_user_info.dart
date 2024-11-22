@@ -6,6 +6,7 @@ class OnboardingUserInfo {
   MemFile? picture;
   MemFile? banner;
   String? about = '';
+  String? pronouns = '';
   String? nip05;
   String? website = '';
   bool nip46 = false;
@@ -19,6 +20,7 @@ class OnboardingUserInfo {
     this.picture,
     this.banner,
     this.about,
+    this.pronouns,
     this.nip05,
     this.website,
     this.nip46 = false,

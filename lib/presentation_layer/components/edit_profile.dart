@@ -27,6 +27,8 @@ class EditProfile extends ConsumerStatefulWidget {
   final Function(String) onLud06Changed;
   final String initialLud16;
   final Function(String) onLud16Changed;
+  final String initialPronouns;
+  final Function(String) onPronounsChanged;
 
   const EditProfile({
     super.key,
@@ -38,6 +40,7 @@ class EditProfile extends ConsumerStatefulWidget {
     required this.initialWebsite,
     required this.initialLud06,
     required this.initialLud16,
+    required this.initialPronouns,
     required this.onNameChanged,
     required this.pictureCallback,
     required this.bannerCallback,
@@ -46,6 +49,7 @@ class EditProfile extends ConsumerStatefulWidget {
     required this.onWebsiteChanged,
     required this.onLud06Changed,
     required this.onLud16Changed,
+    required this.onPronounsChanged,
   });
 
   @override
@@ -67,6 +71,7 @@ class _EditProfileState extends ConsumerState<EditProfile> {
       'website': TextEditingController(text: widget.initialWebsite),
       'lud06': TextEditingController(text: widget.initialLud06),
       'lud16': TextEditingController(text: widget.initialLud16),
+      'pronouns': TextEditingController(text: widget.initialPronouns),
     };
 
     // Adding listeners to each controller to call the corresponding callback when the text changes.
@@ -90,6 +95,9 @@ class _EditProfileState extends ConsumerState<EditProfile> {
             break;
           case 'lud16':
             widget.onLud16Changed(controller.text);
+            break;
+          case 'pronouns':
+            widget.onPronounsChanged(controller.text);
             break;
         }
       });
@@ -170,10 +178,10 @@ class _EditProfileState extends ConsumerState<EditProfile> {
         children: [
           _buildInputField('Name', _controllers['name']!),
           _buildInputField('Bio', _controllers['about']!, isMultiline: true),
+          _buildInputField('pronouns', _controllers['pronouns']!),
           _buildInputField('Website', _controllers['website']!),
-          _buildInputField('nip05', _controllers['nip05']!),
-          _buildInputField('lud06', _controllers['lud06']!),
-          _buildInputField('lud16', _controllers['lud16']!),
+          _buildInputField('username (nip05)', _controllers['nip05']!),
+          _buildInputField('lightning address', _controllers['lud16']!),
         ],
       ),
     );
