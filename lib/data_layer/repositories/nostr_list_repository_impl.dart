@@ -9,11 +9,9 @@ import '../models/nostr_lists_model.dart';
 
 class NostrListRepositoryImpl implements NostrListRepository {
   final DartNdkSource dartNdkSource;
-  final ndk.EventVerifier eventVerifier;
 
   NostrListRepositoryImpl({
     required this.dartNdkSource,
-    required this.eventVerifier,
   });
 
   @override
