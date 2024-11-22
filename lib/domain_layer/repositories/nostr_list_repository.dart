@@ -5,4 +5,8 @@ abstract class NostrListRepository {
     required String pubKey,
     required String name,
   });
+  Future<List<NostrSet>?> getPublicNostrSets({
+    required String pubKey,
+    required int kind,
+  });
 }

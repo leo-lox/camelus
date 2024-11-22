@@ -7,7 +7,7 @@ List<String> CAMELUS_BOOTSTRAP_RELAYS = [
   "wss://relay.snort.social",
   "wss://relay.nostr.band",
   "wss://relay.mostr.pub",
-  "wss://ditto.pub/relay",
+  "wss://relay.camelus.app",
 ];
 
 final Map<String, ndk_entities.ReadWriteMarker>

@@ -31,4 +31,23 @@ class NostrListRepositoryImpl implements NostrListRepository {
     final listSet = NostrSetModel.fromNDK(ndkSet);
     return listSet;
   }
+
+  @override
+  Future<List<NostrSet>?> getPublicNostrSets({
+    required String pubKey,
+    required int kind,
+  }) async {
+    final ndkSets = await dartNdkSource.dartNdk.lists.getPublicNip51RelaySets(
+      kind: kind,
+      publicKey: pubKey,
+      forceRefresh: false,
+    );
+
+    if (ndkSets == null) {
+      return null;
+    }
+
+    final listSets = ndkSets.map((e) => NostrSetModel.fromNDK(e)).toList();
+    return listSets;
+  }
 }

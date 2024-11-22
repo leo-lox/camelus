@@ -17,4 +17,14 @@ class GetNostrLists {
       name: name,
     );
   }
+
+  /// gives you all the public sets by a user
+  Future<List<NostrSet>?> getPublicNostrFollowSets({
+    required String pubKey,
+  }) {
+    return _nostrListRepository.getPublicNostrSets(
+      pubKey: pubKey,
+      kind: NostrList.FOLLOW_SET,
+    );
+  }
 }
