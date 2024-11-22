@@ -74,9 +74,12 @@ class _NoteCardSplitContentState extends ConsumerState<NoteCardSplitContent> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SelectableText.rich(
+        Text.rich(
           TextSpan(
-              children: _buildContentSpans(widget.note.content, metadataMap)),
+              children: _buildContentSpans(
+            widget.note.content,
+            metadataMap,
+          )),
           style: const TextStyle(color: Palette.lightGray, fontSize: 17),
         ),
         if (_imageLinks.isNotEmpty) ...[
@@ -126,7 +129,9 @@ class _NoteCardSplitContentState extends ConsumerState<NoteCardSplitContent> {
         return '';
       },
       onNonMatch: (String text) {
-        spans.add(TextSpan(text: text));
+        spans.add(TextSpan(
+          text: text,
+        ));
         return '';
       },
     );
