@@ -82,9 +82,9 @@ dependencies:
   
 
 
-dependency_overrides:
-  ndk:
-    path: ../ndk
+#dependency_overrides:
+#  ndk:
+#    path: ../ndk
     #git:
     #  url: https://github.com/relaystr/ndk.git
     #  ref: isar
