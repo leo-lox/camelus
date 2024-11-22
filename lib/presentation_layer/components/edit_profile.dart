@@ -178,10 +178,10 @@ class _EditProfileState extends ConsumerState<EditProfile> {
         children: [
           _buildInputField('Name', _controllers['name']!),
           _buildInputField('Bio', _controllers['about']!, isMultiline: true),
-          _buildInputField('pronouns', _controllers['pronouns']!),
+          _buildInputField('Pronouns', _controllers['pronouns']!),
           _buildInputField('Website', _controllers['website']!),
-          _buildInputField('username (nip05)', _controllers['nip05']!),
-          _buildInputField('lightning address', _controllers['lud16']!),
+          _buildInputField('Username (nip05)', _controllers['nip05']!),
+          _buildInputField('Lightning address', _controllers['lud16']!),
         ],
       ),
     );
