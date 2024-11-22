@@ -1,14 +1,13 @@
-import 'package:camelus/presentation_layer/atoms/my_profile_picture.dart';
-import 'package:camelus/presentation_layer/providers/metadata_state_provider.dart';
-import 'package:camelus/presentation_layer/providers/nostr_list_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../config/onboard_conf.dart';
 import '../../../../config/palette.dart';
 import '../../../../domain_layer/entities/onboarding_user_info.dart';
-import '../../../../domain_layer/entities/user_metadata.dart';
+import '../../../atoms/long_button.dart';
+import '../../../atoms/my_profile_picture.dart';
 import '../../../atoms/overlapting_avatars.dart';
+import '../../../providers/metadata_state_provider.dart';
 import '../../../providers/nostr_lists_follow_state_provider.dart';
 
 class OnboardingStarterPack extends ConsumerStatefulWidget {
@@ -37,14 +36,14 @@ class _OnboardingStarterPackState extends ConsumerState<OnboardingStarterPack> {
     final List<NostrListsFollowState> followSetsList = [];
     final List<MetadataState> recommenderMetadataList = [];
 
-    CAMELUS_RECOMMEDED_STARTER_PACKS.forEach((element) {
+    for (var element in CAMELUS_RECOMMEDED_STARTER_PACKS) {
       followSetsList.add(
         ref.watch(nostrListsFollowStateProvider(element)),
       );
       recommenderMetadataList.add(
         ref.watch(metadataStateProvider(element)),
       );
-    });
+    }
 
     return Scaffold(
       backgroundColor: Palette.background,
@@ -54,21 +53,20 @@ class _OnboardingStarterPackState extends ConsumerState<OnboardingStarterPack> {
         leadingWidth: 0,
         title: Text("Starter Packs"),
       ),
-      body: ListView.builder(
-        itemCount: followSetsList.length,
-        itemBuilder: (context, followSetsIndex) {
-          final followSets = followSetsList[followSetsIndex];
+      body: Column(
+        children: [
+          Expanded(
+            child: ListView.builder(
+              itemCount: followSetsList.length,
+              itemBuilder: (context, followSetsIndex) {
+                final followSets = followSetsList[followSetsIndex];
 
-          return followSets.isLoading
-              ? Center(
-                  child: CircularProgressIndicator(),
-                )
-              : ListView.builder(
-                  shrinkWrap: true,
-                  //physics: ,
-                  itemCount: followSets.publicNostrFollowSets.length,
-                  itemBuilder: (context, index) {
-                    final nostrSet = followSets.publicNostrFollowSets[index];
+                if (followSets.isLoading) {
+                  return Center(child: CircularProgressIndicator());
+                }
+
+                return Column(
+                  children: followSets.publicNostrFollowSets.map((nostrSet) {
                     if (nostrSet.elements.isEmpty) return Container();
                     return ListTile(
                       title: Row(
@@ -80,18 +78,20 @@ class _OnboardingStarterPackState extends ConsumerState<OnboardingStarterPack> {
                             Image.asset("assets/images/list_placeholder.png",
                                 width: 50, height: 50),
                           SizedBox(width: 10),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(nostrSet.title ?? nostrSet.name),
-                              Text(
-                                "by ${recommenderMetadataList[followSetsIndex].userMetadata?.name ?? "Unknown"}",
-                                style: TextStyle(
-                                  color: Palette.gray,
-                                  fontSize: 12,
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(nostrSet.title ?? nostrSet.name),
+                                Text(
+                                  "by ${recommenderMetadataList[followSetsIndex].userMetadata?.name ?? "Unknown"}",
+                                  style: TextStyle(
+                                    color: Palette.gray,
+                                    fontSize: 12,
+                                  ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ],
                       ),
@@ -112,13 +112,28 @@ class _OnboardingStarterPackState extends ConsumerState<OnboardingStarterPack> {
                       ),
                       onTap: () {},
                     );
-                  },
+                  }).toList(),
                 );
-        },
+              },
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            width: 400,
+            height: 40,
+            child: longButton(
+              name: true ? "next" : "skip",
+              onPressed: (() {
+                widget.submitCallback([]);
+              }),
+              inverted: false,
+            ),
+          ),
+          const SizedBox(
+            height: 15,
+          ),
+        ],
       ),
     );
   }
 }
-
-
-//PersonCard
