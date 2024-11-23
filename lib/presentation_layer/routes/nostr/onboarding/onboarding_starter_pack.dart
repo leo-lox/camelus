@@ -127,8 +127,12 @@ class _OnboardingStarterPackState extends ConsumerState<OnboardingStarterPack> {
                           ),
                         ],
                       ),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 0,
+                      ),
                       trailing: SizedBox(
-                        width: 150,
+                        width: 135,
                         child: OverlappingAvatars(
                           avatars: nostrSet.elements
                               .take(5)
