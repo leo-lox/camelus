@@ -35,8 +35,9 @@
 
                 <data android:scheme="nostr" />
                 <data android:scheme="camelus" />
-                <!-- with verification 
-                <data android:scheme="camelus" android:host="de.lox.dev.camelus" />-->
+
+                <!-- with verification -->
+                <data android:scheme="https" android:host="camelus.app" />
 
 
             </intent-filter>

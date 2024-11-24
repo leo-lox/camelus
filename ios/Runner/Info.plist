@@ -55,6 +55,7 @@
 		<array>
 			<string>nostr</string>
 			<string>camelus</string>
+			<string>camelus.app</string>
 		</array>
 	</dict>
 </plist>
