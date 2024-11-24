@@ -14,14 +14,8 @@ import 'onboarding_profile.dart';
 import 'onboarding_starter_pack.dart';
 
 class NostrOnboarding extends ConsumerStatefulWidget {
-  final String? invitedByPubkey;
-  final String? inviteListName;
-
   const NostrOnboarding({
     super.key,
-    this.invitedByPubkey =
-        "717ff238f888273f5d5ee477097f2b398921503769303a0c518d06a952f2a75e", // test
-    this.inviteListName = "news organizations",
   });
 
   @override
@@ -155,7 +149,7 @@ class _NostrOnboardingState extends ConsumerState<NostrOnboarding>
             controller: _tabController,
             physics: pageLock ? const NeverScrollableScrollPhysics() : null,
             children: [
-              if (widget.invitedByPubkey == null)
+              if (signUpInfo.invitedByPubkey == null)
                 OnboardingPage01(
                   loginCallback: _navigateToLogin,
                   registerCallback: () {
@@ -166,14 +160,14 @@ class _NostrOnboardingState extends ConsumerState<NostrOnboarding>
                     );
                   },
                 ),
-              if (widget.invitedByPubkey != null)
+              if (signUpInfo.invitedByPubkey != null)
                 OnboardingInvitedBy(
                   nextCallback: () {
                     _nextTab();
                   },
                   userInfo: signUpInfo,
-                  invitedByPubkey: widget.invitedByPubkey!,
-                  inviteListName: widget.inviteListName!,
+                  invitedByPubkey: signUpInfo.invitedByPubkey!,
+                  inviteListName: signUpInfo.inviteListName!,
                 ),
               OnboardingName(
                 userInfo: signUpInfo,
@@ -194,7 +188,7 @@ class _NostrOnboardingState extends ConsumerState<NostrOnboarding>
                 signUpInfo: signUpInfo,
               ),
               OnboardingStarterPack(
-                invitedByPubkey: widget.invitedByPubkey,
+                invitedByPubkey: signUpInfo.invitedByPubkey,
                 submitCallback: (followPubkeys) {
                   signUpInfo.followPubkeys = followPubkeys;
                   _nextTab();

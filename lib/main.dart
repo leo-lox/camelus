@@ -74,6 +74,7 @@ Future<void> main() async {
 
   listenDeeplinks(
     navigatorKey: navigatorKey,
+    providerContainer: providerContainer,
   );
 
   runApp(
