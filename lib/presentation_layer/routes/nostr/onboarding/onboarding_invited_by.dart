@@ -1,21 +1,21 @@
-import 'package:camelus/presentation_layer/atoms/long_button.dart';
-import 'package:camelus/config/palette.dart';
-import 'package:camelus/presentation_layer/atoms/my_profile_picture.dart';
-import 'package:camelus/presentation_layer/providers/metadata_state_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../config/palette.dart';
 import '../../../../domain_layer/entities/nostr_list.dart';
 import '../../../../domain_layer/entities/onboarding_user_info.dart';
+import '../../../atoms/long_button.dart';
+import '../../../atoms/my_profile_picture.dart';
+import '../../../providers/metadata_state_provider.dart';
 import '../../../providers/nostr_lists_follow_state_provider.dart';
 
 class OnboardingInvitedBy extends ConsumerStatefulWidget {
-  Function nextCallback;
-  OnboardingUserInfo userInfo;
-  String invitedByPubkey;
-  String inviteListName;
+  final Function nextCallback;
+  final OnboardingUserInfo userInfo;
+  final String invitedByPubkey;
+  final String inviteListName;
 
-  OnboardingInvitedBy({
+  const OnboardingInvitedBy({
     super.key,
     required this.nextCallback,
     required this.userInfo,
@@ -28,6 +28,21 @@ class OnboardingInvitedBy extends ConsumerStatefulWidget {
 }
 
 class _OnboardingInvitedByState extends ConsumerState<OnboardingInvitedBy> {
+  onJoinWithStarterPack(NostrSet? invitedSet) {
+    if (invitedSet == null) {
+      widget.nextCallback();
+      return;
+    }
+
+    widget.userInfo.followPubkeys
+        .addAll(invitedSet.elements.map((e) => e.value));
+
+    // remove duplicates
+    widget.userInfo.followPubkeys =
+        widget.userInfo.followPubkeys.toSet().toList();
+    widget.nextCallback();
+  }
+
   NostrSet? _getInvitedSet(WidgetRef ref) {
     final inviteeLists =
         ref.watch(nostrListsFollowStateProvider(widget.invitedByPubkey));
@@ -61,7 +76,7 @@ class _OnboardingInvitedByState extends ConsumerState<OnboardingInvitedBy> {
               children: [
                 // Header section (1/4 of the screen)
                 Container(
-                  height: 200,
+                  height: 180,
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       begin: Alignment.topLeft,
@@ -165,16 +180,6 @@ class _OnboardingInvitedByState extends ConsumerState<OnboardingInvitedBy> {
                             .watch(metadataStateProvider(displayPubkey))
                             .userMetadata;
                         return ListTile(
-                          onTap: () {
-                            // Toggle selection
-                            //setState(() {
-                            //  if (wselectedPubkeys.contains(displayPubkey)) {
-                            //    selectedPubkeys.remove(displayPubkey);
-                            //  } else {
-                            //    selectedPubkeys.add(displayPubkey);
-                            //  }
-                            //});
-                          },
                           title: Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -222,29 +227,30 @@ class _OnboardingInvitedByState extends ConsumerState<OnboardingInvitedBy> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Container(
+                      SizedBox(
                         width: 400,
                         height: 40,
                         child: longButton(
                           name: "Join Camelus",
                           onPressed: () {
-                            widget.nextCallback();
+                            onJoinWithStarterPack(invitedSet);
                           },
                           inverted: true,
                         ),
                       ),
                       const SizedBox(height: 15),
-                      Container(
-                        width: 400,
-                        height: 40,
-                        child: longButton(
-                          name: "Signup without a starter pack",
-                          onPressed: () {
-                            // Add cancel functionality
-                          },
-                          inverted: false,
+                      if (invitedSet != null)
+                        SizedBox(
+                          width: 400,
+                          height: 40,
+                          child: longButton(
+                            name: "Signup without a starter pack",
+                            onPressed: () {
+                              widget.nextCallback();
+                            },
+                            inverted: false,
+                          ),
                         ),
-                      ),
                     ],
                   ),
                 ),

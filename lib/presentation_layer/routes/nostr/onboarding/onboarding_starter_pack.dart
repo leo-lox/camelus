@@ -16,11 +16,13 @@ class OnboardingStarterPack extends ConsumerStatefulWidget {
   final Function(List<String>) submitCallback;
 
   final OnboardingUserInfo userInfo;
+  final String? invitedByPubkey;
 
   const OnboardingStarterPack({
     super.key,
     required this.submitCallback,
     required this.userInfo,
+    this.invitedByPubkey,
   });
   @override
   ConsumerState<OnboardingStarterPack> createState() =>
@@ -30,10 +32,22 @@ class OnboardingStarterPack extends ConsumerStatefulWidget {
 class _OnboardingStarterPackState extends ConsumerState<OnboardingStarterPack> {
   late List<String> selectedPubkeys;
 
+  final List<String> recommendedStarterPacks = CAMELUS_RECOMMEDED_STARTER_PACKS;
+
   @override
   void initState() {
     super.initState();
     selectedPubkeys = widget.userInfo.followPubkeys;
+
+    if (widget.invitedByPubkey != null && widget.invitedByPubkey!.isNotEmpty) {
+      // check if its already in the list
+      if (recommendedStarterPacks.contains(widget.invitedByPubkey!)) {
+        return;
+      }
+
+      // add to beginning of list
+      recommendedStarterPacks.insert(0, widget.invitedByPubkey!);
+    }
   }
 
   @override
@@ -41,7 +55,7 @@ class _OnboardingStarterPackState extends ConsumerState<OnboardingStarterPack> {
     final List<NostrListsFollowState> followSetsList = [];
     final List<MetadataState> recommenderMetadataList = [];
 
-    for (var element in CAMELUS_RECOMMEDED_STARTER_PACKS) {
+    for (var element in recommendedStarterPacks) {
       followSetsList.add(
         ref.watch(nostrListsFollowStateProvider(element)),
       );
@@ -56,7 +70,9 @@ class _OnboardingStarterPackState extends ConsumerState<OnboardingStarterPack> {
         backgroundColor: Palette.background,
         leading: Container(),
         leadingWidth: 0,
-        title: Text("Starter Packs"),
+        title: widget.invitedByPubkey == null
+            ? Text("Starter Packs")
+            : Text("Additional Starter Packs"),
       ),
       body: Column(
         children: [

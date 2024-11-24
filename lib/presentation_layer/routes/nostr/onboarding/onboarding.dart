@@ -1,21 +1,28 @@
-import 'package:camelus/presentation_layer/providers/onboarding_provider.dart';
-import 'package:camelus/presentation_layer/routes/nostr/onboarding/onboarding_done.dart';
-import 'package:camelus/presentation_layer/routes/nostr/onboarding/onboarding_follow_graph/onboarding_follow_graph.dart';
-import 'package:camelus/presentation_layer/routes/nostr/onboarding/onboarding_login.dart';
-import 'package:camelus/presentation_layer/routes/nostr/onboarding/onboarding_login_amber.dart';
-import 'package:camelus/presentation_layer/routes/nostr/onboarding/onboarding_name.dart';
-import 'package:camelus/presentation_layer/routes/nostr/onboarding/onboarding_page01.dart';
-import 'package:camelus/presentation_layer/routes/nostr/onboarding/onboarding_picture.dart';
-import 'package:camelus/presentation_layer/routes/nostr/onboarding/onboarding_profile.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../config/onboard_conf.dart';
+import '../../../providers/onboarding_provider.dart';
+import 'onboarding_done.dart';
+import 'onboarding_invited_by.dart';
+import 'onboarding_login.dart';
+import 'onboarding_login_amber.dart';
 import 'onboarding_login_select.dart';
+import 'onboarding_name.dart';
+import 'onboarding_page01.dart';
+import 'onboarding_picture.dart';
+import 'onboarding_profile.dart';
 import 'onboarding_starter_pack.dart';
 
 class NostrOnboarding extends ConsumerStatefulWidget {
-  const NostrOnboarding({super.key});
+  final String? invitedByPubkey;
+  final String? inviteListName;
+
+  const NostrOnboarding({
+    super.key,
+    this.invitedByPubkey =
+        "717ff238f888273f5d5ee477097f2b398921503769303a0c518d06a952f2a75e", // test
+    this.inviteListName = "news organizations",
+  });
 
   @override
   ConsumerState<NostrOnboarding> createState() => _NostrOnboardingState();
@@ -148,16 +155,26 @@ class _NostrOnboardingState extends ConsumerState<NostrOnboarding>
             controller: _tabController,
             physics: pageLock ? const NeverScrollableScrollPhysics() : null,
             children: [
-              OnboardingPage01(
-                loginCallback: _navigateToLogin,
-                registerCallback: () {
-                  _tabController.animateTo(
-                    1,
-                    curve: Curves.easeInOut,
-                    duration: const Duration(milliseconds: 500),
-                  );
-                },
-              ),
+              if (widget.invitedByPubkey == null)
+                OnboardingPage01(
+                  loginCallback: _navigateToLogin,
+                  registerCallback: () {
+                    _tabController.animateTo(
+                      1,
+                      curve: Curves.easeInOut,
+                      duration: const Duration(milliseconds: 500),
+                    );
+                  },
+                ),
+              if (widget.invitedByPubkey != null)
+                OnboardingInvitedBy(
+                  nextCallback: () {
+                    _nextTab();
+                  },
+                  userInfo: signUpInfo,
+                  invitedByPubkey: widget.invitedByPubkey!,
+                  inviteListName: widget.inviteListName!,
+                ),
               OnboardingName(
                 userInfo: signUpInfo,
                 submitCallback: (_) {
@@ -177,6 +194,7 @@ class _NostrOnboardingState extends ConsumerState<NostrOnboarding>
                 signUpInfo: signUpInfo,
               ),
               OnboardingStarterPack(
+                invitedByPubkey: widget.invitedByPubkey,
                 submitCallback: (followPubkeys) {
                   signUpInfo.followPubkeys = followPubkeys;
                   _nextTab();
