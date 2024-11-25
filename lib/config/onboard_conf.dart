@@ -13,6 +13,6 @@ final List<String> ONBOARD_RECOMMANDATIONS = [
 ];
 
 final List<String> CAMELUS_RECOMMEDED_STARTER_PACKS = [
-  '717ff238f888273f5d5ee477097f2b398921503769303a0c518d06a952f2a75e', // leo
+  'c7779fdc1e5d2bbf5edd5f68785bfc4299b3c77d8046957cc79bc4d25ad9d330', // camelus.app
   '0f22c06eac1002684efcc68f568540e8342d1609d508bcd4312c038e6194f8b6', // nos.social
 ];
