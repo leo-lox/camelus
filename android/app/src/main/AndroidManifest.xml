@@ -48,6 +48,8 @@
                 <!-- with verification -->
                 <data android:scheme="https" android:host="www.camelus.app" android:pathPrefix="/i"/>
                 <data android:scheme="https" android:host="camelus.app" android:pathPrefix="/i"/>
+                <data android:scheme="https" android:host="www.camelus.app" android:pathPrefix="/s"/>
+                <data android:scheme="https" android:host="camelus.app" android:pathPrefix="/s"/>
 
 
             </intent-filter>

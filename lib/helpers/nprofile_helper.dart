@@ -7,6 +7,18 @@ import 'package:hex/hex.dart';
 class NprofileHelper {
   NprofileHelper();
 
+  /// [returns] {pubkey: "hex", relays: ["relay1", "relay2"]}
+  Map<String, dynamic> nprofileOrNpubToMap(String nprofileOrNpub) {
+    if (nprofileOrNpub.contains("nprofile")) {
+      return bech32toMap(nprofileOrNpub);
+    } else if (nprofileOrNpub.contains("npub")) {
+      final List<String> decoded = Helpers().decodeBech32(nprofileOrNpub);
+      return {"pubkey": decoded[0], "relays": []};
+    } else {
+      throw Exception("Invalid nprofileOrNpub");
+    }
+  }
+
   /// finds relays and [returns] a bech32 encoded nprofile with relay hints
   Future<String> getNprofile(String pubkey, List<String> userRelays) async {
     return mapToBech32({"pubkey": pubkey, "relays": userRelays});

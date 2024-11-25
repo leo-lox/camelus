@@ -164,6 +164,7 @@ class NostrListElement {
 }
 
 class NostrSet extends NostrList {
+  // name is d tag
   late String name;
   String? title;
   String? description;

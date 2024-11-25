@@ -48,7 +48,7 @@ class _OnboardingInvitedByState extends ConsumerState<OnboardingInvitedBy> {
         ref.watch(nostrListsFollowStateProvider(widget.invitedByPubkey));
 
     for (var set in inviteeLists.publicNostrFollowSets) {
-      if (set.title == widget.inviteListName) {
+      if (set.name == widget.inviteListName) {
         return set;
       }
     }

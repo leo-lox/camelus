@@ -45,7 +45,7 @@ Future<void> _camelusLinks({
 }) async {
   final myMatch = link.replaceAll("https://camelus.app", "");
 
-  if (myMatch.startsWith("/i/")) {
+  if (myMatch.startsWith("/i/") || myMatch.startsWith("/s/")) {
     final List<String> myMatchSplit = myMatch.split("/");
     final String invitedBy = myMatchSplit[2];
     final String inviteListName = myMatchSplit[3];
@@ -58,9 +58,19 @@ Future<void> _camelusLinks({
       return;
     }
 
+    NprofileHelper().nprofileOrNpubToMap(invitedBy);
+
     final provider = providerContainer.read(onboardingProvider);
-    provider.signUpInfo.invitedByPubkey = invitedBy;
-    provider.signUpInfo.inviteListName = inviteListName;
+
+    try {
+      final decoded = NprofileHelper().nprofileOrNpubToMap(invitedBy);
+
+      provider.signUpInfo.invitedByPubkey = decoded['pubkey'];
+      provider.signUpInfo.inviteListName = inviteListName;
+      //todo: add relays to ndk
+    } catch (e) {
+      print("error $e");
+    }
 
     // to update state
     navigatorKey.currentState?.pushReplacementNamed(
