@@ -59,9 +59,15 @@
 				<array>
 					<string>nostr</string>
 					<string>camelus</string>
-					<string>camelus.app</string>
+
 				</array>
 			</dict>
+		</array>
+
+		<key>com.apple.developer.associated-domains</key>
+		<array>
+			<string>applinks:camelus.app</string>
+			<string>applinks:www.camelus.app</string>
 		</array>
 	</dict>
 </plist>
