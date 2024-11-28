@@ -5,6 +5,7 @@ import 'package:amberflutter/amberflutter.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:ndk/ndk.dart';
 import 'package:ndk/shared/nips/nip19/nip19.dart';
+import 'package:ndk_amber/ndk_amber.dart';
 
 import '../entities/key_pair.dart';
 

@@ -1,4 +1,5 @@
-import 'package:ndk/ndk.dart'; 
+import 'package:ndk/ndk.dart';
+import 'package:ndk_rust_verifier/ndk_rust_verifier.dart';
 import 'package:ndk/entities.dart' as ndk_entities;
 import 'package:riverpod/riverpod.dart';
 
@@ -10,7 +11,6 @@ final eventVerifierProvider = Provider<EventVerifier>((ref) {
   final EventVerifier mockEventVerifier = MockEventVerifier();
   final RustEventVerifier rustEventVerifier = RustEventVerifier();
 
- 
   return rustEventVerifier;
 });
 
@@ -18,15 +18,14 @@ final eventVerifierProvider = Provider<EventVerifier>((ref) {
 class MockEventVerifier implements EventVerifier {
   bool _result = true;
 
-
   /// The result parameter controls whether verify always returns true or false.
   MockEventVerifier({bool result = true}) {
-    _result = result; 
+    _result = result;
   }
 
   /// Verifies the event, returning a fixed result.
   @override
   Future<bool> verify(ndk_entities.Nip01Event event) async {
-    return _result; // Return the mock result 
+    return _result; // Return the mock result
   }
 }
