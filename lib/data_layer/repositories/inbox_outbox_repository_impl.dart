@@ -17,9 +17,9 @@ class InboxOutboxRepositoryImpl implements InboxOutboxRepository {
       relays: newNip65.relays,
     );
 
-    await dartNdkSource.dartNdk.inboxOutbox.setInboxOutbox(
-      nip65model.toNdk(),
-      customRelays: newNip65.relays.keys,
+    await dartNdkSource.dartNdk.userRelayLists.setInitialUserRelayList(
+      nip65model.toNdkUserRelayList(),
+      //customRelays: newNip65.relays.keys,
     );
 
     return newNip65;
@@ -27,13 +27,14 @@ class InboxOutboxRepositoryImpl implements InboxOutboxRepository {
 
   @override
   Future<Nip65?> getNip65data(String npub, {bool forceRefresh = false}) async {
-    final ndkData = await dartNdkSource.dartNdk.inboxOutbox.getNip65(
-      pubkeys: [npub],
+    final ndkData =
+        await dartNdkSource.dartNdk.userRelayLists.getSingleUserRelayList(
+      npub,
       forceRefresh: forceRefresh,
     );
-    if (ndkData.isEmpty) return null;
+    if (ndkData == null) return null;
 
-    final data = Nip65Model.fromNdk(ndkData.first);
+    final data = Nip65Model.fromNdkUserRelayList(ndkData);
     return data;
   }
 }

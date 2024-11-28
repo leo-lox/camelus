@@ -16,6 +16,24 @@ class Nip65Model extends Nip65 {
     );
   }
 
+  ndk_entities.UserRelayList toNdkUserRelayList() {
+    return ndk_entities.UserRelayList(
+      refreshedTimestamp: 0,
+      createdAt: super.createdAt,
+      pubKey: super.pubKey,
+      relays: super.relays,
+    );
+  }
+
+  factory Nip65Model.fromNdkUserRelayList(
+      ndk_entities.UserRelayList userRelayList) {
+    return Nip65Model(
+      createdAt: userRelayList.createdAt,
+      pubKey: userRelayList.pubKey,
+      relays: userRelayList.relays,
+    );
+  }
+
   factory Nip65Model.fromNdk(ndk_entities.Nip65 ndkNip65) {
     return Nip65Model(
       createdAt: ndkNip65.createdAt,
