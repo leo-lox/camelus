@@ -9,6 +9,7 @@ import 'package:mime/mime.dart';
 
 import '../../../../domain_layer/entities/mem_file.dart';
 import '../../../../domain_layer/entities/onboarding_user_info.dart';
+import '../../../../domain_layer/usecases/remove_image_metadata.dart';
 import '../../../atoms/crop_avatar.dart';
 import '../../../atoms/long_button.dart';
 
@@ -36,18 +37,20 @@ class _OnboardingProfileState extends ConsumerState<OnboardingProfile> {
 
     if (result != null) {
       File file = File(result.files.single.path!);
+      try {
+        final myImage = await RemoveImageMetadata.fileToMemFile(file);
 
-      Uint8List imageData = file.readAsBytesSync();
-      String imageMimeType = lookupMimeType(file.path) ?? '';
-      String imageName = file.path.split('/').last;
+        return myImage;
+      } catch (e) {
+        if (!mounted) return null;
 
-      MemFile memFile = MemFile(
-        bytes: imageData,
-        mimeType: imageMimeType,
-        name: imageName,
-      );
-
-      return memFile;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('unspoorted image format'),
+          ),
+        );
+      }
+      return null;
     } else {
       // User canceled the picker
       return null;

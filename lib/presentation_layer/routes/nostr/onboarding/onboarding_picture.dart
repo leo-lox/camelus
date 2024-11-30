@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mime/mime.dart';
 
+import '../../../../domain_layer/usecases/remove_image_metadata.dart';
 import '../../../atoms/camer_upload.dart';
 import '../../../atoms/long_button.dart';
 
@@ -40,18 +41,20 @@ class _OnboardingPictureState extends ConsumerState<OnboardingPicture> {
 
     if (result != null) {
       File file = File(result.files.single.path!);
+      try {
+        final myImage = await RemoveImageMetadata.fileToMemFile(file);
 
-      Uint8List imageData = file.readAsBytesSync();
-      String imageMimeType = lookupMimeType(file.path) ?? '';
-      String imageName = file.path.split('/').last;
+        widget.signUpInfo.picture = myImage;
+        _openCropImagePopup(myImage.bytes);
+      } catch (e) {
+        if (!mounted) return;
 
-      MemFile memFile = MemFile(
-        bytes: imageData,
-        mimeType: imageMimeType,
-        name: imageName,
-      );
-      widget.signUpInfo.picture = memFile;
-      _openCropImagePopup(memFile.bytes);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('unspoorted image format'),
+          ),
+        );
+      }
     } else {
       // User canceled the picker
       return;

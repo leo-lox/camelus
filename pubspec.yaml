@@ -82,6 +82,7 @@ dependencies:
   ndk: ^0.1.3
   ndk_rust_verifier: ^0.1.3
   ndk_amber: ^0.1.3
+  image: ^4.3.0
   
 
 

@@ -20,6 +20,9 @@ import 'package:camelus/config/palette.dart';
 import 'package:camelus/helpers/helpers.dart';
 import 'package:camelus/data_layer/models/post_context.dart';
 
+import '../../domain_layer/entities/mem_file.dart';
+import '../../domain_layer/usecases/remove_image_metadata.dart';
+
 class WritePost extends ConsumerStatefulWidget {
   final PostContext? context;
 
@@ -37,7 +40,7 @@ class _WritePostState extends ConsumerState<WritePost> {
 
   bool submitLoading = false;
 
-  final List<File> _images = [];
+  final List<MemFile> _images = [];
   List<Map<String, dynamic>> _mentionsSearchResults = [];
   List<Map<String, dynamic>> _mentionsSearchResultsHashTags = [];
   List<String> _mentionedInPost = [];
@@ -50,15 +53,25 @@ class _WritePostState extends ConsumerState<WritePost> {
     );
 
     if (result != null) {
-      File file = File(result.files.single.path!);
+      try {
+        final myImage = await RemoveImageMetadata.fileToMemFile(
+            File(result.files.single.path!));
+        setState(() {
+          _images.add(myImage);
+        });
+      } catch (e) {
+        if (!mounted) return;
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('unspoorted image format'),
+          ),
+        );
+      }
     } else {
       // User canceled the picker
       return;
     }
-
-    setState(() {
-      _images.add(File(result.files.single.path!));
-    });
   }
 
   _searchMentions(search) async {
@@ -257,7 +270,7 @@ class _WritePostState extends ConsumerState<WritePost> {
     List<String> imageUrls = [];
     for (var image in _images) {
       try {
-        var url = await ref.watch(fileUploadProvider).uploadImageFile(image);
+        var url = await ref.watch(fileUploadProvider).uploadImage(image);
         imageUrls.add(url);
       } catch (e) {
         log("errUploadImage:  ${e.toString()}");
@@ -421,8 +434,8 @@ class _WritePostState extends ConsumerState<WritePost> {
                 margin: const EdgeInsets.only(left: 10, right: 10),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(10),
-                  child: Image.file(
-                    _images[index],
+                  child: Image.memory(
+                    _images[index].bytes,
                     fit: BoxFit.cover,
                     width: 100,
                     height: 100,
