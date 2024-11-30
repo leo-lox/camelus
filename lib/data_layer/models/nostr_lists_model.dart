@@ -75,6 +75,7 @@ class NostrSetModel extends NostrSet {
     return ndk_entities.Nip51Set(
       pubKey: pubKey,
       name: name,
+      kind: NostrList.FOLLOW_SET,
       createdAt: createdAt,
       elements: elements
           .map((e) => NostrListElementModel(
