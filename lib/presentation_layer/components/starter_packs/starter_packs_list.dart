@@ -1,3 +1,4 @@
+import 'package:camelus/presentation_layer/components/starter_packs/open_starter_pack.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -108,7 +109,15 @@ class StarterPacksList extends ConsumerWidget {
                 ),
               ),
               onTap: () {
-                print("tapped");
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => OpenStarterPack(
+                      followSet: nostrSet,
+                      isOwnStarterPack: false, // todo: add own check
+                    ),
+                  ),
+                );
               },
             );
           }),
