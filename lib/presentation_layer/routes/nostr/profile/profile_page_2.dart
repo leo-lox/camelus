@@ -19,7 +19,7 @@ import '../../../atoms/follow_button.dart';
 import '../../../atoms/my_profile_picture.dart';
 import '../../../atoms/nip_05_text.dart';
 import '../../../components/generic_feed.dart';
-import '../../../components/starter_packs_list/starter_packs_list.dart';
+import '../../../components/starter_packs/starter_packs_list.dart';
 import '../../../providers/event_signer_provider.dart';
 import '../../../providers/following_provider.dart';
 import '../../../providers/metadata_provider.dart';
