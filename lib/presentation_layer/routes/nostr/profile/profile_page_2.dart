@@ -19,6 +19,7 @@ import '../../../atoms/follow_button.dart';
 import '../../../atoms/my_profile_picture.dart';
 import '../../../atoms/nip_05_text.dart';
 import '../../../components/generic_feed.dart';
+import '../../../components/starter_packs_list/starter_packs_list.dart';
 import '../../../providers/event_signer_provider.dart';
 import '../../../providers/following_provider.dart';
 import '../../../providers/metadata_provider.dart';
@@ -36,100 +37,102 @@ class ProfilePage2 extends ConsumerWidget {
   Widget build(BuildContext context, ref) {
     final myMetadata = ref.watch(metadataStateProvider(pubkey)).userMetadata;
 
-    return DefaultTabController(
-      length: 2,
-      child: Scaffold(
-        backgroundColor: Palette.background,
-        body: GenericFeed(
-          feedFilter: FeedFilter(
-            authors: [pubkey],
-            kinds: [1, 6],
-            feedId: 'profile-${pubkey.substring(10, 20)}',
+    return Scaffold(
+      backgroundColor: Palette.background,
+      body: GenericFeed(
+        additionalTabViews: [
+          StarterPacksList(
+            pubkey: pubkey,
           ),
-          customHeaderSliverBuilder:
-              (BuildContext context, bool innerBoxIsScrolled) {
-            return <Widget>[
-              SliverOverlapAbsorber(
-                handle:
-                    NestedScrollView.sliverOverlapAbsorberHandleFor(context),
-                sliver: SliverAppBar(
-                  surfaceTintColor: Palette.background,
-                  leading: BackButtonRound(),
-                  actions: [
-                    PopupMenuButton<String>(
-                      color: Palette.extraDarkGray,
-                      tooltip: "More",
-                      onSelected: (e) => {
-                        //log(e),
-                        // toast
-                        if (e == "block")
-                          {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    BlockPage(userPubkey: pubkey),
-                              ),
-                            ).then((value) => {
-                                  Navigator.pop(context),
-                                })
-                          }
-                      },
-                      itemBuilder: (BuildContext context) {
-                        return {'block'}.map((String choice) {
-                          return PopupMenuItem<String>(
-                            value: choice,
-                            child: Text(choice),
-                          );
-                        }).toList();
-                      },
-                    ),
-                  ],
-                  expandedHeight: 400,
-                  pinned: true,
-                  floating: true,
-                  forceElevated: innerBoxIsScrolled,
-                  backgroundColor: Palette.black, // Add a background color
-                  flexibleSpace: FlexibleSpaceBar(
-                    background: _BuildProfileHeader(
-                        userMetadata: UserMetadata(
-                      pubkey: pubkey,
-                      eventId: '',
-                      lastFetch: myMetadata?.lastFetch ?? 0,
-                      name: myMetadata?.name,
-                      picture: myMetadata?.picture,
-                      banner: myMetadata?.banner,
-                      nip05: myMetadata?.nip05,
-                      about: myMetadata?.about,
-                      website: myMetadata?.website,
-                      lud06: myMetadata?.lud06,
-                      lud16: myMetadata?.lud16,
-                    )),
+        ],
+        feedFilter: FeedFilter(
+          authors: [pubkey],
+          kinds: [1, 6],
+          feedId: 'profile-${pubkey.substring(10, 20)}',
+        ),
+        customHeaderSliverBuilder:
+            (BuildContext context, bool innerBoxIsScrolled) {
+          return <Widget>[
+            SliverOverlapAbsorber(
+              handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
+              sliver: SliverAppBar(
+                surfaceTintColor: Palette.background,
+                leading: BackButtonRound(),
+                actions: [
+                  PopupMenuButton<String>(
+                    color: Palette.extraDarkGray,
+                    tooltip: "More",
+                    onSelected: (e) => {
+                      //log(e),
+                      // toast
+                      if (e == "block")
+                        {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  BlockPage(userPubkey: pubkey),
+                            ),
+                          ).then((value) => {
+                                Navigator.pop(context),
+                              })
+                        }
+                    },
+                    itemBuilder: (BuildContext context) {
+                      return {'block'}.map((String choice) {
+                        return PopupMenuItem<String>(
+                          value: choice,
+                          child: Text(choice),
+                        );
+                      }).toList();
+                    },
                   ),
-                  bottom: PreferredSize(
-                    preferredSize: Size.fromHeight(48),
-                    child: Container(
-                      color: Palette
-                          .black, // Add a background color to the tab bar
-                      child: TabBar(
-                        tabs: [
-                          Tab(text: 'Posts'),
-                          Tab(text: 'Posts & Replies'),
-                        ],
-                        labelColor: Palette
-                            .lightGray, // Set the color of the selected tab
-                        unselectedLabelColor:
-                            Colors.grey, // Set the color of unselected tabs
-                        indicatorColor:
-                            Colors.blue, // Set the color of the indicator
-                      ),
+                ],
+                expandedHeight: 400,
+                pinned: true,
+                floating: true,
+                forceElevated: innerBoxIsScrolled,
+                backgroundColor: Palette.black, // Add a background color
+                flexibleSpace: FlexibleSpaceBar(
+                  background: _BuildProfileHeader(
+                      userMetadata: UserMetadata(
+                    pubkey: pubkey,
+                    eventId: '',
+                    lastFetch: myMetadata?.lastFetch ?? 0,
+                    name: myMetadata?.name,
+                    picture: myMetadata?.picture,
+                    banner: myMetadata?.banner,
+                    nip05: myMetadata?.nip05,
+                    about: myMetadata?.about,
+                    website: myMetadata?.website,
+                    lud06: myMetadata?.lud06,
+                    lud16: myMetadata?.lud16,
+                  )),
+                ),
+                bottom: PreferredSize(
+                  preferredSize: Size.fromHeight(48),
+                  child: Container(
+                    color:
+                        Palette.black, // Add a background color to the tab bar
+                    child: TabBar(
+                      tabs: [
+                        Tab(text: 'Posts'),
+                        Tab(text: 'Posts & Replies'),
+                        Tab(text: 'Starter Packs'),
+                      ],
+                      labelColor: Palette
+                          .lightGray, // Set the color of the selected tab
+                      unselectedLabelColor:
+                          Colors.grey, // Set the color of unselected tabs
+                      indicatorColor:
+                          Colors.blue, // Set the color of the indicator
                     ),
                   ),
                 ),
               ),
-            ];
-          },
-        ),
+            ),
+          ];
+        },
       ),
     );
   }

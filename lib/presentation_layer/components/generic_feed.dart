@@ -22,11 +22,14 @@ class GenericFeed extends ConsumerStatefulWidget {
   final List<Widget> Function(BuildContext, bool)? customHeaderSliverBuilder;
   final bool floatHeaderSlivers;
 
+  final List<Widget> additionalTabViews;
+
   const GenericFeed({
     super.key,
     this.customHeaderSliverBuilder,
     this.floatHeaderSlivers = false,
     required this.feedFilter,
+    this.additionalTabViews = const [],
   });
 
   @override
@@ -81,7 +84,9 @@ class _GenericFeedState extends ConsumerState<GenericFeed> {
         ref.watch(genericFeedStateProvider(widget.feedFilter).notifier);
 
     return DefaultTabController(
-      length: 2, // Two tabs for Posts and Posts with Replies
+      length: 2 +
+          widget.additionalTabViews
+              .length, // Two tabs for Posts and Posts with Replies
       child: NestedScrollView(
         floatHeaderSlivers: widget.floatHeaderSlivers,
         controller: _scrollController,
@@ -154,6 +159,7 @@ class _GenericFeedState extends ConsumerState<GenericFeed> {
                   ),
               ],
             ),
+            ...widget.additionalTabViews,
           ],
         ),
       ),
