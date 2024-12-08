@@ -10,6 +10,7 @@ import 'schema/db_contact_list.dart';
 import 'schema/db_metadata.dart';
 import 'schema/db_nip_01_event.dart';
 import 'schema/db_nip_05.dart';
+import 'schema/db_user_relay_list.dart';
 
 class DbObjectBox implements CacheManager {
   final Completer _initCompleter = Completer();
@@ -256,9 +257,18 @@ class DbObjectBox implements CacheManager {
   }
 
   @override
-  Future<UserRelayList?> loadUserRelayList(String pubKey) {
-    // TODO: implement loadUserRelayList
-    throw UnimplementedError();
+  Future<UserRelayList?> loadUserRelayList(String pubKey) async {
+    await _dbRdy;
+    final userRelayListBox = _objectBox.store.box<DbUserRelayList>();
+    final existingUserRelayList = userRelayListBox
+        .query(DbUserRelayList_.pubKey.equals(pubKey))
+        .order(DbUserRelayList_.createdAt, flags: Order.descending)
+        .build()
+        .findFirst();
+    if (existingUserRelayList == null) {
+      return null;
+    }
+    return existingUserRelayList.toNdk();
   }
 
   @override
@@ -345,15 +355,27 @@ class DbObjectBox implements CacheManager {
   }
 
   @override
-  Future<void> saveUserRelayList(UserRelayList userRelayList) {
-    // TODO: implement saveUserRelayList
-    throw UnimplementedError();
+  Future<void> saveUserRelayList(UserRelayList userRelayList) async {
+    await _dbRdy;
+    final userRelayListBox = _objectBox.store.box<DbUserRelayList>();
+    final existingUserRelayList = userRelayListBox
+        .query(DbUserRelayList_.pubKey.equals(userRelayList.pubKey))
+        .order(DbUserRelayList_.createdAt, flags: Order.descending)
+        .build()
+        .findFirst();
+    if (existingUserRelayList != null) {
+      userRelayListBox.remove(existingUserRelayList.dbId);
+    }
+    userRelayListBox.put(DbUserRelayList.fromNdk(userRelayList));
   }
 
   @override
-  Future<void> saveUserRelayLists(List<UserRelayList> userRelayLists) {
-    // TODO: implement saveUserRelayLists
-    throw UnimplementedError();
+  Future<void> saveUserRelayLists(List<UserRelayList> userRelayLists) async {
+    final wait = <Future>[];
+    for (final userRelayList in userRelayLists) {
+      wait.add(saveUserRelayList(userRelayList));
+    }
+    await Future.wait(wait);
   }
 
   @override

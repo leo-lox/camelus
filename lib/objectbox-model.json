@@ -293,9 +293,43 @@
         }
       ],
       "relations": []
+    },
+    {
+      "id": "7:7121738077069950407",
+      "lastPropertyId": "6:3769539562209329664",
+      "name": "DbUserRelayList",
+      "properties": [
+        {
+          "id": "2:1626955690315208675",
+          "name": "pubKey",
+          "type": 9
+        },
+        {
+          "id": "3:2279200721602944096",
+          "name": "createdAt",
+          "type": 6
+        },
+        {
+          "id": "4:7429007344040003737",
+          "name": "refreshedTimestamp",
+          "type": 6
+        },
+        {
+          "id": "5:1857705759697671386",
+          "name": "relaysJson",
+          "type": 9
+        },
+        {
+          "id": "6:3769539562209329664",
+          "name": "dbId",
+          "type": 6,
+          "flags": 1
+        }
+      ],
+      "relations": []
     }
   ],
-  "lastEntityId": "6:5273186663970464575",
+  "lastEntityId": "7:7121738077069950407",
   "lastIndexId": "1:6758634951668169698",
   "lastRelationId": "0:0",
   "lastSequenceId": "0:0",
@@ -303,7 +337,9 @@
   "modelVersionParserMinimum": 5,
   "retiredEntityUids": [],
   "retiredIndexUids": [],
-  "retiredPropertyUids": [],
+  "retiredPropertyUids": [
+    4498920375281389613
+  ],
   "retiredRelationUids": [],
   "version": 1
 }

@@ -19,6 +19,7 @@ import 'data_layer/db/object_box_ndk/schema/db_contact_list.dart';
 import 'data_layer/db/object_box_ndk/schema/db_metadata.dart';
 import 'data_layer/db/object_box_ndk/schema/db_nip_01_event.dart';
 import 'data_layer/db/object_box_ndk/schema/db_nip_05.dart';
+import 'data_layer/db/object_box_ndk/schema/db_user_relay_list.dart';
 
 export 'package:objectbox/objectbox.dart'; // so that callers only have to import this file
 
@@ -312,6 +313,40 @@ final _entities = <obx_int.ModelEntity>[
             flags: 0)
       ],
       relations: <obx_int.ModelRelation>[],
+      backlinks: <obx_int.ModelBacklink>[]),
+  obx_int.ModelEntity(
+      id: const obx_int.IdUid(7, 7121738077069950407),
+      name: 'DbUserRelayList',
+      lastPropertyId: const obx_int.IdUid(6, 3769539562209329664),
+      flags: 0,
+      properties: <obx_int.ModelProperty>[
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(2, 1626955690315208675),
+            name: 'pubKey',
+            type: 9,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(3, 2279200721602944096),
+            name: 'createdAt',
+            type: 6,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(4, 7429007344040003737),
+            name: 'refreshedTimestamp',
+            type: 6,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(5, 1857705759697671386),
+            name: 'relaysJson',
+            type: 9,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(6, 3769539562209329664),
+            name: 'dbId',
+            type: 6,
+            flags: 1)
+      ],
+      relations: <obx_int.ModelRelation>[],
       backlinks: <obx_int.ModelBacklink>[])
 ];
 
@@ -350,13 +385,13 @@ Future<obx.Store> openStore(
 obx_int.ModelDefinition getObjectBoxModel() {
   final model = obx_int.ModelInfo(
       entities: _entities,
-      lastEntityId: const obx_int.IdUid(6, 5273186663970464575),
+      lastEntityId: const obx_int.IdUid(7, 7121738077069950407),
       lastIndexId: const obx_int.IdUid(1, 6758634951668169698),
       lastRelationId: const obx_int.IdUid(0, 0),
       lastSequenceId: const obx_int.IdUid(0, 0),
       retiredEntityUids: const [],
       retiredIndexUids: const [],
-      retiredPropertyUids: const [],
+      retiredPropertyUids: const [4498920375281389613],
       retiredRelationUids: const [],
       modelVersion: 5,
       modelVersionParserMinimum: 5,
@@ -719,6 +754,47 @@ obx_int.ModelDefinition getObjectBoxModel() {
             ..dbId = const fb.Int64Reader().vTableGet(buffer, rootOffset, 4, 0);
 
           return object;
+        }),
+    DbUserRelayList: obx_int.EntityDefinition<DbUserRelayList>(
+        model: _entities[6],
+        toOneRelations: (DbUserRelayList object) => [],
+        toManyRelations: (DbUserRelayList object) => {},
+        getId: (DbUserRelayList object) => object.dbId,
+        setId: (DbUserRelayList object, int id) {
+          object.dbId = id;
+        },
+        objectToFB: (DbUserRelayList object, fb.Builder fbb) {
+          final pubKeyOffset = fbb.writeString(object.pubKey);
+          final relaysJsonOffset = fbb.writeString(object.relaysJson);
+          fbb.startTable(7);
+          fbb.addOffset(1, pubKeyOffset);
+          fbb.addInt64(2, object.createdAt);
+          fbb.addInt64(3, object.refreshedTimestamp);
+          fbb.addOffset(4, relaysJsonOffset);
+          fbb.addInt64(5, object.dbId);
+          fbb.finish(fbb.endTable());
+          return object.dbId;
+        },
+        objectFromFB: (obx.Store store, ByteData fbData) {
+          final buffer = fb.BufferContext(fbData);
+          final rootOffset = buffer.derefObject(0);
+          final pubKeyParam = const fb.StringReader(asciiOptimization: true)
+              .vTableGet(buffer, rootOffset, 6, '');
+          final relaysJsonParam = const fb.StringReader(asciiOptimization: true)
+              .vTableGet(buffer, rootOffset, 12, '');
+          final createdAtParam =
+              const fb.Int64Reader().vTableGet(buffer, rootOffset, 8, 0);
+          final refreshedTimestampParam =
+              const fb.Int64Reader().vTableGet(buffer, rootOffset, 10, 0);
+          final object = DbUserRelayList(
+              pubKey: pubKeyParam,
+              relaysJson: relaysJsonParam,
+              createdAt: createdAtParam,
+              refreshedTimestamp: refreshedTimestampParam)
+            ..dbId =
+                const fb.Int64Reader().vTableGet(buffer, rootOffset, 14, 0);
+
+          return object;
         })
   };
 
@@ -927,4 +1003,27 @@ class DbNip05_ {
   /// See [DbNip05.relays].
   static final relays =
       obx.QueryStringVectorProperty<DbNip05>(_entities[5].properties[5]);
+}
+
+/// [DbUserRelayList] entity fields to define ObjectBox queries.
+class DbUserRelayList_ {
+  /// See [DbUserRelayList.pubKey].
+  static final pubKey =
+      obx.QueryStringProperty<DbUserRelayList>(_entities[6].properties[0]);
+
+  /// See [DbUserRelayList.createdAt].
+  static final createdAt =
+      obx.QueryIntegerProperty<DbUserRelayList>(_entities[6].properties[1]);
+
+  /// See [DbUserRelayList.refreshedTimestamp].
+  static final refreshedTimestamp =
+      obx.QueryIntegerProperty<DbUserRelayList>(_entities[6].properties[2]);
+
+  /// See [DbUserRelayList.relaysJson].
+  static final relaysJson =
+      obx.QueryStringProperty<DbUserRelayList>(_entities[6].properties[3]);
+
+  /// See [DbUserRelayList.dbId].
+  static final dbId =
+      obx.QueryIntegerProperty<DbUserRelayList>(_entities[6].properties[4]);
 }
