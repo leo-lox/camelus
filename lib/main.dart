@@ -1,14 +1,16 @@
+import 'dart:io';
 import 'dart:ui';
 
+import 'package:camelus/presentation_layer/providers/db_ndk_provider.dart';
 import 'package:camelus/presentation_layer/providers/inbox_outbox_provider.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mentions/flutter_mentions.dart';
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ndk/ndk.dart';
 //import 'package:device_preview/device_preview.dart';
-
+import 'data_layer/db/object_box_ndk/db_object_box.dart';
 import 'deep_links.dart';
 import 'domain_layer/usecases/app_auth.dart';
 import 'presentation_layer/providers/event_signer_provider.dart';
@@ -56,6 +58,13 @@ Future<void> main() async {
 
   // Create a ProviderContainer
   final providerContainer = ProviderContainer();
+
+  // init ndk db
+  DbObjectBox dbCacheManager = DbObjectBox();
+  await dbCacheManager.dbRdy;
+  final CacheManager cacheManager = dbCacheManager;
+
+  providerContainer.read(dbNdkProvider.notifier).setDB(cacheManager);
 
   // we have a signer, so we can set it
   if (mySigner != null) {
