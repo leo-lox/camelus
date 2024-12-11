@@ -47,7 +47,7 @@ class NoteRepositoryImpl implements NoteRepository {
       filters: [filter],
       name: 'getTextNote-',
       explicitRelays: explicitRelays,
-      timeout: 5,
+      timeout: Duration(seconds: 5),
       cacheRead: true,
       cacheWrite: true,
     );
@@ -121,7 +121,7 @@ class NoteRepositoryImpl implements NoteRepository {
       name: requestId,
       cacheRead: true,
       cacheWrite: true,
-      timeout: 5,
+      timeout: Duration(seconds: 5),
     );
 
     return response.stream.map(
@@ -241,7 +241,7 @@ class NoteRepositoryImpl implements NoteRepository {
     );
 
     final response = dartNdkSource.dartNdk.requests.query(
-      timeout: 2,
+      timeout: Duration(seconds: 5),
       filters: [filter],
       name: 'getReactions-${postId.substring(5, 10)}-',
       cacheRead: false,
@@ -277,7 +277,7 @@ class NoteRepositoryImpl implements NoteRepository {
     );
 
     final response = dartNdkSource.dartNdk.requests.query(
-      timeout: 3,
+      timeout: Duration(seconds: 5),
       filters: [filter],
       name: 'getReposts',
       cacheRead: cacheEnabled,
