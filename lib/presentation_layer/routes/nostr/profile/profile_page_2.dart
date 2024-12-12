@@ -37,6 +37,12 @@ class ProfilePage2 extends ConsumerWidget {
   Widget build(BuildContext context, ref) {
     final myMetadata = ref.watch(metadataStateProvider(pubkey)).userMetadata;
 
+    final mySigner = ref.watch(eventSignerProvider);
+
+    final myPubkey = mySigner?.getPublicKey();
+
+    final bool isOwnProfile = myPubkey == pubkey;
+
     return Scaffold(
       backgroundColor: Palette.background,
       body: GenericFeed(
@@ -95,19 +101,20 @@ class ProfilePage2 extends ConsumerWidget {
                 backgroundColor: Palette.black, // Add a background color
                 flexibleSpace: FlexibleSpaceBar(
                   background: _BuildProfileHeader(
+                      isOwnProfile: isOwnProfile,
                       userMetadata: UserMetadata(
-                    pubkey: pubkey,
-                    eventId: '',
-                    lastFetch: myMetadata?.lastFetch ?? 0,
-                    name: myMetadata?.name,
-                    picture: myMetadata?.picture,
-                    banner: myMetadata?.banner,
-                    nip05: myMetadata?.nip05,
-                    about: myMetadata?.about,
-                    website: myMetadata?.website,
-                    lud06: myMetadata?.lud06,
-                    lud16: myMetadata?.lud16,
-                  )),
+                        pubkey: pubkey,
+                        eventId: '',
+                        lastFetch: myMetadata?.lastFetch ?? 0,
+                        name: myMetadata?.name,
+                        picture: myMetadata?.picture,
+                        banner: myMetadata?.banner,
+                        nip05: myMetadata?.nip05,
+                        about: myMetadata?.about,
+                        website: myMetadata?.website,
+                        lud06: myMetadata?.lud06,
+                        lud16: myMetadata?.lud16,
+                      )),
                 ),
                 bottom: PreferredSize(
                   preferredSize: Size.fromHeight(48),
@@ -145,11 +152,12 @@ final _userContactsProvider =
 });
 
 class _BuildProfileHeader extends ConsumerWidget {
+  final UserMetadata userMetadata;
+  final bool isOwnProfile;
   const _BuildProfileHeader({
     required this.userMetadata,
+    required this.isOwnProfile,
   });
-
-  final UserMetadata userMetadata;
 
   Future<void> _copyToClipboard(String data) async {
     await Clipboard.setData(ClipboardData(text: data));
@@ -244,9 +252,10 @@ class _BuildProfileHeader extends ConsumerWidget {
                               ),
                             ),
                           ),
-                        _FollowButton(
-                          pubkey: userMetadata.pubkey,
-                        ),
+                        if (!isOwnProfile)
+                          _FollowButton(
+                            pubkey: userMetadata.pubkey,
+                          ),
                       ],
                     ),
                   ],
@@ -393,13 +402,7 @@ class _FollowButtonState extends ConsumerState<_FollowButton> {
   @override
   Widget build(BuildContext context) {
     final followingP = ref.watch(followingProvider);
-    final signerP = ref.watch(eventSignerProvider);
-    final ownPubkey = signerP!.getPublicKey();
 
-    // on own profile page, don't show follow button
-    if (widget.pubkey == ownPubkey) {
-      return Container();
-    }
     return StreamBuilder<ContactList>(
       stream: followingP.getContactsStreamSelf(),
       builder: (context, snapshot) {

@@ -114,7 +114,6 @@ class StarterPacksList extends ConsumerWidget {
                   MaterialPageRoute(
                     builder: (context) => OpenStarterPack(
                       followSet: nostrSet,
-                      isOwnStarterPack: false, // todo: add own check
                     ),
                   ),
                 );
