@@ -53,7 +53,8 @@
 
 
             </intent-filter>
-
+            
+            <!-- deep links so app_links work -->
             <meta-data android:name="flutter_deeplinking_enabled" android:value="false" />
 
         </activity>
