@@ -114,8 +114,6 @@ ${_privateKey.mnemonicSentence}
     /// broadcast nip65
     await inboxOutboxP.setNip65data(myNip65);
 
-    await Future.delayed(Duration(seconds: 1));
-
     final UserMetadata userMetadata = UserMetadata(
       eventId: '',
       lastFetch: 0,
@@ -131,8 +129,8 @@ ${_privateKey.mnemonicSentence}
       lud16: widget.userInfo.lud16,
     );
 
-    metadataP.broadcastMetadata(userMetadata);
-    followP.setContacts(widget.userInfo.followPubkeys);
+    await metadataP.broadcastMetadata(userMetadata);
+    await followP.setContacts(widget.userInfo.followPubkeys);
   }
 
   @override
@@ -181,8 +179,6 @@ ${_privateKey.mnemonicSentence}
         key: "nostrKeys", value: json.encode(myKeyPair.toJson()));
 
     await _broadcastAcc();
-
-    await Future.delayed(const Duration(seconds: 2));
 
     if (!mounted) return;
 
