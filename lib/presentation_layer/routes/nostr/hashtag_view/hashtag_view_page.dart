@@ -10,6 +10,7 @@ class HastagViewPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Palette.background,
       appBar: AppBar(
         title: Row(
           children: [
