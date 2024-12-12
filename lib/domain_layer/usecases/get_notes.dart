@@ -113,6 +113,11 @@ class GetNotes {
   }
 
   Future<void> broadcastNote(NostrNote noteToPublish) async {
-    await _noteRepository.broadcastNote(noteToPublish);
+    await _noteRepository.broadcastNote(noteToPublish).onError(
+      (error, stackTrace) {
+        log('Error broadcasting note: $error', stackTrace: stackTrace);
+        return Future.error(error ?? 'Error broadcasting note');
+      },
+    );
   }
 }

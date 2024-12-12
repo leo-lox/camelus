@@ -320,16 +320,21 @@ class _WritePostState extends ConsumerState<WritePost> {
 
     final int now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
 
-    await notesP.broadcastNote(
-      NostrNote(
-        id: '',
-        pubkey: pubkey,
-        created_at: now,
-        kind: 1,
-        content: content,
-        sig: '',
-        tags: tags,
-      ),
+    await notesP
+        .broadcastNote(NostrNote(
+      id: '',
+      pubkey: pubkey,
+      created_at: now,
+      kind: 1,
+      content: content,
+      sig: '',
+      tags: tags,
+    ))
+        .onError(
+      (error, stackTrace) {
+        _showErrorMsg('Error broadcasting note: $error');
+        return;
+      },
     );
 
     setState(() {
