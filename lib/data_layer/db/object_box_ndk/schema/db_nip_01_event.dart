@@ -188,7 +188,7 @@ class DbTag {
   static DbTag fromList(List<String> list) {
     return DbTag(
       key: list[0],
-      value: list[1],
+      value: list.length >= 2 ? list[1] : '',
       marker: list.length >= 4 ? list[3] : null,
     );
   }

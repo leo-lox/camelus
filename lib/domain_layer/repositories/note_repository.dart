@@ -42,6 +42,7 @@ abstract class NoteRepository {
     int? until,
     int? limit,
     List<String>? eTags,
+    List<String>? tTags,
   });
 
   Stream<NostrNote> genericNostrSubscription({
@@ -52,6 +53,7 @@ abstract class NoteRepository {
     int? until,
     int? limit,
     List<String>? eTags,
+    List<String>? tTags,
   });
 
   Future<void> closeSubscription(String subscriptionId);

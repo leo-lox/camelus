@@ -14,10 +14,10 @@ class NostrTagModel extends NostrTag {
       throw ArgumentError("Invalid tag format: Tag cannot be empty");
     }
 
-    final type = json[0];
-    final value = json.length > 1 ? json[1] : null;
-    final recommendedRelay = json.length > 2 ? json[2] : null;
-    final marker = json.length > 3 ? json[3] : null;
+    final String type = json[0];
+    final String value = json.length > 1 ? json[1] : '';
+    final String? recommendedRelay = json.length > 2 ? json[2] : null;
+    final String? marker = json.length > 3 ? json[3] : null;
 
     return NostrTagModel(
       type: type,
@@ -30,7 +30,7 @@ class NostrTagModel extends NostrTag {
   List<dynamic> toJson() {
     final List<dynamic> json = [type];
 
-    if (value != null) {
+    if (value.isNotEmpty) {
       json.add(value);
       if (recommended_relay != null) {
         json.add(recommended_relay);

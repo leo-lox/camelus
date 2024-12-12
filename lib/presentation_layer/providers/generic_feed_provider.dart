@@ -64,6 +64,7 @@ class GenericFeedState
       kinds: filter.kinds,
       authors: filter.authors,
       eTags: filter.eTags,
+      tTags: filter.tTags,
     );
 
     // Buffer notes for processing in batches
@@ -108,6 +109,7 @@ class GenericFeedState
       kinds: filter.kinds,
       authors: filter.authors,
       eTags: filter.eTags,
+      tTags: filter.tTags,
       limit: limit,
       until: cutoff,
     );

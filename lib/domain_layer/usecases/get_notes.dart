@@ -35,6 +35,7 @@ class GetNotes {
     int? until,
     int? limit,
     List<String>? eTags,
+    List<String>? tTags,
   }) {
     return _noteRepository.genericNostrQuery(
       requestId: requestId,
@@ -44,6 +45,7 @@ class GetNotes {
       until: until,
       limit: limit,
       eTags: eTags,
+      tTags: tTags,
     );
   }
 
@@ -55,6 +57,7 @@ class GetNotes {
     int? until,
     int? limit,
     List<String>? eTags,
+    List<String>? tTags,
   }) {
     return _noteRepository.genericNostrSubscription(
       subscriptionId: subscriptionId,
@@ -64,6 +67,7 @@ class GetNotes {
       until: until,
       limit: limit,
       eTags: eTags,
+      tTags: tTags,
     );
   }
 

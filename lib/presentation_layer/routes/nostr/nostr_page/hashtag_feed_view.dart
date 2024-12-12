@@ -1,5 +1,8 @@
+import 'package:camelus/presentation_layer/components/generic_feed.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../../../domain_layer/entities/feed_filter.dart';
 
 class HashtagFeedView extends ConsumerStatefulWidget {
   final String hashtag;
@@ -23,6 +26,12 @@ class _HashtagFeedViewState extends ConsumerState<HashtagFeedView> {
 
   @override
   Widget build(BuildContext context) {
-    return Text("HashtagFeedView not implemented");
+    return GenericFeed(
+      feedFilter: FeedFilter(
+        feedId: "hashtag-feed-${widget.hashtag}",
+        kinds: [1, 6],
+        tTags: [widget.hashtag.toLowerCase()],
+      ),
+    );
   }
 }

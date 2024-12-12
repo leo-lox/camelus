@@ -106,6 +106,7 @@ class NoteRepositoryImpl implements NoteRepository {
     int? until,
     int? limit,
     List<String>? eTags,
+    List<String>? tTags,
   }) {
     ndk.Filter filter = ndk.Filter(
       authors: authors,
@@ -114,6 +115,7 @@ class NoteRepositoryImpl implements NoteRepository {
       until: until,
       limit: limit,
       eTags: eTags,
+      tTags: tTags,
     );
 
     final response = dartNdkSource.dartNdk.requests.query(
@@ -138,6 +140,7 @@ class NoteRepositoryImpl implements NoteRepository {
     int? until,
     int? limit,
     List<String>? eTags,
+    List<String>? tTags,
   }) {
     ndk.Filter filter = ndk.Filter(
       authors: authors,
@@ -146,6 +149,7 @@ class NoteRepositoryImpl implements NoteRepository {
       until: until,
       limit: limit,
       eTags: eTags,
+      tTags: tTags,
     );
 
     final response = dartNdkSource.dartNdk.requests.subscription(
