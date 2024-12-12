@@ -25,11 +25,10 @@ class UserReactions {
   Future<NostrNote?> isPostLiked({
     required String likedByPubkey,
     required String postId,
+    bool useCache = false,
   }) async {
     final reactions = await _noteRepository.getReactions(
-      postId: postId,
-      authors: [likedByPubkey],
-    );
+        postId: postId, authors: [likedByPubkey], useCache: useCache);
     if (reactions.isEmpty) {
       return null;
     }
@@ -74,8 +73,11 @@ class UserReactions {
     }
 
     // get the reaction to delete
-    final reaction =
-        await isPostLiked(likedByPubkey: selfPubkey!, postId: postId);
+    final reaction = await isPostLiked(
+      likedByPubkey: selfPubkey!,
+      postId: postId,
+      useCache: true,
+    );
     if (reaction == null) {
       throw Exception("Reaction not found");
     }

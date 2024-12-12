@@ -65,6 +65,7 @@ abstract class NoteRepository {
   Future<List<NostrNote>> getReactions({
     required String postId,
     required List<String> authors,
+    bool useCache = false,
   });
 
   Future<List<NostrNote>> getReposts({
