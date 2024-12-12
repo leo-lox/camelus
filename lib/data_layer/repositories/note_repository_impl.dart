@@ -230,8 +230,7 @@ class NoteRepositoryImpl implements NoteRepository {
     final response = dartNdkSource.dartNdk.broadcast
         .broadcast(nostrEvent: noteModel.toNDKEvent());
 
-    //todo: fix in dart_ndk
-    //await response.publishDone;
+    await response.broadcastDoneFuture;
   }
 
   @override
@@ -266,7 +265,7 @@ class NoteRepositoryImpl implements NoteRepository {
   Future<void> deleteNote(String eventId) async {
     final res =
         dartNdkSource.dartNdk.broadcast.broadcastDeletion(eventId: eventId);
-    // await res.publishDone;
+    await res.broadcastDoneFuture;
   }
 
   @override

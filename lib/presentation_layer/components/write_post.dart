@@ -297,8 +297,7 @@ class _WritePostState extends ConsumerState<WritePost> {
 
     final int now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
 
-    //todo:  await, completer in ndk
-    notesP.broadcastNote(
+    await notesP.broadcastNote(
       NostrNote(
         id: '',
         pubkey: pubkey,
@@ -309,7 +308,6 @@ class _WritePostState extends ConsumerState<WritePost> {
         tags: tags,
       ),
     );
-    await Future.delayed(const Duration(seconds: 2));
 
     setState(() {
       submitLoading = false;
