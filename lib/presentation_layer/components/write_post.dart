@@ -1,5 +1,6 @@
 import 'dart:developer';
 import 'dart:io';
+
 import 'package:camelus/domain_layer/entities/nostr_note.dart';
 import 'package:camelus/domain_layer/entities/user_metadata.dart';
 import 'package:camelus/presentation_layer/atoms/picture.dart';
@@ -44,6 +45,7 @@ class _WritePostState extends ConsumerState<WritePost> {
   List<Map<String, dynamic>> _mentionsSearchResults = [];
   List<Map<String, dynamic>> _mentionsSearchResultsHashTags = [];
   List<String> _mentionedInPost = [];
+  List<String> _hashtagsInPost = [];
 
   _addImage() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
@@ -145,6 +147,20 @@ class _WritePostState extends ConsumerState<WritePost> {
 
     setState(() {
       _mentionedInPost = mentionKeys;
+    });
+  }
+
+  _extractHashtags(String markupText) {
+    final hashtagKeys = <String>[];
+    final keyRegex = RegExp(r'#\w+');
+
+    markupText.replaceAllMapped(keyRegex, (match) {
+      hashtagKeys.add(match.group(0)!);
+      return '';
+    });
+
+    setState(() {
+      _hashtagsInPost = hashtagKeys;
     });
   }
 
@@ -266,6 +282,16 @@ class _WritePostState extends ConsumerState<WritePost> {
       }
     }
 
+    // add hashtags
+    for (var hashtag in _hashtagsInPost) {
+      tags.add(
+        NostrTag(
+          type: "t",
+          value: hashtag.toLowerCase().substring(1),
+        ),
+      );
+    }
+
     // upload images
     List<String> imageUrls = [];
     for (var image in _images) {
@@ -282,9 +308,6 @@ class _WritePostState extends ConsumerState<WritePost> {
     for (var url in imageUrls) {
       content += " $url";
     }
-
-    log("content: $content");
-    //_nostrService.writeEvent(content, 1, tags);
 
     final notesP = ref.watch(getNotesProvider);
 
@@ -540,6 +563,7 @@ class _WritePostState extends ConsumerState<WritePost> {
         onMarkupChanged: (p0) {
           // triggers when something is typed in the text field
           _extractMentions(p0);
+          _extractHashtags(p0);
         },
         onSearchChanged: (String trigger, search) {
           if (search.isNotEmpty && trigger == "@") {
