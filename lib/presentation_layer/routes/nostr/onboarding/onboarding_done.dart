@@ -112,8 +112,7 @@ ${_privateKey.mnemonicSentence}
     );
 
     /// broadcast nip65
-    //! todo: await, fix ndk broadcast response
-    inboxOutboxP.setNip65data(myNip65);
+    await inboxOutboxP.setNip65data(myNip65);
 
     await Future.delayed(Duration(seconds: 1));
 
