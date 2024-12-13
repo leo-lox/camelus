@@ -81,7 +81,8 @@ class GenericFeedState
 
     _addNewRootEvents(rootNotes); // Add new root events
     _addNewRootAndReplyEvents(
-        rootAndReplyNotes); // Add new root and reply events
+      rootAndReplyNotes,
+    ); // Add new root and reply events
   }
 
   // Fetches the cutoff time to separate old and new notes
