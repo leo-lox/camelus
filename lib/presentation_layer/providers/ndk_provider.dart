@@ -1,5 +1,4 @@
 import 'package:ndk/ndk.dart';
-import 'package:ndk/shared/logger/logger.dart';
 import 'package:riverpod/riverpod.dart';
 
 import '../../config/default_relays.dart';
