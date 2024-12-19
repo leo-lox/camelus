@@ -17,6 +17,7 @@ final ndkProvider = Provider<Ndk>((ref) {
     eventSigner: eventSigner,
     eventVerifier: eventVerifier,
     bootstrapRelays: CAMELUS_BOOTSTRAP_RELAYS,
+    logLevel: Logger.logLevels.debug,
   );
 
   final ndk = Ndk(ndkConfig);
