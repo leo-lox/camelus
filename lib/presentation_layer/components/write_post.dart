@@ -41,11 +41,8 @@ class _WritePostState extends ConsumerState<WritePost> {
       GlobalKey<FlutterMentionsState>();
   final FocusNode _focusNode = FocusNode();
 
-  final List<MemFile> _images = [];
   List<Map<String, dynamic>> _mentionsSearchResults = [];
   List<Map<String, dynamic>> _mentionsSearchResultsHashTags = [];
-  List<String> _mentionedInPost = [];
-  List<String> _hashtagsInPost = [];
 
   _addImage() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
@@ -58,9 +55,7 @@ class _WritePostState extends ConsumerState<WritePost> {
       try {
         final myImage = await RemoveImageMetadata.fileToMemFile(
             File(result.files.single.path!));
-        setState(() {
-          _images.add(myImage);
-        });
+        ref.read(writePostStateProvider.notifier).addImage(myImage);
       } catch (e) {
         if (!mounted) return;
 
@@ -77,10 +72,11 @@ class _WritePostState extends ConsumerState<WritePost> {
   }
 
   _searchMentions(search) async {
+    final writePostState = ref.read(writePostStateProvider);
     List<Map<String, dynamic>> results = [];
 
     var rawResults = []; //_search.searchUsersMetadata(search);
-    for (var rawResult in rawResults) {
+    for (final rawResult in rawResults) {
       var result = {
         "id": rawResult.pubkey,
         "pubkey": rawResult.pubkey,
@@ -93,7 +89,7 @@ class _WritePostState extends ConsumerState<WritePost> {
     }
 
     // keep data from already mentioned users
-    for (var mention in _mentionedInPost) {
+    for (final mention in writePostState.mentionedInPost) {
       if (results.any((element) => element['id'] == mention)) {
         continue;
       }
@@ -128,34 +124,6 @@ class _WritePostState extends ConsumerState<WritePost> {
 
     setState(() {
       _mentionsSearchResultsHashTags = results;
-    });
-  }
-
-  _extractMentions(String markupText) {
-    final mentionKeys = <String>[];
-    final keyRegex = RegExp(r'@\[__(.*?)__\]');
-
-    markupText.replaceAllMapped(keyRegex, (match) {
-      mentionKeys.add(match.group(1)!);
-      return '';
-    });
-
-    setState(() {
-      _mentionedInPost = mentionKeys;
-    });
-  }
-
-  _extractHashtags(String markupText) {
-    final hashtagKeys = <String>[];
-    final keyRegex = RegExp(r'#\w+');
-
-    markupText.replaceAllMapped(keyRegex, (match) {
-      hashtagKeys.add(match.group(0)!);
-      return '';
-    });
-
-    setState(() {
-      _hashtagsInPost = hashtagKeys;
     });
   }
 
