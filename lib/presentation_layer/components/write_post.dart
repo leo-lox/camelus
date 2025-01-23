@@ -1,15 +1,9 @@
 import 'dart:developer';
 import 'dart:io';
 
-import 'package:camelus/domain_layer/entities/nostr_note.dart';
 import 'package:camelus/domain_layer/entities/user_metadata.dart';
 import 'package:camelus/presentation_layer/atoms/picture.dart';
-import 'package:camelus/helpers/nprofile_helper.dart';
-import 'package:camelus/domain_layer/entities/nostr_tag.dart';
-import 'package:camelus/presentation_layer/providers/edit_relays_provider.dart';
-import 'package:camelus/presentation_layer/providers/event_signer_provider.dart';
-import 'package:camelus/presentation_layer/providers/file_upload_provider.dart';
-import 'package:camelus/presentation_layer/providers/get_notes_provider.dart';
+
 import 'package:camelus/presentation_layer/providers/metadata_state_provider.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -22,7 +16,7 @@ import 'package:camelus/helpers/helpers.dart';
 import 'package:camelus/data_layer/models/post_context.dart';
 
 import '../../config/default_suggestions.dart';
-import '../../domain_layer/entities/mem_file.dart';
+
 import '../../domain_layer/usecases/remove_image_metadata.dart';
 import '../providers/write_post_state.provider.dart';
 
@@ -127,183 +121,6 @@ class _WritePostState extends ConsumerState<WritePost> {
     });
   }
 
-  _submitPost() async {
-    var textController = _textEditingControllerKey.currentState!.controller;
-
-    if (textController!.text == "") {
-      return;
-    }
-
-    var markupText = textController.markupText;
-
-    // extract mentions from markupText
-
-    final mentionKeys = <String>[];
-    final keyRegex = RegExp(r'@\[__(.*?)__\]');
-
-    String output = markupText.replaceAllMapped(keyRegex, (match) {
-      mentionKeys.add(match.group(1)!);
-      var userHex = match.group(1)!;
-
-      var nprofile =
-          NprofileHelper().mapToBech32({'pubkey': userHex, 'relays': []});
-      return 'nostr:$nprofile ';
-    });
-
-    output = output.replaceAllMapped(RegExp(r'\(__.*?\)'), (match) {
-      return '';
-    });
-
-    var content = output;
-
-    List<NostrTag> tags = [];
-
-    if (widget.context != null) {
-      var replyIsReplyToRoot = widget.context!.replyToNote.getRootReply;
-      if (replyIsReplyToRoot != null) {
-        var tag = NostrTag(
-          type: "e",
-          value: replyIsReplyToRoot.value,
-          recommended_relay: "",
-          marker: "root",
-        );
-        tags.add(tag);
-      } else {
-        // is reply to root
-        var tag = NostrTag(
-          type: "e",
-          value: widget.context!.replyToNote.id,
-          recommended_relay: "",
-          marker: "root",
-        );
-        tags.add(tag);
-        var tagPubkey = NostrTag(
-          type: "p",
-          value: widget.context!.replyToNote.pubkey,
-          recommended_relay: "",
-          marker: "root",
-        );
-        tags.add(tagPubkey);
-      }
-
-      // add previous tweet tags
-      for (NostrTag tag in widget.context!.replyToNote.tags) {
-        if (tag.type == "e") {
-          if (tag.marker == "root" || tag.marker == "reply") {
-            continue;
-          }
-          if (!(tags.map((e) => e.value).contains(tag.value))) {
-            tags.add(tag);
-          }
-        }
-        if (tag.type == "p") {
-          if (tag.marker == "root" || tag.marker == "reply") {
-            continue;
-          }
-
-          tags.add(tag);
-        }
-      }
-
-      if (mentionKeys.isNotEmpty) {
-        for (int i = 0; i < mentionKeys.length; i++) {
-          var pubkey = mentionKeys[i];
-          final editRelayProvider = ref.watch(editRelaysProvider);
-
-          var potentialRelays =
-              await editRelayProvider.getRelayHintsInbox(pubkey);
-
-          tags.add(NostrTag(
-            type: "p",
-            value: pubkey,
-            recommended_relay: potentialRelays.firstOrNull?.url ?? "",
-            marker: "mention",
-          ));
-        }
-      }
-
-      if (widget.context != null) {
-        var tag = NostrTag(
-          type: "e",
-          value: widget.context!.replyToNote.id,
-          recommended_relay: "",
-          marker: "reply",
-        );
-        tags.add(tag);
-
-        var tagPubkey = NostrTag(
-          type: 'p',
-          value: widget.context!.replyToNote.pubkey,
-          recommended_relay: '',
-          marker: 'reply',
-        );
-        tags.add(tagPubkey);
-      }
-    }
-
-    // add hashtags
-    for (var hashtag in _hashtagsInPost) {
-      tags.add(
-        NostrTag(
-          type: "t",
-          value: hashtag.toLowerCase().substring(1),
-        ),
-      );
-    }
-
-    // upload images
-    List<String> imageUrls = [];
-    for (var image in _images) {
-      try {
-        var url = await ref.watch(fileUploadProvider).uploadImage(image);
-        imageUrls.add(url);
-      } catch (e) {
-        log("errUploadImage:  ${e.toString()}");
-      }
-    }
-
-    // add image urls to content
-    content += "\n";
-    for (var url in imageUrls) {
-      content += " $url";
-    }
-
-    final notesP = ref.watch(getNotesProvider);
-
-    final signerP = ref.watch(eventSignerProvider);
-    if (signerP == null) {
-      _showErrorMsg("no signer");
-      return;
-    }
-    final pubkey = signerP.getPublicKey();
-
-    final int now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
-
-    await notesP
-        .broadcastNote(NostrNote(
-      id: '',
-      pubkey: pubkey,
-      created_at: now,
-      kind: 1,
-      content: content,
-      sig: '',
-      tags: tags,
-    ))
-        .onError(
-      (error, stackTrace) {
-        _showErrorMsg('Error broadcasting note: $error');
-        return;
-      },
-    );
-
-    // wait for x seconds
-    Future.delayed(const Duration(milliseconds: 100), () {
-      if (!mounted) return;
-      // close modal
-      Navigator.pop(context);
-    });
-  }
-
   _showErrorMsg(String msg) {
     // alert dialog
     showDialog(
@@ -379,7 +196,7 @@ class _WritePostState extends ConsumerState<WritePost> {
               ),
 
               _TopBar(
-                replyToPubkey: writePostState.replyToPubkey,
+                replyToPubkey: writePostState.replyToNote?.pubkey,
                 submitLoading: writePostState.isSubmitting,
                 submitPostCallback: () => writePostNotifier.submitPost(),
               ),
@@ -389,7 +206,7 @@ class _WritePostState extends ConsumerState<WritePost> {
               // large text field
               _writingArea(),
               // image preview
-              if (_images.isNotEmpty) _previewImages(),
+              if (writePostState.images.isNotEmpty) _previewImages(),
 
               // bottom row
               _bottomRow(),
@@ -406,11 +223,12 @@ class _WritePostState extends ConsumerState<WritePost> {
   }
 
   SizedBox _previewImages() {
+    final images = ref.watch(writePostStateProvider).images;
     return SizedBox(
       height: 100,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
-        itemCount: _images.length,
+        itemCount: images.length,
         itemBuilder: (BuildContext context, int index) {
           return Stack(
             children: [
@@ -419,7 +237,7 @@ class _WritePostState extends ConsumerState<WritePost> {
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(10),
                   child: Image.memory(
-                    _images[index].bytes,
+                    images[index].bytes,
                     fit: BoxFit.cover,
                     width: 100,
                     height: 100,
@@ -432,13 +250,16 @@ class _WritePostState extends ConsumerState<WritePost> {
                 child: TextButton(
                   onPressed: (() {
                     setState(() {
-                      _images.removeAt(index);
+                      images.removeAt(index);
                     });
                   }),
                   child: SvgPicture.asset(
                     height: 25,
                     'assets/icons/x.svg',
-                    color: Palette.gray,
+                    colorFilter: const ColorFilter.mode(
+                      Palette.gray,
+                      BlendMode.srcIn,
+                    ),
                   ),
                 ),
               ),
@@ -482,14 +303,6 @@ class _WritePostState extends ConsumerState<WritePost> {
             // on bottom
           ],
         ),
-        if (_images.isNotEmpty)
-          Container(
-            margin: const EdgeInsets.only(left: 10, right: 10),
-            child: const Text(
-              "provided by nostr.build",
-              style: TextStyle(color: Palette.lightGray, fontSize: 11),
-            ),
-          ),
       ],
     );
   }

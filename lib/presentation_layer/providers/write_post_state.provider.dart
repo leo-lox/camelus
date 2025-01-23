@@ -6,6 +6,7 @@ import '../../domain_layer/entities/nostr_tag.dart';
 import '../../helpers/nprofile_helper.dart';
 import 'edit_relays_provider.dart';
 import 'event_signer_provider.dart';
+import 'file_upload_provider.dart';
 import 'get_notes_provider.dart';
 
 final writePostStateProvider =
@@ -92,7 +93,7 @@ class WritePostNotifier extends Notifier<WritePostState> {
     state.hashtagsInPost = hashtagKeys;
   }
 
-  submitPost() async {
+  Future submitPost() async {
     if (state.isSubmitting) return;
     if (state.markupText.isEmpty) return;
 
@@ -118,7 +119,7 @@ class WritePostNotifier extends Notifier<WritePostState> {
       return '';
     });
 
-    final content = output;
+    var content = output;
 
     List<NostrTag> tags = [];
 
@@ -215,14 +216,29 @@ class WritePostNotifier extends Notifier<WritePostState> {
       );
     }
 
-//todo: images
+    // upload images
+    List<String> imageUrls = [];
+    for (final image in state.images) {
+      state.uploadTasks.add(ref.watch(fileUploadProvider).uploadImage(image));
+    }
+
+    //todo!: err handling
+    await Future.wait(state.uploadTasks).then((urls) {
+      imageUrls = urls;
+    });
+
+    // add image urls to content
+    content += "\n";
+    for (var url in imageUrls) {
+      content += " $url";
+    }
 
     final notesP = ref.read(getNotesProvider);
 
     final signerP = ref.read(eventSignerProvider);
     if (signerP == null) {
-      _showErrorMsg("no signer");
-      return;
+      state = state.copyWith(isSubmitting: false);
+      return Future.error('no signer');
     }
     final pubkey = signerP.getPublicKey();
 
@@ -240,8 +256,8 @@ class WritePostNotifier extends Notifier<WritePostState> {
     ))
         .onError(
       (error, stackTrace) {
-        _showErrorMsg('Error broadcasting note: $error');
-        return;
+        state = state.copyWith(isSubmitting: false);
+        return Future.error('Error broadcasting note: $error');
       },
     );
   }
