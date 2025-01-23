@@ -21,8 +21,10 @@ import 'package:camelus/config/palette.dart';
 import 'package:camelus/helpers/helpers.dart';
 import 'package:camelus/data_layer/models/post_context.dart';
 
+import '../../config/default_suggestions.dart';
 import '../../domain_layer/entities/mem_file.dart';
 import '../../domain_layer/usecases/remove_image_metadata.dart';
+import '../providers/write_post_state.provider.dart';
 
 class WritePost extends ConsumerStatefulWidget {
   final PostContext? context;
@@ -38,8 +40,6 @@ class _WritePostState extends ConsumerState<WritePost> {
   final GlobalKey<FlutterMentionsState> _textEditingControllerKey =
       GlobalKey<FlutterMentionsState>();
   final FocusNode _focusNode = FocusNode();
-
-  bool submitLoading = false;
 
   final List<MemFile> _images = [];
   List<Map<String, dynamic>> _mentionsSearchResults = [];
@@ -124,12 +124,7 @@ class _WritePostState extends ConsumerState<WritePost> {
   _searchHashtags(String search) async {
     List<Map<String, dynamic>> results = [];
 
-    results = [
-      {
-        "id": "todo",
-        "display": search,
-      }
-    ];
+    results = defaultHashtagSuggestions;
 
     setState(() {
       _mentionsSearchResultsHashTags = results;
@@ -170,10 +165,6 @@ class _WritePostState extends ConsumerState<WritePost> {
     if (textController!.text == "") {
       return;
     }
-
-    setState(() {
-      submitLoading = true;
-    });
 
     var markupText = textController.markupText;
 
@@ -337,10 +328,6 @@ class _WritePostState extends ConsumerState<WritePost> {
       },
     );
 
-    setState(() {
-      submitLoading = false;
-    });
-
     // wait for x seconds
     Future.delayed(const Duration(milliseconds: 100), () {
       if (!mounted) return;
@@ -394,6 +381,9 @@ class _WritePostState extends ConsumerState<WritePost> {
 
   @override
   Widget build(BuildContext context) {
+    final writePostState = ref.watch(writePostStateProvider);
+    final writePostNotifier = ref.read(writePostStateProvider.notifier);
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -421,9 +411,9 @@ class _WritePostState extends ConsumerState<WritePost> {
               ),
 
               _TopBar(
-                replyToPubkey: widget.context?.replyToNote.pubkey,
-                submitLoading: submitLoading,
-                submitPostCallback: _submitPost,
+                replyToPubkey: writePostState.replyToPubkey,
+                submitLoading: writePostState.isSubmitting,
+                submitPostCallback: () => writePostNotifier.submitPost(),
               ),
               const SizedBox(
                 height: 20,
@@ -566,9 +556,8 @@ class _WritePostState extends ConsumerState<WritePost> {
           log("mention added: $p0");
         },
         onMarkupChanged: (p0) {
-          // triggers when something is typed in the text field
-          _extractMentions(p0);
-          _extractHashtags(p0);
+          // triggers when something is typed in the text fields
+          ref.read(writePostStateProvider.notifier).updateMarkup(p0);
         },
         onSearchChanged: (String trigger, search) {
           if (search.isNotEmpty && trigger == "@") {
@@ -633,7 +622,28 @@ class _WritePostState extends ConsumerState<WritePost> {
           ),
           Mention(
             suggestionBuilder: (data) {
-              return Container();
+              return Container(
+                padding: const EdgeInsets.all(10.0),
+                child: Row(
+                  children: <Widget>[
+                    const SizedBox(
+                      width: 20.0,
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Text(
+                          data['display'] != null ? "#${data['display']}" : "",
+                          style: const TextStyle(
+                            color: Palette.lightGray,
+                            fontSize: 20,
+                          ),
+                        ),
+                      ],
+                    )
+                  ],
+                ),
+              );
             },
             trigger: "#",
             matchAll: true,
@@ -698,8 +708,6 @@ class _TopBar extends ConsumerWidget {
         if (replyToPubkey != null)
           Column(
             children: [
-              // get metadata
-
               SizedBox(
                 width: MediaQuery.of(context).size.width * 0.6,
                 child: Container(
@@ -716,21 +724,6 @@ class _TopBar extends ConsumerWidget {
                   ),
                 ),
               ),
-
-              /// check if replying to multiple people
-              // if ((Helpers()
-              //         .getPubkeysFromTags(
-              //             widget.context?.replyToTweet.tags ?? [])
-              //         .length >
-              //     1))
-              //   Text(
-              //     "and ${Helpers().getPubkeysFromTags(widget.context?.replyToTweet.tags ?? []).length - 1} more",
-              //     style: const TextStyle(
-              //       color: Palette.lightGray,
-              //       fontSize: 16,
-              //       fontWeight: FontWeight.normal,
-              //     ),
-              //   ),
             ],
           ),
         // if submitLoading is true, show spinner
