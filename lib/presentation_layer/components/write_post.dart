@@ -174,6 +174,29 @@ class _WritePostState extends ConsumerState<WritePost> {
       children: [
         // horizontal line fading out to both sides
 
+        if (writePostState.isError)
+          Column(
+            children: [
+              const SizedBox(
+                height: 20,
+              ),
+              Text("error:",
+                  style: TextStyle(
+                    color: Palette.white,
+                    fontWeight: FontWeight.bold,
+                  )),
+              SizedBox(
+                height: 5,
+              ),
+              Text(
+                writePostState.errorText,
+              ),
+              SizedBox(
+                height: 20,
+              )
+            ],
+          ),
+
         Container(
           width: double.infinity,
           //height: MediaQuery.of(context).size.height * 0.4,
@@ -198,7 +221,12 @@ class _WritePostState extends ConsumerState<WritePost> {
               _TopBar(
                 replyToPubkey: writePostState.replyToNote?.pubkey,
                 submitLoading: writePostState.isSubmitting,
-                submitPostCallback: () => writePostNotifier.submitPost(),
+                submitPostCallback: () => writePostNotifier.submitPost().then(
+                  (value) {
+                    if (!mounted) return;
+                    Navigator.pop(context);
+                  },
+                ),
               ),
               const SizedBox(
                 height: 20,

@@ -21,12 +21,16 @@ class WritePostState {
   List<String> hashtagsInPost;
 
   final bool isSubmitting;
+  final bool isError;
+  final String errorText;
   final List<Future<String>> uploadTasks;
 
   final String markupText;
 
   WritePostState({
     required this.markupText,
+    this.isError = false,
+    this.errorText = '',
     this.isSubmitting = false,
     this.uploadTasks = const [],
     this.images = const [],
@@ -43,6 +47,8 @@ class WritePostState {
     bool? isSubmitting,
     List<Future<String>>? uploadTasks,
     String? markupText,
+    bool? isError,
+    String? errorText,
   }) {
     return WritePostState(
       images: images ?? this.images,
@@ -52,6 +58,8 @@ class WritePostState {
       isSubmitting: isSubmitting ?? this.isSubmitting,
       uploadTasks: uploadTasks ?? this.uploadTasks,
       markupText: markupText ?? this.markupText,
+      isError: isError ?? this.isError,
+      errorText: errorText ?? this.errorText,
     );
   }
 }
@@ -244,22 +252,26 @@ class WritePostNotifier extends Notifier<WritePostState> {
 
     final int now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
 
-    await notesP
-        .broadcastNote(NostrNote(
-      id: '',
-      pubkey: pubkey,
-      created_at: now,
-      kind: 1,
-      content: content,
-      sig: '',
-      tags: tags,
-    ))
-        .onError(
-      (error, stackTrace) {
-        state = state.copyWith(isSubmitting: false);
-        return Future.error('Error broadcasting note: $error');
-      },
+    try {
+      await notesP.broadcastNote(NostrNote(
+        id: '',
+        pubkey: pubkey,
+        created_at: now,
+        kind: 1,
+        content: content,
+        sig: '',
+        tags: tags,
+      ));
+    } catch (e) {
+      state = state.copyWith(
+          isSubmitting: false, isError: true, errorText: e.toString());
+      return Future.error('Error broadcasting note: $e');
+    }
+
+    state = state.copyWith(
+      isSubmitting: false,
     );
+    return;
   }
 
   @override
