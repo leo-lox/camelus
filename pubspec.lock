@@ -358,6 +358,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.0.6"
+  cryptography:
+    dependency: transitive
+    description:
+      name: cryptography
+      sha256: d146b76d33d94548cf035233fbc2f4338c1242fa119013bead807d033fc4ae05
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.7.0"
   cupertino_icons:
     dependency: "direct main"
     description:
@@ -430,6 +438,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "7.0.1"
+  elliptic:
+    dependency: transitive
+    description:
+      name: elliptic
+      sha256: "0c303d810603953a65dc39c4c542fb7538defd9e212403c54c266140819523b6"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.3.11"
   encrypt:
     dependency: "direct main"
     description:
@@ -764,14 +780,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.4"
-  isar:
-    dependency: transitive
-    description:
-      name: isar
-      sha256: ebf74d87c400bd9f7da14acb31932b50c2407edbbd40930da3a6c2a8143f85a8
-      url: "https://pub.dev"
-    source: hosted
-    version: "4.0.0-dev.14"
   js:
     dependency: transitive
     description:
@@ -914,21 +922,21 @@ packages:
       path: "../ndk/packages/ndk"
       relative: true
     source: path
-    version: "0.2.0-dev005"
+    version: "0.2.4"
   ndk_amber:
     dependency: "direct main"
     description:
       path: "../ndk/packages/amber"
       relative: true
     source: path
-    version: "0.2.0-dev002"
+    version: "0.2.0"
   ndk_rust_verifier:
     dependency: "direct main"
     description:
       path: "../ndk/packages/rust_verifier"
       relative: true
     source: path
-    version: "0.2.0-dev002"
+    version: "0.2.0"
   node_preamble:
     dependency: transitive
     description:
@@ -1654,6 +1662,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.0.1"
+  web_socket_client:
+    dependency: transitive
+    description:
+      name: web_socket_client
+      sha256: "0ec5230852349191188c013112e4d2be03e3fc83dbe80139ead9bf3a136e53b5"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.1.5"
   webdriver:
     dependency: transitive
     description:
