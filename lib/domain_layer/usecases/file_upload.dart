@@ -1,5 +1,5 @@
 import 'dart:io';
-
+import 'package:ndk/entities.dart' as ndk_entities;
 import '../entities/mem_file.dart';
 import '../repositories/upload_file_repository.dart';
 
@@ -8,11 +8,11 @@ class FileUpload {
 
   FileUpload(this.fileUploadRepository);
 
-  Future<String> uploadImageFile(File file) async {
-    return await fileUploadRepository.uploadImageFile(file);
+  Future<List<ndk_entities.BlobUploadResult>> uploadImageFile(File file) async {
+    return await fileUploadRepository.uploadFilePath(file);
   }
 
-  Future<String> uploadImage(MemFile file) async {
-    return await fileUploadRepository.uploadImage(file);
+  Future<List<ndk_entities.BlobUploadResult>> uploadImage(MemFile file) async {
+    return await fileUploadRepository.uploadMemFile(file);
   }
 }
