@@ -14,8 +14,28 @@ class FileServer {
 class FileServersNotifier extends StateNotifier<AsyncValue<List<FileServer>>> {
   final Ref ref;
 
+  bool _hasUnsavedChanges = false;
+
+  bool get hasUnsavedChanges => _hasUnsavedChanges;
+
   FileServersNotifier(this.ref) : super(const AsyncValue.loading()) {
     loadServers();
+  }
+
+  Future<bool> save() async {
+    final result = await ref
+        .read(fileUploadProvider)
+        .setFileUploadServers(state.value!.map((s) => s.url).toList());
+
+    /// check if at least one broadcast was successful
+
+    final atLeastOne = result.any((r) => r.broadcastSuccessful);
+
+    if (result.isNotEmpty && atLeastOne) {
+      _hasUnsavedChanges = false;
+    }
+
+    return atLeastOne;
   }
 
   Future<void> loadServers() async {
@@ -49,12 +69,14 @@ class FileServersNotifier extends StateNotifier<AsyncValue<List<FileServer>>> {
     final newServer = FileServer(url: url);
     state = AsyncValue.data([...currentServers, newServer]);
     _checkOnlineStatus(newServer);
+    _hasUnsavedChanges = true;
   }
 
   void removeServer(int index) {
     final currentServers = state.value ?? [];
     currentServers.removeAt(index);
     state = AsyncValue.data([...currentServers]);
+    _hasUnsavedChanges = true;
   }
 
   void reorderServers(int oldIndex, int newIndex) {
@@ -65,6 +87,7 @@ class FileServersNotifier extends StateNotifier<AsyncValue<List<FileServer>>> {
     final FileServer item = currentServers.removeAt(oldIndex);
     currentServers.insert(newIndex, item);
     state = AsyncValue.data([...currentServers]);
+    _hasUnsavedChanges = true;
   }
 
   void restoreDefaults() {
@@ -74,6 +97,7 @@ class FileServersNotifier extends StateNotifier<AsyncValue<List<FileServer>>> {
     for (final server in state.value!) {
       _checkOnlineStatus(server);
     }
+    _hasUnsavedChanges = true;
   }
 
   /// checks if the server responds with a 200 status code
