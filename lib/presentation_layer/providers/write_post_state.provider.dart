@@ -286,6 +286,8 @@ class WritePostNotifier extends Notifier<WritePostState> {
 
     state = state.copyWith(
       isSubmitting: false,
+      isError: false,
+      errorText: '',
     );
     return;
   }
