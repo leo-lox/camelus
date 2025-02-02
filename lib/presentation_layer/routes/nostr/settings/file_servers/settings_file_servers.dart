@@ -35,9 +35,26 @@ class SettingsFileServersPageState extends ConsumerState<SettingsFileServers> {
         children: [
           Expanded(
             child: fileServersAsync.when(
-              loading: () => const Center(child: CircularProgressIndicator()),
+              loading: () => const Center(
+                  child: CircularProgressIndicator(
+                color: Palette.lightGray,
+              )),
               error: (error, stack) => Center(
-                child: Text('Error: $error'),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text('Error: $error'),
+                    const SizedBox(height: 25),
+                    longButton(
+                        inverted: true,
+                        name: "setup default servers",
+                        onPressed: () {
+                          ref
+                              .read(fileServersProvider.notifier)
+                              .restoreDefaults();
+                        })
+                  ],
+                ),
               ),
               data: (servers) => CustomScrollView(
                 slivers: [

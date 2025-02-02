@@ -1,4 +1,8 @@
+import 'package:camelus/config/default_blossom.dart';
+import 'package:camelus/presentation_layer/providers/file_upload_provider.dart';
 import 'package:riverpod/riverpod.dart';
+
+import '../../../../providers/event_signer_provider.dart';
 
 class FileServer {
   final String url;
@@ -17,12 +21,20 @@ class FileServersNotifier extends StateNotifier<AsyncValue<List<FileServer>>> {
   Future<void> loadServers() async {
     state = const AsyncValue.loading();
 
+    final signerP = ref.read(eventSignerProvider);
+
     try {
-      await Future.delayed(const Duration(seconds: 1));
-      state = AsyncValue.data([
-        FileServer(url: 'https://server1.com', isOnline: true),
-        FileServer(url: 'https://server2.com', isOnline: false),
-      ]);
+      final fetchedServers = await ref
+          .read(fileUploadProvider)
+          .getFileUploadServers([signerP!.getPublicKey()]);
+
+      if (fetchedServers == null || fetchedServers.isEmpty) {
+        state = AsyncValue.error("no servers found", StackTrace.current);
+        return;
+      }
+
+      state = AsyncValue.data(
+          fetchedServers.map((url) => FileServer(url: url)).toList());
     } catch (e, st) {
       state = AsyncValue.error(e, st);
     }
@@ -50,10 +62,8 @@ class FileServersNotifier extends StateNotifier<AsyncValue<List<FileServer>>> {
   }
 
   void restoreDefaults() {
-    state = AsyncValue.data([
-      FileServer(url: 'https://default.com', isOnline: true),
-      FileServer(url: 'https://server2.com', isOnline: false),
-    ]);
+    state = AsyncValue.data(
+        DEFAULT_BLOSSOM_SERVERS.map((url) => FileServer(url: url)).toList());
   }
 }
 
