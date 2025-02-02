@@ -35,6 +35,10 @@ class FileServersNotifier extends StateNotifier<AsyncValue<List<FileServer>>> {
 
       state = AsyncValue.data(
           fetchedServers.map((url) => FileServer(url: url)).toList());
+
+      for (final server in state.value!) {
+        _checkOnlineStatus(server);
+      }
     } catch (e, st) {
       state = AsyncValue.error(e, st);
     }
@@ -42,7 +46,9 @@ class FileServersNotifier extends StateNotifier<AsyncValue<List<FileServer>>> {
 
   void addServer(String url) {
     final currentServers = state.value ?? [];
-    state = AsyncValue.data([...currentServers, FileServer(url: url)]);
+    final newServer = FileServer(url: url);
+    state = AsyncValue.data([...currentServers, newServer]);
+    _checkOnlineStatus(newServer);
   }
 
   void removeServer(int index) {
@@ -64,6 +70,25 @@ class FileServersNotifier extends StateNotifier<AsyncValue<List<FileServer>>> {
   void restoreDefaults() {
     state = AsyncValue.data(
         DEFAULT_BLOSSOM_SERVERS.map((url) => FileServer(url: url)).toList());
+
+    for (final server in state.value!) {
+      _checkOnlineStatus(server);
+    }
+  }
+
+  /// checks if the server responds with a 200 status code
+  void _checkOnlineStatus(FileServer server) async {
+    final isOnline =
+        await ref.read(fileUploadProvider).isFileUploadServerOnline(
+              server.url,
+            );
+
+    final currentServers = state.value ?? [];
+    final serverIndex = currentServers.indexWhere((s) => s.url == server.url);
+    currentServers[serverIndex] =
+        FileServer(url: server.url, isOnline: isOnline);
+
+    state = AsyncValue.data([...currentServers]);
   }
 }
 

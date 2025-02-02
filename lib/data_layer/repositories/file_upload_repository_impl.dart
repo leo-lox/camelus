@@ -1,18 +1,21 @@
 import 'dart:io';
-import 'package:ndk/entities.dart' as ndk_entities;
 
-import 'package:camelus/data_layer/models/mem_file_model.dart';
-import 'package:camelus/domain_layer/entities/mem_file.dart';
-import 'package:camelus/domain_layer/repositories/upload_file_repository.dart';
+import 'package:ndk/entities.dart' as ndk_entities;
 import 'package:mime/mime.dart';
 
+import '../../domain_layer/entities/mem_file.dart';
+import '../../domain_layer/repositories/upload_file_repository.dart';
 import '../data_sources/dart_ndk_source.dart';
+import '../data_sources/http_request_data_source.dart';
+import '../models/mem_file_model.dart';
 
 class FileUploadRepositoryImpl implements FileUploadRepository {
   final DartNdkSource dartNdkSource;
+  final HttpRequestDataSource httpRequest;
 
   FileUploadRepositoryImpl({
     required this.dartNdkSource,
+    required this.httpRequest,
   });
 
   @override
@@ -55,5 +58,15 @@ class FileUploadRepositoryImpl implements FileUploadRepository {
     return dartNdkSource.dartNdk.blossom.userServerList.getUserServerList(
       pubkeys: pubkeys,
     );
+  }
+
+  @override
+  Future<bool> isFileUploadServerOnline(String url) async {
+    try {
+      final result = await httpRequest.getRequest(url);
+      return result.isNotEmpty;
+    } catch (e) {
+      return false;
+    }
   }
 }

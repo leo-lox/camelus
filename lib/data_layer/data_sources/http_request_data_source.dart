@@ -16,4 +16,14 @@ class HttpRequestDataSource {
     }
     return jsonDecode(response.body);
   }
+
+  Future<String> getRequest(String url) async {
+    http.Response response = await _client.get(Uri.parse(url));
+
+    if (response.statusCode != 200) {
+      return throw Exception(
+          "error fetching STATUS: ${response.statusCode}, Link: $url");
+    }
+    return response.body;
+  }
 }

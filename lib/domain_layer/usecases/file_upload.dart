@@ -24,4 +24,8 @@ class FileUpload {
   Future<List<String>?> getFileUploadServers(List<String> pubkeys) {
     return fileUploadRepository.getFileUploadServers(pubkeys);
   }
+
+  Future<bool> isFileUploadServerOnline(String url) {
+    return fileUploadRepository.isFileUploadServerOnline(url);
+  }
 }
