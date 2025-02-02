@@ -1,3 +1,5 @@
+import 'package:ndk/entities.dart' as ndk_entities;
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../domain_layer/entities/mem_file.dart';
@@ -23,7 +25,7 @@ class WritePostState {
   final bool isSubmitting;
   final bool isError;
   final String errorText;
-  final List<Future<String>> uploadTasks;
+  final List<Future<List<ndk_entities.BlobUploadResult>>> uploadTasks;
 
   final String markupText;
 
@@ -45,7 +47,7 @@ class WritePostState {
     List<String>? mentionedInPost,
     List<String>? hashtagsInPost,
     bool? isSubmitting,
-    List<Future<String>>? uploadTasks,
+    List<Future<List<ndk_entities.BlobUploadResult>>>? uploadTasks,
     String? markupText,
     bool? isError,
     String? errorText,
@@ -227,12 +229,26 @@ class WritePostNotifier extends Notifier<WritePostState> {
     // upload images
     List<String> imageUrls = [];
     for (final image in state.images) {
-      state.uploadTasks.add(ref.watch(fileUploadProvider).uploadImage(image));
+      state.uploadTasks.add(ref
+          .watch(fileUploadProvider)
+          .uploadImage(image)
+          .onError((err, trace) {
+        // display error
+        state = state.copyWith(
+          isSubmitting: false,
+          errorText: "error uploading image: ${err.toString()}",
+          isError: true,
+        );
+        return Future.error(err.toString());
+      }));
     }
 
-    //todo!: err handling
-    await Future.wait(state.uploadTasks).then((urls) {
-      imageUrls = urls;
+    await Future.wait(state.uploadTasks).then((resultList) {
+      if (resultList.isEmpty) return;
+      imageUrls = resultList
+          .where((e) => e.isNotEmpty && e.first.descriptor?.url != null)
+          .map((e) => e.first.descriptor!.url)
+          .toList();
     });
 
     // add image urls to content

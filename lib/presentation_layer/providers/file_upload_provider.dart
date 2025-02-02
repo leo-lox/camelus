@@ -1,13 +1,18 @@
-import 'package:camelus/data_layer/data_sources/nostr_build_file_upload.dart';
-import 'package:camelus/data_layer/repositories/file_upload_repository_impl.dart';
-import 'package:camelus/domain_layer/repositories/upload_file_repository.dart';
-import 'package:camelus/domain_layer/usecases/file_upload.dart';
 import 'package:riverpod/riverpod.dart';
 
+import '../../data_layer/data_sources/dart_ndk_source.dart';
+import '../../data_layer/repositories/file_upload_repository_impl.dart';
+import '../../domain_layer/usecases/file_upload.dart';
+import 'ndk_provider.dart';
+
 final fileUploadProvider = Provider<FileUpload>((ref) {
-  final nostrBuildFileUpload = NostrBuildFileUpload();
-  final FileUploadRepository fileUploadRepository =
-      FileUploadRepositoryImpl(nostrBuildFileUpload: nostrBuildFileUpload);
+  final ndk = ref.watch(ndkProvider);
+
+  final DartNdkSource dartNdkSource = DartNdkSource(ndk);
+
+  final fileUploadRepository =
+      FileUploadRepositoryImpl(dartNdkSource: dartNdkSource);
+
   final fileUpload = FileUpload(fileUploadRepository);
 
   return fileUpload;
