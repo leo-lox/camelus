@@ -20,7 +20,7 @@ import 'presentation_layer/routes/nostr/event_view/event_view_page.dart';
 import 'presentation_layer/routes/nostr/hashtag_view/hashtag_view_page.dart';
 import 'presentation_layer/routes/nostr/onboarding/onboarding.dart';
 import 'presentation_layer/routes/nostr/profile/profile_page_2.dart';
-import 'presentation_layer/routes/nostr/settings/settings_file_servers.dart';
+import 'presentation_layer/routes/nostr/settings/file_servers/settings_file_servers.dart';
 import 'presentation_layer/routes/nostr/settings/settings_page.dart';
 import 'theme.dart' as theme;
 

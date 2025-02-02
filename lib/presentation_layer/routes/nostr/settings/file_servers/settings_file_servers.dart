@@ -1,8 +1,9 @@
-import 'package:camelus/presentation_layer/atoms/long_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../config/palette.dart';
+import '../../../../../config/palette.dart';
+import '../../../../atoms/long_button.dart';
+import 'file_server_state_provider.dart';
 
 class SettingsFileServers extends ConsumerStatefulWidget {
   const SettingsFileServers({super.key});
@@ -201,66 +202,3 @@ class SettingsFileServersPageState extends ConsumerState<SettingsFileServers> {
     );
   }
 }
-
-class FileServer {
-  final String url;
-  final bool isOnline;
-
-  FileServer({required this.url, this.isOnline = false});
-}
-
-class FileServersNotifier extends StateNotifier<AsyncValue<List<FileServer>>> {
-  FileServersNotifier() : super(const AsyncValue.loading()) {
-    loadServers();
-  }
-
-  Future<void> loadServers() async {
-    state = const AsyncValue.loading();
-    try {
-      // TODO: Implement actual loading logic from your storage
-      await Future.delayed(const Duration(seconds: 1)); // Simulate loading
-      state = AsyncValue.data([
-        FileServer(url: 'https://server1.com', isOnline: true),
-        FileServer(url: 'https://server2.com', isOnline: false),
-      ]);
-    } catch (e, st) {
-      state = AsyncValue.error(e, st);
-    }
-  }
-
-  void addServer(String url) {
-    final currentServers = state.value ?? [];
-    state = AsyncValue.data([...currentServers, FileServer(url: url)]);
-    // TODO: Implement saving to storage
-  }
-
-  void removeServer(int index) {
-    final currentServers = state.value ?? [];
-    currentServers.removeAt(index);
-    state = AsyncValue.data([...currentServers]);
-    // TODO: Implement saving to storage
-  }
-
-  void reorderServers(int oldIndex, int newIndex) {
-    final currentServers = state.value ?? [];
-    if (oldIndex < newIndex) {
-      newIndex -= 1;
-    }
-    final FileServer item = currentServers.removeAt(oldIndex);
-    currentServers.insert(newIndex, item);
-    state = AsyncValue.data([...currentServers]);
-    // TODO: Implement saving to storage
-  }
-
-  void restoreDefaults() {
-    state = AsyncValue.data([
-      FileServer(url: 'https://default.com', isOnline: true),
-      FileServer(url: 'https://server2.com', isOnline: false),
-    ]);
-    // TODO: Implement saving to storage
-  }
-}
-
-final fileServersProvider =
-    StateNotifierProvider<FileServersNotifier, AsyncValue<List<FileServer>>>(
-        (ref) => FileServersNotifier());
