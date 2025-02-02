@@ -31,6 +31,10 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     Navigator.pushNamedAndRemoveUntil(context, '/onboarding', (route) => false);
   }
 
+  void _navigateToFileServers() {
+    Navigator.pushNamed(context, '/settings/file-servers');
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -41,6 +45,13 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
       ),
       body: ListView(
         children: [
+          ListTile(
+            title: const Text('file servers',
+                style: TextStyle(color: Colors.white)),
+            onTap: () {
+              _navigateToFileServers();
+            },
+          ),
           ListTile(
             title: const Text('logout', style: TextStyle(color: Colors.white)),
             onTap: () {
