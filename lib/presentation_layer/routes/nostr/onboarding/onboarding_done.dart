@@ -10,6 +10,7 @@ import 'package:ndk/entities.dart' as ndk_entities;
 import 'package:ndk/ndk.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../../../config/default_blossom.dart';
 import '../../../../config/default_relays.dart';
 import '../../../../config/palette.dart';
 import '../../../../domain_layer/entities/generated_private_key.dart';
@@ -88,23 +89,13 @@ ${_privateKey.mnemonicSentence}
   Future<void> _broadcastAcc() async {
     String? uploadedPicture;
     String? uploadedBanner;
-    final fileUploadP = ref.watch(fileUploadProvider);
-
-    if (widget.userInfo.picture != null) {
-      setState(() {
-        // add to start
-        loadingTexts.insert(0, "uploading profile picture");
-      });
-      uploadedPicture = await fileUploadP.uploadImage(widget.userInfo.picture!);
-    }
-    if (widget.userInfo.banner != null) {
-      uploadedBanner = await fileUploadP.uploadImage(widget.userInfo.banner!);
-    }
 
     final metadataP = ref.watch(metadataProvider);
     final followP = ref.watch(followingProvider);
     final inboxOutboxP = ref.read(inboxOutboxProvider);
+    final fileUploadP = ref.watch(fileUploadProvider);
 
+    // set nip65 - inbox/outbox
     final Nip65 myNip65 = Nip65(
       pubKey: _privateKey.publicKey,
       createdAt: DateTime.now().millisecondsSinceEpoch ~/ 1000,
@@ -113,6 +104,32 @@ ${_privateKey.mnemonicSentence}
 
     /// broadcast nip65
     await inboxOutboxP.setNip65data(myNip65);
+
+    /// broadcast blossom servers
+    await fileUploadP.setFileUploadServers(DEFAULT_BLOSSOM_SERVERS);
+
+    if (widget.userInfo.picture != null) {
+      setState(() {
+        // add to start
+        loadingTexts.insert(0, "uploading profile picture");
+      });
+
+      try {
+        uploadedPicture =
+            (await fileUploadP.uploadImage(widget.userInfo.picture!))[0]
+                .descriptor!
+                .url;
+      } catch (_) {}
+    }
+
+    if (widget.userInfo.banner != null) {
+      try {
+        uploadedBanner =
+            (await fileUploadP.uploadImage(widget.userInfo.banner!))[0]
+                .descriptor!
+                .url;
+      } catch (_) {}
+    }
 
     final UserMetadata userMetadata = UserMetadata(
       eventId: '',

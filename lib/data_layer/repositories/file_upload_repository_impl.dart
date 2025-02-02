@@ -40,4 +40,20 @@ class FileUploadRepositoryImpl implements FileUploadRepository {
     );
     return uploadMemFile(memFile);
   }
+
+  @override
+  Future<List<ndk_entities.RelayBroadcastResponse>> setFileUploadServers(
+    List<String> servers,
+  ) {
+    return dartNdkSource.dartNdk.blossom.userServerList.publishUserServerList(
+      serverUrlsOrdered: servers,
+    );
+  }
+
+  @override
+  Future<List<String>?> getFileUploadServers(List<String> pubkeys) {
+    return dartNdkSource.dartNdk.blossom.userServerList.getUserServerList(
+      pubkeys: pubkeys,
+    );
+  }
 }

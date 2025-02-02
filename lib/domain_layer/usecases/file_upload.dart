@@ -15,4 +15,13 @@ class FileUpload {
   Future<List<ndk_entities.BlobUploadResult>> uploadImage(MemFile file) async {
     return await fileUploadRepository.uploadMemFile(file);
   }
+
+  Future<List<ndk_entities.RelayBroadcastResponse>> setFileUploadServers(
+      List<String> servers) {
+    return fileUploadRepository.setFileUploadServers(servers);
+  }
+
+  Future<List<String>?> getFileUploadServers(List<String> pubkeys) {
+    return fileUploadRepository.getFileUploadServers(pubkeys);
+  }
 }
