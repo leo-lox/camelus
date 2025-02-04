@@ -229,25 +229,35 @@ class WritePostNotifier extends Notifier<WritePostState> {
     // upload images
     List<String> imageUrls = [];
     for (final image in state.images) {
-      state.uploadTasks.add(ref
-          .watch(fileUploadProvider)
-          .uploadImage(image)
-          .onError((err, trace) {
-        // display error
-        state = state.copyWith(
-          isSubmitting: false,
-          errorText: "error uploading image: ${err.toString()}",
-          isError: true,
-        );
-        return Future.error(err.toString());
-      }));
+      state = state.copyWith(
+        uploadTasks: [
+          ...state.uploadTasks,
+          ref
+              .watch(fileUploadProvider)
+              .uploadImage(image)
+              .onError((err, trace) {
+            // display error
+            state = state.copyWith(
+              isSubmitting: false,
+              errorText: "error uploading image: ${err.toString()}",
+              isError: true,
+            );
+            return Future.error(err.toString());
+          })
+        ],
+      );
     }
 
     await Future.wait(state.uploadTasks).then((resultList) {
       if (resultList.isEmpty) return;
       imageUrls = resultList
-          .where((e) => e.isNotEmpty && e.first.descriptor?.url != null)
-          .map((e) => e.first.descriptor!.url)
+          .where((e) =>
+              e.isNotEmpty &&
+              e.any((item) => item.descriptor?.url.isNotEmpty == true))
+          .map((e) => e
+              .firstWhere((item) => item.descriptor?.url.isNotEmpty == true)
+              .descriptor!
+              .url)
           .toList();
     });
 
@@ -288,6 +298,8 @@ class WritePostNotifier extends Notifier<WritePostState> {
       isSubmitting: false,
       isError: false,
       errorText: '',
+      images: [],
+      uploadTasks: [],
     );
     return;
   }
