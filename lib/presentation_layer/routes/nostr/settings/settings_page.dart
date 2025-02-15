@@ -34,6 +34,10 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     Navigator.pushNamed(context, '/settings/file-servers');
   }
 
+  void _navigateToInitalRoute() {
+    Navigator.pushNamed(context, '/settings/inital-route');
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -49,6 +53,13 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                 style: TextStyle(color: Colors.white)),
             onTap: () {
               _navigateToFileServers();
+            },
+          ),
+          ListTile(
+            title: const Text('Inital route',
+                style: TextStyle(color: Colors.white)),
+            onTap: () {
+              _navigateToInitalRoute();
             },
           ),
           ListTile(
