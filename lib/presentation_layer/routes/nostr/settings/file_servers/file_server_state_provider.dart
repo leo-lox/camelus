@@ -1,8 +1,8 @@
-import 'package:camelus/config/default_blossom.dart';
-import 'package:camelus/presentation_layer/providers/file_upload_provider.dart';
 import 'package:riverpod/riverpod.dart';
 
-import '../../../../providers/event_signer_provider.dart';
+import '../../../../../config/default_blossom.dart';
+import '../../../../providers/file_upload_provider.dart';
+import '../../../../providers/ndk_provider.dart';
 
 class FileServer {
   final String url;
@@ -41,12 +41,13 @@ class FileServersNotifier extends StateNotifier<AsyncValue<List<FileServer>>> {
   Future<void> loadServers() async {
     state = const AsyncValue.loading();
 
-    final signerP = ref.read(eventSignerProvider);
+    final ndk = ref.watch(ndkProvider);
+
+    final myPubkey = ndk.accounts.getPublicKey();
 
     try {
-      final fetchedServers = await ref
-          .read(fileUploadProvider)
-          .getFileUploadServers([signerP!.getPublicKey()]);
+      final fetchedServers =
+          await ref.read(fileUploadProvider).getFileUploadServers([myPubkey!]);
 
       if (fetchedServers == null || fetchedServers.isEmpty) {
         state = AsyncValue.error("no servers found", StackTrace.current);

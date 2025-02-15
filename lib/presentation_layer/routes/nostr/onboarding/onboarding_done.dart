@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:math';
 
 import 'package:camelus/presentation_layer/components/full_screen_loading.dart';
+import 'package:camelus/presentation_layer/providers/ndk_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -21,7 +22,6 @@ import '../../../../domain_layer/entities/user_metadata.dart';
 import '../../../../domain_layer/usecases/generate_private_key.dart';
 import '../../../atoms/long_button.dart';
 import '../../../atoms/mnemonic_grid.dart';
-import '../../../providers/event_signer_provider.dart';
 import '../../../providers/file_upload_provider.dart';
 import '../../../providers/following_provider.dart';
 import '../../../providers/inbox_outbox_provider.dart';
@@ -188,7 +188,7 @@ ${_privateKey.mnemonicSentence}
       publicKey: myKeyPair.publicKey,
     );
 
-    ref.read(eventSignerProvider.notifier).setSigner(bip340Signer);
+    ref.read(ndkProvider).accounts.loginExternalSigner(signer: bip340Signer);
 
     // save in storage
     const storage = FlutterSecureStorage();

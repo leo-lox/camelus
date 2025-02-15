@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:camelus/presentation_layer/providers/metadata_state_provider.dart';
+import 'package:camelus/presentation_layer/providers/ndk_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
@@ -20,9 +21,7 @@ import '../../../atoms/my_profile_picture.dart';
 import '../../../atoms/nip_05_text.dart';
 import '../../../components/generic_feed.dart';
 import '../../../components/starter_packs/starter_packs_list.dart';
-import '../../../providers/event_signer_provider.dart';
 import '../../../providers/following_provider.dart';
-import '../../../providers/metadata_provider.dart';
 import '../blockedUsers/block_page.dart';
 import 'follower_page.dart';
 
@@ -37,9 +36,9 @@ class ProfilePage2 extends ConsumerWidget {
   Widget build(BuildContext context, ref) {
     final myMetadata = ref.watch(metadataStateProvider(pubkey)).userMetadata;
 
-    final mySigner = ref.watch(eventSignerProvider);
+    final ndk = ref.watch(ndkProvider);
 
-    final myPubkey = mySigner?.getPublicKey();
+    final myPubkey = ndk.accounts.getPublicKey();
 
     final bool isOwnProfile = myPubkey == pubkey;
 

@@ -7,9 +7,9 @@ import '../../domain_layer/entities/nostr_note.dart';
 import '../../domain_layer/entities/nostr_tag.dart';
 import '../../helpers/nprofile_helper.dart';
 import 'edit_relays_provider.dart';
-import 'event_signer_provider.dart';
 import 'file_upload_provider.dart';
 import 'get_notes_provider.dart';
+import 'ndk_provider.dart';
 
 final writePostStateProvider =
     NotifierProvider<WritePostNotifier, WritePostState>(
@@ -269,12 +269,12 @@ class WritePostNotifier extends Notifier<WritePostState> {
 
     final notesP = ref.read(getNotesProvider);
 
-    final signerP = ref.read(eventSignerProvider);
-    if (signerP == null) {
+    final ndk = ref.read(ndkProvider);
+    if (ndk.accounts.cannotSign) {
       state = state.copyWith(isSubmitting: false);
       return Future.error('no signer');
     }
-    final pubkey = signerP.getPublicKey();
+    final pubkey = ndk.accounts.getPublicKey()!;
 
     final int now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
 

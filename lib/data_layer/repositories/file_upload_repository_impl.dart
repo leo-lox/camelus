@@ -48,14 +48,14 @@ class FileUploadRepositoryImpl implements FileUploadRepository {
   Future<List<ndk_entities.RelayBroadcastResponse>> setFileUploadServers(
     List<String> servers,
   ) {
-    return dartNdkSource.dartNdk.blossom.userServerList.publishUserServerList(
+    return dartNdkSource.dartNdk.blossomUserServerList.publishUserServerList(
       serverUrlsOrdered: servers,
     );
   }
 
   @override
   Future<List<String>?> getFileUploadServers(List<String> pubkeys) {
-    return dartNdkSource.dartNdk.blossom.userServerList.getUserServerList(
+    return dartNdkSource.dartNdk.blossomUserServerList.getUserServerList(
       pubkeys: pubkeys,
     );
   }

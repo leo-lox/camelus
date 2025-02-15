@@ -1,18 +1,16 @@
-import 'package:camelus/helpers/helpers.dart';
-import 'package:camelus/helpers/nevent_helper.dart';
-import 'package:camelus/helpers/nprofile_helper.dart';
-import 'package:camelus/presentation_layer/atoms/follow_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../config/palette.dart';
 import '../../../domain_layer/entities/nostr_list.dart';
+import '../../../helpers/helpers.dart';
+import '../../../helpers/nprofile_helper.dart';
 import '../../atoms/long_button.dart';
 import '../../atoms/my_profile_picture.dart';
-import '../../providers/event_signer_provider.dart';
 import '../../providers/inbox_outbox_provider.dart';
 import '../../providers/metadata_state_provider.dart';
+import '../../providers/ndk_provider.dart';
 import '../../routes/nostr/profile/profile_page_2.dart';
 
 class OpenStarterPack extends ConsumerWidget {
@@ -57,9 +55,9 @@ class OpenStarterPack extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final mySigner = ref.watch(eventSignerProvider);
+    final ndk = ref.watch(ndkProvider);
 
-    final myPubkey = mySigner?.getPublicKey();
+    final myPubkey = ndk.accounts.getPublicKey();
 
     final bool isOwnStarterPack = myPubkey == followSet.pubKey;
 

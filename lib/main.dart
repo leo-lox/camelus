@@ -3,6 +3,7 @@ import 'dart:ui';
 
 import 'package:camelus/presentation_layer/providers/db_ndk_provider.dart';
 import 'package:camelus/presentation_layer/providers/inbox_outbox_provider.dart';
+import 'package:camelus/presentation_layer/providers/ndk_provider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -14,7 +15,6 @@ import 'package:ndk/ndk.dart';
 import 'package:ndk_objectbox/ndk_objectbox.dart';
 import 'deep_links.dart';
 import 'domain_layer/usecases/app_auth.dart';
-import 'presentation_layer/providers/event_signer_provider.dart';
 import 'presentation_layer/routes/home_page.dart';
 import 'presentation_layer/routes/nostr/blockedUsers/blocked_users.dart';
 import 'presentation_layer/routes/nostr/event_view/event_view_page.dart';
@@ -70,7 +70,10 @@ Future<void> main() async {
 
   // we have a signer, so we can set it
   if (mySigner != null) {
-    providerContainer.read(eventSignerProvider.notifier).setSigner(mySigner);
+    /// ndk login
+    providerContainer.read(ndkProvider).accounts.loginExternalSigner(
+          signer: mySigner,
+        );
 
     /// get fresh nip65 data on startup
     final myPubkey = mySigner.getPublicKey();
