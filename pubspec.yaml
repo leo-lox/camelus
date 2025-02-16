@@ -89,12 +89,13 @@ dependencies:
 
 dependency_overrides:
   ndk:
-    path: ../ndk/packages/ndk
-    #git:
-    #  url: https://github.com/relaystr/ndk.git
+    #path: ../ndk/packages/ndk
+    git:
+      url: https://github.com/relaystr/ndk.git
+      path: packages/ndk
     #  ref: isar
-  ndk_rust_verifier:
-    path: ../ndk/packages/rust_verifier
+  #ndk_rust_verifier:
+  #  path: ../ndk/packages/rust_verifier
   #ndk_amber:
   #  path: ../ndk/packages/amber
 
