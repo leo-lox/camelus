@@ -10,22 +10,22 @@ import 'package:badges/badges.dart' as badges;
 import '../../../../config/palette.dart';
 import '../../../../domain_layer/entities/contact_list.dart';
 import '../../../../domain_layer/entities/feed_filter.dart';
-import '../../../../domain_layer/entities/user_metadata.dart';
 
 import '../../../atoms/my_profile_picture.dart';
 import '../../../components/generic_feed.dart';
 import '../../../providers/following_provider.dart';
-import '../../../providers/metadata_provider.dart';
 import '../relays_page.dart';
 
 class NostrPage extends ConsumerStatefulWidget {
   final GlobalKey<ScaffoldState> parentScaffoldKey;
   final String pubkey;
+  final String? initialTab;
 
   const NostrPage({
     super.key,
     required this.parentScaffoldKey,
     required this.pubkey,
+    this.initialTab,
   });
 
   @override
@@ -82,6 +82,7 @@ class _NostrPageState extends ConsumerState<NostrPage>
             return GenericFeed(
               key: PageStorageKey('homeFeed-${widget.pubkey}'),
               floatHeaderSlivers: true,
+              initialTab: widget.initialTab == "/post-and-replies" ? 1 : 0,
               customHeaderSliverBuilder:
                   (BuildContext context, bool innerBoxIsScrolled) {
                 return <Widget>[

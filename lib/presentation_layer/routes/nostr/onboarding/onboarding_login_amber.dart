@@ -8,7 +8,7 @@ import '../../../../config/amber_url.dart';
 import '../../../../config/palette.dart';
 import '../../../../domain_layer/usecases/app_auth.dart';
 import '../../../atoms/long_button.dart';
-import '../../../providers/event_signer_provider.dart';
+import '../../../providers/ndk_provider.dart';
 import '../../home_page.dart';
 
 class OnboardingLoginAmberPage extends ConsumerStatefulWidget {
@@ -60,7 +60,7 @@ class _OnboardingLoginAmberPageState
 
     final amberSigner = await AppAuth.amberRegister();
 
-    ref.read(eventSignerProvider.notifier).setSigner(amberSigner);
+    ref.read(ndkProvider).accounts.loginExternalSigner(signer: amberSigner);
 
     setState(() {});
 

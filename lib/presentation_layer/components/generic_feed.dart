@@ -24,12 +24,15 @@ class GenericFeed extends ConsumerStatefulWidget {
 
   final List<Widget> additionalTabViews;
 
+  final int? initialTab;
+
   const GenericFeed({
     super.key,
     this.customHeaderSliverBuilder,
     this.floatHeaderSlivers = false,
     required this.feedFilter,
     this.additionalTabViews = const [],
+    this.initialTab,
   });
 
   @override
@@ -84,6 +87,7 @@ class _GenericFeedState extends ConsumerState<GenericFeed> {
         ref.watch(genericFeedStateProvider(widget.feedFilter).notifier);
 
     return DefaultTabController(
+      initialIndex: widget.initialTab ?? 0,
       length: 2 +
           widget.additionalTabViews
               .length, // Two tabs for Posts and Posts with Replies

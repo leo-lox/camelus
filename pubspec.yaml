@@ -79,23 +79,25 @@ dependencies:
   app_links: ^6.3.2
   phosphor_flutter: ^2.1.0
   ## ndk imnports
-  ndk: ^0.1.3
-  ndk_rust_verifier: ^0.1.3
-  ndk_amber: ^0.1.3
+  ndk: ^0.2.6
+  ndk_rust_verifier: ^0.2.1
+  ndk_amber: ^0.2.0
+  ndk_objectbox: ^0.2.1
   image: ^4.3.0
   
 
 
 dependency_overrides:
   ndk:
-    path: ../ndk/packages/ndk
-    #git:
-    #  url: https://github.com/relaystr/ndk.git
+    #path: ../ndk/packages/ndk
+    git:
+      url: https://github.com/relaystr/ndk.git
+      path: packages/ndk
     #  ref: isar
-  ndk_rust_verifier:
-    path: ../ndk/packages/rust_verifier
-  ndk_amber:
-    path: ../ndk/packages/amber
+  #ndk_rust_verifier:
+  #  path: ../ndk/packages/rust_verifier
+  #ndk_amber:
+  #  path: ../ndk/packages/amber
 
 
 

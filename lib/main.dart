@@ -3,6 +3,7 @@ import 'dart:ui';
 
 import 'package:camelus/presentation_layer/providers/db_ndk_provider.dart';
 import 'package:camelus/presentation_layer/providers/inbox_outbox_provider.dart';
+import 'package:camelus/presentation_layer/providers/ndk_provider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -10,16 +11,19 @@ import 'package:flutter_mentions/flutter_mentions.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ndk/ndk.dart';
 //import 'package:device_preview/device_preview.dart';
-import 'data_layer/db/object_box_ndk/db_object_box.dart';
+//import 'data_layer/db/object_box_ndk/db_object_box.dart';
+import 'package:ndk_objectbox/ndk_objectbox.dart';
 import 'deep_links.dart';
 import 'domain_layer/usecases/app_auth.dart';
-import 'presentation_layer/providers/event_signer_provider.dart';
+import 'presentation_layer/providers/db_app_provider.dart';
 import 'presentation_layer/routes/home_page.dart';
 import 'presentation_layer/routes/nostr/blockedUsers/blocked_users.dart';
 import 'presentation_layer/routes/nostr/event_view/event_view_page.dart';
 import 'presentation_layer/routes/nostr/hashtag_view/hashtag_view_page.dart';
 import 'presentation_layer/routes/nostr/onboarding/onboarding.dart';
 import 'presentation_layer/routes/nostr/profile/profile_page_2.dart';
+import 'presentation_layer/routes/nostr/settings/file_servers/settings_file_servers.dart';
+import 'presentation_layer/routes/nostr/settings/inital_route/inital_route_settings.dart';
 import 'presentation_layer/routes/nostr/settings/settings_page.dart';
 import 'theme.dart' as theme;
 
@@ -30,17 +34,17 @@ Future<List<dynamic>> _getInitialData() async {
   final mySigner = await AppAuth.getEventSigner();
 
   if (mySigner == null) {
-    var initialRoute = '/onboarding';
+    final initialRoute = '/onboarding';
 
     return [initialRoute, null];
   }
 
-  return ['/', mySigner];
+  return [null, mySigner];
 }
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  var initalData = await _getInitialData();
+  final initalData = await _getInitialData();
 
   // currently incompatible with recent flutter sdk https://github.com/aloisdeniel/flutter_device_preview/issues/244
   // if (kDebugMode && devDeviceFrame) {
@@ -68,7 +72,10 @@ Future<void> main() async {
 
   // we have a signer, so we can set it
   if (mySigner != null) {
-    providerContainer.read(eventSignerProvider.notifier).setSigner(mySigner);
+    /// ndk login
+    providerContainer.read(ndkProvider).accounts.loginExternalSigner(
+          signer: mySigner,
+        );
 
     /// get fresh nip65 data on startup
     final myPubkey = mySigner.getPublicKey();
@@ -81,6 +88,18 @@ Future<void> main() async {
 
   final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
+  final String initalRoute;
+
+  // get inital route
+  if (initalData[0] != null) {
+    initalRoute = initalData[0];
+  } else {
+    final appDb = providerContainer.read(dbAppProvider);
+
+    final savedRoute = await appDb.read('initalRoute');
+    initalRoute = savedRoute ?? '/';
+  }
+
   listenDeeplinks(
     navigatorKey: navigatorKey,
     providerContainer: providerContainer,
@@ -91,7 +110,7 @@ Future<void> main() async {
       container: providerContainer,
       child: MyApp(
         navigatorKey: navigatorKey,
-        initialRoute: initalData[0],
+        initialRoute: initalRoute,
         pubkey: mySigner?.getPublicKey() ?? '',
       ),
     ),
@@ -130,8 +149,12 @@ class MyApp extends StatelessWidget {
         onGenerateRoute: (RouteSettings settings) {
           switch (settings.name) {
             case '/':
+            case '/post-and-replies':
               return CupertinoPageRoute(builder: (context) {
-                return HomePage(pubkey: pubkey);
+                return HomePage(
+                  pubkey: pubkey,
+                  initialTab: settings.name,
+                );
               });
 
             case '/onboarding':
@@ -142,6 +165,14 @@ class MyApp extends StatelessWidget {
             case '/settings':
               return MaterialPageRoute(
                 builder: (context) => const SettingsPage(),
+              );
+            case '/settings/file-servers':
+              return MaterialPageRoute(
+                builder: (context) => const SettingsFileServers(),
+              );
+            case '/settings/inital-route':
+              return MaterialPageRoute(
+                builder: (context) => const InitalRouteSettings(),
               );
             case '/nostr/event':
               return CupertinoPageRoute(

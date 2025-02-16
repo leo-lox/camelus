@@ -1,3 +1,5 @@
+import 'package:ndk/entities.dart' as ndk_entities;
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../domain_layer/entities/mem_file.dart';
@@ -5,9 +7,9 @@ import '../../domain_layer/entities/nostr_note.dart';
 import '../../domain_layer/entities/nostr_tag.dart';
 import '../../helpers/nprofile_helper.dart';
 import 'edit_relays_provider.dart';
-import 'event_signer_provider.dart';
 import 'file_upload_provider.dart';
 import 'get_notes_provider.dart';
+import 'ndk_provider.dart';
 
 final writePostStateProvider =
     NotifierProvider<WritePostNotifier, WritePostState>(
@@ -23,7 +25,7 @@ class WritePostState {
   final bool isSubmitting;
   final bool isError;
   final String errorText;
-  final List<Future<String>> uploadTasks;
+  final List<Future<List<ndk_entities.BlobUploadResult>>> uploadTasks;
 
   final String markupText;
 
@@ -45,7 +47,7 @@ class WritePostState {
     List<String>? mentionedInPost,
     List<String>? hashtagsInPost,
     bool? isSubmitting,
-    List<Future<String>>? uploadTasks,
+    List<Future<List<ndk_entities.BlobUploadResult>>>? uploadTasks,
     String? markupText,
     bool? isError,
     String? errorText,
@@ -227,12 +229,36 @@ class WritePostNotifier extends Notifier<WritePostState> {
     // upload images
     List<String> imageUrls = [];
     for (final image in state.images) {
-      state.uploadTasks.add(ref.watch(fileUploadProvider).uploadImage(image));
+      state = state.copyWith(
+        uploadTasks: [
+          ...state.uploadTasks,
+          ref
+              .watch(fileUploadProvider)
+              .uploadImage(image)
+              .onError((err, trace) {
+            // display error
+            state = state.copyWith(
+              isSubmitting: false,
+              errorText: "error uploading image: ${err.toString()}",
+              isError: true,
+            );
+            return Future.error(err.toString());
+          })
+        ],
+      );
     }
 
-    //todo!: err handling
-    await Future.wait(state.uploadTasks).then((urls) {
-      imageUrls = urls;
+    await Future.wait(state.uploadTasks).then((resultList) {
+      if (resultList.isEmpty) return;
+      imageUrls = resultList
+          .where((e) =>
+              e.isNotEmpty &&
+              e.any((item) => item.descriptor?.url.isNotEmpty == true))
+          .map((e) => e
+              .firstWhere((item) => item.descriptor?.url.isNotEmpty == true)
+              .descriptor!
+              .url)
+          .toList();
     });
 
     // add image urls to content
@@ -243,12 +269,12 @@ class WritePostNotifier extends Notifier<WritePostState> {
 
     final notesP = ref.read(getNotesProvider);
 
-    final signerP = ref.read(eventSignerProvider);
-    if (signerP == null) {
+    final ndk = ref.read(ndkProvider);
+    if (ndk.accounts.cannotSign) {
       state = state.copyWith(isSubmitting: false);
       return Future.error('no signer');
     }
-    final pubkey = signerP.getPublicKey();
+    final pubkey = ndk.accounts.getPublicKey()!;
 
     final int now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
 
@@ -270,6 +296,10 @@ class WritePostNotifier extends Notifier<WritePostState> {
 
     state = state.copyWith(
       isSubmitting: false,
+      isError: false,
+      errorText: '',
+      images: [],
+      uploadTasks: [],
     );
     return;
   }

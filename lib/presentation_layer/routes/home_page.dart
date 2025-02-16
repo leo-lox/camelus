@@ -20,7 +20,13 @@ import '../providers/app_update_provider.dart';
 
 class HomePage extends ConsumerStatefulWidget {
   final String pubkey;
-  const HomePage({super.key, required this.pubkey});
+  final String? initialTab;
+
+  const HomePage({
+    super.key,
+    required this.pubkey,
+    this.initialTab,
+  });
 
   @override
   ConsumerState<HomePage> createState() => _HomePageState();
@@ -132,6 +138,7 @@ class _HomePageState extends ConsumerState<HomePage> {
             NostrPage(
               parentScaffoldKey: _scaffoldKey,
               pubkey: widget.pubkey,
+              initialTab: widget.initialTab,
             ),
             const SearchPage(),
             const NotificationPage(),
