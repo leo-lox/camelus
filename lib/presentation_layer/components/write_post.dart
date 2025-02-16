@@ -149,6 +149,11 @@ class _WritePostState extends ConsumerState<WritePost> {
     super.initState();
     // focus text field
     _focusNode.requestFocus();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref
+          .read(writePostStateProvider.notifier)
+          .updateReplyToNote(widget.context?.replyToNote);
+    });
   }
 
   @override
@@ -167,7 +172,7 @@ class _WritePostState extends ConsumerState<WritePost> {
   @override
   Widget build(BuildContext context) {
     final writePostState = ref.watch(writePostStateProvider);
-    final writePostNotifier = ref.read(writePostStateProvider.notifier);
+    final writePostNotifier = ref.watch(writePostStateProvider.notifier);
 
     return Column(
       mainAxisSize: MainAxisSize.min,

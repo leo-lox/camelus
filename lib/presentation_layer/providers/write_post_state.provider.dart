@@ -304,6 +304,10 @@ class WritePostNotifier extends Notifier<WritePostState> {
     return;
   }
 
+  void updateReplyToNote(NostrNote? replyToNote) {
+    state = state.copyWith(replyToNote: replyToNote);
+  }
+
   @override
   WritePostState build() {
     return WritePostState(markupText: "");
