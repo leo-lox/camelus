@@ -926,9 +926,10 @@ packages:
   ndk_amber:
     dependency: "direct main"
     description:
-      path: "../ndk/packages/amber"
-      relative: true
-    source: path
+      name: ndk_amber
+      sha256: "8624bf6e92aac7ea8aa77287d38d9da3a2db3ad9707ef1f0336138dfee49196c"
+      url: "https://pub.dev"
+    source: hosted
     version: "0.2.0"
   ndk_objectbox:
     dependency: "direct main"

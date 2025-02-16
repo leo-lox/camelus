@@ -95,8 +95,8 @@ dependency_overrides:
     #  ref: isar
   ndk_rust_verifier:
     path: ../ndk/packages/rust_verifier
-  ndk_amber:
-    path: ../ndk/packages/amber
+  #ndk_amber:
+  #  path: ../ndk/packages/amber
 
 
 
