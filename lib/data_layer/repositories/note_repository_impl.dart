@@ -126,9 +126,11 @@ class NoteRepositoryImpl implements NoteRepository {
       timeout: Duration(seconds: 15),
     );
 
-    return response.stream.map(
-      (event) => NostrNoteModel.fromNDKEvent(event),
-    );
+    return response.stream
+        .map(
+          (event) => NostrNoteModel.fromNDKEvent(event),
+        )
+        .asBroadcastStream();
   }
 
   @override

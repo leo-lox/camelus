@@ -919,11 +919,9 @@ packages:
   ndk:
     dependency: "direct main"
     description:
-      path: "packages/ndk"
-      ref: HEAD
-      resolved-ref: d925e7720552870d6e1d325fb8e4e652e735635d
-      url: "https://github.com/relaystr/ndk.git"
-    source: git
+      path: "../ndk/packages/ndk"
+      relative: true
+    source: path
     version: "0.2.6"
   ndk_amber:
     dependency: "direct main"
