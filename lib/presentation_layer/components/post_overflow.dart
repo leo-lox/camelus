@@ -6,6 +6,7 @@ class PostOverflowIndicator extends StatelessWidget {
   final int maxLength;
   final double size;
   final int warningThreshold;
+  final int maxDisplayedNumber;
 
   const PostOverflowIndicator({
     super.key,
@@ -13,6 +14,7 @@ class PostOverflowIndicator extends StatelessWidget {
     this.maxLength = 280,
     this.size = 24.0,
     this.warningThreshold = 20,
+    this.maxDisplayedNumber = 99,
   });
 
   @override
@@ -23,6 +25,7 @@ class PostOverflowIndicator extends StatelessWidget {
     final double fillPercentage =
         isOverLimit ? 1.0 : (characterCount / maxLength);
 
+    // Determine color based on state
     final Color indicatorColor = isOverLimit
         ? Palette.error
         : (isApproachingLimit ? Colors.orange : Palette.primary);
@@ -30,6 +33,14 @@ class PostOverflowIndicator extends StatelessWidget {
     final Color borderColor = isOverLimit
         ? Palette.error
         : (isApproachingLimit ? Colors.orange : Palette.gray);
+
+    // Calculate the number to display
+    final int numberToDisplay =
+        isOverLimit ? characterCount - maxLength : maxLength - characterCount;
+
+    // Determine if we should show the number
+    final bool showNumber = (isOverLimit || isApproachingLimit) &&
+        numberToDisplay <= maxDisplayedNumber;
 
     return Container(
       width: size,
@@ -50,16 +61,20 @@ class PostOverflowIndicator extends StatelessWidget {
             valueColor: AlwaysStoppedAnimation<Color>(indicatorColor),
             strokeWidth: 3,
           ),
-          if (isOverLimit || isApproachingLimit)
+          if (showNumber)
             Text(
-              isOverLimit
-                  ? '-${characterCount - maxLength}'
-                  : '${maxLength - characterCount}',
+              isOverLimit ? '-$numberToDisplay' : '$numberToDisplay',
               style: TextStyle(
                 color: indicatorColor,
                 fontWeight: FontWeight.bold,
                 fontSize: size * 0.4,
               ),
+            ),
+          if (!showNumber && isOverLimit)
+            Icon(
+              Icons.warning,
+              color: indicatorColor,
+              size: size * 0.6,
             ),
         ],
       ),
