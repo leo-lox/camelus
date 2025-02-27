@@ -1,5 +1,6 @@
 import 'package:camelus/domain_layer/entities/user_metadata.dart';
 import 'package:camelus/domain_layer/usecases/get_user_metadata.dart';
+import 'package:camelus/presentation_layer/atoms/long_button.dart';
 import 'package:camelus/presentation_layer/components/images_tile_view.dart';
 import 'package:camelus/presentation_layer/components/note_card/note_card_reference.dart';
 import 'package:camelus/config/palette.dart';
@@ -41,10 +42,19 @@ class _NoteCardSplitContentState extends ConsumerState<NoteCardSplitContent> {
   late Set<String> _profileHexIdentifiers;
   final Map<String, WidgetSpan> _memoizedNoteReferences = {};
 
+  bool _isExpanded = false;
+  final double _collapsedHeight = 250.0;
+  bool _shouldShowButton = false;
+
   @override
   void initState() {
     super.initState();
     _parseContent();
+
+    // Check if content needs "Show More" button after first layout
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _checkIfContentExceedsHeight();
+    });
   }
 
   @override
@@ -52,7 +62,38 @@ class _NoteCardSplitContentState extends ConsumerState<NoteCardSplitContent> {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.note.id != widget.note.id) {
       _parseContent();
+      _isExpanded = false;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _checkIfContentExceedsHeight();
+      });
     }
+  }
+
+  void _checkIfContentExceedsHeight() {
+    // Calculate the total content height
+    final textHeight = _calculateTextHeight(widget.note.content);
+    final imageHeight = _imageLinks.isEmpty ? 0 : 200; // Image height + spacing
+    final totalHeight = textHeight + imageHeight;
+
+    // If content exceeds collapsed height, show the button; + image height so post with images get more space
+    if (totalHeight > _collapsedHeight + imageHeight) {
+      setState(() {
+        _shouldShowButton = true;
+      });
+    }
+  }
+
+  double _calculateTextHeight(String text) {
+    final TextPainter textPainter = TextPainter(
+      text: TextSpan(
+        text: text,
+        style: const TextStyle(color: Palette.lightGray, fontSize: 17),
+      ),
+      maxLines: null,
+      textDirection: TextDirection.ltr,
+    )..layout(maxWidth: MediaQuery.of(context).size.width - 60);
+
+    return textPainter.height;
   }
 
   void _parseContent() {
@@ -74,17 +115,71 @@ class _NoteCardSplitContentState extends ConsumerState<NoteCardSplitContent> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text.rich(
-          TextSpan(
-              children: _buildContentSpans(
-            widget.note.content,
-            metadataMap,
-          )),
-          style: const TextStyle(color: Palette.lightGray, fontSize: 17),
+        // Constrained content container
+        ConstrainedBox(
+          constraints: BoxConstraints(
+            // Only apply max height when not expanded AND content needs to be constrained
+            maxHeight: (!_isExpanded && _shouldShowButton)
+                ? _collapsedHeight
+                : double.infinity,
+          ),
+          child: ClipRect(
+            // Only clip when not expanded and should show button
+
+            clipBehavior:
+                (!_isExpanded && _shouldShowButton) ? Clip.hardEdge : Clip.none,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text.rich(
+                  TextSpan(
+                    children: _buildContentSpans(
+                      widget.note.content,
+                      metadataMap,
+                    ),
+                  ),
+                  style:
+                      const TextStyle(color: Palette.lightGray, fontSize: 17),
+                  maxLines: _isExpanded
+                      ? null
+                      : null, // Let it flow naturally within constraint
+                  overflow: TextOverflow.clip,
+                ),
+                if (_imageLinks.isNotEmpty) ...[
+                  const SizedBox(height: 8),
+                  ImagesTileView(images: _imageLinks),
+                ],
+              ],
+            ),
+          ),
         ),
-        if (_imageLinks.isNotEmpty) ...[
+
+        // Show More button if needed
+        if (_shouldShowButton) ...[
           const SizedBox(height: 8),
-          ImagesTileView(images: _imageLinks),
+          GestureDetector(
+            onTap: () {
+              setState(() {
+                _isExpanded = !_isExpanded;
+              });
+            },
+            child: Center(
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+                decoration: BoxDecoration(
+                  color: Palette.primary.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  _isExpanded ? "Show Less" : "Show More",
+                  style: const TextStyle(
+                    color: Palette.primary,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+          ),
         ],
       ],
     );
