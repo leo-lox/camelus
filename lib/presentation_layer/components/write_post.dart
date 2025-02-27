@@ -1,6 +1,8 @@
 import 'dart:developer';
 import 'dart:io';
 
+import 'package:image_picker/image_picker.dart';
+
 import 'package:camelus/domain_layer/entities/user_metadata.dart';
 import 'package:camelus/presentation_layer/atoms/picture.dart';
 
@@ -39,29 +41,23 @@ class _WritePostState extends ConsumerState<WritePost> {
   List<Map<String, dynamic>> _mentionsSearchResultsHashTags = [];
 
   _addImage() async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles(
-      allowMultiple: false,
-      type: FileType.image,
-      dialogTitle: "select image",
-    );
+    final ImagePicker picker = ImagePicker();
+    final result = await picker.pickMultiImage();
 
-    if (result != null) {
-      try {
-        final myImage = await RemoveImageMetadata.fileToMemFile(
-            File(result.files.single.path!));
+    try {
+      for (final image in result) {
+        final myImage =
+            await RemoveImageMetadata.fileToMemFile(File(image.path));
         ref.read(writePostStateProvider.notifier).addImage(myImage);
-      } catch (e) {
-        if (!mounted) return;
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('unspoorted image format'),
-          ),
-        );
       }
-    } else {
-      // User canceled the picker
-      return;
+    } catch (e) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('unspoorted image format'),
+        ),
+      );
     }
   }
 

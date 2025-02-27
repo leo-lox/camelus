@@ -48,7 +48,8 @@ dependencies:
   url_launcher: ^6.1.7
   lottie: ^3.0.0
   flutter_launcher_icons: ^0.14.1
-  file_picker: ^8.0.0+1
+  file_picker: ^9.0.2
+  image_picker: ^1.1.2
   mime: ^2.0.0
   flutter_mentions: ^2.0.1
   photo_view: ^0.15.0
