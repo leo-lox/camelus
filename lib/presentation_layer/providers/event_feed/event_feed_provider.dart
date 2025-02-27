@@ -2,13 +2,12 @@ import 'dart:async';
 
 import 'package:riverpod/riverpod.dart';
 import 'package:ndk/entities.dart' as ndk_entities;
-import 'package:ndk/ndk.dart' as ndk;
 import 'package:rxdart/rxdart.dart';
 
-import '../../domain_layer/entities/feed_event_view_model.dart';
-import '../../domain_layer/usecases/event_feed.dart';
-import '../../helpers/helpers.dart';
-import 'get_notes_provider.dart';
+import '../../../domain_layer/entities/feed_event_view_model.dart';
+import 'replies_tree.dart';
+import '../../../helpers/helpers.dart';
+import '../get_notes_provider.dart';
 
 /// Riverpod NotifierProvider for managing the state of a specific event feed.
 /// [String] represents the root event ID.
@@ -103,7 +102,7 @@ class EventFeedState
         .listen((replies) {
       state = state.copyWith(
         unprocessedCommentsSet: {...state.unprocessedCommentsSet, ...replies},
-        comments: EventFeed.buildRepliesTree(
+        comments: RepliesTree.buildRepliesTree(
           rootNoteId: rootNoteId,
           replies: [...state.unprocessedCommentsSet, ...replies],
         ),
@@ -133,7 +132,7 @@ class EventFeedState
         .listen((replies) {
       state = state.copyWith(
         unprocessedCommentsSet: {...state.unprocessedCommentsSet, ...replies},
-        comments: EventFeed.buildRepliesTree(
+        comments: RepliesTree.buildRepliesTree(
           rootNoteId: rootNoteId,
           replies: [...state.unprocessedCommentsSet, ...replies],
         ),
