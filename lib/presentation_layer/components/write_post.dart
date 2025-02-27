@@ -21,6 +21,7 @@ import '../../config/default_suggestions.dart';
 
 import '../../domain_layer/usecases/remove_image_metadata.dart';
 import '../providers/write_post_state.provider.dart';
+import 'post_overflow.dart';
 
 class WritePost extends ConsumerStatefulWidget {
   final PostContext? context;
@@ -304,6 +305,7 @@ class _WritePostState extends ConsumerState<WritePost> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             // add image
             TextButton(
@@ -330,6 +332,14 @@ class _WritePostState extends ConsumerState<WritePost> {
             //),
 
             // on bottom
+            Padding(
+              padding: const EdgeInsets.only(right: 20),
+              child: PostOverflowIndicator(
+                characterCount:
+                    ref.watch(writePostStateProvider).markupText.length,
+                maxLength: 280,
+              ),
+            ),
           ],
         ),
       ],
@@ -536,6 +546,7 @@ class _TopBar extends ConsumerWidget {
               ),
             ],
           ),
+
         // if submitLoading is true, show spinner
         !submitLoading
             ? TextButton(
