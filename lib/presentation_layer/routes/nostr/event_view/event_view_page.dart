@@ -11,7 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../components/comments_section.dart';
-import '../../../providers/event_feed_provider.dart';
+import '../../../providers/event_feed/event_feed_provider.dart';
 
 class EventViewPage extends ConsumerStatefulWidget {
   final String? _openNoteId;
@@ -104,22 +104,10 @@ class _EventViewPageState extends ConsumerState<EventViewPage> {
 
           final event = eventFeedState.comments[index - 1];
 
-          if (index <= eventFeedState.comments.length) {
-            return CommentSection(
-              key: ObjectKey(event),
-              comment: event,
-            );
-          }
-          if (index == eventFeedState.comments.length + 1) {
-            SkeletonNote(
-              renderCallback: () {
-                print("load more event");
-                //   ref
-                //       .read(eventFeedStateProvider(widget._rootNoteId).notifier)
-                //       .loadMore();
-              },
-            );
-          }
+          return CommentSection(
+            key: ObjectKey(event),
+            comment: event,
+          );
         },
       ),
     );

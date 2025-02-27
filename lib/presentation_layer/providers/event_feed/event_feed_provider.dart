@@ -2,12 +2,12 @@ import 'dart:async';
 
 import 'package:riverpod/riverpod.dart';
 import 'package:ndk/entities.dart' as ndk_entities;
-import 'package:ndk/ndk.dart' as ndk;
 import 'package:rxdart/rxdart.dart';
 
-import '../../domain_layer/entities/feed_event_view_model.dart';
-import '../../domain_layer/usecases/event_feed.dart';
-import 'get_notes_provider.dart';
+import '../../../domain_layer/entities/feed_event_view_model.dart';
+import 'replies_tree.dart';
+import '../../../helpers/helpers.dart';
+import '../get_notes_provider.dart';
 
 /// Riverpod NotifierProvider for managing the state of a specific event feed.
 /// [String] represents the root event ID.
@@ -24,6 +24,8 @@ class EventFeedState
   // Stream subscriptions for root note and comment notes.
   StreamSubscription? _rootNoteSub;
   StreamSubscription? _commentNotesSub;
+
+  String threadId = "thr-${Helpers().getRandomString(10)}";
 
   /// Resets the state and disposes of active resources like stream subscriptions.
   Future<void> resetStateDispose() async {
@@ -49,21 +51,18 @@ class EventFeedState
     /// auto dispose delay
     final link = ref.keepAlive();
     Timer? timer;
-    //ref.onDispose(() => timer?.cancel());
+
     ref.onCancel(() {
-      print("### EventFeedState canceled");
-      //todo: stop subscription
+      _cancelNewNotesSub();
       timer = Timer(Duration(minutes: 2), () => link.close());
     });
     ref.onResume(() {
-      // todo: resume subscription
-      print("### EventFeedState resumed");
+      _subNewNotes(arg);
       timer?.cancel();
     });
 
     // Ensures that resources are cleaned up when the notifier is disposed.
     ref.onDispose(() {
-      print("### EventFeedState disposed");
       resetStateDispose();
       timer?.cancel();
     });
@@ -84,7 +83,7 @@ class EventFeedState
     final notesP = ref.watch(getNotesProvider);
     // Subscribes to updates for the root note.
 
-    final sub = notesP.getNote(rootNoteId).listen((rootNote) {
+    _rootNoteSub = notesP.getNote(rootNoteId).listen((rootNote) {
       // Updates the root note in the state.
       state = state.copyWith(rootNote: rootNote);
     });
@@ -103,14 +102,48 @@ class EventFeedState
         .listen((replies) {
       state = state.copyWith(
         unprocessedCommentsSet: {...state.unprocessedCommentsSet, ...replies},
-        comments: EventFeed.buildRepliesTree(
+        comments: RepliesTree.buildRepliesTree(
           rootNoteId: rootNoteId,
           replies: [...state.unprocessedCommentsSet, ...replies],
         ),
       );
     }).onDone(() {
       /// setup subscription for new replies
-      print("### Replies stream done");
+      _subNewNotes(rootNoteId);
     });
+  }
+
+  /// Subcribes to new notes for the given root note ID.
+  _subNewNotes(String rootNoteId) {
+    final notesP = ref.watch(getNotesProvider);
+    final now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
+
+    final repliesStream = notesP.genericNostrSubscription(
+      subscriptionId: "replies-sub-$threadId",
+      eTags: [rootNoteId],
+      kinds: [ndk_entities.Nip01Event.kTextNodeKind],
+      since: state.comments.isNotEmpty
+          ? state.comments.last.value.created_at + 1 // +1 to avoid duplicates
+          : now,
+    );
+    _commentNotesSub = repliesStream
+        .bufferTime(const Duration(seconds: 1))
+        .where((events) => events.isNotEmpty)
+        .listen((replies) {
+      state = state.copyWith(
+        unprocessedCommentsSet: {...state.unprocessedCommentsSet, ...replies},
+        comments: RepliesTree.buildRepliesTree(
+          rootNoteId: rootNoteId,
+          replies: [...state.unprocessedCommentsSet, ...replies],
+        ),
+      );
+    });
+  }
+
+  _cancelNewNotesSub() {
+    final notesP = ref.watch(getNotesProvider);
+    notesP.closeSubscription("replies-sub-$threadId");
+
+    _commentNotesSub?.cancel();
   }
 }

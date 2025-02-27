@@ -1,6 +1,6 @@
 import 'package:camelus/domain_layer/entities/nostr_note.dart';
 import 'package:camelus/domain_layer/entities/nostr_tag.dart';
-import 'package:camelus/domain_layer/usecases/event_feed.dart';
+import 'package:camelus/presentation_layer/providers/event_feed/replies_tree.dart';
 import 'package:test/test.dart';
 
 void main() {
@@ -115,7 +115,7 @@ void main() {
     ];
 
     test('test building tree', () {
-      final tree = EventFeed.buildRepliesTree(
+      final tree = RepliesTree.buildRepliesTree(
         rootNoteId: rootNote.id,
         replies: allValidReplies,
       );
