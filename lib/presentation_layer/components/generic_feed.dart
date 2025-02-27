@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter_list_view/flutter_list_view.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../config/palette.dart';
@@ -186,9 +187,9 @@ class ScrollablePostsList extends ConsumerWidget {
     final genericFeedStateNoti =
         ref.read(genericFeedStateProvider(feedFilter).notifier);
 
-    return _BuildScrollablePostsList(
-      itemCount: genericFeedStateP.timelineRootNotes.length + 1,
-      itemBuilder: (context, index) {
+    return FlutterListView(
+        delegate: FlutterListViewDelegate(
+      (BuildContext context, int index) {
         if (index == genericFeedStateP.timelineRootNotes.length) {
           if (genericFeedStateP.endOfRootNotes) {
             return NoMoreNotes();
@@ -213,7 +214,8 @@ class ScrollablePostsList extends ConsumerWidget {
         }
         return Container();
       },
-    );
+      childCount: genericFeedStateP.timelineRootNotes.length + 1,
+    ));
   }
 }
 
@@ -232,9 +234,9 @@ class ScrollablePostsAndRepliesList extends ConsumerWidget {
     final genericFeedStateNoti =
         ref.read(genericFeedStateProvider(feedFilter).notifier);
 
-    return _BuildScrollablePostsList(
-      itemCount: genericFeedStateP.timelineRootAndReplyNotes.length + 1,
-      itemBuilder: (context, index) {
+    return FlutterListView(
+        delegate: FlutterListViewDelegate(
+      (BuildContext context, int index) {
         if (index == genericFeedStateP.timelineRootAndReplyNotes.length) {
           if (genericFeedStateP.endOfRootAndReplyNotes) {
             return NoMoreNotes();
@@ -262,40 +264,7 @@ class ScrollablePostsAndRepliesList extends ConsumerWidget {
         }
         return Container();
       },
-    );
-  }
-}
-
-// Common scrollable list builder for posts and replies
-class _BuildScrollablePostsList extends StatelessWidget {
-  final Widget Function(BuildContext, int) itemBuilder;
-  final int itemCount;
-
-  const _BuildScrollablePostsList({
-    super.key,
-    required this.itemBuilder,
-    required this.itemCount,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return CustomScrollView(
-      slivers: [
-        SliverOverlapInjector(
-          handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
-        ),
-        SliverPadding(
-          padding: EdgeInsets.all(0.0),
-          sliver: SliverList(
-            delegate: SliverChildBuilderDelegate(
-              (BuildContext context, int index) {
-                return itemBuilder(context, index);
-              },
-              childCount: itemCount,
-            ),
-          ),
-        ),
-      ],
-    );
+      childCount: genericFeedStateP.timelineRootAndReplyNotes.length + 1,
+    ));
   }
 }
