@@ -24,11 +24,13 @@ class GenericFeed extends ConsumerStatefulWidget {
   final bool floatHeaderSlivers;
 
   final List<Widget> additionalTabViews;
+  final EdgeInsets? feedPadding;
 
   final int? initialTab;
 
   const GenericFeed({
     super.key,
+    this.feedPadding,
     this.customHeaderSliverBuilder,
     this.floatHeaderSlivers = false,
     required this.feedFilter,
@@ -117,55 +119,59 @@ class _GenericFeedState extends ConsumerState<GenericFeed> {
                 ),
               ];
             },
-        body: TabBarView(
-          children: [
-            // Tab 1: Display posts
-            Stack(
-              children: [
-                RefreshIndicatorNoNeed(
-                  onRefresh: () async {
-                    await Future.delayed(Duration.zero);
-                  },
-                  child: ScrollablePostsList(feedFilter: widget.feedFilter),
-                ),
-                if (genericFeedStateP.newRootNotes.isNotEmpty)
-                  newPostsAvailable(
-                    name: "${genericFeedStateP.newRootNotes.length} new posts",
-                    onPressed: () {
-                      genericFeedStateNotifier.integrateNewNotes();
-                      _scrollToTop();
+        body: Padding(
+          padding: widget.feedPadding ?? EdgeInsets.zero,
+          child: TabBarView(
+            children: [
+              // Tab 1: Display posts
+              Stack(
+                children: [
+                  RefreshIndicatorNoNeed(
+                    onRefresh: () async {
+                      await Future.delayed(Duration.zero);
                     },
+                    child: ScrollablePostsList(feedFilter: widget.feedFilter),
                   ),
-              ],
-            ),
-            // Tab 2: Display posts with replies
-            Stack(
-              children: [
-                RefreshIndicatorNoNeed(
-                  onRefresh: () async {
-                    await Future.delayed(Duration.zero);
-                  },
-                  child: ScrollablePostsAndRepliesList(
-                      feedFilter: widget.feedFilter),
-                ),
-                if (genericFeedStateP.newRootAndReplyNotes.isNotEmpty)
-                  Positioned(
-                    top: 20,
-                    left: 0,
-                    right: 0,
-                    child: newPostsAvailable(
+                  if (genericFeedStateP.newRootNotes.isNotEmpty)
+                    newPostsAvailable(
                       name:
-                          "${genericFeedStateP.newRootAndReplyNotes.length} new posts",
+                          "${genericFeedStateP.newRootNotes.length} new posts",
                       onPressed: () {
                         genericFeedStateNotifier.integrateNewNotes();
                         _scrollToTop();
                       },
                     ),
+                ],
+              ),
+              // Tab 2: Display posts with replies
+              Stack(
+                children: [
+                  RefreshIndicatorNoNeed(
+                    onRefresh: () async {
+                      await Future.delayed(Duration.zero);
+                    },
+                    child: ScrollablePostsAndRepliesList(
+                        feedFilter: widget.feedFilter),
                   ),
-              ],
-            ),
-            ...widget.additionalTabViews,
-          ],
+                  if (genericFeedStateP.newRootAndReplyNotes.isNotEmpty)
+                    Positioned(
+                      top: 20,
+                      left: 0,
+                      right: 0,
+                      child: newPostsAvailable(
+                        name:
+                            "${genericFeedStateP.newRootAndReplyNotes.length} new posts",
+                        onPressed: () {
+                          genericFeedStateNotifier.integrateNewNotes();
+                          _scrollToTop();
+                        },
+                      ),
+                    ),
+                ],
+              ),
+              ...widget.additionalTabViews,
+            ],
+          ),
         ),
       ),
     );
