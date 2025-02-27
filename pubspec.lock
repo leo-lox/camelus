@@ -560,6 +560,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "5.0.0"
+  flutter_list_view:
+    dependency: "direct main"
+    description:
+      name: flutter_list_view
+      sha256: "7fb70adb9ef41393bc65a26fc2e3e3a498f808063bb9242bf63fd492624bf319"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.1.29"
   flutter_mentions:
     dependency: "direct main"
     description:

@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter_list_view/flutter_list_view.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../config/palette.dart';
@@ -23,11 +24,13 @@ class GenericFeed extends ConsumerStatefulWidget {
   final bool floatHeaderSlivers;
 
   final List<Widget> additionalTabViews;
+  final EdgeInsets? feedPadding;
 
   final int? initialTab;
 
   const GenericFeed({
     super.key,
+    this.feedPadding,
     this.customHeaderSliverBuilder,
     this.floatHeaderSlivers = false,
     required this.feedFilter,
@@ -116,55 +119,59 @@ class _GenericFeedState extends ConsumerState<GenericFeed> {
                 ),
               ];
             },
-        body: TabBarView(
-          children: [
-            // Tab 1: Display posts
-            Stack(
-              children: [
-                RefreshIndicatorNoNeed(
-                  onRefresh: () async {
-                    await Future.delayed(Duration.zero);
-                  },
-                  child: ScrollablePostsList(feedFilter: widget.feedFilter),
-                ),
-                if (genericFeedStateP.newRootNotes.isNotEmpty)
-                  newPostsAvailable(
-                    name: "${genericFeedStateP.newRootNotes.length} new posts",
-                    onPressed: () {
-                      genericFeedStateNotifier.integrateNewNotes();
-                      _scrollToTop();
+        body: Padding(
+          padding: widget.feedPadding ?? EdgeInsets.zero,
+          child: TabBarView(
+            children: [
+              // Tab 1: Display posts
+              Stack(
+                children: [
+                  RefreshIndicatorNoNeed(
+                    onRefresh: () async {
+                      await Future.delayed(Duration.zero);
                     },
+                    child: ScrollablePostsList(feedFilter: widget.feedFilter),
                   ),
-              ],
-            ),
-            // Tab 2: Display posts with replies
-            Stack(
-              children: [
-                RefreshIndicatorNoNeed(
-                  onRefresh: () async {
-                    await Future.delayed(Duration.zero);
-                  },
-                  child: ScrollablePostsAndRepliesList(
-                      feedFilter: widget.feedFilter),
-                ),
-                if (genericFeedStateP.newRootAndReplyNotes.isNotEmpty)
-                  Positioned(
-                    top: 20,
-                    left: 0,
-                    right: 0,
-                    child: newPostsAvailable(
+                  if (genericFeedStateP.newRootNotes.isNotEmpty)
+                    newPostsAvailable(
                       name:
-                          "${genericFeedStateP.newRootAndReplyNotes.length} new posts",
+                          "${genericFeedStateP.newRootNotes.length} new posts",
                       onPressed: () {
                         genericFeedStateNotifier.integrateNewNotes();
                         _scrollToTop();
                       },
                     ),
+                ],
+              ),
+              // Tab 2: Display posts with replies
+              Stack(
+                children: [
+                  RefreshIndicatorNoNeed(
+                    onRefresh: () async {
+                      await Future.delayed(Duration.zero);
+                    },
+                    child: ScrollablePostsAndRepliesList(
+                        feedFilter: widget.feedFilter),
                   ),
-              ],
-            ),
-            ...widget.additionalTabViews,
-          ],
+                  if (genericFeedStateP.newRootAndReplyNotes.isNotEmpty)
+                    Positioned(
+                      top: 20,
+                      left: 0,
+                      right: 0,
+                      child: newPostsAvailable(
+                        name:
+                            "${genericFeedStateP.newRootAndReplyNotes.length} new posts",
+                        onPressed: () {
+                          genericFeedStateNotifier.integrateNewNotes();
+                          _scrollToTop();
+                        },
+                      ),
+                    ),
+                ],
+              ),
+              ...widget.additionalTabViews,
+            ],
+          ),
         ),
       ),
     );
@@ -186,9 +193,9 @@ class ScrollablePostsList extends ConsumerWidget {
     final genericFeedStateNoti =
         ref.read(genericFeedStateProvider(feedFilter).notifier);
 
-    return _BuildScrollablePostsList(
-      itemCount: genericFeedStateP.timelineRootNotes.length + 1,
-      itemBuilder: (context, index) {
+    return FlutterListView(
+        delegate: FlutterListViewDelegate(
+      (BuildContext context, int index) {
         if (index == genericFeedStateP.timelineRootNotes.length) {
           if (genericFeedStateP.endOfRootNotes) {
             return NoMoreNotes();
@@ -213,7 +220,8 @@ class ScrollablePostsList extends ConsumerWidget {
         }
         return Container();
       },
-    );
+      childCount: genericFeedStateP.timelineRootNotes.length + 1,
+    ));
   }
 }
 
@@ -232,9 +240,9 @@ class ScrollablePostsAndRepliesList extends ConsumerWidget {
     final genericFeedStateNoti =
         ref.read(genericFeedStateProvider(feedFilter).notifier);
 
-    return _BuildScrollablePostsList(
-      itemCount: genericFeedStateP.timelineRootAndReplyNotes.length + 1,
-      itemBuilder: (context, index) {
+    return FlutterListView(
+        delegate: FlutterListViewDelegate(
+      (BuildContext context, int index) {
         if (index == genericFeedStateP.timelineRootAndReplyNotes.length) {
           if (genericFeedStateP.endOfRootAndReplyNotes) {
             return NoMoreNotes();
@@ -262,40 +270,7 @@ class ScrollablePostsAndRepliesList extends ConsumerWidget {
         }
         return Container();
       },
-    );
-  }
-}
-
-// Common scrollable list builder for posts and replies
-class _BuildScrollablePostsList extends StatelessWidget {
-  final Widget Function(BuildContext, int) itemBuilder;
-  final int itemCount;
-
-  const _BuildScrollablePostsList({
-    super.key,
-    required this.itemBuilder,
-    required this.itemCount,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return CustomScrollView(
-      slivers: [
-        SliverOverlapInjector(
-          handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
-        ),
-        SliverPadding(
-          padding: EdgeInsets.all(0.0),
-          sliver: SliverList(
-            delegate: SliverChildBuilderDelegate(
-              (BuildContext context, int index) {
-                return itemBuilder(context, index);
-              },
-              childCount: itemCount,
-            ),
-          ),
-        ),
-      ],
-    );
+      childCount: genericFeedStateP.timelineRootAndReplyNotes.length + 1,
+    ));
   }
 }
