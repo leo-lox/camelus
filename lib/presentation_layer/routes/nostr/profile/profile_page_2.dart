@@ -45,7 +45,8 @@ class ProfilePage2 extends ConsumerWidget {
     return Scaffold(
       backgroundColor: Palette.background,
       body: GenericFeed(
-        feedPadding: EdgeInsets.only(top: 48),
+        feedPadding:
+            EdgeInsets.only(top: MediaQuery.of(context).padding.top + 48),
         additionalTabViews: [
           StarterPacksList(
             pubkey: pubkey,
