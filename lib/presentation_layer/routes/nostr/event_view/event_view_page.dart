@@ -104,10 +104,22 @@ class _EventViewPageState extends ConsumerState<EventViewPage> {
 
           final event = eventFeedState.comments[index - 1];
 
-          return CommentSection(
-            key: ObjectKey(event),
-            comment: event,
-          );
+          if (index <= eventFeedState.comments.length) {
+            return CommentSection(
+              key: ObjectKey(event),
+              comment: event,
+            );
+          }
+          if (index == eventFeedState.comments.length + 1) {
+            SkeletonNote(
+              renderCallback: () {
+                print("load more event");
+                //   ref
+                //       .read(eventFeedStateProvider(widget._rootNoteId).notifier)
+                //       .loadMore();
+              },
+            );
+          }
         },
       ),
     );
