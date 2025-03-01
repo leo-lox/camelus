@@ -100,11 +100,13 @@ class EventFeedState
         .bufferTime(const Duration(milliseconds: 700))
         .where((events) => events.isNotEmpty)
         .listen((replies) {
+      final newSet = {...state.unprocessedCommentsSet, ...replies};
+
       state = state.copyWith(
-        unprocessedCommentsSet: {...state.unprocessedCommentsSet, ...replies},
+        unprocessedCommentsSet: newSet,
         comments: RepliesTree.buildRepliesTree(
           rootNoteId: rootNoteId,
-          replies: [...state.unprocessedCommentsSet, ...replies],
+          replies: newSet.toList(), // avoids duplicates
         ),
       );
     }).onDone(() {
