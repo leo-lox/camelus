@@ -1048,10 +1048,9 @@ packages:
   ndk_rust_verifier:
     dependency: "direct main"
     description:
-      name: ndk_rust_verifier
-      sha256: "36da57c1e65d85065e225430bfb7f949fb314adf4153e0047b2ed75893c3476e"
-      url: "https://pub.dev"
-    source: hosted
+      path: "../ndk/packages/rust_verifier"
+      relative: true
+    source: path
     version: "0.2.3"
   node_preamble:
     dependency: transitive
