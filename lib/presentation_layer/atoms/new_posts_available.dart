@@ -161,7 +161,7 @@ Widget newPostsAvailable({
       onDismissed: onDismissed,
       dismissThreshold: dismissThreshold,
       child: Padding(
-        padding: const EdgeInsets.only(top: 20),
+        padding: const EdgeInsets.only(top: 15),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
