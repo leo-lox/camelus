@@ -1,13 +1,11 @@
 import 'dart:async';
 import 'dart:developer';
-import 'package:camelus/domain_layer/usecases/get_notes.dart';
-import 'package:camelus/presentation_layer/atoms/refresh_indicator_no_need.dart';
 import 'package:camelus/presentation_layer/components/note_card/note_card_container.dart';
 import 'package:camelus/config/palette.dart';
 import 'package:camelus/domain_layer/entities/nostr_note.dart';
 import 'package:camelus/presentation_layer/components/note_card/skeleton_note.dart';
-import 'package:camelus/presentation_layer/providers/get_notes_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_list_view/flutter_list_view.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../components/comments_section.dart';
@@ -25,21 +23,17 @@ class EventViewPage extends ConsumerStatefulWidget {
         _rootNoteId = rootNoteId;
 
   @override
-  _EventViewPageState createState() => _EventViewPageState();
+  EventViewPageState createState() => EventViewPageState();
 }
 
-class _EventViewPageState extends ConsumerState<EventViewPage> {
-  late GetNotes _getNotes;
-
+class EventViewPageState extends ConsumerState<EventViewPage> {
   Stream<List<NostrNote>> notesStream = Stream.empty();
 
   late final ScrollController _scrollControllerFeed = ScrollController();
 
-  final Completer<void> _servicesReady = Completer<void>();
-
   final String eventFeedFreshId = "fresh";
 
-  NostrNote? _lastNoteInFeed;
+  late FlutterListViewController eventViewController;
 
   void _setupScrollListener() {
     _scrollControllerFeed.addListener(() {
@@ -60,20 +54,20 @@ class _EventViewPageState extends ConsumerState<EventViewPage> {
   }
 
   Future<void> _initSequence() async {
-    _getNotes = ref.read(getNotesProvider);
     _setupScrollListener();
   }
 
   @override
   void initState() {
     super.initState();
+    eventViewController = FlutterListViewController();
     _initSequence();
   }
 
   @override
   void dispose() {
     _scrollControllerFeed.dispose();
-
+    eventViewController.dispose();
     super.dispose();
   }
 
@@ -89,26 +83,30 @@ class _EventViewPageState extends ConsumerState<EventViewPage> {
         backgroundColor: Palette.background,
         title: const Text("thread"),
       ),
-      body: ListView.builder(
-        controller: _scrollControllerFeed,
-        itemCount: eventFeedState.comments.length + 1,
-        itemBuilder: (context, index) {
-          if (index == 0) {
-            return eventFeedState.rootNote != null
-                ? NoteCardContainer(
-                    note: eventFeedState.rootNote!,
-                    key: ValueKey(widget._rootNoteId),
-                  )
-                : const SkeletonNote();
-          }
+      body: FlutterListView(
+        controller: eventViewController,
+        delegate: FlutterListViewDelegate(
+          childCount: eventFeedState.comments.length + 1,
+          // onItemKey: (index) => eventFeedState.comments[index].value.id,
+          // keepPosition: true,
+          (BuildContext context, int index) {
+            if (index == 0) {
+              return eventFeedState.rootNote != null
+                  ? NoteCardContainer(
+                      note: eventFeedState.rootNote!,
+                      key: ValueKey(widget._rootNoteId),
+                    )
+                  : const SkeletonNote();
+            }
 
-          final event = eventFeedState.comments[index - 1];
+            final event = eventFeedState.comments[index - 1];
 
-          return CommentSection(
-            key: ObjectKey(event),
-            comment: event,
-          );
-        },
+            return CommentSection(
+              key: ObjectKey(event),
+              comment: event,
+            );
+          },
+        ),
       ),
     );
   }
