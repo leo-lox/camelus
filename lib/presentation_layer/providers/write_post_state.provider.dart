@@ -44,6 +44,7 @@ class WritePostState {
   copyWith({
     List<MemFile>? images,
     NostrNote? replyToNote,
+    bool clearReplyToNote = false,
     List<String>? mentionedInPost,
     List<String>? hashtagsInPost,
     bool? isSubmitting,
@@ -54,7 +55,7 @@ class WritePostState {
   }) {
     return WritePostState(
       images: images ?? this.images,
-      replyToNote: replyToNote ?? this.replyToNote,
+      replyToNote: clearReplyToNote ? null : (replyToNote ?? this.replyToNote),
       mentionedInPost: mentionedInPost ?? this.mentionedInPost,
       hashtagsInPost: hashtagsInPost ?? this.hashtagsInPost,
       isSubmitting: isSubmitting ?? this.isSubmitting,
@@ -294,17 +295,30 @@ class WritePostNotifier extends Notifier<WritePostState> {
       return Future.error('Error broadcasting note: $e');
     }
 
-    state = state.copyWith(
-      isSubmitting: false,
-      isError: false,
-      errorText: '',
-      images: [],
-      uploadTasks: [],
-    );
+    clearPost();
     return;
   }
 
+  void clearPost() {
+    state = state.copyWith(
+      errorText: '',
+      isError: false,
+      isSubmitting: false,
+      uploadTasks: [],
+      clearReplyToNote: true,
+      markupText: '',
+      images: [],
+      mentionedInPost: [],
+      hashtagsInPost: [],
+      replyToNote: null,
+    );
+  }
+
   void updateReplyToNote(NostrNote? replyToNote) {
+    if (replyToNote == null) {
+      state = state.copyWith(clearReplyToNote: true);
+      return;
+    }
     state = state.copyWith(replyToNote: replyToNote);
   }
 

@@ -33,7 +33,7 @@ class WritePost extends ConsumerStatefulWidget {
 }
 
 class _WritePostState extends ConsumerState<WritePost> {
-  final TextEditingController _textEditingController = TextEditingController();
+  //final TextEditingController _textEditingController = TextEditingController();
   final GlobalKey<FlutterMentionsState> _textEditingControllerKey =
       GlobalKey<FlutterMentionsState>();
   final FocusNode _focusNode = FocusNode();
@@ -150,6 +150,9 @@ class _WritePostState extends ConsumerState<WritePost> {
       ref
           .read(writePostStateProvider.notifier)
           .updateReplyToNote(widget.context?.replyToNote);
+
+      _textEditingControllerKey.currentState?.controller?.text =
+          ref.read(writePostStateProvider).markupText;
     });
   }
 
@@ -161,7 +164,7 @@ class _WritePostState extends ConsumerState<WritePost> {
 
   @override
   void dispose() {
-    _textEditingController.dispose();
+    //_textEditingController.dispose();
     _focusNode.dispose();
     super.dispose();
   }
@@ -506,14 +509,19 @@ class _TopBar extends ConsumerWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
+        /// close button
         TextButton(
           onPressed: (() {
+            ref.read(writePostStateProvider.notifier).clearPost();
             Navigator.pop(context);
           }),
           child: SvgPicture.asset(
             height: 25,
             'assets/icons/x.svg',
-            color: Palette.gray,
+            colorFilter: const ColorFilter.mode(
+              Palette.gray,
+              BlendMode.srcIn,
+            ),
           ),
         ),
         if (replyToPubkey == null)
