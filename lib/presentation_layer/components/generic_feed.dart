@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_list_view/flutter_list_view.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../config/feeds_config.dart';
 import '../../config/palette.dart';
 import '../../domain_layer/entities/feed_filter.dart';
 import '../atoms/new_posts_available.dart';
@@ -47,6 +48,8 @@ class _GenericFeedState extends ConsumerState<GenericFeed> {
   late ScrollController _scrollController; // Controller for scrolling behavior
   late StreamSubscription<void> _homeBarSub; // Subscription to home tab events
 
+  final newPostsController = SwipeableFadeOutController();
+
   // Scroll to the top of the feed
   _scrollToTop() {
     _scrollController.animateTo(
@@ -54,6 +57,13 @@ class _GenericFeedState extends ConsumerState<GenericFeed> {
       duration: const Duration(milliseconds: 500),
       curve: Curves.easeOutCubic,
     );
+  }
+
+  _newPostControllerDismissed() {
+    // don't bother the user for x minutes
+    Future.delayed(NEW_POSTS_DISMISS_SLEEP, () {
+      newPostsController.reset();
+    });
   }
 
   @override
@@ -134,12 +144,15 @@ class _GenericFeedState extends ConsumerState<GenericFeed> {
                   ),
                   if (genericFeedStateP.newRootNotes.isNotEmpty)
                     newPostsAvailable(
+                      controller: newPostsController,
+                      dismissThreshold: NEW_POSTS_DISMISS_THRESHOLD,
                       name:
                           "${genericFeedStateP.newRootNotes.length} new posts",
                       onPressed: () {
                         genericFeedStateNotifier.integrateNewNotes();
                         _scrollToTop();
                       },
+                      onDismissed: _newPostControllerDismissed,
                     ),
                 ],
               ),
@@ -159,6 +172,9 @@ class _GenericFeedState extends ConsumerState<GenericFeed> {
                       left: 0,
                       right: 0,
                       child: newPostsAvailable(
+                        controller: newPostsController,
+                        onDismissed: _newPostControllerDismissed,
+                        dismissThreshold: NEW_POSTS_DISMISS_THRESHOLD,
                         name:
                             "${genericFeedStateP.newRootAndReplyNotes.length} new posts",
                         onPressed: () {
