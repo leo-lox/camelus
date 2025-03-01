@@ -5,7 +5,7 @@ class SwipeableFadeOut extends StatefulWidget {
   final Widget child;
   final Function? onDismissed;
   final double dismissThreshold;
-  final Function? onReset; // New reset callback
+  final Function? onReset;
 
   const SwipeableFadeOut({
     super.key,
