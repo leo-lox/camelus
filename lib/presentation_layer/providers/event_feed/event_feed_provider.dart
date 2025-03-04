@@ -54,7 +54,8 @@ class EventFeedState
 
     ref.onCancel(() {
       _cancelNewNotesSub();
-      timer = Timer(Duration(minutes: 2), () => link.close());
+      //! debug
+      timer = Timer(Duration(minutes: 0), () => link.close());
     });
     ref.onResume(() {
       _subNewNotes(arg);
@@ -120,23 +121,30 @@ class EventFeedState
     final notesP = ref.watch(getNotesProvider);
     final now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
 
+    // find oldest comment in unprocessedCommentsSet
+    final oldestComment = state.unprocessedCommentsSet.isNotEmpty
+        ? state.unprocessedCommentsSet
+            .reduce((a, b) => a.created_at < b.created_at ? a : b)
+        : null;
+
     final repliesStream = notesP.genericNostrSubscription(
       subscriptionId: "replies-sub-$threadId",
       eTags: [rootNoteId],
       kinds: [ndk_entities.Nip01Event.kTextNodeKind],
-      since: state.comments.isNotEmpty
-          ? state.comments.last.value.created_at + 1 // +1 to avoid duplicates
+      since: oldestComment != null
+          ? oldestComment.created_at + 1 // +1 to avoid duplicates
           : now,
     );
     _commentNotesSub = repliesStream
         .bufferTime(const Duration(seconds: 1))
         .where((events) => events.isNotEmpty)
         .listen((replies) {
+      final newSet = {...state.unprocessedCommentsSet, ...replies};
       state = state.copyWith(
-        unprocessedCommentsSet: {...state.unprocessedCommentsSet, ...replies},
+        unprocessedCommentsSet: newSet,
         comments: RepliesTree.buildRepliesTree(
           rootNoteId: rootNoteId,
-          replies: [...state.unprocessedCommentsSet, ...replies],
+          replies: newSet.toList(),
         ),
       );
     });
