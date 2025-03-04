@@ -54,8 +54,7 @@ class EventFeedState
 
     ref.onCancel(() {
       _cancelNewNotesSub();
-      //! debug
-      timer = Timer(Duration(minutes: 0), () => link.close());
+      timer = Timer(Duration(minutes: 2), () => link.close());
     });
     ref.onResume(() {
       _subNewNotes(arg);
