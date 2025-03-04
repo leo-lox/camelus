@@ -1025,10 +1025,10 @@ packages:
     description:
       path: "packages/ndk"
       ref: HEAD
-      resolved-ref: a9a987e54945571539c38e1ba3ed7e303da0061a
+      resolved-ref: "04e29d4bf80ba47497d695cf741928b8985ef330"
       url: "https://github.com/relaystr/ndk.git"
     source: git
-    version: "0.3.0"
+    version: "0.3.1"
   ndk_amber:
     dependency: "direct main"
     description:
@@ -1048,9 +1048,11 @@ packages:
   ndk_rust_verifier:
     dependency: "direct main"
     description:
-      path: "../ndk/packages/rust_verifier"
-      relative: true
-    source: path
+      path: "packages/rust_verifier"
+      ref: HEAD
+      resolved-ref: "04e29d4bf80ba47497d695cf741928b8985ef330"
+      url: "https://github.com/relaystr/ndk.git"
+    source: git
     version: "0.2.3"
   node_preamble:
     dependency: transitive
