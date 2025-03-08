@@ -44,8 +44,12 @@ class _SearchFeedPageState extends State<SearchFeedPage> {
       // Navigate to a new SearchFeedPage with the new query
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(
-          builder: (context) => SearchFeedPage(query: value.trim()),
+        PageRouteBuilder(
+          pageBuilder: (context, animation, secondaryAnimation) =>
+              SearchFeedPage(query: value.trim()),
+          // no animation
+          transitionDuration: Duration.zero,
+          reverseTransitionDuration: Duration.zero,
         ),
       );
     }
@@ -75,31 +79,33 @@ class _SearchFeedPageState extends State<SearchFeedPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Palette.background,
-      body: Column(
-        children: [
-          SearchBarWidget(
-            onSearchChanged: _onSearchChanged,
-            onSubmit: _onSubmit,
-            helpSearch: _helpSearch,
-            externalFocusNode: _searchFocusNode,
-            externalController: _searchController,
-            leading: IconButton(
-              icon: Icon(PhosphorIcons.arrowLeft()),
-              onPressed: () {
-                Navigator.pop(context);
-              },
-            ),
-          ),
-          Expanded(
-            child: GenericFeed(
-              feedFilter: FeedFilter(
-                feedId: "search-feed-${_currentQuery}",
-                kinds: [1, 6],
-                search: _currentQuery,
+      body: SafeArea(
+        child: Column(
+          children: [
+            SearchBarWidget(
+              onSearchChanged: _onSearchChanged,
+              onSubmit: _onSubmit,
+              helpSearch: _helpSearch,
+              externalFocusNode: _searchFocusNode,
+              externalController: _searchController,
+              leading: IconButton(
+                icon: Icon(PhosphorIcons.arrowLeft()),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
               ),
             ),
-          ),
-        ],
+            Expanded(
+              child: GenericFeed(
+                feedFilter: FeedFilter(
+                  feedId: "search-feed-${_currentQuery}",
+                  kinds: [1, 6],
+                  search: _currentQuery,
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

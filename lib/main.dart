@@ -195,9 +195,11 @@ class MyApp extends StatelessWidget {
                     HastagViewPage(hashtag: settings.arguments as String),
               );
             case '/nostr/search':
-              return MaterialPageRoute(
-                builder: (context) =>
+              return PageRouteBuilder(
+                pageBuilder: (context, animation, secondaryAnimation) =>
                     SearchFeedPage(query: settings.arguments as String),
+                transitionDuration: Duration.zero,
+                reverseTransitionDuration: Duration.zero,
               );
             case '/nostr/blockedUsers':
               return MaterialPageRoute(
