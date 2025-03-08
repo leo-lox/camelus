@@ -82,8 +82,8 @@ class SearchStateNotifier extends StateNotifier<SearchState> {
     state = state.copyWith(searchResultsNotes: notes);
   }
 
-  void clearSearch() {
-    state = SearchState();
+  void clearSearch({bool stillSearching = false}) {
+    state = SearchState(isSearching: stillSearching);
   }
 }
 
@@ -152,7 +152,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
     ref.read(searchStateProvider.notifier).setSearchQuery(value);
 
     if (value.isEmpty) {
-      ref.read(searchStateProvider.notifier).clearSearch();
+      ref.read(searchStateProvider.notifier).clearSearch(stillSearching: true);
       return;
     }
 
