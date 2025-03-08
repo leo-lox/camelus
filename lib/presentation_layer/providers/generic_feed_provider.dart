@@ -65,6 +65,7 @@ class GenericFeedState
       authors: filter.authors,
       eTags: filter.eTags,
       tTags: filter.tTags,
+      search: filter.search,
     );
 
     // Buffer notes for processing in batches
@@ -112,6 +113,7 @@ class GenericFeedState
       tTags: filter.tTags,
       limit: limit,
       until: cutoff,
+      search: filter.search,
     );
   }
 

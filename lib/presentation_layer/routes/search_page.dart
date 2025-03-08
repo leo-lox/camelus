@@ -174,8 +174,10 @@ class _SearchPageState extends ConsumerState<SearchPage> {
 
   void _onSubmit(String value) {
     if (value.startsWith('#')) {
-      var hashtag = value.substring(1);
+      final hashtag = value.substring(1);
       Navigator.pushNamed(context, '/nostr/hastag', arguments: hashtag);
+    } else {
+      Navigator.pushNamed(context, '/nostr/search', arguments: value);
     }
   }
 
@@ -258,7 +260,9 @@ class _SearchPageState extends ConsumerState<SearchPage> {
         children: [
           if (searchState.searchQuery.isNotEmpty)
             InkWell(
-              onTap: () {},
+              onTap: () {
+                _onSubmit(searchState.searchQuery);
+              },
               child: Container(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 0, vertical: 15),
@@ -281,7 +285,6 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                       ),
                       Icon(
                         PhosphorIcons.arrowUpLeft(),
-                        //size: 32.0,
                         color: Palette.gray,
                       )
                     ],

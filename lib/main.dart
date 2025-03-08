@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'package:camelus/presentation_layer/providers/db_ndk_provider.dart';
 import 'package:camelus/presentation_layer/providers/inbox_outbox_provider.dart';
 import 'package:camelus/presentation_layer/providers/ndk_provider.dart';
+import 'package:camelus/presentation_layer/routes/nostr/search_feed_page/search_feed_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -192,6 +193,11 @@ class MyApp extends StatelessWidget {
               return MaterialPageRoute(
                 builder: (context) =>
                     HastagViewPage(hashtag: settings.arguments as String),
+              );
+            case '/nostr/search':
+              return MaterialPageRoute(
+                builder: (context) =>
+                    SearchFeedPage(query: settings.arguments as String),
               );
             case '/nostr/blockedUsers':
               return MaterialPageRoute(
