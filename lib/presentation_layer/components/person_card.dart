@@ -16,6 +16,7 @@ class PersonCard extends ConsumerWidget {
   final bool isFollowing;
   final Function onTap;
   final Function(bool) onFollowTab;
+  final bool showFollowButton;
 
   const PersonCard({
     super.key,
@@ -27,6 +28,7 @@ class PersonCard extends ConsumerWidget {
     required this.onTap,
     required this.onFollowTab,
     this.nip05,
+    this.showFollowButton = true,
   });
 
   @override
@@ -80,7 +82,9 @@ class PersonCard extends ConsumerWidget {
                   const SizedBox(height: 4),
                   SizedBox(
                     // 1/3 of screen width
-                    width: MediaQuery.of(context).size.width / 2,
+                    width: showFollowButton
+                        ? MediaQuery.of(context).size.width / 2
+                        : double.infinity,
                     child: Text(
                       about,
                       style: const TextStyle(
@@ -98,11 +102,12 @@ class PersonCard extends ConsumerWidget {
 
             const SizedBox(width: 16),
             //follow and unfollow button
-            followButton(
-                isFollowing: isFollowing,
-                onPressed: () {
-                  onFollowTab(!isFollowing);
-                }),
+            if (showFollowButton)
+              followButton(
+                  isFollowing: isFollowing,
+                  onPressed: () {
+                    onFollowTab(!isFollowing);
+                  }),
           ],
         ),
       ),

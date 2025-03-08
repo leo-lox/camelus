@@ -5,10 +5,14 @@ import 'package:camelus/data_layer/models/nostr_band_people_model.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 
 class ApiNostrBandDataSource {
-  Future<T> _fetchData<T>(String type, String key,
-      T Function(Map<String, dynamic>) fromJson) async {
+  Future<T> _fetchData<T>({
+    required String type,
+    required String key,
+    required T Function(Map<String, dynamic>) fromJson,
+    String? lang = 'en',
+  }) async {
     var file = await DefaultCacheManager().getSingleFile(
-      'https://camelus.app/api/v1/nostr-band-cache?type=$type&limit=10',
+      'https://camelus.app/api/v1/nostr-band-cache?type=$type&limit=10&lang=$lang',
       key: key,
       headers: {'Cache-Control': 'max-age=7200'},
     );
@@ -21,12 +25,19 @@ class ApiNostrBandDataSource {
   }
 
   Future<NostrBandPeopleModel?> getTrendingProfiles() async {
-    return _fetchData('profiles', 'trending_profiles_nostr_band',
-        NostrBandPeopleModel.fromJson);
+    return _fetchData(
+      type: 'profiles',
+      key: 'trending_profiles_nostr_band',
+      fromJson: NostrBandPeopleModel.fromJson,
+    );
   }
 
-  Future<NostrBandHashtagsModel?> getTrendingHashtags() async {
-    return _fetchData('hashtags', 'trending_hashtags_nostr_band',
-        NostrBandHashtagsModel.fromJson);
+  Future<NostrBandHashtagsModel?> getTrendingHashtags({String? lang}) async {
+    return _fetchData(
+      type: 'hashtags',
+      key: 'trending_hashtags_nostr_band',
+      fromJson: NostrBandHashtagsModel.fromJson,
+      lang: lang,
+    );
   }
 }

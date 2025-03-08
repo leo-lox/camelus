@@ -325,6 +325,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
             ),
             const SizedBox(height: 10),
             ...searchState.searchResultsUsers.map((user) => PersonCard(
+                  showFollowButton: false,
                   pubkey: user.pubkey,
                   name: user.name ?? '',
                   pictureUrl: user.picture ?? '',
@@ -404,17 +405,17 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                   "trends",
                   style: TextStyle(
                       color: Palette.white,
-                      fontSize: 25,
+                      fontSize: 27,
                       fontWeight: FontWeight.bold),
                 ),
-                const SizedBox(width: 18),
+                const SizedBox(width: 15),
                 GestureDetector(
                   onTap: () {
                     Uri url = Uri.parse("https://nostr.band");
                     launchUrl(url, mode: LaunchMode.externalApplication);
                   },
                   child: const Text("by nostr.band",
-                      style: TextStyle(color: Palette.gray, fontSize: 15)),
+                      style: TextStyle(color: Palette.gray, fontSize: 14)),
                 ),
               ],
             ),
@@ -435,8 +436,11 @@ class _SearchPageState extends ConsumerState<SearchPage> {
 
   Widget _buildTrendingHashtags() {
     return Consumer(builder: (context, ref, child) {
-      final nostrBandAsync = ref.watch(nostrBandProvider
-          .select((provider) => provider.getTrendingHashtags()));
+      final nostrBandAsync = ref.watch(
+        nostrBandProvider.select(
+          (provider) => provider.getTrendingHashtags(),
+        ),
+      );
 
       return FutureBuilder<NostrBandHashtags?>(
         future: nostrBandAsync,
@@ -448,7 +452,10 @@ class _SearchPageState extends ConsumerState<SearchPage> {
           }
 
           if (snapshot.hasData) {
-            return _trendingHashtags(api: snapshot.data!, limit: 10);
+            return _trendingHashtags(
+              api: snapshot.data!,
+              limit: 10,
+            );
           }
 
           if (snapshot.connectionState == ConnectionState.done) {
@@ -494,7 +501,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
   }
 
   Widget _trendingHashtags({required NostrBandHashtags api, int? limit}) {
-    var myHashtags = api.hashtags;
+    final myHashtags = api.hashtags;
     int displayLimit = limit ?? myHashtags.length;
 
     return Column(
@@ -507,7 +514,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
           return HashtagCard(
             index: i,
             hashtag: cleanHashtag,
-            threadsCount: hashtag.threadsCount,
+            postsCount: hashtag.posts,
             onTap: (hashtag) {
               Navigator.pushNamed(context, '/nostr/hastag', arguments: hashtag);
             },

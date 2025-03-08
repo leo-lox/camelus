@@ -6,14 +6,14 @@ import 'package:flutter/material.dart';
 class HashtagCard extends StatelessWidget {
   final int index;
   final String hashtag;
-  final int threadsCount;
+  final int postsCount;
   final Function(String hashtag) onTap;
 
   const HashtagCard({
     super.key,
     required this.index,
     required this.hashtag,
-    required this.threadsCount,
+    required this.postsCount,
     required this.onTap,
   });
 
@@ -45,27 +45,26 @@ class HashtagCard extends StatelessWidget {
                   style: const TextStyle(
                     height: BorderSide.strokeAlignCenter,
                     letterSpacing: 1,
-                    fontSize: 28,
+                    fontSize: 22,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 2),
             Row(
               children: [
                 const SizedBox(width: 25),
                 Text(
-                  threadsCount.toString(),
+                  postsCount.toString(),
                   style: const TextStyle(
-                    fontSize: 16,
+                    fontSize: 12,
                     fontWeight: FontWeight.w400,
                     color: Palette.gray,
                   ),
                 ),
                 const SizedBox(width: 8),
                 const Text(
-                  "threads",
+                  "posts",
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w400,
