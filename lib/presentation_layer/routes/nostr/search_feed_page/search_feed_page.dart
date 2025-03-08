@@ -1,5 +1,6 @@
 import 'package:camelus/config/palette.dart';
 import 'package:flutter/material.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../../domain_layer/entities/feed_filter.dart';
 import '../../../components/generic_feed.dart';
@@ -74,25 +75,31 @@ class _SearchFeedPageState extends State<SearchFeedPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Palette.background,
-      appBar: AppBar(
-        automaticallyImplyLeading: false, // Remove back button
-        title: SearchBarWidget(
-          onSearchChanged: _onSearchChanged,
-          onSubmit: _onSubmit,
-          helpSearch: _helpSearch,
-          externalFocusNode: _searchFocusNode,
-          externalController: _searchController,
-        ),
-        foregroundColor: Palette.white,
-        backgroundColor: Palette.background,
-        toolbarHeight: 80, // Adjust as needed
-      ),
-      body: GenericFeed(
-        feedFilter: FeedFilter(
-          feedId: "search-feed-${_currentQuery}",
-          kinds: [1, 6],
-          search: _currentQuery,
-        ),
+      body: Column(
+        children: [
+          SearchBarWidget(
+            onSearchChanged: _onSearchChanged,
+            onSubmit: _onSubmit,
+            helpSearch: _helpSearch,
+            externalFocusNode: _searchFocusNode,
+            externalController: _searchController,
+            leading: IconButton(
+              icon: Icon(PhosphorIcons.arrowLeft()),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+          ),
+          Expanded(
+            child: GenericFeed(
+              feedFilter: FeedFilter(
+                feedId: "search-feed-${_currentQuery}",
+                kinds: [1, 6],
+                search: _currentQuery,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

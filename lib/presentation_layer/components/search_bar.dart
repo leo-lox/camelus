@@ -8,6 +8,7 @@ class SearchBarWidget extends StatefulWidget {
   final Function(BuildContext) helpSearch;
   final FocusNode? externalFocusNode;
   final TextEditingController? externalController;
+  final Widget? leading;
 
   const SearchBarWidget({
     super.key,
@@ -16,6 +17,7 @@ class SearchBarWidget extends StatefulWidget {
     required this.helpSearch,
     this.externalFocusNode,
     this.externalController,
+    this.leading,
   });
 
   @override
@@ -67,22 +69,23 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
               //color: Palette.extraDarkGray,
               borderRadius: BorderRadius.circular(200),
             ),
-            child: IconButton(
-              icon: _searchFocusNode.hasFocus
-                  ? Icon(PhosphorIcons.arrowLeft())
-                  : Icon(
-                      PhosphorIcons.magnifyingGlass(),
-                      size: 23,
-                    ),
-              color: Palette.white,
-              onPressed: () {
-                _searchController.clear();
-                // unfocus search bar
-                _searchFocusNode.hasFocus
-                    ? _searchFocusNode.unfocus()
-                    : _searchFocusNode.requestFocus();
-              },
-            ),
+            child: widget.leading ??
+                IconButton(
+                  icon: _searchFocusNode.hasFocus
+                      ? Icon(PhosphorIcons.arrowLeft())
+                      : Icon(
+                          PhosphorIcons.magnifyingGlass(),
+                          size: 23,
+                        ),
+                  color: Palette.white,
+                  onPressed: () {
+                    _searchController.clear();
+                    // unfocus search bar
+                    _searchFocusNode.hasFocus
+                        ? _searchFocusNode.unfocus()
+                        : _searchFocusNode.requestFocus();
+                  },
+                ),
           ),
           const SizedBox(width: 5),
           Expanded(
