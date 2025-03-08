@@ -562,8 +562,11 @@ class _SearchPageState extends ConsumerState<SearchPage> {
             ),
             child: IconButton(
               icon: _searchFocusNode.hasFocus
-                  ? const Icon(Icons.arrow_back)
-                  : const Icon(Icons.search),
+                  ? Icon(PhosphorIcons.arrowLeft())
+                  : Icon(
+                      PhosphorIcons.magnifyingGlass(),
+                      size: 23,
+                    ),
               color: Palette.white,
               onPressed: () {
                 _searchController.clear();
@@ -615,9 +618,9 @@ class _SearchPageState extends ConsumerState<SearchPage> {
             width: 41,
             height: 41,
             child: IconButton(
-              icon: SvgPicture.asset(
-                'assets/icons/question.svg',
-                color: Palette.extraLightGray,
+              icon: Icon(
+                PhosphorIcons.question(),
+                size: 23,
               ),
               color: Palette.white,
               onPressed: () => _helpSearch(context),
