@@ -3,36 +3,95 @@ import 'package:flutter/material.dart';
 
 import '../../../../domain_layer/entities/feed_filter.dart';
 import '../../../components/generic_feed.dart';
+import '../../../components/search_bar.dart';
 
-class SearchFeedPage extends StatelessWidget {
+class SearchFeedPage extends StatefulWidget {
   final String query;
 
   const SearchFeedPage({super.key, required this.query});
+
+  @override
+  State<SearchFeedPage> createState() => _SearchFeedPageState();
+}
+
+class _SearchFeedPageState extends State<SearchFeedPage> {
+  late TextEditingController _searchController;
+  late FocusNode _searchFocusNode;
+  late String _currentQuery;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentQuery = widget.query;
+    _searchController = TextEditingController(text: widget.query);
+    _searchFocusNode = FocusNode();
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    _searchFocusNode.dispose();
+    super.dispose();
+  }
+
+  void _onSearchChanged(String value) {
+    // real time search
+  }
+
+  void _onSubmit(String value) {
+    if (value.trim().isNotEmpty && value.trim() != _currentQuery) {
+      // Navigate to a new SearchFeedPage with the new query
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => SearchFeedPage(query: value.trim()),
+        ),
+      );
+    }
+  }
+
+  void _helpSearch(BuildContext context) {
+    // Implement your help functionality here
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Search Help'),
+        content: const Text('Enter keywords to search for posts.'),
+        backgroundColor: Palette.darkGray,
+        titleTextStyle: const TextStyle(color: Palette.white, fontSize: 18),
+        contentTextStyle: const TextStyle(color: Palette.white),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('OK', style: TextStyle(color: Palette.primary)),
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Palette.background,
       appBar: AppBar(
-        title: Row(
-          children: [
-            Text(
-              query,
-              style: const TextStyle(
-                  fontSize: 25,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 1.1),
-            ),
-          ],
+        automaticallyImplyLeading: false, // Remove back button
+        title: SearchBarWidget(
+          onSearchChanged: _onSearchChanged,
+          onSubmit: _onSubmit,
+          helpSearch: _helpSearch,
+          externalFocusNode: _searchFocusNode,
+          externalController: _searchController,
         ),
         foregroundColor: Palette.white,
         backgroundColor: Palette.background,
+        toolbarHeight: 80, // Adjust as needed
       ),
       body: GenericFeed(
         feedFilter: FeedFilter(
-          feedId: "search-feed-${query}",
+          feedId: "search-feed-${_currentQuery}",
           kinds: [1, 6],
-          search: query,
+          search: _currentQuery,
         ),
       ),
     );
