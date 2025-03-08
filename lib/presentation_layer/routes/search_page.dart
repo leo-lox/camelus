@@ -19,6 +19,7 @@ import 'package:camelus/presentation_layer/providers/nostr_band_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../domain_layer/entities/contact_list.dart';
@@ -164,8 +165,11 @@ class _SearchPageState extends ConsumerState<SearchPage> {
     ref.read(searchStateProvider.notifier).setSearchResultsUsers(users);
 
     // Search for notes
-    //final notes = await searchService.searchNotes(value);
-    //ref.read(searchStateProvider.notifier).setSearchResultsNotes(notes);
+    final notes =
+        await searchService.searchNotes(search: value, kinds: [1], limit: 10);
+    ref.read(searchStateProvider.notifier).setSearchResultsNotes(
+          notes,
+        );
   }
 
   void _onSubmit(String value) {
@@ -252,6 +256,47 @@ class _SearchPageState extends ConsumerState<SearchPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          if (searchState.searchQuery.isNotEmpty)
+            InkWell(
+              onTap: () {},
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 0, vertical: 15),
+                decoration: BoxDecoration(
+                  //color: Palette.extraDarkGray,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          'search for "${searchState.searchQuery}"',
+                          style: const TextStyle(
+                            color: Palette.white,
+                            fontSize: 16,
+                          ),
+                        ),
+                      ),
+                      Icon(
+                        PhosphorIcons.arrowUpLeft(),
+                        //size: 32.0,
+                        color: Palette.gray,
+                      )
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          // horizontal line
+          if (searchState.searchQuery.isNotEmpty)
+            Container(
+              margin: const EdgeInsets.only(top: 10, bottom: 10),
+              height: 1,
+              color: Palette.extraDarkGray,
+            ),
+
           // Users section
           if (searchState.searchResultsUsers.isNotEmpty) ...[
             const Text(
