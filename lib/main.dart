@@ -3,8 +3,10 @@ import 'dart:ui';
 
 import 'package:camelus/presentation_layer/providers/db_ndk_provider.dart';
 import 'package:camelus/presentation_layer/providers/inbox_outbox_provider.dart';
+import 'package:camelus/presentation_layer/providers/language_provider.dart';
 import 'package:camelus/presentation_layer/providers/ndk_provider.dart';
 import 'package:camelus/presentation_layer/routes/nostr/search_feed_page/search_feed_page.dart';
+import 'package:camelus/presentation_layer/routes/nostr/settings/locale/locale_settings.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -174,6 +176,10 @@ class MyApp extends StatelessWidget {
             case '/settings/inital-route':
               return MaterialPageRoute(
                 builder: (context) => const InitalRouteSettings(),
+              );
+            case '/settings/locale':
+              return MaterialPageRoute(
+                builder: (context) => const LocaleSettingsPage(),
               );
             case '/nostr/event':
               return CupertinoPageRoute(

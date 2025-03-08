@@ -49,7 +49,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
       body: ListView(
         children: [
           ListTile(
-            title: const Text('file servers',
+            title: const Text('File servers',
                 style: TextStyle(color: Colors.white)),
             onTap: () {
               _navigateToFileServers();
@@ -63,7 +63,14 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
             },
           ),
           ListTile(
-            title: const Text('logout', style: TextStyle(color: Colors.white)),
+            title: const Text('Language Settings',
+                style: TextStyle(color: Colors.white)),
+            onTap: () {
+              Navigator.pushNamed(context, '/settings/locale');
+            },
+          ),
+          ListTile(
+            title: const Text('Logout', style: TextStyle(color: Colors.white)),
             onTap: () {
               _logout();
             },

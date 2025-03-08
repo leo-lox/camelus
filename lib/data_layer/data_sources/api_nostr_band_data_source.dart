@@ -1,8 +1,9 @@
 import 'dart:convert';
 
-import 'package:camelus/data_layer/models/nostr_band_hashtags_model.dart';
-import 'package:camelus/data_layer/models/nostr_band_people_model.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
+
+import '../models/nostr_band_hashtags_model.dart';
+import '../models/nostr_band_people_model.dart';
 
 class ApiNostrBandDataSource {
   Future<T> _fetchData<T>({
@@ -11,16 +12,16 @@ class ApiNostrBandDataSource {
     required T Function(Map<String, dynamic>) fromJson,
     String? lang = 'en',
   }) async {
-    var file = await DefaultCacheManager().getSingleFile(
+    final file = await DefaultCacheManager().getSingleFile(
       'https://camelus.app/api/v1/nostr-band-cache?type=$type&limit=10&lang=$lang',
       key: key,
-      headers: {'Cache-Control': 'max-age=7200'},
+      headers: {'Cache-Control': 'max-age=3600'},
     );
-    var result = await file.readAsString();
+    final result = await file.readAsString();
     if (result.isEmpty) {
       throw Exception('No data');
     }
-    var json = jsonDecode(result);
+    final json = jsonDecode(result);
     return fromJson(json);
   }
 

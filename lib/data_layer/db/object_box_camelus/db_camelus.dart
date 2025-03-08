@@ -31,7 +31,7 @@ class DbAppImpl implements AppDb {
     await _dbRdy;
 
     // run transaction to get the id of the key and then delete it
-    await _objectBox.store.runInTransaction(TxMode.write, () async {
+    _objectBox.store.runInTransaction(TxMode.write, () {
       final keyBox = _objectBox.store.box<DbKeyValue>();
       final keyToDelete =
           keyBox.query(DbKeyValue_.key.equals(key)).build().findFirst();
