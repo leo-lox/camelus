@@ -25,6 +25,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../domain_layer/entities/contact_list.dart';
 import '../../domain_layer/entities/nostr_note.dart';
 import '../components/note_card/note_card.dart';
+import '../components/search_bar.dart';
 import '../providers/search_provider.dart';
 import 'nostr/profile/profile_page_2.dart';
 
@@ -221,7 +222,19 @@ class _SearchPageState extends ConsumerState<SearchPage> {
 
                 return Column(
                   children: [
-                    _searchBar(context),
+                    SearchBarWidget(
+                      onSearchChanged: (value) {
+                        _onSearchChanged(value);
+                      },
+                      onSubmit: (value) {
+                        _onSubmit(value);
+                      },
+                      helpSearch: (context) {
+                        _helpSearch(context);
+                      },
+                      externalFocusNode: _searchFocusNode,
+                      externalController: _searchController,
+                    ),
                     Expanded(
                       child: ListView(
                         physics: const BouncingScrollPhysics(),
@@ -544,90 +557,6 @@ class _SearchPageState extends ConsumerState<SearchPage> {
     }
     return Column(
       children: personCards,
-    );
-  }
-
-  Padding _searchBar(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 20, left: 15, right: 10, bottom: 10),
-      child: Row(
-        children: [
-          // back button
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              //color: Palette.extraDarkGray,
-              borderRadius: BorderRadius.circular(200),
-            ),
-            child: IconButton(
-              icon: _searchFocusNode.hasFocus
-                  ? Icon(PhosphorIcons.arrowLeft())
-                  : Icon(
-                      PhosphorIcons.magnifyingGlass(),
-                      size: 23,
-                    ),
-              color: Palette.white,
-              onPressed: () {
-                _searchController.clear();
-                // unfocus search bar
-                _searchFocusNode.hasFocus
-                    ? _searchFocusNode.unfocus()
-                    : _searchFocusNode.requestFocus();
-              },
-            ),
-          ),
-          const SizedBox(width: 5),
-          Expanded(
-            child: TextField(
-              controller: _searchController,
-              focusNode: _searchFocusNode,
-              decoration: InputDecoration(
-                isDense: true,
-                hintText: ' Search',
-                hintStyle:
-                    const TextStyle(color: Palette.white, letterSpacing: 1.1),
-                filled: true,
-                fillColor: _searchFocusNode.hasFocus
-                    ? Palette.background
-                    : Palette.extraDarkGray,
-                enabledBorder: const OutlineInputBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(50.0)),
-                  borderSide: BorderSide(color: Palette.extraDarkGray),
-                ),
-                focusedBorder: const OutlineInputBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(25.0)),
-                  borderSide: BorderSide(color: Palette.background),
-                ),
-              ),
-              style: const TextStyle(color: Palette.white),
-              onChanged: (value) {
-                _onSearchChanged(value);
-              },
-              onSubmitted: (value) {
-                _onSubmit(value);
-              },
-              onTapOutside: (value) {
-                // close keyboard
-                //FocusScope.of(context).requestFocus(FocusNode());
-              },
-            ),
-          ),
-          const SizedBox(width: 5),
-          SizedBox(
-            width: 41,
-            height: 41,
-            child: IconButton(
-              icon: Icon(
-                PhosphorIcons.question(),
-                size: 23,
-              ),
-              color: Palette.white,
-              onPressed: () => _helpSearch(context),
-            ),
-          ),
-        ],
-      ),
     );
   }
 }
