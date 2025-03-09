@@ -21,11 +21,13 @@ import '../providers/app_update_provider.dart';
 class HomePage extends ConsumerStatefulWidget {
   final String pubkey;
   final String? initialTab;
+  final int initialPage;
 
   const HomePage({
     super.key,
     required this.pubkey,
     this.initialTab,
+    this.initialPage = 0,
   });
 
   @override
@@ -99,6 +101,15 @@ class _HomePageState extends ConsumerState<HomePage> {
     super.initState();
     _initMatomo();
     _checkForUpdates();
+
+    // set initail page
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _myPage.jumpToPage(widget.initialPage);
+      ref.read(navigationBarProvider).tabSearch();
+      setState(() {
+        _selectedIndex = widget.initialPage;
+      });
+    });
   }
 
   @override

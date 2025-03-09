@@ -20,6 +20,7 @@ class InitalRouteSettingsState extends ConsumerState<InitalRouteSettings> {
   final List<String> routes = [
     '/',
     '/post-and-replies',
+    '/search',
   ];
 
   _laodInitialRoute() async {

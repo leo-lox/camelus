@@ -160,6 +160,14 @@ class MyApp extends StatelessWidget {
                 );
               });
 
+            case '/search':
+              return CupertinoPageRoute(builder: (context) {
+                return HomePage(
+                  pubkey: pubkey,
+                  initialPage: 1,
+                );
+              });
+
             case '/onboarding':
               return MaterialPageRoute(
                 builder: (context) => const NostrOnboarding(),
