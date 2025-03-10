@@ -16,12 +16,14 @@ import 'package:lottie/lottie.dart';
 import 'package:camelus/config/palette.dart';
 import 'package:camelus/helpers/helpers.dart';
 import 'package:camelus/data_layer/models/post_context.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../config/default_suggestions.dart';
 
 import '../../domain_layer/usecases/remove_image_metadata.dart';
 import '../providers/write_post_state.provider.dart';
 import 'post_overflow.dart';
+import 'write_post/post_settings_dialog.dart';
 
 class WritePost extends ConsumerStatefulWidget {
   final PostContext? context;
@@ -303,49 +305,79 @@ class _WritePostState extends ConsumerState<WritePost> {
     );
   }
 
-  Column _bottomRow() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+  Widget _bottomRow() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            // add image
-            TextButton(
-              onPressed: (() {
-                _addImage();
-              }),
-              child: SvgPicture.asset(
-                height: 25,
-                'assets/icons/image.svg',
-                color: Palette.gray,
-              ),
+            SizedBox(
+              width: 10,
             ),
-            // add video
-
-            //TextButton(
-            //  onPressed: (() {
-            //    // _addVideo();
-            //  }),
-            //  child: SvgPicture.asset(
-            //    height: 25,
-            //    'assets/icons/file-video.svg',
-            //    color: Palette.gray,
-            //  ),
-            //),
-
-            // on bottom
-            Padding(
-              padding: const EdgeInsets.only(right: 20),
-              child: PostOverflowIndicator(
-                characterCount:
-                    ref.watch(writePostStateProvider).markupText.length,
-                maxLength: 280,
+            _buildActionButton(
+              icon: Icon(
+                PhosphorIcons.image(),
+                color: Palette.gray,
+                size: 25,
               ),
+              onPressed: _addImage,
+            ),
+            _buildActionButton(
+              icon: Icon(
+                PhosphorIcons.gearSix(),
+                color: Palette.gray,
+                size: 25,
+              ),
+              onPressed: () => _showPostSettingsDialog(context),
             ),
           ],
         ),
+
+        // Character counter
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          child: PostOverflowIndicator(
+            characterCount: ref.watch(writePostStateProvider).markupText.length,
+            maxLength: 280,
+          ),
+        ),
       ],
+    );
+  }
+
+  void _showPostSettingsDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return PostSettings(
+          onSettingsChanged: (settings) {
+            // Handle settings changes if needed
+            print('Settings updated: $settings');
+
+            // You can update your state or UI based on the settings
+            // For example:
+            // setState(() {
+            //   _postHasContentWarning = settings['contentWarning']['enabled'];
+            //   _postHasClientTag = settings['clientTag']['enabled'];
+            // });
+          },
+        );
+      },
+    );
+  }
+
+  Widget _buildActionButton({
+    required Icon icon,
+    required VoidCallback onPressed,
+  }) {
+    return TextButton(
+      onPressed: onPressed,
+      style: TextButton.styleFrom(
+        minimumSize: Size.zero,
+        padding: const EdgeInsets.symmetric(horizontal: 18.0, vertical: 12.0),
+        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+      ),
+      child: icon,
     );
   }
 
