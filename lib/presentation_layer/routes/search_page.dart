@@ -512,7 +512,8 @@ class _SearchPageState extends ConsumerState<SearchPage> {
             hashtag: hashtag.hashtag,
             postsCount: hashtag.posts,
             onTap: (hashtag) {
-              Navigator.pushNamed(context, '/nostr/search', arguments: hashtag);
+              Navigator.pushNamed(context, '/nostr/search',
+                  arguments: "#$hashtag");
             },
           );
         },
