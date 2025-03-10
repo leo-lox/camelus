@@ -30,11 +30,22 @@ class LanguageNotifier extends StateNotifier<LanguageState> {
     _initializeLocale();
   }
 
-  // Initialize the locale asynchronously
   Future<void> _initializeLocale() async {
     final savedLocale = await _getSavedLocale(_appDb);
     if (savedLocale != null) {
+      // Use the saved locale from DB if it exists
       state = LanguageState(locale: savedLocale);
+    } else {
+      // keep the default 'en' locale, context not available here
+    }
+  }
+
+  Future<void> initializeWithSystemLocaleIfNeeded(BuildContext context) async {
+    final savedLocale = await _getSavedLocale(_appDb);
+    if (savedLocale == null) {
+      // ignore: use_build_context_synchronously
+      final deviceLocale = Localizations.localeOf(context);
+      state = state.copyWith(locale: deviceLocale);
     }
   }
 

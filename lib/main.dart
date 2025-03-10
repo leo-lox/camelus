@@ -120,7 +120,7 @@ Future<void> main() async {
   );
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends ConsumerWidget {
   final String initialRoute;
   final String pubkey;
   final GlobalKey<NavigatorState> navigatorKey;
@@ -132,9 +132,12 @@ class MyApp extends StatelessWidget {
     required this.pubkey,
   });
 
-  // This widget is the root of your application.
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, ref) {
+    // set system locale if no locale is set
+    ref
+        .read(languageProvider.notifier)
+        .initializeWithSystemLocaleIfNeeded(context);
     return Portal(
       child: MaterialApp(
         navigatorKey: navigatorKey,
