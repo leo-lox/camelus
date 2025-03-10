@@ -86,6 +86,17 @@ class NostrNote {
     return true;
   }
 
+  /// checks if ther is a content warning for the note, \
+  /// if yes returns the reason
+  String? get contentWarning {
+    for (NostrTag tag in tags) {
+      if (tag.type == "content-warning") {
+        return tag.value;
+      }
+    }
+    return null;
+  }
+
   NostrTag? get getRootReply {
     for (NostrTag tag in getTagEvents) {
       // in spec

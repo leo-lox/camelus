@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:camelus/domain_layer/entities/user_metadata.dart';
 import 'package:camelus/domain_layer/usecases/get_user_metadata.dart';
 import 'package:camelus/presentation_layer/atoms/long_button.dart';
@@ -12,6 +14,7 @@ import 'package:camelus/presentation_layer/providers/metadata_state_provider.dar
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 final profilePattern = RegExp(r"nostr:(nprofile|npub)[a-zA-Z0-9]+");
@@ -41,6 +44,7 @@ class _NoteCardSplitContentState extends ConsumerState<NoteCardSplitContent> {
   late List<String> _imageLinks;
   late Set<String> _profileHexIdentifiers;
   final Map<String, WidgetSpan> _memoizedNoteReferences = {};
+  bool _isContentRevealed = false;
 
   bool _isExpanded = false;
   final double _collapsedHeight = 250.0;
@@ -104,6 +108,7 @@ class _NoteCardSplitContentState extends ConsumerState<NoteCardSplitContent> {
 
   @override
   Widget build(BuildContext context) {
+    final hasContentWarning = widget.note.contentWarning != null;
     // Watch metadata for all profile links
     final metadataMap = Map.fromEntries(
       _profileHexIdentifiers.map((hexId) => MapEntry(
@@ -112,75 +117,131 @@ class _NoteCardSplitContentState extends ConsumerState<NoteCardSplitContent> {
           )),
     );
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return Stack(
       children: [
-        // Constrained content container
-        ConstrainedBox(
-          constraints: BoxConstraints(
-            // Only apply max height when not expanded AND content needs to be constrained
-            maxHeight: (!_isExpanded && _shouldShowButton)
-                ? _collapsedHeight
-                : double.infinity,
-          ),
-          child: ClipRect(
-            // Only clip when not expanded and should show button
-
-            clipBehavior:
-                (!_isExpanded && _shouldShowButton) ? Clip.hardEdge : Clip.none,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text.rich(
-                  TextSpan(
-                    children: _buildContentSpans(
-                      widget.note.content,
-                      metadataMap,
-                    ),
-                  ),
-                  style:
-                      const TextStyle(color: Palette.lightGray, fontSize: 17),
-                  maxLines: _isExpanded
-                      ? null
-                      : null, // Let it flow naturally within constraint
-                  overflow: TextOverflow.clip,
+        ImageFiltered(
+          imageFilter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+          enabled: hasContentWarning && !_isContentRevealed,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Constrained content container
+              ConstrainedBox(
+                constraints: BoxConstraints(
+                  // Only apply max height when not expanded AND content needs to be constrained
+                  maxHeight: (!_isExpanded && _shouldShowButton)
+                      ? _collapsedHeight
+                      : double.infinity,
                 ),
-                if (_imageLinks.isNotEmpty) ...[
-                  const SizedBox(height: 8),
-                  ImagesTileView(images: _imageLinks),
-                ],
-              ],
-            ),
-          ),
-        ),
+                child: ClipRect(
+                  // Only clip when not expanded and should show button
 
-        // Show More button if needed
-        if (_shouldShowButton) ...[
-          const SizedBox(height: 8),
-          GestureDetector(
-            onTap: () {
-              setState(() {
-                _isExpanded = !_isExpanded;
-              });
-            },
-            child: Center(
-              child: Container(
-                padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-                decoration: BoxDecoration(
-                  color: Palette.primary.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Text(
-                  _isExpanded ? "Show Less" : "Show More",
-                  style: const TextStyle(
-                    color: Palette.primary,
-                    fontWeight: FontWeight.bold,
+                  clipBehavior: (!_isExpanded && _shouldShowButton)
+                      ? Clip.hardEdge
+                      : Clip.none,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text.rich(
+                        TextSpan(
+                          children: _buildContentSpans(
+                            widget.note.content,
+                            metadataMap,
+                          ),
+                        ),
+                        style: const TextStyle(
+                            color: Palette.lightGray, fontSize: 17),
+                        maxLines: _isExpanded
+                            ? null
+                            : null, // Let it flow naturally within constraint
+                        overflow: TextOverflow.clip,
+                      ),
+                      if (_imageLinks.isNotEmpty) ...[
+                        const SizedBox(height: 8),
+                        ImagesTileView(images: _imageLinks),
+                      ],
+                    ],
                   ),
                 ),
               ),
+
+              // Show More button if needed
+              if (_shouldShowButton) ...[
+                const SizedBox(height: 8),
+                GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      _isExpanded = !_isExpanded;
+                    });
+                  },
+                  child: Center(
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 4, horizontal: 8),
+                      decoration: BoxDecoration(
+                        color: Palette.primary.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(
+                        _isExpanded ? "Show Less" : "Show More",
+                        style: const TextStyle(
+                          color: Palette.primary,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ),
+        if (hasContentWarning && !_isContentRevealed)
+          Center(
+            child: Container(
+              alignment: Alignment.center,
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        PhosphorIcons.warningOctagon(),
+                        color: Palette.error,
+                        size: 32,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        widget.note.contentWarning!,
+                        style: const TextStyle(
+                          color: Palette.error,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _isContentRevealed = true;
+                      });
+                    },
+                    child: longButton(
+                        name: "show",
+                        onPressed: () {
+                          setState(() {
+                            _isContentRevealed = true;
+                          });
+                        }),
+                  ),
+                ],
+              ),
             ),
           ),
-        ],
       ],
     );
   }
