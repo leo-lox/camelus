@@ -303,7 +303,7 @@ class _NoteCardSplitContentState extends ConsumerState<NoteCardSplitContent> {
       text: word,
       style: const TextStyle(color: Palette.primary),
       recognizer: TapGestureRecognizer()
-        ..onTap = () => widget.hashtagCallback(word.substring(1)),
+        ..onTap = () => widget.hashtagCallback(word),
     );
   }
 

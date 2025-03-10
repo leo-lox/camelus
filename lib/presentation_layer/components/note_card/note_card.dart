@@ -64,7 +64,7 @@ class NoteCard extends ConsumerWidget {
                           context, "/nostr/profile",
                           arguments: pubkey),
                       hashtagCallback: (String hashtag) => Navigator.pushNamed(
-                          context, "/nostr/hastag",
+                          context, "/nostr/search",
                           arguments: hashtag),
                     ),
                   ],

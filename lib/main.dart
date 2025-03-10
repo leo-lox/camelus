@@ -22,7 +22,6 @@ import 'presentation_layer/providers/db_app_provider.dart';
 import 'presentation_layer/routes/home_page.dart';
 import 'presentation_layer/routes/nostr/blockedUsers/blocked_users.dart';
 import 'presentation_layer/routes/nostr/event_view/event_view_page.dart';
-import 'presentation_layer/routes/nostr/hashtag_view/hashtag_view_page.dart';
 import 'presentation_layer/routes/nostr/onboarding/onboarding.dart';
 import 'presentation_layer/routes/nostr/profile/profile_page_2.dart';
 import 'presentation_layer/routes/nostr/settings/file_servers/settings_file_servers.dart';
@@ -205,11 +204,6 @@ class MyApp extends ConsumerWidget {
               return MaterialPageRoute(
                 builder: (context) =>
                     ProfilePage2(pubkey: settings.arguments as String),
-              );
-            case '/nostr/hastag':
-              return MaterialPageRoute(
-                builder: (context) =>
-                    HastagViewPage(hashtag: settings.arguments as String),
               );
             case '/nostr/search':
               return PageRouteBuilder(

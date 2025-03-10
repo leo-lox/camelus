@@ -75,6 +75,22 @@ class _SearchFeedPageState extends State<SearchFeedPage> {
     );
   }
 
+  FeedFilter _buildFeedFilter(String query) {
+    if (query.startsWith('#')) {
+      return FeedFilter(
+        feedId: "hashtag-feed-${query.substring(1)}",
+        kinds: [1, 6],
+        tTags: [query.substring(1).toLowerCase()],
+      );
+    }
+
+    return FeedFilter(
+      feedId: "search-feed-$query",
+      kinds: [1, 6],
+      search: query,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -97,11 +113,7 @@ class _SearchFeedPageState extends State<SearchFeedPage> {
             ),
             Expanded(
               child: GenericFeed(
-                feedFilter: FeedFilter(
-                  feedId: "search-feed-${_currentQuery}",
-                  kinds: [1, 6],
-                  search: _currentQuery,
-                ),
+                feedFilter: _buildFeedFilter(_currentQuery),
               ),
             ),
           ],

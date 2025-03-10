@@ -175,12 +175,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
   }
 
   void _onSubmit(String value) {
-    if (value.startsWith('#')) {
-      final hashtag = value.substring(1);
-      Navigator.pushNamed(context, '/nostr/hastag', arguments: hashtag);
-    } else {
-      Navigator.pushNamed(context, '/nostr/search', arguments: value);
-    }
+    Navigator.pushNamed(context, '/nostr/search', arguments: value);
   }
 
   void _changeFollowing(
@@ -510,14 +505,14 @@ class _SearchPageState extends ConsumerState<SearchPage> {
       children: List.generate(
         displayLimit > myHashtags.length ? myHashtags.length : displayLimit,
         (i) {
-          var hashtag = myHashtags[i];
-          String cleanHashtag = hashtag.hashtag.replaceFirst('#', '');
+          final hashtag = myHashtags[i];
+
           return HashtagCard(
             index: i,
-            hashtag: cleanHashtag,
+            hashtag: hashtag.hashtag,
             postsCount: hashtag.posts,
             onTap: (hashtag) {
-              Navigator.pushNamed(context, '/nostr/hastag', arguments: hashtag);
+              Navigator.pushNamed(context, '/nostr/search', arguments: hashtag);
             },
           );
         },
