@@ -6,21 +6,89 @@ import 'package:camelus/domain_layer/entities/nostr_band_hashtags.dart';
 import 'package:camelus/domain_layer/entities/nostr_band_people.dart';
 import 'package:camelus/domain_layer/entities/user_metadata.dart';
 import 'package:camelus/presentation_layer/atoms/hashtag_card.dart';
+import 'package:camelus/presentation_layer/components/note_card/note_card_container.dart';
 import 'package:camelus/presentation_layer/components/person_card.dart';
 import 'package:camelus/config/palette.dart';
 import 'package:camelus/helpers/helpers.dart';
 import 'package:camelus/helpers/nprofile_helper.dart';
 import 'package:camelus/presentation_layer/providers/following_provider.dart';
+import 'package:camelus/presentation_layer/providers/language_provider.dart';
 import 'package:camelus/presentation_layer/providers/metadata_provider.dart';
 import 'package:camelus/presentation_layer/providers/navigation_bar_provider.dart';
+import 'package:camelus/presentation_layer/providers/ndk_provider.dart';
 import 'package:camelus/presentation_layer/providers/nostr_band_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../domain_layer/entities/contact_list.dart';
+import '../../domain_layer/entities/nostr_note.dart';
+import '../components/note_card/note_card.dart';
+import '../components/search_bar.dart';
+import '../providers/search_provider.dart';
 import 'nostr/profile/profile_page_2.dart';
+
+// Search state provider
+final searchStateProvider =
+    StateNotifierProvider<SearchStateNotifier, SearchState>((ref) {
+  return SearchStateNotifier();
+});
+
+// Search state class
+class SearchState {
+  final bool isSearching;
+  final String searchQuery;
+  final List<UserMetadata> searchResultsUsers;
+  final List<NostrNote> searchResultsNotes;
+
+  SearchState({
+    this.isSearching = false,
+    this.searchQuery = '',
+    this.searchResultsUsers = const [],
+    this.searchResultsNotes = const [],
+  });
+
+  SearchState copyWith({
+    bool? isSearching,
+    String? searchQuery,
+    List<UserMetadata>? searchResultsUsers,
+    List<NostrNote>? searchResultsNotes,
+  }) {
+    return SearchState(
+      isSearching: isSearching ?? this.isSearching,
+      searchQuery: searchQuery ?? this.searchQuery,
+      searchResultsUsers: searchResultsUsers ?? this.searchResultsUsers,
+      searchResultsNotes: searchResultsNotes ?? this.searchResultsNotes,
+    );
+  }
+}
+
+// Search state notifier
+class SearchStateNotifier extends StateNotifier<SearchState> {
+  SearchStateNotifier() : super(SearchState());
+
+  void setSearching(bool isSearching) {
+    state = state.copyWith(isSearching: isSearching);
+  }
+
+  void setSearchQuery(String query) {
+    state = state.copyWith(searchQuery: query);
+  }
+
+  void setSearchResultsUsers(List<UserMetadata> users) {
+    state = state.copyWith(searchResultsUsers: users);
+  }
+
+  void setSearchResultsNotes(List<NostrNote> notes) {
+    state = state.copyWith(searchResultsNotes: notes);
+  }
+
+  void clearSearch({bool stillSearching = false}) {
+    state = SearchState(isSearching: stillSearching);
+  }
+}
 
 class SearchPage extends ConsumerStatefulWidget {
   const SearchPage({super.key});
@@ -32,51 +100,7 @@ class SearchPage extends ConsumerStatefulWidget {
 class _SearchPageState extends ConsumerState<SearchPage> {
   final TextEditingController _searchController = TextEditingController();
   final FocusNode _searchFocusNode = FocusNode();
-
   final List<StreamSubscription> _subscriptions = [];
-
-  bool _isSearching = false;
-
-  _listenToNavigationBar() {
-    // listen to home bar
-    final navigationBar = ref.watch(navigationBarProvider);
-    _subscriptions.add(navigationBar.onTabSearch.listen((event) {
-      _focusSearchBar();
-    }));
-  }
-
-  void _setupFocusNodeListener() {
-    _searchFocusNode.addListener(() {
-      if (_searchFocusNode.hasFocus) {
-        setState(() {
-          _isSearching = true;
-        });
-      } else {
-        log("schould unfocus");
-        setState(() {
-          _isSearching = false;
-        });
-      }
-    });
-  }
-
-  void _focusSearchBar() {
-    log("message");
-    // focus input
-    FocusScope.of(context).requestFocus(_searchFocusNode);
-  }
-
-  void _initSequence() async {
-    // wait 1 second with then
-    await Future.delayed(const Duration(milliseconds: 200)).then((value) {
-      // check if mounted
-      if (mounted) {
-        _listenToNavigationBar();
-      }
-    });
-
-    _setupFocusNodeListener();
-  }
 
   @override
   void initState() {
@@ -86,8 +110,39 @@ class _SearchPageState extends ConsumerState<SearchPage> {
 
   @override
   void dispose() {
-    super.dispose();
+    _searchController.dispose();
+    _searchFocusNode.dispose();
     _disposeSubscriptions();
+    super.dispose();
+  }
+
+  void _initSequence() async {
+    await Future.delayed(const Duration(milliseconds: 200)).then((value) {
+      if (mounted) {
+        _listenToNavigationBar();
+      }
+    });
+
+    _setupFocusNodeListener();
+  }
+
+  void _listenToNavigationBar() {
+    final navigationBar = ref.read(navigationBarProvider);
+    _subscriptions.add(navigationBar.onTabSearch.listen((event) {
+      _focusSearchBar();
+    }));
+  }
+
+  void _setupFocusNodeListener() {
+    _searchFocusNode.addListener(() {
+      ref
+          .read(searchStateProvider.notifier)
+          .setSearching(_searchFocusNode.hasFocus);
+    });
+  }
+
+  void _focusSearchBar() {
+    FocusScope.of(context).requestFocus(_searchFocusNode);
   }
 
   void _disposeSubscriptions() {
@@ -97,175 +152,238 @@ class _SearchPageState extends ConsumerState<SearchPage> {
   }
 
   void _onSearchChanged(String value) async {
-    var metadata = ref.watch(metadataProvider);
-    List<UserMetadata> workingMetadata = [];
+    ref.read(searchStateProvider.notifier).setSearchQuery(value);
 
-    final pattern = RegExp(r"nostr:(nprofile|npub)[a-zA-Z0-9]+");
-
-    // check if it is a valid nip05
-    RegExp nip05Regex =
-        RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
-    RegExp mastodonRegex =
-        RegExp(r'^@[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
-
-    RegExp hastagRegex = RegExp(r'^#\S+');
-
-    RegExp cashtagRegex = RegExp(r'^(\$|\€|\£|\¥|\₿)\S+');
-
-    RegExp hexRegex = RegExp(r'[a-fA-F0-9]{64}');
-
-    RegExp nprofileNpubRegex = RegExp(r'(nostr:|)(nprofile|npub)[a-zA-Z0-9]+');
-
-    String? finalNip05;
-
-    if (hexRegex.hasMatch(value) || nprofileNpubRegex.hasMatch(value)) {
-      String hex = '';
-      if (value.contains('nostr:')) {
-        value = value.replaceAll('nostr:', '');
-      }
-
-      if (value.contains('nprofile')) {
-        Map nprofile = NprofileHelper().bech32toMap(value);
-        hex = nprofile['pubkey'];
-        var relays = nprofile['relays'];
-      }
-
-      if (value.contains('npub')) {
-        List<String> npub = Helpers().decodeBech32(value);
-        hex = npub[0];
-      }
-
-      if (hexRegex.hasMatch(value)) {
-        hex = value;
-      }
-
-      var personMetadata =
-          await metadata.getMetadataByPubkey(hex).first.timeout(
-                const Duration(seconds: 1),
-              );
-
-      if (personMetadata != null) {
-        workingMetadata.add(personMetadata);
-        personMetadata.pubkey = hex;
-      } else {
-        final mockUser =
-            UserMetadata(pubkey: value, eventId: "", lastFetch: 0, name: value);
-        workingMetadata.add(mockUser);
-      }
+    if (value.isEmpty) {
+      ref.read(searchStateProvider.notifier).clearSearch(stillSearching: true);
+      return;
     }
 
-    if (nip05Regex.hasMatch(value)) {
-      finalNip05 = value;
-    }
-    if (mastodonRegex.hasMatch(value)) {
-      //turn into https://mostr.pub/.well-known/nostr.json?name=username_at_domain.tld
-      final String removeAt = value.replaceFirst('@', '');
-      final String snakeCase = removeAt.replaceAll('@', '_at_');
-      //finalNip05 = 'https://mostr.pub/.well-known/nostr.json?name=$snakeCase';
-      finalNip05 = "$snakeCase@mostr.pub";
-    }
-    if (finalNip05 != null) {
-      log('finalNip05 $finalNip05');
-      var nip05Metadata = {}; //await _search.searchNip05(finalNip05);
+    final searchService = ref.read(searchProvider);
+    final metadata = ref.read(metadataProvider);
 
-      if (nip05Metadata != null) {
-        final String nipPubkey = nip05Metadata['pubkey'];
-        final List nipRelays = nip05Metadata['relays'];
+    // Search for users
+    final users = await searchService.searchMetadata(value);
+    ref.read(searchStateProvider.notifier).setSearchResultsUsers(users);
 
-        var personMetadata = await metadata
-            .getMetadataByPubkey(nipPubkey)
-            .first
-            .timeout(const Duration(seconds: 1));
-        personMetadata!.pubkey = nipPubkey;
-
-        workingMetadata.add(personMetadata);
-      }
-    }
-
-    if (hastagRegex.hasMatch(value)) {
-      // search for hashtag
-
-      log('hashtagRelays $value');
-    }
-
-    if (cashtagRegex.hasMatch(value)) {
-      // search for cashtag
-      log('cashtag $value');
-    }
-
-    setState(() {
-      //_searchResultsUsers = workingMetadata;
-    });
+    // Search for notes
+    final notes =
+        await searchService.searchNotes(search: value, kinds: [1], limit: 10);
+    ref.read(searchStateProvider.notifier).setSearchResultsNotes(
+          notes,
+        );
   }
 
   void _onSubmit(String value) {
-    if (value.startsWith('#')) {
-      var hastag = value.substring(1);
-      Navigator.pushNamed(context, '/nostr/hastag', arguments: hastag);
-    }
+    Navigator.pushNamed(context, '/nostr/search', arguments: value);
   }
 
   void _changeFollowing(
       bool followChange, String pubkey, ContactList currentOwnContacts) async {
-    List<String> newContacts = [...currentOwnContacts.contacts];
+    final followingService = ref.read(followingProvider);
 
     if (followChange) {
-      newContacts.add(pubkey);
+      await followingService.followUser(pubkey);
     } else {
-      newContacts.removeWhere((element) => element == pubkey);
+      await followingService.unfollowUser(pubkey);
     }
-
-    throw UnimplementedError("save contacts");
   }
 
   @override
   Widget build(BuildContext context) {
-    var followingService = ref.watch(followingProvider);
+    final searchState = ref.watch(searchStateProvider);
+    final isSearching = searchState.isSearching;
 
-    return WillPopScope(
-      onWillPop: () async {
-        // check if search is focused
-        if (_searchFocusNode.hasFocus) {
+    return PopScope(
+      canPop: true,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop && _searchFocusNode.hasFocus) {
           _searchFocusNode.unfocus();
           _searchController.clear();
-          return false;
+          ref.read(searchStateProvider.notifier).clearSearch();
         }
-        return true;
       },
       child: Scaffold(
         backgroundColor: Palette.background,
-        // scrollable column
-        body: StreamBuilder<ContactList>(
-          stream: followingService.getContactsStreamSelf(),
-          builder: (context, ownFollowingSnapshot) {
-            return Column(
-              children: [
-                _searchBar(context),
-                Expanded(
-                  child: ListView(
-                    physics: const BouncingScrollPhysics(),
-                    children: [
-                      // hide default view when searching
-                      Visibility(
-                        maintainState: true,
-                        maintainInteractivity: false,
-                        visible: !_isSearching,
-                        child: _defaultView(ownFollowingSnapshot.data!),
+        body: Consumer(
+          builder: (context, ref, child) {
+            final followingService = ref.watch(followingProvider);
+
+            return StreamBuilder<ContactList>(
+              stream: followingService.getContactsStreamSelf(),
+              builder: (context, ownFollowingSnapshot) {
+                if (!ownFollowingSnapshot.hasData) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+
+                return Column(
+                  children: [
+                    SearchBarWidget(
+                      onSearchChanged: (value) {
+                        _onSearchChanged(value);
+                      },
+                      onSubmit: (value) {
+                        _onSubmit(value);
+                      },
+                      helpSearch: (context) {
+                        _helpSearch(context);
+                      },
+                      externalFocusNode: _searchFocusNode,
+                      externalController: _searchController,
+                    ),
+                    Expanded(
+                      child: ListView(
+                        physics: const BouncingScrollPhysics(),
+                        children: [
+                          // Default view (trends)
+                          Visibility(
+                            maintainState: true,
+                            maintainInteractivity: false,
+                            visible: !isSearching,
+                            child: _defaultView(ownFollowingSnapshot.data!),
+                          ),
+
+                          // Search results
+                          if (isSearching)
+                            _buildSearchResults(ownFollowingSnapshot.data!)
+                        ],
                       ),
-                      if (_searchFocusNode.hasFocus)
-                        Column(
-                          children: [
-                            // search results
-                            Text("todo: search results")
-                          ],
-                        )
-                    ],
-                  ),
-                ),
-              ],
+                    ),
+                  ],
+                );
+              },
             );
           },
         ),
+      ),
+    );
+  }
+
+  Widget _buildSearchResults(ContactList currentFollowing) {
+    final searchState = ref.watch(searchStateProvider);
+
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (searchState.searchQuery.isNotEmpty)
+            InkWell(
+              onTap: () {
+                _onSubmit(searchState.searchQuery);
+              },
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 0, vertical: 15),
+                decoration: BoxDecoration(
+                  //color: Palette.extraDarkGray,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          'search for "${searchState.searchQuery}"',
+                          style: const TextStyle(
+                            color: Palette.white,
+                            fontSize: 16,
+                          ),
+                        ),
+                      ),
+                      Icon(
+                        PhosphorIcons.arrowUpLeft(),
+                        color: Palette.gray,
+                      )
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          // horizontal line
+          if (searchState.searchQuery.isNotEmpty)
+            Container(
+              margin: const EdgeInsets.only(top: 10, bottom: 10),
+              height: 1,
+              color: Palette.extraDarkGray,
+            ),
+
+          // Users section
+          if (searchState.searchResultsUsers.isNotEmpty) ...[
+            const Text(
+              "People",
+              style: TextStyle(
+                color: Palette.white,
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 10),
+            ...searchState.searchResultsUsers.map((user) => PersonCard(
+                  showFollowButton: false,
+                  pubkey: user.pubkey,
+                  name: user.name ?? '',
+                  pictureUrl: user.picture ?? '',
+                  about: user.about ?? '',
+                  nip05: user.nip05,
+                  isFollowing: currentFollowing.contacts.contains(user.pubkey),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ProfilePage2(
+                          pubkey: user.pubkey,
+                        ),
+                      ),
+                    );
+                  },
+                  onFollowTab: (followState) {
+                    _changeFollowing(
+                      followState,
+                      user.pubkey,
+                      currentFollowing,
+                    );
+                  },
+                )),
+            const SizedBox(height: 20),
+          ],
+
+          // Notes section
+          if (searchState.searchResultsNotes.isNotEmpty) ...[
+            const Text(
+              "Notes",
+              style: TextStyle(
+                color: Palette.white,
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 10),
+            ...searchState.searchResultsNotes.map((note) => NoteCardContainer(
+                  note: note,
+
+                  // onTap: () {
+                  //   // Navigate to note detail
+                  //   Navigator.pushNamed(context, '/nostr/note', arguments: note.id);
+                  // },
+                )),
+          ],
+
+          // No results
+          if (searchState.searchResultsUsers.isEmpty &&
+              searchState.searchResultsNotes.isEmpty &&
+              searchState.searchQuery.isNotEmpty)
+            const Center(
+              child: Padding(
+                padding: EdgeInsets.all(20.0),
+                child: Text(
+                  "No results found",
+                  style: TextStyle(color: Palette.gray, fontSize: 16),
+                ),
+              ),
+            ),
+        ],
       ),
     );
   }
@@ -283,40 +401,21 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                   "trends",
                   style: TextStyle(
                       color: Palette.white,
-                      fontSize: 25,
+                      fontSize: 27,
                       fontWeight: FontWeight.bold),
                 ),
-                const SizedBox(width: 18),
+                const SizedBox(width: 15),
                 GestureDetector(
                   onTap: () {
                     Uri url = Uri.parse("https://nostr.band");
                     launchUrl(url, mode: LaunchMode.externalApplication);
                   },
                   child: const Text("by nostr.band",
-                      style: TextStyle(color: Palette.gray, fontSize: 15)),
+                      style: TextStyle(color: Palette.gray, fontSize: 14)),
                 ),
               ],
             ),
-            FutureBuilder<NostrBandHashtags?>(
-                future: ref.watch(nostrBandProvider).getTrendingHashtags(),
-                builder: (context, AsyncSnapshot<NostrBandHashtags?> snapshot) {
-                  if (snapshot.hasError) {
-                    log(snapshot.error.toString());
-                    return const Text('Something went wrong');
-                  }
-                  if (snapshot.hasData) {
-                    return _trendingHashtags(api: snapshot.data!, limit: 10);
-                  }
-                  if (snapshot.connectionState == ConnectionState.done) {
-                    return const Text('no connection');
-                  }
-
-                  return Column(
-                    children: [
-                      for (var i = 0; i < 10; i++) const HashtagCardSkeleton()
-                    ],
-                  );
-                }),
+            _buildTrendingHashtags(),
             const SizedBox(height: 20),
             const Text(
               "trending people",
@@ -326,53 +425,99 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                   fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 10),
-            FutureBuilder<NostrBandPeople?>(
-                future: ref.watch(nostrBandProvider).getTrendingPeople(),
-                builder: (context, AsyncSnapshot<NostrBandPeople?> snapshot) {
-                  if (snapshot.hasError) {
-                    log(snapshot.error.toString());
-                    return const Text('Something went wrong');
-                  }
-                  if (snapshot.hasData) {
-                    return _trendingPeople(
-                        snapshot.data!, 10, currentFollowing);
-                  }
-                  if (snapshot.connectionState == ConnectionState.done) {
-                    return const Text('no connection');
-                  }
-
-                  return const Center(child: CircularProgressIndicator());
-                }),
+            _buildTrendingPeople(currentFollowing),
           ],
         ));
   }
 
-  Widget _trendingHashtags({required NostrBandHashtags api, int? limit}) {
-    var myHashtags = api.hashtags;
-
-    List<Widget> hashtagWidgets = [];
-
-    for (int i = 0; i < myHashtags.length; i++) {
-      if (i == limit) {
-        break;
-      }
-      var hashtag = myHashtags[i];
-      String cleanHashtag = hashtag.hashtag.replaceFirst('#', '');
-      hashtagWidgets.add(
-        HashtagCard(
-          index: i,
-          hashtag: cleanHashtag,
-          threadsCount: hashtag.threadsCount,
-          onTap: (hashtag) {
-            Navigator.pushNamed(context, '/nostr/hastag', arguments: hashtag);
-          },
+  Widget _buildTrendingHashtags() {
+    return Consumer(builder: (context, ref, child) {
+      final nostrBandAsync = ref.watch(
+        nostrBandProvider.select(
+          (provider) => provider.getTrendingHashtags(),
         ),
       );
-    }
+
+      return FutureBuilder<NostrBandHashtags?>(
+        future: nostrBandAsync,
+        builder: (context, snapshot) {
+          if (snapshot.hasError) {
+            log(snapshot.error.toString());
+            return const Text('Something went wrong',
+                style: TextStyle(color: Palette.gray));
+          }
+
+          if (snapshot.hasData) {
+            return _trendingHashtags(
+              api: snapshot.data!,
+              limit: 10,
+            );
+          }
+
+          if (snapshot.connectionState == ConnectionState.done) {
+            return const Text('No connection',
+                style: TextStyle(color: Palette.gray));
+          }
+
+          return Column(
+            children: List.generate(10, (i) => const HashtagCardSkeleton()),
+          );
+        },
+      );
+    });
+  }
+
+  Widget _buildTrendingPeople(ContactList currentFollowing) {
+    return Consumer(builder: (context, ref, child) {
+      final nostrBandAsync = ref.watch(
+          nostrBandProvider.select((provider) => provider.getTrendingPeople()));
+
+      return FutureBuilder<NostrBandPeople?>(
+        future: nostrBandAsync,
+        builder: (context, snapshot) {
+          if (snapshot.hasError) {
+            log(snapshot.error.toString());
+            return const Text('Something went wrong',
+                style: TextStyle(color: Palette.gray));
+          }
+
+          if (snapshot.hasData) {
+            return _trendingPeople(snapshot.data!, 10, currentFollowing);
+          }
+
+          if (snapshot.connectionState == ConnectionState.done) {
+            return const Text('No connection',
+                style: TextStyle(color: Palette.gray));
+          }
+
+          return const Center(child: CircularProgressIndicator());
+        },
+      );
+    });
+  }
+
+  Widget _trendingHashtags({required NostrBandHashtags api, int? limit}) {
+    final myHashtags = api.hashtags;
+    int displayLimit = limit ?? myHashtags.length;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: hashtagWidgets,
+      children: List.generate(
+        displayLimit > myHashtags.length ? myHashtags.length : displayLimit,
+        (i) {
+          final hashtag = myHashtags[i];
+
+          return HashtagCard(
+            index: i,
+            hashtag: hashtag.hashtag,
+            postsCount: hashtag.posts,
+            onTap: (hashtag) {
+              Navigator.pushNamed(context, '/nostr/search',
+                  arguments: "#$hashtag");
+            },
+          );
+        },
+      ),
     );
   }
 
@@ -416,87 +561,6 @@ class _SearchPageState extends ConsumerState<SearchPage> {
     }
     return Column(
       children: personCards,
-    );
-  }
-
-  Padding _searchBar(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 20, left: 15, right: 10, bottom: 10),
-      child: Row(
-        children: [
-          // back button
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              //color: Palette.extraDarkGray,
-              borderRadius: BorderRadius.circular(200),
-            ),
-            child: IconButton(
-              icon: _searchFocusNode.hasFocus
-                  ? const Icon(Icons.arrow_back)
-                  : const Icon(Icons.search),
-              color: Palette.white,
-              onPressed: () {
-                _searchController.clear();
-                // unfocus search bar
-                _searchFocusNode.hasFocus
-                    ? _searchFocusNode.unfocus()
-                    : _searchFocusNode.requestFocus();
-              },
-            ),
-          ),
-          const SizedBox(width: 5),
-          Expanded(
-            child: TextField(
-              controller: _searchController,
-              focusNode: _searchFocusNode,
-              decoration: InputDecoration(
-                isDense: true,
-                hintText: ' Search',
-                hintStyle:
-                    const TextStyle(color: Palette.white, letterSpacing: 1.1),
-                filled: true,
-                fillColor: _searchFocusNode.hasFocus
-                    ? Palette.background
-                    : Palette.extraDarkGray,
-                enabledBorder: const OutlineInputBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(50.0)),
-                  borderSide: BorderSide(color: Palette.extraDarkGray),
-                ),
-                focusedBorder: const OutlineInputBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(25.0)),
-                  borderSide: BorderSide(color: Palette.background),
-                ),
-              ),
-              style: const TextStyle(color: Palette.white),
-              onChanged: (value) {
-                _onSearchChanged(value);
-              },
-              onSubmitted: (value) {
-                _onSubmit(value);
-              },
-              onTapOutside: (value) {
-                // close keyboard
-                //FocusScope.of(context).requestFocus(FocusNode());
-              },
-            ),
-          ),
-          const SizedBox(width: 5),
-          SizedBox(
-            width: 41,
-            height: 41,
-            child: IconButton(
-              icon: SvgPicture.asset(
-                'assets/icons/question.svg',
-                color: Palette.extraLightGray,
-              ),
-              color: Palette.white,
-              onPressed: () => _helpSearch(context),
-            ),
-          ),
-        ],
-      ),
     );
   }
 }

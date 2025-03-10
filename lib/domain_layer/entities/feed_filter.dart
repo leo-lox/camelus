@@ -40,6 +40,7 @@ class FeedFilter {
     this.tTags,
     this.aTags,
     this.dTags,
+    this.search,
   });
 
   @override

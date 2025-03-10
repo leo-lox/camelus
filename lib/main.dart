@@ -3,7 +3,10 @@ import 'dart:ui';
 
 import 'package:camelus/presentation_layer/providers/db_ndk_provider.dart';
 import 'package:camelus/presentation_layer/providers/inbox_outbox_provider.dart';
+import 'package:camelus/presentation_layer/providers/language_provider.dart';
 import 'package:camelus/presentation_layer/providers/ndk_provider.dart';
+import 'package:camelus/presentation_layer/routes/nostr/search_feed_page/search_feed_page.dart';
+import 'package:camelus/presentation_layer/routes/nostr/settings/locale/locale_settings.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -19,7 +22,6 @@ import 'presentation_layer/providers/db_app_provider.dart';
 import 'presentation_layer/routes/home_page.dart';
 import 'presentation_layer/routes/nostr/blockedUsers/blocked_users.dart';
 import 'presentation_layer/routes/nostr/event_view/event_view_page.dart';
-import 'presentation_layer/routes/nostr/hashtag_view/hashtag_view_page.dart';
 import 'presentation_layer/routes/nostr/onboarding/onboarding.dart';
 import 'presentation_layer/routes/nostr/profile/profile_page_2.dart';
 import 'presentation_layer/routes/nostr/settings/file_servers/settings_file_servers.dart';
@@ -117,7 +119,7 @@ Future<void> main() async {
   );
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends ConsumerWidget {
   final String initialRoute;
   final String pubkey;
   final GlobalKey<NavigatorState> navigatorKey;
@@ -129,9 +131,12 @@ class MyApp extends StatelessWidget {
     required this.pubkey,
   });
 
-  // This widget is the root of your application.
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, ref) {
+    // set system locale if no locale is set
+    ref
+        .read(languageProvider.notifier)
+        .initializeWithSystemLocaleIfNeeded(context);
     return Portal(
       child: MaterialApp(
         navigatorKey: navigatorKey,
@@ -157,6 +162,14 @@ class MyApp extends StatelessWidget {
                 );
               });
 
+            case '/search':
+              return CupertinoPageRoute(builder: (context) {
+                return HomePage(
+                  pubkey: pubkey,
+                  initialPage: 1,
+                );
+              });
+
             case '/onboarding':
               return MaterialPageRoute(
                 builder: (context) => const NostrOnboarding(),
@@ -174,6 +187,10 @@ class MyApp extends StatelessWidget {
               return MaterialPageRoute(
                 builder: (context) => const InitalRouteSettings(),
               );
+            case '/settings/locale':
+              return MaterialPageRoute(
+                builder: (context) => const LocaleSettingsPage(),
+              );
             case '/nostr/event':
               return CupertinoPageRoute(
                 builder: (context) => EventViewPage(
@@ -188,10 +205,12 @@ class MyApp extends StatelessWidget {
                 builder: (context) =>
                     ProfilePage2(pubkey: settings.arguments as String),
               );
-            case '/nostr/hastag':
-              return MaterialPageRoute(
-                builder: (context) =>
-                    HastagViewPage(hashtag: settings.arguments as String),
+            case '/nostr/search':
+              return PageRouteBuilder(
+                pageBuilder: (context, animation, secondaryAnimation) =>
+                    SearchFeedPage(query: settings.arguments as String),
+                transitionDuration: Duration.zero,
+                reverseTransitionDuration: Duration.zero,
               );
             case '/nostr/blockedUsers':
               return MaterialPageRoute(

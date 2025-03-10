@@ -1,18 +1,13 @@
-import 'package:camelus/data_layer/models/nostr_note_model.dart';
-import 'package:camelus/domain_layer/entities/nostr_note.dart';
-
 import '../../domain_layer/entities/nostr_band_people.dart';
+import 'nostr_note_model.dart';
 
 class NostrBandPeopleModel extends NostrBandPeople {
   NostrBandPeopleModel({required super.profiles});
 
   factory NostrBandPeopleModel.fromJson(Map<String, dynamic> json) {
     List<dynamic> profilesJson = json['profiles'] ?? [];
-    List<ProfilesModel> profiles = [];
-    //cast using for loop
-    for (Map<String, dynamic> profile in profilesJson) {
-      profiles.add(ProfilesModel.fromJson(profile));
-    }
+    List<ProfilesModel> profiles =
+        profilesJson.map((profile) => ProfilesModel.fromJson(profile)).toList();
 
     return NostrBandPeopleModel(
       profiles: profiles,
@@ -20,19 +15,11 @@ class NostrBandPeopleModel extends NostrBandPeople {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    data['profiles'] = profiles
-        .map((v) => {
-              ProfilesModel(
-                newFollowersCount: v.newFollowersCount,
-                profile: v.profile,
-                pubkey: v.pubkey,
-                relays: v.relays,
-              ).toJson()
-            })
-        .toList();
-
-    return data;
+    return {
+      'profiles': profiles
+          .map((profile) => (profile as ProfilesModel).toJson())
+          .toList(),
+    };
   }
 }
 
@@ -45,35 +32,20 @@ class ProfilesModel extends Profiles {
   });
 
   factory ProfilesModel.fromJson(Map<String, dynamic> json) {
-    List<dynamic> relaysJson = json['relays'] ?? [];
-    List<String> relays = [];
-    //cast using for loop
-    for (String relay in relaysJson) {
-      relays.add(relay);
-    }
-
     return ProfilesModel(
-      pubkey: json['pubkey'],
-      newFollowersCount: json['new_followers_count'],
-      relays: relays,
+      pubkey: json['pubkey'] ?? '',
+      newFollowersCount: json['new_followers_count'] ?? 0,
+      relays: [], //List<String>.from(json['relays'] ?? []),
       profile: NostrNoteModel.fromJson(json['profile']),
     );
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    data['pubkey'] = pubkey;
-    data['new_followers_count'] = newFollowersCount;
-    data['relays'] = relays;
-    data['profile'] = NostrNoteModel(
-      id: super.profile.id,
-      pubkey: super.profile.pubkey,
-      created_at: super.profile.created_at,
-      kind: super.profile.kind,
-      content: super.profile.content,
-      sig: super.profile.sig,
-      tags: super.profile.tags,
-    ).toJson();
-    return data;
+    return {
+      'pubkey': pubkey,
+      'new_followers_count': newFollowersCount,
+      'relays': relays,
+      'profile': (profile as NostrNoteModel).toJson(),
+    };
   }
 }

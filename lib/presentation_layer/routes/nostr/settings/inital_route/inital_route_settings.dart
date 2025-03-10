@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../../../config/palette.dart';
 import '../../../../providers/inital_route_provider.dart';
@@ -19,6 +20,7 @@ class InitalRouteSettingsState extends ConsumerState<InitalRouteSettings> {
   final List<String> routes = [
     '/',
     '/post-and-replies',
+    '/search',
   ];
 
   _laodInitialRoute() async {
@@ -53,7 +55,7 @@ class InitalRouteSettingsState extends ConsumerState<InitalRouteSettings> {
               style: TextStyle(color: Palette.lightGray),
             ),
             trailing: selectedRoute == route
-                ? Icon(Icons.check, color: Palette.white)
+                ? Icon(PhosphorIcons.check(), color: Palette.white)
                 : null,
             onTap: () {
               ref.read(selectedRouteProvider.notifier).state = route;

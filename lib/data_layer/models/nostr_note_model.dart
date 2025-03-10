@@ -31,7 +31,7 @@ class NostrNoteModel extends NostrNote {
       kind: json['kind'],
       content: json['content'],
       sig: json['sig'],
-      sources: json['sources'],
+      sources: json['sources'] ?? [],
       tags: tags.map((tag) => NostrTagModel.fromJson(tag)).toList(),
     );
   }
