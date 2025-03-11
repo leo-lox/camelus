@@ -200,7 +200,9 @@ class _SearchPageState extends ConsumerState<SearchPage> {
         if (didPop && _searchFocusNode.hasFocus) {
           _searchFocusNode.unfocus();
           _searchController.clear();
-          ref.read(searchStateProvider.notifier).clearSearch();
+          ref
+              .read(searchStateProvider.notifier)
+              .clearSearch(stillSearching: true);
         }
       },
       child: Scaffold(
@@ -220,6 +222,13 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                   children: [
                     SearchBarWidget(
                       onSearchChanged: (value) {
+                        if (value.length < 2) {
+                          ref
+                              .read(searchStateProvider.notifier)
+                              .clearSearch(stillSearching: true);
+                          return;
+                        }
+
                         _onSearchChanged(value);
                       },
                       onSubmit: (value) {
