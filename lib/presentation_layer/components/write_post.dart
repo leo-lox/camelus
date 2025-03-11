@@ -349,19 +349,7 @@ class _WritePostState extends ConsumerState<WritePost> {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return PostSettings(
-          onSettingsChanged: (settings) {
-            // Handle settings changes if needed
-            print('Settings updated: $settings');
-
-            // You can update your state or UI based on the settings
-            // For example:
-            // setState(() {
-            //   _postHasContentWarning = settings['contentWarning']['enabled'];
-            //   _postHasClientTag = settings['clientTag']['enabled'];
-            // });
-          },
-        );
+        return PostSettings();
       },
     );
   }

@@ -2,10 +2,12 @@ import 'package:ndk/entities.dart' as ndk_entities;
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../config/camelus_config.dart';
 import '../../domain_layer/entities/mem_file.dart';
 import '../../domain_layer/entities/nostr_note.dart';
 import '../../domain_layer/entities/nostr_tag.dart';
 import '../../helpers/nprofile_helper.dart';
+import '../components/write_post/post_settings_dialog.dart';
 import 'edit_relays_provider.dart';
 import 'file_upload_provider.dart';
 import 'get_notes_provider.dart';
@@ -279,16 +281,37 @@ class WritePostNotifier extends Notifier<WritePostState> {
 
     final int now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
 
-    try {
-      await notesP.broadcastNote(NostrNote(
-        id: '',
-        pubkey: pubkey,
-        created_at: now,
-        kind: 1,
-        content: content,
-        sig: '',
-        tags: tags,
+    // add post settings tags
+    final postSettings = ref.watch(postSettingsProvider);
+
+    if (postSettings.enableContentWarning) {
+      tags.add(NostrTag(
+        type: 'content-warning',
+        value: postSettings.warning,
       ));
+    }
+    if (postSettings.enableClientTag) {
+      // ["client", "My Client", "31990:app1-pubkey:<d-identifier>", "wss://relay1"]
+      tags.add(NostrTag(
+        type: 'client',
+        value: CamelusConfig.name,
+        marker: CamelusConfig.identifierAddress,
+        recommended_relay: CamelusConfig.homeRelay,
+      ));
+    }
+
+    try {
+      await notesP.broadcastNote(
+        NostrNote(
+          id: '',
+          pubkey: pubkey,
+          created_at: now,
+          kind: 1,
+          content: content,
+          sig: '',
+          tags: tags,
+        ),
+      );
     } catch (e) {
       state = state.copyWith(
           isSubmitting: false, isError: true, errorText: e.toString());
@@ -300,6 +323,7 @@ class WritePostNotifier extends Notifier<WritePostState> {
   }
 
   void clearPost() {
+    ref.read(postSettingsProvider.notifier).reset();
     state = state.copyWith(
       errorText: '',
       isError: false,
