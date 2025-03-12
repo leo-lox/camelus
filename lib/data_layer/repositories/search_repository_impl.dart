@@ -41,6 +41,7 @@ class SearchRepositoryImpl implements SearchRepository {
       until: until,
       search: search,
       limit: limit,
+      cacheOnly: true,
     );
     return results.map((e) => NostrNoteModel.fromNDKEvent(e)).toList();
   }
