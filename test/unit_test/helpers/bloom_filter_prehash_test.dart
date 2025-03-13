@@ -1,49 +1,58 @@
 import 'dart:typed_data';
-import 'package:camelus/helpers/bloom_filter.dart';
+import 'package:camelus/data_layer/models/nostr_note_model.dart';
+import 'package:camelus/domain_layer/entities/nostr_note.dart';
+import 'package:camelus/helpers/bip340.dart';
+import 'package:camelus/helpers/bloom_filter_prehash.dart';
 import 'package:test/test.dart';
 
 void main() {
-  group('BloomFilter', () {
+  group('BloomFilterPrehash', () {
     test('initialization with valid parameters', () {
       final filter =
-          BloomFilter(falsePositiveProbability: 0.01, numItems: 1000);
+          BloomFilterPrehash(falsePositiveProbability: 0.01, numItems: 1000);
       expect(filter.size, greaterThan(0));
       expect(filter.numHashFunctions, greaterThan(0));
     });
 
     test('throws exception with invalid probability', () {
-      expect(() => BloomFilter(falsePositiveProbability: 0, numItems: 1000),
+      expect(
+          () => BloomFilterPrehash(falsePositiveProbability: 0, numItems: 1000),
           throwsArgumentError);
-      expect(() => BloomFilter(falsePositiveProbability: 1, numItems: 1000),
+      expect(
+          () => BloomFilterPrehash(falsePositiveProbability: 1, numItems: 1000),
           throwsArgumentError);
-      expect(() => BloomFilter(falsePositiveProbability: -0.1, numItems: 1000),
+      expect(
+          () => BloomFilterPrehash(
+              falsePositiveProbability: -0.1, numItems: 1000),
           throwsArgumentError);
     });
 
     test('throws exception with invalid number of items', () {
-      expect(() => BloomFilter(falsePositiveProbability: 0.01, numItems: 0),
+      expect(
+          () => BloomFilterPrehash(falsePositiveProbability: 0.01, numItems: 0),
           throwsArgumentError);
-      expect(() => BloomFilter(falsePositiveProbability: 0.01, numItems: -10),
+      expect(
+          () =>
+              BloomFilterPrehash(falsePositiveProbability: 0.01, numItems: -10),
           throwsArgumentError);
     });
 
     test('add and contains work correctly', () {
       final filter =
-          BloomFilter(falsePositiveProbability: 0.01, numItems: 1000);
+          BloomFilterPrehash(falsePositiveProbability: 0.01, numItems: 1000);
 
       // Add some items
       filter.add(
-          '395f432aee274459be33c6684fad9471181e0a075bcce8e6fda4050bb1955c51');
+          '341ac9cefc8364e77f570cf43fb90ce82d53628fd7d1567e3d5716db3852d11a');
       filter.add(
           '9b8b989bcc4c4e618a136965c8f1c82e9cc3db22568a52bdebeb6f2fa0422796');
       filter.add(
           '0f59b606089c756cf02c67012956638a0c0ae78bbf41be0ee3aabceba4803ba0');
-      filter.add('gerneric-value');
 
       // Check for added items
       expect(
           filter.contains(
-              '395f432aee274459be33c6684fad9471181e0a075bcce8e6fda4050bb1955c51'),
+              '341ac9cefc8364e77f570cf43fb90ce82d53628fd7d1567e3d5716db3852d11a'),
           isTrue);
       expect(
           filter.contains(
@@ -53,16 +62,21 @@ void main() {
           filter.contains(
               '0f59b606089c756cf02c67012956638a0c0ae78bbf41be0ee3aabceba4803ba0'),
           isTrue);
-      expect(filter.contains('gerneric-value'), isTrue);
 
       // Check for non-added items
-      expect(filter.contains('notInThere'), isFalse);
-      expect(filter.contains('🫠'), isFalse);
+      expect(
+          filter.contains(
+              'cc125c8c1025487681e086c6b3c5b64d6bce14fdc6502c18f3c7472130ea211e'),
+          isFalse);
+      expect(
+          filter.contains(
+              '2da7850b3bca47cbe6c08685ea844b33659e5f8b94df469b6005cc012849ef15'),
+          isFalse);
     });
 
     test('serialization and deserialization', () {
       final originalFilter =
-          BloomFilter(falsePositiveProbability: 0.01, numItems: 1000);
+          BloomFilterPrehash(falsePositiveProbability: 0.01, numItems: 1000);
 
       // Add some items
       originalFilter.add(
@@ -71,13 +85,13 @@ void main() {
           '625bac679a9b02a5b737e3c915209481bb604609247802acd39c1c2c3a68d7a6');
       originalFilter.add(
           'c878f3e84c39f1671dd763c7e96c89926952cdfdf497f075f3441e6590b1a9d3');
-      originalFilter.add('generic-value');
 
       // Serialize
       final serialized = originalFilter.serialize();
 
       // Deserialize
-      final deserializedFilter = BloomFilter.fromNumHashFunctionsAndByteArray(
+      final deserializedFilter =
+          BloomFilterPrehash.fromNumHashFunctionsAndByteArray(
         numHashFunctions: originalFilter.numHashFunctions,
         byteArray: serialized,
         size: originalFilter.size,
@@ -96,7 +110,7 @@ void main() {
           deserializedFilter.contains(
               'c878f3e84c39f1671dd763c7e96c89926952cdfdf497f075f3441e6590b1a9d3'),
           isTrue);
-      expect(deserializedFilter.contains('generic-value'), isTrue);
+
       expect(
           deserializedFilter.contains(
               'faf136b76938530e5a6702bf6f25f6f52a714bc7387bdebc64ae0aefbf8e5937'),
@@ -107,21 +121,44 @@ void main() {
       // Create a filter with 1% false positive rate for 1000 items
       final falsePositiveRate = 0.01;
       final numItems = 1000;
-      final filter = BloomFilter(
+      final filter = BloomFilterPrehash(
           falsePositiveProbability: falsePositiveRate, numItems: numItems);
 
       // Add numItems different items
       for (int i = 0; i < numItems; i++) {
-        filter.add('item_$i');
+        final keypair = Bip340().generatePrivateKey();
+        final nostrNote = NostrNote(
+          id: "",
+          sig: "",
+          created_at: 0,
+          pubkey: keypair.publicKey,
+          content: "hi$i",
+          kind: 1,
+          tags: [],
+        );
+        final ndkEvent = NostrNoteModel.fromEntity(nostrNote).toNDKEvent();
+
+        filter.add(ndkEvent.id);
       }
 
       // Test with a different set of items to check false positive rate
       int falsePositives = 0;
-      final testSize = 10000;
+      final testSize = 1000;
 
       for (int i = 0; i < testSize; i++) {
-        final testItem = 'test_item_$i';
-        if (filter.contains(testItem)) {
+        final keypair = Bip340().generatePrivateKey();
+        final nostrNote = NostrNote(
+          id: "",
+          sig: "",
+          created_at: 0,
+          pubkey: keypair.publicKey,
+          content: "hi$i",
+          kind: 1,
+          tags: [],
+        );
+        final testItem = NostrNoteModel.fromEntity(nostrNote).toNDKEvent();
+
+        if (filter.contains(testItem.id)) {
           falsePositives++;
         }
       }
@@ -135,35 +172,19 @@ void main() {
       print('Actual false positive rate: $actualFalsePositiveRate');
     });
 
-    test('handles large number of items', () {
-      const numberOfItems = 1000000;
-      final filter =
-          BloomFilter(falsePositiveProbability: 0.01, numItems: numberOfItems);
-
-      // Add many items
-      for (int i = 0; i < numberOfItems; i++) {
-        filter.add('large_item_$i');
-      }
-
-      // Check that all added items are found
-      for (int i = 0; i < 10000; i++) {
-        expect(filter.contains('large_item_$i'), isTrue);
-      }
-    });
-
     test('fromNumHashFunctionsAndByteArray constructor validation', () {
       expect(
-          () => BloomFilter.fromNumHashFunctionsAndByteArray(
+          () => BloomFilterPrehash.fromNumHashFunctionsAndByteArray(
               numHashFunctions: 0, byteArray: Uint8List(10), size: 10),
           throwsArgumentError);
 
       expect(
-          () => BloomFilter.fromNumHashFunctionsAndByteArray(
+          () => BloomFilterPrehash.fromNumHashFunctionsAndByteArray(
               numHashFunctions: -1, byteArray: Uint8List(10), size: 10),
           throwsArgumentError);
 
       expect(
-          () => BloomFilter.fromNumHashFunctionsAndByteArray(
+          () => BloomFilterPrehash.fromNumHashFunctionsAndByteArray(
               numHashFunctions: 5, byteArray: Uint8List(0), size: 10),
           throwsArgumentError);
     });
