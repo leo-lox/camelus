@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:typed_data';
 import 'package:camelus/helpers/bloom_filter.dart';
 import 'package:test/test.dart';
@@ -79,7 +80,7 @@ void main() {
       // Deserialize
       final deserializedFilter = BloomFilter.fromNumHashFunctionsAndByteArray(
         numHashFunctions: originalFilter.numHashFunctions,
-        byteArray: serialized,
+        byteArray: base64Decode(serialized),
         size: originalFilter.size,
       );
 

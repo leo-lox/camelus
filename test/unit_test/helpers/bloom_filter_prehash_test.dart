@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:typed_data';
 import 'package:camelus/data_layer/models/nostr_note_model.dart';
 import 'package:camelus/domain_layer/entities/nostr_note.dart';
@@ -93,7 +94,7 @@ void main() {
       final deserializedFilter =
           BloomFilterPrehash.fromNumHashFunctionsAndByteArray(
         numHashFunctions: originalFilter.numHashFunctions,
-        byteArray: serialized,
+        byteArray: base64Decode(serialized),
         size: originalFilter.size,
       );
 
