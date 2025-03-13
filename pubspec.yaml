@@ -86,6 +86,8 @@ dependencies:
   ndk_objectbox: ^0.2.1
   image: ^4.3.0
   flutter_list_view: ^1.1.29
+  xxh3: ^1.2.0
+
   
 
 
