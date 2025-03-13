@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:math';
 import 'dart:typed_data';
 
@@ -55,18 +56,18 @@ class BloomFilterPrehash {
     return {
       'size': _size,
       'numHashFunctions': _numHashFunctions,
-      'bitArray': _bitArray,
+      'bitArray': base64Encode(_bitArray),
     };
   }
 
-  Uint8List serialize() {
-    return _bitArray;
+  String serialize() {
+    return base64Encode(_bitArray);
   }
 
   static BloomFilterPrehash deserialize(Map<String, dynamic> data) {
     return BloomFilterPrehash.fromNumHashFunctionsAndByteArray(
       numHashFunctions: data['numHashFunctions'],
-      byteArray: data['bitArray'],
+      byteArray: base64Decode(data['bitArray']),
       size: data['size'],
     );
   }
@@ -79,6 +80,7 @@ class BloomFilterPrehash {
     return ((m / n) * log(2)).ceil();
   }
 
+  /// [hexHash] must be a 64 character hash value with even distribution!
   void add(String hexHash) {
     if (!_isValidHexHash(hexHash)) {
       throw ArgumentError("Input must be a 64-character hexadecimal string");

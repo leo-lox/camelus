@@ -1,6 +1,6 @@
 import 'dart:math';
 import 'dart:typed_data';
-import 'dart:convert' show utf8;
+import 'dart:convert' show base64Decode, base64Encode, utf8;
 import 'package:xxh3/xxh3.dart';
 
 class BloomFilter {
@@ -56,20 +56,20 @@ class BloomFilter {
     return {
       'size': _size,
       'numHashFunctions': _numHashFunctions,
-      'bitArray': _bitArray,
+      'bitArray': base64Encode(_bitArray),
     };
   }
 
   // Basic serialization for backward compatibility
-  Uint8List serialize() {
-    return _bitArray;
+  String serialize() {
+    return base64Encode(_bitArray);
   }
 
   // Static method to deserialize from a map
   static BloomFilter deserialize(Map<String, dynamic> data) {
     return BloomFilter.fromNumHashFunctionsAndByteArray(
       numHashFunctions: data['numHashFunctions'],
-      byteArray: data['bitArray'],
+      byteArray: base64Decode(data['bitArray']),
       size: data['size'],
     );
   }
