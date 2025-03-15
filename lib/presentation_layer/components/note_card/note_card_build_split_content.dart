@@ -150,7 +150,11 @@ class _NoteCardSplitContentState extends ConsumerState<NoteCardSplitContent> {
                           ),
                         ),
                         style: const TextStyle(
-                            color: Palette.lightGray, fontSize: 17),
+                          color: Palette.lightGray,
+                          fontSize: 17,
+                          height: 1.3,
+                          wordSpacing: 1.05,
+                        ),
                         maxLines: _isExpanded
                             ? null
                             : null, // Let it flow naturally within constraint

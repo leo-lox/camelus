@@ -142,6 +142,7 @@ class NoteCard extends ConsumerWidget {
       child: UserImage(
         imageUrl: myMetadata?.picture,
         pubkey: note.pubkey,
+        size: 45,
       ),
     );
   }
