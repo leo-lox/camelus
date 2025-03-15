@@ -38,6 +38,13 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.11.3"
+  apipod_client:
+    dependency: "direct main"
+    description:
+      path: "apipod/apipod_client"
+      relative: true
+    source: path
+    version: "0.0.0"
   app_links:
     dependency: "direct main"
     description:
@@ -1023,12 +1030,10 @@ packages:
   ndk:
     dependency: "direct main"
     description:
-      path: "packages/ndk"
-      ref: HEAD
-      resolved-ref: "04e29d4bf80ba47497d695cf741928b8985ef330"
-      url: "https://github.com/relaystr/ndk.git"
-    source: git
-    version: "0.3.1"
+      path: "../ndk/packages/ndk"
+      relative: true
+    source: path
+    version: "0.3.2"
   ndk_amber:
     dependency: "direct main"
     description:
@@ -1040,10 +1045,9 @@ packages:
   ndk_objectbox:
     dependency: "direct main"
     description:
-      name: ndk_objectbox
-      sha256: "6897f82c691b185d9095db146df0e08233cb2d115b9888eeda27b39928961709"
-      url: "https://pub.dev"
-    source: hosted
+      path: "../ndk/packages/objectbox"
+      relative: true
+    source: path
     version: "0.2.1"
   ndk_rust_verifier:
     dependency: "direct main"
@@ -1334,6 +1338,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.28.0"
+  serverpod_client:
+    dependency: "direct main"
+    description:
+      name: serverpod_client
+      sha256: "67f09bb7ce1b19e1690ce34f390904924d654d9c57680ec9ec7a8c2a88393c88"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.4.0"
+  serverpod_serialization:
+    dependency: transitive
+    description:
+      name: serverpod_serialization
+      sha256: "87d9e769c1189b1fb0eb96a986b673508f351ddee0d472638bcff1f837bf2627"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.4.0"
   shared_preferences:
     dependency: "direct main"
     description:
@@ -1843,6 +1863,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "6.5.0"
+  xxh3:
+    dependency: "direct main"
+    description:
+      name: xxh3
+      sha256: "399a0438f5d426785723c99da6b16e136f4953fb1e9db0bf270bd41dd4619916"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.2.0"
   yaml:
     dependency: transitive
     description:
