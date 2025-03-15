@@ -27,7 +27,7 @@ class Moderation {
   ///    'size': <int>,
   ///    'numHashFunctions': <int>,
   ///    'bitArray': <string>,
-  Future<Map<String, dynamic>> fetchBloomFilter() {
-    return _moderationRepository.fetchBloomFilter();
+  Future<Map<String, dynamic>?> fetchBloomFilterProfiles() {
+    return _moderationRepository.fetchBloomFilterProfiles();
   }
 }

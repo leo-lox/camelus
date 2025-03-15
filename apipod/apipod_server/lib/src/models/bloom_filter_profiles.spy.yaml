@@ -1,0 +1,14 @@
+class: BloomFilterProfile
+table: bloom_filter_profiles
+fields:
+  size: int
+  numHashFunctions: int
+  bitArray: String
+  createdAt: DateTime
+  name: String?
+  description: String?
+
+indexes:
+  bloom_filter_events_created_at_idx:
+    fields: createdAt
+    unique: false

@@ -9,7 +9,7 @@ class ModerationRepositoryImpl implements ModerationRepository {
   });
 
   @override
-  Future<Map<String, dynamic>> fetchBloomFilter() {
+  Future<Map<String, dynamic>?> fetchBloomFilterProfiles() {
     return server.client.moderation.getProfileBloomFilter();
   }
 }

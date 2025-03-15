@@ -13,20 +13,9 @@ import 'package:serverpod_client/serverpod_client.dart' as _i1;
 import 'dart:async' as _i2;
 import 'protocol.dart' as _i3;
 
-/// {@category Endpoint}
-class EndpointExample extends _i1.EndpointRef {
-  EndpointExample(_i1.EndpointCaller caller) : super(caller);
-
-  @override
-  String get name => 'example';
-
-  _i2.Future<String> hello(String name) => caller.callServerEndpoint<String>(
-        'example',
-        'hello',
-        {'name': name},
-      );
-}
-
+///    'size': <int>,
+///    'numHashFunctions': <int>,
+///    'bitArray': <string>,
 /// {@category Endpoint}
 class EndpointModeration extends _i1.EndpointRef {
   EndpointModeration(_i1.EndpointCaller caller) : super(caller);
@@ -34,8 +23,8 @@ class EndpointModeration extends _i1.EndpointRef {
   @override
   String get name => 'moderation';
 
-  _i2.Future<Map<String, dynamic>> getProfileBloomFilter() =>
-      caller.callServerEndpoint<Map<String, dynamic>>(
+  _i2.Future<Map<String, dynamic>?> getProfileBloomFilter() =>
+      caller.callServerEndpoint<Map<String, dynamic>?>(
         'moderation',
         'getProfileBloomFilter',
         {},
@@ -68,19 +57,14 @@ class Client extends _i1.ServerpodClientShared {
           disconnectStreamsOnLostInternetConnection:
               disconnectStreamsOnLostInternetConnection,
         ) {
-    example = EndpointExample(this);
     moderation = EndpointModeration(this);
   }
-
-  late final EndpointExample example;
 
   late final EndpointModeration moderation;
 
   @override
-  Map<String, _i1.EndpointRef> get endpointRefLookup => {
-        'example': example,
-        'moderation': moderation,
-      };
+  Map<String, _i1.EndpointRef> get endpointRefLookup =>
+      {'moderation': moderation};
 
   @override
   Map<String, _i1.ModuleEndpointCaller> get moduleLookup => {};

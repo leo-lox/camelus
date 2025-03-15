@@ -1,3 +1,3 @@
 abstract class ModerationRepository {
-  Future<Map<String, dynamic>> fetchBloomFilter();
+  Future<Map<String, dynamic>?> fetchBloomFilterProfiles();
 }

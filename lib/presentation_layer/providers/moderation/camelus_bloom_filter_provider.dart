@@ -43,8 +43,11 @@ class BloomFilterNotifier extends Notifier<BloomFilterState> {
   // Update the filter from network
   Future<void> updateFromNetwork() async {
     final moderation = await ref.read(moderationProvider.future);
-    final serializedBloom = await moderation.fetchBloomFilter();
+    final serializedBloom = await moderation.fetchBloomFilterProfiles();
 
+    if (serializedBloom == null) {
+      return;
+    }
     try {
       final newFilter = BloomFilterPrehash.fromNumHashFunctionsAndByteArray(
         numHashFunctions: serializedBloom["numHashFunctions"],
