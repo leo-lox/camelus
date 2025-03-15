@@ -325,6 +325,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.19.1"
+  connectivity_plus:
+    dependency: transitive
+    description:
+      name: connectivity_plus
+      sha256: "04bf81bb0b77de31557b58d052b24b3eee33f09a6e7a8c68a3e247c7df19ec27"
+      url: "https://pub.dev"
+    source: hosted
+    version: "6.1.3"
+  connectivity_plus_platform_interface:
+    dependency: transitive
+    description:
+      name: connectivity_plus_platform_interface
+      sha256: "42657c1715d48b167930d5f34d00222ac100475f73d10162ddf43e714932f204"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.1"
   convert:
     dependency: transitive
     description:
@@ -429,6 +445,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.3.8"
+  dbus:
+    dependency: transitive
+    description:
+      name: dbus
+      sha256: "79e0c23480ff85dc68de79e2cd6334add97e48f7f4865d17686dd6ea81a47e8c"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.7.11"
   device_info_plus:
     dependency: transitive
     description:
@@ -1030,9 +1054,11 @@ packages:
   ndk:
     dependency: "direct main"
     description:
-      path: "../ndk/packages/ndk"
-      relative: true
-    source: path
+      path: "packages/ndk"
+      ref: search-usecase
+      resolved-ref: ca536abb24b78fae9066ab0dcf14cc332dcfdf72
+      url: "https://github.com/relaystr/ndk.git"
+    source: git
     version: "0.3.2"
   ndk_amber:
     dependency: "direct main"
@@ -1045,9 +1071,11 @@ packages:
   ndk_objectbox:
     dependency: "direct main"
     description:
-      path: "../ndk/packages/objectbox"
-      relative: true
-    source: path
+      path: "packages/objectbox"
+      ref: search-usecase
+      resolved-ref: ca536abb24b78fae9066ab0dcf14cc332dcfdf72
+      url: "https://github.com/relaystr/ndk.git"
+    source: git
     version: "0.2.1"
   ndk_rust_verifier:
     dependency: "direct main"
@@ -1058,6 +1086,14 @@ packages:
       url: "https://github.com/relaystr/ndk.git"
     source: git
     version: "0.2.3"
+  nm:
+    dependency: transitive
+    description:
+      name: nm
+      sha256: "2c9aae4127bdc8993206464fcc063611e0e36e72018696cd9631023a31b24254"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.5.0"
   node_preamble:
     dependency: transitive
     description:
@@ -1339,10 +1375,18 @@ packages:
     source: hosted
     version: "0.28.0"
   serverpod_client:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: serverpod_client
       sha256: "67f09bb7ce1b19e1690ce34f390904924d654d9c57680ec9ec7a8c2a88393c88"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.4.0"
+  serverpod_flutter:
+    dependency: "direct main"
+    description:
+      name: serverpod_flutter
+      sha256: "554f5a702bc7d45b6c15424f99bc656013b2a84eef4c49fd16f82d39e9a4c200"
       url: "https://pub.dev"
     source: hosted
     version: "2.4.0"

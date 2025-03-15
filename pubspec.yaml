@@ -87,7 +87,7 @@ dependencies:
   image: ^4.3.0
   flutter_list_view: ^1.1.29
   xxh3: ^1.2.0
-  serverpod_client: 2.4.0
+  serverpod_flutter: 2.4.0
   apipod_client:
     path: ./apipod/apipod_client
 
@@ -96,18 +96,23 @@ dependencies:
 
 dependency_overrides:
   ndk:
-    path: ../ndk/packages/ndk
-    # git:
-      # url: https://github.com/relaystr/ndk.git
-      # path: packages/ndk
-    #  ref: isar
+    #path: ../ndk/packages/ndk
+     git:
+       url: https://github.com/relaystr/ndk.git
+       path: packages/ndk
+       ref: search-usecase
   ndk_rust_verifier:
     #path: ../ndk/packages/rust_verifier
     git:
       url: https://github.com/relaystr/ndk.git
       path: packages/rust_verifier
   ndk_objectbox:
-    path: ../ndk/packages/objectbox
+    #path: ../ndk/packages/objectbox
+    git:
+       url: https://github.com/relaystr/ndk.git
+       path: packages/objectbox
+       ref: search-usecase
+
   #ndk_amber:
   #  path: ../ndk/packages/amber
 
