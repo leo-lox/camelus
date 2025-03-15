@@ -7,11 +7,11 @@ import 'package:ndk/ndk.dart' as ndk;
 import '../../../helpers/bloom_filter_prehash.dart';
 
 class BloomFilterState {
-  final BloomFilterPrehash filter;
+  final BloomFilterPrehash filterProfiles;
   final bool isEnabled;
 
   BloomFilterState({
-    required this.filter,
+    required this.filterProfiles,
     this.isEnabled = true,
   });
 
@@ -20,7 +20,7 @@ class BloomFilterState {
     bool? isEnabled,
   }) {
     return BloomFilterState(
-      filter: filter ?? this.filter,
+      filterProfiles: filter ?? this.filterProfiles,
       isEnabled: isEnabled ?? this.isEnabled,
     );
   }
@@ -30,7 +30,8 @@ class BloomFilterNotifier extends Notifier<BloomFilterState> {
   @override
   BloomFilterState build() {
     return BloomFilterState(
-      filter: BloomFilterPrehash(falsePositiveProbability: 0.001, numItems: 1),
+      filterProfiles:
+          BloomFilterPrehash(falsePositiveProbability: 0.001, numItems: 1),
       isEnabled: true,
     );
   }
@@ -66,16 +67,16 @@ final bloomFilterNotifierProvider =
 final camelusBloomFilterProvider = Provider<ndk.EventFilter>((ref) {
   final bloomFilterState = ref.watch(bloomFilterNotifierProvider);
 
-  return MyEventBloomFilter(
-      bloomFilter: bloomFilterState.filter,
+  return MyProfilesBloomFilter(
+      bloomFilter: bloomFilterState.filterProfiles,
       enabled: bloomFilterState.isEnabled);
 });
 
-class MyEventBloomFilter implements ndk.EventFilter {
+class MyProfilesBloomFilter implements ndk.EventFilter {
   final BloomFilterPrehash _bloomFilter;
   final bool _enabled;
 
-  MyEventBloomFilter(
+  MyProfilesBloomFilter(
       {required BloomFilterPrehash bloomFilter, required bool enabled})
       : _bloomFilter = bloomFilter,
         _enabled = enabled;
