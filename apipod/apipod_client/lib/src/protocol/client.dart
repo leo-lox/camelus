@@ -29,6 +29,22 @@ class EndpointModeration extends _i1.EndpointRef {
         'getProfileBloomFilter',
         {},
       );
+
+  _i2.Future<Map<String, dynamic>?> getEventBloomFilter() =>
+      caller.callServerEndpoint<Map<String, dynamic>?>(
+        'moderation',
+        'getEventBloomFilter',
+        {},
+      );
+
+  /// accepts a nostr report event \
+  /// will be integrated into a relay in the future
+  _i2.Future<String> report(Map<String, dynamic> reportEventJson) =>
+      caller.callServerEndpoint<String>(
+        'moderation',
+        'report',
+        {'reportEventJson': reportEventJson},
+      );
 }
 
 class Client extends _i1.ServerpodClientShared {

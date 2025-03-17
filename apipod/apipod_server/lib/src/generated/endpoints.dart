@@ -10,7 +10,7 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
-import '../endpoints/moderation_endpoint.dart' as _i2;
+import '../endpoints/moderation/moderation_endpoint.dart' as _i2;
 
 class Endpoints extends _i1.EndpointDispatch {
   @override
@@ -36,7 +36,35 @@ class Endpoints extends _i1.EndpointDispatch {
           ) async =>
               (endpoints['moderation'] as _i2.ModerationEndpoint)
                   .getProfileBloomFilter(session),
-        )
+        ),
+        'getEventBloomFilter': _i1.MethodConnector(
+          name: 'getEventBloomFilter',
+          params: {},
+          call: (
+            _i1.Session session,
+            Map<String, dynamic> params,
+          ) async =>
+              (endpoints['moderation'] as _i2.ModerationEndpoint)
+                  .getEventBloomFilter(session),
+        ),
+        'report': _i1.MethodConnector(
+          name: 'report',
+          params: {
+            'reportEventJson': _i1.ParameterDescription(
+              name: 'reportEventJson',
+              type: _i1.getType<Map<String, dynamic>>(),
+              nullable: false,
+            )
+          },
+          call: (
+            _i1.Session session,
+            Map<String, dynamic> params,
+          ) async =>
+              (endpoints['moderation'] as _i2.ModerationEndpoint).report(
+            session,
+            params['reportEventJson'],
+          ),
+        ),
       },
     );
   }

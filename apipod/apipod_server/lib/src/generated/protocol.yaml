@@ -1,2 +1,4 @@
 moderation:
   - getProfileBloomFilter:
+  - getEventBloomFilter:
+  - report:

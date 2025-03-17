@@ -14,9 +14,12 @@ import 'package:serverpod/protocol.dart' as _i2;
 import 'bloom_filter_events.dart' as _i3;
 import 'bloom_filter_profiles.dart' as _i4;
 import 'example.dart' as _i5;
+import 'reports_incoming.dart' as _i6;
+import 'package:ndk/domain_layer/entities/nip_01_event.dart' as _i7;
 export 'bloom_filter_events.dart';
 export 'bloom_filter_profiles.dart';
 export 'example.dart';
+export 'reports_incoming.dart';
 
 class Protocol extends _i1.SerializationManagerServer {
   Protocol._();
@@ -188,6 +191,69 @@ class Protocol extends _i1.SerializationManagerServer {
       ],
       managed: true,
     ),
+    _i2.TableDefinition(
+      name: 'reports_incoming',
+      dartName: 'ReportsIncoming',
+      schema: 'public',
+      module: 'apipod',
+      columns: [
+        _i2.ColumnDefinition(
+          name: 'id',
+          columnType: _i2.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int?',
+          columnDefault: 'nextval(\'reports_incoming_id_seq\'::regclass)',
+        ),
+        _i2.ColumnDefinition(
+          name: 'createdAt',
+          columnType: _i2.ColumnType.timestampWithoutTimeZone,
+          isNullable: false,
+          dartType: 'DateTime',
+        ),
+        _i2.ColumnDefinition(
+          name: 'report',
+          columnType: _i2.ColumnType.json,
+          isNullable: false,
+          dartType:
+              'package:ndk/domain_layer/entities/nip_01_event.dart:Nip01Event',
+        ),
+        _i2.ColumnDefinition(
+          name: 'author',
+          columnType: _i2.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+        ),
+        _i2.ColumnDefinition(
+          name: 'type',
+          columnType: _i2.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+        ),
+        _i2.ColumnDefinition(
+          name: 'processed',
+          columnType: _i2.ColumnType.boolean,
+          isNullable: false,
+          dartType: 'bool',
+        ),
+      ],
+      foreignKeys: [],
+      indexes: [
+        _i2.IndexDefinition(
+          indexName: 'reports_incoming_pkey',
+          tableSpace: null,
+          elements: [
+            _i2.IndexElementDefinition(
+              type: _i2.IndexElementDefinitionType.column,
+              definition: 'id',
+            )
+          ],
+          type: 'btree',
+          isUnique: true,
+          isPrimary: true,
+        )
+      ],
+      managed: true,
+    ),
     ..._i2.Protocol.targetTableDefinitions,
   ];
 
@@ -206,6 +272,9 @@ class Protocol extends _i1.SerializationManagerServer {
     if (t == _i5.Example) {
       return _i5.Example.fromJson(data) as T;
     }
+    if (t == _i6.ReportsIncoming) {
+      return _i6.ReportsIncoming.fromJson(data) as T;
+    }
     if (t == _i1.getType<_i3.BloomFilterEvent?>()) {
       return (data != null ? _i3.BloomFilterEvent.fromJson(data) : null) as T;
     }
@@ -215,11 +284,24 @@ class Protocol extends _i1.SerializationManagerServer {
     if (t == _i1.getType<_i5.Example?>()) {
       return (data != null ? _i5.Example.fromJson(data) : null) as T;
     }
+    if (t == _i1.getType<_i6.ReportsIncoming?>()) {
+      return (data != null ? _i6.ReportsIncoming.fromJson(data) : null) as T;
+    }
+    if (t == _i7.Nip01Event) {
+      return _i7.Nip01Event.fromJson(data) as T;
+    }
     if (t == _i1.getType<Map<String, dynamic>?>()) {
       return (data != null
           ? (data as Map).map((k, v) =>
               MapEntry(deserialize<String>(k), deserialize<dynamic>(v)))
           : null) as T;
+    }
+    if (t == Map<String, dynamic>) {
+      return (data as Map).map((k, v) =>
+          MapEntry(deserialize<String>(k), deserialize<dynamic>(v))) as T;
+    }
+    if (t == _i1.getType<_i7.Nip01Event?>()) {
+      return (data != null ? _i7.Nip01Event.fromJson(data) : null) as T;
     }
     try {
       return _i2.Protocol().deserialize<T>(data, t);
@@ -231,6 +313,9 @@ class Protocol extends _i1.SerializationManagerServer {
   String? getClassNameForObject(Object? data) {
     String? className = super.getClassNameForObject(data);
     if (className != null) return className;
+    if (data is _i7.Nip01Event) {
+      return 'Nip01Event';
+    }
     if (data is _i3.BloomFilterEvent) {
       return 'BloomFilterEvent';
     }
@@ -239,6 +324,9 @@ class Protocol extends _i1.SerializationManagerServer {
     }
     if (data is _i5.Example) {
       return 'Example';
+    }
+    if (data is _i6.ReportsIncoming) {
+      return 'ReportsIncoming';
     }
     className = _i2.Protocol().getClassNameForObject(data);
     if (className != null) {
@@ -253,6 +341,9 @@ class Protocol extends _i1.SerializationManagerServer {
     if (dataClassName is! String) {
       return super.deserializeByClassName(data);
     }
+    if (dataClassName == 'Nip01Event') {
+      return deserialize<_i7.Nip01Event>(data['data']);
+    }
     if (dataClassName == 'BloomFilterEvent') {
       return deserialize<_i3.BloomFilterEvent>(data['data']);
     }
@@ -261,6 +352,9 @@ class Protocol extends _i1.SerializationManagerServer {
     }
     if (dataClassName == 'Example') {
       return deserialize<_i5.Example>(data['data']);
+    }
+    if (dataClassName == 'ReportsIncoming') {
+      return deserialize<_i6.ReportsIncoming>(data['data']);
     }
     if (dataClassName.startsWith('serverpod.')) {
       data['className'] = dataClassName.substring(10);
@@ -282,6 +376,8 @@ class Protocol extends _i1.SerializationManagerServer {
         return _i3.BloomFilterEvent.t;
       case _i4.BloomFilterProfile:
         return _i4.BloomFilterProfile.t;
+      case _i6.ReportsIncoming:
+        return _i6.ReportsIncoming.t;
     }
     return null;
   }

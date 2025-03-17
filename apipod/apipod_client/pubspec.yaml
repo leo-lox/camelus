@@ -6,3 +6,13 @@ environment:
 
 dependencies:
   serverpod_client: 2.4.0
+  ndk: ^0.1.3
+
+
+dependency_overrides:
+  ndk:
+    path: ../../../ndk/packages/ndk
+    # git:
+    #   url: https://github.com/relaystr/ndk.git
+    #   path: packages/ndk
+    #   ref: search-usecase

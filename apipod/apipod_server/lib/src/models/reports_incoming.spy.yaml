@@ -1,0 +1,9 @@
+class: ReportsIncoming
+table: reports_incoming
+fields:
+  createdAt: DateTime
+  report: Nip01Event
+  author: String
+  type: String # event or profile report
+  processed: bool
+
