@@ -31,6 +31,16 @@ class _BlockPageState extends ConsumerState<BlockPage> {
   bool _reportSuccessful = false;
   bool _reportLoading = false;
 
+  final List<String> reportReasons = [
+    "impersonation",
+    "spam",
+    "illegal",
+    "profanity",
+    "nudity",
+    "malware",
+    "other",
+  ];
+
   @override
   void initState() {
     super.initState();
@@ -203,39 +213,19 @@ class _BlockPageState extends ConsumerState<BlockPage> {
                       //text user input
 
                       GridView.count(
-                          crossAxisCount: 2,
-                          childAspectRatio: 4.5 / 1,
-                          shrinkWrap: true,
-                          mainAxisSpacing: 10,
-                          crossAxisSpacing: 10,
-                          children: [
-                            longButton(
-                              name: "impersonation",
-                              onPressed: () =>
-                                  {_setReportReason("impersonation")},
-                              inverted: _reportReason == "impersonation",
-                            ),
-                            longButton(
-                              name: "spam",
-                              onPressed: () => {_setReportReason("spam")},
-                              inverted: _reportReason == "spam",
-                            ),
-                            longButton(
-                              name: "illegal",
-                              onPressed: () => {_setReportReason("illegal")},
-                              inverted: _reportReason == "illegal",
-                            ),
-                            longButton(
-                              name: "profanity",
-                              onPressed: () => {_setReportReason("profanity")},
-                              inverted: _reportReason == "profanity",
-                            ),
-                            longButton(
-                              name: "nudity",
-                              onPressed: () => {_setReportReason("nudity")},
-                              inverted: _reportReason == "nudity",
-                            ),
-                          ]),
+                        crossAxisCount: 2,
+                        childAspectRatio: 4.5 / 1,
+                        shrinkWrap: true,
+                        mainAxisSpacing: 10,
+                        crossAxisSpacing: 10,
+                        children: reportReasons
+                            .map((reason) => longButton(
+                                  name: reason,
+                                  onPressed: () => {_setReportReason(reason)},
+                                  inverted: _reportReason == reason,
+                                ))
+                            .toList(),
+                      ),
 
                       const SizedBox(height: 20),
                       SizedBox(
@@ -268,12 +258,19 @@ class _BlockPageState extends ConsumerState<BlockPage> {
                           maxLines: 5,
                         ),
                       ),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 30),
+
+                      const Text(
+                        "Reports are sent to the relays where you received the note from.",
+                        style: TextStyle(color: Palette.gray),
+                      ),
+
+                      const SizedBox(height: 10),
 
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Text("additionally report to camelus"),
+                          Text("Additionally, report to camelus directly"),
                           const SizedBox(width: 10),
                           Switch(
                             value: reportToCamelus,
