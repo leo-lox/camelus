@@ -1,19 +1,19 @@
 import 'dart:async';
-import 'package:camelus/helpers/helpers.dart';
-import 'package:camelus/presentation_layer/atoms/long_button.dart';
-import 'package:camelus/config/palette.dart';
-import 'package:camelus/domain_layer/entities/nostr_tag.dart';
-import 'package:camelus/presentation_layer/providers/metadata_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../config/palette.dart';
+import '../../../../domain_layer/entities/nostr_tag.dart';
+import '../../../atoms/long_button.dart';
 import '../../../providers/metadata_state_provider.dart';
+import '../../../providers/moderation/moderation_provider.dart';
+import '../../../providers/ndk_provider.dart';
 
 class BlockPage extends ConsumerStatefulWidget {
-  String userPubkey;
-  String? postId;
+  final String userPubkey;
+  final String? postId;
 
-  BlockPage({super.key, required this.userPubkey, this.postId});
+  const BlockPage({super.key, required this.userPubkey, this.postId});
 
   @override
   ConsumerState<BlockPage> createState() => _BlockPageState();
@@ -57,18 +57,30 @@ class _BlockPageState extends ConsumerState<BlockPage> {
     });
   }
 
-  Future _reportPost() async {
-    //throw UnimplementedError();
+  Future _submitReport() async {
     setState(() {
       _reportLoading = true;
     });
-    await Future.delayed(Duration(seconds: 1));
+    final ndk = ref.read(ndkProvider);
+    final myPubkey = ndk.accounts.getPublicKey();
+    if (myPubkey == null) {
+      throw Exception("cannot report without account");
+    }
+
+    final moderation = ref.read(moderationProvider);
+    await moderation.report(
+      pubkeySubmittingReport: myPubkey,
+      reportReason: _reportReason,
+      userReport: _textController.text,
+      reportedPubkey: widget.userPubkey,
+      postId: widget.postId,
+      reportToCamelus: reportToCamelus,
+    );
 
     setState(() {
       _reportLoading = false;
       _reportSuccessful = true;
     });
-    throw UnimplementedError();
   }
 
   @override
@@ -284,7 +296,7 @@ class _BlockPageState extends ConsumerState<BlockPage> {
                                 : "report user",
                             inverted: true,
                             loading: _reportLoading,
-                            onPressed: () => {_reportPost()}),
+                            onPressed: () => {_submitReport()}),
                       ),
                     ],
                   ),

@@ -42,7 +42,7 @@ class BloomFilterNotifier extends Notifier<BloomFilterState> {
 
   // Update the filter from network
   Future<void> updateFromNetwork() async {
-    final moderation = await ref.read(moderationProvider.future);
+    final moderation = ref.read(moderationProvider);
     final serializedBloom = await moderation.fetchBloomFilterProfiles();
 
     if (serializedBloom == null) {

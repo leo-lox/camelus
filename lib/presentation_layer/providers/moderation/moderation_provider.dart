@@ -5,7 +5,7 @@ import '../../../domain_layer/usecases/moderation.dart';
 import '../get_notes_provider.dart';
 import '../serverpod_provider.dart';
 
-final moderationProvider = FutureProvider<Moderation>((ref) async {
+final moderationProvider = Provider<Moderation>((ref) {
   final serverpodDs = ref.watch(serverpodProvider);
   final moderationRepo = ModerationRepositoryImpl(server: serverpodDs);
   final getNotes = ref.watch(getNotesProvider);
