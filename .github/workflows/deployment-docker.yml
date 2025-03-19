@@ -18,7 +18,7 @@ env:
   # maybe use GITHUB_REPOSITORY_OWNER variable instead of hardcoding the
   # organization. Maybe this part "../../../../../../templates/serverpod_templates/github/workflows"could be included in the make file and asked
   # the user what they want to use.
-  
+
   GHCR_ORG: "leo-lox"
 
 jobs:
@@ -29,7 +29,7 @@ jobs:
       packages: write
     defaults:
       run:
-        working-directory: ./apipod_server
+        working-directory: ./apipod/apipod_server
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -56,8 +56,8 @@ jobs:
           build-args: |
             GITHUB_PAT=${{ secrets.PAT_GITHUB }}
             GITHUB_USER=${{ secrets.PAT_USER_GITHUB }}
-          context: ./apipod_server
-          file: ./apipod_server/Dockerfile.prod
+          context: ./apipod/apipod_server
+          file: ./apipod/apipod_server/Dockerfile.prod
           push: true
           # TODO This same value is used in docker-compose.production.yaml too,
           #  maybe it should be an environment variable
