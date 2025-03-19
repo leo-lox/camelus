@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:camelus/config/palette.dart';
 import 'package:flutter/material.dart';
 import 'package:photo_view/photo_view.dart';
@@ -6,6 +7,7 @@ import 'package:flutter/services.dart';
 /// A widget for displaying an image gallery with swipeable fullscreen images.
 class ImageGallery extends StatefulWidget {
   final List<String> imageUrls;
+
   /// Index of the image to show by default when the gallery opens.
   final int defaultImageIndex;
 
@@ -28,15 +30,15 @@ class ImageGallery extends StatefulWidget {
   });
 
   @override
-  _ImageGalleryState createState() => _ImageGalleryState();
+  ImageGalleryState createState() => ImageGalleryState();
 }
 
 /// State class for [ImageGallery].
 /// Manages the behavior of the gallery, including swiping between images
 /// and showing/hiding the status bar.
-class _ImageGalleryState extends State<ImageGallery> {
-  late PageController _pageController; 
-  bool _hideStatusBarWhileViewing = false; // Tracks if the status bar is hidden.
+class ImageGalleryState extends State<ImageGallery> {
+  late PageController _pageController;
+  bool _hideStatusBarWhileViewing = false;
   late int _currentPageIndex; // Tracks the currently displayed image index.
 
   /// Shows or hides the status bar based on the [show] parameter.
@@ -96,7 +98,9 @@ class _ImageGalleryState extends State<ImageGallery> {
             _imageGallery(), // The main image gallery.
             SafeArea(
               child: AnimatedOpacity(
-                opacity: _hideStatusBarWhileViewing ? 0 : 1, // Hide UI if status bar is hidden.
+                opacity: _hideStatusBarWhileViewing
+                    ? 0
+                    : 1, // Hide UI if status bar is hidden.
                 duration: const Duration(milliseconds: 100),
                 curve: Curves.easeInOut,
                 child: Column(
@@ -107,7 +111,7 @@ class _ImageGalleryState extends State<ImageGallery> {
                       child: Container(
                         padding: const EdgeInsets.symmetric(
                             horizontal: 10, vertical: 5),
-                        child: widget.bottomBarWidget, // Optional bottom bar widget.
+                        child: widget.bottomBarWidget,
                       ),
                     ),
                   ],
@@ -124,7 +128,7 @@ class _ImageGalleryState extends State<ImageGallery> {
   Container _topBar(BuildContext context) {
     return Container(
       width: MediaQuery.of(context).size.width,
-      color: Palette.background.withOpacity(0.25), // Transparent background color.
+      color: Palette.background.withValues(alpha: 0.25),
       child: Row(
         children: [
           // Close button to exit the gallery.
@@ -167,18 +171,18 @@ class _ImageGalleryState extends State<ImageGallery> {
   PageView _imageGallery() {
     return PageView.builder(
       controller: _pageController,
-      itemCount: widget.imageUrls.length, // Total number of images.
+      itemCount: widget.imageUrls.length,
       itemBuilder: (context, index) {
         return PhotoView(
-          imageProvider: NetworkImage(widget.imageUrls[index]), // Display image from network.
+          imageProvider: CachedNetworkImageProvider(widget.imageUrls[index]),
           heroAttributes: widget.heroTag != null
               ? PhotoViewHeroAttributes(
                   tag:
                       'image-${widget.imageUrls[widget.defaultImageIndex]}-${widget.heroTag}')
-              : null, // Optional hero animation.
-          minScale: PhotoViewComputedScale.contained * 1, // Minimum zoom scale.
-          maxScale: PhotoViewComputedScale.covered * 2, // Maximum zoom scale.
-          filterQuality: FilterQuality.high, // High quality image rendering.
+              : null,
+          minScale: PhotoViewComputedScale.contained * 1,
+          maxScale: PhotoViewComputedScale.covered * 2,
+          filterQuality: FilterQuality.high,
         );
       },
     );

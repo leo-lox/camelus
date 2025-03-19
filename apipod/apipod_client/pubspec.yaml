@@ -1,0 +1,18 @@
+name: apipod_client
+description: Starting point for a Serverpod client.
+
+environment:
+  sdk: '>=3.3.0 <4.0.0'
+
+dependencies:
+  serverpod_client: 2.4.0
+  ndk: ^0.1.3
+
+
+dependency_overrides:
+  ndk:
+    path: ../../../ndk/packages/ndk
+    # git:
+    #   url: https://github.com/relaystr/ndk.git
+    #   path: packages/ndk
+    #   ref: search-usecase

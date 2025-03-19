@@ -62,7 +62,7 @@ class NostrNoteModel extends NostrNote {
     );
   }
 
-  toNDKEvent() {
+  Nip01Event toNDKEvent() {
     return Nip01Event(
       content: content,
       createdAt: created_at,

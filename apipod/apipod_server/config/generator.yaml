@@ -1,0 +1,7 @@
+type: server
+
+client_package_path: ../apipod_client
+server_test_tools_path: test/integration/test_tools
+
+extraClasses:
+  - package:ndk/domain_layer/entities/nip_01_event.dart:Nip01Event

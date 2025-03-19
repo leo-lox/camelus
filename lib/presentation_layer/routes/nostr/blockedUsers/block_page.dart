@@ -1,16 +1,19 @@
 import 'dart:async';
-import 'package:camelus/presentation_layer/atoms/long_button.dart';
-import 'package:camelus/config/palette.dart';
-import 'package:camelus/domain_layer/entities/nostr_tag.dart';
-import 'package:camelus/presentation_layer/providers/metadata_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class BlockPage extends ConsumerStatefulWidget {
-  String userPubkey;
-  String? postId;
+import '../../../../config/palette.dart';
+import '../../../../domain_layer/entities/nostr_tag.dart';
+import '../../../atoms/long_button.dart';
+import '../../../providers/metadata_state_provider.dart';
+import '../../../providers/moderation/moderation_provider.dart';
+import '../../../providers/ndk_provider.dart';
 
-  BlockPage({super.key, required this.userPubkey, this.postId});
+class BlockPage extends ConsumerStatefulWidget {
+  final String userPubkey;
+  final String? postId;
+
+  const BlockPage({super.key, required this.userPubkey, this.postId});
 
   @override
   ConsumerState<BlockPage> createState() => _BlockPageState();
@@ -19,13 +22,24 @@ class BlockPage extends ConsumerStatefulWidget {
 class _BlockPageState extends ConsumerState<BlockPage> {
   bool isUserBlocked = false;
   bool requestLoading = false;
+  bool reportToCamelus = true;
 
   List<NostrTag> contentTags = [];
 
   final TextEditingController _textController = TextEditingController();
   String _reportReason = "";
-  bool _postReported = false;
+  bool _reportSuccessful = false;
   bool _reportLoading = false;
+
+  final List<String> reportReasons = [
+    "impersonation",
+    "spam",
+    "illegal",
+    "profanity",
+    "nudity",
+    "malware",
+    "other",
+  ];
 
   @override
   void initState() {
@@ -53,12 +67,81 @@ class _BlockPageState extends ConsumerState<BlockPage> {
     });
   }
 
-  Future _reportPost() async {
-    throw UnimplementedError();
+  Future _submitReport() async {
+    setState(() {
+      _reportLoading = true;
+    });
+    final ndk = ref.read(ndkProvider);
+    final myPubkey = ndk.accounts.getPublicKey();
+    if (myPubkey == null) {
+      throw Exception("cannot report without account");
+    }
+
+    final moderation = ref.read(moderationProvider);
+    await moderation.report(
+      pubkeySubmittingReport: myPubkey,
+      reportReason: _reportReason,
+      userReport: _textController.text,
+      reportedPubkey: widget.userPubkey,
+      postId: widget.postId,
+      reportToCamelus: reportToCamelus,
+    );
+
+    setState(() {
+      _reportLoading = false;
+      _reportSuccessful = true;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+    final user =
+        ref.watch(metadataStateProvider(widget.userPubkey)).userMetadata;
+
+    if (_reportSuccessful) {
+      return Scaffold(
+        backgroundColor: Palette.background,
+        body: SafeArea(
+          child: Center(
+            child: Container(
+              constraints: BoxConstraints(
+                maxWidth: 250,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text(
+                    "report send",
+                    style: TextStyle(
+                        color: Palette.white,
+                        fontSize: 30,
+                        fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 20),
+                  const Text(
+                    "thank you for your report",
+                    style: TextStyle(color: Palette.lightGray, fontSize: 20),
+                  ),
+                  const SizedBox(height: 20),
+                  SizedBox(
+                    height: 40,
+                    width: MediaQuery.of(context).size.width * 0.75,
+                    child: longButton(
+                        inverted: true,
+                        name: "go back",
+                        onPressed: () => {
+                              Navigator.pop(context),
+                            }),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('block/report'),
@@ -81,7 +164,7 @@ class _BlockPageState extends ConsumerState<BlockPage> {
                           style: TextStyle(
                               color: Palette.lightGray, fontSize: 20)),
                       const SizedBox(width: 10),
-                      Text("unimplemented",
+                      Text(user?.name ?? user?.nip05 ?? widget.userPubkey,
                           style: TextStyle(
                               color: Palette.white,
                               fontSize: 20,
@@ -124,104 +207,96 @@ class _BlockPageState extends ConsumerState<BlockPage> {
                         );
                       }),
                   const SizedBox(height: 10),
-                  if (widget.postId != null && !_postReported)
-                    Column(
-                      children: [
-                        const SizedBox(height: 100),
-                        //text user input
+                  Column(
+                    children: [
+                      const SizedBox(height: 100),
+                      //text user input
 
-                        GridView.count(
-                            crossAxisCount: 2,
-                            childAspectRatio: 4.5 / 1,
-                            shrinkWrap: true,
-                            mainAxisSpacing: 10,
-                            crossAxisSpacing: 10,
-                            children: [
-                              longButton(
-                                name: "impersonation",
-                                onPressed: () =>
-                                    {_setReportReason("impersonation")},
-                                inverted: _reportReason == "impersonation",
-                              ),
-                              longButton(
-                                name: "spam",
-                                onPressed: () => {_setReportReason("spam")},
-                                inverted: _reportReason == "spam",
-                              ),
-                              longButton(
-                                name: "illegal",
-                                onPressed: () => {_setReportReason("illegal")},
-                                inverted: _reportReason == "illegal",
-                              ),
-                              longButton(
-                                name: "profanity",
-                                onPressed: () =>
-                                    {_setReportReason("profanity")},
-                                inverted: _reportReason == "profanity",
-                              ),
-                              longButton(
-                                name: "nudity",
-                                onPressed: () => {_setReportReason("nudity")},
-                                inverted: _reportReason == "nudity",
-                              ),
-                            ]),
+                      GridView.count(
+                        crossAxisCount: 2,
+                        childAspectRatio: 4.5 / 1,
+                        shrinkWrap: true,
+                        mainAxisSpacing: 10,
+                        crossAxisSpacing: 10,
+                        children: reportReasons
+                            .map((reason) => longButton(
+                                  name: reason,
+                                  onPressed: () => {_setReportReason(reason)},
+                                  inverted: _reportReason == reason,
+                                ))
+                            .toList(),
+                      ),
 
-                        const SizedBox(height: 20),
-                        SizedBox(
-                          width: MediaQuery.of(context).size.width * 0.90,
-                          child: TextField(
-                            controller: _textController,
-                            decoration: const InputDecoration(
-                              border: OutlineInputBorder(),
-                              labelText: 'what is wrong with this post?',
+                      const SizedBox(height: 20),
+                      SizedBox(
+                        width: MediaQuery.of(context).size.width * 0.90,
+                        child: TextField(
+                          controller: _textController,
+                          decoration: InputDecoration(
+                            isDense: true,
+                            hintText: widget.postId != null
+                                ? 'what is wrong with this post?'
+                                : 'what is wrong with this user?',
+                            hintStyle: const TextStyle(
+                                color: Palette.white, letterSpacing: 1.1),
+                            filled: true,
+                            fillColor: Palette.extraDarkGray,
+                            enabledBorder: const OutlineInputBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(10.0)),
+                              borderSide:
+                                  BorderSide(color: Palette.extraDarkGray),
+                            ),
+                            focusedBorder: const OutlineInputBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(10.0)),
+                              borderSide: BorderSide(color: Palette.background),
                             ),
                           ),
+                          style: const TextStyle(color: Palette.white),
+                          minLines: 3,
+                          maxLines: 5,
                         ),
-                        const SizedBox(height: 20),
+                      ),
+                      const SizedBox(height: 30),
 
-                        SizedBox(
-                          height: 40,
-                          width: MediaQuery.of(context).size.width * 0.75,
-                          child: longButton(
-                              name: "report post",
-                              inverted: true,
-                              loading: _reportLoading,
-                              onPressed: () => {_reportPost()}),
-                        ),
-                      ],
-                    ),
-                  if (_postReported)
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const SizedBox(height: 100),
-                        const Text(
-                          "post reported",
-                          style: TextStyle(
-                              color: Palette.white,
-                              fontSize: 30,
-                              fontWeight: FontWeight.bold),
-                        ),
-                        const SizedBox(height: 20),
-                        const Text(
-                          "thank you for reporting this post",
-                          style:
-                              TextStyle(color: Palette.lightGray, fontSize: 20),
-                        ),
-                        const SizedBox(height: 20),
-                        SizedBox(
-                          height: 40,
-                          width: MediaQuery.of(context).size.width * 0.75,
-                          child: longButton(
-                              inverted: true,
-                              name: "go back",
-                              onPressed: () => {
-                                    Navigator.pop(context),
-                                  }),
-                        ),
-                      ],
-                    )
+                      const Text(
+                        "Reports are sent to the relays where you received the note from.",
+                        style: TextStyle(color: Palette.gray),
+                      ),
+
+                      const SizedBox(height: 10),
+
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text("Additionally, report to camelus directly"),
+                          const SizedBox(width: 10),
+                          Switch(
+                            value: reportToCamelus,
+                            onChanged: (value) {
+                              setState(() {
+                                reportToCamelus = value;
+                              });
+                            },
+                            activeColor: Palette.white,
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 20),
+                      SizedBox(
+                        height: 40,
+                        width: MediaQuery.of(context).size.width * 0.75,
+                        child: longButton(
+                            name: widget.postId != null
+                                ? "report post"
+                                : "report user",
+                            inverted: true,
+                            loading: _reportLoading,
+                            onPressed: () => {_submitReport()}),
+                      ),
+                    ],
+                  ),
                 ],
               ),
             )
