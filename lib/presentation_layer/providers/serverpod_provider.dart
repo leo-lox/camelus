@@ -9,7 +9,7 @@ import '../../data_layer/data_sources/serverpod_data_source.dart';
 final serverpodProvider = Provider<ServerpodDataSource>((ref) {
   final String url;
 
-  if (false && kDebugMode) {
+  if (kDebugMode) {
     url = 'http://$localhost:8080/';
   } else {
     url = "${CamelusConfig.apiEndpoint}/"; // must end with /

@@ -88,7 +88,7 @@ class MyProfilesBloomFilter implements ndk.EventFilter {
 
   @override
   bool filter(ndk.Nip01Event event) {
-    if (_enabled && _bloomFilter.contains(event.id)) {
+    if (_enabled && _bloomFilter.contains(event.pubKey)) {
       return false;
     }
     return true;
