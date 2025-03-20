@@ -284,9 +284,11 @@ packages:
   ndk:
     dependency: "direct main"
     description:
-      path: "../../../ndk/packages/ndk"
-      relative: true
-    source: path
+      path: "packages/ndk"
+      ref: HEAD
+      resolved-ref: b946b357e3660616d8b500199a9086a6d46d7bb5
+      url: "https://github.com/relaystr/ndk.git"
+    source: git
     version: "0.3.2"
   node_preamble:
     dependency: transitive
@@ -648,6 +650,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.2.1"
+  xxh3:
+    dependency: transitive
+    description:
+      name: xxh3
+      sha256: "399a0438f5d426785723c99da6b16e136f4953fb1e9db0bf270bd41dd4619916"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.2.0"
   yaml:
     dependency: transitive
     description:

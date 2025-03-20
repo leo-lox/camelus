@@ -1,7 +1,8 @@
 import 'dart:convert';
 
 import 'package:ndk/ndk.dart';
-import 'package:ndk/shared/bloom_filter_prehash.dart';
+import 'package:ndk/shared/bloom_filter/bloom_filter_prehash.dart';
+
 import 'package:serverpod/serverpod.dart';
 
 import '../../config/service_config.dart';

@@ -1055,8 +1055,8 @@ packages:
     dependency: "direct main"
     description:
       path: "packages/ndk"
-      ref: search-usecase
-      resolved-ref: ca536abb24b78fae9066ab0dcf14cc332dcfdf72
+      ref: HEAD
+      resolved-ref: b946b357e3660616d8b500199a9086a6d46d7bb5
       url: "https://github.com/relaystr/ndk.git"
     source: git
     version: "0.3.2"
