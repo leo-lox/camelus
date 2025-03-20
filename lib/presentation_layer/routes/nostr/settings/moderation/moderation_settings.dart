@@ -87,49 +87,51 @@ class ModerationSettingsPageState
         title: const Text('Moderation Settings'),
         backgroundColor: Palette.background,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Camelus Content Filtering',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Camelus Content Filtering',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-            ),
-            const SizedBox(height: 8),
-            const Text(
-              'Enable content filtering to hide potentially inappropriate content.',
-              style: TextStyle(
-                color: Colors.grey,
+              const SizedBox(height: 8),
+              const Text(
+                'Enable content filtering to hide potentially inappropriate content.',
+                style: TextStyle(
+                  color: Colors.grey,
+                ),
               ),
-            ),
-            const SizedBox(height: 16),
-            SwitchListTile(
-              title: const Text('Enable Content Filter'),
-              value: isFilterEnabled.isEnabled,
-              onChanged: _isLoading ? null : _toggleFilter,
-              secondary: _isLoading
-                  ? const SizedBox(
-                      width: 24,
-                      height: 24,
-                      child: CircularProgressIndicator(strokeWidth: 2))
-                  : const Icon(Icons.security),
-              activeColor: Palette.primary,
-            ),
-            const Divider(),
-            const SizedBox(height: 16),
-            const Text(
-              'Note: Filters are applied locally (on device). When users report nostr content directly to camelus it gets added to the filter.',
-              style: TextStyle(
-                fontSize: 12,
-                fontStyle: FontStyle.italic,
-                color: Colors.grey,
+              const SizedBox(height: 16),
+              SwitchListTile(
+                title: const Text('Enable Content Filter'),
+                value: isFilterEnabled.isEnabled,
+                onChanged: _isLoading ? null : _toggleFilter,
+                secondary: _isLoading
+                    ? const SizedBox(
+                        width: 24,
+                        height: 24,
+                        child: CircularProgressIndicator(strokeWidth: 2))
+                    : const Icon(Icons.security),
+                activeColor: Palette.primary,
               ),
-            ),
-          ],
+              const Divider(),
+              const SizedBox(height: 16),
+              const Text(
+                'Note: Filters are applied locally (on device). When users report nostr content directly to camelus it gets added to the filter.',
+                style: TextStyle(
+                  fontSize: 12,
+                  fontStyle: FontStyle.italic,
+                  color: Colors.grey,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
