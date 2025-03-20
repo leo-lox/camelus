@@ -4,6 +4,7 @@ import 'package:ndk/ndk.dart';
 import 'package:serverpod/serverpod.dart';
 
 import '../../config/service_config.dart';
+import '../../generated/bloom_filter_data.dart';
 import '../../generated/bloom_filter_events.dart';
 import '../../generated/bloom_filter_profiles.dart';
 import '../../generated/reports_incoming.dart';
@@ -17,7 +18,7 @@ class ModerationEndpoint extends Endpoint {
   static final cacheKeyEvents = 'bloom-filter-events';
   static final bloomFilterCacheLifetime = Duration(minutes: 10);
 
-  Future<Map<String, dynamic>?> getProfileBloomFilter(Session session) async {
+  Future<BloomFilterData?> getProfileBloomFilter(Session session) async {
     var bloomFilter =
         await session.caches.local.get<BloomFilterProfile>(cacheKeyProfiles);
 
@@ -39,15 +40,15 @@ class ModerationEndpoint extends Endpoint {
       return null;
     }
 
-    return {
-      "size": bloomFilter.size,
-      "numHashFunctions": bloomFilter.numHashFunctions,
-      "bitArray": bloomFilter.bitArray,
-      "createdAt": bloomFilter.createdAt,
-    };
+    return BloomFilterData(
+      size: bloomFilter.size,
+      numHashFunctions: bloomFilter.numHashFunctions,
+      bitArray: bloomFilter.bitArray,
+      createdAt: bloomFilter.createdAt,
+    );
   }
 
-  Future<Map<String, dynamic>?> getEventBloomFilter(Session session) async {
+  Future<BloomFilterData?> getEventBloomFilter(Session session) async {
     var bloomFilter =
         await session.caches.local.get<BloomFilterEvent>(cacheKeyEvents);
 
@@ -69,12 +70,12 @@ class ModerationEndpoint extends Endpoint {
       return null;
     }
 
-    return {
-      "size": bloomFilter.size,
-      "numHashFunctions": bloomFilter.numHashFunctions,
-      "bitArray": bloomFilter.bitArray,
-      "createdAt": bloomFilter.createdAt,
-    };
+    return BloomFilterData(
+      size: bloomFilter.size,
+      numHashFunctions: bloomFilter.numHashFunctions,
+      bitArray: bloomFilter.bitArray,
+      createdAt: bloomFilter.createdAt,
+    );
   }
 
   /// accepts a nostr report event \

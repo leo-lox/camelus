@@ -30,9 +30,9 @@ class ModerationSettingsPageState
     }
 
     final newFilter = BloomFilterPrehash.fromNumHashFunctionsAndByteArray(
-      numHashFunctions: serializedBloom["numHashFunctions"],
-      byteArray: base64Decode(serializedBloom["bitArray"]),
-      size: serializedBloom["size"],
+      numHashFunctions: serializedBloom.numHashFunctions,
+      byteArray: base64Decode(serializedBloom.bitArray),
+      size: serializedBloom.size,
     );
     final bloomProvider = ref.read(bloomFilterNotifierProvider.notifier);
     bloomProvider.setFilter(newFilter);

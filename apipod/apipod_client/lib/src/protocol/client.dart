@@ -11,8 +11,9 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
 import 'dart:async' as _i2;
-import 'package:ndk/domain_layer/entities/nip_01_event.dart' as _i3;
-import 'protocol.dart' as _i4;
+import 'package:apipod_client/src/protocol/bloom_filter_data.dart' as _i3;
+import 'package:ndk/domain_layer/entities/nip_01_event.dart' as _i4;
+import 'protocol.dart' as _i5;
 
 ///    'size': <int>,
 ///    'numHashFunctions': <int>,
@@ -24,15 +25,15 @@ class EndpointModeration extends _i1.EndpointRef {
   @override
   String get name => 'moderation';
 
-  _i2.Future<Map<String, dynamic>?> getProfileBloomFilter() =>
-      caller.callServerEndpoint<Map<String, dynamic>?>(
+  _i2.Future<_i3.BloomFilterData?> getProfileBloomFilter() =>
+      caller.callServerEndpoint<_i3.BloomFilterData?>(
         'moderation',
         'getProfileBloomFilter',
         {},
       );
 
-  _i2.Future<Map<String, dynamic>?> getEventBloomFilter() =>
-      caller.callServerEndpoint<Map<String, dynamic>?>(
+  _i2.Future<_i3.BloomFilterData?> getEventBloomFilter() =>
+      caller.callServerEndpoint<_i3.BloomFilterData?>(
         'moderation',
         'getEventBloomFilter',
         {},
@@ -40,7 +41,7 @@ class EndpointModeration extends _i1.EndpointRef {
 
   /// accepts a nostr report event \
   /// will be integrated into a relay in the future
-  _i2.Future<String> report(_i3.Nip01Event reportEvent) =>
+  _i2.Future<String> report(_i4.Nip01Event reportEvent) =>
       caller.callServerEndpoint<String>(
         'moderation',
         'report',
@@ -64,7 +65,7 @@ class Client extends _i1.ServerpodClientShared {
     bool? disconnectStreamsOnLostInternetConnection,
   }) : super(
           host,
-          _i4.Protocol(),
+          _i5.Protocol(),
           securityContext: securityContext,
           authenticationKeyManager: authenticationKeyManager,
           streamingConnectionTimeout: streamingConnectionTimeout,

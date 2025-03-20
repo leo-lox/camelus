@@ -1,0 +1,6 @@
+class: BloomFilterData
+fields:
+  size: int
+  numHashFunctions: int
+  bitArray: String
+  createdAt: DateTime

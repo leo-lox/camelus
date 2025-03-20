@@ -1,6 +1,7 @@
 import 'package:ndk/ndk.dart';
 
 import '../../data_layer/models/nostr_note_model.dart';
+import '../entities/bloom_filter_data.dart';
 import '../entities/nostr_note.dart';
 import '../entities/nostr_tag.dart';
 import '../repositories/moderation_repository.dart';
@@ -42,7 +43,7 @@ class Moderation {
   ///    'size': <int>,
   ///    'numHashFunctions': <int>,
   ///    'bitArray': <string>,
-  Future<Map<String, dynamic>?> fetchBloomFilterProfiles() {
+  Future<BloomFilterData?> fetchBloomFilterProfiles() {
     return _moderationRepository.fetchBloomFilterProfiles();
   }
 
