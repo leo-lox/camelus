@@ -11,7 +11,8 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
 import 'dart:async' as _i2;
-import 'protocol.dart' as _i3;
+import 'package:ndk/domain_layer/entities/nip_01_event.dart' as _i3;
+import 'protocol.dart' as _i4;
 
 ///    'size': <int>,
 ///    'numHashFunctions': <int>,
@@ -39,11 +40,11 @@ class EndpointModeration extends _i1.EndpointRef {
 
   /// accepts a nostr report event \
   /// will be integrated into a relay in the future
-  _i2.Future<String> report(Map<String, dynamic> reportEventJson) =>
+  _i2.Future<String> report(_i3.Nip01Event reportEvent) =>
       caller.callServerEndpoint<String>(
         'moderation',
         'report',
-        {'reportEventJson': reportEventJson},
+        {'reportEvent': reportEvent},
       );
 }
 
@@ -63,7 +64,7 @@ class Client extends _i1.ServerpodClientShared {
     bool? disconnectStreamsOnLostInternetConnection,
   }) : super(
           host,
-          _i3.Protocol(),
+          _i4.Protocol(),
           securityContext: securityContext,
           authenticationKeyManager: authenticationKeyManager,
           streamingConnectionTimeout: streamingConnectionTimeout,

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:ndk/ndk.dart';
 import 'package:serverpod/serverpod.dart';
 
@@ -79,18 +81,21 @@ class ModerationEndpoint extends Endpoint {
   /// will be integrated into a relay in the future
   Future<String> report(
     Session session,
-    Map<String, dynamic> reportEventJson,
+    Nip01Event reportEvent,
   ) async {
-    final event = Nip01Event.fromJson(reportEventJson);
+    final event = reportEvent;
 
     event.validSig = await Bip340EventVerifier().verify(event);
 
     if (event.validSig != null && !event.validSig!) {
+      session.log("invalid sig", level: LogLevel.info);
       return "invalid sig";
     }
 
+    session.log("report", level: LogLevel.info);
+
     DateTime now = DateTime.now();
-    final isEventReport = event.getEId() != null;
+    final isEventReport = event.getFirstTag('e') != null;
 
     if (ServiceConfig.trustedPubkeys.contains(event.pubKey)) {
       final process = ProcessReport();

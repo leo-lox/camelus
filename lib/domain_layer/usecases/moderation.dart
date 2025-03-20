@@ -1,3 +1,6 @@
+import 'package:ndk/ndk.dart';
+
+import '../../data_layer/models/nostr_note_model.dart';
 import '../entities/nostr_note.dart';
 import '../entities/nostr_tag.dart';
 import '../repositories/moderation_repository.dart';
@@ -9,12 +12,15 @@ class Moderation {
   final ModerationRepository _moderationRepository;
 
   final GetNotes _notes;
+  final Ndk _ndk;
 
   Moderation({
     required ModerationRepository moderationrepository,
     required GetNotes notes,
+    required Ndk ndk,
   })  : _moderationRepository = moderationrepository,
-        _notes = notes;
+        _notes = notes,
+        _ndk = ndk;
 
   Future<void> muteUser(String npub) async {
     throw UnimplementedError();
@@ -48,9 +54,10 @@ class Moderation {
     required String userReport,
     String? postId,
   }) async {
+    final now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
     final report = NostrNote(
       content: userReport,
-      created_at: 0,
+      created_at: now,
       id: "",
       kind: _reportKind,
       pubkey: pubkeySubmittingReport,
@@ -79,12 +86,27 @@ class Moderation {
       ]);
     }
 
+    final NostrNoteModel model = NostrNoteModel.fromEntity(report);
+    final ndkEvent = model.toNDKEvent();
+
+    // sign
+    await _ndk.accounts.sign(ndkEvent);
+
+    final signedReport = NostrNoteModel.fromNDKEvent(ndkEvent);
+
+    final List<Future> futures = [
+      _notes.broadcastNote(signedReport),
+    ];
+
+    if (reportToCamelus) {
+      futures.add(
+        _moderationRepository.reportToCamelus(signedReport),
+      );
+    }
+
     // send report
     try {
-      await Future.wait([
-        _moderationRepository.reportToCamelus(report),
-        _notes.broadcastNote(report)
-      ]);
+      await Future.wait(futures);
     } catch (e) {
       return false;
     }
