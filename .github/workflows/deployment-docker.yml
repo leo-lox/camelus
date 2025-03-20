@@ -97,12 +97,12 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: List files in the directory
-        run: ls -la ./apipod_server/
+        run: ls -la ./apipod/apipod_server/
 
       - name: Run docker-compose
         run: |
-          docker compose -f ./apipod_server/docker-compose.production.yaml pull
-          docker compose -f ./apipod_server/docker-compose.production.yaml up -d
+          docker compose -f ./apipod/apipod_server/docker-compose.production.yaml pull
+          docker compose -f ./apipod/apipod_server/docker-compose.production.yaml up -d
         env:
           DOCKER_HOST: "ssh://${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}"
           # The database name
