@@ -18,6 +18,7 @@ import 'package:ndk/ndk.dart';
 import 'package:ndk_objectbox/ndk_objectbox.dart';
 import 'deep_links.dart';
 import 'domain_layer/usecases/app_auth.dart';
+import 'presentation_layer/init/init_moderation.dart';
 import 'presentation_layer/providers/db_app_provider.dart';
 import 'presentation_layer/routes/home_page.dart';
 import 'presentation_layer/routes/nostr/blockedUsers/blocked_users.dart';
@@ -97,7 +98,6 @@ Future<void> main() async {
     initalRoute = initalData[0];
   } else {
     final appDb = providerContainer.read(dbAppProvider);
-
     final savedRoute = await appDb.read('initalRoute');
     initalRoute = savedRoute ?? '/';
   }
@@ -106,6 +106,8 @@ Future<void> main() async {
     navigatorKey: navigatorKey,
     providerContainer: providerContainer,
   );
+
+  InitModeration.initBloomFilter(provider: providerContainer);
 
   runApp(
     UncontrolledProviderScope(

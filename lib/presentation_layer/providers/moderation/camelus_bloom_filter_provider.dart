@@ -1,6 +1,3 @@
-import 'dart:convert';
-
-import 'package:camelus/presentation_layer/providers/moderation/moderation_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ndk/ndk.dart' as ndk;
 
@@ -40,25 +37,8 @@ class BloomFilterNotifier extends Notifier<BloomFilterState> {
     state = state.copyWith(isEnabled: enabled);
   }
 
-  // Update the filter from network
-  Future<void> updateFromNetwork() async {
-    final moderation = ref.read(moderationProvider);
-    final serializedBloom = await moderation.fetchBloomFilterProfiles();
-
-    if (serializedBloom == null) {
-      return;
-    }
-    try {
-      final newFilter = BloomFilterPrehash.fromNumHashFunctionsAndByteArray(
-        numHashFunctions: serializedBloom["numHashFunctions"],
-        byteArray: base64Decode(serializedBloom["bitArray"]),
-        size: serializedBloom["size"],
-      );
-
-      state = state.copyWith(filter: newFilter);
-    } catch (e) {
-      print('Error updating bloom filter: $e');
-    }
+  Future<void> setFilter(BloomFilterPrehash newFilter) async {
+    state = state.copyWith(filter: newFilter);
   }
 }
 
@@ -71,18 +51,40 @@ final camelusBloomFilterProvider = Provider<ndk.EventFilter>((ref) {
   final bloomFilterState = ref.watch(bloomFilterNotifierProvider);
 
   return MyProfilesBloomFilter(
-      bloomFilter: bloomFilterState.filterProfiles,
-      enabled: bloomFilterState.isEnabled);
+    bloomFilter: bloomFilterState.filterProfiles,
+    enabled: bloomFilterState.isEnabled,
+  );
+});
+
+final bloomFilterReferenceProvider = Provider<MyProfilesBloomFilter>((ref) {
+  // Create a mutable filter instance
+  final filter = MyProfilesBloomFilter(
+    bloomFilter:
+        BloomFilterPrehash(falsePositiveProbability: 0.001, numItems: 1),
+    enabled: true,
+  );
+
+  // Set up a listener to update the filter when the state changes
+  ref.listen(bloomFilterNotifierProvider, (previous, next) {
+    filter.updateFilter(next.filterProfiles, next.isEnabled);
+  });
+
+  return filter;
 });
 
 class MyProfilesBloomFilter implements ndk.EventFilter {
-  final BloomFilterPrehash _bloomFilter;
-  final bool _enabled;
+  BloomFilterPrehash _bloomFilter;
+  bool _enabled;
 
   MyProfilesBloomFilter(
       {required BloomFilterPrehash bloomFilter, required bool enabled})
       : _bloomFilter = bloomFilter,
         _enabled = enabled;
+
+  void updateFilter(BloomFilterPrehash newFilter, bool enabled) {
+    _bloomFilter = newFilter;
+    _enabled = enabled;
+  }
 
   @override
   bool filter(ndk.Nip01Event event) {

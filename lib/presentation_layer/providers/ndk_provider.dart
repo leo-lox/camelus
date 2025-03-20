@@ -7,9 +7,9 @@ import 'event_verifier.dart';
 import 'moderation/camelus_bloom_filter_provider.dart';
 
 final ndkProvider = Provider<Ndk>((ref) {
-  final eventVerifier = ref.watch(eventVerifierProvider);
-  final db = ref.watch(dbNdkProvider);
-  final bloomFilter = ref.watch(camelusBloomFilterProvider);
+  final eventVerifier = ref.read(eventVerifierProvider);
+  final db = ref.read(dbNdkProvider);
+  final bloomFilterRef = ref.read(bloomFilterReferenceProvider);
 
   final NdkConfig ndkConfig = NdkConfig(
     engine: NdkEngine.JIT,
@@ -18,7 +18,7 @@ final ndkProvider = Provider<Ndk>((ref) {
     bootstrapRelays: CAMELUS_BOOTSTRAP_RELAYS,
     logLevel: Logger.logLevels.debug,
     defaultBroadcastConsiderDonePercent: 0.2,
-    eventOutFilters: [bloomFilter],
+    eventOutFilters: [bloomFilterRef],
   );
 
   final ndk = Ndk(ndkConfig);

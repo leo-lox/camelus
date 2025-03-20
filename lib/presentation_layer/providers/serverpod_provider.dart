@@ -10,9 +10,9 @@ final serverpodProvider = Provider<ServerpodDataSource>((ref) {
   final String url;
 
   if (kDebugMode) {
-    url = 'http://$localhost:8080';
+    url = 'http://$localhost:8080/';
   } else {
-    url = CamelusConfig.apiEndpoint;
+    url = "${CamelusConfig.apiEndpoint}/"; // must end with /
   }
 
   final client = api_pod.Client(url)
