@@ -7,6 +7,7 @@ import 'package:camelus/presentation_layer/providers/language_provider.dart';
 import 'package:camelus/presentation_layer/providers/ndk_provider.dart';
 import 'package:camelus/presentation_layer/routes/nostr/search_feed_page/search_feed_page.dart';
 import 'package:camelus/presentation_layer/routes/nostr/settings/locale/locale_settings.dart';
+import 'package:camelus/presentation_layer/routes/nostr/settings/moderation/moderation_settings.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -192,6 +193,10 @@ class MyApp extends ConsumerWidget {
             case '/settings/locale':
               return MaterialPageRoute(
                 builder: (context) => const LocaleSettingsPage(),
+              );
+            case '/settings/moderation':
+              return MaterialPageRoute(
+                builder: (context) => const ModerationSettingsPage(),
               );
             case '/nostr/event':
               return CupertinoPageRoute(

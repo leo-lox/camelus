@@ -19,17 +19,12 @@ class InitModeration {
 
     if (dbResult == "true") {
       bloomFilter.toggleFilter(true);
-      //!
-      bloomFilter.toggleFilter(false);
 
       await _updateFilterFromNetwork(provider: provider);
     } else if (dbResult == "false") {
       bloomFilter.toggleFilter(false);
     } else {
       bloomFilter.toggleFilter(true);
-
-      //!
-      bloomFilter.toggleFilter(false);
 
       await _updateFilterFromNetwork(provider: provider);
       await appDb.save(key: "camelus_filter", value: "true");
