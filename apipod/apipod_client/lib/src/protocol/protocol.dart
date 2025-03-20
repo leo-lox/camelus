@@ -67,10 +67,6 @@ class Protocol extends _i1.SerializationManager {
               MapEntry(deserialize<String>(k), deserialize<dynamic>(v)))
           : null) as T;
     }
-    if (t == Map<String, dynamic>) {
-      return (data as Map).map((k, v) =>
-          MapEntry(deserialize<String>(k), deserialize<dynamic>(v))) as T;
-    }
     if (t == _i1.getType<_i6.Nip01Event?>()) {
       return (data != null ? _i6.Nip01Event.fromJson(data) : null) as T;
     }

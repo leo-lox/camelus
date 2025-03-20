@@ -63,13 +63,21 @@ class NostrNoteModel extends NostrNote {
   }
 
   Nip01Event toNDKEvent() {
-    return Nip01Event(
+    final mynip01 = Nip01Event(
       content: content,
       createdAt: created_at,
       kind: kind,
       pubKey: pubkey,
       tags: tags.map((tag) => tag.toList()).toList(),
     );
+
+    if (sig.isNotEmpty) {
+      mynip01.sig = sig;
+    }
+    if (id.isNotEmpty) {
+      mynip01.id = id;
+    }
+    return mynip01;
   }
 
   factory NostrNoteModel.fromEntity(NostrNote nostrNote) {

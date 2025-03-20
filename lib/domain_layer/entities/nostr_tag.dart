@@ -9,18 +9,22 @@ class NostrTag {
 
   final String? marker;
 
-  NostrTag(
-      {required this.type,
-      required this.value,
-      this.recommended_relay,
-      this.marker});
+  NostrTag({
+    required this.type,
+    required this.value,
+    this.recommended_relay,
+    this.marker,
+  });
 
   List<String> toList() {
     List<String> raw = [type, value];
 
-    raw.add(recommended_relay ?? "");
-
-    raw.add(marker ?? "");
+    if (recommended_relay != null && recommended_relay!.isNotEmpty) {
+      raw.add(recommended_relay!);
+    }
+    if (marker != null && marker!.isNotEmpty) {
+      raw.add(marker!);
+    }
 
     return raw;
   }

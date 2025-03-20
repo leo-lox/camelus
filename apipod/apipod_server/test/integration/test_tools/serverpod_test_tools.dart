@@ -14,6 +14,7 @@
 import 'package:serverpod_test/serverpod_test.dart' as _i1;
 import 'package:serverpod/serverpod.dart' as _i2;
 import 'dart:async' as _i3;
+import 'package:ndk/domain_layer/entities/nip_01_event.dart' as _i4;
 import 'package:apipod_server/src/generated/protocol.dart';
 import 'package:apipod_server/src/generated/endpoints.dart';
 export 'package:serverpod_test/serverpod_test_public_exports.dart';
@@ -181,7 +182,7 @@ class _ModerationEndpoint {
 
   _i3.Future<String> report(
     _i1.TestSessionBuilder sessionBuilder,
-    Map<String, dynamic> reportEventJson,
+    _i4.Nip01Event reportEvent,
   ) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
@@ -194,8 +195,7 @@ class _ModerationEndpoint {
           createSessionCallback: (_) => _localUniqueSession,
           endpointPath: 'moderation',
           methodName: 'report',
-          parameters:
-              _i1.testObjectToJson({'reportEventJson': reportEventJson}),
+          parameters: _i1.testObjectToJson({'reportEvent': reportEvent}),
           serializationManager: _serializationManager,
         );
         var _localReturnValue = await (_localCallContext.method.call(

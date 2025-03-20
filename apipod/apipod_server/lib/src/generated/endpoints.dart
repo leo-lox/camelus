@@ -11,6 +11,7 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
 import '../endpoints/moderation/moderation_endpoint.dart' as _i2;
+import 'package:ndk/domain_layer/entities/nip_01_event.dart' as _i3;
 
 class Endpoints extends _i1.EndpointDispatch {
   @override
@@ -50,9 +51,9 @@ class Endpoints extends _i1.EndpointDispatch {
         'report': _i1.MethodConnector(
           name: 'report',
           params: {
-            'reportEventJson': _i1.ParameterDescription(
-              name: 'reportEventJson',
-              type: _i1.getType<Map<String, dynamic>>(),
+            'reportEvent': _i1.ParameterDescription(
+              name: 'reportEvent',
+              type: _i1.getType<_i3.Nip01Event>(),
               nullable: false,
             )
           },
@@ -62,7 +63,7 @@ class Endpoints extends _i1.EndpointDispatch {
           ) async =>
               (endpoints['moderation'] as _i2.ModerationEndpoint).report(
             session,
-            params['reportEventJson'],
+            params['reportEvent'],
           ),
         ),
       },

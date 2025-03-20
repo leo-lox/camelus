@@ -18,6 +18,7 @@ class ModerationRepositoryImpl implements ModerationRepository {
   @override
   Future<String> reportToCamelus(NostrNote report) {
     final NostrNoteModel model = NostrNoteModel.fromEntity(report);
-    return server.client.moderation.report(model.toJson());
+    final ndkEvent = model.toNDKEvent();
+    return server.client.moderation.report(ndkEvent);
   }
 }

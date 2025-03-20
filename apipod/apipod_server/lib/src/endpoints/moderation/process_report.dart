@@ -20,6 +20,7 @@ class ProcessReport {
     required bool isEventReport,
   }) async {
     if (!ServiceConfig.trustedPubkeys.contains(event.pubKey)) {
+      session.log("error: untrusted public key", level: LogLevel.warning);
       return "error: untrusted public key";
     }
 
@@ -36,6 +37,8 @@ class ProcessReport {
     } else {
       final errMsg =
           isEventReport ? "error no e tag found" : "error no p tag found";
+
+      session.log(errMsg, level: LogLevel.warning);
       return errMsg;
     }
 
@@ -57,6 +60,7 @@ class ProcessReport {
       );
     }
 
+    session.log("updated bloom filter", level: LogLevel.info);
     return "ok";
   }
 
