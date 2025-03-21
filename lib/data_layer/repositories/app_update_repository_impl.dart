@@ -1,21 +1,21 @@
-import 'package:camelus/config/app_update_config.dart';
-import 'package:camelus/data_layer/models/app_update_model.dart';
-import 'package:camelus/domain_layer/entities/app_update.dart';
-import 'package:camelus/domain_layer/repositories/app_update_repository.dart';
-
-import '../data_sources/http_request_data_source.dart';
+import '../../config/app_update_config.dart';
+import '../../domain_layer/entities/app_update.dart';
+import '../../domain_layer/repositories/app_update_repository.dart';
+import '../data_sources/serverpod_data_source.dart';
+import '../models/app_update_model.dart';
 
 class AppUpdateRepositoryImpl implements AppUpdateRepository {
-  final HttpRequestDataSource httpJsonDataSource;
+  final ServerpodDataSource serverpodDataSource;
 
-  AppUpdateRepositoryImpl({required this.httpJsonDataSource});
+  AppUpdateRepositoryImpl({
+    required this.serverpodDataSource,
+  });
 
   @override
   Future<AppUpdate> checkAppUpdate() async {
-    final json =
-        await httpJsonDataSource.jsonRequest(AppUpdateConfig.appUpdateCheckUrl);
+    final result = await serverpodDataSource.client.appUpdate.checkVersion();
 
-    final myUpdate = AppUpdateModel.fromJson(json);
+    final myUpdate = AppUpdateModel.fromServerpod(result);
     myUpdate.currentVersion = await AppUpdateConfig.getBuildNumber();
 
     return myUpdate;

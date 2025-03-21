@@ -1,4 +1,6 @@
-import 'package:camelus/domain_layer/entities/app_update.dart';
+import 'package:apipod_client/apipod_client.dart';
+
+import '../../domain_layer/entities/app_update.dart';
 
 class AppUpdateModel extends AppUpdate {
   AppUpdateModel({
@@ -15,6 +17,15 @@ class AppUpdateModel extends AppUpdate {
       title: json['title'],
       url: json['url'],
       body: json['body'],
+    );
+  }
+
+  factory AppUpdateModel.fromServerpod(AppUpdateData data) {
+    return AppUpdateModel(
+      latestVersion: data.version,
+      title: data.title,
+      url: data.url,
+      body: data.body,
     );
   }
 }

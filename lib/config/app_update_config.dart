@@ -5,7 +5,4 @@ class AppUpdateConfig {
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
     return int.parse(packageInfo.buildNumber);
   }
-
-  static const String appUpdateCheckUrl =
-      'https://lox.de/.well-known/app-update-beta.json';
 }
