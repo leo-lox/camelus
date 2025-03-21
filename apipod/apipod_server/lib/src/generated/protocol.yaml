@@ -1,3 +1,5 @@
+appUpdate:
+  - checkVersion:
 moderation:
   - getProfileBloomFilter:
   - getEventBloomFilter:

@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'dart:ui';
 
 import 'package:camelus/presentation_layer/providers/db_ndk_provider.dart';
@@ -9,7 +8,6 @@ import 'package:camelus/presentation_layer/routes/nostr/search_feed_page/search_
 import 'package:camelus/presentation_layer/routes/nostr/settings/locale/locale_settings.dart';
 import 'package:camelus/presentation_layer/routes/nostr/settings/moderation/moderation_settings.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mentions/flutter_mentions.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

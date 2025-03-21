@@ -268,6 +268,7 @@ class UpdateDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
+      backgroundColor: Palette.extraDarkGray,
       title: Text(updateInfo.title),
       content: Text(updateInfo.body),
       actions: <Widget>[

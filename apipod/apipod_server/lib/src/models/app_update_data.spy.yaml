@@ -1,0 +1,6 @@
+class: AppUpdateData
+fields:
+  version: int
+  title: String
+  body: String
+  url: String

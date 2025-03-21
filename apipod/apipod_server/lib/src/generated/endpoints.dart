@@ -10,20 +10,43 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
-import '../endpoints/moderation/moderation_endpoint.dart' as _i2;
-import 'package:ndk/domain_layer/entities/nip_01_event.dart' as _i3;
+import '../endpoints/app_update_endpoint.dart' as _i2;
+import '../endpoints/moderation/moderation_endpoint.dart' as _i3;
+import 'package:ndk/domain_layer/entities/nip_01_event.dart' as _i4;
 
 class Endpoints extends _i1.EndpointDispatch {
   @override
   void initializeEndpoints(_i1.Server server) {
     var endpoints = <String, _i1.Endpoint>{
-      'moderation': _i2.ModerationEndpoint()
+      'appUpdate': _i2.AppUpdateEndpoint()
+        ..initialize(
+          server,
+          'appUpdate',
+          null,
+        ),
+      'moderation': _i3.ModerationEndpoint()
         ..initialize(
           server,
           'moderation',
           null,
-        )
+        ),
     };
+    connectors['appUpdate'] = _i1.EndpointConnector(
+      name: 'appUpdate',
+      endpoint: endpoints['appUpdate']!,
+      methodConnectors: {
+        'checkVersion': _i1.MethodConnector(
+          name: 'checkVersion',
+          params: {},
+          call: (
+            _i1.Session session,
+            Map<String, dynamic> params,
+          ) async =>
+              (endpoints['appUpdate'] as _i2.AppUpdateEndpoint)
+                  .checkVersion(session),
+        )
+      },
+    );
     connectors['moderation'] = _i1.EndpointConnector(
       name: 'moderation',
       endpoint: endpoints['moderation']!,
@@ -35,7 +58,7 @@ class Endpoints extends _i1.EndpointDispatch {
             _i1.Session session,
             Map<String, dynamic> params,
           ) async =>
-              (endpoints['moderation'] as _i2.ModerationEndpoint)
+              (endpoints['moderation'] as _i3.ModerationEndpoint)
                   .getProfileBloomFilter(session),
         ),
         'getEventBloomFilter': _i1.MethodConnector(
@@ -45,7 +68,7 @@ class Endpoints extends _i1.EndpointDispatch {
             _i1.Session session,
             Map<String, dynamic> params,
           ) async =>
-              (endpoints['moderation'] as _i2.ModerationEndpoint)
+              (endpoints['moderation'] as _i3.ModerationEndpoint)
                   .getEventBloomFilter(session),
         ),
         'report': _i1.MethodConnector(
@@ -53,7 +76,7 @@ class Endpoints extends _i1.EndpointDispatch {
           params: {
             'reportEvent': _i1.ParameterDescription(
               name: 'reportEvent',
-              type: _i1.getType<_i3.Nip01Event>(),
+              type: _i1.getType<_i4.Nip01Event>(),
               nullable: false,
             )
           },
@@ -61,7 +84,7 @@ class Endpoints extends _i1.EndpointDispatch {
             _i1.Session session,
             Map<String, dynamic> params,
           ) async =>
-              (endpoints['moderation'] as _i2.ModerationEndpoint).report(
+              (endpoints['moderation'] as _i3.ModerationEndpoint).report(
             session,
             params['reportEvent'],
           ),
