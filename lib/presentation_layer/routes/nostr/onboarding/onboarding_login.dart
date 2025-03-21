@@ -139,7 +139,7 @@ class _OnboardingLoginPageState extends ConsumerState<OnboardingLoginPage> {
 
     // store in secure storage
     const storage = FlutterSecureStorage();
-    storage.write(key: "nostrKeys", value: json.encode(myKeys!.toJson()));
+    await storage.write(key: "nostrKeys", value: json.encode(myKeys!.toJson()));
     // save in provider
 
     final bip340Signer = Bip340EventSigner(
@@ -147,7 +147,7 @@ class _OnboardingLoginPageState extends ConsumerState<OnboardingLoginPage> {
       publicKey: myKeys!.publicKey,
     );
 
-    ref.read(ndkProvider).accounts.loginExternalSigner(signer: bip340Signer);
+    ref.watch(ndkProvider).accounts.loginExternalSigner(signer: bip340Signer);
 
     setState(() {});
 

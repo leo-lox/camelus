@@ -26,7 +26,7 @@ final followingProvider = Provider<Follow>((ref) {
   // Creates an instance of the Follow use case, passing the follow repository and user's public key.
   final follow = Follow(
     followRepository: _followRepository,
-    selfPubkey: ndk.accounts.getPublicKey(),
+    selfPubkey: ndk.accounts.getPublicKey,
   );
 
   return follow;

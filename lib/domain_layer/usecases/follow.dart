@@ -4,7 +4,7 @@ import '../entities/nostr_tag.dart';
 import '../repositories/follow_repository.dart';
 
 class Follow {
-  final String? selfPubkey;
+  final String? Function() selfPubkey;
 
   final FollowRepository followRepository;
 
@@ -14,7 +14,7 @@ class Follow {
   });
 
   _checkSelfPubkey() {
-    if (selfPubkey == null) {
+    if (selfPubkey() == null) {
       throw Exception("selfPubkey is null");
     }
   }
@@ -32,7 +32,7 @@ class Follow {
     _checkSelfPubkey();
     return followRepository.setFollowing(
       ContactList(
-        pubKey: selfPubkey!,
+        pubKey: selfPubkey()!,
         contacts: pubkeys,
         contactRelays: [],
         createdAt: 0,
@@ -56,7 +56,7 @@ class Follow {
 
   Future<ContactList?> getContactsSelf() {
     _checkSelfPubkey();
-    return getContacts(selfPubkey!);
+    return getContacts(selfPubkey()!);
   }
 
   Stream<ContactList> getContactsStream(String npub) {
@@ -65,7 +65,7 @@ class Follow {
 
   Stream<ContactList> getContactsStreamSelf() {
     _checkSelfPubkey();
-    return getContactsStream(selfPubkey!);
+    return getContactsStream(selfPubkey()!);
   }
 
   Stream<List<NostrTag>> getFollowers(String npub) {
@@ -74,6 +74,6 @@ class Follow {
 
   Stream<List<NostrTag>> getFollowersSelf() {
     _checkSelfPubkey();
-    return getFollowers(selfPubkey!);
+    return getFollowers(selfPubkey()!);
   }
 }
