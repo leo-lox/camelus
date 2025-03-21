@@ -3,5 +3,6 @@ import '../entities/nostr_note.dart';
 
 abstract class ModerationRepository {
   Future<BloomFilterData?> fetchBloomFilterProfiles();
+  Future<BloomFilterData?> fetchBloomFilterEvents();
   Future<String> reportToCamelus(NostrNote report);
 }

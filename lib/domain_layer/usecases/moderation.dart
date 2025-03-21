@@ -40,11 +40,12 @@ class Moderation {
     throw UnimplementedError();
   }
 
-  ///    'size': <int>,
-  ///    'numHashFunctions': <int>,
-  ///    'bitArray': <string>,
   Future<BloomFilterData?> fetchBloomFilterProfiles() {
     return _moderationRepository.fetchBloomFilterProfiles();
+  }
+
+  Future<BloomFilterData?> fetchBloomFilterEvents() {
+    return _moderationRepository.fetchBloomFilterEvents();
   }
 
   Future<bool> report({

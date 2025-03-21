@@ -5,19 +5,23 @@ import '../../../helpers/bloom_filter_prehash.dart';
 
 class BloomFilterState {
   final BloomFilterPrehash filterProfiles;
+  final BloomFilterPrehash filterEvents;
   final bool isEnabled;
 
   BloomFilterState({
     required this.filterProfiles,
+    required this.filterEvents,
     this.isEnabled = true,
   });
 
   BloomFilterState copyWith({
-    BloomFilterPrehash? filter,
+    BloomFilterPrehash? filterProfiles,
+    BloomFilterPrehash? filterEvents,
     bool? isEnabled,
   }) {
     return BloomFilterState(
-      filterProfiles: filter ?? this.filterProfiles,
+      filterProfiles: filterProfiles ?? this.filterProfiles,
+      filterEvents: filterEvents ?? this.filterEvents,
       isEnabled: isEnabled ?? this.isEnabled,
     );
   }
@@ -29,6 +33,8 @@ class BloomFilterNotifier extends Notifier<BloomFilterState> {
     return BloomFilterState(
       filterProfiles:
           BloomFilterPrehash(falsePositiveProbability: 0.001, numItems: 1),
+      filterEvents:
+          BloomFilterPrehash(falsePositiveProbability: 0.001, numItems: 1),
       isEnabled: true,
     );
   }
@@ -37,8 +43,14 @@ class BloomFilterNotifier extends Notifier<BloomFilterState> {
     state = state.copyWith(isEnabled: enabled);
   }
 
-  Future<void> setFilter(BloomFilterPrehash newFilter) async {
-    state = state.copyWith(filter: newFilter);
+  Future<void> setFilter({
+    BloomFilterPrehash? newFilterProfiles,
+    BloomFilterPrehash? newFilterEvents,
+  }) async {
+    state = state.copyWith(
+      filterProfiles: newFilterProfiles,
+      filterEvents: newFilterEvents,
+    );
   }
 }
 
@@ -51,7 +63,8 @@ final camelusBloomFilterProvider = Provider<ndk.EventFilter>((ref) {
   final bloomFilterState = ref.watch(bloomFilterNotifierProvider);
 
   return MyProfilesBloomFilter(
-    bloomFilter: bloomFilterState.filterProfiles,
+    bloomFilterProfiles: bloomFilterState.filterProfiles,
+    bloomFilterEvents: bloomFilterState.filterEvents,
     enabled: bloomFilterState.isEnabled,
   );
 });
@@ -59,36 +72,58 @@ final camelusBloomFilterProvider = Provider<ndk.EventFilter>((ref) {
 final bloomFilterReferenceProvider = Provider<MyProfilesBloomFilter>((ref) {
   // Create a mutable filter instance
   final filter = MyProfilesBloomFilter(
-    bloomFilter:
+    bloomFilterProfiles:
+        BloomFilterPrehash(falsePositiveProbability: 0.001, numItems: 1),
+    bloomFilterEvents:
         BloomFilterPrehash(falsePositiveProbability: 0.001, numItems: 1),
     enabled: true,
   );
 
   // Set up a listener to update the filter when the state changes
   ref.listen(bloomFilterNotifierProvider, (previous, next) {
-    filter.updateFilter(next.filterProfiles, next.isEnabled);
+    filter.updateFilter(
+      newFilterProfiles: next.filterProfiles,
+      newFilterEvents: next.filterEvents,
+      enabled: next.isEnabled,
+    );
   });
 
   return filter;
 });
 
 class MyProfilesBloomFilter implements ndk.EventFilter {
-  BloomFilterPrehash _bloomFilter;
+  BloomFilterPrehash _bloomFilterProfiles;
+  BloomFilterPrehash _bloomFilterEvents;
   bool _enabled;
 
-  MyProfilesBloomFilter(
-      {required BloomFilterPrehash bloomFilter, required bool enabled})
-      : _bloomFilter = bloomFilter,
+  MyProfilesBloomFilter({
+    required BloomFilterPrehash bloomFilterProfiles,
+    required BloomFilterPrehash bloomFilterEvents,
+    required bool enabled,
+  })  : _bloomFilterProfiles = bloomFilterProfiles,
+        _bloomFilterEvents = bloomFilterEvents,
         _enabled = enabled;
 
-  void updateFilter(BloomFilterPrehash newFilter, bool enabled) {
-    _bloomFilter = newFilter;
+  void updateFilter({
+    BloomFilterPrehash? newFilterProfiles,
+    BloomFilterPrehash? newFilterEvents,
+    required bool enabled,
+  }) {
+    if (newFilterProfiles != null) {
+      _bloomFilterProfiles = newFilterProfiles;
+    }
+    if (newFilterEvents != null) {
+      _bloomFilterEvents = newFilterEvents;
+    }
+
     _enabled = enabled;
   }
 
   @override
   bool filter(ndk.Nip01Event event) {
-    if (_enabled && _bloomFilter.contains(event.pubKey)) {
+    if (_enabled &&
+        (_bloomFilterProfiles.contains(event.pubKey) ||
+            _bloomFilterEvents.contains(event.id))) {
       return false;
     }
     return true;

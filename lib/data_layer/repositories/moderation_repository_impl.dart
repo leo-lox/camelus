@@ -26,6 +26,17 @@ class ModerationRepositoryImpl implements ModerationRepository {
   }
 
   @override
+  Future<BloomFilterData?> fetchBloomFilterEvents() async {
+    final sp.BloomFilterData? data =
+        await server.client.moderation.getEventBloomFilter();
+    if (data == null) {
+      return null;
+    }
+
+    return BloomFilterDataModel.fromServerpod(data);
+  }
+
+  @override
   Future<String> reportToCamelus(NostrNote report) {
     final NostrNoteModel model = NostrNoteModel.fromEntity(report);
     final ndkEvent = model.toNDKEvent();

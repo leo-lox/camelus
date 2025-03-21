@@ -1,13 +1,14 @@
 import 'dart:convert';
 
-import 'package:camelus/presentation_layer/providers/moderation/moderation_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../../config/palette.dart';
+import '../../../../../domain_layer/entities/bloom_filter_data.dart';
 import '../../../../../helpers/bloom_filter_prehash.dart';
 import '../../../../providers/db_app_provider.dart';
 import '../../../../providers/moderation/camelus_bloom_filter_provider.dart';
+import '../../../../providers/moderation/moderation_provider.dart';
 
 class ModerationSettingsPage extends ConsumerStatefulWidget {
   const ModerationSettingsPage({super.key});
@@ -23,19 +24,31 @@ class ModerationSettingsPageState
   /// updates filter from network
   Future<void> _updateFilter() async {
     final moderation = ref.read(moderationProvider);
+    final bloomProvider = ref.read(bloomFilterNotifierProvider.notifier);
 
-    final serializedBloom = await moderation.fetchBloomFilterProfiles();
-    if (serializedBloom == null) {
+    final profilesFilterData = await moderation.fetchBloomFilterProfiles();
+    final eventsFilterData = await moderation.fetchBloomFilterEvents();
+    if (profilesFilterData == null && eventsFilterData == null) {
       throw Exception("no filter found");
     }
 
-    final newFilter = BloomFilterPrehash.fromNumHashFunctionsAndByteArray(
-      numHashFunctions: serializedBloom.numHashFunctions,
-      byteArray: base64Decode(serializedBloom.bitArray),
-      size: serializedBloom.size,
+    final profilesFilter = _createFilterFromData(profilesFilterData);
+    final eventsFilter = _createFilterFromData(eventsFilterData);
+
+    bloomProvider.setFilter(
+      newFilterProfiles: profilesFilter,
+      newFilterEvents: eventsFilter,
     );
-    final bloomProvider = ref.read(bloomFilterNotifierProvider.notifier);
-    bloomProvider.setFilter(newFilter);
+  }
+
+  BloomFilterPrehash? _createFilterFromData(BloomFilterData? filterData) {
+    if (filterData == null) return null;
+
+    return BloomFilterPrehash.fromNumHashFunctionsAndByteArray(
+      numHashFunctions: filterData.numHashFunctions,
+      byteArray: base64Decode(filterData.bitArray),
+      size: filterData.size,
+    );
   }
 
   Future<void> _toggleFilter(bool value) async {

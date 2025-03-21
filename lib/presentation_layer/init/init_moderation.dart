@@ -3,6 +3,7 @@ import 'dart:developer';
 
 import 'package:riverpod/riverpod.dart';
 
+import '../../domain_layer/entities/bloom_filter_data.dart';
 import '../../helpers/bloom_filter_prehash.dart';
 import '../providers/db_app_provider.dart';
 import '../providers/moderation/camelus_bloom_filter_provider.dart';
@@ -35,22 +36,37 @@ class InitModeration {
     required ProviderContainer provider,
   }) async {
     final moderation = provider.read(moderationProvider);
+    final bloomProvider = provider.read(bloomFilterNotifierProvider.notifier);
 
     try {
-      final serializedBloom = await moderation.fetchBloomFilterProfiles();
-      if (serializedBloom == null) {
+      // Fetch filter data
+      final profilesFilterData = await moderation.fetchBloomFilterProfiles();
+      final eventsFilterData = await moderation.fetchBloomFilterEvents();
+
+      if (profilesFilterData == null && eventsFilterData == null) {
         return;
       }
 
-      final newFilter = BloomFilterPrehash.fromNumHashFunctionsAndByteArray(
-        numHashFunctions: serializedBloom.numHashFunctions,
-        byteArray: base64Decode(serializedBloom.bitArray),
-        size: serializedBloom.size,
+      // Process filters
+      final profilesFilter = _createFilterFromData(profilesFilterData);
+      final eventsFilter = _createFilterFromData(eventsFilterData);
+
+      // Update filters
+      bloomProvider.setFilter(
+        newFilterProfiles: profilesFilter,
+        newFilterEvents: eventsFilter,
       );
-      final bloomProvider = provider.read(bloomFilterNotifierProvider.notifier);
-      bloomProvider.setFilter(newFilter);
-    } catch (e) {
-      log("err downloading filter: $e");
-    }
+    } catch (_) {}
+  }
+
+  static BloomFilterPrehash? _createFilterFromData(
+      BloomFilterData? filterData) {
+    if (filterData == null) return null;
+
+    return BloomFilterPrehash.fromNumHashFunctionsAndByteArray(
+      numHashFunctions: filterData.numHashFunctions,
+      byteArray: base64Decode(filterData.bitArray),
+      size: filterData.size,
+    );
   }
 }
