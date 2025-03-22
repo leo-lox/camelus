@@ -30,7 +30,7 @@ dependencies:
   flutter:
     sdk: flutter
   cupertino_icons: ^1.0.2
-  flutter_hooks: ^0.20.5
+  flutter_hooks: ^0.21.2
   riverpod: ^2.3.6
   riverpod_annotation: ^2.3.5
   flutter_riverpod: ^2.6.1
@@ -68,7 +68,7 @@ dependencies:
   #device_preview: ^1.1.0
   bip39_mnemonic: ^3.0.6
   bip32: ^2.0.0
-  crop_your_image: ^1.0.1
+  crop_your_image: ^2.0.0
   package_info_plus: ^8.0.2
   rxdart: ^0.28.0
   shimmer: ^3.0.0
@@ -82,7 +82,7 @@ dependencies:
   ## ndk imnports
   ndk: ^0.3.1
   ndk_rust_verifier: ^0.2.3
-  ndk_amber: ^0.2.0
+  ndk_amber: ^0.3.0
   ndk_objectbox: ^0.2.1
   image: ^4.3.0
   flutter_list_view: ^1.1.29
