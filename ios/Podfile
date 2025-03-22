@@ -51,4 +51,6 @@ post_install do |installer|
       config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '14.0'  # Set this to match your platform version
     end
   end
+  # Add privacy manifests after build
+  system('sh ./add_privacy_manifests.sh')
 end
