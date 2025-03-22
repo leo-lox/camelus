@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
@@ -8,7 +7,10 @@ import '../../config/palette.dart';
 import '../atoms/camer_upload.dart';
 import '../atoms/round_image_border.dart';
 
-/// A screen for editing the user's profile, allowing updates to various fields like name
+// to control upload state
+final editProfilePictureUploadingProvider = StateProvider<bool>((ref) => false);
+final editProfileBannerUploadingProvider = StateProvider<bool>((ref) => false);
+
 class EditProfile extends ConsumerStatefulWidget {
   // Fields to initialize and update the profile.
   final String initialName;
@@ -106,8 +108,7 @@ class _EditProfileState extends ConsumerState<EditProfile> {
 
   @override
   void dispose() {
-    // Disposing of all controllers when the widget is disposed.
-    for (var controller in _controllers.values) {
+    for (final controller in _controllers.values) {
       controller.dispose();
     }
     super.dispose();
@@ -115,54 +116,93 @@ class _EditProfileState extends ConsumerState<EditProfile> {
 
   @override
   Widget build(BuildContext context) {
+    final isUploadingPicture = ref.watch(editProfilePictureUploadingProvider);
+    final isUploadingBanner = ref.watch(editProfileBannerUploadingProvider);
+
     return Column(
       children: [
-        _buildHeader(), // Building the header section with profile picture and banner.
-        _buildForm(), // Building the form with input fields for profile details.
+        _buildHeader(isUploadingPicture, isUploadingBanner),
+        _buildForm(),
       ],
     );
   }
 
-  /// Builds the header section of the profile with banner and profile picture.
-  Widget _buildHeader() {
+  Widget _buildHeader(bool isUploadingPicture, bool isUploadingBanner) {
     return SizedBox(
       height: (MediaQuery.of(context).size.height / 6) + 60,
       child: Stack(
         children: <Widget>[
+          // Banner section
           InkWell(
-            onTap: () {
-              widget
-                  .bannerCallback(); // Trigger callback to update banner when clicked.
-            },
-            child: Container(
-              width: MediaQuery.of(context).size.width,
-              height: MediaQuery.of(context).size.height / 6,
-              decoration: BoxDecoration(
-                color: Palette.darkGray,
-                image: widget.initialBanner != null
-                    ? DecorationImage(
-                        image: MemoryImage(widget.initialBanner!),
-                        fit: BoxFit.cover,
-                      )
-                    : null,
-              ),
+            onTap: isUploadingBanner ? null : widget.bannerCallback,
+            child: Stack(
+              children: [
+                // Banner image or background
+                Container(
+                  width: MediaQuery.of(context).size.width,
+                  height: MediaQuery.of(context).size.height / 6,
+                  decoration: BoxDecoration(
+                    color: Palette.darkGray,
+                    image: widget.initialBanner != null
+                        ? DecorationImage(
+                            image: MemoryImage(widget.initialBanner!),
+                            fit: BoxFit.cover,
+                          )
+                        : null,
+                  ),
+                ),
+
+                // Banner upload overlay
+                if (isUploadingBanner)
+                  Container(
+                    width: MediaQuery.of(context).size.width,
+                    height: MediaQuery.of(context).size.height / 6,
+                    color: Palette.black.withValues(alpha: 0.5),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Text(
+                          "Uploading...",
+                          style: TextStyle(
+                            color: Palette.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 32.0),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(4),
+                            child: const LinearProgressIndicator(
+                              backgroundColor: Palette.gray,
+                              valueColor:
+                                  AlwaysStoppedAnimation<Color>(Palette.white),
+                              minHeight: 6,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+              ],
             ),
           ),
-          // Positioned profile picture in the header section.
+
           Positioned(
             bottom: 0,
             left: MediaQuery.of(context).size.width / 8,
             child: InkWell(
-              onTap: () {
-                widget
-                    .pictureCallback(); // Trigger callback to update profile picture when clicked.
-              },
-              child: widget.initialPicture == null
-                  ? const CameraUpload(
-                      size: 100,
-                    )
-                  : RoundImageWithBorder(
-                      image: widget.initialPicture!, size: 102),
+              onTap: isUploadingPicture ? null : widget.pictureCallback,
+              child: Stack(
+                children: [
+                  widget.initialPicture == null
+                      ? const CameraUpload(size: 100)
+                      : RoundImageWithBorder(
+                          image: widget.initialPicture!, size: 102),
+                  if (isUploadingPicture) _buildUploadingProfilePicture(),
+                ],
+              ),
             ),
           ),
         ],
@@ -170,7 +210,47 @@ class _EditProfileState extends ConsumerState<EditProfile> {
     );
   }
 
-  /// Builds the form section with input fields for profile details.
+  Widget _buildUploadingProfilePicture() {
+    return Stack(
+      alignment: Alignment.center,
+      children: [
+        // Background circle
+        Container(
+          width: 102,
+          height: 102,
+          decoration: BoxDecoration(
+            color: Palette.black.withValues(alpha: 0.5),
+            shape: BoxShape.circle,
+            border: Border.all(
+              color: Palette.white,
+              width: 3,
+            ),
+          ),
+        ),
+
+        // Circular progress indicator
+        const SizedBox(
+          width: 60,
+          height: 60,
+          child: CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation<Color>(Palette.white),
+            strokeWidth: 3,
+          ),
+        ),
+
+        // Text in the center
+        const Text(
+          "Uploading",
+          style: TextStyle(
+            color: Palette.white,
+            fontSize: 10,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget _buildForm() {
     return Padding(
       padding: const EdgeInsets.all(16.0),
@@ -187,7 +267,6 @@ class _EditProfileState extends ConsumerState<EditProfile> {
     );
   }
 
-  /// Builds a single input field with a label and controller.
   Widget _buildInputField(String label, TextEditingController controller,
       {bool isMultiline = false}) {
     return Column(
@@ -216,14 +295,13 @@ class _EditProfileState extends ConsumerState<EditProfile> {
   }
 }
 
-/// Decoration for the text input fields in the form.
 const textEditInputDecoration = InputDecoration(
   hintText: "",
   contentPadding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 8.0),
   enabledBorder: UnderlineInputBorder(
     borderSide: BorderSide(
       width: 1,
-      color: Colors.grey, // Border color for the text field.
+      color: Palette.gray, // Border color for the text field.
     ),
   ),
 );

@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import '../entities/user_metadata.dart';
 import '../repositories/metadata_repository.dart';
 
@@ -12,5 +14,9 @@ class GetUserMetadata {
 
   Future<UserMetadata> broadcastMetadata(UserMetadata metadata) {
     return _metadataRepository.broadcastMetadata(metadata);
+  }
+
+  Future<Uint8List?> downloadImageUrl(String imageUrl) {
+    return _metadataRepository.downloadImageUrl(imageUrl);
   }
 }

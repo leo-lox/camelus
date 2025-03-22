@@ -23,6 +23,7 @@ import 'presentation_layer/routes/home_page.dart';
 import 'presentation_layer/routes/nostr/blockedUsers/blocked_users.dart';
 import 'presentation_layer/routes/nostr/event_view/event_view_page.dart';
 import 'presentation_layer/routes/nostr/onboarding/onboarding.dart';
+import 'presentation_layer/routes/nostr/profile/edit_profile_page.dart';
 import 'presentation_layer/routes/nostr/profile/profile_page_2.dart';
 import 'presentation_layer/routes/nostr/settings/file_servers/settings_file_servers.dart';
 import 'presentation_layer/routes/nostr/settings/inital_route/inital_route_settings.dart';
@@ -209,6 +210,11 @@ class MyApp extends ConsumerWidget {
               return MaterialPageRoute(
                 builder: (context) =>
                     ProfilePage2(pubkey: settings.arguments as String),
+              );
+            case '/nostr/profile/edit':
+              return MaterialPageRoute(
+                builder: (context) =>
+                    EditProfilePage(pubkey: settings.arguments as String),
               );
             case '/nostr/search':
               return PageRouteBuilder(
