@@ -1,3 +1,6 @@
+import 'dart:developer';
+import 'dart:typed_data';
+
 import 'package:ndk/entities.dart' as ndk_entities;
 import 'package:ndk/ndk.dart' as ndk;
 
@@ -64,5 +67,17 @@ class MetadataRepositoryImpl implements MetadataRepository {
     final result =
         await dartNdkSource.dartNdk.metadata.broadcastMetadata(ndkMetadata);
     return UserMetadataModel.fromNDKMetadata(result);
+  }
+
+  @override
+  Future<Uint8List?> downloadImageUrl(String imageUrl) async {
+    try {
+      final result = await dartNdkSource.dartNdk.files.download(url: imageUrl);
+      return result.data;
+    } catch (e) {
+      log("image download err $e");
+    }
+
+    return null;
   }
 }

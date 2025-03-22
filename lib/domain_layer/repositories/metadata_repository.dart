@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import '../entities/user_metadata.dart';
 
 abstract class MetadataRepository {
@@ -6,4 +8,7 @@ abstract class MetadataRepository {
   /// broadcasts the given [metadata] \
   /// [returns] the broadcasted metadata when complete
   Future<UserMetadata> broadcastMetadata(UserMetadata metadata);
+
+  /// downloads a image and returns the uint8list
+  Future<Uint8List?> downloadImageUrl(String imageUrl);
 }

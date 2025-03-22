@@ -1,7 +1,3 @@
-import 'dart:developer';
-
-import 'package:camelus/presentation_layer/providers/metadata_state_provider.dart';
-import 'package:camelus/presentation_layer/providers/ndk_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
@@ -17,11 +13,14 @@ import '../../../../helpers/helpers.dart';
 import '../../../../helpers/nprofile_helper.dart';
 import '../../../atoms/back_button_round.dart';
 import '../../../atoms/follow_button.dart';
+import '../../../atoms/long_button.dart';
 import '../../../atoms/my_profile_picture.dart';
 import '../../../atoms/nip_05_text.dart';
 import '../../../components/generic_feed.dart';
 import '../../../components/starter_packs/starter_packs_list.dart';
 import '../../../providers/following_provider.dart';
+import '../../../providers/metadata_state_provider.dart';
+import '../../../providers/ndk_provider.dart';
 import '../blockedUsers/block_page.dart';
 import 'follower_page.dart';
 
@@ -257,6 +256,16 @@ class _BuildProfileHeader extends ConsumerWidget {
                           _FollowButton(
                             pubkey: userMetadata.pubkey,
                           ),
+                        if (isOwnProfile)
+                          longButton(
+                              name: "edit",
+                              onPressed: () {
+                                Navigator.pushNamed(
+                                  context,
+                                  '/nostr/profile/edit',
+                                  arguments: userMetadata.pubkey,
+                                );
+                              })
                       ],
                     ),
                   ],

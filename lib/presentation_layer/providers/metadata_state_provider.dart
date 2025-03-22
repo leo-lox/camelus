@@ -45,6 +45,10 @@ class MetadataStateNotifier extends StateNotifier<MetadataState> {
   Future<UserMetadata> broadcastMetadata(UserMetadata metadata) {
     return _getUserMetadata.broadcastMetadata(metadata);
   }
+
+  void setMetadata(UserMetadata newMetadata) {
+    state = state.copyWith(userMetadata: newMetadata);
+  }
 }
 
 /// arg is pubkey
