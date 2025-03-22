@@ -152,7 +152,9 @@ class _HomePageState extends ConsumerState<HomePage> {
               initialTab: widget.initialTab,
             ),
             const SearchPage(),
-            const NotificationPage(),
+            NotificationPage(
+              pubkey: widget.pubkey,
+            ),
             const Center(
               child: Text('work in progress',
                   style: TextStyle(color: Colors.white)),
