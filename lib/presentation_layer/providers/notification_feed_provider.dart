@@ -87,7 +87,6 @@ class NotificationsState
   List<NostrNotification> _convertToNotifications(
       List<NostrNote> notes, String userPubkey) {
     return notes.map((note) {
-      // Determine notification type based on note kind and content
       NotificationType type;
       String? targetNoteId;
 
@@ -156,18 +155,24 @@ class NotificationsState
       requestId: "notifications-query",
       kinds: [1, 7, 6], // Text notes, reactions, reposts
       pTags: [userPubkey],
-      limit: 50,
+      limit: 10,
       until: cutoff,
     );
+
+    // process notes
+    notesStream
+        .bufferTime(const Duration(milliseconds: 100))
+        .where((events) => events.isNotEmpty)
+        .listen((data) {
+      final notifications = _convertToNotifications(data, userPubkey);
+      _addTimelineNotifications(notifications);
+    });
 
     final notes = await notesStream.toList();
     if (notes.isEmpty) {
       state = state.copyWith(endOfNotifications: true);
       return;
     }
-
-    final notifications = _convertToNotifications(notes, userPubkey);
-    _addTimelineNotifications(notifications);
   }
 
   // Add notifications to the timeline
