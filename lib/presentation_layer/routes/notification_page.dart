@@ -12,6 +12,7 @@ import 'package:timeago/timeago.dart' as timeago;
 
 import '../../config/palette.dart';
 
+import '../components/enable_notifications.dart';
 import '../providers/notification_feed_provider.dart';
 
 class NotificationPage extends ConsumerStatefulWidget {
@@ -77,13 +78,14 @@ class _NotificationPageState extends ConsumerState<NotificationPage>
             ),
         ],
         bottom: PreferredSize(
-          preferredSize: Size.fromHeight(80),
+          preferredSize: Size.fromHeight(200),
           child: Column(
             children: [
               Text(
                 "work in progress!",
                 style: TextStyle(color: Palette.error),
               ),
+              PushNotificationToggle(),
               TabBar(
                 controller: _tabController,
                 labelColor: Colors.white,

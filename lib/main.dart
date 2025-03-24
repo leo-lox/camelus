@@ -7,6 +7,8 @@ import 'package:camelus/presentation_layer/providers/ndk_provider.dart';
 import 'package:camelus/presentation_layer/routes/nostr/search_feed_page/search_feed_page.dart';
 import 'package:camelus/presentation_layer/routes/nostr/settings/locale/locale_settings.dart';
 import 'package:camelus/presentation_layer/routes/nostr/settings/moderation/moderation_settings.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mentions/flutter_mentions.dart';
@@ -15,6 +17,7 @@ import 'package:ndk/ndk.dart';
 //import 'package:device_preview/device_preview.dart';
 //import 'data_layer/db/object_box_ndk/db_object_box.dart';
 import 'package:ndk_objectbox/ndk_objectbox.dart';
+import 'background_notification.dart';
 import 'deep_links.dart';
 import 'domain_layer/usecases/app_auth.dart';
 import 'presentation_layer/init/init_moderation.dart';
@@ -106,6 +109,13 @@ Future<void> main() async {
     navigatorKey: navigatorKey,
     providerContainer: providerContainer,
   );
+
+  // notifications
+  await Firebase.initializeApp();
+  checkForInitialMessage();
+  FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+  FirebaseMessaging.onMessageOpenedApp.listen(firebaseMessagingOpenedApp);
+  FirebaseMessaging.onMessage.listen(firebaseMessagingAppOpen);
 
   InitModeration.initBloomFilter(provider: providerContainer);
 
