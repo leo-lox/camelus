@@ -17,13 +17,15 @@ import 'bloom_filter_events.dart' as _i5;
 import 'bloom_filter_profiles.dart' as _i6;
 import 'example.dart' as _i7;
 import 'reports_incoming.dart' as _i8;
-import 'package:ndk/domain_layer/entities/nip_01_event.dart' as _i9;
+import 'subscription.dart' as _i9;
+import 'package:ndk/domain_layer/entities/nip_01_event.dart' as _i10;
 export 'app_update_data.dart';
 export 'bloom_filter_data.dart';
 export 'bloom_filter_events.dart';
 export 'bloom_filter_profiles.dart';
 export 'example.dart';
 export 'reports_incoming.dart';
+export 'subscription.dart';
 
 class Protocol extends _i1.SerializationManagerServer {
   Protocol._();
@@ -196,6 +198,77 @@ class Protocol extends _i1.SerializationManagerServer {
       managed: true,
     ),
     _i2.TableDefinition(
+      name: 'push_subscriptions',
+      dartName: 'PushSubscription',
+      schema: 'public',
+      module: 'apipod',
+      columns: [
+        _i2.ColumnDefinition(
+          name: 'id',
+          columnType: _i2.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int?',
+          columnDefault: 'nextval(\'push_subscriptions_id_seq\'::regclass)',
+        ),
+        _i2.ColumnDefinition(
+          name: 'pubKey',
+          columnType: _i2.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+        ),
+        _i2.ColumnDefinition(
+          name: 'relay',
+          columnType: _i2.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+        ),
+        _i2.ColumnDefinition(
+          name: 'token',
+          columnType: _i2.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+        ),
+      ],
+      foreignKeys: [],
+      indexes: [
+        _i2.IndexDefinition(
+          indexName: 'push_subscriptions_pkey',
+          tableSpace: null,
+          elements: [
+            _i2.IndexElementDefinition(
+              type: _i2.IndexElementDefinitionType.column,
+              definition: 'id',
+            )
+          ],
+          type: 'btree',
+          isUnique: true,
+          isPrimary: true,
+        ),
+        _i2.IndexDefinition(
+          indexName: 'subscription_unique_idx',
+          tableSpace: null,
+          elements: [
+            _i2.IndexElementDefinition(
+              type: _i2.IndexElementDefinitionType.column,
+              definition: 'pubKey',
+            ),
+            _i2.IndexElementDefinition(
+              type: _i2.IndexElementDefinitionType.column,
+              definition: 'relay',
+            ),
+            _i2.IndexElementDefinition(
+              type: _i2.IndexElementDefinitionType.column,
+              definition: 'token',
+            ),
+          ],
+          type: 'btree',
+          isUnique: true,
+          isPrimary: false,
+        ),
+      ],
+      managed: true,
+    ),
+    _i2.TableDefinition(
       name: 'reports_incoming',
       dartName: 'ReportsIncoming',
       schema: 'public',
@@ -285,6 +358,9 @@ class Protocol extends _i1.SerializationManagerServer {
     if (t == _i8.ReportsIncoming) {
       return _i8.ReportsIncoming.fromJson(data) as T;
     }
+    if (t == _i9.PushSubscription) {
+      return _i9.PushSubscription.fromJson(data) as T;
+    }
     if (t == _i1.getType<_i3.AppUpdateData?>()) {
       return (data != null ? _i3.AppUpdateData.fromJson(data) : null) as T;
     }
@@ -303,11 +379,23 @@ class Protocol extends _i1.SerializationManagerServer {
     if (t == _i1.getType<_i8.ReportsIncoming?>()) {
       return (data != null ? _i8.ReportsIncoming.fromJson(data) : null) as T;
     }
-    if (t == _i9.Nip01Event) {
-      return _i9.Nip01Event.fromJson(data) as T;
+    if (t == _i1.getType<_i9.PushSubscription?>()) {
+      return (data != null ? _i9.PushSubscription.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i9.Nip01Event?>()) {
-      return (data != null ? _i9.Nip01Event.fromJson(data) : null) as T;
+    if (t == _i10.Nip01Event) {
+      return _i10.Nip01Event.fromJson(data) as T;
+    }
+    if (t == List<Map<String, dynamic>>) {
+      return (data as List)
+          .map((e) => deserialize<Map<String, dynamic>>(e))
+          .toList() as T;
+    }
+    if (t == Map<String, dynamic>) {
+      return (data as Map).map((k, v) =>
+          MapEntry(deserialize<String>(k), deserialize<dynamic>(v))) as T;
+    }
+    if (t == _i1.getType<_i10.Nip01Event?>()) {
+      return (data != null ? _i10.Nip01Event.fromJson(data) : null) as T;
     }
     try {
       return _i2.Protocol().deserialize<T>(data, t);
@@ -319,7 +407,7 @@ class Protocol extends _i1.SerializationManagerServer {
   String? getClassNameForObject(Object? data) {
     String? className = super.getClassNameForObject(data);
     if (className != null) return className;
-    if (data is _i9.Nip01Event) {
+    if (data is _i10.Nip01Event) {
       return 'Nip01Event';
     }
     if (data is _i3.AppUpdateData) {
@@ -340,6 +428,9 @@ class Protocol extends _i1.SerializationManagerServer {
     if (data is _i8.ReportsIncoming) {
       return 'ReportsIncoming';
     }
+    if (data is _i9.PushSubscription) {
+      return 'PushSubscription';
+    }
     className = _i2.Protocol().getClassNameForObject(data);
     if (className != null) {
       return 'serverpod.$className';
@@ -354,7 +445,7 @@ class Protocol extends _i1.SerializationManagerServer {
       return super.deserializeByClassName(data);
     }
     if (dataClassName == 'Nip01Event') {
-      return deserialize<_i9.Nip01Event>(data['data']);
+      return deserialize<_i10.Nip01Event>(data['data']);
     }
     if (dataClassName == 'AppUpdateData') {
       return deserialize<_i3.AppUpdateData>(data['data']);
@@ -373,6 +464,9 @@ class Protocol extends _i1.SerializationManagerServer {
     }
     if (dataClassName == 'ReportsIncoming') {
       return deserialize<_i8.ReportsIncoming>(data['data']);
+    }
+    if (dataClassName == 'PushSubscription') {
+      return deserialize<_i9.PushSubscription>(data['data']);
     }
     if (dataClassName.startsWith('serverpod.')) {
       data['className'] = dataClassName.substring(10);
@@ -396,6 +490,8 @@ class Protocol extends _i1.SerializationManagerServer {
         return _i6.BloomFilterProfile.t;
       case _i8.ReportsIncoming:
         return _i8.ReportsIncoming.t;
+      case _i9.PushSubscription:
+        return _i9.PushSubscription.t;
     }
     return null;
   }

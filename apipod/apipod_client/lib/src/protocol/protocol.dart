@@ -16,13 +16,15 @@ import 'bloom_filter_events.dart' as _i4;
 import 'bloom_filter_profiles.dart' as _i5;
 import 'example.dart' as _i6;
 import 'reports_incoming.dart' as _i7;
-import 'package:ndk/domain_layer/entities/nip_01_event.dart' as _i8;
+import 'subscription.dart' as _i8;
+import 'package:ndk/domain_layer/entities/nip_01_event.dart' as _i9;
 export 'app_update_data.dart';
 export 'bloom_filter_data.dart';
 export 'bloom_filter_events.dart';
 export 'bloom_filter_profiles.dart';
 export 'example.dart';
 export 'reports_incoming.dart';
+export 'subscription.dart';
 export 'client.dart';
 
 class Protocol extends _i1.SerializationManager {
@@ -56,6 +58,9 @@ class Protocol extends _i1.SerializationManager {
     if (t == _i7.ReportsIncoming) {
       return _i7.ReportsIncoming.fromJson(data) as T;
     }
+    if (t == _i8.PushSubscription) {
+      return _i8.PushSubscription.fromJson(data) as T;
+    }
     if (t == _i1.getType<_i2.AppUpdateData?>()) {
       return (data != null ? _i2.AppUpdateData.fromJson(data) : null) as T;
     }
@@ -74,11 +79,23 @@ class Protocol extends _i1.SerializationManager {
     if (t == _i1.getType<_i7.ReportsIncoming?>()) {
       return (data != null ? _i7.ReportsIncoming.fromJson(data) : null) as T;
     }
-    if (t == _i8.Nip01Event) {
-      return _i8.Nip01Event.fromJson(data) as T;
+    if (t == _i1.getType<_i8.PushSubscription?>()) {
+      return (data != null ? _i8.PushSubscription.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i8.Nip01Event?>()) {
-      return (data != null ? _i8.Nip01Event.fromJson(data) : null) as T;
+    if (t == _i9.Nip01Event) {
+      return _i9.Nip01Event.fromJson(data) as T;
+    }
+    if (t == List<Map<String, dynamic>>) {
+      return (data as List)
+          .map((e) => deserialize<Map<String, dynamic>>(e))
+          .toList() as T;
+    }
+    if (t == Map<String, dynamic>) {
+      return (data as Map).map((k, v) =>
+          MapEntry(deserialize<String>(k), deserialize<dynamic>(v))) as T;
+    }
+    if (t == _i1.getType<_i9.Nip01Event?>()) {
+      return (data != null ? _i9.Nip01Event.fromJson(data) : null) as T;
     }
     return super.deserialize<T>(data, t);
   }
@@ -87,7 +104,7 @@ class Protocol extends _i1.SerializationManager {
   String? getClassNameForObject(Object? data) {
     String? className = super.getClassNameForObject(data);
     if (className != null) return className;
-    if (data is _i8.Nip01Event) {
+    if (data is _i9.Nip01Event) {
       return 'Nip01Event';
     }
     if (data is _i2.AppUpdateData) {
@@ -108,6 +125,9 @@ class Protocol extends _i1.SerializationManager {
     if (data is _i7.ReportsIncoming) {
       return 'ReportsIncoming';
     }
+    if (data is _i8.PushSubscription) {
+      return 'PushSubscription';
+    }
     return null;
   }
 
@@ -118,7 +138,7 @@ class Protocol extends _i1.SerializationManager {
       return super.deserializeByClassName(data);
     }
     if (dataClassName == 'Nip01Event') {
-      return deserialize<_i8.Nip01Event>(data['data']);
+      return deserialize<_i9.Nip01Event>(data['data']);
     }
     if (dataClassName == 'AppUpdateData') {
       return deserialize<_i2.AppUpdateData>(data['data']);
@@ -137,6 +157,9 @@ class Protocol extends _i1.SerializationManager {
     }
     if (dataClassName == 'ReportsIncoming') {
       return deserialize<_i7.ReportsIncoming>(data['data']);
+    }
+    if (dataClassName == 'PushSubscription') {
+      return deserialize<_i8.PushSubscription>(data['data']);
     }
     return super.deserializeByClassName(data);
   }

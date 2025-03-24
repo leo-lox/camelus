@@ -12,7 +12,8 @@
 import 'package:serverpod/serverpod.dart' as _i1;
 import '../endpoints/app_update_endpoint.dart' as _i2;
 import '../endpoints/moderation/moderation_endpoint.dart' as _i3;
-import 'package:ndk/domain_layer/entities/nip_01_event.dart' as _i4;
+import '../endpoints/push/nostr_push_endpoint.dart' as _i4;
+import 'package:ndk/domain_layer/entities/nip_01_event.dart' as _i5;
 
 class Endpoints extends _i1.EndpointDispatch {
   @override
@@ -28,6 +29,12 @@ class Endpoints extends _i1.EndpointDispatch {
         ..initialize(
           server,
           'moderation',
+          null,
+        ),
+      'nostrPush': _i4.NostrPushEndpoint()
+        ..initialize(
+          server,
+          'nostrPush',
           null,
         ),
     };
@@ -76,7 +83,7 @@ class Endpoints extends _i1.EndpointDispatch {
           params: {
             'reportEvent': _i1.ParameterDescription(
               name: 'reportEvent',
-              type: _i1.getType<_i4.Nip01Event>(),
+              type: _i1.getType<_i5.Nip01Event>(),
               nullable: false,
             )
           },
@@ -89,6 +96,36 @@ class Endpoints extends _i1.EndpointDispatch {
             params['reportEvent'],
           ),
         ),
+      },
+    );
+    connectors['nostrPush'] = _i1.EndpointConnector(
+      name: 'nostrPush',
+      endpoint: endpoints['nostrPush']!,
+      methodConnectors: {
+        'register': _i1.MethodConnector(
+          name: 'register',
+          params: {
+            'token': _i1.ParameterDescription(
+              name: 'token',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+            'events': _i1.ParameterDescription(
+              name: 'events',
+              type: _i1.getType<List<Map<String, dynamic>>>(),
+              nullable: false,
+            ),
+          },
+          call: (
+            _i1.Session session,
+            Map<String, dynamic> params,
+          ) async =>
+              (endpoints['nostrPush'] as _i4.NostrPushEndpoint).register(
+            session,
+            params['token'],
+            params['events'],
+          ),
+        )
       },
     );
   }

@@ -4,3 +4,5 @@ moderation:
   - getProfileBloomFilter:
   - getEventBloomFilter:
   - report:
+nostrPush:
+  - register:

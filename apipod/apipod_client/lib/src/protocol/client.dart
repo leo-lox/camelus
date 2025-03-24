@@ -65,6 +65,27 @@ class EndpointModeration extends _i1.EndpointRef {
       );
 }
 
+/// {@category Endpoint}
+class EndpointNostrPush extends _i1.EndpointRef {
+  EndpointNostrPush(_i1.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'nostrPush';
+
+  _i2.Future<List<Map<String, dynamic>>> register(
+    String token,
+    List<Map<String, dynamic>> events,
+  ) =>
+      caller.callServerEndpoint<List<Map<String, dynamic>>>(
+        'nostrPush',
+        'register',
+        {
+          'token': token,
+          'events': events,
+        },
+      );
+}
+
 class Client extends _i1.ServerpodClientShared {
   Client(
     String host, {
@@ -93,16 +114,20 @@ class Client extends _i1.ServerpodClientShared {
         ) {
     appUpdate = EndpointAppUpdate(this);
     moderation = EndpointModeration(this);
+    nostrPush = EndpointNostrPush(this);
   }
 
   late final EndpointAppUpdate appUpdate;
 
   late final EndpointModeration moderation;
 
+  late final EndpointNostrPush nostrPush;
+
   @override
   Map<String, _i1.EndpointRef> get endpointRefLookup => {
         'appUpdate': appUpdate,
         'moderation': moderation,
+        'nostrPush': nostrPush,
       };
 
   @override
