@@ -1,5 +1,10 @@
+import '../entities/nostr_note.dart';
+
 abstract class NotificationsRepository {
-  Future<List<Map<String, dynamic>>> registerDevice();
+  Future<bool> registerDevice({
+    required String token,
+    required NostrNote registrationNote,
+  });
   Future<void> displayGenericNotification({
     required int id,
     required String title,

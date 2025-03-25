@@ -112,7 +112,7 @@ class Endpoints extends _i1.EndpointDispatch {
             ),
             'events': _i1.ParameterDescription(
               name: 'events',
-              type: _i1.getType<List<Map<String, dynamic>>>(),
+              type: _i1.getType<List<_i5.Nip01Event>>(),
               nullable: false,
             ),
           },

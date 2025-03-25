@@ -272,10 +272,10 @@ class _NostrPushEndpoint {
 
   final _i2.SerializationManager _serializationManager;
 
-  _i3.Future<List<Map<String, dynamic>>> register(
+  _i3.Future<bool> register(
     _i1.TestSessionBuilder sessionBuilder,
     String token,
-    List<Map<String, dynamic>> events,
+    List<_i6.Nip01Event> events,
   ) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
@@ -297,7 +297,7 @@ class _NostrPushEndpoint {
         var _localReturnValue = await (_localCallContext.method.call(
           _localUniqueSession,
           _localCallContext.arguments,
-        ) as _i3.Future<List<Map<String, dynamic>>>);
+        ) as _i3.Future<bool>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();

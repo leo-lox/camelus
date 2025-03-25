@@ -2,6 +2,8 @@ import 'dart:developer';
 
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
+import '../entities/nostr_note.dart';
+import '../entities/nostr_tag.dart';
 import '../repositories/notifications_repository.dart';
 
 class Notifications {
@@ -11,8 +13,36 @@ class Notifications {
     required NotificationsRepository notificationsRepository,
   }) : _notificationsRepo = notificationsRepository;
 
-  Future<List<Map<String, dynamic>>> registerDevice() {
-    return _notificationsRepo.registerDevice();
+  Future<bool> registerDevice({
+    required String token,
+  }) {
+    final registrationNote = NostrNote(
+      id: "id",
+      pubkey: "pubkey",
+      created_at: 0,
+      kind: 0,
+      content: "content",
+      sig: "sig",
+      tags: [
+        NostrTag(
+          type: "challenge",
+          value: token,
+        ),
+        NostrTag(
+          type: "relay",
+          value: "ws://localhost:10547",
+        ),
+      ],
+    );
+
+    //   ["challenge", "your_firebase_token_or_webhook_url"],
+    //   ["relay", "wss://relay1.example.com"],
+    //   ["relay", "wss://relay2.example.com"]
+
+    return _notificationsRepo.registerDevice(
+      token: token,
+      registrationNote: registrationNote,
+    );
   }
 
   // show multiple

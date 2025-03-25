@@ -3,6 +3,7 @@ import 'dart:math';
 import 'dart:typed_data';
 import 'package:crypto/crypto.dart';
 import 'package:hex/hex.dart';
+import 'package:ndk/ndk.dart';
 import 'package:pointycastle/export.dart';
 
 // Generate a random 32-byte private key
@@ -17,7 +18,7 @@ Uint8List generateSecretKey() {
 }
 
 // Verify an event's signature
-bool verifyEvent(Map<String, dynamic> event) {
+bool verifyEvent(Nip01Event event) {
   // Placeholder implementation
   return true;
 }
@@ -35,6 +36,7 @@ Map<String, dynamic> finalizeEvent(
 
   // Sign the event
   finalEvent['sig'] = signEvent(id, privateKey);
+  finalEvent['pubkey'] = "fakePubkey";
 
   return finalEvent;
 }

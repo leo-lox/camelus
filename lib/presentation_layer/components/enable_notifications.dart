@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -6,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../config/palette.dart';
 import '../providers/db_app_provider.dart';
+import '../providers/notifications_provider.dart';
 
 // Create a provider to track notification enabled status
 final notificationsEnabledProvider = StateProvider<bool>((ref) => false);
@@ -98,7 +100,11 @@ class PushNotificationToggleState
     ref.read(notificationsDeniedProvider.notifier).state = isDenied;
 
     if (isAuthorized) {
-      await getAndStoreToken();
+      final token = await getAndStoreToken();
+      if (token != null) {
+        final result = await registerToken(token);
+        log(result.toString());
+      }
     } else {
       log("not authorized: ${settings.authorizationStatus}");
     }
@@ -108,7 +114,8 @@ class PushNotificationToggleState
     });
   }
 
-  Future<void> getAndStoreToken() async {
+  /// [returns] token
+  Future<String?> getAndStoreToken() async {
     String? token = await FirebaseMessaging.instance.getToken();
 
     if (token != null) {
@@ -124,6 +131,12 @@ class PushNotificationToggleState
         }
       });
     }
+    return token;
+  }
+
+  Future<bool> registerToken(String token) async {
+    final notiProvider = await ref.read(notificationsProvider.future);
+    return notiProvider.registerDevice(token: token);
   }
 
   @override

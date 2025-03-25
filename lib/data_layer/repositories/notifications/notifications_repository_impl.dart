@@ -1,26 +1,33 @@
-import 'dart:io';
-import 'dart:ui';
-
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:path_provider/path_provider.dart';
 
+import '../../../domain_layer/entities/nostr_note.dart';
 import '../../../domain_layer/repositories/notifications_repository.dart';
 import '../../data_sources/http_request_data_source.dart';
 import '../../data_sources/notification_data_source.dart';
+import '../../data_sources/serverpod_data_source.dart';
+import '../../models/nostr_note_model.dart';
 
 class NotificationsRepositoryImpl implements NotificationsRepository {
   NotificationDataSource notiDs;
   HttpRequestDataSource http;
+  ServerpodDataSource serverpodDs;
 
   NotificationsRepositoryImpl({
     required this.notiDs,
     required this.http,
+    required this.serverpodDs,
   });
 
   @override
-  Future<List<Map<String, dynamic>>> registerDevice() {
-    // TODO: implement registerDevice
-    throw UnimplementedError();
+  Future<bool> registerDevice({
+    required String token,
+    required NostrNote registrationNote,
+  }) {
+    final registrationNoteModel = NostrNoteModel.fromEntity(registrationNote);
+    return serverpodDs.client.nostrPush.register(
+      token,
+      [registrationNoteModel.toNDKEvent()],
+    );
   }
 
   @override
@@ -118,11 +125,7 @@ class NotificationsRepositoryImpl implements NotificationsRepository {
           ],
         ),
 
-        // Add additional customization
-        color:
-            const Color(0xFF3B82F6), // A blue color similar to messaging apps
         category: AndroidNotificationCategory.message,
-        visibility: NotificationVisibility.private,
         channelAction: AndroidNotificationChannelAction.createIfNotExists,
       );
 

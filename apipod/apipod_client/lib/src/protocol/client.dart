@@ -72,11 +72,11 @@ class EndpointNostrPush extends _i1.EndpointRef {
   @override
   String get name => 'nostrPush';
 
-  _i2.Future<List<Map<String, dynamic>>> register(
+  _i2.Future<bool> register(
     String token,
-    List<Map<String, dynamic>> events,
+    List<_i5.Nip01Event> events,
   ) =>
-      caller.callServerEndpoint<List<Map<String, dynamic>>>(
+      caller.callServerEndpoint<bool>(
         'nostrPush',
         'register',
         {
