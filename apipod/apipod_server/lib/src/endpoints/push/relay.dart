@@ -1,166 +1,197 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:ndk/ndk.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
+/// Represents a Nostr relay connection
 class Relay {
+  /// The WebSocket URL of the relay
   final String url;
-  final Map<String, dynamic> opts;
-  WebSocketChannel? ws;
-  bool manualClose = false;
-  bool reconnecting = false;
-  Map<String, Function> onfn = {};
 
-  Relay(this.url, [this.opts = const {}]) {
-    final options = Map<String, dynamic>.from(opts);
-    if (options['reconnect'] == null) {
-      options['reconnect'] = true;
-    }
+  /// Configuration options
+  final RelayOptions options;
 
-    initWebsocket().catchError((e) {
-      if (onfn.containsKey('error')) {
-        onfn['error']!(e);
-      }
-    });
+  /// The WebSocket connection
+  WebSocketChannel? _ws;
+
+  /// Flag indicating if the connection was manually closed
+  bool _manualClose = false;
+
+  /// Flag indicating if reconnection is in progress
+  bool _reconnecting = false;
+
+  /// Stream controllers for different event types
+  final _openController = StreamController<Relay>.broadcast();
+  final _closeController = StreamController<void>.broadcast();
+  final _errorController = StreamController<dynamic>.broadcast();
+  final _eventController = StreamController<Nip01Event>.broadcast();
+  final _eoseController = StreamController<String>.broadcast();
+  final _noticeController = StreamController<String>.broadcast();
+  final _okController = StreamController<List<dynamic>>.broadcast();
+
+  /// Public streams for events
+  Stream<Relay> get onOpen => _openController.stream;
+  Stream<void> get onClose => _closeController.stream;
+  Stream<dynamic> get onError => _errorController.stream;
+  Stream<Nip01Event> get onEvent => _eventController.stream;
+  Stream<String> get onEose => _eoseController.stream;
+  Stream<String> get onNotice => _noticeController.stream;
+  Stream<List<dynamic>> get onOk => _okController.stream;
+
+  /// Creates a new relay connection
+  Relay(this.url, {RelayOptions? options})
+      : options = options ?? RelayOptions() {
+    _initWebsocket();
   }
 
-  Future<Relay> initWebsocket() async {
+  /// Initializes the WebSocket connection
+  Future<void> _initWebsocket() async {
     try {
       final headers = {'User-Agent': 'Amethyst Push Server'};
-      ws = WebSocketChannel.connect(Uri.parse(url));
+      _ws = WebSocketChannel.connect(Uri.parse(url));
 
-      bool resolved = false;
-
-      // Set up message handler
-      ws!.stream.listen(
-        (message) {
-          handleNostrMessage(message);
-          if (onfn.containsKey('message')) {
-            onfn['message']!(message);
-          }
-        },
-        onDone: () {
-          if (onfn.containsKey('close')) {
-            onfn['close']!(null);
-          }
-          if (reconnecting) return;
-          if (!manualClose && opts['reconnect'] == true) {
-            reconnect();
-          }
-        },
-        onError: (e) {
-          if (onfn.containsKey('error')) {
-            onfn['error']!(e);
-          }
-          if (reconnecting) return;
-          if (!manualClose && opts['reconnect'] == true) {
-            reconnect();
-          }
-        },
+      await _ws!.ready;
+      _ws!.stream.listen(
+        _handleMessage,
+        onDone: _handleClose,
+        onError: _handleError,
       );
 
-      // Trigger open event after connection is established
-      if (onfn.containsKey('open')) {
-        onfn['open']!(null);
-      }
-
-      return this;
+      // Emit open event
+      _openController.add(this);
     } catch (e) {
-      if (onfn.containsKey('error')) {
-        onfn['error']!(e);
-      }
-      rethrow;
-    }
-  }
-
-  Future<void> waitConnected() async {
-    int retry = 100000;
-    while (true) {
-      if (!manualClose && ws != null && ws!.sink is! WebSocketSink) {
-        await Future.delayed(Duration(milliseconds: retry));
-        retry = (retry * 1.5).toInt();
-      } else {
-        return;
+      _errorController.add(e);
+      if (options.reconnect) {
+        _scheduleReconnect();
       }
     }
   }
 
-  Future<void> reconnect() async {
-    reconnecting = true;
-    int n = 100;
-
+  /// Handles incoming WebSocket messages
+  void _handleMessage(dynamic message) {
     try {
-      await initWebsocket();
-      reconnecting = false;
-    } catch (e) {
-      await Future.delayed(Duration(milliseconds: n));
-      n = (n * 1.5).toInt();
-      reconnect(); // Try again with exponential backoff
-    }
-  }
-
-  Relay on(String method, Function fn) {
-    onfn[method] = fn;
-    return this;
-  }
-
-  void close() {
-    manualClose = true;
-    if (ws != null) {
-      ws!.sink.close();
-    }
-  }
-
-  void subscribe(String subId, dynamic filters) {
-    if (filters is List) {
-      send(['REQ', subId, ...filters]);
-    } else {
-      send(['REQ', subId, filters]);
-    }
-  }
-
-  void unsubscribe(String subId) {
-    send(['CLOSE', subId]);
-  }
-
-  Future<void> send(List<dynamic> data) async {
-    await waitConnected();
-    if (!manualClose && ws != null) {
-      ws!.sink.add(jsonEncode(data));
-    } else {
-      print('WS not found while sending to $url');
-    }
-  }
-
-  void handleNostrMessage(dynamic msg) {
-    try {
-      final data = jsonDecode(msg);
+      final data = jsonDecode(message);
       if (data is List && data.length >= 2) {
         switch (data[0]) {
           case 'EVENT':
             if (data.length < 3) return;
-            if (onfn.containsKey('event')) {
-              onfn['event']!(data[1], data[2]);
-            }
+            final subId = data[1];
+            final event = Nip01Event.fromJson(data[2]);
+            _eventController.add(event);
             break;
           case 'EOSE':
-            if (onfn.containsKey('eose')) {
-              onfn['eose']!(data[1]);
-            }
+            _eoseController.add(data[1]);
             break;
           case 'NOTICE':
-            if (onfn.containsKey('notice')) {
-              Function.apply(onfn['notice']!, data.sublist(1));
+            if (data.length > 1) {
+              _noticeController.add(data[1]);
             }
             break;
           case 'OK':
-            if (onfn.containsKey('ok')) {
-              Function.apply(onfn['ok']!, data.sublist(1));
+            if (data.length > 1) {
+              _okController.add(data.sublist(1));
             }
             break;
         }
       }
     } catch (e) {
-      print('handleNostrMessage error: $url, $msg, $e');
+      print('Error handling message from $url: $e');
     }
   }
+
+  /// Handles WebSocket close events
+  void _handleClose() {
+    _closeController.add(null);
+    if (!_manualClose && options.reconnect) {
+      _scheduleReconnect();
+    }
+  }
+
+  /// Handles WebSocket error events
+  void _handleError(dynamic error) {
+    _errorController.add(error);
+    if (!_manualClose && options.reconnect) {
+      _scheduleReconnect();
+    }
+  }
+
+  /// Schedules a reconnection attempt with exponential backoff
+  void _scheduleReconnect() {
+    if (_reconnecting) return;
+    _reconnecting = true;
+
+    int delay = 100;
+    Future.delayed(Duration(milliseconds: delay), () async {
+      try {
+        await _initWebsocket();
+        _reconnecting = false;
+      } catch (e) {
+        delay = (delay * 1.5).toInt();
+        _scheduleReconnect();
+      }
+    });
+  }
+
+  /// Waits until the connection is established
+  Future<void> waitUntilConnected() async {
+    if (_manualClose || _ws == null) {
+      return;
+    }
+  }
+
+  /// Closes the connection
+  void close() {
+    _manualClose = true;
+    if (_ws != null) {
+      _ws!.sink.close();
+    }
+
+    // Close all stream controllers
+    _openController.close();
+    _closeController.close();
+    _errorController.close();
+    _eventController.close();
+    _eoseController.close();
+    _noticeController.close();
+    _okController.close();
+  }
+
+  /// Subscribes to events matching the given filters
+  Future<void> subscribe(String subId, dynamic filters) async {
+    await waitUntilConnected();
+
+    List<dynamic> request = ['REQ', subId];
+    if (filters is List) {
+      request.addAll(filters);
+    } else {
+      request.add(filters);
+    }
+
+    _send(request);
+  }
+
+  /// Unsubscribes from a subscription
+  Future<void> unsubscribe(String subId) async {
+    await waitUntilConnected();
+    _send(['CLOSE', subId]);
+  }
+
+  /// Sends data to the relay
+  void _send(List<dynamic> data) {
+    if (_manualClose || _ws == null) {
+      print('Cannot send to $url: connection closed');
+      return;
+    }
+
+    _ws!.sink.add(jsonEncode(data));
+  }
+}
+
+/// Configuration options for a relay connection
+class RelayOptions {
+  /// Whether to automatically reconnect on disconnection
+  final bool reconnect;
+
+  /// Creates a new options object
+  const RelayOptions({this.reconnect = true});
 }

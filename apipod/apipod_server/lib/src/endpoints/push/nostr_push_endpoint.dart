@@ -6,6 +6,7 @@ import 'package:dart_firebase_admin/dart_firebase_admin.dart';
 import 'package:dart_firebase_admin/messaging.dart';
 import 'package:serverpod/serverpod.dart';
 import 'package:http/http.dart' as http;
+import 'package:ndk/ndk.dart' as ndk;
 
 import '../../generated/protocol.dart';
 import 'database_operations.dart';
@@ -61,16 +62,22 @@ class NostrPushEndpoint extends Endpoint {
   }
 
   Future<void> onServerStart(InternalSession session) async {
+    // bg session needs on init
+    final projectId = Platform.environment['FIREBASE_PROJECT_ID'];
+    _firebaseAdminApp = FirebaseAdminApp.initializeApp(
+        projectId!, Credential.fromApplicationDefaultCredentials());
+    _firebaseMessaging = Messaging(_firebaseAdminApp);
+
     await _restartRelayPool(session);
 
     // Set up periodic cache cleaning
     Timer.periodic(Duration(minutes: 1), (_) => _cleanCache());
   }
 
-  Future<List<Map<String, dynamic>>> register(
+  Future<bool> register(
     Session session,
     String token,
-    List<Map<String, dynamic>> events,
+    List<ndk.Nip01Event> events,
   ) async {
     List<Map<String, dynamic>> processed = [];
     bool newRelays = false;
@@ -78,11 +85,11 @@ class NostrPushEndpoint extends Endpoint {
     for (final event in events) {
       bool veryOk = verifyEvent(event);
 
-      final tokenTag = event['tags'].firstWhere(
-          (tag) => tag[0] == 'challenge' && tag.length > 1,
-          orElse: () => null);
+      final tokenTag = event.tags.firstWhere(
+        (tag) => tag[0] == 'challenge' && tag.length > 1,
+      );
 
-      final relayTags = event['tags']
+      final relayTags = event.tags
           .where((tag) =>
               tag[0] == 'relay' &&
               tag.length > 1 &&
@@ -92,10 +99,7 @@ class NostrPushEndpoint extends Endpoint {
           .toSet() // Remove duplicates
           .toList();
 
-      if (tokenTag != null &&
-          tokenTag[1] != null &&
-          veryOk &&
-          relayTags.isNotEmpty) {
+      if (veryOk && relayTags.isNotEmpty) {
         newRelays = await checkIfThereIsANewRelay(session, relayTags);
 
         // Register in database
@@ -103,25 +107,24 @@ class NostrPushEndpoint extends Endpoint {
           await PushSubscription.db.insertRow(
               session,
               PushSubscription(
-                  pubKey: event['pubkey'],
-                  relay: relayUrl,
-                  token: tokenTag[1]));
+                  pubKey: event.pubKey, relay: relayUrl, token: tokenTag[1]));
         }
       } else {
         session.log('Invalid registration: $veryOk, $tokenTag, $relayTags');
       }
 
       processed.add({
-        'pubkey': event['pubkey'],
+        'pubkey': event.pubKey,
         'added': tokenTag != null && veryOk && relayTags.isNotEmpty
       });
+      session.log('pubkey added: ${event.pubKey}, $tokenTag, $relayTags');
     }
 
     if (newRelays) {
       await _restartRelayPool(session);
     }
 
-    return processed;
+    return true;
   }
 
   bool isValidUrl(String urlString) {
@@ -165,84 +168,82 @@ class NostrPushEndpoint extends Endpoint {
 
   Future<void> _notify(
     Session session,
-    Map<String, dynamic> event,
+    ndk.Nip01Event event,
     Relay relay,
   ) async {
-    final pubkeyTag = event['tags'].firstWhere(
-        (tag) => tag[0] == 'p' && tag.length > 1,
-        orElse: () => null);
+    final pubkeyTag = event.tags.firstWhere(
+      (tag) => tag[0] == 'p' && tag.length > 1,
+    );
 
-    if (pubkeyTag != null && pubkeyTag[1] != null) {
-      final tokens = await getTokensByPubKey(session, pubkeyTag[1]);
-      final tokensAsUrls =
-          tokens.where((token) => isValidHttpUrl(token)).toList();
-      final firebaseTokens =
-          tokens.where((token) => !tokensAsUrls.contains(token)).toList();
+    final tokens = await getTokensByPubKey(session, pubkeyTag[1]);
+    final tokensAsUrls =
+        tokens.where((token) => isValidHttpUrl(token)).toList();
+    final firebaseTokens =
+        tokens.where((token) => !tokensAsUrls.contains(token)).toList();
 
-      if (tokens.isNotEmpty) {
-        final wrappedEvent = createWrap(pubkeyTag[1], event);
-        final stringifiedWrappedEventToPush = jsonEncode(wrappedEvent);
+    if (tokens.isNotEmpty) {
+      final wrappedEvent = createWrap(pubkeyTag[1], event);
+      final stringifiedWrappedEventToPush = jsonEncode(wrappedEvent);
 
-        // Send to HTTP URLs
-        if (tokensAsUrls.isNotEmpty) {
-          for (final tokenUrl in tokensAsUrls) {
-            try {
-              final response = await http
-                  .post(
-                    Uri.parse(tokenUrl),
-                    body: stringifiedWrappedEventToPush,
-                  )
-                  .timeout(Duration(seconds: 5));
-
-              if (response.statusCode != 200) {
-                session.log(
-                    'Error posting to NTFY: ${stringifiedWrappedEventToPush.length} chars. $tokenUrl ${response.statusCode} ${response.reasonPhrase}');
-                await deleteToken(session, tokenUrl);
-              }
-            } catch (err) {
-              session.log(
-                  'Error posting to NTFY: ${stringifiedWrappedEventToPush.length} chars. $tokenUrl $err');
-              // Uncomment to delete tokens on error
-              // await deleteToken(session, tokenUrl);
-            }
-          }
-          session.log(
-              'NTFY New kind ${event['kind']} event for ${pubkeyTag[1]} with ${stringifiedWrappedEventToPush.length} bytes');
-        }
-
-        // Send to Firebase
-        if (firebaseTokens.isNotEmpty) {
-          final message = {
-            'encryptedEvent': stringifiedWrappedEventToPush,
-          };
-
+      // Send to HTTP URLs
+      if (tokensAsUrls.isNotEmpty) {
+        for (final tokenUrl in tokensAsUrls) {
           try {
-            final response =
-                await _firebaseMessaging.sendEachForMulticast(MulticastMessage(
-              tokens: firebaseTokens,
-              data: message,
-            ));
+            final response = await http
+                .post(
+                  Uri.parse(tokenUrl),
+                  body: stringifiedWrappedEventToPush,
+                )
+                .timeout(Duration(seconds: 5));
 
-            if (response.failureCount > 0) {
-              response.responses.asMap().forEach((idx, resp) {
-                if (!resp.success) {
-                  session.log(
-                      'Failed: ${resp.error?.code} ${resp.error?.message} ${jsonEncode(message).length} chars');
-                  if (resp.error?.code ==
-                      'messaging/registration-token-not-registered') {
-                    session.log('Deleting Token ${tokens[idx]}');
-                    deleteToken(session, tokens[idx]);
-                  }
-                }
-              });
+            if (response.statusCode != 200) {
+              session.log(
+                  'Error posting to NTFY: ${stringifiedWrappedEventToPush.length} chars. $tokenUrl ${response.statusCode} ${response.reasonPhrase}');
+              await deleteToken(session, tokenUrl);
             }
-          } catch (e) {
-            session.log('Firebase messaging error: $e');
+          } catch (err) {
+            session.log(
+                'Error posting to NTFY: ${stringifiedWrappedEventToPush.length} chars. $tokenUrl $err');
+            // Uncomment to delete tokens on error
+            // await deleteToken(session, tokenUrl);
           }
-
-          session.log(
-              'Firebase New kind ${event['kind']} event for ${pubkeyTag[1]} with ${stringifiedWrappedEventToPush.length} bytes');
         }
+        session.log(
+            'NTFY New kind ${event.kind} event for ${pubkeyTag[1]} with ${stringifiedWrappedEventToPush.length} bytes');
+      }
+
+      // Send to Firebase
+      if (firebaseTokens.isNotEmpty) {
+        final message = {
+          'encryptedEvent': stringifiedWrappedEventToPush,
+        };
+
+        try {
+          final response =
+              await _firebaseMessaging.sendEachForMulticast(MulticastMessage(
+            tokens: firebaseTokens,
+            data: message,
+          ));
+
+          if (response.failureCount > 0) {
+            response.responses.asMap().forEach((idx, resp) {
+              if (!resp.success) {
+                session.log(
+                    'Failed: ${resp.error?.code} ${resp.error?.message} ${jsonEncode(message).length} chars');
+                if (resp.error?.code ==
+                    'messaging/registration-token-not-registered') {
+                  session.log('Deleting Token ${tokens[idx]}');
+                  deleteToken(session, tokens[idx]);
+                }
+              }
+            });
+          }
+        } catch (e) {
+          session.log('Firebase messaging error: $e');
+        }
+
+        session.log(
+            'Firebase New kind ${event.kind} event for ${pubkeyTag[1]} with ${stringifiedWrappedEventToPush.length} bytes');
       }
     }
   }
@@ -266,50 +267,63 @@ class NostrPushEndpoint extends Endpoint {
         _relayPool!.close();
       }
 
-      _relayPool = RelayPool(relays, {'reconnect': true});
+      // Create a new relay pool with the fetched relay URLs
+      _relayPool = RelayPool(relays);
 
-      _relayPool!.on('open', (relay) {
+      // Set up event handlers using the new stream-based approach
+      _relayPool!.onOpen.listen((relay) {
+        session.log("onOpen.listen ${relay.url}");
+        // Subscribe to specific event kinds when a relay connects
         relay.subscribe('subid', {
-          'kinds': [4, 9735, 1059],
+          'kinds': [1, 4, 9735, 1059],
           'limit': 1
         });
       });
 
-      _relayPool!.on('eose', (relay) {
-        // End of stored events
-      });
-
-      _relayPool!.on('event', (relay, subId, ev) {
+      _relayPool!.onEvent.listen((relayEvent) {
+        session.log("onEvent.listen, relay: ${relayEvent.relay}");
         try {
-          if (_sentCache.containsKey(ev['id'])) return;
-          _sentCache[ev['id']] = DateTime.now();
+          final event = relayEvent.event;
 
-          _notify(session, ev, relay);
+          // Skip if we've already processed this event
+          if (_sentCache.containsKey(event.id)) return;
+          _sentCache[event.id] = DateTime.now();
+
+          _notify(session, event, relayEvent.relay);
         } catch (e) {
           session.log('Error handling event: $e');
         }
       });
 
-      _relayPool!.on('error', (relay, e) {
+      _relayPool!.onError.listen((relayError) {
+        session.log(".onError.listen, relay: ${relayError.relay}");
+        final relay = relayError.relay;
+        final error = relayError.error.toString();
+
         if (!isSupportedUrl(relay.url) ||
-            e.toString().contains('Invalid URL') ||
-            e.toString().contains('ECONNREFUSED') ||
-            e.toString().contains('Invalid WebSocket frame: FIN must be set') ||
-            e.toString().contains("The URL's protocol must be one of")) {
+            error.contains('Invalid URL') ||
+            error.contains('ECONNREFUSED') ||
+            error.contains('Invalid WebSocket frame: FIN must be set') ||
+            error.contains("The URL's protocol must be one of")) {
           _relayPool!.remove(relay.url);
+
           deleteRelay(session, relay.url);
         }
       });
 
       session.log('Restarted pool with ${relays.length} relays');
+    } catch (e) {
+      session.log('Error restarting relay pool: $e');
     } finally {
       _isInRelayPoolFunction = false;
     }
   }
 
   Map<String, dynamic> createWrap(
-      String recipientPubkey, Map<String, dynamic> event,
-      [List<List<String>> tags = const []]) {
+    String recipientPubkey,
+    ndk.Nip01Event event, [
+    List<List<String>> tags = const [],
+  ]) {
     final wrapperPrivkey = generateSecretKey();
 
     final wrapTemplate = {
