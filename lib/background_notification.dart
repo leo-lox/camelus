@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:firebase_messaging/firebase_messaging.dart';
 
 // app not launched
+@pragma('vm:entry-point')
 Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   log("Handling a background message: ${message.messageId}");
 }
@@ -19,7 +20,6 @@ Future<void> firebaseMessagingAppOpen(RemoteMessage message) async {
 
   if (message.notification != null) {
     log('Message also contained a notification: ${message.notification}');
-    // You can show a local notification here using flutter_local_notifications
   }
 }
 

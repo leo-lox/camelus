@@ -70,3 +70,4 @@ isar.dll
 
 # firebase
 firebase_options.dart
+firebase.json
