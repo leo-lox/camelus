@@ -24,10 +24,16 @@ class Notifications {
     required String body,
     String? payload,
   }) {
-    return _notificationsRepo.displayNotification(
+    return _notificationsRepo.displayAvatarNotification(
       id: _getNotificationId(),
-      title: title,
-      body: body,
+      title: "Leo",
+      body: "lorem ipsum",
+      avatarUrl: "https://lox.de/downloads/profile.jpg",
+      pubkey:
+          "717ff238f888273f5d5ee477097f2b398921503769303a0c518d06a952f2a75e",
+      type: "new reply",
+      threadIdentifier:
+          "717ff238f888273f5d5ee477097f2b398921503769303a0c518d06a952f2a75e",
       payload: payload,
     );
   }
