@@ -57,6 +57,9 @@
             <!-- deep links so app_links work -->
             <meta-data android:name="flutter_deeplinking_enabled" android:value="false" />
 
+            <meta-data android:name="com.google.firebase.messaging.default_notification_channel_id" android:value="high_importance_channel" />
+
+
         </activity>
 
 
@@ -64,7 +67,8 @@
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->
         <meta-data android:name="flutterEmbedding" android:value="2" />
 
-
+        <!-- notification actions -->
+        <receiver android:exported="false" android:name="com.dexterous.flutterlocalnotifications.ActionBroadcastReceiver" />
 
     </application>
 
