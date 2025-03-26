@@ -8,9 +8,11 @@ import 'package:ndk_objectbox/ndk_objectbox.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
+import 'config/dicebear.dart';
 import 'domain_layer/usecases/app_auth.dart';
 import 'objectbox.g.dart';
 import 'presentation_layer/providers/db_ndk_provider.dart';
+import 'presentation_layer/providers/metadata_provider.dart';
 import 'presentation_layer/providers/ndk_provider.dart';
 import 'presentation_layer/providers/notifications_provider.dart';
 import 'presentation_layer/providers/signer_provider.dart';
@@ -88,11 +90,30 @@ Future<void> _processMsgData({
 
   final notiProvider = await provider.read(notificationsProvider.future);
 
-  await notiProvider.displayLocalAvatarNotification(
-    title: "kind ${unwrappedEvent.kind}, id: ${unwrappedEvent.id}",
-    body: unwrappedEvent.content,
-    payload: jsonEncode(unwrappedEvent.toJson()),
-  );
+  if (unwrappedEvent.kind == 1) {
+    final metadata = await provider
+        .read(metadataProvider)
+        .getMetadataByPubkey(unwrappedEvent.pubKey)
+        .first;
+
+    final signer = provider.read(signerProvider);
+    final myPubkey = signer!.getPublicKey();
+
+    final lastPtag = unwrappedEvent.pTags.last;
+
+    await notiProvider.displayLocalAvatarNotification(
+      title: metadata.name ??
+          metadata.nip05 ??
+          "${metadata.pubkey.substring(0, 15)}...",
+      body: unwrappedEvent.content.length < 280
+          ? unwrappedEvent.content
+          : "${unwrappedEvent.content.substring(0, 280)}...",
+      avatarUrl: metadata.picture ?? "${Dicebear.baseUrlPng}${metadata.pubkey}",
+      pubkey: unwrappedEvent.pubKey,
+      payload: jsonEncode(unwrappedEvent.toJson()),
+      type: myPubkey == lastPtag ? "new reply" : "new mention",
+    );
+  }
 }
 
 Future<ProviderContainer> _setupProviderBackgroundThread() async {

@@ -61,18 +61,22 @@ class Notifications {
   Future<void> displayLocalAvatarNotification({
     required String title,
     required String body,
+    required String avatarUrl,
+    required String pubkey,
+
+    /// e.g. new reply
+    required String type,
+    String? threadIdentifier,
     String? payload,
   }) {
     return _notificationsRepo.displayAvatarNotification(
       id: _getNotificationId(),
       title: title,
       body: body,
-      avatarUrl: "https://lox.de/downloads/profile.jpg",
-      pubkey:
-          "717ff238f888273f5d5ee477097f2b398921503769303a0c518d06a952f2a75e",
-      type: "new reply",
-      threadIdentifier:
-          "717ff238f888273f5d5ee477097f2b398921503769303a0c518d06a952f2a75e",
+      avatarUrl: avatarUrl,
+      pubkey: pubkey,
+      type: type,
+      threadIdentifier: threadIdentifier,
       payload: payload,
     );
   }
