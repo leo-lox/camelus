@@ -24,3 +24,20 @@ final ndkProvider = Provider<Ndk>((ref) {
   final ndk = Ndk(ndkConfig);
   return ndk;
 });
+
+/// lightweight instance of ndk
+final ndkProviderLight = Provider<Ndk>((ref) {
+  final eventVerifier = ref.read(eventVerifierProvider);
+  final db = ref.read(dbNdkProvider);
+
+  final NdkConfig ndkConfig = NdkConfig(
+      cache: db!,
+      eventVerifier: eventVerifier,
+      bootstrapRelays: [],
+      logLevel: Logger.logLevels.warning,
+      eventOutFilters: [],
+      defaultQueryTimeout: Duration(seconds: 5));
+
+  final ndk = Ndk(ndkConfig);
+  return ndk;
+});

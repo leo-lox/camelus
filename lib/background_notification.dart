@@ -31,7 +31,7 @@ Future<void> firebaseMessagingBackgroundHandler(
   );
 
   // close db after processing
-  providerContainer.read(dbNdkProvider)!.closeDb();
+  providerContainer.read(dbNdkProvider)!.close();
 }
 
 // called when a user presses a notification message displayed via FCM.
@@ -80,7 +80,7 @@ Future<void> _processMsgData({
   final encryptedWrapEvent = Nip01Event.fromJson(encryptedEventJson);
 
   final ndk = isBackground
-      ? provider.read(ndkProviderNoRelays)
+      ? provider.read(ndkProviderLight)
       : provider.read(ndkProvider);
 
   final unwrappedEvent =
@@ -120,7 +120,7 @@ Future<ProviderContainer> _setupProviderBackgroundThread() async {
 
   if (mySigner != null) {
     /// ndk login
-    providerContainer.read(ndkProviderNoRelays).accounts.loginExternalSigner(
+    providerContainer.read(ndkProviderLight).accounts.loginExternalSigner(
           signer: mySigner,
         );
     providerContainer.read(signerProvider.notifier).setSigner(mySigner);
