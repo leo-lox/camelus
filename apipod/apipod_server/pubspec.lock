@@ -413,8 +413,8 @@ packages:
     dependency: "direct main"
     description:
       path: "packages/ndk"
-      ref: HEAD
-      resolved-ref: b946b357e3660616d8b500199a9086a6d46d7bb5
+      ref: nip-59-gift-wrap
+      resolved-ref: "6cd230dae9aa96dbda9505fffa29f69ec913d16d"
       url: "https://github.com/relaystr/ndk.git"
     source: git
     version: "0.3.2"

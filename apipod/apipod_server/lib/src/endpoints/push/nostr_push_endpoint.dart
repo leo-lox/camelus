@@ -182,7 +182,11 @@ class NostrPushEndpoint extends Endpoint {
         tokens.where((token) => !tokensAsUrls.contains(token)).toList();
 
     if (tokens.isNotEmpty) {
-      final wrappedEvent = createWrap(pubkeyTag[1], event);
+      final wrappedEvent = await ndk.GiftWrap.wrapEvent(
+        recipientPublicKey: pubkeyTag[1],
+        sealEvent: event,
+      );
+
       final stringifiedWrappedEventToPush = jsonEncode(wrappedEvent);
 
       // Send to HTTP URLs
@@ -317,23 +321,5 @@ class NostrPushEndpoint extends Endpoint {
     } finally {
       _isInRelayPoolFunction = false;
     }
-  }
-
-  Map<String, dynamic> createWrap(
-    String recipientPubkey,
-    ndk.Nip01Event event, [
-    List<List<String>> tags = const [],
-  ]) {
-    final wrapperPrivkey = generateSecretKey();
-
-    final wrapTemplate = {
-      'kind': 1059,
-      'created_at': DateTime.now().millisecondsSinceEpoch ~/ 1000,
-      'tags': tags,
-      'content': nip44.encrypt(jsonEncode(event),
-          nip44.getConversationKey(wrapperPrivkey, recipientPubkey))
-    };
-
-    return finalizeEvent(wrapTemplate, wrapperPrivkey);
   }
 }
