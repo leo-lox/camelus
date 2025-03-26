@@ -4,6 +4,7 @@ import 'package:camelus/presentation_layer/providers/db_ndk_provider.dart';
 import 'package:camelus/presentation_layer/providers/inbox_outbox_provider.dart';
 import 'package:camelus/presentation_layer/providers/language_provider.dart';
 import 'package:camelus/presentation_layer/providers/ndk_provider.dart';
+import 'package:camelus/presentation_layer/providers/signer_provider.dart';
 import 'package:camelus/presentation_layer/routes/nostr/search_feed_page/search_feed_page.dart';
 import 'package:camelus/presentation_layer/routes/nostr/settings/locale/locale_settings.dart';
 import 'package:camelus/presentation_layer/routes/nostr/settings/moderation/moderation_settings.dart';
@@ -83,6 +84,7 @@ Future<void> main() async {
     providerContainer.read(ndkProvider).accounts.loginExternalSigner(
           signer: mySigner,
         );
+    providerContainer.read(signerProvider.notifier).setSigner(mySigner);
 
     /// get fresh nip65 data on startup
     final myPubkey = mySigner.getPublicKey();

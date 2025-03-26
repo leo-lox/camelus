@@ -1,4 +1,5 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:ndk/ndk.dart' as ndk;
 
 import '../../../domain_layer/entities/nostr_note.dart';
 import '../../../domain_layer/repositories/notifications_repository.dart';
@@ -8,25 +9,34 @@ import '../../data_sources/serverpod_data_source.dart';
 import '../../models/nostr_note_model.dart';
 
 class NotificationsRepositoryImpl implements NotificationsRepository {
-  NotificationDataSource notiDs;
-  HttpRequestDataSource http;
-  ServerpodDataSource serverpodDs;
+  final NotificationDataSource notiDs;
+  final HttpRequestDataSource http;
+  final ServerpodDataSource serverpodDs;
+  final ndk.EventSigner? eventSigner;
 
   NotificationsRepositoryImpl({
     required this.notiDs,
     required this.http,
     required this.serverpodDs,
+    required this.eventSigner,
   });
 
   @override
   Future<bool> registerDevice({
     required String token,
     required NostrNote registrationNote,
-  }) {
+  }) async {
     final registrationNoteModel = NostrNoteModel.fromEntity(registrationNote);
+    final ndkEvent = registrationNoteModel.toNDKEvent();
+
+    if (eventSigner == null) {
+      throw Exception("cannot register device without signer");
+    }
+
+    await eventSigner!.sign(ndkEvent);
     return serverpodDs.client.nostrPush.register(
       token,
-      [registrationNoteModel.toNDKEvent()],
+      [ndkEvent],
     );
   }
 

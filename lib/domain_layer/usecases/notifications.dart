@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:ndk/ndk.dart' as ndk;
 
 import '../entities/nostr_note.dart';
 import '../entities/nostr_tag.dart';
@@ -8,19 +9,25 @@ import '../repositories/notifications_repository.dart';
 
 class Notifications {
   final NotificationsRepository _notificationsRepo;
+  final ndk.EventSigner? _eventSigner;
 
   Notifications({
     required NotificationsRepository notificationsRepository,
-  }) : _notificationsRepo = notificationsRepository;
+    required ndk.EventSigner? eventSigner,
+  })  : _notificationsRepo = notificationsRepository,
+        _eventSigner = eventSigner;
 
   Future<bool> registerDevice({
     required String token,
   }) {
+    if (_eventSigner == null) {
+      throw Exception("cannot register device without signer");
+    }
+
     //! todo WIP
     final registrationNote = NostrNote(
       id: "",
-      pubkey:
-          "da1678cd43b0afed5c5566b878a0a5faae97b16635b47d58b9179a75de500801",
+      pubkey: _eventSigner!.getPublicKey(),
       created_at: 0,
       kind: 0,
       content: "",
@@ -71,6 +78,6 @@ class Notifications {
   }
 
   onNotificationTap(NotificationResponse notiResponse) {
-    log("onNotificationTap $notiResponse");
+    log("onNotificationTapUsecase ${notiResponse.data}");
   }
 }

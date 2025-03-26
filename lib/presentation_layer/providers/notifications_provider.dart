@@ -1,3 +1,4 @@
+import 'package:camelus/presentation_layer/providers/signer_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 
@@ -17,14 +18,16 @@ final notificationsProvider = FutureProvider<Notifications>((ref) async {
 
   final serverpodDs = ref.watch(serverpodProvider);
 
+  final mySigner = ref.watch(signerProvider);
+
   final NotificationsRepository notiRepo = NotificationsRepositoryImpl(
     http: httpDs,
     notiDs: notiDs,
     serverpodDs: serverpodDs,
+    eventSigner: mySigner,
   );
-  final Notifications notifications = Notifications(
-    notificationsRepository: notiRepo,
-  );
+  final Notifications notifications =
+      Notifications(notificationsRepository: notiRepo, eventSigner: mySigner);
 
   // set NotificationTab callback
   notiDs.onNotificationTap = notifications.onNotificationTap;

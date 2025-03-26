@@ -26,6 +26,7 @@ import '../../../providers/file_upload_provider.dart';
 import '../../../providers/following_provider.dart';
 import '../../../providers/inbox_outbox_provider.dart';
 import '../../../providers/metadata_provider.dart';
+import '../../../providers/signer_provider.dart';
 import '../../home_page.dart';
 
 class OnboardingDone extends ConsumerStatefulWidget {
@@ -189,6 +190,7 @@ ${_privateKey.mnemonicSentence}
     );
 
     ref.read(ndkProvider).accounts.loginExternalSigner(signer: bip340Signer);
+    ref.read(signerProvider.notifier).setSigner(bip340Signer);
 
     // save in storage
     const storage = FlutterSecureStorage();

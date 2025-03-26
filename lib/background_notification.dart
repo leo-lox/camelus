@@ -11,6 +11,7 @@ import 'domain_layer/usecases/app_auth.dart';
 import 'presentation_layer/providers/db_ndk_provider.dart';
 import 'presentation_layer/providers/ndk_provider.dart';
 import 'presentation_layer/providers/notifications_provider.dart';
+import 'presentation_layer/providers/signer_provider.dart';
 
 // app not launched
 @pragma('vm:entry-point')
@@ -83,6 +84,7 @@ _processMsgData({
   notiProvider.displayLocalAvatarNotification(
     title: "kind ${unwrappedEvent.kind}, id: ${unwrappedEvent.id}",
     body: unwrappedEvent.content,
+    payload: jsonEncode(unwrappedEvent.toJson()),
   );
 }
 
@@ -102,6 +104,7 @@ Future<ProviderContainer> _setupProviderBackgroundThread() async {
     providerContainer.read(ndkProvider).accounts.loginExternalSigner(
           signer: mySigner,
         );
+    providerContainer.read(signerProvider.notifier).setSigner(mySigner);
   }
 
   return providerContainer;
