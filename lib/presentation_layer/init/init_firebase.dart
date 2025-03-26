@@ -9,8 +9,10 @@ import 'package:riverpod/riverpod.dart';
 import '../../background_notification.dart';
 import '../../firebase_options.dart';
 
-Future<void> initializeFirebase(
-    {bool enable = true, required ProviderContainer provider}) async {
+Future<void> initializeFirebase({
+  bool enable = true,
+  required ProviderContainer provider,
+}) async {
   if (!enable) {
     return;
   }
@@ -23,6 +25,7 @@ Future<void> initializeFirebase(
 
     // Set up Firebase Messaging
     checkForInitialMessage();
+
     FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
     FirebaseMessaging.onMessageOpenedApp.listen(
       (data) => firebaseMessagingOpenedApp(data, provider),

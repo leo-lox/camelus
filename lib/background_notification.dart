@@ -5,17 +5,21 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ndk/ndk.dart';
 import 'package:ndk_objectbox/ndk_objectbox.dart';
+import 'package:path/path.dart' as p;
+import 'package:path_provider/path_provider.dart';
 
-import 'data_layer/models/nostr_note_model.dart';
 import 'domain_layer/usecases/app_auth.dart';
+import 'objectbox.g.dart';
 import 'presentation_layer/providers/db_ndk_provider.dart';
 import 'presentation_layer/providers/ndk_provider.dart';
 import 'presentation_layer/providers/notifications_provider.dart';
 import 'presentation_layer/providers/signer_provider.dart';
 
-// app not launched
+// called when the app is in the background or terminated.
 @pragma('vm:entry-point')
-Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+Future<void> firebaseMessagingBackgroundHandler(
+  RemoteMessage message,
+) async {
   log("Handling a background message: ${message.messageId}");
 
   final providerContainer = await _setupProviderBackgroundThread();
@@ -25,21 +29,24 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
     provider: providerContainer,
     isBackground: true,
   );
+
+  // close db after processing
+  providerContainer.read(dbNdkProvider)!.closeDb();
 }
 
-// Handle notification taps when app is in background but not terminated
+// called when a user presses a notification message displayed via FCM.
+// and if the app has opened from a background state (not terminated).
 Future<void> firebaseMessagingOpenedApp(
   RemoteMessage message,
-  ProviderContainer provider,
+  ProviderContainer? provider,
 ) async {
   log("Handling a OpenedApp message: ${message.messageId}");
-  _processMsgData(data: message.data, provider: provider);
 }
 
-// app is open
+// called when an incoming FCM payload is received whilst the Flutter instance is in the foreground.
 Future<void> firebaseMessagingAppOpen(
   RemoteMessage message,
-  ProviderContainer provider,
+  ProviderContainer? provider,
 ) async {
   log('Got a message whilst in the foreground!');
 
@@ -48,7 +55,7 @@ Future<void> firebaseMessagingAppOpen(
   }
 
   //! debug
-  _processMsgData(data: message.data, provider: provider);
+  await _processMsgData(data: message.data, provider: provider!);
 }
 
 Future<void> checkForInitialMessage() async {
@@ -62,7 +69,7 @@ Future<void> checkForInitialMessage() async {
   }
 }
 
-_processMsgData({
+Future<void> _processMsgData({
   required Map<String, dynamic> data,
   required ProviderContainer provider,
   bool isBackground = false,
@@ -81,7 +88,7 @@ _processMsgData({
 
   final notiProvider = await provider.read(notificationsProvider.future);
 
-  notiProvider.displayLocalAvatarNotification(
+  await notiProvider.displayLocalAvatarNotification(
     title: "kind ${unwrappedEvent.kind}, id: ${unwrappedEvent.id}",
     body: unwrappedEvent.content,
     payload: jsonEncode(unwrappedEvent.toJson()),
@@ -92,7 +99,19 @@ Future<ProviderContainer> _setupProviderBackgroundThread() async {
   final providerContainer = ProviderContainer();
 
   // init ndk db
-  DbObjectBox dbCacheManager = DbObjectBox();
+  // db could already be open by main thread
+  final DbObjectBox dbCacheManager;
+
+  final docsDir = await getApplicationDocumentsDirectory();
+  final dbPath = p.join(docsDir.path, "ndk-obx-default");
+  final isDbOpen = Store.isOpen(dbPath);
+
+  if (isDbOpen) {
+    dbCacheManager = DbObjectBox(attach: true);
+  } else {
+    dbCacheManager = DbObjectBox(attach: false);
+  }
+
   await dbCacheManager.dbRdy;
   final CacheManager cacheManager = dbCacheManager;
 
@@ -101,7 +120,7 @@ Future<ProviderContainer> _setupProviderBackgroundThread() async {
 
   if (mySigner != null) {
     /// ndk login
-    providerContainer.read(ndkProvider).accounts.loginExternalSigner(
+    providerContainer.read(ndkProviderNoRelays).accounts.loginExternalSigner(
           signer: mySigner,
         );
     providerContainer.read(signerProvider.notifier).setSigner(mySigner);

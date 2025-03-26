@@ -58,7 +58,7 @@ class Notifications {
   int _getNotificationId() =>
       DateTime.now().millisecondsSinceEpoch.remainder(100000);
 
-  displayLocalAvatarNotification({
+  Future<void> displayLocalAvatarNotification({
     required String title,
     required String body,
     String? payload,
