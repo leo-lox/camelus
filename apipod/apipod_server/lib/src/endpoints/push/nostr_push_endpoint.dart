@@ -171,7 +171,8 @@ class NostrPushEndpoint extends Endpoint {
     ndk.Nip01Event event,
     Relay relay,
   ) async {
-    final pubkeyTag = event.tags.firstWhere(
+    /// gets the last added pubkey (usually the direct reply)
+    final pubkeyTag = event.tags.lastWhere(
       (tag) => tag[0] == 'p' && tag.length > 1,
     );
 
