@@ -1143,25 +1143,26 @@ packages:
     dependency: "direct main"
     description:
       path: "packages/ndk"
-      ref: HEAD
-      resolved-ref: "3004069db523e0150e3c0a2b8b96eda1b6676454"
+      ref: nip-59-gift-wrap
+      resolved-ref: "6cd230dae9aa96dbda9505fffa29f69ec913d16d"
       url: "https://github.com/relaystr/ndk.git"
     source: git
     version: "0.3.2"
   ndk_amber:
     dependency: "direct main"
     description:
-      name: ndk_amber
-      sha256: "6f525e2bcdea08ecdd1815e2fdfc6e53c4bb86335927d8c333c1f4513dc1c099"
-      url: "https://pub.dev"
-    source: hosted
+      path: "packages/amber"
+      ref: nip-59-gift-wrap
+      resolved-ref: "6cd230dae9aa96dbda9505fffa29f69ec913d16d"
+      url: "https://github.com/relaystr/ndk.git"
+    source: git
     version: "0.3.0"
   ndk_objectbox:
     dependency: "direct main"
     description:
       path: "packages/objectbox"
-      ref: search-usecase
-      resolved-ref: ab1bb6575be518983f73a5b962c107906d109f78
+      ref: HEAD
+      resolved-ref: "3004069db523e0150e3c0a2b8b96eda1b6676454"
       url: "https://github.com/relaystr/ndk.git"
     source: git
     version: "0.2.3"

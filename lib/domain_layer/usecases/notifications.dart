@@ -16,13 +16,15 @@ class Notifications {
   Future<bool> registerDevice({
     required String token,
   }) {
+    //! todo WIP
     final registrationNote = NostrNote(
-      id: "id",
-      pubkey: "pubkey",
+      id: "",
+      pubkey:
+          "da1678cd43b0afed5c5566b878a0a5faae97b16635b47d58b9179a75de500801",
       created_at: 0,
       kind: 0,
-      content: "content",
-      sig: "sig",
+      content: "",
+      sig: "",
       tags: [
         NostrTag(
           type: "challenge",
@@ -49,15 +51,15 @@ class Notifications {
   int _getNotificationId() =>
       DateTime.now().millisecondsSinceEpoch.remainder(100000);
 
-  displayLocalNotification({
+  displayLocalAvatarNotification({
     required String title,
     required String body,
     String? payload,
   }) {
     return _notificationsRepo.displayAvatarNotification(
       id: _getNotificationId(),
-      title: "Leo",
-      body: "lorem ipsum",
+      title: title,
+      body: body,
       avatarUrl: "https://lox.de/downloads/profile.jpg",
       pubkey:
           "717ff238f888273f5d5ee477097f2b398921503769303a0c518d06a952f2a75e",

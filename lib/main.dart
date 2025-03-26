@@ -112,7 +112,10 @@ Future<void> main() async {
   );
 
   // notifications
-  await initializeFirebase(enable: CamelusConfig.firebaseEnabled);
+  await initializeFirebase(
+    enable: CamelusConfig.firebaseEnabled,
+    provider: providerContainer,
+  );
 
   InitModeration.initBloomFilter(provider: providerContainer);
 
