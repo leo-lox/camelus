@@ -1,14 +1,5 @@
 import 'dart:ui';
 
-import 'package:camelus/presentation_layer/providers/db_ndk_provider.dart';
-import 'package:camelus/presentation_layer/providers/inbox_outbox_provider.dart';
-import 'package:camelus/presentation_layer/providers/language_provider.dart';
-import 'package:camelus/presentation_layer/providers/ndk_provider.dart';
-import 'package:camelus/presentation_layer/providers/signer_provider.dart';
-import 'package:camelus/presentation_layer/routes/nostr/search_feed_page/search_feed_page.dart';
-import 'package:camelus/presentation_layer/routes/nostr/settings/locale/locale_settings.dart';
-import 'package:camelus/presentation_layer/routes/nostr/settings/moderation/moderation_settings.dart';
-
 import 'package:flutter/cupertino.dart';
 
 import 'package:flutter/material.dart';
@@ -19,19 +10,28 @@ import 'package:ndk/ndk.dart';
 //import 'data_layer/db/object_box_ndk/db_object_box.dart';
 import 'package:ndk_objectbox/ndk_objectbox.dart';
 import 'config/camelus_config.dart';
-import 'deep_links.dart';
+import 'lifecycle/deep_links.dart';
 import 'domain_layer/usecases/app_auth.dart';
-import 'presentation_layer/init/init_firebase.dart';
+import 'lifecycle/notifications/init_firebase.dart';
+import 'lifecycle/notifications/notifications_caller.dart';
 import 'presentation_layer/init/init_moderation.dart';
 import 'presentation_layer/providers/db_app_provider.dart';
+import 'presentation_layer/providers/db_ndk_provider.dart';
+import 'presentation_layer/providers/inbox_outbox_provider.dart';
+import 'presentation_layer/providers/language_provider.dart';
+import 'presentation_layer/providers/ndk_provider.dart';
+import 'presentation_layer/providers/signer_provider.dart';
 import 'presentation_layer/routes/home_page.dart';
 import 'presentation_layer/routes/nostr/blockedUsers/blocked_users.dart';
 import 'presentation_layer/routes/nostr/event_view/event_view_page.dart';
 import 'presentation_layer/routes/nostr/onboarding/onboarding.dart';
 import 'presentation_layer/routes/nostr/profile/edit_profile_page.dart';
 import 'presentation_layer/routes/nostr/profile/profile_page_2.dart';
+import 'presentation_layer/routes/nostr/search_feed_page/search_feed_page.dart';
 import 'presentation_layer/routes/nostr/settings/file_servers/settings_file_servers.dart';
 import 'presentation_layer/routes/nostr/settings/inital_route/inital_route_settings.dart';
+import 'presentation_layer/routes/nostr/settings/locale/locale_settings.dart';
+import 'presentation_layer/routes/nostr/settings/moderation/moderation_settings.dart';
 import 'presentation_layer/routes/nostr/settings/settings_page.dart';
 import 'theme.dart' as theme;
 
@@ -49,6 +49,8 @@ Future<List<dynamic>> _getInitialData() async {
 
   return [null, mySigner];
 }
+
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -95,8 +97,6 @@ Future<void> main() async {
     );
   }
 
-  final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
-
   final String initalRoute;
 
   // get inital route
@@ -118,6 +118,8 @@ Future<void> main() async {
     enable: CamelusConfig.firebaseEnabled,
     provider: providerContainer,
   );
+
+  checkForPendingNotifications();
 
   InitModeration.initBloomFilter(provider: providerContainer);
 

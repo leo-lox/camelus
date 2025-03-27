@@ -1,8 +1,11 @@
+import 'dart:convert';
 import 'dart:developer' as developer;
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:ndk/ndk.dart' as ndk;
 
 import '../../config/default_relays.dart';
+import '../../data_layer/models/nostr_note_model.dart';
+import '../../main.dart';
 import '../entities/nostr_note.dart';
 import '../entities/nostr_tag.dart';
 import '../repositories/notifications_repository.dart';
@@ -66,6 +69,8 @@ class Notifications {
             );
           },
         ),
+
+        //NostrTag(type: "relay", value: "ws://localhost:10547")
       ],
     );
 
@@ -106,7 +111,31 @@ class Notifications {
     );
   }
 
+  /// called on foreground or paused
   onNotificationTap(NotificationResponse notiResponse) {
-    developer.log("onNotificationTapUsecase ${notiResponse.data}");
+    developer.log("onNotificationTapUsecase ${notiResponse.payload}");
+
+    processNotificationPayload(notiResponse.payload);
+  }
+
+  /// gets called on lauch if payload is found
+  static processNotificationPayload(String? payload) {
+    if (payload != null) {
+      final payloadJson = jsonDecode(payload!);
+      final nostrNoteJson = jsonDecode(payloadJson['note']);
+      final bool likleyDirectReply = payloadJson['likleyDirectReply'];
+      final nostrNote = NostrNoteModel.fromJson(nostrNoteJson);
+
+      if (likleyDirectReply) {
+        final replyId = nostrNote.getDirectReply?.value;
+        final rootId = nostrNote.getRootReply?.value;
+
+        navigatorKey.currentState
+            ?.pushNamed("/nostr/event", arguments: <String, String?>{
+          "root": rootId ?? replyId ?? nostrNote.id,
+          "scrollIntoView": replyId,
+        });
+      }
+    }
   }
 }

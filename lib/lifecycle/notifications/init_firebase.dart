@@ -6,8 +6,9 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:riverpod/riverpod.dart';
 
-import '../../background_notification.dart';
+import 'notifications_caller.dart';
 import '../../firebase_options.dart';
+import 'background_notifications_thread.dart';
 
 Future<void> initializeFirebase({
   bool enable = true,
