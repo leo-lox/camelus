@@ -9,6 +9,7 @@ import 'package:serverpod/serverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:ndk/ndk.dart' as ndk;
 
+import '../../config/push_config.dart';
 import '../../generated/protocol.dart';
 import 'database_operations.dart';
 import 'nostr_utils.dart';
@@ -188,6 +189,11 @@ class NostrPushEndpoint extends Endpoint {
       return;
     }
 
+    if (event.pTags.length > PushConfig.maxPubkeyPerEvent) {
+      // hellthread prevention
+      return;
+    }
+
     final tokens = await getTokensByPubKey(session, pubkeyTag[1]);
     final tokensAsUrls =
         tokens.where((token) => isValidHttpUrl(token)).toList();
@@ -271,9 +277,9 @@ class NostrPushEndpoint extends Endpoint {
 
     try {
       final relays = await getAllRelays(session);
-      if (!relays.contains("wss://relay.camelus.app")) {
+      if (!relays.contains(PushConfig.bootstrapRelay)) {
         // add at least on relay to keep the session alive (first startup)
-        relays.add("wss://relay.camelus.app");
+        relays.add(PushConfig.bootstrapRelay);
       }
 
       if (_relayPool != null) {
@@ -295,7 +301,7 @@ class NostrPushEndpoint extends Endpoint {
       _relayPool!.onOpen.listen((relay) {
         session.log("onOpen.listen ${relay.url}");
         // Subscribe to specific event kinds when a relay connects
-        relay.subscribe('camelusPush', {
+        relay.subscribe(PushConfig.subscriptionId, {
           'kinds': [1],
           'limit': 1
         });
