@@ -6,6 +6,8 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:riverpod/riverpod.dart';
 
+import '../../presentation_layer/providers/db_app_provider.dart';
+import '../../presentation_layer/providers/notifications_provider.dart';
 import 'notifications_caller.dart';
 import '../../firebase_options.dart';
 import 'background_notifications_thread.dart';
@@ -34,6 +36,14 @@ Future<void> initializeFirebase({
 
     FirebaseMessaging.onMessage
         .listen((data) => firebaseMessagingAppOpen(data, provider));
+
+    /// listen to token refresh
+    FirebaseMessaging.instance.onTokenRefresh.listen((newToken) async {
+      final notiProvider = await provider.read(notificationsProvider.future);
+      final appDb = provider.read(dbAppProvider);
+      await appDb.save(key: "fcm_token", value: newToken);
+      await notiProvider.registerDevice(token: newToken);
+    });
   } else {
     log('Firebase not initialized: unsupported platform');
   }

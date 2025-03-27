@@ -57,6 +57,7 @@ class NotificationsRepositoryImpl implements NotificationsRepository {
       importance: Importance.defaultImportance,
       priority: Priority.defaultPriority,
       showWhen: true,
+      icon: 'ic_notification',
     );
 
     // iOS notification details
@@ -108,9 +109,11 @@ class NotificationsRepositoryImpl implements NotificationsRepository {
         'Nostr Notifications',
         channelDescription:
             'This channel is used to receive nostr notifications',
+
         importance: Importance.defaultImportance,
         priority: Priority.defaultPriority,
         showWhen: true,
+        icon: 'ic_notification',
 
         // Use a large icon (avatar) for the notification
 

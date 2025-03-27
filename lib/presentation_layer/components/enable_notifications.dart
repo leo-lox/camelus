@@ -134,13 +134,6 @@ class PushNotificationToggleState
       // Store token in your database
       final appDb = ref.read(dbAppProvider);
       await appDb.save(key: "fcm_token", value: token);
-
-      // Set up token refresh listener
-      FirebaseMessaging.instance.onTokenRefresh.listen((newToken) async {
-        if (ref.read(notificationsEnabledProvider)) {
-          await appDb.save(key: "fcm_token", value: newToken);
-        }
-      });
     }
     return token;
   }

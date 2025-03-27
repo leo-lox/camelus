@@ -27,7 +27,7 @@ class NotificationDataSource {
   Future<void> initializeNotifications() async {
     // Android initialization settings
     const AndroidInitializationSettings initializationSettingsAndroid =
-        AndroidInitializationSettings('@mipmap/ic_launcher');
+        AndroidInitializationSettings('ic_notification');
 
     // iOS initialization settings
     const DarwinInitializationSettings initializationSettingsIOS =
