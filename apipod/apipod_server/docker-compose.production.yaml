@@ -81,11 +81,12 @@ services:
         "--server-id",
         "default",
         "--logging",
-        "normal",
+        "info",
         "--role",
         "monolith",
         "--apply-migrations",
       ]
+    # logging normal
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.api.rule=Host(`${SERVERPOD_API_SERVER_PUBLIC_HOST}`)"
