@@ -198,11 +198,12 @@ class _NotificationPageState extends ConsumerState<NotificationPage>
         leading: _getNotificationIcon(notification),
         title: Row(
           children: [
-            UserImage(
-              size: 23,
-              imageUrl: reactingUser.userMetadata?.picture,
-              pubkey: notification.sourceNote.pubkey,
-            ),
+            if (notification.type == NotificationType.reaction)
+              UserImage(
+                size: 23,
+                imageUrl: reactingUser.userMetadata?.picture,
+                pubkey: notification.sourceNote.pubkey,
+              ),
             const SizedBox(
               width: 10,
             ),
@@ -252,6 +253,8 @@ class _NotificationPageState extends ConsumerState<NotificationPage>
         return "reacted to your post";
       case NotificationType.reply:
         return "replied to your post";
+      case NotificationType.threadReply:
+        return "mentiend you in a thread";
       case NotificationType.repost:
         return "reposted your post";
       case NotificationType.mention:
@@ -295,6 +298,10 @@ class _NotificationPageState extends ConsumerState<NotificationPage>
         icon = PhosphorIcons.at();
         iconColor = Colors.orange;
         break;
+      default:
+        icon = PhosphorIcons.question();
+        iconColor = Palette.primary;
+        break;
     }
 
     return Icon(icon, size: 23, color: iconColor);
@@ -308,8 +315,23 @@ class _NotificationPageState extends ConsumerState<NotificationPage>
         //return Container();
         break;
       case NotificationType.reply:
-        return Text("reply");
-        break;
+        final mentionUser =
+            ref.watch(metadataStateProvider(notification.sourceNote.pubkey));
+        return NoteCard(
+          note: notification.sourceNote,
+          myMetadata: mentionUser.userMetadata,
+          hideBottomBar: true,
+        );
+
+      case NotificationType.threadReply:
+        final mentionUser =
+            ref.watch(metadataStateProvider(notification.sourceNote.pubkey));
+        return NoteCard(
+          note: notification.sourceNote,
+          myMetadata: mentionUser.userMetadata,
+          hideBottomBar: true,
+        );
+
       case NotificationType.repost:
         break;
       case NotificationType.mention:
