@@ -1,8 +1,13 @@
+import 'dart:developer';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:rxdart/rxdart.dart';
 
 import '../../domain_layer/entities/nostr_note.dart';
 
+import '../../domain_layer/entities/nostr_tag.dart';
+import '../../helpers/helpers.dart';
+import '../../helpers/nprofile_helper.dart';
 import 'db_app_provider.dart';
 import 'get_notes_provider.dart';
 
@@ -90,6 +95,28 @@ class NotificationsState
       NotificationType type;
       String? targetNoteId;
 
+      final List<String> foundPubkeysContent = [];
+      final exp = RegExp(
+        r'nostr:(nprofile|npub)[a-zA-Z0-9]+',
+        caseSensitive: false,
+      );
+      final List<String> foundProfiles =
+          exp.allMatches(note.content).map((match) => match.group(0)!).toList();
+
+      for (var profile in foundProfiles) {
+        profile = profile.replaceFirst('nostr:', '');
+        final String pubkey;
+        if (profile.startsWith('nprofile')) {
+          final decoded = NprofileHelper().bech32toMap(profile);
+          pubkey = decoded['pubkey'] ?? '';
+          foundPubkeysContent.add(pubkey);
+        } else if (profile.startsWith('npub')) {
+          final decoded = Helpers().decodeBech32(profile);
+          pubkey = decoded[0] ?? '';
+          foundPubkeysContent.add(pubkey);
+        }
+      }
+
       if (note.kind == 7) {
         type = NotificationType.reaction;
         targetNoteId = note.tags
@@ -104,13 +131,24 @@ class NotificationsState
               (tag) => tag.type == 'e',
             )
             .value;
-      } else if (note.tags
-          .any((tag) => tag.type == 'p' && tag.value == userPubkey)) {
+      } else if (foundPubkeysContent.contains(userPubkey)) {
         type = NotificationType.mention;
-      } else {
+      } else if (note.getTagPubkeys.last.value == userPubkey) {
+        /// find note id of reply
+        for (final tag in note.tags) {
+          if (tag.type == 'e' && tag.marker == 'reply') {
+            targetNoteId = tag.value;
+            break;
+          }
+        }
         type = NotificationType.reply;
-        // Check if it's a reply to user's post
-        // todo: find out based on e tags
+      } else if (note.getTagPubkeys
+          .where((t) => t.value == userPubkey)
+          .isNotEmpty) {
+        type = NotificationType.threadReply;
+      } else {
+        log(note.toString());
+        type = NotificationType.unknown;
       }
 
       return NostrNotification(
@@ -223,12 +261,7 @@ class NotificationViewModel {
   }
 }
 
-enum NotificationType {
-  reaction,
-  reply,
-  repost,
-  mention,
-}
+enum NotificationType { reaction, reply, threadReply, repost, mention, unknown }
 
 class NostrNotification {
   final String id;
