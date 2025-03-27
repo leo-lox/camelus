@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -25,12 +27,21 @@ class PushNotificationToggle extends ConsumerStatefulWidget {
 class PushNotificationToggleState
     extends ConsumerState<PushNotificationToggle> {
   bool isLoading = true;
+  bool platformSupported = true;
 
   @override
   void initState() {
     super.initState();
-    // Check if notifications are already enabled
-    checkNotificationStatus();
+
+    // platform supported?
+    if ((kIsWeb || Platform.isAndroid || Platform.isIOS || Platform.isMacOS)) {
+      // Check if notifications are already enabled
+      checkNotificationStatus();
+    } else {
+      setState(() {
+        platformSupported = false;
+      });
+    }
   }
 
   Future<void> checkNotificationStatus() async {
@@ -143,6 +154,10 @@ class PushNotificationToggleState
   Widget build(BuildContext context) {
     final notificationsEnabled = ref.watch(notificationsEnabledProvider);
     final notificationsDenied = ref.watch(notificationsDeniedProvider);
+
+    if (!platformSupported) {
+      return Container();
+    }
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
