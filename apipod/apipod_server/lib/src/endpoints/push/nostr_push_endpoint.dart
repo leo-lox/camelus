@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
 import 'package:apipod_server/src/endpoints/push/relay_pool.dart';
 import 'package:dart_firebase_admin/dart_firebase_admin.dart';
 import 'package:dart_firebase_admin/messaging.dart';
@@ -12,6 +13,8 @@ import '../../generated/protocol.dart';
 import 'database_operations.dart';
 import 'nostr_utils.dart';
 import 'relay.dart';
+
+const int maxRelaysRegistration = 4;
 
 class NostrPushEndpoint extends Endpoint {
   // Cache implementation
@@ -99,25 +102,29 @@ class NostrPushEndpoint extends Endpoint {
           .toSet() // Remove duplicates
           .toList();
 
+      final int endIndex = min(relayTags.length, maxRelaysRegistration);
+      final relayTagsShort = relayTags.sublist(0, endIndex);
+
       if (veryOk && relayTags.isNotEmpty) {
-        newRelays = await checkIfThereIsANewRelay(session, relayTags);
+        newRelays = await checkIfThereIsANewRelay(session, relayTagsShort);
 
         // Register in database
-        for (final relayUrl in relayTags) {
+        for (final relayUrl in relayTagsShort) {
           await PushSubscription.db.insertRow(
               session,
               PushSubscription(
                   pubKey: event.pubKey, relay: relayUrl, token: tokenTag[1]));
         }
       } else {
-        session.log('Invalid registration: $veryOk, $tokenTag, $relayTags');
+        session
+            .log('Invalid registration: $veryOk, $tokenTag, $relayTagsShort');
       }
 
       processed.add({
         'pubkey': event.pubKey,
-        'added': tokenTag != null && veryOk && relayTags.isNotEmpty
+        'added': veryOk && relayTagsShort.isNotEmpty
       });
-      session.log('pubkey added: ${event.pubKey}, $tokenTag, $relayTags');
+      session.log('pubkey added: ${event.pubKey}, $tokenTag, $relayTagsShort');
     }
 
     if (newRelays) {
@@ -171,10 +178,15 @@ class NostrPushEndpoint extends Endpoint {
     ndk.Nip01Event event,
     Relay relay,
   ) async {
-    /// gets the last added pubkey (usually the direct reply)
-    final pubkeyTag = event.tags.lastWhere(
-      (tag) => tag[0] == 'p' && tag.length > 1,
-    );
+    /// get the last added pubkey (usually the direct reply)
+    List<String> pubkeyTag;
+    try {
+      pubkeyTag = event.tags.lastWhere(
+        (tag) => tag[0] == 'p' && tag.length > 1,
+      );
+    } catch (e) {
+      return;
+    }
 
     final tokens = await getTokensByPubKey(session, pubkeyTag[1]);
     final tokensAsUrls =
@@ -279,14 +291,15 @@ class NostrPushEndpoint extends Endpoint {
       _relayPool!.onOpen.listen((relay) {
         session.log("onOpen.listen ${relay.url}");
         // Subscribe to specific event kinds when a relay connects
-        relay.subscribe('subid', {
-          'kinds': [1, 4, 9735, 1059],
+        relay.subscribe('camelusPush', {
+          'kinds': [1],
           'limit': 1
         });
       });
 
       _relayPool!.onEvent.listen((relayEvent) {
-        session.log("onEvent.listen, relay: ${relayEvent.relay}");
+        // session.log(
+        //     "onEvent.listen, relay: ${relayEvent.relay.url} eventId: ${relayEvent.event.id}");
         try {
           final event = relayEvent.event;
 

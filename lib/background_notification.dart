@@ -101,6 +101,9 @@ Future<void> _processMsgData({
 
     final lastPtag = unwrappedEvent.pTags.last;
 
+    final threadId =
+        unwrappedEvent.getTags('e').where((t) => t[3] == 'root').firstOrNull;
+
     await notiProvider.displayLocalAvatarNotification(
       title: metadata.name ??
           metadata.nip05 ??
@@ -111,7 +114,8 @@ Future<void> _processMsgData({
       avatarUrl: metadata.picture ?? "${Dicebear.baseUrlPng}${metadata.pubkey}",
       pubkey: unwrappedEvent.pubKey,
       payload: jsonEncode(unwrappedEvent.toJson()),
-      type: myPubkey == lastPtag ? "new reply" : "new mention",
+      type: myPubkey == lastPtag ? "new reply" : "new mention (thread)",
+      threadIdentifier: threadId,
     );
   }
 }

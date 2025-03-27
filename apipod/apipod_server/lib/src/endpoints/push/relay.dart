@@ -47,8 +47,9 @@ class Relay {
   /// Initializes the WebSocket connection
   Future<void> _initWebsocket() async {
     try {
-      final headers = {'User-Agent': 'Amethyst Push Server'};
-      _ws = WebSocketChannel.connect(Uri.parse(url));
+      _ws = WebSocketChannel.connect(
+        Uri.parse(url),
+      );
 
       await _ws!.ready;
       _ws!.stream.listen(
