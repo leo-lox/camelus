@@ -271,6 +271,10 @@ class NostrPushEndpoint extends Endpoint {
 
     try {
       final relays = await getAllRelays(session);
+      if (!relays.contains("wss://relay.camelus.app")) {
+        // add at least on relay to keep the session alive (first startup)
+        relays.add("wss://relay.camelus.app");
+      }
 
       if (_relayPool != null) {
         final hasNewRelay = relays.any((relay) => !_relayPool!.has(relay));
