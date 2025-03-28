@@ -5,20 +5,19 @@ import 'package:rxdart/rxdart.dart';
 
 import '../../domain_layer/entities/nostr_note.dart';
 
-import '../../domain_layer/entities/nostr_tag.dart';
 import '../../helpers/helpers.dart';
 import '../../helpers/nprofile_helper.dart';
+import 'app_bar_provider/app_bottom_bar_provider.dart';
 import 'db_app_provider.dart';
 import 'get_notes_provider.dart';
 
 // Provider for managing notification state
-final notificationsStateProvider = NotifierProvider.autoDispose
-    .family<NotificationsState, NotificationViewModel, String>(
+final notificationsStateProvider =
+    NotifierProvider.family<NotificationsState, NotificationViewModel, String>(
   NotificationsState.new,
 );
 
-class NotificationsState
-    extends AutoDisposeFamilyNotifier<NotificationViewModel, String> {
+class NotificationsState extends FamilyNotifier<NotificationViewModel, String> {
   static const String SUBSCRIPTION_ID = "notifications-sub";
   static const String NOTIFICATION_CUTOFF_KEY = "notifications-cutoff";
 
@@ -55,6 +54,10 @@ class NotificationsState
     state = state.copyWith(
       newNotifications: [],
     );
+
+    ref
+        .read(appBottomNavigationBarProvider.notifier)
+        .resetNewNotesCountNotifications();
   }
 
   // Set up subscription for real-time notifications
@@ -232,6 +235,10 @@ class NotificationsState
     state = state.copyWith(
         newNotifications: [...state.newNotifications, ...notifications]
           ..sort((a, b) => b.createdAt.compareTo(a.createdAt)));
+
+    ref
+        .read(appBottomNavigationBarProvider.notifier)
+        .updateNewNotesCountNotifications(state.newNotifications.length);
   }
 }
 

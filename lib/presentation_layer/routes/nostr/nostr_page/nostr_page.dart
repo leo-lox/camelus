@@ -123,7 +123,7 @@ class _NostrPageState extends ConsumerState<NostrPage>
                 kinds: [1, 6],
                 authors: snapshot.data?.contacts != null
                     ? [...snapshot.data!.contacts, widget.pubkey]
-                    : [],
+                    : [widget.pubkey],
               ),
             );
           }

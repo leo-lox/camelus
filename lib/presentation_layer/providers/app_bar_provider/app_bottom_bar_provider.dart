@@ -5,20 +5,25 @@ enum NavigationTab { home, search, notifications, chat }
 
 class NavigationState {
   final NavigationTab selectedTab;
-  final int newNotesCount;
+  final int newNotesCountHome;
+  final int newNotesCountNotifications;
 
   NavigationState({
     required this.selectedTab,
-    this.newNotesCount = 0,
+    this.newNotesCountHome = 0,
+    this.newNotesCountNotifications = 0,
   });
 
   NavigationState copyWith({
     NavigationTab? selectedTab,
-    int? newNotesCount,
+    int? newNotesCountHome,
+    int? newNotesCountNotifications,
   }) {
     return NavigationState(
       selectedTab: selectedTab ?? this.selectedTab,
-      newNotesCount: newNotesCount ?? this.newNotesCount,
+      newNotesCountHome: newNotesCountHome ?? this.newNotesCountHome,
+      newNotesCountNotifications:
+          newNotesCountNotifications ?? this.newNotesCountNotifications,
     );
   }
 }
@@ -98,12 +103,20 @@ class NavigationNotifier extends StateNotifier<NavigationState> {
     }
   }
 
-  void updateNewNotesCount(int count) {
-    state = state.copyWith(newNotesCount: count);
+  void updateNewNotesCountHome(int count) {
+    state = state.copyWith(newNotesCountHome: count);
   }
 
-  void resetNewNotesCount() {
-    state = state.copyWith(newNotesCount: 0);
+  void resetNewNotesCountHome() {
+    state = state.copyWith(newNotesCountHome: 0);
+  }
+
+  void updateNewNotesCountNotifications(int count) {
+    state = state.copyWith(newNotesCountNotifications: count);
+  }
+
+  void resetNewNotesCountNotifications() {
+    state = state.copyWith(newNotesCountNotifications: 0);
   }
 
   @override

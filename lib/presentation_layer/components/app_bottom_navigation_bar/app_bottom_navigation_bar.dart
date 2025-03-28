@@ -55,22 +55,7 @@ class AppBottomNavigationBar extends ConsumerWidget {
                 color: isSelected ? Palette.primary : Palette.darkGray,
                 size: 23,
               ),
-              if (state.newNotesCount > 0)
-                Positioned(
-                  right: 0,
-                  bottom: 0,
-                  child: Container(
-                    padding: const EdgeInsets.all(1),
-                    decoration: BoxDecoration(
-                      color: Palette.lightGray,
-                      borderRadius: BorderRadius.circular(50),
-                    ),
-                    constraints: const BoxConstraints(
-                      minWidth: 12,
-                      minHeight: 12,
-                    ),
-                  ),
-                ),
+              if (state.newNotesCountHome > 0) IndicatorDot(),
             ],
           ),
         ],
@@ -90,6 +75,7 @@ class AppBottomNavigationBar extends ConsumerWidget {
         size: 23,
       ),
       label: "search",
+      tooltip: "search",
     );
   }
 
@@ -97,12 +83,23 @@ class AppBottomNavigationBar extends ConsumerWidget {
     final isSelected = state.selectedTab == NavigationTab.notifications;
 
     return BottomNavigationBarItem(
-      icon: Icon(
-        PhosphorIcons.bell(),
-        color: isSelected ? Palette.primary : Palette.darkGray,
-        size: 23,
+      icon: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Stack(
+            children: <Widget>[
+              Icon(
+                PhosphorIcons.bell(),
+                color: isSelected ? Palette.primary : Palette.darkGray,
+                size: 23,
+              ),
+              if (state.newNotesCountNotifications > 0) IndicatorDot(),
+            ],
+          ),
+        ],
       ),
-      label: "",
+      label: "notifications",
+      tooltip: "notifications",
     );
   }
 
@@ -116,6 +113,31 @@ class AppBottomNavigationBar extends ConsumerWidget {
         size: 23,
       ),
       label: "",
+    );
+  }
+}
+
+class IndicatorDot extends StatelessWidget {
+  const IndicatorDot({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Positioned(
+      right: 0,
+      bottom: 0,
+      child: Container(
+        padding: const EdgeInsets.all(1),
+        decoration: BoxDecoration(
+          color: Palette.lightGray,
+          borderRadius: BorderRadius.circular(50),
+        ),
+        constraints: const BoxConstraints(
+          minWidth: 12,
+          minHeight: 12,
+        ),
+      ),
     );
   }
 }
