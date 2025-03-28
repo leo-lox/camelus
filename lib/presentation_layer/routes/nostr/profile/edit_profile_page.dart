@@ -393,7 +393,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  spinnerCenter(),
+                  SpinnerCenter(),
                   SizedBox(height: 16),
                   Text(
                     'Loading profile...',

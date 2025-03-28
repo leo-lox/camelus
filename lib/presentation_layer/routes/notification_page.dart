@@ -79,48 +79,44 @@ class _NotificationPageState extends ConsumerState<NotificationPage>
               },
             ),
         ],
-        bottom: PreferredSize(
-          preferredSize: Size.fromHeight(200),
-          child: Column(
-            children: [
-              Text(
-                "work in progress!",
-                style: TextStyle(color: Palette.error),
-              ),
-              PushNotificationToggle(),
-              TabBar(
-                controller: _tabController,
-                labelColor: Colors.white,
-                unselectedLabelColor: Colors.grey,
-                indicatorColor: Palette.primary,
-                tabs: const [
-                  Tab(text: "All"),
-                  Tab(text: "Mentions"),
-                ],
-              ),
+      ),
+      body: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          PushNotificationToggle(),
+          TabBar(
+            controller: _tabController,
+            labelColor: Colors.white,
+            unselectedLabelColor: Colors.grey,
+            indicatorColor: Palette.primary,
+            tabs: const [
+              Tab(text: "All"),
+              Tab(text: "Mentions"),
             ],
           ),
-        ),
-      ),
-      body: TabBarView(
-        controller: _tabController,
-        children: [
-          // All notifications tab
-          RefreshIndicatorNoNeed(
-            onRefresh: () async {
-              await Future.delayed(Duration.zero);
-            },
-            child: _buildNotificationList(
-                context, ref, allNotifications, notificationsState),
-          ),
+          Expanded(
+            child: TabBarView(
+              controller: _tabController,
+              children: [
+                // All notifications tab
+                RefreshIndicatorNoNeed(
+                  onRefresh: () async {
+                    await Future.delayed(Duration.zero);
+                  },
+                  child: _buildNotificationList(
+                      context, ref, allNotifications, notificationsState),
+                ),
 
-          // Mentions tab
-          RefreshIndicatorNoNeed(
-            onRefresh: () async {
-              await Future.delayed(Duration.zero);
-            },
-            child: _buildNotificationList(
-                context, ref, mentionNotifications, notificationsState),
+                // Mentions tab
+                RefreshIndicatorNoNeed(
+                  onRefresh: () async {
+                    await Future.delayed(Duration.zero);
+                  },
+                  child: _buildNotificationList(
+                      context, ref, mentionNotifications, notificationsState),
+                ),
+              ],
+            ),
           ),
         ],
       ),

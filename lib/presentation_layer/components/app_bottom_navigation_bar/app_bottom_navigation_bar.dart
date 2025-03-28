@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../config/palette.dart';
@@ -36,7 +35,7 @@ class AppBottomNavigationBar extends ConsumerWidget {
         _buildHomeItem(navigationState, ref),
         _buildSearchItem(navigationState),
         _buildNotificationsItem(navigationState),
-        _buildChatItem(navigationState),
+        //_buildChatItem(navigationState),
       ],
     );
   }

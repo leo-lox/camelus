@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../config/palette.dart';
+import '../atoms/spinner_center.dart';
 import '../providers/db_app_provider.dart';
 import '../providers/notifications_provider.dart';
 
@@ -171,7 +172,7 @@ class PushNotificationToggleState
                 const SizedBox(
                   width: 24,
                   height: 24,
-                  child: CircularProgressIndicator(strokeWidth: 2),
+                  child: SpinnerCenter(),
                 )
               else
                 Switch(
@@ -184,10 +185,10 @@ class PushNotificationToggleState
           const SizedBox(height: 8),
           Text(
             notificationsEnabled
-                ? 'You will receive notifications about new events.'
-                : 'Enable notifications to receive events.',
+                ? 'You will receive notifications about new replies.'
+                : 'Enable notifications to get notified about new replies',
             style: TextStyle(
-              color: Colors.grey[600],
+              color: Palette.gray,
               fontSize: 14,
             ),
           ),
@@ -198,7 +199,7 @@ class PushNotificationToggleState
               child: Text(
                 'Note: You previously denied notifications. Please enable them in your device settings to receive notifications.',
                 style: TextStyle(
-                  color: Colors.orange[700],
+                  color: Palette.warn,
                   fontSize: 12,
                   fontStyle: FontStyle.italic,
                 ),
