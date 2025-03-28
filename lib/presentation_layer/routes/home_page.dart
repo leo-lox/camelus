@@ -106,7 +106,6 @@ class _HomePageState extends ConsumerState<HomePage> {
     // set initail page
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _myPage.jumpToPage(widget.initialPage);
-      ref.read(appBottomNavigationBarEventsProvider).triggerSearchTabEvent();
       setState(() {
         _selectedIndex = widget.initialPage;
       });

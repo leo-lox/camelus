@@ -170,7 +170,7 @@ class MyApp extends ConsumerWidget {
         onGenerateRoute: (RouteSettings settings) {
           switch (settings.name) {
             case '/':
-            case '/post-and-replies':
+            case '/posts-and-replies':
               return CupertinoPageRoute(builder: (context) {
                 return HomePage(
                   pubkey: pubkey,
@@ -183,6 +183,14 @@ class MyApp extends ConsumerWidget {
                 return HomePage(
                   pubkey: pubkey,
                   initialPage: 1,
+                );
+              });
+
+            case '/notifications':
+              return CupertinoPageRoute(builder: (context) {
+                return HomePage(
+                  pubkey: pubkey,
+                  initialPage: 2,
                 );
               });
 
