@@ -13,6 +13,7 @@ import 'package:camelus/config/palette.dart';
 import 'package:camelus/presentation_layer/routes/nostr/nostr_drawer.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:matomo_tracker/matomo_tracker.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../domain_layer/entities/app_update.dart';
@@ -233,26 +234,26 @@ class _HomePageState extends ConsumerState<HomePage> {
             label: "home",
           ),
           BottomNavigationBarItem(
-            icon: SvgPicture.asset(
-              height: 23,
-              'assets/icons/magnifying-glass.svg',
+            icon: Icon(
+              PhosphorIcons.magnifyingGlass(),
               color: _selectedIndex == 1 ? Palette.primary : Palette.darkGray,
+              size: 23,
             ),
-            label: "",
+            label: "search",
           ),
           BottomNavigationBarItem(
-            icon: SvgPicture.asset(
-              height: 23,
-              'assets/icons/bell.svg',
+            icon: Icon(
+              PhosphorIcons.bell(),
               color: _selectedIndex == 2 ? Palette.primary : Palette.darkGray,
+              size: 23,
             ),
             label: "",
           ),
           BottomNavigationBarItem(
-            icon: SvgPicture.asset(
-              height: 23,
-              'assets/icons/chats.svg',
+            icon: Icon(
+              PhosphorIcons.chats(),
               color: _selectedIndex == 3 ? Palette.primary : Palette.darkGray,
+              size: 23,
             ),
             label: "",
           ),
