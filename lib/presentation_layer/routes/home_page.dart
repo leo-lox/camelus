@@ -1,10 +1,5 @@
 import 'dart:ui';
 
-import 'package:camelus/helpers/helpers.dart';
-import 'package:camelus/presentation_layer/providers/navigation_bar_provider.dart';
-import 'package:camelus/presentation_layer/routes/nostr/nostr_page/nostr_page.dart';
-import 'package:camelus/presentation_layer/routes/notification_page.dart';
-import 'package:camelus/presentation_layer/routes/search_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_svg/svg.dart';
@@ -13,11 +8,16 @@ import 'package:camelus/config/palette.dart';
 import 'package:camelus/presentation_layer/routes/nostr/nostr_drawer.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:matomo_tracker/matomo_tracker.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../domain_layer/entities/app_update.dart';
+import '../../helpers/helpers.dart';
+import '../components/app_bottom_navigation_bar/app_bottom_navigation_bar.dart';
+import '../providers/app_bar_provider/app_bottom_bar_provider.dart';
 import '../providers/app_update_provider.dart';
+import 'nostr/nostr_page/nostr_page.dart';
+import 'notification_page.dart';
+import 'search_page.dart';
 
 class HomePage extends ConsumerStatefulWidget {
   final String pubkey;
@@ -106,7 +106,7 @@ class _HomePageState extends ConsumerState<HomePage> {
     // set initail page
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _myPage.jumpToPage(widget.initialPage);
-      ref.read(navigationBarProvider).tabSearch();
+      ref.read(appBottomNavigationBarEventsProvider).triggerSearchTabEvent();
       setState(() {
         _selectedIndex = widget.initialPage;
       });
@@ -120,8 +120,6 @@ class _HomePageState extends ConsumerState<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final navBarProvider = ref.watch(navigationBarProvider);
-
     return Scaffold(
       key: _scaffoldKey,
       drawer: NostrDrawer(pubkey: widget.pubkey),
@@ -160,104 +158,17 @@ class _HomePageState extends ConsumerState<HomePage> {
               child: Text('work in progress',
                   style: TextStyle(color: Colors.white)),
             )
-          ], // Comment this if you need to use Swipe.
+          ],
+          onPageChanged: (index) {
+            // Update the selected tab when page changes
+            ref
+                .read(appBottomNavigationBarProvider.notifier)
+                .selectTab(NavigationTab.values[index]);
+          },
         ),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: Palette.background,
-        showSelectedLabels: false,
-        showUnselectedLabels: false,
-        type: BottomNavigationBarType.fixed,
-        currentIndex: _selectedIndex,
-        onTap: (int index) {
-          // used to notify feeds to scroll up
-          if (index == 0) {
-            navBarProvider.tabHome();
-          }
-          if (index == 1) {
-            navBarProvider.tabSearch();
-          }
-
-          setState(() {
-            _selectedIndex = index;
-            // currentPage = pages[index];
-
-            setState(() {
-              _myPage.jumpToPage(index);
-            });
-          });
-        },
-        items: <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Stack(
-                  children: <Widget>[
-                    SvgPicture.asset(
-                      height: 23,
-                      'assets/icons/house.svg',
-                      colorFilter: ColorFilter.mode(
-                        _selectedIndex == 0
-                            ? Palette.primary
-                            : Palette.darkGray,
-                        BlendMode.srcIn,
-                      ),
-                    ),
-                    StreamBuilder<int>(
-                        stream: navBarProvider.newNotesCountStream,
-                        initialData: 0,
-                        builder: (context, AsyncSnapshot<int> snapshot) {
-                          if (!snapshot.hasData) return Container();
-                          if (snapshot.data! < 1) return Container();
-                          return Positioned(
-                            right: 0,
-                            bottom: 0,
-                            child: Container(
-                              padding: const EdgeInsets.all(1),
-                              decoration: BoxDecoration(
-                                color: Palette.lightGray,
-                                borderRadius: BorderRadius.circular(50),
-                              ),
-                              constraints: const BoxConstraints(
-                                minWidth: 12,
-                                minHeight: 12,
-                              ),
-                            ),
-                          );
-                        })
-                  ],
-                ),
-              ],
-            ),
-            tooltip: _selectedIndex == 0 ? "scroll to top" : "home",
-            label: "home",
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(
-              PhosphorIcons.magnifyingGlass(),
-              color: _selectedIndex == 1 ? Palette.primary : Palette.darkGray,
-              size: 23,
-            ),
-            label: "search",
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(
-              PhosphorIcons.bell(),
-              color: _selectedIndex == 2 ? Palette.primary : Palette.darkGray,
-              size: 23,
-            ),
-            label: "",
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(
-              PhosphorIcons.chats(),
-              color: _selectedIndex == 3 ? Palette.primary : Palette.darkGray,
-              size: 23,
-            ),
-            label: "",
-          ),
-        ],
+      bottomNavigationBar: AppBottomNavigationBar(
+        pageController: _myPage,
       ),
     );
   }
