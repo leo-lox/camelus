@@ -50,13 +50,10 @@ class AppBottomNavigationBar extends ConsumerWidget {
         children: [
           Stack(
             children: <Widget>[
-              SvgPicture.asset(
-                height: 23,
-                'assets/icons/house.svg',
-                colorFilter: ColorFilter.mode(
-                  isSelected ? Palette.primary : Palette.darkGray,
-                  BlendMode.srcIn,
-                ),
+              Icon(
+                PhosphorIcons.house(),
+                color: isSelected ? Palette.primary : Palette.darkGray,
+                size: 23,
               ),
               if (state.newNotesCount > 0)
                 Positioned(
