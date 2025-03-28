@@ -18,7 +18,6 @@ import 'presentation_layer/init/init_moderation.dart';
 import 'presentation_layer/providers/db_app_provider.dart';
 import 'presentation_layer/providers/db_ndk_provider.dart';
 import 'presentation_layer/providers/inbox_outbox_provider.dart';
-import 'presentation_layer/providers/language_provider.dart';
 import 'presentation_layer/providers/ndk_provider.dart';
 import 'presentation_layer/providers/signer_provider.dart';
 import 'presentation_layer/routes/home_page.dart';
@@ -149,10 +148,6 @@ class MyApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, ref) {
-    // set system locale if no locale is set
-    ref
-        .read(languageProvider.notifier)
-        .initializeWithSystemLocaleIfNeeded(context);
     return Portal(
       child: MaterialApp(
         navigatorKey: navigatorKey,

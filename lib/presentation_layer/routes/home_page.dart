@@ -15,6 +15,7 @@ import '../../helpers/helpers.dart';
 import '../components/app_bottom_navigation_bar/app_bottom_navigation_bar.dart';
 import '../providers/app_bar_provider/app_bottom_bar_provider.dart';
 import '../providers/app_update_provider.dart';
+import '../providers/language_provider.dart';
 import 'nostr/nostr_page/nostr_page.dart';
 import 'notification_page.dart';
 import 'search_page.dart';
@@ -109,6 +110,11 @@ class _HomePageState extends ConsumerState<HomePage> {
       setState(() {
         _selectedIndex = widget.initialPage;
       });
+
+      // set system locale if no locale is set
+      ref
+          .read(languageProvider.notifier)
+          .initializeWithSystemLocaleIfNeeded(context);
     });
   }
 
