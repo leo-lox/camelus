@@ -104,6 +104,8 @@ class TestEndpoints {
   late final _AppUpdateEndpoint appUpdate;
 
   late final _ModerationEndpoint moderation;
+
+  late final _NostrPushEndpoint nostrPush;
 }
 
 class _InternalTestEndpoints extends TestEndpoints
@@ -118,6 +120,10 @@ class _InternalTestEndpoints extends TestEndpoints
       serializationManager,
     );
     moderation = _ModerationEndpoint(
+      endpoints,
+      serializationManager,
+    );
+    nostrPush = _NostrPushEndpoint(
       endpoints,
       serializationManager,
     );
@@ -248,6 +254,50 @@ class _ModerationEndpoint {
           _localUniqueSession,
           _localCallContext.arguments,
         ) as _i3.Future<String>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+}
+
+class _NostrPushEndpoint {
+  _NostrPushEndpoint(
+    this._endpointDispatch,
+    this._serializationManager,
+  );
+
+  final _i2.EndpointDispatch _endpointDispatch;
+
+  final _i2.SerializationManager _serializationManager;
+
+  _i3.Future<bool> register(
+    _i1.TestSessionBuilder sessionBuilder,
+    String token,
+    List<_i6.Nip01Event> events,
+  ) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+        endpoint: 'nostrPush',
+        method: 'register',
+      );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'nostrPush',
+          methodName: 'register',
+          parameters: _i1.testObjectToJson({
+            'token': token,
+            'events': events,
+          }),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue = await (_localCallContext.method.call(
+          _localUniqueSession,
+          _localCallContext.arguments,
+        ) as _i3.Future<bool>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();

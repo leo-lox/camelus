@@ -13,6 +13,7 @@ class Palette {
   static const Color extraDarkGray = Color(0xFF1A1A1A);
   static const Color white = Color(0xFFFFFFFF);
   static const Color black = Color(0xFF000000);
+  static const Color warn = Color.fromARGB(255, 252, 127, 3);
   static const Color error = Color.fromARGB(255, 254, 29, 29);
   static const Color likeActive = Color.fromARGB(255, 230, 40, 85);
   static const Color repostActive = Color.fromARGB(255, 22, 163, 74);

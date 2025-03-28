@@ -19,8 +19,9 @@ class InitalRouteSettingsState extends ConsumerState<InitalRouteSettings> {
   // List of available routes
   final List<String> routes = [
     '/',
-    '/post-and-replies',
+    '/posts-and-replies',
     '/search',
+    '/notifications'
   ];
 
   _laodInitialRoute() async {

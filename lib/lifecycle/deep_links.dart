@@ -5,11 +5,11 @@ import 'package:app_links/app_links.dart';
 import 'package:flutter/material.dart';
 import 'package:riverpod/riverpod.dart';
 
-import 'domain_layer/usecases/app_auth.dart';
-import 'helpers/helpers.dart';
-import 'helpers/nevent_helper.dart';
-import 'helpers/nprofile_helper.dart';
-import 'presentation_layer/providers/onboarding_provider.dart';
+import '../domain_layer/usecases/app_auth.dart';
+import '../helpers/helpers.dart';
+import '../helpers/nevent_helper.dart';
+import '../helpers/nprofile_helper.dart';
+import '../presentation_layer/providers/onboarding_provider.dart';
 
 /// sets up links listener
 //todo: fetch the notes with inbox/outbox first then navigate to the note

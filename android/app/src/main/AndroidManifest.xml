@@ -13,7 +13,7 @@
             <data android:scheme="nostrsigner" />
         </intent>
     </queries>
-    <application android:label="camelus" android:name="${applicationName}" android:icon="@mipmap/launcher_icon" android:enableOnBackInvokedCallback="true">
+    <application android:label="camelus" android:name="${applicationName}" android:icon="@mipmap/ic_launcher" android:enableOnBackInvokedCallback="true">
         <activity android:name=".MainActivity" android:exported="true" android:launchMode="singleTop" android:theme="@style/LaunchTheme" android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode" android:hardwareAccelerated="true" android:windowSoftInputMode="adjustResize">
             <!-- Specifies an Android theme to apply to this Activity as soon as
                  the Android process has started. This theme is visible to the user
@@ -57,6 +57,10 @@
             <!-- deep links so app_links work -->
             <meta-data android:name="flutter_deeplinking_enabled" android:value="false" />
 
+            <meta-data android:name="com.google.firebase.messaging.default_notification_channel_id" android:value="high_importance_channel" />
+            <meta-data android:name="com.google.firebase.messaging.default_notification_icon" android:resource="@drawable/ic_notification" />
+
+
         </activity>
 
 
@@ -64,13 +68,18 @@
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->
         <meta-data android:name="flutterEmbedding" android:value="2" />
 
-
+        <!-- notification actions -->
+        <receiver android:exported="false" android:name="com.dexterous.flutterlocalnotifications.ActionBroadcastReceiver" />
 
     </application>
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="ANDROID.PERMISSION.READ_EXTERNAL_STORAGE"/>
     <uses-permission android:name="ANDROID.PERMISSION.WRITE_EXTERNAL_STORAGE"/>
+
+    <!-- notifications -->
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 </manifest>
 
 

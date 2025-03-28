@@ -70,6 +70,10 @@ services:
       - SERVERPOD_WEB_SERVER_PORT
       - SERVERPOD_SERVICE_SECRET
       - SERVERPOD_MAX_REQUEST_SIZE
+      - GOOGLE_APPLICATION_CREDENTIALS
+      - FIREBASE_PROJECT_ID
+    volumes:
+      - /mnt/HC_Volume_102297201/apipod_config:/apipod_config
     command:
       [
         "--mode",
@@ -77,11 +81,12 @@ services:
         "--server-id",
         "default",
         "--logging",
-        "normal",
+        "info",
         "--role",
         "monolith",
         "--apply-migrations",
       ]
+    # logging normal
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.api.rule=Host(`${SERVERPOD_API_SERVER_PUBLIC_HOST}`)"

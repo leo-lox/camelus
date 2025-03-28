@@ -1,13 +1,7 @@
 import 'dart:ui';
 
-import 'package:camelus/presentation_layer/providers/db_ndk_provider.dart';
-import 'package:camelus/presentation_layer/providers/inbox_outbox_provider.dart';
-import 'package:camelus/presentation_layer/providers/language_provider.dart';
-import 'package:camelus/presentation_layer/providers/ndk_provider.dart';
-import 'package:camelus/presentation_layer/routes/nostr/search_feed_page/search_feed_page.dart';
-import 'package:camelus/presentation_layer/routes/nostr/settings/locale/locale_settings.dart';
-import 'package:camelus/presentation_layer/routes/nostr/settings/moderation/moderation_settings.dart';
 import 'package:flutter/cupertino.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_mentions/flutter_mentions.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -15,18 +9,28 @@ import 'package:ndk/ndk.dart';
 //import 'package:device_preview/device_preview.dart';
 //import 'data_layer/db/object_box_ndk/db_object_box.dart';
 import 'package:ndk_objectbox/ndk_objectbox.dart';
-import 'deep_links.dart';
+import 'config/camelus_config.dart';
+import 'lifecycle/deep_links.dart';
 import 'domain_layer/usecases/app_auth.dart';
+import 'lifecycle/notifications/init_firebase.dart';
+import 'lifecycle/notifications/notifications_caller.dart';
 import 'presentation_layer/init/init_moderation.dart';
 import 'presentation_layer/providers/db_app_provider.dart';
+import 'presentation_layer/providers/db_ndk_provider.dart';
+import 'presentation_layer/providers/inbox_outbox_provider.dart';
+import 'presentation_layer/providers/ndk_provider.dart';
+import 'presentation_layer/providers/signer_provider.dart';
 import 'presentation_layer/routes/home_page.dart';
 import 'presentation_layer/routes/nostr/blockedUsers/blocked_users.dart';
 import 'presentation_layer/routes/nostr/event_view/event_view_page.dart';
 import 'presentation_layer/routes/nostr/onboarding/onboarding.dart';
 import 'presentation_layer/routes/nostr/profile/edit_profile_page.dart';
 import 'presentation_layer/routes/nostr/profile/profile_page_2.dart';
+import 'presentation_layer/routes/nostr/search_feed_page/search_feed_page.dart';
 import 'presentation_layer/routes/nostr/settings/file_servers/settings_file_servers.dart';
 import 'presentation_layer/routes/nostr/settings/inital_route/inital_route_settings.dart';
+import 'presentation_layer/routes/nostr/settings/locale/locale_settings.dart';
+import 'presentation_layer/routes/nostr/settings/moderation/moderation_settings.dart';
 import 'presentation_layer/routes/nostr/settings/settings_page.dart';
 import 'theme.dart' as theme;
 
@@ -44,6 +48,8 @@ Future<List<dynamic>> _getInitialData() async {
 
   return [null, mySigner];
 }
+
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -79,6 +85,7 @@ Future<void> main() async {
     providerContainer.read(ndkProvider).accounts.loginExternalSigner(
           signer: mySigner,
         );
+    providerContainer.read(signerProvider.notifier).setSigner(mySigner);
 
     /// get fresh nip65 data on startup
     final myPubkey = mySigner.getPublicKey();
@@ -88,8 +95,6 @@ Future<void> main() async {
       forceRefresh: true,
     );
   }
-
-  final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
   final String initalRoute;
 
@@ -106,6 +111,14 @@ Future<void> main() async {
     navigatorKey: navigatorKey,
     providerContainer: providerContainer,
   );
+
+  // notifications
+  await initializeFirebase(
+    enable: CamelusConfig.firebaseEnabled,
+    provider: providerContainer,
+  );
+
+  checkForPendingNotifications();
 
   InitModeration.initBloomFilter(provider: providerContainer);
 
@@ -135,10 +148,6 @@ class MyApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, ref) {
-    // set system locale if no locale is set
-    ref
-        .read(languageProvider.notifier)
-        .initializeWithSystemLocaleIfNeeded(context);
     return Portal(
       child: MaterialApp(
         navigatorKey: navigatorKey,
@@ -156,7 +165,7 @@ class MyApp extends ConsumerWidget {
         onGenerateRoute: (RouteSettings settings) {
           switch (settings.name) {
             case '/':
-            case '/post-and-replies':
+            case '/posts-and-replies':
               return CupertinoPageRoute(builder: (context) {
                 return HomePage(
                   pubkey: pubkey,
@@ -169,6 +178,14 @@ class MyApp extends ConsumerWidget {
                 return HomePage(
                   pubkey: pubkey,
                   initialPage: 1,
+                );
+              });
+
+            case '/notifications':
+              return CupertinoPageRoute(builder: (context) {
+                return HomePage(
+                  pubkey: pubkey,
+                  initialPage: 2,
                 );
               });
 

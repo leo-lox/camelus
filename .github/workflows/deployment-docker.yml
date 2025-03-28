@@ -165,5 +165,12 @@ jobs:
           # The token used to connect with insights must be at least 20 chars
           SERVERPOD_SERVICE_SECRET: ${{ secrets.SERVERPOD_SERVICE_SECRET }}
 
+          # firebase project id
+          FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
+
+          # GOOGLE_APPLICATION_CREDENTIALS path
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS}}
+
+
       - name: cleanup
         run: rm -rf ~/.ssh

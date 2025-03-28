@@ -107,6 +107,7 @@ class NoteRepositoryImpl implements NoteRepository {
     int? limit,
     List<String>? eTags,
     List<String>? tTags,
+    List<String>? pTags,
     String? search,
   }) {
     ndk.Filter filter = ndk.Filter(
@@ -117,6 +118,7 @@ class NoteRepositoryImpl implements NoteRepository {
       limit: limit,
       eTags: eTags,
       tTags: tTags,
+      pTags: pTags,
       search: search,
     );
 
@@ -143,6 +145,7 @@ class NoteRepositoryImpl implements NoteRepository {
     int? limit,
     List<String>? eTags,
     List<String>? tTags,
+    List<String>? pTags,
     String? search,
   }) {
     ndk.Filter filter = ndk.Filter(
@@ -153,6 +156,7 @@ class NoteRepositoryImpl implements NoteRepository {
       limit: limit,
       eTags: eTags,
       tTags: tTags,
+      pTags: pTags,
       search: search,
     );
 

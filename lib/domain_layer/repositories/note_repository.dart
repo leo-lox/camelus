@@ -43,6 +43,7 @@ abstract class NoteRepository {
     int? limit,
     List<String>? eTags,
     List<String>? tTags,
+    List<String>? pTags,
     String? search,
   });
 
@@ -55,6 +56,7 @@ abstract class NoteRepository {
     int? limit,
     List<String>? eTags,
     List<String>? tTags,
+    List<String>? pTags,
     String? search,
   });
 

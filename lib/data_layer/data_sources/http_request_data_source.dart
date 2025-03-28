@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:typed_data';
 import 'package:http/http.dart' as http;
 
 class HttpRequestDataSource {
@@ -25,5 +26,15 @@ class HttpRequestDataSource {
           "error fetching STATUS: ${response.statusCode}, Link: $url");
     }
     return response.body;
+  }
+
+  Future<Uint8List> getBytes(String url) async {
+    http.Response response = await _client.get(Uri.parse(url));
+
+    if (response.statusCode != 200) {
+      return throw Exception(
+          "error fetching STATUS: ${response.statusCode}, Link: $url");
+    }
+    return response.bodyBytes;
   }
 }

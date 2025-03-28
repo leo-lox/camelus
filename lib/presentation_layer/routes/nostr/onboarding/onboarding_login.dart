@@ -19,6 +19,7 @@ import 'package:bip39_mnemonic/bip39_mnemonic.dart';
 import '../../../../domain_layer/entities/key_pair.dart';
 
 import '../../../providers/ndk_provider.dart';
+import '../../../providers/signer_provider.dart';
 
 class OnboardingLoginPage extends ConsumerStatefulWidget {
   const OnboardingLoginPage({super.key});
@@ -148,6 +149,7 @@ class _OnboardingLoginPageState extends ConsumerState<OnboardingLoginPage> {
     );
 
     ref.watch(ndkProvider).accounts.loginExternalSigner(signer: bip340Signer);
+    ref.read(signerProvider.notifier).setSigner(bip340Signer);
 
     setState(() {});
 

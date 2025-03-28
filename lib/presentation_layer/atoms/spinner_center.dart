@@ -1,10 +1,15 @@
 import 'package:camelus/config/palette.dart';
 import 'package:flutter/material.dart';
 
-Widget spinnerCenter() {
-  return const Center(
-    child: CircularProgressIndicator(
-      color: Palette.white,
-    ),
-  );
+class SpinnerCenter extends StatelessWidget {
+  const SpinnerCenter({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Center(
+      child: CircularProgressIndicator(
+        color: Palette.white,
+      ),
+    );
+  }
 }

@@ -68,3 +68,6 @@ isar.dll
 # scan temporary files
 **/fastlane/test_output
 
+# firebase
+firebase_options.dart
+firebase.json

@@ -2,31 +2,25 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
 
-import 'package:camelus/domain_layer/entities/nostr_band_hashtags.dart';
-import 'package:camelus/domain_layer/entities/nostr_band_people.dart';
-import 'package:camelus/domain_layer/entities/user_metadata.dart';
-import 'package:camelus/presentation_layer/atoms/hashtag_card.dart';
-import 'package:camelus/presentation_layer/components/note_card/note_card_container.dart';
-import 'package:camelus/presentation_layer/components/person_card.dart';
-import 'package:camelus/config/palette.dart';
-import 'package:camelus/helpers/helpers.dart';
-import 'package:camelus/helpers/nprofile_helper.dart';
-import 'package:camelus/presentation_layer/providers/following_provider.dart';
-import 'package:camelus/presentation_layer/providers/language_provider.dart';
-import 'package:camelus/presentation_layer/providers/metadata_provider.dart';
-import 'package:camelus/presentation_layer/providers/navigation_bar_provider.dart';
-import 'package:camelus/presentation_layer/providers/ndk_provider.dart';
-import 'package:camelus/presentation_layer/providers/nostr_band_provider.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../config/palette.dart';
 import '../../domain_layer/entities/contact_list.dart';
+import '../../domain_layer/entities/nostr_band_hashtags.dart';
+import '../../domain_layer/entities/nostr_band_people.dart';
 import '../../domain_layer/entities/nostr_note.dart';
-import '../components/note_card/note_card.dart';
+import '../../domain_layer/entities/user_metadata.dart';
+import '../atoms/hashtag_card.dart';
+import '../components/note_card/note_card_container.dart';
+import '../components/person_card.dart';
 import '../components/search_bar.dart';
+import '../providers/app_bar_provider/app_bottom_bar_provider.dart';
+import '../providers/following_provider.dart';
+import '../providers/metadata_provider.dart';
+import '../providers/nostr_band_provider.dart';
 import '../providers/search_provider.dart';
 import 'nostr/profile/profile_page_2.dart';
 
@@ -127,8 +121,8 @@ class _SearchPageState extends ConsumerState<SearchPage> {
   }
 
   void _listenToNavigationBar() {
-    final navigationBar = ref.read(navigationBarProvider);
-    _subscriptions.add(navigationBar.onTabSearch.listen((event) {
+    final navigationBar = ref.read(appBottomNavigationBarEventsProvider);
+    _subscriptions.add(navigationBar.onSearchTabSelected.listen((event) {
       _focusSearchBar();
     }));
   }

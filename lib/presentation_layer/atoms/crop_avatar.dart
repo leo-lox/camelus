@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 
@@ -66,14 +67,20 @@ class _CropAvatarState extends State<CropAvatar> {
           image: widget._imageData,
           controller: _controller,
 
-          onCropped: (image) async {
-            final resizedImage =
-                await _resizeImage(image, targetWidth: widget.targetWidth);
-            setState(() {
-              _loading = false;
-            });
-            if (mounted) {
-              Navigator.pop<Uint8List>(context, resizedImage);
+          onCropped: (result) async {
+            switch (result) {
+              case CropSuccess(:final croppedImage):
+                final resizedImage = await _resizeImage(croppedImage,
+                    targetWidth: widget.targetWidth);
+                setState(() {
+                  _loading = false;
+                });
+                if (mounted) {
+                  Navigator.pop<Uint8List>(context, resizedImage);
+                }
+                break;
+              case CropFailure(:final cause):
+                log(cause.toString());
             }
           },
         ),

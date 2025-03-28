@@ -8,7 +8,7 @@ import 'event_verifier.dart';
 import 'ndk_provider.dart';
 
 // Provider for managing the "GetUserMetadata" use case.
-// This provider creates and returns an instance of GetUserMetadata, 
+// This provider creates and returns an instance of GetUserMetadata,
 // which is used to fetch user metadata from the repository.
 final metadataProvider = Provider<GetUserMetadata>((ref) {
   final ndk = ref.watch(ndkProvider);

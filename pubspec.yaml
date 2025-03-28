@@ -15,7 +15,7 @@ publish_to: "none" # Remove this line if you wish to publish to pub.dev
 # In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 1.4.0+49
+version: 1.4.0+54
 
 environment:
   sdk: ">=3.0.0 <4.0.0"
@@ -30,7 +30,7 @@ dependencies:
   flutter:
     sdk: flutter
   cupertino_icons: ^1.0.2
-  flutter_hooks: ^0.20.5
+  flutter_hooks: ^0.21.2
   riverpod: ^2.3.6
   riverpod_annotation: ^2.3.5
   flutter_riverpod: ^2.6.1
@@ -68,7 +68,7 @@ dependencies:
   #device_preview: ^1.1.0
   bip39_mnemonic: ^3.0.6
   bip32: ^2.0.0
-  crop_your_image: ^1.0.1
+  crop_your_image: ^2.0.0
   package_info_plus: ^8.0.2
   rxdart: ^0.28.0
   shimmer: ^3.0.0
@@ -80,16 +80,20 @@ dependencies:
   app_links: ^6.3.2
   phosphor_flutter: ^2.1.0
   ## ndk imnports
-  ndk: ^0.3.1
-  ndk_rust_verifier: ^0.2.3
-  ndk_amber: ^0.2.0
-  ndk_objectbox: ^0.2.1
+  ndk: ^0.3.2
+  ndk_rust_verifier: ^0.3.1
+  ndk_amber: ^0.3.0
+  ndk_objectbox: ^0.2.3
   image: ^4.3.0
   flutter_list_view: ^1.1.29
   xxh3: ^1.2.0
   serverpod_flutter: 2.4.0
   apipod_client:
     path: ./apipod/apipod_client
+  firebase_messaging: ^15.2.4
+  firebase_core: ^3.12.1
+  flutter_local_notifications: ^19.0.0
+  path: ^1.9.1
 
   
 
@@ -100,7 +104,7 @@ dependency_overrides:
     git:
       url: https://github.com/relaystr/ndk.git
       path: packages/ndk
-    #   ref: search-usecase
+      #ref: nip-59-gift-wrap
   ndk_rust_verifier:
     #path: ../ndk/packages/rust_verifier
     git:
@@ -111,10 +115,14 @@ dependency_overrides:
     git:
        url: https://github.com/relaystr/ndk.git
        path: packages/objectbox
-       ref: search-usecase
+    #   #ref: search-usecase
 
-  #ndk_amber:
-  #  path: ../ndk/packages/amber
+  ndk_amber:
+    #path: ../ndk/packages/amber
+    git:
+      url: https://github.com/relaystr/ndk.git
+      path: packages/amber
+    #  ref: nip-59-gift-wrap
 
 
 dev_dependencies:

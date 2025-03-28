@@ -8,8 +8,8 @@ import '../../config/palette.dart';
 import '../../domain_layer/entities/feed_filter.dart';
 import '../atoms/new_posts_available.dart';
 import '../atoms/refresh_indicator_no_need.dart';
+import '../providers/app_bar_provider/app_bottom_bar_provider.dart';
 import '../providers/generic_feed_provider.dart';
-import '../providers/navigation_bar_provider.dart';
 import 'note_card/no_more_notes.dart';
 import 'note_card/note_card_container.dart';
 import 'note_card/note_card_repost.dart';
@@ -72,12 +72,12 @@ class _GenericFeedState extends ConsumerState<GenericFeed> {
     _scrollController = ScrollController();
 
     // Initialize providers for navigation and feed state
-    final navBarP = ref.read(navigationBarProvider);
+    final navBarP = ref.read(appBottomNavigationBarEventsProvider);
     final genericFeedStateNotifier =
         ref.read(genericFeedStateProvider(widget.feedFilter).notifier);
 
     // Listen to home tab events and refresh the feed
-    _homeBarSub = navBarP.onTabHome.listen((_) {
+    _homeBarSub = navBarP.onHomeTabSelected.listen((_) {
       genericFeedStateNotifier.integrateNewNotes();
       _scrollToTop();
     });
