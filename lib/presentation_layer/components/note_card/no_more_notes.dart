@@ -4,7 +4,13 @@ import '../../../config/palette.dart';
 class NoMoreNotes extends StatelessWidget {
   final Function? renderCallback;
 
-  const NoMoreNotes({super.key, this.renderCallback});
+  final String text;
+
+  const NoMoreNotes({
+    super.key,
+    this.renderCallback,
+    this.text = "No more notes to show",
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +26,7 @@ class NoMoreNotes extends StatelessWidget {
         const SizedBox(height: 20),
         Center(
           child: Text(
-            "No more notes to show",
+            text,
             style: TextStyle(
               color: Palette.darkGray,
               fontSize: 16,

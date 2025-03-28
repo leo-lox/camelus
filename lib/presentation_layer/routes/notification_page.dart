@@ -5,6 +5,7 @@ import 'package:camelus/presentation_layer/components/note_card/skeleton_note.da
 import 'package:camelus/presentation_layer/providers/get_notes_provider.dart';
 import 'package:camelus/presentation_layer/providers/metadata_state_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_list_view/flutter_list_view.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
@@ -13,6 +14,7 @@ import 'package:timeago/timeago.dart' as timeago;
 import '../../config/palette.dart';
 
 import '../components/enable_notifications.dart';
+import '../components/note_card/no_more_notes.dart';
 import '../providers/notification_feed_provider.dart';
 
 class NotificationPage extends ConsumerStatefulWidget {
@@ -149,17 +151,19 @@ class _NotificationPageState extends ConsumerState<NotificationPage>
 
   Widget _buildNotificationList(BuildContext context, WidgetRef ref,
       List<NostrNotification> notifications, NotificationViewModel state) {
-    return ListView.builder(
-      itemCount: notifications.length + 1, // +1 for the loading indicator
-      itemBuilder: (context, index) {
-        if (state.endOfNotifications) {
-          return _buildEmptyState("No notifications yet");
-        }
+    if (notifications.isEmpty && state.endOfNotifications) {
+      return _buildEmptyState("no notifications");
+    }
 
+    return FlutterListView(
+        delegate: FlutterListViewDelegate(
+      (BuildContext context, int index) {
         // Handle the loading indicator at the end
         if (index == notifications.length) {
           if (state.endOfNotifications) {
-            return const SizedBox(height: 30);
+            return NoMoreNotes(
+              text: "end of notifications",
+            );
           }
           return Padding(
             padding: const EdgeInsets.symmetric(vertical: 16.0),
@@ -183,7 +187,8 @@ class _NotificationPageState extends ConsumerState<NotificationPage>
 
         return _buildNotificationItem(context, notification, isNew, ref);
       },
-    );
+      childCount: notifications.length + 1,
+    ));
   }
 
   Widget _buildNotificationItem(BuildContext context,
