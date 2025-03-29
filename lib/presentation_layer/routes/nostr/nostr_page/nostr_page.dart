@@ -72,6 +72,8 @@ class _NostrPageState extends ConsumerState<NostrPage>
   Widget build(BuildContext context) {
     super.build(context);
 
+    final initialTabIndex = widget.initialTab == "/posts-and-replies" ? 1 : 0;
+
     return SafeArea(
       child: FutureBuilder(
         future: _contactsFuture,
@@ -82,9 +84,12 @@ class _NostrPageState extends ConsumerState<NostrPage>
             return GenericFeed(
               key: PageStorageKey('homeFeed-${widget.pubkey}'),
               floatHeaderSlivers: true,
-              initialTab: widget.initialTab == "/posts-and-replies" ? 1 : 0,
-              customHeaderSliverBuilder:
-                  (BuildContext context, bool innerBoxIsScrolled) {
+              initialTab: initialTabIndex,
+              customHeaderSliverBuilder: (
+                BuildContext context,
+                bool innerBoxIsScrolled,
+                TabController tabController,
+              ) {
                 return <Widget>[
                   SliverOverlapAbsorber(
                     handle: NestedScrollView.sliverOverlapAbsorberHandleFor(
@@ -108,6 +113,7 @@ class _NostrPageState extends ConsumerState<NostrPage>
                       bottom: PreferredSize(
                         preferredSize: const Size.fromHeight(40),
                         child: TabBar(
+                          controller: tabController,
                           tabs: [
                             Tab(text: "Posts"),
                             Tab(text: "Posts and Replies"),

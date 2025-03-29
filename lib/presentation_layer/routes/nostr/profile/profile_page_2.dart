@@ -56,8 +56,11 @@ class ProfilePage2 extends ConsumerWidget {
           kinds: [1, 6],
           feedId: 'profile-${pubkey.substring(10, 20)}',
         ),
-        customHeaderSliverBuilder:
-            (BuildContext context, bool innerBoxIsScrolled) {
+        customHeaderSliverBuilder: (
+          BuildContext context,
+          bool innerBoxIsScrolled,
+          TabController tabController,
+        ) {
           return <Widget>[
             SliverOverlapAbsorber(
               handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
