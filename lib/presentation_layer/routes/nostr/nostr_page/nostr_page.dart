@@ -82,7 +82,7 @@ class _NostrPageState extends ConsumerState<NostrPage>
             return GenericFeed(
               key: PageStorageKey('homeFeed-${widget.pubkey}'),
               floatHeaderSlivers: true,
-              initialTab: widget.initialTab == "/post-and-replies" ? 1 : 0,
+              initialTab: widget.initialTab == "/posts-and-replies" ? 1 : 0,
               customHeaderSliverBuilder:
                   (BuildContext context, bool innerBoxIsScrolled) {
                 return <Widget>[
