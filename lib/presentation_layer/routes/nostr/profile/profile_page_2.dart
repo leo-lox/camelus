@@ -125,6 +125,7 @@ class ProfilePage2 extends ConsumerWidget {
                     color:
                         Palette.black, // Add a background color to the tab bar
                     child: TabBar(
+                      controller: tabController,
                       tabs: [
                         Tab(text: 'Posts'),
                         Tab(text: 'Posts & Replies'),
