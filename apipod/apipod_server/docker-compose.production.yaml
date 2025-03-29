@@ -84,9 +84,8 @@ services:
         "normal",
         "--role",
         "monolith",
-        "--apply-repair-migration"
+        "--apply-migrations"
       ]
-    # --apply-migrations
     # logging normal
     labels:
       - "traefik.enable=true"
