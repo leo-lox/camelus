@@ -113,6 +113,7 @@ class _SearchFeedPageState extends State<SearchFeedPage> {
             ),
             Expanded(
               child: GenericFeed(
+                feedPadding: EdgeInsets.only(top: 50),
                 feedFilter: _buildFeedFilter(_currentQuery),
               ),
             ),
