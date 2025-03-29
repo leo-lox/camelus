@@ -15,14 +15,20 @@ import 'bloom_filter_data.dart' as _i3;
 import 'bloom_filter_events.dart' as _i4;
 import 'bloom_filter_profiles.dart' as _i5;
 import 'example.dart' as _i6;
-import 'reports_incoming.dart' as _i7;
-import 'subscription.dart' as _i8;
-import 'package:ndk/domain_layer/entities/nip_01_event.dart' as _i9;
+import 'nip05/check_name_result_spy.dart' as _i7;
+import 'nip05/nip_05_data_spy.dart' as _i8;
+import 'nip05/nip_05_response_spy.dart' as _i9;
+import 'reports_incoming.dart' as _i10;
+import 'subscription.dart' as _i11;
+import 'package:ndk/domain_layer/entities/nip_01_event.dart' as _i12;
 export 'app_update_data.dart';
 export 'bloom_filter_data.dart';
 export 'bloom_filter_events.dart';
 export 'bloom_filter_profiles.dart';
 export 'example.dart';
+export 'nip05/check_name_result_spy.dart';
+export 'nip05/nip_05_data_spy.dart';
+export 'nip05/nip_05_response_spy.dart';
 export 'reports_incoming.dart';
 export 'subscription.dart';
 export 'client.dart';
@@ -55,11 +61,20 @@ class Protocol extends _i1.SerializationManager {
     if (t == _i6.Example) {
       return _i6.Example.fromJson(data) as T;
     }
-    if (t == _i7.ReportsIncoming) {
-      return _i7.ReportsIncoming.fromJson(data) as T;
+    if (t == _i7.NameCheckResult) {
+      return _i7.NameCheckResult.fromJson(data) as T;
     }
-    if (t == _i8.PushSubscription) {
-      return _i8.PushSubscription.fromJson(data) as T;
+    if (t == _i8.Nip05Data) {
+      return _i8.Nip05Data.fromJson(data) as T;
+    }
+    if (t == _i9.Nip05Response) {
+      return _i9.Nip05Response.fromJson(data) as T;
+    }
+    if (t == _i10.ReportsIncoming) {
+      return _i10.ReportsIncoming.fromJson(data) as T;
+    }
+    if (t == _i11.PushSubscription) {
+      return _i11.PushSubscription.fromJson(data) as T;
     }
     if (t == _i1.getType<_i2.AppUpdateData?>()) {
       return (data != null ? _i2.AppUpdateData.fromJson(data) : null) as T;
@@ -76,21 +91,41 @@ class Protocol extends _i1.SerializationManager {
     if (t == _i1.getType<_i6.Example?>()) {
       return (data != null ? _i6.Example.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i7.ReportsIncoming?>()) {
-      return (data != null ? _i7.ReportsIncoming.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i7.NameCheckResult?>()) {
+      return (data != null ? _i7.NameCheckResult.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i8.PushSubscription?>()) {
-      return (data != null ? _i8.PushSubscription.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i8.Nip05Data?>()) {
+      return (data != null ? _i8.Nip05Data.fromJson(data) : null) as T;
     }
-    if (t == _i9.Nip01Event) {
-      return _i9.Nip01Event.fromJson(data) as T;
+    if (t == _i1.getType<_i9.Nip05Response?>()) {
+      return (data != null ? _i9.Nip05Response.fromJson(data) : null) as T;
     }
-    if (t == List<_i9.Nip01Event>) {
-      return (data as List).map((e) => deserialize<_i9.Nip01Event>(e)).toList()
+    if (t == _i1.getType<_i10.ReportsIncoming?>()) {
+      return (data != null ? _i10.ReportsIncoming.fromJson(data) : null) as T;
+    }
+    if (t == _i1.getType<_i11.PushSubscription?>()) {
+      return (data != null ? _i11.PushSubscription.fromJson(data) : null) as T;
+    }
+    if (t == List<String>) {
+      return (data as List).map((e) => deserialize<String>(e)).toList() as T;
+    }
+    if (t == Map<String, String>) {
+      return (data as Map).map((k, v) =>
+          MapEntry(deserialize<String>(k), deserialize<String>(v))) as T;
+    }
+    if (t == Map<String, List<String>>) {
+      return (data as Map).map((k, v) =>
+          MapEntry(deserialize<String>(k), deserialize<List<String>>(v))) as T;
+    }
+    if (t == _i12.Nip01Event) {
+      return _i12.Nip01Event.fromJson(data) as T;
+    }
+    if (t == List<_i12.Nip01Event>) {
+      return (data as List).map((e) => deserialize<_i12.Nip01Event>(e)).toList()
           as T;
     }
-    if (t == _i1.getType<_i9.Nip01Event?>()) {
-      return (data != null ? _i9.Nip01Event.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i12.Nip01Event?>()) {
+      return (data != null ? _i12.Nip01Event.fromJson(data) : null) as T;
     }
     return super.deserialize<T>(data, t);
   }
@@ -99,7 +134,7 @@ class Protocol extends _i1.SerializationManager {
   String? getClassNameForObject(Object? data) {
     String? className = super.getClassNameForObject(data);
     if (className != null) return className;
-    if (data is _i9.Nip01Event) {
+    if (data is _i12.Nip01Event) {
       return 'Nip01Event';
     }
     if (data is _i2.AppUpdateData) {
@@ -117,10 +152,19 @@ class Protocol extends _i1.SerializationManager {
     if (data is _i6.Example) {
       return 'Example';
     }
-    if (data is _i7.ReportsIncoming) {
+    if (data is _i7.NameCheckResult) {
+      return 'NameCheckResult';
+    }
+    if (data is _i8.Nip05Data) {
+      return 'Nip05Data';
+    }
+    if (data is _i9.Nip05Response) {
+      return 'Nip05Response';
+    }
+    if (data is _i10.ReportsIncoming) {
       return 'ReportsIncoming';
     }
-    if (data is _i8.PushSubscription) {
+    if (data is _i11.PushSubscription) {
       return 'PushSubscription';
     }
     return null;
@@ -133,7 +177,7 @@ class Protocol extends _i1.SerializationManager {
       return super.deserializeByClassName(data);
     }
     if (dataClassName == 'Nip01Event') {
-      return deserialize<_i9.Nip01Event>(data['data']);
+      return deserialize<_i12.Nip01Event>(data['data']);
     }
     if (dataClassName == 'AppUpdateData') {
       return deserialize<_i2.AppUpdateData>(data['data']);
@@ -150,11 +194,20 @@ class Protocol extends _i1.SerializationManager {
     if (dataClassName == 'Example') {
       return deserialize<_i6.Example>(data['data']);
     }
+    if (dataClassName == 'NameCheckResult') {
+      return deserialize<_i7.NameCheckResult>(data['data']);
+    }
+    if (dataClassName == 'Nip05Data') {
+      return deserialize<_i8.Nip05Data>(data['data']);
+    }
+    if (dataClassName == 'Nip05Response') {
+      return deserialize<_i9.Nip05Response>(data['data']);
+    }
     if (dataClassName == 'ReportsIncoming') {
-      return deserialize<_i7.ReportsIncoming>(data['data']);
+      return deserialize<_i10.ReportsIncoming>(data['data']);
     }
     if (dataClassName == 'PushSubscription') {
-      return deserialize<_i8.PushSubscription>(data['data']);
+      return deserialize<_i11.PushSubscription>(data['data']);
     }
     return super.deserializeByClassName(data);
   }

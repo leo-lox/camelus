@@ -1,0 +1,8 @@
+class: Nip05Response
+fields:
+  names: Map<String, String>
+  relays: Map<String,List<String>>
+  domain: String
+
+
+

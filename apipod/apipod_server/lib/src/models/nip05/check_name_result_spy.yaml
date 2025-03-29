@@ -1,0 +1,5 @@
+class: NameCheckResult
+fields:
+  isAvailable: bool
+  reason: String?
+  suggestions: List<String>

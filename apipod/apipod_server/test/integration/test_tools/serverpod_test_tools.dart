@@ -17,6 +17,9 @@ import 'dart:async' as _i3;
 import 'package:apipod_server/src/generated/app_update_data.dart' as _i4;
 import 'package:apipod_server/src/generated/bloom_filter_data.dart' as _i5;
 import 'package:ndk/domain_layer/entities/nip_01_event.dart' as _i6;
+import 'package:apipod_server/src/generated/nip05/nip_05_data_spy.dart' as _i7;
+import 'package:apipod_server/src/generated/nip05/check_name_result_spy.dart'
+    as _i8;
 import 'package:apipod_server/src/generated/protocol.dart';
 import 'package:apipod_server/src/generated/endpoints.dart';
 export 'package:serverpod_test/serverpod_test_public_exports.dart';
@@ -105,6 +108,8 @@ class TestEndpoints {
 
   late final _ModerationEndpoint moderation;
 
+  late final _Nip05Endpoint nip05;
+
   late final _NostrPushEndpoint nostrPush;
 }
 
@@ -120,6 +125,10 @@ class _InternalTestEndpoints extends TestEndpoints
       serializationManager,
     );
     moderation = _ModerationEndpoint(
+      endpoints,
+      serializationManager,
+    );
+    nip05 = _Nip05Endpoint(
       endpoints,
       serializationManager,
     );
@@ -254,6 +263,83 @@ class _ModerationEndpoint {
           _localUniqueSession,
           _localCallContext.arguments,
         ) as _i3.Future<String>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+}
+
+class _Nip05Endpoint {
+  _Nip05Endpoint(
+    this._endpointDispatch,
+    this._serializationManager,
+  );
+
+  final _i2.EndpointDispatch _endpointDispatch;
+
+  final _i2.SerializationManager _serializationManager;
+
+  _i3.Future<_i7.Nip05Data?> getNip05(
+    _i1.TestSessionBuilder sessionBuilder,
+    String? name,
+    String domain,
+  ) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+        endpoint: 'nip05',
+        method: 'getNip05',
+      );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'nip05',
+          methodName: 'getNip05',
+          parameters: _i1.testObjectToJson({
+            'name': name,
+            'domain': domain,
+          }),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue = await (_localCallContext.method.call(
+          _localUniqueSession,
+          _localCallContext.arguments,
+        ) as _i3.Future<_i7.Nip05Data?>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _i3.Future<_i8.NameCheckResult> checkName(
+    _i1.TestSessionBuilder sessionBuilder,
+    String name,
+    String domain,
+  ) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+        endpoint: 'nip05',
+        method: 'checkName',
+      );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'nip05',
+          methodName: 'checkName',
+          parameters: _i1.testObjectToJson({
+            'name': name,
+            'domain': domain,
+          }),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue = await (_localCallContext.method.call(
+          _localUniqueSession,
+          _localCallContext.arguments,
+        ) as _i3.Future<_i8.NameCheckResult>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();

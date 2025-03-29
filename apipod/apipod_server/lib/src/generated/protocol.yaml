@@ -4,5 +4,8 @@ moderation:
   - getProfileBloomFilter:
   - getEventBloomFilter:
   - report:
+nip05:
+  - getNip05:
+  - checkName:
 nostrPush:
   - register:

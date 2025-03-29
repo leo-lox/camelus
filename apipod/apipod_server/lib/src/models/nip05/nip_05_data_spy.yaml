@@ -1,0 +1,20 @@
+class: Nip05Data
+table: nip_05_data
+fields:
+  name: String
+  domain: String
+  pubkey: String
+  relays: List<String>
+  createdAt: DateTime
+
+
+indexes:
+  domain_idx:
+    fields: domain
+    unique: false
+  nip_05_crated_at_idx:
+    fields: createdAt
+    unique: false
+  name_domain_idx:
+    fields: name, domain
+    unique: true

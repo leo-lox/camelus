@@ -14,7 +14,10 @@ import 'dart:async' as _i2;
 import 'package:apipod_client/src/protocol/app_update_data.dart' as _i3;
 import 'package:apipod_client/src/protocol/bloom_filter_data.dart' as _i4;
 import 'package:ndk/domain_layer/entities/nip_01_event.dart' as _i5;
-import 'protocol.dart' as _i6;
+import 'package:apipod_client/src/protocol/nip05/nip_05_data_spy.dart' as _i6;
+import 'package:apipod_client/src/protocol/nip05/check_name_result_spy.dart'
+    as _i7;
+import 'protocol.dart' as _i8;
 
 /// {@category Endpoint}
 class EndpointAppUpdate extends _i1.EndpointRef {
@@ -66,6 +69,40 @@ class EndpointModeration extends _i1.EndpointRef {
 }
 
 /// {@category Endpoint}
+class EndpointNip05 extends _i1.EndpointRef {
+  EndpointNip05(_i1.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'nip05';
+
+  _i2.Future<_i6.Nip05Data?> getNip05(
+    String? name,
+    String domain,
+  ) =>
+      caller.callServerEndpoint<_i6.Nip05Data?>(
+        'nip05',
+        'getNip05',
+        {
+          'name': name,
+          'domain': domain,
+        },
+      );
+
+  _i2.Future<_i7.NameCheckResult> checkName(
+    String name,
+    String domain,
+  ) =>
+      caller.callServerEndpoint<_i7.NameCheckResult>(
+        'nip05',
+        'checkName',
+        {
+          'name': name,
+          'domain': domain,
+        },
+      );
+}
+
+/// {@category Endpoint}
 class EndpointNostrPush extends _i1.EndpointRef {
   EndpointNostrPush(_i1.EndpointCaller caller) : super(caller);
 
@@ -102,7 +139,7 @@ class Client extends _i1.ServerpodClientShared {
     bool? disconnectStreamsOnLostInternetConnection,
   }) : super(
           host,
-          _i6.Protocol(),
+          _i8.Protocol(),
           securityContext: securityContext,
           authenticationKeyManager: authenticationKeyManager,
           streamingConnectionTimeout: streamingConnectionTimeout,
@@ -114,6 +151,7 @@ class Client extends _i1.ServerpodClientShared {
         ) {
     appUpdate = EndpointAppUpdate(this);
     moderation = EndpointModeration(this);
+    nip05 = EndpointNip05(this);
     nostrPush = EndpointNostrPush(this);
   }
 
@@ -121,12 +159,15 @@ class Client extends _i1.ServerpodClientShared {
 
   late final EndpointModeration moderation;
 
+  late final EndpointNip05 nip05;
+
   late final EndpointNostrPush nostrPush;
 
   @override
   Map<String, _i1.EndpointRef> get endpointRefLookup => {
         'appUpdate': appUpdate,
         'moderation': moderation,
+        'nip05': nip05,
         'nostrPush': nostrPush,
       };
 
