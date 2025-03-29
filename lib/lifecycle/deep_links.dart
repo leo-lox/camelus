@@ -2,36 +2,32 @@ import 'dart:async';
 
 import 'package:app_links/app_links.dart';
 
-import 'package:flutter/material.dart';
 import 'package:riverpod/riverpod.dart';
 
 import '../domain_layer/usecases/app_auth.dart';
 import '../helpers/helpers.dart';
 import '../helpers/nevent_helper.dart';
 import '../helpers/nprofile_helper.dart';
+import '../main.dart';
 import '../presentation_layer/providers/onboarding_provider.dart';
 
 /// sets up links listener
 //todo: fetch the notes with inbox/outbox first then navigate to the note
-void listenDeeplinks({
-  required GlobalKey<NavigatorState> navigatorKey,
+Future<void> listenDeeplinks({
   required ProviderContainer providerContainer,
-}) {
+}) async {
   final appLinks = AppLinks(); // AppLinks is singleton
 
 // Subscribe to all events (initial link and further)
   final sub = appLinks.uriLinkStream.listen((uri) async {
     final uriString = uri.toString();
-    print("uriString ${uriString}");
     if (uriString.startsWith("nostr:")) {
       _nostrLinks(
         link: uriString,
-        navigatorKey: navigatorKey,
       );
     } else if (uriString.startsWith("https://camelus.app")) {
       await _camelusLinks(
         link: uriString,
-        navigatorKey: navigatorKey,
         providerContainer: providerContainer,
       );
     }
@@ -40,7 +36,6 @@ void listenDeeplinks({
 
 Future<void> _camelusLinks({
   required String link,
-  required GlobalKey<NavigatorState> navigatorKey,
   required ProviderContainer providerContainer,
 }) async {
   final myMatch = link.replaceAll("https://camelus.app", "");
@@ -83,7 +78,6 @@ Future<void> _camelusLinks({
 
 _nostrLinks({
   required String link,
-  required GlobalKey<NavigatorState> navigatorKey,
 }) {
   final myMatch = link.replaceAll("nostr:", "");
   String myPubkeyHex = "";
@@ -98,7 +92,6 @@ _nostrLinks({
 
     _pushProfile(
       pubkey: myPubkeyHex,
-      navigatorKey: navigatorKey,
     );
   } else if (myMatch.contains("npub")) {
     final List decode = Helpers().decodeBech32(myMatch);
@@ -107,7 +100,6 @@ _nostrLinks({
 
     _pushProfile(
       pubkey: myPubkeyHex,
-      navigatorKey: navigatorKey,
     );
   } else if (myMatch.contains("note1")) {
     final decode = Helpers().decodeBech32(myMatch);
@@ -118,7 +110,6 @@ _nostrLinks({
     }
     _pushNote(
       noteId: noteId,
-      navigatorKey: navigatorKey,
     );
   } else if (myMatch.contains("nevent")) {
     final map = NeventHelper().bech32ToMap(myMatch);
@@ -131,14 +122,12 @@ _nostrLinks({
 
     _pushNote(
       noteId: eventId,
-      navigatorKey: navigatorKey,
     );
   }
 }
 
 _pushProfile({
   required String pubkey,
-  required GlobalKey<NavigatorState> navigatorKey,
 }) {
   navigatorKey.currentState?.pushNamed(
     "/nostr/profile",
@@ -148,7 +137,6 @@ _pushProfile({
 
 _pushNote({
   required String noteId,
-  required GlobalKey<NavigatorState> navigatorKey,
 }) {
   navigatorKey.currentState?.pushNamed(
     "/nostr/event",

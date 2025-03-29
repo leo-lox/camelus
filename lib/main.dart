@@ -107,11 +107,6 @@ Future<void> main() async {
     initalRoute = savedRoute ?? '/';
   }
 
-  listenDeeplinks(
-    navigatorKey: navigatorKey,
-    providerContainer: providerContainer,
-  );
-
   // notifications
   await initializeFirebase(
     enable: CamelusConfig.firebaseEnabled,
@@ -131,6 +126,10 @@ Future<void> main() async {
         pubkey: mySigner?.getPublicKey() ?? '',
       ),
     ),
+  );
+
+  listenDeeplinks(
+    providerContainer: providerContainer,
   );
 }
 
