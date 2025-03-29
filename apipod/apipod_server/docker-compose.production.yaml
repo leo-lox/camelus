@@ -81,7 +81,7 @@ services:
         "--server-id",
         "default",
         "--logging",
-        "info",
+        "normal",
         "--role",
         "monolith",
         "--apply-repair-migration"
