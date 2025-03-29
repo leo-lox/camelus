@@ -21,6 +21,7 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 import '../../config/default_suggestions.dart';
 
 import '../../domain_layer/usecases/remove_image_metadata.dart';
+import '../providers/search_provider.dart';
 import '../providers/write_post_state.provider.dart';
 import 'post_overflow.dart';
 import 'write_post/post_settings_dialog.dart';
@@ -66,11 +67,13 @@ class _WritePostState extends ConsumerState<WritePost> {
 
   _searchMentions(search) async {
     final writePostState = ref.read(writePostStateProvider);
+    final searchService = ref.read(searchProvider);
     List<Map<String, dynamic>> results = [];
 
-    var rawResults = []; //_search.searchUsersMetadata(search);
+    final rawResults = await searchService.searchMetadata(search);
+
     for (final rawResult in rawResults) {
-      var result = {
+      final result = {
         "id": rawResult.pubkey,
         "pubkey": rawResult.pubkey,
         "display": rawResult.name ?? "",
