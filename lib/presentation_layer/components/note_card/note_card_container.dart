@@ -26,7 +26,7 @@ class NoteCardContainer extends ConsumerWidget {
     // off spec support, sometimes not marked as root
     root ??= refEvents.first;
 
-    _navigateToEventViewPage(context, root.value, reply?.value ?? myNote.id);
+    _navigateToEventViewPage(context, root.value, myNote.id);
   }
 
   static void _navigateToEventViewPage(

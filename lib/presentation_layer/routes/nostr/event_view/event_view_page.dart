@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_list_view/flutter_list_view.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../domain_layer/entities/feed_event_view_model.dart';
 import '../../../components/comments_section.dart';
 import '../../../providers/event_feed/event_feed_provider.dart';
 
@@ -28,53 +29,47 @@ class EventViewPage extends ConsumerStatefulWidget {
 
 class EventViewPageState extends ConsumerState<EventViewPage> {
   Stream<List<NostrNote>> notesStream = Stream.empty();
-
   late final ScrollController _scrollControllerFeed = ScrollController();
-
   final String eventFeedFreshId = "fresh";
-
   late FlutterListViewController eventViewController;
 
-  void _setupScrollListener() {
-    _scrollControllerFeed.addListener(() {
-      if (_scrollControllerFeed.position.pixels ==
-          _scrollControllerFeed.position.maxScrollExtent) {
-        log("reached end of scroll");
-      }
-
-      if (_scrollControllerFeed.position.pixels < 100) {
-        // disable after sroll
-        // if (_newPostsAvailable) {
-        //   setState(() {
-        //     _newPostsAvailable = false;
-        //   });
-        // }
-      }
-    });
-  }
-
-  Future<void> _initSequence() async {
-    _setupScrollListener();
-  }
+  // Map to store indices of notes for quick lookup
+  final Map<String, int> _noteIndices = {};
 
   @override
   void initState() {
     super.initState();
     eventViewController = FlutterListViewController();
-    _initSequence();
+
+    // If we have a note ID to open, scroll to it after build
+    if (widget._openNoteId != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Future.delayed(Duration(milliseconds: 1200)).then(
+          (_) {
+            scrollToNote(widget._openNoteId!);
+          },
+        );
+      });
+    }
   }
 
-  @override
-  void dispose() {
-    _scrollControllerFeed.dispose();
-    eventViewController.dispose();
-    super.dispose();
+  void scrollToNote(String noteId) {
+    if (_noteIndices.containsKey(noteId)) {
+      // eventViewController.sliverController.animateToIndex(_noteIndices[noteId]!,
+      //     duration: Duration(milliseconds: 400), curve: Curves.easeInOut);
+      eventViewController.sliverController.animateToIndex(_noteIndices[noteId]!,
+          duration: Duration(milliseconds: 400), curve: Curves.easeInOut);
+    }
   }
+
+  // Rest of your existing code...
 
   @override
   Widget build(BuildContext context) {
     final eventFeedState =
         ref.watch(eventFeedStateProvider(widget._rootNoteId));
+
+    _buildNoteIndices(eventFeedState);
 
     return Scaffold(
       backgroundColor: Palette.background,
@@ -87,8 +82,14 @@ class EventViewPageState extends ConsumerState<EventViewPage> {
         controller: eventViewController,
         delegate: FlutterListViewDelegate(
           childCount: eventFeedState.comments.length + 1,
-          // onItemKey: (index) => eventFeedState.comments[index].value.id,
-          // keepPosition: true,
+
+          // itemKey: (index) {
+          //   if (index == 0) {
+          //     return widget._rootNoteId;
+          //   }
+          //   return eventFeedState.comments[index - 1].value.id;
+          // },
+          keepPosition: true,
           (BuildContext context, int index) {
             if (index == 0) {
               return eventFeedState.rootNote != null
@@ -104,10 +105,26 @@ class EventViewPageState extends ConsumerState<EventViewPage> {
             return CommentSection(
               key: ObjectKey(event),
               comment: event,
+              openNoteId: widget._openNoteId,
             );
           },
         ),
       ),
     );
+  }
+
+  // Build a map of note IDs to their indices for quick lookup
+  void _buildNoteIndices(FeedEventViewModel eventFeedState) {
+    _noteIndices.clear();
+
+    // Add root note
+    if (eventFeedState.rootNote != null) {
+      _noteIndices[eventFeedState.rootNote!.id] = 0;
+    }
+
+    // Add all comments
+    for (int i = 0; i < eventFeedState.comments.length; i++) {
+      _noteIndices[eventFeedState.comments[i].value.id] = i + 1;
+    }
   }
 }
