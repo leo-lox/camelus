@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:developer';
 import 'package:camelus/presentation_layer/components/note_card/note_card_container.dart';
 import 'package:camelus/config/palette.dart';
 import 'package:camelus/domain_layer/entities/nostr_note.dart';
@@ -8,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_list_view/flutter_list_view.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../domain_layer/entities/feed_event_view_model.dart';
+import '../../../../domain_layer/entities/tree_node.dart';
 import '../../../components/comments_section.dart';
 import '../../../providers/event_feed/event_feed_provider.dart';
 
@@ -28,48 +27,115 @@ class EventViewPage extends ConsumerStatefulWidget {
 }
 
 class EventViewPageState extends ConsumerState<EventViewPage> {
-  Stream<List<NostrNote>> notesStream = Stream.empty();
-  late final ScrollController _scrollControllerFeed = ScrollController();
-  final String eventFeedFreshId = "fresh";
   late FlutterListViewController eventViewController;
 
-  // Map to store indices of notes for quick lookup
-  final Map<String, int> _noteIndices = {};
+  // Flattened list of comments with their depth information
+  List<FlattenedComment> _flattenedComments = [];
 
   @override
   void initState() {
     super.initState();
     eventViewController = FlutterListViewController();
+  }
 
-    // If we have a note ID to open, scroll to it after build
-    if (widget._openNoteId != null) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        Future.delayed(Duration(milliseconds: 1200)).then(
-          (_) {
-            scrollToNote(widget._openNoteId!);
-          },
-        );
-      });
+  @override
+  void dispose() {
+    super.dispose();
+    eventViewController.dispose();
+  }
+
+  void scrollToNote(String? noteId) {
+    if (noteId == null) {
+      return;
+    }
+    if (noteId == widget._rootNoteId) {
+      eventViewController.sliverController.animateToIndex(0,
+          duration: Duration(milliseconds: 200), curve: Curves.easeInOut);
+      return;
+    }
+
+    // Find the index in the flattened comments list
+    for (int i = 0; i < _flattenedComments.length; i++) {
+      if (_flattenedComments[i].note.id == noteId) {
+        // Add 1 to account for the root note at index 0
+        eventViewController.sliverController.animateToIndex(i + 1,
+            duration: Duration(milliseconds: 300), curve: Curves.easeInOutExpo);
+        return;
+      }
     }
   }
 
-  void scrollToNote(String noteId) {
-    if (_noteIndices.containsKey(noteId)) {
-      // eventViewController.sliverController.animateToIndex(_noteIndices[noteId]!,
-      //     duration: Duration(milliseconds: 400), curve: Curves.easeInOut);
-      eventViewController.sliverController.animateToIndex(_noteIndices[noteId]!,
-          duration: Duration(milliseconds: 400), curve: Curves.easeInOut);
+  // Flatten the comment tree into a list with depth information
+  List<FlattenedComment> _flattenCommentTree(
+      List<TreeNode<NostrNote>> comments) {
+    List<FlattenedComment> result = [];
+
+    // Sort direct replies to root by creation time (oldest first)
+    final sortedComments = List<TreeNode<NostrNote>>.from(comments)
+      ..sort((a, b) => a.value.created_at.compareTo(b.value.created_at));
+
+    // Process each top-level comment
+    for (final comment in sortedComments) {
+      // Add the comment itself
+      result.add(FlattenedComment(
+        note: comment.value,
+        depth: 0,
+        ancestorHasSibling: [false],
+      ));
+
+      // Add all its children recursively (with child comments sorted by creation time)
+      if (comment.children.isNotEmpty) {
+        result.addAll(_flattenChildComments(
+            comment.children, 1, [comment != sortedComments.last]));
+      }
     }
+
+    return result;
   }
 
-  // Rest of your existing code...
+  // Helper method to recursively flatten child comments
+  List<FlattenedComment> _flattenChildComments(
+      List<TreeNode<NostrNote>> children,
+      int depth,
+      List<bool> ancestorHasSibling) {
+    List<FlattenedComment> result = [];
+
+    // Sort child comments by creation time (older first)
+    final sortedChildren = List<TreeNode<NostrNote>>.from(children)
+      ..sort((a, b) => a.value.created_at.compareTo(b.value.created_at));
+
+    for (var i = 0; i < sortedChildren.length; i++) {
+      final child = sortedChildren[i];
+      final isLastChild = i == sortedChildren.length - 1;
+
+      // Add the child comment
+      result.add(FlattenedComment(
+        note: child.value,
+        depth: depth,
+        ancestorHasSibling: [...ancestorHasSibling, !isLastChild],
+      ));
+
+      // Add all its children recursively
+      if (child.children.isNotEmpty) {
+        result.addAll(_flattenChildComments(
+            child.children, depth + 1, [...ancestorHasSibling, !isLastChild]));
+      }
+    }
+
+    return result;
+  }
 
   @override
   Widget build(BuildContext context) {
+    Future.delayed(Duration(milliseconds: 300)).then((_) {
+      scrollToNote(widget._openNoteId);
+    });
+
     final eventFeedState =
         ref.watch(eventFeedStateProvider(widget._rootNoteId));
 
-    _buildNoteIndices(eventFeedState);
+    // Flatten the comment tree
+    _flattenedComments = _flattenCommentTree(eventFeedState.comments);
 
     return Scaffold(
       backgroundColor: Palette.background,
@@ -81,17 +147,11 @@ class EventViewPageState extends ConsumerState<EventViewPage> {
       body: FlutterListView(
         controller: eventViewController,
         delegate: FlutterListViewDelegate(
-          childCount: eventFeedState.comments.length + 1,
-
-          // itemKey: (index) {
-          //   if (index == 0) {
-          //     return widget._rootNoteId;
-          //   }
-          //   return eventFeedState.comments[index - 1].value.id;
-          // },
+          childCount: _flattenedComments.length + 1, // +1 for root note
           keepPosition: true,
           (BuildContext context, int index) {
             if (index == 0) {
+              // Root note
               return eventFeedState.rootNote != null
                   ? NoteCardContainer(
                       note: eventFeedState.rootNote!,
@@ -100,31 +160,16 @@ class EventViewPageState extends ConsumerState<EventViewPage> {
                   : const SkeletonNote();
             }
 
-            final event = eventFeedState.comments[index - 1];
-
-            return CommentSection(
-              key: ObjectKey(event),
-              comment: event,
-              openNoteId: widget._openNoteId,
+            // Comment
+            final flatComment = _flattenedComments[index - 1];
+            return FlatCommentWidget(
+              key: ValueKey(flatComment.note.id),
+              comment: flatComment,
+              isHighlighted: flatComment.note.id == widget._openNoteId,
             );
           },
         ),
       ),
     );
-  }
-
-  // Build a map of note IDs to their indices for quick lookup
-  void _buildNoteIndices(FeedEventViewModel eventFeedState) {
-    _noteIndices.clear();
-
-    // Add root note
-    if (eventFeedState.rootNote != null) {
-      _noteIndices[eventFeedState.rootNote!.id] = 0;
-    }
-
-    // Add all comments
-    for (int i = 0; i < eventFeedState.comments.length; i++) {
-      _noteIndices[eventFeedState.comments[i].value.id] = i + 1;
-    }
   }
 }

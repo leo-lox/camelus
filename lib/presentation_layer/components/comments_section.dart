@@ -1,159 +1,49 @@
 import 'package:flutter/material.dart';
-import 'package:camelus/config/palette.dart';
-import 'package:camelus/domain_layer/entities/nostr_note.dart';
-import 'package:camelus/domain_layer/entities/tree_node.dart';
-import 'package:camelus/presentation_layer/components/note_card/note_card_container.dart';
-import 'package:camelus/presentation_layer/atoms/rounded_corner_painer.dart';
 
-/// A widget representing a section of comments
-class CommentSection extends StatelessWidget {
-  final TreeNode<NostrNote> comment;
-  final String? openNoteId;
+import '../../config/palette.dart';
+import '../../domain_layer/entities/nostr_note.dart';
+import 'note_card/note_card_container.dart';
 
-  const CommentSection({
-    super.key,
-    required this.comment,
-    this.openNoteId,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return CommentTreeItem(
-      node: comment,
-      depth: 0,
-      ancestorHasSibling: [false],
-      openNoteId: openNoteId,
-    );
-  }
-}
-
-class CommentTreeItem extends StatefulWidget {
-  final TreeNode<NostrNote> node;
+class FlattenedComment {
+  final NostrNote note;
   final int depth;
   final List<bool> ancestorHasSibling;
-  final String? openNoteId;
 
-  const CommentTreeItem({
-    super.key,
-    required this.node,
+  FlattenedComment({
+    required this.note,
     required this.depth,
     required this.ancestorHasSibling,
-    this.openNoteId,
   });
-
-  @override
-  CommentTreeItemState createState() => CommentTreeItemState();
 }
 
-class CommentTreeItemState extends State<CommentTreeItem> {
-  bool isExpanded = false;
-
-  @override
-  void initState() {
-    super.initState();
-    // Automatically expand nodes with fewer than 2 children
-    isExpanded = widget.node.children.length < 2;
-
-    if (widget.openNoteId != null) {
-      if (widget.node.value.id == widget.openNoteId) {
-        isExpanded = true;
-      } else {
-        // Check if any child contains the openNoteId
-        _checkChildrenForOpenNote(widget.node);
-      }
-    }
-  }
-
-  // Recursively check if any child contains the openNoteId
-  bool _checkChildrenForOpenNote(TreeNode<NostrNote> node) {
-    for (final child in node.children) {
-      if (child.value.id == widget.openNoteId) {
-        isExpanded = true;
-        return true;
-      }
-      if (_checkChildrenForOpenNote(child)) {
-        isExpanded = true;
-        return true;
-      }
-    }
-    return false;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        CommentCard(
-          node: widget.node,
-          depth: widget.depth,
-          ancestorHasSibling: widget.ancestorHasSibling,
-          isExpanded: isExpanded,
-          isHighlighted: widget.node.value.id == widget.openNoteId,
-          onToggleExpand: () {
-            setState(() {
-              isExpanded = !isExpanded;
-            });
-          },
-        ),
-        if (isExpanded)
-          ...widget.node.children.asMap().entries.map((entry) {
-            final index = entry.key;
-            final child = entry.value;
-            final isLastChild = index == widget.node.children.length - 1;
-
-            return CommentTreeItem(
-              node: child,
-              depth: widget.depth + 1,
-              ancestorHasSibling: [
-                ...widget.ancestorHasSibling,
-                !isLastChild, // Only show the line if it's not the last child
-              ],
-            );
-          }),
-      ],
-    );
-  }
-}
-
-class CommentCard extends StatelessWidget {
-  final TreeNode<NostrNote> node;
-  final int depth;
-  final List<bool> ancestorHasSibling;
-  final bool isExpanded;
-  final VoidCallback onToggleExpand;
+// Widget to display a flattened comment
+class FlatCommentWidget extends StatelessWidget {
+  final FlattenedComment comment;
   final bool isHighlighted;
 
-  const CommentCard({
+  const FlatCommentWidget({
     super.key,
-    required this.node,
-    required this.depth,
-    required this.ancestorHasSibling,
-    required this.isExpanded,
-    required this.onToggleExpand,
+    required this.comment,
     this.isHighlighted = false,
   });
 
   @override
   Widget build(BuildContext context) {
-    final Color lineColor = Palette.darkGray;
-
     return Stack(
       clipBehavior: Clip.none,
       children: [
-        // Reddit-style depth indicator bars
+        // Depth indicator bars
         Positioned(
           left: 0,
           top: 0,
           bottom: 0,
           child: DepthIndicator(
-            isHighlighted: isHighlighted,
-            depth: depth,
-            ancestorHasSibling: ancestorHasSibling,
+            isHighlighted: false,
+            depth: comment.depth,
           ),
         ),
         Padding(
-          padding: EdgeInsets.only(left: depth * 16.0),
+          padding: EdgeInsets.only(left: comment.depth * 16.0),
           child: Stack(
             clipBehavior: Clip.none,
             children: [
@@ -163,47 +53,19 @@ class CommentCard extends StatelessWidget {
                   child: Container(
                     decoration: BoxDecoration(
                       border: Border.all(
-                        color: Palette.primary.withOpacity(0.7),
+                        color: Palette.primary.withValues(alpha: 0.65),
                         width: 2.0,
                       ),
-                      borderRadius: BorderRadius.circular(8.0),
-                      color: Palette.primary.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(10.0),
+                      color: Palette.primary.withValues(alpha: 0.05),
                     ),
-                    // margin: const EdgeInsets.all(-4.0),
                   ),
                 ),
               // Render the main comment content
               NoteCardContainer(
-                key: ValueKey(node.value.id),
-                note: node.value,
+                key: ValueKey(comment.note.id),
+                note: comment.note,
               ),
-              // Expandable icon for nodes with multiple children
-              if (node.hasChildren && node.children.length > 1)
-                Positioned(
-                  left: -14.0,
-                  bottom: 20,
-                  child: SizedBox(
-                    width: 50.0,
-                    height: 50.0,
-                    child: InkWell(
-                      borderRadius: BorderRadius.circular(50.0),
-                      onTap: onToggleExpand,
-                      child: Container(
-                        child: isExpanded
-                            ? Icon(
-                                Icons.remove_circle_outline,
-                                color: Palette.gray,
-                                size: 22.0,
-                              )
-                            : Icon(
-                                Icons.add_circle_outline,
-                                color: Palette.gray,
-                                size: 22.0,
-                              ),
-                      ),
-                    ),
-                  ),
-                ),
             ],
           ),
         ),
@@ -214,13 +76,11 @@ class CommentCard extends StatelessWidget {
 
 class DepthIndicator extends StatelessWidget {
   final int depth;
-  final List<bool> ancestorHasSibling;
   final bool isHighlighted;
 
   const DepthIndicator({
     super.key,
     required this.depth,
-    required this.ancestorHasSibling,
     this.isHighlighted = false,
   });
 
@@ -230,18 +90,35 @@ class DepthIndicator extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         for (int i = 0; i < depth; i++)
-          if (true || i < ancestorHasSibling.length && ancestorHasSibling[i])
-            Container(
-              width: 2.0,
-              height: double.infinity,
-              margin: const EdgeInsets.symmetric(horizontal: 7.0),
+          Container(
+            width: 1.5,
+            height: double.infinity,
+            margin: const EdgeInsets.only(left: 10),
+            decoration: BoxDecoration(
               color: isHighlighted && i == depth - 1
                   ? Palette.primary
-                  : Palette.gray,
-            )
-          else
-            SizedBox(width: 16.0),
+                  : Palette.white.withValues(alpha: _calculateOpacity(i + 1)),
+              // borderRadius: BorderRadius.vertical(
+              //   top: Radius.circular(25),
+              //   bottom: Radius.circular(25),
+              // ),
+            ),
+          )
       ],
     );
+  }
+
+  double _calculateOpacity(int lineDepth) {
+    // If highlighted and this is the last line, use full opacity
+    if (isHighlighted && lineDepth == depth) {
+      return 1.0;
+    }
+
+    // For normal lines, calculate opacity based on depth
+    if (lineDepth >= 10) {
+      return 1.0;
+    } else {
+      return 0.35 + (lineDepth - 1) * (1 / 10);
+    }
   }
 }
