@@ -91,13 +91,14 @@ class DepthIndicator extends StatelessWidget {
       children: [
         for (int i = 0; i < depth; i++)
           Container(
-            width: 1.5,
+            width: 1.1,
             height: double.infinity,
             margin: const EdgeInsets.only(left: 10),
             decoration: BoxDecoration(
               color: isHighlighted && i == depth - 1
                   ? Palette.primary
-                  : Palette.white.withValues(alpha: _calculateOpacity(i + 1)),
+                  : Palette.lightGray
+                      .withValues(alpha: _calculateOpacity(i + 1)),
               // borderRadius: BorderRadius.vertical(
               //   top: Radius.circular(25),
               //   bottom: Radius.circular(25),
@@ -115,10 +116,10 @@ class DepthIndicator extends StatelessWidget {
     }
 
     // For normal lines, calculate opacity based on depth
-    if (lineDepth >= 10) {
+    if (lineDepth >= 12) {
       return 1.0;
     } else {
-      return 0.35 + (lineDepth - 1) * (1 / 10);
+      return 0.35 + (lineDepth - 1) * (1 / 12);
     }
   }
 }
