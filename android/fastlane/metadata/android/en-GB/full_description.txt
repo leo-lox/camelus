@@ -1,5 +1,5 @@
 camelus the decentralized social network build on the nostr protocol.
-You data your control!
+Your data your control!
 
 
 With camelus you can:
