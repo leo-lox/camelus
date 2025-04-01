@@ -378,7 +378,7 @@ class _NotificationPageState extends ConsumerState<NotificationPage>
       "root": notification.sourceNote.getRootReply?.value ??
           notification.targetNoteId ??
           notification.sourceNote.id,
-      "scrollIntoView": notification.sourceNote.getRootReply?.value
+      "scrollIntoView": notification.sourceNote.id
     });
   }
 }
