@@ -174,6 +174,13 @@ class EventViewPageState extends ConsumerState<EventViewPage> {
         delegate: FlutterListViewDelegate(
           childCount: _flattenedComments.length + 1, // +1 for root note
           keepPosition: true,
+          onItemKey: (index) {
+            if (index == 0) {
+              return widget._rootNoteId;
+            } else {
+              return _flattenedComments[index - 1].note.id;
+            }
+          },
           (BuildContext context, int index) {
             if (index == 0) {
               // Root note
