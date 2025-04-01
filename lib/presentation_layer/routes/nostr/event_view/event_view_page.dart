@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 import 'package:camelus/presentation_layer/components/note_card/note_card_container.dart';
 import 'package:camelus/config/palette.dart';
 import 'package:camelus/domain_layer/entities/nostr_note.dart';
@@ -32,20 +33,26 @@ class EventViewPageState extends ConsumerState<EventViewPage> {
   // Flattened list of comments with their depth information
   List<FlattenedComment> _flattenedComments = [];
 
+  bool _userHasScrolled = false;
+  double _lastScrollPosition = 0;
+
   @override
   void initState() {
     super.initState();
     eventViewController = FlutterListViewController();
+
+    eventViewController.addListener(_onScroll);
   }
 
   @override
   void dispose() {
     super.dispose();
+    eventViewController.removeListener(_onScroll);
     eventViewController.dispose();
   }
 
   void scrollToNote(String? noteId) {
-    if (noteId == null) {
+    if (noteId == null || _userHasScrolled) {
       return;
     }
     if (noteId == widget._rootNoteId) {
@@ -63,6 +70,22 @@ class EventViewPageState extends ConsumerState<EventViewPage> {
         return;
       }
     }
+  }
+
+  void _onScroll() {
+    // Get the current scroll position
+    final currentPosition = eventViewController.offset;
+
+    // Check if the position has changed significantly (to filter out small changes)
+    if ((currentPosition - _lastScrollPosition).abs() > 1.0) {
+      setState(() {
+        _userHasScrolled = true;
+      });
+      eventViewController.removeListener(_onScroll);
+    }
+
+    // Update the last position
+    _lastScrollPosition = currentPosition;
   }
 
   // Flatten the comment tree into a list with depth information
@@ -127,9 +150,11 @@ class EventViewPageState extends ConsumerState<EventViewPage> {
 
   @override
   Widget build(BuildContext context) {
-    Future.delayed(Duration(milliseconds: 300)).then((_) {
-      scrollToNote(widget._openNoteId);
-    });
+    if (!_userHasScrolled) {
+      Future.delayed(Duration(milliseconds: 200)).then((_) {
+        scrollToNote(widget._openNoteId);
+      });
+    }
 
     final eventFeedState =
         ref.watch(eventFeedStateProvider(widget._rootNoteId));
