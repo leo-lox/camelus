@@ -2,12 +2,12 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:camelus/presentation_layer/components/write_post.dart';
 import 'package:camelus/config/palette.dart';
 import 'package:camelus/presentation_layer/routes/nostr/nostr_drawer.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:matomo_tracker/matomo_tracker.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../domain_layer/entities/app_update.dart';
@@ -38,7 +38,7 @@ class HomePage extends ConsumerStatefulWidget {
 
 class _HomePageState extends ConsumerState<HomePage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  int _selectedIndex = 0;
+
   final PageController _myPage = PageController(initialPage: 0);
 
   Future<void> _checkForUpdates() async {
@@ -107,9 +107,6 @@ class _HomePageState extends ConsumerState<HomePage> {
     // set initail page
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _myPage.jumpToPage(widget.initialPage);
-      setState(() {
-        _selectedIndex = widget.initialPage;
-      });
 
       // set system locale if no locale is set
       ref
@@ -125,25 +122,36 @@ class _HomePageState extends ConsumerState<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final navigationState = ref.watch(appBottomNavigationBarProvider);
+
+    final isHomeSelected = navigationState.selectedTab == NavigationTab.home;
+
     return Scaffold(
       key: _scaffoldKey,
       drawer: NostrDrawer(pubkey: widget.pubkey),
       backgroundColor: Palette.background,
-      floatingActionButton: AnimatedOpacity(
-        opacity: (_selectedIndex != 0) ? 0.0 : 1.0,
+      floatingActionButton: AnimatedSwitcher(
         duration: const Duration(milliseconds: 150),
-        child: FloatingActionButton(
-          backgroundColor: Palette.primary,
-          child: SvgPicture.asset(
-            'assets/icons/plus.svg',
-            color: Palette.white,
-            height: 27,
-            width: 27,
-          ),
-          onPressed: () => {
-            _show(context),
-          },
-        ),
+        transitionBuilder: (Widget child, Animation<double> animation) {
+          return FadeTransition(
+            opacity: animation,
+            child: child,
+          );
+        },
+        child: isHomeSelected
+            ? FloatingActionButton(
+                key: const ValueKey<String>('FAB'),
+                backgroundColor: Palette.primary,
+                child: Icon(
+                  PhosphorIcons.plus(),
+                  color: Palette.white,
+                  size: 27,
+                ),
+                onPressed: () => {
+                  _show(context),
+                },
+              )
+            : null,
       ),
       body: SafeArea(
         child: PageView(
