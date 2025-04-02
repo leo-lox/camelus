@@ -9,8 +9,13 @@ import 'note_card.dart';
 
 class NoteCardContainer extends ConsumerWidget {
   final NostrNote note;
+  final double? fontSize;
 
-  const NoteCardContainer({super.key, required this.note});
+  const NoteCardContainer({
+    super.key,
+    required this.note,
+    this.fontSize,
+  });
 
   static void _onNoteTab(BuildContext context, NostrNote myNote) {
     var refEvents = myNote.getTagEvents;
@@ -63,6 +68,7 @@ class NoteCardContainer extends ConsumerWidget {
               note: note,
               myMetadata: myMetadata,
               key: ValueKey('note-${note.id}'),
+              fontSize: fontSize ?? 17,
             ),
           ],
         ),

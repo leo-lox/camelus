@@ -65,6 +65,7 @@ class FlatCommentWidget extends StatelessWidget {
               NoteCardContainer(
                 key: ValueKey(comment.note.id),
                 note: comment.note,
+                fontSize: isHighlighted ? 17.5 : 16,
               ),
             ],
           ),
@@ -93,7 +94,7 @@ class DepthIndicator extends StatelessWidget {
           Container(
             width: 1.1,
             height: double.infinity,
-            margin: const EdgeInsets.only(left: 10),
+            margin: const EdgeInsets.only(left: 12),
             decoration: BoxDecoration(
               color: isHighlighted && i == depth - 1
                   ? Palette.primary
@@ -119,7 +120,7 @@ class DepthIndicator extends StatelessWidget {
     if (lineDepth >= 12) {
       return 1.0;
     } else {
-      return 0.35 + (lineDepth - 1) * (1 / 12);
+      return 0.30 + (lineDepth - 1) * (1 / 12);
     }
   }
 }

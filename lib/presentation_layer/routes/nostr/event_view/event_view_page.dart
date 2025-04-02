@@ -188,6 +188,7 @@ class EventViewPageState extends ConsumerState<EventViewPage> {
                   ? NoteCardContainer(
                       note: eventFeedState.rootNote!,
                       key: ValueKey(widget._rootNoteId),
+                      fontSize: 17.5,
                     )
                   : const SkeletonNote();
             }

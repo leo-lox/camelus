@@ -74,7 +74,7 @@ class _NoteCardNameRowState extends ConsumerState<NoteCardNameRow> {
                             style: const TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.bold,
-                              fontSize: 15,
+                              fontSize: 14,
                             ),
                           ),
                         ],
