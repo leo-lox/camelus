@@ -29,7 +29,7 @@ Runs all the tests
 [bundle exec] fastlane android production
 ```
 
-Deploy a new version to the Google Play
+Deploy a new version to Google Play
 
 ### android beta
 

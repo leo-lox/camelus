@@ -23,10 +23,14 @@ platform :android do
 
 
 
-  desc "Deploy a new version to the Google Play"
+  desc "Deploy a new version to Google Play"
   lane :production do
-    gradle(task: "clean assembleRelease")
-    upload_to_play_store
+    sh "flutter build appbundle --release --obfuscate --split-debug-info=/myBuilds/obfuscate" # build the app bundle
+    #gradle(task: "clean assembleRelease")
+    upload_to_play_store(
+      aab: '../build/app/outputs/bundle/release/app-release.aab',
+      json_key_data: ENV['G_PLAY_FASTLANE_SERVICE_ACCOUNT']
+    )
   end
 
   desc "Deploy a new version to open Testing Track"

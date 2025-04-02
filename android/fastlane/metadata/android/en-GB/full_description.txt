@@ -1,7 +1,16 @@
-camelus the decentralized social network build on the nostr protocol.
-Your data your control!
+Share your moments instantly with Camelus
 
+Camelus is a refreshingly simple way to share your thoughts, photos, and connect with people who matter. No complicated setup, no tech knowledge required.
 
-With camelus you can:
-- Post content and participate in public conversations
-- Stay up to date with the latest news and follow your interests
+Why you'll love Camelus:
+• Effortless Photo Sharing: Snap and share in seconds with our one-tap image uploads
+• Clean, Ad-Free Experience: Focus on content that matters, not distractions
+• Your Space, Your Rules: Control what you want to see and customize your feed
+• Lightning Fast: Designed to be responsive even on slower connections
+• Privacy First: Your data stays yours - we don't track or sell your information
+
+Camelus connects you to a growing global community while keeping things simple. No algorithms deciding what you see - just chronological posts from people you choose to follow.
+
+Join thousands of others and start your microblogging journey.
+
+Download today and start posting in under a minute!

@@ -1,1 +1,1 @@
-camelus is the truly decentralized social network build on the nostr protocol
+Microblogging. No algorithms, no ads, connect with people who matter.
