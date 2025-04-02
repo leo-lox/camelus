@@ -1,7 +1,6 @@
 import 'dart:ui';
 
 import 'package:camelus/domain_layer/entities/user_metadata.dart';
-import 'package:camelus/domain_layer/usecases/get_user_metadata.dart';
 import 'package:camelus/presentation_layer/atoms/long_button.dart';
 import 'package:camelus/presentation_layer/components/images_tile_view.dart';
 import 'package:camelus/presentation_layer/components/note_card/note_card_reference.dart';
@@ -9,7 +8,6 @@ import 'package:camelus/config/palette.dart';
 import 'package:camelus/helpers/helpers.dart';
 import 'package:camelus/helpers/nprofile_helper.dart';
 import 'package:camelus/domain_layer/entities/nostr_note.dart';
-import 'package:camelus/presentation_layer/providers/metadata_provider.dart';
 import 'package:camelus/presentation_layer/providers/metadata_state_provider.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -26,13 +24,15 @@ class NoteCardSplitContent extends ConsumerStatefulWidget {
   final NostrNote note;
   final Function(String) profileCallback;
   final Function(String) hashtagCallback;
+  final double _fontSize;
 
   const NoteCardSplitContent({
     super.key,
     required this.note,
     required this.hashtagCallback,
     required this.profileCallback,
-  });
+    required final double fontSize,
+  }) : _fontSize = fontSize;
 
   @override
   ConsumerState<NoteCardSplitContent> createState() =>
@@ -91,7 +91,7 @@ class _NoteCardSplitContentState extends ConsumerState<NoteCardSplitContent> {
     final TextPainter textPainter = TextPainter(
       text: TextSpan(
         text: text,
-        style: const TextStyle(color: Palette.lightGray, fontSize: 17),
+        style: TextStyle(color: Palette.lightGray, fontSize: widget._fontSize),
       ),
       maxLines: null,
       textDirection: TextDirection.ltr,
@@ -149,10 +149,10 @@ class _NoteCardSplitContentState extends ConsumerState<NoteCardSplitContent> {
                             metadataMap,
                           ),
                         ),
-                        style: const TextStyle(
+                        style: TextStyle(
                           color: Palette.lightGray,
-                          fontSize: 17,
-                          height: 1.3,
+                          fontSize: widget._fontSize,
+                          height: 1.2,
                           wordSpacing: 1.05,
                         ),
                         maxLines: _isExpanded
@@ -409,28 +409,32 @@ class DisplayText extends StatelessWidget {
   const DisplayText({
     super.key,
     required this.word,
+    required this.fontSize,
   });
 
   final String word;
+
+  final double fontSize;
 
   @override
   Widget build(BuildContext context) {
     return Text(
       word,
-      style: const TextStyle(color: Palette.lightGray, fontSize: 17),
+      style: TextStyle(color: Palette.lightGray, fontSize: fontSize),
     );
   }
 }
 
 class HttpLink extends StatelessWidget {
-  const HttpLink({
-    super.key,
-    required this.imageLinks,
-    required this.word,
-  });
+  const HttpLink(
+      {super.key,
+      required this.imageLinks,
+      required this.word,
+      required this.fontSize});
 
   final List<String> imageLinks;
   final String word;
+  final double fontSize;
 
   @override
   Widget build(BuildContext context) {
@@ -444,21 +448,23 @@ class HttpLink extends StatelessWidget {
       },
       child: Text(
         word,
-        style: const TextStyle(color: Palette.primary, fontSize: 17),
+        style: TextStyle(color: Palette.primary, fontSize: fontSize),
       ),
     );
   }
 }
 
 class HashtagLink extends StatelessWidget {
-  const HashtagLink({
-    super.key,
-    required Function(String p1) hashtagCallback,
-    required this.word,
-  }) : _hashtagCallback = hashtagCallback;
+  const HashtagLink(
+      {super.key,
+      required Function(String p1) hashtagCallback,
+      required this.word,
+      required this.fontSize})
+      : _hashtagCallback = hashtagCallback;
 
   final Function(String p1) _hashtagCallback;
   final String word;
+  final double fontSize;
 
   @override
   Widget build(BuildContext context) {
@@ -470,7 +476,7 @@ class HashtagLink extends StatelessWidget {
       },
       child: Text(
         word,
-        style: const TextStyle(color: Palette.primary, fontSize: 17),
+        style: TextStyle(color: Palette.primary, fontSize: fontSize),
       ),
     );
   }
@@ -534,10 +540,12 @@ class ProfileLink extends ConsumerWidget {
     super.key,
     required Function(String p1) profileCallback,
     required this.word,
+    required this.fontSize,
   }) : _profileCallback = profileCallback;
 
   final Function(String p1) _profileCallback;
   final String word;
+  final double fontSize;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -583,7 +591,7 @@ class ProfileLink extends ConsumerWidget {
         myUserMetadata != null
             ? "@${myUserMetadata.name ?? pubkeyHr}"
             : "@$pubkeyHr",
-        style: const TextStyle(color: Palette.primary, fontSize: 17),
+        style: TextStyle(color: Palette.primary, fontSize: fontSize),
       ),
     );
   }

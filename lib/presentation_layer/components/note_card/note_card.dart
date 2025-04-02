@@ -22,11 +22,14 @@ class NoteCard extends ConsumerWidget {
   final UserMetadata? myMetadata;
   final bool hideBottomBar;
 
+  final double fontSize;
+
   const NoteCard({
     super.key,
     required this.note,
     required this.myMetadata,
     this.hideBottomBar = false,
+    this.fontSize = 17,
   });
 
   @override
@@ -66,6 +69,7 @@ class NoteCard extends ConsumerWidget {
                       hashtagCallback: (String hashtag) => Navigator.pushNamed(
                           context, "/nostr/search",
                           arguments: hashtag),
+                      fontSize: fontSize,
                     ),
                   ],
                 ),

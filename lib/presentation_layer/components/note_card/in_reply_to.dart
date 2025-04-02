@@ -64,7 +64,7 @@ class InReplyTo extends ConsumerWidget {
       children: [
         const Text(
           "reply to ",
-          style: TextStyle(fontSize: 16, color: Palette.gray),
+          style: TextStyle(fontSize: 14, color: Palette.gray),
         ),
         GestureDetector(
           onTap: () {
@@ -73,7 +73,7 @@ class InReplyTo extends ConsumerWidget {
           },
           child: Text('@$valueFirst ',
               style: const TextStyle(
-                  color: Palette.primary, fontSize: 16, height: 1.3)),
+                  color: Palette.primary, fontSize: 14, height: 1.3)),
         ),
         if (valueSecond.isNotEmpty)
           GestureDetector(
@@ -83,12 +83,12 @@ class InReplyTo extends ConsumerWidget {
             },
             child: Text('@$valueSecond ',
                 style: const TextStyle(
-                    color: Palette.primary, fontSize: 16, height: 1.3)),
+                    color: Palette.primary, fontSize: 14, height: 1.3)),
           ),
         if (othersCount != 0)
           Text(' and $othersCount more',
               style: const TextStyle(
-                  color: Palette.darkGray, fontSize: 16, height: 1.3))
+                  color: Palette.darkGray, fontSize: 14, height: 1.3))
       ],
     );
   }
