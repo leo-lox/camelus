@@ -13,7 +13,7 @@ class PostSettingsState {
 
   PostSettingsState({
     this.enableContentWarning = false,
-    this.enableClientTag = false,
+    this.enableClientTag = true,
     this.selectedWarning = 'Sensitive Content',
     this.customWarning = '',
   });
