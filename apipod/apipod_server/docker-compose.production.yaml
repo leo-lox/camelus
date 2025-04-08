@@ -51,7 +51,7 @@ services:
     volumes:
       - ./pgbackrest:/etc/pgbackrest
       - ./pgbackrest-repo:/var/lib/pgbackrest
-      - postgres-data:/var/lib/postgresql/data:ro
+      - /mnt/HC_Volume_102297201/postgresql:/var/lib/postgresql/data:ro
     environment:
       - PGBACKREST_REPO1_PATH=/var/lib/pgbackrest
       - PGBACKREST_STANZA=main
