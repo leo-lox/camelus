@@ -45,6 +45,26 @@ services:
     networks:
       - serverpod-network
 
+  pgbackrest:
+    image: pgbackrest/pgbackrest:latest
+    restart: on-failure
+    volumes:
+      - ./pgbackrest:/etc/pgbackrest
+      - ./pgbackrest-repo:/var/lib/pgbackrest
+      - postgres-data:/var/lib/postgresql/data:ro
+    environment:
+      - PGBACKREST_REPO1_PATH=/var/lib/pgbackrest
+      - PGBACKREST_STANZA=main
+      - PGBACKREST_PG1_PATH=/var/lib/postgresql/data
+      - PGBACKREST_PG1_PORT=5432
+      - PGBACKREST_PG1_HOST=postgres
+      - PGBACKREST_PG1_USER=${POSTGRES_USER}
+      - PGBACKREST_PG1_PASSWORD=${POSTGRES_PASSWORD}
+    networks:
+      - serverpod-network
+    depends_on:
+      - postgres
+
   serverpod:
     restart: on-failure
     image: ghcr.io/${GHCR_ORG}/apipod_server:latest
