@@ -46,7 +46,7 @@ services:
       - serverpod-network
 
   pgbackrest:
-    image: pgbackrest/pgbackrest:latest
+    image: woblerr/pgbackrest:latest
     restart: on-failure
     volumes:
       - ./pgbackrest:/etc/pgbackrest
