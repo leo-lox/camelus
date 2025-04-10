@@ -1,0 +1,6 @@
+class: NostrBandProfiles
+fields:
+  pubkey: String
+  newFollowersCount: int
+  relays: List<String>
+  profile: Nip01Event

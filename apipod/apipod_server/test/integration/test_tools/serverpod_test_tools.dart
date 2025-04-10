@@ -17,9 +17,14 @@ import 'dart:async' as _i3;
 import 'package:apipod_server/src/generated/app_update_data.dart' as _i4;
 import 'package:apipod_server/src/generated/bloom_filter_data.dart' as _i5;
 import 'package:ndk/domain_layer/entities/nip_01_event.dart' as _i6;
-import 'package:apipod_server/src/generated/nip05/nip_05_data_spy.dart' as _i7;
+import 'package:apipod_server/src/generated/nip05/nip_05_response_spy.dart'
+    as _i7;
 import 'package:apipod_server/src/generated/nip05/check_name_result_spy.dart'
     as _i8;
+import 'package:apipod_server/src/generated/nostr_band/nostr_band_hashtags.dart'
+    as _i9;
+import 'package:apipod_server/src/generated/nostr_band/nostr_band_people.dart'
+    as _i10;
 import 'package:apipod_server/src/generated/protocol.dart';
 import 'package:apipod_server/src/generated/endpoints.dart';
 export 'package:serverpod_test/serverpod_test_public_exports.dart';
@@ -110,6 +115,8 @@ class TestEndpoints {
 
   late final _Nip05Endpoint nip05;
 
+  late final _NostrBandEndpoint nostrBand;
+
   late final _NostrPushEndpoint nostrPush;
 }
 
@@ -129,6 +136,10 @@ class _InternalTestEndpoints extends TestEndpoints
       serializationManager,
     );
     nip05 = _Nip05Endpoint(
+      endpoints,
+      serializationManager,
+    );
+    nostrBand = _NostrBandEndpoint(
       endpoints,
       serializationManager,
     );
@@ -281,7 +292,7 @@ class _Nip05Endpoint {
 
   final _i2.SerializationManager _serializationManager;
 
-  _i3.Future<_i7.Nip05Data?> getNip05(
+  _i3.Future<_i7.Nip05Response?> getNip05(
     _i1.TestSessionBuilder sessionBuilder,
     String? name,
     String domain,
@@ -306,7 +317,7 @@ class _Nip05Endpoint {
         var _localReturnValue = await (_localCallContext.method.call(
           _localUniqueSession,
           _localCallContext.arguments,
-        ) as _i3.Future<_i7.Nip05Data?>);
+        ) as _i3.Future<_i7.Nip05Response?>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -340,6 +351,79 @@ class _Nip05Endpoint {
           _localUniqueSession,
           _localCallContext.arguments,
         ) as _i3.Future<_i8.NameCheckResult>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+}
+
+class _NostrBandEndpoint {
+  _NostrBandEndpoint(
+    this._endpointDispatch,
+    this._serializationManager,
+  );
+
+  final _i2.EndpointDispatch _endpointDispatch;
+
+  final _i2.SerializationManager _serializationManager;
+
+  _i3.Future<_i9.NostrBandHashtags> hashtags(
+    _i1.TestSessionBuilder sessionBuilder, {
+    String? lang,
+    String? limit,
+  }) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+        endpoint: 'nostrBand',
+        method: 'hashtags',
+      );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'nostrBand',
+          methodName: 'hashtags',
+          parameters: _i1.testObjectToJson({
+            'lang': lang,
+            'limit': limit,
+          }),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue = await (_localCallContext.method.call(
+          _localUniqueSession,
+          _localCallContext.arguments,
+        ) as _i3.Future<_i9.NostrBandHashtags>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _i3.Future<_i10.NostrBandPeople> profiles(
+    _i1.TestSessionBuilder sessionBuilder, {
+    String? limit,
+  }) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+        endpoint: 'nostrBand',
+        method: 'profiles',
+      );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'nostrBand',
+          methodName: 'profiles',
+          parameters: _i1.testObjectToJson({'limit': limit}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue = await (_localCallContext.method.call(
+          _localUniqueSession,
+          _localCallContext.arguments,
+        ) as _i3.Future<_i10.NostrBandPeople>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();

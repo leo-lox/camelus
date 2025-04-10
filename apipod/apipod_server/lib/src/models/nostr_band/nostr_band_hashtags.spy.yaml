@@ -1,0 +1,4 @@
+class: NostrBandHashtags
+fields:
+  hashtags: List<NostrBandHashtagInfo>
+

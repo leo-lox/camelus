@@ -18,9 +18,13 @@ import 'example.dart' as _i6;
 import 'nip05/check_name_result_spy.dart' as _i7;
 import 'nip05/nip_05_data_spy.dart' as _i8;
 import 'nip05/nip_05_response_spy.dart' as _i9;
-import 'reports_incoming.dart' as _i10;
-import 'subscription.dart' as _i11;
-import 'package:ndk/domain_layer/entities/nip_01_event.dart' as _i12;
+import 'nostr_band/nostr_band_hashtags.dart' as _i10;
+import 'nostr_band/nostr_band_hastag_info.dart' as _i11;
+import 'nostr_band/nostr_band_people.dart' as _i12;
+import 'nostr_band/nostr_band_profiles.dart' as _i13;
+import 'reports_incoming.dart' as _i14;
+import 'subscription.dart' as _i15;
+import 'package:ndk/domain_layer/entities/nip_01_event.dart' as _i16;
 export 'app_update_data.dart';
 export 'bloom_filter_data.dart';
 export 'bloom_filter_events.dart';
@@ -29,6 +33,10 @@ export 'example.dart';
 export 'nip05/check_name_result_spy.dart';
 export 'nip05/nip_05_data_spy.dart';
 export 'nip05/nip_05_response_spy.dart';
+export 'nostr_band/nostr_band_hashtags.dart';
+export 'nostr_band/nostr_band_hastag_info.dart';
+export 'nostr_band/nostr_band_people.dart';
+export 'nostr_band/nostr_band_profiles.dart';
 export 'reports_incoming.dart';
 export 'subscription.dart';
 export 'client.dart';
@@ -70,11 +78,23 @@ class Protocol extends _i1.SerializationManager {
     if (t == _i9.Nip05Response) {
       return _i9.Nip05Response.fromJson(data) as T;
     }
-    if (t == _i10.ReportsIncoming) {
-      return _i10.ReportsIncoming.fromJson(data) as T;
+    if (t == _i10.NostrBandHashtags) {
+      return _i10.NostrBandHashtags.fromJson(data) as T;
     }
-    if (t == _i11.PushSubscription) {
-      return _i11.PushSubscription.fromJson(data) as T;
+    if (t == _i11.NostrBandHashtagInfo) {
+      return _i11.NostrBandHashtagInfo.fromJson(data) as T;
+    }
+    if (t == _i12.NostrBandPeople) {
+      return _i12.NostrBandPeople.fromJson(data) as T;
+    }
+    if (t == _i13.NostrBandProfiles) {
+      return _i13.NostrBandProfiles.fromJson(data) as T;
+    }
+    if (t == _i14.ReportsIncoming) {
+      return _i14.ReportsIncoming.fromJson(data) as T;
+    }
+    if (t == _i15.PushSubscription) {
+      return _i15.PushSubscription.fromJson(data) as T;
     }
     if (t == _i1.getType<_i2.AppUpdateData?>()) {
       return (data != null ? _i2.AppUpdateData.fromJson(data) : null) as T;
@@ -100,11 +120,24 @@ class Protocol extends _i1.SerializationManager {
     if (t == _i1.getType<_i9.Nip05Response?>()) {
       return (data != null ? _i9.Nip05Response.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i10.ReportsIncoming?>()) {
-      return (data != null ? _i10.ReportsIncoming.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i10.NostrBandHashtags?>()) {
+      return (data != null ? _i10.NostrBandHashtags.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i11.PushSubscription?>()) {
-      return (data != null ? _i11.PushSubscription.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i11.NostrBandHashtagInfo?>()) {
+      return (data != null ? _i11.NostrBandHashtagInfo.fromJson(data) : null)
+          as T;
+    }
+    if (t == _i1.getType<_i12.NostrBandPeople?>()) {
+      return (data != null ? _i12.NostrBandPeople.fromJson(data) : null) as T;
+    }
+    if (t == _i1.getType<_i13.NostrBandProfiles?>()) {
+      return (data != null ? _i13.NostrBandProfiles.fromJson(data) : null) as T;
+    }
+    if (t == _i1.getType<_i14.ReportsIncoming?>()) {
+      return (data != null ? _i14.ReportsIncoming.fromJson(data) : null) as T;
+    }
+    if (t == _i1.getType<_i15.PushSubscription?>()) {
+      return (data != null ? _i15.PushSubscription.fromJson(data) : null) as T;
     }
     if (t == List<String>) {
       return (data as List).map((e) => deserialize<String>(e)).toList() as T;
@@ -117,15 +150,25 @@ class Protocol extends _i1.SerializationManager {
       return (data as Map).map((k, v) =>
           MapEntry(deserialize<String>(k), deserialize<List<String>>(v))) as T;
     }
-    if (t == _i12.Nip01Event) {
-      return _i12.Nip01Event.fromJson(data) as T;
+    if (t == List<_i11.NostrBandHashtagInfo>) {
+      return (data as List)
+          .map((e) => deserialize<_i11.NostrBandHashtagInfo>(e))
+          .toList() as T;
     }
-    if (t == List<_i12.Nip01Event>) {
-      return (data as List).map((e) => deserialize<_i12.Nip01Event>(e)).toList()
+    if (t == List<_i13.NostrBandProfiles>) {
+      return (data as List)
+          .map((e) => deserialize<_i13.NostrBandProfiles>(e))
+          .toList() as T;
+    }
+    if (t == _i16.Nip01Event) {
+      return _i16.Nip01Event.fromJson(data) as T;
+    }
+    if (t == List<_i16.Nip01Event>) {
+      return (data as List).map((e) => deserialize<_i16.Nip01Event>(e)).toList()
           as T;
     }
-    if (t == _i1.getType<_i12.Nip01Event?>()) {
-      return (data != null ? _i12.Nip01Event.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i16.Nip01Event?>()) {
+      return (data != null ? _i16.Nip01Event.fromJson(data) : null) as T;
     }
     return super.deserialize<T>(data, t);
   }
@@ -134,7 +177,7 @@ class Protocol extends _i1.SerializationManager {
   String? getClassNameForObject(Object? data) {
     String? className = super.getClassNameForObject(data);
     if (className != null) return className;
-    if (data is _i12.Nip01Event) {
+    if (data is _i16.Nip01Event) {
       return 'Nip01Event';
     }
     if (data is _i2.AppUpdateData) {
@@ -161,10 +204,22 @@ class Protocol extends _i1.SerializationManager {
     if (data is _i9.Nip05Response) {
       return 'Nip05Response';
     }
-    if (data is _i10.ReportsIncoming) {
+    if (data is _i10.NostrBandHashtags) {
+      return 'NostrBandHashtags';
+    }
+    if (data is _i11.NostrBandHashtagInfo) {
+      return 'NostrBandHashtagInfo';
+    }
+    if (data is _i12.NostrBandPeople) {
+      return 'NostrBandPeople';
+    }
+    if (data is _i13.NostrBandProfiles) {
+      return 'NostrBandProfiles';
+    }
+    if (data is _i14.ReportsIncoming) {
       return 'ReportsIncoming';
     }
-    if (data is _i11.PushSubscription) {
+    if (data is _i15.PushSubscription) {
       return 'PushSubscription';
     }
     return null;
@@ -177,7 +232,7 @@ class Protocol extends _i1.SerializationManager {
       return super.deserializeByClassName(data);
     }
     if (dataClassName == 'Nip01Event') {
-      return deserialize<_i12.Nip01Event>(data['data']);
+      return deserialize<_i16.Nip01Event>(data['data']);
     }
     if (dataClassName == 'AppUpdateData') {
       return deserialize<_i2.AppUpdateData>(data['data']);
@@ -203,11 +258,23 @@ class Protocol extends _i1.SerializationManager {
     if (dataClassName == 'Nip05Response') {
       return deserialize<_i9.Nip05Response>(data['data']);
     }
+    if (dataClassName == 'NostrBandHashtags') {
+      return deserialize<_i10.NostrBandHashtags>(data['data']);
+    }
+    if (dataClassName == 'NostrBandHashtagInfo') {
+      return deserialize<_i11.NostrBandHashtagInfo>(data['data']);
+    }
+    if (dataClassName == 'NostrBandPeople') {
+      return deserialize<_i12.NostrBandPeople>(data['data']);
+    }
+    if (dataClassName == 'NostrBandProfiles') {
+      return deserialize<_i13.NostrBandProfiles>(data['data']);
+    }
     if (dataClassName == 'ReportsIncoming') {
-      return deserialize<_i10.ReportsIncoming>(data['data']);
+      return deserialize<_i14.ReportsIncoming>(data['data']);
     }
     if (dataClassName == 'PushSubscription') {
-      return deserialize<_i11.PushSubscription>(data['data']);
+      return deserialize<_i15.PushSubscription>(data['data']);
     }
     return super.deserializeByClassName(data);
   }

@@ -14,10 +14,15 @@ import 'dart:async' as _i2;
 import 'package:apipod_client/src/protocol/app_update_data.dart' as _i3;
 import 'package:apipod_client/src/protocol/bloom_filter_data.dart' as _i4;
 import 'package:ndk/domain_layer/entities/nip_01_event.dart' as _i5;
-import 'package:apipod_client/src/protocol/nip05/nip_05_data_spy.dart' as _i6;
+import 'package:apipod_client/src/protocol/nip05/nip_05_response_spy.dart'
+    as _i6;
 import 'package:apipod_client/src/protocol/nip05/check_name_result_spy.dart'
     as _i7;
-import 'protocol.dart' as _i8;
+import 'package:apipod_client/src/protocol/nostr_band/nostr_band_hashtags.dart'
+    as _i8;
+import 'package:apipod_client/src/protocol/nostr_band/nostr_band_people.dart'
+    as _i9;
+import 'protocol.dart' as _i10;
 
 /// {@category Endpoint}
 class EndpointAppUpdate extends _i1.EndpointRef {
@@ -75,11 +80,11 @@ class EndpointNip05 extends _i1.EndpointRef {
   @override
   String get name => 'nip05';
 
-  _i2.Future<_i6.Nip05Data?> getNip05(
+  _i2.Future<_i6.Nip05Response?> getNip05(
     String? name,
     String domain,
   ) =>
-      caller.callServerEndpoint<_i6.Nip05Data?>(
+      caller.callServerEndpoint<_i6.Nip05Response?>(
         'nip05',
         'getNip05',
         {
@@ -99,6 +104,34 @@ class EndpointNip05 extends _i1.EndpointRef {
           'name': name,
           'domain': domain,
         },
+      );
+}
+
+/// {@category Endpoint}
+class EndpointNostrBand extends _i1.EndpointRef {
+  EndpointNostrBand(_i1.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'nostrBand';
+
+  _i2.Future<_i8.NostrBandHashtags> hashtags({
+    String? lang,
+    String? limit,
+  }) =>
+      caller.callServerEndpoint<_i8.NostrBandHashtags>(
+        'nostrBand',
+        'hashtags',
+        {
+          'lang': lang,
+          'limit': limit,
+        },
+      );
+
+  _i2.Future<_i9.NostrBandPeople> profiles({String? limit}) =>
+      caller.callServerEndpoint<_i9.NostrBandPeople>(
+        'nostrBand',
+        'profiles',
+        {'limit': limit},
       );
 }
 
@@ -139,7 +172,7 @@ class Client extends _i1.ServerpodClientShared {
     bool? disconnectStreamsOnLostInternetConnection,
   }) : super(
           host,
-          _i8.Protocol(),
+          _i10.Protocol(),
           securityContext: securityContext,
           authenticationKeyManager: authenticationKeyManager,
           streamingConnectionTimeout: streamingConnectionTimeout,
@@ -152,6 +185,7 @@ class Client extends _i1.ServerpodClientShared {
     appUpdate = EndpointAppUpdate(this);
     moderation = EndpointModeration(this);
     nip05 = EndpointNip05(this);
+    nostrBand = EndpointNostrBand(this);
     nostrPush = EndpointNostrPush(this);
   }
 
@@ -161,6 +195,8 @@ class Client extends _i1.ServerpodClientShared {
 
   late final EndpointNip05 nip05;
 
+  late final EndpointNostrBand nostrBand;
+
   late final EndpointNostrPush nostrPush;
 
   @override
@@ -168,6 +204,7 @@ class Client extends _i1.ServerpodClientShared {
         'appUpdate': appUpdate,
         'moderation': moderation,
         'nip05': nip05,
+        'nostrBand': nostrBand,
         'nostrPush': nostrPush,
       };
 

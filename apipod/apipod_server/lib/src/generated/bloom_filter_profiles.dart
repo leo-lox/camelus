@@ -12,7 +12,7 @@
 import 'package:serverpod/serverpod.dart' as _i1;
 
 abstract class BloomFilterProfile
-    implements _i1.TableRow, _i1.ProtocolSerialization {
+    implements _i1.TableRow<int>, _i1.ProtocolSerialization {
   BloomFilterProfile._({
     this.id,
     required this.size,
@@ -66,7 +66,7 @@ abstract class BloomFilterProfile
   String? description;
 
   @override
-  _i1.Table get table => t;
+  _i1.Table<int> get table => t;
 
   /// Returns a shallow copy of this [BloomFilterProfile]
   /// with some or all fields replaced by the given arguments.
@@ -182,7 +182,7 @@ class _BloomFilterProfileImpl extends BloomFilterProfile {
   }
 }
 
-class BloomFilterProfileTable extends _i1.Table {
+class BloomFilterProfileTable extends _i1.Table<int> {
   BloomFilterProfileTable({super.tableRelation})
       : super(tableName: 'bloom_filter_profiles') {
     size = _i1.ColumnInt(
@@ -242,7 +242,7 @@ class BloomFilterProfileInclude extends _i1.IncludeObject {
   Map<String, _i1.Include?> get includes => {};
 
   @override
-  _i1.Table get table => BloomFilterProfile.t;
+  _i1.Table<int> get table => BloomFilterProfile.t;
 }
 
 class BloomFilterProfileIncludeList extends _i1.IncludeList {
@@ -262,7 +262,7 @@ class BloomFilterProfileIncludeList extends _i1.IncludeList {
   Map<String, _i1.Include?> get includes => include?.includes ?? {};
 
   @override
-  _i1.Table get table => BloomFilterProfile.t;
+  _i1.Table<int> get table => BloomFilterProfile.t;
 }
 
 class BloomFilterProfileRepository {

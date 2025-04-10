@@ -11,7 +11,8 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
 
-abstract class Nip05Data implements _i1.TableRow, _i1.ProtocolSerialization {
+abstract class Nip05Data
+    implements _i1.TableRow<int>, _i1.ProtocolSerialization {
   Nip05Data._({
     this.id,
     required this.name,
@@ -62,7 +63,7 @@ abstract class Nip05Data implements _i1.TableRow, _i1.ProtocolSerialization {
   DateTime createdAt;
 
   @override
-  _i1.Table get table => t;
+  _i1.Table<int> get table => t;
 
   /// Returns a shallow copy of this [Nip05Data]
   /// with some or all fields replaced by the given arguments.
@@ -171,7 +172,7 @@ class _Nip05DataImpl extends Nip05Data {
   }
 }
 
-class Nip05DataTable extends _i1.Table {
+class Nip05DataTable extends _i1.Table<int> {
   Nip05DataTable({super.tableRelation}) : super(tableName: 'nip_05_data') {
     name = _i1.ColumnString(
       'name',
@@ -223,7 +224,7 @@ class Nip05DataInclude extends _i1.IncludeObject {
   Map<String, _i1.Include?> get includes => {};
 
   @override
-  _i1.Table get table => Nip05Data.t;
+  _i1.Table<int> get table => Nip05Data.t;
 }
 
 class Nip05DataIncludeList extends _i1.IncludeList {
@@ -243,7 +244,7 @@ class Nip05DataIncludeList extends _i1.IncludeList {
   Map<String, _i1.Include?> get includes => include?.includes ?? {};
 
   @override
-  _i1.Table get table => Nip05Data.t;
+  _i1.Table<int> get table => Nip05Data.t;
 }
 
 class Nip05DataRepository {

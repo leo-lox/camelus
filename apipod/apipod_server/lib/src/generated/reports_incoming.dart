@@ -13,7 +13,7 @@ import 'package:serverpod/serverpod.dart' as _i1;
 import 'package:ndk/domain_layer/entities/nip_01_event.dart' as _i2;
 
 abstract class ReportsIncoming
-    implements _i1.TableRow, _i1.ProtocolSerialization {
+    implements _i1.TableRow<int>, _i1.ProtocolSerialization {
   ReportsIncoming._({
     this.id,
     required this.createdAt,
@@ -62,7 +62,7 @@ abstract class ReportsIncoming
   bool processed;
 
   @override
-  _i1.Table get table => t;
+  _i1.Table<int> get table => t;
 
   /// Returns a shallow copy of this [ReportsIncoming]
   /// with some or all fields replaced by the given arguments.
@@ -175,7 +175,7 @@ class _ReportsIncomingImpl extends ReportsIncoming {
   }
 }
 
-class ReportsIncomingTable extends _i1.Table {
+class ReportsIncomingTable extends _i1.Table<int> {
   ReportsIncomingTable({super.tableRelation})
       : super(tableName: 'reports_incoming') {
     createdAt = _i1.ColumnDateTime(
@@ -228,7 +228,7 @@ class ReportsIncomingInclude extends _i1.IncludeObject {
   Map<String, _i1.Include?> get includes => {};
 
   @override
-  _i1.Table get table => ReportsIncoming.t;
+  _i1.Table<int> get table => ReportsIncoming.t;
 }
 
 class ReportsIncomingIncludeList extends _i1.IncludeList {
@@ -248,7 +248,7 @@ class ReportsIncomingIncludeList extends _i1.IncludeList {
   Map<String, _i1.Include?> get includes => include?.includes ?? {};
 
   @override
-  _i1.Table get table => ReportsIncoming.t;
+  _i1.Table<int> get table => ReportsIncoming.t;
 }
 
 class ReportsIncomingRepository {

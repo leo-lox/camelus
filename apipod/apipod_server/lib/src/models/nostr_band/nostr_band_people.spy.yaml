@@ -1,0 +1,4 @@
+class: NostrBandPeople
+fields:
+  profiles: List<NostrBandProfiles>
+

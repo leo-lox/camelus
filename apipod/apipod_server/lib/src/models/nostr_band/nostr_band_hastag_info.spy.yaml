@@ -1,0 +1,4 @@
+class: NostrBandHashtagInfo
+fields:
+  hashtag: String
+  posts: int
