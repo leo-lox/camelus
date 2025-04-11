@@ -7,13 +7,14 @@ import '../models/nostr_band_people_model.dart';
 
 class ApiNostrBandDataSource {
   Future<T> _fetchData<T>({
-    required String type,
+    required String baseUrl,
     required String key,
     required T Function(Map<String, dynamic>) fromJson,
     String? lang = 'en',
   }) async {
+    // https://api.camelus.app/nostrBand/hashtags
     final file = await DefaultCacheManager().getSingleFile(
-      'https://camelus.app/api/v1/nostr-band-cache?type=$type&limit=10&lang=$lang',
+      '$baseUrl?limit=10&lang=$lang',
       key: key,
       headers: {'Cache-Control': 'max-age=3600'},
     );
@@ -27,7 +28,7 @@ class ApiNostrBandDataSource {
 
   Future<NostrBandPeopleModel?> getTrendingProfiles() async {
     return _fetchData(
-      type: 'profiles',
+      baseUrl: 'https://api.camelus.app/nostrBand/profiles',
       key: 'trending_profiles_nostr_band',
       fromJson: NostrBandPeopleModel.fromJson,
     );
@@ -35,7 +36,7 @@ class ApiNostrBandDataSource {
 
   Future<NostrBandHashtagsModel?> getTrendingHashtags({String? lang}) async {
     return _fetchData(
-      type: 'hashtags',
+      baseUrl: 'https://api.camelus.app/nostrBand/hashtags',
       key: 'trending_hashtags_nostr_band',
       fromJson: NostrBandHashtagsModel.fromJson,
       lang: lang,
