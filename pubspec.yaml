@@ -87,7 +87,7 @@ dependencies:
   image: ^4.3.0
   flutter_list_view: ^1.1.29
   xxh3: ^1.2.0
-  serverpod_flutter: 2.4.0
+  serverpod_flutter: 2.5.1
   apipod_client:
     path: ./apipod/apipod_client
   firebase_messaging: ^15.2.4
