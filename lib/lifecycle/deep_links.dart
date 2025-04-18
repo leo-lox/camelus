@@ -40,7 +40,7 @@ Future<void> _camelusLinks({
 }) async {
   final myMatch = link.replaceAll("https://camelus.app", "");
 
-  if (myMatch.startsWith("/i/") || myMatch.startsWith("/s/")) {
+  if (myMatch.startsWith("/i/") || myMatch.startsWith("/ii/")) {
     final List<String> myMatchSplit = myMatch.split("/");
     final String invitedBy = myMatchSplit[2];
     final String inviteListName = myMatchSplit[3];
