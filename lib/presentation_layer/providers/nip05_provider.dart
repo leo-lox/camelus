@@ -8,7 +8,7 @@ import 'package:http/http.dart';
 
 import '../../data_layer/data_sources/http_request_data_source.dart';
 
-final nip05provider = FutureProvider<VerifyNip05>((ref) async {
+final nip05provider = Provider<VerifyNip05>((ref) {
   final Client client = Client();
   final HttpRequestDataSource dataSource = HttpRequestDataSource(client);
   final Nip05Repository nip05Repository =

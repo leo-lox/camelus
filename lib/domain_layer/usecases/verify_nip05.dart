@@ -11,6 +11,7 @@ class VerifyNip05 {
 
   VerifyNip05(this._database, this._nip05Repository);
 
+  /// checks a nip05 with caching enabled
   Future<Nip05?> check(String nip05, String pubkey) async {
     if (nip05.isEmpty || pubkey.isEmpty) {
       throw Exception("nip05 or pubkey empty");
@@ -41,9 +42,15 @@ class VerifyNip05 {
 
     _inFlight.add(nip05);
 
-    var result = await _nip05Repository.requestNip05(nip05, pubkey);
+    var result =
+        await _nip05Repository.requestNip05(nip05: nip05, pubkey: pubkey);
     _inFlight.remove(nip05);
 
     return result;
+  }
+
+  /// gets the nip05 data from http
+  Future<Nip05?> get(String nip05) async {
+    return _nip05Repository.requestNip05(nip05: nip05);
   }
 }

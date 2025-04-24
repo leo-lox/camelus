@@ -10,7 +10,7 @@ class Nip05RepositoryImpl implements Nip05Repository {
   Nip05RepositoryImpl({required this.dataSource});
 
   @override
-  Future<Nip05?> requestNip05(String nip05, String pubkey) async {
+  Future<Nip05?> requestNip05({required String nip05, String? pubkey}) async {
     String username = nip05.split("@")[0];
     String url = nip05.split("@")[1];
 
@@ -31,6 +31,7 @@ class Nip05RepositoryImpl implements Nip05Repository {
 
     var result = Nip05Model(
       nip05: nip05,
+      pubkey: names[username],
       valid: valid,
       lastCheck: DateTime.now().millisecondsSinceEpoch ~/ 1000,
       relays: pRelays,
