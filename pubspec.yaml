@@ -94,6 +94,7 @@ dependencies:
   firebase_core: ^3.12.1
   flutter_local_notifications: ^19.0.0
   path: ^1.9.1
+  share_plus: ^11.0.0
 
   
 

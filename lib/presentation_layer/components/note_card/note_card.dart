@@ -97,7 +97,7 @@ class NoteCard extends ConsumerWidget {
                 onRetweet: () {
                   ref.read(postRepostProvider(note).notifier).toggleRepost();
                 },
-                onShare: () => openBottomSheetShare(context, note),
+                onShare: () => openBottomSheetShare(context, ref, note),
                 onMore: () => openBottomSheetMore(context, note),
               ),
             ),
