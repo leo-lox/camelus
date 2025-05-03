@@ -154,6 +154,9 @@ class _RelaysPageState extends ConsumerState<RelaysPage> {
                               ),
                             ],
                           ),
+                          const SizedBox(
+                            height: 10,
+                          ),
 
                           if (relay.relayInfo!.description.isNotEmpty)
                             Padding(
@@ -272,19 +275,19 @@ class _StatItem extends StatelessWidget {
   final IconData icon;
   final String label;
   final String value;
-  final double? maxWidth;
+  final double maxWidth;
 
   const _StatItem({
     required this.icon,
     required this.label,
     required this.value,
-    this.maxWidth,
+    this.maxWidth = 120,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      constraints: BoxConstraints(maxWidth: maxWidth ?? double.infinity),
+      constraints: BoxConstraints(maxWidth: maxWidth),
       child: Column(
         children: [
           Icon(icon, size: 20, color: Palette.gray),
@@ -303,7 +306,7 @@ class _StatItem extends StatelessWidget {
               fontSize: 14,
               fontWeight: FontWeight.bold,
             ),
-            maxLines: 1,
+            maxLines: 3,
             overflow: TextOverflow.ellipsis,
           ),
         ],
