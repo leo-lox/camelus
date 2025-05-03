@@ -43,9 +43,9 @@ class _RelaysPageState extends ConsumerState<RelaysPage> {
                   final relay = entry.value;
 
                   // Check if this relay has privacy policy or terms of service
-                  final hasPrivacyPolicy =
+                  final hasPrivacyPolicy = relay.relayInfo != null &&
                       relay.relayInfo!.privacyPolicy.isNotEmpty;
-                  final hasTermsOfService =
+                  final hasTermsOfService = relay.relayInfo != null &&
                       relay.relayInfo!.termsOfService.isNotEmpty;
 
                   return Card(
@@ -148,9 +148,9 @@ class _RelaysPageState extends ConsumerState<RelaysPage> {
                                 value: relay.stats.eventsWritten.toString(),
                               ),
                               _StatItem(
-                                icon: PhosphorIcons.cloudWarning(),
-                                label: 'Connection Errors',
-                                value: relay.stats.connectionErrors.toString(),
+                                icon: PhosphorIcons.lighthouse(),
+                                label: 'Connection Source',
+                                value: relay.relay.connectionSource.name,
                               ),
                             ],
                           ),
@@ -158,7 +158,8 @@ class _RelaysPageState extends ConsumerState<RelaysPage> {
                             height: 10,
                           ),
 
-                          if (relay.relayInfo!.description.isNotEmpty)
+                          if (relay.relayInfo != null &&
+                              relay.relayInfo!.description.isNotEmpty)
                             Padding(
                               padding: const EdgeInsets.only(top: 12.0),
                               child: Text(

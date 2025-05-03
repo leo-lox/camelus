@@ -224,12 +224,14 @@ class RelaysWidget extends ConsumerWidget {
                 key: ValueKey(isConnected),
               ),
               const SizedBox(width: 5),
-              if (!kReleaseMode)
-                Text(
-                  connectedCount.toString(),
-                  style: const TextStyle(color: Palette.lightGray),
-                  key: ValueKey(connectedCount),
+              //if (!kReleaseMode)
+              Text(
+                connectedCount.toString(),
+                style: const TextStyle(
+                  color: Palette.lightGray,
                 ),
+                key: ValueKey(connectedCount),
+              ),
               const SizedBox(width: 5),
             ],
           );
