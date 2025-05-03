@@ -45,6 +45,21 @@ class _RelaysPageState extends ConsumerState<RelaysPage> {
                         const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
                     child: ListTile(
                       title: Text("$url - ${relay.relayInfo?.name}"),
+                      leading: relay.relayInfo?.icon != null
+                          ? Image.network(
+                              "${relay.relayInfo?.icon}",
+                              width: 40,
+                              errorBuilder: (context, error, stackTrace) {
+                                return SizedBox(
+                                  width: 40,
+                                  height: 40,
+                                );
+                              },
+                            )
+                          : SizedBox(
+                              width: 40,
+                              height: 40,
+                            ),
                       subtitle: Text(
                           'events read: ${relay.stats.eventsRead} | events write ${relay.stats.eventsWritten} '),
                       trailing: Icon(
