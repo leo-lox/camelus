@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:camelus/presentation_layer/providers/metadata_state_provider.dart';
 import 'package:flutter/foundation.dart';
@@ -6,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:badges/badges.dart' as badges;
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../../config/palette.dart';
 import '../../../../domain_layer/entities/contact_list.dart';
@@ -14,6 +16,7 @@ import '../../../../domain_layer/entities/feed_filter.dart';
 import '../../../atoms/my_profile_picture.dart';
 import '../../../components/generic_feed.dart';
 import '../../../providers/following_provider.dart';
+import '../../../providers/ndk_provider.dart';
 import '../relays_page.dart';
 
 class NostrPage extends ConsumerStatefulWidget {
@@ -189,35 +192,43 @@ class TitleWidget extends StatelessWidget {
   }
 }
 
-class RelaysWidget extends StatelessWidget {
+class RelaysWidget extends ConsumerWidget {
   final VoidCallback onTap;
 
   const RelaysWidget({super.key, required this.onTap});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final ndk = ref.watch(ndkProvider);
+
     return GestureDetector(
       onTap: onTap,
-      child: StreamBuilder<List<void>>(
-        stream: Stream.empty(), // TODO: implement get relays
+      child: StreamBuilder(
+        stream: ndk.relays.relayConnectivityChanges,
         builder: (context, snapshot) {
-          final isConnected = snapshot.hasData && snapshot.data!.isNotEmpty;
+          final isConnected = snapshot.hasData &&
+              snapshot.data!.isNotEmpty &&
+              snapshot.data!.values.any((e) => e.isConnected);
+
+          final connectedCount = snapshot.hasData && snapshot.data!.isNotEmpty
+              ? snapshot.data!.values.where((e) => e.isConnected).length
+              : 0;
+
+          log("Stream updated: isConnected=$isConnected, count=$connectedCount");
           return Row(
             children: [
-              SvgPicture.asset(
+              Icon(
                 isConnected
-                    ? 'assets/icons/cell-signal-full.svg'
-                    : 'assets/icons/cell-signal-slash.svg',
-                colorFilter:
-                    const ColorFilter.mode(Palette.lightGray, BlendMode.srcIn),
-                height: 22,
-                width: 22,
+                    ? PhosphorIcons.cellSignalFull()
+                    : PhosphorIcons.cellSignalSlash(),
+                key: ValueKey(isConnected),
               ),
               const SizedBox(width: 5),
               if (!kReleaseMode)
                 Text(
-                  isConnected ? "0" : "0",
+                  connectedCount.toString(),
                   style: const TextStyle(color: Palette.lightGray),
+                  key: ValueKey(connectedCount),
                 ),
               const SizedBox(width: 5),
             ],
