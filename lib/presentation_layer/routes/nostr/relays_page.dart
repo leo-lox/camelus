@@ -29,7 +29,7 @@ class _RelaysPageState extends ConsumerState<RelaysPage> {
       backgroundColor: Palette.background,
       body: SafeArea(
         child: StreamBuilder<Map<String, RelayConnectivity>>(
-          stream: ndk.relays.relayConnectivityChanges,
+          stream: ndk.connectivity.relayConnectivityChanges,
           builder: (context, snapshot) {
             if (snapshot.hasData && snapshot.data != null) {
               final relaysMap = snapshot.data!;

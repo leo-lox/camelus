@@ -204,7 +204,7 @@ class RelaysWidget extends ConsumerWidget {
     return GestureDetector(
       onTap: onTap,
       child: StreamBuilder(
-        stream: ndk.relays.relayConnectivityChanges,
+        stream: ndk.connectivity.relayConnectivityChanges,
         builder: (context, snapshot) {
           final isConnected = snapshot.hasData &&
               snapshot.data!.isNotEmpty &&
