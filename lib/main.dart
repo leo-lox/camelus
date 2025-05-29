@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:camelus/lifecycle/connectivity/connectivity.dart';
 import 'package:flutter/cupertino.dart';
 
 import 'package:flutter/material.dart';
@@ -15,6 +16,7 @@ import 'domain_layer/usecases/app_auth.dart';
 import 'lifecycle/notifications/init_firebase.dart';
 import 'lifecycle/notifications/notifications_caller.dart';
 import 'presentation_layer/init/init_moderation.dart';
+import 'presentation_layer/providers/app_lifecycle_provider.dart';
 import 'presentation_layer/providers/db_app_provider.dart';
 import 'presentation_layer/providers/db_ndk_provider.dart';
 import 'presentation_layer/providers/inbox_outbox_provider.dart';
@@ -131,6 +133,11 @@ Future<void> main() async {
   listenDeeplinks(
     providerContainer: providerContainer,
   );
+
+  listenToConnectivityChanges(providerContainer);
+
+  // init lifecycle
+  providerContainer.read(appLifecycleProvider);
 }
 
 class MyApp extends ConsumerWidget {
