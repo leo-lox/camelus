@@ -11,6 +11,7 @@ final eventVerifierProvider = Provider<EventVerifier>((ref) {
   final EventVerifier mockEventVerifier = MockEventVerifier();
   final RustEventVerifier rustEventVerifier = RustEventVerifier();
 
+  return mockEventVerifier;
   return rustEventVerifier;
 });
 
