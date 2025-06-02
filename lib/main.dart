@@ -15,6 +15,7 @@ import 'lifecycle/deep_links.dart';
 import 'domain_layer/usecases/app_auth.dart';
 import 'lifecycle/notifications/init_firebase.dart';
 import 'lifecycle/notifications/notifications_caller.dart';
+import 'objectbox_isolate.dart';
 import 'presentation_layer/init/init_moderation.dart';
 import 'presentation_layer/providers/app_lifecycle_provider.dart';
 import 'presentation_layer/providers/db_app_provider.dart';
@@ -74,8 +75,16 @@ Future<void> main() async {
   // Create a ProviderContainer
   final providerContainer = ProviderContainer();
 
+  final rootToken = RootIsolateToken.instance;
+  if (rootToken == null) {
+    throw StateError(
+        'Cannot get the root isolate token. This is required for plugins to work in background isolates.');
+  }
+  final dbIsolateManager = DbIsolateManager();
+  await dbIsolateManager.start();
+
   // init ndk db
-  DbObjectBox dbCacheManager = DbObjectBox();
+  DbObjectBox dbCacheManager = DbObjectBox(attach: true);
   await dbCacheManager.dbRdy;
   final CacheManager cacheManager = dbCacheManager;
 
