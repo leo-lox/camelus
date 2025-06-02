@@ -17,13 +17,13 @@ class AppAuth {
 
   /// logs in with amber and sets the storage flag for amber
   static Future<AmberEventSigner> amberRegister() async {
-    final amberSigner = await _amberLogin();
+    final amberSigner = await _amberRegisterPopup();
     await secureStorage.write(key: "amber", value: amberSigner.publicKey);
 
     return amberSigner;
   }
 
-  static Future<AmberEventSigner> _amberLogin() async {
+  static Future<AmberEventSigner> _amberRegisterPopup() async {
     final installed = await amber.isAppInstalled();
     if (!installed) {
       throw Exception('Amber is not installed');
@@ -35,6 +35,12 @@ class AppAuth {
         ),
         const Permission(
           type: "nip04_decrypt",
+        ),
+        const Permission(
+          type: "nip44_encrypt",
+        ),
+        const Permission(
+          type: "nip44_decrypt",
         ),
         const Permission(type: "sign_event", kind: 0),
         const Permission(type: "sign_event", kind: 1),
@@ -55,6 +61,17 @@ class AppAuth {
     final amberFlutterDS = AmberFlutterDS(amber);
     final amberSigner =
         AmberEventSigner(publicKey: pubkeyHex, amberFlutterDS: amberFlutterDS);
+    return amberSigner;
+  }
+
+  static Future<AmberEventSigner> _amberLogin(String amberPubkey) async {
+    final installed = await amber.isAppInstalled();
+    if (!installed) {
+      throw Exception('Amber is not installed');
+    }
+    final amberFlutterDS = AmberFlutterDS(amber);
+    final amberSigner = AmberEventSigner(
+        publicKey: amberPubkey, amberFlutterDS: amberFlutterDS);
     return amberSigner;
   }
 
@@ -98,7 +115,7 @@ class AppAuth {
     }
 
     // ok to login with amber
-    return await _amberLogin();
+    return await _amberLogin(amberPubkey);
   }
 
   /// deltes the keys from storage.
