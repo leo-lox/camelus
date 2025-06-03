@@ -15,25 +15,7 @@ class NostrListRepositoryImpl implements NostrListRepository {
   });
 
   @override
-  Future<NostrSet?> getPublicNostrFollowSet({
-    required String pubKey,
-    required String name,
-  }) async {
-    final ndkSet =
-        await dartNdkSource.dartNdk.lists.getSinglePublicNip51RelaySet(
-      name: name,
-      publicKey: pubKey,
-    );
-
-    if (ndkSet == null) {
-      return null;
-    }
-    final listSet = NostrSetModel.fromNDK(ndkSet);
-    return listSet;
-  }
-
-  @override
-  Future<List<NostrSet>?> getPublicNostrSets({
+  Future<List<NostrStarterPack>?> getPublicNostrStarterPacks({
     required String pubKey,
     required int kind,
   }) async {
@@ -47,7 +29,8 @@ class NostrListRepositoryImpl implements NostrListRepository {
       return null;
     }
 
-    final listSets = ndkSets.map((e) => NostrSetModel.fromNDK(e)).toList();
+    final listSets =
+        ndkSets.map((e) => NostrStarterPackModel.fromNDK(e)).toList();
     return listSets;
   }
 }

@@ -28,7 +28,7 @@ class OnboardingInvitedBy extends ConsumerStatefulWidget {
 }
 
 class _OnboardingInvitedByState extends ConsumerState<OnboardingInvitedBy> {
-  onJoinWithStarterPack(NostrSet? invitedSet) {
+  onJoinWithStarterPack(NostrStarterPack? invitedSet) {
     if (invitedSet == null) {
       widget.nextCallback();
       return;
@@ -43,7 +43,7 @@ class _OnboardingInvitedByState extends ConsumerState<OnboardingInvitedBy> {
     widget.nextCallback();
   }
 
-  NostrSet? _getInvitedSet(WidgetRef ref) {
+  NostrStarterPack? _getInvitedSet(WidgetRef ref) {
     final inviteeLists =
         ref.watch(nostrListsFollowStateProvider(widget.invitedByPubkey));
 

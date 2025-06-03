@@ -8,23 +8,13 @@ class GetNostrLists {
     required NostrListRepository nostrListRepository,
   }) : _nostrListRepository = nostrListRepository;
 
-  Future<NostrSet?> getPublicNostrFollowSet({
-    required String pubKey,
-    required String name,
-  }) {
-    return _nostrListRepository.getPublicNostrFollowSet(
-      pubKey: pubKey,
-      name: name,
-    );
-  }
-
   /// gives you all the public sets by a user
-  Future<List<NostrSet>?> getPublicNostrFollowSets({
+  Future<List<NostrStarterPack>?> getPublicNostrStarterPacks({
     required String pubKey,
   }) {
-    return _nostrListRepository.getPublicNostrSets(
+    return _nostrListRepository.getPublicNostrStarterPacks(
       pubKey: pubKey,
-      kind: NostrList.FOLLOW_SET,
+      kind: NostrList.STARTER_PACK,
     );
   }
 }

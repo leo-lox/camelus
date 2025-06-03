@@ -39,7 +39,7 @@ class StarterPacksList extends ConsumerWidget {
             context,
             followSetsIndex,
           ) {
-            final NostrSet nostrSet =
+            final NostrStarterPack nostrSet =
                 followSetsList.publicNostrFollowSets[followSetsIndex];
 
             if (nostrSet.elements.isEmpty) return Container();

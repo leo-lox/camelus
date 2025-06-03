@@ -14,7 +14,7 @@ import '../../providers/ndk_provider.dart';
 import '../../routes/nostr/profile/profile_page_2.dart';
 
 class OpenStarterPack extends ConsumerWidget {
-  final NostrSet followSet;
+  final NostrStarterPack followSet;
 
   const OpenStarterPack({
     super.key,

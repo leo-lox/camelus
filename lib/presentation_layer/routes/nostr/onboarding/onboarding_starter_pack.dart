@@ -204,7 +204,7 @@ class _OnboardingStarterPackState extends ConsumerState<OnboardingStarterPack> {
 }
 
 class OnboardingOpenStarterPack extends ConsumerStatefulWidget {
-  final NostrSet followSet;
+  final NostrStarterPack followSet;
   final List<String> selectedPubkeys;
 
   const OnboardingOpenStarterPack({

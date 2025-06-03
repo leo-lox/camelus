@@ -38,26 +38,26 @@ class NostrListModel extends NostrList {
   }
 }
 
-class NostrSetModel extends NostrSet {
+class NostrStarterPackModel extends NostrStarterPack {
   //String name;
   //String? title;
   String? description;
   String? image;
 
-  NostrSetModel({
+  NostrStarterPackModel({
     required super.pubKey,
     required super.name,
     required super.createdAt,
     required super.elements,
-    super.kind = NostrList.FOLLOW_SET,
+    super.kind = NostrList.STARTER_PACK,
     super.title,
     this.description,
     this.image,
   });
 
   // Convert from Nip51Set (NDK) to NostrSetModel
-  static NostrSetModel fromNDK(ndk_entities.Nip51Set ndkSet) {
-    return NostrSetModel(
+  static NostrStarterPackModel fromNDK(ndk_entities.Nip51Set ndkSet) {
+    return NostrStarterPackModel(
       pubKey: ndkSet.pubKey,
       name: ndkSet.name,
       createdAt: ndkSet.createdAt,
@@ -75,7 +75,7 @@ class NostrSetModel extends NostrSet {
     return ndk_entities.Nip51Set(
       pubKey: pubKey,
       name: name,
-      kind: NostrList.FOLLOW_SET,
+      kind: NostrList.STARTER_PACK,
       createdAt: createdAt,
       elements: elements
           .map((e) => NostrListElementModel(
