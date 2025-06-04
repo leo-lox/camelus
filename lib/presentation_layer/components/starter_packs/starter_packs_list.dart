@@ -1,3 +1,4 @@
+import 'package:camelus/presentation_layer/atoms/long_button.dart';
 import 'package:camelus/presentation_layer/components/starter_packs/open_starter_pack.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -6,7 +7,9 @@ import '../../../config/palette.dart';
 import '../../../domain_layer/entities/nostr_list.dart';
 import '../../atoms/my_profile_picture.dart';
 import '../../atoms/overlapting_avatars.dart';
+import '../../atoms/spinner_center.dart';
 import '../../providers/metadata_state_provider.dart';
+import '../../providers/ndk_provider.dart';
 import '../../providers/nostr_lists_follow_state_provider.dart';
 
 class StarterPacksList extends ConsumerWidget {
@@ -22,10 +25,23 @@ class StarterPacksList extends ConsumerWidget {
     final followSetsList = ref.watch(nostrListsFollowStateProvider(pubkey));
 
     if (followSetsList.isLoading) {
-      return Center(child: CircularProgressIndicator());
+      return Center(child: SpinnerCenter());
     }
 
     if (followSetsList.publicNostrFollowSets.isEmpty) {
+      final ndk = ref.watch(ndkProvider);
+
+      final myPubkey = ndk.accounts.getPublicKey();
+
+      final bool isOwnProfile = myPubkey == pubkey;
+
+      if (isOwnProfile) {
+        return Center(
+          child: longButton(
+              name: "create starter pack", inverted: true, onPressed: () {}),
+        );
+      }
+
       return Center(
         child: Text("No starter packs found"),
       );
@@ -48,7 +64,11 @@ class StarterPacksList extends ConsumerWidget {
               title: Row(
                 children: [
                   if (starterPacks.image != null)
-                    Image.network(starterPacks.image!, width: 50, height: 50),
+                    Image.network(
+                      starterPacks.image!,
+                      width: 50,
+                      height: 50,
+                    ),
                   if (starterPacks.image == null)
                     Image.asset("assets/images/list_placeholder.png",
                         width: 50, height: 50),
