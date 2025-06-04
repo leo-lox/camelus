@@ -9,7 +9,7 @@ class GetNostrLists {
   }) : _nostrListRepository = nostrListRepository;
 
   /// gives you all the public sets by a user
-  Future<List<NostrStarterPack>?> getPublicNostrStarterPacks({
+  Stream<List<NostrStarterPack>?> getPublicNostrStarterPacks({
     required String pubKey,
   }) {
     return _nostrListRepository.getPublicNostrStarterPacks(

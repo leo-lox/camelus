@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ndk/shared/nips/nip19/nip19.dart';
 
 import '../../../config/palette.dart';
 import '../../../domain_layer/entities/nostr_list.dart';
@@ -35,7 +36,14 @@ class OpenStarterPack extends ConsumerWidget {
       "relays": outboxRelays ?? [],
     });
 
-    final url = "https://camelus.app/i/$npub/${followSet.name}";
+    final ndk = ref.watch(ndkProvider);
+
+    final myPubkey = ndk.accounts.getPublicKey();
+
+    final myNpub = Nip19.encodePubKey(myPubkey!);
+
+    ///  /invitee/pubkeyList/listName
+    final url = "https://camelus.app/i/${myNpub}/${followSet.name}";
 
     await Clipboard.setData(
       ClipboardData(text: url),
@@ -72,12 +80,11 @@ class OpenStarterPack extends ConsumerWidget {
             backgroundColor: Palette.background,
             toolbarHeight: 45,
             actions: [
-              if (isOwnStarterPack)
-                longButton(
-                  name: "share",
-                  onPressed: () => _onShare(ref),
-                  inverted: true,
-                ),
+              longButton(
+                name: "share",
+                onPressed: () => _onShare(ref),
+                inverted: true,
+              ),
               const SizedBox(
                 width: 20,
               )

@@ -39,17 +39,17 @@ class StarterPacksList extends ConsumerWidget {
             context,
             followSetsIndex,
           ) {
-            final NostrStarterPack nostrSet =
+            final NostrStarterPack starterPacks =
                 followSetsList.publicNostrFollowSets[followSetsIndex];
 
-            if (nostrSet.elements.isEmpty) return Container();
+            if (starterPacks.elements.isEmpty) return Container();
 
             return ListTile(
               title: Row(
                 children: [
-                  if (nostrSet.image != null)
-                    Image.network(nostrSet.image!, width: 50, height: 50),
-                  if (nostrSet.image == null)
+                  if (starterPacks.image != null)
+                    Image.network(starterPacks.image!, width: 50, height: 50),
+                  if (starterPacks.image == null)
                     Image.asset("assets/images/list_placeholder.png",
                         width: 50, height: 50),
                   SizedBox(width: 10),
@@ -62,7 +62,7 @@ class StarterPacksList extends ConsumerWidget {
                           TextSpan(
                             children: [
                               TextSpan(
-                                text: nostrSet.title ?? nostrSet.name,
+                                text: starterPacks.title ?? starterPacks.name,
                                 style: const TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w600,
@@ -70,7 +70,7 @@ class StarterPacksList extends ConsumerWidget {
                               ),
                               const TextSpan(text: " "),
                               TextSpan(
-                                text: "(${nostrSet.elements.length}) ",
+                                text: "(${starterPacks.elements.length}) ",
                                 style: const TextStyle(
                                   color: Palette.gray,
                                   fontSize: 12,
@@ -80,7 +80,7 @@ class StarterPacksList extends ConsumerWidget {
                           ),
                         ),
                         Text(
-                          nostrSet.description ?? "",
+                          starterPacks.description ?? "",
                           style: const TextStyle(fontSize: 12),
                           maxLines: 2,
                         ),
@@ -96,7 +96,7 @@ class StarterPacksList extends ConsumerWidget {
               trailing: SizedBox(
                 width: 135,
                 child: OverlappingAvatars(
-                  avatars: nostrSet.elements
+                  avatars: starterPacks.elements
                       .take(5)
                       .map((e) => UserImage(
                             imageUrl: ref
@@ -113,7 +113,7 @@ class StarterPacksList extends ConsumerWidget {
                   context,
                   MaterialPageRoute(
                     builder: (context) => OpenStarterPack(
-                      followSet: nostrSet,
+                      followSet: starterPacks,
                     ),
                   ),
                 );

@@ -1,4 +1,5 @@
 import 'package:riverpod/riverpod.dart';
+import 'dart:async';
 
 import '../../domain_layer/entities/nostr_list.dart';
 import '../../domain_layer/usecases/get_nostr_lists.dart';
@@ -36,8 +37,8 @@ final nostrListsFollowStateProvider = StateNotifierProvider.family<
 
 class NostrListsNotifier extends StateNotifier<NostrListsFollowState> {
   final GetNostrLists _getNostrLists;
-
   final String _pubkey;
+  StreamSubscription<List<NostrStarterPack>?>? _subscription;
 
   NostrListsNotifier(this._getNostrLists, this._pubkey)
       : super(
@@ -49,13 +50,27 @@ class NostrListsNotifier extends StateNotifier<NostrListsFollowState> {
     _initializeState();
   }
 
-  Future<void> _initializeState() async {
-    final lists =
-        await _getNostrLists.getPublicNostrStarterPacks(pubKey: _pubkey);
-
-    state = state.copyWith(
-      isLoading: false,
-      publicNostrFollowSets: lists ?? [],
+  void _initializeState() {
+    _subscription =
+        _getNostrLists.getPublicNostrStarterPacks(pubKey: _pubkey).listen(
+      (lists) {
+        state = state.copyWith(
+          isLoading: false,
+          publicNostrFollowSets: lists ?? [],
+        );
+      },
+      onError: (error) {
+        state = state.copyWith(
+          isLoading: false,
+          publicNostrFollowSets: [],
+        );
+      },
     );
+  }
+
+  @override
+  void dispose() {
+    _subscription?.cancel();
+    super.dispose();
   }
 }

@@ -15,22 +15,28 @@ class NostrListRepositoryImpl implements NostrListRepository {
   });
 
   @override
-  Future<List<NostrStarterPack>?> getPublicNostrStarterPacks({
+  Stream<List<NostrStarterPack>?> getPublicNostrStarterPacks({
     required String pubKey,
     required int kind,
-  }) async {
-    final ndkSets = await dartNdkSource.dartNdk.lists.getPublicNip51RelaySets(
+  }) {
+    final ndkSets = dartNdkSource.dartNdk.lists.getPublicSets(
       kind: kind,
       publicKey: pubKey,
       forceRefresh: false,
     );
 
-    if (ndkSets == null) {
-      return null;
-    }
+    final listSets = ndkSets.asyncMap((sets) async {
+      if (sets == null) return null;
 
-    final listSets =
-        ndkSets.map((e) => NostrStarterPackModel.fromNDK(e)).toList();
+      final starterPacks = <NostrStarterPack>[];
+      for (final set in sets) {
+        final starterPack = NostrStarterPackModel.fromNDK(set);
+        starterPacks.add(starterPack);
+      }
+      return starterPacks;
+    });
     return listSets;
   }
+
+  // todo get list by name
 }
