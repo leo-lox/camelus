@@ -98,7 +98,8 @@ class _EditStarterPackContentState
                     onTab: () => _removeFromSelection(user),
                   );
                 }),
-              if (starterPackData.selectedUsers.isEmpty)
+              if (starterPackData.selectedUsers.isEmpty &&
+                  !searchState.isSearching)
                 Center(
                   heightFactor: 5,
                   child: Text("start searching to add user"),
