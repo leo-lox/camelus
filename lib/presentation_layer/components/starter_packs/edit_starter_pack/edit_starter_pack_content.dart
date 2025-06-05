@@ -26,6 +26,8 @@ class EditStarterPackContent extends ConsumerStatefulWidget {
 
 class _EditStarterPackContentState
     extends ConsumerState<EditStarterPackContent> {
+  bool _isReorderMode = false;
+
   _addToSelection(UserMetadata user) {
     final starterPackNotifier =
         ref.read(editStarterPackProvider(widget.starterPackId).notifier);
@@ -40,6 +42,13 @@ class _EditStarterPackContentState
     starterPackNotifier.removeUser(user);
   }
 
+  _reorderUser(int oldIndex, int newIndex) {
+    final starterPackNotifier =
+        ref.read(editStarterPackProvider(widget.starterPackId).notifier);
+
+    starterPackNotifier.reorderUser(oldIndex, newIndex);
+  }
+
   @override
   Widget build(BuildContext context) {
     final searchService = ref.read(searchProvider);
@@ -47,67 +56,115 @@ class _EditStarterPackContentState
     final searchNotifier = ref.watch(searchStateProvider.notifier);
     final starterPackData =
         ref.watch(editStarterPackProvider(widget.starterPackId));
+
     return Scaffold(
       backgroundColor: Palette.background,
       body: Column(
         children: [
-          SearchBarWidget(
-            onSearchChanged: (value) async {
-              searchNotifier.setSearchQuery(value);
-              searchNotifier.setSearching(true);
+          Column(
+            children: [
+              SearchBarWidget(
+                onSearchChanged: (value) async {
+                  searchNotifier.setSearchQuery(value);
+                  searchNotifier.setSearching(true);
 
-              if (value.isEmpty) {
-                ref
-                    .read(searchStateProvider.notifier)
-                    .clearSearch(stillSearching: false);
-                return;
-              }
-              final users = await searchService.searchMetadata(value);
-              ref
-                  .read(searchStateProvider.notifier)
-                  .setSearchResultsUsers(users);
-            },
-            onSubmit: (value) {},
-            helpSearch: (context) {},
-            onBackPress: () {
-              searchNotifier.clearSearch();
-            },
+                  if (value.isEmpty) {
+                    ref
+                        .read(searchStateProvider.notifier)
+                        .clearSearch(stillSearching: false);
+                    return;
+                  }
+                  final users = await searchService.searchMetadata(value);
+                  ref
+                      .read(searchStateProvider.notifier)
+                      .setSearchResultsUsers(users);
+
+                  setState(() {
+                    _isReorderMode = false;
+                  });
+                },
+                onSubmit: (value) {},
+                helpSearch: (context) {},
+                trailing: IconButton(
+                  icon: Icon(
+                    PhosphorIcons.listNumbers(),
+                    color: _isReorderMode ? Palette.primary : Palette.white,
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      _isReorderMode = !_isReorderMode;
+                    });
+                  },
+                ),
+                onBackPress: () {
+                  searchNotifier.clearSearch();
+                },
+              ),
+            ],
           ),
           Expanded(
-              child: ListView(
-            physics: const BouncingScrollPhysics(),
-            children: [
-              ...searchState.searchResultsUsers.map((user) {
-                final selected = starterPackData.selectedUsers.contains(user);
-                return PersonSelect(
-                  user: user,
-                  selected: selected,
-                  onTab: () => selected
-                      ? _removeFromSelection(user)
-                      : _addToSelection(user),
-                );
-              }),
-              if (!searchState.isSearching)
-                ...starterPackData.selectedUsers.map((user) {
-                  if (searchState.searchResultsUsers.contains(user)) {
-                    return Container();
-                  }
-                  return PersonSelect(
-                    user: user,
-                    selected: true,
-                    onTab: () => _removeFromSelection(user),
-                  );
-                }),
-              if (starterPackData.selectedUsers.isEmpty &&
-                  !searchState.isSearching)
-                Center(
-                  heightFactor: 5,
-                  child: Text("start searching to add user"),
-                )
-            ],
-          ))
+            child: _isReorderMode && starterPackData.selectedUsers.isNotEmpty
+                ? _buildReorderableList(starterPackData)
+                : _buildNormalList(searchState, starterPackData),
+          ),
         ],
       ),
+    );
+  }
+
+  Widget _buildReorderableList(StarterPackData starterPackData) {
+    return ReorderableListView.builder(
+      physics: const BouncingScrollPhysics(),
+      itemCount: starterPackData.selectedUsers.length,
+      onReorder: _reorderUser,
+      buildDefaultDragHandles: false,
+      itemBuilder: (context, index) {
+        final user = starterPackData.selectedUsers[index];
+        return PersonSelect(
+          key: ValueKey(user.pubkey),
+          user: user,
+          selected: true,
+          onTab: () => _removeFromSelection(user),
+          isReorderMode: true,
+          reorderIndex: index,
+        );
+      },
+    );
+  }
+
+  Widget _buildNormalList(
+      SearchState searchState, StarterPackData starterPackData) {
+    return ListView(
+      physics: const BouncingScrollPhysics(),
+      children: [
+        ...searchState.searchResultsUsers.map((user) {
+          final selected = starterPackData.selectedUsers.contains(user);
+          return PersonSelect(
+            user: user,
+            selected: selected,
+            onTab: () =>
+                selected ? _removeFromSelection(user) : _addToSelection(user),
+            isReorderMode: false,
+          );
+        }),
+        if (!searchState.isSearching)
+          ...starterPackData.selectedUsers.map((user) {
+            if (searchState.searchResultsUsers.contains(user)) {
+              return Container();
+            }
+            return PersonSelect(
+              user: user,
+              selected: true,
+              onTab: () => _removeFromSelection(user),
+              isReorderMode: false,
+            );
+          }),
+        if (starterPackData.selectedUsers.isEmpty && !searchState.isSearching)
+          const Center(
+            heightFactor: 5,
+            child: Text("start searching to add user"),
+          )
+      ],
     );
   }
 }
@@ -116,17 +173,23 @@ class PersonSelect extends StatelessWidget {
   final UserMetadata user;
   final bool selected;
   final Function onTab;
+  final bool isReorderMode;
+  final int? reorderIndex;
+
   const PersonSelect({
     super.key,
     required this.user,
     required this.selected,
     required this.onTab,
+    this.isReorderMode = false,
+    this.reorderIndex,
   });
 
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      onTap: () => onTab(),
+      onTap:
+          isReorderMode ? null : () => onTab(), // Disable tap in reorder mode
       title: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -167,9 +230,25 @@ class PersonSelect extends StatelessWidget {
           ),
         ],
       ),
-      trailing: Icon(
-        selected ? PhosphorIcons.checkCircle() : PhosphorIcons.circle(),
-        color: Palette.white,
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (!isReorderMode)
+            Icon(
+              selected ? PhosphorIcons.checkCircle() : PhosphorIcons.circle(),
+              color: Palette.white,
+            ),
+          if (isReorderMode)
+            ReorderableDragStartListener(
+              index: reorderIndex!,
+              child: Container(
+                color: Colors.transparent,
+                height: 80,
+                width: 50,
+                child: Icon(PhosphorIcons.dotsSixVertical()),
+              ),
+            )
+        ],
       ),
     );
   }

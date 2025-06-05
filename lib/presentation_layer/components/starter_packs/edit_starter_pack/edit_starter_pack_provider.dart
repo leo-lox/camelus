@@ -75,8 +75,20 @@ class EditStarterPackNotifier extends StateNotifier<StarterPackData> {
   }
 
   void removeUser(UserMetadata user) {
-    final newList = state.selectedUsers.remove(user);
+    state.selectedUsers.remove(user);
     state = state.copyWith(selectedUsers: state.selectedUsers);
+  }
+
+  void reorderUser(int oldIndex, int newIndex) {
+    if (newIndex > oldIndex) {
+      newIndex -= 1;
+    }
+
+    final users = List<UserMetadata>.from(state.selectedUsers);
+    final user = users.removeAt(oldIndex);
+    users.insert(newIndex, user);
+
+    state = state.copyWith(selectedUsers: users);
   }
 
   // Validation methods
