@@ -7,9 +7,11 @@ import 'edit_starter_pack_provider.dart';
 
 class EditStarterPackMeta extends ConsumerStatefulWidget {
   final String starterPackId;
+  final Function onNext;
   const EditStarterPackMeta({
     super.key,
     required this.starterPackId,
+    required this.onNext,
   });
   @override
   ConsumerState<EditStarterPackMeta> createState() =>
@@ -204,7 +206,11 @@ class _EditStarterPackMetaState extends ConsumerState<EditStarterPackMeta> {
                   width: double.infinity,
                   height: 40,
                   child: longButton(
-                      name: "next", inverted: true, onPressed: () {})),
+                      name: "next",
+                      inverted: true,
+                      onPressed: () {
+                        widget.onNext();
+                      })),
             ),
           ),
         ],

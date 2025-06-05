@@ -27,8 +27,14 @@ class _EditStarterPackState extends ConsumerState<EditStarterPack>
       controller: _horizontalPageController,
       children: [
         EditStarterPackMeta(
-          starterPackId: "testId",
-        ),
+            starterPackId: "testId",
+            onNext: () {
+              _horizontalPageController.animateToPage(
+                1,
+                duration: const Duration(milliseconds: 200),
+                curve: Curves.easeInOut,
+              );
+            }),
         EditStarterPackContent(),
       ],
     ));
