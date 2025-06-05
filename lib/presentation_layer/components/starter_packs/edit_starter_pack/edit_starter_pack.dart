@@ -26,7 +26,9 @@ class _EditStarterPackState extends ConsumerState<EditStarterPack>
         child: PageView(
       controller: _horizontalPageController,
       children: [
-        EditStarterPackMeta(),
+        EditStarterPackMeta(
+          starterPackId: "testId",
+        ),
         EditStarterPackContent(),
       ],
     ));
