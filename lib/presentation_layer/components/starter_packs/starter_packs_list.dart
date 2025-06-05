@@ -38,7 +38,11 @@ class StarterPacksList extends ConsumerWidget {
       if (isOwnProfile) {
         return Center(
           child: longButton(
-              name: "create starter pack", inverted: true, onPressed: () {}),
+              name: "create starter pack",
+              inverted: true,
+              onPressed: () {
+                Navigator.pushNamed(context, '/edit-starter-pack');
+              }),
         );
       }
 

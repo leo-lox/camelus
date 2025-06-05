@@ -16,6 +16,7 @@ import 'domain_layer/usecases/app_auth.dart';
 import 'lifecycle/notifications/init_firebase.dart';
 import 'lifecycle/notifications/notifications_caller.dart';
 import 'objectbox_isolate.dart';
+import 'presentation_layer/components/starter_packs/edit_starter_pack/edit_starter_pack.dart';
 import 'presentation_layer/init/init_moderation.dart';
 import 'presentation_layer/providers/app_lifecycle_provider.dart';
 import 'presentation_layer/providers/db_app_provider.dart';
@@ -258,6 +259,10 @@ class MyApp extends ConsumerWidget {
             case '/nostr/blockedUsers':
               return MaterialPageRoute(
                 builder: (context) => const BlockedUsers(),
+              );
+            case '/edit-starter-pack':
+              return MaterialPageRoute(
+                builder: (context) => const EditStarterPack(),
               );
           }
           assert(false, 'Need to implement ${settings.name}');
