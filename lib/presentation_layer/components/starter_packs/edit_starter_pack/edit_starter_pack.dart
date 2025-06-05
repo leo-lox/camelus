@@ -35,7 +35,10 @@ class _EditStarterPackState extends ConsumerState<EditStarterPack>
                 curve: Curves.easeInOut,
               );
             }),
-        EditStarterPackContent(),
+        EditStarterPackContent(
+          starterPackId: "testId",
+          onNext: () {},
+        ),
       ],
     ));
   }

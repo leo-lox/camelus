@@ -1,21 +1,28 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../domain_layer/entities/user_metadata.dart';
+
 class StarterPackData {
   final String title;
   final String description;
+  final List<UserMetadata>
+      selectedUsers; // list over set so odering is possible
 
   const StarterPackData({
     required this.title,
     required this.description,
+    required this.selectedUsers,
   });
 
   StarterPackData copyWith({
     String? title,
     String? description,
+    List<UserMetadata>? selectedUsers,
   }) {
     return StarterPackData(
       title: title ?? this.title,
       description: description ?? this.description,
+      selectedUsers: selectedUsers ?? this.selectedUsers,
     );
   }
 
@@ -35,10 +42,7 @@ class StarterPackData {
 class EditStarterPackNotifier extends StateNotifier<StarterPackData> {
   EditStarterPackNotifier(String starterPackId)
       : super(
-          const StarterPackData(
-            title: '',
-            description: '',
-          ),
+          const StarterPackData(title: '', description: '', selectedUsers: []),
         ) {
     // Load initial data based on starterPackId
     _loadStarterPack(starterPackId);
@@ -61,6 +65,18 @@ class EditStarterPackNotifier extends StateNotifier<StarterPackData> {
       title: title,
       description: description,
     );
+  }
+
+  void addUser(UserMetadata user) {
+    if (state.selectedUsers.contains(user)) {
+      return;
+    }
+    state = state.copyWith(selectedUsers: [user, ...state.selectedUsers]);
+  }
+
+  void removeUser(UserMetadata user) {
+    final newList = state.selectedUsers.remove(user);
+    state = state.copyWith(selectedUsers: state.selectedUsers);
   }
 
   // Validation methods

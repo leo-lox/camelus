@@ -9,6 +9,7 @@ class SearchBarWidget extends StatefulWidget {
   final FocusNode? externalFocusNode;
   final TextEditingController? externalController;
   final Widget? leading;
+  final Function? onBackPress;
 
   const SearchBarWidget({
     super.key,
@@ -18,6 +19,7 @@ class SearchBarWidget extends StatefulWidget {
     this.externalFocusNode,
     this.externalController,
     this.leading,
+    this.onBackPress,
   });
 
   @override
@@ -84,6 +86,9 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
                     _searchFocusNode.hasFocus
                         ? _searchFocusNode.unfocus()
                         : _searchFocusNode.requestFocus();
+                    if (widget.onBackPress != null) {
+                      widget.onBackPress!();
+                    }
                   },
                 ),
           ),
