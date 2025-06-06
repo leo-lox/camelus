@@ -4,6 +4,7 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../../config/palette.dart';
 import '../../../../domain_layer/entities/user_metadata.dart';
+import '../../../atoms/long_button.dart';
 import '../../../atoms/my_profile_picture.dart';
 import '../../../atoms/nip_05_text.dart';
 import '../../../providers/search_provider.dart';
@@ -107,6 +108,25 @@ class _EditStarterPackContentState
                 ? _buildReorderableList(starterPackData)
                 : _buildNormalList(searchState, starterPackData),
           ),
+          if (!searchState.isSearching)
+            Container(
+              padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
+              child: SafeArea(
+                top: false,
+                child: SizedBox(
+                    width: double.infinity,
+                    height: 40,
+                    child: longButton(
+                        name: starterPackData.selectedUsers.isEmpty
+                            ? "add users to continue"
+                            : "continue with ${starterPackData.selectedUsers.length} people",
+                        inverted: true,
+                        disabled: starterPackData.selectedUsers.isEmpty,
+                        onPressed: () {
+                          widget.onNext();
+                        })),
+              ),
+            ),
         ],
       ),
     );
