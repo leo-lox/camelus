@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../../config/palette.dart';
+import '../../../../domain_layer/entities/starter_pack_identifier.dart';
 import '../../../../domain_layer/entities/user_metadata.dart';
 import '../../../atoms/long_button.dart';
 import '../../../atoms/my_profile_picture.dart';
@@ -13,11 +14,11 @@ import '../../search_bar.dart';
 import 'edit_starter_pack_provider.dart';
 
 class EditStarterPackContent extends ConsumerStatefulWidget {
-  final String starterPackId;
+  final StarterPackIdentifier starterPackIdentifier;
   final Function onNext;
   const EditStarterPackContent({
     super.key,
-    required this.starterPackId,
+    required this.starterPackIdentifier,
     required this.onNext,
   });
   @override
@@ -30,22 +31,22 @@ class _EditStarterPackContentState
   bool _isReorderMode = false;
 
   _addToSelection(UserMetadata user) {
-    final starterPackNotifier =
-        ref.read(editStarterPackProvider(widget.starterPackId).notifier);
+    final starterPackNotifier = ref
+        .read(editStarterPackProvider(widget.starterPackIdentifier).notifier);
 
     starterPackNotifier.addUser(user);
   }
 
   _removeFromSelection(UserMetadata user) {
-    final starterPackNotifier =
-        ref.read(editStarterPackProvider(widget.starterPackId).notifier);
+    final starterPackNotifier = ref
+        .read(editStarterPackProvider(widget.starterPackIdentifier).notifier);
 
     starterPackNotifier.removeUser(user);
   }
 
   _reorderUser(int oldIndex, int newIndex) {
-    final starterPackNotifier =
-        ref.read(editStarterPackProvider(widget.starterPackId).notifier);
+    final starterPackNotifier = ref
+        .read(editStarterPackProvider(widget.starterPackIdentifier).notifier);
 
     starterPackNotifier.reorderUser(oldIndex, newIndex);
   }
@@ -56,7 +57,7 @@ class _EditStarterPackContentState
     final searchState = ref.watch(searchStateProvider);
     final searchNotifier = ref.watch(searchStateProvider.notifier);
     final starterPackData =
-        ref.watch(editStarterPackProvider(widget.starterPackId));
+        ref.watch(editStarterPackProvider(widget.starterPackIdentifier));
 
     return Scaffold(
       backgroundColor: Palette.background,

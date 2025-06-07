@@ -11,6 +11,7 @@ import 'package:ndk/ndk.dart';
 //import 'data_layer/db/object_box_ndk/db_object_box.dart';
 import 'package:ndk_objectbox/ndk_objectbox.dart';
 import 'config/camelus_config.dart';
+import 'domain_layer/entities/starter_pack_identifier.dart';
 import 'lifecycle/deep_links.dart';
 import 'domain_layer/usecases/app_auth.dart';
 import 'lifecycle/notifications/init_firebase.dart';
@@ -262,7 +263,10 @@ class MyApp extends ConsumerWidget {
               );
             case '/edit-starter-pack':
               return MaterialPageRoute(
-                builder: (context) => const EditStarterPack(),
+                builder: (context) => EditStarterPack(
+                  starterPackIdentifier:
+                      settings.arguments as StarterPackIdentifier,
+                ),
               );
           }
           assert(false, 'Need to implement ${settings.name}');

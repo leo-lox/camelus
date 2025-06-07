@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../domain_layer/entities/nostr_list.dart';
+import '../../../../domain_layer/entities/starter_pack_identifier.dart';
 import '../../../../domain_layer/entities/user_metadata.dart';
 import '../../../../domain_layer/usecases/get_nostr_lists.dart';
 import '../../../providers/nostr_list_provider.dart';
@@ -60,11 +61,13 @@ class StarterPackData {
 // State notifier for managing starter pack data
 class EditStarterPackNotifier extends StateNotifier<StarterPackData> {
   final GetNostrLists _listsProvider;
+  final NostrListsFollowState _listsState;
 
-  EditStarterPackNotifier(this._listsProvider, String starterPackId)
+  EditStarterPackNotifier(
+      this._listsProvider, this._listsState, StarterPackIdentifier identifier)
       : super(
           StarterPackData(
-            name: starterPackId,
+            name: identifier.name,
             title: '',
             description: '',
             selectedUsers: [],
@@ -73,11 +76,24 @@ class EditStarterPackNotifier extends StateNotifier<StarterPackData> {
           ),
         ) {
     // Load initial data based on starterPackId
-    _loadStarterPack(starterPackId);
+    _loadStarterPack(identifier);
   }
 
-  void _loadStarterPack(String id) {
-    // todo
+  void _loadStarterPack(StarterPackIdentifier identifier) {
+    try {
+      final myList = _listsState.publicNostrFollowSets
+          .where((l) => l.name == identifier.name)
+          .first;
+      state = state.copyWith(
+        name: myList.name,
+        title: myList.title,
+        description: myList.description,
+        //todo fetch metadata
+        //selectedUsers: myList.pubKeys
+      );
+    } catch (_) {
+      // new set, do nothing
+    }
   }
 
   void updateTitle(String title) {
@@ -151,9 +167,15 @@ class EditStarterPackNotifier extends StateNotifier<StarterPackData> {
 }
 
 final editStarterPackProvider = StateNotifierProvider.family<
-    EditStarterPackNotifier, StarterPackData, String>(
-  (ref, starterPackId) {
+    EditStarterPackNotifier, StarterPackData, StarterPackIdentifier>(
+  (ref, identifier) {
+    final listStateProvider =
+        ref.watch(nostrListsFollowStateProvider(identifier.pubkey));
     final listProvider = ref.watch(nostrListProvider);
-    return EditStarterPackNotifier(listProvider, starterPackId);
+    return EditStarterPackNotifier(
+      listProvider,
+      listStateProvider,
+      identifier,
+    );
   },
 );

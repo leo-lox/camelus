@@ -2,16 +2,17 @@ import 'package:camelus/presentation_layer/components/starter_packs/edit_starter
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../domain_layer/entities/starter_pack_identifier.dart';
 import '../../../../helpers/helpers.dart';
 import 'edit_starter_pack_content.dart';
 import 'edit_starter_pack_meta.dart';
 
 class EditStarterPack extends ConsumerStatefulWidget {
-  final String? starterPackId;
+  final StarterPackIdentifier starterPackIdentifier;
 
   const EditStarterPack({
     super.key,
-    this.starterPackId,
+    required this.starterPackIdentifier,
   });
 
   @override
@@ -20,21 +21,6 @@ class EditStarterPack extends ConsumerStatefulWidget {
 
 class _EditStarterPackState extends ConsumerState<EditStarterPack>
     with TickerProviderStateMixin {
-  late final String myStarterPackId;
-  @override
-  void initState() {
-    super.initState();
-
-    // new starter pack id gets created
-    myStarterPackId =
-        widget.starterPackId ?? "i-${Helpers().getRandomString(10)}";
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-  }
-
   final PageController _horizontalPageController = PageController(
     initialPage: 0,
     keepPage: true,
@@ -52,7 +38,7 @@ class _EditStarterPackState extends ConsumerState<EditStarterPack>
           : const AlwaysScrollableScrollPhysics(),
       children: [
         EditStarterPackMeta(
-            starterPackId: myStarterPackId,
+            starterPackIdentifier: widget.starterPackIdentifier,
             onNext: () {
               _horizontalPageController.animateToPage(
                 1,
@@ -61,7 +47,7 @@ class _EditStarterPackState extends ConsumerState<EditStarterPack>
               );
             }),
         EditStarterPackContent(
-          starterPackId: myStarterPackId,
+          starterPackIdentifier: widget.starterPackIdentifier,
           onNext: () {
             _horizontalPageController.animateToPage(
               2,
@@ -71,7 +57,7 @@ class _EditStarterPackState extends ConsumerState<EditStarterPack>
           },
         ),
         EditStarterPackSummary(
-            starterPackId: myStarterPackId,
+            starterPackIdentifier: widget.starterPackIdentifier,
             onNext: () {
               setState(() {
                 scrollLock = true;

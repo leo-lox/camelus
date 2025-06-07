@@ -3,14 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../config/palette.dart';
+import '../../../../domain_layer/entities/starter_pack_identifier.dart';
 import 'edit_starter_pack_provider.dart';
 
 class EditStarterPackMeta extends ConsumerStatefulWidget {
-  final String starterPackId;
+  final StarterPackIdentifier starterPackIdentifier;
   final Function onNext;
   const EditStarterPackMeta({
     super.key,
-    required this.starterPackId,
+    required this.starterPackIdentifier,
     required this.onNext,
   });
   @override
@@ -30,7 +31,8 @@ class _EditStarterPackMetaState extends ConsumerState<EditStarterPackMeta> {
 
     // Listen to provider changes and update controllers
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final data = ref.read(editStarterPackProvider(widget.starterPackId));
+      final data =
+          ref.read(editStarterPackProvider(widget.starterPackIdentifier));
       _titleController.text = data.title;
       _descriptionController.text = data.description ?? "";
     });
@@ -46,9 +48,9 @@ class _EditStarterPackMetaState extends ConsumerState<EditStarterPackMeta> {
   @override
   Widget build(BuildContext context) {
     final starterPackData =
-        ref.watch(editStarterPackProvider(widget.starterPackId));
-    final starterPackNotifier =
-        ref.watch(editStarterPackProvider(widget.starterPackId).notifier);
+        ref.watch(editStarterPackProvider(widget.starterPackIdentifier));
+    final starterPackNotifier = ref
+        .watch(editStarterPackProvider(widget.starterPackIdentifier).notifier);
 
     return Scaffold(
       backgroundColor: Palette.background,

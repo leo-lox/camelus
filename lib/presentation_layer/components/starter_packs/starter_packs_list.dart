@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../domain_layer/entities/nostr_list.dart';
+import '../../../domain_layer/entities/starter_pack_identifier.dart';
+import '../../../helpers/helpers.dart';
 import '../../atoms/spinner_center.dart';
 import '../../providers/ndk_provider.dart';
 import '../../providers/nostr_lists_follow_state_provider.dart';
@@ -36,7 +38,11 @@ class StarterPacksList extends ConsumerWidget {
               name: "create starter pack",
               inverted: true,
               onPressed: () {
-                Navigator.pushNamed(context, '/edit-starter-pack');
+                Navigator.pushNamed(context, '/edit-starter-pack',
+                    arguments: StarterPackIdentifier(
+                      name: "i-${Helpers().getRandomString(10)}", //create new
+                      pubkey: pubkey,
+                    ));
               }),
         );
       }
@@ -49,7 +55,9 @@ class StarterPacksList extends ConsumerWidget {
     return Padding(
       padding: const EdgeInsets.only(top: 50),
       child: ListView.builder(
-          itemCount: followSetsList.publicNostrFollowSets.length + 1,
+          itemCount: isOwnProfile
+              ? followSetsList.publicNostrFollowSets.length + 1
+              : followSetsList.publicNostrFollowSets.length,
           itemBuilder: (
             context,
             followSetsIndex,
@@ -64,7 +72,12 @@ class StarterPacksList extends ConsumerWidget {
                       name: "create another",
                       inverted: true,
                       onPressed: () {
-                        Navigator.pushNamed(context, '/edit-starter-pack');
+                        Navigator.pushNamed(context, '/edit-starter-pack',
+                            arguments: StarterPackIdentifier(
+                              name:
+                                  "i-${Helpers().getRandomString(10)}", //create new
+                              pubkey: pubkey,
+                            ));
                       }),
                 ),
               );

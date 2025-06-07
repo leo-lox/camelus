@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ndk/shared/nips/nip19/nip19.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../config/palette.dart';
 import '../../../domain_layer/entities/nostr_list.dart';
+import '../../../domain_layer/entities/starter_pack_identifier.dart';
 import '../../../helpers/helpers.dart';
 import '../../../helpers/nprofile_helper.dart';
 import '../../atoms/long_button.dart';
@@ -50,6 +52,21 @@ class OpenStarterPack extends ConsumerWidget {
     );
   }
 
+  _onEdit(
+    BuildContext context,
+  ) {
+    Navigator.pushNamed(context, '/edit-starter-pack',
+        arguments: StarterPackIdentifier(
+          name: followSet.name,
+          pubkey: followSet.pubKey,
+        ));
+  }
+
+  _onDelete() {
+    // TODO: implement delete
+    print("Delete starter pack");
+  }
+
   _navigateToProfile(BuildContext context, String pubkey) {
     Navigator.push(
       context,
@@ -70,7 +87,7 @@ class OpenStarterPack extends ConsumerWidget {
     final bool isOwnStarterPack = myPubkey == followSet.pubKey;
 
     return DefaultTabController(
-      length: 3,
+      length: 1,
       child: Scaffold(
         backgroundColor: Palette.background,
         appBar: AppBar(
@@ -87,7 +104,54 @@ class OpenStarterPack extends ConsumerWidget {
               ),
               const SizedBox(
                 width: 20,
-              )
+              ),
+              if (isOwnStarterPack)
+                PopupMenuButton<String>(
+                  icon: Icon(
+                    PhosphorIcons.dotsThreeVertical(),
+                    color: Palette.white,
+                  ),
+                  color: Palette.extraDarkGray,
+                  onSelected: (String value) {
+                    switch (value) {
+                      case 'edit':
+                        _onEdit(context);
+                        break;
+                      case 'delete':
+                        _onDelete();
+                        break;
+                    }
+                  },
+                  itemBuilder: (BuildContext context) => [
+                    PopupMenuItem<String>(
+                      value: 'edit',
+                      child: Row(
+                        children: [
+                          Icon(PhosphorIcons.pen(),
+                              color: Palette.white, size: 20),
+                          SizedBox(width: 8),
+                          Text('Edit',
+                              style: TextStyle(color: Palette.lightGray)),
+                        ],
+                      ),
+                    ),
+                    PopupMenuItem<String>(
+                      value: 'delete',
+                      child: Row(
+                        children: [
+                          Icon(PhosphorIcons.trash(),
+                              color: Colors.red, size: 20),
+                          SizedBox(width: 8),
+                          Text('Delete',
+                              style: TextStyle(color: Palette.lightGray)),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              const SizedBox(
+                width: 20,
+              ),
             ]),
         body: Column(
           children: [
@@ -190,21 +254,6 @@ class OpenStarterPack extends ConsumerWidget {
                 ],
               ),
             ),
-            const SizedBox(
-              height: 15,
-            ),
-            if (false)
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                width: 400,
-                height: 40,
-                child: longButton(
-                  name: "wip",
-                  onPressed: (() {}),
-                  disabled: false,
-                  inverted: true,
-                ),
-              ),
             const SizedBox(
               height: 15,
             ),

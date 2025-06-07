@@ -5,17 +5,18 @@ import 'package:share_plus/share_plus.dart';
 
 import '../../../../config/palette.dart';
 import '../../../../domain_layer/entities/nostr_list.dart';
+import '../../../../domain_layer/entities/starter_pack_identifier.dart';
 import '../../../atoms/long_button.dart';
 import '../../../providers/ndk_provider.dart';
 import '../starter_pack_card.dart';
 import 'edit_starter_pack_provider.dart';
 
 class EditStarterPackSummary extends ConsumerStatefulWidget {
-  final String starterPackId;
+  final StarterPackIdentifier starterPackIdentifier;
   final Function onNext;
   const EditStarterPackSummary({
     super.key,
-    required this.starterPackId,
+    required this.starterPackIdentifier,
     required this.onNext,
   });
   @override
@@ -80,14 +81,15 @@ class _EditStarterPackSummaryState extends ConsumerState<EditStarterPackSummary>
   @override
   Widget build(BuildContext context) {
     final starterPackData =
-        ref.watch(editStarterPackProvider(widget.starterPackId));
-    final starterPackNotifier =
-        ref.watch(editStarterPackProvider(widget.starterPackId).notifier);
+        ref.watch(editStarterPackProvider(widget.starterPackIdentifier));
+    final starterPackNotifier = ref
+        .watch(editStarterPackProvider(widget.starterPackIdentifier).notifier);
 
     final ndk = ref.watch(ndkProvider);
 
     // trigger animations when broadcasted becomes true
-    ref.listen(editStarterPackProvider(widget.starterPackId), (previous, next) {
+    ref.listen(editStarterPackProvider(widget.starterPackIdentifier),
+        (previous, next) {
       if (previous?.broadcasted == false && next.broadcasted == true) {
         _slideController.forward();
         _fadeController.forward();
@@ -247,7 +249,7 @@ class _EditStarterPackSummaryState extends ConsumerState<EditStarterPackSummary>
                       Navigator.pop(context);
 
                       ref.invalidate(
-                        editStarterPackProvider(starterPackData.name),
+                        editStarterPackProvider(widget.starterPackIdentifier),
                       );
                     },
                   ),
