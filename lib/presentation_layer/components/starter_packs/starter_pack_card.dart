@@ -12,9 +12,11 @@ import '../../providers/metadata_state_provider.dart';
 
 class StarterPackCard extends ConsumerStatefulWidget {
   final NostrStarterPack pack;
+  final Function? onTab;
   const StarterPackCard({
     super.key,
     required this.pack,
+    this.onTab,
   });
 
   @override
@@ -26,176 +28,183 @@ class _StarterPackCardState extends ConsumerState<StarterPackCard> {
   Widget build(BuildContext context) {
     final creatorMetadata =
         ref.watch(metadataStateProvider(widget.pack.pubKey)).userMetadata;
-    return Card(
-      margin: const EdgeInsets.all(16),
-      clipBehavior: Clip.antiAlias,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Stack(
-        children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // image
-              if (widget.pack.image != null)
-                Container(
-                  height: 120,
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    image: DecorationImage(
-                      image: NetworkImage(widget.pack.image!),
-                      fit: BoxFit.cover,
+    return InkWell(
+      borderRadius: BorderRadius.circular(12),
+      onTap: widget.onTab != null ? () => widget.onTab!() : null,
+      splashColor: widget.onTab != null ? null : Colors.transparent,
+      highlightColor: widget.onTab != null ? null : Colors.transparent,
+      hoverColor: widget.onTab != null ? null : Colors.transparent,
+      focusColor: widget.onTab != null ? null : Colors.transparent,
+      child: Card(
+        // margin: const EdgeInsets.all(16),
+        clipBehavior: Clip.antiAlias,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Stack(
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // image
+                if (widget.pack.image != null)
+                  Container(
+                    height: 120,
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      image: DecorationImage(
+                        image: NetworkImage(widget.pack.image!),
+                        fit: BoxFit.cover,
+                      ),
                     ),
                   ),
-                ),
-              if (widget.pack.image == null)
-                Container(
-                  height: 120,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [
-                        Palette.extraDarkGray,
-                        Palette.extraDarkGray.withValues(alpha: 1),
-                        Palette.extraDarkGray,
+                if (widget.pack.image == null)
+                  Container(
+                    height: 120,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          Palette.extraDarkGray,
+                          Palette.extraDarkGray.withValues(alpha: 1),
+                          Palette.extraDarkGray,
+                        ],
+                      ),
+                    ),
+                    child: Stack(
+                      children: [
+                        // Pattern of icons
+                        ...List.generate(20, (index) {
+                          final row = index ~/ 5;
+                          final col = index % 5;
+
+                          // List of different people/social icons
+                          final icons = [
+                            PhosphorIcons.house(),
+                            PhosphorIcons.users(),
+                            PhosphorIcons.personSimpleTaiChi(),
+                            PhosphorIcons.personSimple(),
+                          ];
+
+                          return Positioned(
+                            left: col * 100 + (row.isEven ? 0 : 30),
+                            top: row * 30.0 - 10,
+                            child: Icon(
+                              icons[index % icons.length],
+                              color: Colors.white.withValues(
+                                  alpha: 0.09 +
+                                      (index % 3) * 0.02), // Varying opacity
+                              size: 20 + (index % 3) * 4, // Varying sizes
+                            ),
+                          );
+                        }),
                       ],
                     ),
                   ),
-                  child: Stack(
+
+                // body - content
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 25, 16, 16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Pattern of icons
-                      ...List.generate(20, (index) {
-                        final row = index ~/ 5;
-                        final col = index % 5;
+                      // Title
+                      Text(
+                        widget.pack.title ?? "Starter Pack",
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
 
-                        // List of different people/social icons
-                        final icons = [
-                          PhosphorIcons.house(),
-                          PhosphorIcons.users(),
-                          PhosphorIcons.personSimpleTaiChi(),
-                          PhosphorIcons.personSimple(),
-                        ];
+                      Text(
+                        widget.pack.description ?? "",
+                        maxLines: 3,
+                        textAlign: TextAlign.justify,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.normal,
+                          color: Palette.gray,
+                        ),
+                      ),
 
-                        return Positioned(
-                          left: col * 100 + (row.isEven ? 0 : 30),
-                          top: row * 30.0 - 10,
-                          child: Icon(
-                            icons[index % icons.length],
-                            color: Colors.white.withValues(
-                                alpha: 0.09 +
-                                    (index % 3) * 0.02), // Varying opacity
-                            size: 20 + (index % 3) * 4, // Varying sizes
+                      const SizedBox(height: 8),
+
+                      // Creator info
+                      Row(
+                        children: [
+                          Text(
+                            "by",
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Palette.gray,
+                            ),
                           ),
-                        );
-                      }),
+                          const SizedBox(width: 4),
+                          Text(
+                            creatorMetadata?.name ??
+                                _pubkeyToHrBech32Short(widget.pack.pubKey),
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Palette.gray,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          UserImage(
+                            size: 20,
+                            imageUrl: creatorMetadata?.picture,
+                            pubkey: widget.pack.pubKey,
+                          ),
+                        ],
+                      ),
                     ],
                   ),
                 ),
-
-              // body - content
-              Padding(
-                padding: const EdgeInsets.fromLTRB(
-                    16, 32, 16, 16), // Increased top padding
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Title
-                    Text(
-                      widget.pack.title ?? "Starter Pack",
-                      style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-
-                    Text(
-                      widget.pack.description ?? "",
-                      maxLines: 3,
-                      textAlign: TextAlign.justify,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.normal,
-                        color: Palette.gray,
-                      ),
-                    ),
-
-                    const SizedBox(height: 8),
-
-                    // Creator info
-                    Row(
-                      children: [
-                        Text(
-                          "by",
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Palette.gray,
-                          ),
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          creatorMetadata?.name ??
-                              _pubkeyToHrBech32Short(widget.pack.pubKey),
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Palette.gray,
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        UserImage(
-                          size: 20,
-                          imageUrl: creatorMetadata?.picture,
-                          pubkey: widget.pack.pubKey,
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-
-          // avatars
-          Positioned(
-            top: 100,
-            left: 12,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                SizedBox(
-                  width: 155,
-                  child: OverlappingAvatars(
-                    avatarSize: 40,
-                    avatars: widget.pack.pubKeys.take(5).map((e) {
-                      return UserImage(
-                        imageUrl: ref
-                            .watch(metadataStateProvider(e.value))
-                            .userMetadata
-                            ?.picture,
-                        pubkey: e.value,
-                      );
-                    }).toList(),
-                  ),
-                ),
-                // + counter
-                if ((widget.pack.pubKeys.length) > 5)
-                  Padding(
-                    padding: const EdgeInsets.only(left: 8),
-                    child: Text(
-                      "+${(widget.pack.pubKeys.length - 5)}",
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Palette.lightGray,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
               ],
             ),
-          ),
-        ],
+
+            // avatars
+            Positioned(
+              top: 100,
+              left: 12,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  SizedBox(
+                    width: 155,
+                    child: OverlappingAvatars(
+                      avatarSize: 40,
+                      avatars: widget.pack.pubKeys.take(5).map((e) {
+                        return UserImage(
+                          imageUrl: ref
+                              .watch(metadataStateProvider(e.value))
+                              .userMetadata
+                              ?.picture,
+                          pubkey: e.value,
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                  // + counter
+                  if ((widget.pack.pubKeys.length) > 5)
+                    Padding(
+                      padding: const EdgeInsets.only(left: 8),
+                      child: Text(
+                        "+${(widget.pack.pubKeys.length - 5)}",
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Palette.lightGray,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
