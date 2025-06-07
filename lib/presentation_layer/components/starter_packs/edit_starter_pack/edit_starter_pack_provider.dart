@@ -3,26 +3,41 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../domain_layer/entities/user_metadata.dart';
 
 class StarterPackData {
+  final String name; // name as nostr identifier
   final String title;
-  final String description;
+  final String? description;
+  final String? imageUrl;
   final List<UserMetadata>
       selectedUsers; // list over set so odering is possible
+  final bool broadcasting;
+  final bool broadcasted;
 
   const StarterPackData({
+    required this.name,
     required this.title,
-    required this.description,
+    this.description,
     required this.selectedUsers,
+    this.imageUrl,
+    required this.broadcasted,
+    required this.broadcasting,
+    req,
   });
 
   StarterPackData copyWith({
+    String? name,
     String? title,
     String? description,
     List<UserMetadata>? selectedUsers,
+    bool? broadcasted,
+    bool? broadcasting,
   }) {
     return StarterPackData(
+      name: name ?? this.name,
       title: title ?? this.title,
       description: description ?? this.description,
       selectedUsers: selectedUsers ?? this.selectedUsers,
+      broadcasted: broadcasted ?? this.broadcasted,
+      broadcasting: broadcasting ?? this.broadcasting,
     );
   }
 
@@ -42,7 +57,14 @@ class StarterPackData {
 class EditStarterPackNotifier extends StateNotifier<StarterPackData> {
   EditStarterPackNotifier(String starterPackId)
       : super(
-          const StarterPackData(title: '', description: '', selectedUsers: []),
+          StarterPackData(
+            name: starterPackId,
+            title: '',
+            description: '',
+            selectedUsers: [],
+            broadcasted: false,
+            broadcasting: false,
+          ),
         ) {
     // Load initial data based on starterPackId
     _loadStarterPack(starterPackId);
@@ -94,15 +116,19 @@ class EditStarterPackNotifier extends StateNotifier<StarterPackData> {
   // Validation methods
   bool get isTitleValid =>
       state.title.trim().isNotEmpty && state.title.length <= 40;
-  bool get isDescriptionValid => state.description.trim().isNotEmpty;
-  bool get isValid => isTitleValid && isDescriptionValid;
+  bool get isValid => isTitleValid;
 
   int get titleCharacterCount => state.title.length;
 
   // Save method
-  Future<bool> save() async {
+  Future<bool> broadcast() async {
     if (!isValid) return false;
 
+    state = state.copyWith(broadcasting: true);
+
+    //todo: real broadcast
+    await Future.delayed(Duration(seconds: 10));
+    state = state.copyWith(broadcasting: false, broadcasted: true);
     try {
       return true;
     } catch (e) {
