@@ -127,7 +127,7 @@ class EditStarterPackNotifier extends StateNotifier<StarterPackData> {
     state = state.copyWith(broadcasting: true);
 
     //todo: real broadcast
-    await Future.delayed(Duration(seconds: 10));
+    await Future.delayed(Duration(seconds: 5));
     state = state.copyWith(broadcasting: false, broadcasted: true);
     try {
       return true;
@@ -135,6 +135,14 @@ class EditStarterPackNotifier extends StateNotifier<StarterPackData> {
       // Handle error
       return false;
     }
+  }
+
+  // resets the state
+  void reset() {
+    state = state.copyWith(
+      broadcasted: false,
+      broadcasting: false,
+    );
   }
 }
 

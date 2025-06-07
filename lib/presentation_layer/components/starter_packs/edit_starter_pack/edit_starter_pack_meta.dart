@@ -32,7 +32,7 @@ class _EditStarterPackMetaState extends ConsumerState<EditStarterPackMeta> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final data = ref.read(editStarterPackProvider(widget.starterPackId));
       _titleController.text = data.title;
-      _descriptionController.text = data.description;
+      _descriptionController.text = data.description ?? "";
     });
   }
 
