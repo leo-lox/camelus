@@ -20,18 +20,16 @@ class StarterPacksList extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final followSetsList = ref.watch(nostrListsFollowStateProvider(pubkey));
+    final ndk = ref.watch(ndkProvider);
+    final myPubkey = ndk.accounts.getPublicKey();
+
+    final bool isOwnProfile = myPubkey == pubkey;
 
     if (followSetsList.isLoading) {
       return Center(child: SpinnerCenter());
     }
 
     if (followSetsList.publicNostrFollowSets.isEmpty) {
-      final ndk = ref.watch(ndkProvider);
-
-      final myPubkey = ndk.accounts.getPublicKey();
-
-      final bool isOwnProfile = myPubkey == pubkey;
-
       if (isOwnProfile) {
         return Center(
           child: longButton(
@@ -51,14 +49,28 @@ class StarterPacksList extends ConsumerWidget {
     return Padding(
       padding: const EdgeInsets.only(top: 50),
       child: ListView.builder(
-          itemCount: followSetsList.publicNostrFollowSets.length,
+          itemCount: followSetsList.publicNostrFollowSets.length + 1,
           itemBuilder: (
             context,
             followSetsIndex,
           ) {
+            if (followSetsIndex ==
+                    followSetsList.publicNostrFollowSets.length &&
+                isOwnProfile) {
+              return Container(
+                padding: EdgeInsets.only(top: 18, bottom: 50),
+                child: Center(
+                  child: longButton(
+                      name: "create another",
+                      inverted: true,
+                      onPressed: () {
+                        Navigator.pushNamed(context, '/edit-starter-pack');
+                      }),
+                ),
+              );
+            }
             final NostrStarterPack starterPacks =
                 followSetsList.publicNostrFollowSets[followSetsIndex];
-
             if (starterPacks.elements.isEmpty) return Container();
 
             return Container(

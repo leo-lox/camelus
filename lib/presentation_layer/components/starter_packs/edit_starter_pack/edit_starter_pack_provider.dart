@@ -1,6 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../domain_layer/entities/nostr_list.dart';
 import '../../../../domain_layer/entities/user_metadata.dart';
+import '../../../../domain_layer/usecases/get_nostr_lists.dart';
+import '../../../providers/nostr_list_provider.dart';
+import '../../../providers/nostr_lists_follow_state_provider.dart';
 
 class StarterPackData {
   final String name; // name as nostr identifier
@@ -55,7 +59,9 @@ class StarterPackData {
 
 // State notifier for managing starter pack data
 class EditStarterPackNotifier extends StateNotifier<StarterPackData> {
-  EditStarterPackNotifier(String starterPackId)
+  final GetNostrLists _listsProvider;
+
+  EditStarterPackNotifier(this._listsProvider, String starterPackId)
       : super(
           StarterPackData(
             name: starterPackId,
@@ -121,20 +127,18 @@ class EditStarterPackNotifier extends StateNotifier<StarterPackData> {
   int get titleCharacterCount => state.title.length;
 
   // Save method
-  Future<bool> broadcast() async {
+  Future<bool> broadcast(NostrStarterPack pack) async {
     if (!isValid) return false;
 
     state = state.copyWith(broadcasting: true);
 
-    //todo: real broadcast
-    await Future.delayed(Duration(seconds: 5));
+    final result = await _listsProvider.broadcastStarterPack(starterPack: pack);
+
+    print(result);
+
     state = state.copyWith(broadcasting: false, broadcasted: true);
-    try {
-      return true;
-    } catch (e) {
-      // Handle error
-      return false;
-    }
+
+    return true;
   }
 
   // resets the state
@@ -148,5 +152,8 @@ class EditStarterPackNotifier extends StateNotifier<StarterPackData> {
 
 final editStarterPackProvider = StateNotifierProvider.family<
     EditStarterPackNotifier, StarterPackData, String>(
-  (ref, starterPackId) => EditStarterPackNotifier(starterPackId),
+  (ref, starterPackId) {
+    final listProvider = ref.watch(nostrListProvider);
+    return EditStarterPackNotifier(listProvider, starterPackId);
+  },
 );

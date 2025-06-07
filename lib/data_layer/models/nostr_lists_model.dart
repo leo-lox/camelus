@@ -34,7 +34,7 @@ class NostrListModel extends NostrList {
                 private: e.private,
               ).toNDK())
           .toList(),
-    )..id = id;
+    );
   }
 }
 
@@ -64,17 +64,37 @@ class NostrStarterPackModel extends NostrStarterPack {
       elements:
           ndkSet.elements.map((e) => NostrListElementModel.fromNDK(e)).toList(),
       title: ndkSet.title,
+      kind: ndkSet.kind,
       description: ndkSet.description,
       image: ndkSet.image,
-    )..id = ndkSet.id;
+    );
+  }
+
+  factory NostrStarterPackModel.fromEntity(NostrStarterPack starterPack) {
+    final model = NostrStarterPackModel(
+      createdAt: starterPack.createdAt,
+      elements: starterPack.elements,
+      name: starterPack.name,
+      pubKey: starterPack.pubKey,
+      description: starterPack.description,
+      image: starterPack.image,
+      kind: starterPack.kind,
+      title: starterPack.title,
+    );
+    if (starterPack.id != null) {
+      model.id = starterPack.id;
+    }
+    return model;
   }
 
   // Convert from NostrSetModel to Nip51Set (NDK)
-  @override
   ndk_entities.Nip51Set toNDK() {
-    return ndk_entities.Nip51Set(
+    final ndkSet = ndk_entities.Nip51Set(
       pubKey: pubKey,
       name: name,
+      title: title,
+      description: description,
+      image: image,
       kind: NostrList.STARTER_PACK,
       createdAt: createdAt,
       elements: elements
@@ -84,11 +104,12 @@ class NostrStarterPackModel extends NostrStarterPack {
                 private: e.private,
               ).toNDK())
           .toList(),
-      title: title,
-    )
-      ..id = id
-      ..description = description
-      ..image = image;
+    );
+
+    if (id != null) {
+      ndkSet.id = id!;
+    }
+    return ndkSet;
   }
 }
 

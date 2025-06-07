@@ -5,4 +5,8 @@ abstract class NostrListRepository {
     required String pubKey,
     required int kind,
   });
+
+  Future<NostrStarterPack> broadcastStarterPack({
+    required NostrStarterPack starterPack,
+  });
 }

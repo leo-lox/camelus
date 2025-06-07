@@ -223,7 +223,7 @@ class _EditStarterPackSummaryState extends ConsumerState<EditStarterPackSummary>
                     disabled: starterPackData.selectedUsers.isEmpty,
                     loading: starterPackData.broadcasting,
                     onPressed: () {
-                      starterPackNotifier.broadcast();
+                      starterPackNotifier.broadcast(myNostrPack);
 
                       widget.onNext();
                     },
@@ -245,6 +245,10 @@ class _EditStarterPackSummaryState extends ConsumerState<EditStarterPackSummary>
                     onPressed: () {
                       starterPackNotifier.reset();
                       Navigator.pop(context);
+
+                      ref.invalidate(
+                        editStarterPackProvider(starterPackData.name),
+                      );
                     },
                   ),
                 ),

@@ -38,5 +38,18 @@ class NostrListRepositoryImpl implements NostrListRepository {
     return listSets;
   }
 
+  @override
+  Future<NostrStarterPack> broadcastStarterPack({
+    required NostrStarterPack starterPack,
+  }) async {
+    final ndkStarterPack =
+        NostrStarterPackModel.fromEntity(starterPack).toNDK();
+    final result = await dartNdkSource.dartNdk.lists.setCompleteSet(
+      set: ndkStarterPack,
+      kind: NostrList.STARTER_PACK,
+    );
+    return NostrStarterPackModel.fromNDK(result);
+  }
+
   // todo get list by name
 }

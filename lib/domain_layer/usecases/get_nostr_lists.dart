@@ -17,4 +17,10 @@ class GetNostrLists {
       kind: NostrList.STARTER_PACK,
     );
   }
+
+  Future<NostrStarterPack> broadcastStarterPack({
+    required NostrStarterPack starterPack,
+  }) {
+    return _nostrListRepository.broadcastStarterPack(starterPack: starterPack);
+  }
 }

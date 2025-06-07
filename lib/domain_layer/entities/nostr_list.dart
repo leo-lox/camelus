@@ -56,7 +56,7 @@ class NostrList {
     A
   ];
 
-  late String id;
+  String? id;
   late String pubKey;
   late int kind;
 
@@ -117,6 +117,7 @@ class NostrList {
     required this.kind,
     required this.createdAt,
     required this.elements,
+    this.id,
   });
 
   void parseTags(List tags, {required bool private}) {
