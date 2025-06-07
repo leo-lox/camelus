@@ -21,11 +21,16 @@ class _EditStarterPackState extends ConsumerState<EditStarterPack>
     keepPage: true,
   );
 
+  bool scrollLock = false;
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
         child: PageView(
       controller: _horizontalPageController,
+      physics: scrollLock
+          ? const NeverScrollableScrollPhysics()
+          : const AlwaysScrollableScrollPhysics(),
       children: [
         EditStarterPackMeta(
             starterPackId: "testId",
@@ -46,7 +51,13 @@ class _EditStarterPackState extends ConsumerState<EditStarterPack>
             );
           },
         ),
-        EditStarterPackSummary(starterPackId: "testId", onNext: () {})
+        EditStarterPackSummary(
+            starterPackId: "testId",
+            onNext: () {
+              setState(() {
+                scrollLock = true;
+              });
+            })
       ],
     ));
   }
