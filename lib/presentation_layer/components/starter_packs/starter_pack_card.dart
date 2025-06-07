@@ -1,6 +1,7 @@
 import 'package:camelus/presentation_layer/atoms/my_profile_picture.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../config/palette.dart';
 import '../../../domain_layer/entities/nostr_list.dart';
@@ -51,7 +52,46 @@ class _StarterPackCardState extends ConsumerState<StarterPackCard> {
               if (widget.pack.image == null)
                 Container(
                   height: 120,
-                  color: Palette.extraDarkGray,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        Palette.extraDarkGray,
+                        Palette.extraDarkGray.withValues(alpha: 1),
+                        Palette.extraDarkGray,
+                      ],
+                    ),
+                  ),
+                  child: Stack(
+                    children: [
+                      // Pattern of icons
+                      ...List.generate(20, (index) {
+                        final row = index ~/ 5;
+                        final col = index % 5;
+
+                        // List of different people/social icons
+                        final icons = [
+                          PhosphorIcons.house(),
+                          PhosphorIcons.users(),
+                          PhosphorIcons.personSimpleTaiChi(),
+                          PhosphorIcons.personSimple(),
+                        ];
+
+                        return Positioned(
+                          left: col * 100 + (row.isEven ? 0 : 30),
+                          top: row * 30.0 - 10,
+                          child: Icon(
+                            icons[index % icons.length],
+                            color: Colors.white.withValues(
+                                alpha: 0.09 +
+                                    (index % 3) * 0.02), // Varying opacity
+                            size: 20 + (index % 3) * 4, // Varying sizes
+                          ),
+                        );
+                      }),
+                    ],
+                  ),
                 ),
 
               // body - content
