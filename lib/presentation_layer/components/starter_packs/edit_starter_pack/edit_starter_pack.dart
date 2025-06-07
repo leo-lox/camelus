@@ -1,3 +1,4 @@
+import 'package:camelus/presentation_layer/components/starter_packs/edit_starter_pack/edit_starter_pack_summary.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -37,8 +38,15 @@ class _EditStarterPackState extends ConsumerState<EditStarterPack>
             }),
         EditStarterPackContent(
           starterPackId: "testId",
-          onNext: () {},
+          onNext: () {
+            _horizontalPageController.animateToPage(
+              2,
+              duration: const Duration(milliseconds: 200),
+              curve: Curves.easeInOut,
+            );
+          },
         ),
+        EditStarterPackSummary(starterPackId: "testId", onNext: () {})
       ],
     ));
   }
