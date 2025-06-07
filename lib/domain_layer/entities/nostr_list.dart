@@ -180,10 +180,12 @@ class NostrStarterPack extends NostrList {
   /// Create a new StarterPack
   NostrStarterPack({
     required super.pubKey,
+    this.title,
     required this.name,
+    this.image,
+    this.description,
     required super.createdAt,
     required super.elements,
-    this.title,
     super.kind = NostrList.STARTER_PACK,
   });
 
