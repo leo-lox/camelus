@@ -4,10 +4,11 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../../config/palette.dart';
 import '../../../../domain_layer/entities/starter_pack_identifier.dart';
-import '../../../../domain_layer/entities/user_metadata.dart';
+
 import '../../../atoms/long_button.dart';
 import '../../../atoms/my_profile_picture.dart';
 import '../../../atoms/nip_05_text.dart';
+import '../../../providers/metadata_state_provider.dart';
 import '../../../providers/search_provider.dart';
 import '../../../routes/search_page.dart';
 import '../../search_bar.dart';
@@ -30,18 +31,18 @@ class _EditStarterPackContentState
     extends ConsumerState<EditStarterPackContent> {
   bool _isReorderMode = false;
 
-  _addToSelection(UserMetadata user) {
+  _addToSelection(String userPubkey) {
     final starterPackNotifier = ref
         .read(editStarterPackProvider(widget.starterPackIdentifier).notifier);
 
-    starterPackNotifier.addUser(user);
+    starterPackNotifier.addUser(userPubkey);
   }
 
-  _removeFromSelection(UserMetadata user) {
+  _removeFromSelection(String userPubkey) {
     final starterPackNotifier = ref
         .read(editStarterPackProvider(widget.starterPackIdentifier).notifier);
 
-    starterPackNotifier.removeUser(user);
+    starterPackNotifier.removeUser(userPubkey);
   }
 
   _reorderUser(int oldIndex, int newIndex) {
@@ -140,12 +141,12 @@ class _EditStarterPackContentState
       onReorder: _reorderUser,
       buildDefaultDragHandles: false,
       itemBuilder: (context, index) {
-        final user = starterPackData.selectedUsers[index];
+        final userPubkey = starterPackData.selectedUsers[index];
         return PersonSelect(
-          key: ValueKey(user.pubkey),
-          user: user,
+          key: ValueKey(userPubkey),
+          pubkey: userPubkey,
           selected: true,
-          onTab: () => _removeFromSelection(user),
+          onTab: () => _removeFromSelection(userPubkey),
           isReorderMode: true,
           reorderIndex: index,
         );
@@ -159,24 +160,27 @@ class _EditStarterPackContentState
       physics: const BouncingScrollPhysics(),
       children: [
         ...searchState.searchResultsUsers.map((user) {
-          final selected = starterPackData.selectedUsers.contains(user);
+          final selected = starterPackData.selectedUsers.contains(user.pubkey);
           return PersonSelect(
-            user: user,
+            pubkey: user.pubkey,
             selected: selected,
-            onTab: () =>
-                selected ? _removeFromSelection(user) : _addToSelection(user),
+            onTab: () => selected
+                ? _removeFromSelection(user.pubkey)
+                : _addToSelection(user.pubkey),
             isReorderMode: false,
           );
         }),
         if (!searchState.isSearching)
-          ...starterPackData.selectedUsers.map((user) {
-            if (searchState.searchResultsUsers.contains(user)) {
+          ...starterPackData.selectedUsers.map((userPubkey) {
+            if (searchState.searchResultsUsers
+                .where((e) => e.pubkey == userPubkey)
+                .isNotEmpty) {
               return Container();
             }
             return PersonSelect(
-              user: user,
+              pubkey: userPubkey,
               selected: true,
-              onTab: () => _removeFromSelection(user),
+              onTab: () => _removeFromSelection(userPubkey),
               isReorderMode: false,
             );
           }),
@@ -190,8 +194,8 @@ class _EditStarterPackContentState
   }
 }
 
-class PersonSelect extends StatelessWidget {
-  final UserMetadata user;
+class PersonSelect extends ConsumerWidget {
+  final String pubkey;
   final bool selected;
   final Function onTab;
   final bool isReorderMode;
@@ -199,7 +203,7 @@ class PersonSelect extends StatelessWidget {
 
   const PersonSelect({
     super.key,
-    required this.user,
+    required this.pubkey,
     required this.selected,
     required this.onTab,
     this.isReorderMode = false,
@@ -207,7 +211,8 @@ class PersonSelect extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final metadata = ref.watch(metadataStateProvider(pubkey)).userMetadata;
     return ListTile(
       onTap:
           isReorderMode ? null : () => onTab(), // Disable tap in reorder mode
@@ -215,8 +220,8 @@ class PersonSelect extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           UserImage(
-            imageUrl: user?.picture,
-            pubkey: user.pubkey,
+            imageUrl: metadata?.picture,
+            pubkey: pubkey,
           ),
           const SizedBox(width: 16),
           Expanded(
@@ -224,7 +229,7 @@ class PersonSelect extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  user?.name ?? "",
+                  metadata?.name ?? "",
                   style: const TextStyle(
                     color: Palette.white,
                     fontSize: 16,
@@ -233,12 +238,12 @@ class PersonSelect extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
                 Nip05Text(
-                  pubkey: user.pubkey,
-                  nip05verified: user.nip05,
+                  pubkey: pubkey,
+                  nip05verified: metadata?.nip05,
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  user?.about ?? "",
+                  metadata?.about ?? "",
                   style: const TextStyle(
                     color: Palette.gray,
                     fontSize: 12,

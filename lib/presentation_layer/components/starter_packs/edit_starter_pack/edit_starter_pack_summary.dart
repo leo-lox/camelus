@@ -105,8 +105,8 @@ class _EditStarterPackSummaryState extends ConsumerState<EditStarterPackSummary>
       pubKey: ndk.accounts.getPublicKey()!,
       createdAt: now,
       image: starterPackData.imageUrl,
-      elements: starterPackData.selectedUsers.map((e) {
-        return NostrListElement(tag: "p", value: e.pubkey, private: false);
+      elements: starterPackData.selectedUsers.map((userPubkey) {
+        return NostrListElement(tag: "p", value: userPubkey, private: false);
       }).toList(),
     );
 

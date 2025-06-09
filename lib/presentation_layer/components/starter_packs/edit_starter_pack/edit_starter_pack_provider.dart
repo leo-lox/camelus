@@ -12,8 +12,7 @@ class StarterPackData {
   final String title;
   final String? description;
   final String? imageUrl;
-  final List<UserMetadata>
-      selectedUsers; // list over set so odering is possible
+  final List<String> selectedUsers; // list over set so odering is possible
   final bool broadcasting;
   final bool broadcasted;
 
@@ -32,7 +31,7 @@ class StarterPackData {
     String? name,
     String? title,
     String? description,
-    List<UserMetadata>? selectedUsers,
+    List<String>? selectedUsers,
     bool? broadcasted,
     bool? broadcasting,
   }) {
@@ -85,12 +84,10 @@ class EditStarterPackNotifier extends StateNotifier<StarterPackData> {
           .where((l) => l.name == identifier.name)
           .first;
       state = state.copyWith(
-        name: myList.name,
-        title: myList.title,
-        description: myList.description,
-        //todo fetch metadata
-        //selectedUsers: myList.pubKeys
-      );
+          name: myList.name,
+          title: myList.title,
+          description: myList.description,
+          selectedUsers: myList.pubKeys.map((e) => e.value).toList());
     } catch (_) {
       // new set, do nothing
     }
@@ -111,15 +108,15 @@ class EditStarterPackNotifier extends StateNotifier<StarterPackData> {
     );
   }
 
-  void addUser(UserMetadata user) {
-    if (state.selectedUsers.contains(user)) {
+  void addUser(String pubkeyey) {
+    if (state.selectedUsers.contains(pubkeyey)) {
       return;
     }
-    state = state.copyWith(selectedUsers: [user, ...state.selectedUsers]);
+    state = state.copyWith(selectedUsers: [pubkeyey, ...state.selectedUsers]);
   }
 
-  void removeUser(UserMetadata user) {
-    state.selectedUsers.remove(user);
+  void removeUser(String pubkey) {
+    state.selectedUsers.remove(pubkey);
     state = state.copyWith(selectedUsers: state.selectedUsers);
   }
 
@@ -128,7 +125,7 @@ class EditStarterPackNotifier extends StateNotifier<StarterPackData> {
       newIndex -= 1;
     }
 
-    final users = List<UserMetadata>.from(state.selectedUsers);
+    final users = List<String>.from(state.selectedUsers);
     final user = users.removeAt(oldIndex);
     users.insert(newIndex, user);
 
