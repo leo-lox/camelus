@@ -112,8 +112,8 @@ dependency_overrides:
     #git:
     #  url: https://github.com/relaystr/ndk.git
     #  path: packages/rust_verifier
-  #ndk_objectbox:
-    #path: ../ndk/packages/objectbox
+  ndk_objectbox:
+    path: ../ndk/packages/objectbox
     #git:
     #   url: https://github.com/relaystr/ndk.git
     #   path: packages/objectbox

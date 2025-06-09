@@ -9,4 +9,8 @@ abstract class NostrListRepository {
   Future<NostrStarterPack> broadcastStarterPack({
     required NostrStarterPack starterPack,
   });
+
+  Future deleteStarterPack({
+    required String name,
+  });
 }

@@ -51,5 +51,13 @@ class NostrListRepositoryImpl implements NostrListRepository {
     return NostrStarterPackModel.fromNDK(result);
   }
 
+  @override
+  Future deleteStarterPack({required String name}) {
+    return dartNdkSource.dartNdk.lists.deleteSet(
+      name: name,
+      kind: NostrList.STARTER_PACK,
+    );
+  }
+
   // todo get list by name
 }

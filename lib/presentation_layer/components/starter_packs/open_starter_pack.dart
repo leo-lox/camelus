@@ -10,23 +10,34 @@ import '../../../helpers/helpers.dart';
 import '../../../helpers/nprofile_helper.dart';
 import '../../atoms/long_button.dart';
 import '../../atoms/my_profile_picture.dart';
+import '../../atoms/spinner_center.dart';
 import '../../providers/inbox_outbox_provider.dart';
 import '../../providers/metadata_state_provider.dart';
 import '../../providers/ndk_provider.dart';
+import '../../providers/nostr_list_provider.dart';
 import '../../providers/nostr_lists_follow_state_provider.dart';
 import '../../routes/nostr/profile/profile_page_2.dart';
 
-class OpenStarterPack extends ConsumerWidget {
-  final StarterPackIdentifier identifier;
+class OpenStarterPack extends ConsumerStatefulWidget {
+  final StarterPackIdentifier starterPackIdentifier;
 
   const OpenStarterPack({
     super.key,
-    required this.identifier,
+    required this.starterPackIdentifier,
   });
+
+  @override
+  ConsumerState<OpenStarterPack> createState() => _OpenStarterPackState();
+}
+
+class _OpenStarterPackState extends ConsumerState<OpenStarterPack> {
+  bool _isDeleting = false;
+  bool _deleteSuccess = false;
 
   _onShare(WidgetRef ref) async {
     final inboxOutboxP = ref.read(inboxOutboxProvider);
-    final nip65data = await inboxOutboxP.getNip65data(identifier.pubkey);
+    final nip65data =
+        await inboxOutboxP.getNip65data(widget.starterPackIdentifier.pubkey);
 
     final outboxRelays = nip65data?.relays.entries
         .where((element) => element.value.isWrite)
@@ -34,7 +45,7 @@ class OpenStarterPack extends ConsumerWidget {
         .toList();
 
     final npub = NprofileHelper().mapToBech32({
-      "pubkey": identifier.pubkey,
+      "pubkey": widget.starterPackIdentifier.pubkey,
       "relays": outboxRelays ?? [],
     });
 
@@ -45,7 +56,8 @@ class OpenStarterPack extends ConsumerWidget {
     final myNpub = Nip19.encodePubKey(myPubkey!);
 
     ///  /invitee/pubkeyList/listName
-    final url = "https://camelus.app/i/${myNpub}/${identifier.name}";
+    final url =
+        "https://camelus.app/i/${myNpub}/${widget.starterPackIdentifier.name}";
 
     await Clipboard.setData(
       ClipboardData(text: url),
@@ -57,14 +69,70 @@ class OpenStarterPack extends ConsumerWidget {
   ) {
     Navigator.pushNamed(context, '/edit-starter-pack',
         arguments: StarterPackIdentifier(
-          name: identifier.name,
-          pubkey: identifier.pubkey,
+          name: widget.starterPackIdentifier.name,
+          pubkey: widget.starterPackIdentifier.pubkey,
         ));
   }
 
-  _onDelete() {
-    // TODO: implement delete
-    print("Delete starter pack");
+  _showDeleteConfirmationDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Palette.extraDarkGray,
+          title: Text(
+            'Delete Starter Pack',
+            style: TextStyle(color: Palette.white),
+          ),
+          content: Text(
+            'Are you sure you want to delete this starter pack? This action cannot be undone.',
+            style: TextStyle(color: Palette.lightGray),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text(
+                'Cancel',
+                style: TextStyle(color: Palette.lightGray),
+              ),
+            ),
+            TextButton(
+              onPressed: () {
+                // pop dialog
+                Navigator.pop(context);
+                _onDelete(ref, context);
+              },
+              child: Text(
+                'Delete',
+                style: TextStyle(color: Palette.primary),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  _onDelete(WidgetRef ref, BuildContext context) async {
+    setState(() {
+      _isDeleting = true;
+    });
+
+    final listP = ref.read(nostrListProvider);
+
+    await listP.deleteStarterPack(name: widget.starterPackIdentifier.name);
+
+    setState(() {
+      _isDeleting = false;
+      _deleteSuccess = true;
+    });
+
+    ref.invalidate(nostrListProvider);
+    ref.invalidate(
+      nostrListsFollowStateProvider(widget.starterPackIdentifier.pubkey),
+    );
   }
 
   _navigateToProfile(BuildContext context, String pubkey) {
@@ -79,18 +147,55 @@ class OpenStarterPack extends ConsumerWidget {
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final ndk = ref.watch(ndkProvider);
 
     final myPubkey = ndk.accounts.getPublicKey();
 
     final starterSets = ref
-        .watch(nostrListsFollowStateProvider(identifier.pubkey))
+        .watch(
+            nostrListsFollowStateProvider(widget.starterPackIdentifier.pubkey))
         .publicNostrFollowSets;
-    final myStarterSet =
-        starterSets.where((e) => e.name == identifier.name).firstOrNull;
+    final myStarterSet = starterSets
+        .where((e) => e.name == widget.starterPackIdentifier.name)
+        .firstOrNull;
 
-    final bool isOwnStarterPack = myPubkey == identifier.pubkey;
+    final bool isOwnStarterPack =
+        myPubkey == widget.starterPackIdentifier.pubkey;
+
+    if (_isDeleting) {
+      return Scaffold(
+        backgroundColor: Palette.black,
+        body: Center(
+          child: SpinnerCenter(),
+        ),
+      );
+    }
+
+    if (_deleteSuccess) {
+      return Scaffold(
+        backgroundColor: Palette.black,
+        body: Center(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                "deletion requested",
+                style: TextStyle(fontSize: 25),
+              ),
+              SizedBox(height: 25),
+              longButton(
+                name: "go back",
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          ),
+        ),
+      );
+    }
 
     if (myStarterSet == null) {
       return Scaffold(
@@ -133,7 +238,7 @@ class OpenStarterPack extends ConsumerWidget {
                         _onEdit(context);
                         break;
                       case 'delete':
-                        _onDelete();
+                        _showDeleteConfirmationDialog(context);
                         break;
                     }
                   },
@@ -190,7 +295,8 @@ class OpenStarterPack extends ConsumerWidget {
                           Text.rich(TextSpan(
                             children: [
                               TextSpan(
-                                text: myStarterSet.title ?? identifier.name,
+                                text: myStarterSet.title ??
+                                    widget.starterPackIdentifier.name,
                               ),
                             ],
                             style: TextStyle(
@@ -198,8 +304,8 @@ class OpenStarterPack extends ConsumerWidget {
                             ),
                           )),
                           Text(
-                              "by ${isOwnStarterPack ? "you" : ref.watch(metadataStateProvider(identifier.pubkey)).userMetadata?.name ?? Helpers().shortHr(
-                                    identifier.pubkey,
+                              "by ${isOwnStarterPack ? "you" : ref.watch(metadataStateProvider(widget.starterPackIdentifier.pubkey)).userMetadata?.name ?? Helpers().shortHr(
+                                    widget.starterPackIdentifier.pubkey,
                                   )}",
                               style: TextStyle(color: Palette.gray)),
                         ],

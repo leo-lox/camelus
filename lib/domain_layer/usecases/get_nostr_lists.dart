@@ -23,4 +23,10 @@ class GetNostrLists {
   }) {
     return _nostrListRepository.broadcastStarterPack(starterPack: starterPack);
   }
+
+  Future deleteStarterPack({
+    required String name,
+  }) {
+    return _nostrListRepository.deleteStarterPack(name: name);
+  }
 }

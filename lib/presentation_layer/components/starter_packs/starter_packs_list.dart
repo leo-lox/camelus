@@ -1,15 +1,14 @@
-import 'package:camelus/presentation_layer/atoms/long_button.dart';
-import 'package:camelus/presentation_layer/components/starter_packs/open_starter_pack.dart';
-import 'package:camelus/presentation_layer/components/starter_packs/starter_pack_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../domain_layer/entities/nostr_list.dart';
 import '../../../domain_layer/entities/starter_pack_identifier.dart';
 import '../../../helpers/helpers.dart';
+import '../../atoms/long_button.dart';
 import '../../atoms/spinner_center.dart';
 import '../../providers/ndk_provider.dart';
 import '../../providers/nostr_lists_follow_state_provider.dart';
+import 'starter_pack_card.dart';
 
 class StarterPacksList extends ConsumerWidget {
   final String pubkey;
@@ -21,7 +20,8 @@ class StarterPacksList extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final followSetsList = ref.watch(nostrListsFollowStateProvider(pubkey));
+    NostrListsFollowState followSetsList =
+        ref.watch(nostrListsFollowStateProvider(pubkey));
     final ndk = ref.watch(ndkProvider);
     final myPubkey = ndk.accounts.getPublicKey();
 
@@ -91,17 +91,11 @@ class StarterPacksList extends ConsumerWidget {
               child: StarterPackCard(
                 pack: starterPacks,
                 onTab: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => OpenStarterPack(
-                        identifier: StarterPackIdentifier(
-                          pubkey: pubkey,
-                          name: starterPacks.name,
-                        ),
-                      ),
-                    ),
-                  );
+                  Navigator.pushNamed(context, '/open-starter-pack',
+                      arguments: StarterPackIdentifier(
+                        name: starterPacks.name,
+                        pubkey: pubkey,
+                      ));
                 },
               ),
             );
