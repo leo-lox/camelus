@@ -187,7 +187,18 @@ class _EditStarterPackContentState
         if (starterPackData.selectedUsers.isEmpty && !searchState.isSearching)
           const Center(
             heightFactor: 5,
-            child: Text("start searching to add user"),
+            child: Column(
+              children: [
+                Text(
+                  "search to add user",
+                  style: TextStyle(fontSize: 18),
+                ),
+                Text(
+                  "you can also use the three dots menu on every post to add a user to a pack",
+                  style: TextStyle(fontSize: 12, color: Palette.lightGray),
+                ),
+              ],
+            ),
           )
       ],
     );

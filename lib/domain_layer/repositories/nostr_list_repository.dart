@@ -13,4 +13,9 @@ abstract class NostrListRepository {
   Future deleteStarterPack({
     required String name,
   });
+
+  Future<NostrStarterPack?> addUserToStarterPack({
+    required String name,
+    required String pubkey,
+  });
 }

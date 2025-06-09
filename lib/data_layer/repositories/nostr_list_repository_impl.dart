@@ -59,5 +59,20 @@ class NostrListRepositoryImpl implements NostrListRepository {
     );
   }
 
-  // todo get list by name
+  @override
+  Future<NostrStarterPack?> addUserToStarterPack({
+    required String name,
+    required String pubkey,
+  }) async {
+    final ndkSet = await dartNdkSource.dartNdk.lists.addElementToSet(
+      tag: 'p',
+      value: pubkey,
+      name: name,
+      kind: NostrList.STARTER_PACK,
+    );
+    if (ndkSet == null) {
+      return null;
+    }
+    return NostrStarterPackModel.fromNDK(ndkSet);
+  }
 }

@@ -29,4 +29,12 @@ class GetNostrLists {
   }) {
     return _nostrListRepository.deleteStarterPack(name: name);
   }
+
+  Future<NostrStarterPack?> addUserToStarterPack({
+    required String name,
+    required String pubkey,
+  }) {
+    return _nostrListRepository.addUserToStarterPack(
+        name: name, pubkey: pubkey);
+  }
 }
