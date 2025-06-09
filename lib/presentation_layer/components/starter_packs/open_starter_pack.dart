@@ -5,7 +5,6 @@ import 'package:ndk/shared/nips/nip19/nip19.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../config/palette.dart';
-import '../../../domain_layer/entities/nostr_list.dart';
 import '../../../domain_layer/entities/starter_pack_identifier.dart';
 import '../../../helpers/helpers.dart';
 import '../../../helpers/nprofile_helper.dart';
@@ -14,19 +13,20 @@ import '../../atoms/my_profile_picture.dart';
 import '../../providers/inbox_outbox_provider.dart';
 import '../../providers/metadata_state_provider.dart';
 import '../../providers/ndk_provider.dart';
+import '../../providers/nostr_lists_follow_state_provider.dart';
 import '../../routes/nostr/profile/profile_page_2.dart';
 
 class OpenStarterPack extends ConsumerWidget {
-  final NostrStarterPack followSet;
+  final StarterPackIdentifier identifier;
 
   const OpenStarterPack({
     super.key,
-    required this.followSet,
+    required this.identifier,
   });
 
   _onShare(WidgetRef ref) async {
     final inboxOutboxP = ref.read(inboxOutboxProvider);
-    final nip65data = await inboxOutboxP.getNip65data(followSet.pubKey);
+    final nip65data = await inboxOutboxP.getNip65data(identifier.pubkey);
 
     final outboxRelays = nip65data?.relays.entries
         .where((element) => element.value.isWrite)
@@ -34,7 +34,7 @@ class OpenStarterPack extends ConsumerWidget {
         .toList();
 
     final npub = NprofileHelper().mapToBech32({
-      "pubkey": followSet.pubKey,
+      "pubkey": identifier.pubkey,
       "relays": outboxRelays ?? [],
     });
 
@@ -45,7 +45,7 @@ class OpenStarterPack extends ConsumerWidget {
     final myNpub = Nip19.encodePubKey(myPubkey!);
 
     ///  /invitee/pubkeyList/listName
-    final url = "https://camelus.app/i/${myNpub}/${followSet.name}";
+    final url = "https://camelus.app/i/${myNpub}/${identifier.name}";
 
     await Clipboard.setData(
       ClipboardData(text: url),
@@ -57,8 +57,8 @@ class OpenStarterPack extends ConsumerWidget {
   ) {
     Navigator.pushNamed(context, '/edit-starter-pack',
         arguments: StarterPackIdentifier(
-          name: followSet.name,
-          pubkey: followSet.pubKey,
+          name: identifier.name,
+          pubkey: identifier.pubkey,
         ));
   }
 
@@ -84,7 +84,22 @@ class OpenStarterPack extends ConsumerWidget {
 
     final myPubkey = ndk.accounts.getPublicKey();
 
-    final bool isOwnStarterPack = myPubkey == followSet.pubKey;
+    final starterSets = ref
+        .watch(nostrListsFollowStateProvider(identifier.pubkey))
+        .publicNostrFollowSets;
+    final myStarterSet =
+        starterSets.where((e) => e.name == identifier.name).firstOrNull;
+
+    final bool isOwnStarterPack = myPubkey == identifier.pubkey;
+
+    if (myStarterSet == null) {
+      return Scaffold(
+        backgroundColor: Palette.background,
+        body: Center(
+          child: Text("unknown starter pack"),
+        ),
+      );
+    }
 
     return DefaultTabController(
       length: 1,
@@ -162,9 +177,10 @@ class OpenStarterPack extends ConsumerWidget {
                 children: [
                   Row(
                     children: [
-                      if (followSet.image != null)
-                        Image.network(followSet.image!, width: 50, height: 50),
-                      if (followSet.image == null)
+                      if (myStarterSet.image != null)
+                        Image.network(myStarterSet.image!,
+                            width: 50, height: 50),
+                      if (myStarterSet.image == null)
                         Image.asset("assets/images/list_placeholder.png",
                             width: 50, height: 50),
                       const SizedBox(width: 10),
@@ -174,7 +190,7 @@ class OpenStarterPack extends ConsumerWidget {
                           Text.rich(TextSpan(
                             children: [
                               TextSpan(
-                                text: followSet.title ?? followSet.name,
+                                text: myStarterSet.title ?? identifier.name,
                               ),
                             ],
                             style: TextStyle(
@@ -182,8 +198,8 @@ class OpenStarterPack extends ConsumerWidget {
                             ),
                           )),
                           Text(
-                              "by ${isOwnStarterPack ? "you" : ref.watch(metadataStateProvider(followSet.pubKey)).userMetadata?.name ?? Helpers().shortHr(
-                                    followSet.pubKey,
+                              "by ${isOwnStarterPack ? "you" : ref.watch(metadataStateProvider(identifier.pubkey)).userMetadata?.name ?? Helpers().shortHr(
+                                    identifier.pubkey,
                                   )}",
                               style: TextStyle(color: Palette.gray)),
                         ],
@@ -198,9 +214,9 @@ class OpenStarterPack extends ConsumerWidget {
                 children: [
                   ListView.builder(
                     physics: const BouncingScrollPhysics(),
-                    itemCount: followSet.elements.length,
+                    itemCount: myStarterSet.elements.length,
                     itemBuilder: (context, index) {
-                      final displayPubkey = followSet.elements[index].value;
+                      final displayPubkey = myStarterSet.elements[index].value;
                       final displayMetadata = ref
                           .watch(metadataStateProvider(displayPubkey))
                           .userMetadata;

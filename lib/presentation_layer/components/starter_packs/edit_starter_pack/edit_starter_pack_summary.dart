@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../../../config/palette.dart';
@@ -8,6 +7,7 @@ import '../../../../domain_layer/entities/nostr_list.dart';
 import '../../../../domain_layer/entities/starter_pack_identifier.dart';
 import '../../../atoms/long_button.dart';
 import '../../../providers/ndk_provider.dart';
+import '../../../providers/nostr_lists_follow_state_provider.dart';
 import '../starter_pack_card.dart';
 import 'edit_starter_pack_provider.dart';
 
@@ -251,6 +251,10 @@ class _EditStarterPackSummaryState extends ConsumerState<EditStarterPackSummary>
                       ref.invalidate(
                         editStarterPackProvider(widget.starterPackIdentifier),
                       );
+
+                      /// invalidate user starter pack lists so refresh is triggered
+                      ref.invalidate(nostrListsFollowStateProvider(
+                          widget.starterPackIdentifier.pubkey));
                     },
                   ),
                 ),

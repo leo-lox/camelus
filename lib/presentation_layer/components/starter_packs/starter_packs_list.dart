@@ -95,7 +95,10 @@ class StarterPacksList extends ConsumerWidget {
                     context,
                     MaterialPageRoute(
                       builder: (context) => OpenStarterPack(
-                        followSet: starterPacks,
+                        identifier: StarterPackIdentifier(
+                          pubkey: pubkey,
+                          name: starterPacks.name,
+                        ),
                       ),
                     ),
                   );
