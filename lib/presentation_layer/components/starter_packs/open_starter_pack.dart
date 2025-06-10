@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ndk/shared/nips/nip19/nip19.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../../../config/palette.dart';
 import '../../../domain_layer/entities/starter_pack_identifier.dart';
@@ -47,7 +48,7 @@ class _OpenStarterPackState extends ConsumerState<OpenStarterPack> {
         .map((e) => e.key)
         .toList();
 
-    final npub = NprofileHelper().mapToBech32({
+    final listNpub = NprofileHelper().mapToBech32({
       "pubkey": widget.starterPackIdentifier.pubkey,
       "relays": outboxRelays ?? [],
     });
@@ -58,11 +59,21 @@ class _OpenStarterPackState extends ConsumerState<OpenStarterPack> {
 
     final myNpub = Nip19.encodePubKey(myPubkey!);
 
-    final url =
-        "https://camelus.app/i/${myNpub}/${widget.starterPackIdentifier.name}";
+    final String urlPath;
+    if (myNpub == listNpub) {
+      urlPath = "/i/${myNpub}/${widget.starterPackIdentifier.name}";
+    } else {
+      urlPath = "/i/${myNpub}/${widget.starterPackIdentifier.name}/${listNpub}";
+    }
 
-    await Clipboard.setData(
-      ClipboardData(text: url),
+    SharePlus.instance.share(
+      ShareParams(
+        uri: Uri(
+          scheme: 'https',
+          host: 'camelus.app',
+          path: urlPath,
+        ),
+      ),
     );
   }
 
@@ -225,7 +236,7 @@ class _OpenStarterPackState extends ConsumerState<OpenStarterPack> {
                 ),
                 actions: [
                   longButton(
-                    name: "Share",
+                    name: "share",
                     onPressed: () => _onShare(ref),
                     inverted: false,
                   ),
@@ -282,6 +293,7 @@ class _OpenStarterPackState extends ConsumerState<OpenStarterPack> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        const SizedBox(height: 24),
                         Row(
                           children: [
                             // starter pack icon/image
@@ -321,6 +333,7 @@ class _OpenStarterPackState extends ConsumerState<OpenStarterPack> {
                                       fontSize: 24,
                                       fontWeight: FontWeight.bold,
                                     ),
+                                    maxLines: 2,
                                   ),
                                   const SizedBox(height: 4),
                                   Text(
