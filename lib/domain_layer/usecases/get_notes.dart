@@ -1,15 +1,11 @@
 import 'dart:developer';
-
-import 'package:camelus/domain_layer/usecases/follow.dart';
-
 import '../entities/nostr_note.dart';
 import '../repositories/note_repository.dart';
 
 class GetNotes {
   final NoteRepository _noteRepository;
-  final Follow _follow;
 
-  GetNotes(this._noteRepository, this._follow);
+  GetNotes(this._noteRepository);
 
   Stream<NostrNote> getAllNotes() {
     return _noteRepository.getAllNotes();

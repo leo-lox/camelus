@@ -18,8 +18,9 @@ import '../components/note_card/note_card_container.dart';
 import '../components/person_card.dart';
 import '../components/search_bar.dart';
 import '../providers/app_bar_provider/app_bottom_bar_provider.dart';
-import '../providers/following_provider.dart';
+import '../providers/following_contact_state_provider.dart';
 import '../providers/metadata_provider.dart';
+import '../providers/ndk_provider.dart';
 import '../providers/nostr_band_provider.dart';
 import '../providers/search_provider.dart';
 import 'nostr/profile/profile_page_2.dart';
@@ -174,12 +175,14 @@ class _SearchPageState extends ConsumerState<SearchPage> {
 
   void _changeFollowing(
       bool followChange, String pubkey, ContactList currentOwnContacts) async {
-    final followingService = ref.read(followingProvider);
+    final selfPubkey = ref.watch(ndkProvider).accounts.getPublicKey();
+    final myContactListNotifier =
+        ref.watch(contactListStateProvider(selfPubkey!).notifier);
 
     if (followChange) {
-      await followingService.followUser(pubkey);
+      await myContactListNotifier.followUser(pubkey);
     } else {
-      await followingService.unfollowUser(pubkey);
+      await myContactListNotifier.unfollowUser(pubkey);
     }
   }
 
@@ -203,58 +206,50 @@ class _SearchPageState extends ConsumerState<SearchPage> {
         backgroundColor: Palette.background,
         body: Consumer(
           builder: (context, ref, child) {
-            final followingService = ref.watch(followingProvider);
+            final myContactListNotifier =
+                ref.watch(contactListSelfStateProvider);
 
-            return StreamBuilder<ContactList>(
-              stream: followingService.getContactsStreamSelf(),
-              builder: (context, ownFollowingSnapshot) {
-                if (!ownFollowingSnapshot.hasData) {
-                  return const Center(child: CircularProgressIndicator());
-                }
+            return Column(
+              children: [
+                SearchBarWidget(
+                  onSearchChanged: (value) {
+                    if (value.length < 2) {
+                      ref
+                          .read(searchStateProvider.notifier)
+                          .clearSearch(stillSearching: true);
+                      return;
+                    }
 
-                return Column(
-                  children: [
-                    SearchBarWidget(
-                      onSearchChanged: (value) {
-                        if (value.length < 2) {
-                          ref
-                              .read(searchStateProvider.notifier)
-                              .clearSearch(stillSearching: true);
-                          return;
-                        }
-
-                        _onSearchChanged(value);
-                      },
-                      onSubmit: (value) {
-                        _onSubmit(value);
-                      },
-                      helpSearch: (context) {
-                        _helpSearch(context);
-                      },
-                      externalFocusNode: _searchFocusNode,
-                      externalController: _searchController,
-                    ),
-                    Expanded(
-                      child: ListView(
-                        physics: const BouncingScrollPhysics(),
-                        children: [
-                          // Default view (trends)
-                          Visibility(
-                            maintainState: true,
-                            maintainInteractivity: false,
-                            visible: !isSearching,
-                            child: _defaultView(ownFollowingSnapshot.data!),
-                          ),
-
-                          // Search results
-                          if (isSearching)
-                            _buildSearchResults(ownFollowingSnapshot.data!)
-                        ],
+                    _onSearchChanged(value);
+                  },
+                  onSubmit: (value) {
+                    _onSubmit(value);
+                  },
+                  helpSearch: (context) {
+                    _helpSearch(context);
+                  },
+                  externalFocusNode: _searchFocusNode,
+                  externalController: _searchController,
+                ),
+                Expanded(
+                  child: ListView(
+                    physics: const BouncingScrollPhysics(),
+                    children: [
+                      // Default view (trends)
+                      Visibility(
+                        maintainState: true,
+                        maintainInteractivity: false,
+                        visible: !isSearching,
+                        child: _defaultView(myContactListNotifier.contactList),
                       ),
-                    ),
-                  ],
-                );
-              },
+
+                      // Search results
+                      if (isSearching)
+                        _buildSearchResults(myContactListNotifier.contactList)
+                    ],
+                  ),
+                ),
+              ],
             );
           },
         ),

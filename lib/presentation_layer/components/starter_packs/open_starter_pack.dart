@@ -10,6 +10,7 @@ import '../../../helpers/helpers.dart';
 import '../../../helpers/nprofile_helper.dart';
 import '../../atoms/long_button.dart';
 import '../../atoms/spinner_center.dart';
+import '../../providers/following_contact_state_provider.dart';
 import '../../providers/inbox_outbox_provider.dart';
 import '../../providers/metadata_state_provider.dart';
 import '../../providers/ndk_provider.dart';
@@ -406,15 +407,27 @@ class _OpenStarterPackState extends ConsumerState<OpenStarterPack> {
                       .watch(metadataStateProvider(displayPubkey))
                       .userMetadata;
 
+                  final myContactListNotifier =
+                      ref.watch(contactListStateProvider(myPubkey!).notifier);
+                  final myContactListState =
+                      ref.watch(contactListStateProvider(myPubkey));
+
                   return PersonCard(
                     pubkey: displayPubkey,
                     name: displayMetadata?.name ??
                         Helpers().shortHr(displayPubkey),
                     pictureUrl: displayMetadata?.picture ?? "",
                     about: displayMetadata?.about ?? "",
-                    isFollowing: false,
+                    isFollowing: myContactListState.contactList.contacts
+                        .contains(displayPubkey),
                     onTap: () => _navigateToProfile(context, displayPubkey),
-                    onFollowTab: (value) {},
+                    onFollowTab: (value) {
+                      if (value) {
+                        myContactListNotifier.followUser(displayPubkey);
+                      } else {
+                        myContactListNotifier.unfollowUser(displayPubkey);
+                      }
+                    },
                     nip05: displayMetadata?.nip05,
                     showFollowButton: true,
                   );

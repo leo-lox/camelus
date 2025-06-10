@@ -1,12 +1,9 @@
-import 'package:camelus/domain_layer/entities/contact_list.dart';
 import 'package:camelus/domain_layer/entities/user_metadata.dart';
-import 'package:camelus/domain_layer/usecases/follow.dart';
-import 'package:camelus/domain_layer/usecases/get_user_metadata.dart';
+
 import 'package:camelus/helpers/nprofile_helper.dart';
-import 'package:camelus/domain_layer/entities/nostr_tag.dart';
+
 import 'package:camelus/presentation_layer/atoms/my_profile_picture.dart';
-import 'package:camelus/presentation_layer/providers/following_provider.dart';
-import 'package:camelus/presentation_layer/providers/metadata_provider.dart';
+
 import 'package:camelus/presentation_layer/providers/metadata_state_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -16,6 +13,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
+
+import '../../providers/following_contact_state_provider.dart';
 
 class NostrDrawer extends ConsumerWidget {
   final String pubkey;
@@ -85,8 +84,8 @@ class NostrDrawer extends ConsumerWidget {
         });
   }
 
-  Widget _drawerHeader(
-      context, UserMetadata? metadata, Follow followingService) {
+  Widget _drawerHeader(context, UserMetadata? metadata, WidgetRef ref) {
+    final myContactList = ref.watch(contactListSelfStateProvider);
     return DrawerHeader(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -156,28 +155,26 @@ class NostrDrawer extends ConsumerWidget {
           ),
           Row(
             children: [
-              FutureBuilder<ContactList?>(
-                  future: followingService.getContacts(pubkey),
-                  builder: (context, snapshot) {
-                    return RichText(
-                        text: TextSpan(
-                            text: snapshot.hasData
-                                ? snapshot.data?.contacts.length.toString()
-                                : 'n.a.',
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Palette.extraLightGray,
-                            ),
-                            children: const [
-                          TextSpan(
-                            text: ' Following  ',
-                            style: TextStyle(
-                                color: Palette.gray,
-                                fontSize: 13,
-                                fontWeight: FontWeight.normal),
-                          )
-                        ]));
-                  }),
+              RichText(
+                text: TextSpan(
+                  text: !myContactList.isLoading
+                      ? myContactList.contactList.contacts.length.toString()
+                      : 'n.a.',
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Palette.extraLightGray,
+                  ),
+                  children: const [
+                    TextSpan(
+                      text: ' Following  ',
+                      style: TextStyle(
+                          color: Palette.gray,
+                          fontSize: 13,
+                          fontWeight: FontWeight.normal),
+                    )
+                  ],
+                ),
+              ),
               const SizedBox(
                 width: 6,
               ),
@@ -242,8 +239,6 @@ class NostrDrawer extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final followingService = ref.watch(followingProvider);
-
     final myUserMetadata =
         ref.watch(metadataStateProvider(pubkey)).userMetadata;
 
@@ -254,7 +249,7 @@ class NostrDrawer extends ConsumerWidget {
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _drawerHeader(context, myUserMetadata, followingService),
+            _drawerHeader(context, myUserMetadata, ref),
             _divider(),
             _drawerItem(
                 label: 'Profile',

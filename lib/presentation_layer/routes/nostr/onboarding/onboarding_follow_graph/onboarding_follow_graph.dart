@@ -1,19 +1,16 @@
-import 'dart:math';
-
 import 'package:camelus/presentation_layer/atoms/long_button.dart';
 import 'package:camelus/config/palette.dart';
 import 'package:camelus/domain_layer/entities/onboarding_user_info.dart';
 import 'package:camelus/presentation_layer/atoms/my_profile_picture.dart';
-import 'package:camelus/presentation_layer/providers/following_provider.dart';
 import 'package:camelus/presentation_layer/providers/metadata_provider.dart';
-import 'package:camelus/presentation_layer/providers/metadata_state_provider.dart';
 import 'package:camelus/presentation_layer/routes/nostr/onboarding/onboarding_follow_graph/graph_profile.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_force_directed_graph/flutter_force_directed_graph.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../../config/onboard_conf.dart';
-import '../../../../../domain_layer/entities/contact_list.dart';
+
+import '../../../../providers/following_contact_state_provider.dart';
 import 'graph_node_data.dart';
 
 class OnboardingFollowGraph extends ConsumerStatefulWidget {
@@ -160,30 +157,15 @@ class _OnboardingFollowGraphState extends ConsumerState<OnboardingFollowGraph> {
 
   Future<GraphNodeData> _fetchNodePubkeyData(String pubkey) async {
     final metadataP = ref.watch(metadataProvider);
-    final followP = ref.watch(followingProvider);
+    final myContactList = ref.watch(contactListSelfStateProvider);
 
     final metadata =
         (await metadataP.getMetadataByPubkey(pubkey).toList()).first;
-    ContactList? followInfo = await followP.getContacts(pubkey);
-
-    // replace with empty contact list if null
-    followInfo ??= ContactList(
-      pubKey: pubkey,
-      contacts: [],
-      contactRelays: [],
-      createdAt: 0,
-      followedCommunities: [],
-      followedEvents: [],
-      followedTags: [],
-      loadedTimestamp: 0,
-      petnames: [],
-      sources: [],
-    );
 
     final GraphNodeData mynode = GraphNodeData(
       pubkey: pubkey,
       userMetadata: metadata,
-      contactList: followInfo,
+      contactList: myContactList.contactList,
     );
     return mynode;
   }

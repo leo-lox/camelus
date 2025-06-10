@@ -23,7 +23,7 @@ import '../../../../domain_layer/usecases/generate_private_key.dart';
 import '../../../atoms/long_button.dart';
 import '../../../atoms/mnemonic_grid.dart';
 import '../../../providers/file_upload_provider.dart';
-import '../../../providers/following_provider.dart';
+import '../../../providers/following_contact_state_provider.dart';
 import '../../../providers/inbox_outbox_provider.dart';
 import '../../../providers/metadata_provider.dart';
 import '../../../providers/signer_provider.dart';
@@ -92,7 +92,10 @@ ${_privateKey.mnemonicSentence}
     String? uploadedBanner;
 
     final metadataP = ref.watch(metadataProvider);
-    final followP = ref.watch(followingProvider);
+
+    final myContactListNotifier =
+        ref.watch(contactListStateProvider(_privateKey.publicKey).notifier);
+
     final inboxOutboxP = ref.read(inboxOutboxProvider);
     final fileUploadP = ref.watch(fileUploadProvider);
 
@@ -148,7 +151,7 @@ ${_privateKey.mnemonicSentence}
     );
 
     await metadataP.broadcastMetadata(userMetadata);
-    await followP.setContacts(widget.userInfo.followPubkeys);
+    await myContactListNotifier.setContacts(widget.userInfo.followPubkeys);
   }
 
   @override

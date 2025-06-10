@@ -46,10 +46,6 @@ class Follow {
     );
   }
 
-  Future<bool> isFollowing(String npub) async {
-    throw UnimplementedError();
-  }
-
   Future<ContactList?> getContacts(String npub, {int? timeout}) {
     return followRepository.getContacts(npub, timeout: timeout);
   }

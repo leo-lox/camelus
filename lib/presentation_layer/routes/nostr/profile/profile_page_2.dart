@@ -18,7 +18,7 @@ import '../../../atoms/my_profile_picture.dart';
 import '../../../atoms/nip_05_text.dart';
 import '../../../components/generic_feed.dart';
 import '../../../components/starter_packs/starter_packs_list.dart';
-import '../../../providers/following_provider.dart';
+import '../../../providers/following_contact_state_provider.dart';
 import '../../../providers/metadata_state_provider.dart';
 import '../../../providers/ndk_provider.dart';
 import '../blockedUsers/block_page.dart';
@@ -149,12 +149,6 @@ class ProfilePage2 extends ConsumerWidget {
   }
 }
 
-final _userContactsProvider =
-    FutureProvider.family<ContactList?, String>((ref, pubkey) async {
-  final followP = ref.watch(followingProvider);
-  return followP.getContacts(pubkey);
-});
-
 class _BuildProfileHeader extends ConsumerWidget {
   final UserMetadata userMetadata;
   final bool isOwnProfile;
@@ -169,8 +163,7 @@ class _BuildProfileHeader extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, ref) {
-    final contactsAsyncValue =
-        ref.watch(_userContactsProvider(userMetadata.pubkey));
+    final contacts = ref.watch(contactListStateProvider(userMetadata.pubkey));
 
     return Stack(
       children: [
@@ -313,7 +306,7 @@ class _BuildProfileHeader extends ConsumerWidget {
                 SizedBox(height: 5),
                 Row(
                   children: [
-                    _display_following(contactsAsyncValue, context),
+                    _display_following(contacts.contactList, context),
                     SizedBox(width: 16),
                     Text(
                       'n.a Followers',
@@ -332,66 +325,43 @@ class _BuildProfileHeader extends ConsumerWidget {
     );
   }
 
-  Widget _display_following(
-      AsyncValue<ContactList?> contactsAsyncValue, BuildContext context) {
-    return contactsAsyncValue.when(
-      loading: () => Row(
-        children: [
-          Shimmer.fromColors(
-            baseColor: Palette.extraDarkGray,
-            highlightColor: Palette.darkGray,
-            child: Text("_"),
-          ),
-          SizedBox(width: 7),
-          Text(
-            "Following",
-            style: TextStyle(
-              color: Palette.gray,
-              fontSize: 14,
+  Widget _display_following(ContactList? contacts, BuildContext context) {
+    final followingCount = contacts?.contacts.length ?? 0;
+    return GestureDetector(
+      onTap: () {
+        if (contacts != null) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => FollowerPage(
+                contactList: contacts,
+                title: "Following",
+              ),
             ),
-          )
-        ],
-      ),
-      error: (err, stack) => Text('err'),
-      data: (contacts) {
-        final followingCount = contacts?.contacts.length ?? 0;
-        return GestureDetector(
-          onTap: () {
-            if (contacts != null) {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => FollowerPage(
-                    contactList: contacts,
-                    title: "Following",
-                  ),
-                ),
-              );
-            }
-          },
-          child: RichText(
-            text: TextSpan(
-              children: [
-                TextSpan(
-                  text: '$followingCount',
-                  style: const TextStyle(
-                    color: Palette.lightGray,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14,
-                  ),
-                ),
-                const TextSpan(
-                  text: ' Following',
-                  style: TextStyle(
-                    color: Palette.gray,
-                    fontSize: 14,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
+          );
+        }
       },
+      child: RichText(
+        text: TextSpan(
+          children: [
+            TextSpan(
+              text: '$followingCount',
+              style: const TextStyle(
+                color: Palette.lightGray,
+                fontWeight: FontWeight.bold,
+                fontSize: 14,
+              ),
+            ),
+            const TextSpan(
+              text: ' Following',
+              style: TextStyle(
+                color: Palette.gray,
+                fontSize: 14,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
@@ -415,35 +385,27 @@ class _FollowButtonState extends ConsumerState<_FollowButton> {
 
   @override
   Widget build(BuildContext context) {
-    final followingP = ref.watch(followingProvider);
+    final selfPubkey = ref.watch(ndkProvider).accounts.getPublicKey();
+    final myContactListNotifier =
+        ref.watch(contactListStateProvider(selfPubkey!).notifier);
 
-    return StreamBuilder<ContactList>(
-      stream: followingP.getContactsStreamSelf(),
-      builder: (context, snapshot) {
-        if (snapshot.hasData) {
-          var followingList = snapshot.data!.contacts;
+    final myContactListState = ref.watch(contactListSelfStateProvider);
 
-          if (followingList.contains(widget.pubkey)) {
-            return followButton(
-              isFollowing: true,
-              onPressed: () {
-                followingP.unfollowUser(widget.pubkey);
-                setState(() {});
-              },
-            );
-          } else {
-            return followButton(
-              isFollowing: false,
-              onPressed: () {
-                followingP.followUser(widget.pubkey);
-                setState(() {});
-              },
-            );
-          }
-        }
-        return Container();
-      },
-    );
+    if (myContactListState.contactList.contacts.contains(widget.pubkey)) {
+      return followButton(
+        isFollowing: true,
+        onPressed: () {
+          myContactListNotifier.unfollowUser(widget.pubkey);
+        },
+      );
+    } else {
+      return followButton(
+        isFollowing: false,
+        onPressed: () {
+          myContactListNotifier.followUser(widget.pubkey);
+        },
+      );
+    }
   }
 }
 
