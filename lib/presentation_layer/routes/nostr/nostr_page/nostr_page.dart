@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:camelus/presentation_layer/atoms/spinner_center.dart';
 import 'package:camelus/presentation_layer/providers/metadata_state_provider.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -71,7 +72,7 @@ class _NostrPageState extends ConsumerState<NostrPage>
     final myContactList = ref.watch(contactListSelfStateProvider);
 
     if (myContactList.isLoading) {
-      return Center(child: Text("iam loading"));
+      return Center(child: SpinnerCenter());
     }
 
     return SafeArea(
