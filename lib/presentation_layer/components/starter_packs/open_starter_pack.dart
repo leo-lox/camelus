@@ -9,7 +9,6 @@ import '../../../domain_layer/entities/starter_pack_identifier.dart';
 import '../../../helpers/helpers.dart';
 import '../../../helpers/nprofile_helper.dart';
 import '../../atoms/long_button.dart';
-import '../../atoms/my_profile_picture.dart';
 import '../../atoms/spinner_center.dart';
 import '../../providers/inbox_outbox_provider.dart';
 import '../../providers/metadata_state_provider.dart';
@@ -17,6 +16,7 @@ import '../../providers/ndk_provider.dart';
 import '../../providers/nostr_list_provider.dart';
 import '../../providers/nostr_lists_follow_state_provider.dart';
 import '../../routes/nostr/profile/profile_page_2.dart';
+import '../person_card.dart';
 
 class OpenStarterPack extends ConsumerStatefulWidget {
   final StarterPackIdentifier starterPackIdentifier;
@@ -55,7 +55,6 @@ class _OpenStarterPackState extends ConsumerState<OpenStarterPack> {
 
     final myNpub = Nip19.encodePubKey(myPubkey!);
 
-    ///  /invitee/pubkeyList/listName
     final url =
         "https://camelus.app/i/${myNpub}/${widget.starterPackIdentifier.name}";
 
@@ -100,7 +99,6 @@ class _OpenStarterPackState extends ConsumerState<OpenStarterPack> {
             ),
             TextButton(
               onPressed: () {
-                // pop dialog
                 Navigator.pop(context);
                 _onDelete(ref, context);
               },
@@ -210,132 +208,102 @@ class _OpenStarterPackState extends ConsumerState<OpenStarterPack> {
       length: 1,
       child: Scaffold(
         backgroundColor: Palette.background,
-        appBar: AppBar(
-            title: Column(
-              children: [],
-            ),
-            backgroundColor: Palette.background,
-            toolbarHeight: 45,
-            actions: [
-              longButton(
-                name: "share",
-                onPressed: () => _onShare(ref),
-                inverted: true,
-              ),
-              const SizedBox(
-                width: 20,
-              ),
-              if (isOwnStarterPack)
-                PopupMenuButton<String>(
-                  icon: Icon(
-                    PhosphorIcons.dotsThreeVertical(),
-                    color: Palette.white,
-                  ),
-                  color: Palette.extraDarkGray,
-                  onSelected: (String value) {
-                    switch (value) {
-                      case 'edit':
-                        _onEdit(context);
-                        break;
-                      case 'delete':
-                        _showDeleteConfirmationDialog(context);
-                        break;
-                    }
-                  },
-                  itemBuilder: (BuildContext context) => [
-                    PopupMenuItem<String>(
-                      value: 'edit',
-                      child: Row(
-                        children: [
-                          Icon(PhosphorIcons.pen(),
-                              color: Palette.white, size: 20),
-                          SizedBox(width: 8),
-                          Text('Edit',
-                              style: TextStyle(color: Palette.lightGray)),
-                        ],
-                      ),
-                    ),
-                    PopupMenuItem<String>(
-                      value: 'delete',
-                      child: Row(
-                        children: [
-                          Icon(PhosphorIcons.trash(),
-                              color: Colors.red, size: 20),
-                          SizedBox(width: 8),
-                          Text('Delete',
-                              style: TextStyle(color: Palette.lightGray)),
-                        ],
-                      ),
-                    ),
-                  ],
+        body: NestedScrollView(
+          headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
+            return <Widget>[
+              SliverAppBar(
+                backgroundColor: Palette.background,
+                elevation: 0,
+                pinned: true,
+                expandedHeight: 200.0,
+                leading: IconButton(
+                  icon: Icon(Icons.arrow_back, color: Palette.white),
+                  onPressed: () => Navigator.pop(context),
                 ),
-              const SizedBox(
-                width: 20,
-              ),
-            ]),
-        body: Column(
-          children: [
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              height: 70,
-              child: Column(
-                children: [
-                  Row(
-                    children: [
-                      if (myStarterSet.image != null)
-                        Image.network(myStarterSet.image!,
-                            width: 50, height: 50),
-                      if (myStarterSet.image == null)
-                        Image.asset("assets/images/list_placeholder.png",
-                            width: 50, height: 50),
-                      const SizedBox(width: 10),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text.rich(TextSpan(
-                            children: [
-                              TextSpan(
-                                text: myStarterSet.title ??
-                                    widget.starterPackIdentifier.name,
-                              ),
-                            ],
-                            style: TextStyle(
-                              fontSize: 20,
-                            ),
-                          )),
-                          Text(
-                              "by ${isOwnStarterPack ? "you" : ref.watch(metadataStateProvider(widget.starterPackIdentifier.pubkey)).userMetadata?.name ?? Helpers().shortHr(
-                                    widget.starterPackIdentifier.pubkey,
-                                  )}",
-                              style: TextStyle(color: Palette.gray)),
-                        ],
-                      ),
-                    ],
+                actions: [
+                  longButton(
+                    name: "Share",
+                    onPressed: () => _onShare(ref),
+                    inverted: false,
                   ),
+                  const SizedBox(width: 16),
+                  if (isOwnStarterPack)
+                    PopupMenuButton<String>(
+                      icon: Icon(
+                        PhosphorIcons.dotsThreeVertical(),
+                        color: Palette.white,
+                      ),
+                      color: Palette.extraDarkGray,
+                      onSelected: (String value) {
+                        switch (value) {
+                          case 'edit':
+                            _onEdit(context);
+                            break;
+                          case 'delete':
+                            _showDeleteConfirmationDialog(context);
+                            break;
+                        }
+                      },
+                      itemBuilder: (BuildContext context) => [
+                        PopupMenuItem<String>(
+                          value: 'edit',
+                          child: Row(
+                            children: [
+                              Icon(PhosphorIcons.pen(),
+                                  color: Palette.white, size: 20),
+                              SizedBox(width: 8),
+                              Text('Edit',
+                                  style: TextStyle(color: Palette.lightGray)),
+                            ],
+                          ),
+                        ),
+                        PopupMenuItem<String>(
+                          value: 'delete',
+                          child: Row(
+                            children: [
+                              Icon(PhosphorIcons.trash(),
+                                  color: Colors.red, size: 20),
+                              SizedBox(width: 8),
+                              Text('Delete',
+                                  style: TextStyle(color: Palette.lightGray)),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  const SizedBox(width: 16),
                 ],
-              ),
-            ),
-            Expanded(
-              child: TabBarView(
-                children: [
-                  ListView.builder(
-                    physics: const BouncingScrollPhysics(),
-                    itemCount: myStarterSet.elements.length,
-                    itemBuilder: (context, index) {
-                      final displayPubkey = myStarterSet.elements[index].value;
-                      final displayMetadata = ref
-                          .watch(metadataStateProvider(displayPubkey))
-                          .userMetadata;
-                      return ListTile(
-                        onTap: () {
-                          _navigateToProfile(context, displayPubkey);
-                        },
-                        title: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                flexibleSpace: FlexibleSpaceBar(
+                  background: Container(
+                    padding: const EdgeInsets.fromLTRB(20, 80, 20, 20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
                           children: [
-                            UserImage(
-                              imageUrl: displayMetadata?.picture,
-                              pubkey: displayPubkey,
+                            // starter pack icon/image
+                            Container(
+                              width: 60,
+                              height: 60,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(12),
+                                color: Palette.primary.withValues(alpha: 0.2),
+                              ),
+                              child: myStarterSet.image != null
+                                  ? ClipRRect(
+                                      borderRadius: BorderRadius.circular(12),
+                                      child: Image.network(
+                                        myStarterSet.image!,
+                                        width: 60,
+                                        height: 60,
+                                        fit: BoxFit.cover,
+                                      ),
+                                    )
+                                  : Icon(
+                                      PhosphorIcons.users(),
+                                      color: Palette.primary,
+                                      size: 30,
+                                    ),
                             ),
                             const SizedBox(width: 16),
                             Expanded(
@@ -343,45 +311,145 @@ class _OpenStarterPackState extends ConsumerState<OpenStarterPack> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    displayMetadata?.name ?? "",
-                                    style: const TextStyle(
+                                    myStarterSet.title ??
+                                        widget.starterPackIdentifier.name,
+                                    style: TextStyle(
                                       color: Palette.white,
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w600,
+                                      fontSize: 24,
+                                      fontWeight: FontWeight.bold,
                                     ),
-                                    overflow: TextOverflow.ellipsis,
                                   ),
                                   const SizedBox(height: 4),
                                   Text(
-                                    displayMetadata?.about ?? "",
-                                    style: const TextStyle(
+                                    "Starter pack by ${isOwnStarterPack ? "you" : ref.watch(metadataStateProvider(widget.starterPackIdentifier.pubkey)).userMetadata?.name ?? Helpers().shortHr(widget.starterPackIdentifier.pubkey)}",
+                                    style: TextStyle(
                                       color: Palette.gray,
-                                      fontSize: 12,
+                                      fontSize: 14,
                                     ),
-                                    maxLines: 3,
-                                    overflow: TextOverflow.ellipsis,
                                   ),
                                 ],
                               ),
                             ),
                           ],
                         ),
-                        trailing: SizedBox(
-                          height: 0,
-                          width: 0,
-                        ),
-                      );
-                    },
+                        if (myStarterSet.description != null &&
+                            myStarterSet.description!.isNotEmpty) ...[
+                          const SizedBox(height: 16),
+                          Text(
+                            myStarterSet.description!,
+                            style: TextStyle(
+                              color: Palette.lightGray,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
                   ),
-                ],
+                ),
               ),
-            ),
-            const SizedBox(
-              height: 15,
-            ),
-          ],
+              SliverPersistentHeader(
+                pinned: true,
+                delegate: _SliverAppBarDelegate(
+                  TabBar(
+                    indicatorColor: Palette.primary,
+                    indicatorWeight: 3,
+                    labelColor: Palette.white,
+                    unselectedLabelColor: Palette.gray,
+                    labelStyle: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
+                    unselectedLabelStyle: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.normal,
+                    ),
+                    tabs: [
+                      Tab(
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text("People"),
+                            const SizedBox(width: 8),
+                            Container(
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 6, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: Palette.gray.withValues(alpha: 0.3),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Text(
+                                "${myStarterSet.elements.length}",
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Palette.lightGray,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ];
+          },
+          body: TabBarView(
+            children: [
+              ListView.builder(
+                physics: const BouncingScrollPhysics(),
+                itemCount: myStarterSet.elements.length,
+                itemBuilder: (context, index) {
+                  final displayPubkey = myStarterSet.elements[index].value;
+                  final displayMetadata = ref
+                      .watch(metadataStateProvider(displayPubkey))
+                      .userMetadata;
+
+                  return PersonCard(
+                    pubkey: displayPubkey,
+                    name: displayMetadata?.name ??
+                        Helpers().shortHr(displayPubkey),
+                    pictureUrl: displayMetadata?.picture ?? "",
+                    about: displayMetadata?.about ?? "",
+                    isFollowing: false,
+                    onTap: () => _navigateToProfile(context, displayPubkey),
+                    onFollowTab: (value) {},
+                    nip05: displayMetadata?.nip05,
+                    showFollowButton: true,
+                  );
+                },
+              ),
+            ],
+          ),
         ),
       ),
     );
+  }
+}
+
+// sticky top bar
+class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
+  _SliverAppBarDelegate(this._tabBar);
+
+  final TabBar _tabBar;
+
+  @override
+  double get minExtent => _tabBar.preferredSize.height;
+  @override
+  double get maxExtent => _tabBar.preferredSize.height;
+
+  @override
+  Widget build(
+      BuildContext context, double shrinkOffset, bool overlapsContent) {
+    return Container(
+      color: Palette.background,
+      child: _tabBar,
+    );
+  }
+
+  @override
+  bool shouldRebuild(_SliverAppBarDelegate oldDelegate) {
+    return false;
   }
 }
