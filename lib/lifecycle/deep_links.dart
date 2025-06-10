@@ -5,6 +5,7 @@ import 'package:camelus/presentation_layer/providers/nip05_provider.dart';
 
 import 'package:riverpod/riverpod.dart';
 
+import '../domain_layer/entities/starter_pack_identifier.dart';
 import '../domain_layer/usecases/app_auth.dart';
 import '../helpers/helpers.dart';
 import '../helpers/nevent_helper.dart';
@@ -47,13 +48,34 @@ Future<void> _camelusLinks({
   if (myMatch.startsWith("/i/") || myMatch.startsWith("/ii/")) {
     final List<String> myMatchSplit = myMatch.split("/");
     final String invitedBy = myMatchSplit[2];
-    final String inviteListName = myMatchSplit[3];
+    final String listName = myMatchSplit[3];
+    final String? listPubkey;
+
+    final String decodedInviteBy;
+    final String? decodedListPubkey;
+
+    if (myMatchSplit.length >= 5) {
+      listPubkey = myMatchSplit[4];
+      decodedListPubkey =
+          NprofileHelper().nprofileOrNpubToMap(listPubkey)['pubkey'];
+    } else {
+      listPubkey = null;
+      decodedListPubkey = null;
+    }
+
+    decodedInviteBy = NprofileHelper().nprofileOrNpubToMap(invitedBy)['pubkey'];
 
     /// check if account already setup
     final mySigner = await AppAuth.getEventSigner();
 
     if (mySigner != null) {
       print("account already setup");
+
+      navigatorKey.currentState?.pushNamed('/open-starter-pack',
+          arguments: StarterPackIdentifier(
+            name: listName,
+            pubkey: decodedListPubkey ?? decodedInviteBy,
+          ));
       return;
     }
 
@@ -62,10 +84,9 @@ Future<void> _camelusLinks({
     final provider = providerContainer.read(onboardingProvider);
 
     try {
-      final decoded = NprofileHelper().nprofileOrNpubToMap(invitedBy);
-
-      provider.signUpInfo.invitedByPubkey = decoded['pubkey'];
-      provider.signUpInfo.inviteListName = inviteListName;
+      provider.signUpInfo.invitedByPubkey = decodedInviteBy;
+      provider.signUpInfo.listName = listName;
+      provider.signUpInfo.listPubkey = decodedListPubkey ?? decodedInviteBy;
       //todo: add relays to ndk
     } catch (e) {
       print("error $e");

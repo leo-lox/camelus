@@ -167,7 +167,8 @@ class _NostrOnboardingState extends ConsumerState<NostrOnboarding>
                   },
                   userInfo: signUpInfo,
                   invitedByPubkey: signUpInfo.invitedByPubkey!,
-                  inviteListName: signUpInfo.inviteListName!,
+                  listName: signUpInfo.listName!,
+                  listPubkey: signUpInfo.listPubkey!,
                 ),
               OnboardingName(
                 userInfo: signUpInfo,

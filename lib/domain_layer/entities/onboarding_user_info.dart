@@ -17,7 +17,8 @@ class OnboardingUserInfo {
 
   // if invited by someone
   String? invitedByPubkey = '';
-  String? inviteListName = '';
+  String? listPubkey = '';
+  String? listName = '';
 
   OnboardingUserInfo({
     this.name,
@@ -32,6 +33,7 @@ class OnboardingUserInfo {
     this.lud16 = '',
     required this.keyPair,
     this.invitedByPubkey,
-    this.inviteListName,
+    this.listPubkey,
+    this.listName,
   });
 }

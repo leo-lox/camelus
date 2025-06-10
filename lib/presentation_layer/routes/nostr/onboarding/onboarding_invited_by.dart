@@ -13,14 +13,16 @@ class OnboardingInvitedBy extends ConsumerStatefulWidget {
   final Function nextCallback;
   final OnboardingUserInfo userInfo;
   final String invitedByPubkey;
-  final String inviteListName;
+  final String listName;
+  final String listPubkey;
 
   const OnboardingInvitedBy({
     super.key,
     required this.nextCallback,
     required this.userInfo,
     required this.invitedByPubkey,
-    required this.inviteListName,
+    required this.listName,
+    required this.listPubkey,
   });
   @override
   ConsumerState<OnboardingInvitedBy> createState() =>
@@ -45,10 +47,10 @@ class _OnboardingInvitedByState extends ConsumerState<OnboardingInvitedBy> {
 
   NostrStarterPack? _getInvitedSet(WidgetRef ref) {
     final inviteeLists =
-        ref.watch(nostrListsFollowStateProvider(widget.invitedByPubkey));
+        ref.watch(nostrListsFollowStateProvider(widget.listPubkey));
 
-    for (var set in inviteeLists.publicNostrFollowSets) {
-      if (set.name == widget.inviteListName) {
+    for (final set in inviteeLists.publicNostrFollowSets) {
+      if (set.name == widget.listName) {
         return set;
       }
     }
