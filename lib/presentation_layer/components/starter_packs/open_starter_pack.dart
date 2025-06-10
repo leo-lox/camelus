@@ -1,3 +1,5 @@
+import 'package:camelus/domain_layer/entities/feed_filter.dart';
+import 'package:camelus/presentation_layer/components/generic_feed.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -206,7 +208,7 @@ class _OpenStarterPackState extends ConsumerState<OpenStarterPack> {
     }
 
     return DefaultTabController(
-      length: 1,
+      length: 2,
       child: Scaffold(
         backgroundColor: Palette.background,
         body: NestedScrollView(
@@ -390,6 +392,9 @@ class _OpenStarterPackState extends ConsumerState<OpenStarterPack> {
                           ],
                         ),
                       ),
+                      Tab(
+                        text: "preview",
+                      ),
                     ],
                   ),
                 ),
@@ -433,6 +438,13 @@ class _OpenStarterPackState extends ConsumerState<OpenStarterPack> {
                   );
                 },
               ),
+              GenericFeed(
+                feedPadding: EdgeInsets.only(top: 50),
+                feedFilter: FeedFilter(
+                  feedId: "p-starter-pck-${myStarterSet.name}",
+                  authors: myStarterSet.elements.map((e) => e.value).toList(),
+                ),
+              )
             ],
           ),
         ),
