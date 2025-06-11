@@ -34,6 +34,6 @@ void run(List<String> args) async {
   await pod.start();
 
   /// restore push server
-  final InternalSession session = await pod.createSession();
-  NostrPushEndpoint().onServerStart(session);
+
+  NostrPushEndpoint().onServerStart(pod);
 }
