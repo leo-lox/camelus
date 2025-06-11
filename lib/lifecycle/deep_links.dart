@@ -1,17 +1,19 @@
 import 'dart:async';
 
 import 'package:app_links/app_links.dart';
-import 'package:camelus/presentation_layer/providers/nip05_provider.dart';
 
 import 'package:riverpod/riverpod.dart';
 
+import '../domain_layer/entities/invite_data.dart';
 import '../domain_layer/entities/starter_pack_identifier.dart';
 import '../domain_layer/usecases/app_auth.dart';
 import '../helpers/helpers.dart';
 import '../helpers/nevent_helper.dart';
 import '../helpers/nprofile_helper.dart';
 import '../main.dart';
+import '../presentation_layer/providers/nip05_provider.dart';
 import '../presentation_layer/providers/onboarding_provider.dart';
+import '../presentation_layer/providers/serverpod_provider.dart';
 
 /// sets up links listener
 //todo: fetch the notes with inbox/outbox first then navigate to the note
@@ -43,77 +45,138 @@ Future<void> _camelusLinks({
   required String link,
   required ProviderContainer providerContainer,
 }) async {
-  final myMatch = link.replaceAll("https://camelus.app", "");
+  final path = link.replaceAll("https://camelus.app", "");
 
-  if (myMatch.startsWith("/i/") || myMatch.startsWith("/ii/")) {
-    final List<String> myMatchSplit = myMatch.split("/");
-    final String invitedBy = myMatchSplit[2];
-    final String listName = myMatchSplit[3];
-    final String? listPubkey;
-
-    final String decodedInviteBy;
-    final String? decodedListPubkey;
-
-    if (myMatchSplit.length >= 5) {
-      listPubkey = myMatchSplit[4];
-      decodedListPubkey =
-          NprofileHelper().nprofileOrNpubToMap(listPubkey)['pubkey'];
-    } else {
-      listPubkey = null;
-      decodedListPubkey = null;
-    }
-
-    decodedInviteBy = NprofileHelper().nprofileOrNpubToMap(invitedBy)['pubkey'];
-
-    /// check if account already setup
-    final mySigner = await AppAuth.getEventSigner();
-
-    if (mySigner != null) {
-      print("account already setup");
-
-      navigatorKey.currentState?.pushNamed('/open-starter-pack',
-          arguments: StarterPackIdentifier(
-            name: listName,
-            pubkey: decodedListPubkey ?? decodedInviteBy,
-          ));
-      return;
-    }
-
-    NprofileHelper().nprofileOrNpubToMap(invitedBy);
-
-    final provider = providerContainer.read(onboardingProvider);
-
-    try {
-      provider.signUpInfo.invitedByPubkey = decodedInviteBy;
-      provider.signUpInfo.listName = listName;
-      provider.signUpInfo.listPubkey = decodedListPubkey ?? decodedInviteBy;
-      //todo: add relays to ndk
-    } catch (e) {
-      print("error $e");
-    }
-
-    // to update state
-    navigatorKey.currentState?.pushReplacementNamed(
-      "/onboarding",
-    );
-  } else if (myMatch.startsWith("/user/")) {
-    final List<String> myMatchSplit = myMatch.split("/");
-
-    final String username = myMatchSplit[2];
-
-    if (myMatchSplit.length > 3 && myMatchSplit[3] == "status") {
-      // This is a status URL
-      final String statusId = myMatchSplit[4];
-
-      _pushNote(
-        noteId: statusId,
-      );
-    } else {
-      // This is just a user profile URL
-      _nostrDecode(nostrCode: username, providerContainer: providerContainer);
-    }
+  if (_isInviteLink(path)) {
+    await _handleInviteLink(path, providerContainer);
+  } else if (_isUserLink(path)) {
+    await _handleUserLink(path, providerContainer);
   } else {
-    print("camelus link not supported ${link}");
+    print("Camelus link not supported: $link");
+  }
+}
+
+bool _isInviteLink(String path) {
+  return path.startsWith("/i/") || path.startsWith("/ii/");
+}
+
+bool _isUserLink(String path) {
+  return path.startsWith("/user/");
+}
+
+Future<void> _handleInviteLink(
+  String path,
+  ProviderContainer providerContainer,
+) async {
+  final pathSegments = path.split("/");
+  if (pathSegments.length < 3) return;
+
+  final firstParam = pathSegments[2];
+  final InviteData inviteData;
+
+  if (firstParam.startsWith("s")) {
+    inviteData = await _getShortInviteData(firstParam, providerContainer);
+    if (inviteData.isEmpty) return;
+  } else {
+    inviteData = InviteData(
+      inviteByNpub: firstParam,
+      listName: pathSegments.length > 3 ? pathSegments[3] : "",
+      listNpub: pathSegments.length >= 5 ? pathSegments[4] : null,
+    );
+  }
+
+  final decodedInviteBy = _decodePubkey(inviteData.inviteByNpub);
+  final decodedListPubkey =
+      inviteData.listNpub != null ? _decodePubkey(inviteData.listNpub!) : null;
+
+  final mySigner = await AppAuth.getEventSigner();
+
+  if (mySigner != null) {
+    _navigateToStarterPack(
+      inviteData.listName,
+      decodedListPubkey ?? decodedInviteBy,
+    );
+    return;
+  }
+
+  await _setupOnboarding(
+    providerContainer,
+    decodedInviteBy,
+    inviteData.listName,
+    decodedListPubkey ?? decodedInviteBy,
+  );
+}
+
+Future<InviteData> _getShortInviteData(
+  String shortLink,
+  ProviderContainer providerContainer,
+) async {
+  try {
+    final serverpodProv = providerContainer.read(serverpodProvider);
+    final shortInviteData = await serverpodProv.client.linkShorter
+        .getInviteByShortLink(shortLink: shortLink);
+
+    if (shortInviteData == null) {
+      return InviteData.empty();
+    }
+
+    return InviteData(
+      inviteByNpub: shortInviteData.invitedByNpub,
+      listName: shortInviteData.listName,
+      listNpub: shortInviteData.listNpub,
+    );
+  } catch (e) {
+    print("Error fetching short invite data: $e");
+    return InviteData.empty();
+  }
+}
+
+String _decodePubkey(String npubOrNprofile) {
+  return NprofileHelper().nprofileOrNpubToMap(npubOrNprofile)['pubkey'];
+}
+
+void _navigateToStarterPack(String listName, String pubkey) {
+  navigatorKey.currentState?.pushNamed(
+    '/open-starter-pack',
+    arguments: StarterPackIdentifier(
+      name: listName,
+      pubkey: pubkey,
+    ),
+  );
+}
+
+Future<void> _setupOnboarding(
+  ProviderContainer providerContainer,
+  String decodedInviteBy,
+  String listName,
+  String listPubkey,
+) async {
+  try {
+    final provider = providerContainer.read(onboardingProvider);
+    provider.signUpInfo.invitedByPubkey = decodedInviteBy;
+    provider.signUpInfo.listName = listName;
+    provider.signUpInfo.listPubkey = listPubkey;
+
+    navigatorKey.currentState?.pushReplacementNamed("/onboarding");
+  } catch (e) {
+    print("Error setting up onboarding: $e");
+  }
+}
+
+Future<void> _handleUserLink(
+  String path,
+  ProviderContainer providerContainer,
+) async {
+  final pathSegments = path.split("/");
+  if (pathSegments.length < 3) return;
+
+  final username = pathSegments[2];
+
+  if (pathSegments.length > 4 && pathSegments[3] == "status") {
+    final statusId = pathSegments[4];
+    _pushNote(noteId: statusId);
+  } else {
+    _nostrDecode(nostrCode: username, providerContainer: providerContainer);
   }
 }
 

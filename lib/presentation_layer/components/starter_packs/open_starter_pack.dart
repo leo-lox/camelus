@@ -1,13 +1,11 @@
-import 'package:camelus/domain_layer/entities/feed_filter.dart';
-import 'package:camelus/presentation_layer/components/generic_feed.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ndk/shared/nips/nip19/nip19.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../../config/palette.dart';
+import '../../../domain_layer/entities/feed_filter.dart';
 import '../../../domain_layer/entities/starter_pack_identifier.dart';
 import '../../../helpers/helpers.dart';
 import '../../../helpers/nprofile_helper.dart';
@@ -20,6 +18,7 @@ import '../../providers/ndk_provider.dart';
 import '../../providers/nostr_list_provider.dart';
 import '../../providers/nostr_lists_follow_state_provider.dart';
 import '../../routes/nostr/profile/profile_page_2.dart';
+import '../generic_feed.dart';
 import '../person_card.dart';
 
 class OpenStarterPack extends ConsumerStatefulWidget {
