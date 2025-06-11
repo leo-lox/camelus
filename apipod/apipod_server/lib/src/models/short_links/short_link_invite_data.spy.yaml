@@ -1,0 +1,16 @@
+class: ShortLinkInviteData
+table: short_link_invite_data
+fields:
+  shortLink: String
+  createdAt: DateTime
+  invitedByNpub: String
+  listName: String
+  listNpub: String
+  usageCount: int, default=0
+  lastUsed: DateTime?
+
+
+indexes:
+  short_link_invite_short_link_idx:
+    fields: shortLink
+    unique: true

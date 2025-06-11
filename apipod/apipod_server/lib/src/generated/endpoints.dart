@@ -11,11 +11,12 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
 import '../endpoints/app_update_endpoint.dart' as _i2;
-import '../endpoints/moderation/moderation_endpoint.dart' as _i3;
-import '../endpoints/nip05/nip05_endpoint.dart' as _i4;
-import '../endpoints/nostr_band/nostr_band_endpoint.dart' as _i5;
-import '../endpoints/push/nostr_push_endpoint.dart' as _i6;
-import 'package:ndk/domain_layer/entities/nip_01_event.dart' as _i7;
+import '../endpoints/link_shorter/link_shorter_endpoint.dart' as _i3;
+import '../endpoints/moderation/moderation_endpoint.dart' as _i4;
+import '../endpoints/nip05/nip05_endpoint.dart' as _i5;
+import '../endpoints/nostr_band/nostr_band_endpoint.dart' as _i6;
+import '../endpoints/push/nostr_push_endpoint.dart' as _i7;
+import 'package:ndk/domain_layer/entities/nip_01_event.dart' as _i8;
 
 class Endpoints extends _i1.EndpointDispatch {
   @override
@@ -27,25 +28,31 @@ class Endpoints extends _i1.EndpointDispatch {
           'appUpdate',
           null,
         ),
-      'moderation': _i3.ModerationEndpoint()
+      'linkShorter': _i3.LinkShorterEndpoint()
+        ..initialize(
+          server,
+          'linkShorter',
+          null,
+        ),
+      'moderation': _i4.ModerationEndpoint()
         ..initialize(
           server,
           'moderation',
           null,
         ),
-      'nip05': _i4.Nip05Endpoint()
+      'nip05': _i5.Nip05Endpoint()
         ..initialize(
           server,
           'nip05',
           null,
         ),
-      'nostrBand': _i5.NostrBandEndpoint()
+      'nostrBand': _i6.NostrBandEndpoint()
         ..initialize(
           server,
           'nostrBand',
           null,
         ),
-      'nostrPush': _i6.NostrPushEndpoint()
+      'nostrPush': _i7.NostrPushEndpoint()
         ..initialize(
           server,
           'nostrPush',
@@ -68,6 +75,61 @@ class Endpoints extends _i1.EndpointDispatch {
         )
       },
     );
+    connectors['linkShorter'] = _i1.EndpointConnector(
+      name: 'linkShorter',
+      endpoint: endpoints['linkShorter']!,
+      methodConnectors: {
+        'shortInvite': _i1.MethodConnector(
+          name: 'shortInvite',
+          params: {
+            'invitedByNpub': _i1.ParameterDescription(
+              name: 'invitedByNpub',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+            'listName': _i1.ParameterDescription(
+              name: 'listName',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+            'listNpub': _i1.ParameterDescription(
+              name: 'listNpub',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+          },
+          call: (
+            _i1.Session session,
+            Map<String, dynamic> params,
+          ) async =>
+              (endpoints['linkShorter'] as _i3.LinkShorterEndpoint).shortInvite(
+            session,
+            invitedByNpub: params['invitedByNpub'],
+            listName: params['listName'],
+            listNpub: params['listNpub'],
+          ),
+        ),
+        'getInviteByShortLink': _i1.MethodConnector(
+          name: 'getInviteByShortLink',
+          params: {
+            'shortLink': _i1.ParameterDescription(
+              name: 'shortLink',
+              type: _i1.getType<String>(),
+              nullable: false,
+            )
+          },
+          call: (
+            _i1.Session session,
+            Map<String, dynamic> params,
+          ) async =>
+              (endpoints['linkShorter'] as _i3.LinkShorterEndpoint)
+                  .getInviteByShortLink(
+            session,
+            shortLink: params['shortLink'],
+          ),
+        ),
+      },
+    );
     connectors['moderation'] = _i1.EndpointConnector(
       name: 'moderation',
       endpoint: endpoints['moderation']!,
@@ -79,7 +141,7 @@ class Endpoints extends _i1.EndpointDispatch {
             _i1.Session session,
             Map<String, dynamic> params,
           ) async =>
-              (endpoints['moderation'] as _i3.ModerationEndpoint)
+              (endpoints['moderation'] as _i4.ModerationEndpoint)
                   .getProfileBloomFilter(session),
         ),
         'getEventBloomFilter': _i1.MethodConnector(
@@ -89,7 +151,7 @@ class Endpoints extends _i1.EndpointDispatch {
             _i1.Session session,
             Map<String, dynamic> params,
           ) async =>
-              (endpoints['moderation'] as _i3.ModerationEndpoint)
+              (endpoints['moderation'] as _i4.ModerationEndpoint)
                   .getEventBloomFilter(session),
         ),
         'report': _i1.MethodConnector(
@@ -97,7 +159,7 @@ class Endpoints extends _i1.EndpointDispatch {
           params: {
             'reportEvent': _i1.ParameterDescription(
               name: 'reportEvent',
-              type: _i1.getType<_i7.Nip01Event>(),
+              type: _i1.getType<_i8.Nip01Event>(),
               nullable: false,
             )
           },
@@ -105,7 +167,7 @@ class Endpoints extends _i1.EndpointDispatch {
             _i1.Session session,
             Map<String, dynamic> params,
           ) async =>
-              (endpoints['moderation'] as _i3.ModerationEndpoint).report(
+              (endpoints['moderation'] as _i4.ModerationEndpoint).report(
             session,
             params['reportEvent'],
           ),
@@ -134,7 +196,7 @@ class Endpoints extends _i1.EndpointDispatch {
             _i1.Session session,
             Map<String, dynamic> params,
           ) async =>
-              (endpoints['nip05'] as _i4.Nip05Endpoint).getNip05(
+              (endpoints['nip05'] as _i5.Nip05Endpoint).getNip05(
             session,
             params['name'],
             params['domain'],
@@ -158,7 +220,7 @@ class Endpoints extends _i1.EndpointDispatch {
             _i1.Session session,
             Map<String, dynamic> params,
           ) async =>
-              (endpoints['nip05'] as _i4.Nip05Endpoint).checkName(
+              (endpoints['nip05'] as _i5.Nip05Endpoint).checkName(
             session,
             params['name'],
             params['domain'],
@@ -188,7 +250,7 @@ class Endpoints extends _i1.EndpointDispatch {
             _i1.Session session,
             Map<String, dynamic> params,
           ) async =>
-              (endpoints['nostrBand'] as _i5.NostrBandEndpoint).hashtags(
+              (endpoints['nostrBand'] as _i6.NostrBandEndpoint).hashtags(
             session,
             lang: params['lang'],
             limit: params['limit'],
@@ -207,7 +269,7 @@ class Endpoints extends _i1.EndpointDispatch {
             _i1.Session session,
             Map<String, dynamic> params,
           ) async =>
-              (endpoints['nostrBand'] as _i5.NostrBandEndpoint).profiles(
+              (endpoints['nostrBand'] as _i6.NostrBandEndpoint).profiles(
             session,
             limit: params['limit'],
           ),
@@ -228,7 +290,7 @@ class Endpoints extends _i1.EndpointDispatch {
             ),
             'events': _i1.ParameterDescription(
               name: 'events',
-              type: _i1.getType<List<_i7.Nip01Event>>(),
+              type: _i1.getType<List<_i8.Nip01Event>>(),
               nullable: false,
             ),
           },
@@ -236,7 +298,7 @@ class Endpoints extends _i1.EndpointDispatch {
             _i1.Session session,
             Map<String, dynamic> params,
           ) async =>
-              (endpoints['nostrPush'] as _i6.NostrPushEndpoint).register(
+              (endpoints['nostrPush'] as _i7.NostrPushEndpoint).register(
             session,
             params['token'],
             params['events'],

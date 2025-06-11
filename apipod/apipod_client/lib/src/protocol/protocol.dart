@@ -23,8 +23,9 @@ import 'nostr_band/nostr_band_hastag_info.dart' as _i11;
 import 'nostr_band/nostr_band_people.dart' as _i12;
 import 'nostr_band/nostr_band_profiles.dart' as _i13;
 import 'reports_incoming.dart' as _i14;
-import 'subscription.dart' as _i15;
-import 'package:ndk/domain_layer/entities/nip_01_event.dart' as _i16;
+import 'short_links/short_link_invite_data.dart' as _i15;
+import 'subscription.dart' as _i16;
+import 'package:ndk/domain_layer/entities/nip_01_event.dart' as _i17;
 export 'app_update_data.dart';
 export 'bloom_filter_data.dart';
 export 'bloom_filter_events.dart';
@@ -38,6 +39,7 @@ export 'nostr_band/nostr_band_hastag_info.dart';
 export 'nostr_band/nostr_band_people.dart';
 export 'nostr_band/nostr_band_profiles.dart';
 export 'reports_incoming.dart';
+export 'short_links/short_link_invite_data.dart';
 export 'subscription.dart';
 export 'client.dart';
 
@@ -93,8 +95,11 @@ class Protocol extends _i1.SerializationManager {
     if (t == _i14.ReportsIncoming) {
       return _i14.ReportsIncoming.fromJson(data) as T;
     }
-    if (t == _i15.PushSubscription) {
-      return _i15.PushSubscription.fromJson(data) as T;
+    if (t == _i15.ShortLinkInviteData) {
+      return _i15.ShortLinkInviteData.fromJson(data) as T;
+    }
+    if (t == _i16.PushSubscription) {
+      return _i16.PushSubscription.fromJson(data) as T;
     }
     if (t == _i1.getType<_i2.AppUpdateData?>()) {
       return (data != null ? _i2.AppUpdateData.fromJson(data) : null) as T;
@@ -136,8 +141,12 @@ class Protocol extends _i1.SerializationManager {
     if (t == _i1.getType<_i14.ReportsIncoming?>()) {
       return (data != null ? _i14.ReportsIncoming.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i15.PushSubscription?>()) {
-      return (data != null ? _i15.PushSubscription.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i15.ShortLinkInviteData?>()) {
+      return (data != null ? _i15.ShortLinkInviteData.fromJson(data) : null)
+          as T;
+    }
+    if (t == _i1.getType<_i16.PushSubscription?>()) {
+      return (data != null ? _i16.PushSubscription.fromJson(data) : null) as T;
     }
     if (t == List<String>) {
       return (data as List).map((e) => deserialize<String>(e)).toList() as T;
@@ -160,15 +169,15 @@ class Protocol extends _i1.SerializationManager {
           .map((e) => deserialize<_i13.NostrBandProfiles>(e))
           .toList() as T;
     }
-    if (t == _i16.Nip01Event) {
-      return _i16.Nip01Event.fromJson(data) as T;
+    if (t == _i17.Nip01Event) {
+      return _i17.Nip01Event.fromJson(data) as T;
     }
-    if (t == List<_i16.Nip01Event>) {
-      return (data as List).map((e) => deserialize<_i16.Nip01Event>(e)).toList()
+    if (t == List<_i17.Nip01Event>) {
+      return (data as List).map((e) => deserialize<_i17.Nip01Event>(e)).toList()
           as T;
     }
-    if (t == _i1.getType<_i16.Nip01Event?>()) {
-      return (data != null ? _i16.Nip01Event.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i17.Nip01Event?>()) {
+      return (data != null ? _i17.Nip01Event.fromJson(data) : null) as T;
     }
     return super.deserialize<T>(data, t);
   }
@@ -177,7 +186,7 @@ class Protocol extends _i1.SerializationManager {
   String? getClassNameForObject(Object? data) {
     String? className = super.getClassNameForObject(data);
     if (className != null) return className;
-    if (data is _i16.Nip01Event) {
+    if (data is _i17.Nip01Event) {
       return 'Nip01Event';
     }
     if (data is _i2.AppUpdateData) {
@@ -219,7 +228,10 @@ class Protocol extends _i1.SerializationManager {
     if (data is _i14.ReportsIncoming) {
       return 'ReportsIncoming';
     }
-    if (data is _i15.PushSubscription) {
+    if (data is _i15.ShortLinkInviteData) {
+      return 'ShortLinkInviteData';
+    }
+    if (data is _i16.PushSubscription) {
       return 'PushSubscription';
     }
     return null;
@@ -232,7 +244,7 @@ class Protocol extends _i1.SerializationManager {
       return super.deserializeByClassName(data);
     }
     if (dataClassName == 'Nip01Event') {
-      return deserialize<_i16.Nip01Event>(data['data']);
+      return deserialize<_i17.Nip01Event>(data['data']);
     }
     if (dataClassName == 'AppUpdateData') {
       return deserialize<_i2.AppUpdateData>(data['data']);
@@ -273,8 +285,11 @@ class Protocol extends _i1.SerializationManager {
     if (dataClassName == 'ReportsIncoming') {
       return deserialize<_i14.ReportsIncoming>(data['data']);
     }
+    if (dataClassName == 'ShortLinkInviteData') {
+      return deserialize<_i15.ShortLinkInviteData>(data['data']);
+    }
     if (dataClassName == 'PushSubscription') {
-      return deserialize<_i15.PushSubscription>(data['data']);
+      return deserialize<_i16.PushSubscription>(data['data']);
     }
     return super.deserializeByClassName(data);
   }
