@@ -13,77 +13,140 @@ import '../../domain_layer/entities/nostr_band_hashtags.dart';
 import '../../domain_layer/entities/nostr_band_people.dart';
 import '../../domain_layer/entities/nostr_note.dart';
 import '../../domain_layer/entities/user_metadata.dart';
+import '../../domain_layer/usecases/search.dart';
 import '../atoms/hashtag_card.dart';
 import '../components/note_card/note_card_container.dart';
 import '../components/person_card.dart';
 import '../components/search_bar.dart';
+import '../components/starter_packs/trending_starter_packs/trending_starter_packs.dart';
 import '../providers/app_bar_provider/app_bottom_bar_provider.dart';
 import '../providers/following_contact_state_provider.dart';
-import '../providers/metadata_provider.dart';
 import '../providers/ndk_provider.dart';
 import '../providers/nostr_band_provider.dart';
 import '../providers/search_provider.dart';
 import 'nostr/profile/profile_page_2.dart';
 
-// Search state provider
-final searchStateProvider =
-    StateNotifierProvider<SearchStateNotifier, SearchState>((ref) {
-  return SearchStateNotifier();
-});
-
-// Search state class
 class SearchState {
   final bool isSearching;
   final String searchQuery;
+  final bool isLoading;
   final List<UserMetadata> searchResultsUsers;
   final List<NostrNote> searchResultsNotes;
+  final String? error;
 
-  SearchState({
+  const SearchState({
     this.isSearching = false,
     this.searchQuery = '',
+    this.isLoading = false,
     this.searchResultsUsers = const [],
     this.searchResultsNotes = const [],
+    this.error,
   });
 
   SearchState copyWith({
     bool? isSearching,
     String? searchQuery,
+    bool? isLoading,
     List<UserMetadata>? searchResultsUsers,
     List<NostrNote>? searchResultsNotes,
+    String? error,
   }) {
     return SearchState(
       isSearching: isSearching ?? this.isSearching,
       searchQuery: searchQuery ?? this.searchQuery,
+      isLoading: isLoading ?? this.isLoading,
       searchResultsUsers: searchResultsUsers ?? this.searchResultsUsers,
       searchResultsNotes: searchResultsNotes ?? this.searchResultsNotes,
+      error: error,
     );
   }
 }
 
-// Search state notifier
 class SearchStateNotifier extends StateNotifier<SearchState> {
-  SearchStateNotifier() : super(SearchState());
+  SearchStateNotifier(this._searchService) : super(const SearchState());
+
+  final Search _searchService;
+  Timer? _debounceTimer;
+
+  @override
+  void dispose() {
+    _debounceTimer?.cancel();
+    super.dispose();
+  }
 
   void setSearching(bool isSearching) {
-    state = state.copyWith(isSearching: isSearching);
+    if (state.isSearching != isSearching) {
+      state = state.copyWith(isSearching: isSearching);
+    }
   }
 
   void setSearchQuery(String query) {
-    state = state.copyWith(searchQuery: query);
+    state = state.copyWith(searchQuery: query, error: null);
+
+    // Cancel previous timer
+    _debounceTimer?.cancel();
+
+    if (query.isEmpty) {
+      clearSearch(stillSearching: true);
+      return;
+    }
+
+    if (query.length < 2) {
+      clearSearch(stillSearching: true);
+      return;
+    }
+
+    // Debounce search
+    _debounceTimer = Timer(const Duration(milliseconds: 50), () {
+      _performSearch(query);
+    });
+  }
+
+  Future<void> _performSearch(String query) async {
+    if (query != state.searchQuery) return; // query changed, ignore
+
+    state = state.copyWith(isLoading: true, error: null);
+
+    try {
+      // perform searches in parallel
+      final results = await Future.wait([
+        _searchService.searchMetadata(query),
+        _searchService.searchNotes(search: query, kinds: [1], limit: 10),
+      ]);
+
+      // only update if query hasn't changed
+      if (query == state.searchQuery) {
+        state = state.copyWith(
+          isLoading: false,
+          searchResultsUsers: results[0] as List<UserMetadata>,
+          searchResultsNotes: results[1] as List<NostrNote>,
+        );
+      }
+    } catch (e) {
+      if (query == state.searchQuery) {
+        state = state.copyWith(
+          isLoading: false,
+          error: e.toString(),
+        );
+      }
+    }
+  }
+
+  void clearSearch({bool stillSearching = false}) {
+    _debounceTimer?.cancel();
+    state = SearchState(isSearching: stillSearching);
   }
 
   void setSearchResultsUsers(List<UserMetadata> users) {
     state = state.copyWith(searchResultsUsers: users);
   }
-
-  void setSearchResultsNotes(List<NostrNote> notes) {
-    state = state.copyWith(searchResultsNotes: notes);
-  }
-
-  void clearSearch({bool stillSearching = false}) {
-    state = SearchState(isSearching: stillSearching);
-  }
 }
+
+final searchStateProvider =
+    StateNotifierProvider<SearchStateNotifier, SearchState>((ref) {
+  final searchService = ref.read(searchProvider);
+  return SearchStateNotifier(searchService);
+});
 
 class SearchPage extends ConsumerStatefulWidget {
   const SearchPage({super.key});
@@ -95,101 +158,86 @@ class SearchPage extends ConsumerStatefulWidget {
 class _SearchPageState extends ConsumerState<SearchPage> {
   final TextEditingController _searchController = TextEditingController();
   final FocusNode _searchFocusNode = FocusNode();
-  final List<StreamSubscription> _subscriptions = [];
+  StreamSubscription? _navigationSubscription;
+
+  @override
+  bool get wantKeepAlive => false; // keep state alive when switching tabs
 
   @override
   void initState() {
     super.initState();
-    _initSequence();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _initSequence());
   }
 
   @override
   void dispose() {
     _searchController.dispose();
     _searchFocusNode.dispose();
-    _disposeSubscriptions();
+    _navigationSubscription?.cancel();
     super.dispose();
   }
 
-  void _initSequence() async {
-    await Future.delayed(const Duration(milliseconds: 200)).then((value) {
-      if (mounted) {
-        _listenToNavigationBar();
-      }
-    });
+  void _initSequence() {
+    if (!mounted) return;
 
     _setupFocusNodeListener();
+    _listenToNavigationBar();
   }
 
   void _listenToNavigationBar() {
     final navigationBar = ref.read(appBottomNavigationBarEventsProvider);
-    _subscriptions.add(navigationBar.onSearchTabSelected.listen((event) {
-      _focusSearchBar();
-    }));
+    _navigationSubscription = navigationBar.onSearchTabSelected.listen((_) {
+      if (mounted) _focusSearchBar();
+    });
   }
 
   void _setupFocusNodeListener() {
     _searchFocusNode.addListener(() {
-      ref
-          .read(searchStateProvider.notifier)
-          .setSearching(_searchFocusNode.hasFocus);
+      if (mounted) {
+        ref
+            .read(searchStateProvider.notifier)
+            .setSearching(_searchFocusNode.hasFocus);
+      }
     });
   }
 
   void _focusSearchBar() {
-    FocusScope.of(context).requestFocus(_searchFocusNode);
-  }
-
-  void _disposeSubscriptions() {
-    for (var s in _subscriptions) {
-      s.cancel();
+    if (mounted) {
+      FocusScope.of(context).requestFocus(_searchFocusNode);
     }
   }
 
-  void _onSearchChanged(String value) async {
+  void _onSearchChanged(String value) {
     ref.read(searchStateProvider.notifier).setSearchQuery(value);
-
-    if (value.isEmpty) {
-      ref.read(searchStateProvider.notifier).clearSearch(stillSearching: true);
-      return;
-    }
-
-    final searchService = ref.read(searchProvider);
-    final metadata = ref.read(metadataProvider);
-
-    // Search for users
-    final users = await searchService.searchMetadata(value);
-    ref.read(searchStateProvider.notifier).setSearchResultsUsers(users);
-
-    // Search for notes
-    final notes =
-        await searchService.searchNotes(search: value, kinds: [1], limit: 10);
-    ref.read(searchStateProvider.notifier).setSearchResultsNotes(
-          notes,
-        );
   }
 
   void _onSubmit(String value) {
-    Navigator.pushNamed(context, '/nostr/search', arguments: value);
+    if (mounted) {
+      Navigator.pushNamed(context, '/nostr/search', arguments: value);
+    }
   }
 
-  void _changeFollowing(
-      bool followChange, String pubkey, ContactList currentOwnContacts) async {
-    final selfPubkey = ref.watch(ndkProvider).accounts.getPublicKey();
-    final myContactListNotifier =
-        ref.watch(contactListStateProvider(selfPubkey!).notifier);
+  Future<void> _changeFollowing(bool followChange, String pubkey) async {
+    try {
+      final selfPubkey = ref.read(ndkProvider).accounts.getPublicKey();
+      if (selfPubkey == null) return;
 
-    if (followChange) {
-      await myContactListNotifier.followUser(pubkey);
-    } else {
-      await myContactListNotifier.unfollowUser(pubkey);
+      final myContactListNotifier =
+          ref.read(contactListStateProvider(selfPubkey).notifier);
+
+      if (followChange) {
+        await myContactListNotifier.followUser(pubkey);
+      } else {
+        await myContactListNotifier.unfollowUser(pubkey);
+      }
+    } catch (e) {
+      log('Error changing follow status: $e');
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final searchState = ref.watch(searchStateProvider);
-    final isSearching = searchState.isSearching;
 
     return PopScope(
       canPop: true,
@@ -204,314 +252,362 @@ class _SearchPageState extends ConsumerState<SearchPage> {
       },
       child: Scaffold(
         backgroundColor: Palette.background,
-        body: Consumer(
-          builder: (context, ref, child) {
-            final myContactListNotifier =
-                ref.watch(contactListSelfStateProvider);
-
-            return Column(
-              children: [
-                SearchBarWidget(
-                  onSearchChanged: (value) {
-                    if (value.length < 2) {
-                      ref
-                          .read(searchStateProvider.notifier)
-                          .clearSearch(stillSearching: true);
-                      return;
-                    }
-
-                    _onSearchChanged(value);
-                  },
-                  onSubmit: (value) {
-                    _onSubmit(value);
-                  },
-                  helpSearch: (context) {
-                    _helpSearch(context);
-                  },
-                  externalFocusNode: _searchFocusNode,
-                  externalController: _searchController,
-                ),
-                Expanded(
-                  child: ListView(
-                    physics: const BouncingScrollPhysics(),
-                    children: [
-                      // Default view (trends)
-                      Visibility(
-                        maintainState: true,
-                        maintainInteractivity: false,
-                        visible: !isSearching,
-                        child: _defaultView(myContactListNotifier.contactList),
-                      ),
-
-                      // Search results
-                      if (isSearching)
-                        _buildSearchResults(myContactListNotifier.contactList)
-                    ],
-                  ),
-                ),
-              ],
-            );
-          },
+        body: Column(
+          children: [
+            SearchBarWidget(
+              onSearchChanged: _onSearchChanged,
+              onSubmit: _onSubmit,
+              helpSearch: _helpSearch,
+              externalFocusNode: _searchFocusNode,
+              externalController: _searchController,
+            ),
+            Expanded(
+              child: searchState.isSearching
+                  ? _buildSearchResults(searchState)
+                  : _buildDefaultView(),
+            ),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildSearchResults(ContactList currentFollowing) {
-    final searchState = ref.watch(searchStateProvider);
-
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          if (searchState.searchQuery.isNotEmpty)
-            InkWell(
-              onTap: () {
-                _onSubmit(searchState.searchQuery);
-              },
-              child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 0, vertical: 15),
-                decoration: BoxDecoration(
-                  //color: Palette.extraDarkGray,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          'search for "${searchState.searchQuery}"',
-                          style: const TextStyle(
+  Widget _buildDefaultView() {
+    return ListView(
+      physics: const BouncingScrollPhysics(),
+      children: [
+        Container(
+          padding: const EdgeInsets.symmetric(vertical: 20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Trends section
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        const Text(
+                          "trends",
+                          style: TextStyle(
                             color: Palette.white,
-                            fontSize: 16,
+                            fontSize: 27,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
-                      ),
-                      Icon(
-                        PhosphorIcons.arrowUpLeft(),
-                        color: Palette.gray,
-                      )
-                    ],
+                        const SizedBox(width: 15),
+                        GestureDetector(
+                          onTap: () {
+                            launchUrl(
+                              Uri.parse("https://nostr.band"),
+                              mode: LaunchMode.externalApplication,
+                            );
+                          },
+                          child: const Text(
+                            "by nostr.band",
+                            style: TextStyle(color: Palette.gray, fontSize: 14),
+                          ),
+                        ),
+                      ],
+                    ),
+                    _buildTrendingHashtags(),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 20),
+
+              // starter packs section
+              const Padding(
+                padding: EdgeInsets.only(left: 20, bottom: 10),
+                child: Text(
+                  "recent starter packs",
+                  style: TextStyle(
+                    color: Palette.white,
+                    fontSize: 25,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
-            ),
-          // horizontal line
-          if (searchState.searchQuery.isNotEmpty)
-            Container(
-              margin: const EdgeInsets.only(top: 10, bottom: 10),
-              height: 1,
-              color: Palette.extraDarkGray,
-            ),
-
-          // Users section
-          if (searchState.searchResultsUsers.isNotEmpty) ...[
-            const Text(
-              "People",
-              style: TextStyle(
-                color: Palette.white,
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
+              const SizedBox(
+                height: 280,
+                child: TrendingStarterPacks(),
               ),
-            ),
-            const SizedBox(height: 10),
-            ...searchState.searchResultsUsers.map((user) => PersonCard(
-                  showFollowButton: false,
-                  pubkey: user.pubkey,
-                  name: user.name ?? '',
-                  pictureUrl: user.picture ?? '',
-                  about: user.about ?? '',
-                  nip05: user.nip05,
-                  isFollowing: currentFollowing.contacts.contains(user.pubkey),
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => ProfilePage2(
-                          pubkey: user.pubkey,
-                        ),
+
+              const SizedBox(height: 20),
+
+              // trending people section
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      "trending people",
+                      style: TextStyle(
+                        color: Palette.white,
+                        fontSize: 25,
+                        fontWeight: FontWeight.bold,
                       ),
-                    );
-                  },
-                  onFollowTab: (followState) {
-                    _changeFollowing(
-                      followState,
-                      user.pubkey,
-                      currentFollowing,
-                    );
-                  },
-                )),
-            const SizedBox(height: 20),
-          ],
-
-          // Notes section
-          if (searchState.searchResultsNotes.isNotEmpty) ...[
-            const Text(
-              "Notes",
-              style: TextStyle(
-                color: Palette.white,
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 10),
-            ...searchState.searchResultsNotes.map((note) => NoteCardContainer(
-                  note: note,
-
-                  // onTap: () {
-                  //   // Navigate to note detail
-                  //   Navigator.pushNamed(context, '/nostr/note', arguments: note.id);
-                  // },
-                )),
-          ],
-
-          // No results
-          if (searchState.searchResultsUsers.isEmpty &&
-              searchState.searchResultsNotes.isEmpty &&
-              searchState.searchQuery.isNotEmpty)
-            const Center(
-              child: Padding(
-                padding: EdgeInsets.all(20.0),
-                child: Text(
-                  "No results found",
-                  style: TextStyle(color: Palette.gray, fontSize: 16),
+                    ),
+                    const SizedBox(height: 10),
+                    _buildTrendingPeople(),
+                  ],
                 ),
               ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSearchResults(SearchState searchState) {
+    return Consumer(
+      builder: (context, ref, child) {
+        final myContactList =
+            ref.watch(contactListSelfStateProvider).contactList;
+
+        return ListView(
+          physics: const BouncingScrollPhysics(),
+          padding: const EdgeInsets.all(16.0),
+          children: [
+            // Search query display
+            if (searchState.searchQuery.isNotEmpty) ...[
+              _buildSearchQueryCard(searchState.searchQuery),
+              const Divider(color: Palette.extraDarkGray, height: 20),
+            ],
+
+            // Loading indicator
+            if (searchState.isLoading)
+              const Center(
+                child: Padding(
+                  padding: EdgeInsets.all(20.0),
+                  child: CircularProgressIndicator(),
+                ),
+              ),
+
+            // error display
+            if (searchState.error != null)
+              Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Text(
+                    'Error: ${searchState.error}',
+                    style: const TextStyle(color: Colors.red, fontSize: 16),
+                  ),
+                ),
+              ),
+
+            // results sections
+            if (!searchState.isLoading && searchState.error == null) ...[
+              if (searchState.searchResultsUsers.isNotEmpty)
+                _buildUsersSection(
+                    searchState.searchResultsUsers, myContactList),
+
+              if (searchState.searchResultsNotes.isNotEmpty)
+                _buildNotesSection(searchState.searchResultsNotes),
+
+              // no results
+              if (searchState.searchResultsUsers.isEmpty &&
+                  searchState.searchResultsNotes.isEmpty &&
+                  searchState.searchQuery.isNotEmpty)
+                const Center(
+                  child: Padding(
+                    padding: EdgeInsets.all(20.0),
+                    child: Text(
+                      "No results found",
+                      style: TextStyle(color: Palette.gray, fontSize: 16),
+                    ),
+                  ),
+                ),
+            ],
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildSearchQueryCard(String query) {
+    return InkWell(
+      onTap: () => _onSubmit(query),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+        child: Row(
+          children: [
+            Expanded(
+              child: Text(
+                'Search for "$query"',
+                style: const TextStyle(color: Palette.white, fontSize: 16),
+              ),
             ),
-        ],
+            Icon(PhosphorIcons.arrowUpLeft(), color: Palette.gray),
+          ],
+        ),
       ),
     );
   }
 
-  Container _defaultView(ContactList currentFollowing) {
-    return Container(
-        padding: const EdgeInsets.only(left: 20, top: 20, bottom: 10),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                const Text(
-                  "trends",
-                  style: TextStyle(
-                      color: Palette.white,
-                      fontSize: 27,
-                      fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(width: 15),
-                GestureDetector(
-                  onTap: () {
-                    Uri url = Uri.parse("https://nostr.band");
-                    launchUrl(url, mode: LaunchMode.externalApplication);
-                  },
-                  child: const Text("by nostr.band",
-                      style: TextStyle(color: Palette.gray, fontSize: 14)),
-                ),
-              ],
-            ),
-            _buildTrendingHashtags(),
-            const SizedBox(height: 20),
-            const Text(
-              "trending people",
-              style: TextStyle(
-                  color: Palette.white,
-                  fontSize: 25,
-                  fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 10),
-            _buildTrendingPeople(currentFollowing),
-          ],
-        ));
+  Widget _buildUsersSection(List<UserMetadata> users, ContactList contactList) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          "People",
+          style: TextStyle(
+            color: Palette.white,
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const SizedBox(height: 10),
+        ...users.map((user) => PersonCard(
+              showFollowButton: false,
+              pubkey: user.pubkey,
+              name: user.name ?? '',
+              pictureUrl: user.picture ?? '',
+              about: user.about ?? '',
+              nip05: user.nip05,
+              isFollowing: contactList.contacts.contains(user.pubkey),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ProfilePage2(pubkey: user.pubkey),
+                  ),
+                );
+              },
+              onFollowTab: (followState) =>
+                  _changeFollowing(followState, user.pubkey),
+            )),
+        const SizedBox(height: 20),
+      ],
+    );
+  }
+
+  Widget _buildNotesSection(List<NostrNote> notes) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          "Notes",
+          style: TextStyle(
+            color: Palette.white,
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const SizedBox(height: 10),
+        ...notes.map((note) => NoteCardContainer(note: note)),
+      ],
+    );
   }
 
   Widget _buildTrendingHashtags() {
-    return Consumer(builder: (context, ref, child) {
-      final nostrBandAsync = ref.watch(
-        nostrBandProvider.select(
-          (provider) => provider.getTrendingHashtags(),
-        ),
-      );
+    return Consumer(
+      builder: (context, ref, child) {
+        final nostrBandAsync = ref.watch(
+          nostrBandProvider.select(
+            (provider) => provider.getTrendingHashtags(),
+          ),
+        );
 
-      return FutureBuilder<NostrBandHashtags?>(
-        future: nostrBandAsync,
-        builder: (context, snapshot) {
-          if (snapshot.hasError) {
-            log(snapshot.error.toString());
-            return const Text('Something went wrong',
-                style: TextStyle(color: Palette.gray));
-          }
+        return FutureBuilder<NostrBandHashtags?>(
+          future: nostrBandAsync,
+          builder: (context, snapshot) {
+            if (snapshot.hasError) {
+              log(snapshot.error.toString());
+              return const Text(
+                'Something went wrong',
+                style: TextStyle(color: Palette.gray),
+              );
+            }
 
-          if (snapshot.hasData) {
-            return _trendingHashtags(
-              api: snapshot.data!,
-              limit: 10,
+            if (snapshot.hasData && snapshot.data != null) {
+              return _buildHashtagsList(snapshot.data!, 10);
+            }
+
+            if (snapshot.connectionState == ConnectionState.done) {
+              return const Text(
+                'No connection',
+                style: TextStyle(color: Palette.gray),
+              );
+            }
+
+            return Column(
+              children: List.generate(
+                10,
+                (i) => const HashtagCardSkeleton(),
+              ),
             );
-          }
-
-          if (snapshot.connectionState == ConnectionState.done) {
-            return const Text('No connection',
-                style: TextStyle(color: Palette.gray));
-          }
-
-          return Column(
-            children: List.generate(10, (i) => const HashtagCardSkeleton()),
-          );
-        },
-      );
-    });
+          },
+        );
+      },
+    );
   }
 
-  Widget _buildTrendingPeople(ContactList currentFollowing) {
-    return Consumer(builder: (context, ref, child) {
-      final nostrBandAsync = ref.watch(
-          nostrBandProvider.select((provider) => provider.getTrendingPeople()));
+  Widget _buildTrendingPeople() {
+    return Consumer(
+      builder: (context, ref, child) {
+        final contactList = ref.watch(contactListSelfStateProvider).contactList;
+        final nostrBandAsync = ref.watch(
+          nostrBandProvider.select(
+            (provider) => provider.getTrendingPeople(),
+          ),
+        );
 
-      return FutureBuilder<NostrBandPeople?>(
-        future: nostrBandAsync,
-        builder: (context, snapshot) {
-          if (snapshot.hasError) {
-            log(snapshot.error.toString());
-            return const Text('Something went wrong',
-                style: TextStyle(color: Palette.gray));
-          }
+        return FutureBuilder<NostrBandPeople?>(
+          future: nostrBandAsync,
+          builder: (context, snapshot) {
+            if (snapshot.hasError) {
+              log(snapshot.error.toString());
+              return const Text(
+                'Something went wrong',
+                style: TextStyle(color: Palette.gray),
+              );
+            }
 
-          if (snapshot.hasData) {
-            return _trendingPeople(snapshot.data!, 10, currentFollowing);
-          }
+            if (snapshot.hasData && snapshot.data != null) {
+              return _buildPeopleList(snapshot.data!, 10, contactList);
+            }
 
-          if (snapshot.connectionState == ConnectionState.done) {
-            return const Text('No connection',
-                style: TextStyle(color: Palette.gray));
-          }
+            if (snapshot.connectionState == ConnectionState.done) {
+              return const Text(
+                'No connection',
+                style: TextStyle(color: Palette.gray),
+              );
+            }
 
-          return const Center(child: CircularProgressIndicator());
-        },
-      );
-    });
+            return const Center(child: CircularProgressIndicator());
+          },
+        );
+      },
+    );
   }
 
-  Widget _trendingHashtags({required NostrBandHashtags api, int? limit}) {
-    final myHashtags = api.hashtags;
-    int displayLimit = limit ?? myHashtags.length;
+  Widget _buildHashtagsList(NostrBandHashtags api, int limit) {
+    final hashtags = api.hashtags;
+    final displayLimit = limit > hashtags.length ? hashtags.length : limit;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: List.generate(
-        displayLimit > myHashtags.length ? myHashtags.length : displayLimit,
+        displayLimit,
         (i) {
-          final hashtag = myHashtags[i];
-
+          final hashtag = hashtags[i];
           return HashtagCard(
             index: i,
             hashtag: hashtag.hashtag,
             postsCount: hashtag.posts,
             onTap: (hashtag) {
-              Navigator.pushNamed(context, '/nostr/search',
-                  arguments: "#$hashtag");
+              Navigator.pushNamed(
+                context,
+                '/nostr/search',
+                arguments: "#$hashtag",
+              );
             },
           );
         },
@@ -519,53 +615,46 @@ class _SearchPageState extends ConsumerState<SearchPage> {
     );
   }
 
-  Widget _trendingPeople(
-      NostrBandPeople api, int limit, ContactList currentFollowing) {
-    List<PersonCard> personCards = [];
+  Widget _buildPeopleList(
+    NostrBandPeople api,
+    int limit,
+    ContactList contactList,
+  ) {
+    final profiles = api.profiles.take(limit).toList();
 
-    for (int i = 0; i < api.profiles.length; i++) {
-      if (i == limit) {
-        break;
-      }
-      var profile = api.profiles[i];
-      Map metadata = jsonDecode(profile.profile.content);
-      PersonCard myCard = PersonCard(
-        pubkey: profile.pubkey,
-        name: metadata['name'] ?? '',
-        pictureUrl: metadata['picture'] ?? '',
-        about: metadata['about'] ?? '',
-        nip05: metadata['nip05'],
-        isFollowing: currentFollowing.contacts
-            .any((element) => element == profile.pubkey),
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => ProfilePage2(
-                pubkey: profile.pubkey,
-              ),
-            ),
-          );
-        },
-        onFollowTab: (followState) {
-          _changeFollowing(
-            followState,
-            profile.pubkey,
-            currentFollowing,
-          );
-        },
-      );
-      personCards.add(myCard);
-    }
     return Column(
-      children: personCards,
+      children: profiles.map((profile) {
+        try {
+          final metadata = jsonDecode(profile.profile.content);
+          return PersonCard(
+            pubkey: profile.pubkey,
+            name: metadata['name'] ?? '',
+            pictureUrl: metadata['picture'] ?? '',
+            about: metadata['about'] ?? '',
+            nip05: metadata['nip05'],
+            isFollowing: contactList.contacts.contains(profile.pubkey),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ProfilePage2(pubkey: profile.pubkey),
+                ),
+              );
+            },
+            onFollowTab: (followState) =>
+                _changeFollowing(followState, profile.pubkey),
+          );
+        } catch (e) {
+          log('Error parsing profile metadata: $e');
+          return const SizedBox.shrink();
+        }
+      }).toList(),
     );
   }
 }
 
-_helpSearch(BuildContext context) {
-  // open bottom sheet
-  return showModalBottomSheet(
+void _helpSearch(BuildContext context) {
+  showModalBottomSheet(
     backgroundColor: Palette.extraDarkGray,
     context: context,
     shape: const RoundedRectangleBorder(
@@ -574,13 +663,12 @@ _helpSearch(BuildContext context) {
         topRight: Radius.circular(20),
       ),
     ),
-    //showDragHandle: true,
     builder: (context) {
       return const Padding(
         padding: EdgeInsets.fromLTRB(30, 20, 30, 20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
           children: [
             Text(
               'Search',
@@ -591,88 +679,63 @@ _helpSearch(BuildContext context) {
               ),
             ),
             SizedBox(height: 25),
-            // hashtag
-            Text(
-              '#hashtag',
-              style: TextStyle(
-                color: Palette.white,
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            SizedBox(height: 5),
-            Expanded(
-              child: Text(
-                'search for hashtags',
-                style: TextStyle(
-                  color: Palette.white,
-                  fontSize: 18,
-                ),
-              ),
+            _SearchHelpItem(
+              title: '#hashtag',
+              description: 'search for hashtags',
             ),
             SizedBox(height: 20),
-            // username
-            Text(
-              'username',
-              style: TextStyle(
-                color: Palette.white,
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            SizedBox(height: 5),
-            Expanded(
-              child: Text(
-                'works only if already in cache',
-                style: TextStyle(
-                  color: Palette.white,
-                  fontSize: 18,
-                ),
-              ),
+            _SearchHelpItem(
+              title: 'username',
+              description: 'works only if already in cache',
             ),
             SizedBox(height: 20),
-            // nip05
-            Text(
-              'user@domain.tld',
-              style: TextStyle(
-                color: Palette.white,
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            SizedBox(height: 5),
-            Expanded(
-              child: Text(
-                'nip05 address',
-                style: TextStyle(
-                  color: Palette.white,
-                  fontSize: 18,
-                ),
-              ),
+            _SearchHelpItem(
+              title: 'user@domain.tld',
+              description: 'nip05 address',
             ),
             SizedBox(height: 20),
-            // mastodon
-            Text(
-              '@mastodon@domain.tld',
-              style: TextStyle(
-                color: Palette.white,
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            SizedBox(height: 5),
-            Expanded(
-              child: Text(
-                'mastodon address (provided by mostr.pub)',
-                style: TextStyle(
-                  color: Palette.white,
-                  fontSize: 18,
-                ),
-              ),
+            _SearchHelpItem(
+              title: '@mastodon@domain.tld',
+              description: 'mastodon address (provided by mostr.pub)',
             ),
           ],
         ),
       );
     },
   );
+}
+
+class _SearchHelpItem extends StatelessWidget {
+  final String title;
+  final String description;
+
+  const _SearchHelpItem({
+    required this.title,
+    required this.description,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: const TextStyle(
+            color: Palette.white,
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const SizedBox(height: 5),
+        Text(
+          description,
+          style: const TextStyle(
+            color: Palette.white,
+            fontSize: 18,
+          ),
+        ),
+      ],
+    );
+  }
 }
