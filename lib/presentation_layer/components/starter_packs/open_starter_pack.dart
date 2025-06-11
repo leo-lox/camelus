@@ -17,6 +17,7 @@ import '../../providers/metadata_state_provider.dart';
 import '../../providers/ndk_provider.dart';
 import '../../providers/nostr_list_provider.dart';
 import '../../providers/nostr_lists_follow_state_provider.dart';
+import '../../providers/serverpod_provider.dart';
 import '../../routes/nostr/profile/profile_page_2.dart';
 import '../generic_feed.dart';
 import '../person_card.dart';
@@ -58,11 +59,23 @@ class _OpenStarterPackState extends ConsumerState<OpenStarterPack> {
 
     final myNpub = Nip19.encodePubKey(myPubkey!);
 
-    final String urlPath;
+    String urlPath;
     if (myNpub == listNpub) {
       urlPath = "/i/${myNpub}/${widget.starterPackIdentifier.name}";
     } else {
       urlPath = "/i/${myNpub}/${widget.starterPackIdentifier.name}/${listNpub}";
+    }
+
+    final serverpodProv = ref.read(serverpodProvider);
+    try {
+      final shortPath = await serverpodProv.client.linkShorter.shortInvite(
+        invitedByNpub: myNpub,
+        listName: widget.starterPackIdentifier.name,
+        listNpub: listNpub,
+      );
+      urlPath = "/i/$shortPath";
+    } catch (_) {
+      // server likley offline
     }
 
     SharePlus.instance.share(
