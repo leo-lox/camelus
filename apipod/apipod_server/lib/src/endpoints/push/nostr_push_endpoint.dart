@@ -331,7 +331,10 @@ class NostrPushEndpoint extends Endpoint {
 
         // Set up event handlers using the new stream-based approach
         _relayPool!.onOpen.listen((relay) {
-          session.log("onOpen.listen ${relay.url}");
+          _withSession((s) async {
+            s.log("onOpen.listen ${relay.url}");
+          });
+
           // Subscribe to specific event kinds when a relay connects
           relay.subscribe(PushConfig.subscriptionId, {
             'kinds': [1],
@@ -352,14 +355,19 @@ class NostrPushEndpoint extends Endpoint {
 
               _notify(event, relayEvent.relay);
             } catch (e) {
-              session.log('Error handling event: $e');
+              _withSession((s) async {
+                s.log('Error handling event: $e');
+              });
             }
           }),
         );
 
         _subscriptions.add(
           _relayPool!.onError.listen((relayError) async {
-            session.log(".onError.listen, relay: ${relayError.relay}");
+            await _withSession((s) async {
+              s.log(".onError.listen, relay: ${relayError.relay}");
+            });
+
             final relay = relayError.relay;
             final error = relayError.error.toString();
 
