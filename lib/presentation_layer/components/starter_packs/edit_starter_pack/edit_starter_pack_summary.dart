@@ -182,6 +182,30 @@ class _EditStarterPackSummaryState extends ConsumerState<EditStarterPackSummary>
                               textAlign: TextAlign.center,
                             ),
                             const SizedBox(height: 20),
+                            if (starterPackData.shortLinkPart != null)
+                              Container(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 16, vertical: 12),
+                                decoration: BoxDecoration(
+                                  color: Palette.extraDarkGray,
+                                  borderRadius: BorderRadius.circular(8),
+                                  border: Border.all(color: Palette.gray),
+                                ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      'camelus.app/i/${starterPackData.shortLinkPart}',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500,
+                                        fontFamily: 'monospace',
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            const SizedBox(height: 20),
                             SizedBox(
                               width: double.infinity,
                               height: 40,
@@ -195,7 +219,8 @@ class _EditStarterPackSummaryState extends ConsumerState<EditStarterPackSummary>
                                       uri: Uri(
                                         scheme: 'https',
                                         host: 'camelus.app',
-                                        path: '/i/TODO',
+                                        path:
+                                            '/i/${starterPackData.shortLinkPart}',
                                       ),
                                     ),
                                   );

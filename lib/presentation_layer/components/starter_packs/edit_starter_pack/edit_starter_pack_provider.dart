@@ -1,11 +1,12 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../data_layer/data_sources/serverpod_data_source.dart';
 import '../../../../domain_layer/entities/nostr_list.dart';
 import '../../../../domain_layer/entities/starter_pack_identifier.dart';
-import '../../../../domain_layer/entities/user_metadata.dart';
 import '../../../../domain_layer/usecases/get_nostr_lists.dart';
 import '../../../providers/nostr_list_provider.dart';
 import '../../../providers/nostr_lists_follow_state_provider.dart';
+import '../../../providers/serverpod_provider.dart';
 
 class StarterPackData {
   final String name; // name as nostr identifier
@@ -15,6 +16,7 @@ class StarterPackData {
   final List<String> selectedUsers; // list over set so odering is possible
   final bool broadcasting;
   final bool broadcasted;
+  final String? shortLinkPart;
 
   const StarterPackData({
     required this.name,
@@ -24,7 +26,7 @@ class StarterPackData {
     this.imageUrl,
     required this.broadcasted,
     required this.broadcasting,
-    req,
+    this.shortLinkPart,
   });
 
   StarterPackData copyWith({
@@ -34,6 +36,7 @@ class StarterPackData {
     List<String>? selectedUsers,
     bool? broadcasted,
     bool? broadcasting,
+    String? shortLinkPart,
   }) {
     return StarterPackData(
       name: name ?? this.name,
@@ -42,6 +45,7 @@ class StarterPackData {
       selectedUsers: selectedUsers ?? this.selectedUsers,
       broadcasted: broadcasted ?? this.broadcasted,
       broadcasting: broadcasting ?? this.broadcasting,
+      shortLinkPart: shortLinkPart ?? this.shortLinkPart,
     );
   }
 
@@ -61,10 +65,14 @@ class StarterPackData {
 class EditStarterPackNotifier extends StateNotifier<StarterPackData> {
   final GetNostrLists _listsProvider;
   final NostrListsFollowState _listsState;
+  final ServerpodDataSource _serverpodProvider;
 
   EditStarterPackNotifier(
-      this._listsProvider, this._listsState, StarterPackIdentifier identifier)
-      : super(
+    this._listsProvider,
+    this._listsState,
+    this._serverpodProvider,
+    StarterPackIdentifier identifier,
+  ) : super(
           StarterPackData(
             name: identifier.name,
             title: '',
@@ -147,9 +155,24 @@ class EditStarterPackNotifier extends StateNotifier<StarterPackData> {
 
     final result = await _listsProvider.broadcastStarterPack(starterPack: pack);
 
+    String? shortLinkPart;
+    try {
+      shortLinkPart = await _serverpodProvider.client.linkShorter.shortInvite(
+        invitedByNpub: pack.pubKey,
+        listName: pack.name,
+        listNpub: pack.pubKey,
+      );
+    } catch (_) {
+      //server down
+    }
+
     print(result);
 
-    state = state.copyWith(broadcasting: false, broadcasted: true);
+    state = state.copyWith(
+      broadcasting: false,
+      broadcasted: true,
+      shortLinkPart: shortLinkPart,
+    );
 
     return true;
   }
@@ -169,9 +192,11 @@ final editStarterPackProvider = StateNotifierProvider.family<
     final listStateProvider =
         ref.watch(nostrListsFollowStateProvider(identifier.pubkey));
     final listProvider = ref.watch(nostrListProvider);
+    final serverpodProv = ref.watch(serverpodProvider);
     return EditStarterPackNotifier(
       listProvider,
       listStateProvider,
+      serverpodProv,
       identifier,
     );
   },
