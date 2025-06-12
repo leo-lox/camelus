@@ -87,7 +87,7 @@ dependencies:
   image: ^4.3.0
   flutter_list_view: ^1.1.29
   xxh3: ^1.2.0
-  serverpod_flutter: 2.5.1
+  serverpod_flutter: 2.8.0
   apipod_client:
     path: ./apipod/apipod_client
   firebase_messaging: ^15.2.4
@@ -102,21 +102,21 @@ dependencies:
 
 dependency_overrides:
   ndk:
-    path: ../ndk/packages/ndk
-    #git:
-    #  url: https://github.com/relaystr/ndk.git
-    #  path: packages/ndk
-      #ref: nip-59-gift-wrap
+    #path: ../ndk/packages/ndk
+    git:
+      url: https://github.com/relaystr/ndk.git
+      path: packages/ndk
+      ref: 175-refactor-list-usecase
   #ndk_rust_verifier:
   #  path: ../ndk/packages/rust_verifier
     #git:
     #  url: https://github.com/relaystr/ndk.git
     #  path: packages/rust_verifier
-  #ndk_objectbox:
+  ndk_objectbox:
     #path: ../ndk/packages/objectbox
-    #git:
-    #   url: https://github.com/relaystr/ndk.git
-    #   path: packages/objectbox
+    git:
+       url: https://github.com/relaystr/ndk.git
+       path: packages/objectbox
     #   #ref: search-usecase
 
   #ndk_amber:

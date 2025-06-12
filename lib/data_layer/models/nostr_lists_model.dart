@@ -34,48 +34,68 @@ class NostrListModel extends NostrList {
                 private: e.private,
               ).toNDK())
           .toList(),
-    )..id = id;
+    );
   }
 }
 
-class NostrSetModel extends NostrSet {
+class NostrStarterPackModel extends NostrStarterPack {
   //String name;
   //String? title;
   String? description;
   String? image;
 
-  NostrSetModel({
+  NostrStarterPackModel({
     required super.pubKey,
     required super.name,
     required super.createdAt,
     required super.elements,
-    super.kind = NostrList.FOLLOW_SET,
+    super.kind = NostrList.STARTER_PACK,
     super.title,
     this.description,
     this.image,
   });
 
   // Convert from Nip51Set (NDK) to NostrSetModel
-  static NostrSetModel fromNDK(ndk_entities.Nip51Set ndkSet) {
-    return NostrSetModel(
+  static NostrStarterPackModel fromNDK(ndk_entities.Nip51Set ndkSet) {
+    return NostrStarterPackModel(
       pubKey: ndkSet.pubKey,
       name: ndkSet.name,
       createdAt: ndkSet.createdAt,
       elements:
           ndkSet.elements.map((e) => NostrListElementModel.fromNDK(e)).toList(),
       title: ndkSet.title,
+      kind: ndkSet.kind,
       description: ndkSet.description,
       image: ndkSet.image,
-    )..id = ndkSet.id;
+    );
+  }
+
+  factory NostrStarterPackModel.fromEntity(NostrStarterPack starterPack) {
+    final model = NostrStarterPackModel(
+      createdAt: starterPack.createdAt,
+      elements: starterPack.elements,
+      name: starterPack.name,
+      pubKey: starterPack.pubKey,
+      description: starterPack.description,
+      image: starterPack.image,
+      kind: starterPack.kind,
+      title: starterPack.title,
+    );
+    if (starterPack.id != null) {
+      model.id = starterPack.id;
+    }
+    return model;
   }
 
   // Convert from NostrSetModel to Nip51Set (NDK)
-  @override
   ndk_entities.Nip51Set toNDK() {
-    return ndk_entities.Nip51Set(
+    final ndkSet = ndk_entities.Nip51Set(
       pubKey: pubKey,
       name: name,
-      kind: NostrList.FOLLOW_SET,
+      title: title,
+      description: description,
+      image: image,
+      kind: NostrList.STARTER_PACK,
       createdAt: createdAt,
       elements: elements
           .map((e) => NostrListElementModel(
@@ -84,11 +104,12 @@ class NostrSetModel extends NostrSet {
                 private: e.private,
               ).toNDK())
           .toList(),
-      title: title,
-    )
-      ..id = id
-      ..description = description
-      ..image = image;
+    );
+
+    if (id != null) {
+      ndkSet.id = id!;
+    }
+    return ndkSet;
   }
 }
 

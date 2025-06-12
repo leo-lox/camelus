@@ -1,12 +1,13 @@
-import 'package:camelus/domain_layer/entities/contact_list.dart';
-import 'package:camelus/domain_layer/entities/user_metadata.dart';
-import 'package:camelus/presentation_layer/components/person_card.dart';
-import 'package:camelus/presentation_layer/providers/following_provider.dart';
-import 'package:camelus/presentation_layer/providers/metadata_provider.dart';
-import 'package:camelus/presentation_layer/providers/metadata_state_provider.dart';
 import 'package:flutter/material.dart';
-import 'package:camelus/config/palette.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../config/palette.dart';
+import '../../../../domain_layer/entities/contact_list.dart';
+import '../../../../domain_layer/entities/user_metadata.dart';
+import '../../../components/person_card.dart';
+import '../../../providers/following_contact_state_provider.dart';
+import '../../../providers/metadata_state_provider.dart';
+import '../../../providers/ndk_provider.dart';
 import 'profile_page_2.dart';
 
 class FollowerPage extends ConsumerStatefulWidget {
@@ -31,15 +32,18 @@ class _FollowerPageState extends ConsumerState<FollowerPage> {
     String pubkey,
     ContactList currentOwnContacts,
   ) async {
-    final followService = ref.read(followingProvider);
+    final selfPubkey = ref.watch(ndkProvider).accounts.getPublicKey();
+    final myContactListNotifier =
+        ref.watch(contactListStateProvider(selfPubkey!).notifier);
+
     List<String> newContacts = [...currentOwnContacts.contacts];
 
     if (followChange) {
       newContacts.add(pubkey);
-      await followService.followUser(pubkey);
+      await myContactListNotifier.followUser(pubkey);
     } else {
       newContacts.removeWhere((element) => element == pubkey);
-      await followService.unfollowUser(pubkey);
+      await myContactListNotifier.unfollowUser(pubkey);
     }
     setState(() {
       currentOwnContacts.contacts = newContacts;
@@ -58,7 +62,7 @@ class _FollowerPageState extends ConsumerState<FollowerPage> {
 
   @override
   Widget build(BuildContext context) {
-    var followingService = ref.watch(followingProvider);
+    final myContactList = ref.watch(contactListSelfStateProvider);
     return Scaffold(
       backgroundColor: Palette.background,
       appBar: AppBar(
@@ -66,34 +70,20 @@ class _FollowerPageState extends ConsumerState<FollowerPage> {
         title: Text(widget.title),
         foregroundColor: Palette.white,
       ),
-      body: StreamBuilder<ContactList>(
+      body: ListView.builder(
+          physics: const BouncingScrollPhysics(),
+          itemCount: widget.contactList.contacts.length,
+          itemBuilder: (context, index) {
+            final displayPubkey = widget.contactList.contacts[index];
 
-          /// get self contacts to display follow state
-          stream: followingService.getContactsStreamSelf(),
-          builder: (context, contactsSnapshot) {
-            if (contactsSnapshot.hasError) {
-              return Text('Error: ${contactsSnapshot.error}');
-            }
-            if (!contactsSnapshot.hasData) {
-              return const Center(child: CircularProgressIndicator());
-            }
-
-            return ListView.builder(
-                physics: const BouncingScrollPhysics(),
-                itemCount: widget.contactList.contacts.length,
-                itemBuilder: (context, index) {
-                  final displayPubkey = widget.contactList.contacts[index];
-
-                  final displayMetadata = ref
-                      .watch(metadataStateProvider(displayPubkey))
-                      .userMetadata;
-                  return personCard(
-                    displayPubkey,
-                    displayMetadata,
-                    contactsSnapshot.data!,
-                    context,
-                  );
-                });
+            final displayMetadata =
+                ref.watch(metadataStateProvider(displayPubkey)).userMetadata;
+            return personCard(
+              displayPubkey,
+              displayMetadata,
+              myContactList.contactList,
+              context,
+            );
           }),
     );
   }

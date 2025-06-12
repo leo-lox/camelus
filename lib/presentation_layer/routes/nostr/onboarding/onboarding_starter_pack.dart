@@ -8,13 +8,13 @@ import '../../../../domain_layer/entities/nostr_list.dart';
 import '../../../../domain_layer/entities/onboarding_user_info.dart';
 import '../../../atoms/long_button.dart';
 import '../../../atoms/my_profile_picture.dart';
-import '../../../atoms/overlapting_avatars.dart';
+import '../../../atoms/spinner_center.dart';
+import '../../../components/starter_packs/starter_pack_card.dart';
 import '../../../providers/metadata_state_provider.dart';
 import '../../../providers/nostr_lists_follow_state_provider.dart';
 
 class OnboardingStarterPack extends ConsumerStatefulWidget {
   final Function(List<String>) submitCallback;
-
   final OnboardingUserInfo userInfo;
   final String? invitedByPubkey;
 
@@ -24,6 +24,7 @@ class OnboardingStarterPack extends ConsumerStatefulWidget {
     required this.userInfo,
     this.invitedByPubkey,
   });
+
   @override
   ConsumerState<OnboardingStarterPack> createState() =>
       _OnboardingStarterPackState();
@@ -31,7 +32,6 @@ class OnboardingStarterPack extends ConsumerStatefulWidget {
 
 class _OnboardingStarterPackState extends ConsumerState<OnboardingStarterPack> {
   late List<String> selectedPubkeys;
-
   final List<String> recommendedStarterPacks = CAMELUS_RECOMMEDED_STARTER_PACKS;
 
   @override
@@ -40,29 +40,64 @@ class _OnboardingStarterPackState extends ConsumerState<OnboardingStarterPack> {
     selectedPubkeys = widget.userInfo.followPubkeys;
 
     if (widget.invitedByPubkey != null && widget.invitedByPubkey!.isNotEmpty) {
-      // check if its already in the list
-      if (recommendedStarterPacks.contains(widget.invitedByPubkey!)) {
-        return;
+      if (!recommendedStarterPacks.contains(widget.invitedByPubkey!)) {
+        recommendedStarterPacks.insert(0, widget.invitedByPubkey!);
       }
-
-      // add to beginning of list
-      recommendedStarterPacks.insert(0, widget.invitedByPubkey!);
     }
+  }
+
+  // flattened list of starter pack items
+  List<_StarterPackItem> _buildFlattenedItems() {
+    final List<NostrListsFollowState> followSetsList = [];
+
+    // build the follow sets list
+    for (final element in recommendedStarterPacks) {
+      followSetsList.add(ref.watch(nostrListsFollowStateProvider(element)));
+    }
+
+    List<_StarterPackItem> items = [];
+
+    for (int i = 0; i < followSetsList.length; i++) {
+      final followSets = followSetsList[i];
+
+      if (followSets.isLoading) {
+        items.add(_StarterPackItem.loading());
+      } else {
+        for (var nostrSet in followSets.publicNostrFollowSets) {
+          if (nostrSet.elements.isNotEmpty) {
+            items.add(_StarterPackItem.starterPack(nostrSet));
+          }
+        }
+      }
+    }
+
+    return items;
+  }
+
+  Widget _buildItemWidget(_StarterPackItem item) {
+    if (item.isLoading) {
+      return const Center(child: SpinnerCenter());
+    }
+
+    return StarterPackCard(
+      pack: item.nostrSet!,
+      onTab: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => OnboardingOpenStarterPack(
+              followSet: item.nostrSet!,
+              selectedPubkeys: selectedPubkeys,
+            ),
+          ),
+        );
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    final List<NostrListsFollowState> followSetsList = [];
-    final List<MetadataState> recommenderMetadataList = [];
-
-    for (var element in recommendedStarterPacks) {
-      followSetsList.add(
-        ref.watch(nostrListsFollowStateProvider(element)),
-      );
-      recommenderMetadataList.add(
-        ref.watch(metadataStateProvider(element)),
-      );
-    }
+    final flattenedItems = _buildFlattenedItems();
 
     return Scaffold(
       backgroundColor: Palette.background,
@@ -71,114 +106,19 @@ class _OnboardingStarterPackState extends ConsumerState<OnboardingStarterPack> {
         leading: Container(),
         leadingWidth: 0,
         title: widget.invitedByPubkey == null
-            ? Text("Starter Packs")
-            : Text("Additional Starter Packs"),
+            ? const Text("Starter Packs")
+            : const Text("Additional Starter Packs"),
       ),
       body: Column(
         children: [
           Expanded(
             child: ListView.builder(
-              itemCount: followSetsList.length,
-              itemBuilder: (context, followSetsIndex) {
-                final followSets = followSetsList[followSetsIndex];
-
-                if (followSets.isLoading) {
-                  return Center(child: CircularProgressIndicator());
-                }
-
-                return Column(
-                  children: followSets.publicNostrFollowSets.map((nostrSet) {
-                    if (nostrSet.elements.isEmpty) return Container();
-                    return ListTile(
-                      title: Row(
-                        children: [
-                          if (nostrSet.image != null)
-                            Image.network(nostrSet.image!,
-                                width: 50, height: 50),
-                          if (nostrSet.image == null)
-                            Image.asset("assets/images/list_placeholder.png",
-                                width: 50, height: 50),
-                          SizedBox(width: 10),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text.rich(
-                                  overflow: TextOverflow.ellipsis,
-                                  TextSpan(
-                                    children: [
-                                      TextSpan(
-                                        text: nostrSet.title ?? nostrSet.name,
-                                        style: const TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ),
-                                      const TextSpan(text: " "),
-                                      TextSpan(
-                                        text: "(${nostrSet.elements.length}) ",
-                                        style: const TextStyle(
-                                          color: Palette.gray,
-                                          fontSize: 12,
-                                        ),
-                                      ),
-                                      TextSpan(
-                                        text:
-                                            "by ${recommenderMetadataList[followSetsIndex].userMetadata?.name ?? "Unknown"}",
-                                        style: TextStyle(
-                                          color: Palette.gray,
-                                          fontSize: 12,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                Text(
-                                  nostrSet.description ?? "",
-                                  style: const TextStyle(fontSize: 12),
-                                  maxLines: 2,
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 0,
-                      ),
-                      trailing: SizedBox(
-                        width: 135,
-                        child: OverlappingAvatars(
-                          avatars: nostrSet.elements
-                              .take(5)
-                              .map((e) => UserImage(
-                                    imageUrl: ref
-                                        .watch(metadataStateProvider(e.value))
-                                        .userMetadata
-                                        ?.picture,
-                                    pubkey: e.value,
-                                  ))
-                              .toList(),
-                        ),
-                      ),
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => OnboardingOpenStarterPack(
-                              followSet: nostrSet,
-                              selectedPubkeys: selectedPubkeys,
-                            ),
-                          ),
-                        );
-                      },
-                    );
-                  }).toList(),
-                );
-              },
+              itemCount: flattenedItems.length,
+              itemBuilder: (context, index) =>
+                  _buildItemWidget(flattenedItems[index]),
             ),
           ),
+          const SizedBox(height: 8),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             width: 400,
@@ -194,17 +134,28 @@ class _OnboardingStarterPackState extends ConsumerState<OnboardingStarterPack> {
               inverted: true,
             ),
           ),
-          const SizedBox(
-            height: 15,
-          ),
+          const SizedBox(height: 15),
         ],
       ),
     );
   }
 }
 
+// helper class to represent flattened items
+class _StarterPackItem {
+  final bool isLoading;
+  final NostrStarterPack? nostrSet;
+
+  _StarterPackItem._({required this.isLoading, this.nostrSet});
+
+  factory _StarterPackItem.loading() => _StarterPackItem._(isLoading: true);
+
+  factory _StarterPackItem.starterPack(NostrStarterPack nostrSet) =>
+      _StarterPackItem._(isLoading: false, nostrSet: nostrSet);
+}
+
 class OnboardingOpenStarterPack extends ConsumerStatefulWidget {
-  final NostrSet followSet;
+  final NostrStarterPack followSet;
   final List<String> selectedPubkeys;
 
   const OnboardingOpenStarterPack({
@@ -212,6 +163,7 @@ class OnboardingOpenStarterPack extends ConsumerStatefulWidget {
     required this.followSet,
     required this.selectedPubkeys,
   });
+
   @override
   ConsumerState<OnboardingOpenStarterPack> createState() =>
       _OnboardingOpenStarterPackState();
@@ -221,12 +173,13 @@ class _OnboardingOpenStarterPackState
     extends ConsumerState<OnboardingOpenStarterPack> {
   late final List<String> selectedPubkeys;
 
-  // check if nothing of the followSet is selected
+  // Check if nothing of the followSet is selected
   bool get nothingOfOwnSelected => widget.followSet.elements
       .every((element) => !selectedPubkeys.contains(element.value));
 
   Iterable<NostrListElement> get ownSelected => widget.followSet.elements
       .where((element) => selectedPubkeys.contains(element.value));
+
   int get ownSelectedCount => ownSelected.length;
 
   bool get allSelected => widget.followSet.elements
@@ -274,12 +227,11 @@ class _OnboardingOpenStarterPackState
               ),
             ),
             const SizedBox(width: 10),
-            Spacer(flex: 1),
+            const Spacer(flex: 1),
             if (allSelected)
               longButton(
                   name: "unselect all",
                   onPressed: () {
-                    // unselect only own
                     setState(() {
                       selectedPubkeys.removeWhere((element) {
                         return widget.followSet.elements
@@ -305,7 +257,6 @@ class _OnboardingOpenStarterPackState
                     .userMetadata;
                 return ListTile(
                   onTap: () {
-                    // Toggle selection
                     setState(() {
                       if (selectedPubkeys.contains(displayPubkey)) {
                         selectedPubkeys.remove(displayPubkey);
@@ -360,9 +311,7 @@ class _OnboardingOpenStarterPackState
               },
             ),
           ),
-          const SizedBox(
-            height: 15,
-          ),
+          const SizedBox(height: 15),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             width: 400,
@@ -377,7 +326,6 @@ class _OnboardingOpenStarterPackState
                     selectedPubkeys
                         .addAll(widget.followSet.elements.map((e) => e.value));
                   }
-
                   Navigator.pop(context, selectedPubkeys);
                 });
               }),
@@ -385,9 +333,7 @@ class _OnboardingOpenStarterPackState
               inverted: true,
             ),
           ),
-          const SizedBox(
-            height: 15,
-          ),
+          const SizedBox(height: 15),
         ],
       ),
     );

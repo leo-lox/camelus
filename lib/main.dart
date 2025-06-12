@@ -1,6 +1,5 @@
 import 'dart:ui';
 
-import 'package:camelus/lifecycle/connectivity/connectivity.dart';
 import 'package:flutter/cupertino.dart';
 
 import 'package:flutter/material.dart';
@@ -11,11 +10,15 @@ import 'package:ndk/ndk.dart';
 //import 'data_layer/db/object_box_ndk/db_object_box.dart';
 import 'package:ndk_objectbox/ndk_objectbox.dart';
 import 'config/camelus_config.dart';
+import 'domain_layer/entities/starter_pack_identifier.dart';
+import 'lifecycle/connectivity/connectivity.dart';
 import 'lifecycle/deep_links.dart';
 import 'domain_layer/usecases/app_auth.dart';
 import 'lifecycle/notifications/init_firebase.dart';
 import 'lifecycle/notifications/notifications_caller.dart';
 import 'objectbox_isolate.dart';
+import 'presentation_layer/components/starter_packs/edit_starter_pack/edit_starter_pack.dart';
+import 'presentation_layer/components/starter_packs/open_starter_pack.dart';
 import 'presentation_layer/init/init_moderation.dart';
 import 'presentation_layer/providers/app_lifecycle_provider.dart';
 import 'presentation_layer/providers/db_app_provider.dart';
@@ -258,6 +261,20 @@ class MyApp extends ConsumerWidget {
             case '/nostr/blockedUsers':
               return MaterialPageRoute(
                 builder: (context) => const BlockedUsers(),
+              );
+            case '/edit-starter-pack':
+              return MaterialPageRoute(
+                builder: (context) => EditStarterPack(
+                  starterPackIdentifier:
+                      settings.arguments as StarterPackIdentifier,
+                ),
+              );
+            case '/open-starter-pack':
+              return MaterialPageRoute(
+                builder: (context) => OpenStarterPack(
+                  starterPackIdentifier:
+                      settings.arguments as StarterPackIdentifier,
+                ),
               );
           }
           assert(false, 'Need to implement ${settings.name}');

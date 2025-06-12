@@ -9,6 +9,8 @@ class SearchBarWidget extends StatefulWidget {
   final FocusNode? externalFocusNode;
   final TextEditingController? externalController;
   final Widget? leading;
+  final Widget? trailing;
+  final Function? onBackPress;
 
   const SearchBarWidget({
     super.key,
@@ -18,6 +20,8 @@ class SearchBarWidget extends StatefulWidget {
     this.externalFocusNode,
     this.externalController,
     this.leading,
+    this.trailing,
+    this.onBackPress,
   });
 
   @override
@@ -84,6 +88,9 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
                     _searchFocusNode.hasFocus
                         ? _searchFocusNode.unfocus()
                         : _searchFocusNode.requestFocus();
+                    if (widget.onBackPress != null) {
+                      widget.onBackPress!();
+                    }
                   },
                 ),
           ),
@@ -124,18 +131,20 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
             ),
           ),
           const SizedBox(width: 5),
-          SizedBox(
-            width: 41,
-            height: 41,
-            child: IconButton(
-              icon: Icon(
-                PhosphorIcons.question(),
-                size: 23,
+          if (widget.trailing == null)
+            SizedBox(
+              width: 41,
+              height: 41,
+              child: IconButton(
+                icon: Icon(
+                  PhosphorIcons.question(),
+                  size: 23,
+                ),
+                color: Palette.white,
+                onPressed: () => widget.helpSearch(context),
               ),
-              color: Palette.white,
-              onPressed: () => widget.helpSearch(context),
             ),
-          ),
+          if (widget.trailing != null) widget.trailing!,
         ],
       ),
     );

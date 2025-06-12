@@ -10,6 +10,7 @@ class NostrList {
   static const int EMOJIS = 10030;
 
   static const int FOLLOW_SET = 30000;
+  static const int STARTER_PACK = 39089;
   static const int RELAY_SET = 30002;
   static const int BOOKMARKS_SET = 30003;
   static const int CURATION_SET = 30004;
@@ -36,6 +37,7 @@ class NostrList {
     INTERESTS,
     EMOJIS,
     FOLLOW_SET,
+    STARTER_PACK,
     RELAY_SET,
     BOOKMARKS_SET,
     CURATION_SET,
@@ -54,7 +56,7 @@ class NostrList {
     A
   ];
 
-  late String id;
+  String? id;
   late String pubKey;
   late int kind;
 
@@ -115,6 +117,7 @@ class NostrList {
     required this.kind,
     required this.createdAt,
     required this.elements,
+    this.id,
   });
 
   void parseTags(List tags, {required bool private}) {
@@ -163,7 +166,7 @@ class NostrListElement {
   });
 }
 
-class NostrSet extends NostrList {
+class NostrStarterPack extends NostrList {
   // name is d tag
   late String name;
   String? title;
@@ -175,15 +178,16 @@ class NostrSet extends NostrList {
     return 'Nip51Set { $name}';
   }
 
-  /// Create a new Nip51Set
-  /// default kind is Nip51List.FOLLOW_SET
-  NostrSet({
+  /// Create a new StarterPack
+  NostrStarterPack({
     required super.pubKey,
+    this.title,
     required this.name,
+    this.image,
+    this.description,
     required super.createdAt,
     required super.elements,
-    this.title,
-    super.kind = NostrList.FOLLOW_SET,
+    super.kind = NostrList.STARTER_PACK,
   });
 
   void parseSetTags(List tags) {

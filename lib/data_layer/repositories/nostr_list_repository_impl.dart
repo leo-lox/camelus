@@ -15,39 +15,64 @@ class NostrListRepositoryImpl implements NostrListRepository {
   });
 
   @override
-  Future<NostrSet?> getPublicNostrFollowSet({
-    required String pubKey,
-    required String name,
-  }) async {
-    final ndkSet =
-        await dartNdkSource.dartNdk.lists.getSinglePublicNip51RelaySet(
-      name: name,
-      publicKey: pubKey,
-    );
-
-    if (ndkSet == null) {
-      return null;
-    }
-    final listSet = NostrSetModel.fromNDK(ndkSet);
-    return listSet;
-  }
-
-  @override
-  Future<List<NostrSet>?> getPublicNostrSets({
+  Stream<List<NostrStarterPack>?> getPublicNostrStarterPacks({
     required String pubKey,
     required int kind,
-  }) async {
-    final ndkSets = await dartNdkSource.dartNdk.lists.getPublicNip51RelaySets(
+  }) {
+    final ndkSets = dartNdkSource.dartNdk.lists.getPublicSets(
       kind: kind,
       publicKey: pubKey,
       forceRefresh: false,
     );
 
-    if (ndkSets == null) {
+    final listSets = ndkSets.asyncMap((sets) async {
+      if (sets == null) return null;
+
+      final starterPacks = <NostrStarterPack>[];
+      for (final set in sets) {
+        final starterPack = NostrStarterPackModel.fromNDK(set);
+        starterPacks.add(starterPack);
+      }
+      return starterPacks;
+    });
+    return listSets;
+  }
+
+  @override
+  Future<NostrStarterPack> broadcastStarterPack({
+    required NostrStarterPack starterPack,
+  }) async {
+    final ndkStarterPack =
+        NostrStarterPackModel.fromEntity(starterPack).toNDK();
+    final result = await dartNdkSource.dartNdk.lists.setCompleteSet(
+      set: ndkStarterPack,
+      kind: NostrList.STARTER_PACK,
+    );
+    return NostrStarterPackModel.fromNDK(result);
+  }
+
+  @override
+  Future deleteStarterPack({required String name}) {
+    return dartNdkSource.dartNdk.lists.deleteSet(
+      name: name,
+      kind: NostrList.STARTER_PACK,
+    );
+  }
+
+  @override
+  Future<NostrStarterPack?> addUserToStarterPack({
+    required String name,
+    required String pubkey,
+  }) async {
+    final ndkSet = await dartNdkSource.dartNdk.lists.addElementToSet(
+      tag: 'p',
+      value: pubkey,
+      name: name,
+      kind: NostrList.STARTER_PACK,
+    );
+    if (ndkSet == null) {
       return null;
     }
-
-    final listSets = ndkSets.map((e) => NostrSetModel.fromNDK(e)).toList();
-    return listSets;
+    return NostrStarterPackModel.fromNDK(ndkSet);
   }
 }

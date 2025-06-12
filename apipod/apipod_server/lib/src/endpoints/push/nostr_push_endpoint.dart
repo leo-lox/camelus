@@ -18,6 +18,8 @@ import 'relay.dart';
 const int maxRelaysRegistration = 4;
 
 class NostrPushEndpoint extends Endpoint {
+  Serverpod? _pod; // pod reference
+
   // Cache implementation
   final Map<String, DateTime> _sentCache = {};
   final int _maxCacheSize = 5000;
@@ -28,6 +30,8 @@ class NostrPushEndpoint extends Endpoint {
 
   late final FirebaseAdminApp _firebaseAdminApp;
   late final Messaging _firebaseMessaging;
+
+  List<StreamSubscription> _subscriptions = [];
 
   @override
   void initialize(Server server, String name, String? moduleName) {
@@ -65,17 +69,38 @@ class NostrPushEndpoint extends Endpoint {
     }
   }
 
-  Future<void> onServerStart(InternalSession session) async {
+  Future<void> onServerStart(Serverpod pod) async {
+    _pod = pod;
+
     // bg session needs on init
     final projectId = Platform.environment['FIREBASE_PROJECT_ID'];
     _firebaseAdminApp = FirebaseAdminApp.initializeApp(
         projectId!, Credential.fromApplicationDefaultCredentials());
     _firebaseMessaging = Messaging(_firebaseAdminApp);
 
-    await _restartRelayPool(session);
+    final session = await pod.createSession();
+    try {
+      await _restartRelayPool();
+    } finally {
+      await session.close(); // Always close sessions
+    }
 
     // Set up periodic cache cleaning
     Timer.periodic(Duration(minutes: 1), (_) => _cleanCache());
+  }
+
+  /// helper method to execute operations with fresh sessions
+  /// creates a new session for the given operation
+  Future<T> _withSession<T>(
+      Future<T> Function(Session session) operation) async {
+    if (_pod == null) throw Exception('Pod not initialized');
+
+    final session = await _pod!.createSession();
+    try {
+      return await operation(session);
+    } finally {
+      await session.close();
+    }
   }
 
   Future<bool> register(
@@ -129,7 +154,7 @@ class NostrPushEndpoint extends Endpoint {
     }
 
     if (newRelays) {
-      await _restartRelayPool(session);
+      await _restartRelayPool();
     }
 
     return true;
@@ -175,173 +200,193 @@ class NostrPushEndpoint extends Endpoint {
   }
 
   Future<void> _notify(
-    Session session,
     ndk.Nip01Event event,
     Relay relay,
   ) async {
-    /// get the last added pubkey (usually the direct reply)
-    List<String> pubkeyTag;
-    try {
-      pubkeyTag = event.tags.lastWhere(
-        (tag) => tag[0] == 'p' && tag.length > 1,
-      );
-    } catch (e) {
-      return;
-    }
+    await _withSession((session) async {
+      /// get the last added pubkey (usually the direct reply)
+      List<String> pubkeyTag;
+      try {
+        pubkeyTag = event.tags.lastWhere(
+          (tag) => tag[0] == 'p' && tag.length > 1,
+        );
+      } catch (e) {
+        return;
+      }
 
-    if (event.pTags.length > PushConfig.maxPubkeyPerEvent) {
-      // hellthread prevention
-      return;
-    }
+      if (event.pTags.length > PushConfig.maxPubkeyPerEvent) {
+        // hellthread prevention
+        return;
+      }
 
-    final tokens = await getTokensByPubKey(session, pubkeyTag[1]);
-    final tokensAsUrls =
-        tokens.where((token) => isValidHttpUrl(token)).toList();
-    final firebaseTokens =
-        tokens.where((token) => !tokensAsUrls.contains(token)).toList();
+      final tokens = await getTokensByPubKey(session, pubkeyTag[1]);
+      final tokensAsUrls =
+          tokens.where((token) => isValidHttpUrl(token)).toList();
+      final firebaseTokens =
+          tokens.where((token) => !tokensAsUrls.contains(token)).toList();
 
-    if (tokens.isNotEmpty) {
-      final wrappedEvent = await ndk.GiftWrap.wrapEvent(
-        recipientPublicKey: pubkeyTag[1],
-        sealEvent: event,
-      );
+      if (tokens.isNotEmpty) {
+        final wrappedEvent = await ndk.GiftWrap.wrapEvent(
+          recipientPublicKey: pubkeyTag[1],
+          sealEvent: event,
+        );
 
-      final stringifiedWrappedEventToPush = jsonEncode(wrappedEvent);
+        final stringifiedWrappedEventToPush = jsonEncode(wrappedEvent);
 
-      // Send to HTTP URLs
-      if (tokensAsUrls.isNotEmpty) {
-        for (final tokenUrl in tokensAsUrls) {
-          try {
-            final response = await http
-                .post(
-                  Uri.parse(tokenUrl),
-                  body: stringifiedWrappedEventToPush,
-                )
-                .timeout(Duration(seconds: 5));
+        // Send to HTTP URLs
+        if (tokensAsUrls.isNotEmpty) {
+          for (final tokenUrl in tokensAsUrls) {
+            try {
+              final response = await http
+                  .post(
+                    Uri.parse(tokenUrl),
+                    body: stringifiedWrappedEventToPush,
+                  )
+                  .timeout(Duration(seconds: 5));
 
-            if (response.statusCode != 200) {
+              if (response.statusCode != 200) {
+                session.log(
+                    'Error posting to NTFY: ${stringifiedWrappedEventToPush.length} chars. $tokenUrl ${response.statusCode} ${response.reasonPhrase}');
+                await deleteToken(session, tokenUrl);
+              }
+            } catch (err) {
               session.log(
-                  'Error posting to NTFY: ${stringifiedWrappedEventToPush.length} chars. $tokenUrl ${response.statusCode} ${response.reasonPhrase}');
+                  'Error posting to NTFY: ${stringifiedWrappedEventToPush.length} chars. $tokenUrl $err');
+              // delete tokens on error
               await deleteToken(session, tokenUrl);
             }
-          } catch (err) {
-            session.log(
-                'Error posting to NTFY: ${stringifiedWrappedEventToPush.length} chars. $tokenUrl $err');
-            // Uncomment to delete tokens on error
-            // await deleteToken(session, tokenUrl);
           }
+          session.log(
+              'NTFY New kind ${event.kind} event for ${pubkeyTag[1]} with ${stringifiedWrappedEventToPush.length} bytes');
         }
-        session.log(
-            'NTFY New kind ${event.kind} event for ${pubkeyTag[1]} with ${stringifiedWrappedEventToPush.length} bytes');
-      }
 
-      // Send to Firebase
-      if (firebaseTokens.isNotEmpty) {
-        final message = {
-          'encryptedEvent': stringifiedWrappedEventToPush,
-        };
+        // Send to Firebase
+        if (firebaseTokens.isNotEmpty) {
+          final message = {
+            'encryptedEvent': stringifiedWrappedEventToPush,
+          };
 
-        try {
-          final response =
-              await _firebaseMessaging.sendEachForMulticast(MulticastMessage(
-            tokens: firebaseTokens,
-            data: message,
-          ));
+          try {
+            final response =
+                await _firebaseMessaging.sendEachForMulticast(MulticastMessage(
+              tokens: firebaseTokens,
+              data: message,
+            ));
 
-          if (response.failureCount > 0) {
-            response.responses.asMap().forEach((idx, resp) {
-              if (!resp.success) {
-                session.log(
-                    'Failed: ${resp.error?.code} ${resp.error?.message} ${jsonEncode(message).length} chars');
-                if (resp.error?.code ==
-                    'messaging/registration-token-not-registered') {
-                  session.log('Deleting Token ${tokens[idx]}');
-                  deleteToken(session, tokens[idx]);
+            if (response.failureCount > 0) {
+              response.responses.asMap().forEach((idx, resp) async {
+                if (!resp.success) {
+                  session.log(
+                      'Failed: ${resp.error?.code} ${resp.error?.message} ${jsonEncode(message).length} chars');
+                  if (resp.error?.code ==
+                      'messaging/registration-token-not-registered') {
+                    session.log('Deleting Token ${tokens[idx]}');
+                    await deleteToken(session, tokens[idx]);
+                  }
                 }
-              }
-            });
+              });
+            }
+          } catch (e) {
+            session.log('Firebase messaging error: $e');
           }
-        } catch (e) {
-          session.log('Firebase messaging error: $e');
-        }
 
-        session.log(
-            'Firebase New kind ${event.kind} event for ${pubkeyTag[1]} with ${stringifiedWrappedEventToPush.length} bytes');
+          session.log(
+              'Firebase New kind ${event.kind} event for ${pubkeyTag[1]} with ${stringifiedWrappedEventToPush.length} bytes');
+        }
       }
-    }
+    });
   }
 
-  Future<void> _restartRelayPool(Session session) async {
+  Future<void> _restartRelayPool() async {
     if (_isInRelayPoolFunction) return;
     _isInRelayPoolFunction = true;
 
+    for (final sub in _subscriptions) {
+      await sub.cancel();
+    }
+    _subscriptions.clear();
+
     try {
-      final relays = await getAllRelays(session);
-      if (!relays.contains(PushConfig.bootstrapRelay)) {
-        // add at least on relay to keep the session alive (first startup)
-        relays.add(PushConfig.bootstrapRelay);
-      }
-
-      if (_relayPool != null) {
-        final hasNewRelay = relays.any((relay) => !_relayPool!.has(relay));
-        if (!hasNewRelay) {
-          _isInRelayPoolFunction = false;
-          return;
+      await _withSession((session) async {
+        final relays = await getAllRelays(session);
+        if (!relays.contains(PushConfig.bootstrapRelay)) {
+          // add at least on relay to keep the session alive (first startup)
+          relays.add(PushConfig.bootstrapRelay);
         }
-      }
 
-      if (_relayPool != null) {
-        _relayPool!.close();
-      }
+        if (_relayPool != null) {
+          final hasNewRelay = relays.any((relay) => !_relayPool!.has(relay));
+          if (!hasNewRelay) {
+            _isInRelayPoolFunction = false;
+            return;
+          }
+        }
 
-      // Create a new relay pool with the fetched relay URLs
-      _relayPool = RelayPool(relays);
+        if (_relayPool != null) {
+          _relayPool!.close();
+        }
 
-      // Set up event handlers using the new stream-based approach
-      _relayPool!.onOpen.listen((relay) {
-        session.log("onOpen.listen ${relay.url}");
-        // Subscribe to specific event kinds when a relay connects
-        relay.subscribe(PushConfig.subscriptionId, {
-          'kinds': [1],
-          'limit': 1
+        // Create a new relay pool with the fetched relay URLs
+        _relayPool = RelayPool(relays);
+
+        // Set up event handlers using the new stream-based approach
+        _relayPool!.onOpen.listen((relay) {
+          _withSession((s) async {
+            s.log("onOpen.listen ${relay.url}");
+          });
+
+          // Subscribe to specific event kinds when a relay connects
+          relay.subscribe(PushConfig.subscriptionId, {
+            'kinds': [1],
+            'limit': 1
+          });
         });
+
+        _subscriptions.add(
+          _relayPool!.onEvent.listen((relayEvent) {
+            // session.log(
+            //     "onEvent.listen, relay: ${relayEvent.relay.url} eventId: ${relayEvent.event.id}");
+            try {
+              final event = relayEvent.event;
+
+              // Skip if we've already processed this event
+              if (_sentCache.containsKey(event.id)) return;
+              _sentCache[event.id] = DateTime.now();
+
+              _notify(event, relayEvent.relay);
+            } catch (e) {
+              _withSession((s) async {
+                s.log('Error handling event: $e');
+              });
+            }
+          }),
+        );
+
+        _subscriptions.add(
+          _relayPool!.onError.listen((relayError) async {
+            await _withSession((s) async {
+              s.log(".onError.listen, relay: ${relayError.relay}");
+            });
+
+            final relay = relayError.relay;
+            final error = relayError.error.toString();
+
+            if (!isSupportedUrl(relay.url) ||
+                error.contains('Invalid URL') ||
+                error.contains('ECONNREFUSED') ||
+                error.contains('Invalid WebSocket frame: FIN must be set') ||
+                error.contains("The URL's protocol must be one of")) {
+              _relayPool!.remove(relay.url);
+
+              await _withSession((s) async {
+                await deleteRelay(s, relay.url);
+              });
+            }
+          }),
+        );
+
+        session.log('Restarted pool with ${relays.length} relays');
       });
-
-      _relayPool!.onEvent.listen((relayEvent) {
-        // session.log(
-        //     "onEvent.listen, relay: ${relayEvent.relay.url} eventId: ${relayEvent.event.id}");
-        try {
-          final event = relayEvent.event;
-
-          // Skip if we've already processed this event
-          if (_sentCache.containsKey(event.id)) return;
-          _sentCache[event.id] = DateTime.now();
-
-          _notify(session, event, relayEvent.relay);
-        } catch (e) {
-          session.log('Error handling event: $e');
-        }
-      });
-
-      _relayPool!.onError.listen((relayError) {
-        session.log(".onError.listen, relay: ${relayError.relay}");
-        final relay = relayError.relay;
-        final error = relayError.error.toString();
-
-        if (!isSupportedUrl(relay.url) ||
-            error.contains('Invalid URL') ||
-            error.contains('ECONNREFUSED') ||
-            error.contains('Invalid WebSocket frame: FIN must be set') ||
-            error.contains("The URL's protocol must be one of")) {
-          _relayPool!.remove(relay.url);
-
-          deleteRelay(session, relay.url);
-        }
-      });
-
-      session.log('Restarted pool with ${relays.length} relays');
-    } catch (e) {
-      session.log('Error restarting relay pool: $e');
     } finally {
       _isInRelayPoolFunction = false;
     }

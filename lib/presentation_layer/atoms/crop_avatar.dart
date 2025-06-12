@@ -16,6 +16,7 @@ class CropAvatar extends StatefulWidget {
 
   final bool resize;
   final int targetWidth;
+  final String? buttonText;
 
   const CropAvatar({
     super.key,
@@ -24,6 +25,7 @@ class CropAvatar extends StatefulWidget {
     this.roundUi = true,
     this.resize = false,
     this.targetWidth = 250,
+    this.buttonText,
   }) : _imageData = imageData;
 
   @override
@@ -94,7 +96,7 @@ class _CropAvatarState extends State<CropAvatar> {
                 child: longButton(
                   loading: _loading,
                   inverted: true,
-                  name: "apply",
+                  name: widget.buttonText ?? "apply",
                   onPressed: () {
                     setState(() {
                       _loading = true;

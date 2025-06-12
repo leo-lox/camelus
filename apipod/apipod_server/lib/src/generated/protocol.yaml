@@ -1,5 +1,8 @@
 appUpdate:
   - checkVersion:
+linkShorter:
+  - shortInvite:
+  - getInviteByShortLink:
 moderation:
   - getProfileBloomFilter:
   - getEventBloomFilter:

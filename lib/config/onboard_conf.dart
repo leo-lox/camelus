@@ -15,4 +15,6 @@ final List<String> ONBOARD_RECOMMANDATIONS = [
 final List<String> CAMELUS_RECOMMEDED_STARTER_PACKS = [
   'c7779fdc1e5d2bbf5edd5f68785bfc4299b3c77d8046957cc79bc4d25ad9d330', // camelus.app
   '0f22c06eac1002684efcc68f568540e8342d1609d508bcd4312c038e6194f8b6', // nos.social
+  '895c2a90a860ac18434aa69e7b0da8465721216fa36e42c022e393579c486cba', // damus onboarding packs
+  '50d94fc2d8580c682b071a542f8b1e31a200b0508bab95a33bef0855df281d63', // calle
 ];

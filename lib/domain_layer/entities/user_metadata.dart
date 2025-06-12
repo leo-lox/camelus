@@ -31,4 +31,14 @@ class UserMetadata {
     this.bot,
     this.pronouns,
   });
+
+  @override
+  bool operator ==(Object other) {
+    return other is UserMetadata &&
+        other.eventId == eventId &&
+        other.pubkey == pubkey;
+  }
+
+  @override
+  int get hashCode => eventId.hashCode;
 }

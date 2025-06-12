@@ -8,23 +8,33 @@ class GetNostrLists {
     required NostrListRepository nostrListRepository,
   }) : _nostrListRepository = nostrListRepository;
 
-  Future<NostrSet?> getPublicNostrFollowSet({
+  /// gives you all the public sets by a user
+  Stream<List<NostrStarterPack>?> getPublicNostrStarterPacks({
     required String pubKey,
-    required String name,
   }) {
-    return _nostrListRepository.getPublicNostrFollowSet(
+    return _nostrListRepository.getPublicNostrStarterPacks(
       pubKey: pubKey,
-      name: name,
+      kind: NostrList.STARTER_PACK,
     );
   }
 
-  /// gives you all the public sets by a user
-  Future<List<NostrSet>?> getPublicNostrFollowSets({
-    required String pubKey,
+  Future<NostrStarterPack> broadcastStarterPack({
+    required NostrStarterPack starterPack,
   }) {
-    return _nostrListRepository.getPublicNostrSets(
-      pubKey: pubKey,
-      kind: NostrList.FOLLOW_SET,
-    );
+    return _nostrListRepository.broadcastStarterPack(starterPack: starterPack);
+  }
+
+  Future deleteStarterPack({
+    required String name,
+  }) {
+    return _nostrListRepository.deleteStarterPack(name: name);
+  }
+
+  Future<NostrStarterPack?> addUserToStarterPack({
+    required String name,
+    required String pubkey,
+  }) {
+    return _nostrListRepository.addUserToStarterPack(
+        name: name, pubkey: pubkey);
   }
 }

@@ -12,7 +12,7 @@
 import 'package:serverpod/serverpod.dart' as _i1;
 
 abstract class PushSubscription
-    implements _i1.TableRow<int>, _i1.ProtocolSerialization {
+    implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
   PushSubscription._({
     this.id,
     required this.pubKey,
@@ -50,7 +50,7 @@ abstract class PushSubscription
   String token;
 
   @override
-  _i1.Table<int> get table => t;
+  _i1.Table<int?> get table => t;
 
   /// Returns a shallow copy of this [PushSubscription]
   /// with some or all fields replaced by the given arguments.
@@ -145,7 +145,7 @@ class _PushSubscriptionImpl extends PushSubscription {
   }
 }
 
-class PushSubscriptionTable extends _i1.Table<int> {
+class PushSubscriptionTable extends _i1.Table<int?> {
   PushSubscriptionTable({super.tableRelation})
       : super(tableName: 'push_subscriptions') {
     pubKey = _i1.ColumnString(
@@ -184,7 +184,7 @@ class PushSubscriptionInclude extends _i1.IncludeObject {
   Map<String, _i1.Include?> get includes => {};
 
   @override
-  _i1.Table<int> get table => PushSubscription.t;
+  _i1.Table<int?> get table => PushSubscription.t;
 }
 
 class PushSubscriptionIncludeList extends _i1.IncludeList {
@@ -204,7 +204,7 @@ class PushSubscriptionIncludeList extends _i1.IncludeList {
   Map<String, _i1.Include?> get includes => include?.includes ?? {};
 
   @override
-  _i1.Table<int> get table => PushSubscription.t;
+  _i1.Table<int?> get table => PushSubscription.t;
 }
 
 class PushSubscriptionRepository {
