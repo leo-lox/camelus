@@ -13,6 +13,7 @@ class StarterPackData {
   final String title;
   final String? description;
   final String? imageUrl;
+  final bool imageUploading;
   final List<String> selectedUsers; // list over set so odering is possible
   final bool broadcasting;
   final bool broadcasted;
@@ -24,6 +25,7 @@ class StarterPackData {
     this.description,
     required this.selectedUsers,
     this.imageUrl,
+    required this.imageUploading,
     required this.broadcasted,
     required this.broadcasting,
     this.shortLinkPart,
@@ -37,6 +39,8 @@ class StarterPackData {
     bool? broadcasted,
     bool? broadcasting,
     String? shortLinkPart,
+    String? imageUrl,
+    bool? imageUploading,
   }) {
     return StarterPackData(
       name: name ?? this.name,
@@ -46,6 +50,8 @@ class StarterPackData {
       broadcasted: broadcasted ?? this.broadcasted,
       broadcasting: broadcasting ?? this.broadcasting,
       shortLinkPart: shortLinkPart ?? this.shortLinkPart,
+      imageUrl: imageUrl ?? this.imageUrl,
+      imageUploading: imageUploading ?? this.imageUploading,
     );
   }
 
@@ -80,6 +86,7 @@ class EditStarterPackNotifier extends StateNotifier<StarterPackData> {
             selectedUsers: [],
             broadcasted: false,
             broadcasting: false,
+            imageUploading: false,
           ),
         ) {
     // Load initial data based on starterPackId
@@ -92,10 +99,12 @@ class EditStarterPackNotifier extends StateNotifier<StarterPackData> {
           .where((l) => l.name == identifier.name)
           .first;
       state = state.copyWith(
-          name: myList.name,
-          title: myList.title,
-          description: myList.description,
-          selectedUsers: myList.pubKeys.map((e) => e.value).toList());
+        name: myList.name,
+        title: myList.title,
+        description: myList.description,
+        selectedUsers: myList.pubKeys.map((e) => e.value).toList(),
+        imageUrl: myList.image,
+      );
     } catch (_) {
       // new set, do nothing
     }
@@ -107,6 +116,10 @@ class EditStarterPackNotifier extends StateNotifier<StarterPackData> {
 
   void updateDescription(String description) {
     state = state.copyWith(description: description);
+  }
+
+  void updateImage({required bool imageUploading, String? imageurl}) {
+    state = state.copyWith(imageUploading: imageUploading, imageUrl: imageurl);
   }
 
   void updateData({String? title, String? description}) {

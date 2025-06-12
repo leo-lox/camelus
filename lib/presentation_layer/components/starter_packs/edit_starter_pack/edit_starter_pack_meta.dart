@@ -1,9 +1,16 @@
-import 'package:camelus/presentation_layer/atoms/long_button.dart';
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../../../../config/palette.dart';
+import '../../../../domain_layer/entities/mem_file.dart';
 import '../../../../domain_layer/entities/starter_pack_identifier.dart';
+import '../../../atoms/crop_avatar.dart';
+import '../../../atoms/icon_patter.dart';
+import '../../../atoms/long_button.dart';
+import '../../../providers/file_upload_provider.dart';
 import 'edit_starter_pack_provider.dart';
 
 class EditStarterPackMeta extends ConsumerStatefulWidget {
@@ -45,6 +52,59 @@ class _EditStarterPackMetaState extends ConsumerState<EditStarterPackMeta> {
     super.dispose();
   }
 
+  Future<XFile?> _pickImage() async {
+    final ImagePicker picker = ImagePicker();
+    final result = await picker.pickImage(source: ImageSource.gallery);
+    return result;
+  }
+
+  Future<void> _bannerUpload() async {
+    final pickedImage = await _pickImage();
+    if (pickedImage == null) return;
+    final uneditedImage = await pickedImage.readAsBytes();
+    if (!mounted) return;
+    Navigator.push(
+      context,
+      MaterialPageRoute<Uint8List>(
+        builder: (context) => CropAvatar(
+          resize: true,
+          targetWidth: 400,
+          roundUi: false,
+          aspectRatio: 16 / 6,
+          buttonText: "upload",
+          imageData: uneditedImage,
+        ),
+      ),
+    ).then((value) async {
+      if (value != null) {
+        final stateNoti = ref.read(
+            editStarterPackProvider(widget.starterPackIdentifier).notifier);
+        stateNoti.updateImage(imageUploading: true);
+
+        final editedFile = MemFile(
+          bytes: value,
+          mimeType: pickedImage.mimeType ?? '',
+          name: pickedImage.name,
+        );
+        final imageUrl = await _uploadImage(editedFile);
+
+        if (imageUrl == null) return;
+
+        stateNoti.updateImage(imageUploading: false, imageurl: imageUrl);
+      }
+    });
+  }
+
+  Future<String?> _uploadImage(MemFile imageData) async {
+    final uploadResult =
+        await ref.read(fileUploadProvider).uploadImage(imageData);
+    final hostedImageUrl = uploadResult
+        .firstWhere((e) => e.descriptor?.url.isNotEmpty == true)
+        .descriptor
+        ?.url;
+    return hostedImageUrl;
+  }
+
   @override
   Widget build(BuildContext context) {
     final starterPackData =
@@ -79,12 +139,6 @@ class _EditStarterPackMetaState extends ConsumerState<EditStarterPackMeta> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   const SizedBox(height: 40),
-
-                  Image.asset("assets/images/list_placeholder.png",
-                      width: 80, height: 80),
-
-                  const SizedBox(height: 40),
-
                   // Title
                   const Text(
                     'create your starter pack',
@@ -95,9 +149,6 @@ class _EditStarterPackMetaState extends ConsumerState<EditStarterPackMeta> {
                     ),
                     textAlign: TextAlign.center,
                   ),
-
-                  const SizedBox(height: 16),
-
                   // Subtitle
                   const Text(
                     'Invite your friends to follow your favorite people',
@@ -107,8 +158,62 @@ class _EditStarterPackMetaState extends ConsumerState<EditStarterPackMeta> {
                     ),
                     textAlign: TextAlign.center,
                   ),
+                  const SizedBox(height: 70),
+                  GestureDetector(
+                    onTap: () => _bannerUpload(),
+                    child: Container(
+                      constraints: BoxConstraints(minWidth: 100, maxWidth: 350),
+                      child: AspectRatio(
+                        aspectRatio: 16 / 6,
+                        child: Stack(
+                          children: [
+                            starterPackData.imageUrl != null
+                                ? ClipRRect(
+                                    borderRadius: BorderRadius.circular(10),
+                                    child: Image.network(
+                                      starterPackData.imageUrl!,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  )
+                                : IconPattern(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
 
-                  const SizedBox(height: 60),
+                            // upload loading overlay
+                            if (starterPackData.imageUploading)
+                              Container(
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(10),
+                                  color: Palette.black.withValues(alpha: 0.6),
+                                ),
+                                child: Center(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      CircularProgressIndicator(
+                                        color: Colors.white,
+                                        strokeWidth: 2,
+                                      ),
+                                      SizedBox(height: 8),
+                                      Text(
+                                        'Uploading...',
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 12),
 
                   // Form fields
                   Column(
