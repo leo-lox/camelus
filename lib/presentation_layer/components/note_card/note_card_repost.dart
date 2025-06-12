@@ -36,9 +36,6 @@ class NoteCardRepost extends ConsumerWidget {
 
     final displayNoteStream = notesP.getNote(
       noteEtag.value,
-      explicitRelays: noteEtag.recommended_relay != null
-          ? [noteEtag.recommended_relay!]
-          : null,
     );
 
     return Column(
