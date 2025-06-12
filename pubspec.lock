@@ -1150,9 +1150,11 @@ packages:
   ndk:
     dependency: "direct main"
     description:
-      path: "../ndk/packages/ndk"
-      relative: true
-    source: path
+      path: "packages/ndk"
+      ref: "175-refactor-list-usecase"
+      resolved-ref: fca3d34d46f7b679282704302b26506882727a59
+      url: "https://github.com/relaystr/ndk.git"
+    source: git
     version: "0.4.0"
   ndk_amber:
     dependency: "direct main"
@@ -1165,9 +1167,11 @@ packages:
   ndk_objectbox:
     dependency: "direct main"
     description:
-      path: "../ndk/packages/objectbox"
-      relative: true
-    source: path
+      path: "packages/objectbox"
+      ref: HEAD
+      resolved-ref: "7570d94919ad1b2d9424909218e1850341d9c874"
+      url: "https://github.com/relaystr/ndk.git"
+    source: git
     version: "0.2.4"
   ndk_rust_verifier:
     dependency: "direct main"
