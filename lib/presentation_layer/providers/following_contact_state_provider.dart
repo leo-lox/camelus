@@ -1,10 +1,12 @@
-import 'package:camelus/presentation_layer/providers/ndk_provider.dart';
 import 'package:riverpod/riverpod.dart';
 import 'dart:async';
 
 import '../../domain_layer/entities/contact_list.dart';
 import '../../domain_layer/usecases/follow.dart';
-import 'following_provider.dart'; // Import your following provider
+import '../../domain_layer/usecases/inbox_outbox.dart';
+import 'following_provider.dart';
+import 'inbox_outbox_provider.dart';
+import 'ndk_provider.dart'; // Import your following provider
 
 class ContactListState {
   final bool isLoading;
@@ -30,7 +32,8 @@ final contactListStateProvider =
     StateNotifierProvider.family<ContactListNotifier, ContactListState, String>(
         (ref, pubkey) {
   final follow = ref.watch(followingProvider);
-  return ContactListNotifier(follow, pubkey);
+  final inboxOutbox = ref.watch(inboxOutboxProvider);
+  return ContactListNotifier(pubkey, follow, inboxOutbox);
 });
 
 /// convinience provider
@@ -42,10 +45,14 @@ final contactListSelfStateProvider = Provider<ContactListState>((ref) {
 class ContactListNotifier extends StateNotifier<ContactListState> {
   final Follow _followUseCase;
   final String _pubkey;
+  final InboxOutbox _inboxOutbox;
   StreamSubscription<ContactList?>? _subscription;
 
-  ContactListNotifier(this._followUseCase, this._pubkey)
-      : super(
+  ContactListNotifier(
+    this._pubkey,
+    this._followUseCase,
+    this._inboxOutbox,
+  ) : super(
           ContactListState(
             isLoading: true,
             contactList: ContactList(
@@ -70,6 +77,11 @@ class ContactListNotifier extends StateNotifier<ContactListState> {
         state = state.copyWith(
           isLoading: false,
           contactList: contactList,
+        );
+
+        _inboxOutbox.updateCache(
+          contactList.contacts,
+          forceRefresh: true,
         );
       },
       onError: (error) {

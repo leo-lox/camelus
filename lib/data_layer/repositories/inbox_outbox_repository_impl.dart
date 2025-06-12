@@ -37,4 +37,14 @@ class InboxOutboxRepositoryImpl implements InboxOutboxRepository {
     final data = Nip65Model.fromNdkUserRelayList(ndkData);
     return data;
   }
+
+  @override
+  Future<void> updateCache(List<String> pubkeys,
+      {bool forceRefresh = false}) async {
+    await dartNdkSource.dartNdk.userRelayLists
+        .loadMissingRelayListsFromNip65OrNip02(
+      pubkeys,
+      forceRefresh: forceRefresh,
+    );
+  }
 }

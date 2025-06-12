@@ -18,4 +18,11 @@ class InboxOutbox {
     return _inboxOutboxRepository.getNip65data(npub,
         forceRefresh: forceRefresh);
   }
+
+  Future<void> updateCache(List<String> pubkeys, {bool forceRefresh = false}) {
+    return _inboxOutboxRepository.updateCache(
+      pubkeys,
+      forceRefresh: forceRefresh,
+    );
+  }
 }
