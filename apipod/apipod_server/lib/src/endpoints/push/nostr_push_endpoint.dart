@@ -205,7 +205,7 @@ class NostrPushEndpoint extends Endpoint {
     ndk.Nip01Event event,
     Relay relay,
   ) async {
-    await _withSession(enableLogging: true, (session) async {
+    await _withSession(enableLogging: false, (session) async {
       /// get the last added pubkey (usually the direct reply)
       List<String> pubkeyTag;
       try {
@@ -248,17 +248,20 @@ class NostrPushEndpoint extends Endpoint {
 
               if (response.statusCode != 200) {
                 session.log(
+                    level: LogLevel.error,
                     'Error posting to NTFY: ${stringifiedWrappedEventToPush.length} chars. $tokenUrl ${response.statusCode} ${response.reasonPhrase}');
                 await deleteToken(session, tokenUrl);
               }
             } catch (err) {
               session.log(
+                  level: LogLevel.error,
                   'Error posting to NTFY: ${stringifiedWrappedEventToPush.length} chars. $tokenUrl $err');
               // delete tokens on error
               await deleteToken(session, tokenUrl);
             }
           }
           session.log(
+              level: LogLevel.info,
               'NTFY New kind ${event.kind} event for ${pubkeyTag[1]} with ${stringifiedWrappedEventToPush.length} bytes');
         }
 
@@ -277,22 +280,28 @@ class NostrPushEndpoint extends Endpoint {
 
             if (response.failureCount > 0) {
               response.responses.asMap().forEach((idx, resp) async {
-                if (!resp.success) {
-                  session.log(
-                      'Failed: ${resp.error?.code} ${resp.error?.message} ${jsonEncode(message).length} chars');
-                  if (resp.error?.code ==
-                      'messaging/registration-token-not-registered') {
-                    session.log('Deleting Token ${tokens[idx]}');
-                    await deleteToken(session, tokens[idx]);
+                _withSession(enableLogging: true, (s) async {
+                  if (!resp.success) {
+                    s.log(
+                        level: LogLevel.error,
+                        'Failed: ${resp.error?.code} ${resp.error?.message} ${jsonEncode(message).length} chars');
+                    if (resp.error?.code ==
+                        'messaging/registration-token-not-registered') {
+                      s.log(
+                          level: LogLevel.info,
+                          'Deleting Token ${tokens[idx]}');
+                      await deleteToken(session, tokens[idx]);
+                    }
                   }
-                }
+                });
               });
             }
           } catch (e) {
-            session.log('Firebase messaging error: $e');
+            session.log(level: LogLevel.error, 'Firebase messaging error: $e');
           }
 
           session.log(
+              level: LogLevel.info,
               'Firebase New kind ${event.kind} event for ${pubkeyTag[1]} with ${stringifiedWrappedEventToPush.length} bytes');
         }
       }
@@ -334,7 +343,7 @@ class NostrPushEndpoint extends Endpoint {
         // Set up event handlers using the new stream-based approach
         _relayPool!.onOpen.listen((relay) {
           _withSession(enableLogging: true, (s) async {
-            s.log("onOpen.listen ${relay.url}");
+            s.log(level: LogLevel.info, "onOpen.listen ${relay.url}");
           });
 
           // Subscribe to specific event kinds when a relay connects
@@ -358,7 +367,7 @@ class NostrPushEndpoint extends Endpoint {
               _notify(event, relayEvent.relay);
             } catch (e) {
               _withSession(enableLogging: true, (s) async {
-                s.log('Error handling event: $e');
+                s.log(level: LogLevel.error, 'Error handling event: $e');
               });
             }
           }),
@@ -367,7 +376,9 @@ class NostrPushEndpoint extends Endpoint {
         _subscriptions.add(
           _relayPool!.onError.listen((relayError) async {
             await _withSession(enableLogging: true, (s) async {
-              s.log(".onError.listen, relay: ${relayError.relay}");
+              s.log(
+                  level: LogLevel.error,
+                  ".onError.listen, relay: ${relayError.relay}");
             });
 
             final relay = relayError.relay;
@@ -387,7 +398,9 @@ class NostrPushEndpoint extends Endpoint {
           }),
         );
 
-        session.log('Restarted pool with ${relays.length} relays');
+        session.log(
+            level: LogLevel.info,
+            'Restarted pool with ${relays.length} relays');
       });
     } finally {
       _isInRelayPoolFunction = false;
