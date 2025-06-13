@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:serverpod/serverpod.dart';
 import 'dart:math';
 import '../../generated/protocol.dart';
@@ -100,17 +102,21 @@ class LinkShorterEndpoint extends Endpoint {
     );
   }
 
-  // async method that doesn't block the main response
-  void _trackUsageAsync(Session session, String shortLink) {
-    // Don't await this - let it run in background
-    Future(() async {
-      try {
-        await _incrementUsageCount(session, shortLink);
-      } catch (e) {
-        // log error but don't let it affect the main flow
-        session.log('Failed to track usage for $shortLink: $e');
-      }
-    });
+  void _trackUsageAsync(Session session, String shortLink) async {
+    try {
+      session.serverpod
+          .createSession(enableLogging: false)
+          .then((newSession) async {
+        try {
+          await _incrementUsageCount(newSession, shortLink);
+        } finally {
+          await newSession.close();
+        }
+      });
+    } catch (e) {
+      // Log to server logger instead of session logger
+      print('Failed to track usage for $shortLink: $e');
+    }
   }
 
   Future<void> _incrementUsageCount(Session session, String shortLink,
