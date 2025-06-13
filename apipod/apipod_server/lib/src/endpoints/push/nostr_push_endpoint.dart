@@ -91,11 +91,13 @@ class NostrPushEndpoint extends Endpoint {
 
   /// helper method to execute operations with fresh sessions
   /// creates a new session for the given operation
-  Future<T> _withSession<T>(
-      Future<T> Function(Session session) operation) async {
+  Future<T> _withSession<T>(Future<T> Function(Session session) operation,
+      {final bool enableLogging = false}) async {
     if (_pod == null) throw Exception('Pod not initialized');
 
-    final session = await _pod!.createSession();
+    final session = await _pod!.createSession(
+      enableLogging: enableLogging,
+    );
     try {
       return await operation(session);
     } finally {
@@ -203,7 +205,7 @@ class NostrPushEndpoint extends Endpoint {
     ndk.Nip01Event event,
     Relay relay,
   ) async {
-    await _withSession((session) async {
+    await _withSession(enableLogging: true, (session) async {
       /// get the last added pubkey (usually the direct reply)
       List<String> pubkeyTag;
       try {
@@ -331,7 +333,7 @@ class NostrPushEndpoint extends Endpoint {
 
         // Set up event handlers using the new stream-based approach
         _relayPool!.onOpen.listen((relay) {
-          _withSession((s) async {
+          _withSession(enableLogging: true, (s) async {
             s.log("onOpen.listen ${relay.url}");
           });
 
@@ -355,7 +357,7 @@ class NostrPushEndpoint extends Endpoint {
 
               _notify(event, relayEvent.relay);
             } catch (e) {
-              _withSession((s) async {
+              _withSession(enableLogging: true, (s) async {
                 s.log('Error handling event: $e');
               });
             }
@@ -364,7 +366,7 @@ class NostrPushEndpoint extends Endpoint {
 
         _subscriptions.add(
           _relayPool!.onError.listen((relayError) async {
-            await _withSession((s) async {
+            await _withSession(enableLogging: true, (s) async {
               s.log(".onError.listen, relay: ${relayError.relay}");
             });
 
@@ -378,7 +380,7 @@ class NostrPushEndpoint extends Endpoint {
                 error.contains("The URL's protocol must be one of")) {
               _relayPool!.remove(relay.url);
 
-              await _withSession((s) async {
+              await _withSession(enableLogging: true, (s) async {
                 await deleteRelay(s, relay.url);
               });
             }
