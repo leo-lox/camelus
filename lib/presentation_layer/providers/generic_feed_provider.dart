@@ -1,4 +1,3 @@
-import 'package:camelus/presentation_layer/providers/get_notes_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:rxdart/rxdart.dart';
 
@@ -6,6 +5,8 @@ import '../../domain_layer/entities/feed_filter.dart';
 import '../../domain_layer/entities/feed_view_model.dart';
 import '../../domain_layer/entities/nostr_note.dart';
 import 'db_app_provider.dart';
+import 'get_notes_provider.dart';
+import 'inbox_outbox_provider.dart';
 
 // Provider for managing state related to generic feed
 final genericFeedStateProvider = NotifierProvider.autoDispose
@@ -57,6 +58,12 @@ class GenericFeedState
   // Sets up a subscription to listen for feed updates
   Future<void> _setupSubscription(FeedFilter filter) async {
     int cutoff = await _getCutoffTime(filter.feedId); // Fetch the cutoff time
+
+    if (filter.authors != null && filter.authors!.isNotEmpty) {
+      final inboxOutboxP = ref.watch(inboxOutboxProvider);
+      await inboxOutboxP.updateCache(filter.authors!, forceRefresh: true);
+    }
+
     final notesP = ref.watch(getNotesProvider);
     final sub = notesP.genericNostrSubscription(
       since: cutoff,
