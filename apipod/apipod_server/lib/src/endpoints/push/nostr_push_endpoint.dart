@@ -228,6 +228,11 @@ class NostrPushEndpoint extends Endpoint {
           tokens.where((token) => !tokensAsUrls.contains(token)).toList();
 
       if (tokens.isNotEmpty) {
+        _withSession(enableLogging: true, (s) async {
+          s.log(
+              "fcm msg, all_tokens: ${tokens.toString()}, fcm_tokens: ${firebaseTokens.toString()}");
+        });
+
         final wrappedEvent = await ndk.GiftWrap.wrapEvent(
           recipientPublicKey: pubkeyTag[1],
           sealEvent: event,
