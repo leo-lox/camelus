@@ -20,6 +20,9 @@ class Relay {
   /// Flag indicating if reconnection is in progress
   bool _reconnecting = false;
 
+  int reconnectDelay = 100;
+  int reconnectAttempts = 0;
+
   /// Stream controllers for different event types
   final _openController = StreamController<Relay>.broadcast();
   final _closeController = StreamController<void>.broadcast();
@@ -121,13 +124,20 @@ class Relay {
     if (_reconnecting) return;
     _reconnecting = true;
 
-    int delay = 100;
-    Future.delayed(Duration(milliseconds: delay), () async {
+    Future.delayed(Duration(milliseconds: reconnectDelay), () async {
       try {
         await _initWebsocket();
         _reconnecting = false;
+        reconnectDelay = 100; // reset reconnect delay
+        reconnectAttempts = 0;
       } catch (e) {
-        delay = (delay * 1.5).toInt();
+        reconnectDelay = (reconnectDelay * 1.5).toInt();
+        reconnectAttempts = reconnectAttempts + 1;
+
+        if (reconnectAttempts >= 10) {
+          _errorController.add("to many reconnection attempts");
+        }
+
         _scheduleReconnect();
       }
     });

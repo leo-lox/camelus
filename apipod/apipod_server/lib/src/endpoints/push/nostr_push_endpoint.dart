@@ -381,23 +381,25 @@ class NostrPushEndpoint extends Endpoint {
 
         _subscriptions.add(
           _relayPool!.onError.listen((relayError) async {
+            final relay = relayError.relay;
+            final error = relayError.error.toString();
+
             await _withSession(enableLogging: true, (s) async {
               s.log(
                   level: LogLevel.error,
-                  ".onError.listen, relay: ${relayError.relay}");
+                  ".onError.listen, relay: ${relay.url} error: $error");
             });
-
-            final relay = relayError.relay;
-            final error = relayError.error.toString();
 
             if (!isSupportedUrl(relay.url) ||
                 error.contains('Invalid URL') ||
                 error.contains('ECONNREFUSED') ||
                 error.contains('Invalid WebSocket frame: FIN must be set') ||
-                error.contains("The URL's protocol must be one of")) {
+                error.contains("The URL's protocol must be one of") ||
+                error.contains("to many reconnection attempts")) {
               _relayPool!.remove(relay.url);
 
               await _withSession(enableLogging: true, (s) async {
+                s.log("deleting relay: ${relay.url}");
                 await deleteRelay(s, relay.url);
               });
             }
