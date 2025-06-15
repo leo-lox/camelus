@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ndk/shared/nips/nip19/nip19.dart';
 
 import '../../../../data_layer/data_sources/serverpod_data_source.dart';
 import '../../../../domain_layer/entities/nostr_list.dart';
@@ -171,9 +172,9 @@ class EditStarterPackNotifier extends StateNotifier<StarterPackData> {
     String? shortLinkPart;
     try {
       shortLinkPart = await _serverpodProvider.client.linkShorter.shortInvite(
-        invitedByNpub: pack.pubKey,
+        invitedByNpub: Nip19.encodePubKey(pack.pubKey),
         listName: pack.name,
-        listNpub: pack.pubKey,
+        listNpub: Nip19.encodePubKey(pack.pubKey),
       );
     } catch (_) {
       //server down
