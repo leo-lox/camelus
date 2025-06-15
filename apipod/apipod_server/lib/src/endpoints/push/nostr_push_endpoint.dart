@@ -291,7 +291,8 @@ class NostrPushEndpoint extends Endpoint {
                         level: LogLevel.error,
                         'Failed: ${resp.error?.code} ${resp.error?.message} ${jsonEncode(message).length} chars');
                     if (resp.error?.code ==
-                        'messaging/registration-token-not-registered') {
+                            'messaging/registration-token-not-registered' ||
+                        resp.error?.code == 'messaging/internal-error') {
                       s.log(
                           level: LogLevel.info,
                           'Deleting Token ${tokens[idx]}');
