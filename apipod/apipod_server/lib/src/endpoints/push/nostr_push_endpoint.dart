@@ -382,7 +382,7 @@ class NostrPushEndpoint extends Endpoint {
         _subscriptions.add(
           _relayPool!.onError.listen((relayError) async {
             final relay = relayError.relay;
-            final error = relayError.error.toString();
+            final error = relayError.error;
 
             await _withSession(enableLogging: true, (s) async {
               s.log(
@@ -390,8 +390,8 @@ class NostrPushEndpoint extends Endpoint {
                   ".onError.listen, relay: ${relay.url} error: $error");
               s.log(
                 level: LogLevel.error,
-                error,
-                exception: error,
+                "${error.message}, httpStatusCode: ${error.httpStatusCode} ",
+                exception: error.message,
               );
             });
 
