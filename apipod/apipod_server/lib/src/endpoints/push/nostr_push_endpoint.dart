@@ -388,6 +388,11 @@ class NostrPushEndpoint extends Endpoint {
               s.log(
                   level: LogLevel.error,
                   ".onError.listen, relay: ${relay.url} error: $error");
+              s.log(
+                level: LogLevel.error,
+                error,
+                exception: error,
+              );
             });
 
             if (!isSupportedUrl(relay.url) ||
