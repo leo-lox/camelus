@@ -396,17 +396,24 @@ class NostrPushEndpoint extends Endpoint {
               );
             });
 
-            if (!isSupportedUrl(relay.url) ||
-                error.contains('Invalid URL') ||
-                error.contains('ECONNREFUSED') ||
-                error.contains('Invalid WebSocket frame: FIN must be set') ||
-                error.contains("The URL's protocol must be one of") ||
-                error.contains("to many reconnection attempts")) {
-              _relayPool!.remove(relay.url);
+            try {
+              if (!isSupportedUrl(relay.url) ||
+                  error.message.contains('Invalid URL') ||
+                  error.message.contains('ECONNREFUSED') ||
+                  error.message
+                      .contains('Invalid WebSocket frame: FIN must be set') ||
+                  error.message.contains("The URL's protocol must be one of") ||
+                  error.message.contains("to many reconnection attempts")) {
+                _relayPool!.remove(relay.url);
 
+                await _withSession(enableLogging: true, (s) async {
+                  s.log("deleting relay: ${relay.url}");
+                  await deleteRelay(s, relay.url);
+                });
+              }
+            } catch (e) {
               await _withSession(enableLogging: true, (s) async {
-                s.log("deleting relay: ${relay.url}");
-                await deleteRelay(s, relay.url);
+                s.log("contains err: $e");
               });
             }
           }),
