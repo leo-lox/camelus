@@ -406,6 +406,28 @@ class NostrPushEndpoint extends Endpoint {
           }),
         );
 
+        _subscriptions.add(
+          _relayPool!.onClose.listen((relayClose) async {
+            final relay = relayClose.url;
+
+            await _withSession(enableLogging: true, (s) async {
+              s.log(level: LogLevel.warning, "relay closed $relay");
+            });
+          }),
+        );
+
+        _subscriptions.add(
+          _relayPool!.onNotice.listen((relayNotice) async {
+            final relay = relayNotice.relay;
+            final msg = relayNotice.message;
+            await _withSession(enableLogging: true, (s) async {
+              s.log(
+                  level: LogLevel.warning,
+                  "relayNotice from ${relay.url}, msg: $msg");
+            });
+          }),
+        );
+
         session.log(
             level: LogLevel.info,
             'Restarted pool with ${relays.length} relays');
