@@ -8,6 +8,7 @@ import 'package:dart_firebase_admin/messaging.dart';
 import 'package:serverpod/serverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:ndk/ndk.dart' as ndk;
+import 'package:web_socket_channel/web_socket_channel.dart';
 
 import '../../config/push_config.dart';
 import '../../generated/protocol.dart';
@@ -390,7 +391,7 @@ class NostrPushEndpoint extends Endpoint {
                   ".onError.listen, relay: ${relay.url} error: $error");
               s.log(
                 level: LogLevel.error,
-                "${error.message}, httpStatusCode: ${error.httpStatusCode} ",
+                "${error.message}, httpStatusCode: ",
                 exception: error.message,
               );
             });
