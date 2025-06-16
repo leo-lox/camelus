@@ -8,7 +8,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ndk/ndk.dart';
 //import 'package:device_preview/device_preview.dart';
 //import 'data_layer/db/object_box_ndk/db_object_box.dart';
-import 'package:ndk_objectbox/ndk_objectbox.dart';
 import 'config/camelus_config.dart';
 import 'domain_layer/entities/starter_pack_identifier.dart';
 import 'lifecycle/connectivity/connectivity.dart';
@@ -78,18 +77,7 @@ Future<void> main() async {
   // Create a ProviderContainer
   final providerContainer = ProviderContainer();
 
-  final rootToken = RootIsolateToken.instance;
-  if (rootToken == null) {
-    throw StateError(
-        'Cannot get the root isolate token. This is required for plugins to work in background isolates.');
-  }
-  final dbIsolateManager = DbIsolateManager();
-  await dbIsolateManager.start();
-
-  // init ndk db
-  DbObjectBox dbCacheManager = DbObjectBox(attach: true);
-  await dbCacheManager.dbRdy;
-  final CacheManager cacheManager = dbCacheManager;
+  final CacheManager cacheManager = await getDbMainThread();
 
   providerContainer.read(dbNdkProvider.notifier).setDB(cacheManager);
 

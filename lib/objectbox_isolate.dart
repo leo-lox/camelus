@@ -1,8 +1,31 @@
 import 'dart:isolate';
 import 'dart:async';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+import 'package:ndk/ndk.dart';
 import 'package:ndk_objectbox/ndk_objectbox.dart';
+
+/// inits the db in a isolate
+Future<CacheManager> getDbWithIsolate() async {
+  final rootToken = RootIsolateToken.instance;
+  if (rootToken == null) {
+    throw StateError(
+        'Cannot get the root isolate token. This is required for plugins to work in background isolates.');
+  }
+  final dbIsolateManager = DbIsolateManager();
+  await dbIsolateManager.start();
+
+  DbObjectBox dbCacheManager = DbObjectBox(attach: true);
+  await dbCacheManager.dbRdy;
+
+  return dbCacheManager;
+}
+
+/// inits db on main thread
+Future<CacheManager> getDbMainThread() async {
+  DbObjectBox dbCacheManager = DbObjectBox(attach: false);
+  await dbCacheManager.dbRdy;
+  return dbCacheManager;
+}
 
 class DbIsolateData {
   final SendPort sendPort;
