@@ -385,15 +385,31 @@ class NostrPushEndpoint extends Endpoint {
             final relay = relayError.relay;
             final error = relayError.error;
 
+            final message = error.message;
+
             await _withSession(enableLogging: true, (s) async {
               s.log(
                   level: LogLevel.error,
                   ".onError.listen, relay: ${relay.url} error: $error");
               s.log(
                 level: LogLevel.error,
-                "${error.message}, httpStatusCode: ",
-                exception: error.message,
+                "${message}, ",
+                exception: message,
               );
+              if (message is WebSocketException) {
+                s.log(
+                  level: LogLevel.error,
+                  "${message.httpStatusCode}, ${message.message}, ",
+                  exception: message.message,
+                );
+              }
+              if (message is WebSocketChannelException) {
+                s.log(
+                  level: LogLevel.error,
+                  "myWebSocketChannelException: ${message.inner}, ${message.message}",
+                  exception: message.message,
+                );
+              }
             });
 
             try {
