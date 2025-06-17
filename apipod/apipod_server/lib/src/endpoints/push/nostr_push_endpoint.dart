@@ -414,7 +414,7 @@ class NostrPushEndpoint extends Endpoint {
 
             try {
               if (!isSupportedUrl(relay.url) ||
-                  error.message.contains('Invalid URL') ||
+                  error.contains('Failed host lookup') ||
                   error.message.contains('ECONNREFUSED') ||
                   error.message
                       .contains('Invalid WebSocket frame: FIN must be set') ||
@@ -440,7 +440,9 @@ class NostrPushEndpoint extends Endpoint {
             final relay = relayClose.url;
 
             await _withSession(enableLogging: true, (s) async {
-              s.log(level: LogLevel.warning, "relay closed $relay");
+              s.log(
+                  level: LogLevel.warning,
+                  "relay closed $relay, ${relayClose.closeReason}");
             });
           }),
         );

@@ -17,6 +17,8 @@ class Relay {
   /// Flag indicating if the connection was manually closed
   bool _manualClose = false;
 
+  String? closeReason;
+
   /// Flag indicating if reconnection is in progress
   bool _reconnecting = false;
 
@@ -55,9 +57,15 @@ class Relay {
       );
 
       await _ws!.ready;
+
+      closeReason = null;
+
       _ws!.stream.listen(
         _handleMessage,
-        onDone: _handleClose,
+        onDone: () {
+          closeReason = _ws!.closeReason;
+          _handleClose();
+        },
         onError: _handleError,
       );
 
