@@ -457,9 +457,11 @@ class NostrPushEndpoint extends Endpoint {
           }),
         );
 
-        session.log(
-            level: LogLevel.info,
-            'Restarted pool with ${relays.length} relays');
+        await _withSession(enableLogging: true, (s) async {
+          s.log(
+              level: LogLevel.info,
+              'Restarted pool with ${relays.length} relays');
+        });
       });
     } finally {
       _isInRelayPoolFunction = false;
