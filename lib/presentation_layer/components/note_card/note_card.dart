@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:camelus/domain_layer/entities/parsed_post.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -16,9 +17,10 @@ import 'bottom_action_row.dart';
 import 'bottom_sheet_more.dart';
 import 'name_row.dart';
 import 'note_card_build_split_content.dart';
+import 'post_content.dart';
 
 class NoteCard extends ConsumerWidget {
-  final NostrNote note;
+  final ParsedPost note;
   final UserMetadata? myMetadata;
   final bool hideBottomBar;
 
@@ -41,7 +43,7 @@ class NoteCard extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        if (note.sig_valid != true) _buildInvalidSignature(),
+        if (note.nostrNote.sig_valid != true) _buildInvalidSignature(),
         Padding(
           padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
           child: Row(
@@ -60,17 +62,21 @@ class NoteCard extends ConsumerWidget {
                       pubkey: note.pubkey,
                     ),
                     const SizedBox(height: 10),
-                    NoteCardSplitContent(
+                    PostContentWidget(
                       key: ValueKey("${note.id}split_content"),
-                      note: note,
-                      profileCallback: (String pubkey) => Navigator.pushNamed(
-                          context, "/nostr/profile",
-                          arguments: pubkey),
-                      hashtagCallback: (String hashtag) => Navigator.pushNamed(
-                          context, "/nostr/search",
-                          arguments: hashtag),
-                      fontSize: fontSize,
-                    ),
+                      segments: note.contentSegments,
+                    )
+                    // NoteCardSplitContent(
+                    //   key: ValueKey("${note.id}split_content"),
+                    //   note: note,
+                    //   profileCallback: (String pubkey) => Navigator.pushNamed(
+                    //       context, "/nostr/profile",
+                    //       arguments: pubkey),
+                    //   hashtagCallback: (String hashtag) => Navigator.pushNamed(
+                    //       context, "/nostr/search",
+                    //       arguments: hashtag),
+                    //   fontSize: fontSize,
+                    // ),
                   ],
                 ),
               ),
@@ -83,22 +89,29 @@ class NoteCard extends ConsumerWidget {
             child: SizedBox(
               width: MediaQuery.of(context).size.width * 0.9,
               child: BottomActionRow(
-                isLiked: ref.watch(postLikeProvider(note)).isLiked,
+                isLiked: ref.watch(postLikeProvider(note.nostrNote)).isLiked,
                 key: ValueKey("${note.id}bottom_action_row"),
                 onComment: () {
-                  _writeReply(context, note);
+                  _writeReply(context, note.nostrNote);
                 },
                 onLike: () {
-                  ref.read(postLikeProvider(note).notifier).toggleLike();
+                  ref
+                      .read(postLikeProvider(note.nostrNote).notifier)
+                      .toggleLike();
                 },
-                retweetLoading:
-                    ref.watch(postRepostProvider(note)).toggleRepostLoading,
-                isRetweeted: ref.watch(postRepostProvider(note)).isReposted,
+                retweetLoading: ref
+                    .watch(postRepostProvider(note.nostrNote))
+                    .toggleRepostLoading,
+                isRetweeted:
+                    ref.watch(postRepostProvider(note.nostrNote)).isReposted,
                 onRetweet: () {
-                  ref.read(postRepostProvider(note).notifier).toggleRepost();
+                  ref
+                      .read(postRepostProvider(note.nostrNote).notifier)
+                      .toggleRepost();
                 },
-                onShare: () => openBottomSheetShare(context, ref, note),
-                onMore: () => openBottomSheetMore(context, note),
+                onShare: () =>
+                    openBottomSheetShare(context, ref, note.nostrNote),
+                onMore: () => openBottomSheetMore(context, note.nostrNote),
               ),
             ),
           ),
@@ -117,7 +130,7 @@ class NoteCard extends ConsumerWidget {
       height: 50,
       child: Center(
         child: Text(
-          "Missing note:  ${note.getDirectReply?.recommended_relay},  ${note.getRootReply?.recommended_relay}",
+          "Missing note:  ${note.nostrNote.getDirectReply?.recommended_relay},  ${note.nostrNote.getRootReply?.recommended_relay}",
           style: const TextStyle(color: Colors.purple, fontSize: 20),
         ),
       ),

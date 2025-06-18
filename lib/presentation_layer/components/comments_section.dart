@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
 import '../../config/palette.dart';
-import '../../domain_layer/entities/nostr_note.dart';
+import '../../domain_layer/entities/parsed_post.dart';
 import 'note_card/note_card_container.dart';
 
 class FlattenedComment {
-  final NostrNote note;
+  final ParsedPost note;
   final int depth;
   final List<bool> ancestorHasSibling;
 

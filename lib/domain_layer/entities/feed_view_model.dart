@@ -1,14 +1,15 @@
 import 'nostr_note.dart';
+import 'parsed_post.dart';
 
 class FeedViewModel {
-  List<NostrNote> timelineRootNotes;
-  List<NostrNote> newRootNotes;
+  List<ParsedPost> timelineRootNotes;
+  List<ParsedPost> newRootNotes;
 
   /// if true then no more root notes are available
   bool endOfRootNotes;
 
-  List<NostrNote> timelineRootAndReplyNotes;
-  List<NostrNote> newRootAndReplyNotes;
+  List<ParsedPost> timelineRootAndReplyNotes;
+  List<ParsedPost> newRootAndReplyNotes;
 
   bool endOfRootAndReplyNotes;
 
@@ -22,10 +23,10 @@ class FeedViewModel {
   });
 
   copyWith({
-    List<NostrNote>? timelineRootNotes,
-    List<NostrNote>? newRootNotes,
-    List<NostrNote>? timelineRootAndReplyNotes,
-    List<NostrNote>? newRootAndReplyNotes,
+    List<ParsedPost>? timelineRootNotes,
+    List<ParsedPost>? newRootNotes,
+    List<ParsedPost>? timelineRootAndReplyNotes,
+    List<ParsedPost>? newRootAndReplyNotes,
     bool? endOfRootNotes,
     bool? endOfRootAndReplyNotes,
   }) {

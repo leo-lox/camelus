@@ -1150,9 +1150,11 @@ packages:
   ndk:
     dependency: "direct main"
     description:
-      path: "../ndk/packages/ndk"
-      relative: true
-    source: path
+      path: "packages/ndk"
+      ref: tmp-camelus-1-6-0
+      resolved-ref: c634f168fc746426f48efce7bbc5b48e19bf1298
+      url: "https://github.com/relaystr/ndk.git"
+    source: git
     version: "0.4.0"
   ndk_amber:
     dependency: "direct main"

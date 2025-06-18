@@ -15,6 +15,7 @@ import '../../domain_layer/entities/nostr_note.dart';
 import '../../domain_layer/entities/user_metadata.dart';
 import '../../domain_layer/usecases/search.dart';
 import '../atoms/hashtag_card.dart';
+import '../components/note_card/nostr_parser.dart';
 import '../components/note_card/note_card_container.dart';
 import '../components/person_card.dart';
 import '../components/search_bar.dart';
@@ -501,7 +502,8 @@ class _SearchPageState extends ConsumerState<SearchPage> {
           ),
         ),
         const SizedBox(height: 10),
-        ...notes.map((note) => NoteCardContainer(note: note)),
+        ...notes.map((note) =>
+            NoteCardContainer(note: NostrParser.parseEventSync(note))),
       ],
     );
   }

@@ -1,5 +1,3 @@
-import 'package:camelus/presentation_layer/providers/get_notes_provider.dart';
-import 'package:camelus/presentation_layer/providers/metadata_state_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
@@ -8,6 +6,9 @@ import '../../../config/palette.dart';
 import '../../../domain_layer/entities/nostr_note.dart';
 import '../../../domain_layer/entities/nostr_tag.dart';
 import '../../../helpers/helpers.dart';
+import '../../providers/get_notes_provider.dart';
+import '../../providers/metadata_state_provider.dart';
+import 'nostr_parser.dart';
 import 'note_card_container.dart';
 import 'skeleton_note.dart';
 
@@ -121,7 +122,7 @@ class NoteCardRepost extends ConsumerWidget {
 
             return NoteCardContainer(
               key: PageStorageKey(repostEvent.id),
-              note: snapshot.data!,
+              note: NostrParser.parseEventSync(snapshot.data!),
             );
           },
         ),

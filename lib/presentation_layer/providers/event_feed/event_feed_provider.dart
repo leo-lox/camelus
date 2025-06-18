@@ -5,6 +5,7 @@ import 'package:ndk/entities.dart' as ndk_entities;
 import 'package:rxdart/rxdart.dart';
 
 import '../../../domain_layer/entities/feed_event_view_model.dart';
+import '../../components/note_card/nostr_parser.dart';
 import 'replies_tree.dart';
 import '../../../helpers/helpers.dart';
 import '../get_notes_provider.dart';
@@ -84,8 +85,9 @@ class EventFeedState
     // Subscribes to updates for the root note.
 
     _rootNoteSub = notesP.getNote(rootNoteId).listen((rootNote) {
+      final parsedRootNote = NostrParser.parseEventSync(rootNote);
       // Updates the root note in the state.
-      state = state.copyWith(rootNote: rootNote);
+      state = state.copyWith(rootNote: parsedRootNote);
     });
 
     // Subscribes to updates for the reply notes of the root note.
@@ -100,7 +102,8 @@ class EventFeedState
         .bufferTime(const Duration(milliseconds: 700))
         .where((events) => events.isNotEmpty)
         .listen((replies) {
-      final newSet = {...state.unprocessedCommentsSet, ...replies};
+      final parsedReplies = NostrParser.parseEventsSync(replies);
+      final newSet = {...state.unprocessedCommentsSet, ...parsedReplies};
 
       state = state.copyWith(
         unprocessedCommentsSet: newSet,
@@ -138,7 +141,8 @@ class EventFeedState
         .bufferTime(const Duration(seconds: 1))
         .where((events) => events.isNotEmpty)
         .listen((replies) {
-      final newSet = {...state.unprocessedCommentsSet, ...replies};
+      final parsedReplies = NostrParser.parseEventsSync(replies);
+      final newSet = {...state.unprocessedCommentsSet, ...parsedReplies};
       state = state.copyWith(
         unprocessedCommentsSet: newSet,
         comments: RepliesTree.buildRepliesTree(

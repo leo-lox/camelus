@@ -9,6 +9,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../providers/metadata_state_provider.dart';
+import 'nostr_parser.dart';
 
 /// embed, inline post
 class NoteCardReference extends ConsumerWidget {
@@ -79,6 +80,8 @@ class NoteCardReference extends ConsumerWidget {
 
         final note = snapshot.data!;
 
+        final parsedNote = NostrParser.parseEventSync(note);
+
         return Consumer(
           builder: (context, ref, child) {
             final metadata =
@@ -100,7 +103,7 @@ class NoteCardReference extends ConsumerWidget {
                       border: Border.all(color: Palette.darkGray, width: 1.0),
                     ),
                     child: NoteCard(
-                      note: note,
+                      note: parsedNote,
                       myMetadata: metadata,
                       key: ValueKey(note.id),
                       hideBottomBar: true,

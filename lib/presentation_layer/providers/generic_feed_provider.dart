@@ -1,9 +1,12 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:rxdart/rxdart.dart';
 
 import '../../domain_layer/entities/feed_filter.dart';
 import '../../domain_layer/entities/feed_view_model.dart';
 import '../../domain_layer/entities/nostr_note.dart';
+import '../../domain_layer/entities/parsed_post.dart';
+import '../components/note_card/nostr_parser.dart';
 import 'db_app_provider.dart';
 import 'get_notes_provider.dart';
 import 'inbox_outbox_provider.dart';
@@ -87,9 +90,14 @@ class GenericFeedState
     final rootNotes = networkNotes.where((note) => note.isRoot).toList();
     final rootAndReplyNotes = networkNotes;
 
-    _addNewRootEvents(rootNotes); // Add new root events
+    final parsedRootNotes = await NostrParser.parseEvents(rootNotes);
+    final parsedRootAndReplyNotes =
+        await NostrParser.parseEvents(rootAndReplyNotes);
+
+    _addNewRootEvents(parsedRootNotes); // Add new root events
     _addNewRootAndReplyEvents(
-        rootAndReplyNotes); // Add new root and reply events
+      parsedRootAndReplyNotes,
+    ); // Add new root and reply events
   }
 
   // Fetches the cutoff time to separate old and new notes
@@ -129,9 +137,13 @@ class GenericFeedState
     final rootNotes = networkNotes.where((note) => note.isRoot).toList();
     final rootAndReplyNotes = networkNotes;
 
-    _addRootTimelineEvents(rootNotes); // Add root notes to the timeline
+    final parsedRootNotes = await NostrParser.parseEvents(rootNotes);
+    final parsedRootAndReplyNotes =
+        await NostrParser.parseEvents(rootAndReplyNotes);
+
+    _addRootTimelineEvents(parsedRootNotes); // Add root notes to the timeline
     _addRootAndReplyTimelineEvents(
-        rootAndReplyNotes); // Add root and reply notes
+        parsedRootAndReplyNotes); // Add root and reply notes
   }
 
   // Loads more notes for infinite scrolling
@@ -167,7 +179,7 @@ class GenericFeedState
   }
 
   // Helper to add root timeline events to the state
-  void _addRootTimelineEvents(List<NostrNote> events) {
+  void _addRootTimelineEvents(List<ParsedPost> events) {
     events = events.where((event) {
       return !state.timelineRootNotes.any((element) => element.id == event.id);
     }).toList();
@@ -178,14 +190,14 @@ class GenericFeedState
   }
 
   // Helper to add new root events
-  void _addNewRootEvents(List<NostrNote> events) {
+  void _addNewRootEvents(List<ParsedPost> events) {
     state = state.copyWith(
         newRootNotes: [...state.newRootNotes, ...events]
           ..sort((a, b) => b.created_at.compareTo(a.created_at)));
   }
 
   // Helper to add root and reply timeline events
-  void _addRootAndReplyTimelineEvents(List<NostrNote> events) {
+  void _addRootAndReplyTimelineEvents(List<ParsedPost> events) {
     events = events.where((event) {
       return !state.timelineRootAndReplyNotes
           .any((element) => element.id == event.id);
@@ -199,7 +211,7 @@ class GenericFeedState
   }
 
   // Helper to add new root and reply events
-  void _addNewRootAndReplyEvents(List<NostrNote> events) {
+  void _addNewRootAndReplyEvents(List<ParsedPost> events) {
     state = state.copyWith(
         newRootAndReplyNotes: [...state.newRootAndReplyNotes, ...events]
           ..sort((a, b) => b.created_at.compareTo(a.created_at)));
