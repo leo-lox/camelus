@@ -1,31 +1,58 @@
+import 'dart:ui';
+
 import 'package:cached_network_image/cached_network_image.dart';
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_link_previewer/flutter_link_previewer.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
+import '../../../config/palette.dart';
 import '../../../domain_layer/entities/parsed_post.dart';
+import '../../atoms/long_button.dart';
+import '../../providers/link_preview_state_provider.dart';
 import '../../providers/metadata_state_provider.dart';
+import '../images_tile_view.dart';
+
+final isContentRevealedProvider =
+    StateProvider.family<bool, String>((ref, postId) => false);
 
 class PostContentWidget extends ConsumerWidget {
-  final List<ContentSegment> segments;
+  final ParsedPost post;
+  final double _fontSize;
 
-  const PostContentWidget({super.key, required this.segments});
+  const PostContentWidget({
+    super.key,
+    required this.post,
+    required final double fontSize,
+  }) : _fontSize = fontSize;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final hasContentWarning = post.nostrNote.contentWarning != null;
     final widgets = <Widget>[];
     final currentTextSpans = <TextSpan>[];
 
-    for (final segment in segments) {
+    final isContentRevealed = ref.watch(isContentRevealedProvider(post.id));
+
+    for (final segment in post.contentSegments) {
       if (_isMediaType(segment.type)) {
         // Flush accumulated text spans
         if (currentTextSpans.isNotEmpty) {
           widgets.add(
             Padding(
               padding: const EdgeInsets.only(bottom: 8.0),
-              child: RichText(
-                text: TextSpan(children: [...currentTextSpans]),
+              child: SelectableText.rich(
+                TextSpan(
+                    style: TextStyle(
+                      fontSize: _fontSize,
+                      height: 1.2,
+                      wordSpacing: 1.05,
+                    ),
+                    children: [...currentTextSpans]),
               ),
             ),
           );
@@ -38,21 +65,114 @@ class PostContentWidget extends ConsumerWidget {
         // Accumulate text spans
         currentTextSpans.add(_buildTextSpan(segment, ref, context));
       }
+
+      if (segment.type == ContentType.link) {
+        widgets.add(
+          Padding(
+            padding: const EdgeInsets.only(bottom: 8.0),
+            child: InkWell(
+              onTap: () => _openLink(segment.metadata!),
+              child: Container(
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(
+                      color: Palette.darkGray,
+                    )),
+                child: LinkPreview(
+                  linkStyle: TextStyle(
+                    color: Palette.primary,
+                    fontSize: _fontSize - 2,
+                    decoration: TextDecoration.none,
+                  ),
+                  enableAnimation: true,
+                  onPreviewDataFetched: (data) {
+                    ref
+                        .read(linkPreviewProvider(segment.metadata!).notifier)
+                        .state = data;
+                  },
+                  previewData:
+                      ref.watch(linkPreviewProvider(segment.metadata!)),
+                  text: segment.metadata!,
+                  textWidget: Text(
+                    segment.content,
+                    style: TextStyle(color: Palette.primary),
+                  ),
+                  width: MediaQuery.of(context).size.width,
+                ),
+              ),
+            ),
+          ),
+        );
+      }
     }
 
     // Flush remaining text spans
     if (currentTextSpans.isNotEmpty) {
       widgets.add(
-        RichText(
-          text: TextSpan(children: currentTextSpans),
+        SelectableText.rich(
+          TextSpan(
+              style: TextStyle(
+                fontSize: _fontSize,
+                height: 1.2,
+                wordSpacing: 1.05,
+              ),
+              children: currentTextSpans),
         ),
       );
     }
+    // add images
+    if (post.imageUrls.isNotEmpty) {
+      widgets.add(ImagesTileView(images: post.imageUrls));
+    }
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: widgets,
-    );
+    return Stack(children: [
+      ImageFiltered(
+          imageFilter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+          enabled: hasContentWarning && !isContentRevealed,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: widgets,
+          )),
+      if (hasContentWarning && !isContentRevealed)
+        Center(
+          child: Container(
+            alignment: Alignment.center,
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      PhosphorIcons.warningOctagon(),
+                      color: Palette.error,
+                      size: 32,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      post.nostrNote.contentWarning!,
+                      style: const TextStyle(
+                        color: Palette.error,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                longButton(
+                    name: "show",
+                    onPressed: () {
+                      ref
+                          .read(isContentRevealedProvider(post.id).notifier)
+                          .state = true;
+                    }),
+              ],
+            ),
+          ),
+        ),
+    ]);
   }
 
   bool _isMediaType(ContentType type) {
@@ -62,6 +182,9 @@ class PostContentWidget extends ConsumerWidget {
   Widget _buildMediaWidget(ContentSegment segment) {
     switch (segment.type) {
       case ContentType.image:
+        return Container();
+
+        /// inline image could be here
         return Padding(
           padding: const EdgeInsets.symmetric(vertical: 8.0),
           child: ClipRRect(
@@ -101,20 +224,21 @@ class PostContentWidget extends ConsumerWidget {
       case ContentType.text:
         return TextSpan(
           text: segment.content,
-          style: Theme.of(context).textTheme.bodyMedium,
+          style: TextStyle(fontSize: _fontSize),
         );
 
       case ContentType.mention:
         final user =
             ref.watch(metadataStateProvider(segment.metadata!)).userMetadata;
         return TextSpan(
-          text: user?.name ?? '@loading...',
+          text: user?.name != null ? "@${user?.name}" : segment.content,
           style: TextStyle(
-            color: Colors.blue,
-            fontWeight: FontWeight.bold,
+            color: Palette.primary,
+            fontWeight: FontWeight.normal,
+            fontSize: _fontSize,
           ),
           recognizer: TapGestureRecognizer()
-            ..onTap = () => _openUserProfile(segment.metadata!),
+            ..onTap = () => _openUserProfile(context, segment.metadata!),
         );
 
       case ContentType.hashtag:
@@ -125,40 +249,33 @@ class PostContentWidget extends ConsumerWidget {
             decoration: TextDecoration.none,
           ),
           recognizer: TapGestureRecognizer()
-            ..onTap = () => _openHashtag(segment.metadata!),
+            ..onTap = () => _openHashtag(context, segment.metadata!),
         );
 
       case ContentType.link:
-        return TextSpan(
-          text: segment.content,
-          style: TextStyle(
-            color: Colors.blue,
-            decoration: TextDecoration.underline,
-          ),
-          recognizer: TapGestureRecognizer()
-            ..onTap = () => _openLink(segment.metadata!),
-        );
+        return TextSpan();
 
       default:
         return TextSpan(
           text: segment.content,
-          style: Theme.of(context).textTheme.bodyMedium,
+          style: TextStyle(fontSize: _fontSize),
         );
     }
   }
 
-  void _openUserProfile(String userId) {
-    // Navigate to user profile
-    print('Opening user profile: $userId');
+  void _openUserProfile(BuildContext context, String pubkey) {
+    Navigator.pushNamed(
+      context,
+      "/nostr/profile",
+      arguments: pubkey,
+    );
   }
 
-  void _openHashtag(String hashtag) {
-    // Navigate to hashtag feed
-    print('Opening hashtag: $hashtag');
+  void _openHashtag(BuildContext context, String hashtag) {
+    Navigator.pushNamed(context, "/nostr/search", arguments: hashtag);
   }
 
   void _openLink(String url) {
-    // Open external link
-    print('Opening link: $url');
+    launchUrlString(url, mode: LaunchMode.externalApplication);
   }
 }

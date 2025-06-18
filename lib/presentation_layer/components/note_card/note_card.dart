@@ -64,7 +64,8 @@ class NoteCard extends ConsumerWidget {
                     const SizedBox(height: 10),
                     PostContentWidget(
                       key: ValueKey("${note.id}split_content"),
-                      segments: note.contentSegments,
+                      post: note,
+                      fontSize: fontSize,
                     )
                     // NoteCardSplitContent(
                     //   key: ValueKey("${note.id}split_content"),

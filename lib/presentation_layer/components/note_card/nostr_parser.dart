@@ -2,6 +2,8 @@ import 'package:flutter/foundation.dart';
 
 import '../../../domain_layer/entities/nostr_note.dart';
 import '../../../domain_layer/entities/parsed_post.dart';
+import '../../../helpers/helpers.dart';
+import '../../../helpers/nprofile_helper.dart';
 
 class NostrParser {
   /// parses the event in a seperate thread
@@ -65,7 +67,7 @@ class NostrParser {
 
     // Regex to match different content types
     final regex = RegExp(
-      r'nostr:(nevent1\w+|npub1\w+|note1\w+)|' // Nostr references
+      r'nostr:(nevent1\w+|npub1\w+|nprofile1\w+|note1\w+)|' // Nostr references
       r'#(\w+)|' // Hashtags
       r'(https?://\S+\.(?:jpg|jpeg|png|gif|webp))|' // Images
       r'(https?://\S+\.(?:mp4|webm|mov))|' // Videos
@@ -90,9 +92,9 @@ class NostrParser {
       final matchText = match.group(0)!;
 
       // Parse different types
-      if (matchText.startsWith('nostr:npub1')) {
+      if (matchText.startsWith(RegExp(r'nostr:(nprofile|npub)[a-zA-Z0-9]+'))) {
         segments.add(ContentSegment(
-          content: '@user', // Placeholder, will be replaced by actual name
+          content: matchText,
           type: ContentType.mention,
           metadata: _extractUserIdFromNostr(matchText),
         ));
@@ -149,9 +151,16 @@ class NostrParser {
   }
 
   static String _extractUserIdFromNostr(String nostrRef) {
-    // Extract and decode the npub1... part
-    // This is simplified - you'd use actual nostr decoding
-    return nostrRef.replaceFirst('nostr:', '');
+    final encoded = nostrRef.replaceFirst('nostr:', '');
+
+    if (encoded.startsWith('nprofile')) {
+      final decoded = NprofileHelper().bech32toMap(encoded);
+      return decoded['pubkey'] ?? '';
+    } else if (encoded.startsWith('npub')) {
+      final decoded = Helpers().decodeBech32(encoded);
+      return decoded[0] ?? '';
+    }
+    return nostrRef;
   }
 
   static String _extractNoteIdFromNostr(String nostrRef) {
@@ -159,8 +168,12 @@ class NostrParser {
   }
 
   static String _shortenUrl(String url) {
-    final uri = Uri.parse(url);
-    return uri.host +
-        (uri.path.length > 20 ? '${uri.path.substring(0, 20)}...' : uri.path);
+    try {
+      final uri = Uri.parse(url);
+      return uri.host +
+          (uri.path.length > 20 ? '${uri.path.substring(0, 20)}...' : uri.path);
+    } catch (_) {
+      return url;
+    }
   }
 }

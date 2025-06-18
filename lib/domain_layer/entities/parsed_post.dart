@@ -28,6 +28,16 @@ class ParsedPost {
     required this.videoUrls,
     required this.nostrNote,
   });
+
+  @override
+  bool operator ==(Object other) {
+    return other is ParsedPost &&
+        other.id == id &&
+        other.nostrNote == nostrNote;
+  }
+
+  @override
+  int get hashCode => nostrNote.hashCode ^ id.hashCode;
 }
 
 class ContentSegment {
