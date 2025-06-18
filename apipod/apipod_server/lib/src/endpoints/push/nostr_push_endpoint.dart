@@ -414,12 +414,17 @@ class NostrPushEndpoint extends Endpoint {
 
             try {
               if (!isSupportedUrl(relay.url) ||
-                  error.contains('Failed host lookup') ||
-                  error.message.contains('ECONNREFUSED') ||
+                  error.toString().contains('Failed host lookup') ||
+                  error.message.toString().contains('ECONNREFUSED') ||
                   error.message
+                      .toString()
                       .contains('Invalid WebSocket frame: FIN must be set') ||
-                  error.message.contains("The URL's protocol must be one of") ||
-                  error.message.contains("to many reconnection attempts")) {
+                  error.message
+                      .toString()
+                      .contains("The URL's protocol must be one of") ||
+                  error.message
+                      .toString()
+                      .contains("to many reconnection attempts")) {
                 _relayPool!.remove(relay.url);
 
                 await _withSession(enableLogging: true, (s) async {

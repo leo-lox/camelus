@@ -58,7 +58,7 @@ class Relay {
 
       await _ws!.ready;
 
-      closeReason = null;
+      //closeReason = null;
 
       _ws!.stream.listen(
         _handleMessage,
