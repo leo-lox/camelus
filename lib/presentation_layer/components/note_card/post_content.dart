@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_link_previewer/flutter_link_previewer.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 import '../../../config/palette.dart';
@@ -16,6 +15,7 @@ import '../../atoms/long_button.dart';
 import '../../providers/link_preview_state_provider.dart';
 import '../../providers/metadata_state_provider.dart';
 import '../images_tile_view.dart';
+import '../inline_video_player.dart';
 
 final isContentRevealedProvider =
     StateProvider.family<bool, String>((ref, postId) => false);
@@ -208,10 +208,12 @@ class PostContentWidget extends ConsumerWidget {
 
       case ContentType.video:
         return Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8.0),
-            child: Text(
-                "VIDEO PLAYER HERE") //VideoPlayerWidget(videoUrl: segment.metadata!),
-            );
+          padding: const EdgeInsets.symmetric(vertical: 8.0),
+          child: InlineVideoPlayer(
+            initVideoLink: segment.metadata!,
+            videoId: segment.metadata!,
+          ),
+        );
 
       default:
         return const SizedBox.shrink();
