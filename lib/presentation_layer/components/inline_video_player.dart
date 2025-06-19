@@ -10,6 +10,7 @@ import 'package:shimmer/shimmer.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 
 import '../../config/palette.dart';
+import '../providers/moderation/moderation_state_provider.dart';
 import '../providers/ndk_provider.dart';
 
 class VideoState {
@@ -238,10 +239,15 @@ class InlineVideoPlayer extends ConsumerWidget {
   final String videoId;
   final String initVideoLink;
 
+  /// if no author pubkey is provided video is untrusted by default \
+  /// => no auto play
+  final String? authorPubkey;
+
   const InlineVideoPlayer({
     super.key,
     required this.videoId,
     required this.initVideoLink,
+    required this.authorPubkey,
   });
 
   @override
@@ -308,13 +314,22 @@ class InlineVideoPlayer extends ConsumerWidget {
                   final visiblePercentage =
                       visibilityInfo.visibleFraction * 100;
                   if (visiblePercentage >= 90) {
+                    if (authorPubkey == null) return;
+                    final isAuthorTrusted = ref
+                        .read(moderationStateProvider.notifier)
+                        .isPubkeyTrusted(authorPubkey!);
+                    if (!isAuthorTrusted) {
+                      return;
+                    }
+
                     videoState.player.play();
                   } else {
                     videoState.player.pause();
                   }
                 },
                 child: MaterialVideoControlsTheme(
-                  normal: const MaterialVideoControlsThemeData(
+                  normal: MaterialVideoControlsThemeData(
+                      visibleOnMount: false,
                       seekBarThumbColor: Palette.white,
                       seekBarPositionColor: Palette.white,
                       displaySeekBar: true,
@@ -338,6 +353,7 @@ class InlineVideoPlayer extends ConsumerWidget {
                         MaterialDesktopVolumeButton()
                       ]),
                   fullscreen: MaterialVideoControlsThemeData(
+                    topButtonBar: [Spacer(), MaterialDesktopVolumeButton()],
                     seekBarThumbColor: Palette.white,
                     seekBarPositionColor: Palette.white,
                     padding: EdgeInsets.all(20),
@@ -349,6 +365,11 @@ class InlineVideoPlayer extends ConsumerWidget {
                     filterQuality: FilterQuality.low,
                     controller: videoState.controller,
                     controls: MaterialVideoControls,
+                    onEnterFullscreen: () async {
+                      if (videoState.isVertical == false) {
+                        await defaultEnterNativeFullscreen();
+                      }
+                    },
                   ),
                 ),
               ),
