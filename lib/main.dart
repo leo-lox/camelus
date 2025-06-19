@@ -96,7 +96,7 @@ Future<void> main() async {
     final inboxOutboxP = providerContainer.read(inboxOutboxProvider);
     inboxOutboxP.getNip65data(
       myPubkey,
-      forceRefresh: true,
+      forceRefresh: false,
     );
   }
 
