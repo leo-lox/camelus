@@ -21,16 +21,23 @@ class VideoState {
   final String videoLink;
   final bool showControls;
   final Timer? showControlsTimer;
+  final double? videoWidth;
+  final double? videoHeight;
+  final bool? isVertical;
 
-  VideoState(
-      {required this.player,
-      required this.controller,
-      this.isInitialized = false,
-      this.isLoading = true,
-      this.isError = false,
-      this.showControls = false,
-      required this.videoLink,
-      this.showControlsTimer});
+  VideoState({
+    required this.player,
+    required this.controller,
+    this.isInitialized = false,
+    this.isLoading = true,
+    this.isError = false,
+    this.showControls = false,
+    required this.videoLink,
+    this.showControlsTimer,
+    this.videoWidth,
+    this.videoHeight,
+    this.isVertical,
+  });
 
   VideoState copyWith({
     Player? player,
@@ -41,6 +48,9 @@ class VideoState {
     bool? isError,
     bool? showControls,
     Timer? showControlsTimer,
+    double? videoWidth,
+    double? videoHeight,
+    bool? isVertical,
   }) {
     return VideoState(
       player: player ?? this.player,
@@ -51,7 +61,17 @@ class VideoState {
       isError: isError ?? this.isError,
       showControls: showControls ?? this.showControls,
       showControlsTimer: showControlsTimer ?? this.showControlsTimer,
+      videoWidth: videoWidth ?? this.videoWidth,
+      videoHeight: videoHeight ?? this.videoHeight,
+      isVertical: isVertical ?? this.isVertical,
     );
+  }
+
+  double get aspectRatio {
+    if (videoWidth != null && videoHeight != null && videoHeight! > 0) {
+      return videoWidth! / videoHeight!;
+    }
+    return 16.0 / 9.0; // Default aspect ratio
   }
 }
 
@@ -69,6 +89,7 @@ final videoPlayerProvider = StateNotifierProvider.family
 class VideoPlayerNotifier extends StateNotifier<VideoState> {
   final String videoId;
   final Ndk ndkProvider;
+  StreamSubscription<VideoParams>? _videoParamsSubscription;
 
   VideoPlayerNotifier({
     required this.videoId,
@@ -101,6 +122,31 @@ class VideoPlayerNotifier extends StateNotifier<VideoState> {
       controller: controller,
       videoLink: '',
     );
+
+    // Listen to video params to extract dimensions
+    _setupVideoParamsListener();
+  }
+
+  void _setupVideoParamsListener() {
+    _videoParamsSubscription = state.player.stream.videoParams.listen((params) {
+      if (params.w != null &&
+          params.h != null &&
+          params.w! > 0 &&
+          params.h! > 0) {
+        final width = params.w!.toDouble();
+        final height = params.h!.toDouble();
+        final isVertical = height > width;
+
+        state = state.copyWith(
+          videoWidth: width,
+          videoHeight: height,
+          isVertical: isVertical,
+        );
+
+        debugPrint(
+            'Video dimensions extracted: ${width}x${height}, isVertical: $isVertical');
+      }
+    });
   }
 
   Future<void> loadVideo(String videoLink) async {
@@ -110,8 +156,14 @@ class VideoPlayerNotifier extends StateNotifier<VideoState> {
       return;
     }
 
-    // Update state to indicate loading
-    state = state.copyWith(isLoading: true, videoLink: videoLink);
+    // Reset dimensions when loading new video
+    state = state.copyWith(
+      isLoading: true,
+      videoLink: videoLink,
+      videoWidth: null,
+      videoHeight: null,
+      isVertical: null,
+    );
 
     try {
       // Process the video link (simulated)
@@ -129,6 +181,9 @@ class VideoPlayerNotifier extends StateNotifier<VideoState> {
       await state.player.open(Media(processedLink), play: false);
       await state.player.setPlaylistMode(PlaylistMode.single);
       await state.player.setVolume(0);
+
+      // Wait a bit for video params to be available
+      await Future.delayed(Duration(milliseconds: 100));
 
       // Update state to indicate loading complete
       state = state.copyWith(
@@ -173,6 +228,7 @@ class VideoPlayerNotifier extends StateNotifier<VideoState> {
 
   @override
   void dispose() {
+    _videoParamsSubscription?.cancel();
     state.player.dispose();
     super.dispose();
   }
@@ -204,7 +260,6 @@ class InlineVideoPlayer extends ConsumerWidget {
     // Load the video when the widget is built
     ref.listen(videoPlayerProvider(videoId), (previous, next) {
       if (next.videoLink != initVideoLink) {
-        // This will run only once when the provider is first created
         ref
             .read(videoPlayerProvider(videoId).notifier)
             .loadVideo(initVideoLink);
@@ -213,7 +268,6 @@ class InlineVideoPlayer extends ConsumerWidget {
 
     // Ensure the video is loaded
     if (videoState.videoLink != initVideoLink) {
-      // This handles the case where the widget is rebuilt with a new link
       WidgetsBinding.instance.addPostFrameCallback((_) {
         ref
             .read(videoPlayerProvider(videoId).notifier)
@@ -221,14 +275,31 @@ class InlineVideoPlayer extends ConsumerWidget {
       });
     }
 
-    final videoHeight = MediaQuery.of(context).size.width * 9.0 / 16.0;
-    final videoWidth = MediaQuery.of(context).size.width;
+    final screenWidth = MediaQuery.of(context).size.width;
 
-    return GestureDetector(
-      onTap: () {},
-      child: SizedBox(
-        width: videoWidth,
-        height: videoHeight,
+    // Calculate dimensions based on stored video dimensions
+    double videoWidth, videoHeight;
+
+    if (videoState.videoWidth != null && videoState.videoHeight != null) {
+      // Use actual video dimensions
+      if (videoState.isVertical == true) {
+        // For vertical videos, make them narrower
+        videoWidth = screenWidth * 0.6;
+        videoHeight = videoWidth / videoState.aspectRatio;
+      } else {
+        // For horizontal videos, use full width
+        videoWidth = screenWidth;
+        videoHeight = videoWidth / videoState.aspectRatio;
+      }
+    } else {
+      // Fallback to default 16:9 while loading
+      videoWidth = screenWidth;
+      videoHeight = screenWidth * 9.0 / 16.0;
+    }
+
+    return Center(
+      child: GestureDetector(
+        onTap: () {},
         child: videoState.isLoading
             ? _buildShimmerLoading(videoWidth, videoHeight)
             : VisibilityDetector(
@@ -274,6 +345,9 @@ class InlineVideoPlayer extends ConsumerWidget {
                     padding: EdgeInsets.all(20),
                   ),
                   child: Video(
+                    height: videoHeight,
+                    width: videoWidth,
+                    aspectRatio: videoState.aspectRatio,
                     filterQuality: FilterQuality.low,
                     controller: videoState.controller,
                     controls: MaterialVideoControls,
@@ -286,19 +360,12 @@ class InlineVideoPlayer extends ConsumerWidget {
 
   Widget _buildShimmerLoading(double width, double height) {
     return Shimmer.fromColors(
-      baseColor: Colors.grey[300]!,
-      highlightColor: Colors.grey[100]!,
+      baseColor: Palette.extraDarkGray.withValues(alpha: 0.1),
+      highlightColor: Palette.extraDarkGray.withValues(alpha: 0.7),
       child: Container(
         width: width,
         height: height,
-        color: Colors.white,
-        child: const Center(
-          child: Icon(
-            Icons.play_circle_outline,
-            size: 50,
-            color: Colors.grey,
-          ),
-        ),
+        color: Colors.black,
       ),
     );
   }
