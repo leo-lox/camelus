@@ -1,5 +1,7 @@
 import 'package:camelus/domain_layer/entities/nostr_note.dart';
 import 'package:camelus/domain_layer/entities/nostr_tag.dart';
+import 'package:camelus/domain_layer/entities/parsed_post.dart';
+import 'package:camelus/presentation_layer/components/note_card/nostr_parser.dart';
 import 'package:camelus/presentation_layer/providers/event_feed/replies_tree.dart';
 import 'package:test/test.dart';
 
@@ -104,14 +106,16 @@ void main() {
     );
 
     // Create a list of all notes
-    final List<NostrNote> allValidReplies = [
-      reply1,
-      reply2,
-      nestedReply1,
-      nestedReply2,
-      nestedNestedReply1,
-      nestedNestedReply2,
-      notFoundReply,
+    final List<ParsedPost> allValidReplies = [
+      ...NostrParser.parseEventsSync([
+        reply1,
+        reply2,
+        nestedReply1,
+        nestedReply2,
+        nestedNestedReply1,
+        nestedNestedReply2,
+        notFoundReply,
+      ])
     ];
 
     test('test building tree', () {
