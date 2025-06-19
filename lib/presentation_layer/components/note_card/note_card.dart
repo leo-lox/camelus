@@ -16,7 +16,6 @@ import '../write_post.dart';
 import 'bottom_action_row.dart';
 import 'bottom_sheet_more.dart';
 import 'name_row.dart';
-import 'note_card_build_split_content.dart';
 import 'post_content.dart';
 
 class NoteCard extends ConsumerWidget {
