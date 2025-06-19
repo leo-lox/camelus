@@ -67,17 +67,6 @@ class NoteCard extends ConsumerWidget {
                       post: note,
                       fontSize: fontSize,
                     )
-                    // NoteCardSplitContent(
-                    //   key: ValueKey("${note.id}split_content"),
-                    //   note: note,
-                    //   profileCallback: (String pubkey) => Navigator.pushNamed(
-                    //       context, "/nostr/profile",
-                    //       arguments: pubkey),
-                    //   hashtagCallback: (String hashtag) => Navigator.pushNamed(
-                    //       context, "/nostr/search",
-                    //       arguments: hashtag),
-                    //   fontSize: fontSize,
-                    // ),
                   ],
                 ),
               ),

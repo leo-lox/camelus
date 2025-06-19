@@ -16,6 +16,7 @@ import '../../providers/link_preview_state_provider.dart';
 import '../../providers/metadata_state_provider.dart';
 import '../images_tile_view.dart';
 import '../inline_video_player.dart';
+import 'note_card_reference.dart';
 
 final isContentRevealedProvider =
     StateProvider.family<bool, String>((ref, postId) => false);
@@ -45,8 +46,8 @@ class PostContentWidget extends ConsumerWidget {
           widgets.add(
             Padding(
               padding: const EdgeInsets.only(bottom: 8.0),
-              child: SelectableText.rich(
-                TextSpan(
+              child: RichText(
+                text: TextSpan(
                     style: TextStyle(
                       fontSize: _fontSize,
                       height: 1.2,
@@ -104,13 +105,18 @@ class PostContentWidget extends ConsumerWidget {
           ),
         );
       }
+
+      if (segment.type == ContentType.noteReference) {
+        widgets.add(NoteCardReference(
+            key: ValueKey(segment.metadata), word: segment.metadata!));
+      }
     }
 
     // Flush remaining text spans
     if (currentTextSpans.isNotEmpty) {
       widgets.add(
-        SelectableText.rich(
-          TextSpan(
+        RichText(
+          text: TextSpan(
               style: TextStyle(
                 fontSize: _fontSize,
                 height: 1.2,
@@ -255,6 +261,9 @@ class PostContentWidget extends ConsumerWidget {
         );
 
       case ContentType.link:
+        return TextSpan();
+
+      case ContentType.noteReference:
         return TextSpan();
 
       default:

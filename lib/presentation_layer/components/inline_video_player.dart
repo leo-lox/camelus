@@ -307,8 +307,6 @@ class InlineVideoPlayer extends ConsumerWidget {
                 onVisibilityChanged: (visibilityInfo) {
                   final visiblePercentage =
                       visibilityInfo.visibleFraction * 100;
-                  debugPrint(
-                      'Widget ${visibilityInfo.key} is ${visiblePercentage}% visible');
                   if (visiblePercentage >= 90) {
                     videoState.player.play();
                   } else {
