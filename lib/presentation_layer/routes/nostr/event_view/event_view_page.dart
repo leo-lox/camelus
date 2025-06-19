@@ -8,8 +8,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_list_view/flutter_list_view.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../domain_layer/entities/parsed_post.dart';
 import '../../../../domain_layer/entities/tree_node.dart';
 import '../../../components/comments_section.dart';
+import '../../../components/note_card/nostr_parser.dart';
 import '../../../providers/event_feed/event_feed_provider.dart';
 
 class EventViewPage extends ConsumerStatefulWidget {
@@ -90,11 +92,11 @@ class EventViewPageState extends ConsumerState<EventViewPage> {
 
   // Flatten the comment tree into a list with depth information
   List<FlattenedComment> _flattenCommentTree(
-      List<TreeNode<NostrNote>> comments) {
+      List<TreeNode<ParsedPost>> comments) {
     List<FlattenedComment> result = [];
 
     // Sort direct replies to root by creation time (oldest first)
-    final sortedComments = List<TreeNode<NostrNote>>.from(comments)
+    final sortedComments = List<TreeNode<ParsedPost>>.from(comments)
       ..sort((a, b) => a.value.created_at.compareTo(b.value.created_at));
 
     // Process each top-level comment
@@ -118,13 +120,13 @@ class EventViewPageState extends ConsumerState<EventViewPage> {
 
   // Helper method to recursively flatten child comments
   List<FlattenedComment> _flattenChildComments(
-      List<TreeNode<NostrNote>> children,
+      List<TreeNode<ParsedPost>> children,
       int depth,
       List<bool> ancestorHasSibling) {
     List<FlattenedComment> result = [];
 
     // Sort child comments by creation time (older first)
-    final sortedChildren = List<TreeNode<NostrNote>>.from(children)
+    final sortedChildren = List<TreeNode<ParsedPost>>.from(children)
       ..sort((a, b) => a.value.created_at.compareTo(b.value.created_at));
 
     for (var i = 0; i < sortedChildren.length; i++) {

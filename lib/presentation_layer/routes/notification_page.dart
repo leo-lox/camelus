@@ -15,6 +15,7 @@ import '../../config/palette.dart';
 
 import '../components/enable_notifications.dart';
 import '../components/note_card/no_more_notes.dart';
+import '../components/note_card/nostr_parser.dart';
 import '../providers/notification_feed_provider.dart';
 
 class NotificationPage extends ConsumerStatefulWidget {
@@ -311,6 +312,9 @@ class _NotificationPageState extends ConsumerState<NotificationPage>
   // Build the content preview based on notification type
   Widget _buildNotificationContent(
       NostrNotification notification, WidgetRef ref) {
+    final parsedSourceNote =
+        NostrParser.parseEventSync(notification.sourceNote);
+
     switch (notification.type) {
       case NotificationType.reaction:
         //return Container();
@@ -319,7 +323,7 @@ class _NotificationPageState extends ConsumerState<NotificationPage>
         final mentionUser =
             ref.watch(metadataStateProvider(notification.sourceNote.pubkey));
         return NoteCard(
-          note: notification.sourceNote,
+          note: parsedSourceNote,
           myMetadata: mentionUser.userMetadata,
           hideBottomBar: true,
         );
@@ -328,7 +332,7 @@ class _NotificationPageState extends ConsumerState<NotificationPage>
         final mentionUser =
             ref.watch(metadataStateProvider(notification.sourceNote.pubkey));
         return NoteCard(
-          note: notification.sourceNote,
+          note: parsedSourceNote,
           myMetadata: mentionUser.userMetadata,
           hideBottomBar: true,
         );
@@ -339,7 +343,7 @@ class _NotificationPageState extends ConsumerState<NotificationPage>
         final mentionUser =
             ref.watch(metadataStateProvider(notification.sourceNote.pubkey));
         return NoteCard(
-          note: notification.sourceNote,
+          note: parsedSourceNote,
           myMetadata: mentionUser.userMetadata,
           hideBottomBar: true,
         );
@@ -359,7 +363,7 @@ class _NotificationPageState extends ConsumerState<NotificationPage>
               final noteUserMetadata =
                   ref.watch(metadataStateProvider(data.data!.pubkey));
               return NoteCard(
-                note: data.data!,
+                note: NostrParser.parseEventSync(data.data!),
                 myMetadata: noteUserMetadata.userMetadata,
                 hideBottomBar: true,
               );

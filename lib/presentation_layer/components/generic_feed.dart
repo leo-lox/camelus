@@ -251,7 +251,7 @@ class ScrollablePostsList extends ConsumerWidget {
         } else if (note.kind == 6) {
           return NoteCardRepost(
             key: PageStorageKey(note.id),
-            repostEvent: note,
+            repostEvent: note.nostrNote,
           );
         }
         return Container();
@@ -301,7 +301,7 @@ class ScrollablePostsAndRepliesList extends ConsumerWidget {
         } else if (note.kind == 6) {
           return NoteCardRepost(
             key: PageStorageKey(note.id),
-            repostEvent: note,
+            repostEvent: note.nostrNote,
           );
         }
         return Container();

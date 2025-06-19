@@ -3,12 +3,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../domain_layer/entities/nostr_note.dart';
 import '../../../domain_layer/entities/nostr_tag.dart';
+import '../../../domain_layer/entities/parsed_post.dart';
 import '../../providers/metadata_state_provider.dart';
 import 'in_reply_to.dart';
 import 'note_card.dart';
 
 class NoteCardContainer extends ConsumerWidget {
-  final NostrNote note;
+  final ParsedPost note;
   final double? fontSize;
 
   const NoteCardContainer({
@@ -17,16 +18,16 @@ class NoteCardContainer extends ConsumerWidget {
     this.fontSize,
   });
 
-  static void _onNoteTab(BuildContext context, NostrNote myNote) {
-    var refEvents = myNote.getTagEvents;
+  static void _onNoteTab(BuildContext context, ParsedPost myNote) {
+    var refEvents = myNote.nostrNote.getTagEvents;
 
-    if (myNote.isRoot) {
+    if (myNote.nostrNote.isRoot) {
       _navigateToEventViewPage(context, myNote.id, null);
       return;
     }
 
-    NostrTag? root = myNote.getRootReply;
-    NostrTag? reply = myNote.getDirectReply;
+    NostrTag? root = myNote.nostrNote.getRootReply;
+    NostrTag? reply = myNote.nostrNote.getDirectReply;
 
     // off spec support, sometimes not marked as root
     root ??= refEvents.first;
@@ -56,12 +57,12 @@ class NoteCardContainer extends ConsumerWidget {
         color: Colors.transparent,
         child: Column(
           children: [
-            if (note.getTagEvents.isNotEmpty)
+            if (note.nostrNote.getTagEvents.isNotEmpty)
               Padding(
                 padding: const EdgeInsets.only(left: 15.0),
                 child: InReplyTo(
                   key: ValueKey('in-reply-to-${note.id}'),
-                  myNote: note,
+                  myNote: note.nostrNote,
                 ),
               ),
             NoteCard(
