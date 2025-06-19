@@ -1,12 +1,16 @@
-import 'package:camelus/presentation_layer/providers/ndk_provider.dart';
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
 import 'package:ndk/ndk.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:visibility_detector/visibility_detector.dart';
 
 import '../../config/palette.dart';
+import '../providers/ndk_provider.dart';
 
 class VideoState {
   final Player player;
@@ -15,15 +19,18 @@ class VideoState {
   final bool isLoading;
   final bool isError;
   final String videoLink;
+  final bool showControls;
+  final Timer? showControlsTimer;
 
-  VideoState({
-    required this.player,
-    required this.controller,
-    this.isInitialized = false,
-    this.isLoading = true,
-    this.isError = false,
-    required this.videoLink,
-  });
+  VideoState(
+      {required this.player,
+      required this.controller,
+      this.isInitialized = false,
+      this.isLoading = true,
+      this.isError = false,
+      this.showControls = false,
+      required this.videoLink,
+      this.showControlsTimer});
 
   VideoState copyWith({
     Player? player,
@@ -32,6 +39,8 @@ class VideoState {
     bool? isLoading,
     String? videoLink,
     bool? isError,
+    bool? showControls,
+    Timer? showControlsTimer,
   }) {
     return VideoState(
       player: player ?? this.player,
@@ -40,6 +49,8 @@ class VideoState {
       isLoading: isLoading ?? this.isLoading,
       videoLink: videoLink ?? this.videoLink,
       isError: isError ?? this.isError,
+      showControls: showControls ?? this.showControls,
+      showControlsTimer: showControlsTimer ?? this.showControlsTimer,
     );
   }
 }
@@ -115,8 +126,9 @@ class VideoPlayerNotifier extends StateNotifier<VideoState> {
       }
 
       // Load the video
-      await state.player.open(Media(processedLink));
-      state.player.setPlaylistMode(PlaylistMode.single);
+      await state.player.open(Media(processedLink), play: false);
+      await state.player.setPlaylistMode(PlaylistMode.single);
+      await state.player.setVolume(0);
 
       // Update state to indicate loading complete
       state = state.copyWith(
@@ -127,6 +139,27 @@ class VideoPlayerNotifier extends StateNotifier<VideoState> {
       debugPrint('Error loading video $videoId: $e');
       state = state.copyWith(isLoading: false);
     }
+  }
+
+  void setControlsState(bool showControls, {Timer? newTimer}) {
+    state =
+        state.copyWith(showControls: showControls, showControlsTimer: newTimer);
+  }
+
+  void setControlsTimer(Timer? timer) {
+    state = state.copyWith(showControlsTimer: timer);
+  }
+
+  void newTimer() {
+    state.showControlsTimer?.cancel();
+
+    state = state.copyWith(
+        showControlsTimer: Timer(
+      Duration(seconds: 1),
+      () {
+        state = state.copyWith(showControls: false);
+      },
+    ));
   }
 
   Future<String?> _processVideoLink(String initialLink) async {
@@ -192,17 +225,60 @@ class InlineVideoPlayer extends ConsumerWidget {
     final videoWidth = MediaQuery.of(context).size.width;
 
     return GestureDetector(
-      behavior: HitTestBehavior.opaque,
       onTap: () {},
       child: SizedBox(
         width: videoWidth,
         height: videoHeight,
         child: videoState.isLoading
             ? _buildShimmerLoading(videoWidth, videoHeight)
-            : Video(
-                filterQuality: FilterQuality.low,
-                controller: videoState.controller,
-                controls: MaterialVideoControls,
+            : VisibilityDetector(
+                key: Key('video-$videoId'),
+                onVisibilityChanged: (visibilityInfo) {
+                  final visiblePercentage =
+                      visibilityInfo.visibleFraction * 100;
+                  debugPrint(
+                      'Widget ${visibilityInfo.key} is ${visiblePercentage}% visible');
+                  if (visiblePercentage >= 90) {
+                    videoState.player.play();
+                  } else {
+                    videoState.player.pause();
+                  }
+                },
+                child: MaterialVideoControlsTheme(
+                  normal: const MaterialVideoControlsThemeData(
+                      seekBarThumbColor: Palette.white,
+                      seekBarPositionColor: Palette.white,
+                      displaySeekBar: true,
+                      speedUpOnLongPress: true,
+                      padding: EdgeInsets.all(20),
+                      shiftSubtitlesOnControlsVisibilityChange: true,
+                      primaryButtonBar: [
+                        Spacer(),
+                        MaterialPlayOrPauseButton(
+                          iconSize: 48,
+                        ),
+                        Spacer(),
+                      ],
+                      bottomButtonBar: [
+                        MaterialPositionIndicator(),
+                        Spacer(),
+                        MaterialFullscreenButton()
+                      ],
+                      topButtonBar: [
+                        Spacer(),
+                        MaterialDesktopVolumeButton()
+                      ]),
+                  fullscreen: MaterialVideoControlsThemeData(
+                    seekBarThumbColor: Palette.white,
+                    seekBarPositionColor: Palette.white,
+                    padding: EdgeInsets.all(20),
+                  ),
+                  child: Video(
+                    filterQuality: FilterQuality.low,
+                    controller: videoState.controller,
+                    controls: MaterialVideoControls,
+                  ),
+                ),
               ),
       ),
     );
