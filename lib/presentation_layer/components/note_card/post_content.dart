@@ -107,8 +107,13 @@ class PostContentWidget extends ConsumerWidget {
       }
 
       if (segment.type == ContentType.noteReference) {
-        widgets.add(NoteCardReference(
-            key: ValueKey(segment.metadata), word: segment.metadata!));
+        widgets.add(Padding(
+          padding: EdgeInsetsGeometry.only(bottom: 8),
+          child: NoteCardReference(
+            key: ValueKey(segment.metadata),
+            word: segment.metadata!,
+          ),
+        ));
       }
     }
 
@@ -117,12 +122,13 @@ class PostContentWidget extends ConsumerWidget {
       widgets.add(
         RichText(
           text: TextSpan(
-              style: TextStyle(
-                fontSize: _fontSize,
-                height: 1.2,
-                wordSpacing: 1.05,
-              ),
-              children: currentTextSpans),
+            style: TextStyle(
+              fontSize: _fontSize,
+              height: 1.2,
+              wordSpacing: 1.05,
+            ),
+            children: currentTextSpans,
+          ),
         ),
       );
     }
