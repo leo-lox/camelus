@@ -353,6 +353,7 @@ class InlineVideoPlayer extends ConsumerWidget {
                         MaterialDesktopVolumeButton()
                       ]),
                   fullscreen: MaterialVideoControlsThemeData(
+                    topButtonBar: [Spacer(), MaterialDesktopVolumeButton()],
                     seekBarThumbColor: Palette.white,
                     seekBarPositionColor: Palette.white,
                     padding: EdgeInsets.all(20),
@@ -364,6 +365,11 @@ class InlineVideoPlayer extends ConsumerWidget {
                     filterQuality: FilterQuality.low,
                     controller: videoState.controller,
                     controls: MaterialVideoControls,
+                    onEnterFullscreen: () async {
+                      if (videoState.isVertical == false) {
+                        await defaultEnterNativeFullscreen();
+                      }
+                    },
                   ),
                 ),
               ),
