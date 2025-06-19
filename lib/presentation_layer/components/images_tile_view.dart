@@ -23,9 +23,17 @@ class ImagesTileView extends StatelessWidget {
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        double aspectRatio = imageCount > 1 ? 1 : 16 / 9;
-        double widgetHeight = constraints.maxWidth / aspectRatio;
+        if (imageCount == 1) {
+          return ClipRRect(
+            borderRadius: BorderRadius.circular(10),
+            child:
+                _buildSingleImageWithAspectRatio(context, constraints.maxWidth),
+          );
+        }
 
+        // For multiple images, use the existing logic
+        double aspectRatio = 1;
+        double widgetHeight = constraints.maxWidth / aspectRatio;
         widgetHeight = widgetHeight > maxHeight ? maxHeight : widgetHeight;
 
         return ClipRRect(
@@ -39,12 +47,39 @@ class ImagesTileView extends StatelessWidget {
     );
   }
 
+  Widget _buildSingleImageWithAspectRatio(
+      BuildContext context, double maxWidth) {
+    return CachedNetworkImage(
+      imageUrl: images[0],
+      imageBuilder: (context, imageProvider) {
+        return GestureDetector(
+          onTap: () => _openGallery(context, 0),
+          child: Hero(
+            tag: 'image-${images[0]}-$_tileViewId',
+            child: Image(
+              image: imageProvider,
+              fit: BoxFit.cover,
+              width: maxWidth,
+              // height: maxHeight,
+            ),
+          ),
+        );
+      },
+      placeholder: (context, url) => SizedBox(
+        width: maxWidth,
+        height: maxHeight,
+        child: _imageLoading(),
+      ),
+      errorWidget: (context, url, error) => SizedBox(
+        width: maxWidth,
+        height: maxHeight,
+        child: const Icon(Icons.error),
+      ),
+    );
+  }
+
   Widget _buildImageGrid(
       int imageCount, double maxWidth, BuildContext context) {
-    if (imageCount == 1) {
-      return _buildImageTile(0, 0, context);
-    }
-
     return Column(
       children: [
         Expanded(
