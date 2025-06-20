@@ -14,7 +14,7 @@ import '../../atoms/long_button.dart';
 import '../../providers/link_preview_state_provider.dart';
 import '../../providers/metadata_state_provider.dart';
 import '../images_tile_view.dart';
-import '../video/inline_video_player2.dart';
+import '../video/inline_video_player.dart';
 import 'note_card_reference.dart';
 
 final isContentRevealedProvider =
@@ -218,7 +218,7 @@ class PostContentWidget extends ConsumerWidget {
         );
 
       case ContentType.video:
-        return InlineVideoPlayer2(
+        return InlineVideoPlayer(
           videoId: segment.metadata!,
           initVideoLink: segment.metadata!,
           authorPubkey: post.pubkey,

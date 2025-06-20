@@ -11,7 +11,7 @@ import '../../providers/moderation/moderation_state_provider.dart';
 import 'fullscreen_video_player.dart';
 import 'video_player_state_provider.dart';
 
-class InlineVideoPlayer2 extends ConsumerWidget {
+class InlineVideoPlayer extends ConsumerWidget {
   final String videoId;
   final String initVideoLink;
 
@@ -19,7 +19,7 @@ class InlineVideoPlayer2 extends ConsumerWidget {
   /// => no auto play
   final String? authorPubkey;
 
-  const InlineVideoPlayer2({
+  const InlineVideoPlayer({
     super.key,
     required this.videoId,
     required this.initVideoLink,
