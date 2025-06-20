@@ -1,13 +1,12 @@
 import 'dart:ui';
 
-import 'package:cached_network_image/cached_network_image.dart';
-
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_link_previewer/flutter_link_previewer.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:url_launcher/url_launcher_string.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 import '../../../config/palette.dart';
 import '../../../domain_layer/entities/parsed_post.dart';
@@ -223,10 +222,6 @@ class PostContentWidget extends ConsumerWidget {
           videoId: segment.metadata!,
           initVideoLink: segment.metadata!,
           authorPubkey: post.pubkey,
-        );
-        return Text(
-          "video player",
-          style: TextStyle(color: Palette.purple),
         );
 
       default:
