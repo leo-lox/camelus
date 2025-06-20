@@ -15,7 +15,7 @@ import '../../atoms/long_button.dart';
 import '../../providers/link_preview_state_provider.dart';
 import '../../providers/metadata_state_provider.dart';
 import '../images_tile_view.dart';
-import '../inline_video_player.dart';
+import '../video/inline_video_player2.dart';
 import 'note_card_reference.dart';
 
 final isContentRevealedProvider =
@@ -219,13 +219,14 @@ class PostContentWidget extends ConsumerWidget {
         );
 
       case ContentType.video:
-        return Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8.0),
-          child: InlineVideoPlayer(
-            initVideoLink: segment.metadata!,
-            videoId: segment.metadata!,
-            authorPubkey: post.pubkey,
-          ),
+        return InlineVideoPlayer2(
+          videoId: segment.metadata!,
+          initVideoLink: segment.metadata!,
+          authorPubkey: post.pubkey,
+        );
+        return Text(
+          "video player",
+          style: TextStyle(color: Palette.purple),
         );
 
       default:
