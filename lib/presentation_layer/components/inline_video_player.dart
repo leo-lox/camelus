@@ -13,6 +13,23 @@ import '../../config/palette.dart';
 import '../providers/moderation/moderation_state_provider.dart';
 import '../providers/ndk_provider.dart';
 
+// pool to reuse players
+final videoPlayerPoolProvider = Provider<List<Player>>((ref) {
+  final pool = List.generate(3, (_) => Player());
+
+  // dispose  when provider is disposed
+  ref.onDispose(() {
+    for (final player in pool) {
+      player.dispose();
+    }
+  });
+
+  return pool;
+});
+
+// Track currently visible videos
+final visibleVideosProvider = StateProvider<Set<String>>((ref) => {});
+
 class VideoState {
   final Player player;
   final VideoController controller;
@@ -25,6 +42,7 @@ class VideoState {
   final double? videoWidth;
   final double? videoHeight;
   final bool? isVertical;
+  final bool isVisible;
 
   VideoState({
     required this.player,
@@ -38,6 +56,7 @@ class VideoState {
     this.videoWidth,
     this.videoHeight,
     this.isVertical,
+    this.isVisible = false,
   });
 
   VideoState copyWith({
@@ -52,6 +71,7 @@ class VideoState {
     double? videoWidth,
     double? videoHeight,
     bool? isVertical,
+    bool? isVisible,
   }) {
     return VideoState(
       player: player ?? this.player,
@@ -65,6 +85,7 @@ class VideoState {
       videoWidth: videoWidth ?? this.videoWidth,
       videoHeight: videoHeight ?? this.videoHeight,
       isVertical: isVertical ?? this.isVertical,
+      isVisible: isVisible ?? this.isVisible,
     );
   }
 
@@ -76,30 +97,95 @@ class VideoState {
   }
 }
 
+// singleton manager to track which players are in use
+final videoPlayerManagerProvider = Provider<_VideoPlayerManager>((ref) {
+  return _VideoPlayerManager();
+});
+
+class _VideoPlayerManager {
+  final Map<String, Player> _assignedPlayers = {};
+  final Set<Player> _availablePlayers = {};
+
+  void registerPlayer(Player player) {
+    _availablePlayers.add(player);
+  }
+
+  Player? getAssignedPlayer(String videoId) {
+    return _assignedPlayers[videoId];
+  }
+
+  Player assignPlayerToVideo(String videoId) {
+    // if already assigned, return that player
+    if (_assignedPlayers.containsKey(videoId)) {
+      return _assignedPlayers[videoId]!;
+    }
+
+    // get an available player or reuse the least recently used one
+    Player player;
+    if (_availablePlayers.isNotEmpty) {
+      player = _availablePlayers.first;
+      _availablePlayers.remove(player);
+    } else {
+      final reusedVideoId = _assignedPlayers.keys.first;
+      player = _assignedPlayers[reusedVideoId]!;
+      _assignedPlayers.remove(reusedVideoId);
+    }
+
+    _assignedPlayers[videoId] = player;
+    return player;
+  }
+
+  void releasePlayer(String videoId) {
+    final player = _assignedPlayers.remove(videoId);
+    if (player != null) {
+      _availablePlayers.add(player);
+    }
+  }
+}
+
 final videoPlayerProvider = StateNotifierProvider.family
     .autoDispose<VideoPlayerNotifier, VideoState, String>(
   (ref, videoId) {
     final ndkP = ref.read(ndkProvider);
-    return VideoPlayerNotifier(
+    final playerPool = ref.read(videoPlayerPoolProvider);
+    final playerManager = ref.read(videoPlayerManagerProvider);
+
+    // register all players in the pool
+    for (final player in playerPool) {
+      playerManager.registerPlayer(player);
+    }
+
+    // create the notifier with a player from the pool
+    final notifier = VideoPlayerNotifier(
       videoId: videoId,
       ndkProvider: ndkP,
+      ref: ref,
     );
+
+    // release the player when this provider is disposed
+    ref.onDispose(() {
+      notifier.releaseResources();
+    });
+
+    return notifier;
   },
 );
 
 class VideoPlayerNotifier extends StateNotifier<VideoState> {
   final String videoId;
   final Ndk ndkProvider;
+  final Ref ref;
   StreamSubscription<VideoParams>? _videoParamsSubscription;
 
   VideoPlayerNotifier({
     required this.videoId,
     required this.ndkProvider,
+    required this.ref,
   }) : super(
           VideoState(
-            player: Player(),
+            player: Player(), // Temporary player, will be replaced
             controller: VideoController(
-              Player(),
+              Player(), // Temporary player, will be replaced
               configuration: const VideoControllerConfiguration(
                 enableHardwareAcceleration: true,
                 width: 360,
@@ -108,8 +194,14 @@ class VideoPlayerNotifier extends StateNotifier<VideoState> {
             videoLink: '',
           ),
         ) {
-    // Initialize the controller in the constructor
-    final player = Player();
+    _initializeWithPooledPlayer();
+  }
+
+  void _initializeWithPooledPlayer() {
+    final playerManager = ref.read(videoPlayerManagerProvider);
+    final player = playerManager.assignPlayerToVideo(videoId);
+
+    // Create controller with the assigned player
     final controller = VideoController(
       player,
       configuration: const VideoControllerConfiguration(
@@ -129,6 +221,7 @@ class VideoPlayerNotifier extends StateNotifier<VideoState> {
   }
 
   void _setupVideoParamsListener() {
+    _videoParamsSubscription?.cancel();
     _videoParamsSubscription = state.player.stream.videoParams.listen((params) {
       if (params.w != null &&
           params.h != null &&
@@ -143,9 +236,6 @@ class VideoPlayerNotifier extends StateNotifier<VideoState> {
           videoHeight: height,
           isVertical: isVertical,
         );
-
-        debugPrint(
-            'Video dimensions extracted: ${width}x${height}, isVertical: $isVertical');
       }
     });
   }
@@ -167,7 +257,10 @@ class VideoPlayerNotifier extends StateNotifier<VideoState> {
     );
 
     try {
-      // Process the video link (simulated)
+      // Stop current video before loading new one
+      await state.player.stop();
+
+      // Process the video link
       final processedLink = await _processVideoLink(videoLink);
 
       if (processedLink == null) {
@@ -193,8 +286,24 @@ class VideoPlayerNotifier extends StateNotifier<VideoState> {
       );
     } catch (e) {
       debugPrint('Error loading video $videoId: $e');
-      state = state.copyWith(isLoading: false);
+      state = state.copyWith(isLoading: false, isError: true);
     }
+  }
+
+  void setVisibility(bool isVisible) {
+    final visibleVideos = ref.read(visibleVideosProvider);
+
+    if (isVisible) {
+      ref.read(visibleVideosProvider.notifier).state = {
+        ...visibleVideos,
+        videoId
+      };
+    } else {
+      visibleVideos.remove(videoId);
+      ref.read(visibleVideosProvider.notifier).state = {...visibleVideos};
+    }
+
+    state = state.copyWith(isVisible: isVisible);
   }
 
   void setControlsState(bool showControls, {Timer? newTimer}) {
@@ -227,10 +336,20 @@ class VideoPlayerNotifier extends StateNotifier<VideoState> {
     }
   }
 
+  void releaseResources() {
+    _videoParamsSubscription?.cancel();
+
+    // stop playback
+    state.player.pause();
+
+    // release the player back to the pool
+    final playerManager = ref.read(videoPlayerManagerProvider);
+    playerManager.releasePlayer(videoId);
+  }
+
   @override
   void dispose() {
-    _videoParamsSubscription?.cancel();
-    state.player.dispose();
+    releaseResources();
     super.dispose();
   }
 }
@@ -263,7 +382,7 @@ class InlineVideoPlayer extends ConsumerWidget {
       );
     }
 
-    // Load the video when the widget is built
+    // load the video when the widget is built
     ref.listen(videoPlayerProvider(videoId), (previous, next) {
       if (next.videoLink != initVideoLink) {
         ref
@@ -272,7 +391,7 @@ class InlineVideoPlayer extends ConsumerWidget {
       }
     });
 
-    // Ensure the video is loaded
+    // ensure the video is loaded
     if (videoState.videoLink != initVideoLink) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         ref
@@ -283,7 +402,7 @@ class InlineVideoPlayer extends ConsumerWidget {
 
     final screenWidth = MediaQuery.of(context).size.width;
 
-    // Calculate dimensions based on stored video dimensions
+    // calculate dimensions based on stored video dimensions
     double videoWidth, videoHeight;
 
     if (videoState.videoWidth != null && videoState.videoHeight != null) {
@@ -313,6 +432,12 @@ class InlineVideoPlayer extends ConsumerWidget {
                 onVisibilityChanged: (visibilityInfo) {
                   final visiblePercentage =
                       visibilityInfo.visibleFraction * 100;
+
+                  // update visibility state
+                  ref
+                      .read(videoPlayerProvider(videoId).notifier)
+                      .setVisibility(visiblePercentage >= 50);
+
                   if (visiblePercentage >= 90) {
                     if (authorPubkey == null) return;
                     final isAuthorTrusted = ref
