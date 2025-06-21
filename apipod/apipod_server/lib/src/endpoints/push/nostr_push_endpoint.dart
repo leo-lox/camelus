@@ -34,6 +34,8 @@ class NostrPushEndpoint extends Endpoint {
 
   List<StreamSubscription> _subscriptions = [];
 
+  Timer? relayPoolRestartTimer;
+
   @override
   void initialize(Server server, String name, String? moduleName) {
     super.initialize(server, name, moduleName);
@@ -319,6 +321,12 @@ class NostrPushEndpoint extends Endpoint {
     if (_isInRelayPoolFunction) return;
     _isInRelayPoolFunction = true;
 
+    /// restart pool in 4 hours
+    relayPoolRestartTimer?.cancel();
+    relayPoolRestartTimer = Timer(Duration(hours: 4), () {
+      _restartRelayPool();
+    });
+
     for (final sub in _subscriptions) {
       await sub.cancel();
     }
@@ -393,7 +401,7 @@ class NostrPushEndpoint extends Endpoint {
                   ".onError.listen, relay: ${relay.url} error: $error");
               s.log(
                 level: LogLevel.error,
-                "${message}, ",
+                "${message}",
                 exception: message,
               );
               if (message is WebSocketException) {
