@@ -401,7 +401,7 @@ class NostrPushEndpoint extends Endpoint {
                   ".onError.listen, relay: ${relay.url} error: $error");
               s.log(
                 level: LogLevel.error,
-                "${message}",
+                "${message}, ${message?.message}",
                 exception: message,
               );
               if (message is WebSocketException) {
