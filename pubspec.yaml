@@ -106,21 +106,21 @@ dependencies:
 
 dependency_overrides:
   ndk:
-    path: ../ndk/packages/ndk
-    #git:
-    #  url: https://github.com/relaystr/ndk.git
-    #  path: packages/ndk
-    #  ref: tmp-camelus-1-6-0
+    #path: ../ndk/packages/ndk
+    git:
+      url: https://github.com/relaystr/ndk.git
+      path: packages/ndk
+      ref: tmp-camelus-1-6-0
   #ndk_rust_verifier:
   #  path: ../ndk/packages/rust_verifier
     #git:
     #  url: https://github.com/relaystr/ndk.git
     #  path: packages/rust_verifier
   ndk_objectbox:
-    path: ../ndk/packages/objectbox
-    #git:
-    #   url: https://github.com/relaystr/ndk.git
-    #   path: packages/objectbox
+    #path: ../ndk/packages/objectbox
+    git:
+       url: https://github.com/relaystr/ndk.git
+       path: packages/objectbox
        #ref: search-usecase
 
   #ndk_amber:
