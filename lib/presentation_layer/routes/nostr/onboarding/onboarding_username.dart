@@ -228,7 +228,11 @@ class _OnboardingUsernameState extends ConsumerState<OnboardingUsername> {
                 name: _isAvailable ? "next" : "skip",
                 onPressed: (() {
                   _nameFocusNode.unfocus();
-                  widget.submitCallback(username);
+                  if (_isAvailable) {
+                    widget.submitCallback(username);
+                  } else {
+                    widget.submitCallback("");
+                  }
                 }),
                 inverted: _isAvailable,
               ),
