@@ -230,89 +230,90 @@ class NostrPushEndpoint extends Endpoint {
       final firebaseTokens =
           tokens.where((token) => !tokensAsUrls.contains(token)).toList();
 
-      if (tokens.isNotEmpty) {
-        _withSession(enableLogging: true, (s) async {
-          s.log(
-              "fcm msg, all_tokens: ${tokens.toString()}, fcm_tokens: ${firebaseTokens.toString()}");
-        });
+      if (tokens.isEmpty) {
+        return;
+      }
 
-        final wrappedEvent = await ndk.GiftWrap.wrapEvent(
-          recipientPublicKey: pubkeyTag[1],
-          sealEvent: event,
-        );
+      _withSession(enableLogging: true, (s) async {
+        s.log(
+            "fcm msg, all_tokens: ${tokens.toString()}, fcm_tokens: ${firebaseTokens.toString()}");
+      });
 
-        final stringifiedWrappedEventToPush = jsonEncode(wrappedEvent);
+      final wrappedEvent = await ndk.GiftWrap.wrapEvent(
+        recipientPublicKey: pubkeyTag[1],
+        sealEvent: event,
+      );
 
-        // Send to HTTP URLs
-        if (tokensAsUrls.isNotEmpty) {
-          for (final tokenUrl in tokensAsUrls) {
-            try {
-              final response = await http
-                  .post(
-                    Uri.parse(tokenUrl),
-                    body: stringifiedWrappedEventToPush,
-                  )
-                  .timeout(Duration(seconds: 5));
+      final stringifiedWrappedEventToPush = jsonEncode(wrappedEvent);
 
-              if (response.statusCode != 200) {
-                session.log(
-                    level: LogLevel.error,
-                    'Error posting to NTFY: ${stringifiedWrappedEventToPush.length} chars. $tokenUrl ${response.statusCode} ${response.reasonPhrase}');
-                await deleteToken(session, tokenUrl);
-              }
-            } catch (err) {
+      // Send to HTTP URLs
+      if (tokensAsUrls.isNotEmpty) {
+        for (final tokenUrl in tokensAsUrls) {
+          try {
+            final response = await http
+                .post(
+                  Uri.parse(tokenUrl),
+                  body: stringifiedWrappedEventToPush,
+                )
+                .timeout(Duration(seconds: 5));
+
+            if (response.statusCode != 200) {
               session.log(
                   level: LogLevel.error,
-                  'Error posting to NTFY: ${stringifiedWrappedEventToPush.length} chars. $tokenUrl $err');
-              // delete tokens on error
+                  'Error posting to NTFY: ${stringifiedWrappedEventToPush.length} chars. $tokenUrl ${response.statusCode} ${response.reasonPhrase}');
               await deleteToken(session, tokenUrl);
             }
+          } catch (err) {
+            session.log(
+                level: LogLevel.error,
+                'Error posting to NTFY: ${stringifiedWrappedEventToPush.length} chars. $tokenUrl $err');
+            // delete tokens on error
+            await deleteToken(session, tokenUrl);
           }
-          session.log(
-              level: LogLevel.info,
-              'NTFY New kind ${event.kind} event for ${pubkeyTag[1]} with ${stringifiedWrappedEventToPush.length} bytes');
         }
+        session.log(
+            level: LogLevel.info,
+            'NTFY New kind ${event.kind} event for ${pubkeyTag[1]} with ${stringifiedWrappedEventToPush.length} bytes');
+      }
 
-        // Send to Firebase
-        if (firebaseTokens.isNotEmpty) {
-          final message = {
-            'encryptedEvent': stringifiedWrappedEventToPush,
-          };
+      // Send to Firebase
+      if (firebaseTokens.isNotEmpty) {
+        final message = {
+          'encryptedEvent': stringifiedWrappedEventToPush,
+        };
 
-          try {
-            final response =
-                await _firebaseMessaging.sendEachForMulticast(MulticastMessage(
-              tokens: firebaseTokens,
-              data: message,
-            ));
+        try {
+          final response =
+              await _firebaseMessaging.sendEachForMulticast(MulticastMessage(
+            tokens: firebaseTokens,
+            data: message,
+          ));
 
-            if (response.failureCount > 0) {
-              response.responses.asMap().forEach((idx, resp) async {
-                _withSession(enableLogging: true, (s) async {
-                  if (!resp.success) {
+          if (response.failureCount > 0) {
+            response.responses.asMap().forEach((idx, resp) async {
+              _withSession(enableLogging: true, (s) async {
+                if (!resp.success) {
+                  s.log(
+                      level: LogLevel.error,
+                      'Failed: ${resp.error?.code} ${resp.error?.message} ${jsonEncode(message).length} chars');
+                  if (resp.error?.code ==
+                          'messaging/registration-token-not-registered' ||
+                      resp.error?.code == 'messaging/internal-error') {
                     s.log(
-                        level: LogLevel.error,
-                        'Failed: ${resp.error?.code} ${resp.error?.message} ${jsonEncode(message).length} chars');
-                    if (resp.error?.code ==
-                            'messaging/registration-token-not-registered' ||
-                        resp.error?.code == 'messaging/internal-error') {
-                      s.log(
-                          level: LogLevel.info,
-                          'Deleting Token ${tokens[idx]}');
-                      await deleteToken(session, tokens[idx]);
-                    }
+                        level: LogLevel.info, 'Deleting Token ${tokens[idx]}');
+                    await deleteToken(session, tokens[idx]);
                   }
-                });
+                }
               });
-            }
-          } catch (e) {
-            session.log(level: LogLevel.error, 'Firebase messaging error: $e');
+            });
           }
-
-          session.log(
-              level: LogLevel.info,
-              'Firebase New kind ${event.kind} event for ${pubkeyTag[1]} with ${stringifiedWrappedEventToPush.length} bytes');
+        } catch (e) {
+          session.log(level: LogLevel.error, 'Firebase messaging error: $e');
         }
+
+        session.log(
+            level: LogLevel.info,
+            'Firebase New kind ${event.kind} event for ${pubkeyTag[1]} with ${stringifiedWrappedEventToPush.length} bytes');
       }
     });
   }
@@ -359,6 +360,9 @@ class NostrPushEndpoint extends Endpoint {
         _relayPool!.onOpen.listen((relay) {
           _withSession(enableLogging: true, (s) async {
             s.log(level: LogLevel.info, "onOpen.listen ${relay.url}");
+            s.log(
+                level: LogLevel.info,
+                "relayPool relays: ${_relayPool!.myRelays.length}");
           });
 
           // Subscribe to specific event kinds when a relay connects
@@ -418,6 +422,14 @@ class NostrPushEndpoint extends Endpoint {
                   exception: message.message,
                 );
               }
+
+              s.log(
+                  level: LogLevel.info,
+                  "relayPool relays: ${_relayPool!.myRelays.length}");
+
+              s.log(
+                  level: LogLevel.info,
+                  "relayPool relays: ${_relayPool!.myRelays.map((e) => e.url)}");
             });
 
             try {

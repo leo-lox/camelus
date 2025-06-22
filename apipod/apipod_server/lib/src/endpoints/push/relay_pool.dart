@@ -8,6 +8,8 @@ class RelayPool {
   /// List of active relay connections
   final List<Relay> _relays = [];
 
+  List<Relay> get myRelays => _relays;
+
   /// Configuration options
   final RelayOptions _options;
 
