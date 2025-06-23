@@ -45,7 +45,7 @@ class Nip05Endpoint extends Endpoint {
 
   Future<NameCheckResult> checkName(
     Session session,
-    String name,
+    String nameUser,
     String domain,
   ) async {
     final result = NameCheckResult(
@@ -53,18 +53,20 @@ class Nip05Endpoint extends Endpoint {
       suggestions: [],
     );
 
+    final cleanedName = nameUser.replaceAll(" ", "");
+
     // Check if name is in disallowed list
-    if (disallowedWords.contains(name.toLowerCase())) {
+    if (disallowedWords.contains(cleanedName.toLowerCase())) {
       result.reason = 'This name is not allowed';
       // Generate suggestions
-      result.suggestions = generateSuggestions(name);
+      result.suggestions = generateSuggestions(cleanedName);
       return result;
     }
 
     // Check if name exists in database
-    var existingName = await Nip05Data.db.findFirstRow(
+    final existingName = await Nip05Data.db.findFirstRow(
       session,
-      where: (t) => t.name.equals(name) & t.domain.equals(domain),
+      where: (t) => t.name.equals(cleanedName) & t.domain.equals(domain),
     );
 
     if (existingName == null) {
@@ -73,7 +75,7 @@ class Nip05Endpoint extends Endpoint {
       return result;
     } else {
       result.reason = 'This name is already taken';
-      result.suggestions = generateSuggestions(name);
+      result.suggestions = generateSuggestions(cleanedName);
       return result;
     }
   }
