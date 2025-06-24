@@ -286,7 +286,7 @@ class PostContentWidget extends ConsumerWidget {
   }
 
   void _openHashtag(BuildContext context, String hashtag) {
-    Navigator.pushNamed(context, "/nostr/search", arguments: hashtag);
+    Navigator.pushNamed(context, "/nostr/search", arguments: "#$hashtag");
   }
 
   void _openLink(String url) {
