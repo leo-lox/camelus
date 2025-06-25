@@ -195,6 +195,7 @@ class NoteRepositoryImpl implements NoteRepository {
     final response = dartNdkSource.dartNdk.requests.subscription(
       filters: [filter],
       name: requestId,
+      id: requestId,
       cacheRead: true,
       cacheWrite: true,
     );
@@ -222,6 +223,7 @@ class NoteRepositoryImpl implements NoteRepository {
     final response = dartNdkSource.dartNdk.requests.subscription(
       filters: [filter],
       name: requestId,
+      id: requestId,
       //todo: bug in the NDK when using cacheRead and subscription
       // cacheRead: true,
       // cacheWrite: true,
