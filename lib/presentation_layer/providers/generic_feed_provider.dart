@@ -121,7 +121,7 @@ class GenericFeedState
       {int? limit}) {
     final notesP = ref.watch(getNotesProvider);
     return notesP.genericNostrQuery(
-      requestId: filter.feedId,
+      requestId: "q-${filter.feedId}",
       kinds: filter.kinds,
       authors: filter.authors,
       eTags: filter.eTags,
