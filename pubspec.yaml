@@ -106,11 +106,11 @@ dependencies:
 
 dependency_overrides:
   ndk:
-    #path: ../ndk/packages/ndk
-    git:
-      url: https://github.com/relaystr/ndk.git
-      path: packages/ndk
-      ref: tmp-camelus-1-6-0
+    path: ../ndk/packages/ndk
+    #git:
+    #  url: https://github.com/relaystr/ndk.git
+    #  path: packages/ndk
+    #  ref: tmp-camelus-1-6-0
   #ndk_rust_verifier:
   #  path: ../ndk/packages/rust_verifier
     #git:
@@ -167,6 +167,7 @@ flutter:
     - assets/images/
     - assets/lottie/
     - assets/app_icons/
+    - assets/animations/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

@@ -37,6 +37,7 @@ import 'presentation_layer/routes/nostr/settings/inital_route/inital_route_setti
 import 'presentation_layer/routes/nostr/settings/locale/locale_settings.dart';
 import 'presentation_layer/routes/nostr/settings/moderation/moderation_settings.dart';
 import 'presentation_layer/routes/nostr/settings/settings_page.dart';
+import 'presentation_layer/routes/wallet/wallet_navigation.dart';
 import 'theme.dart' as theme;
 
 const devDeviceFrame = true;
@@ -262,6 +263,12 @@ class MyApp extends ConsumerWidget {
                 builder: (context) => OpenStarterPack(
                   starterPackIdentifier:
                       settings.arguments as StarterPackIdentifier,
+                ),
+              );
+            case '/wallet':
+              return MaterialPageRoute(
+                builder: (context) => WalletNavigation(
+                  title: "a",
                 ),
               );
           }

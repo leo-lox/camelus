@@ -271,11 +271,7 @@ class NostrDrawer extends ConsumerWidget {
                 label: 'Payments',
                 icon: 'assets/icons/lightning.svg',
                 onTap: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Not implemented yet'),
-                    ),
-                  );
+                  Navigator.pushNamed(context, '/wallet');
                 }),
             _drawerItem(
                 label: 'Blocklist',
