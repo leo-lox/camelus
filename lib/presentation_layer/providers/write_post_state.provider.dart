@@ -137,34 +137,38 @@ class WritePostNotifier extends Notifier<WritePostState> {
     List<NostrTag> tags = [];
 
     if (state.replyToNote != null) {
+      // handle "e" tags first
       final replyIsReplyToRoot = state.replyToNote!.getRootReply;
       if (replyIsReplyToRoot != null) {
-        final tag = NostrTag(
+        // reply to a reply - add root "e" tag
+        final rootTag = NostrTag(
           type: "e",
           value: replyIsReplyToRoot.value,
           recommended_relay: "",
           marker: "root",
         );
-        tags.add(tag);
+        tags.add(rootTag);
       } else {
-        // is reply to root
-        final tag = NostrTag(
+        // direct reply to root - add root "e" tag
+        final rootTag = NostrTag(
           type: "e",
           value: state.replyToNote!.id,
           recommended_relay: "",
           marker: "root",
         );
-        tags.add(tag);
-        final tagPubkey = NostrTag(
-          type: "p",
-          value: state.replyToNote!.pubkey,
-          recommended_relay: "",
-          marker: "root",
-        );
-        tags.add(tagPubkey);
+        tags.add(rootTag);
       }
 
-      // add previous tweet tags
+      // add reply "e" tag (always the note directly replying to)
+      final replyTag = NostrTag(
+        type: "e",
+        value: state.replyToNote!.id,
+        recommended_relay: "",
+        marker: "reply",
+      );
+      tags.add(replyTag);
+
+      // Add previous tweet "e" tags (mentions, not root/reply)
       for (NostrTag tag in state.replyToNote!.tags) {
         if (tag.type == "e") {
           if (tag.marker == "root" || tag.marker == "reply") {
@@ -174,48 +178,50 @@ class WritePostNotifier extends Notifier<WritePostState> {
             tags.add(tag);
           }
         }
-        if (tag.type == "p") {
-          if (tag.marker == "root" || tag.marker == "reply") {
-            continue;
-          }
+      }
 
-          tags.add(tag);
+      // Handle "p" tags - collect all unique pubkeys
+      Set<String> pubkeysToTag = {};
+
+      // Add the author of the note we're replying to
+      pubkeysToTag.add(state.replyToNote!.pubkey);
+
+      // Add all existing "p" tags from the original note
+      for (NostrTag tag in state.replyToNote!.tags) {
+        if (tag.type == "p") {
+          pubkeysToTag.add(tag.value);
         }
       }
 
+      // Add mentions from the current post
+      for (final pubkey in mentionKeys) {
+        pubkeysToTag.add(pubkey);
+      }
+
+      // Create "p" tags (without markers)
+
+      for (final pubkey in pubkeysToTag) {
+        tags.add(NostrTag(
+            type: "p",
+            value: pubkey,
+            recommended_relay:
+                "" // todo  await editRelayProvider.getRelayHintsInbox(pubkey);
+            // No marker for p tags according to NIP-10
+            ));
+      }
+    } else {
+      // Not a reply, but still add mentions as "p" tags
       if (mentionKeys.isNotEmpty) {
         for (int i = 0; i < mentionKeys.length; i++) {
           final pubkey = mentionKeys[i];
-          final editRelayProvider = ref.watch(editRelaysProvider);
-
-          final potentialRelays =
-              await editRelayProvider.getRelayHintsInbox(pubkey);
 
           tags.add(NostrTag(
-            type: "p",
-            value: pubkey,
-            recommended_relay: potentialRelays.firstOrNull?.url ?? "",
-            marker: "mention",
-          ));
+              type: "p",
+              value: pubkey,
+              recommended_relay:
+                  "" //todo  await editRelayProvider.getRelayHintsInbox(pubkey);,
+              ));
         }
-      }
-
-      if (state.replyToNote != null) {
-        final tag = NostrTag(
-          type: "e",
-          value: state.replyToNote!.id,
-          recommended_relay: "",
-          marker: "reply",
-        );
-        tags.add(tag);
-
-        final tagPubkey = NostrTag(
-          type: 'p',
-          value: state.replyToNote!.pubkey,
-          recommended_relay: '',
-          marker: 'reply',
-        );
-        tags.add(tagPubkey);
       }
     }
 
