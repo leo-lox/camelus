@@ -265,7 +265,28 @@ class MyApp extends ConsumerWidget {
                       settings.arguments as StarterPackIdentifier,
                 ),
               );
-            case '/wallet':
+
+            case '/wallet/dashboard':
+              return MaterialPageRoute(
+                builder: (context) => WalletNavigation(
+                  title: "a",
+                ),
+              );
+            case '/wallet/receive':
+              return MaterialPageRoute(
+                builder: (context) => WalletNavigation(
+                  title: "a",
+                ),
+              );
+
+            case '/wallet/mints':
+              return MaterialPageRoute(
+                builder: (context) => WalletNavigation(
+                  title: "a",
+                ),
+              );
+
+            case '/wallet/qr-scan':
               return MaterialPageRoute(
                 builder: (context) => WalletNavigation(
                   title: "a",

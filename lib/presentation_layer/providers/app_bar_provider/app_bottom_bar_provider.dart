@@ -1,7 +1,14 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'dart:async';
 
-enum NavigationTab { home, search, notifications, chat }
+enum NavigationTab {
+  home,
+  search,
+
+  notifications,
+  chat,
+  wallet,
+}
 
 class NavigationState {
   final NavigationTab selectedTab;
@@ -34,6 +41,7 @@ class NavigationEvents {
   final _searchTabController = StreamController<void>.broadcast();
   final _notificationsTabController = StreamController<void>.broadcast();
   final _chatTabController = StreamController<void>.broadcast();
+  final _walletTabController = StreamController<void>.broadcast();
 
   // Expose streams for listeners
   Stream<void> get onHomeTabSelected => _homeTabController.stream;
@@ -41,6 +49,7 @@ class NavigationEvents {
   Stream<void> get onNotificationsTabSelected =>
       _notificationsTabController.stream;
   Stream<void> get onChatTabSelected => _chatTabController.stream;
+  Stream<void> get onWalletTabSelected => _walletTabController.stream;
 
   // Methods to trigger events
   void triggerHomeTabEvent() {
@@ -59,11 +68,16 @@ class NavigationEvents {
     _chatTabController.add(null);
   }
 
+  void triggerWalletTabEvent() {
+    _walletTabController.add(null);
+  }
+
   void dispose() {
     _homeTabController.close();
     _searchTabController.close();
     _notificationsTabController.close();
     _chatTabController.close();
+    _walletTabController.close();
   }
 }
 
@@ -99,6 +113,9 @@ class NavigationNotifier extends StateNotifier<NavigationState> {
         break;
       case NavigationTab.chat:
         events.triggerChatTabEvent();
+        break;
+      case NavigationTab.wallet:
+        events.triggerWalletTabEvent();
         break;
     }
   }

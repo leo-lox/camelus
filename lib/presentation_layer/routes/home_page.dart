@@ -164,6 +164,7 @@ class _HomePageState extends ConsumerState<HomePage> {
               initialTab: widget.initialTab,
             ),
             const SearchPage(),
+            //const WalletNavigation(title: "title"),
             NotificationPage(
               pubkey: widget.pubkey,
             ),

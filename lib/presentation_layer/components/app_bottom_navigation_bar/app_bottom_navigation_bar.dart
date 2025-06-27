@@ -34,6 +34,7 @@ class AppBottomNavigationBar extends ConsumerWidget {
       items: <BottomNavigationBarItem>[
         _buildHomeItem(navigationState, ref),
         _buildSearchItem(navigationState),
+        //_buildWalletItem(navigationState),
         _buildNotificationsItem(navigationState),
         //_buildChatItem(navigationState),
       ],
@@ -112,6 +113,19 @@ class AppBottomNavigationBar extends ConsumerWidget {
         size: 23,
       ),
       label: "",
+    );
+  }
+
+  BottomNavigationBarItem _buildWalletItem(NavigationState state) {
+    final isSelected = state.selectedTab == NavigationTab.wallet;
+
+    return BottomNavigationBarItem(
+      icon: Icon(
+        PhosphorIcons.wallet(),
+        color: isSelected ? Palette.primary : Palette.darkGray,
+        size: 23,
+      ),
+      label: "wallet",
     );
   }
 }

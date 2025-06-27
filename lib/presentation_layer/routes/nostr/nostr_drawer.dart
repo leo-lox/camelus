@@ -271,7 +271,7 @@ class NostrDrawer extends ConsumerWidget {
                 label: 'Payments',
                 icon: 'assets/icons/lightning.svg',
                 onTap: () {
-                  Navigator.pushNamed(context, '/wallet');
+                  Navigator.pushNamed(context, '/wallet/dashboard');
                 }),
             _drawerItem(
                 label: 'Blocklist',
