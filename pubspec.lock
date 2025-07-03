@@ -1200,7 +1200,7 @@ packages:
     description:
       path: "packages/ndk"
       ref: tmp-camelus-1-7-2
-      resolved-ref: "1dbd6bc0252febb08ff8a82a2239d98253a05fb4"
+      resolved-ref: ff55425d33cfcaae88f50661c78b0294d6fc6b10
       url: "https://github.com/relaystr/ndk.git"
     source: git
     version: "0.4.1"
