@@ -1199,11 +1199,11 @@ packages:
     dependency: "direct main"
     description:
       path: "packages/ndk"
-      ref: tmp-camelus-1-6-0
-      resolved-ref: c634f168fc746426f48efce7bbc5b48e19bf1298
+      ref: tmp-camelus-1-7-2
+      resolved-ref: "1dbd6bc0252febb08ff8a82a2239d98253a05fb4"
       url: "https://github.com/relaystr/ndk.git"
     source: git
-    version: "0.4.0"
+    version: "0.4.1"
   ndk_amber:
     dependency: "direct main"
     description:
@@ -1215,12 +1215,11 @@ packages:
   ndk_objectbox:
     dependency: "direct main"
     description:
-      path: "packages/objectbox"
-      ref: HEAD
-      resolved-ref: "5e67f35410599cde8c6e074037f55741d16fe3ed"
-      url: "https://github.com/relaystr/ndk.git"
-    source: git
-    version: "0.2.4"
+      name: ndk_objectbox
+      sha256: "8dddde6f0b93e0ae70e65a650a50836158b1640eddf6b52cbafaf093940c2766"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.2.5"
   ndk_rust_verifier:
     dependency: "direct main"
     description:

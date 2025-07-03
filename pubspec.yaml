@@ -80,10 +80,10 @@ dependencies:
   app_links: ^6.3.2
   phosphor_flutter: ^2.1.0
   ## ndk imnports
-  ndk: ^0.4.0
+  ndk: ^0.4.1
   ndk_rust_verifier: ^0.4.0
   ndk_amber: ^0.3.1
-  ndk_objectbox: ^0.2.4
+  ndk_objectbox: ^0.2.5
   image: ^4.3.0
   flutter_list_view: ^1.1.29
   xxh3: ^1.2.0
@@ -110,17 +110,17 @@ dependency_overrides:
     git:
       url: https://github.com/relaystr/ndk.git
       path: packages/ndk
-      ref: tmp-camelus-1-6-0
+      ref: tmp-camelus-1-7-2
   #ndk_rust_verifier:
   #  path: ../ndk/packages/rust_verifier
     #git:
     #  url: https://github.com/relaystr/ndk.git
     #  path: packages/rust_verifier
-  ndk_objectbox:
+  #ndk_objectbox:
     #path: ../ndk/packages/objectbox
-    git:
-       url: https://github.com/relaystr/ndk.git
-       path: packages/objectbox
+    #git:
+    #   url: https://github.com/relaystr/ndk.git
+    #   path: packages/objectbox
        #ref: search-usecase
 
   #ndk_amber:
