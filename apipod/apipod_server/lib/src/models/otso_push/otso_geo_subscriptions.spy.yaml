@@ -1,0 +1,9 @@
+class: OtsoGeoSubscription
+table: otso_geo_subscriptions
+fields:
+  pubKey: String
+  geohash: String
+indexes:
+  otso_geo_subscription_unique_idx:
+    fields: pubKey, geohash
+    unique: true
