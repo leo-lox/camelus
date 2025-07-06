@@ -354,7 +354,11 @@ class NostrPushEndpoint extends Endpoint {
         }
 
         // Create a new relay pool with the fetched relay URLs
-        _relayPool = RelayPool(relays);
+        _relayPool = RelayPool(relays,
+            options: RelayOptions(
+              reconnectFilter: PushConfig.subscriptionFilter,
+              reconnectSubId: PushConfig.subscriptionId,
+            ));
 
         // Set up event handlers using the new stream-based approach
         _relayPool!.onOpen.listen((relay) {

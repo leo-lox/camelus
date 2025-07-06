@@ -157,11 +157,14 @@ class Relay {
   }
 
   /// Resubscribe after reconnect
-  void _handleOpen() {
-    subscribe(
-      PushConfig.subscriptionId,
-      PushConfig.subscriptionFilter,
-    );
+  Future<void> _handleOpen() async {
+    if (options.reconnectFilter != null && options.reconnectSubId != null) {
+      await subscribe(
+        options.reconnectSubId!,
+        options.reconnectFilter,
+      );
+    }
+
     print("Resubscribed to $url after reconnect");
   }
 
@@ -225,6 +228,13 @@ class RelayOptions {
   /// Whether to automatically reconnect on disconnection
   final bool reconnect;
 
+  final Map<String, Object>? reconnectFilter;
+  final String? reconnectSubId;
+
   /// Creates a new options object
-  const RelayOptions({this.reconnect = true});
+  const RelayOptions({
+    this.reconnect = true,
+    this.reconnectFilter,
+    this.reconnectSubId,
+  });
 }
