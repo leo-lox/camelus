@@ -194,7 +194,7 @@ class OtsoPushEndpoint extends Endpoint {
           await OtsoPushSubscription.db.insertRow(
               session,
               OtsoPushSubscription(
-                  pubKey: event.pubKey, relay: relayUrl, token: userFcmToken));
+                  pubkey: event.pubKey, relay: relayUrl, token: userFcmToken));
         }
       } else {
         session
@@ -258,12 +258,19 @@ class OtsoPushEndpoint extends Endpoint {
     ndk.Nip01Event event,
     Relay relay,
   ) async {
-    await _withSession(enableLogging: false, (session) async {
+    ///todo debu get logging false
+    await _withSession(enableLogging: true, (session) async {
+      session.log("notify!", level: LogLevel.debug);
+
       /// get the geotag with most presicion
       String eventGeoTag = OtsoHelpers.findLongestGValue(event.tags);
 
+      session.log("geotag: ${eventGeoTag}", level: LogLevel.debug);
+
       final pubkeysToNotify =
           await getPubkeysToNotify(geoHash: eventGeoTag, session: session);
+
+      session.log("pubkeystoNotify: ${pubkeysToNotify}", level: LogLevel.debug);
 
       /// send all devices their gift wrap event
       for (final devicePubkeyToNotify in pubkeysToNotify) {

@@ -1,10 +1,10 @@
 class: OtsoPushSubscription
 table: otso_push_subscriptions
 fields:
-  pubKey: String
+  pubkey: String
   relay: String
   token: String
 indexes:
   otso_push_subscription_unique_idx:
-    fields: pubKey, relay, token
+    fields: pubkey, relay, token
     unique: true

@@ -54,38 +54,38 @@ CREATE UNIQUE INDEX "name_domain_idx" ON "nip_05_data" USING btree ("name", "dom
 --
 CREATE TABLE "otso_geo_subscriptions" (
     "id" bigserial PRIMARY KEY,
-    "pubKey" text NOT NULL,
+    "pubkey" text NOT NULL,
     "geohash" text NOT NULL
 );
 
 -- Indexes
-CREATE UNIQUE INDEX "otso_geo_subscription_unique_idx" ON "otso_geo_subscriptions" USING btree ("pubKey", "geohash");
+CREATE UNIQUE INDEX "otso_geo_subscription_unique_idx" ON "otso_geo_subscriptions" USING btree ("pubkey", "geohash");
 
 --
 -- Class OtsoPushSubscription as table otso_push_subscriptions
 --
 CREATE TABLE "otso_push_subscriptions" (
     "id" bigserial PRIMARY KEY,
-    "pubKey" text NOT NULL,
+    "pubkey" text NOT NULL,
     "relay" text NOT NULL,
     "token" text NOT NULL
 );
 
 -- Indexes
-CREATE UNIQUE INDEX "otso_push_subscription_unique_idx" ON "otso_push_subscriptions" USING btree ("pubKey", "relay", "token");
+CREATE UNIQUE INDEX "otso_push_subscription_unique_idx" ON "otso_push_subscriptions" USING btree ("pubkey", "relay", "token");
 
 --
 -- Class PushSubscription as table push_subscriptions
 --
 CREATE TABLE "push_subscriptions" (
     "id" bigserial PRIMARY KEY,
-    "pubKey" text NOT NULL,
+    "pubkey" text NOT NULL,
     "relay" text NOT NULL,
     "token" text NOT NULL
 );
 
 -- Indexes
-CREATE UNIQUE INDEX "subscription_unique_idx" ON "push_subscriptions" USING btree ("pubKey", "relay", "token");
+CREATE UNIQUE INDEX "subscription_unique_idx" ON "push_subscriptions" USING btree ("pubkey", "relay", "token");
 
 --
 -- Class ReportsIncoming as table reports_incoming

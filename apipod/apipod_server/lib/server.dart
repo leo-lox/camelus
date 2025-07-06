@@ -3,6 +3,7 @@ import 'package:serverpod/serverpod.dart';
 import 'package:apipod_server/src/web/routes/root.dart';
 
 import 'src/endpoints/push/nostr_push_endpoint.dart';
+import 'src/endpoints/push_otso/otso_push_endpoint.dart';
 import 'src/generated/protocol.dart';
 import 'src/generated/endpoints.dart';
 
@@ -36,4 +37,5 @@ void run(List<String> args) async {
   /// restore push server
 
   NostrPushEndpoint().onServerStart(pod);
+  OtsoPushEndpoint().onServerStart(pod);
 }

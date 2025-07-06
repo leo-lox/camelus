@@ -5,25 +5,25 @@ BEGIN;
 --
 CREATE TABLE "otso_geo_subscriptions" (
     "id" bigserial PRIMARY KEY,
-    "pubKey" text NOT NULL,
+    "pubkey" text NOT NULL,
     "geohash" text NOT NULL
 );
 
 -- Indexes
-CREATE UNIQUE INDEX "otso_geo_subscription_unique_idx" ON "otso_geo_subscriptions" USING btree ("pubKey", "geohash");
+CREATE UNIQUE INDEX "otso_geo_subscription_unique_idx" ON "otso_geo_subscriptions" USING btree ("pubkey", "geohash");
 
 --
 -- ACTION CREATE TABLE
 --
 CREATE TABLE "otso_push_subscriptions" (
     "id" bigserial PRIMARY KEY,
-    "pubKey" text NOT NULL,
+    "pubkey" text NOT NULL,
     "relay" text NOT NULL,
     "token" text NOT NULL
 );
 
 -- Indexes
-CREATE UNIQUE INDEX "otso_push_subscription_unique_idx" ON "otso_push_subscriptions" USING btree ("pubKey", "relay", "token");
+CREATE UNIQUE INDEX "otso_push_subscription_unique_idx" ON "otso_push_subscriptions" USING btree ("pubkey", "relay", "token");
 
 
 --

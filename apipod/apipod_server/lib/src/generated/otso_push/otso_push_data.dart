@@ -15,14 +15,14 @@ abstract class OtsoPushSubscription
     implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
   OtsoPushSubscription._({
     this.id,
-    required this.pubKey,
+    required this.pubkey,
     required this.relay,
     required this.token,
   });
 
   factory OtsoPushSubscription({
     int? id,
-    required String pubKey,
+    required String pubkey,
     required String relay,
     required String token,
   }) = _OtsoPushSubscriptionImpl;
@@ -31,7 +31,7 @@ abstract class OtsoPushSubscription
       Map<String, dynamic> jsonSerialization) {
     return OtsoPushSubscription(
       id: jsonSerialization['id'] as int?,
-      pubKey: jsonSerialization['pubKey'] as String,
+      pubkey: jsonSerialization['pubkey'] as String,
       relay: jsonSerialization['relay'] as String,
       token: jsonSerialization['token'] as String,
     );
@@ -44,7 +44,7 @@ abstract class OtsoPushSubscription
   @override
   int? id;
 
-  String pubKey;
+  String pubkey;
 
   String relay;
 
@@ -58,7 +58,7 @@ abstract class OtsoPushSubscription
   @_i1.useResult
   OtsoPushSubscription copyWith({
     int? id,
-    String? pubKey,
+    String? pubkey,
     String? relay,
     String? token,
   });
@@ -66,7 +66,7 @@ abstract class OtsoPushSubscription
   Map<String, dynamic> toJson() {
     return {
       if (id != null) 'id': id,
-      'pubKey': pubKey,
+      'pubkey': pubkey,
       'relay': relay,
       'token': token,
     };
@@ -76,7 +76,7 @@ abstract class OtsoPushSubscription
   Map<String, dynamic> toJsonForProtocol() {
     return {
       if (id != null) 'id': id,
-      'pubKey': pubKey,
+      'pubkey': pubkey,
       'relay': relay,
       'token': token,
     };
@@ -117,12 +117,12 @@ class _Undefined {}
 class _OtsoPushSubscriptionImpl extends OtsoPushSubscription {
   _OtsoPushSubscriptionImpl({
     int? id,
-    required String pubKey,
+    required String pubkey,
     required String relay,
     required String token,
   }) : super._(
           id: id,
-          pubKey: pubKey,
+          pubkey: pubkey,
           relay: relay,
           token: token,
         );
@@ -133,13 +133,13 @@ class _OtsoPushSubscriptionImpl extends OtsoPushSubscription {
   @override
   OtsoPushSubscription copyWith({
     Object? id = _Undefined,
-    String? pubKey,
+    String? pubkey,
     String? relay,
     String? token,
   }) {
     return OtsoPushSubscription(
       id: id is int? ? id : this.id,
-      pubKey: pubKey ?? this.pubKey,
+      pubkey: pubkey ?? this.pubkey,
       relay: relay ?? this.relay,
       token: token ?? this.token,
     );
@@ -149,8 +149,8 @@ class _OtsoPushSubscriptionImpl extends OtsoPushSubscription {
 class OtsoPushSubscriptionTable extends _i1.Table<int?> {
   OtsoPushSubscriptionTable({super.tableRelation})
       : super(tableName: 'otso_push_subscriptions') {
-    pubKey = _i1.ColumnString(
-      'pubKey',
+    pubkey = _i1.ColumnString(
+      'pubkey',
       this,
     );
     relay = _i1.ColumnString(
@@ -163,7 +163,7 @@ class OtsoPushSubscriptionTable extends _i1.Table<int?> {
     );
   }
 
-  late final _i1.ColumnString pubKey;
+  late final _i1.ColumnString pubkey;
 
   late final _i1.ColumnString relay;
 
@@ -172,7 +172,7 @@ class OtsoPushSubscriptionTable extends _i1.Table<int?> {
   @override
   List<_i1.Column> get columns => [
         id,
-        pubKey,
+        pubkey,
         relay,
         token,
       ];

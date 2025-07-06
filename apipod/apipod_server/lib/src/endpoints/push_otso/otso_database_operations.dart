@@ -25,7 +25,7 @@ Future<void> registerInDatabaseTuples(
 
       try {
         await OtsoPushSubscription.db.insertRow(session,
-            OtsoPushSubscription(pubKey: pubkey, relay: relay, token: token));
+            OtsoPushSubscription(pubkey: pubkey, relay: relay, token: token));
       } catch (e) {
         // Handle unique constraint violation
         if (e.toString().contains('unique constraint')) {
@@ -40,7 +40,7 @@ Future<void> registerInDatabaseTuples(
 
 Future<List<String>> getAllKeys(Session session) async {
   final subscriptions = await OtsoPushSubscription.db.find(session);
-  return subscriptions.map((s) => s.pubKey).toSet().toList();
+  return subscriptions.map((s) => s.pubkey).toSet().toList();
 }
 
 Future<List<String>> getAllRelays(Session session) async {
@@ -48,9 +48,9 @@ Future<List<String>> getAllRelays(Session session) async {
   return subscriptions.map((s) => s.relay).toSet().toList();
 }
 
-Future<List<String>> getTokensByPubKey(Session session, String pubKey) async {
+Future<List<String>> getTokensByPubKey(Session session, String pubkey) async {
   final subscriptions = await OtsoPushSubscription.db
-      .find(session, where: (t) => t.pubKey.equals(pubKey));
+      .find(session, where: (t) => t.pubkey.equals(pubkey));
 
   return subscriptions.map((s) => s.token).toSet().toList();
 }
@@ -69,11 +69,28 @@ Future<List<String>> getPubkeysToNotify({
   required Session session,
   required String geoHash,
 }) async {
-  final query =
-      await OtsoGeoSubscription.db.find(session, where: (subscription) {
-    return subscription.geohash.like('$geoHash%');
-  });
-  return query.map((q) => q.pubKey).toSet().toList();
+  //final query =
+  //    await OtsoGeoSubscription.db.find(session, where: (subscription) {
+  //  return subscription.geohash.like('$geoHash%');
+  //});
+  //return query.map((q) => q.pubkey).toSet().toList();
+
+  final result = await session.db.unsafeQuery(
+    "SELECT id, geoHash, pubkey FROM otso_geo_subscriptions WHERE @pattern LIKE geoHash || '%';",
+    parameters: QueryParameters.named({
+      'pattern': geoHash,
+    }),
+  );
+  final rows = result.map((row) => row.toColumnMap()).toList();
+
+  final List<String> pubkeys = [];
+  for (final row in rows) {
+    //final int id = row['id'] as int;
+    //final String geoHash = row['geohash'] as String;
+    final String geoHash = row['pubkey'] as String;
+    pubkeys.add(geoHash);
+  }
+  return pubkeys;
 }
 
 Future<List<OtsoGeoSubscription>> getAllGeohashesPubkey({
@@ -82,7 +99,7 @@ Future<List<OtsoGeoSubscription>> getAllGeohashesPubkey({
 }) async {
   final query = await OtsoGeoSubscription.db.find(
     session,
-    where: (p0) => p0.pubKey.equals(pubkey),
+    where: (p0) => p0.pubkey.equals(pubkey),
   );
   return query;
 }
@@ -95,7 +112,7 @@ Future<List<OtsoGeoSubscription>> insertGeotags({
   final insert = await OtsoGeoSubscription.db.insert(
     session,
     geotags.map((g) {
-      return OtsoGeoSubscription(geohash: g, pubKey: pubkey);
+      return OtsoGeoSubscription(geohash: g, pubkey: pubkey);
     }).toList(),
   );
   return insert;
@@ -108,7 +125,7 @@ Future<List<OtsoGeoSubscription>> deleteGeotags({
 }) async {
   final del = await OtsoGeoSubscription.db.deleteWhere(
     session,
-    where: (r) => r.pubKey.equals(pubkey) & r.geohash.inSet(geotags.toSet()),
+    where: (r) => r.pubkey.equals(pubkey) & r.geohash.inSet(geotags.toSet()),
   );
   return del;
 }
@@ -124,12 +141,12 @@ Future deletePubkeyAnywhere(
   final transaction = await session.db.transaction((transaction) async {
     await OtsoGeoSubscription.db.deleteWhere(
       session,
-      where: (r) => r.pubKey.equals(pubkey),
+      where: (r) => r.pubkey.equals(pubkey),
       transaction: transaction,
     );
     await OtsoPushSubscription.db.deleteWhere(
       session,
-      where: (r) => r.pubKey.equals(pubkey),
+      where: (r) => r.pubkey.equals(pubkey),
       transaction: transaction,
     );
   });

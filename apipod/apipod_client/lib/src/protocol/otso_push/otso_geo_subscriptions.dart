@@ -14,20 +14,20 @@ import 'package:serverpod_client/serverpod_client.dart' as _i1;
 abstract class OtsoGeoSubscription implements _i1.SerializableModel {
   OtsoGeoSubscription._({
     this.id,
-    required this.pubKey,
+    required this.pubkey,
     required this.geohash,
   });
 
   factory OtsoGeoSubscription({
     int? id,
-    required String pubKey,
+    required String pubkey,
     required String geohash,
   }) = _OtsoGeoSubscriptionImpl;
 
   factory OtsoGeoSubscription.fromJson(Map<String, dynamic> jsonSerialization) {
     return OtsoGeoSubscription(
       id: jsonSerialization['id'] as int?,
-      pubKey: jsonSerialization['pubKey'] as String,
+      pubkey: jsonSerialization['pubkey'] as String,
       geohash: jsonSerialization['geohash'] as String,
     );
   }
@@ -37,7 +37,7 @@ abstract class OtsoGeoSubscription implements _i1.SerializableModel {
   /// the id will be null.
   int? id;
 
-  String pubKey;
+  String pubkey;
 
   String geohash;
 
@@ -46,14 +46,14 @@ abstract class OtsoGeoSubscription implements _i1.SerializableModel {
   @_i1.useResult
   OtsoGeoSubscription copyWith({
     int? id,
-    String? pubKey,
+    String? pubkey,
     String? geohash,
   });
   @override
   Map<String, dynamic> toJson() {
     return {
       if (id != null) 'id': id,
-      'pubKey': pubKey,
+      'pubkey': pubkey,
       'geohash': geohash,
     };
   }
@@ -69,11 +69,11 @@ class _Undefined {}
 class _OtsoGeoSubscriptionImpl extends OtsoGeoSubscription {
   _OtsoGeoSubscriptionImpl({
     int? id,
-    required String pubKey,
+    required String pubkey,
     required String geohash,
   }) : super._(
           id: id,
-          pubKey: pubKey,
+          pubkey: pubkey,
           geohash: geohash,
         );
 
@@ -83,12 +83,12 @@ class _OtsoGeoSubscriptionImpl extends OtsoGeoSubscription {
   @override
   OtsoGeoSubscription copyWith({
     Object? id = _Undefined,
-    String? pubKey,
+    String? pubkey,
     String? geohash,
   }) {
     return OtsoGeoSubscription(
       id: id is int? ? id : this.id,
-      pubKey: pubKey ?? this.pubKey,
+      pubkey: pubkey ?? this.pubkey,
       geohash: geohash ?? this.geohash,
     );
   }

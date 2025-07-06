@@ -336,7 +336,7 @@ class Protocol extends _i1.SerializationManagerServer {
           columnDefault: 'nextval(\'otso_geo_subscriptions_id_seq\'::regclass)',
         ),
         _i2.ColumnDefinition(
-          name: 'pubKey',
+          name: 'pubkey',
           columnType: _i2.ColumnType.text,
           isNullable: false,
           dartType: 'String',
@@ -369,7 +369,7 @@ class Protocol extends _i1.SerializationManagerServer {
           elements: [
             _i2.IndexElementDefinition(
               type: _i2.IndexElementDefinitionType.column,
-              definition: 'pubKey',
+              definition: 'pubkey',
             ),
             _i2.IndexElementDefinition(
               type: _i2.IndexElementDefinitionType.column,
@@ -398,7 +398,7 @@ class Protocol extends _i1.SerializationManagerServer {
               'nextval(\'otso_push_subscriptions_id_seq\'::regclass)',
         ),
         _i2.ColumnDefinition(
-          name: 'pubKey',
+          name: 'pubkey',
           columnType: _i2.ColumnType.text,
           isNullable: false,
           dartType: 'String',
@@ -437,7 +437,7 @@ class Protocol extends _i1.SerializationManagerServer {
           elements: [
             _i2.IndexElementDefinition(
               type: _i2.IndexElementDefinitionType.column,
-              definition: 'pubKey',
+              definition: 'pubkey',
             ),
             _i2.IndexElementDefinition(
               type: _i2.IndexElementDefinitionType.column,

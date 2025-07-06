@@ -16,7 +16,7 @@
             "dartType": "int?"
           },
           {
-            "name": "pubKey",
+            "name": "pubkey",
             "columnType": 0,
             "isNullable": false,
             "dartType": "String"
@@ -47,7 +47,7 @@
             "elements": [
               {
                 "type": 0,
-                "definition": "pubKey"
+                "definition": "pubkey"
               },
               {
                 "type": 0,
@@ -78,7 +78,7 @@
             "dartType": "int?"
           },
           {
-            "name": "pubKey",
+            "name": "pubkey",
             "columnType": 0,
             "isNullable": false,
             "dartType": "String"
@@ -115,7 +115,7 @@
             "elements": [
               {
                 "type": 0,
-                "definition": "pubKey"
+                "definition": "pubkey"
               },
               {
                 "type": 0,
