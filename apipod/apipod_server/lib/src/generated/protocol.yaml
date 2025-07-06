@@ -15,3 +15,5 @@ nostrBand:
   - profiles:
 nostrPush:
   - register:
+otsoPush:
+  - register:

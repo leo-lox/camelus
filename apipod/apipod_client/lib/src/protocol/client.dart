@@ -190,6 +190,21 @@ class EndpointNostrPush extends _i1.EndpointRef {
       );
 }
 
+/// {@category Endpoint}
+class EndpointOtsoPush extends _i1.EndpointRef {
+  EndpointOtsoPush(_i1.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'otsoPush';
+
+  _i2.Future<bool> register(List<_i6.Nip01Event> events) =>
+      caller.callServerEndpoint<bool>(
+        'otsoPush',
+        'register',
+        {'events': events},
+      );
+}
+
 class Client extends _i1.ServerpodClientShared {
   Client(
     String host, {
@@ -222,6 +237,7 @@ class Client extends _i1.ServerpodClientShared {
     nip05 = EndpointNip05(this);
     nostrBand = EndpointNostrBand(this);
     nostrPush = EndpointNostrPush(this);
+    otsoPush = EndpointOtsoPush(this);
   }
 
   late final EndpointAppUpdate appUpdate;
@@ -236,6 +252,8 @@ class Client extends _i1.ServerpodClientShared {
 
   late final EndpointNostrPush nostrPush;
 
+  late final EndpointOtsoPush otsoPush;
+
   @override
   Map<String, _i1.EndpointRef> get endpointRefLookup => {
         'appUpdate': appUpdate,
@@ -244,6 +262,7 @@ class Client extends _i1.ServerpodClientShared {
         'nip05': nip05,
         'nostrBand': nostrBand,
         'nostrPush': nostrPush,
+        'otsoPush': otsoPush,
       };
 
   @override

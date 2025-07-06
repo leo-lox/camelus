@@ -16,7 +16,8 @@ import '../endpoints/moderation/moderation_endpoint.dart' as _i4;
 import '../endpoints/nip05/nip05_endpoint.dart' as _i5;
 import '../endpoints/nostr_band/nostr_band_endpoint.dart' as _i6;
 import '../endpoints/push/nostr_push_endpoint.dart' as _i7;
-import 'package:ndk/domain_layer/entities/nip_01_event.dart' as _i8;
+import '../endpoints/push_otso/otso_push_endpoint.dart' as _i8;
+import 'package:ndk/domain_layer/entities/nip_01_event.dart' as _i9;
 
 class Endpoints extends _i1.EndpointDispatch {
   @override
@@ -56,6 +57,12 @@ class Endpoints extends _i1.EndpointDispatch {
         ..initialize(
           server,
           'nostrPush',
+          null,
+        ),
+      'otsoPush': _i8.OtsoPushEndpoint()
+        ..initialize(
+          server,
+          'otsoPush',
           null,
         ),
     };
@@ -159,7 +166,7 @@ class Endpoints extends _i1.EndpointDispatch {
           params: {
             'reportEvent': _i1.ParameterDescription(
               name: 'reportEvent',
-              type: _i1.getType<_i8.Nip01Event>(),
+              type: _i1.getType<_i9.Nip01Event>(),
               nullable: false,
             )
           },
@@ -290,7 +297,7 @@ class Endpoints extends _i1.EndpointDispatch {
             ),
             'events': _i1.ParameterDescription(
               name: 'events',
-              type: _i1.getType<List<_i8.Nip01Event>>(),
+              type: _i1.getType<List<_i9.Nip01Event>>(),
               nullable: false,
             ),
           },
@@ -301,6 +308,30 @@ class Endpoints extends _i1.EndpointDispatch {
               (endpoints['nostrPush'] as _i7.NostrPushEndpoint).register(
             session,
             params['token'],
+            params['events'],
+          ),
+        )
+      },
+    );
+    connectors['otsoPush'] = _i1.EndpointConnector(
+      name: 'otsoPush',
+      endpoint: endpoints['otsoPush']!,
+      methodConnectors: {
+        'register': _i1.MethodConnector(
+          name: 'register',
+          params: {
+            'events': _i1.ParameterDescription(
+              name: 'events',
+              type: _i1.getType<List<_i9.Nip01Event>>(),
+              nullable: false,
+            )
+          },
+          call: (
+            _i1.Session session,
+            Map<String, dynamic> params,
+          ) async =>
+              (endpoints['otsoPush'] as _i8.OtsoPushEndpoint).register(
+            session,
             params['events'],
           ),
         )

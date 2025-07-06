@@ -20,7 +20,7 @@ import 'otso_helpers.dart';
 
 const int maxRelaysRegistration = 4;
 
-class NostrPushEndpoint extends Endpoint {
+class OtsoPushEndpoint extends Endpoint {
   Serverpod? _pod; // pod reference
 
   // Cache implementation

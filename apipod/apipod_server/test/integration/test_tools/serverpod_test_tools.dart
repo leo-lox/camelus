@@ -124,6 +124,8 @@ class TestEndpoints {
   late final _NostrBandEndpoint nostrBand;
 
   late final _NostrPushEndpoint nostrPush;
+
+  late final _OtsoPushEndpoint otsoPush;
 }
 
 class _InternalTestEndpoints extends TestEndpoints
@@ -154,6 +156,10 @@ class _InternalTestEndpoints extends TestEndpoints
       serializationManager,
     );
     nostrPush = _NostrPushEndpoint(
+      endpoints,
+      serializationManager,
+    );
+    otsoPush = _OtsoPushEndpoint(
       endpoints,
       serializationManager,
     );
@@ -547,6 +553,46 @@ class _NostrPushEndpoint {
             'token': token,
             'events': events,
           }),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue = await (_localCallContext.method.call(
+          _localUniqueSession,
+          _localCallContext.arguments,
+        ) as _i3.Future<bool>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+}
+
+class _OtsoPushEndpoint {
+  _OtsoPushEndpoint(
+    this._endpointDispatch,
+    this._serializationManager,
+  );
+
+  final _i2.EndpointDispatch _endpointDispatch;
+
+  final _i2.SerializationManager _serializationManager;
+
+  _i3.Future<bool> register(
+    _i1.TestSessionBuilder sessionBuilder,
+    List<_i7.Nip01Event> events,
+  ) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+        endpoint: 'otsoPush',
+        method: 'register',
+      );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'otsoPush',
+          methodName: 'register',
+          parameters: _i1.testObjectToJson({'events': events}),
           serializationManager: _serializationManager,
         );
         var _localReturnValue = await (_localCallContext.method.call(
