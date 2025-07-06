@@ -76,8 +76,62 @@ Future<List<String>> getPubkeysToNotify({
   return query.map((q) => q.pubKey).toSet().toList();
 }
 
-deleteGeoHashSubscription(
+Future<List<OtsoGeoSubscription>> getAllGeohashesPubkey({
+  required Session session,
+  required String pubkey,
+}) async {
+  final query = await OtsoGeoSubscription.db.find(
+    session,
+    where: (p0) => p0.pubKey.equals(pubkey),
+  );
+  return query;
+}
+
+Future<List<OtsoGeoSubscription>> insertGeotags({
+  required Session session,
+  required String pubkey,
+  required List<String> geotags,
+}) async {
+  final insert = await OtsoGeoSubscription.db.insert(
+    session,
+    geotags.map((g) {
+      return OtsoGeoSubscription(geohash: g, pubKey: pubkey);
+    }).toList(),
+  );
+  return insert;
+}
+
+Future<List<OtsoGeoSubscription>> deleteGeotags({
+  required Session session,
+  required String pubkey,
+  required List<String> geotags,
+}) async {
+  final del = await OtsoGeoSubscription.db.deleteWhere(
+    session,
+    where: (r) => r.pubKey.equals(pubkey) & r.geohash.inSet(geotags.toSet()),
+  );
+  return del;
+}
+
+Future<List<OtsoGeoSubscription>> deleteGeoHashSubscription(
     {required Session session, required String geoHash}) async {
-  await OtsoGeoSubscription.db
+  return await OtsoGeoSubscription.db
       .deleteWhere(session, where: (t) => t.geohash.equals(geoHash));
+}
+
+Future deletePubkeyAnywhere(
+    {required Session session, required String pubkey}) async {
+  final transaction = await session.db.transaction((transaction) async {
+    await OtsoGeoSubscription.db.deleteWhere(
+      session,
+      where: (r) => r.pubKey.equals(pubkey),
+      transaction: transaction,
+    );
+    await OtsoPushSubscription.db.deleteWhere(
+      session,
+      where: (r) => r.pubKey.equals(pubkey),
+      transaction: transaction,
+    );
+  });
+  return transaction;
 }

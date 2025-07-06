@@ -112,7 +112,6 @@ class NostrPushEndpoint extends Endpoint {
 
   Future<bool> register(
     Session session,
-    String token,
     List<ndk.Nip01Event> events,
   ) async {
     List<Map<String, dynamic>> processed = [];
@@ -125,6 +124,18 @@ class NostrPushEndpoint extends Endpoint {
         (tag) => tag[0] == 'challenge' && tag.length > 1,
       );
 
+      if (tokenTag.isEmpty) {
+        return false;
+      }
+
+      final userFcmToken = tokenTag[1];
+
+      final geoTags = event.tags
+          .where((tag) => tag[0] == 'g' && tag.length > 1)
+          .map((tag) => tag[1])
+          .toSet()
+          .toList();
+
       final relayTags = event.tags
           .where((tag) =>
               tag[0] == 'relay' &&
@@ -135,6 +146,43 @@ class NostrPushEndpoint extends Endpoint {
           .toSet() // Remove duplicates
           .toList();
 
+      if (veryOk && geoTags.isNotEmpty) {
+        /// sync with db
+        // Fetch existing geoTags from the database for this event
+        final existingGeoTagsTable =
+            await getAllGeohashesPubkey(session: session, pubkey: event.pubKey);
+        final existingGeoTags = existingGeoTagsTable.map((e) => e.geohash);
+
+        // Calculate tags to add and remove
+        final tagsToAdd =
+            geoTags.where((tag) => !existingGeoTags.contains(tag)).toList();
+        final tagsToRemove =
+            existingGeoTags.where((tag) => !geoTags.contains(tag)).toList();
+
+        // Add new tags
+        if (tagsToAdd.isNotEmpty) {
+          await insertGeotags(
+            session: session,
+            pubkey: event.pubKey,
+            geotags: tagsToAdd,
+          );
+        }
+
+        // Remove outdated tags
+        if (tagsToRemove.isNotEmpty) {
+          await deleteGeotags(
+            session: session,
+            pubkey: event.pubKey,
+            geotags: tagsToRemove,
+          );
+        }
+      } else {
+        await deletePubkeyAnywhere(
+          session: session,
+          pubkey: event.pubKey,
+        );
+      }
+
       final int endIndex = min(relayTags.length, maxRelaysRegistration);
       final relayTagsShort = relayTags.sublist(0, endIndex);
 
@@ -143,10 +191,10 @@ class NostrPushEndpoint extends Endpoint {
 
         // Register in database
         for (final relayUrl in relayTagsShort) {
-          await PushSubscription.db.insertRow(
+          await OtsoPushSubscription.db.insertRow(
               session,
-              PushSubscription(
-                  pubKey: event.pubKey, relay: relayUrl, token: tokenTag[1]));
+              OtsoPushSubscription(
+                  pubKey: event.pubKey, relay: relayUrl, token: userFcmToken));
         }
       } else {
         session
