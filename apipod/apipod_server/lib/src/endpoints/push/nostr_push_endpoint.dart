@@ -366,10 +366,10 @@ class NostrPushEndpoint extends Endpoint {
           });
 
           // Subscribe to specific event kinds when a relay connects
-          relay.subscribe(PushConfig.subscriptionId, {
-            'kinds': [1],
-            'limit': 1
-          });
+          relay.subscribe(
+            PushConfig.subscriptionId,
+            PushConfig.subscriptionFilter,
+          );
         });
 
         _subscriptions.add(
