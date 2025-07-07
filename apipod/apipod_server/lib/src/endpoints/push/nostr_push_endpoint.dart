@@ -96,7 +96,7 @@ class NostrPushEndpoint extends Endpoint {
   /// creates a new session for the given operation
   Future<T> _withSession<T>(Future<T> Function(Session session) operation,
       {final bool enableLogging = false}) async {
-    if (_pod == null) throw Exception('Pod not initialized');
+    _pod ??= Serverpod.instance;
 
     final session = await _pod!.createSession(
       enableLogging: enableLogging,

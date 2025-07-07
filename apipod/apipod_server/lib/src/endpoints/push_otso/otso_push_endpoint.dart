@@ -98,7 +98,7 @@ class OtsoPushEndpoint extends Endpoint {
   /// creates a new session for the given operation
   Future<T> _withSession<T>(Future<T> Function(Session session) operation,
       {final bool enableLogging = false}) async {
-    if (_pod == null) throw Exception('Pod not initialized');
+    _pod ??= Serverpod.instance;
 
     final session = await _pod!.createSession(
       enableLogging: enableLogging,
@@ -189,12 +189,33 @@ class OtsoPushEndpoint extends Endpoint {
       if (veryOk && relayTags.isNotEmpty) {
         newRelays = await checkIfThereIsANewRelay(session, relayTagsShort);
 
+        final existingRelaysTable = await OtsoPushSubscription.db.find(
+          session,
+          where: (r) =>
+              r.relay.inSet(relayTagsShort.toSet()) &
+              r.pubkey.equals(event.pubKey),
+        );
+        final existingRelays = existingRelaysTable.map((e) => e.relay);
+
+        final relaysToAdd = relayTagsShort
+            .where((relay) => !existingRelays.contains(relay))
+            .toList();
+        final relaysToRemove = existingRelays
+            .where((relay) => !existingRelays.contains(relay))
+            .toList();
+
         // Register in database
-        for (final relayUrl in relayTagsShort) {
+        for (final relayUrl in relaysToAdd) {
           await OtsoPushSubscription.db.insertRow(
               session,
               OtsoPushSubscription(
                   pubkey: event.pubKey, relay: relayUrl, token: userFcmToken));
+        }
+
+        for (final relayUrl in relaysToRemove) {
+          await OtsoPushSubscription.db.deleteWhere(session,
+              where: (r) =>
+                  r.pubkey.equals(event.pubKey) & r.relay.equals(relayUrl));
         }
       } else {
         session
