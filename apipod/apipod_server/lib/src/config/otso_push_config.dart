@@ -3,6 +3,6 @@ abstract class OtsoPushConfig {
   static final String subscriptionId = "eagle";
   static final Map<String, Object> subscriptionFilter = {
     'kinds': [6472],
-    'limit': 1
+    'limit': 0
   };
 }

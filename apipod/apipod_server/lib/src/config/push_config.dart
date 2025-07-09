@@ -4,6 +4,6 @@ abstract class PushConfig {
   static final String subscriptionId = "camelusPush";
   static final Map<String, Object> subscriptionFilter = {
     'kinds': [1],
-    'limit': 1
+    'limit': 0
   };
 }
