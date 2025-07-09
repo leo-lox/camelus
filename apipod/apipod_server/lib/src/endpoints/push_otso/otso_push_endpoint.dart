@@ -217,6 +217,22 @@ class OtsoPushEndpoint extends Endpoint {
               where: (r) =>
                   r.pubkey.equals(event.pubKey) & r.relay.equals(relayUrl));
         }
+
+        /// delete old pubkeys (e.g. on app reset):
+        final existingRelaysTableToken = await OtsoPushSubscription.db.find(
+          session,
+          where: (r) => r.token.equals(userFcmToken),
+        );
+        final pubkeysToRemove = existingRelaysTableToken
+            .where((t) => t.pubkey != event.pubKey)
+            .toList();
+
+        for (final pubkeyToRemove in pubkeysToRemove) {
+          try {
+            await OtsoPushSubscription.db.deleteWhere(session,
+                where: (r) => r.pubkey.equals(pubkeyToRemove.pubkey));
+          } catch (_) {}
+        }
       } else {
         session
             .log('Invalid registration: $veryOk, $tokenTag, $relayTagsShort');
@@ -302,6 +318,14 @@ class OtsoPushEndpoint extends Endpoint {
             tokens.where((token) => !tokensAsUrls.contains(token)).toList();
 
         if (tokens.isEmpty) {
+          // nothing to notify delete geo sub
+          try {
+            await OtsoGeoSubscription.db.deleteWhere(
+              session,
+              where: (r) => r.pubkey.equals(event.pubKey),
+            );
+          } catch (_) {}
+
           return;
         }
 
@@ -396,10 +420,10 @@ class OtsoPushEndpoint extends Endpoint {
     _isInRelayPoolFunction = true;
 
     /// restart pool in 4 hours
-    relayPoolRestartTimer?.cancel();
-    relayPoolRestartTimer = Timer(Duration(hours: 4), () {
-      _restartRelayPool();
-    });
+    // relayPoolRestartTimer?.cancel();
+    // relayPoolRestartTimer = Timer(Duration(hours: 4), () {
+    //   _restartRelayPool();
+    // });
 
     for (final sub in _subscriptions) {
       await sub.cancel();
