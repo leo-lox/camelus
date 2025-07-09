@@ -15,9 +15,11 @@ import '../endpoints/link_shorter/link_shorter_endpoint.dart' as _i3;
 import '../endpoints/moderation/moderation_endpoint.dart' as _i4;
 import '../endpoints/nip05/nip05_endpoint.dart' as _i5;
 import '../endpoints/nostr_band/nostr_band_endpoint.dart' as _i6;
-import '../endpoints/push/nostr_push_endpoint.dart' as _i7;
-import '../endpoints/push_otso/otso_push_endpoint.dart' as _i8;
-import 'package:ndk/domain_layer/entities/nip_01_event.dart' as _i9;
+import '../endpoints/otso_external_sync/otso_external_sync_endpoint.dart'
+    as _i7;
+import '../endpoints/push/nostr_push_endpoint.dart' as _i8;
+import '../endpoints/push_otso/otso_push_endpoint.dart' as _i9;
+import 'package:ndk/domain_layer/entities/nip_01_event.dart' as _i10;
 
 class Endpoints extends _i1.EndpointDispatch {
   @override
@@ -53,13 +55,19 @@ class Endpoints extends _i1.EndpointDispatch {
           'nostrBand',
           null,
         ),
-      'nostrPush': _i7.NostrPushEndpoint()
+      'otsoExternalSync': _i7.OtsoExternalSyncEndpoint()
+        ..initialize(
+          server,
+          'otsoExternalSync',
+          null,
+        ),
+      'nostrPush': _i8.NostrPushEndpoint()
         ..initialize(
           server,
           'nostrPush',
           null,
         ),
-      'otsoPush': _i8.OtsoPushEndpoint()
+      'otsoPush': _i9.OtsoPushEndpoint()
         ..initialize(
           server,
           'otsoPush',
@@ -166,7 +174,7 @@ class Endpoints extends _i1.EndpointDispatch {
           params: {
             'reportEvent': _i1.ParameterDescription(
               name: 'reportEvent',
-              type: _i1.getType<_i9.Nip01Event>(),
+              type: _i1.getType<_i10.Nip01Event>(),
               nullable: false,
             )
           },
@@ -283,6 +291,11 @@ class Endpoints extends _i1.EndpointDispatch {
         ),
       },
     );
+    connectors['otsoExternalSync'] = _i1.EndpointConnector(
+      name: 'otsoExternalSync',
+      endpoint: endpoints['otsoExternalSync']!,
+      methodConnectors: {},
+    );
     connectors['nostrPush'] = _i1.EndpointConnector(
       name: 'nostrPush',
       endpoint: endpoints['nostrPush']!,
@@ -297,7 +310,7 @@ class Endpoints extends _i1.EndpointDispatch {
             ),
             'events': _i1.ParameterDescription(
               name: 'events',
-              type: _i1.getType<List<_i9.Nip01Event>>(),
+              type: _i1.getType<List<_i10.Nip01Event>>(),
               nullable: false,
             ),
           },
@@ -305,7 +318,7 @@ class Endpoints extends _i1.EndpointDispatch {
             _i1.Session session,
             Map<String, dynamic> params,
           ) async =>
-              (endpoints['nostrPush'] as _i7.NostrPushEndpoint).register(
+              (endpoints['nostrPush'] as _i8.NostrPushEndpoint).register(
             session,
             params['token'],
             params['events'],
@@ -322,7 +335,7 @@ class Endpoints extends _i1.EndpointDispatch {
           params: {
             'events': _i1.ParameterDescription(
               name: 'events',
-              type: _i1.getType<List<_i9.Nip01Event>>(),
+              type: _i1.getType<List<_i10.Nip01Event>>(),
               nullable: false,
             )
           },
@@ -330,7 +343,7 @@ class Endpoints extends _i1.EndpointDispatch {
             _i1.Session session,
             Map<String, dynamic> params,
           ) async =>
-              (endpoints['otsoPush'] as _i8.OtsoPushEndpoint).register(
+              (endpoints['otsoPush'] as _i9.OtsoPushEndpoint).register(
             session,
             params['events'],
           ),

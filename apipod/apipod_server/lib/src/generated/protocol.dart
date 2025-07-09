@@ -25,10 +25,11 @@ import 'nostr_band/nostr_band_people.dart' as _i13;
 import 'nostr_band/nostr_band_profiles.dart' as _i14;
 import 'otso_push/otso_geo_subscriptions.dart' as _i15;
 import 'otso_push/otso_push_data.dart' as _i16;
-import 'reports_incoming.dart' as _i17;
-import 'short_links/short_link_invite_data.dart' as _i18;
-import 'subscription.dart' as _i19;
-import 'package:ndk/domain_layer/entities/nip_01_event.dart' as _i20;
+import 'otso_sync/otos_external_sync.dart' as _i17;
+import 'reports_incoming.dart' as _i18;
+import 'short_links/short_link_invite_data.dart' as _i19;
+import 'subscription.dart' as _i20;
+import 'package:ndk/domain_layer/entities/nip_01_event.dart' as _i21;
 export 'app_update_data.dart';
 export 'bloom_filter_data.dart';
 export 'bloom_filter_events.dart';
@@ -43,6 +44,7 @@ export 'nostr_band/nostr_band_people.dart';
 export 'nostr_band/nostr_band_profiles.dart';
 export 'otso_push/otso_geo_subscriptions.dart';
 export 'otso_push/otso_push_data.dart';
+export 'otso_sync/otos_external_sync.dart';
 export 'reports_incoming.dart';
 export 'short_links/short_link_invite_data.dart';
 export 'subscription.dart';
@@ -314,6 +316,63 @@ class Protocol extends _i1.SerializationManagerServer {
               type: _i2.IndexElementDefinitionType.column,
               definition: 'domain',
             ),
+          ],
+          type: 'btree',
+          isUnique: true,
+          isPrimary: false,
+        ),
+      ],
+      managed: true,
+    ),
+    _i2.TableDefinition(
+      name: 'otso_external_sync',
+      dartName: 'OtsoExternalSync',
+      schema: 'public',
+      module: 'apipod',
+      columns: [
+        _i2.ColumnDefinition(
+          name: 'id',
+          columnType: _i2.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int?',
+          columnDefault: 'nextval(\'otso_external_sync_id_seq\'::regclass)',
+        ),
+        _i2.ColumnDefinition(
+          name: 'itemId',
+          columnType: _i2.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int',
+        ),
+        _i2.ColumnDefinition(
+          name: 'syncedAt',
+          columnType: _i2.ColumnType.timestampWithoutTimeZone,
+          isNullable: false,
+          dartType: 'DateTime',
+        ),
+      ],
+      foreignKeys: [],
+      indexes: [
+        _i2.IndexDefinition(
+          indexName: 'otso_external_sync_pkey',
+          tableSpace: null,
+          elements: [
+            _i2.IndexElementDefinition(
+              type: _i2.IndexElementDefinitionType.column,
+              definition: 'id',
+            )
+          ],
+          type: 'btree',
+          isUnique: true,
+          isPrimary: true,
+        ),
+        _i2.IndexDefinition(
+          indexName: 'otso_external_sync_unique_idx',
+          tableSpace: null,
+          elements: [
+            _i2.IndexElementDefinition(
+              type: _i2.IndexElementDefinitionType.column,
+              definition: 'itemId',
+            )
           ],
           type: 'btree',
           isUnique: true,
@@ -728,14 +787,17 @@ class Protocol extends _i1.SerializationManagerServer {
     if (t == _i16.OtsoPushSubscription) {
       return _i16.OtsoPushSubscription.fromJson(data) as T;
     }
-    if (t == _i17.ReportsIncoming) {
-      return _i17.ReportsIncoming.fromJson(data) as T;
+    if (t == _i17.OtsoExternalSync) {
+      return _i17.OtsoExternalSync.fromJson(data) as T;
     }
-    if (t == _i18.ShortLinkInviteData) {
-      return _i18.ShortLinkInviteData.fromJson(data) as T;
+    if (t == _i18.ReportsIncoming) {
+      return _i18.ReportsIncoming.fromJson(data) as T;
     }
-    if (t == _i19.PushSubscription) {
-      return _i19.PushSubscription.fromJson(data) as T;
+    if (t == _i19.ShortLinkInviteData) {
+      return _i19.ShortLinkInviteData.fromJson(data) as T;
+    }
+    if (t == _i20.PushSubscription) {
+      return _i20.PushSubscription.fromJson(data) as T;
     }
     if (t == _i1.getType<_i3.AppUpdateData?>()) {
       return (data != null ? _i3.AppUpdateData.fromJson(data) : null) as T;
@@ -782,15 +844,18 @@ class Protocol extends _i1.SerializationManagerServer {
       return (data != null ? _i16.OtsoPushSubscription.fromJson(data) : null)
           as T;
     }
-    if (t == _i1.getType<_i17.ReportsIncoming?>()) {
-      return (data != null ? _i17.ReportsIncoming.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i17.OtsoExternalSync?>()) {
+      return (data != null ? _i17.OtsoExternalSync.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i18.ShortLinkInviteData?>()) {
-      return (data != null ? _i18.ShortLinkInviteData.fromJson(data) : null)
+    if (t == _i1.getType<_i18.ReportsIncoming?>()) {
+      return (data != null ? _i18.ReportsIncoming.fromJson(data) : null) as T;
+    }
+    if (t == _i1.getType<_i19.ShortLinkInviteData?>()) {
+      return (data != null ? _i19.ShortLinkInviteData.fromJson(data) : null)
           as T;
     }
-    if (t == _i1.getType<_i19.PushSubscription?>()) {
-      return (data != null ? _i19.PushSubscription.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i20.PushSubscription?>()) {
+      return (data != null ? _i20.PushSubscription.fromJson(data) : null) as T;
     }
     if (t == List<String>) {
       return (data as List).map((e) => deserialize<String>(e)).toList() as T;
@@ -813,15 +878,15 @@ class Protocol extends _i1.SerializationManagerServer {
           .map((e) => deserialize<_i14.NostrBandProfiles>(e))
           .toList() as T;
     }
-    if (t == _i20.Nip01Event) {
-      return _i20.Nip01Event.fromJson(data) as T;
+    if (t == _i21.Nip01Event) {
+      return _i21.Nip01Event.fromJson(data) as T;
     }
-    if (t == List<_i20.Nip01Event>) {
-      return (data as List).map((e) => deserialize<_i20.Nip01Event>(e)).toList()
+    if (t == List<_i21.Nip01Event>) {
+      return (data as List).map((e) => deserialize<_i21.Nip01Event>(e)).toList()
           as T;
     }
-    if (t == _i1.getType<_i20.Nip01Event?>()) {
-      return (data != null ? _i20.Nip01Event.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i21.Nip01Event?>()) {
+      return (data != null ? _i21.Nip01Event.fromJson(data) : null) as T;
     }
     try {
       return _i2.Protocol().deserialize<T>(data, t);
@@ -833,7 +898,7 @@ class Protocol extends _i1.SerializationManagerServer {
   String? getClassNameForObject(Object? data) {
     String? className = super.getClassNameForObject(data);
     if (className != null) return className;
-    if (data is _i20.Nip01Event) {
+    if (data is _i21.Nip01Event) {
       return 'Nip01Event';
     }
     if (data is _i3.AppUpdateData) {
@@ -878,13 +943,16 @@ class Protocol extends _i1.SerializationManagerServer {
     if (data is _i16.OtsoPushSubscription) {
       return 'OtsoPushSubscription';
     }
-    if (data is _i17.ReportsIncoming) {
+    if (data is _i17.OtsoExternalSync) {
+      return 'OtsoExternalSync';
+    }
+    if (data is _i18.ReportsIncoming) {
       return 'ReportsIncoming';
     }
-    if (data is _i18.ShortLinkInviteData) {
+    if (data is _i19.ShortLinkInviteData) {
       return 'ShortLinkInviteData';
     }
-    if (data is _i19.PushSubscription) {
+    if (data is _i20.PushSubscription) {
       return 'PushSubscription';
     }
     className = _i2.Protocol().getClassNameForObject(data);
@@ -901,7 +969,7 @@ class Protocol extends _i1.SerializationManagerServer {
       return super.deserializeByClassName(data);
     }
     if (dataClassName == 'Nip01Event') {
-      return deserialize<_i20.Nip01Event>(data['data']);
+      return deserialize<_i21.Nip01Event>(data['data']);
     }
     if (dataClassName == 'AppUpdateData') {
       return deserialize<_i3.AppUpdateData>(data['data']);
@@ -945,14 +1013,17 @@ class Protocol extends _i1.SerializationManagerServer {
     if (dataClassName == 'OtsoPushSubscription') {
       return deserialize<_i16.OtsoPushSubscription>(data['data']);
     }
+    if (dataClassName == 'OtsoExternalSync') {
+      return deserialize<_i17.OtsoExternalSync>(data['data']);
+    }
     if (dataClassName == 'ReportsIncoming') {
-      return deserialize<_i17.ReportsIncoming>(data['data']);
+      return deserialize<_i18.ReportsIncoming>(data['data']);
     }
     if (dataClassName == 'ShortLinkInviteData') {
-      return deserialize<_i18.ShortLinkInviteData>(data['data']);
+      return deserialize<_i19.ShortLinkInviteData>(data['data']);
     }
     if (dataClassName == 'PushSubscription') {
-      return deserialize<_i19.PushSubscription>(data['data']);
+      return deserialize<_i20.PushSubscription>(data['data']);
     }
     if (dataClassName.startsWith('serverpod.')) {
       data['className'] = dataClassName.substring(10);
@@ -980,12 +1051,14 @@ class Protocol extends _i1.SerializationManagerServer {
         return _i15.OtsoGeoSubscription.t;
       case _i16.OtsoPushSubscription:
         return _i16.OtsoPushSubscription.t;
-      case _i17.ReportsIncoming:
-        return _i17.ReportsIncoming.t;
-      case _i18.ShortLinkInviteData:
-        return _i18.ShortLinkInviteData.t;
-      case _i19.PushSubscription:
-        return _i19.PushSubscription.t;
+      case _i17.OtsoExternalSync:
+        return _i17.OtsoExternalSync.t;
+      case _i18.ReportsIncoming:
+        return _i18.ReportsIncoming.t;
+      case _i19.ShortLinkInviteData:
+        return _i19.ShortLinkInviteData.t;
+      case _i20.PushSubscription:
+        return _i20.PushSubscription.t;
     }
     return null;
   }

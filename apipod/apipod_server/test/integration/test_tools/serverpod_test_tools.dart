@@ -123,6 +123,8 @@ class TestEndpoints {
 
   late final _NostrBandEndpoint nostrBand;
 
+  late final _OtsoExternalSyncEndpoint otsoExternalSync;
+
   late final _NostrPushEndpoint nostrPush;
 
   late final _OtsoPushEndpoint otsoPush;
@@ -152,6 +154,10 @@ class _InternalTestEndpoints extends TestEndpoints
       serializationManager,
     );
     nostrBand = _NostrBandEndpoint(
+      endpoints,
+      serializationManager,
+    );
+    otsoExternalSync = _OtsoExternalSyncEndpoint(
       endpoints,
       serializationManager,
     );
@@ -521,6 +527,13 @@ class _NostrBandEndpoint {
       }
     });
   }
+}
+
+class _OtsoExternalSyncEndpoint {
+  _OtsoExternalSyncEndpoint(
+    _endpointDispatch,
+    _serializationManager,
+  );
 }
 
 class _NostrPushEndpoint {

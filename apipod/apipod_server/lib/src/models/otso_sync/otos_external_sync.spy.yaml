@@ -1,0 +1,9 @@
+class: OtsoExternalSync
+table: otso_external_sync
+fields:
+  itemId: int
+  syncedAt: DateTime
+indexes:
+  otso_external_sync_unique_idx:
+    fields: itemId
+    unique: true

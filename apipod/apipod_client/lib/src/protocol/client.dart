@@ -170,6 +170,14 @@ class EndpointNostrBand extends _i1.EndpointRef {
 }
 
 /// {@category Endpoint}
+class EndpointOtsoExternalSync extends _i1.EndpointRef {
+  EndpointOtsoExternalSync(_i1.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'otsoExternalSync';
+}
+
+/// {@category Endpoint}
 class EndpointNostrPush extends _i1.EndpointRef {
   EndpointNostrPush(_i1.EndpointCaller caller) : super(caller);
 
@@ -236,6 +244,7 @@ class Client extends _i1.ServerpodClientShared {
     moderation = EndpointModeration(this);
     nip05 = EndpointNip05(this);
     nostrBand = EndpointNostrBand(this);
+    otsoExternalSync = EndpointOtsoExternalSync(this);
     nostrPush = EndpointNostrPush(this);
     otsoPush = EndpointOtsoPush(this);
   }
@@ -250,6 +259,8 @@ class Client extends _i1.ServerpodClientShared {
 
   late final EndpointNostrBand nostrBand;
 
+  late final EndpointOtsoExternalSync otsoExternalSync;
+
   late final EndpointNostrPush nostrPush;
 
   late final EndpointOtsoPush otsoPush;
@@ -261,6 +272,7 @@ class Client extends _i1.ServerpodClientShared {
         'moderation': moderation,
         'nip05': nip05,
         'nostrBand': nostrBand,
+        'otsoExternalSync': otsoExternalSync,
         'nostrPush': nostrPush,
         'otsoPush': otsoPush,
       };

@@ -92,6 +92,8 @@ services:
       - SERVERPOD_MAX_REQUEST_SIZE
       - GOOGLE_APPLICATION_CREDENTIALS
       - FIREBASE_PROJECT_ID
+      - OTSO_NOSTR_PUB_KEY
+      - OTSO_NOSTR_PRIV_KEY
     volumes:
       - /mnt/HC_Volume_102297201/apipod_config:/apipod_config
     command:

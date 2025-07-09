@@ -24,7 +24,7 @@ class Relay {
   /// Flag indicating if reconnection is in progress
   bool _reconnecting = false;
 
-  int reconnectDelay = 100;
+  int reconnectDelay = 4000;
   int reconnectAttempts = 0;
 
   /// Stream controllers for different event types

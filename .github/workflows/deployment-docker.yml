@@ -171,6 +171,10 @@ jobs:
           # GOOGLE_APPLICATION_CREDENTIALS path
           GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS}}
 
+          # nostr keys
+          OTSO_NOSTR_PRIV_KEY: ${{ secrets.OTSO_NOSTR_PRIV_KEY }}
+          OTSO_NOSTR_PUB_KEY:  ${{ secrets.OTSO_NOSTR_PUB_KEY }}
+
 
       - name: cleanup
         run: rm -rf ~/.ssh
