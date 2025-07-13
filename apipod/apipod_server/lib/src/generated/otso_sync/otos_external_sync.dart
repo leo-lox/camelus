@@ -16,12 +16,14 @@ abstract class OtsoExternalSync
   OtsoExternalSync._({
     this.id,
     required this.itemId,
+    required this.source,
     required this.syncedAt,
   });
 
   factory OtsoExternalSync({
     int? id,
     required int itemId,
+    required String source,
     required DateTime syncedAt,
   }) = _OtsoExternalSyncImpl;
 
@@ -29,6 +31,7 @@ abstract class OtsoExternalSync
     return OtsoExternalSync(
       id: jsonSerialization['id'] as int?,
       itemId: jsonSerialization['itemId'] as int,
+      source: jsonSerialization['source'] as String,
       syncedAt:
           _i1.DateTimeJsonExtension.fromJson(jsonSerialization['syncedAt']),
     );
@@ -43,6 +46,8 @@ abstract class OtsoExternalSync
 
   int itemId;
 
+  String source;
+
   DateTime syncedAt;
 
   @override
@@ -54,6 +59,7 @@ abstract class OtsoExternalSync
   OtsoExternalSync copyWith({
     int? id,
     int? itemId,
+    String? source,
     DateTime? syncedAt,
   });
   @override
@@ -61,6 +67,7 @@ abstract class OtsoExternalSync
     return {
       if (id != null) 'id': id,
       'itemId': itemId,
+      'source': source,
       'syncedAt': syncedAt.toJson(),
     };
   }
@@ -70,6 +77,7 @@ abstract class OtsoExternalSync
     return {
       if (id != null) 'id': id,
       'itemId': itemId,
+      'source': source,
       'syncedAt': syncedAt.toJson(),
     };
   }
@@ -110,10 +118,12 @@ class _OtsoExternalSyncImpl extends OtsoExternalSync {
   _OtsoExternalSyncImpl({
     int? id,
     required int itemId,
+    required String source,
     required DateTime syncedAt,
   }) : super._(
           id: id,
           itemId: itemId,
+          source: source,
           syncedAt: syncedAt,
         );
 
@@ -124,11 +134,13 @@ class _OtsoExternalSyncImpl extends OtsoExternalSync {
   OtsoExternalSync copyWith({
     Object? id = _Undefined,
     int? itemId,
+    String? source,
     DateTime? syncedAt,
   }) {
     return OtsoExternalSync(
       id: id is int? ? id : this.id,
       itemId: itemId ?? this.itemId,
+      source: source ?? this.source,
       syncedAt: syncedAt ?? this.syncedAt,
     );
   }
@@ -141,6 +153,10 @@ class OtsoExternalSyncTable extends _i1.Table<int?> {
       'itemId',
       this,
     );
+    source = _i1.ColumnString(
+      'source',
+      this,
+    );
     syncedAt = _i1.ColumnDateTime(
       'syncedAt',
       this,
@@ -149,12 +165,15 @@ class OtsoExternalSyncTable extends _i1.Table<int?> {
 
   late final _i1.ColumnInt itemId;
 
+  late final _i1.ColumnString source;
+
   late final _i1.ColumnDateTime syncedAt;
 
   @override
   List<_i1.Column> get columns => [
         id,
         itemId,
+        source,
         syncedAt,
       ];
 }

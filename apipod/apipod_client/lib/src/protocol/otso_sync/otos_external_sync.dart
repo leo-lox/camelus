@@ -15,12 +15,14 @@ abstract class OtsoExternalSync implements _i1.SerializableModel {
   OtsoExternalSync._({
     this.id,
     required this.itemId,
+    required this.source,
     required this.syncedAt,
   });
 
   factory OtsoExternalSync({
     int? id,
     required int itemId,
+    required String source,
     required DateTime syncedAt,
   }) = _OtsoExternalSyncImpl;
 
@@ -28,6 +30,7 @@ abstract class OtsoExternalSync implements _i1.SerializableModel {
     return OtsoExternalSync(
       id: jsonSerialization['id'] as int?,
       itemId: jsonSerialization['itemId'] as int,
+      source: jsonSerialization['source'] as String,
       syncedAt:
           _i1.DateTimeJsonExtension.fromJson(jsonSerialization['syncedAt']),
     );
@@ -40,6 +43,8 @@ abstract class OtsoExternalSync implements _i1.SerializableModel {
 
   int itemId;
 
+  String source;
+
   DateTime syncedAt;
 
   /// Returns a shallow copy of this [OtsoExternalSync]
@@ -48,6 +53,7 @@ abstract class OtsoExternalSync implements _i1.SerializableModel {
   OtsoExternalSync copyWith({
     int? id,
     int? itemId,
+    String? source,
     DateTime? syncedAt,
   });
   @override
@@ -55,6 +61,7 @@ abstract class OtsoExternalSync implements _i1.SerializableModel {
     return {
       if (id != null) 'id': id,
       'itemId': itemId,
+      'source': source,
       'syncedAt': syncedAt.toJson(),
     };
   }
@@ -71,10 +78,12 @@ class _OtsoExternalSyncImpl extends OtsoExternalSync {
   _OtsoExternalSyncImpl({
     int? id,
     required int itemId,
+    required String source,
     required DateTime syncedAt,
   }) : super._(
           id: id,
           itemId: itemId,
+          source: source,
           syncedAt: syncedAt,
         );
 
@@ -85,11 +94,13 @@ class _OtsoExternalSyncImpl extends OtsoExternalSync {
   OtsoExternalSync copyWith({
     Object? id = _Undefined,
     int? itemId,
+    String? source,
     DateTime? syncedAt,
   }) {
     return OtsoExternalSync(
       id: id is int? ? id : this.id,
       itemId: itemId ?? this.itemId,
+      source: source ?? this.source,
       syncedAt: syncedAt ?? this.syncedAt,
     );
   }

@@ -2,8 +2,9 @@ class: OtsoExternalSync
 table: otso_external_sync
 fields:
   itemId: int
+  source: String
   syncedAt: DateTime
 indexes:
   otso_external_sync_unique_idx:
-    fields: itemId
+    fields: itemId, source
     unique: true
