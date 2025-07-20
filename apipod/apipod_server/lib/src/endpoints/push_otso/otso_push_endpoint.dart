@@ -118,7 +118,7 @@ class OtsoPushEndpoint extends Endpoint {
     bool newRelays = false;
 
     for (final event in events) {
-      bool veryOk = verifyEvent(event);
+      bool veryOk = await verifyEvent(event);
 
       final tokenTag = event.tags.firstWhere(
         (tag) => tag[0] == 'challenge' && tag.length > 1,
