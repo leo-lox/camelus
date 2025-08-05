@@ -285,6 +285,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.3.1"
+  cbor:
+    dependency: transitive
+    description:
+      name: cbor
+      sha256: f5239dd6b6ad24df67d1449e87d7180727d6f43b87b3c9402e6398c7a2d9609b
+      url: "https://pub.dev"
+    source: hosted
+    version: "6.3.7"
   characters:
     dependency: transitive
     description:
@@ -958,6 +966,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.1.2"
+  ieee754:
+    dependency: transitive
+    description:
+      name: ieee754
+      sha256: "7d87451c164a56c156180d34a4e93779372edd191d2c219206100b976203128c"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.3"
   image:
     dependency: "direct main"
     description:
@@ -1198,12 +1214,10 @@ packages:
   ndk:
     dependency: "direct main"
     description:
-      path: "packages/ndk"
-      ref: tmp-camelus-1-7-2
-      resolved-ref: "1dbd6bc0252febb08ff8a82a2239d98253a05fb4"
-      url: "https://github.com/relaystr/ndk.git"
-    source: git
-    version: "0.4.1"
+      path: "../ndk/packages/ndk"
+      relative: true
+    source: path
+    version: "0.5.0"
   ndk_amber:
     dependency: "direct main"
     description:
@@ -1215,10 +1229,9 @@ packages:
   ndk_objectbox:
     dependency: "direct main"
     description:
-      name: ndk_objectbox
-      sha256: "8dddde6f0b93e0ae70e65a650a50836158b1640eddf6b52cbafaf093940c2766"
-      url: "https://pub.dev"
-    source: hosted
+      path: "../ndk/packages/objectbox"
+      relative: true
+    source: path
     version: "0.2.5"
   ndk_rust_verifier:
     dependency: "direct main"

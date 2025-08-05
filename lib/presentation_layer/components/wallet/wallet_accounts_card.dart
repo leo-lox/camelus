@@ -1,42 +1,37 @@
 import 'package:flutter/material.dart';
-
 import 'package:lottie/lottie.dart';
 import 'package:intl/intl.dart';
 
-class WalletAccountsCard extends StatefulWidget {
-  const WalletAccountsCard({super.key, required this.title});
+class WalletAccountsCard extends StatelessWidget {
+  const WalletAccountsCard({
+    super.key,
+    required this.title,
+    required this.nfcAnimController,
+    required this.alias,
+    required this.mainCurrencySymbol,
+    required this.mainCurrencyValue,
+    required this.mainCurrencyCode,
+  });
+
   final String title;
+  final String alias;
+
+  final AnimationController nfcAnimController;
+
+  /// ₿
+  final String mainCurrencySymbol;
+  final double mainCurrencyValue;
+  final String mainCurrencyCode;
 
   @override
-  State<WalletAccountsCard> createState() => _AccountsCard();
-}
+  Widget build(BuildContext context) {
+    final satFormat = NumberFormat("#,##0.##", "de_DE");
+    final eurFormat = NumberFormat("#,##0.00", "de_DE");
 
-class _AccountsCard extends State<WalletAccountsCard>
-    with TickerProviderStateMixin {
-  late final AnimationController _nfcAnimController;
-
-  final satFormat = NumberFormat("#,##0.##", "de_DE");
-  final eurFormat = NumberFormat("#,##0.00", "de_DE");
-
-  @override
-  void initState() {
-    super.initState();
-
-    _nfcAnimController = AnimationController(vsync: this);
-  }
-
-  @override
-  void dispose() {
-    _nfcAnimController.dispose();
-    super.dispose();
-  }
-
-  @override
-  build(BuildContext context) {
     return Column(
-      children: <Widget>[
+      children: [
         Column(
-          children: <Widget>[
+          children: [
             Container(
               width: 370,
               height: 210,
@@ -66,15 +61,15 @@ class _AccountsCard extends State<WalletAccountsCard>
                   children: [
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
+                      children: [
                         Text(
-                          "alias",
+                          alias,
                           style: TextStyle(fontSize: 18),
                         ),
                         Container(
                           margin: const EdgeInsets.fromLTRB(10.0, 10, 0, 0),
-                          child: const Text(
-                            "main ",
+                          child: Text(
+                            title,
                             style: TextStyle(
                                 fontSize: 35,
                                 color: Colors.white,
@@ -90,8 +85,8 @@ class _AccountsCard extends State<WalletAccountsCard>
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.end,
                                 children: [
-                                  const Text(
-                                    "₿",
+                                  Text(
+                                    mainCurrencySymbol,
                                     style: TextStyle(
                                       fontSize: 37,
                                       fontWeight: FontWeight.bold,
@@ -99,15 +94,15 @@ class _AccountsCard extends State<WalletAccountsCard>
                                     ),
                                   ),
                                   Text(
-                                    '${satFormat.format(20.4)}',
+                                    '${satFormat.format(mainCurrencyValue)}',
                                     style: const TextStyle(
                                       fontSize: 37,
                                       fontWeight: FontWeight.bold,
                                       color: Colors.white,
                                     ),
                                   ),
-                                  const Text(
-                                    "sat",
+                                  Text(
+                                    mainCurrencyCode,
                                     style: TextStyle(
                                       fontSize: 25,
                                       fontWeight: FontWeight.bold,
@@ -151,7 +146,6 @@ class _AccountsCard extends State<WalletAccountsCard>
                       ],
                     ),
                     //lottie animation
-
                     Positioned(
                       right: -50,
                       child: Transform(
@@ -163,11 +157,11 @@ class _AccountsCard extends State<WalletAccountsCard>
                           'assets/animations/nfc-mood.json',
                           width: 150,
                           //fit: BoxFit.cover,
-                          controller: _nfcAnimController,
+                          controller: nfcAnimController,
                           onLoaded: (composition) {
-                            _nfcAnimController.duration = composition.duration;
-                            _nfcAnimController.repeat();
-                            _nfcAnimController.forward();
+                            nfcAnimController.duration = composition.duration;
+                            nfcAnimController.repeat();
+                            nfcAnimController.forward();
                           },
                         ),
                       ),
