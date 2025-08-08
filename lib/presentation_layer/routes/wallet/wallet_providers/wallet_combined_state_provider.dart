@@ -1,6 +1,6 @@
 import 'package:camelus/presentation_layer/providers/db_ndk_provider.dart';
 import 'package:camelus/presentation_layer/providers/ndk_provider.dart';
-import 'package:ndk/domain_layer/usecases/cashu_wallet/cashu_wallet_account.dart';
+import 'package:ndk/entities.dart';
 import 'package:ndk/ndk.dart';
 import 'package:riverpod/riverpod.dart';
 import 'package:serverpod_flutter/serverpod_flutter.dart';
@@ -43,35 +43,37 @@ class WalletCombinedStateNotifier extends StateNotifier<WalletCombinedState> {
   }
 
   Future<void> _initializeState() async {
-    final sub = _ndk.wallet.balances.listen((data) {
-      final satValue = data['sat'];
-      state = state.copyWith(combinedAmount: satValue);
+    final sub = _ndk.wallets.combinedBalances.listen((data) {
+      try {
+        final satValue = data.firstWhere((d) => d.unit == "sat");
+        state = state.copyWith(combinedAmount: satValue.amount);
+      } catch (_) {}
     });
 
     sub.onDone(() => sub.cancel());
+
+    _ndk.wallets.addWallet(CashuWallet(
+      id: "http://$localhost:8085",
+      name: "$localhost:8085",
+      supportedUnits: {"sat"},
+      mintUrl: "http://$localhost:8085",
+      type: WalletType.CASHU,
+    ));
   }
 
   fundWallet() async {
     /// todo acc management in wallet usecase
     /// just testing
-    final myAcc = CashuWalletAccount(
-      id: "myid",
-      name: "test",
-      type: WalletAccountType.CASHU,
-      unit: "sat",
-      cashuWallet: _ndk.cashuWallet,
-      mintUrl: "http://$localhost:8085",
-      cacheManager: ndkDb,
-    );
 
-    myAcc.pendingTransactions.listen((pending) {
-      print(pending);
-    });
+    final draftTransaction = await _ndk.cashu.initiateFund(
+        mintUrl: "http://$localhost:8085",
+        amount: 10,
+        unit: "sat",
+        method: "bolt11");
 
-    _ndk.wallet.addAccount(myAcc);
-    final draftTransaction = await myAcc.initiateFund(amount: 50);
-    final transaction =
-        await myAcc.retriveFunds(draftTransaction: draftTransaction);
+    final transaction = await _ndk.cashu
+        .retriveFunds(draftTransaction: draftTransaction)
+        .toList();
     print(transaction);
   }
 }
