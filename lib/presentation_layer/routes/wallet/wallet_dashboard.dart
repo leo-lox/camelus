@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../config/palette.dart';
 import '../../atoms/my_profile_picture.dart';
+import '../../components/wallet/payment_history_short.dart';
 import '../../components/wallet/wallet_actions_strip.dart';
 import '../../components/wallet/wallet_friends_strip.dart';
 import '../../components/wallet/wallet_accounts_card.dart';
@@ -92,11 +93,14 @@ class _WalletDashboardState extends ConsumerState<WalletDashboard>
               const WalletActionsStrip(),
               const SizedBox(height: 30),
               TextButton(
-                  onPressed: () {
-                    combinedWalletNotifier.fundWallet();
-                  },
-                  child: Text("invoke"))
-              //PaymentHistoryShort(),
+                onPressed: () {
+                  combinedWalletNotifier.fundWallet();
+                },
+                child: Text("invoke"),
+              ),
+              PaymentHistoryShort(
+                transactions: combinedWallet.recentTransactions,
+              ),
             ],
           ),
         ),

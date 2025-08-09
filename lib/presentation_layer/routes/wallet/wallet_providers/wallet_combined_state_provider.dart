@@ -1,23 +1,33 @@
-import 'package:camelus/presentation_layer/providers/db_ndk_provider.dart';
-import 'package:camelus/presentation_layer/providers/ndk_provider.dart';
-import 'package:ndk/entities.dart';
+import 'package:ndk/entities.dart' as ndk_entities;
 import 'package:ndk/ndk.dart';
+
 import 'package:riverpod/riverpod.dart';
 import 'package:serverpod_flutter/serverpod_flutter.dart';
+
+import '../../../providers/db_ndk_provider.dart';
+import '../../../providers/ndk_provider.dart';
 
 /// class for to save state for each post if it is reposted or not
 class WalletCombinedState {
   final int combinedAmount;
+  final List<ndk_entities.WalletTransaction> recentTransactions;
+  final List<ndk_entities.WalletTransaction> pendingTransactions;
 
   WalletCombinedState({
     required this.combinedAmount,
+    required this.recentTransactions,
+    required this.pendingTransactions,
   });
 
   WalletCombinedState copyWith({
     int? combinedAmount,
+    List<ndk_entities.WalletTransaction>? recentTransactions,
+    List<ndk_entities.WalletTransaction>? pendingTransactions,
   }) {
     return WalletCombinedState(
       combinedAmount: combinedAmount ?? this.combinedAmount,
+      recentTransactions: recentTransactions ?? this.recentTransactions,
+      pendingTransactions: pendingTransactions ?? this.pendingTransactions,
     );
   }
 }
@@ -38,7 +48,13 @@ class WalletCombinedStateNotifier extends StateNotifier<WalletCombinedState> {
   WalletCombinedStateNotifier(
     this._ndk,
     this.ndkDb,
-  ) : super(WalletCombinedState(combinedAmount: 0)) {
+  ) : super(
+          WalletCombinedState(
+            combinedAmount: 0,
+            recentTransactions: [],
+            pendingTransactions: [],
+          ),
+        ) {
     _initializeState();
   }
 
@@ -52,12 +68,24 @@ class WalletCombinedStateNotifier extends StateNotifier<WalletCombinedState> {
 
     sub.onDone(() => sub.cancel());
 
-    _ndk.wallets.addWallet(CashuWallet(
+    final sub1 = _ndk.wallets.combinedRecentTransactions.listen((data) {
+      state = state.copyWith(recentTransactions: data);
+    });
+
+    sub1.onDone(() => sub1.cancel());
+
+    final sub2 = _ndk.wallets.combinedPendingTransactions.listen((data) {
+      state = state.copyWith(pendingTransactions: data);
+    });
+
+    sub2.onDone(() => sub2.cancel());
+
+    _ndk.wallets.addWallet(ndk_entities.CashuWallet(
       id: "http://$localhost:8085",
       name: "$localhost:8085",
       supportedUnits: {"sat"},
       mintUrl: "http://$localhost:8085",
-      type: WalletType.CASHU,
+      type: ndk_entities.WalletType.CASHU,
     ));
   }
 
