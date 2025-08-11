@@ -9,25 +9,29 @@ import '../../../providers/ndk_provider.dart';
 
 /// class for to save state for each post if it is reposted or not
 class WalletCombinedState {
-  final int combinedAmount;
+  final List<ndk_entities.WalletBalance> balances;
+  final List<ndk_entities.Wallet> wallets;
   final List<ndk_entities.WalletTransaction> recentTransactions;
   final List<ndk_entities.WalletTransaction> pendingTransactions;
 
   WalletCombinedState({
-    required this.combinedAmount,
+    required this.balances,
     required this.recentTransactions,
     required this.pendingTransactions,
+    required this.wallets,
   });
 
   WalletCombinedState copyWith({
-    int? combinedAmount,
+    List<ndk_entities.WalletBalance>? balances,
     List<ndk_entities.WalletTransaction>? recentTransactions,
     List<ndk_entities.WalletTransaction>? pendingTransactions,
+    List<ndk_entities.Wallet>? wallets,
   }) {
     return WalletCombinedState(
-      combinedAmount: combinedAmount ?? this.combinedAmount,
+      balances: balances ?? this.balances,
       recentTransactions: recentTransactions ?? this.recentTransactions,
       pendingTransactions: pendingTransactions ?? this.pendingTransactions,
+      wallets: wallets ?? this.wallets,
     );
   }
 }
@@ -50,20 +54,17 @@ class WalletCombinedStateNotifier extends StateNotifier<WalletCombinedState> {
     this.ndkDb,
   ) : super(
           WalletCombinedState(
-            combinedAmount: 0,
-            recentTransactions: [],
-            pendingTransactions: [],
-          ),
+              balances: [],
+              recentTransactions: [],
+              pendingTransactions: [],
+              wallets: []),
         ) {
     _initializeState();
   }
 
   Future<void> _initializeState() async {
     final sub = _ndk.wallets.combinedBalances.listen((data) {
-      try {
-        final satValue = data.firstWhere((d) => d.unit == "sat");
-        state = state.copyWith(combinedAmount: satValue.amount);
-      } catch (_) {}
+      state = state.copyWith(balances: data);
     });
 
     sub.onDone(() => sub.cancel());
@@ -80,13 +81,10 @@ class WalletCombinedStateNotifier extends StateNotifier<WalletCombinedState> {
 
     sub2.onDone(() => sub2.cancel());
 
-    _ndk.wallets.addWallet(ndk_entities.CashuWallet(
-      id: "http://$localhost:8085",
-      name: "$localhost:8085",
-      supportedUnits: {"sat"},
-      mintUrl: "http://$localhost:8085",
-      type: ndk_entities.WalletType.CASHU,
-    ));
+    final sub3 = _ndk.wallets.walletsStream.listen((data) {
+      state = state.copyWith(wallets: data);
+    });
+    sub3.onDone(() => sub3.cancel());
   }
 
   fundWallet() async {
