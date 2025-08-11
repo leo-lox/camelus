@@ -1,30 +1,31 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lottie/lottie.dart';
 import 'package:intl/intl.dart';
 
-class WalletAccountsCard extends StatelessWidget {
+import 'package:ndk/entities.dart' as ndk_entities;
+
+class WalletAccountsCard extends ConsumerWidget {
   const WalletAccountsCard({
     super.key,
+    required this.walletId,
     required this.title,
     required this.nfcAnimController,
     required this.alias,
-    required this.mainCurrencySymbol,
-    required this.mainCurrencyValue,
-    required this.mainCurrencyCode,
+    required this.balances,
   });
 
+  final String walletId;
   final String title;
   final String alias;
 
   final AnimationController nfcAnimController;
 
   /// ₿
-  final String mainCurrencySymbol;
-  final double mainCurrencyValue;
-  final String mainCurrencyCode;
+  final List<ndk_entities.WalletBalance> balances;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final satFormat = NumberFormat("#,##0.##", "de_DE");
     final eurFormat = NumberFormat("#,##0.00", "de_DE");
 
@@ -82,64 +83,15 @@ class WalletAccountsCard extends StatelessWidget {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  Text(
-                                    mainCurrencySymbol,
-                                    style: TextStyle(
-                                      fontSize: 37,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
-                                    ),
+                              for (final balance in balances)
+                                Text(
+                                  "${satFormat.format(balance.amount)} ${balance.unit}",
+                                  style: const TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.normal,
+                                    color: Colors.white60,
                                   ),
-                                  Text(
-                                    '${satFormat.format(mainCurrencyValue)}',
-                                    style: const TextStyle(
-                                      fontSize: 37,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                  Text(
-                                    mainCurrencyCode,
-                                    style: TextStyle(
-                                      fontSize: 25,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 0),
-                              Row(
-                                  mainAxisAlignment: MainAxisAlignment.end,
-                                  children: [
-                                    const Text(
-                                      "€",
-                                      style: TextStyle(
-                                        fontSize: 32,
-                                        fontWeight: FontWeight.normal,
-                                        color: Colors.white60,
-                                      ),
-                                    ),
-                                    Text(
-                                      eurFormat.format(20.5),
-                                      style: const TextStyle(
-                                        fontSize: 32,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white60,
-                                      ),
-                                    ),
-                                    const Text(
-                                      "eur",
-                                      style: TextStyle(
-                                        fontSize: 25,
-                                        fontWeight: FontWeight.normal,
-                                        color: Colors.white60,
-                                      ),
-                                    ),
-                                  ]),
+                                ),
                             ],
                           ),
                         ),

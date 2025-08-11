@@ -8,6 +8,7 @@ import '../../components/wallet/payment_history_short.dart';
 import '../../components/wallet/wallet_actions_strip.dart';
 import '../../components/wallet/wallet_friends_strip.dart';
 import '../../components/wallet/wallet_accounts_card.dart';
+import '../../components/wallet/wallets_carusel.dart';
 import '../../providers/metadata_state_provider.dart';
 import '../../providers/ndk_provider.dart';
 import '../nostr/nostr_drawer.dart';
@@ -45,6 +46,8 @@ class _WalletDashboardState extends ConsumerState<WalletDashboard>
     final combinedWallet = ref.watch(walletCombinedProvider);
     final combinedWalletNotifier = ref.watch(walletCombinedProvider.notifier);
 
+    final wallets = combinedWallet.wallets;
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Palette.background,
@@ -76,13 +79,10 @@ class _WalletDashboardState extends ConsumerState<WalletDashboard>
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               const SizedBox(height: 20),
-              WalletAccountsCard(
-                title: "mainW",
+              WalletsCarousel(
+                wallets: wallets,
+                balances: combinedWallet.balances,
                 nfcAnimController: _nfcAnimController,
-                alias: "testwallet",
-                mainCurrencyCode: "sat",
-                mainCurrencySymbol: "₿",
-                mainCurrencyValue: combinedWallet.combinedAmount.toDouble(),
               ),
               const SizedBox(height: 30),
               const Padding(
