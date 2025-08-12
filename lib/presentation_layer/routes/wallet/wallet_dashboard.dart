@@ -8,7 +8,7 @@ import '../../components/wallet/payment_history_short.dart';
 import '../../components/wallet/wallet_actions_strip.dart';
 import '../../components/wallet/wallet_friends_strip.dart';
 import '../../components/wallet/wallet_accounts_card.dart';
-import '../../components/wallet/wallets_carusel.dart';
+import '../../components/wallet/wallets_carousel.dart';
 import '../../providers/metadata_state_provider.dart';
 import '../../providers/ndk_provider.dart';
 import '../nostr/nostr_drawer.dart';
