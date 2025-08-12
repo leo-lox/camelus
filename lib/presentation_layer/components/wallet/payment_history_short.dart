@@ -3,8 +3,11 @@ import 'package:intl/intl.dart';
 import 'package:ndk/entities.dart' as ndk_entities;
 import 'package:timeago/timeago.dart' as timeago;
 
+import '../../../config/palette.dart';
+
 class PaymentHistoryShort extends StatelessWidget {
   final List<ndk_entities.WalletTransaction> transactions;
+  final List<ndk_entities.WalletTransaction> pendingTransactions;
   final int? maxItems;
   final void Function(ndk_entities.WalletTransaction tx)? onTap;
   final bool showDividers;
@@ -16,6 +19,7 @@ class PaymentHistoryShort extends StatelessWidget {
   const PaymentHistoryShort({
     super.key,
     required this.transactions,
+    required this.pendingTransactions,
     this.maxItems,
     this.onTap,
     this.showDividers = true,
@@ -29,96 +33,133 @@ class PaymentHistoryShort extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (transactions.isEmpty) {
+    if (transactions.isEmpty && pendingTransactions.isEmpty) {
       return Padding(
         padding: const EdgeInsets.symmetric(vertical: 24.0),
         child: Center(child: Text(emptyText)),
       );
     }
 
-    final items = List<ndk_entities.WalletTransaction>.from(transactions);
-    items.sort((a, b) => (_bestDate(b) ?? 0).compareTo(_bestDate(a) ?? 0));
-    final visible = maxItems == null ? items : items.take(maxItems!).toList();
+    final sortedPending =
+        List<ndk_entities.WalletTransaction>.from(pendingTransactions);
+    sortedPending
+        .sort((a, b) => (_bestDate(b) ?? 0).compareTo(_bestDate(a) ?? 0));
 
-    final list = ListView.separated(
+    final sortedTransactions =
+        List<ndk_entities.WalletTransaction>.from(transactions);
+    sortedTransactions
+        .sort((a, b) => (_bestDate(b) ?? 0).compareTo(_bestDate(a) ?? 0));
+
+    final allTransactions = [...sortedPending, ...sortedTransactions];
+
+    final visible = maxItems == null
+        ? allTransactions
+        : allTransactions.take(maxItems!).toList();
+
+    final scrollView = CustomScrollView(
       controller: controller,
       physics: physics,
-      padding: EdgeInsets.zero,
-      itemCount: visible.length,
-      separatorBuilder: (_, __) =>
-          showDividers ? const Divider(height: 1) : const SizedBox.shrink(),
-      itemBuilder: (context, index) {
-        final tx = visible[index];
-        final isIncoming = tx.changeAmount >= 0;
-        final color = isIncoming ? Colors.green : Colors.red;
-        final icon = isIncoming
-            ? Icons.arrow_downward_rounded
-            : Icons.arrow_upward_rounded;
+      slivers: [
+        SliverList(
+          delegate: SliverChildBuilderDelegate(
+            (context, index) {
+              final tx = visible[index];
+              final isPending = pendingTransactions.contains(tx);
+              final isIncoming = tx.changeAmount >= 0;
+              final color = isIncoming ? Colors.green : Colors.red;
+              final icon = isIncoming
+                  ? Icons.arrow_downward_rounded
+                  : Icons.arrow_upward_rounded;
 
-        final dateToUse = _bestDate(tx);
-        final now = DateTime.now();
-        final transactionDate = dateToUse != null
-            ? DateTime.fromMillisecondsSinceEpoch(dateToUse * 1000)
-            : null;
-        final difference = transactionDate != null
-            ? now.difference(transactionDate)
-            : Duration.zero;
+              final dateToUse = _bestDate(tx);
+              final now = DateTime.now();
+              final transactionDate = dateToUse != null
+                  ? DateTime.fromMillisecondsSinceEpoch(dateToUse * 1000)
+                  : null;
+              final difference = transactionDate != null
+                  ? now.difference(transactionDate)
+                  : Duration.zero;
 
-        final String transactionDateText;
-        if (difference.inDays < 1) {
-          transactionDateText =
-              transactionDate != null ? timeago.format(transactionDate) : '';
-        } else {
-          transactionDateText = transactionDate != null
-              ? DateFormat('MMM d, yyyy').format(transactionDate)
-              : '';
-        }
-        final amountStr = _formatAmount(tx.changeAmount, tx.unit);
+              final String transactionDateText;
+              if (difference.inDays < 1) {
+                transactionDateText = transactionDate != null
+                    ? timeago.format(transactionDate)
+                    : '';
+              } else {
+                transactionDateText = transactionDate != null
+                    ? DateFormat('MMM d, yyyy').format(transactionDate)
+                    : '';
+              }
 
-        return ListTile(
-          onTap: onTap == null ? null : () => onTap!(tx),
-          leading: CircleAvatar(
-            backgroundColor: color.withOpacity(0.1),
-            child: Icon(icon, color: color),
-          ),
-          title: Text(
-            '${isIncoming ? 'Incoming' : 'Outgoing'} - ${tx.walletType}',
-            style: const TextStyle(fontWeight: FontWeight.w600),
-          ),
-          subtitle: Text(
-            [
-              transactionDateText,
-              _removeHttpPrefix(tx.walletId),
-              //_enumLabel(tx.state),
-            ].where((e) => e.isNotEmpty).join(' • '),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-          trailing: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Text(
-                amountStr,
-                style: TextStyle(
-                  fontWeight: FontWeight.w700,
-                  color: color,
+              final amountStr = _formatAmount(tx.changeAmount, tx.unit);
+
+              Widget listTile = ListTile(
+                onTap: onTap == null ? null : () => onTap!(tx),
+                leading: CircleAvatar(
+                  backgroundColor: isPending
+                      ? Colors.blue.withValues(alpha: 0.1)
+                      : color.withValues(alpha: 0.1),
+                  child: Icon(
+                    isPending ? Icons.pending : icon,
+                    color: isPending ? Colors.blue : color,
+                  ),
                 ),
-              ),
-              if (tx.completionMsg != null && tx.completionMsg!.isNotEmpty)
-                Text(
-                  tx.completionMsg!,
-                  style: Theme.of(context).textTheme.bodySmall,
+                title: Text(
+                  '${isPending ? 'Pending' : (isIncoming ? 'Incoming' : 'Outgoing')} - ${tx.walletType}',
+                  style: const TextStyle(fontWeight: FontWeight.w600),
+                ),
+                subtitle: Text(
+                  [
+                    transactionDateText,
+                    _removeHttpPrefix(tx.walletId),
+                    //_enumLabel(tx.state),
+                  ].where((e) => e.isNotEmpty).join(' • '),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
-            ],
+                trailing: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(
+                      amountStr,
+                      style: TextStyle(
+                        fontWeight: FontWeight.w700,
+                        color: isPending ? Colors.blue : color,
+                      ),
+                    ),
+                    if (tx.completionMsg != null &&
+                        tx.completionMsg!.isNotEmpty)
+                      Text(
+                        tx.completionMsg!,
+                        style: Theme.of(context).textTheme.bodySmall,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                  ],
+                ),
+              );
+
+              if (showDividers && index < visible.length - 1) {
+                return Column(
+                  children: [
+                    listTile,
+                    const Divider(height: 1, color: Palette.darkGray),
+                  ],
+                );
+              }
+
+              return listTile;
+            },
+            childCount: visible.length,
           ),
-        );
-      },
+        ),
+      ],
     );
 
-    return height != null ? SizedBox(height: height, child: list) : list;
+    return height != null
+        ? SizedBox(height: height, child: scrollView)
+        : scrollView;
   }
 
   static int? _bestDate(ndk_entities.WalletTransaction tx) =>

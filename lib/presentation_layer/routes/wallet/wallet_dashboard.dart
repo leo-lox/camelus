@@ -100,6 +100,8 @@ class _WalletDashboardState extends ConsumerState<WalletDashboard>
               ),
               PaymentHistoryShort(
                 transactions: combinedWallet.recentTransactions,
+                pendingTransactions: combinedWallet.pendingTransactions,
+                showDividers: false,
               ),
             ],
           ),
