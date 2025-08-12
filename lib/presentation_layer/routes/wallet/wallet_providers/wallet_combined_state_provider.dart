@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:ndk/entities.dart' as ndk_entities;
 import 'package:ndk/ndk.dart';
 
@@ -41,6 +43,7 @@ final walletCombinedProvider = StateNotifierProvider.autoDispose<
   (ref) {
     final ndk = ref.watch(ndkProvider);
     final ndkDb = ref.watch(dbNdkProvider)!;
+
     return WalletCombinedStateNotifier(ndk, ndkDb);
   },
 );
@@ -48,6 +51,8 @@ final walletCombinedProvider = StateNotifierProvider.autoDispose<
 class WalletCombinedStateNotifier extends StateNotifier<WalletCombinedState> {
   final Ndk _ndk;
   final CacheManager ndkDb;
+
+  final _subscriptions = <StreamSubscription>[];
 
   WalletCombinedStateNotifier(
     this._ndk,
@@ -62,29 +67,29 @@ class WalletCombinedStateNotifier extends StateNotifier<WalletCombinedState> {
     _initializeState();
   }
 
+  @override
+  void dispose() {
+    for (final subscription in _subscriptions) {
+      subscription.cancel();
+    }
+    super.dispose();
+  }
+
   Future<void> _initializeState() async {
-    final sub = _ndk.wallets.combinedBalances.listen((data) {
-      state = state.copyWith(balances: data);
-    });
-
-    sub.onDone(() => sub.cancel());
-
-    final sub1 = _ndk.wallets.combinedRecentTransactions.listen((data) {
-      state = state.copyWith(recentTransactions: data);
-    });
-
-    sub1.onDone(() => sub1.cancel());
-
-    final sub2 = _ndk.wallets.combinedPendingTransactions.listen((data) {
-      state = state.copyWith(pendingTransactions: data);
-    });
-
-    sub2.onDone(() => sub2.cancel());
-
-    final sub3 = _ndk.wallets.walletsStream.listen((data) {
-      state = state.copyWith(wallets: data);
-    });
-    sub3.onDone(() => sub3.cancel());
+    _subscriptions.addAll([
+      _ndk.wallets.combinedBalances.listen((data) {
+        state = state.copyWith(balances: data);
+      }),
+      _ndk.wallets.combinedRecentTransactions.listen((data) {
+        state = state.copyWith(recentTransactions: data);
+      }),
+      _ndk.wallets.combinedPendingTransactions.listen((data) {
+        state = state.copyWith(pendingTransactions: data);
+      }),
+      _ndk.wallets.walletsStream.listen((data) {
+        state = state.copyWith(wallets: data);
+      }),
+    ]);
   }
 
   fundWallet() async {
