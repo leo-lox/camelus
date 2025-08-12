@@ -1,33 +1,30 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../config/palette.dart';
 
 class WalletActionsStrip extends StatelessWidget {
-  const WalletActionsStrip({super.key});
+  final void Function() onScan;
+  final void Function() onReceive;
+  final void Function() onPay;
+  final void Function() onHistory;
+
+  const WalletActionsStrip({
+    super.key,
+    required this.onScan,
+    required this.onReceive,
+    required this.onPay,
+    required this.onHistory,
+  });
 
   final myIconColor = Colors.white70;
   final myTextColor = Colors.white60;
-
-  _onScan() {
-    log("onScan");
-  }
-
-  _onReceive() {
-    log("onReceive");
-  }
-
-  _onPay(context) {
-    log("onPay");
-  }
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 12),
-      child: Container(
+      child: SizedBox(
         width: MediaQuery.of(context).size.width,
         //height: 120,
         //color: Colors.white12,
@@ -38,7 +35,7 @@ class WalletActionsStrip extends StatelessWidget {
               padding: const EdgeInsets.all(2),
               child: _actionButton(
                 iconData: PhosphorIcons.barcode(),
-                onTab: () => _onScan(),
+                onTab: () => onScan(),
                 text: "scan",
               ),
             ),
@@ -46,7 +43,7 @@ class WalletActionsStrip extends StatelessWidget {
               padding: const EdgeInsets.all(2),
               child: _actionButton(
                 iconData: PhosphorIcons.wallet(),
-                onTab: () => _onPay(context),
+                onTab: () => onPay(),
                 text: "pay",
               ),
             ),
@@ -54,16 +51,16 @@ class WalletActionsStrip extends StatelessWidget {
               padding: const EdgeInsets.all(2),
               child: _actionButton(
                   iconData: PhosphorIcons.piggyBank(),
-                  onTab: () => _onReceive(),
+                  onTab: () => onReceive(),
                   text: "receive"),
             ),
             Container(
-              padding: const EdgeInsets.all(2),
-              child: _actionButton(
+                padding: const EdgeInsets.all(2),
+                child: _actionButton(
                   iconData: PhosphorIcons.receipt(),
                   text: "history",
-                  onTab: () {}),
-            ),
+                  onTab: () => onHistory(),
+                )),
           ],
         ),
       ),

@@ -90,7 +90,12 @@ class _WalletDashboardState extends ConsumerState<WalletDashboard>
                 child: WalletFriendsStrip(),
               ),
               const SizedBox(height: 30),
-              const WalletActionsStrip(),
+              WalletActionsStrip(
+                onScan: () {},
+                onReceive: () {},
+                onPay: () {},
+                onHistory: () {},
+              ),
               const SizedBox(height: 30),
               TextButton(
                 onPressed: () {
