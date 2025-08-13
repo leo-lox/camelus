@@ -4,6 +4,7 @@ import 'package:ndk/entities.dart' as ndk_entities;
 import 'package:timeago/timeago.dart' as timeago;
 
 import '../../../config/palette.dart';
+import '../../../helpers/wallet_number_formatting.dart';
 
 class PaymentHistoryShort extends StatelessWidget {
   final List<ndk_entities.WalletTransaction> transactions;
@@ -91,7 +92,8 @@ class PaymentHistoryShort extends StatelessWidget {
                     : '';
               }
 
-              final amountStr = _formatAmount(tx.changeAmount, tx.unit);
+              final amountStr = WalletNumberFormatting.formatAmount(
+                  amount: tx.changeAmount, unit: tx.unit);
 
               Widget listTile = ListTile(
                 onTap: onTap == null ? null : () => onTap!(tx),
@@ -164,14 +166,6 @@ class PaymentHistoryShort extends StatelessWidget {
 
   static int? _bestDate(ndk_entities.WalletTransaction tx) =>
       tx.transactionDate ?? tx.initiatedDate;
-
-  static String _formatAmount(int change, String unit) {
-    final sign = change >= 0 ? '+' : '-';
-    final abs = change.abs();
-    final withSeparators =
-        abs.toString().replaceAll(RegExp(r'\B(?=(\d{3})+(?!\d))'), ',');
-    return '$sign$withSeparators $unit';
-  }
 
   static String _enumLabel(Object? value) {
     if (value == null) return '';
