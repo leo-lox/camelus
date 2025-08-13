@@ -5,8 +5,10 @@ import 'package:intl/intl.dart';
 
 import 'package:ndk/entities.dart' as ndk_entities;
 
+import '../../../helpers/wallet_number_formatting.dart';
+
 class WalletAccountsCard extends ConsumerWidget {
-  const WalletAccountsCard({
+  WalletAccountsCard({
     super.key,
     required this.walletId,
     required this.title,
@@ -24,11 +26,10 @@ class WalletAccountsCard extends ConsumerWidget {
   /// ₿
   final List<ndk_entities.WalletBalance> balances;
 
+  final WalletNumberFormatting _numberFormatter = WalletNumberFormatting();
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final satFormat = NumberFormat("#,##0.##", "de_DE");
-    final eurFormat = NumberFormat("#,##0.00", "de_DE");
-
     return Column(
       children: [
         Column(
@@ -85,7 +86,7 @@ class WalletAccountsCard extends ConsumerWidget {
                             children: [
                               for (final balance in balances)
                                 Text(
-                                  "${satFormat.format(balance.amount)} ${balance.unit}",
+                                  "${_numberFormatter.formatAmount(amount: balance.amount, unit: balance.unit)} ${balance.unit}",
                                   style: const TextStyle(
                                     fontSize: 20,
                                     fontWeight: FontWeight.normal,
