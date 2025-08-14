@@ -66,14 +66,14 @@ class WalletPayRecieverState {
   }
 }
 
-class WalletPaymentNotifier extends StateNotifier<WalletPayRecieverState> {
+class WalletPayToNotifier extends StateNotifier<WalletPayRecieverState> {
   final Ndk _ndk;
 
   final GetUserMetadata _getUserMetadata;
 
   final List<String> _contactPubkeys;
 
-  WalletPaymentNotifier({
+  WalletPayToNotifier({
     String? initialWalletId,
     required Ndk ndk,
     required List<String> contactPubkeys,
@@ -131,25 +131,13 @@ class WalletPaymentNotifier extends StateNotifier<WalletPayRecieverState> {
     );
   }
 
-  void setSelectedWallet(String? walletId) {
-    state = state.copyWith(selectedWalletId: walletId);
-  }
-
   void setSearchQuery(String q) {
     state = state.copyWith(searchQuery: q);
-  }
-
-  void selectContact(UserMetadata c) {
-    throw UnimplementedError();
-  }
-
-  void onWalletTab(ndk_entities.Wallet w) {
-    throw UnimplementedError();
   }
 }
 
 final walletPayRecieverProvider = StateNotifierProvider.family<
-    WalletPaymentNotifier,
+    WalletPayToNotifier,
     WalletPayRecieverState,
     String?>((ref, initialWalletId) {
   final ndk = ref.watch(ndkProvider);
@@ -158,7 +146,7 @@ final walletPayRecieverProvider = StateNotifierProvider.family<
 
   final getUserMetadata = ref.watch(metadataProvider);
 
-  return WalletPaymentNotifier(
+  return WalletPayToNotifier(
     initialWalletId: initialWalletId,
     ndk: ndk,
     contactPubkeys: contacts.contactList.contacts,

@@ -9,17 +9,50 @@ import '../../../../../helpers/helpers.dart';
 import '../../../../../helpers/wallet_number_formatting.dart';
 import '../../../../atoms/long_button.dart';
 import '../../../../atoms/my_profile_picture.dart';
+import '../wallet_pay_select_amount/wallet_pay_select_amount.dart';
+
+import '../wallet_pay_state_provider.dart';
 import 'wallet_pay_reciever_state_provider.dart';
 
-class WalletPaymentPage extends ConsumerWidget {
+class WalletSelectReciever extends ConsumerWidget {
   final String? walletId;
+  final Function doneCallback;
 
-  const WalletPaymentPage({super.key, this.walletId});
+  const WalletSelectReciever({
+    super.key,
+    this.walletId,
+    required this.doneCallback,
+  });
+
+  _onTokenSelected(WalletPayNotifier notifier) {
+    notifier.updateRecieverType(PaymentRecieverType.token);
+    doneCallback();
+  }
+
+  _onContactSelected({
+    required WalletPayNotifier notifier,
+    required String pubkey,
+  }) {
+    notifier.updateRecieverType(PaymentRecieverType.contact);
+    notifier.updatePayToPubkey(pubkey);
+    doneCallback();
+  }
+
+  _onWalletSelected({
+    required WalletPayNotifier notifier,
+    required String walletId,
+  }) {
+    notifier.updateRecieverType(PaymentRecieverType.wallet);
+    notifier.updatePayToWalletId(walletId);
+    doneCallback();
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(walletPayRecieverProvider(walletId));
     final notifier = ref.read(walletPayRecieverProvider(walletId).notifier);
+
+    final paymentStateNotifier = ref.watch(walletPayStateProvider.notifier);
 
     return Scaffold(
       backgroundColor: Palette.background,
@@ -76,7 +109,8 @@ class WalletPaymentPage extends ConsumerWidget {
                             title: "Anonymous Token",
                             child: longButton(
                               name: "create token",
-                              onPressed: () {},
+                              onPressed: () =>
+                                  _onTokenSelected(paymentStateNotifier),
                             ),
                           ),
                         if (state.searchQuery.trim().isEmpty)
@@ -84,7 +118,10 @@ class WalletPaymentPage extends ConsumerWidget {
                             title: 'Recent contacts',
                             child: _ContactsList(
                               contacts: state.recentContacts,
-                              onTap: notifier.selectContact,
+                              onTap: (c) => _onContactSelected(
+                                notifier: paymentStateNotifier,
+                                pubkey: c.pubkey,
+                              ),
                             ),
                           ),
                         if (state.searchQuery.trim().isNotEmpty)
@@ -92,7 +129,10 @@ class WalletPaymentPage extends ConsumerWidget {
                             title: 'Matching contacts',
                             child: _ContactsList(
                               contacts: state.filteredContacts,
-                              onTap: notifier.selectContact,
+                              onTap: (c) => _onContactSelected(
+                                notifier: paymentStateNotifier,
+                                pubkey: c.pubkey,
+                              ),
                               emptyPlaceholder: const Padding(
                                 padding: EdgeInsets.all(12.0),
                                 child: Text('No matching contacts'),
@@ -129,7 +169,10 @@ class WalletPaymentPage extends ConsumerWidget {
                             wallets: state.filteredWallets,
                             balances: state.balances,
                             selectedWalletId: state.selectedWalletId,
-                            onTap: notifier.onWalletTab,
+                            onTap: (wallet) => _onWalletSelected(
+                              notifier: paymentStateNotifier,
+                              walletId: wallet.id,
+                            ),
                           ),
                         ),
                       ],
@@ -146,7 +189,12 @@ class WalletPaymentPage extends ConsumerWidget {
           child: SizedBox(
             width: double.infinity,
             height: 45,
-            child: longButton(name: "next", onPressed: () {}, inverted: true),
+            child: longButton(
+                name: "next",
+                onPressed: () {
+                  _onTokenSelected(paymentStateNotifier);
+                },
+                inverted: true),
           ),
         ),
       ),
