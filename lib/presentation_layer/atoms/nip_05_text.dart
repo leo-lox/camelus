@@ -8,7 +8,7 @@ class Nip05Text extends StatelessWidget {
   final bool cutPubkey;
 
   String shortHr(String pubkey) {
-    final npubHr = Helpers().encodeBech32(pubkey, "npub");
+    final npubHr = Helpers.encodeBech32(pubkey, "npub");
     if (!cutPubkey) {
       return npubHr;
     }

@@ -38,6 +38,7 @@ import 'presentation_layer/routes/nostr/settings/locale/locale_settings.dart';
 import 'presentation_layer/routes/nostr/settings/moderation/moderation_settings.dart';
 import 'presentation_layer/routes/nostr/settings/settings_page.dart';
 import 'presentation_layer/routes/wallet/wallet_navigation.dart';
+import 'presentation_layer/routes/wallet/wallet_pay/wallet_pay_select_reciever/wallet_pay_reciever.dart';
 import 'theme.dart' as theme;
 
 const devDeviceFrame = true;
@@ -291,6 +292,10 @@ class MyApp extends ConsumerWidget {
                 builder: (context) => WalletNavigation(
                   title: "a",
                 ),
+              );
+            case '/wallet/pay':
+              return MaterialPageRoute(
+                builder: (context) => WalletPaymentPage(),
               );
           }
           assert(false, 'Need to implement ${settings.name}');

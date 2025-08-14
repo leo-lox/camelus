@@ -91,9 +91,15 @@ class _WalletDashboardState extends ConsumerState<WalletDashboard>
               ),
               const SizedBox(height: 30),
               WalletActionsStrip(
-                onScan: () {},
-                onReceive: () {},
-                onPay: () {},
+                onScan: () {
+                  Navigator.pushNamed(context, '/wallet/scan');
+                },
+                onReceive: () {
+                  Navigator.pushNamed(context, '/wallet/receive');
+                },
+                onPay: () {
+                  Navigator.pushNamed(context, '/wallet/pay');
+                },
                 onHistory: () {},
               ),
               const SizedBox(height: 30),
@@ -101,7 +107,13 @@ class _WalletDashboardState extends ConsumerState<WalletDashboard>
                 onPressed: () {
                   combinedWalletNotifier.fundWallet();
                 },
-                child: Text("invoke"),
+                child: Text("fund"),
+              ),
+              TextButton(
+                onPressed: () {
+                  combinedWalletNotifier.spend();
+                },
+                child: Text("spend"),
               ),
               PaymentHistoryShort(
                 transactions: combinedWallet.recentTransactions,

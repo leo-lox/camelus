@@ -281,7 +281,7 @@ class _BuildProfileHeader extends ConsumerWidget {
                   onTap: () {
                     /// copy to clipboard
                     _copyToClipboard(
-                      Helpers().encodeBech32(userMetadata.pubkey, "npub"),
+                      Helpers.encodeBech32(userMetadata.pubkey, "npub"),
                     );
                   },
                   child: Nip05Text(
@@ -410,7 +410,7 @@ class _FollowButtonState extends ConsumerState<_FollowButton> {
 }
 
 _pubkeyToHrBech32Short(pubkey) {
-  final bech = Helpers().encodeBech32(pubkey, "npub");
+  final bech = Helpers.encodeBech32(pubkey, "npub");
   final bechShort = NprofileHelper().bech32toHr(bech, cutLength: 11);
 
   return bechShort;

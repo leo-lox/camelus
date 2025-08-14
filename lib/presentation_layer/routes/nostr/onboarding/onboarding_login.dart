@@ -63,7 +63,7 @@ class _OnboardingLoginPageState extends ConsumerState<OnboardingLoginPage> {
       var privkey = Helpers().decodeBech32(nsec)[0];
       var pubkey = Bip340().getPublicKey(privkey);
       var privKeyHr = nsec;
-      var publicKeyHr = Helpers().encodeBech32(pubkey, 'npub');
+      var publicKeyHr = Helpers.encodeBech32(pubkey, 'npub');
 
       setState(() {
         myKeys = KeyPair(
@@ -94,8 +94,8 @@ class _OnboardingLoginPageState extends ConsumerState<OnboardingLoginPage> {
       final privkeyHex = HEX.encode(child.privateKey!);
 
       var pubkey = Bip340().getPublicKey(privkeyHex);
-      var privKeyHr = Helpers().encodeBech32(privkeyHex, 'nsec');
-      var publicKeyHr = Helpers().encodeBech32(pubkey, 'npub');
+      var privKeyHr = Helpers.encodeBech32(privkeyHex, 'nsec');
+      var publicKeyHr = Helpers.encodeBech32(pubkey, 'npub');
 
       setState(() {
         myKeys = KeyPair(

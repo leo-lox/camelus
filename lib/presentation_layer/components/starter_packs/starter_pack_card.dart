@@ -168,7 +168,7 @@ class _StarterPackCardState extends ConsumerState<StarterPackCard> {
 }
 
 _pubkeyToHrBech32Short(pubkey) {
-  final bech = Helpers().encodeBech32(pubkey, "npub");
+  final bech = Helpers.encodeBech32(pubkey, "npub");
   final bechShort = NprofileHelper().bech32toHr(bech, cutLength: 11);
 
   return bechShort;

@@ -17,7 +17,7 @@ class InReplyTo extends ConsumerWidget {
   final NostrNote myNote;
 
   String _formatPubkey(String pubkey) {
-    final pubkeyBech = Helpers().encodeBech32(pubkey, "npub");
+    final pubkeyBech = Helpers.encodeBech32(pubkey, "npub");
     final pubkeyHr =
         "${pubkeyBech.substring(0, 4)}:${pubkeyBech.substring(pubkeyBech.length - 5)}";
     return pubkeyHr;

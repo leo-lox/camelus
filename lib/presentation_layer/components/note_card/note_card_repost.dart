@@ -69,7 +69,7 @@ class NoteCardRepost extends ConsumerWidget {
                     children: [
                       TextSpan(
                         text: repostedByMetadata?.name ??
-                            Helpers().shortHr(repostEvent.pubkey),
+                            Helpers.shortHr(repostEvent.pubkey),
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 15,

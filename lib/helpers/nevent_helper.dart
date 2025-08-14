@@ -15,7 +15,7 @@ class NeventHelper {
     final List<TLV> tlvList = _generateTlvList(eventId, authorPubkey, relays);
     final String dataString = HEX.encode(TlvUtils.encode(tlvList));
 
-    return _helper.encodeBech32(dataString, 'nevent');
+    return Helpers.encodeBech32(dataString, 'nevent');
   }
 
   /// Generates a list of TLV objects

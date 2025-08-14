@@ -349,7 +349,7 @@ class _OpenStarterPackState extends ConsumerState<OpenStarterPack> {
                                   ),
                                   const SizedBox(height: 4),
                                   Text(
-                                    "Starter pack by ${isOwnStarterPack ? "you" : ref.watch(metadataStateProvider(widget.starterPackIdentifier.pubkey)).userMetadata?.name ?? Helpers().shortHr(widget.starterPackIdentifier.pubkey)}",
+                                    "Starter pack by ${isOwnStarterPack ? "you" : ref.watch(metadataStateProvider(widget.starterPackIdentifier.pubkey)).userMetadata?.name ?? Helpers.shortHr(widget.starterPackIdentifier.pubkey)}",
                                     style: TextStyle(
                                       color: Palette.gray,
                                       fontSize: 14,
@@ -444,8 +444,8 @@ class _OpenStarterPackState extends ConsumerState<OpenStarterPack> {
 
                   return PersonCard(
                     pubkey: displayPubkey,
-                    name: displayMetadata?.name ??
-                        Helpers().shortHr(displayPubkey),
+                    name:
+                        displayMetadata?.name ?? Helpers.shortHr(displayPubkey),
                     pictureUrl: displayMetadata?.picture ?? "",
                     about: displayMetadata?.about ?? "",
                     isFollowing: myContactListState.contactList.contacts

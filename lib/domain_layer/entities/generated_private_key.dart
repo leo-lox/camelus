@@ -6,8 +6,8 @@ class GeneratedPrivateKey {
   final String privateKey;
   final String publicKey;
 
-  String get privKeyHr => Helpers().encodeBech32(privateKey, 'nsec');
-  String get publicKeyHr => Helpers().encodeBech32(publicKey, 'npub');
+  String get privKeyHr => Helpers.encodeBech32(privateKey, 'nsec');
+  String get publicKeyHr => Helpers.encodeBech32(publicKey, 'npub');
 
   GeneratedPrivateKey({
     required this.mnemonicSentence,

@@ -36,7 +36,7 @@ class Helpers {
   }
 
   /// Encode a hex string + human readable part as a bech32 string
-  String encodeBech32(String hex, String hrp) {
+  static String encodeBech32(String hex, String hrp) {
     final bytes = HEX.decode(hex);
     final fiveBitWords = _convertBits(bytes, 8, 5, true);
     return bech32.encode(Bech32(hrp, fiveBitWords), hex.length + hrp.length);
@@ -91,7 +91,8 @@ class Helpers {
   /// [pad] - whether to pad the output if there are not enough bits
   /// If pad is true, and there are remaining bits after the conversion, then the remaining bits are left-shifted and added to the result
   /// [return] - the converted data
-  List<int> _convertBits(List<int> data, int fromBits, int toBits, bool pad) {
+  static List<int> _convertBits(
+      List<int> data, int fromBits, int toBits, bool pad) {
     int acc = 0;
     int bits = 0;
     List<int> result = [];
@@ -117,7 +118,7 @@ class Helpers {
     return result;
   }
 
-  String shortHr(String pubkey, {bool cutPubkey = true}) {
+  static String shortHr(String pubkey, {bool cutPubkey = true}) {
     final npubHr = encodeBech32(pubkey, "npub");
     if (!cutPubkey) {
       return npubHr;

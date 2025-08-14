@@ -49,7 +49,7 @@ class _NoteCardNameRowState extends ConsumerState<NoteCardNameRow> {
   }
 
   void _initSequence() {
-    var npubHr = Helpers().encodeBech32(widget.pubkey, "npub");
+    var npubHr = Helpers.encodeBech32(widget.pubkey, "npub");
     npubHrShort =
         "${npubHr.substring(0, 4)}...${npubHr.substring(npubHr.length - 4)}";
   }

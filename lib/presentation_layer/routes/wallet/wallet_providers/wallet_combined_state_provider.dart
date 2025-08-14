@@ -92,12 +92,12 @@ class WalletCombinedStateNotifier extends StateNotifier<WalletCombinedState> {
     ]);
   }
 
-  fundWallet() async {
+  void fundWallet() async {
     /// todo acc management in wallet usecase
     /// just testing
 
     final draftTransaction = await _ndk.cashu.initiateFund(
-        mintUrl: "http://$localhost:8085",
+        mintUrl: "http://$localhost:8086",
         amount: 10,
         unit: "sat",
         method: "bolt11");
@@ -106,5 +106,22 @@ class WalletCombinedStateNotifier extends StateNotifier<WalletCombinedState> {
         .retriveFunds(draftTransaction: draftTransaction)
         .toList();
     print(transaction);
+  }
+
+  void spend() async {
+    final mintUrl = "http://$localhost:8086";
+    final unit = "eur";
+
+    final spend = await _ndk.cashu.initiateSpend(
+      mintUrl: mintUrl,
+      amount: 1,
+      unit: unit,
+    );
+
+    print(spend);
+
+    final token =
+        _ndk.cashu.proofsToToken(proofs: spend, mintUrl: mintUrl, unit: unit);
+    print(token);
   }
 }

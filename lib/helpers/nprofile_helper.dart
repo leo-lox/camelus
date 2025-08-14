@@ -56,7 +56,6 @@ class NprofileHelper {
 
   /// expects a map with pubkey and relays and [returns] a bech32 encoded nprofile
   String mapToBech32(Map<String, dynamic> map) {
-    final Helpers helper = Helpers();
     final String pubkey = map["pubkey"];
     final List<String> relays = List<String>.from(map['relays']);
 
@@ -64,7 +63,7 @@ class NprofileHelper {
     final Uint8List bytes = TlvUtils.encode(tlvList);
     final String dataString = HEX.encode(bytes);
 
-    return helper.encodeBech32(dataString, "nprofile");
+    return Helpers.encodeBech32(dataString, "nprofile");
   }
 
   Map<String, dynamic> _parseTlvList(List<TLV> tlvList) {

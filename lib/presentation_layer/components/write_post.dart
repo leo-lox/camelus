@@ -515,7 +515,7 @@ class _TopBar extends ConsumerWidget {
   });
 
   getPubkeyHrShort(String pubkey) {
-    final pubkeyHr = Helpers().encodeBech32(pubkey, "npub");
+    final pubkeyHr = Helpers.encodeBech32(pubkey, "npub");
     final pubkeyHrShort =
         "${pubkeyHr.substring(0, 5)}...${pubkeyHr.substring(pubkeyHr.length - 5)}";
     return pubkeyHrShort;
