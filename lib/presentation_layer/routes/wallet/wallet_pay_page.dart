@@ -61,8 +61,7 @@ class _WalletPayPageState extends ConsumerState<WalletPayPage>
           doneCallback: () {
             _navigateToNextPage();
           },
-          currencies: ['todo', 'sat', 'eur', 'usd'],
-          title: 'Select Amount',
+          title: 'Enter amount',
         ),
         WalletPaySummary(),
       ],

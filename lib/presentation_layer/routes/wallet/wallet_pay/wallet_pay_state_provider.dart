@@ -17,6 +17,7 @@ class WalletPayState {
   final String? payToPubkey;
   final String? payToWalletId;
   final String? payFromWalletId;
+  final Set<String>? supportedUnitsByWallet;
 
   WalletPayState({
     required this.availableWallets,
@@ -28,7 +29,17 @@ class WalletPayState {
     required this.recieverType,
     required this.payToPubkey,
     required this.payToWalletId,
+    this.supportedUnitsByWallet,
   });
+
+  ndk_entities.Wallet? get payFromWallet {
+    if (payFromWalletId == null) return null;
+    final filter = availableWallets.where(
+      (wallet) => wallet.id == payFromWalletId,
+    );
+    if (filter.isEmpty) return null;
+    return filter.first;
+  }
 
   WalletPayState copyWith({
     List<ndk_entities.Wallet>? availableWallets,
@@ -40,6 +51,7 @@ class WalletPayState {
     PaymentRecieverType? recieverType,
     String? payToPubkey,
     String? payToWalletId,
+    Set<String>? supportedUnitsByWallet,
   }) {
     return WalletPayState(
       availableWallets: availableWallets ?? this.availableWallets,
@@ -51,6 +63,8 @@ class WalletPayState {
       recieverType: recieverType ?? this.recieverType,
       payToPubkey: payToPubkey ?? this.payToPubkey,
       payToWalletId: payToWalletId ?? this.payToWalletId,
+      supportedUnitsByWallet:
+          supportedUnitsByWallet ?? this.supportedUnitsByWallet,
     );
   }
 }
@@ -106,15 +120,23 @@ class WalletPayNotifier extends StateNotifier<WalletPayState> {
   }
 
   void updatePayFromWalletId(String walletId) {
-    state = state.copyWith(payFromWalletId: walletId);
+    state = state.copyWith(
+      payFromWalletId: walletId,
+    );
+    state = state.copyWith(
+      supportedUnitsByWallet: state.payFromWallet?.supportedUnits,
+      unit: "sat", // state.payFromWallet?.supportedUnits.first,
+    );
   }
 
   void updateAmount(int amount) {
     state = state.copyWith(amount: amount);
+    print('Updated amount: $amount');
   }
 
   void updateUnit(String unit) {
     state = state.copyWith(unit: unit);
+    print('Updated unit: $unit');
   }
 
   void updateMemo(String? memo) {

@@ -6,10 +6,10 @@ import 'package:ndk/entities.dart' as ndk_entities;
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../../../config/palette.dart';
+import '../../../../atoms/currency_picker_bar.dart';
 import '../../../../atoms/long_button.dart';
 import '../../../../components/wallet/wallets_select_bottom_sheet.dart';
 import '../wallet_pay_state_provider.dart';
-import 'wallet_pay_select_amount_state_provider.dart';
 
 class WalletPaySelectAmount extends ConsumerStatefulWidget {
   final Function doneCallback;
@@ -19,11 +19,8 @@ class WalletPaySelectAmount extends ConsumerStatefulWidget {
     super.key,
     required this.doneCallback,
     required this.backCallback,
-    required this.currencies,
     this.title,
   });
-
-  final List<String> currencies;
 
   final String? title;
 
@@ -41,20 +38,31 @@ class _WalletPaySelectAmountState extends ConsumerState<WalletPaySelectAmount> {
   @override
   void initState() {
     super.initState();
-    final state = ref.read(walletSelectAmountStateProvider);
-    _amountController = TextEditingController(text: state.amount.toString());
+    final state = ref.read(walletPayStateProvider);
+    _amountController = TextEditingController(text: state.amount?.toString());
     _memoController = TextEditingController(text: state.memo);
 
     _amountController.addListener(() {
-      //todo: input validation - double.parse sat vs fiat
-      ref
-          .read(walletSelectAmountStateProvider.notifier)
-          .setAmount(int.parse(_amountController.text));
+      final stateR = ref.read(walletPayStateProvider);
+      if (_amountController.text.isEmpty) {
+        return;
+      }
+
+      final int? parsedAmount;
+      if (stateR.unit == 'sat') {
+        parsedAmount = int.tryParse(_amountController.text);
+      } else {
+        // Handle decimal input for fiat currencies
+        final sanitizedInput = _amountController.text.replaceAll(',', '.');
+        parsedAmount = ((double.tryParse(sanitizedInput) ?? 0) * 100).toInt();
+      }
+
+      ref.read(walletPayStateProvider.notifier).updateAmount(parsedAmount ?? 0);
     });
     _memoController.addListener(() {
       ref
-          .read(walletSelectAmountStateProvider.notifier)
-          .setMemo(_memoController.text);
+          .read(walletPayStateProvider.notifier)
+          .updateMemo(_memoController.text);
     });
   }
 
@@ -67,10 +75,26 @@ class _WalletPaySelectAmountState extends ConsumerState<WalletPaySelectAmount> {
     super.dispose();
   }
 
+  _onSwitchCurrency() {
+    final state = ref.read(walletPayStateProvider);
+    final stateNotifier = ref.read(walletPayStateProvider.notifier);
+    if (state.unit == 'sat') {
+      // remove last two digits from state.amount
+      final newAmount =
+          state.amount != null ? (state.amount! / 100).toStringAsFixed(0) : '0';
+      _amountController.text = newAmount;
+      stateNotifier.updateAmount((state.amount! / 100).toInt());
+    } else {
+      // Convert amount to fiat format
+      final amountInFiat = (state.amount ?? 0) / 100;
+      _amountController.text = amountInFiat.toStringAsFixed(2);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final selectAmountState = ref.watch(walletSelectAmountStateProvider);
-    final notifier = ref.read(walletSelectAmountStateProvider.notifier);
+    final state = ref.watch(walletPayStateProvider);
+    final notifier = ref.read(walletPayStateProvider.notifier);
 
     final payState = ref.watch(walletPayStateProvider);
     final payNotifier = ref.read(walletPayStateProvider.notifier);
@@ -136,19 +160,24 @@ class _WalletPaySelectAmountState extends ConsumerState<WalletPaySelectAmount> {
                 controller: _amountController,
                 focusNode: _amountFocus,
                 autofocus: true,
-                keyboardType:
-                    const TextInputType.numberWithOptions(decimal: true),
-                inputFormatters: [
-                  FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
-                ],
+                keyboardType: TextInputType.numberWithOptions(
+                    decimal: state.unit != 'sat'),
+                inputFormatters: state.unit == 'sat'
+                    ? [
+                        FilteringTextInputFormatter.digitsOnly,
+                      ]
+                    : [
+                        FilteringTextInputFormatter.allow(RegExp(r'[0-9\.,]')),
+                        DecimalTextInputFormatter(decimalRange: 2),
+                      ],
                 textAlign: TextAlign.center,
                 style: const TextStyle(
                   fontSize: 40,
                   fontWeight: FontWeight.w600,
                 ),
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   border: InputBorder.none,
-                  hintText: '0.00',
+                  hintText: state.unit != 'sat' ? '0.00' : '0',
                 ),
               ),
 
@@ -160,27 +189,28 @@ class _WalletPaySelectAmountState extends ConsumerState<WalletPaySelectAmount> {
                 alignment: Alignment.center,
                 child: ConstrainedBox(
                   constraints: const BoxConstraints(maxWidth: 320),
-                  child: DropdownButtonFormField<String>(
-                    value: selectAmountState.currency,
-                    isExpanded: true,
-                    decoration: const InputDecoration(
-                      labelText: 'Currency',
-                      border: OutlineInputBorder(),
-                      contentPadding:
-                          EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                    ),
-                    items: widget.currencies
-                        .map(
-                          (c) => DropdownMenuItem<String>(
-                            value: c,
-                            child: Text(c),
-                          ),
-                        )
-                        .toList(),
-                    onChanged: (value) => notifier.setCurrency(value),
+                  child: CurrencyPickerBar(
+                    currencies: state.supportedUnitsByWallet != null
+                        ? state.supportedUnitsByWallet!.toList()
+                        : [],
+                    initialIndex: state.unit != null
+                        ? state.supportedUnitsByWallet!
+                            .toList()
+                            .indexOf(state.unit!)
+                        : 0,
+                    onChanged: (i) => {
+                      payNotifier.updateUnit(
+                        state.supportedUnitsByWallet!.elementAt(i),
+                      ),
+                      _onSwitchCurrency(),
+                    },
+                    showHaptics: true,
+                    trackColor: Palette.extraDarkGray,
+                    activeColor: Palette.primary,
                   ),
                 ),
               ),
+
               Spacer(flex: 5),
 
               /// memo input
@@ -199,6 +229,7 @@ class _WalletPaySelectAmountState extends ConsumerState<WalletPaySelectAmount> {
                   ),
                 ),
               ),
+              Spacer(flex: 1),
             ],
           ),
         ),
@@ -211,5 +242,47 @@ class _WalletPaySelectAmountState extends ConsumerState<WalletPaySelectAmount> {
         ),
       ),
     );
+  }
+}
+
+class DecimalTextInputFormatter extends TextInputFormatter {
+  DecimalTextInputFormatter({required this.decimalRange})
+      : assert(decimalRange > 0);
+
+  final int decimalRange;
+
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    String newText = newValue.text;
+
+    newText = newText.replaceAll(',', '.');
+
+    if (newText.isEmpty) {
+      return newValue.copyWith(text: '');
+    }
+
+    if (newText == '.') {
+      return newValue.copyWith(text: '0.');
+    }
+
+    if (!RegExp(r'^\d*\.?\d*').hasMatch(newText)) {
+      return oldValue;
+    }
+
+    if (newText.contains('.')) {
+      List<String> parts = newText.split('.');
+      if (parts.length > 2) {
+        return oldValue;
+      }
+      if (parts[1].length > decimalRange) {
+        // too many decimal places
+        return oldValue;
+      }
+    }
+
+    return newValue.copyWith(text: newText);
   }
 }
