@@ -13,6 +13,10 @@ class WalletCard extends StatelessWidget {
 
   final Widget? tralling;
 
+  final bool showBalances;
+
+  final Color backgroundColor;
+
   const WalletCard({
     super.key,
     required this.wallet,
@@ -20,20 +24,31 @@ class WalletCard extends StatelessWidget {
     required this.onTap,
     this.isSelected = false,
     this.isDisabled = false,
+    this.backgroundColor = Palette.extraDarkGray,
     this.tralling,
+    this.showBalances = true,
   });
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: isDisabled ? null : () => onTap(wallet.id),
-      child: Card(
-        color: Palette.extraDarkGray,
+      child: Container(
+        decoration: BoxDecoration(
+          color: backgroundColor,
+          borderRadius: BorderRadius.circular(12),
+        ),
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
+              CircleAvatar(
+                backgroundColor: Palette.primary.withValues(alpha: 0.8),
+                child: Text(wallet.name.substring(0, 2).toUpperCase(),
+                    style: TextStyle(color: Colors.white, fontSize: 12)),
+              ),
+              const SizedBox(width: 12),
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -61,15 +76,16 @@ class WalletCard extends StatelessWidget {
               ),
               const SizedBox(width: 12),
               Spacer(flex: 1),
-              Column(children: [
-                for (final b in balances)
-                  Text(
-                    "${WalletNumberFormatting.formatAmount(amount: b.amount, unit: b.unit)} ${b.unit}",
-                    style: TextStyle(
-                      color: Palette.white,
+              if (showBalances)
+                Column(children: [
+                  for (final b in balances)
+                    Text(
+                      "${WalletNumberFormatting.formatAmount(amount: b.amount, unit: b.unit)} ${b.unit}",
+                      style: TextStyle(
+                        color: Palette.white,
+                      ),
                     ),
-                  ),
-              ]),
+                ]),
               if (tralling != null) ...[
                 Spacer(flex: 2),
                 tralling!,

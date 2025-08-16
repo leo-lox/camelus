@@ -173,7 +173,7 @@ class _WalletPaySelectAmountState extends ConsumerState<WalletPaySelectAmount> {
                 textAlign: TextAlign.center,
                 style: const TextStyle(
                   fontSize: 40,
-                  fontWeight: FontWeight.w600,
+                  fontWeight: FontWeight.bold,
                 ),
                 decoration: InputDecoration(
                   border: InputBorder.none,

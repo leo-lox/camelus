@@ -70,9 +70,23 @@ class WalletPayState {
 }
 
 enum PaymentRecieverType {
-  token,
-  contact,
-  wallet,
+  token('token'),
+  contact('contact'),
+  wallet('wallet');
+
+  final String value;
+
+  const PaymentRecieverType(this.value);
+
+  factory PaymentRecieverType.fromValue(String value) {
+    return PaymentRecieverType.values.firstWhere(
+      (kind) => kind.value == value,
+      orElse: () => throw ArgumentError('Invalid event kind value: $value'),
+    );
+  }
+
+  @override
+  String toString() => value;
 }
 
 class WalletPayNotifier extends StateNotifier<WalletPayState> {

@@ -63,7 +63,11 @@ class _WalletPayPageState extends ConsumerState<WalletPayPage>
           },
           title: 'Enter amount',
         ),
-        WalletPaySummary(),
+        WalletPaySummary(
+          backCallback: () {
+            _navigateToPreviousPage();
+          },
+        ),
       ],
     );
   }
