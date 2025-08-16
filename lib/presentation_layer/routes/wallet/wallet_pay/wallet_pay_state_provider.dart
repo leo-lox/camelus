@@ -19,6 +19,12 @@ class WalletPayState {
   final String? payFromWalletId;
   final Set<String>? supportedUnitsByWallet;
 
+  final bool isProcessing;
+  final bool isError;
+  final bool isSuccess;
+  final String? errorMessage;
+  final ndk_entities.CashuToken? outputToken;
+
   WalletPayState({
     required this.availableWallets,
     required this.availableBalances,
@@ -30,6 +36,11 @@ class WalletPayState {
     required this.payToPubkey,
     required this.payToWalletId,
     this.supportedUnitsByWallet,
+    this.isProcessing = false,
+    this.isError = false,
+    this.isSuccess = false,
+    this.errorMessage,
+    this.outputToken,
   });
 
   ndk_entities.Wallet? get payFromWallet {
@@ -52,6 +63,11 @@ class WalletPayState {
     String? payToPubkey,
     String? payToWalletId,
     Set<String>? supportedUnitsByWallet,
+    bool? isProcessing,
+    bool? isError,
+    bool? isSuccess,
+    String? errorMessage,
+    ndk_entities.CashuToken? outputToken,
   }) {
     return WalletPayState(
       availableWallets: availableWallets ?? this.availableWallets,
@@ -65,6 +81,11 @@ class WalletPayState {
       payToWalletId: payToWalletId ?? this.payToWalletId,
       supportedUnitsByWallet:
           supportedUnitsByWallet ?? this.supportedUnitsByWallet,
+      isProcessing: isProcessing ?? this.isProcessing,
+      isError: isError ?? this.isError,
+      isSuccess: isSuccess ?? this.isSuccess,
+      errorMessage: errorMessage ?? this.errorMessage,
+      outputToken: outputToken ?? this.outputToken,
     );
   }
 }
@@ -169,6 +190,51 @@ class WalletPayNotifier extends StateNotifier<WalletPayState> {
     state = state.copyWith(payToWalletId: walletId);
   }
 
+  void setProcessing({bool isProcessing = true}) {
+    state = state.copyWith(isProcessing: isProcessing);
+  }
+
+  void setError({bool isError = true, String? errorMessage}) {
+    state = state.copyWith(
+      isError: isError,
+      errorMessage: errorMessage,
+      isProcessing: false,
+    );
+  }
+
+  void setSuccessToken(
+      {bool isSuccess = true, required ndk_entities.CashuToken outputToken}) {
+    state = state.copyWith(
+      isSuccess: isSuccess,
+      outputToken: outputToken,
+      isProcessing: false,
+    );
+  }
+
+  void createToken() async {
+    try {
+      final proofs = await _ndk.cashu.initiateSpend(
+        mintUrl: state.payFromWallet!.id,
+        amount: state.amount!,
+        unit: state.unit!,
+      );
+
+      final token = _ndk.cashu.proofsToToken(
+        proofs: proofs,
+        mintUrl: state.payFromWallet!.id,
+        unit: state.unit!,
+        memo: state.memo ?? '',
+      );
+      setSuccessToken(outputToken: token);
+    } catch (e) {
+      setError(
+        errorMessage: e.toString(),
+      );
+
+      return;
+    }
+  }
+
   void reset() {
     state = WalletPayState(
       availableBalances: state.availableBalances,
@@ -180,6 +246,12 @@ class WalletPayNotifier extends StateNotifier<WalletPayState> {
       recieverType: null,
       payToPubkey: null,
       payToWalletId: null,
+      supportedUnitsByWallet: null,
+      isProcessing: false,
+      isError: false,
+      isSuccess: false,
+      errorMessage: null,
+      outputToken: null,
     );
   }
 }

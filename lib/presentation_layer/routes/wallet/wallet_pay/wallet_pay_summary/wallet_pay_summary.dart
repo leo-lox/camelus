@@ -9,6 +9,7 @@ import '../../../../../config/palette.dart';
 import '../../../../../helpers/wallet_number_formatting.dart';
 import '../../../../atoms/wallet/wallet_card.dart';
 import '../../../../components/wallet/wallets_select_bottom_sheet.dart';
+import '../wallet_pay_done/wallet_pay_done.dart';
 import '../wallet_pay_state_provider.dart';
 
 class WalletPaySummary extends ConsumerWidget {
@@ -18,10 +19,70 @@ class WalletPaySummary extends ConsumerWidget {
     required this.backCallback,
   });
 
+  showSnackBar(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        backgroundColor: Palette.warn,
+        content: Text(
+          message,
+          style: TextStyle(color: Colors.white),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(walletPayStateProvider);
     final payNotifier = ref.read(walletPayStateProvider.notifier);
+
+    bool isValid() {
+      if (state.payFromWalletId == null || state.payFromWalletId!.isEmpty) {
+        showSnackBar(context, 'Please select a wallet');
+        return false;
+      }
+      if (state.amount == null || state.amount! <= 0) {
+        showSnackBar(context, 'Please enter a valid amount');
+        return false;
+      }
+      if (state.unit == null || state.unit!.isEmpty) {
+        showSnackBar(context, 'Please select a unit');
+        return false;
+      }
+      //! only token support for now
+      if (state.recieverType != PaymentRecieverType.token) {
+        showSnackBar(context, 'Only token payments are supported for now');
+        return false;
+      }
+
+      final availableBalanceForUnit = state.availableBalances.where(
+        (balance) =>
+            balance.walletId == state.payFromWalletId &&
+            balance.unit == state.unit,
+      );
+      if (availableBalanceForUnit.isEmpty ||
+          availableBalanceForUnit.first.amount < state.amount!) {
+        showSnackBar(context,
+            'Insufficient balance in the selected wallet for the specified unit');
+        return false;
+      }
+
+      return true;
+    }
+
+    void onSend() async {
+      final stateNotifier = ref.read(walletPayStateProvider.notifier);
+      if (!isValid()) return;
+
+      stateNotifier.createToken();
+
+      /// navigate to done page
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(
+          builder: (context) => WalletPayDone(),
+        ),
+      );
+    }
 
     return Scaffold(
       backgroundColor: Colors.black,
@@ -215,7 +276,8 @@ class WalletPaySummary extends ConsumerWidget {
         top: false,
         child: Padding(
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-          child: longButton(name: "send", onPressed: () {}, inverted: true),
+          child: longButton(
+              name: "send", onPressed: () => onSend(), inverted: true),
         ),
       ),
     );
