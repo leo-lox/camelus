@@ -171,41 +171,16 @@ class WalletPaySummary extends ConsumerWidget {
                         Divider(color: Palette.darkGray, height: 1),
 
                         /// receiver
-                        Padding(
-                          padding: EdgeInsets.all(16),
-                          child: Row(
-                            children: [
-                              CircleAvatar(
-                                backgroundColor: Color(0xFF1976D2),
-                                child: Text('TK',
-                                    style: TextStyle(
-                                        color: Colors.white, fontSize: 12)),
-                              ),
-                              SizedBox(width: 12),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text('receiver',
-                                        style: TextStyle(
-                                            color: Colors.grey, fontSize: 12)),
-                                    Text('TOKEN',
-                                        style: TextStyle(
-                                            color: Colors.white, fontSize: 16)),
-                                    Text('<cashu...>',
-                                        style: TextStyle(
-                                            color: Colors.grey, fontSize: 14)),
-                                  ],
-                                ),
-                              ),
-                              Icon(
-                                PhosphorIcons.notePencil(),
-                                size: 24,
-                                color: Palette.lightGray,
-                              ),
-                            ],
-                          ),
-                        ),
+                        if (state.recieverType ==
+                            PaymentRecieverType.contact) ...[
+                          ContactReciever(),
+                        ] else if (state.recieverType ==
+                            PaymentRecieverType.token) ...[
+                          TokenReciever(),
+                        ] else if (state.recieverType ==
+                            PaymentRecieverType.wallet) ...[
+                          WalletReciever(),
+                        ],
                       ],
                     ),
                   ),
@@ -273,6 +248,117 @@ class WalletPaySummary extends ConsumerWidget {
               color: Palette.primary,
               onPressed: isEditable ? onEdit : null,
             ),
+        ],
+      ),
+    );
+  }
+}
+
+class ContactReciever extends StatelessWidget {
+  const ContactReciever({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.all(16),
+      child: Row(
+        children: [
+          CircleAvatar(
+            backgroundColor: Palette.primary.withValues(alpha: 0.8),
+            child:
+                Text('NA', style: TextStyle(color: Colors.white, fontSize: 12)),
+          ),
+          SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('receiver',
+                    style: TextStyle(color: Colors.grey, fontSize: 12)),
+                Text('NOT IMPLEMENTED',
+                    style: TextStyle(color: Colors.white, fontSize: 16)),
+                Text('send to pubkey not implemented',
+                    style: TextStyle(color: Colors.grey, fontSize: 14)),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class TokenReciever extends StatelessWidget {
+  const TokenReciever({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.all(16),
+      child: Row(
+        children: [
+          CircleAvatar(
+            backgroundColor: Palette.primary.withValues(alpha: 0.8),
+            child:
+                Text('TK', style: TextStyle(color: Colors.white, fontSize: 12)),
+          ),
+          SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('receiver',
+                    style: TextStyle(color: Palette.gray, fontSize: 12)),
+                Text('Token',
+                    style: TextStyle(
+                        color: Palette.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold)),
+                Text('send as a <cashu> token or qr code',
+                    style: TextStyle(color: Palette.lightGray, fontSize: 14)),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class WalletReciever extends StatelessWidget {
+  const WalletReciever({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.all(16),
+      child: Row(
+        children: [
+          CircleAvatar(
+            backgroundColor: Palette.primary.withValues(alpha: 0.8),
+            child:
+                Text('NA', style: TextStyle(color: Colors.white, fontSize: 12)),
+          ),
+          SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('receiver',
+                    style: TextStyle(color: Colors.grey, fontSize: 12)),
+                Text('NOT IMPLEMENTED',
+                    style: TextStyle(color: Colors.white, fontSize: 16)),
+                Text('send to wallet not implemented',
+                    style: TextStyle(color: Colors.grey, fontSize: 14)),
+              ],
+            ),
+          ),
         ],
       ),
     );
