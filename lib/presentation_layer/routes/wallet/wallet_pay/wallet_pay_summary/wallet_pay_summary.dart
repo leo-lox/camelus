@@ -129,6 +129,7 @@ class WalletPaySummary extends ConsumerWidget {
                             size: 24,
                           ),
                           onPressed: () {
+                            payNotifier.reset();
                             Navigator.of(context).pop();
                           },
                         ),

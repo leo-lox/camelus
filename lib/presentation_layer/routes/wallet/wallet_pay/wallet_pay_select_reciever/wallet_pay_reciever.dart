@@ -64,7 +64,10 @@ class WalletSelectReciever extends ConsumerWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.close),
-            onPressed: () => Navigator.pop(context),
+            onPressed: () {
+              paymentStateNotifier.reset();
+              Navigator.pop(context);
+            },
           ),
         ],
         bottom: PreferredSize(

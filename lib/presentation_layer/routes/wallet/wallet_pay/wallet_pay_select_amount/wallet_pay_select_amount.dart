@@ -91,6 +91,18 @@ class _WalletPaySelectAmountState extends ConsumerState<WalletPaySelectAmount> {
     }
   }
 
+  showSnackBar(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        backgroundColor: Palette.warn,
+        content: Text(
+          message,
+          style: TextStyle(color: Colors.white),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(walletPayStateProvider);
@@ -238,7 +250,22 @@ class _WalletPaySelectAmountState extends ConsumerState<WalletPaySelectAmount> {
         top: false,
         child: Padding(
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-          child: longButton(name: "next", onPressed: () {}, inverted: true),
+          child: longButton(
+              name: "next",
+              onPressed: () {
+                if (state.payFromWalletId == null ||
+                    state.payFromWalletId!.isEmpty) {
+                  showSnackBar(context, 'Please select a wallet to pay from.');
+                  return;
+                }
+                if (state.amount == null || state.amount! <= 0) {
+                  _amountFocus.requestFocus();
+                  showSnackBar(context, 'Please enter a valid amount.');
+                  return;
+                }
+                widget.doneCallback();
+              },
+              inverted: true),
         ),
       ),
     );
