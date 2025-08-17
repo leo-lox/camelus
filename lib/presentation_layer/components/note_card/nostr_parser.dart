@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/foundation.dart';
 
 import '../../../domain_layer/entities/nostr_note.dart';
@@ -93,11 +95,15 @@ class NostrParser {
 
       // Parse different types
       if (matchText.startsWith(RegExp(r'nostr:(nprofile|npub)[a-zA-Z0-9]+'))) {
-        segments.add(ContentSegment(
-          content: matchText,
-          type: ContentType.mention,
-          metadata: _extractUserIdFromNostr(matchText),
-        ));
+        try {
+          segments.add(ContentSegment(
+            content: matchText,
+            type: ContentType.mention,
+            metadata: _extractUserIdFromNostr(matchText),
+          ));
+        } catch (e) {
+          log('Error parsing Nostr reference: $matchText', error: e);
+        }
       } else if (matchText.startsWith('nostr:note1')) {
         segments.add(ContentSegment(
           content: 'Note reference',

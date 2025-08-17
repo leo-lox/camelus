@@ -48,7 +48,7 @@ class NprofileHelper {
     final Map<String, dynamic> resultMap = _parseTlvList(tlvList);
 
     if (resultMap["pubkey"].length != 64) {
-      throw Exception("Invalid pubkey length");
+      throw Exception("Invalid pubkey length $resultMap");
     }
 
     return resultMap;
