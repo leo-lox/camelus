@@ -1,22 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../config/palette.dart';
 import '../../atoms/spinner_center.dart';
+import 'wallet_providers/qr_value_processing_state_provider.dart';
 
-class WalletQrScan extends StatefulWidget {
+class WalletQrScan extends ConsumerStatefulWidget {
   const WalletQrScan({super.key});
 
   @override
-  State<WalletQrScan> createState() => _QrScan();
+  ConsumerState<WalletQrScan> createState() => _QrScan();
 }
 
-class _QrScan extends State<WalletQrScan> {
+class _QrScan extends ConsumerState<WalletQrScan> {
   Barcode? _barcode;
   MobileScannerController controller = MobileScannerController();
-  String? _errorMessage;
 
   @override
   void initState() {
@@ -45,19 +46,42 @@ class _QrScan extends State<WalletQrScan> {
       ClipboardData? data = await Clipboard.getData(Clipboard.kTextPlain);
       return data?.text;
     } catch (e) {
-      setState(() {
-        _errorMessage = 'Failed to read clipboard: $e';
-      });
+      ref
+          .read(qrScannerProvider.notifier)
+          .setError('Failed to read clipboard: $e');
+
       return null;
     }
   }
 
   void _processValue(String barcode) {
-    print('Scanned barcode: $barcode');
+    ref.read(qrScannerProvider.notifier).processQRCode(barcode);
   }
 
   @override
   Widget build(BuildContext context) {
+    final qrScannerState = ref.watch(qrScannerProvider);
+
+    // apperently this is save to do with riverpod
+    ref.listen(qrScannerProvider, (previous, next) {
+      // only navigate if its new
+      if (previous?.navigationTarget != next.navigationTarget &&
+          next.navigationTarget != null &&
+          next.navigationData != null) {
+        ref.read(qrScannerProvider.notifier).clearNavigation();
+
+        switch (next.navigationTarget!) {
+          case QRNavigationTarget.rcvPage:
+            Navigator.pushNamed(
+              context,
+              '/wallet/receive',
+              arguments: next.navigationData,
+            );
+            break;
+        }
+      }
+    });
+
     return Scaffold(
       backgroundColor: Colors.black,
       body: Stack(
@@ -164,6 +188,17 @@ class _QrScan extends State<WalletQrScan> {
               ),
             ),
           ),
+          if (qrScannerState.isProcessing)
+            Positioned(
+              bottom: 115,
+              left: 20,
+              right: 20,
+              child: LinearProgressIndicator(
+                borderRadius: BorderRadius.circular(20),
+                backgroundColor: Palette.extraDarkGray,
+                color: Palette.white,
+              ),
+            ),
 
           /// top controls
           Positioned(
@@ -174,7 +209,7 @@ class _QrScan extends State<WalletQrScan> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  _errorMessage != null
+                  qrScannerState.error != null
                       ? Container(
                           padding: const EdgeInsets.symmetric(
                               horizontal: 12, vertical: 6),
@@ -183,7 +218,7 @@ class _QrScan extends State<WalletQrScan> {
                             borderRadius: BorderRadius.circular(50),
                           ),
                           child: Text(
-                            _errorMessage ?? "",
+                            qrScannerState.error ?? "",
                             style: const TextStyle(
                               color: Palette.warn,
                               fontSize: 16,
