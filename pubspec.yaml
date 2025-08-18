@@ -102,6 +102,7 @@ dependencies:
   video_player: ^2.10.0
   pretty_qr_code: ^3.5.0
   bc_ur_dart: ^0.1.19
+  mobile_scanner: ^7.0.1
 
   
 
