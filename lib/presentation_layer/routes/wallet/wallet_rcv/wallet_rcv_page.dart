@@ -1,0 +1,231 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
+
+import '../../../../config/palette.dart';
+import '../../../../helpers/wallet_number_formatting.dart';
+import '../../../atoms/long_button.dart';
+import 'wallet_rcv_state_provider.dart';
+
+class WalletReceivePage extends ConsumerWidget {
+  const WalletReceivePage({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final walletState = ref.watch(walletReceiveProvider);
+
+    return Scaffold(
+      backgroundColor: Palette.background,
+      appBar: null,
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              Spacer(flex: 1),
+              // Status Card
+              _buildStatusCard(walletState),
+
+              Spacer(flex: 7),
+
+              if (walletState.amount != null && walletState.unit != null) ...[
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      '+',
+                      style: const TextStyle(
+                        color: Palette.lightGray,
+                        fontSize: 28,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      WalletNumberFormatting.formatAmount(
+                          amount: walletState.amount!, unit: walletState.unit!),
+                      style: const TextStyle(
+                        color: Palette.white,
+                        fontSize: 48,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      walletState.unit ?? '',
+                      style: const TextStyle(
+                          fontSize: 16, color: Palette.lightGray),
+                    ),
+                  ],
+                ),
+              ],
+              Spacer(flex: 1),
+              if (walletState.memo != null) ...[
+                const SizedBox(height: 16),
+                Container(
+                  constraints: BoxConstraints(
+                    maxWidth: MediaQuery.of(context).size.width - 32,
+                    // max height for memo
+                    maxHeight: 120,
+                  ),
+                  child: SingleChildScrollView(
+                    child: Text(
+                      walletState.memo!,
+                      style: const TextStyle(
+                        color: Palette.white,
+                        fontSize: 16,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ),
+              ],
+
+              if (walletState.errorMessage != null) ...[
+                Spacer(flex: 1),
+                _buildErrorCard(walletState.errorMessage!),
+              ],
+              Spacer(flex: 10),
+            ],
+          ),
+        ),
+      ),
+      bottomNavigationBar: SafeArea(
+        top: false,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+          child: longButton(
+              name: "close",
+              onPressed: () => {Navigator.of(context).pop()},
+              inverted: true),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStatusCard(WalletRcvState state) {
+    IconData icon;
+    Color color;
+    String title;
+    String subtitle;
+
+    if (state.isPending) {
+      icon = PhosphorIcons.hourglass();
+      color = Palette.primary;
+      title = 'Processing';
+      subtitle = 'Receiving...';
+    } else if (state.isError) {
+      icon = PhosphorIcons.warningCircle();
+      color = Palette.error;
+      title = 'Failed';
+      subtitle = 'transaction failed';
+    } else if (state.isSuccess) {
+      icon = PhosphorIcons.checkCircle();
+      color = Palette.success;
+      title = 'Success';
+      subtitle = 'received successfully';
+    } else {
+      icon = PhosphorIcons.info();
+      color = Palette.gray;
+      title = 'Ready';
+      subtitle = 'waiting for transaction';
+    }
+
+    return Card(
+      elevation: 4,
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: color.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(50),
+              ),
+              child: Icon(
+                icon,
+                color: color,
+                size: 32,
+              ),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    subtitle,
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey[600],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            if (state.isPending)
+              const SizedBox(
+                width: 24,
+                height: 24,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildErrorCard(String errorMessage) {
+    return Card(
+      elevation: 2,
+      color: Colors.red[50],
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Icon(
+              Icons.error_outline,
+              color: Colors.red[700],
+              size: 24,
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Error',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.red[700],
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    errorMessage,
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.red[600],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

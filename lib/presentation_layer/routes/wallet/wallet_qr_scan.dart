@@ -7,6 +7,7 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 import '../../../config/palette.dart';
 import '../../atoms/spinner_center.dart';
 import 'wallet_providers/qr_value_processing_state_provider.dart';
+import 'wallet_rcv/wallet_rcv_state_provider.dart';
 
 class WalletQrScan extends ConsumerStatefulWidget {
   const WalletQrScan({super.key});
@@ -27,6 +28,7 @@ class _QrScan extends ConsumerState<WalletQrScan> {
   @override
   void dispose() {
     controller.dispose();
+
     super.dispose();
   }
 
@@ -70,13 +72,21 @@ class _QrScan extends ConsumerState<WalletQrScan> {
           next.navigationData != null) {
         ref.read(qrScannerProvider.notifier).clearNavigation();
 
+        final rcvProvider = ref.read(walletReceiveProvider.notifier);
+
         switch (next.navigationTarget!) {
           case QRNavigationTarget.rcvPage:
+            final ecashTokenString =
+                next.navigationData!['cashuTokenString'] as String;
+            rcvProvider.receiveEcash(tokenString: ecashTokenString);
             Navigator.pushNamed(
               context,
               '/wallet/receive',
-              arguments: next.navigationData,
             );
+            break;
+          case QRNavigationTarget.sendPage:
+            throw UnimplementedError(
+                'Send page navigation is not implemented yet');
             break;
         }
       }

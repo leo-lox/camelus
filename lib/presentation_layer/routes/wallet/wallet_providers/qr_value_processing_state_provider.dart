@@ -30,6 +30,7 @@ class QRScannerState {
 
 enum QRNavigationTarget {
   rcvPage,
+  sendPage,
 }
 
 class QRScanTypeResult {
@@ -77,7 +78,7 @@ class QRScannerNotifier extends StateNotifier<QRScannerState> {
     } else if (result.type == QRScanTypes.lightningInvoice) {
       state = state.copyWith(
         isProcessing: false,
-        navigationTarget: QRNavigationTarget.rcvPage,
+        navigationTarget: QRNavigationTarget.sendPage,
         navigationData: {'lightningInvoice': result.value},
       );
     } else {
@@ -90,6 +91,15 @@ class QRScannerNotifier extends StateNotifier<QRScannerState> {
 
   void clearNavigation() {
     state = state.copyWith(navigationTarget: null, navigationData: null);
+  }
+
+  void reset() {
+    state = state.copyWith(
+      isProcessing: false,
+      error: null,
+      navigationTarget: null,
+      navigationData: null,
+    );
   }
 
   Future<QRScanTypeResult> _analyzeQRData(String qrData) async {
