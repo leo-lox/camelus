@@ -24,6 +24,7 @@ class WalletPayState {
   final bool isSuccess;
   final String? errorMessage;
   final ndk_entities.CashuToken? outputToken;
+  final String? transactionId;
 
   WalletPayState({
     required this.availableWallets,
@@ -41,6 +42,7 @@ class WalletPayState {
     this.isSuccess = false,
     this.errorMessage,
     this.outputToken,
+    this.transactionId,
   });
 
   ndk_entities.Wallet? get payFromWallet {
@@ -68,6 +70,7 @@ class WalletPayState {
     bool? isSuccess,
     String? errorMessage,
     ndk_entities.CashuToken? outputToken,
+    String? transactionId,
   }) {
     return WalletPayState(
       availableWallets: availableWallets ?? this.availableWallets,
@@ -86,6 +89,7 @@ class WalletPayState {
       isSuccess: isSuccess ?? this.isSuccess,
       errorMessage: errorMessage ?? this.errorMessage,
       outputToken: outputToken ?? this.outputToken,
+      transactionId: transactionId ?? this.transactionId,
     );
   }
 }
@@ -202,30 +206,32 @@ class WalletPayNotifier extends StateNotifier<WalletPayState> {
     );
   }
 
-  void setSuccessToken(
-      {bool isSuccess = true, required ndk_entities.CashuToken outputToken}) {
+  void setSuccessToken({
+    bool isSuccess = true,
+    required ndk_entities.CashuToken outputToken,
+    String? transactionId,
+  }) {
     state = state.copyWith(
       isSuccess: isSuccess,
       outputToken: outputToken,
       isProcessing: false,
+      transactionId: transactionId,
     );
   }
 
-  void createToken() async {
+  void createToken({String? memo}) async {
     try {
-      final proofs = await _ndk.cashu.initiateSpend(
+      final result = await _ndk.cashu.initiateSpend(
         mintUrl: state.payFromWallet!.id,
         amount: state.amount!,
         unit: state.unit!,
+        memo: memo,
       );
 
-      final token = _ndk.cashu.proofsToToken(
-        proofs: proofs,
-        mintUrl: state.payFromWallet!.id,
-        unit: state.unit!,
-        memo: state.memo ?? '',
+      setSuccessToken(
+        outputToken: result.token,
+        transactionId: result.transaction.id,
       );
-      setSuccessToken(outputToken: token);
     } catch (e) {
       setError(
         errorMessage: e.toString(),

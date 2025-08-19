@@ -74,7 +74,7 @@ class WalletPaySummary extends ConsumerWidget {
       final stateNotifier = ref.read(walletPayStateProvider.notifier);
       if (!isValid()) return;
 
-      stateNotifier.createToken();
+      stateNotifier.createToken(memo: state.memo);
 
       /// navigate to done page
       Navigator.of(context).pushReplacement(

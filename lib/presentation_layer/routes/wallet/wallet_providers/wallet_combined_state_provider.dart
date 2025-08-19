@@ -118,10 +118,6 @@ class WalletCombinedStateNotifier extends StateNotifier<WalletCombinedState> {
       unit: unit,
     );
 
-    print(spend);
-
-    final token =
-        _ndk.cashu.proofsToToken(proofs: spend, mintUrl: mintUrl, unit: unit);
-    print(token);
+    print(spend.token.toV4TokenString());
   }
 }

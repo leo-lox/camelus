@@ -4,11 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ndk/entities.dart' as ndk_entities;
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../../../config/palette.dart';
 import '../../../../../helpers/wallet_number_formatting.dart';
 import '../../../../atoms/long_button.dart';
 import '../../../../components/wallet/animated_qr.dart';
+import '../../wallet_providers/wallet_combined_state_provider.dart';
 import '../wallet_pay_state_provider.dart';
 
 class WalletPayDone extends ConsumerWidget {
@@ -32,11 +34,11 @@ class WalletPayDone extends ConsumerWidget {
         child: Padding(
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
           child: longButton(
-            name: "close",
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-          ),
+              name: "close",
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              inverted: true),
         ),
       ),
     );
@@ -179,14 +181,8 @@ class SuccessStep extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 24),
-        const Text(
-          'Pending Ecash',
-          style: TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-            color: Palette.white,
-          ),
-        ),
+
+        TransactionState(),
         const SizedBox(height: 32),
 
         Container(
@@ -262,5 +258,69 @@ class _CopyTokenButtonState extends State<CopyTokenButton> {
         });
       }
     });
+  }
+}
+
+class TransactionState extends ConsumerWidget {
+  const TransactionState({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final walletPayState = ref.watch(walletPayStateProvider);
+    final walletCombined = ref.watch(walletCombinedProvider);
+
+    final myTransactionList = walletCombined.recentTransactions.where(
+      (transaction) => transaction.id == walletPayState.transactionId,
+    );
+
+    final myPendingTransactionList = walletCombined.pendingTransactions.where(
+      (transaction) => transaction.id == walletPayState.transactionId,
+    );
+
+    if (myTransactionList.isEmpty && myPendingTransactionList.isEmpty) {
+      return const SizedBox.shrink();
+    }
+    final myTransaction = myTransactionList.isNotEmpty
+        ? myTransactionList.first
+        : myPendingTransactionList.first;
+
+    IconData icon;
+    Color color;
+    String title;
+
+    if (myTransaction.state == ndk_entities.WalletTransactionState.pending) {
+      icon = PhosphorIcons.hourglass();
+      color = Palette.lightGray;
+      title = 'pending ecash';
+    } else if (myTransaction.state ==
+        ndk_entities.WalletTransactionState.failed) {
+      icon = PhosphorIcons.warningCircle();
+      color = Palette.error;
+      title = 'failed';
+    } else {
+      icon = PhosphorIcons.checkCircle();
+      color = Palette.success;
+      title = 'ecash claimed';
+    }
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Row(
+          children: [
+            Icon(icon, color: color, size: 23),
+            const SizedBox(width: 8),
+            Text(
+              title,
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: color,
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
   }
 }
