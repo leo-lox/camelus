@@ -1,4 +1,3 @@
-import 'package:camelus/presentation_layer/routes/wallet/wallet_providers/wallet_combined_state_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -7,11 +6,13 @@ import '../../atoms/my_profile_picture.dart';
 import '../../components/wallet/payment_history_short.dart';
 import '../../components/wallet/wallet_actions_strip.dart';
 import '../../components/wallet/wallet_friends_strip.dart';
-import '../../components/wallet/wallet_accounts_card.dart';
 import '../../components/wallet/wallets_carousel.dart';
+import '../../components/wallet/wallets_select_bottom_sheet.dart';
 import '../../providers/metadata_state_provider.dart';
 import '../../providers/ndk_provider.dart';
 import '../nostr/nostr_drawer.dart';
+import 'wallet_pay/wallet_pay_state_provider.dart';
+import 'wallet_providers/wallet_combined_state_provider.dart';
 
 class WalletDashboard extends ConsumerStatefulWidget {
   const WalletDashboard({super.key});
@@ -97,8 +98,22 @@ class _WalletDashboardState extends ConsumerState<WalletDashboard>
                 onReceive: () {
                   Navigator.pushNamed(context, '/wallet/receive');
                 },
-                onPay: () {
-                  Navigator.pushNamed(context, '/wallet/pay');
+                onPay: () async {
+                  final selectedId = await showWalletsSelectBottomSheet(
+                    context: context,
+                    wallets: combinedWallet.wallets,
+                    balances: combinedWallet.balances,
+                    title: "Select Wallet to Pay From",
+                  );
+                  if (selectedId != null) {
+                    final payNotifier =
+                        ref.read(walletPayStateProvider.notifier);
+                    payNotifier.reset();
+                    payNotifier.updatePayFromWalletId(selectedId);
+                    if (mounted) {
+                      Navigator.pushNamed(context, '/wallet/pay');
+                    }
+                  }
                 },
                 onHistory: () {},
               ),

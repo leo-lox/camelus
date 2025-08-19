@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -19,6 +17,7 @@ class WalletPayDone extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final walletPayState = ref.watch(walletPayStateProvider);
+    final payNotifier = ref.watch(walletPayStateProvider.notifier);
 
     return Scaffold(
       backgroundColor: Palette.background,
@@ -36,6 +35,7 @@ class WalletPayDone extends ConsumerWidget {
           child: longButton(
               name: "close",
               onPressed: () {
+                payNotifier.reset();
                 Navigator.of(context).pop();
               },
               inverted: true),

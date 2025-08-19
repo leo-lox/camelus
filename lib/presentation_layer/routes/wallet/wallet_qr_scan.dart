@@ -6,6 +6,7 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../config/palette.dart';
 import '../../atoms/spinner_center.dart';
+import 'wallet_navigation.dart';
 import 'wallet_providers/qr_value_processing_state_provider.dart';
 import 'wallet_rcv/wallet_rcv_state_provider.dart';
 
@@ -83,6 +84,7 @@ class _QrScan extends ConsumerState<WalletQrScan> {
               context,
               '/wallet/receive',
             );
+            ref.read(walletNavigationProvider.notifier).changeDashboardPage(1);
             break;
           case QRNavigationTarget.sendPage:
             throw UnimplementedError(
@@ -128,26 +130,16 @@ class _QrScan extends ConsumerState<WalletQrScan> {
           /// scanning indicator
           Center(
             child: Container(
-              width: 250,
-              height: 250,
-              decoration: BoxDecoration(
-                border: Border.all(
-                  color: Palette.white,
-                  width: 2,
-                ),
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: const Center(
-                child: Text(
-                  'Position QR code here',
-                  style: TextStyle(
-                    color: Colors.white70,
-                    fontSize: 16,
+                width: 250,
+                height: 250,
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: Palette.white,
+                    width: 2,
                   ),
-                  textAlign: TextAlign.center,
+                  borderRadius: BorderRadius.circular(20),
                 ),
-              ),
-            ),
+                child: null),
           ),
 
           /// bottom area

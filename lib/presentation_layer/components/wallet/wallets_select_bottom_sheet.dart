@@ -7,6 +7,7 @@ Future<String?> showWalletsSelectBottomSheet({
   required BuildContext context,
   required List<ndk_entities.Wallet> wallets,
   required List<ndk_entities.WalletBalance> balances,
+  String? title,
   String? selectedId,
   double maxHeightFactor = 0.7, // cap as a fraction of screen height
 }) {
@@ -48,6 +49,18 @@ Future<String?> showWalletsSelectBottomSheet({
                   ),
                 ),
                 const SizedBox(height: 8),
+                if (title != null)
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Text(
+                      title,
+                      style: TextStyle(
+                        color: Palette.white,
+                        fontSize: 20,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
                 Flexible(
                   fit: FlexFit.loose,
                   child: ConstrainedBox(
