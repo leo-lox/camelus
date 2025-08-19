@@ -3,6 +3,7 @@ import 'package:ndk/entities.dart' as ndk_entities;
 import 'package:ndk/ndk.dart';
 
 import '../../../providers/ndk_provider.dart';
+import '../wallet_providers/wallet_combined_state_provider.dart';
 
 class WalletPayState {
   final List<ndk_entities.Wallet> availableWallets;
@@ -116,8 +117,9 @@ enum PaymentRecieverType {
 
 class WalletPayNotifier extends StateNotifier<WalletPayState> {
   final Ndk _ndk;
+  final Ref ref;
 
-  WalletPayNotifier({required Ndk ndk})
+  WalletPayNotifier({required Ndk ndk, required this.ref})
       : _ndk = ndk,
         super(
           WalletPayState(
@@ -132,18 +134,16 @@ class WalletPayNotifier extends StateNotifier<WalletPayState> {
             payToWalletId: null,
           ),
         ) {
-    _loadInitial();
-  }
-
-  Future<void> _loadInitial() async {
-    final balances = await _ndk.wallets.combinedBalances.first;
-
-    final wallets = await _ndk.wallets.walletsStream.first;
-
-    state = state.copyWith(
-      availableWallets: wallets,
-      availableBalances: balances,
-    );
+    // listen to state changes
+    ref.listen(walletCombinedProvider, (previous, next) {
+      if (next.balances != previous?.balances ||
+          next.wallets != previous?.wallets) {
+        state = state.copyWith(
+          availableBalances: next.balances,
+          availableWallets: next.wallets,
+        );
+      }
+    }, fireImmediately: true);
   }
 
   bool get valid {
@@ -265,5 +265,5 @@ class WalletPayNotifier extends StateNotifier<WalletPayState> {
 final walletPayStateProvider =
     StateNotifierProvider<WalletPayNotifier, WalletPayState>((ref) {
   final ndk = ref.watch(ndkProvider);
-  return WalletPayNotifier(ndk: ndk);
+  return WalletPayNotifier(ndk: ndk, ref: ref);
 });
