@@ -35,7 +35,7 @@ void main() {
       const hex = '1e1a76e8dc8f8c82eacb5ea02a1e87a2f172dd';
       const hrp = 'test';
 
-      final bech32 = helpers.encodeBech32(hex, hrp);
+      final bech32 = Helpers.encodeBech32(hex, hrp);
       final decoded = helpers.decodeBech32(bech32);
 
       expect(decoded[0], hex);

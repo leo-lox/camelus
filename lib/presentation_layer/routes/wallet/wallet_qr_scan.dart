@@ -8,7 +8,7 @@ import '../../../config/palette.dart';
 import '../../atoms/spinner_center.dart';
 import 'wallet_navigation.dart';
 import 'wallet_providers/qr_value_processing_state_provider.dart';
-import 'wallet_rcv/wallet_rcv_state_provider.dart';
+import 'wallet_receive/rcv_completers/wallet_rcv_ecash_completer_state_provider.dart';
 
 class WalletQrScan extends ConsumerStatefulWidget {
   const WalletQrScan({super.key});
@@ -73,7 +73,8 @@ class _QrScan extends ConsumerState<WalletQrScan> {
           next.navigationData != null) {
         ref.read(qrScannerProvider.notifier).clearNavigation();
 
-        final rcvProvider = ref.read(walletReceiveProvider.notifier);
+        final rcvProvider =
+            ref.read(walletReceiveEcashCompleterProvider.notifier);
 
         switch (next.navigationTarget!) {
           case QRNavigationTarget.rcvPage:

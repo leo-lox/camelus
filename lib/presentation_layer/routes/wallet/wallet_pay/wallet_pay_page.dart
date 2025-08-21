@@ -1,9 +1,9 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'wallet_pay/wallet_pay_select_amount/wallet_pay_select_amount.dart';
-import 'wallet_pay/wallet_pay_select_reciever/wallet_pay_reciever.dart';
-import 'wallet_pay/wallet_pay_summary/wallet_pay_summary.dart';
+import 'wallet_pay_select_amount/wallet_pay_select_amount.dart';
+import 'wallet_pay_select_reciever/wallet_pay_reciever.dart';
+import 'wallet_pay_summary/wallet_pay_summary.dart';
 
 class WalletPayPage extends ConsumerStatefulWidget {
   const WalletPayPage({

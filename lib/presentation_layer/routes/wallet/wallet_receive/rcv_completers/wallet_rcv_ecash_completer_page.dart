@@ -2,17 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
-import '../../../../config/palette.dart';
-import '../../../../helpers/wallet_number_formatting.dart';
-import '../../../atoms/long_button.dart';
-import 'wallet_rcv_state_provider.dart';
+import '../../../../../config/palette.dart';
+import '../../../../../helpers/wallet_number_formatting.dart';
+import '../../../../atoms/long_button.dart';
+import 'wallet_rcv_ecash_completer_state_provider.dart';
 
-class WalletReceivePage extends ConsumerWidget {
-  const WalletReceivePage({super.key});
+class WalletReceiveEcashCompleterPage extends ConsumerWidget {
+  const WalletReceiveEcashCompleterPage({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final walletState = ref.watch(walletReceiveProvider);
+    final walletState = ref.watch(walletReceiveEcashCompleterProvider);
 
     return Scaffold(
       backgroundColor: Palette.background,
@@ -104,7 +104,7 @@ class WalletReceivePage extends ConsumerWidget {
     );
   }
 
-  Widget _buildStatusCard(WalletRcvState state) {
+  Widget _buildStatusCard(WalletRcvEcashCompleterState state) {
     IconData icon;
     Color color;
     String title;
