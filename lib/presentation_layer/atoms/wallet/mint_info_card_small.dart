@@ -17,7 +17,7 @@ class MintInfoCardSmall extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       elevation: 4,
-      color: Palette.extraDarkGray,
+      color: Palette.background,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
         side: BorderSide(

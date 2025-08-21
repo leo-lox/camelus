@@ -38,6 +38,7 @@ import 'presentation_layer/routes/nostr/settings/locale/locale_settings.dart';
 import 'presentation_layer/routes/nostr/settings/moderation/moderation_settings.dart';
 import 'presentation_layer/routes/nostr/settings/settings_page.dart';
 import 'presentation_layer/routes/wallet/add_mint/add_mint_page.dart';
+import 'presentation_layer/routes/wallet/mint_info/mint_info_page.dart';
 import 'presentation_layer/routes/wallet/wallet_navigation.dart';
 import 'presentation_layer/routes/wallet/wallet_pay_page.dart';
 import 'presentation_layer/routes/wallet/wallet_rcv/wallet_rcv_page.dart';
@@ -300,6 +301,13 @@ class MyApp extends ConsumerWidget {
             case '/wallet/add_mint':
               return MaterialPageRoute(
                 builder: (context) => const AddMintPage(),
+              );
+
+            case '/wallet/mint_details':
+              return MaterialPageRoute(
+                builder: (context) => MintInfoPage(
+                  mintUrl: settings.arguments as String?,
+                ),
               );
           }
           assert(false, 'Need to implement ${settings.name}');

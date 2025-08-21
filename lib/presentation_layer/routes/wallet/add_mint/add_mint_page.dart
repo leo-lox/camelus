@@ -88,6 +88,7 @@ class AddMintNotifier extends StateNotifier<ValidationState> {
     } catch (e) {
       state = state.copyWith(
           isValidating: false, isValid: false, clearMintInfo: true);
+      debugPrint('Error validating mint: $e');
       return;
     }
   }

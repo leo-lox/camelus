@@ -203,6 +203,7 @@ class WalletPaySummary extends ConsumerWidget {
                               type: ndk_entities.WalletType.CASHU,
                               supportedUnits: {},
                               mintUrl: '',
+                              mintInfo: ndk_entities.CashuMintInfo(nuts: {}),
                             ),
                           ),
                           balances: state.availableBalances

@@ -111,12 +111,23 @@ class _WalletsCarouselState extends State<WalletsCarousel> {
               right: index == wallets.length - 1 ? 16 : 8,
             ),
             child: _CardMaxWidth(
-              child: WalletAccountsCard(
-                  walletId: w.id,
-                  title: title,
-                  alias: alias,
-                  balances: myBalances,
-                  nfcAnimController: widget.nfcAnimController!),
+              child: GestureDetector(
+                onTap: () {
+                  if (mintUrl != null) {
+                    Navigator.pushNamed(
+                      context,
+                      '/wallet/mint_details',
+                      arguments: mintUrl,
+                    );
+                  }
+                },
+                child: WalletAccountsCard(
+                    walletId: w.id,
+                    title: title,
+                    alias: alias,
+                    balances: myBalances,
+                    nfcAnimController: widget.nfcAnimController!),
+              ),
             ),
           );
         },
