@@ -63,7 +63,11 @@ class _WalletsCarouselState extends State<WalletsCarousel> {
         child: SizedBox(
           height: 210,
           child: _CardMaxWidth(
-            child: WalletAccountCardPlaceholder(),
+            child: WalletAccountCardPlaceholder(
+              onTap: () {
+                Navigator.pushNamed(context, '/wallet/add_mint');
+              },
+            ),
           ),
         ),
       );

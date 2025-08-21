@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../config/palette.dart';
 import '../../atoms/my_profile_picture.dart';
@@ -69,6 +70,17 @@ class _WalletDashboardState extends ConsumerState<WalletDashboard>
             );
           },
         ),
+        actions: [
+          IconButton(
+            icon: Icon(
+              PhosphorIcons.plusCircle(),
+              size: 30,
+            ),
+            onPressed: () {
+              Navigator.pushNamed(context, '/wallet/add_mint');
+            },
+          ),
+        ],
       ),
       backgroundColor: Palette.background,
       drawer: NostrDrawer(pubkey: myUserPubkey),
