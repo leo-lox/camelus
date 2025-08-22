@@ -190,6 +190,14 @@ class WalletReceiveRequest extends ConsumerWidget {
               padding: EdgeInsets.all(16),
               child: Column(
                 children: [
+                  if (state.requestErr != null)
+                    Text(
+                      state.requestErr!,
+                      style: TextStyle(
+                        color: Palette.error,
+                        fontSize: 14,
+                      ),
+                    ),
                   SizedBox(height: 16),
                   _buildDetailRow(
                     label: "Amount",

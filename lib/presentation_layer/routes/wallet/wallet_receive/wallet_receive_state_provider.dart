@@ -95,7 +95,10 @@ class WalletPayToNotifier extends StateNotifier<WalletPayRecieverState> {
         );
 
   void updateRecieveToWalletId(String? walletId) {
-    state = state.copyWith(recieveToWalletId: walletId);
+    state = state.copyWith(
+      recieveToWalletId: walletId,
+      unit: state.unit == null ? "sat" : null,
+    );
   }
 
   void updateMethod(RecieveMethods? method) {
@@ -132,39 +135,46 @@ class WalletPayToNotifier extends StateNotifier<WalletPayRecieverState> {
       throw ArgumentError('Invalid state for minting ecash token');
     }
 
-    final initTransaction = await _ndk.cashu.initiateFund(
-      mintUrl: state.recieveToWalletId!,
-      amount: state.amount!,
-      unit: state.unit!,
-      method: state.method!.toString(),
-      memo: state.memo,
-    );
+    try {
+      final initTransaction = await _ndk.cashu.initiateFund(
+        mintUrl: state.recieveToWalletId!,
+        amount: state.amount!,
+        unit: state.unit!,
+        method: state.method!.toString(),
+        memo: state.memo,
+      );
 
-    state = state.copyWith(
-      request: initTransaction.qoute!.request,
-      decodedBolt11Request:
-          Bolt11PaymentRequest(initTransaction.qoute!.request),
-      isPending: true,
-    );
+      state = state.copyWith(
+        request: initTransaction.qoute!.request,
+        decodedBolt11Request:
+            Bolt11PaymentRequest(initTransaction.qoute!.request),
+        isPending: true,
+      );
 
-    print(state);
+      final resultStream =
+          _ndk.cashu.retriveFunds(draftTransaction: initTransaction);
 
-    final resultStream =
-        _ndk.cashu.retriveFunds(draftTransaction: initTransaction);
-
-    await for (final result in resultStream) {
-      if (result.state == ndk_entities.WalletTransactionState.completed) {
-        state = state.copyWith(
-          isPending: false,
-          isSuccess: true,
-        );
-      } else if (result.state == ndk_entities.WalletTransactionState.failed) {
-        state = state.copyWith(
-          requestErr: result.completionMsg,
-          isPending: false,
-          isSuccess: false,
-        );
+      await for (final result in resultStream) {
+        if (result.state == ndk_entities.WalletTransactionState.completed) {
+          state = state.copyWith(
+            isPending: false,
+            isSuccess: true,
+          );
+        } else if (result.state == ndk_entities.WalletTransactionState.failed) {
+          state = state.copyWith(
+            requestErr: result.completionMsg,
+            isPending: false,
+            isSuccess: false,
+          );
+        }
       }
+    } catch (e) {
+      state = state.copyWith(
+        requestErr: e.toString(),
+        isPending: false,
+        isSuccess: false,
+      );
+      return;
     }
   }
 }

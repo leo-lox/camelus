@@ -164,7 +164,8 @@ class WalletPayNotifier extends StateNotifier<WalletPayState> {
     );
     state = state.copyWith(
       supportedUnitsByWallet: state.payFromWallet?.supportedUnits,
-      unit: "sat", // state.payFromWallet?.supportedUnits.first,
+      unit:
+          state.unit == null ? state.payFromWallet?.supportedUnits.first : null,
     );
   }
 
