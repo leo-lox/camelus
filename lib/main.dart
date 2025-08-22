@@ -42,6 +42,7 @@ import 'presentation_layer/routes/wallet/mint_info/mint_info_page.dart';
 import 'presentation_layer/routes/wallet/wallet_navigation.dart';
 import 'presentation_layer/routes/wallet/wallet_pay/wallet_pay_page.dart';
 import 'presentation_layer/routes/wallet/wallet_receive/rcv_completers/wallet_rcv_ecash_completer_page.dart';
+import 'presentation_layer/routes/wallet/wallet_receive/wallet_receive_page.dart';
 import 'theme.dart' as theme;
 
 const devDeviceFrame = true;
@@ -277,6 +278,11 @@ class MyApp extends ConsumerWidget {
                 ),
               );
             case '/wallet/receive':
+              return MaterialPageRoute(
+                builder: (context) => WalletReceivePage(),
+              );
+
+            case '/wallet/receive/ecash':
               return MaterialPageRoute(
                 builder: (context) => WalletReceiveEcashCompleterPage(),
               );

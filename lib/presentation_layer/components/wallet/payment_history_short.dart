@@ -25,8 +25,6 @@ class PaymentHistoryShort extends StatelessWidget {
     this.onTap,
     this.showDividers = true,
     this.emptyText = 'no transactions yet',
-
-    /// default height
     this.height = 300,
     this.physics,
     this.controller,
@@ -65,12 +63,7 @@ class PaymentHistoryShort extends StatelessWidget {
           delegate: SliverChildBuilderDelegate(
             (context, index) {
               final tx = visible[index];
-              final isPending = pendingTransactions.contains(tx);
-              final isIncoming = tx.changeAmount >= 0;
-              final color = isIncoming ? Colors.green : Colors.red;
-              final icon = isIncoming
-                  ? Icons.arrow_downward_rounded
-                  : Icons.arrow_upward_rounded;
+              final transactionStatus = _getTransactionStatus(tx);
 
               final dateToUse = _bestDate(tx);
               final now = DateTime.now();
@@ -98,23 +91,21 @@ class PaymentHistoryShort extends StatelessWidget {
               Widget listTile = ListTile(
                 onTap: onTap == null ? null : () => onTap!(tx),
                 leading: CircleAvatar(
-                  backgroundColor: isPending
-                      ? Colors.blue.withValues(alpha: 0.1)
-                      : color.withValues(alpha: 0.1),
+                  backgroundColor:
+                      transactionStatus.color.withValues(alpha: 0.1),
                   child: Icon(
-                    isPending ? Icons.pending : icon,
-                    color: isPending ? Colors.blue : color,
+                    transactionStatus.icon,
+                    color: transactionStatus.color,
                   ),
                 ),
                 title: Text(
-                  '${isPending ? 'Pending' : (isIncoming ? 'Incoming' : 'Outgoing')} - ${tx.walletType}',
+                  '${transactionStatus.label} - ${tx.walletType}',
                   style: const TextStyle(fontWeight: FontWeight.w600),
                 ),
                 subtitle: Text(
                   [
                     transactionDateText,
                     _removeHttpPrefix(tx.walletId),
-                    //_enumLabel(tx.state),
                   ].where((e) => e.isNotEmpty).join(' • '),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -127,16 +118,22 @@ class PaymentHistoryShort extends StatelessWidget {
                       amountStr,
                       style: TextStyle(
                         fontWeight: FontWeight.w700,
-                        color: isPending ? Colors.blue : color,
+                        color: transactionStatus.color,
+                        decoration: transactionStatus.isStrikethrough
+                            ? TextDecoration.lineThrough
+                            : null,
                       ),
                     ),
                     if (tx.completionMsg != null &&
                         tx.completionMsg!.isNotEmpty)
-                      Text(
-                        tx.completionMsg!,
-                        style: Theme.of(context).textTheme.bodySmall,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+                      ConstrainedBox(
+                        constraints: const BoxConstraints(maxWidth: 150),
+                        child: Text(
+                          tx.completionMsg!,
+                          style: Theme.of(context).textTheme.bodySmall,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ),
                   ],
                 ),
@@ -164,6 +161,51 @@ class PaymentHistoryShort extends StatelessWidget {
         : scrollView;
   }
 
+  static TransactionStatus _getTransactionStatus(
+      ndk_entities.WalletTransaction tx) {
+    final isDraft = tx.state == ndk_entities.WalletTransactionState.draft;
+    final isPending = tx.state == ndk_entities.WalletTransactionState.pending;
+    final isFailed = tx.state == ndk_entities.WalletTransactionState.failed;
+    final isCanceled = tx.state == ndk_entities.WalletTransactionState.canceled;
+    final isIncoming = tx.changeAmount >= 0;
+
+    if (isPending || isDraft) {
+      return TransactionStatus(
+        label: 'Pending',
+        icon: Icons.pending,
+        color: Colors.blue,
+        isStrikethrough: false,
+      );
+    } else if (isFailed) {
+      return TransactionStatus(
+        label: 'Failed ${isIncoming ? 'Incoming' : 'Outgoing'}',
+        icon: Icons.error_outline,
+        color: Colors.red,
+        isStrikethrough: true,
+      );
+    } else if (isCanceled) {
+      return TransactionStatus(
+        label: 'Canceled ${isIncoming ? 'Incoming' : 'Outgoing'}',
+        icon: Icons.cancel_outlined,
+        color: Colors.orange,
+        isStrikethrough: true,
+      );
+    } else {
+      // Successful transaction
+      final color = isIncoming ? Colors.green : Colors.red;
+      final icon = isIncoming
+          ? Icons.arrow_downward_rounded
+          : Icons.arrow_upward_rounded;
+
+      return TransactionStatus(
+        label: isIncoming ? 'Incoming' : 'Outgoing',
+        icon: icon,
+        color: color,
+        isStrikethrough: false,
+      );
+    }
+  }
+
   static int? _bestDate(ndk_entities.WalletTransaction tx) =>
       tx.transactionDate ?? tx.initiatedDate;
 
@@ -182,4 +224,18 @@ class PaymentHistoryShort extends StatelessWidget {
     }
     return url;
   }
+}
+
+class TransactionStatus {
+  final String label;
+  final IconData icon;
+  final Color color;
+  final bool isStrikethrough;
+
+  const TransactionStatus({
+    required this.label,
+    required this.icon,
+    required this.color,
+    required this.isStrikethrough,
+  });
 }

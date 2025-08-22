@@ -6,6 +6,7 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../../../config/palette.dart';
 import '../../../../../helpers/wallet_number_formatting.dart';
+import '../../../../atoms/copy_to_clipboard.dart';
 import '../../../../atoms/long_button.dart';
 import '../../../../components/wallet/animated_qr.dart';
 import '../../wallet_providers/wallet_combined_state_provider.dart';
@@ -203,61 +204,13 @@ class SuccessStep extends StatelessWidget {
         /// copy button
         SizedBox(
           width: 250,
-          child: CopyTokenButton(
-            token: outputToken!.toV4TokenString(),
+          child: CopyClipboardButton(
+            value: outputToken!.toV4TokenString(),
+            copyText: "Copy Token",
           ),
         ),
       ],
     );
-  }
-}
-
-class CopyTokenButton extends StatefulWidget {
-  final String token;
-
-  const CopyTokenButton({super.key, required this.token});
-
-  @override
-  State<CopyTokenButton> createState() => _CopyTokenButtonState();
-}
-
-class _CopyTokenButtonState extends State<CopyTokenButton> {
-  bool _copied = false;
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: double.infinity,
-      child: ElevatedButton.icon(
-        onPressed: _copied ? null : _copyToClipboard,
-        icon: Icon(_copied ? Icons.check : Icons.copy),
-        label: Text(_copied ? 'Copied to Clipboard!' : 'Copy Token'),
-        style: ElevatedButton.styleFrom(
-          backgroundColor:
-              _copied ? Palette.white : Palette.primary.withValues(alpha: 0.9),
-          foregroundColor: Colors.white,
-          padding: const EdgeInsets.symmetric(vertical: 16),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Future<void> _copyToClipboard() async {
-    await Clipboard.setData(ClipboardData(text: widget.token));
-    setState(() {
-      _copied = true;
-    });
-
-    Future.delayed(const Duration(seconds: 3), () {
-      if (mounted) {
-        setState(() {
-          _copied = false;
-        });
-      }
-    });
   }
 }
 

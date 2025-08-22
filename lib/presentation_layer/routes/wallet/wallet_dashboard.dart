@@ -14,6 +14,7 @@ import '../../providers/ndk_provider.dart';
 import '../nostr/nostr_drawer.dart';
 import 'wallet_pay/wallet_pay_state_provider.dart';
 import 'wallet_providers/wallet_combined_state_provider.dart';
+import 'wallet_receive/wallet_receive_state_provider.dart';
 
 class WalletDashboard extends ConsumerStatefulWidget {
   const WalletDashboard({super.key});
@@ -85,70 +86,68 @@ class _WalletDashboardState extends ConsumerState<WalletDashboard>
       backgroundColor: Palette.background,
       drawer: NostrDrawer(pubkey: myUserPubkey),
       body: SafeArea(
-        child: SingleChildScrollView(
-          physics: const NeverScrollableScrollPhysics(),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              const SizedBox(height: 20),
-              WalletsCarousel(
-                wallets: wallets,
-                balances: combinedWallet.balances,
-                nfcAnimController: _nfcAnimController,
-              ),
-              const SizedBox(height: 30),
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 10),
-                child: WalletFriendsStrip(),
-              ),
-              const SizedBox(height: 30),
-              WalletActionsStrip(
-                onScan: () {
-                  Navigator.pushNamed(context, '/wallet/scan');
-                },
-                onReceive: () {
-                  Navigator.pushNamed(context, '/wallet/receive');
-                },
-                onPay: () async {
-                  final selectedId = await showWalletsSelectBottomSheet(
-                    context: context,
-                    wallets: combinedWallet.wallets,
-                    balances: combinedWallet.balances,
-                    title: "Select Wallet to Pay From",
-                  );
-                  if (selectedId != null) {
-                    final payNotifier =
-                        ref.read(walletPayStateProvider.notifier);
-                    payNotifier.reset();
-                    payNotifier.updatePayFromWalletId(selectedId);
-                    if (mounted) {
-                      Navigator.pushNamed(context, '/wallet/pay');
-                    }
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: <Widget>[
+            const SizedBox(height: 20),
+            WalletsCarousel(
+              wallets: wallets,
+              balances: combinedWallet.balances,
+              nfcAnimController: _nfcAnimController,
+            ),
+            const SizedBox(height: 30),
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 10),
+              child: WalletFriendsStrip(),
+            ),
+            const SizedBox(height: 30),
+            WalletActionsStrip(
+              onScan: () {
+                Navigator.pushNamed(context, '/wallet/scan');
+              },
+              onReceive: () async {
+                final selectedId = await showWalletsSelectBottomSheet(
+                  context: context,
+                  wallets: combinedWallet.wallets,
+                  balances: combinedWallet.balances,
+                  title: "Select Wallet to Receive To",
+                );
+                if (selectedId != null) {
+                  final rcvNotifier = ref.read(walletRecieverProvider.notifier);
+                  rcvNotifier.reset();
+                  rcvNotifier.updateRecieveToWalletId(selectedId);
+                  if (mounted) {
+                    Navigator.pushNamed(context, '/wallet/receive');
                   }
-                },
-                onHistory: () {},
-              ),
-              const SizedBox(height: 30),
-              TextButton(
-                onPressed: () {
-                  combinedWalletNotifier.fundWallet();
-                },
-                child: Text("fund"),
-              ),
-              TextButton(
-                onPressed: () {
-                  combinedWalletNotifier.spend();
-                },
-                child: Text("spend"),
-              ),
-              PaymentHistoryShort(
+                }
+              },
+              onPay: () async {
+                final selectedId = await showWalletsSelectBottomSheet(
+                  context: context,
+                  wallets: combinedWallet.wallets,
+                  balances: combinedWallet.balances,
+                  title: "Select Wallet to Pay From",
+                );
+                if (selectedId != null) {
+                  final payNotifier = ref.read(walletPayStateProvider.notifier);
+                  payNotifier.reset();
+                  payNotifier.updatePayFromWalletId(selectedId);
+                  if (mounted) {
+                    Navigator.pushNamed(context, '/wallet/pay');
+                  }
+                }
+              },
+              onHistory: () {},
+            ),
+            Expanded(
+              child: PaymentHistoryShort(
+                height: double.infinity,
                 transactions: combinedWallet.recentTransactions,
                 pendingTransactions: combinedWallet.pendingTransactions,
                 showDividers: false,
               ),
-            ],
-          ),
+            )
+          ],
         ),
       ),
     );

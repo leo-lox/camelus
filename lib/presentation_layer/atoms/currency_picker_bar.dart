@@ -4,6 +4,16 @@ import 'package:flutter/services.dart';
 
 import '../../config/palette.dart';
 
+class ChangeResult {
+  final String currentUnit;
+  final String previousUnit;
+
+  ChangeResult({
+    required this.currentUnit,
+    required this.previousUnit,
+  });
+}
+
 class CurrencyPickerBar extends StatefulWidget {
   const CurrencyPickerBar({
     super.key,
@@ -24,7 +34,7 @@ class CurrencyPickerBar extends StatefulWidget {
 
   final List<String> currencies;
   final int initialIndex;
-  final ValueChanged<int>? onChanged;
+  final ValueChanged<ChangeResult>? onChanged;
   final double height;
   final double lensRadius;
   final EdgeInsets padding;
@@ -123,6 +133,7 @@ class _CurrencyPickerBarState extends State<CurrencyPickerBar>
   }
 
   void _setSelectedIndex(int index, {bool fromUser = true}) {
+    final previousIndex = _selectedIndex;
     if (index == _selectedIndex) return;
     setState(() {
       _selectedIndex = index;
@@ -130,7 +141,16 @@ class _CurrencyPickerBarState extends State<CurrencyPickerBar>
     if (widget.showHaptics && fromUser) {
       HapticFeedback.selectionClick();
     }
-    widget.onChanged?.call(_selectedIndex);
+
+    final currentUnit = widget.currencies[_selectedIndex];
+    final previousUnit = widget.currencies[previousIndex];
+
+    widget.onChanged?.call(
+      ChangeResult(
+        currentUnit: currentUnit,
+        previousUnit: previousUnit,
+      ),
+    );
   }
 
   @override

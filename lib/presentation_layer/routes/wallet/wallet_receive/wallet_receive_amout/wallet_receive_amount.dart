@@ -1,4 +1,3 @@
-import 'package:camelus/presentation_layer/atoms/wallet/wallet_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -8,14 +7,17 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 import '../../../../../config/palette.dart';
 import '../../../../atoms/currency_picker_bar.dart';
 import '../../../../atoms/long_button.dart';
+import '../../../../atoms/wallet/wallet_card.dart';
 import '../../../../components/wallet/wallets_select_bottom_sheet.dart';
-import '../wallet_pay_state_provider.dart';
+import '../../wallet_providers/wallet_combined_state_provider.dart';
 
-class WalletPaySelectAmount extends ConsumerStatefulWidget {
+import '../wallet_receive_state_provider.dart';
+
+class WalletReceiveAmount extends ConsumerStatefulWidget {
   final Function doneCallback;
   final Function backCallback;
 
-  const WalletPaySelectAmount({
+  const WalletReceiveAmount({
     super.key,
     required this.doneCallback,
     required this.backCallback,
@@ -25,11 +27,11 @@ class WalletPaySelectAmount extends ConsumerStatefulWidget {
   final String? title;
 
   @override
-  ConsumerState<WalletPaySelectAmount> createState() =>
+  ConsumerState<WalletReceiveAmount> createState() =>
       _WalletPaySelectAmountState();
 }
 
-class _WalletPaySelectAmountState extends ConsumerState<WalletPaySelectAmount> {
+class _WalletPaySelectAmountState extends ConsumerState<WalletReceiveAmount> {
   late final TextEditingController _amountController;
   late final TextEditingController _memoController;
   final FocusNode _amountFocus = FocusNode();
@@ -38,12 +40,12 @@ class _WalletPaySelectAmountState extends ConsumerState<WalletPaySelectAmount> {
   @override
   void initState() {
     super.initState();
-    final state = ref.read(walletPayStateProvider);
+    final state = ref.read(walletRecieverProvider);
     _amountController = TextEditingController(text: state.amount?.toString());
     _memoController = TextEditingController(text: state.memo);
 
     _amountController.addListener(() {
-      final stateR = ref.read(walletPayStateProvider);
+      final stateR = ref.read(walletRecieverProvider);
       if (_amountController.text.isEmpty) {
         return;
       }
@@ -57,11 +59,11 @@ class _WalletPaySelectAmountState extends ConsumerState<WalletPaySelectAmount> {
         parsedAmount = ((double.tryParse(sanitizedInput) ?? 0) * 100).toInt();
       }
 
-      ref.read(walletPayStateProvider.notifier).updateAmount(parsedAmount ?? 0);
+      ref.read(walletRecieverProvider.notifier).updateAmount(parsedAmount ?? 0);
     });
     _memoController.addListener(() {
       ref
-          .read(walletPayStateProvider.notifier)
+          .read(walletRecieverProvider.notifier)
           .updateMemo(_memoController.text);
     });
   }
@@ -79,8 +81,9 @@ class _WalletPaySelectAmountState extends ConsumerState<WalletPaySelectAmount> {
     required String previousUnit,
     required String currentUnit,
   }) {
-    final state = ref.read(walletPayStateProvider);
-    final stateNotifier = ref.read(walletPayStateProvider.notifier);
+    final state = ref.read(walletRecieverProvider);
+    final stateNotifier = ref.read(walletRecieverProvider.notifier);
+
     if (previousUnit == "sat" && currentUnit != "sat") {
       /// sat to fiat
       final amount = state.amount;
@@ -116,11 +119,25 @@ class _WalletPaySelectAmountState extends ConsumerState<WalletPaySelectAmount> {
 
   @override
   Widget build(BuildContext context) {
-    final state = ref.watch(walletPayStateProvider);
-    final notifier = ref.read(walletPayStateProvider.notifier);
+    final state = ref.watch(walletRecieverProvider);
+    final notifier = ref.read(walletRecieverProvider.notifier);
 
-    final payState = ref.watch(walletPayStateProvider);
-    final payNotifier = ref.read(walletPayStateProvider.notifier);
+    final combinedWallets = ref.watch(walletCombinedProvider);
+
+    final List<ndk_entities.Wallet?> mySelectedWalletList =
+        combinedWallets.wallets
+            .where(
+              (w) => w.id == state.recieveToWalletId,
+            )
+            .toList();
+
+    final ndk_entities.CashuWallet? mySelectedWallet =
+        mySelectedWalletList.isNotEmpty
+            ? mySelectedWalletList.first as ndk_entities.CashuWallet
+            : null;
+
+    final List<String> supportedUnitsBySelectedWallet =
+        mySelectedWallet?.supportedUnits.toList() ?? [];
 
     return Scaffold(
       appBar: widget.title != null
@@ -143,8 +160,8 @@ class _WalletPaySelectAmountState extends ConsumerState<WalletPaySelectAmount> {
             children: [
               Container(
                 child: WalletCard(
-                  wallet: payState.availableWallets.firstWhere(
-                    (w) => w.id == payState.payFromWalletId,
+                  wallet: combinedWallets.wallets.firstWhere(
+                    (w) => w.id == state.recieveToWalletId,
                     orElse: () => ndk_entities.CashuWallet(
                       id: '',
                       name: 'Select Wallet',
@@ -154,8 +171,8 @@ class _WalletPaySelectAmountState extends ConsumerState<WalletPaySelectAmount> {
                       mintInfo: ndk_entities.CashuMintInfo(nuts: {}),
                     ),
                   ),
-                  balances: payState.availableBalances
-                      .where((b) => b.walletId == payState.payFromWalletId)
+                  balances: combinedWallets.balances
+                      .where((b) => b.walletId == state.recieveToWalletId)
                       .toList(),
                   onTap: (_) {},
                   tralling: IconButton(
@@ -167,12 +184,12 @@ class _WalletPaySelectAmountState extends ConsumerState<WalletPaySelectAmount> {
                     onPressed: () async {
                       final selectedId = await showWalletsSelectBottomSheet(
                         context: context,
-                        selectedId: payState.payFromWalletId,
-                        wallets: payState.availableWallets,
-                        balances: payState.availableBalances,
+                        selectedId: state.recieveToWalletId,
+                        wallets: combinedWallets.wallets,
+                        balances: combinedWallets.balances,
                       );
                       if (selectedId != null) {
-                        payNotifier.updatePayFromWalletId(selectedId);
+                        notifier.updateRecieveToWalletId(selectedId);
                       }
                     },
                   ),
@@ -214,16 +231,12 @@ class _WalletPaySelectAmountState extends ConsumerState<WalletPaySelectAmount> {
                 child: ConstrainedBox(
                   constraints: const BoxConstraints(maxWidth: 320),
                   child: CurrencyPickerBar(
-                    currencies: state.supportedUnitsByWallet != null
-                        ? state.supportedUnitsByWallet!.toList()
-                        : [],
+                    currencies: supportedUnitsBySelectedWallet,
                     initialIndex: state.unit != null
-                        ? state.supportedUnitsByWallet!
-                            .toList()
-                            .indexOf(state.unit!)
+                        ? supportedUnitsBySelectedWallet.indexOf(state.unit!)
                         : 0,
                     onChanged: (r) => {
-                      payNotifier.updateUnit(
+                      notifier.updateUnit(
                         r.currentUnit,
                       ),
                       _onSwitchCurrency(
@@ -264,23 +277,29 @@ class _WalletPaySelectAmountState extends ConsumerState<WalletPaySelectAmount> {
       bottomNavigationBar: SafeArea(
         top: false,
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-          child: longButton(
-              name: "next",
-              onPressed: () {
-                if (state.payFromWalletId == null ||
-                    state.payFromWalletId!.isEmpty) {
-                  showSnackBar(context, 'Please select a wallet to pay from.');
-                  return;
-                }
-                if (state.amount == null || state.amount! <= 0) {
-                  _amountFocus.requestFocus();
-                  showSnackBar(context, 'Please enter a valid amount.');
-                  return;
-                }
-                widget.doneCallback();
-              },
-              inverted: true),
+          padding: const EdgeInsets.fromLTRB(12, 8, 12, 12),
+          child: SizedBox(
+            width: double.infinity,
+            height: 40,
+            child: longButton(
+                name: "create request",
+                onPressed: () {
+                  if (state.recieveToWalletId == null ||
+                      state.recieveToWalletId!.isEmpty) {
+                    showSnackBar(
+                        context, 'Please select a wallet to receive to.');
+                    return;
+                  }
+                  if (state.amount == null || state.amount! <= 0) {
+                    _amountFocus.requestFocus();
+                    showSnackBar(context, 'Please enter a valid amount.');
+                    return;
+                  }
+                  notifier.mintEcashToken();
+                  widget.doneCallback();
+                },
+                inverted: true),
+          ),
         ),
       ),
     );

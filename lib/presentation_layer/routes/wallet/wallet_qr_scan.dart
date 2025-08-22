@@ -83,7 +83,7 @@ class _QrScan extends ConsumerState<WalletQrScan> {
             rcvProvider.receiveEcash(tokenString: ecashTokenString);
             Navigator.pushNamed(
               context,
-              '/wallet/receive',
+              '/wallet/receive/ecash',
             );
             ref.read(walletNavigationProvider.notifier).changeDashboardPage(1);
             break;

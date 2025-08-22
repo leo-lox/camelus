@@ -4,7 +4,6 @@ import 'package:ndk/entities.dart' as ndk_entities;
 import 'package:ndk/ndk.dart';
 
 import 'package:riverpod/riverpod.dart';
-import 'package:serverpod_flutter/serverpod_flutter.dart';
 
 import '../../../providers/db_ndk_provider.dart';
 import '../../../providers/ndk_provider.dart';
@@ -90,34 +89,5 @@ class WalletCombinedStateNotifier extends StateNotifier<WalletCombinedState> {
         state = state.copyWith(wallets: data);
       }),
     ]);
-  }
-
-  void fundWallet() async {
-    /// todo acc management in wallet usecase
-    /// just testing
-
-    final draftTransaction = await _ndk.cashu.initiateFund(
-        mintUrl: "http://$localhost:8086",
-        amount: 10,
-        unit: "sat",
-        method: "bolt11");
-
-    final transaction = await _ndk.cashu
-        .retriveFunds(draftTransaction: draftTransaction)
-        .toList();
-    print(transaction);
-  }
-
-  void spend() async {
-    final mintUrl = "http://$localhost:8086";
-    final unit = "eur";
-
-    final spend = await _ndk.cashu.initiateSpend(
-      mintUrl: mintUrl,
-      amount: 1,
-      unit: unit,
-    );
-
-    print(spend.token.toV4TokenString());
   }
 }
