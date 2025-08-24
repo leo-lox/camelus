@@ -12,6 +12,7 @@ import '../../components/wallet/wallets_select_bottom_sheet.dart';
 import '../../providers/metadata_state_provider.dart';
 import '../../providers/ndk_provider.dart';
 import '../nostr/nostr_drawer.dart';
+import 'wallet_navigation.dart';
 import 'wallet_pay/wallet_pay_state_provider.dart';
 import 'wallet_providers/wallet_combined_state_provider.dart';
 import 'wallet_receive/wallet_receive_state_provider.dart';
@@ -54,6 +55,7 @@ class _WalletDashboardState extends ConsumerState<WalletDashboard>
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Palette.background,
+        surfaceTintColor: Palette.background,
         leading: Builder(
           builder: (context) {
             final myMetadata =
@@ -103,7 +105,9 @@ class _WalletDashboardState extends ConsumerState<WalletDashboard>
             const SizedBox(height: 30),
             WalletActionsStrip(
               onScan: () {
-                Navigator.pushNamed(context, '/wallet/scan');
+                final navigationNoti =
+                    ref.read(walletNavigationProvider.notifier);
+                navigationNoti.changeDashboardPage(0);
               },
               onReceive: () async {
                 final selectedId = await showWalletsSelectBottomSheet(
@@ -137,14 +141,23 @@ class _WalletDashboardState extends ConsumerState<WalletDashboard>
                   }
                 }
               },
-              onHistory: () {},
+              onHistory: () {
+                final navigationNoti =
+                    ref.read(walletNavigationProvider.notifier);
+                navigationNoti.changeMainPage(1);
+              },
             ),
             Expanded(
               child: PaymentHistoryShort(
-                height: double.infinity,
                 transactions: combinedWallet.recentTransactions,
                 pendingTransactions: combinedWallet.pendingTransactions,
-                showDividers: false,
+                onTap: (tx) {
+                  Navigator.pushNamed(
+                    context,
+                    '/wallet/transactions/detail',
+                    arguments: tx,
+                  );
+                },
               ),
             )
           ],

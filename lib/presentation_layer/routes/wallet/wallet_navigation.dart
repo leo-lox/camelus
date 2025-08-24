@@ -7,6 +7,7 @@ import '../../components/wallet/sheet_send_receive.dart';
 import 'wallet_dashboard.dart';
 
 import 'wallet_qr_scan.dart';
+import 'wallet_transaction/wallet_transaction_list_page.dart';
 
 // Navigation state class
 class WalletNavigationState {
@@ -280,6 +281,7 @@ class _WalletNavigationState extends ConsumerState<WalletNavigation>
             WalletDashboard(),
           ],
         ),
+        WalletTransactionListPage(),
       ],
     );
   }

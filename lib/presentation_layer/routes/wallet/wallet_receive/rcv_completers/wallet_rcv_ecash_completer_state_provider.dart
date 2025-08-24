@@ -108,7 +108,7 @@ class WalletRcvEcashCompleterNotifier
             isError: true,
             isCompleted: true,
             isPending: false,
-            errorMessage: 'Failed to receive eCash: ${rcvResult.completionMsg}',
+            errorMessage: '${rcvResult.completionMsg}',
           );
         }
       }
@@ -117,7 +117,7 @@ class WalletRcvEcashCompleterNotifier
         isPending: false,
         isError: true,
         isCompleted: true,
-        errorMessage: 'Failed to receive eCash: $e',
+        errorMessage: '$e',
       );
       return;
     }

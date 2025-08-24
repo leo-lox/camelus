@@ -39,11 +39,13 @@ import 'presentation_layer/routes/nostr/settings/moderation/moderation_settings.
 import 'presentation_layer/routes/nostr/settings/settings_page.dart';
 import 'presentation_layer/routes/wallet/add_mint/add_mint_page.dart';
 import 'presentation_layer/routes/wallet/mint_info/mint_info_page.dart';
+import 'presentation_layer/routes/wallet/wallet_transaction/wallet_transaction_detail_page.dart';
 import 'presentation_layer/routes/wallet/wallet_navigation.dart';
 import 'presentation_layer/routes/wallet/wallet_pay/wallet_pay_page.dart';
 import 'presentation_layer/routes/wallet/wallet_receive/rcv_completers/wallet_rcv_ecash_completer_page.dart';
 import 'presentation_layer/routes/wallet/wallet_receive/wallet_receive_page.dart';
 import 'theme.dart' as theme;
+import 'package:ndk/entities.dart' as ndk_entities;
 
 const devDeviceFrame = true;
 
@@ -294,12 +296,6 @@ class MyApp extends ConsumerWidget {
                 ),
               );
 
-            case '/wallet/qr-scan':
-              return MaterialPageRoute(
-                builder: (context) => WalletNavigation(
-                  title: "a",
-                ),
-              );
             case '/wallet/pay':
               return MaterialPageRoute(
                 builder: (context) => WalletPayPage(),
@@ -313,6 +309,14 @@ class MyApp extends ConsumerWidget {
               return MaterialPageRoute(
                 builder: (context) => MintInfoPage(
                   mintUrl: settings.arguments as String?,
+                ),
+              );
+
+            case '/wallet/transactions/detail':
+              return MaterialPageRoute(
+                builder: (context) => WalletTransactionDetailPage(
+                  transaction:
+                      settings.arguments as ndk_entities.WalletTransaction,
                 ),
               );
           }
