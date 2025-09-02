@@ -40,7 +40,7 @@ class WalletTransactionCard extends StatelessWidget {
 
     return Card(
       elevation: 0,
-      color: Palette.extraDarkGray.withValues(alpha: 0.5),
+      color: Palette.extraDarkGray.withValues(alpha: 0.75),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
         side: BorderSide(color: Palette.darkGray.withValues(alpha: 0.25)),
