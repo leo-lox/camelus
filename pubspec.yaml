@@ -15,7 +15,7 @@ publish_to: "none" # Remove this line if you wish to publish to pub.dev
 # In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 1.7.2+66
+version: 1.7.3+66
 
 environment:
   sdk: ">=3.0.0 <4.0.0"
@@ -103,12 +103,12 @@ dependencies:
 
 
 dependency_overrides:
-  # ndk:
+  ndk:
     #path: ../ndk/packages/ndk
-    # git:
-    #   url: https://github.com/relaystr/ndk.git
-    #   path: packages/ndk
-    #   ref: tmp-camelus-1-7-2
+    git:
+      url: https://github.com/relaystr/ndk.git
+      path: packages/ndk
+      ref: tmp-camelus-1-7-3
   #ndk_rust_verifier:
   #  path: ../ndk/packages/rust_verifier
     #git:

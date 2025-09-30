@@ -1154,10 +1154,11 @@ packages:
   ndk:
     dependency: "direct main"
     description:
-      name: ndk
-      sha256: "6e71dc1b797aaffb5c4246d09d11ff69b5682c8e35549be52e5371473eb309c2"
-      url: "https://pub.dev"
-    source: hosted
+      path: "packages/ndk"
+      ref: tmp-camelus-1-7-3
+      resolved-ref: f6c4400659f214d71b9680a17470c570b547de18
+      url: "https://github.com/relaystr/ndk.git"
+    source: git
     version: "0.5.1"
   ndk_amber:
     dependency: "direct main"
