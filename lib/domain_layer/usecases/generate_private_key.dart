@@ -11,7 +11,7 @@ class GeneratePrivateKey {
   static GeneratedPrivateKey generateKey() {
     final mnemonic = Mnemonic.generate(
       Language.english,
-      entropyLength: 256,
+      length: MnemonicLength.words24,
     );
 
     final sentence = mnemonic.sentence;

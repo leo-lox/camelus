@@ -40,9 +40,7 @@ dependencies:
   badges: ^3.1.2
   uuid: ^4.4.2
   cached_network_image: ^3.3.1
-  bip340:
-    git:
-      url: https://github.com/1-leo/dart-bip340.git
+  bip340: ^0.3.1
   bech32: ^0.2.1
   hex: ^0.2.0
   flutter_secure_storage: ^9.2.2
@@ -66,7 +64,7 @@ dependencies:
   path_provider: ^2.1.4
   pointycastle: ^4.0.0
   #device_preview: ^1.1.0
-  bip39_mnemonic: ^3.0.6
+  bip39_mnemonic: ^4.0.1
   bip32: ^2.0.0
   crop_your_image: ^2.0.0
   package_info_plus: ^8.0.2

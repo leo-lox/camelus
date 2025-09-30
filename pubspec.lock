@@ -144,23 +144,31 @@ packages:
       url: "https://github.com/ejayjeon/bip32-dart.git"
     source: git
     version: "2.0.0"
-  bip340:
-    dependency: "direct main"
+  bip32_keys:
+    dependency: transitive
     description:
       path: "."
       ref: HEAD
-      resolved-ref: d1157e2aebd3debc8466a30ddf852cb9b69dfe30
-      url: "https://github.com/1-leo/dart-bip340.git"
+      resolved-ref: b5a0342220e7ee5aaf64d489a589bdee6ef8de22
+      url: "https://github.com/1-leo/dart-bip32-keys"
     source: git
+    version: "3.1.2"
+  bip340:
+    dependency: "direct main"
+    description:
+      name: bip340
+      sha256: "4c2df9fa2409d26f1d9334b2801015ebe4dc3978191f186743e60e89a90230c4"
+      url: "https://pub.dev"
+    source: hosted
     version: "0.3.1"
   bip39_mnemonic:
     dependency: "direct main"
     description:
       name: bip39_mnemonic
-      sha256: e280b785d40dda3f70186d5a51126c5d3ae2c3b9a1bafdbd20a94b50c8253fb3
+      sha256: dd6bdfc2547d986b2c00f99bba209c69c0b6fa5c1a185e1f728998282f1249d5
       url: "https://pub.dev"
     source: hosted
-    version: "3.0.10"
+    version: "4.0.1"
   bolt11_decoder:
     dependency: "direct main"
     description:
@@ -1228,7 +1236,7 @@ packages:
       path: "../ndk/packages/objectbox"
       relative: true
     source: path
-    version: "0.2.5"
+    version: "0.2.6"
   ndk_rust_verifier:
     dependency: "direct main"
     description:

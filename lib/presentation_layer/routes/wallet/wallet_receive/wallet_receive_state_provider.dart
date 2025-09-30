@@ -152,7 +152,7 @@ class WalletPayToNotifier extends StateNotifier<WalletPayRecieverState> {
       );
 
       final resultStream =
-          _ndk.cashu.retriveFunds(draftTransaction: initTransaction);
+          _ndk.cashu.retrieveFunds(draftTransaction: initTransaction);
 
       await for (final result in resultStream) {
         if (result.state == ndk_entities.WalletTransactionState.completed) {
