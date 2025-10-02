@@ -25,14 +25,16 @@ class UserImage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (imageUrl == null) {
-      return Container(
-        height: size,
-        width: size,
-        decoration: const BoxDecoration(
-          color: Palette.primary,
-          shape: BoxShape.circle,
+      return ClipOval(
+        child: Container(
+          height: size,
+          width: size,
+          decoration: const BoxDecoration(
+            color: Palette.primary,
+            shape: BoxShape.circle,
+          ),
+          child: SvgPicture.network("${Dicebear.baseUrl}$pubkey"),
         ),
-        child: SvgPicture.network("${Dicebear.baseUrl}$pubkey"),
       );
     }
 
