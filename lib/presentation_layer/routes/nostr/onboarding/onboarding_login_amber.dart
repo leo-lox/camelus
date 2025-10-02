@@ -13,7 +13,12 @@ import '../../../providers/signer_provider.dart';
 import '../../home_page.dart';
 
 class OnboardingLoginAmberPage extends ConsumerStatefulWidget {
-  const OnboardingLoginAmberPage({super.key});
+  final Function? onPressedBack;
+
+  const OnboardingLoginAmberPage({
+    super.key,
+    this.onPressedBack,
+  });
   @override
   ConsumerState<OnboardingLoginAmberPage> createState() =>
       _OnboardingLoginAmberPageState();
@@ -89,7 +94,17 @@ class _OnboardingLoginAmberPageState
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              const SizedBox(height: 20),
+              if (widget.onPressedBack != null)
+                Row(
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.arrow_back, color: Palette.white),
+                      onPressed: () => widget.onPressedBack!(),
+                    ),
+                  ],
+                ),
+              if (widget.onPressedBack == null)
+                const SizedBox(height: 20),
               SizedBox(
                 height: 200,
                 width: MediaQuery.of(context).size.width,

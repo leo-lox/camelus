@@ -140,9 +140,32 @@ class _NostrOnboardingState extends ConsumerState<NostrOnboarding>
                     duration: const Duration(milliseconds: 500),
                   );
                 },
+                onPressedBack: () {
+                  _horizontalPageController.animateToPage(
+                    1,
+                    duration: const Duration(milliseconds: 500),
+                    curve: Curves.easeInOut,
+                  );
+                },
               ),
-              OnboardingLoginPage(),
-              OnboardingLoginAmberPage(),
+              OnboardingLoginPage(
+                onPressedBack: () {
+                  _loginTabController.animateTo(
+                    0,
+                    curve: Curves.easeInOut,
+                    duration: const Duration(milliseconds: 500),
+                  );
+                },
+              ),
+              OnboardingLoginAmberPage(
+                onPressedBack: () {
+                  _loginTabController.animateTo(
+                    0,
+                    curve: Curves.easeInOut,
+                    duration: const Duration(milliseconds: 500),
+                  );
+                },
+              ),
             ],
           ),
           TabBarView(
@@ -174,6 +197,13 @@ class _NostrOnboardingState extends ConsumerState<NostrOnboarding>
                 userInfo: signUpInfo,
                 submitCallback: (_) {
                   _nextTab();
+                },
+                onPressedBack: () {
+                  _tabController.animateTo(
+                    0,
+                    curve: Curves.easeInOut,
+                    duration: const Duration(milliseconds: 500),
+                  );
                 },
               ),
               OnboardingPicture(

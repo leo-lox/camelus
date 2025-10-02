@@ -22,7 +22,12 @@ import '../../../providers/ndk_provider.dart';
 import '../../../providers/signer_provider.dart';
 
 class OnboardingLoginPage extends ConsumerStatefulWidget {
-  const OnboardingLoginPage({super.key});
+  final Function? onPressedBack;
+
+  const OnboardingLoginPage({
+    super.key,
+    this.onPressedBack,
+  });
   @override
   ConsumerState<OnboardingLoginPage> createState() =>
       _OnboardingLoginPageState();
@@ -246,7 +251,17 @@ class _OnboardingLoginPageState extends ConsumerState<OnboardingLoginPage> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      const SizedBox(height: 20),
+                      if (widget.onPressedBack != null)
+                        Row(
+                          children: [
+                            IconButton(
+                              icon: const Icon(Icons.arrow_back, color: Palette.white),
+                              onPressed: () => widget.onPressedBack!(),
+                            ),
+                          ],
+                        ),
+                      if (widget.onPressedBack == null)
+                        const SizedBox(height: 20),
 
                       if (_userWords.isNotEmpty)
                         Column(

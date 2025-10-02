@@ -10,11 +10,13 @@ import '../../../atoms/long_button.dart';
 class OnboardingLoginSelectPage extends ConsumerStatefulWidget {
   final Function onPressedSeedPhraseLogin;
   final Function onPressedAmberLogin;
+  final Function? onPressedBack;
 
   const OnboardingLoginSelectPage({
     super.key,
     required this.onPressedSeedPhraseLogin,
     required this.onPressedAmberLogin,
+    this.onPressedBack,
   });
   @override
   ConsumerState<OnboardingLoginSelectPage> createState() =>
@@ -39,7 +41,17 @@ class _OnboardingLoginSelectPageState
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              const SizedBox(height: 20),
+              if (widget.onPressedBack != null)
+                Row(
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.arrow_back, color: Palette.white),
+                      onPressed: () => widget.onPressedBack!(),
+                    ),
+                  ],
+                ),
+              if (widget.onPressedBack == null)
+                const SizedBox(height: 20),
               SizedBox(
                 height: 200,
                 width: MediaQuery.of(context).size.width,
