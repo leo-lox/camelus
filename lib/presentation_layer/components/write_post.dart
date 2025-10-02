@@ -529,40 +529,41 @@ class _TopBar extends ConsumerWidget {
       metadata = ref.watch(metadataStateProvider(replyToPubkey!)).userMetadata;
     }
 
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        /// close button
-        TextButton(
-          onPressed: (() {
-            ref.read(writePostStateProvider.notifier).clearPost();
-            Navigator.pop(context);
-          }),
-          child: SvgPicture.asset(
-            height: 25,
-            'assets/icons/x.svg',
-            colorFilter: const ColorFilter.mode(
-              Palette.gray,
-              BlendMode.srcIn,
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 6),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          /// close button
+          IconButton(
+            onPressed: (() {
+              ref.read(writePostStateProvider.notifier).clearPost();
+              Navigator.pop(context);
+            }),
+            icon: SvgPicture.asset(
+              height: 25,
+              'assets/icons/x.svg',
+              colorFilter: const ColorFilter.mode(
+                Palette.gray,
+                BlendMode.srcIn,
+              ),
             ),
           ),
-        ),
-        if (replyToPubkey == null)
-          const Text(
-            "write a post",
-            style: TextStyle(
-              color: Palette.lightGray,
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
+          if (replyToPubkey == null)
+            const Text(
+              "write a post",
+              style: TextStyle(
+                color: Palette.lightGray,
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
             ),
-          ),
-        if (replyToPubkey != null)
-          Column(
-            children: [
-              SizedBox(
+          if (replyToPubkey != null)
+            Expanded(
+              child: SizedBox(
                 width: MediaQuery.of(context).size.width * 0.6,
                 child: Container(
-                  margin: const EdgeInsets.only(left: 10, right: 10, top: 5),
+                  margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
                   child: Text(
                     "reply to ${metadata?.name ?? getPubkeyHrShort(replyToPubkey!)}",
                     overflow: TextOverflow.ellipsis,
@@ -575,28 +576,28 @@ class _TopBar extends ConsumerWidget {
                   ),
                 ),
               ),
-            ],
-          ),
-
-        // if submitLoading is true, show spinner
-        !submitLoading
-            ? TextButton(
-                onPressed: (() {
-                  submitPostCallback();
-                }),
-                child: SvgPicture.asset(
-                  height: 25,
-                  'assets/icons/paper-plane-tilt.svg',
-                  color: Palette.primary,
-                ),
-              )
-            : Lottie.asset(
-                'assets/lottie/spinner.json',
-                height: 40,
-                width: 64,
-                alignment: Alignment.topCenter,
-              )
-      ],
+            ),
+      
+          // if submitLoading is true, show spinner
+          !submitLoading
+              ? IconButton(
+                  onPressed: (() {
+                    submitPostCallback();
+                  }),
+                  icon: SvgPicture.asset(
+                    height: 25,
+                    'assets/icons/paper-plane-tilt.svg',
+                    color: Palette.primary,
+                  ),
+                )
+              : Lottie.asset(
+                  'assets/lottie/spinner.json',
+                  height: 40,
+                  width: 64,
+                  alignment: Alignment.topCenter,
+                )
+        ],
+      ),
     );
   }
 }
