@@ -184,8 +184,9 @@ class _OnboardingLoginAmberPageState
               ),
               const SizedBox(height: 20),
               if (!_amberInstalled)
-                SizedBox(
-                  width: MediaQuery.of(context).size.width,
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  width: 400,
                   height: 40,
                   child: longButton(
                     name: "install amber",
@@ -194,8 +195,9 @@ class _OnboardingLoginAmberPageState
                   ),
                 ),
               if (_amberInstalled)
-                SizedBox(
-                  width: MediaQuery.of(context).size.width,
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  width: 400,
                   height: 40,
                   child: longButton(
                     name: "authorise amber",

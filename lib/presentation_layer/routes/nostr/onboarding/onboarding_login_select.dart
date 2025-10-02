@@ -74,8 +74,9 @@ class _OnboardingLoginSelectPageState
                 flex: 1,
               ),
               if (Platform.isAndroid)
-                SizedBox(
-                  width: MediaQuery.of(context).size.width,
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  width: 400,
                   height: 40,
                   child: longButton(
                     name: "amber login",
@@ -86,8 +87,9 @@ class _OnboardingLoginSelectPageState
               const SizedBox(
                 height: 20,
               ),
-              SizedBox(
-                width: MediaQuery.of(context).size.width,
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                width: 400,
                 height: 40,
                 child: longButton(
                   name: "seed phrase login",
