@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_mentions/flutter_mentions.dart';
@@ -109,13 +110,19 @@ Future<void> main() async {
     initalRoute = savedRoute ?? '/';
   }
 
-  // notifications
-  await initializeFirebase(
-    enable: CamelusConfig.firebaseEnabled,
-    provider: providerContainer,
-  );
+  // check if firebase is supported on this platform
+  final bool firebaseSupported = (defaultTargetPlatform == TargetPlatform.iOS ||
+      defaultTargetPlatform == TargetPlatform.android ||
+      kIsWeb);
 
-  checkForPendingNotifications();
+  if (firebaseSupported) {
+    // notifications
+    await initializeFirebase(
+      enable: CamelusConfig.firebaseEnabled,
+      provider: providerContainer,
+    );
+    checkForPendingNotifications();
+  }
 
   InitModeration.initBloomFilter(provider: providerContainer);
 
