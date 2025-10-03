@@ -666,12 +666,13 @@ void _helpSearch(BuildContext context) {
       ),
     ),
     builder: (context) {
-      return const Padding(
-        padding: EdgeInsets.fromLTRB(30, 20, 30, 20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
+      return Padding(
+        padding: const EdgeInsets.fromLTRB(30, 20, 30, 20),
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: const [
             Text(
               'Search',
               style: TextStyle(
@@ -700,7 +701,8 @@ void _helpSearch(BuildContext context) {
               title: '@mastodon@domain.tld',
               description: 'mastodon address (provided by mostr.pub)',
             ),
-          ],
+            ],
+          ),
         ),
       );
     },

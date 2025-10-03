@@ -27,6 +27,14 @@ class _RelaysPageState extends ConsumerState<RelaysPage> {
 
     return Scaffold(
       backgroundColor: Palette.background,
+      appBar: AppBar(
+        backgroundColor: Palette.background,
+        leading: IconButton(
+          icon: Icon(PhosphorIcons.arrowLeft()),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+        title: const Text('Relays'),
+      ),
       body: SafeArea(
         child: StreamBuilder<Map<String, RelayConnectivity>>(
           stream: ndk.connectivity.relayConnectivityChanges,
