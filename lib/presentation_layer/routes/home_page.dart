@@ -13,6 +13,8 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../domain_layer/entities/app_update.dart';
 import '../../helpers/helpers.dart';
 import '../components/app_bottom_navigation_bar/app_bottom_navigation_bar.dart';
+import '../layouts/responsive_layout.dart';
+import '../layouts/three_colum_layout.dart';
 import '../providers/app_bar_provider/app_bottom_bar_provider.dart';
 import '../providers/app_update_provider.dart';
 import '../providers/language_provider.dart';
@@ -126,62 +128,80 @@ class _HomePageState extends ConsumerState<HomePage> {
 
     final isHomeSelected = navigationState.selectedTab == NavigationTab.home;
 
-    return Scaffold(
-      key: _scaffoldKey,
-      drawer: NostrDrawer(pubkey: widget.pubkey),
-      backgroundColor: Palette.background,
-      floatingActionButton: AnimatedSwitcher(
-        duration: const Duration(milliseconds: 150),
-        transitionBuilder: (Widget child, Animation<double> animation) {
-          return FadeTransition(
-            opacity: animation,
-            child: child,
-          );
-        },
-        child: isHomeSelected
-            ? FloatingActionButton(
-                key: const ValueKey<String>('FAB'),
-                backgroundColor: Palette.primary,
-                child: Icon(
-                  PhosphorIcons.plus(),
-                  color: Palette.white,
-                  size: 27,
-                ),
-                onPressed: () => {
-                  _show(context),
-                },
-              )
-            : null,
-      ),
-      body: SafeArea(
-        child: PageView(
-          controller: _myPage,
-          physics: const NeverScrollableScrollPhysics(),
-          children: <Widget>[
-            NostrPage(
-              parentScaffoldKey: _scaffoldKey,
-              pubkey: widget.pubkey,
-              initialTab: widget.initialTab,
-            ),
-            const SearchPage(),
-            NotificationPage(
-              pubkey: widget.pubkey,
-            ),
-            const Center(
-              child: Text('work in progress',
-                  style: TextStyle(color: Colors.white)),
-            )
-          ],
-          onPageChanged: (index) {
-            // Update the selected tab when page changes
-            ref
-                .read(appBottomNavigationBarProvider.notifier)
-                .selectTab(NavigationTab.values[index]);
-          },
+    return ResponsiveLayout(
+      desktopContent: ThreeColumnLayout(
+        mainContent: Scaffold(
+          backgroundColor: Palette.background,
+          body: NostrPage(
+            parentScaffoldKey: _scaffoldKey,
+            pubkey: widget.pubkey,
+            initialTab: widget.initialTab,
+          ),
+        ),
+        leftSidebar: Container(
+          color: Colors.amber,
+        ),
+        rightSidebar: Container(
+          color: Colors.blue,
         ),
       ),
-      bottomNavigationBar: AppBottomNavigationBar(
-        pageController: _myPage,
+      mobileContent: Scaffold(
+        key: _scaffoldKey,
+        drawer: NostrDrawer(pubkey: widget.pubkey),
+        backgroundColor: Palette.background,
+        floatingActionButton: AnimatedSwitcher(
+          duration: const Duration(milliseconds: 150),
+          transitionBuilder: (Widget child, Animation<double> animation) {
+            return FadeTransition(
+              opacity: animation,
+              child: child,
+            );
+          },
+          child: isHomeSelected
+              ? FloatingActionButton(
+                  key: const ValueKey<String>('FAB'),
+                  backgroundColor: Palette.primary,
+                  child: Icon(
+                    PhosphorIcons.plus(),
+                    color: Palette.white,
+                    size: 27,
+                  ),
+                  onPressed: () => {
+                    _show(context),
+                  },
+                )
+              : null,
+        ),
+        body: SafeArea(
+          child: PageView(
+            controller: _myPage,
+            physics: const NeverScrollableScrollPhysics(),
+            children: <Widget>[
+              NostrPage(
+                parentScaffoldKey: _scaffoldKey,
+                pubkey: widget.pubkey,
+                initialTab: widget.initialTab,
+              ),
+              const SearchPage(),
+              NotificationPage(
+                pubkey: widget.pubkey,
+              ),
+              const Center(
+                child: Text('work in progress',
+                    style: TextStyle(color: Colors.white)),
+              )
+            ],
+            onPageChanged: (index) {
+              // Update the selected tab when page changes
+              ref
+                  .read(appBottomNavigationBarProvider.notifier)
+                  .selectTab(NavigationTab.values[index]);
+            },
+          ),
+        ),
+        bottomNavigationBar: AppBottomNavigationBar(
+          pageController: _myPage,
+        ),
       ),
     );
   }
