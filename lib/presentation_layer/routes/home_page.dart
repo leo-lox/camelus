@@ -13,6 +13,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../domain_layer/entities/app_update.dart';
 import '../../helpers/helpers.dart';
 import '../components/app_bottom_navigation_bar/app_bottom_navigation_bar.dart';
+import '../components/drawer/nostr_side_menu.dart';
 import '../layouts/responsive_layout.dart';
 import '../layouts/three_colum_layout.dart';
 import '../providers/app_bar_provider/app_bottom_bar_provider.dart';
@@ -138,8 +139,12 @@ class _HomePageState extends ConsumerState<HomePage> {
             initialTab: widget.initialTab,
           ),
         ),
-        leftSidebar: Container(
-          color: Colors.amber,
+        leftSidebar: NostrSideMenu(
+          leadingWidget: Container(
+            color: Colors.amber,
+            height: 250,
+          ),
+          pubkey: widget.pubkey,
         ),
         rightSidebar: Container(
           color: Colors.blue,
