@@ -18,20 +18,20 @@ class AppBottomNavigationBar extends ConsumerWidget {
     final navigationState = ref.watch(appBottomNavigationBarProvider);
     final notifier = ref.read(appBottomNavigationBarProvider.notifier);
 
-    return BottomNavigationBar(
+    return NavigationBar(
+      height: kBottomNavigationBarHeight,
       backgroundColor: Palette.background,
-      showSelectedLabels: false,
-      showUnselectedLabels: false,
-      type: BottomNavigationBarType.fixed,
-      currentIndex: navigationState.selectedTab.index,
-      onTap: (int index) {
+      labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
+      selectedIndex: navigationState.selectedTab.index,
+      indicatorColor: Colors.transparent,
+      onDestinationSelected: (int index) {
         final tab = NavigationTab.values[index];
         notifier.selectTab(tab);
 
         // Jump to the corresponding page
         pageController.jumpToPage(index);
       },
-      items: <BottomNavigationBarItem>[
+      destinations: <NavigationDestination>[
         _buildHomeItem(navigationState, ref),
         _buildSearchItem(navigationState),
         _buildNotificationsItem(navigationState),
@@ -40,34 +40,34 @@ class AppBottomNavigationBar extends ConsumerWidget {
     );
   }
 
-  BottomNavigationBarItem _buildHomeItem(NavigationState state, WidgetRef ref) {
+  NavigationDestination _buildHomeItem(NavigationState state, WidgetRef ref) {
     final isSelected = state.selectedTab == NavigationTab.home;
 
-    return BottomNavigationBarItem(
-      icon: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Stack(
-            children: <Widget>[
-              Icon(
-                PhosphorIcons.house(),
-                color: isSelected ? Palette.primary : Palette.darkGray,
-                size: 23,
-              ),
-              if (state.newNotesCountHome > 0) IndicatorDot(),
-            ],
-          ),
-        ],
-      ),
+    return NavigationDestination(
+      icon: Builder(builder: (context) {
+        final child = Icon(
+          PhosphorIcons.house(),
+          color: isSelected ? Palette.primary : Palette.darkGray,
+          size: 23,
+        );
+
+        if (state.newNotesCountHome > 0) {
+          return Badge(
+            child: child,
+          );
+        }
+
+        return child;
+      }),
       tooltip: isSelected ? "scroll to top" : "home",
       label: "home",
     );
   }
 
-  BottomNavigationBarItem _buildSearchItem(NavigationState state) {
+  NavigationDestination _buildSearchItem(NavigationState state) {
     final isSelected = state.selectedTab == NavigationTab.search;
 
-    return BottomNavigationBarItem(
+    return NavigationDestination(
       icon: Icon(
         PhosphorIcons.magnifyingGlass(),
         color: isSelected ? Palette.primary : Palette.darkGray,
@@ -78,65 +78,40 @@ class AppBottomNavigationBar extends ConsumerWidget {
     );
   }
 
-  BottomNavigationBarItem _buildNotificationsItem(NavigationState state) {
+  NavigationDestination _buildNotificationsItem(NavigationState state) {
     final isSelected = state.selectedTab == NavigationTab.notifications;
 
-    return BottomNavigationBarItem(
-      icon: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Stack(
-            children: <Widget>[
-              Icon(
-                PhosphorIcons.bell(),
-                color: isSelected ? Palette.primary : Palette.darkGray,
-                size: 23,
-              ),
-              if (state.newNotesCountNotifications > 0) IndicatorDot(),
-            ],
-          ),
-        ],
-      ),
+    return NavigationDestination(
+      icon: Builder(builder: (context) {
+        final child = Icon(
+          PhosphorIcons.bell(),
+          color: isSelected ? Palette.primary : Palette.darkGray,
+          size: 23,
+        );
+
+        if (state.newNotesCountNotifications > 0) {
+          return Badge(
+            child: child,
+          );
+        }
+
+        return child;
+      }),
       label: "notifications",
       tooltip: "notifications",
     );
   }
 
-  BottomNavigationBarItem _buildChatItem(NavigationState state) {
+  NavigationDestination _buildChatItem(NavigationState state) {
     final isSelected = state.selectedTab == NavigationTab.chat;
 
-    return BottomNavigationBarItem(
+    return NavigationDestination(
       icon: Icon(
         PhosphorIcons.chats(),
         color: isSelected ? Palette.primary : Palette.darkGray,
         size: 23,
       ),
       label: "",
-    );
-  }
-}
-
-class IndicatorDot extends StatelessWidget {
-  const IndicatorDot({
-    super.key,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Positioned(
-      right: 0,
-      bottom: 0,
-      child: Container(
-        padding: const EdgeInsets.all(1),
-        decoration: BoxDecoration(
-          color: Palette.lightGray,
-          borderRadius: BorderRadius.circular(50),
-        ),
-        constraints: const BoxConstraints(
-          minWidth: 12,
-          minHeight: 12,
-        ),
-      ),
     );
   }
 }
