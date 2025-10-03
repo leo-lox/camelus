@@ -18,7 +18,7 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y flatpak flatpak-builder libgtk-3-dev ninja-build
+          sudo apt-get install -y flatpak flatpak-builder libgtk-3-dev libsecret-1-dev ninja-build
 
       - name: Add Flathub repository
         run: |
