@@ -71,5 +71,11 @@ isar.dll
 **/fastlane/test_output
 
 # firebase
+firebase_options.dart
 firebase.json
 dart_defines.json
+
+# Flatpak build artifacts
+.flatpak-builder/
+build-dir/
+*.flatpak

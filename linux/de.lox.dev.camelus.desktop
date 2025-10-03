@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=Camelus
+Comment=Nostr client for freedom lovers
+Exec=camelus
+Icon=de.lox.dev.camelus
+Type=Application
+Categories=Network;InstantMessaging;
+Terminal=false
+StartupWMClass=camelus
+X-Flatpak-RenamedFrom=camelus.desktop

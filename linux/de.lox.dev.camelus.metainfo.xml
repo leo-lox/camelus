@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>de.lox.dev.camelus</id>
+  <name>Camelus</name>
+  <summary>Nostr client for freedom lovers</summary>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>MIT</project_license>
+
+  <description>
+    <p>
+      Camelus is a modern Nostr client built with Flutter that provides a seamless
+      experience for communicating on the Nostr protocol. It features a clean interface,
+      end-to-end encryption, and full support for the Nostr ecosystem.
+    </p>
+    <p>Features:</p>
+    <ul>
+      <li>Send and receive Nostr notes</li>
+      <li>Media sharing and previews</li>
+      <li>Direct messaging with encryption</li>
+      <li>Follow and interact with other users</li>
+      <li>Multiple relay support</li>
+    </ul>
+  </description>
+
+  <launchable type="desktop-id">de.lox.dev.camelus.desktop</launchable>
+
+  <url type="homepage">https://github.com/camelus-hq/camelus</url>
+  <url type="bugtracker">https://github.com/camelus-hq/camelus/issues</url>
+
+  <screenshots>
+    <screenshot type="default">
+      <caption>Main application window</caption>
+    </screenshot>
+  </screenshots>
+
+  <provides>
+    <binary>camelus</binary>
+  </provides>
+
+  <releases>
+    <release version="1.7.3" date="2025-10-03">
+      <description>
+        <p>Latest release with bug fixes and improvements</p>
+      </description>
+    </release>
+  </releases>
+
+  <content_rating type="oars-1.1">
+    <content_attribute id="social-chat">intense</content_attribute>
+    <content_attribute id="social-info">intense</content_attribute>
+  </content_rating>
+</component>
