@@ -22,7 +22,12 @@ import '../../../providers/ndk_provider.dart';
 import '../../../providers/signer_provider.dart';
 
 class OnboardingLoginPage extends ConsumerStatefulWidget {
-  const OnboardingLoginPage({super.key});
+  final Function? onPressedBack;
+
+  const OnboardingLoginPage({
+    super.key,
+    this.onPressedBack,
+  });
   @override
   ConsumerState<OnboardingLoginPage> createState() =>
       _OnboardingLoginPageState();
@@ -246,7 +251,17 @@ class _OnboardingLoginPageState extends ConsumerState<OnboardingLoginPage> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      const SizedBox(height: 20),
+                      if (widget.onPressedBack != null)
+                        Row(
+                          children: [
+                            IconButton(
+                              icon: const Icon(Icons.arrow_back, color: Palette.white),
+                              onPressed: () => widget.onPressedBack!(),
+                            ),
+                          ],
+                        ),
+                      if (widget.onPressedBack == null)
+                        const SizedBox(height: 20),
 
                       if (_userWords.isNotEmpty)
                         Column(
@@ -341,6 +356,8 @@ class _OnboardingLoginPageState extends ConsumerState<OnboardingLoginPage> {
                         ),
                       ),
                       Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        width: 400,
                         child: TextField(
                           onSubmitted: (value) {
                             _addWords(value);
@@ -379,12 +396,15 @@ class _OnboardingLoginPageState extends ConsumerState<OnboardingLoginPage> {
                       ),
 
                       const SizedBox(height: 15),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          SizedBox(
-                            height: 31,
-                            child: ElevatedButton(
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        width: 400,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            SizedBox(
+                              height: 31,
+                              child: ElevatedButton(
                               onPressed: () {
                                 _pasteFromClipboard();
                               },
@@ -429,6 +449,7 @@ class _OnboardingLoginPageState extends ConsumerState<OnboardingLoginPage> {
                             ),
                           ),
                         ],
+                        ),
                       ),
 
                       const SizedBox(height: 50),
@@ -498,8 +519,9 @@ class _OnboardingLoginPageState extends ConsumerState<OnboardingLoginPage> {
 
                       const SizedBox(height: 20),
 
-                      SizedBox(
-                        width: MediaQuery.of(context).size.width,
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        width: 400,
                         height: 40,
                         child: longButton(
                           name: "login",

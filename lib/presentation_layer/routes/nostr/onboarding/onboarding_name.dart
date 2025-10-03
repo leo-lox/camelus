@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class OnboardingName extends ConsumerStatefulWidget {
   final Function submitCallback;
+  final Function? onPressedBack;
 
   OnboardingUserInfo userInfo;
 
@@ -13,6 +14,7 @@ class OnboardingName extends ConsumerStatefulWidget {
     super.key,
     required this.submitCallback,
     required this.userInfo,
+    this.onPressedBack,
   });
   @override
   ConsumerState<OnboardingName> createState() => _OnboardingNameState();
@@ -52,6 +54,17 @@ class _OnboardingNameState extends ConsumerState<OnboardingName> {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
+            if (widget.onPressedBack != null)
+              Padding(
+                padding: const EdgeInsets.all(30),
+                child: Align(
+                  alignment: Alignment.topLeft,
+                  child: IconButton(
+                    icon: const Icon(Icons.arrow_back, color: Palette.white),
+                    onPressed: () => widget.onPressedBack!(),
+                  ),
+                ),
+              ),
             const Spacer(
               flex: 20,
             ),
