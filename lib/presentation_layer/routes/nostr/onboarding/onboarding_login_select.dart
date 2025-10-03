@@ -11,12 +11,14 @@ import '../../../atoms/long_button.dart';
 class OnboardingLoginSelectPage extends ConsumerStatefulWidget {
   final Function onPressedSeedPhraseLogin;
   final Function onPressedAmberLogin;
+  final Function onPressedBunkerLogin;
   final Function? onPressedBack;
 
   const OnboardingLoginSelectPage({
     super.key,
     required this.onPressedSeedPhraseLogin,
     required this.onPressedAmberLogin,
+    required this.onPressedBunkerLogin,
     this.onPressedBack,
   });
   @override
@@ -96,6 +98,19 @@ class _OnboardingLoginSelectPageState
                   name: "seed phrase login",
                   inverted: false,
                   onPressed: () => widget.onPressedSeedPhraseLogin(),
+                ),
+              ),
+              const SizedBox(
+                height: 20,
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                width: 400,
+                height: 40,
+                child: longButton(
+                  name: "bunker login",
+                  inverted: false,
+                  onPressed: () => widget.onPressedBunkerLogin(),
                 ),
               ),
             ],
