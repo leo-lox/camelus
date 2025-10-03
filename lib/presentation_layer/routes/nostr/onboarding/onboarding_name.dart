@@ -3,6 +3,7 @@ import 'package:camelus/config/palette.dart';
 import 'package:camelus/domain_layer/entities/onboarding_user_info.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 class OnboardingName extends ConsumerStatefulWidget {
   final Function submitCallback;
@@ -60,7 +61,10 @@ class _OnboardingNameState extends ConsumerState<OnboardingName> {
                 child: Align(
                   alignment: Alignment.topLeft,
                   child: IconButton(
-                    icon: const Icon(Icons.arrow_back, color: Palette.white),
+                    icon: Icon(
+                      PhosphorIcons.arrowLeft(),
+                      color: Palette.white,
+                    ),
                     onPressed: () => widget.onPressedBack!(),
                   ),
                 ),

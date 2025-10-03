@@ -1,6 +1,7 @@
 import 'package:amberflutter/amberflutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
@@ -98,13 +99,13 @@ class _OnboardingLoginAmberPageState
                 Row(
                   children: [
                     IconButton(
-                      icon: const Icon(Icons.arrow_back, color: Palette.white),
+                      icon:
+                          Icon(PhosphorIcons.arrowLeft(), color: Palette.white),
                       onPressed: () => widget.onPressedBack!(),
                     ),
                   ],
                 ),
-              if (widget.onPressedBack == null)
-                const SizedBox(height: 20),
+              if (widget.onPressedBack == null) const SizedBox(height: 20),
               SizedBox(
                 height: 200,
                 width: MediaQuery.of(context).size.width,

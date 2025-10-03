@@ -13,6 +13,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:hex/hex.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ndk/ndk.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:bip39_mnemonic/bip39_mnemonic.dart';
 
@@ -255,7 +256,10 @@ class _OnboardingLoginPageState extends ConsumerState<OnboardingLoginPage> {
                         Row(
                           children: [
                             IconButton(
-                              icon: const Icon(Icons.arrow_back, color: Palette.white),
+                              icon: Icon(
+                                PhosphorIcons.arrowLeft(),
+                                color: Palette.white,
+                              ),
                               onPressed: () => widget.onPressedBack!(),
                             ),
                           ],
@@ -405,50 +409,50 @@ class _OnboardingLoginPageState extends ConsumerState<OnboardingLoginPage> {
                             SizedBox(
                               height: 31,
                               child: ElevatedButton(
-                              onPressed: () {
-                                _pasteFromClipboard();
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Palette.background,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(20),
-                                  side: const BorderSide(
-                                      color: Palette.white, width: 1),
+                                onPressed: () {
+                                  _pasteFromClipboard();
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Palette.background,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20),
+                                    side: const BorderSide(
+                                        color: Palette.white, width: 1),
+                                  ),
                                 ),
-                              ),
-                              child: const Text(
-                                'paste',
-                                style: TextStyle(
-                                  color: Palette.white,
-                                  fontSize: 16,
-                                ),
-                              ),
-                            ),
-                          ),
-                          SizedBox(
-                            height: 31,
-                            child: ElevatedButton(
-                              onPressed: () {
-                                _addWords(_inputController.text);
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Palette.white,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(20),
-                                  side: const BorderSide(
-                                      color: Palette.background, width: 1),
-                                ),
-                              ),
-                              child: const Text(
-                                'add',
-                                style: TextStyle(
-                                  color: Palette.background,
-                                  fontSize: 16,
+                                child: const Text(
+                                  'paste',
+                                  style: TextStyle(
+                                    color: Palette.white,
+                                    fontSize: 16,
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
-                        ],
+                            SizedBox(
+                              height: 31,
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  _addWords(_inputController.text);
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Palette.white,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20),
+                                    side: const BorderSide(
+                                        color: Palette.background, width: 1),
+                                  ),
+                                ),
+                                child: const Text(
+                                  'add',
+                                  style: TextStyle(
+                                    color: Palette.background,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
 

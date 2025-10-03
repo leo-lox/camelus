@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../../config/palette.dart';
 import '../../../atoms/long_button.dart';
@@ -45,13 +46,13 @@ class _OnboardingLoginSelectPageState
                 Row(
                   children: [
                     IconButton(
-                      icon: const Icon(Icons.arrow_back, color: Palette.white),
+                      icon:
+                          Icon(PhosphorIcons.arrowLeft(), color: Palette.white),
                       onPressed: () => widget.onPressedBack!(),
                     ),
                   ],
                 ),
-              if (widget.onPressedBack == null)
-                const SizedBox(height: 20),
+              if (widget.onPressedBack == null) const SizedBox(height: 20),
               SizedBox(
                 height: 200,
                 width: MediaQuery.of(context).size.width,
