@@ -19,6 +19,7 @@ class AppBottomNavigationBar extends ConsumerWidget {
     final notifier = ref.read(appBottomNavigationBarProvider.notifier);
 
     return NavigationBar(
+      height: kBottomNavigationBarHeight,
       backgroundColor: Palette.background,
       labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
       selectedIndex: navigationState.selectedTab.index,
