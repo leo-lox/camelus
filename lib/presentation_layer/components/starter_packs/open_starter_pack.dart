@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:ndk/shared/nips/nip19/nip19.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:share_plus/share_plus.dart';
@@ -127,7 +128,7 @@ class _OpenStarterPackState extends ConsumerState<OpenStarterPack> {
             ),
             TextButton(
               onPressed: () {
-                Navigator.pop(context);
+                context.pop();
                 _onDelete(ref, context);
               },
               child: Text(
@@ -214,7 +215,7 @@ class _OpenStarterPackState extends ConsumerState<OpenStarterPack> {
               longButton(
                 name: "go back",
                 onPressed: () {
-                  Navigator.pop(context);
+                  context.pop();
                 },
               ),
             ],
@@ -246,7 +247,7 @@ class _OpenStarterPackState extends ConsumerState<OpenStarterPack> {
                 expandedHeight: 200.0,
                 leading: IconButton(
                   icon: Icon(Icons.arrow_back, color: Palette.white),
-                  onPressed: () => Navigator.pop(context),
+                  onPressed: () => context.pop(),
                 ),
                 actions: [
                   longButton(

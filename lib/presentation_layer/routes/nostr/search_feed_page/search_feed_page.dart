@@ -1,5 +1,6 @@
 import 'package:camelus/config/palette.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../../domain_layer/entities/feed_filter.dart';
@@ -67,7 +68,7 @@ class _SearchFeedPageState extends State<SearchFeedPage> {
         contentTextStyle: const TextStyle(color: Palette.white),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => context.pop(),
             child: const Text('OK', style: TextStyle(color: Palette.primary)),
           ),
         ],
@@ -107,7 +108,8 @@ class _SearchFeedPageState extends State<SearchFeedPage> {
               leading: IconButton(
                 icon: Icon(PhosphorIcons.arrowLeft()),
                 onPressed: () {
-                  Navigator.pop(context);
+                  context.pop();
+                  ;
                 },
               ),
             ),

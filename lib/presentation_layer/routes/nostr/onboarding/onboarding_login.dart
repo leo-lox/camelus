@@ -10,6 +10,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hex/hex.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ndk/ndk.dart';
@@ -160,11 +161,7 @@ class _OnboardingLoginPageState extends ConsumerState<OnboardingLoginPage> {
     setState(() {});
 
     // ignore: use_build_context_synchronously
-    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
-      return HomePage();
-    }));
-
-    //Navigator.popAndPushNamed(context, '/');
+    context.go('/');
   }
 
   bool _checkWord(String word) {

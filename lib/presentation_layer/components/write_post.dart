@@ -1,6 +1,7 @@
 import 'dart:developer';
 import 'dart:io';
 
+import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 
 import 'package:camelus/domain_layer/entities/user_metadata.dart';
@@ -212,7 +213,7 @@ class _WritePostState extends ConsumerState<WritePost> {
                 submitPostCallback: () => writePostNotifier.submitPost().then(
                   (value) {
                     if (!mounted) return;
-                    Navigator.pop(context);
+                    context.pop();
                   },
                 ),
               ),
@@ -516,7 +517,7 @@ class _TopBar extends ConsumerWidget {
           IconButton(
             onPressed: (() {
               ref.read(writePostStateProvider.notifier).clearPost();
-              Navigator.pop(context);
+              context.pop();
             }),
             icon: SvgPicture.asset(
               height: 25,
@@ -566,7 +567,8 @@ class _TopBar extends ConsumerWidget {
                   icon: SvgPicture.asset(
                     height: 25,
                     'assets/icons/paper-plane-tilt.svg',
-                    colorFilter: ColorFilter.mode(Palette.primary, BlendMode.srcIn),
+                    colorFilter:
+                        ColorFilter.mode(Palette.primary, BlendMode.srcIn),
                   ),
                 )
               : Lottie.asset(

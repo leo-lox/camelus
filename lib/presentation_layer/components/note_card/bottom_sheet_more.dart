@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../config/palette.dart';
@@ -123,7 +124,8 @@ class MoreOptionsBottomSheet extends ConsumerWidget {
   }
 
   void _showFollowPackSelection(BuildContext context, WidgetRef ref) {
-    Navigator.pop(context); // Close current bottom sheet
+    context.pop();
+    // Close current bottom sheet
 
     // You'll need to get the current user's pubkey - adjust this based on your app structure
     final currentUserPubkey = ref.read(ndkProvider).accounts.getPublicKey();
@@ -142,7 +144,8 @@ class MoreOptionsBottomSheet extends ConsumerWidget {
   }
 
   void _navigateToBlockPage(BuildContext context) {
-    Navigator.pop(context); // Close bottom sheet first
+    context.pop();
+    ; // Close bottom sheet first
     Navigator.push(
       context,
       MaterialPageRoute(

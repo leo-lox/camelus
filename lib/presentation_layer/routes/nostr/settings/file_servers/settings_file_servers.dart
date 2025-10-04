@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../../config/palette.dart';
 import '../../../../atoms/long_button.dart';
@@ -243,7 +244,7 @@ class SettingsFileServersPageState extends ConsumerState<SettingsFileServers> {
                                       'Are you sure you want to restore default servers? This will remove all custom servers.'),
                                   actions: [
                                     TextButton(
-                                      onPressed: () => Navigator.pop(context),
+                                      onPressed: () => context.pop(),
                                       child: const Text('Cancel'),
                                     ),
                                     TextButton(
@@ -251,7 +252,7 @@ class SettingsFileServersPageState extends ConsumerState<SettingsFileServers> {
                                         ref
                                             .read(fileServersProvider.notifier)
                                             .restoreDefaults();
-                                        Navigator.pop(context);
+                                        context.pop();
                                       },
                                       child: const Text('Restore'),
                                     ),
