@@ -162,7 +162,6 @@ class _SearchPageState extends ConsumerState<SearchPage> {
   final FocusNode _searchFocusNode = FocusNode();
   StreamSubscription? _navigationSubscription;
 
-  @override
   bool get wantKeepAlive => false; // keep state alive when switching tabs
 
   @override

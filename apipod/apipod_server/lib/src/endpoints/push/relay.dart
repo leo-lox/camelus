@@ -91,7 +91,6 @@ class Relay {
         switch (data[0]) {
           case 'EVENT':
             if (data.length < 3) return;
-            final subId = data[1];
             final event = Nip01Event.fromJson(data[2]);
             _eventController.add(event);
             break;

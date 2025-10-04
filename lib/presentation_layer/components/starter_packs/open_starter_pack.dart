@@ -63,9 +63,9 @@ class _OpenStarterPackState extends ConsumerState<OpenStarterPack> {
 
     String urlPath;
     if (myNpub == listNpub) {
-      urlPath = "/i/${myNpub}/${widget.starterPackIdentifier.name}";
+      urlPath = "/i/$myNpub/${widget.starterPackIdentifier.name}";
     } else {
-      urlPath = "/i/${myNpub}/${widget.starterPackIdentifier.name}/${listNpub}";
+      urlPath = "/i/$myNpub/${widget.starterPackIdentifier.name}/$listNpub";
     }
 
     final serverpodProv = ref.read(serverpodProvider);

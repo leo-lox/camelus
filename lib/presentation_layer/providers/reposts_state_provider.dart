@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:riverpod/riverpod.dart';
 
 import '../../domain_layer/entities/nostr_note.dart';
@@ -73,7 +74,9 @@ class PostRepostNotifier extends StateNotifier<PostRepostState> {
         toggleRepostLoading: false,
       );
     } catch (e) {
-      print(e);
+      if (kDebugMode) {
+        print(e);
+      }
       // Handle error
       state = state.copyWith(isLoading: false, toggleRepostLoading: false);
     }

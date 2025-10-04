@@ -8,7 +8,6 @@ import '../../domain_layer/entities/nostr_note.dart';
 import '../../domain_layer/entities/nostr_tag.dart';
 import '../../helpers/nprofile_helper.dart';
 import '../components/write_post/post_settings_dialog.dart';
-import 'edit_relays_provider.dart';
 import 'file_upload_provider.dart';
 import 'get_notes_provider.dart';
 import 'ndk_provider.dart';

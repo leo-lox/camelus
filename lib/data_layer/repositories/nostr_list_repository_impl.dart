@@ -1,7 +1,3 @@
-import 'dart:developer';
-
-import 'package:ndk/ndk.dart' as ndk;
-
 import '../../domain_layer/entities/nostr_list.dart';
 import '../../domain_layer/repositories/nostr_list_repository.dart';
 import '../data_sources/dart_ndk_source.dart';

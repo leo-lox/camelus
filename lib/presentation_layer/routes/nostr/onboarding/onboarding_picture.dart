@@ -1,15 +1,12 @@
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:camelus/domain_layer/entities/mem_file.dart';
 import 'package:camelus/presentation_layer/atoms/crop_avatar.dart';
-import 'package:camelus/presentation_layer/atoms/my_profile_picture.dart';
 import 'package:camelus/config/palette.dart';
 import 'package:camelus/domain_layer/entities/onboarding_user_info.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mime/mime.dart';
 
 import '../../../../domain_layer/usecases/remove_image_metadata.dart';
 import '../../../atoms/camer_upload.dart';
@@ -60,8 +57,6 @@ class _OnboardingPictureState extends ConsumerState<OnboardingPicture> {
       return;
     }
   }
-
-  Uint8List? _displayImage;
 
   _openCropImagePopup(Uint8List imageData) {
     // push fullscreen widget

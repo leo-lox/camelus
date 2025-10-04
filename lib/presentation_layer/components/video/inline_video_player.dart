@@ -49,7 +49,7 @@ class InlineVideoPlayer extends ConsumerWidget {
           child: controller != null
               ? Stack(children: [
                   AspectRatio(
-                    aspectRatio: controller!.value.aspectRatio,
+                    aspectRatio: controller.value.aspectRatio,
                     child: VisibilityDetector(
                       key: Key('video-$videoId'),
                       onVisibilityChanged: (visibilityInfo) {
@@ -76,7 +76,7 @@ class InlineVideoPlayer extends ConsumerWidget {
                           onTap: () {
                             videoStateNoti.showControls();
                           },
-                          child: VideoPlayer(controller!)),
+                          child: VideoPlayer(controller)),
                     ),
                   ),
                   Positioned.fill(

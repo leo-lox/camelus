@@ -1,10 +1,6 @@
 import 'dart:async';
-import 'package:camelus/presentation_layer/atoms/my_profile_picture.dart';
-import 'package:camelus/presentation_layer/atoms/spinner_center.dart';
 import 'package:camelus/config/palette.dart';
-import 'package:camelus/helpers/helpers.dart';
 import 'package:camelus/domain_layer/entities/nostr_tag.dart';
-import 'package:camelus/presentation_layer/providers/metadata_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 

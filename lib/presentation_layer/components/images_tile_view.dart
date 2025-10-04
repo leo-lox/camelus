@@ -136,8 +136,8 @@ class ImagesTileView extends StatelessWidget {
       decoration: BoxDecoration(
         gradient: RadialGradient(
           colors: [
-            Palette.black.withOpacity(0.8),
-            Palette.extraDarkGray.withOpacity(0.5),
+            Palette.black.withValues(alpha: 0.8),
+            Palette.extraDarkGray.withValues(alpha: 0.5),
           ],
           stops: const [0.0, 1.0],
         ),
@@ -171,7 +171,7 @@ Widget _imageLoading() {
   return Container(
     decoration: BoxDecoration(
       borderRadius: BorderRadius.circular(8),
-      color: Palette.extraDarkGray.withOpacity(0.5),
+      color: Palette.extraDarkGray.withValues(alpha: 0.5),
     ),
     child: Center(
       child: CircularProgressIndicator(

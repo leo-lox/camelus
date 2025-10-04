@@ -1,8 +1,6 @@
 import 'dart:async';
-import 'dart:developer';
 import 'package:camelus/presentation_layer/components/note_card/note_card_container.dart';
 import 'package:camelus/config/palette.dart';
-import 'package:camelus/domain_layer/entities/nostr_note.dart';
 import 'package:camelus/presentation_layer/components/note_card/skeleton_note.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_list_view/flutter_list_view.dart';
@@ -11,7 +9,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../domain_layer/entities/parsed_post.dart';
 import '../../../../domain_layer/entities/tree_node.dart';
 import '../../../components/comments_section.dart';
-import '../../../components/note_card/nostr_parser.dart';
 import '../../../providers/event_feed/event_feed_provider.dart';
 
 class EventViewPage extends ConsumerStatefulWidget {

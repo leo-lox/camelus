@@ -4,6 +4,7 @@ import 'package:camelus/domain_layer/entities/onboarding_user_info.dart';
 import 'package:camelus/presentation_layer/atoms/my_profile_picture.dart';
 import 'package:camelus/presentation_layer/providers/metadata_provider.dart';
 import 'package:camelus/presentation_layer/routes/nostr/onboarding/onboarding_follow_graph/graph_profile.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_force_directed_graph/flutter_force_directed_graph.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -56,8 +57,6 @@ class _OnboardingFollowGraphState extends ConsumerState<OnboardingFollowGraph> {
   final Set<GraphNodeData> _nodes = {};
   final Map<String, String> _edges = {};
   double _scale = 1.0;
-  int _locatedTo = 0;
-  GraphNodeData? _draggingData;
 
   /// if addedBy Pubkey drawas a edge to the old and new node
   addNode(GraphNodeData data, {String? addedByPubkey}) async {
@@ -133,7 +132,9 @@ class _OnboardingFollowGraphState extends ConsumerState<OnboardingFollowGraph> {
         addNode(mynode, addedByPubkey: addedByPubkey);
       });
     } catch (e) {
-      print("error adding node $pubkey");
+      if (kDebugMode) {
+        print("error adding node $pubkey");
+      }
     }
   }
 
@@ -200,26 +201,14 @@ class _OnboardingFollowGraphState extends ConsumerState<OnboardingFollowGraph> {
                 controller: _graphController,
                 onDraggingStart: (data) {
                   setState(() {
-                    _draggingData = data;
                   });
                 },
                 onDraggingEnd: (data) {
                   setState(() {
-                    _draggingData = null;
                   });
                 },
                 onDraggingUpdate: (data) {},
                 nodesBuilder: (context, data) {
-                  final Color color;
-
-                  if (_draggingData == data) {
-                    color = Colors.yellow;
-                  } else if (_nodes.contains(data)) {
-                    color = Colors.green;
-                  } else {
-                    color = Colors.red;
-                  }
-
                   return GestureDetector(
                     key: ValueKey(data.pubkey),
                     onTap: () {
@@ -261,13 +250,12 @@ class _OnboardingFollowGraphState extends ConsumerState<OnboardingFollowGraph> {
                   );
                 },
                 edgesBuilder: (context, a, b, distance) {
-                  final Color color;
-
                   return GestureDetector(
                     onTap: () {
-                      final edge = "$a <-> $b";
                       setState(() {
-                        print("onTap $a <-$distance-> $b");
+                        if (kDebugMode) {
+                          print("onTap $a <-$distance-> $b");
+                        }
                       });
                     },
                     child: Container(

@@ -9,11 +9,11 @@ class FullScreenLoading extends StatefulWidget {
   final void Function(void Function()) updateState;
 
   const FullScreenLoading({
-    Key? key,
+    super.key,
     required this.loadingTexts,
     this.numberOfBlobs = 5,
     required this.updateState,
-  }) : super(key: key);
+  });
 
   @override
   _FullScreenLoadingState createState() => _FullScreenLoadingState();
@@ -162,8 +162,8 @@ class BlobPainter extends CustomPainter {
     final paint = Paint()
       ..shader = RadialGradient(
         colors: [
-          blob.color.withOpacity(0.85),
-          blob.color.withOpacity(0.0),
+          blob.color.withValues(alpha: 0.85),
+          blob.color.withValues(alpha: 0.0),
         ],
         stops: const [0.0, 1.0],
       ).createShader(

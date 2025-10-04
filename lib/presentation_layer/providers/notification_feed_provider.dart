@@ -115,7 +115,7 @@ class NotificationsState extends FamilyNotifier<NotificationViewModel, String> {
           foundPubkeysContent.add(pubkey);
         } else if (profile.startsWith('npub')) {
           final decoded = Helpers().decodeBech32(profile);
-          pubkey = decoded[0] ?? '';
+          pubkey = decoded[0];
           foundPubkeysContent.add(pubkey);
         }
       }

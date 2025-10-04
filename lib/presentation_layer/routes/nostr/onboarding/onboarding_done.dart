@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:ndk/entities.dart' as ndk_entities;
 import 'package:ndk/ndk.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -324,7 +323,7 @@ ${_privateKey.mnemonicSentence}
                           },
                           activeColor: Palette.white,
                           checkColor: Palette.black,
-                          fillColor: MaterialStateProperty.all(Palette.white),
+                          fillColor: WidgetStateProperty.all(Palette.white),
                         ),
                         const Text(
                           "I have read and accept the ",
@@ -390,14 +389,12 @@ ${_privateKey.mnemonicSentence}
               curve: Curves.easeInOut,
               duration: const Duration(seconds: 2),
               child: _isLoading
-                  ? Container(
-                      child: Center(
-                        child: FullScreenLoading(
-                          loadingTexts: loadingTexts,
-                          updateState: (function) => {},
-                        ),
-                      ),
-                    )
+                  ? Center(
+                    child: FullScreenLoading(
+                      loadingTexts: loadingTexts,
+                      updateState: (function) => {},
+                    ),
+                  )
                   : const SizedBox.shrink(),
             ),
         ],

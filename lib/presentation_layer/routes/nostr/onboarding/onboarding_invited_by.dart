@@ -84,7 +84,7 @@ class _OnboardingInvitedByState extends ConsumerState<OnboardingInvitedBy> {
                       begin: Alignment.topLeft,
                       end: Alignment.bottomCenter,
                       colors: [
-                        Palette.primary.withOpacity(0.7),
+                        Palette.primary.withValues(alpha: 0.7),
                         Palette.primary,
                       ],
                     ),

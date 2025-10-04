@@ -1,4 +1,3 @@
-import 'nostr_note.dart';
 import 'parsed_post.dart';
 
 class FeedViewModel {

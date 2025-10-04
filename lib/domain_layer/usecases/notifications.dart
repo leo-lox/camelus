@@ -121,7 +121,7 @@ class Notifications {
   /// gets called on lauch if payload is found
   static processNotificationPayload(String? payload) {
     if (payload != null) {
-      final payloadJson = jsonDecode(payload!);
+      final payloadJson = jsonDecode(payload);
       final nostrNoteJson = jsonDecode(payloadJson['note']);
       final bool likleyDirectReply = payloadJson['likleyDirectReply'];
       final nostrNote = NostrNoteModel.fromJson(nostrNoteJson);

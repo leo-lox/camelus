@@ -5,7 +5,6 @@ import '../../../config/palette.dart';
 import '../../../domain_layer/entities/nostr_note.dart';
 import '../../../domain_layer/entities/nostr_tag.dart';
 import '../../../helpers/helpers.dart';
-import '../../providers/metadata_provider.dart';
 import '../../providers/metadata_state_provider.dart';
 
 class InReplyTo extends ConsumerWidget {

@@ -41,9 +41,7 @@ class NostrNoteModel extends NostrNote {
     final sanitizedTags = nip01event.tags.where((tags) {
       // Assuming tags are in 'tags' key
 
-      if (tags == null) return false; // Or handle null tags differently
-
-      return tags is List && tags.isNotEmpty;
+      return tags.isNotEmpty;
     }).toList();
 
     final myTags =

@@ -6,8 +6,4 @@ class Onboard {
   Onboard({
     required this.signUpInfo,
   });
-
-  _uploadPicture() {
-    throw UnimplementedError();
-  }
 }

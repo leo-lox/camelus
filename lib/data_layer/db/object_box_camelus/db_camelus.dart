@@ -23,7 +23,7 @@ class DbAppImpl implements AppDb {
   @override
   Future<void> clear() async {
     await _dbRdy;
-    await _objectBox.store.box().removeAll();
+    _objectBox.store.box().removeAll();
   }
 
   @override
