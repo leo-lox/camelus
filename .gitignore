@@ -10,6 +10,8 @@
 .svn/
 .keys/
 migrate_working_dir/
+.env
+
 
 # IntelliJ related
 *.iml
@@ -69,5 +71,5 @@ isar.dll
 **/fastlane/test_output
 
 # firebase
-firebase_options.dart
 firebase.json
+dart_defines.json
