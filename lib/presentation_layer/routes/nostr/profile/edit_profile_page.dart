@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
@@ -386,6 +387,8 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                         }
                       }),
                 ),
+          if (Platform.isWindows || Platform.isLinux || Platform.isMacOS)
+            const SizedBox(width: 154),
         ],
       ),
       body: profileState.isLoading

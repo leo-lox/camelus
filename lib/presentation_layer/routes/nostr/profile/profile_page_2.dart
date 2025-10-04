@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
@@ -96,6 +98,8 @@ class ProfilePage2 extends ConsumerWidget {
                       }).toList();
                     },
                   ),
+                  if (Platform.isWindows || Platform.isLinux || Platform.isMacOS)
+                    const SizedBox(width: 154),
                 ],
                 expandedHeight: 400,
                 pinned: true,
