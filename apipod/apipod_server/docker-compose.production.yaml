@@ -41,7 +41,7 @@ services:
       - POSTGRES_DB
       - POSTGRES_PASSWORD
     volumes:
-      - /mnt/HC_Volume_102297201/postgresql:/var/lib/postgresql/data
+      - /mnt/HC_Volume_102297201/postgresql:/var/lib/postgresql/data:rshared
     networks:
       - serverpod-network
 
