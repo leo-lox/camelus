@@ -169,9 +169,9 @@ class _HomePageState extends ConsumerState<HomePage> {
             NotificationPage(
               pubkey: widget.pubkey,
             ),
-            const Center(
+            Center(
               child: Text('work in progress',
-                  style: TextStyle(color: Colors.white)),
+                  style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
             )
           ],
           onPageChanged: (index) {

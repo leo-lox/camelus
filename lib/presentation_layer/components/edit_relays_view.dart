@@ -147,7 +147,7 @@ class _EditRelaysViewState extends ConsumerState<EditRelaysView> {
         await _checkClose();
       },
       child: reconnecting
-          ? const Center(
+          ? Center(
               child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -155,7 +155,7 @@ class _EditRelaysViewState extends ConsumerState<EditRelaysView> {
                 SizedBox(height: 20),
                 Text(
                   "reconnecting to relays...",
-                  style: TextStyle(color: Colors.white),
+                  style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
                 ),
               ],
             ))
@@ -176,7 +176,7 @@ class _EditRelaysViewState extends ConsumerState<EditRelaysView> {
                         borderRadius: BorderRadius.all(Radius.circular(30)),
                       ),
                     ),
-                    style: const TextStyle(color: Colors.white),
+                    style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
                     onSubmitted: (value) {
                       _addRelay();
                     },
@@ -205,7 +205,7 @@ class _EditRelaysViewState extends ConsumerState<EditRelaysView> {
                           const SizedBox(width: 15),
                           Text(
                             relay.url,
-                            style: const TextStyle(color: Colors.white),
+                            style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
                           ),
                           const Spacer(),
                           // switch button read
@@ -225,9 +225,9 @@ class _EditRelaysViewState extends ConsumerState<EditRelaysView> {
 
                                 //activeColor: Paletter.getPrimary(context),
                               ),
-                              const Text(
+                              Text(
                                 'read',
-                                style: TextStyle(color: Colors.white),
+                                style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
                               ),
                             ],
                           ),
@@ -246,9 +246,9 @@ class _EditRelaysViewState extends ConsumerState<EditRelaysView> {
                                   });
                                 },
                               ),
-                              const Text(
+                              Text(
                                 'write',
-                                style: TextStyle(color: Colors.white),
+                                style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
                               ),
                             ],
                           ),
@@ -293,9 +293,9 @@ class _EditRelaysViewState extends ConsumerState<EditRelaysView> {
                                   );
                                 },
                               ),
-                              const Text(
+                              Text(
                                 'delete',
-                                style: TextStyle(color: Colors.white),
+                                style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
                               ),
                             ],
                           ),

@@ -90,13 +90,13 @@ class InlineVideoPlayer extends ConsumerWidget {
                       },
                       child: videoState.showControls
                           ? Container(
-                              color: Colors.black54,
+                              color: Theme.of(context).colorScheme.surface.withOpacity(0.54),
                               child: Center(
                                 child: Icon(
                                   videoState.isPlaying
                                       ? PhosphorIcons.pause()
                                       : PhosphorIcons.play(),
-                                  color: Colors.white,
+                                  color: Theme.of(context).colorScheme.onSurface,
                                   size: 64.0,
                                 ),
                               ),
@@ -117,7 +117,7 @@ class InlineVideoPlayer extends ConsumerWidget {
                               videoState.volume == 0.0
                                   ? PhosphorIcons.speakerSlash()
                                   : PhosphorIcons.speakerHigh(),
-                              color: Colors.white,
+                              color: Theme.of(context).colorScheme.onSurface,
                             ),
                             onPressed: () {
                               if (videoState.volume == 0.0) {
@@ -132,7 +132,7 @@ class InlineVideoPlayer extends ConsumerWidget {
                           IconButton(
                             icon: Icon(
                               PhosphorIcons.cornersOut(),
-                              color: Colors.white,
+                              color: Theme.of(context).colorScheme.onSurface,
                             ),
                             onPressed: () {
                               enterFullScreen(context, ref);
@@ -172,7 +172,7 @@ class InlineVideoPlayer extends ConsumerWidget {
           child: Container(
             width: width,
             height: height,
-            color: Colors.black,
+            color: Theme.of(context).colorScheme.surface,
           ),
         );
       }

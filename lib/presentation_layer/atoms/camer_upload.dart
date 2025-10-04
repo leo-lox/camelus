@@ -37,7 +37,7 @@ class CameraUpload extends StatelessWidget {
               ),
               child: Icon(
                 Icons.add,
-                color: Colors.white,
+                color: Theme.of(context).colorScheme.onSurface,
                 size: size / 6,
               ),
             ),

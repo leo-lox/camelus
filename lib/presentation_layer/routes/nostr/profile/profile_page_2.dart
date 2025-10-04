@@ -136,12 +136,12 @@ class ProfilePage2 extends ConsumerWidget {
                         Tab(text: 'Posts & Replies'),
                         Tab(text: 'Starter Packs'),
                       ],
-                      labelColor: Paletter
-                          .getLightGray(context), // Set the color of the selected tab
+                      labelColor: Theme.of(context)
+                          .colorScheme.onSurface, // Set the color of the selected tab
                       unselectedLabelColor:
-                          Colors.grey, // Set the color of unselected tabs
+                          Theme.of(context).colorScheme.onSurfaceVariant, // Set the color of unselected tabs
                       indicatorColor:
-                          Colors.blue, // Set the color of the indicator
+                          Theme.of(context).colorScheme.primary, // Set the color of the indicator
                     ),
                   ),
                 ),
@@ -279,7 +279,7 @@ class _BuildProfileHeader extends ConsumerWidget {
                   style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
-                      color: Colors.white),
+                      color: Theme.of(context).colorScheme.onSurface),
                 ),
 
                 GestureDetector(

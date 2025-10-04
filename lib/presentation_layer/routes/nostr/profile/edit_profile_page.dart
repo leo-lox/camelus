@@ -362,14 +362,14 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
             width: 10,
           ),
           profileState.isSaving
-              ? const Padding(
+              ? Padding(
                   padding: EdgeInsets.all(16.0),
                   child: SizedBox(
                     width: 20,
                     height: 20,
                     child: CircularProgressIndicator(
                       strokeWidth: 2,
-                      color: Colors.white,
+                      color: Theme.of(context).colorScheme.onSurface,
                     ),
                   ),
                 )
@@ -400,7 +400,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                   SizedBox(height: 16),
                   Text(
                     'Loading profile...',
-                    style: TextStyle(color: Colors.white),
+                    style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
                   ),
                 ],
               ),

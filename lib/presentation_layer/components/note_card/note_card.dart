@@ -128,14 +128,16 @@ class NoteCard extends ConsumerWidget {
 
   Widget _buildInvalidSignature() {
     return Center(
-      child: Container(
-        decoration: const BoxDecoration(
-          color: Colors.red,
-          borderRadius: BorderRadius.all(Radius.circular(25)),
-        ),
-        child: const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 25, vertical: 8),
-          child: Text("Invalid signature!", style: TextStyle(fontSize: 15)),
+      child: Builder(
+        builder: (context) => Container(
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.error,
+            borderRadius: BorderRadius.all(Radius.circular(25)),
+          ),
+          child: const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 25, vertical: 8),
+            child: Text("Invalid signature!", style: TextStyle(fontSize: 15)),
+          ),
         ),
       ),
     );

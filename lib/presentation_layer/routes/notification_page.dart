@@ -67,13 +67,13 @@ class _NotificationPageState extends ConsumerState<NotificationPage>
       backgroundColor: Paletter.getBackground(context),
       appBar: AppBar(
         title:
-            const Text('Notifications', style: TextStyle(color: Colors.white)),
+            Text('Notifications', style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
         backgroundColor: Paletter.getBackground(context),
         elevation: 0,
         actions: [
           if (notificationsState.newNotifications.isNotEmpty)
             IconButton(
-              icon: const Icon(Icons.check_circle_outline, color: Colors.white),
+              icon: Icon(Icons.check_circle_outline, color: Theme.of(context).colorScheme.onSurface),
               onPressed: () {
                 // Mark all notifications as read
                 ref
@@ -133,16 +133,16 @@ class _NotificationPageState extends ConsumerState<NotificationPage>
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.notifications_off, color: Colors.grey, size: 48),
+          Icon(Icons.notifications_off, color: Theme.of(context).colorScheme.onSurfaceVariant, size: 48),
           SizedBox(height: 16),
           Text(
             message,
-            style: TextStyle(color: Colors.white, fontSize: 16),
+            style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 16),
           ),
           SizedBox(height: 8),
           Text(
             'When someone interacts with your posts,\nyou\'ll see it here',
-            style: TextStyle(color: Colors.grey, fontSize: 14),
+            style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant, fontSize: 14),
             textAlign: TextAlign.center,
           ),
         ],
@@ -219,9 +219,9 @@ class _NotificationPageState extends ConsumerState<NotificationPage>
                   children: [
                     TextSpan(
                       text: reactingUser.userMetadata?.name ?? '',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                        color: Theme.of(context).colorScheme.onSurface,
                       ),
                     ),
                     TextSpan(
@@ -229,7 +229,7 @@ class _NotificationPageState extends ConsumerState<NotificationPage>
                     ),
                     TextSpan(
                       text: _getNotificationText(notification),
-                      style: const TextStyle(color: Colors.white),
+                      style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
                     ),
                   ],
                 ),
@@ -238,7 +238,7 @@ class _NotificationPageState extends ConsumerState<NotificationPage>
             Text(
               timeago.format(DateTime.fromMillisecondsSinceEpoch(
                   notification.createdAt * 1000)),
-              style: const TextStyle(color: Colors.grey, fontSize: 12),
+              style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant, fontSize: 12),
             ),
           ],
         ),
@@ -278,7 +278,7 @@ class _NotificationPageState extends ConsumerState<NotificationPage>
       case NotificationType.reaction:
         if (notification.sourceNote.content == '+') {
           icon = PhosphorIcons.heart(PhosphorIconsStyle.bold);
-          iconColor = Colors.red;
+          iconColor = Theme.of(context).colorScheme.error;
         } else {
           return Text(
             notification.sourceNote.content,

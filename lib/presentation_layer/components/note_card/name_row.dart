@@ -71,8 +71,8 @@ class _NoteCardNameRowState extends ConsumerState<NoteCardNameRow> {
                         children: [
                           TextSpan(
                             text: widget.myMetadata?.name ?? npubHrShort,
-                            style: const TextStyle(
-                              color: Colors.white,
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.onSurface,
                               fontWeight: FontWeight.bold,
                               fontSize: 15,
                             ),

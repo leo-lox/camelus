@@ -55,16 +55,16 @@ class NostrDrawer extends ConsumerWidget {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Text(
+                  Text(
                     "Share your Profile",
-                    style: TextStyle(color: Colors.white),
+                    style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
                   ),
                   const SizedBox(height: 40),
                   QrImageView(
                     data: "nostr:$nprofile",
                     version: QrVersions.auto,
                     size: 300.0,
-                    backgroundColor: Colors.white,
+                    backgroundColor: Theme.of(context).colorScheme.surface,
 
                     //embeddedImage: AssetImage('assets/app_icons/icon.png'),
                   ),

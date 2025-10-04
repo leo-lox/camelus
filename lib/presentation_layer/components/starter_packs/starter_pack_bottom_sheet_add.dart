@@ -313,7 +313,7 @@ class _StarterPackSelectionBottomSheetState
               children: [
                 Icon(
                   PhosphorIcons.warning(),
-                  color: Colors.white,
+                  color: Theme.of(context).colorScheme.onSurface,
                   size: 20,
                 ),
                 const SizedBox(width: 12),

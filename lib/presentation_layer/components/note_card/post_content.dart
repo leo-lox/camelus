@@ -233,7 +233,7 @@ class PostContentWidget extends ConsumerWidget {
         return TextSpan(
           text: segment.content,
           style: TextStyle(
-            color: Colors.blue,
+            color: Theme.of(context).colorScheme.primary,
             decoration: TextDecoration.none,
           ),
           recognizer: TapGestureRecognizer()
