@@ -185,6 +185,7 @@ class MyApp extends ConsumerWidget {
         title: 'camelus',
         theme: theme.themeMap["DARK"],
         initialRoute: initialRoute,
+        builder: (context, child) => DragToResizeArea(child: child!),
         onGenerateRoute: (RouteSettings settings) {
           switch (settings.name) {
             case '/':
