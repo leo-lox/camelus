@@ -113,7 +113,7 @@ class _BlockPageState extends ConsumerState<BlockPage> {
                   Text(
                     "report send",
                     style: TextStyle(
-                        color: Paletter.getWhite(context),
+                        color: Theme.of(context).colorScheme.onSurface,
                         fontSize: 30,
                         fontWeight: FontWeight.bold),
                   ),
@@ -163,7 +163,7 @@ class _BlockPageState extends ConsumerState<BlockPage> {
                       const SizedBox(width: 10),
                       Text(user?.name ?? user?.nip05 ?? widget.userPubkey,
                           style: TextStyle(
-                              color: Paletter.getWhite(context),
+                              color: Theme.of(context).colorScheme.onSurface,
                               fontSize: 20,
                               fontWeight: FontWeight.bold)),
                     ],
@@ -235,7 +235,7 @@ class _BlockPageState extends ConsumerState<BlockPage> {
                                 ? 'what is wrong with this post?'
                                 : 'what is wrong with this user?',
                             hintStyle: TextStyle(
-                                color: Paletter.getWhite(context), letterSpacing: 1.1),
+                                color: Theme.of(context).colorScheme.onSurface, letterSpacing: 1.1),
                             filled: true,
                             fillColor: Paletter.getExtraDarkGray(context),
                             enabledBorder: OutlineInputBorder(
@@ -247,10 +247,10 @@ class _BlockPageState extends ConsumerState<BlockPage> {
                             focusedBorder: OutlineInputBorder(
                               borderRadius:
                                   BorderRadius.all(Radius.circular(10.0)),
-                              borderSide: BorderSide(color: Paletter.getBackground(context)),
+                              borderSide: BorderSide(color: Theme.of(context).colorScheme.surface),
                             ),
                           ),
-                          style: TextStyle(color: Paletter.getWhite(context)),
+                          style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
                           minLines: 3,
                           maxLines: 5,
                         ),
@@ -276,7 +276,7 @@ class _BlockPageState extends ConsumerState<BlockPage> {
                                 reportToCamelus = value;
                               });
                             },
-                            activeThumbColor: Paletter.getWhite(context),
+                            activeThumbColor: Theme.of(context).colorScheme.onSurface,
                           ),
                         ],
                       ),

@@ -1,4 +1,3 @@
-import 'package:camelus/config/palette.dart';
 import 'package:flutter/material.dart';
 
 class SwipeableFadeOut extends StatefulWidget {
@@ -170,7 +169,7 @@ Widget newPostsAvailable({
               height: 40,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(20),
-                color: Paletter.getPrimary(context),
+                color: Theme.of(context).colorScheme.primary,
               ),
               child: TextButton(
                 onPressed: () {
@@ -178,7 +177,7 @@ Widget newPostsAvailable({
                 },
                 child: Text(
                   name,
-                  style: TextStyle(color: Paletter.getWhite(context)),
+                  style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
                 ),
               ),
             )

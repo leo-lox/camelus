@@ -37,7 +37,7 @@ class _OnboardingPage01State extends ConsumerState<OnboardingPage01> {
             Text(
               "camelus",
               style: TextStyle(
-                color: Paletter.getWhite(context),
+                color: Theme.of(context).colorScheme.onSurface,
                 fontSize: MediaQuery.of(context).size.width / 7,
                 fontFamily: 'Poppins',
               ),

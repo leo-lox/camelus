@@ -275,7 +275,7 @@ class _OnboardingOpenStarterPackState
                             Text(
                               displayMetadata?.name ?? "",
                               style: TextStyle(
-                                color: Paletter.getWhite(context),
+                                color: Theme.of(context).colorScheme.onSurface,
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600,
                               ),
@@ -300,7 +300,7 @@ class _OnboardingOpenStarterPackState
                     selectedPubkeys.contains(displayPubkey)
                         ? PhosphorIcons.checkCircle()
                         : PhosphorIcons.circle(),
-                    color: Paletter.getWhite(context),
+                    color: Theme.of(context).colorScheme.onSurface,
                   ),
                 );
               },

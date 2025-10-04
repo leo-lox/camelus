@@ -83,8 +83,8 @@ class _OnboardingInvitedByState extends ConsumerState<OnboardingInvitedBy> {
                       begin: Alignment.topLeft,
                       end: Alignment.bottomCenter,
                       colors: [
-                        Paletter.getPrimary(context).withValues(alpha: 0.7),
-                        Paletter.getPrimary(context),
+                        Theme.of(context).colorScheme.primary.withValues(alpha: 0.7),
+                        Theme.of(context).colorScheme.primary,
                       ],
                     ),
                   ),
@@ -196,7 +196,7 @@ class _OnboardingInvitedByState extends ConsumerState<OnboardingInvitedBy> {
                                     Text(
                                       displayMetadata?.name ?? "",
                                       style: TextStyle(
-                                        color: Paletter.getWhite(context),
+                                        color: Theme.of(context).colorScheme.onSurface,
                                         fontSize: 16,
                                         fontWeight: FontWeight.w600,
                                       ),

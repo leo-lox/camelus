@@ -42,7 +42,7 @@ class MoreOptionsBottomSheet extends ConsumerWidget {
       child: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: Paletter.getBackground(context),
+          color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
         ),
         child: Column(

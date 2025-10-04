@@ -6,7 +6,6 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 import '../../../../config/amber_url.dart';
-import '../../../../config/palette.dart';
 import '../../../../domain_layer/usecases/app_auth.dart';
 import '../../../atoms/long_button.dart';
 import '../../../providers/ndk_provider.dart';
@@ -56,7 +55,7 @@ class _OnboardingLoginAmberPageState
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Please read and accept the terms and conditions first',
-              style: TextStyle(color: Paletter.getBlack(context))),
+              style: TextStyle(color: Theme.of(context).colorScheme.surface)),
         ),
       );
       return;
@@ -99,7 +98,7 @@ class _OnboardingLoginAmberPageState
                   children: [
                     IconButton(
                       icon:
-                          Icon(PhosphorIcons.arrowLeft(), color: Paletter.getWhite(context)),
+                          Icon(PhosphorIcons.arrowLeft(), color: Theme.of(context).colorScheme.onSurface),
                       onPressed: () => widget.onPressedBack!(),
                     ),
                   ],
@@ -115,7 +114,7 @@ class _OnboardingLoginAmberPageState
                     Text(
                       "login",
                       style: TextStyle(
-                        color: Paletter.getWhite(context),
+                        color: Theme.of(context).colorScheme.onSurface,
                         fontSize: 40,
                         fontFamily: "Poppins",
                       ),
@@ -136,15 +135,15 @@ class _OnboardingLoginAmberPageState
                         _termsAndConditions = value!;
                       });
                     },
-                    activeColor: Paletter.getWhite(context),
-                    checkColor: Paletter.getBlack(context),
-                    fillColor: WidgetStateProperty.all(Paletter.getWhite(context)),
-                    //overlayColor: MaterialStateProperty.all(Paletter.getPrimary(context)),
+                    activeColor: Theme.of(context).colorScheme.onSurface,
+                    checkColor: Theme.of(context).colorScheme.surface,
+                    fillColor: WidgetStateProperty.all(Theme.of(context).colorScheme.onSurface),
+                    //overlayColor: MaterialStateProperty.all(Theme.of(context).colorScheme.primary),
                   ),
                   Text(
                     "I have read and accept the ",
                     style: TextStyle(
-                      color: Paletter.getWhite(context),
+                      color: Theme.of(context).colorScheme.onSurface,
                       fontSize: 12,
                       fontWeight: FontWeight.normal,
                     ),
@@ -157,7 +156,7 @@ class _OnboardingLoginAmberPageState
                     child: Text(
                       "terms and conditions",
                       style: TextStyle(
-                        color: Paletter.getWhite(context),
+                        color: Theme.of(context).colorScheme.onSurface,
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
                         decoration: TextDecoration.underline,
@@ -175,7 +174,7 @@ class _OnboardingLoginAmberPageState
                 child: Text(
                   "privacy policy",
                   style: TextStyle(
-                    color: Paletter.getWhite(context),
+                    color: Theme.of(context).colorScheme.onSurface,
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
                     decoration: TextDecoration.underline,

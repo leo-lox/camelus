@@ -3,7 +3,6 @@ import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:camelus/presentation_layer/atoms/long_button.dart';
-import 'package:camelus/config/palette.dart';
 import 'package:flutter/material.dart';
 import 'package:crop_your_image/crop_your_image.dart';
 
@@ -59,7 +58,7 @@ class _CropAvatarState extends State<CropAvatar> {
     return Stack(
       children: [
         Crop(
-          baseColor: Paletter.getBackground(context),
+          baseColor: Theme.of(context).colorScheme.surface,
           aspectRatio: widget.aspectRatio,
           //radius: 150,
 

@@ -125,7 +125,7 @@ class _OnboardingLoginPageState extends ConsumerState<OnboardingLoginPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Please read and accept the terms and conditions first',
-              style: TextStyle(color: Paletter.getBlack(context))),
+              style: TextStyle(color: Theme.of(context).colorScheme.surface)),
         ),
       );
       return;
@@ -257,7 +257,7 @@ class _OnboardingLoginPageState extends ConsumerState<OnboardingLoginPage> {
                             IconButton(
                               icon: Icon(
                                 PhosphorIcons.arrowLeft(),
-                                color: Paletter.getWhite(context),
+                                color: Theme.of(context).colorScheme.onSurface,
                               ),
                               onPressed: () => widget.onPressedBack!(),
                             ),
@@ -292,15 +292,15 @@ class _OnboardingLoginPageState extends ConsumerState<OnboardingLoginPage> {
                                 children: [
                                   Text(mneonicError ?? "",
                                       style: TextStyle(
-                                        color: Paletter.getError(context),
+                                        color: Theme.of(context).colorScheme.error,
                                         fontSize: 12,
                                       )),
                                   Text(
                                     "${_userWords.length}/${(_userWords.length <= 12 ? "12" : "24")}",
                                     style: TextStyle(
                                       color: (_userWords.length > 24)
-                                          ? Paletter.getError(context)
-                                          : Paletter.getWhite(context),
+                                          ? Theme.of(context).colorScheme.error
+                                          : Theme.of(context).colorScheme.onSurface,
                                       fontSize: 12,
                                     ),
                                   ),
@@ -320,7 +320,7 @@ class _OnboardingLoginPageState extends ConsumerState<OnboardingLoginPage> {
                               Text(
                                 "login",
                                 style: TextStyle(
-                                  color: Paletter.getWhite(context),
+                                  color: Theme.of(context).colorScheme.onSurface,
                                   fontSize: 40,
                                   fontFamily: "Poppins",
                                 ),
@@ -375,7 +375,7 @@ class _OnboardingLoginPageState extends ConsumerState<OnboardingLoginPage> {
                             isDense: true,
                             hintText: 'enter your seed phrase or nsec1',
                             hintStyle: TextStyle(
-                                color: Paletter.getWhite(context), letterSpacing: 1.1),
+                                color: Theme.of(context).colorScheme.onSurface, letterSpacing: 1.1),
                             filled: true,
                             fillColor: Paletter.getExtraDarkGray(context),
                             enabledBorder: OutlineInputBorder(
@@ -392,7 +392,7 @@ class _OnboardingLoginPageState extends ConsumerState<OnboardingLoginPage> {
                             errorBorder: OutlineInputBorder(
                               borderRadius:
                                   BorderRadius.all(Radius.circular(10)),
-                              borderSide: BorderSide(color: Paletter.getPurple(context)),
+                              borderSide: BorderSide(color: Colors.purple),
                             ),
                           ),
                         ),
@@ -412,17 +412,17 @@ class _OnboardingLoginPageState extends ConsumerState<OnboardingLoginPage> {
                                   _pasteFromClipboard();
                                 },
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: Paletter.getBackground(context),
+                                  backgroundColor: Theme.of(context).colorScheme.surface,
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(20),
                                     side: BorderSide(
-                                        color: Paletter.getWhite(context), width: 1),
+                                        color: Theme.of(context).colorScheme.onSurface, width: 1),
                                   ),
                                 ),
                                 child: Text(
                                   'paste',
                                   style: TextStyle(
-                                    color: Paletter.getWhite(context),
+                                    color: Theme.of(context).colorScheme.onSurface,
                                     fontSize: 16,
                                   ),
                                 ),
@@ -435,17 +435,17 @@ class _OnboardingLoginPageState extends ConsumerState<OnboardingLoginPage> {
                                   _addWords(_inputController.text);
                                 },
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: Paletter.getWhite(context),
+                                  backgroundColor: Theme.of(context).colorScheme.onSurface,
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(20),
                                     side: BorderSide(
-                                        color: Paletter.getBackground(context), width: 1),
+                                        color: Theme.of(context).colorScheme.surface, width: 1),
                                   ),
                                 ),
                                 child: Text(
                                   'add',
                                   style: TextStyle(
-                                    color: Paletter.getBackground(context),
+                                    color: Theme.of(context).colorScheme.surface,
                                     fontSize: 16,
                                   ),
                                 ),
@@ -471,15 +471,15 @@ class _OnboardingLoginPageState extends ConsumerState<OnboardingLoginPage> {
                                 _termsAndConditions = value!;
                               });
                             },
-                            activeColor: Paletter.getWhite(context),
-                            checkColor: Paletter.getBlack(context),
-                            fillColor: WidgetStateProperty.all(Paletter.getWhite(context)),
-                            //overlayColor: MaterialStateProperty.all(Paletter.getPrimary(context)),
+                            activeColor: Theme.of(context).colorScheme.onSurface,
+                            checkColor: Theme.of(context).colorScheme.surface,
+                            fillColor: WidgetStateProperty.all(Theme.of(context).colorScheme.onSurface),
+                            //overlayColor: MaterialStateProperty.all(Theme.of(context).colorScheme.primary),
                           ),
                           Text(
                             "I have read and accept the ",
                             style: TextStyle(
-                              color: Paletter.getWhite(context),
+                              color: Theme.of(context).colorScheme.onSurface,
                               fontSize: 12,
                               fontWeight: FontWeight.normal,
                             ),
@@ -493,7 +493,7 @@ class _OnboardingLoginPageState extends ConsumerState<OnboardingLoginPage> {
                             child: Text(
                               "terms and conditions",
                               style: TextStyle(
-                                color: Paletter.getWhite(context),
+                                color: Theme.of(context).colorScheme.onSurface,
                                 fontSize: 12,
                                 fontWeight: FontWeight.bold,
                                 decoration: TextDecoration.underline,
@@ -512,7 +512,7 @@ class _OnboardingLoginPageState extends ConsumerState<OnboardingLoginPage> {
                         child: Text(
                           "privacy policy",
                           style: TextStyle(
-                            color: Paletter.getWhite(context),
+                            color: Theme.of(context).colorScheme.onSurface,
                             fontSize: 12,
                             fontWeight: FontWeight.bold,
                             decoration: TextDecoration.underline,

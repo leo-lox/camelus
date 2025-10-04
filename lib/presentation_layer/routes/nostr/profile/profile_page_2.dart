@@ -65,7 +65,7 @@ class ProfilePage2 extends ConsumerWidget {
             SliverOverlapAbsorber(
               handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
               sliver: SliverAppBar(
-                surfaceTintColor: Paletter.getBackground(context),
+                surfaceTintColor: Theme.of(context).colorScheme.surface,
                 leading: BackButtonRound(),
                 actions: [
                   PopupMenuButton<String>(
@@ -105,7 +105,7 @@ class ProfilePage2 extends ConsumerWidget {
                 pinned: true,
                 floating: true,
                 forceElevated: innerBoxIsScrolled,
-                backgroundColor: Paletter.getBlack(context), // Add a background color
+                backgroundColor: Theme.of(context).colorScheme.surface, // Add a background color
                 flexibleSpace: FlexibleSpaceBar(
                   background: _BuildProfileHeader(
                       isOwnProfile: isOwnProfile,
@@ -127,7 +127,7 @@ class ProfilePage2 extends ConsumerWidget {
                   preferredSize: Size.fromHeight(48),
                   child: Container(
                     color:
-                        Paletter.getBlack(context), // Add a background color to the tab bar
+                        Theme.of(context).colorScheme.surface, // Add a background color to the tab bar
                     child: TabBar(
                       controller: tabController,
                       tabs: [
@@ -209,7 +209,7 @@ class _BuildProfileHeader extends ConsumerWidget {
                   children: [
                     Container(
                       decoration: BoxDecoration(
-                        border: Border.all(color: Paletter.getBackground(context), width: 2),
+                        border: Border.all(color: Theme.of(context).colorScheme.surface, width: 2),
                         shape: BoxShape.circle,
                       ),
                       child: UserImage(
@@ -236,18 +236,18 @@ class _BuildProfileHeader extends ConsumerWidget {
                                 }
                               },
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: Paletter.getBackground(context),
+                                backgroundColor: Theme.of(context).colorScheme.surface,
                                 padding: const EdgeInsets.all(0),
                                 shape: CircleBorder(
                                     side: BorderSide(
-                                        color: Paletter.getWhite(context), width: 1)),
+                                        color: Theme.of(context).colorScheme.onSurface, width: 1)),
                               ),
                               child: SvgPicture.asset(
                                 "assets/icons/lightning-fill.svg",
                                 height: 25,
                                 width: 25,
                                 colorFilter: ColorFilter.mode(
-                                  Paletter.getWhite(context),
+                                  Theme.of(context).colorScheme.onSurface,
                                   BlendMode.srcIn,
                                 ),
                               ),

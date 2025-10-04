@@ -1,4 +1,3 @@
-import 'package:camelus/config/palette.dart';
 import 'package:flutter/material.dart';
 
 Widget followButton({
@@ -15,16 +14,16 @@ Widget followButton({
               onPressed();
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: Paletter.getBlack(context),
+              backgroundColor: Theme.of(context).colorScheme.surface,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(20),
-                side: BorderSide(color: Paletter.getWhite(context), width: 1),
+                side: BorderSide(color: Theme.of(context).colorScheme.onSurface, width: 1),
               ),
             ),
             child: Text(
               'unfollow',
               style: TextStyle(
-                color: Paletter.getWhite(context),
+                color: Theme.of(context).colorScheme.onSurface,
                 fontSize: 16,
               ),
             ),
@@ -42,16 +41,16 @@ Widget followButton({
             onPressed();
           },
           style: ElevatedButton.styleFrom(
-            backgroundColor: Paletter.getWhite(context),
+            backgroundColor: Theme.of(context).colorScheme.onSurface,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(20),
-              side: BorderSide(color: Paletter.getBlack(context), width: 1),
+              side: BorderSide(color: Theme.of(context).colorScheme.surface, width: 1),
             ),
           ),
           child: Text(
             'follow',
             style: TextStyle(
-              color: Paletter.getBlack(context),
+              color: Theme.of(context).colorScheme.surface,
               fontSize: 16,
             ),
           ),

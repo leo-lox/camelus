@@ -116,7 +116,7 @@ class _BottomActionRowState extends State<BottomActionRow>
           count: widget.commentCount,
         ),
         _buildRetweetButton(
-          color: widget.isRetweeted ? Paletter.getRepostActive(context) : null,
+          color: widget.isRetweeted ? Color.fromARGB(255, 22, 163, 74) : null,
           onTap: widget.onRetweet,
           repostController: _repostController,
         ),
@@ -162,7 +162,7 @@ class _BottomActionRowState extends State<BottomActionRow>
                       : PhosphorIcons.heart(),
                   size: BottomActionRow.iconSize,
                   color: widget.isLiked
-                      ? Paletter.getLikeActive(context)
+                      ? Color.fromARGB(255, 230, 40, 85)
                       : defaultColor,
                 ),
               ),

@@ -172,7 +172,7 @@ class _EditRelaysViewState extends ConsumerState<EditRelaysView> {
                         borderRadius: BorderRadius.all(Radius.circular(30)),
                       ),
                       focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Paletter.getWhite(context)),
+                        borderSide: BorderSide(color: Theme.of(context).colorScheme.onSurface),
                         borderRadius: BorderRadius.all(Radius.circular(30)),
                       ),
                     ),
@@ -214,7 +214,7 @@ class _EditRelaysViewState extends ConsumerState<EditRelaysView> {
                             children: [
                               Checkbox(
                                 activeColor: Paletter.getLightGray(context),
-                                checkColor: Paletter.getBlack(context),
+                                checkColor: Theme.of(context).colorScheme.surface,
                                 value: relay.read,
                                 onChanged: (value) {
                                   setState(() {
@@ -223,7 +223,7 @@ class _EditRelaysViewState extends ConsumerState<EditRelaysView> {
                                   });
                                 },
 
-                                //activeColor: Paletter.getPrimary(context),
+                                //activeColor: Theme.of(context).colorScheme.primary,
                               ),
                               Text(
                                 'read',
@@ -237,7 +237,7 @@ class _EditRelaysViewState extends ConsumerState<EditRelaysView> {
                             children: [
                               Checkbox(
                                 activeColor: Paletter.getLightGray(context),
-                                checkColor: Paletter.getBlack(context),
+                                checkColor: Theme.of(context).colorScheme.surface,
                                 value: relay.write,
                                 onChanged: (value) {
                                   setState(() {

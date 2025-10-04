@@ -206,7 +206,7 @@ class _PostSettingsState extends ConsumerState<PostSettings> {
         Switch(
           value: value,
           onChanged: onChanged,
-          activeThumbColor: Paletter.getWhite(context),
+          activeThumbColor: Theme.of(context).colorScheme.onSurface,
         ),
       ],
     );
@@ -244,7 +244,7 @@ class _PostSettingsState extends ConsumerState<PostSettings> {
                 value,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
-                  color: Paletter.getWhite(context),
+                  color: Theme.of(context).colorScheme.onSurface,
                 ),
               ),
             );

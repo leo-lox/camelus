@@ -304,7 +304,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                         Text(
                           "trends",
                           style: TextStyle(
-                            color: Paletter.getWhite(context),
+                            color: Theme.of(context).colorScheme.onSurface,
                             fontSize: 27,
                             fontWeight: FontWeight.bold,
                           ),
@@ -337,7 +337,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                 child: Text(
                   "recent starter packs",
                   style: TextStyle(
-                    color: Paletter.getWhite(context),
+                    color: Theme.of(context).colorScheme.onSurface,
                     fontSize: 25,
                     fontWeight: FontWeight.bold,
                   ),
@@ -359,7 +359,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                     Text(
                       "trending people",
                       style: TextStyle(
-                        color: Paletter.getWhite(context),
+                        color: Theme.of(context).colorScheme.onSurface,
                         fontSize: 25,
                         fontWeight: FontWeight.bold,
                       ),
@@ -452,7 +452,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
             Expanded(
               child: Text(
                 'Search for "$query"',
-                style: TextStyle(color: Paletter.getWhite(context), fontSize: 16),
+                style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 16),
               ),
             ),
             Icon(PhosphorIcons.arrowUpLeft(), color: Paletter.getGray(context)),
@@ -469,7 +469,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
         Text(
           "People",
           style: TextStyle(
-            color: Paletter.getWhite(context),
+            color: Theme.of(context).colorScheme.onSurface,
             fontSize: 20,
             fontWeight: FontWeight.bold,
           ),
@@ -506,7 +506,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
         Text(
           "Notes",
           style: TextStyle(
-            color: Paletter.getWhite(context),
+            color: Theme.of(context).colorScheme.onSurface,
             fontSize: 20,
             fontWeight: FontWeight.bold,
           ),
@@ -686,7 +686,7 @@ void _helpSearch(BuildContext context) {
               Text(
                 'Search',
                 style: TextStyle(
-                  color: Paletter.getWhite(context),
+                  color: Theme.of(context).colorScheme.onSurface,
                   fontSize: 30,
                   fontWeight: FontWeight.bold,
                 ),
@@ -736,7 +736,7 @@ class _SearchHelpItem extends StatelessWidget {
         Text(
           title,
           style: TextStyle(
-            color: Paletter.getWhite(context),
+            color: Theme.of(context).colorScheme.onSurface,
             fontSize: 20,
             fontWeight: FontWeight.bold,
           ),
@@ -745,7 +745,7 @@ class _SearchHelpItem extends StatelessWidget {
         Text(
           description,
           style: TextStyle(
-            color: Paletter.getWhite(context),
+            color: Theme.of(context).colorScheme.onSurface,
             fontSize: 18,
           ),
         ),

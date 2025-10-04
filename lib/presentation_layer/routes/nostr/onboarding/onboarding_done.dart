@@ -169,7 +169,7 @@ ${_privateKey.mnemonicSentence}
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Please read and accept the terms and conditions first',
-              style: TextStyle(color: Paletter.getBlack(context))),
+              style: TextStyle(color: Theme.of(context).colorScheme.surface)),
         ),
       );
       return;
@@ -228,7 +228,7 @@ ${_privateKey.mnemonicSentence}
                         Text(
                           "recovery phrase",
                           style: TextStyle(
-                            color: Paletter.getWhite(context),
+                            color: Theme.of(context).colorScheme.onSurface,
                             fontSize: 22,
                             fontWeight: FontWeight.bold,
                           ),
@@ -246,8 +246,8 @@ ${_privateKey.mnemonicSentence}
                             children: [
                               ElevatedButton.icon(
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: Paletter.getBlack(context),
-                                  foregroundColor: Paletter.getWhite(context),
+                                  backgroundColor: Theme.of(context).colorScheme.surface,
+                                  foregroundColor: Theme.of(context).colorScheme.onSurface,
                                 ),
                                 onPressed: () => {
                                   ScaffoldMessenger.of(context).showSnackBar(
@@ -256,7 +256,7 @@ ${_privateKey.mnemonicSentence}
                                       content: Text(
                                           'a new seed phrase has been generated',
                                           style:
-                                              TextStyle(color: Paletter.getBlack(context))),
+                                              TextStyle(color: Theme.of(context).colorScheme.surface)),
                                     ),
                                   ),
                                   _generateKey()
@@ -268,7 +268,7 @@ ${_privateKey.mnemonicSentence}
                               ElevatedButton.icon(
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: Paletter.getLightGray(context),
-                                  foregroundColor: Paletter.getBlack(context),
+                                  foregroundColor: Theme.of(context).colorScheme.surface,
                                 ),
                                 onPressed: () => {
                                   ScaffoldMessenger.of(context).showSnackBar(
@@ -277,7 +277,7 @@ ${_privateKey.mnemonicSentence}
                                       content: Text(
                                           'copied seed phrase to clipboard',
                                           style:
-                                              TextStyle(color: Paletter.getBlack(context))),
+                                              TextStyle(color: Theme.of(context).colorScheme.surface)),
                                     ),
                                   ),
                                   _copyKey()
@@ -320,14 +320,14 @@ ${_privateKey.mnemonicSentence}
                               _termsAndConditions = value!;
                             });
                           },
-                          activeColor: Paletter.getWhite(context),
-                          checkColor: Paletter.getBlack(context),
-                          fillColor: WidgetStateProperty.all(Paletter.getWhite(context)),
+                          activeColor: Theme.of(context).colorScheme.onSurface,
+                          checkColor: Theme.of(context).colorScheme.surface,
+                          fillColor: WidgetStateProperty.all(Theme.of(context).colorScheme.onSurface),
                         ),
                         Text(
                           "I have read and accept the ",
                           style: TextStyle(
-                            color: Paletter.getWhite(context),
+                            color: Theme.of(context).colorScheme.onSurface,
                             fontSize: 12,
                             fontWeight: FontWeight.normal,
                           ),
@@ -341,7 +341,7 @@ ${_privateKey.mnemonicSentence}
                           child: Text(
                             "terms and conditions",
                             style: TextStyle(
-                              color: Paletter.getWhite(context),
+                              color: Theme.of(context).colorScheme.onSurface,
                               fontSize: 12,
                               fontWeight: FontWeight.bold,
                               decoration: TextDecoration.underline,
@@ -358,7 +358,7 @@ ${_privateKey.mnemonicSentence}
                       child: Text(
                         "privacy policy",
                         style: TextStyle(
-                          color: Paletter.getWhite(context),
+                          color: Theme.of(context).colorScheme.onSurface,
                           fontSize: 12,
                           fontWeight: FontWeight.bold,
                           decoration: TextDecoration.underline,

@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 
-import '../../../../config/palette.dart';
 import '../../../../domain_layer/entities/mem_file.dart';
 import '../../../../domain_layer/entities/user_metadata.dart';
 import '../../../atoms/crop_avatar.dart';
@@ -354,7 +353,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
           Text(
             "${profileState.errBroadcasting ?? ''} ${profileState.profilePictureErr ?? ''} ${profileState.bannerPictureErr ?? ''}",
             style: TextStyle(
-              color: Paletter.getError(context),
+              color: Theme.of(context).colorScheme.error,
             ),
           ),
           const SizedBox(

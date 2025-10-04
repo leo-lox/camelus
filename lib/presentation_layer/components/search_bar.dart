@@ -81,7 +81,7 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
                           PhosphorIcons.magnifyingGlass(),
                           size: 23,
                         ),
-                  color: Paletter.getWhite(context),
+                  color: Theme.of(context).colorScheme.onSurface,
                   onPressed: () {
                     _searchController.clear();
                     // unfocus search bar
@@ -103,10 +103,10 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
                 isDense: true,
                 hintText: ' Search',
                 hintStyle:
-                    TextStyle(color: Paletter.getWhite(context), letterSpacing: 1.1),
+                    TextStyle(color: Theme.of(context).colorScheme.onSurface, letterSpacing: 1.1),
                 filled: true,
                 fillColor: _searchFocusNode.hasFocus
-                    ? Paletter.getBackground(context)
+                    ? Theme.of(context).colorScheme.surface
                     : Paletter.getExtraDarkGray(context),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.all(Radius.circular(50.0)),
@@ -114,10 +114,10 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.all(Radius.circular(25.0)),
-                  borderSide: BorderSide(color: Paletter.getBackground(context)),
+                  borderSide: BorderSide(color: Theme.of(context).colorScheme.surface),
                 ),
               ),
-              style: TextStyle(color: Paletter.getWhite(context)),
+              style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
               onChanged: (value) {
                 widget.onSearchChanged(value);
               },
@@ -140,7 +140,7 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
                   PhosphorIcons.question(),
                   size: 23,
                 ),
-                color: Paletter.getWhite(context),
+                color: Theme.of(context).colorScheme.onSurface,
                 onPressed: () => widget.helpSearch(context),
               ),
             ),

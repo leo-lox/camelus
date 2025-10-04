@@ -178,7 +178,7 @@ class PushNotificationToggleState
                 Switch(
                   value: notificationsEnabled,
                   onChanged: toggleNotifications,
-                  activeThumbColor: Paletter.getWhite(context),
+                  activeThumbColor: Theme.of(context).colorScheme.onSurface,
                 ),
             ],
           ),
@@ -199,7 +199,7 @@ class PushNotificationToggleState
               child: Text(
                 'Note: You previously denied notifications. Please enable them in your device settings to receive notifications.',
                 style: TextStyle(
-                  color: Paletter.getWarn(context),
+                  color: Colors.orangeAccent,
                   fontSize: 12,
                   fontStyle: FontStyle.italic,
                 ),

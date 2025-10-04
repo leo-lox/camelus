@@ -5,7 +5,7 @@ import 'package:camelus/helpers/nevent_helper.dart';
 import 'package:camelus/domain_layer/entities/nostr_note.dart';
 import 'package:camelus/presentation_layer/components/note_card/skeleton_note.dart';
 import 'package:camelus/presentation_layer/providers/get_notes_provider.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../providers/metadata_state_provider.dart';
@@ -71,7 +71,7 @@ class NoteCardReference extends ConsumerWidget {
                 padding: EdgeInsets.symmetric(horizontal: 0, vertical: 20),
                 child: Text(
                   "Note not found",
-                  style: TextStyle(color: Paletter.getWhite(context), fontSize: 17),
+                  style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 17),
                 ),
               ),
             ),

@@ -20,11 +20,11 @@ Widget longButton({
         onPressed: disabled && !loading ? null : onPressed,
         style: ElevatedButton.styleFrom(
           disabledBackgroundColor: Paletter.getDarkGray(context),
-          foregroundColor: inverted ? Paletter.getBlack(context) : Paletter.getLightGray(context),
-          backgroundColor: inverted ? Paletter.getExtraLightGray(context) : Paletter.getBlack(context),
+          foregroundColor: inverted ? Theme.of(context).colorScheme.surface : Paletter.getLightGray(context),
+          backgroundColor: inverted ? Paletter.getExtraLightGray(context) : Theme.of(context).colorScheme.surface,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
-            side: BorderSide(color: Paletter.getWhite(context), width: 1),
+            side: BorderSide(color: Theme.of(context).colorScheme.onSurface, width: 1),
           ),
         ),
         // Show a loading indicator if `loading` is true; otherwise, display text.
@@ -33,7 +33,7 @@ Widget longButton({
             : Text(
                 name, // Button text.
                 style: TextStyle(
-                  color: inverted ? Paletter.getBlack(context) : Paletter.getWhite(context), // Text color.
+                  color: inverted ? Theme.of(context).colorScheme.surface : Theme.of(context).colorScheme.onSurface, // Text color.
                   fontSize: 18, // Font size for the text.
                 ),
               ),
@@ -52,7 +52,7 @@ Widget _progress() {
       builder: (context) {
         return LinearProgressIndicator(
           backgroundColor: Paletter.getGray(context),
-          color: Paletter.getBlack(context),
+          color: Theme.of(context).colorScheme.surface,
         );
       }
     ),

@@ -13,8 +13,6 @@ import 'package:flutter_svg/svg.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
-import '../../config/palette.dart';
-
 import '../components/enable_notifications.dart';
 import '../components/note_card/no_more_notes.dart';
 import '../components/note_card/nostr_parser.dart';
@@ -91,7 +89,7 @@ class _NotificationPageState extends ConsumerState<NotificationPage>
             controller: _tabController,
             labelColor: Colors.white,
             unselectedLabelColor: Colors.grey,
-            indicatorColor: Paletter.getPrimary(context),
+            indicatorColor: Theme.of(context).colorScheme.primary,
             tabs: const [
               Tab(text: "All"),
               Tab(text: "Mentions"),
@@ -197,7 +195,7 @@ class _NotificationPageState extends ConsumerState<NotificationPage>
 
     // Create a container with a highlight color if it's a new notification
     return Container(
-      color: isNew ? Paletter.getPrimary(context).withValues(alpha: 0.1) : null,
+      color: isNew ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.1) : null,
       child: ListTile(
         leading: _getNotificationIcon(notification),
         title: Row(
@@ -286,7 +284,7 @@ class _NotificationPageState extends ConsumerState<NotificationPage>
 
       case NotificationType.reply:
         icon = PhosphorIcons.arrowBendUpLeft();
-        iconColor = Paletter.getPrimary(context);
+        iconColor = Theme.of(context).colorScheme.primary;
         break;
 
       case NotificationType.repost:
@@ -294,7 +292,7 @@ class _NotificationPageState extends ConsumerState<NotificationPage>
           'assets/icons/retweet.svg',
           height: 18,
           colorFilter: ColorFilter.mode(
-            Paletter.getRepostActive(context),
+            Color.fromARGB(255, 22, 163, 74),
             BlendMode.srcATop,
           ),
         );
@@ -304,7 +302,7 @@ class _NotificationPageState extends ConsumerState<NotificationPage>
         break;
       default:
         icon = PhosphorIcons.question();
-        iconColor = Paletter.getPrimary(context);
+        iconColor = Theme.of(context).colorScheme.primary;
         break;
     }
 

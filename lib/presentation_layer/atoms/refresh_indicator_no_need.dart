@@ -84,7 +84,7 @@ class _MyIndicator extends StatelessWidget {
               child: Text(
                 'no need 😉', // The custom message displayed when the refresh indicator is active.
                 style: TextStyle(
-                  color: Paletter.getWhite(context),
+                  color: Theme.of(context).colorScheme.onSurface,
                   fontSize: 18,
                 ), // Text style for the message.
               ),

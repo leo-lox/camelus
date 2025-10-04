@@ -170,7 +170,7 @@ class _WritePostState extends ConsumerState<WritePost> {
               ),
               Text("error:",
                   style: TextStyle(
-                    color: Paletter.getWhite(context),
+                    color: Theme.of(context).colorScheme.onSurface,
                     fontWeight: FontWeight.bold,
                   )),
               SizedBox(
@@ -356,7 +356,7 @@ class _WritePostState extends ConsumerState<WritePost> {
       padding: const EdgeInsets.only(left: 20, right: 20),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10),
-        //border: Border.all(color: Paletter.getPrimary(context)), //debug
+        //border: Border.all(color: Theme.of(context).colorScheme.primary), //debug
       ),
       child: FlutterMentions(
         key: _textEditingControllerKey,
@@ -364,7 +364,7 @@ class _WritePostState extends ConsumerState<WritePost> {
         keyboardAppearance: Brightness.dark,
         suggestionPosition: SuggestionPosition.Top,
         focusNode: _focusNode,
-        style: TextStyle(color: Paletter.getWhite(context), fontSize: 21),
+        style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 21),
         decoration: InputDecoration(
           border: InputBorder.none,
           hintText: "What's on your mind?",
@@ -407,7 +407,7 @@ class _WritePostState extends ConsumerState<WritePost> {
                       child: SizedBox.fromSize(
                         size: const Size.fromRadius(30), // Image radius
                         child: Container(
-                          color: Paletter.getBackground(context),
+                          color: Theme.of(context).colorScheme.surface,
                           child: simplePicture(data['picture'], data['id']),
                         ),
                       ),
@@ -441,7 +441,7 @@ class _WritePostState extends ConsumerState<WritePost> {
             trigger: "@",
             matchAll: true,
             disableMarkup: false,
-            style: TextStyle(color: Paletter.getPrimary(context)),
+            style: TextStyle(color: Theme.of(context).colorScheme.primary),
             data: _mentionsSearchResults,
           ),
           Mention(
@@ -472,7 +472,7 @@ class _WritePostState extends ConsumerState<WritePost> {
             trigger: "#",
             matchAll: true,
             disableMarkup: true,
-            style: TextStyle(color: Paletter.getPurple(context)),
+            style: TextStyle(color: Colors.purple),
             data: _mentionsSearchResultsHashTags,
           ),
         ],
@@ -566,7 +566,7 @@ class _TopBar extends ConsumerWidget {
                   icon: SvgPicture.asset(
                     height: 25,
                     'assets/icons/paper-plane-tilt.svg',
-                    colorFilter: ColorFilter.mode(Paletter.getPrimary(context), BlendMode.srcIn),
+                    colorFilter: ColorFilter.mode(Theme.of(context).colorScheme.primary, BlendMode.srcIn),
                   ),
                 )
               : Lottie.asset(

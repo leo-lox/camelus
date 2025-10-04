@@ -138,7 +138,7 @@ class ImagesTileView extends StatelessWidget {
           decoration: BoxDecoration(
             gradient: RadialGradient(
               colors: [
-                Paletter.getBlack(context).withValues(alpha: 0.8),
+                Theme.of(context).colorScheme.surface.withValues(alpha: 0.8),
                 Paletter.getExtraDarkGray(context).withValues(alpha: 0.5),
               ],
               stops: const [0.0, 1.0],

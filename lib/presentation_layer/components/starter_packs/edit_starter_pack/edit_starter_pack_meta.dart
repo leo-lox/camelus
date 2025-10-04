@@ -182,7 +182,7 @@ class _EditStarterPackMetaState extends ConsumerState<EditStarterPackMeta> {
                               Container(
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(10),
-                                  color: Paletter.getBlack(context).withValues(alpha: 0.6),
+                                  color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.6),
                                 ),
                                 child: Center(
                                   child: Column(
@@ -249,7 +249,7 @@ class _EditStarterPackMetaState extends ConsumerState<EditStarterPackMeta> {
                             suffixText: '${starterPackData.title.length}/40',
                             suffixStyle: TextStyle(
                               color: starterPackData.title.length > 40
-                                  ? Paletter.getWarn(context)
+                                  ? Colors.orangeAccent
                                   : Paletter.getGray(context),
                               fontSize: 14,
                             ),

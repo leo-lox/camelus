@@ -90,7 +90,7 @@ class _EditStarterPackContentState
                 trailing: IconButton(
                   icon: Icon(
                     PhosphorIcons.listNumbers(),
-                    color: _isReorderMode ? Paletter.getPrimary(context) : Paletter.getWhite(context),
+                    color: _isReorderMode ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.onSurface,
                   ),
                   onPressed: () {
                     setState(() {
@@ -241,7 +241,7 @@ class PersonSelect extends ConsumerWidget {
                 Text(
                   metadata?.name ?? "",
                   style: TextStyle(
-                    color: Paletter.getWhite(context),
+                    color: Theme.of(context).colorScheme.onSurface,
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
                   ),
@@ -272,7 +272,7 @@ class PersonSelect extends ConsumerWidget {
           if (!isReorderMode)
             Icon(
               selected ? PhosphorIcons.checkCircle() : PhosphorIcons.circle(),
-              color: Paletter.getWhite(context),
+              color: Theme.of(context).colorScheme.onSurface,
             ),
           if (isReorderMode)
             ReorderableDragStartListener(

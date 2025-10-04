@@ -62,7 +62,7 @@ class _OnboardingNameState extends ConsumerState<OnboardingName> {
                   child: IconButton(
                     icon: Icon(
                       PhosphorIcons.arrowLeft(),
-                      color: Paletter.getWhite(context),
+                      color: Theme.of(context).colorScheme.onSurface,
                     ),
                     onPressed: () => widget.onPressedBack!(),
                   ),
@@ -87,7 +87,7 @@ class _OnboardingNameState extends ConsumerState<OnboardingName> {
                   hintText: 'what should we call you?',
                   contentPadding: EdgeInsets.all(0),
                   hintStyle: TextStyle(
-                    color: Paletter.getWhite(context),
+                    color: Theme.of(context).colorScheme.onSurface,
                     letterSpacing: 1.1,
                   ),
                   alignLabelWithHint: true,

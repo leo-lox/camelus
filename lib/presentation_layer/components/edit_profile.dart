@@ -157,14 +157,14 @@ class _EditProfileState extends ConsumerState<EditProfile> {
                   Container(
                     width: MediaQuery.of(context).size.width,
                     height: MediaQuery.of(context).size.height / 6,
-                    color: Paletter.getBlack(context).withValues(alpha: 0.5),
+                    color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.5),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
                           "Uploading...",
                           style: TextStyle(
-                            color: Paletter.getWhite(context),
+                            color: Theme.of(context).colorScheme.onSurface,
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
                           ),
@@ -177,7 +177,7 @@ class _EditProfileState extends ConsumerState<EditProfile> {
                             child: LinearProgressIndicator(
                               backgroundColor: Paletter.getGray(context),
                               valueColor:
-                                  AlwaysStoppedAnimation<Color>(Paletter.getWhite(context)),
+                                  AlwaysStoppedAnimation<Color>(Theme.of(context).colorScheme.onSurface),
                               minHeight: 6,
                             ),
                           ),
@@ -219,10 +219,10 @@ class _EditProfileState extends ConsumerState<EditProfile> {
           width: 102,
           height: 102,
           decoration: BoxDecoration(
-            color: Paletter.getBlack(context).withValues(alpha: 0.5),
+            color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.5),
             shape: BoxShape.circle,
             border: Border.all(
-              color: Paletter.getWhite(context),
+              color: Theme.of(context).colorScheme.onSurface,
               width: 3,
             ),
           ),
@@ -233,7 +233,7 @@ class _EditProfileState extends ConsumerState<EditProfile> {
           width: 60,
           height: 60,
           child: CircularProgressIndicator(
-            valueColor: AlwaysStoppedAnimation<Color>(Paletter.getWhite(context)),
+            valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).colorScheme.onSurface),
             strokeWidth: 3,
           ),
         ),
@@ -242,7 +242,7 @@ class _EditProfileState extends ConsumerState<EditProfile> {
         Text(
           "Uploading",
           style: TextStyle(
-            color: Paletter.getWhite(context),
+            color: Theme.of(context).colorScheme.onSurface,
             fontSize: 10,
             fontWeight: FontWeight.bold,
           ),

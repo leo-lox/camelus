@@ -54,13 +54,13 @@ class InitalRouteSettingsState extends ConsumerState<InitalRouteSettings> {
               style: TextStyle(color: Paletter.getLightGray(context)),
             ),
             trailing: selectedRoute == route
-                ? Icon(PhosphorIcons.check(), color: Paletter.getWhite(context))
+                ? Icon(PhosphorIcons.check(), color: Theme.of(context).colorScheme.onSurface)
                 : null,
             onTap: () {
               ref.read(selectedRouteProvider.notifier).state = route;
               ref.read(initalRouteProvider).saveInitialRoute(route);
             },
-            tileColor: Paletter.getBackground(context),
+            tileColor: Theme.of(context).colorScheme.surface,
           );
         },
       ),

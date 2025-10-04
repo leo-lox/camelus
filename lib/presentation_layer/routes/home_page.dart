@@ -135,7 +135,7 @@ class _HomePageState extends ConsumerState<HomePage> {
               key: const ValueKey<String>('FAB'),
               child: Icon(
                 PhosphorIcons.plus(),
-                color: Paletter.getWhite(context),
+                color: Theme.of(context).colorScheme.onSurface,
                 size: 27,
               ),
               onPressed: () => {

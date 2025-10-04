@@ -1,4 +1,3 @@
-import 'package:camelus/config/palette.dart';
 import 'package:flutter/material.dart';
 
 class SpinnerCenter extends StatelessWidget {
@@ -8,7 +7,7 @@ class SpinnerCenter extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: CircularProgressIndicator(
-        color: Paletter.getWhite(context),
+        color: Theme.of(context).colorScheme.onSurface,
       ),
     );
   }

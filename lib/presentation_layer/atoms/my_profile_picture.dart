@@ -30,7 +30,7 @@ class UserImage extends StatelessWidget {
           height: size,
           width: size,
           decoration: BoxDecoration(
-            color: Paletter.getPrimary(context),
+            color: Theme.of(context).colorScheme.primary,
             shape: BoxShape.circle,
           ),
           child: SvgPicture.network("${Dicebear.baseUrl}$pubkey"),
@@ -47,7 +47,7 @@ class UserImage extends StatelessWidget {
         child: SizedBox.fromSize(
           size: Size.fromRadius(size / 2),
           child: Container(
-            color: Paletter.getBackground(context),
+            color: Theme.of(context).colorScheme.surface,
             child: Icon(Icons.image, color: Paletter.getDarkGray(context)),
           ),
         ),
@@ -59,7 +59,7 @@ class UserImage extends StatelessWidget {
       child: SizedBox.fromSize(
         size: Size.fromRadius(size / 2),
         child: Container(
-          color: Paletter.getBackground(context),
+          color: Theme.of(context).colorScheme.surface,
           child: CachedNetworkImage(
             imageUrl: pictureUrl,
             filterQuality: filterQuality,

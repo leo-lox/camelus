@@ -109,7 +109,7 @@ class _OpenStarterPackState extends ConsumerState<OpenStarterPack> {
           backgroundColor: Paletter.getExtraDarkGray(context),
           title: Text(
             'Delete Starter Pack',
-            style: TextStyle(color: Paletter.getWhite(context)),
+            style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
           ),
           content: Text(
             'Are you sure you want to delete this starter pack? This action cannot be undone.',
@@ -132,7 +132,7 @@ class _OpenStarterPackState extends ConsumerState<OpenStarterPack> {
               },
               child: Text(
                 'Delete',
-                style: TextStyle(color: Paletter.getPrimary(context)),
+                style: TextStyle(color: Theme.of(context).colorScheme.primary),
               ),
             ),
           ],
@@ -240,7 +240,7 @@ class _OpenStarterPackState extends ConsumerState<OpenStarterPack> {
                 pinned: true,
                 expandedHeight: 200.0,
                 leading: IconButton(
-                  icon: Icon(Icons.arrow_back, color: Paletter.getWhite(context)),
+                  icon: Icon(Icons.arrow_back, color: Theme.of(context).colorScheme.onSurface),
                   onPressed: () => Navigator.pop(context),
                 ),
                 actions: [
@@ -254,7 +254,7 @@ class _OpenStarterPackState extends ConsumerState<OpenStarterPack> {
                     PopupMenuButton<String>(
                       icon: Icon(
                         PhosphorIcons.dotsThreeVertical(),
-                        color: Paletter.getWhite(context),
+                        color: Theme.of(context).colorScheme.onSurface,
                       ),
                       color: Paletter.getExtraDarkGray(context),
                       onSelected: (String value) {
@@ -273,7 +273,7 @@ class _OpenStarterPackState extends ConsumerState<OpenStarterPack> {
                           child: Row(
                             children: [
                               Icon(PhosphorIcons.pen(),
-                                  color: Paletter.getWhite(context), size: 20),
+                                  color: Theme.of(context).colorScheme.onSurface, size: 20),
                               SizedBox(width: 8),
                               Text('Edit',
                                   style: TextStyle(color: Paletter.getLightGray(context))),
@@ -315,7 +315,7 @@ class _OpenStarterPackState extends ConsumerState<OpenStarterPack> {
                               height: 60,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
-                                color: Paletter.getPrimary(context).withValues(alpha: 0.2),
+                                color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
                               ),
                               child: myStarterSet.image != null
                                   ? ClipRRect(
@@ -329,7 +329,7 @@ class _OpenStarterPackState extends ConsumerState<OpenStarterPack> {
                                     )
                                   : Icon(
                                       PhosphorIcons.users(),
-                                      color: Paletter.getPrimary(context),
+                                      color: Theme.of(context).colorScheme.primary,
                                       size: 30,
                                     ),
                             ),
@@ -342,7 +342,7 @@ class _OpenStarterPackState extends ConsumerState<OpenStarterPack> {
                                     myStarterSet.title ??
                                         widget.starterPackIdentifier.name,
                                     style: TextStyle(
-                                      color: Paletter.getWhite(context),
+                                      color: Theme.of(context).colorScheme.onSurface,
                                       fontSize: 24,
                                       fontWeight: FontWeight.bold,
                                     ),
@@ -381,9 +381,9 @@ class _OpenStarterPackState extends ConsumerState<OpenStarterPack> {
                 pinned: true,
                 delegate: _SliverAppBarDelegate(
                   TabBar(
-                    indicatorColor: Paletter.getPrimary(context),
+                    indicatorColor: Theme.of(context).colorScheme.primary,
                     indicatorWeight: 3,
-                    labelColor: Paletter.getWhite(context),
+                    labelColor: Theme.of(context).colorScheme.onSurface,
                     unselectedLabelColor: Paletter.getGray(context),
                     labelStyle: TextStyle(
                       fontSize: 16,
@@ -494,7 +494,7 @@ class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
   Widget build(
       BuildContext context, double shrinkOffset, bool overlapsContent) {
     return Container(
-      color: Paletter.getBackground(context),
+      color: Theme.of(context).colorScheme.surface,
       child: _tabBar,
     );
   }

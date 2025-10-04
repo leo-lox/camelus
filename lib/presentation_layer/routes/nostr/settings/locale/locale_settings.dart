@@ -63,7 +63,7 @@ class LocaleSettingsPageState extends ConsumerState<LocaleSettingsPage> {
           const SizedBox(height: 10),
           Text("notice: language is still in development!",
               style: TextStyle(
-                color: Paletter.getError(context),
+                color: Theme.of(context).colorScheme.error,
                 fontSize: 16,
               )),
           const SizedBox(height: 10),
@@ -74,7 +74,7 @@ class LocaleSettingsPageState extends ConsumerState<LocaleSettingsPage> {
               style: TextStyle(color: Paletter.getLightGray(context)),
             ),
             trailing: _isSystemLanguage
-                ? Icon(PhosphorIcons.check(), color: Paletter.getWhite(context))
+                ? Icon(PhosphorIcons.check(), color: Theme.of(context).colorScheme.onSurface)
                 : null,
             onTap: () async {
               await languageNotifier.resetToSystemLanguage(context);
@@ -82,7 +82,7 @@ class LocaleSettingsPageState extends ConsumerState<LocaleSettingsPage> {
                 _isSystemLanguage = true;
               });
             },
-            tileColor: Paletter.getBackground(context),
+            tileColor: Theme.of(context).colorScheme.surface,
           ),
 
           Divider(color: Paletter.getDarkGray(context), height: 1),
@@ -104,7 +104,7 @@ class LocaleSettingsPageState extends ConsumerState<LocaleSettingsPage> {
                     style: TextStyle(color: Paletter.getLightGray(context)),
                   ),
                   trailing: isSelected
-                      ? Icon(PhosphorIcons.check(), color: Paletter.getWhite(context))
+                      ? Icon(PhosphorIcons.check(), color: Theme.of(context).colorScheme.onSurface)
                       : null,
                   onTap: () async {
                     await languageNotifier.changeLanguage(locale);
@@ -112,7 +112,7 @@ class LocaleSettingsPageState extends ConsumerState<LocaleSettingsPage> {
                       _isSystemLanguage = false;
                     });
                   },
-                  tileColor: Paletter.getBackground(context),
+                  tileColor: Theme.of(context).colorScheme.surface,
                 );
               },
             ),

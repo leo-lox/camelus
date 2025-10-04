@@ -35,10 +35,10 @@ class SettingsFileServersPageState extends ConsumerState<SettingsFileServers> {
       context: context,
       builder: (context) => AlertDialog(
         title: Text('Unsaved Changes',
-            style: TextStyle(color: Paletter.getWhite(context))),
+            style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
         content: Text(
           'You have unsaved changes. Do you want to discard them?',
-          style: TextStyle(color: Paletter.getWhite(context)),
+          style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
         ),
         actions: [
           TextButton(
@@ -48,7 +48,7 @@ class SettingsFileServersPageState extends ConsumerState<SettingsFileServers> {
           TextButton(
             onPressed: () => Navigator.of(context).pop(true),
             child:
-                Text('Discard', style: TextStyle(color: Paletter.getPrimary(context))),
+                Text('Discard', style: TextStyle(color: Theme.of(context).colorScheme.primary)),
           ),
         ],
       ),
@@ -89,10 +89,10 @@ class SettingsFileServersPageState extends ConsumerState<SettingsFileServers> {
                     builder: (context) => AlertDialog(
                       content: Row(
                         children: [
-                          CircularProgressIndicator(color: Paletter.getWhite(context)),
+                          CircularProgressIndicator(color: Theme.of(context).colorScheme.onSurface),
                           SizedBox(width: 20),
                           Text('Saving...',
-                              style: TextStyle(color: Paletter.getWhite(context))),
+                              style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
                         ],
                       ),
                     ),
@@ -112,7 +112,7 @@ class SettingsFileServersPageState extends ConsumerState<SettingsFileServers> {
                             success
                                 ? 'Changes saved successfully'
                                 : 'Failed to save changes',
-                            style: TextStyle(color: Paletter.getWhite(context))),
+                            style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
                         backgroundColor: Paletter.getExtraDarkGray(context),
                       ),
                     );
@@ -186,7 +186,7 @@ class SettingsFileServersPageState extends ConsumerState<SettingsFileServers> {
                                   Icons.circle,
                                   size: 12,
                                   color: server.isOnline
-                                      ? Paletter.getPrimary(context)
+                                      ? Theme.of(context).colorScheme.primary
                                       : Paletter.getDarkGray(context),
                                 ),
                                 const SizedBox(width: 16),
@@ -197,7 +197,7 @@ class SettingsFileServersPageState extends ConsumerState<SettingsFileServers> {
                                         server.url,
                                         style: TextStyle(
                                           fontSize: 16,
-                                          color: Paletter.getWhite(context),
+                                          color: Theme.of(context).colorScheme.onSurface,
                                         ),
                                       ),
                                       if (index == 0)
@@ -278,7 +278,7 @@ class SettingsFileServersPageState extends ConsumerState<SettingsFileServers> {
                         isDense: true,
                         hintText: 'Enter blossom URL',
                         hintStyle:
-                            TextStyle(color: Paletter.getWhite(context), letterSpacing: 1.1),
+                            TextStyle(color: Theme.of(context).colorScheme.onSurface, letterSpacing: 1.1),
                         filled: true,
                         fillColor: Paletter.getExtraDarkGray(context),
                         enabledBorder: OutlineInputBorder(
@@ -287,7 +287,7 @@ class SettingsFileServersPageState extends ConsumerState<SettingsFileServers> {
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.all(Radius.circular(25.0)),
-                          borderSide: BorderSide(color: Paletter.getBackground(context)),
+                          borderSide: BorderSide(color: Theme.of(context).colorScheme.surface),
                         ),
                       ),
                     ),

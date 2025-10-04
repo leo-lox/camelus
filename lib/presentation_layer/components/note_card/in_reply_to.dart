@@ -72,7 +72,7 @@ class InReplyTo extends ConsumerWidget {
           },
           child: Text('@$valueFirst ',
               style: TextStyle(
-                  color: Paletter.getPrimary(context), fontSize: 14, height: 1.3)),
+                  color: Theme.of(context).colorScheme.primary, fontSize: 14, height: 1.3)),
         ),
         if (valueSecond.isNotEmpty)
           GestureDetector(
@@ -82,7 +82,7 @@ class InReplyTo extends ConsumerWidget {
             },
             child: Text('@$valueSecond ',
                 style: TextStyle(
-                    color: Paletter.getPrimary(context), fontSize: 14, height: 1.3)),
+                    color: Theme.of(context).colorScheme.primary, fontSize: 14, height: 1.3)),
           ),
         if (othersCount != 0)
           Text(' and $othersCount more',

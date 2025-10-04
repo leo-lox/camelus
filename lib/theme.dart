@@ -28,4 +28,10 @@ final ThemeData camelusTheme = ThemeData(
   floatingActionButtonTheme: FloatingActionButtonThemeData(
     backgroundColor: Colors.blue,
   ),
+  dividerTheme: DividerThemeData(
+    color: Colors.black,
+  ),
+  appBarTheme: AppBarThemeData(
+    backgroundColor: Colors.black,
+  ),
 );

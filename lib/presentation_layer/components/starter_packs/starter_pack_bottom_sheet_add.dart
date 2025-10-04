@@ -47,7 +47,7 @@ class _StarterPackSelectionBottomSheetState
       child: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: Paletter.getBackground(context),
+          color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
         ),
         child: Column(
@@ -213,7 +213,7 @@ class _StarterPackSelectionBottomSheetState
     if (showCheck) {
       return Icon(
         PhosphorIcons.check(),
-        color: wasJustAdded ? Paletter.getPrimary(context) : Paletter.getGray(context),
+        color: wasJustAdded ? Theme.of(context).colorScheme.primary : Paletter.getGray(context),
         size: 16,
       );
     }
@@ -327,7 +327,7 @@ class _StarterPackSelectionBottomSheetState
                 ),
               ],
             ),
-            backgroundColor: Paletter.getError(context),
+            backgroundColor: Theme.of(context).colorScheme.error,
             duration: const Duration(seconds: 3),
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(

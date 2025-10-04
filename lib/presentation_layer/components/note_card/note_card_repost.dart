@@ -49,7 +49,7 @@ class NoteCardRepost extends ConsumerWidget {
                 'assets/icons/retweet.svg',
                 height: 18,
                 colorFilter: ColorFilter.mode(
-                  Paletter.getRepostActive(context),
+                  Color.fromARGB(255, 22, 163, 74),
                   BlendMode.srcATop,
                 ),
               ),

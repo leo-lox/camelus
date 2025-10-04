@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
-import '../../../../config/palette.dart';
 import '../../../atoms/long_button.dart';
 
 class OnboardingLoginSelectPage extends ConsumerStatefulWidget {
@@ -46,7 +45,7 @@ class _OnboardingLoginSelectPageState
                   children: [
                     IconButton(
                       icon:
-                          Icon(PhosphorIcons.arrowLeft(), color: Paletter.getWhite(context)),
+                          Icon(PhosphorIcons.arrowLeft(), color: Theme.of(context).colorScheme.onSurface),
                       onPressed: () => widget.onPressedBack!(),
                     ),
                   ],
@@ -62,7 +61,7 @@ class _OnboardingLoginSelectPageState
                     Text(
                       "login",
                       style: TextStyle(
-                        color: Paletter.getWhite(context),
+                        color: Theme.of(context).colorScheme.onSurface,
                         fontSize: 40,
                         fontFamily: "Poppins",
                       ),

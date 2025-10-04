@@ -79,7 +79,7 @@ class PostContentWidget extends ConsumerWidget {
                     )),
                 child: LinkPreview(
                   linkStyle: TextStyle(
-                    color: Paletter.getPrimary(context),
+                    color: Theme.of(context).colorScheme.primary,
                     fontSize: _fontSize - 2,
                     decoration: TextDecoration.none,
                   ),
@@ -94,7 +94,7 @@ class PostContentWidget extends ConsumerWidget {
                   text: segment.metadata!,
                   textWidget: Text(
                     segment.content,
-                    style: TextStyle(color: Paletter.getPrimary(context)),
+                    style: TextStyle(color: Theme.of(context).colorScheme.primary),
                   ),
                   width: MediaQuery.of(context).size.width,
                 ),
@@ -156,14 +156,14 @@ class PostContentWidget extends ConsumerWidget {
                   children: [
                     Icon(
                       PhosphorIcons.warningOctagon(),
-                      color: Paletter.getError(context),
+                      color: Theme.of(context).colorScheme.error,
                       size: 32,
                     ),
                     const SizedBox(width: 8),
                     Text(
                       post.nostrNote.contentWarning!,
                       style: TextStyle(
-                        color: Paletter.getError(context),
+                        color: Theme.of(context).colorScheme.error,
                         fontWeight: FontWeight.bold,
                         fontSize: 18,
                       ),
@@ -221,7 +221,7 @@ class PostContentWidget extends ConsumerWidget {
         return TextSpan(
           text: user?.name != null ? "@${user?.name}" : segment.content,
           style: TextStyle(
-            color: Paletter.getPrimary(context),
+            color: Theme.of(context).colorScheme.primary,
             fontWeight: FontWeight.normal,
             fontSize: _fontSize,
           ),

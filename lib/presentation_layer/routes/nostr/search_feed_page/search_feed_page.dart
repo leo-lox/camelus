@@ -63,12 +63,12 @@ class _SearchFeedPageState extends State<SearchFeedPage> {
         title: const Text('Search Help'),
         content: const Text('Enter keywords to search for posts.'),
         backgroundColor: Paletter.getDarkGray(context),
-        titleTextStyle: TextStyle(color: Paletter.getWhite(context), fontSize: 18),
-        contentTextStyle: TextStyle(color: Paletter.getWhite(context)),
+        titleTextStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 18),
+        contentTextStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('OK', style: TextStyle(color: Paletter.getPrimary(context))),
+            child: Text('OK', style: TextStyle(color: Theme.of(context).colorScheme.primary)),
           ),
         ],
       ),

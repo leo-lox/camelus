@@ -130,8 +130,8 @@ class _RelaysPageState extends ConsumerState<RelaysPage> {
                                     ? PhosphorIcons.plugsConnected()
                                     : PhosphorIcons.plugs(),
                                 color: relay.isConnected
-                                    ? Paletter.getPrimary(context)
-                                    : Paletter.getWarn(context),
+                                    ? Theme.of(context).colorScheme.primary
+                                    : Colors.orangeAccent,
                                 size: 28,
                               ),
                             ],
@@ -219,7 +219,7 @@ class _RelaysPageState extends ConsumerState<RelaysPage> {
                                         'Privacy Policy',
                                         style: TextStyle(
                                           fontSize: 12,
-                                          color: Paletter.getPrimary(context),
+                                          color: Theme.of(context).colorScheme.primary,
                                         ),
                                       ),
                                     ),
@@ -253,7 +253,7 @@ class _RelaysPageState extends ConsumerState<RelaysPage> {
                                         'Terms of Service',
                                         style: TextStyle(
                                           fontSize: 12,
-                                          color: Paletter.getPrimary(context),
+                                          color: Theme.of(context).colorScheme.primary,
                                         ),
                                       ),
                                     ),

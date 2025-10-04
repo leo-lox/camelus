@@ -187,7 +187,7 @@ class MyApp extends ConsumerWidget {
         debugShowCheckedModeBanner: false,
         title: 'camelus',
         theme: lightTheme,
-        darkTheme: darkTheme,
+        darkTheme: camelusTheme,
         initialRoute: initialRoute,
         builder: (context, child) {
           if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {

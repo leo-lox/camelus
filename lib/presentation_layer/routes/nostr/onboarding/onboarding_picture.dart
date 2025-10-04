@@ -2,7 +2,6 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:camelus/presentation_layer/atoms/crop_avatar.dart';
-import 'package:camelus/config/palette.dart';
 import 'package:camelus/domain_layer/entities/onboarding_user_info.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -130,7 +129,7 @@ class _OnboardingPictureState extends ConsumerState<OnboardingPicture> {
                       child: SizedBox.fromSize(
                         size: const Size.square(125),
                         child: Container(
-                            color: Paletter.getBackground(context),
+                            color: Theme.of(context).colorScheme.surface,
                             child:
                                 Image.memory(widget.signUpInfo.picture!.bytes)),
                       ),

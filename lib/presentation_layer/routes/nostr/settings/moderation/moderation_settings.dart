@@ -129,7 +129,7 @@ class ModerationSettingsPageState
                         height: 24,
                         child: CircularProgressIndicator(strokeWidth: 2))
                     : const Icon(Icons.security),
-                activeThumbColor: Paletter.getPrimary(context),
+                activeThumbColor: Theme.of(context).colorScheme.primary,
               ),
               const Divider(),
               const SizedBox(height: 16),

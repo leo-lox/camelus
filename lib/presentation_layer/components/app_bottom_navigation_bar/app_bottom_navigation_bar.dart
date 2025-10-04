@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
-import '../../../config/palette.dart';
 import '../../providers/app_bar_provider/app_bottom_bar_provider.dart';
 
 class AppBottomNavigationBar extends ConsumerWidget {
@@ -46,7 +45,7 @@ class AppBottomNavigationBar extends ConsumerWidget {
       icon: Builder(builder: (context) {
         final child = Icon(
           PhosphorIcons.house(),
-          color: isSelected ? Paletter.getPrimary(context) : null,
+          color: isSelected ? Theme.of(context).colorScheme.primary : null,
           size: 23,
         );
 
@@ -71,7 +70,7 @@ class AppBottomNavigationBar extends ConsumerWidget {
         builder: (context) {
           return Icon(
             PhosphorIcons.magnifyingGlass(),
-            color: isSelected ? Paletter.getPrimary(context) : null,
+            color: isSelected ? Theme.of(context).colorScheme.primary : null,
             size: 23,
           );
         }
@@ -88,7 +87,7 @@ class AppBottomNavigationBar extends ConsumerWidget {
       icon: Builder(builder: (context) {
         final child = Icon(
           PhosphorIcons.bell(),
-          color: isSelected ? Paletter.getPrimary(context) : null,
+          color: isSelected ? Theme.of(context).colorScheme.primary : null,
           size: 23,
         );
 

@@ -97,7 +97,7 @@ class NostrDrawer extends ConsumerWidget {
               width: 35,
               height: 35,
               decoration: BoxDecoration(
-                color: Paletter.getPrimary(context),
+                color: Theme.of(context).colorScheme.primary,
                 shape: BoxShape.circle,
               ),
               child: UserImage(
@@ -144,7 +144,7 @@ class NostrDrawer extends ConsumerWidget {
                 ),
                 //Icon(
                 //  Icons.arrow_drop_down_rounded,
-                //  color: Paletter.getPrimary(context),
+                //  color: Theme.of(context).colorScheme.primary,
                 //  size: 30,
                 //)
               ],
@@ -356,7 +356,7 @@ class NostrDrawer extends ConsumerWidget {
               children: [
                 SvgPicture.asset(
                   'assets/icons/sun.svg',
-                  colorFilter: ColorFilter.mode(Paletter.getPrimary(context), BlendMode.srcIn),
+                  colorFilter: ColorFilter.mode(Theme.of(context).colorScheme.primary, BlendMode.srcIn),
                   height: 22,
                   width: 22,
                 ),
@@ -366,7 +366,7 @@ class NostrDrawer extends ConsumerWidget {
                   },
                   child: SvgPicture.asset(
                     'assets/icons/qr-code.svg',
-                    colorFilter: ColorFilter.mode(Paletter.getPrimary(context), BlendMode.srcIn),
+                    colorFilter: ColorFilter.mode(Theme.of(context).colorScheme.primary, BlendMode.srcIn),
                     height: 22,
                     width: 22,
                   ),
