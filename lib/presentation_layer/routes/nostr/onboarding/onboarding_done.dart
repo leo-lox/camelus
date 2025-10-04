@@ -315,9 +315,6 @@ ${_privateKey.mnemonicSentence}
                               _termsAndConditions = value!;
                             });
                           },
-                          activeColor: Theme.of(context).colorScheme.onSurface,
-                          checkColor: Theme.of(context).colorScheme.surface,
-                          fillColor: WidgetStateProperty.all(Theme.of(context).colorScheme.onSurface),
                         ),
                         Text(
                           "I have read and accept the ",

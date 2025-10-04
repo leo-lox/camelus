@@ -213,8 +213,6 @@ class _EditRelaysViewState extends ConsumerState<EditRelaysView> {
                             mainAxisAlignment: MainAxisAlignment.end,
                             children: [
                               Checkbox(
-                                activeColor: Paletter.getLightGray(context),
-                                checkColor: Theme.of(context).colorScheme.surface,
                                 value: relay.read,
                                 onChanged: (value) {
                                   setState(() {
@@ -236,8 +234,6 @@ class _EditRelaysViewState extends ConsumerState<EditRelaysView> {
                             mainAxisAlignment: MainAxisAlignment.end,
                             children: [
                               Checkbox(
-                                activeColor: Paletter.getLightGray(context),
-                                checkColor: Theme.of(context).colorScheme.surface,
                                 value: relay.write,
                                 onChanged: (value) {
                                   setState(() {

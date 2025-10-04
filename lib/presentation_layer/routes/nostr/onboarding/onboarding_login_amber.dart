@@ -134,10 +134,6 @@ class _OnboardingLoginAmberPageState
                         _termsAndConditions = value!;
                       });
                     },
-                    activeColor: Theme.of(context).colorScheme.onSurface,
-                    checkColor: Theme.of(context).colorScheme.surface,
-                    fillColor: WidgetStateProperty.all(Theme.of(context).colorScheme.onSurface),
-                    //overlayColor: MaterialStateProperty.all(Theme.of(context).colorScheme.primary),
                   ),
                   Text(
                     "I have read and accept the ",
