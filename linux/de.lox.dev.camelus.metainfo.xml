@@ -4,27 +4,26 @@
   <name>Camelus</name>
   <summary>Nostr client for freedom lovers</summary>
   <metadata_license>CC0-1.0</metadata_license>
-  <project_license>MIT</project_license>
+  <project_license>GPL-3.0</project_license>
 
   <description>
     <p>
-      Camelus is a modern Nostr client built with Flutter that provides a seamless
-      experience for communicating on the Nostr protocol. It features a clean interface,
-      end-to-end encryption, and full support for the Nostr ecosystem.
+      Microblogging. No algorithms, no ads, connect with people who matter.
     </p>
     <p>Features:</p>
     <ul>
       <li>Send and receive Nostr notes</li>
       <li>Media sharing and previews</li>
-      <li>Direct messaging with encryption</li>
-      <li>Follow and interact with other users</li>
-      <li>Multiple relay support</li>
+      <li>Clean, Ad-Free Experience: Focus on content that matters, not distractions</li>
+      <li>Your Space, Your Rules: Control what you want to see and customize your feed</li>
+      <li>Lightning Fast: Designed to be responsive even on slower connections</li>
+      <li>Privacy First: Your data stays yours - we don't track or sell your information</li>
     </ul>
   </description>
 
   <launchable type="desktop-id">de.lox.dev.camelus.desktop</launchable>
 
-  <url type="homepage">https://github.com/camelus-hq/camelus</url>
+  <url type="homepage">https://camelus.app/</url>
   <url type="bugtracker">https://github.com/camelus-hq/camelus/issues</url>
 
   <screenshots>
