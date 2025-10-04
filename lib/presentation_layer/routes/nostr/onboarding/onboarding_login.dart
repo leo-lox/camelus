@@ -438,7 +438,7 @@ class _OnboardingLoginPageState extends ConsumerState<OnboardingLoginPage> {
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(20),
                                     side: BorderSide(
-                                        color: Theme.of(context).colorScheme.surface, width: 1),
+                                        color: Theme.of(context).colorScheme.onSurface, width: 1),
                                   ),
                                 ),
                                 child: Text(

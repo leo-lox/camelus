@@ -1,8 +1,16 @@
 import 'package:flutter/material.dart';
 
-final ThemeData lightTheme = ThemeData.from(
+final ThemeData lightTheme = ThemeData(
   colorScheme: ColorScheme.fromSeed(
     seedColor: Colors.blue,
+  ),
+  checkboxTheme: CheckboxThemeData(
+    fillColor: WidgetStateProperty.resolveWith((states) {
+      if (states.contains(WidgetState.selected)) {
+        return Colors.black;
+      }
+      return Colors.transparent;
+    }),
   ),
 );
 
