@@ -113,9 +113,7 @@ class _EditStarterPackMetaState extends ConsumerState<EditStarterPackMeta> {
         .watch(editStarterPackProvider(widget.starterPackIdentifier).notifier);
 
     return Scaffold(
-      backgroundColor: Paletter.getBackground(context),
       appBar: AppBar(
-        backgroundColor: Paletter.getBackground(context),
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),

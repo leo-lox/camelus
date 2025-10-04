@@ -55,10 +55,8 @@ class LocaleSettingsPageState extends ConsumerState<LocaleSettingsPage> {
     final languageNotifier = ref.watch(languageProvider.notifier);
 
     return Scaffold(
-      backgroundColor: Paletter.getBackground(context),
       appBar: AppBar(
         title: const Text('Language Settings'),
-        backgroundColor: Paletter.getBackground(context),
       ),
       body: Column(
         children: [

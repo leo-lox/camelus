@@ -20,7 +20,6 @@ class AppBottomNavigationBar extends ConsumerWidget {
 
     return NavigationBar(
       height: kBottomNavigationBarHeight,
-      backgroundColor: Paletter.getBackground(context),
       labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
       selectedIndex: navigationState.selectedTab.index,
       indicatorColor: Colors.transparent,
@@ -47,7 +46,7 @@ class AppBottomNavigationBar extends ConsumerWidget {
       icon: Builder(builder: (context) {
         final child = Icon(
           PhosphorIcons.house(),
-          color: isSelected ? Paletter.getPrimary(context) : Paletter.getDarkGray(context),
+          color: isSelected ? Paletter.getPrimary(context) : null,
           size: 23,
         );
 
@@ -72,7 +71,7 @@ class AppBottomNavigationBar extends ConsumerWidget {
         builder: (context) {
           return Icon(
             PhosphorIcons.magnifyingGlass(),
-            color: isSelected ? Paletter.getPrimary(context) : Paletter.getDarkGray(context),
+            color: isSelected ? Paletter.getPrimary(context) : null,
             size: 23,
           );
         }
@@ -89,7 +88,7 @@ class AppBottomNavigationBar extends ConsumerWidget {
       icon: Builder(builder: (context) {
         final child = Icon(
           PhosphorIcons.bell(),
-          color: isSelected ? Paletter.getPrimary(context) : Paletter.getDarkGray(context),
+          color: isSelected ? Paletter.getPrimary(context) : null,
           size: 23,
         );
 

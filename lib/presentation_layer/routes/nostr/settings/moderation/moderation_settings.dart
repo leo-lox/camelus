@@ -95,10 +95,8 @@ class ModerationSettingsPageState
     final isFilterEnabled = ref.watch(bloomFilterNotifierProvider);
 
     return Scaffold(
-      backgroundColor: Paletter.getBackground(context),
       appBar: AppBar(
         title: const Text('Moderation Settings'),
-        backgroundColor: Paletter.getBackground(context),
       ),
       body: SingleChildScrollView(
         child: Padding(

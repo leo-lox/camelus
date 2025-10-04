@@ -348,7 +348,6 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
     final profileState = ref.watch(profileProvider(widget.pubkey));
 
     return Scaffold(
-      backgroundColor: Paletter.getBlack(context),
       appBar: AppBar(
         title: const Text('Edit Profile'),
         actions: [

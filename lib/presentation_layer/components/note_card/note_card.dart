@@ -160,7 +160,6 @@ void _writeReply(context, NostrNote note) {
   showModalBottomSheet(
       isScrollControlled: true,
       elevation: 10,
-      backgroundColor: Paletter.getBackground(context),
       isDismissible: false,
       context: context,
       builder: (context) => BackdropFilter(

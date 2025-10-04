@@ -34,7 +34,6 @@ class SettingsFileServersPageState extends ConsumerState<SettingsFileServers> {
     final result = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: Paletter.getBackground(context),
         title: Text('Unsaved Changes',
             style: TextStyle(color: Paletter.getWhite(context))),
         content: Text(
@@ -76,10 +75,8 @@ class SettingsFileServersPageState extends ConsumerState<SettingsFileServers> {
         }
       },
       child: Scaffold(
-        backgroundColor: Paletter.getBackground(context),
         appBar: AppBar(
           title: const Text('File Servers'),
-          backgroundColor: Paletter.getBackground(context),
           actions: [
             if (hasUnsavedChanges)
               longButton(
@@ -90,7 +87,6 @@ class SettingsFileServersPageState extends ConsumerState<SettingsFileServers> {
                     context: context,
                     barrierDismissible: false,
                     builder: (context) => AlertDialog(
-                      backgroundColor: Paletter.getBackground(context),
                       content: Row(
                         children: [
                           CircularProgressIndicator(color: Paletter.getWhite(context)),

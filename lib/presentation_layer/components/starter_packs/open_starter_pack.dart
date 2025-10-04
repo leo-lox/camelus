@@ -191,7 +191,6 @@ class _OpenStarterPackState extends ConsumerState<OpenStarterPack> {
 
     if (_isDeleting) {
       return Scaffold(
-        backgroundColor: Paletter.getBlack(context),
         body: Center(
           child: SpinnerCenter(),
         ),
@@ -200,7 +199,6 @@ class _OpenStarterPackState extends ConsumerState<OpenStarterPack> {
 
     if (_deleteSuccess) {
       return Scaffold(
-        backgroundColor: Paletter.getBlack(context),
         body: Center(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -225,7 +223,6 @@ class _OpenStarterPackState extends ConsumerState<OpenStarterPack> {
 
     if (myStarterSet == null) {
       return Scaffold(
-        backgroundColor: Paletter.getBackground(context),
         body: Center(
           child: Text("unknown starter pack"),
         ),
@@ -235,12 +232,10 @@ class _OpenStarterPackState extends ConsumerState<OpenStarterPack> {
     return DefaultTabController(
       length: 2,
       child: Scaffold(
-        backgroundColor: Paletter.getBackground(context),
         body: NestedScrollView(
           headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
             return <Widget>[
               SliverAppBar(
-                backgroundColor: Paletter.getBackground(context),
                 elevation: 0,
                 pinned: true,
                 expandedHeight: 200.0,

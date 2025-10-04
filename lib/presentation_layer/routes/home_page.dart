@@ -64,7 +64,6 @@ class _HomePageState extends ConsumerState<HomePage> {
     showModalBottomSheet(
         isScrollControlled: true,
         elevation: 10,
-        backgroundColor: Paletter.getBackground(context),
         isDismissible: false,
         context: context,
         builder: (context) => BackdropFilter(
@@ -95,7 +94,7 @@ class _HomePageState extends ConsumerState<HomePage> {
           visitorId: myVisitorId,
         );
       } catch (e) {
-        // 
+        //
       }
     });
   }
@@ -131,30 +130,19 @@ class _HomePageState extends ConsumerState<HomePage> {
     return Scaffold(
       key: _scaffoldKey,
       drawer: NostrDrawer(pubkey: widget.pubkey),
-      backgroundColor: Paletter.getBackground(context),
-      floatingActionButton: AnimatedSwitcher(
-        duration: const Duration(milliseconds: 150),
-        transitionBuilder: (Widget child, Animation<double> animation) {
-          return FadeTransition(
-            opacity: animation,
-            child: child,
-          );
-        },
-        child: isHomeSelected
-            ? FloatingActionButton(
-                key: const ValueKey<String>('FAB'),
-                backgroundColor: Paletter.getPrimary(context),
-                child: Icon(
-                  PhosphorIcons.plus(),
-                  color: Paletter.getWhite(context),
-                  size: 27,
-                ),
-                onPressed: () => {
-                  _show(context),
-                },
-              )
-            : null,
-      ),
+      floatingActionButton: isHomeSelected
+          ? FloatingActionButton(
+              key: const ValueKey<String>('FAB'),
+              child: Icon(
+                PhosphorIcons.plus(),
+                color: Paletter.getWhite(context),
+                size: 27,
+              ),
+              onPressed: () => {
+                _show(context),
+              },
+            )
+          : null,
       body: SafeArea(
         child: PageView(
           controller: _myPage,
@@ -171,7 +159,8 @@ class _HomePageState extends ConsumerState<HomePage> {
             ),
             Center(
               child: Text('work in progress',
-                  style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
+                  style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurface)),
             )
           ],
           onPageChanged: (index) {

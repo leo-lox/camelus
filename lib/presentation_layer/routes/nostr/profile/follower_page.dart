@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../../config/palette.dart';
 import '../../../../domain_layer/entities/contact_list.dart';
 import '../../../../domain_layer/entities/user_metadata.dart';
 import '../../../components/person_card.dart';
@@ -64,11 +63,8 @@ class _FollowerPageState extends ConsumerState<FollowerPage> {
   Widget build(BuildContext context) {
     final myContactList = ref.watch(contactListSelfStateProvider);
     return Scaffold(
-      backgroundColor: Paletter.getBackground(context),
       appBar: AppBar(
-        backgroundColor: Paletter.getBackground(context),
         title: Text(widget.title),
-        foregroundColor: Paletter.getWhite(context),
       ),
       body: ListView.builder(
           physics: const BouncingScrollPhysics(),

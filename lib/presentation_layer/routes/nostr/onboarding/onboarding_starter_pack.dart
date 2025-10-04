@@ -100,9 +100,7 @@ class _OnboardingStarterPackState extends ConsumerState<OnboardingStarterPack> {
     final flattenedItems = _buildFlattenedItems();
 
     return Scaffold(
-      backgroundColor: Paletter.getBackground(context),
       appBar: AppBar(
-        backgroundColor: Paletter.getBackground(context),
         leading: Container(),
         leadingWidth: 0,
         title: widget.invitedByPubkey == null
@@ -194,9 +192,7 @@ class _OnboardingOpenStarterPackState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Paletter.getBackground(context),
       appBar: AppBar(
-        backgroundColor: Paletter.getBackground(context),
         title: Row(
           crossAxisAlignment: CrossAxisAlignment.baseline,
           textBaseline: TextBaseline.alphabetic,
@@ -242,7 +238,6 @@ class _OnboardingOpenStarterPackState
                   })
           ],
         ),
-        foregroundColor: Paletter.getWhite(context),
       ),
       body: Column(
         children: [

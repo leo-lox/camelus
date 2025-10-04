@@ -190,7 +190,6 @@ class _OnboardingFollowGraphState extends ConsumerState<OnboardingFollowGraph> {
   Widget build(BuildContext context) {
     const double miniViewCutoff = 0.35;
     return Scaffold(
-      backgroundColor: Paletter.getBackground(context),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,

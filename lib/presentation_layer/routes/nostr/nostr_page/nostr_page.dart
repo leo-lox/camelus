@@ -93,7 +93,6 @@ class _NostrPageState extends ConsumerState<NostrPage>
                 snap: false,
                 pinned: false,
                 forceElevated: true,
-                backgroundColor: Paletter.getBackground(context),
                 leadingWidth: 48,
                 leading: LeadingWidget(
                   parentScaffoldKey: widget.parentScaffoldKey,

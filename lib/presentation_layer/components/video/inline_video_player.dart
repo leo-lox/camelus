@@ -90,7 +90,7 @@ class InlineVideoPlayer extends ConsumerWidget {
                       },
                       child: videoState.showControls
                           ? Container(
-                              color: Theme.of(context).colorScheme.surface.withOpacity(0.54),
+                              color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.54),
                               child: Center(
                                 child: Icon(
                                   videoState.isPlaying

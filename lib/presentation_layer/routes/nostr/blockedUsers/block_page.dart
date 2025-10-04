@@ -100,7 +100,6 @@ class _BlockPageState extends ConsumerState<BlockPage> {
 
     if (_reportSuccessful) {
       return Scaffold(
-        backgroundColor: Paletter.getBackground(context),
         body: SafeArea(
           child: Center(
             child: Container(
@@ -145,9 +144,7 @@ class _BlockPageState extends ConsumerState<BlockPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('block/report'),
-        backgroundColor: Paletter.getBackground(context),
       ),
-      backgroundColor: Paletter.getBackground(context),
       body: SingleChildScrollView(
         child: Column(
           children: [

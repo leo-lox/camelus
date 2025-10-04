@@ -25,9 +25,7 @@ class _RelaysPageState extends ConsumerState<RelaysPage> {
     final ndk = ref.watch(ndkProvider);
 
     return Scaffold(
-      backgroundColor: Paletter.getBackground(context),
       appBar: AppBar(
-        backgroundColor: Paletter.getBackground(context),
         leading: IconButton(
           icon: Icon(PhosphorIcons.arrowLeft()),
           onPressed: () => Navigator.of(context).pop(),

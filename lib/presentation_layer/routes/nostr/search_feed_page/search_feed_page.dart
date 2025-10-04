@@ -94,7 +94,6 @@ class _SearchFeedPageState extends State<SearchFeedPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Paletter.getBackground(context),
       body: SafeArea(
         child: Column(
           children: [

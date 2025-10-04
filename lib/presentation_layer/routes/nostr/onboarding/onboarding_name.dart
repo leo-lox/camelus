@@ -49,7 +49,6 @@ class _OnboardingNameState extends ConsumerState<OnboardingName> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Paletter.getBackground(context),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

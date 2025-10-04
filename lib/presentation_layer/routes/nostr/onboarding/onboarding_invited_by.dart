@@ -69,7 +69,6 @@ class _OnboardingInvitedByState extends ConsumerState<OnboardingInvitedBy> {
     final invitedSet = _getInvitedSet(ref);
 
     return Scaffold(
-      backgroundColor: Paletter.getBackground(context),
       body: inviteeLists.isLoading
           ? const Center(
               child: CircularProgressIndicator(),

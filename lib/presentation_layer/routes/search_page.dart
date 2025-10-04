@@ -252,7 +252,6 @@ class _SearchPageState extends ConsumerState<SearchPage> {
         }
       },
       child: Scaffold(
-        backgroundColor: Paletter.getBackground(context),
         body: Column(
           children: [
             Builder(builder: (context) {

@@ -111,7 +111,6 @@ class _EditStarterPackSummaryState extends ConsumerState<EditStarterPackSummary>
     );
 
     return Scaffold(
-      backgroundColor: Paletter.getBackground(context),
       body: Column(
         children: [
           Column(

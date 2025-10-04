@@ -64,11 +64,9 @@ class _NotificationPageState extends ConsumerState<NotificationPage>
         .toList();
 
     return Scaffold(
-      backgroundColor: Paletter.getBackground(context),
       appBar: AppBar(
         title:
             Text('Notifications', style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
-        backgroundColor: Paletter.getBackground(context),
         elevation: 0,
         actions: [
           if (notificationsState.newNotifications.isNotEmpty)

@@ -3,8 +3,6 @@ import 'package:camelus/presentation_layer/providers/ndk_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../config/palette.dart';
-
 class SettingsPage extends ConsumerStatefulWidget {
   const SettingsPage({super.key});
 
@@ -41,10 +39,8 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Paletter.getBackground(context),
       appBar: AppBar(
         title: const Text('Settings'),
-        backgroundColor: Paletter.getBackground(context),
       ),
       body: ListView(
         children: [

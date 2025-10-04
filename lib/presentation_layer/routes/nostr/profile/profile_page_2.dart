@@ -43,7 +43,6 @@ class ProfilePage2 extends ConsumerWidget {
     final bool isOwnProfile = myPubkey == pubkey;
 
     return Scaffold(
-      backgroundColor: Paletter.getBackground(context),
       body: GenericFeed(
         feedPadding:
             EdgeInsets.only(top: MediaQuery.of(context).padding.top + 48),

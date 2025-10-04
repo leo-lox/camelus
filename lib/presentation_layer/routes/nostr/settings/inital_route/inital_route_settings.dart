@@ -41,10 +41,8 @@ class InitalRouteSettingsState extends ConsumerState<InitalRouteSettings> {
     final selectedRoute = ref.watch(selectedRouteProvider);
 
     return Scaffold(
-      backgroundColor: Paletter.getBackground(context),
       appBar: AppBar(
         title: const Text('Initial Route Settings'),
-        backgroundColor: Paletter.getBackground(context),
       ),
       body: ListView.builder(
         itemCount: routes.length,

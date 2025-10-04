@@ -255,129 +255,126 @@ class NostrDrawer extends ConsumerWidget {
         ref.watch(metadataStateProvider(pubkey)).userMetadata;
 
     return Drawer(
-      child: Container(
-        color: Paletter.getBackground(context),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _drawerHeader(context, myUserMetadata, ref),
-            _divider(),
-            _drawerItem(
-                label: 'Profile',
-                icon: 'assets/icons/user.svg',
-                onTap: () {
-                  navigateToProfile(context);
-                }),
-            _drawerItem(
-                label: 'Bookmarks',
-                icon: 'assets/icons/bookmark-simple.svg',
-                onTap: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Not implemented yet'),
-                    ),
-                  );
-                }),
-            _drawerItem(
-                label: 'Payments',
-                icon: 'assets/icons/lightning.svg',
-                onTap: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Not implemented yet'),
-                    ),
-                  );
-                }),
-            _drawerItem(
-                label: 'Blocklist',
-                icon: 'assets/icons/yin-yang.svg',
-                onTap: () {
-                  // navigate to blocklist
-                  Navigator.pushNamed(context, '/nostr/blockedUsers');
-                }),
-            const Spacer(),
-            const Spacer(),
-            _divider(),
-            Padding(
-                padding: const EdgeInsets.only(left: 20),
-                child: _textButton(
-                    text: 'Settings',
-                    onPressed: () {
-                      Navigator.pushNamed(context, '/settings');
-                    })),
-            const SizedBox(height: 10),
-            Padding(
-                padding: const EdgeInsets.fromLTRB(20, 10, 15, 20),
-                child: _textButton(
-                    text: 'Terms of Service',
-                    onPressed: () {
-                      // lauch url
-                      Uri url = Uri.parse("https://camelus.app/terms");
-                      launchUrl(url, mode: LaunchMode.externalApplication);
-                    })),
-            const Spacer(),
-            Padding(
-              padding: EdgeInsets.only(left: 20),
-              child: FutureBuilder(
-                  future: _getPackageInfo(),
-                  builder: (context, snapshot) {
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'v${snapshot.data?.version}',
-                          style: TextStyle(
-                            color: Paletter.getGray(context),
-                            fontSize: 10,
-                          ),
-                        ),
-                        Text(
-                          'build ${snapshot.data?.buildNumber}',
-                          style: TextStyle(
-                            color: Paletter.getGray(context),
-                            fontSize: 8,
-                          ),
-                        ),
-                        Text(
-                          '${snapshot.data?.buildSignature}',
-                          style: TextStyle(
-                            color: Paletter.getGray(context),
-                            fontSize: 6,
-                          ),
-                        ),
-                      ],
-                    );
-                  }),
-            ),
-            _divider(),
-            Padding(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _drawerHeader(context, myUserMetadata, ref),
+          _divider(),
+          _drawerItem(
+              label: 'Profile',
+              icon: 'assets/icons/user.svg',
+              onTap: () {
+                navigateToProfile(context);
+              }),
+          _drawerItem(
+              label: 'Bookmarks',
+              icon: 'assets/icons/bookmark-simple.svg',
+              onTap: () {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Not implemented yet'),
+                  ),
+                );
+              }),
+          _drawerItem(
+              label: 'Payments',
+              icon: 'assets/icons/lightning.svg',
+              onTap: () {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Not implemented yet'),
+                  ),
+                );
+              }),
+          _drawerItem(
+              label: 'Blocklist',
+              icon: 'assets/icons/yin-yang.svg',
+              onTap: () {
+                // navigate to blocklist
+                Navigator.pushNamed(context, '/nostr/blockedUsers');
+              }),
+          const Spacer(),
+          const Spacer(),
+          _divider(),
+          Padding(
+              padding: const EdgeInsets.only(left: 20),
+              child: _textButton(
+                  text: 'Settings',
+                  onPressed: () {
+                    Navigator.pushNamed(context, '/settings');
+                  })),
+          const SizedBox(height: 10),
+          Padding(
               padding: const EdgeInsets.fromLTRB(20, 10, 15, 20),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  SvgPicture.asset(
-                    'assets/icons/sun.svg',
+              child: _textButton(
+                  text: 'Terms of Service',
+                  onPressed: () {
+                    // lauch url
+                    Uri url = Uri.parse("https://camelus.app/terms");
+                    launchUrl(url, mode: LaunchMode.externalApplication);
+                  })),
+          const Spacer(),
+          Padding(
+            padding: EdgeInsets.only(left: 20),
+            child: FutureBuilder(
+                future: _getPackageInfo(),
+                builder: (context, snapshot) {
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'v${snapshot.data?.version}',
+                        style: TextStyle(
+                          color: Paletter.getGray(context),
+                          fontSize: 10,
+                        ),
+                      ),
+                      Text(
+                        'build ${snapshot.data?.buildNumber}',
+                        style: TextStyle(
+                          color: Paletter.getGray(context),
+                          fontSize: 8,
+                        ),
+                      ),
+                      Text(
+                        '${snapshot.data?.buildSignature}',
+                        style: TextStyle(
+                          color: Paletter.getGray(context),
+                          fontSize: 6,
+                        ),
+                      ),
+                    ],
+                  );
+                }),
+          ),
+          _divider(),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 10, 15, 20),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                SvgPicture.asset(
+                  'assets/icons/sun.svg',
+                  colorFilter: ColorFilter.mode(Paletter.getPrimary(context), BlendMode.srcIn),
+                  height: 22,
+                  width: 22,
+                ),
+                GestureDetector(
+                  onTap: () {
+                    openQrShareDialog(context);
+                  },
+                  child: SvgPicture.asset(
+                    'assets/icons/qr-code.svg',
                     colorFilter: ColorFilter.mode(Paletter.getPrimary(context), BlendMode.srcIn),
                     height: 22,
                     width: 22,
                   ),
-                  GestureDetector(
-                    onTap: () {
-                      openQrShareDialog(context);
-                    },
-                    child: SvgPicture.asset(
-                      'assets/icons/qr-code.svg',
-                      colorFilter: ColorFilter.mode(Paletter.getPrimary(context), BlendMode.srcIn),
-                      height: 22,
-                      width: 22,
-                    ),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

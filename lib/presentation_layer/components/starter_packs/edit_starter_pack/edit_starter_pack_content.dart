@@ -61,7 +61,6 @@ class _EditStarterPackContentState
         ref.watch(editStarterPackProvider(widget.starterPackIdentifier));
 
     return Scaffold(
-      backgroundColor: Paletter.getBackground(context),
       body: Column(
         children: [
           Column(

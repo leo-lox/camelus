@@ -212,7 +212,6 @@ ${_privateKey.mnemonicSentence}
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Paletter.getBackground(context),
       body: Stack(
         children: [
           AnimatedOpacity(

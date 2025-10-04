@@ -20,7 +20,6 @@ class _OnboardingPage01State extends ConsumerState<OnboardingPage01> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Paletter.getBackground(context),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

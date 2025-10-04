@@ -12,3 +12,20 @@ final ThemeData darkTheme = ThemeData.from(
     brightness: Brightness.dark,
   ),
 );
+
+final ThemeData camelusTheme = ThemeData(
+  colorScheme: ColorScheme.fromSeed(
+    seedColor: Colors.blue,
+    brightness: Brightness.dark,
+  ),
+  scaffoldBackgroundColor: Colors.black,
+  drawerTheme: DrawerThemeData(
+    backgroundColor: Colors.black,
+  ),
+  navigationBarTheme: NavigationBarThemeData(
+    backgroundColor: Colors.black,
+  ),
+  floatingActionButtonTheme: FloatingActionButtonThemeData(
+    backgroundColor: Colors.blue,
+  ),
+);

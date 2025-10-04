@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:ui';
 
+import 'package:camelus/theme.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 
@@ -185,18 +186,8 @@ class MyApp extends ConsumerWidget {
         ),
         debugShowCheckedModeBanner: false,
         title: 'camelus',
-        theme: ThemeData.from(
-          colorScheme: ColorScheme.fromSeed(
-            seedColor: Colors.blue,
-          ),
-        ),
-        darkTheme: ThemeData.from(
-          colorScheme: ColorScheme.fromSeed(
-            seedColor: Colors.blue,
-            brightness: Brightness.dark,
-          ),
-        ),
-        themeMode: ThemeMode.light,
+        theme: lightTheme,
+        darkTheme: darkTheme,
         initialRoute: initialRoute,
         builder: (context, child) {
           if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {

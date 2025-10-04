@@ -83,7 +83,6 @@ class _OnboardingLoginAmberPageState
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: null,
-      backgroundColor: Paletter.getBackground(context),
       resizeToAvoidBottomInset: false,
       body: SafeArea(
         // input for the user to enter their private key, should be visible on a dark background.
