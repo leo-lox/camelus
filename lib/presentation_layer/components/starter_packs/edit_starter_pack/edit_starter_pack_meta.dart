@@ -189,14 +189,13 @@ class _EditStarterPackMetaState extends ConsumerState<EditStarterPackMeta> {
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       CircularProgressIndicator(
-                                        color: Colors.white,
                                         strokeWidth: 2,
                                       ),
                                       SizedBox(height: 8),
                                       Text(
                                         'Uploading...',
                                         style: TextStyle(
-                                          color: Colors.white,
+                                          color: Theme.of(context).colorScheme.onSurface,
                                           fontSize: 12,
                                           fontWeight: FontWeight.w500,
                                         ),

@@ -89,7 +89,7 @@ class SettingsFileServersPageState extends ConsumerState<SettingsFileServers> {
                     builder: (context) => AlertDialog(
                       content: Row(
                         children: [
-                          CircularProgressIndicator(color: Theme.of(context).colorScheme.onSurface),
+                          CircularProgressIndicator(),
                           SizedBox(width: 20),
                           Text('Saving...',
                               style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
@@ -129,9 +129,7 @@ class SettingsFileServersPageState extends ConsumerState<SettingsFileServers> {
             Expanded(
               child: fileServersAsync.when(
                 loading: () => Center(
-                    child: CircularProgressIndicator(
-                  color: Paletter.getLightGray(context),
-                )),
+                    child: CircularProgressIndicator()),
                 error: (error, stack) => Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,

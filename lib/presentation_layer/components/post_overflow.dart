@@ -57,8 +57,6 @@ class PostOverflowIndicator extends StatelessWidget {
         children: [
           CircularProgressIndicator(
             value: fillPercentage,
-            backgroundColor: Colors.transparent,
-            valueColor: AlwaysStoppedAnimation<Color>(indicatorColor),
             strokeWidth: 3,
           ),
           if (showNumber)

@@ -66,7 +66,6 @@ class UserImage extends StatelessWidget {
             progressIndicatorBuilder: (context, url, downloadProgress) =>
                 CircularProgressIndicator(
               value: downloadProgress.progress,
-              color: Paletter.getDarkGray(context),
             ),
             errorWidget: (context, url, error) => const Icon(Icons.error),
             cacheKey: pictureUrl,

@@ -205,7 +205,6 @@ class _StarterPackSelectionBottomSheetState
         height: 16,
         child: CircularProgressIndicator(
           strokeWidth: 2,
-          valueColor: AlwaysStoppedAnimation<Color>(Paletter.getGray(context)),
         ),
       );
     }

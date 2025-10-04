@@ -367,7 +367,6 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                     height: 20,
                     child: CircularProgressIndicator(
                       strokeWidth: 2,
-                      color: Theme.of(context).colorScheme.onSurface,
                     ),
                   ),
                 )

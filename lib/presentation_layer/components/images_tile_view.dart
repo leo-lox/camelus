@@ -180,9 +180,7 @@ Widget _imageLoading() {
           color: Paletter.getExtraDarkGray(context).withValues(alpha: 0.5),
         ),
         child: Center(
-          child: CircularProgressIndicator(
-            color: Paletter.getExtraLightGray(context),
-          ),
+          child: CircularProgressIndicator(),
         ),
       );
     }
