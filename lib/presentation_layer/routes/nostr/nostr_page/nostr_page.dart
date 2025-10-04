@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:camelus/presentation_layer/atoms/spinner_center.dart';
 import 'package:camelus/presentation_layer/providers/metadata_state_provider.dart';
@@ -101,7 +102,11 @@ class _NostrPageState extends ConsumerState<NostrPage>
                 ),
                 centerTitle: true,
                 title: const TitleWidget(),
-                actions: [RelaysWidget(onTap: () => _openRelaysView(context))],
+                actions: [
+                  RelaysWidget(onTap: () => _openRelaysView(context)),
+                  if (Platform.isWindows || Platform.isLinux || Platform.isMacOS)
+                    const SizedBox(width: 154),
+                ],
                 bottom: PreferredSize(
                   preferredSize: const Size.fromHeight(40),
                   child: TabBar(

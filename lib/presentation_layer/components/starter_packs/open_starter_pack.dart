@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ndk/shared/nips/nip19/nip19.dart';
@@ -298,6 +300,8 @@ class _OpenStarterPackState extends ConsumerState<OpenStarterPack> {
                       ],
                     ),
                   const SizedBox(width: 16),
+                  if (Platform.isWindows || Platform.isLinux || Platform.isMacOS)
+                    const SizedBox(width: 154),
                 ],
                 flexibleSpace: FlexibleSpaceBar(
                   background: Container(
