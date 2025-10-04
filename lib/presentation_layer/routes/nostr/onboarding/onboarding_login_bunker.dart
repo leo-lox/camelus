@@ -1,15 +1,23 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:ndk/domain_layer/usecases/bunkers/models/bunker_connection.dart';
+import 'package:ndk/ndk.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../config/palette.dart';
 import '../../../atoms/long_button.dart';
+import '../../../providers/ndk_provider.dart';
+import '../../../providers/signer_provider.dart';
+import '../../home_page.dart';
 
 class OnboardingLoginBunkerPage extends ConsumerStatefulWidget {
   final Function? onPressedBack;
-  
+
   const OnboardingLoginBunkerPage({
     super.key,
     this.onPressedBack,
@@ -26,6 +34,7 @@ class _OnboardingLoginBunkerPageState
 
   final TextEditingController _bunkerUrlController = TextEditingController();
   final FocusNode _inputFocusNode = FocusNode();
+  final FlutterSecureStorage secureStorage = const FlutterSecureStorage();
 
   String? _bunkerUrl;
 
@@ -81,16 +90,53 @@ class _OnboardingLoginBunkerPageState
       _bunkerLoading = true;
     });
 
-    // TODO: Implement bunker connection logic
-    // This would involve:
-    // 1. Parsing the bunker:// URL
-    // 2. Creating a NIP-46 remote signer
-    // 3. Establishing connection with the bunker
-    // 4. Authenticating and storing the connection
+    try {
+      final ndk = ref.read(ndkProvider);
+      // final ndk = Ndk.defaultConfig();
 
-    setState(() {
-      _bunkerLoading = false;
-    });
+      print("1");
+      final connection = await ndk.accounts.loginWithBunkerUrl(
+        bunkerUrl: _bunkerUrl!,
+        bunkers: ndk.bunkers,
+      );
+      print("2");
+
+      if (connection == null) {
+        _showError('Failed to connect to bunker');
+        setState(() {
+          _bunkerLoading = false;
+        });
+        return;
+      }
+
+      // Get the signer from the logged account
+      final signer = ndk.accounts.getLoggedAccount()!.signer;
+
+      // Store bunker connection in secure storage as JSON
+      await secureStorage.write(
+        key: "bunkerConnection",
+        value: json.encode(connection.toJson()),
+      );
+
+      // Set the signer in the provider
+      ref.read(signerProvider.notifier).setSigner(signer);
+
+      setState(() {
+        _bunkerLoading = false;
+      });
+
+      if (!mounted) return;
+
+      // Navigate to home page
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
+        return HomePage(pubkey: signer.getPublicKey());
+      }));
+    } catch (e) {
+      _showError('Failed to connect: ${e.toString()}');
+      setState(() {
+        _bunkerLoading = false;
+      });
+    }
   }
 
   @override
@@ -193,7 +239,8 @@ class _OnboardingLoginBunkerPageState
                           backgroundColor: Palette.background,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(20),
-                            side: const BorderSide(color: Palette.white, width: 1),
+                            side: const BorderSide(
+                                color: Palette.white, width: 1),
                           ),
                         ),
                         child: const Text(
