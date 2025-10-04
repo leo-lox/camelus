@@ -29,7 +29,7 @@ services:
       timeout: 5s
       retries: 5
     restart: on-failure
-    image: postgres:latest
+    image: postgres:17
     labels:
       - "traefik.enable=false" # We typically don't expose databases via HTTP.
     ports:
@@ -51,7 +51,7 @@ services:
     volumes:
       - ./pgbackrest:/etc/pgbackrest
       - ./pgbackrest-repo:/var/lib/pgbackrest
-      - /mnt/HC_Volume_102297201/postgresql:/var/lib/postgresql/data:ro
+      - /mnt/HC_Volume_102297201/postgresql:/var/lib/postgresql/data:ro,rshared
     environment:
       - PGBACKREST_REPO1_PATH=/var/lib/pgbackrest
       - PGBACKREST_STANZA=main
