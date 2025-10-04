@@ -429,10 +429,10 @@ packages:
     dependency: "direct main"
     description:
       name: ndk
-      sha256: "2f64d055e2a656ab523e3d804280e81155a14c029d16d42b804de41ac7f815c2"
+      sha256: "62f6dc5ffb5e4d9e4b18b707bfa9f5ab2d9ce7a2bc0ba1a0a2c2c8063432e90f"
       url: "https://pub.dev"
     source: hosted
-    version: "0.4.0"
+    version: "0.5.0"
   node_preamble:
     dependency: transitive
     description:
