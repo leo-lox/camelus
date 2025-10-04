@@ -95,8 +95,8 @@ class _OpenStarterPackState extends ConsumerState<OpenStarterPack> {
   _onEdit(
     BuildContext context,
   ) {
-    Navigator.pushNamed(context, '/edit-starter-pack',
-        arguments: StarterPackIdentifier(
+    context.push('/edit-starter-pack',
+        extra: StarterPackIdentifier(
           name: widget.starterPackIdentifier.name,
           pubkey: widget.starterPackIdentifier.pubkey,
         ));

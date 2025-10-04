@@ -92,7 +92,7 @@ class NostrSideMenu extends ConsumerWidget {
   }
 
   void navigateToProfile(BuildContext context) {
-    Navigator.pushNamed(context, "/nostr/profile", arguments: pubkey);
+    context.push('/nostr/profile/$pubkey');
   }
 
   Widget _drawerItem(
@@ -192,8 +192,7 @@ class NostrSideMenu extends ConsumerWidget {
               routeName: '/nostr/blockedUsers',
               icon: PhosphorIcons.yinYang(),
               onTap: () {
-                // navigate to blocklist
-                Navigator.pushNamed(context, '/nostr/blockedUsers');
+                context.push('/nostr/blockedUsers');
               }),
           const Spacer(),
           const Spacer(),
@@ -203,7 +202,7 @@ class NostrSideMenu extends ConsumerWidget {
               child: _textButton(
                   text: 'Settings',
                   onPressed: () {
-                    context.go("/settings");
+                    context.push("/settings");
                   })),
           const SizedBox(height: 10),
           Padding(

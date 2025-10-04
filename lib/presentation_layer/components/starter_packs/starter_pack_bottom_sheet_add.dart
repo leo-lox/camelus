@@ -341,13 +341,10 @@ class _StarterPackSelectionBottomSheetState
   }
 
   void _createNewPack(BuildContext context) {
-    Navigator.pushNamed(
-      context,
-      '/edit-starter-pack',
-      arguments: StarterPackIdentifier(
-        name: "i-${Helpers().getRandomString(10)}",
-        pubkey: widget.currentUserPubkey,
-      ),
-    );
+    context.push('/edit-starter-pack',
+        extra: StarterPackIdentifier(
+          name: "i-${Helpers().getRandomString(10)}",
+          pubkey: widget.currentUserPubkey,
+        ));
   }
 }

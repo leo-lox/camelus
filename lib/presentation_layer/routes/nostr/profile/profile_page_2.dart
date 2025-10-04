@@ -263,11 +263,8 @@ class _BuildProfileHeader extends ConsumerWidget {
                           longButton(
                               name: "edit",
                               onPressed: () {
-                                Navigator.pushNamed(
-                                  context,
-                                  '/nostr/profile/edit',
-                                  arguments: userMetadata.pubkey,
-                                );
+                                context.push(
+                                    '/nostr/profile/${userMetadata.pubkey}/edit');
                               })
                       ],
                     ),

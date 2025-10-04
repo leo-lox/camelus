@@ -5,6 +5,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -214,7 +215,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
 
   void _onSubmit(String value) {
     if (mounted) {
-      Navigator.pushNamed(context, '/nostr/search', arguments: value);
+      context.push('/nostr/search', extra: value);
     }
   }
 
@@ -616,11 +617,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
             hashtag: hashtag.hashtag,
             postsCount: hashtag.posts,
             onTap: (hashtag) {
-              Navigator.pushNamed(
-                context,
-                '/nostr/search',
-                arguments: "#$hashtag",
-              );
+              context.push('/nostr/search', extra: "#$hashtag");
             },
           );
         },

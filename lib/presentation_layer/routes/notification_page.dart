@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_list_view/flutter_list_view.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
@@ -381,11 +382,11 @@ class _NotificationPageState extends ConsumerState<NotificationPage>
   }
 
   void _navigateToPost(BuildContext context, NostrNotification notification) {
-    Navigator.pushNamed(context, "/nostr/event", arguments: <String, String?>{
-      "root": notification.sourceNote.getRootReply?.value ??
+    context.push('/nostr/event', extra: {
+      'root': notification.sourceNote.getRootReply?.value ??
           notification.targetNoteId ??
           notification.sourceNote.id,
-      "scrollIntoView": notification.sourceNote.id
+      'scrollIntoView': notification.sourceNote.id,
     });
   }
 }

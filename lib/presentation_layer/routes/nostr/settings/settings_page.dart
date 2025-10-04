@@ -2,6 +2,7 @@ import 'package:camelus/domain_layer/usecases/app_auth.dart';
 import 'package:camelus/presentation_layer/providers/ndk_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../config/palette.dart';
 
@@ -27,15 +28,15 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
       return;
     }
 
-    Navigator.pushNamedAndRemoveUntil(context, '/onboarding', (route) => false);
+    context.go('/onboarding');
   }
 
   void _navigateToFileServers() {
-    Navigator.pushNamed(context, '/settings/file-servers');
+    context.push('/settings/file-servers');
   }
 
   void _navigateToInitalRoute() {
-    Navigator.pushNamed(context, '/settings/inital-route');
+    context.push('/settings/inital-route');
   }
 
   @override
@@ -52,7 +53,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
             title: const Text('Language Settings',
                 style: TextStyle(color: Colors.white)),
             onTap: () {
-              Navigator.pushNamed(context, '/settings/locale');
+              context.push('/settings/locale');
             },
           ),
           ListTile(
@@ -66,7 +67,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
             title:
                 const Text('Moderation', style: TextStyle(color: Colors.white)),
             onTap: () {
-              Navigator.pushNamed(context, '/settings/moderation');
+              context.push('/settings/moderation');
             },
           ),
           ListTile(

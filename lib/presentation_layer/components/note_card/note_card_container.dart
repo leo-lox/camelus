@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../domain_layer/entities/nostr_tag.dart';
 import '../../../domain_layer/entities/parsed_post.dart';
@@ -38,9 +39,9 @@ class NoteCardContainer extends ConsumerWidget {
     String root,
     String? scrollIntoView,
   ) {
-    Navigator.pushNamed(context, "/nostr/event", arguments: <String, String?>{
-      "root": root,
-      "scrollIntoView": scrollIntoView
+    context.push('/nostr/event', extra: {
+      'root': root,
+      'scrollIntoView': scrollIntoView,
     });
   }
 

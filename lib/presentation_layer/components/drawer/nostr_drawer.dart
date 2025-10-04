@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:camelus/config/palette.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../domain_layer/entities/user_metadata.dart';
 import '../../atoms/my_profile_picture.dart';
@@ -17,7 +18,7 @@ class NostrDrawer extends ConsumerWidget {
   const NostrDrawer({super.key, required this.pubkey});
 
   void navigateToProfile(BuildContext context) {
-    Navigator.pushNamed(context, "/nostr/profile", arguments: pubkey);
+    context.push('/nostr/profile/$pubkey');
   }
 
   Widget _drawerHeader(context, UserMetadata? metadata, WidgetRef ref) {

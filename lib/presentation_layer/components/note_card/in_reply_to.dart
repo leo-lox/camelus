@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../config/palette.dart';
 import '../../../domain_layer/entities/nostr_note.dart';
@@ -67,8 +68,7 @@ class InReplyTo extends ConsumerWidget {
         ),
         GestureDetector(
           onTap: () {
-            Navigator.pushNamed(context, "/nostr/profile",
-                arguments: pubkeyFirst);
+            context.push('/nostr/profile/$pubkeyFirst');
           },
           child: Text('@$valueFirst ',
               style: const TextStyle(
@@ -77,8 +77,7 @@ class InReplyTo extends ConsumerWidget {
         if (valueSecond.isNotEmpty)
           GestureDetector(
             onTap: () {
-              Navigator.pushNamed(context, "/nostr/profile",
-                  arguments: pubkeySecond);
+              context.push('/nostr/profile/$pubkeySecond');
             },
             child: Text('@$valueSecond ',
                 style: const TextStyle(
