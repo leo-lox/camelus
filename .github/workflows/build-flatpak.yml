@@ -37,6 +37,9 @@ jobs:
       - name: Get Flutter dependencies
         run: flutter pub get
 
+      - name: Create dart_defines.json
+        run: echo '${{ secrets.DART_DEFINES_JSON }}' > dart_defines.json
+
       - name: Build Flutter Linux app
         run: flutter build linux --release
 
