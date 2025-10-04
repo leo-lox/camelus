@@ -116,13 +116,13 @@ class _EditStarterPackMetaState extends ConsumerState<EditStarterPackMeta> {
       appBar: AppBar(
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          icon: Icon(Icons.arrow_back, color: Theme.of(context).colorScheme.onSurface),
           onPressed: () => Navigator.of(context).pop(),
         ),
-        title: const Text(
+        title: Text(
           'Starter Pack',
           style: TextStyle(
-            color: Colors.white,
+            color: Theme.of(context).colorScheme.onSurface,
             fontSize: 20,
             fontWeight: FontWeight.w600,
           ),
@@ -138,20 +138,20 @@ class _EditStarterPackMetaState extends ConsumerState<EditStarterPackMeta> {
                 children: [
                   const SizedBox(height: 40),
                   // Title
-                  const Text(
+                  Text(
                     'create your starter pack',
                     style: TextStyle(
-                      color: Colors.white,
+                      color: Theme.of(context).colorScheme.onSurface,
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
                     ),
                     textAlign: TextAlign.center,
                   ),
                   // Subtitle
-                  const Text(
+                  Text(
                     'Invite your friends to follow your favorite people',
                     style: TextStyle(
-                      color: Colors.white70,
+                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                       fontSize: 16,
                     ),
                     textAlign: TextAlign.center,
@@ -216,12 +216,12 @@ class _EditStarterPackMetaState extends ConsumerState<EditStarterPackMeta> {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Align(
+                      Align(
                         alignment: Alignment.centerLeft,
                         child: Text(
                           'Title',
                           style: TextStyle(
-                            color: Colors.white70,
+                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                             fontSize: 16,
                           ),
                         ),
@@ -240,8 +240,8 @@ class _EditStarterPackMetaState extends ConsumerState<EditStarterPackMeta> {
                           onChanged: (value) {
                             starterPackNotifier.updateTitle(value);
                           },
-                          style: const TextStyle(
-                              color: Colors.white, fontSize: 18),
+                          style: TextStyle(
+                              color: Theme.of(context).colorScheme.onSurface, fontSize: 18),
                           decoration: InputDecoration(
                             border: InputBorder.none,
                             contentPadding: const EdgeInsets.all(16),
@@ -258,12 +258,12 @@ class _EditStarterPackMetaState extends ConsumerState<EditStarterPackMeta> {
 
                       const SizedBox(height: 32),
 
-                      const Align(
+                      Align(
                         alignment: Alignment.centerLeft,
                         child: Text(
                           'Description',
                           style: TextStyle(
-                            color: Colors.white70,
+                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                             fontSize: 16,
                           ),
                         ),
@@ -283,8 +283,8 @@ class _EditStarterPackMetaState extends ConsumerState<EditStarterPackMeta> {
                           onChanged: (value) {
                             starterPackNotifier.updateDescription(value);
                           },
-                          style: const TextStyle(
-                              color: Colors.white, fontSize: 16),
+                          style: TextStyle(
+                              color: Theme.of(context).colorScheme.onSurface, fontSize: 16),
                           maxLines: null,
                           expands: true,
                           textAlignVertical: TextAlignVertical.top,

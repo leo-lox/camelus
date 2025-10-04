@@ -147,7 +147,7 @@ class ImagesTileView extends StatelessWidget {
           child: Center(
             child: Text(
               '+$additionalImages',
-              style: const TextStyle(color: Colors.white, fontSize: 38),
+              style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 38),
             ),
           ),
         );

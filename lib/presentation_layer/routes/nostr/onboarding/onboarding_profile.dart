@@ -122,7 +122,6 @@ class _OnboardingProfileState extends ConsumerState<OnboardingProfile> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
       body: SafeArea(
         child: Stack(
           children: [
@@ -172,10 +171,10 @@ class _OnboardingProfileState extends ConsumerState<OnboardingProfile> {
               child: Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: Colors.black,
+                  color: Theme.of(context).colorScheme.surface,
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.1),
+                      color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.1),
                       blurRadius: 10,
                       offset: Offset(0, -5),
                     ),

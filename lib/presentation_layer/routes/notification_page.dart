@@ -87,8 +87,8 @@ class _NotificationPageState extends ConsumerState<NotificationPage>
           PushNotificationToggle(),
           TabBar(
             controller: _tabController,
-            labelColor: Colors.white,
-            unselectedLabelColor: Colors.grey,
+            labelColor: Theme.of(context).colorScheme.onSurface,
+            unselectedLabelColor: Theme.of(context).colorScheme.onSurfaceVariant,
             indicatorColor: Theme.of(context).colorScheme.primary,
             tabs: const [
               Tab(text: "All"),

@@ -127,7 +127,7 @@ class _FullScreenLoadingState extends State<FullScreenLoading>
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
                       fontFamily: 'Poppins',
-                      color: _showSuccessMessage ? Colors.green : Colors.white,
+                      color: _showSuccessMessage ? Colors.green : Theme.of(context).colorScheme.onSurface,
                     ),
                   ),
                 );

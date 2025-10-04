@@ -172,11 +172,11 @@ class _EditStarterPackSummaryState extends ConsumerState<EditStarterPackSummary>
                               textAlign: TextAlign.center,
                             ),
                             const SizedBox(height: 8),
-                            const Text(
+                            Text(
                               "Share it with your friends and help them discover amazing people!",
                               style: TextStyle(
                                 fontSize: 16,
-                                color: Colors.grey,
+                                color: Theme.of(context).colorScheme.onSurfaceVariant,
                               ),
                               textAlign: TextAlign.center,
                             ),

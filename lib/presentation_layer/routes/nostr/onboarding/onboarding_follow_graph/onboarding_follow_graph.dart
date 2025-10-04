@@ -231,7 +231,7 @@ class _OnboardingFollowGraphState extends ConsumerState<OnboardingFollowGraph> {
                           color: Paletter.getExtraDarkGray(context),
                           border: Border.all(
                             color: data.selected
-                                ? Colors.white
+                                ? Theme.of(context).colorScheme.onSurface
                                 : Colors.transparent,
                             width: 2,
                           ),

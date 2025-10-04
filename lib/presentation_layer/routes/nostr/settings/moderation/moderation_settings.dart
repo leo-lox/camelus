@@ -112,10 +112,10 @@ class ModerationSettingsPageState
                 ),
               ),
               const SizedBox(height: 8),
-              const Text(
+              Text(
                 'Enable content filtering to hide potentially inappropriate content.',
                 style: TextStyle(
-                  color: Colors.grey,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
               ),
               const SizedBox(height: 16),
@@ -133,12 +133,12 @@ class ModerationSettingsPageState
               ),
               const Divider(),
               const SizedBox(height: 16),
-              const Text(
+              Text(
                 'Note: Filters are applied locally (on device). When users report nostr content directly to camelus it gets added to the filter.',
                 style: TextStyle(
                   fontSize: 12,
                   fontStyle: FontStyle.italic,
-                  color: Colors.grey,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
               ),
             ],

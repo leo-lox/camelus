@@ -301,7 +301,7 @@ class _BuildProfileHeader extends ConsumerWidget {
                   child: SelectableText(
                     userMetadata.about ?? '',
                     style: TextStyle(
-                      color: Colors.white,
+                      color: Theme.of(context).colorScheme.onSurface,
                       overflow: TextOverflow.ellipsis,
                     ),
                     //maxLines: 2, // Adjust this value based on your needs
