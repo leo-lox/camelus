@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:go_router/go_router.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:qr_flutter/qr_flutter.dart';
@@ -202,7 +203,7 @@ class NostrSideMenu extends ConsumerWidget {
               child: _textButton(
                   text: 'Settings',
                   onPressed: () {
-                    Navigator.pushNamed(context, '/settings');
+                    context.go("/settings");
                   })),
           const SizedBox(height: 10),
           Padding(
