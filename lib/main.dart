@@ -1,9 +1,11 @@
+import 'dart:io';
 import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 
 import 'package:flutter/material.dart';
+import 'package:window_manager/window_manager.dart';
 import 'package:flutter_mentions/flutter_mentions.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ndk/ndk.dart';
@@ -59,6 +61,17 @@ final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+    await windowManager.ensureInitialized();
+    WindowOptions windowOptions = WindowOptions(
+      titleBarStyle: TitleBarStyle.hidden,
+    );
+    windowManager.waitUntilReadyToShow(
+      windowOptions,
+    );
+  }
+
   final initalData = await _getInitialData();
 
   // currently incompatible with recent flutter sdk https://github.com/aloisdeniel/flutter_device_preview/issues/244
@@ -175,6 +188,43 @@ class MyApp extends ConsumerWidget {
         title: 'camelus',
         theme: theme.themeMap["DARK"],
         initialRoute: initialRoute,
+        builder: (context, child) {
+          if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+            return DragToResizeArea(
+              child: Stack(
+                children: [
+                  child!,
+                  Positioned(
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    child: SizedBox(
+                      height: 32,
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: DragToMoveArea(
+                              /// drag area
+                              child: Container(),
+                            ),
+                          ),
+                          const SizedBox(
+                            width: 154,
+                            child: WindowCaption(
+                              brightness: Brightness.dark,
+                              backgroundColor: Colors.transparent,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }
+          return child!;
+        },
         onGenerateRoute: (RouteSettings settings) {
           switch (settings.name) {
             case '/':

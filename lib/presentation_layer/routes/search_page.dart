@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -255,12 +256,24 @@ class _SearchPageState extends ConsumerState<SearchPage> {
         backgroundColor: Palette.background,
         body: Column(
           children: [
-            SearchBarWidget(
-              onSearchChanged: _onSearchChanged,
-              onSubmit: _onSubmit,
-              helpSearch: _helpSearch,
-              externalFocusNode: _searchFocusNode,
-              externalController: _searchController,
+            Builder(
+              builder: (context) {
+                final child = SearchBarWidget(
+                  onSearchChanged: _onSearchChanged,
+                  onSubmit: _onSubmit,
+                  helpSearch: _helpSearch,
+                  externalFocusNode: _searchFocusNode,
+                  externalController: _searchController,
+                );
+
+                final isDesktop = Platform.isLinux || Platform.isMacOS || Platform.isWindows;
+                if (!isDesktop) return child;
+
+                return Padding(
+                  padding: const EdgeInsets.only(top: 16),
+                  child: child,
+                );
+              }
             ),
             Expanded(
               child: searchState.isSearching

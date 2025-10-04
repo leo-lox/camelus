@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -122,6 +124,8 @@ class SettingsFileServersPageState extends ConsumerState<SettingsFileServers> {
                 },
               ),
             const SizedBox(width: 16),
+            if (Platform.isWindows || Platform.isLinux || Platform.isMacOS)
+              const SizedBox(width: 154),
           ],
         ),
         body: Column(

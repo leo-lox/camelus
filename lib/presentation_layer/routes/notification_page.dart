@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:camelus/presentation_layer/atoms/my_profile_picture.dart';
 import 'package:camelus/presentation_layer/atoms/refresh_indicator_no_need.dart';
 import 'package:camelus/presentation_layer/components/note_card/note_card.dart';
@@ -79,6 +81,8 @@ class _NotificationPageState extends ConsumerState<NotificationPage>
                     .integrateNewNotifications();
               },
             ),
+          if (Platform.isWindows || Platform.isLinux || Platform.isMacOS)
+            const SizedBox(width: 154),
         ],
       ),
       body: Column(
