@@ -205,7 +205,7 @@ ${_privateKey.mnemonicSentence}
 
     // naviage to /
     Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
-      return HomePage(pubkey: myKeyPair.publicKey);
+      return HomePage();
     }));
   }
 
@@ -390,11 +390,11 @@ ${_privateKey.mnemonicSentence}
               duration: const Duration(seconds: 2),
               child: _isLoading
                   ? Center(
-                    child: FullScreenLoading(
-                      loadingTexts: loadingTexts,
-                      updateState: (function) => {},
-                    ),
-                  )
+                      child: FullScreenLoading(
+                        loadingTexts: loadingTexts,
+                        updateState: (function) => {},
+                      ),
+                    )
                   : const SizedBox.shrink(),
             ),
         ],

@@ -37,28 +37,24 @@ final routes = [
       GoRoute(
         path: '/',
         builder: (context, state) => HomePage(
-          pubkey: pubkey,
           initialTab: '/',
         ),
       ),
       GoRoute(
         path: '/posts-and-replies',
         builder: (context, state) => HomePage(
-          pubkey: pubkey,
           initialTab: '/posts-and-replies',
         ),
       ),
       GoRoute(
         path: '/search',
         builder: (context, state) => HomePage(
-          pubkey: pubkey,
           initialPage: 1,
         ),
       ),
       GoRoute(
         path: '/notifications',
         builder: (context, state) => HomePage(
-          pubkey: pubkey,
           initialPage: 2,
         ),
       ),

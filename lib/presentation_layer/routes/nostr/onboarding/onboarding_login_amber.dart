@@ -75,7 +75,7 @@ class _OnboardingLoginAmberPageState
     if (!mounted) return;
 
     Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
-      return HomePage(pubkey: amberSigner.publicKey);
+      return HomePage();
     }));
   }
 

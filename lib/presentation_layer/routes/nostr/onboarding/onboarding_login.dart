@@ -161,7 +161,7 @@ class _OnboardingLoginPageState extends ConsumerState<OnboardingLoginPage> {
 
     // ignore: use_build_context_synchronously
     Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
-      return HomePage(pubkey: myKeys!.publicKey);
+      return HomePage();
     }));
 
     //Navigator.popAndPushNamed(context, '/');

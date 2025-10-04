@@ -16,18 +16,17 @@ import '../components/app_bottom_navigation_bar/app_bottom_navigation_bar.dart';
 import '../providers/app_bar_provider/app_bottom_bar_provider.dart';
 import '../providers/app_update_provider.dart';
 import '../providers/language_provider.dart';
+import '../providers/ndk_provider.dart';
 import 'nostr/nostr_page/nostr_page.dart';
 import 'notification_page.dart';
 import 'search_page.dart';
 
 class HomePage extends ConsumerStatefulWidget {
-  final String pubkey;
   final String? initialTab;
   final int initialPage;
 
   const HomePage({
     super.key,
-    required this.pubkey,
     this.initialTab,
     this.initialPage = 0,
   });
@@ -95,7 +94,7 @@ class _HomePageState extends ConsumerState<HomePage> {
           visitorId: myVisitorId,
         );
       } catch (e) {
-        // 
+        //
       }
     });
   }
@@ -128,9 +127,11 @@ class _HomePageState extends ConsumerState<HomePage> {
 
     final isHomeSelected = navigationState.selectedTab == NavigationTab.home;
 
+    final currentUserPubkey = ref.read(ndkProvider).accounts.getPublicKey()!;
+
     return Scaffold(
       key: _scaffoldKey,
-      drawer: NostrDrawer(pubkey: widget.pubkey),
+      drawer: NostrDrawer(pubkey: currentUserPubkey),
       backgroundColor: Palette.background,
       floatingActionButton: AnimatedSwitcher(
         duration: const Duration(milliseconds: 150),
@@ -162,12 +163,12 @@ class _HomePageState extends ConsumerState<HomePage> {
           children: <Widget>[
             NostrPage(
               parentScaffoldKey: _scaffoldKey,
-              pubkey: widget.pubkey,
+              pubkey: currentUserPubkey,
               initialTab: widget.initialTab,
             ),
             const SearchPage(),
             NotificationPage(
-              pubkey: widget.pubkey,
+              pubkey: currentUserPubkey,
             ),
             const Center(
               child: Text('work in progress',
