@@ -185,7 +185,42 @@ class MyApp extends ConsumerWidget {
         title: 'camelus',
         theme: theme.themeMap["DARK"],
         initialRoute: initialRoute,
-        builder: (context, child) => DragToResizeArea(child: child!),
+        builder: (context, child) {
+          if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+            return DragToResizeArea(
+              child: Stack(
+                children: [
+                  child!,
+                  Positioned(
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    child: SizedBox(
+                      height: 32,
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: DragToMoveArea(
+                              child: Container(),
+                            ),
+                          ),
+                          const SizedBox(
+                            width: 154,
+                            child: WindowCaption(
+                              brightness: Brightness.dark,
+                              backgroundColor: Colors.transparent,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }
+          return child!;
+        },
         onGenerateRoute: (RouteSettings settings) {
           switch (settings.name) {
             case '/':
