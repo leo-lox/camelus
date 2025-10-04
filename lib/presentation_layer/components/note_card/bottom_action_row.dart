@@ -36,7 +36,7 @@ class BottomActionRow extends StatefulWidget {
   });
 
   @override
-  _BottomActionRowState createState() => _BottomActionRowState();
+  State<BottomActionRow> createState() => _BottomActionRowState();
 }
 
 class _BottomActionRowState extends State<BottomActionRow>

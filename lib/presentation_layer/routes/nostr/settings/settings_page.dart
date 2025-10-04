@@ -9,7 +9,7 @@ class SettingsPage extends ConsumerStatefulWidget {
   const SettingsPage({super.key});
 
   @override
-  _SettingsPageState createState() => _SettingsPageState();
+  ConsumerState<SettingsPage> createState() => _SettingsPageState();
 }
 
 class _SettingsPageState extends ConsumerState<SettingsPage> {

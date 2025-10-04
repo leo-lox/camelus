@@ -42,7 +42,7 @@ class NostrListRepositoryImpl implements NostrListRepository {
         NostrStarterPackModel.fromEntity(starterPack).toNDK();
     final result = await dartNdkSource.dartNdk.lists.setCompleteSet(
       set: ndkStarterPack,
-      kind: NostrList.STARTER_PACK,
+      kind: NostrList.starterPack,
     );
     return NostrStarterPackModel.fromNDK(result);
   }
@@ -51,7 +51,7 @@ class NostrListRepositoryImpl implements NostrListRepository {
   Future deleteStarterPack({required String name}) {
     return dartNdkSource.dartNdk.lists.deleteSet(
       name: name,
-      kind: NostrList.STARTER_PACK,
+      kind: NostrList.starterPack,
     );
   }
 
@@ -64,7 +64,7 @@ class NostrListRepositoryImpl implements NostrListRepository {
       tag: 'p',
       value: pubkey,
       name: name,
-      kind: NostrList.STARTER_PACK,
+      kind: NostrList.starterPack,
     );
     if (ndkSet == null) {
       return null;

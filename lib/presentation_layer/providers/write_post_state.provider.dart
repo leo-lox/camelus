@@ -143,7 +143,7 @@ class WritePostNotifier extends Notifier<WritePostState> {
         final rootTag = NostrTag(
           type: "e",
           value: replyIsReplyToRoot.value,
-          recommended_relay: "",
+          recommendedRelay: "",
           marker: "root",
         );
         tags.add(rootTag);
@@ -152,7 +152,7 @@ class WritePostNotifier extends Notifier<WritePostState> {
         final rootTag = NostrTag(
           type: "e",
           value: state.replyToNote!.id,
-          recommended_relay: "",
+          recommendedRelay: "",
           marker: "root",
         );
         tags.add(rootTag);
@@ -162,7 +162,7 @@ class WritePostNotifier extends Notifier<WritePostState> {
       final replyTag = NostrTag(
         type: "e",
         value: state.replyToNote!.id,
-        recommended_relay: "",
+        recommendedRelay: "",
         marker: "reply",
       );
       tags.add(replyTag);
@@ -203,7 +203,7 @@ class WritePostNotifier extends Notifier<WritePostState> {
         tags.add(NostrTag(
             type: "p",
             value: pubkey,
-            recommended_relay:
+            recommendedRelay:
                 "" // todo  await editRelayProvider.getRelayHintsInbox(pubkey);
             // No marker for p tags according to NIP-10
             ));
@@ -217,7 +217,7 @@ class WritePostNotifier extends Notifier<WritePostState> {
           tags.add(NostrTag(
               type: "p",
               value: pubkey,
-              recommended_relay:
+              recommendedRelay:
                   "" //todo  await editRelayProvider.getRelayHintsInbox(pubkey);,
               ));
         }
@@ -301,7 +301,7 @@ class WritePostNotifier extends Notifier<WritePostState> {
         type: 'client',
         value: CamelusConfig.name,
         marker: CamelusConfig.identifierAddress,
-        recommended_relay: CamelusConfig.homeRelay,
+        recommendedRelay: CamelusConfig.homeRelay,
       ));
     }
 
@@ -310,7 +310,7 @@ class WritePostNotifier extends Notifier<WritePostState> {
         NostrNote(
           id: '',
           pubkey: pubkey,
-          created_at: now,
+          createdAt: now,
           kind: 1,
           content: content,
           sig: '',

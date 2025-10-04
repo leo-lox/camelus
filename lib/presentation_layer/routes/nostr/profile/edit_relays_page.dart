@@ -30,10 +30,8 @@ class _EditRelaysPageState extends ConsumerState<EditRelaysPage> {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async {
-        return true;
-      },
+    return PopScope(
+      canPop: true,
       child: Scaffold(
         backgroundColor: Palette.background,
         appBar: AppBar(

@@ -131,7 +131,7 @@ void main() {
         final nostrNote = NostrNote(
           id: "",
           sig: "",
-          created_at: 0,
+          createdAt: 0,
           pubkey: keypair.publicKey,
           content: "hi$i",
           kind: 1,
@@ -151,7 +151,7 @@ void main() {
         final nostrNote = NostrNote(
           id: "",
           sig: "",
-          created_at: 0,
+          createdAt: 0,
           pubkey: keypair.publicKey,
           content: "hi$i",
           kind: 1,

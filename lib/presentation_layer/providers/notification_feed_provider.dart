@@ -18,12 +18,12 @@ final notificationsStateProvider =
 );
 
 class NotificationsState extends FamilyNotifier<NotificationViewModel, String> {
-  static const String SUBSCRIPTION_ID = "notifications-sub";
-  static const String NOTIFICATION_CUTOFF_KEY = "notifications-cutoff";
+  static const String subscriptionId = "notifications-sub";
+  static const String notificationCutoffKey = "notifications-cutoff";
 
   Future<void> _resetStateDispose() async {
     final notesP = ref.watch(getNotesProvider);
-    await notesP.closeSubscription(SUBSCRIPTION_ID);
+    await notesP.closeSubscription(subscriptionId);
     state = NotificationViewModel(
       timelineNotifications: [],
       newNotifications: [],
@@ -67,7 +67,7 @@ class NotificationsState extends FamilyNotifier<NotificationViewModel, String> {
 
     final sub = notesP.genericNostrSubscription(
       since: cutoff,
-      subscriptionId: SUBSCRIPTION_ID,
+      subscriptionId: subscriptionId,
       kinds: [1, 7, 6], // Text notes, reactions, reposts
       pTags: [userPubkey], // Notes mentioning the user
     );
@@ -156,7 +156,7 @@ class NotificationsState extends FamilyNotifier<NotificationViewModel, String> {
 
       return NostrNotification(
         id: note.id,
-        createdAt: note.created_at,
+        createdAt: note.createdAt,
         type: type,
         sourceNote: note,
         targetNoteId: targetNoteId,
@@ -167,7 +167,7 @@ class NotificationsState extends FamilyNotifier<NotificationViewModel, String> {
   // Get the cutoff time for notifications
   Future<int> _getCutoffTime() async {
     final appDbP = ref.read(dbAppProvider);
-    final lastFetch = await appDbP.read(NOTIFICATION_CUTOFF_KEY);
+    final lastFetch = await appDbP.read(notificationCutoffKey);
     return lastFetch != null
         ? int.parse(lastFetch)
         : DateTime.now().millisecondsSinceEpoch ~/ 1000;
@@ -177,7 +177,7 @@ class NotificationsState extends FamilyNotifier<NotificationViewModel, String> {
   Future<void> _saveCutoffTime() async {
     final appDbP = ref.read(dbAppProvider);
     final now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
-    await appDbP.save(key: NOTIFICATION_CUTOFF_KEY, value: now.toString());
+    await appDbP.save(key: notificationCutoffKey, value: now.toString());
   }
 
   // Load more older notifications

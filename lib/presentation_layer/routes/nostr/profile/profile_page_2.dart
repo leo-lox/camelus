@@ -311,7 +311,7 @@ class _BuildProfileHeader extends ConsumerWidget {
                 SizedBox(height: 5),
                 Row(
                   children: [
-                    _display_following(contacts.contactList, context),
+                    displayFollowing(contacts.contactList, context),
                     SizedBox(width: 16),
                     Text(
                       'n.a Followers',
@@ -330,7 +330,7 @@ class _BuildProfileHeader extends ConsumerWidget {
     );
   }
 
-  Widget _display_following(ContactList? contacts, BuildContext context) {
+  Widget displayFollowing(ContactList? contacts, BuildContext context) {
     final followingCount = contacts?.contacts.length ?? 0;
     return GestureDetector(
       onTap: () {

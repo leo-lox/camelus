@@ -474,7 +474,7 @@ class _OnboardingLoginPageState extends ConsumerState<OnboardingLoginPage> {
                             },
                             activeColor: Palette.white,
                             checkColor: Palette.black,
-                            fillColor: MaterialStateProperty.all(Palette.white),
+                            fillColor: WidgetStateProperty.all(Palette.white),
                             //overlayColor: MaterialStateProperty.all(Palette.primary),
                           ),
                           const Text(
@@ -628,7 +628,7 @@ class _OnboardingLoginPageState extends ConsumerState<OnboardingLoginPage> {
                       ),
                     );
                   },
-                  onWillAcceptWithDetails: (data) => data != index,
+                  onWillAcceptWithDetails: (data) => data.data != index,
                   onAcceptWithDetails: (data) {
                     setState(() {
                       String temp = _userWords[data.data];

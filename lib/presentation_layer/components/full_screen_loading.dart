@@ -16,7 +16,7 @@ class FullScreenLoading extends StatefulWidget {
   });
 
   @override
-  _FullScreenLoadingState createState() => _FullScreenLoadingState();
+  State<FullScreenLoading> createState() => _FullScreenLoadingState();
 }
 
 class _FullScreenLoadingState extends State<FullScreenLoading>

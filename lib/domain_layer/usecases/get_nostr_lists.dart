@@ -14,7 +14,7 @@ class GetNostrLists {
   }) {
     return _nostrListRepository.getPublicNostrStarterPacks(
       pubKey: pubKey,
-      kind: NostrList.STARTER_PACK,
+      kind: NostrList.starterPack,
     );
   }
 

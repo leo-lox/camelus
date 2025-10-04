@@ -566,7 +566,7 @@ class _TopBar extends ConsumerWidget {
                   icon: SvgPicture.asset(
                     height: 25,
                     'assets/icons/paper-plane-tilt.svg',
-                    color: Palette.primary,
+                    colorFilter: ColorFilter.mode(Palette.primary, BlendMode.srcIn),
                   ),
                 )
               : Lottie.asset(

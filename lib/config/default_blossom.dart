@@ -1,4 +1,4 @@
-const DEFAULT_BLOSSOM_SERVERS = [
+const defaultBlossomServers = [
   'https://blossom.band',
   'https://nostr.download',
   'https://blossom.f7z.io',

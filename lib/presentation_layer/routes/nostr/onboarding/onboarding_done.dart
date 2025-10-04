@@ -102,14 +102,14 @@ ${_privateKey.mnemonicSentence}
     final Nip65 myNip65 = Nip65(
       pubKey: _privateKey.publicKey,
       createdAt: DateTime.now().millisecondsSinceEpoch ~/ 1000,
-      relays: DEFAULT_ACCOUNT_CREATION_RELAYS,
+      relays: defaultAccountCreationRelays,
     );
 
     /// broadcast nip65
     await inboxOutboxP.setNip65data(myNip65);
 
     /// broadcast blossom servers
-    await fileUploadP.setFileUploadServers(DEFAULT_BLOSSOM_SERVERS);
+    await fileUploadP.setFileUploadServers(defaultBlossomServers);
 
     if (widget.userInfo.picture != null) {
       setState(() {

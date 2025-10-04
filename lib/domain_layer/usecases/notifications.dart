@@ -43,7 +43,7 @@ class Notifications {
           .map((e) => e.key)
           .toList();
     } else {
-      readRelays = DEFAULT_ACCOUNT_CREATION_RELAYS.entries
+      readRelays = defaultAccountCreationRelays.entries
           .where((e) => e.value.isRead)
           .map((e) => e.key)
           .toList();
@@ -52,7 +52,7 @@ class Notifications {
     final registrationNote = NostrNote(
       id: "",
       pubkey: myPubkey,
-      created_at: DateTime.now().millisecondsSinceEpoch ~/ 1000,
+      createdAt: DateTime.now().millisecondsSinceEpoch ~/ 1000,
       kind: 0,
       content: "",
       sig: "",

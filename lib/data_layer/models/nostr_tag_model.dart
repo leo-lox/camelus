@@ -4,7 +4,7 @@ class NostrTagModel extends NostrTag {
   NostrTagModel({
     required super.type,
     required super.value,
-    super.recommended_relay,
+    super.recommendedRelay,
     super.marker,
   });
 
@@ -22,7 +22,7 @@ class NostrTagModel extends NostrTag {
     return NostrTagModel(
       type: type,
       value: value,
-      recommended_relay: recommendedRelay,
+      recommendedRelay: recommendedRelay,
       marker: marker,
     );
   }
@@ -32,8 +32,8 @@ class NostrTagModel extends NostrTag {
 
     if (value.isNotEmpty) {
       json.add(value);
-      if (recommended_relay != null) {
-        json.add(recommended_relay);
+      if (recommendedRelay != null) {
+        json.add(recommendedRelay);
         if (marker != null) {
           json.add(marker);
         }
