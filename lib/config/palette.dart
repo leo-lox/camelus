@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+@Deprecated('Use Theme.of(context) instead')
 class Paletter {
   static const Color darkGray = Color.fromARGB(255, 75, 75, 75);
   static const Color gray = Color(0xFFAAB8C2);

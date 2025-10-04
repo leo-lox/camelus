@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../../config/palette.dart';
 import '../../../../../domain_layer/entities/bloom_filter_data.dart';
 import '../../../../../helpers/bloom_filter_prehash.dart';
 import '../../../../providers/db_app_provider.dart';
@@ -77,9 +76,7 @@ class ModerationSettingsPageState
           SnackBar(
             content: Text(
               'Error updating filter $e',
-              style: TextStyle(color: Paletter.getLightGray(context)),
             ),
-            backgroundColor: Paletter.getExtraDarkGray(context),
           ),
         );
       }

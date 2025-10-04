@@ -312,7 +312,6 @@ class _StarterPackSelectionBottomSheetState
               children: [
                 Icon(
                   PhosphorIcons.warning(),
-                  color: Theme.of(context).colorScheme.onSurface,
                   size: 20,
                 ),
                 const SizedBox(width: 12),
@@ -326,7 +325,6 @@ class _StarterPackSelectionBottomSheetState
                 ),
               ],
             ),
-            backgroundColor: Theme.of(context).colorScheme.error,
             duration: const Duration(seconds: 3),
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(

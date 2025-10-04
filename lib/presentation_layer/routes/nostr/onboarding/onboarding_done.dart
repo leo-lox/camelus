@@ -168,8 +168,7 @@ ${_privateKey.mnemonicSentence}
     if (!_termsAndConditions) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Please read and accept the terms and conditions first',
-              style: TextStyle(color: Theme.of(context).colorScheme.surface)),
+          content: Text('Please read and accept the terms and conditions first'),
         ),
       );
       return;
@@ -254,9 +253,7 @@ ${_privateKey.mnemonicSentence}
                                     SnackBar(
                                       duration: Duration(seconds: 2),
                                       content: Text(
-                                          'a new seed phrase has been generated',
-                                          style:
-                                              TextStyle(color: Theme.of(context).colorScheme.surface)),
+                                          'a new seed phrase has been generated'),
                                     ),
                                   ),
                                   _generateKey()
@@ -275,9 +272,7 @@ ${_privateKey.mnemonicSentence}
                                     SnackBar(
                                       duration: Duration(seconds: 2),
                                       content: Text(
-                                          'copied seed phrase to clipboard',
-                                          style:
-                                              TextStyle(color: Theme.of(context).colorScheme.surface)),
+                                          'copied seed phrase to clipboard'),
                                     ),
                                   ),
                                   _copyKey()

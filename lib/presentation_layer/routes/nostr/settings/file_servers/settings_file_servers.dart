@@ -111,9 +111,7 @@ class SettingsFileServersPageState extends ConsumerState<SettingsFileServers> {
                         content: Text(
                             success
                                 ? 'Changes saved successfully'
-                                : 'Failed to save changes',
-                            style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
-                        backgroundColor: Paletter.getExtraDarkGray(context),
+                                : 'Failed to save changes'),
                       ),
                     );
                   }

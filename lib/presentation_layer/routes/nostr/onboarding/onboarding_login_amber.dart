@@ -54,8 +54,7 @@ class _OnboardingLoginAmberPageState
     if (!_termsAndConditions) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Please read and accept the terms and conditions first',
-              style: TextStyle(color: Theme.of(context).colorScheme.surface)),
+          content: Text('Please read and accept the terms and conditions first'),
         ),
       );
       return;
