@@ -199,7 +199,7 @@ class _NotificationPageState extends ConsumerState<NotificationPage>
 
     // Create a container with a highlight color if it's a new notification
     return Container(
-      color: isNew ? Palette.primary.withOpacity(0.1) : null,
+      color: isNew ? Palette.primary.withValues(alpha: 0.1) : null,
       child: ListTile(
         leading: _getNotificationIcon(notification),
         title: Row(
@@ -351,7 +351,6 @@ class _NotificationPageState extends ConsumerState<NotificationPage>
           myMetadata: mentionUser.userMetadata,
           hideBottomBar: true,
         );
-        break;
       default:
         return Container();
     }

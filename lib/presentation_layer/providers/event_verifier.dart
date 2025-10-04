@@ -7,8 +7,6 @@ import 'package:riverpod/riverpod.dart';
 // Currently set to use the RustEventVerifier.
 final eventVerifierProvider = Provider<EventVerifier>((ref) {
   // Creating instances of different EventVerifiers (Bip340, Mock, Rust).
-  final EventVerifier eventVerifier = Bip340EventVerifier();
-  final EventVerifier mockEventVerifier = MockEventVerifier();
   final RustEventVerifier rustEventVerifier = RustEventVerifier();
 
   return rustEventVerifier;

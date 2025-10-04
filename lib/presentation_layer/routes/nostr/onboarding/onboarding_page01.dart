@@ -4,10 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class OnboardingPage01 extends ConsumerStatefulWidget {
-  Function loginCallback;
-  Function registerCallback;
+  final Function loginCallback;
+  final Function registerCallback;
 
-  OnboardingPage01({
+  const OnboardingPage01({
     super.key,
     required this.loginCallback,
     required this.registerCallback,

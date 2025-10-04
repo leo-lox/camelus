@@ -94,7 +94,7 @@ class NoteCardRepost extends ConsumerWidget {
             if (!snapshot.hasData) {
               return Column(
                 children: [
-                  if (noteEtag.recommended_relay == null)
+                  if (noteEtag.recommendedRelay == null)
                     Padding(
                       padding: const EdgeInsets.all(16),
                       child: Column(

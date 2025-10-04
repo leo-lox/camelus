@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shimmer/shimmer.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../config/palette.dart';
@@ -98,7 +97,9 @@ class ProfilePage2 extends ConsumerWidget {
                       }).toList();
                     },
                   ),
-                  if (Platform.isWindows || Platform.isLinux || Platform.isMacOS)
+                  if (Platform.isWindows ||
+                      Platform.isLinux ||
+                      Platform.isMacOS)
                     const SizedBox(width: 154),
                 ],
                 expandedHeight: 400,
@@ -310,7 +311,7 @@ class _BuildProfileHeader extends ConsumerWidget {
                 SizedBox(height: 5),
                 Row(
                   children: [
-                    _display_following(contacts.contactList, context),
+                    displayFollowing(contacts.contactList, context),
                     SizedBox(width: 16),
                     Text(
                       'n.a Followers',
@@ -329,7 +330,7 @@ class _BuildProfileHeader extends ConsumerWidget {
     );
   }
 
-  Widget _display_following(ContactList? contacts, BuildContext context) {
+  Widget displayFollowing(ContactList? contacts, BuildContext context) {
     final followingCount = contacts?.contacts.length ?? 0;
     return GestureDetector(
       onTap: () {

@@ -94,7 +94,9 @@ class _HomePageState extends ConsumerState<HomePage> {
           url: 'https://customer.beonde.de/matomo/matomo.php',
           visitorId: myVisitorId,
         );
-      } catch (e) {}
+      } catch (e) {
+        // 
+      }
     });
   }
 

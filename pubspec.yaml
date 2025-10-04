@@ -100,6 +100,7 @@ dependencies:
   video_player: ^2.10.0
   window_manager: ^0.5.1
   go_router: ^16.2.4
+  timeago: ^3.7.1
 
   
 

@@ -9,9 +9,9 @@ class OnboardingName extends ConsumerStatefulWidget {
   final Function submitCallback;
   final Function? onPressedBack;
 
-  OnboardingUserInfo userInfo;
+  final OnboardingUserInfo userInfo;
 
-  OnboardingName({
+  const OnboardingName({
     super.key,
     required this.submitCallback,
     required this.userInfo,

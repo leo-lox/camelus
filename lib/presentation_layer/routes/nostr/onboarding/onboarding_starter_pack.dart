@@ -319,7 +319,7 @@ class _OnboardingOpenStarterPackState
             child: longButton(
               name: nothingOfOwnSelected
                   ? "follow all"
-                  : "follow ${ownSelectedCount} accounts",
+                  : "follow $ownSelectedCount accounts",
               onPressed: (() {
                 setState(() {
                   if (nothingOfOwnSelected) {

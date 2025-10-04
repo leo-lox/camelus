@@ -178,7 +178,7 @@ class PushNotificationToggleState
                 Switch(
                   value: notificationsEnabled,
                   onChanged: toggleNotifications,
-                  activeColor: Palette.white,
+                  activeThumbColor: Palette.white,
                 ),
             ],
           ),

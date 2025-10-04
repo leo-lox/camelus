@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:app_links/app_links.dart';
+import 'package:flutter/foundation.dart';
 
 import 'package:riverpod/riverpod.dart';
 
@@ -23,7 +24,7 @@ Future<void> listenDeeplinks({
   final appLinks = AppLinks(); // AppLinks is singleton
 
 // Subscribe to all events (initial link and further)
-  final sub = appLinks.uriLinkStream.listen((uri) async {
+  appLinks.uriLinkStream.listen((uri) async {
     final uriString = uri.toString();
     if (uriString.startsWith(RegExp(r'nostr:(//)?'))) {
       final nostrCode = uriString.replaceAll(RegExp(r'nostr:(//)?'), "");
@@ -52,7 +53,9 @@ Future<void> _camelusLinks({
   } else if (_isUserLink(path)) {
     await _handleUserLink(path, providerContainer);
   } else {
-    print("Camelus link not supported: $link");
+    if (kDebugMode) {
+      print("Camelus link not supported: $link");
+    }
   }
 }
 
@@ -126,7 +129,9 @@ Future<InviteData> _getShortInviteData(
       listNpub: shortInviteData.listNpub,
     );
   } catch (e) {
-    print("Error fetching short invite data: $e");
+    if (kDebugMode) {
+      print("Error fetching short invite data: $e");
+    }
     return InviteData.empty();
   }
 }
@@ -159,7 +164,9 @@ Future<void> _setupOnboarding(
 
     navigatorKey.currentState?.pushReplacementNamed("/onboarding");
   } catch (e) {
-    print("Error setting up onboarding: $e");
+    if (kDebugMode) {
+      print("Error setting up onboarding: $e");
+    }
   }
 }
 
@@ -192,7 +199,6 @@ _nostrDecode({
 
     Map<String, dynamic> nProfileDecode = NprofileHelper().bech32toMap(myMatch);
 
-    final List<String> myRelays = nProfileDecode['relays'];
     myPubkeyHex = nProfileDecode['pubkey'];
 
     _pushProfile(
@@ -208,7 +214,6 @@ _nostrDecode({
     );
   } else if (myMatch.contains("note1")) {
     final decode = Helpers().decodeBech32(myMatch);
-    final String hr = decode[0];
     final String noteId = decode[1];
     if (noteId.isEmpty) {
       return;
@@ -219,7 +224,6 @@ _nostrDecode({
   } else if (myMatch.contains("nevent")) {
     final map = NeventHelper().bech32ToMap(myMatch);
     final String eventId = map['eventId'];
-    final String authorPubkey = map['authorPubkey'];
 
     if (eventId.isEmpty) {
       return;

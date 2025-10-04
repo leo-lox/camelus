@@ -206,7 +206,7 @@ class _PostSettingsState extends ConsumerState<PostSettings> {
         Switch(
           value: value,
           onChanged: onChanged,
-          activeColor: Palette.white,
+          activeThumbColor: Palette.white,
         ),
       ],
     );

@@ -3,7 +3,6 @@ import 'dart:io';
 
 import 'package:camelus/presentation_layer/atoms/spinner_center.dart';
 import 'package:camelus/presentation_layer/providers/metadata_state_provider.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -104,7 +103,9 @@ class _NostrPageState extends ConsumerState<NostrPage>
                 title: const TitleWidget(),
                 actions: [
                   RelaysWidget(onTap: () => _openRelaysView(context)),
-                  if (Platform.isWindows || Platform.isLinux || Platform.isMacOS)
+                  if (Platform.isWindows ||
+                      Platform.isLinux ||
+                      Platform.isMacOS)
                     const SizedBox(width: 154),
                 ],
                 bottom: PreferredSize(

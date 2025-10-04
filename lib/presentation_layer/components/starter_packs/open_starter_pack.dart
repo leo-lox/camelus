@@ -63,9 +63,9 @@ class _OpenStarterPackState extends ConsumerState<OpenStarterPack> {
 
     String urlPath;
     if (myNpub == listNpub) {
-      urlPath = "/i/${myNpub}/${widget.starterPackIdentifier.name}";
+      urlPath = "/i/$myNpub/${widget.starterPackIdentifier.name}";
     } else {
-      urlPath = "/i/${myNpub}/${widget.starterPackIdentifier.name}/${listNpub}";
+      urlPath = "/i/$myNpub/${widget.starterPackIdentifier.name}/$listNpub";
     }
 
     final serverpodProv = ref.read(serverpodProvider);
@@ -300,7 +300,9 @@ class _OpenStarterPackState extends ConsumerState<OpenStarterPack> {
                       ],
                     ),
                   const SizedBox(width: 16),
-                  if (Platform.isWindows || Platform.isLinux || Platform.isMacOS)
+                  if (Platform.isWindows ||
+                      Platform.isLinux ||
+                      Platform.isMacOS)
                     const SizedBox(width: 154),
                 ],
                 flexibleSpace: FlexibleSpaceBar(

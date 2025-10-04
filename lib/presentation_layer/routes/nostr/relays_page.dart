@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ndk/entities.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 class RelaysPage extends ConsumerStatefulWidget {
@@ -284,13 +283,12 @@ class _StatItem extends StatelessWidget {
   final IconData icon;
   final String label;
   final String value;
-  final double maxWidth;
+  final double maxWidth = 120;
 
   const _StatItem({
     required this.icon,
     required this.label,
     required this.value,
-    this.maxWidth = 120,
   });
 
   @override

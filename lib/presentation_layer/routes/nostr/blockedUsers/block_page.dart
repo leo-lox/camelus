@@ -279,7 +279,7 @@ class _BlockPageState extends ConsumerState<BlockPage> {
                                 reportToCamelus = value;
                               });
                             },
-                            activeColor: Palette.white,
+                            activeThumbColor: Palette.white,
                           ),
                         ],
                       ),

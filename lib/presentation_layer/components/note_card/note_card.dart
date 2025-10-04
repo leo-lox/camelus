@@ -42,7 +42,7 @@ class NoteCard extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        if (note.nostrNote.sig_valid != true) _buildInvalidSignature(),
+        if (note.nostrNote.sigValid != true) _buildInvalidSignature(),
         Padding(
           padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
           child: Row(
@@ -119,7 +119,7 @@ class NoteCard extends ConsumerWidget {
       height: 50,
       child: Center(
         child: Text(
-          "Missing note:  ${note.nostrNote.getDirectReply?.recommended_relay},  ${note.nostrNote.getRootReply?.recommended_relay}",
+          "Missing note:  ${note.nostrNote.getDirectReply?.recommendedRelay},  ${note.nostrNote.getRootReply?.recommendedRelay}",
           style: const TextStyle(color: Colors.purple, fontSize: 20),
         ),
       ),

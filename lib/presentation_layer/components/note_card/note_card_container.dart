@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../domain_layer/entities/nostr_note.dart';
 import '../../../domain_layer/entities/nostr_tag.dart';
 import '../../../domain_layer/entities/parsed_post.dart';
 import '../../providers/metadata_state_provider.dart';
@@ -27,7 +26,6 @@ class NoteCardContainer extends ConsumerWidget {
     }
 
     NostrTag? root = myNote.nostrNote.getRootReply;
-    NostrTag? reply = myNote.nostrNote.getDirectReply;
 
     // off spec support, sometimes not marked as root
     root ??= refEvents.first;

@@ -39,20 +39,15 @@ class NostrListModel extends NostrList {
 }
 
 class NostrStarterPackModel extends NostrStarterPack {
-  //String name;
-  //String? title;
-  String? description;
-  String? image;
-
   NostrStarterPackModel({
     required super.pubKey,
     required super.name,
     required super.createdAt,
     required super.elements,
-    super.kind = NostrList.STARTER_PACK,
+    super.kind = NostrList.starterPack,
     super.title,
-    this.description,
-    this.image,
+    super.description,
+    super.image,
   });
 
   // Convert from Nip51Set (NDK) to NostrSetModel
@@ -95,7 +90,7 @@ class NostrStarterPackModel extends NostrStarterPack {
       title: title,
       description: description,
       image: image,
-      kind: NostrList.STARTER_PACK,
+      kind: NostrList.starterPack,
       createdAt: createdAt,
       elements: elements
           .map((e) => NostrListElementModel(

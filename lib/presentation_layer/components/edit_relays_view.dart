@@ -140,10 +140,11 @@ class _EditRelaysViewState extends ConsumerState<EditRelaysView> {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async {
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) async {
+        if (didPop) return;
         await _checkClose();
-        return false;
       },
       child: reconnecting
           ? const Center(

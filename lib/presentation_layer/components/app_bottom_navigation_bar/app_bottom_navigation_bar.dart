@@ -101,17 +101,4 @@ class AppBottomNavigationBar extends ConsumerWidget {
       tooltip: "notifications",
     );
   }
-
-  NavigationDestination _buildChatItem(NavigationState state) {
-    final isSelected = state.selectedTab == NavigationTab.chat;
-
-    return NavigationDestination(
-      icon: Icon(
-        PhosphorIcons.chats(),
-        color: isSelected ? Palette.primary : Palette.darkGray,
-        size: 23,
-      ),
-      label: "",
-    );
-  }
 }
