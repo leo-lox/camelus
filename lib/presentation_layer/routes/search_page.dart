@@ -256,25 +256,24 @@ class _SearchPageState extends ConsumerState<SearchPage> {
         backgroundColor: Palette.background,
         body: Column(
           children: [
-            Builder(
-              builder: (context) {
-                final child = SearchBarWidget(
-                  onSearchChanged: _onSearchChanged,
-                  onSubmit: _onSubmit,
-                  helpSearch: _helpSearch,
-                  externalFocusNode: _searchFocusNode,
-                  externalController: _searchController,
-                );
+            Builder(builder: (context) {
+              final child = SearchBarWidget(
+                onSearchChanged: _onSearchChanged,
+                onSubmit: _onSubmit,
+                helpSearch: _helpSearch,
+                externalFocusNode: _searchFocusNode,
+                externalController: _searchController,
+              );
 
-                final isDesktop = Platform.isLinux || Platform.isMacOS || Platform.isWindows;
-                if (!isDesktop) return child;
+              final isDesktop =
+                  Platform.isLinux || Platform.isMacOS || Platform.isWindows;
+              if (!isDesktop) return child;
 
-                return Padding(
-                  padding: const EdgeInsets.only(top: 16),
-                  child: child,
-                );
-              }
-            ),
+              return Padding(
+                padding: const EdgeInsets.only(top: 16),
+                child: child,
+              );
+            }),
             Expanded(
               child: searchState.isSearching
                   ? _buildSearchResults(searchState)
@@ -686,34 +685,34 @@ void _helpSearch(BuildContext context) {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: const [
-            Text(
-              'Search',
-              style: TextStyle(
-                color: Palette.white,
-                fontSize: 30,
-                fontWeight: FontWeight.bold,
+              Text(
+                'Search',
+                style: TextStyle(
+                  color: Palette.white,
+                  fontSize: 30,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-            ),
-            SizedBox(height: 25),
-            _SearchHelpItem(
-              title: '#hashtag',
-              description: 'search for hashtags',
-            ),
-            SizedBox(height: 20),
-            _SearchHelpItem(
-              title: 'username',
-              description: 'works only if already in cache',
-            ),
-            SizedBox(height: 20),
-            _SearchHelpItem(
-              title: 'user@domain.tld',
-              description: 'nip05 address',
-            ),
-            SizedBox(height: 20),
-            _SearchHelpItem(
-              title: '@mastodon@domain.tld',
-              description: 'mastodon address (provided by mostr.pub)',
-            ),
+              SizedBox(height: 25),
+              _SearchHelpItem(
+                title: '#hashtag',
+                description: 'search for hashtags',
+              ),
+              SizedBox(height: 20),
+              _SearchHelpItem(
+                title: 'username',
+                description: 'works only if already in cache',
+              ),
+              SizedBox(height: 20),
+              _SearchHelpItem(
+                title: 'user@domain.tld',
+                description: 'nip05 address',
+              ),
+              SizedBox(height: 20),
+              _SearchHelpItem(
+                title: '@mastodon@domain.tld',
+                description: 'mastodon address (provided by mostr.pub)',
+              ),
             ],
           ),
         ),

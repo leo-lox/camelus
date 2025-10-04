@@ -98,7 +98,9 @@ class ProfilePage2 extends ConsumerWidget {
                       }).toList();
                     },
                   ),
-                  if (Platform.isWindows || Platform.isLinux || Platform.isMacOS)
+                  if (Platform.isWindows ||
+                      Platform.isLinux ||
+                      Platform.isMacOS)
                     const SizedBox(width: 154),
                 ],
                 expandedHeight: 400,

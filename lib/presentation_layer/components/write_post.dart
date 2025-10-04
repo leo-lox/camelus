@@ -563,7 +563,8 @@ class _TopBar extends ConsumerWidget {
               child: SizedBox(
                 width: MediaQuery.of(context).size.width * 0.6,
                 child: Container(
-                  margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                  margin:
+                      const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
                   child: Text(
                     "reply to ${metadata?.name ?? getPubkeyHrShort(replyToPubkey!)}",
                     overflow: TextOverflow.ellipsis,
@@ -577,7 +578,7 @@ class _TopBar extends ConsumerWidget {
                 ),
               ),
             ),
-      
+
           // if submitLoading is true, show spinner
           !submitLoading
               ? IconButton(

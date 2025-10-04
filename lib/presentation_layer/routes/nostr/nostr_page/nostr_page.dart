@@ -104,7 +104,9 @@ class _NostrPageState extends ConsumerState<NostrPage>
                 title: const TitleWidget(),
                 actions: [
                   RelaysWidget(onTap: () => _openRelaysView(context)),
-                  if (Platform.isWindows || Platform.isLinux || Platform.isMacOS)
+                  if (Platform.isWindows ||
+                      Platform.isLinux ||
+                      Platform.isMacOS)
                     const SizedBox(width: 154),
                 ],
                 bottom: PreferredSize(
