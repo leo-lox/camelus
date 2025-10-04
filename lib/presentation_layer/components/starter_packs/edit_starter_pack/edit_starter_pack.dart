@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../domain_layer/entities/starter_pack_identifier.dart';
-import '../../../../helpers/helpers.dart';
 import 'edit_starter_pack_content.dart';
 import 'edit_starter_pack_meta.dart';
 

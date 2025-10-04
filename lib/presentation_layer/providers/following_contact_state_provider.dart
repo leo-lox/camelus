@@ -1,11 +1,10 @@
+import 'package:flutter/foundation.dart';
 import 'package:riverpod/riverpod.dart';
 import 'dart:async';
 
 import '../../domain_layer/entities/contact_list.dart';
 import '../../domain_layer/usecases/follow.dart';
-import '../../domain_layer/usecases/inbox_outbox.dart';
 import 'following_provider.dart';
-import 'inbox_outbox_provider.dart';
 import 'ndk_provider.dart'; // Import your following provider
 
 class ContactListState {
@@ -83,7 +82,9 @@ class ContactListNotifier extends StateNotifier<ContactListState> {
           contactList: null, // Set to null on error
         );
         // Handle the error appropriately, e.g., log it
-        print('Error fetching contact list: $error');
+        if (kDebugMode) {
+          print('Error fetching contact list: $error');
+        }
       },
     );
   }

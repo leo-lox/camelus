@@ -7,7 +7,6 @@ import 'package:camelus/domain_layer/entities/user_metadata.dart';
 import 'package:camelus/presentation_layer/atoms/picture.dart';
 
 import 'package:camelus/presentation_layer/providers/metadata_state_provider.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mentions/flutter_mentions.dart';
 import 'package:flutter_svg/svg.dart';
@@ -121,27 +120,6 @@ class _WritePostState extends ConsumerState<WritePost> {
     setState(() {
       _mentionsSearchResultsHashTags = results;
     });
-  }
-
-  _showErrorMsg(String msg) {
-    // alert dialog
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text("error"),
-          content: Text(msg),
-          actions: [
-            TextButton(
-              child: const Text("ok"),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
   }
 
   void _initServices() async {}
@@ -588,7 +566,7 @@ class _TopBar extends ConsumerWidget {
                   icon: SvgPicture.asset(
                     height: 25,
                     'assets/icons/paper-plane-tilt.svg',
-                    color: Palette.primary,
+                    colorFilter: ColorFilter.mode(Palette.primary, BlendMode.srcIn),
                   ),
                 )
               : Lottie.asset(

@@ -139,7 +139,7 @@ class _OnboardingLoginAmberPageState
                     },
                     activeColor: Palette.white,
                     checkColor: Palette.black,
-                    fillColor: MaterialStateProperty.all(Palette.white),
+                    fillColor: WidgetStateProperty.all(Palette.white),
                     //overlayColor: MaterialStateProperty.all(Palette.primary),
                   ),
                   const Text(

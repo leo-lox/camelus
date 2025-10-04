@@ -1,6 +1,6 @@
 import 'dart:convert';
-import 'dart:typed_data';
 import 'package:camelus/helpers/bloom_filter.dart';
+import 'package:flutter/foundation.dart';
 import 'package:test/test.dart';
 
 void main() {
@@ -132,8 +132,10 @@ void main() {
       // Allow some margin of error (3x the expected rate)
       expect(actualFalsePositiveRate, lessThan(falsePositiveRate * 3));
 
-      print('Expected false positive rate: $falsePositiveRate');
-      print('Actual false positive rate: $actualFalsePositiveRate');
+      if (kDebugMode) {
+        print('Expected false positive rate: $falsePositiveRate');
+        print('Actual false positive rate: $actualFalsePositiveRate');
+      }
     });
 
     test('handles large number of items', () {

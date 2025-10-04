@@ -1,9 +1,9 @@
 import 'dart:convert';
-import 'dart:typed_data';
 import 'package:camelus/data_layer/models/nostr_note_model.dart';
 import 'package:camelus/domain_layer/entities/nostr_note.dart';
 import 'package:camelus/helpers/bip340.dart';
 import 'package:camelus/helpers/bloom_filter_prehash.dart';
+import 'package:flutter/foundation.dart';
 import 'package:test/test.dart';
 
 void main() {
@@ -131,7 +131,7 @@ void main() {
         final nostrNote = NostrNote(
           id: "",
           sig: "",
-          created_at: 0,
+          createdAt: 0,
           pubkey: keypair.publicKey,
           content: "hi$i",
           kind: 1,
@@ -151,7 +151,7 @@ void main() {
         final nostrNote = NostrNote(
           id: "",
           sig: "",
-          created_at: 0,
+          createdAt: 0,
           pubkey: keypair.publicKey,
           content: "hi$i",
           kind: 1,
@@ -169,8 +169,10 @@ void main() {
       // Allow some margin of error (3x the expected rate)
       expect(actualFalsePositiveRate, lessThan(falsePositiveRate * 3));
 
-      print('Expected false positive rate: $falsePositiveRate');
-      print('Actual false positive rate: $actualFalsePositiveRate');
+      if (kDebugMode) {
+        print('Expected false positive rate: $falsePositiveRate');
+        print('Actual false positive rate: $actualFalsePositiveRate');
+      }
     });
 
     test('fromNumHashFunctionsAndByteArray constructor validation', () {

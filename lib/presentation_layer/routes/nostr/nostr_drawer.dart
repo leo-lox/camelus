@@ -346,7 +346,7 @@ class NostrDrawer extends ConsumerWidget {
                 children: [
                   SvgPicture.asset(
                     'assets/icons/sun.svg',
-                    color: Palette.primary,
+                    colorFilter: ColorFilter.mode(Palette.primary, BlendMode.srcIn),
                     height: 22,
                     width: 22,
                   ),
@@ -356,7 +356,7 @@ class NostrDrawer extends ConsumerWidget {
                     },
                     child: SvgPicture.asset(
                       'assets/icons/qr-code.svg',
-                      color: Palette.primary,
+                      colorFilter: const ColorFilter.mode(Palette.primary, BlendMode.srcIn),
                       height: 22,
                       width: 22,
                     ),

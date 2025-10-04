@@ -3,7 +3,6 @@ import 'dart:io';
 
 import 'package:camelus/presentation_layer/atoms/spinner_center.dart';
 import 'package:camelus/presentation_layer/providers/metadata_state_provider.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';

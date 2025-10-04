@@ -6,7 +6,6 @@ import 'package:flutter_link_previewer/flutter_link_previewer.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:url_launcher/url_launcher_string.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 
 import '../../../config/palette.dart';
 import '../../../domain_layer/entities/parsed_post.dart';
@@ -194,28 +193,6 @@ class PostContentWidget extends ConsumerWidget {
     switch (segment.type) {
       case ContentType.image:
         return Container();
-
-        /// inline image could be here
-        return Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8.0),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(8.0),
-            child: CachedNetworkImage(
-              imageUrl: segment.metadata!,
-              placeholder: (context, url) => Container(
-                height: 200,
-                color: Colors.grey[300],
-                child: const Center(child: CircularProgressIndicator()),
-              ),
-              errorWidget: (context, url, error) => Container(
-                height: 200,
-                color: Colors.grey[300],
-                child: const Icon(Icons.error),
-              ),
-              fit: BoxFit.cover,
-            ),
-          ),
-        );
 
       case ContentType.video:
         return InlineVideoPlayer(

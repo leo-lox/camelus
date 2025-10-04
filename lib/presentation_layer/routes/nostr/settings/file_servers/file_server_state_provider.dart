@@ -93,7 +93,7 @@ class FileServersNotifier extends StateNotifier<AsyncValue<List<FileServer>>> {
 
   void restoreDefaults() {
     state = AsyncValue.data(
-        DEFAULT_BLOSSOM_SERVERS.map((url) => FileServer(url: url)).toList());
+        defaultBlossomServers.map((url) => FileServer(url: url)).toList());
 
     for (final server in state.value!) {
       _checkOnlineStatus(server);

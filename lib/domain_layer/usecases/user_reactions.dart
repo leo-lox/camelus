@@ -56,7 +56,7 @@ class UserReactions {
     final myReaction = NostrNote(
         content: "+",
         pubkey: selfPubkey!,
-        created_at: now,
+        createdAt: now,
         kind: 7,
         id: "",
         sig: "",

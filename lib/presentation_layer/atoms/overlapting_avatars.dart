@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../../config/palette.dart';
-
 class OverlappingAvatars extends StatelessWidget {
   final List<Widget> avatars;
   final double overlap;
