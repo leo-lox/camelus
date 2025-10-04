@@ -6,9 +6,9 @@ class SpinnerCenter extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
+    return Center(
       child: CircularProgressIndicator(
-        color: Palette.white,
+        color: Paletter.getWhite(context),
       ),
     );
   }

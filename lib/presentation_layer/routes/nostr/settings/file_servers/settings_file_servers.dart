@@ -34,22 +34,22 @@ class SettingsFileServersPageState extends ConsumerState<SettingsFileServers> {
     final result = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: Palette.background,
-        title: const Text('Unsaved Changes',
-            style: TextStyle(color: Palette.white)),
-        content: const Text(
+        backgroundColor: Paletter.getBackground(context),
+        title: Text('Unsaved Changes',
+            style: TextStyle(color: Paletter.getWhite(context))),
+        content: Text(
           'You have unsaved changes. Do you want to discard them?',
-          style: TextStyle(color: Palette.white),
+          style: TextStyle(color: Paletter.getWhite(context)),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('Cancel', style: TextStyle(color: Palette.gray)),
+            child: Text('Cancel', style: TextStyle(color: Paletter.getGray(context))),
           ),
           TextButton(
             onPressed: () => Navigator.of(context).pop(true),
             child:
-                const Text('Discard', style: TextStyle(color: Palette.primary)),
+                Text('Discard', style: TextStyle(color: Paletter.getPrimary(context))),
           ),
         ],
       ),
@@ -76,10 +76,10 @@ class SettingsFileServersPageState extends ConsumerState<SettingsFileServers> {
         }
       },
       child: Scaffold(
-        backgroundColor: Palette.background,
+        backgroundColor: Paletter.getBackground(context),
         appBar: AppBar(
           title: const Text('File Servers'),
-          backgroundColor: Palette.background,
+          backgroundColor: Paletter.getBackground(context),
           actions: [
             if (hasUnsavedChanges)
               longButton(
@@ -90,13 +90,13 @@ class SettingsFileServersPageState extends ConsumerState<SettingsFileServers> {
                     context: context,
                     barrierDismissible: false,
                     builder: (context) => AlertDialog(
-                      backgroundColor: Palette.background,
-                      content: const Row(
+                      backgroundColor: Paletter.getBackground(context),
+                      content: Row(
                         children: [
-                          CircularProgressIndicator(color: Palette.white),
+                          CircularProgressIndicator(color: Paletter.getWhite(context)),
                           SizedBox(width: 20),
                           Text('Saving...',
-                              style: TextStyle(color: Palette.white)),
+                              style: TextStyle(color: Paletter.getWhite(context))),
                         ],
                       ),
                     ),
@@ -116,8 +116,8 @@ class SettingsFileServersPageState extends ConsumerState<SettingsFileServers> {
                             success
                                 ? 'Changes saved successfully'
                                 : 'Failed to save changes',
-                            style: TextStyle(color: Palette.white)),
-                        backgroundColor: Palette.extraDarkGray,
+                            style: TextStyle(color: Paletter.getWhite(context))),
+                        backgroundColor: Paletter.getExtraDarkGray(context),
                       ),
                     );
                   }
@@ -132,9 +132,9 @@ class SettingsFileServersPageState extends ConsumerState<SettingsFileServers> {
           children: [
             Expanded(
               child: fileServersAsync.when(
-                loading: () => const Center(
+                loading: () => Center(
                     child: CircularProgressIndicator(
-                  color: Palette.lightGray,
+                  color: Paletter.getLightGray(context),
                 )),
                 error: (error, stack) => Center(
                   child: Column(
@@ -176,12 +176,12 @@ class SettingsFileServersPageState extends ConsumerState<SettingsFileServers> {
                               children: [
                                 ReorderableDragStartListener(
                                   index: index,
-                                  child: const SizedBox(
+                                  child: SizedBox(
                                     width: 40,
                                     child: Center(
                                       child: Icon(
                                         Icons.drag_handle,
-                                        color: Palette.darkGray,
+                                        color: Paletter.getDarkGray(context),
                                       ),
                                     ),
                                   ),
@@ -190,8 +190,8 @@ class SettingsFileServersPageState extends ConsumerState<SettingsFileServers> {
                                   Icons.circle,
                                   size: 12,
                                   color: server.isOnline
-                                      ? Palette.primary
-                                      : Palette.darkGray,
+                                      ? Paletter.getPrimary(context)
+                                      : Paletter.getDarkGray(context),
                                 ),
                                 const SizedBox(width: 16),
                                 Expanded(
@@ -199,22 +199,22 @@ class SettingsFileServersPageState extends ConsumerState<SettingsFileServers> {
                                     children: [
                                       Text(
                                         server.url,
-                                        style: const TextStyle(
+                                        style: TextStyle(
                                           fontSize: 16,
-                                          color: Palette.white,
+                                          color: Paletter.getWhite(context),
                                         ),
                                       ),
                                       if (index == 0)
-                                        const Text(' (default)',
+                                        Text(' (default)',
                                             style:
-                                                TextStyle(color: Palette.gray)),
+                                                TextStyle(color: Paletter.getGray(context))),
                                     ],
                                   ),
                                 ),
                                 IconButton(
-                                  icon: const Icon(
+                                  icon: Icon(
                                     Icons.delete,
-                                    color: Palette.gray,
+                                    color: Paletter.getGray(context),
                                   ),
                                   onPressed: () {
                                     ref
@@ -260,9 +260,9 @@ class SettingsFileServersPageState extends ConsumerState<SettingsFileServers> {
                               );
                             },
                             icon:
-                                const Icon(Icons.restore, color: Palette.gray),
-                            label: const Text('Restore Defaults',
-                                style: TextStyle(color: Palette.gray)),
+                                Icon(Icons.restore, color: Paletter.getGray(context)),
+                            label: Text('Restore Defaults',
+                                style: TextStyle(color: Paletter.getGray(context))),
                           ),
                         ),
                       ),
@@ -278,20 +278,20 @@ class SettingsFileServersPageState extends ConsumerState<SettingsFileServers> {
                   Expanded(
                     child: TextField(
                       controller: _urlController,
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         isDense: true,
                         hintText: 'Enter blossom URL',
                         hintStyle:
-                            TextStyle(color: Palette.white, letterSpacing: 1.1),
+                            TextStyle(color: Paletter.getWhite(context), letterSpacing: 1.1),
                         filled: true,
-                        fillColor: Palette.extraDarkGray,
+                        fillColor: Paletter.getExtraDarkGray(context),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.all(Radius.circular(50.0)),
-                          borderSide: BorderSide(color: Palette.extraDarkGray),
+                          borderSide: BorderSide(color: Paletter.getExtraDarkGray(context)),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.all(Radius.circular(25.0)),
-                          borderSide: BorderSide(color: Palette.background),
+                          borderSide: BorderSide(color: Paletter.getBackground(context)),
                         ),
                       ),
                     ),

@@ -25,9 +25,9 @@ class _RelaysPageState extends ConsumerState<RelaysPage> {
     final ndk = ref.watch(ndkProvider);
 
     return Scaffold(
-      backgroundColor: Palette.background,
+      backgroundColor: Paletter.getBackground(context),
       appBar: AppBar(
-        backgroundColor: Palette.background,
+        backgroundColor: Paletter.getBackground(context),
         leading: IconButton(
           icon: Icon(PhosphorIcons.arrowLeft()),
           onPressed: () => Navigator.of(context).pop(),
@@ -78,10 +78,10 @@ class _RelaysPageState extends ConsumerState<RelaysPage> {
                                           return Container(
                                             width: 50,
                                             height: 50,
-                                            color: Palette.lightGray,
+                                            color: Paletter.getLightGray(context),
                                             child: Icon(
                                               PhosphorIcons.globe(),
-                                              color: Palette.darkGray,
+                                              color: Paletter.getDarkGray(context),
                                             ),
                                           );
                                         },
@@ -91,13 +91,13 @@ class _RelaysPageState extends ConsumerState<RelaysPage> {
                                       width: 50,
                                       height: 50,
                                       decoration: BoxDecoration(
-                                        color: Palette.lightGray,
+                                        color: Paletter.getLightGray(context),
                                         borderRadius:
                                             BorderRadius.circular(8.0),
                                       ),
                                       child: Icon(
                                         PhosphorIcons.globe(),
-                                        color: Palette.darkGray,
+                                        color: Paletter.getDarkGray(context),
                                       ),
                                     ),
                               const SizedBox(width: 16),
@@ -119,7 +119,7 @@ class _RelaysPageState extends ConsumerState<RelaysPage> {
                                       url,
                                       style: TextStyle(
                                         fontSize: 14,
-                                        color: Palette.gray,
+                                        color: Paletter.getGray(context),
                                       ),
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
@@ -132,8 +132,8 @@ class _RelaysPageState extends ConsumerState<RelaysPage> {
                                     ? PhosphorIcons.plugsConnected()
                                     : PhosphorIcons.plugs(),
                                 color: relay.isConnected
-                                    ? Palette.primary
-                                    : Palette.warn,
+                                    ? Paletter.getPrimary(context)
+                                    : Paletter.getWarn(context),
                                 size: 28,
                               ),
                             ],
@@ -173,7 +173,7 @@ class _RelaysPageState extends ConsumerState<RelaysPage> {
                                 relay.relayInfo!.description,
                                 style: TextStyle(
                                   fontSize: 14,
-                                  color: Palette.lightGray,
+                                  color: Paletter.getLightGray(context),
                                 ),
                                 maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
@@ -188,7 +188,7 @@ class _RelaysPageState extends ConsumerState<RelaysPage> {
                                 "contact: ${relay.relayInfo!.contact}",
                                 style: TextStyle(
                                   fontSize: 14,
-                                  color: Palette.gray,
+                                  color: Paletter.getGray(context),
                                 ),
                                 maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
@@ -221,7 +221,7 @@ class _RelaysPageState extends ConsumerState<RelaysPage> {
                                         'Privacy Policy',
                                         style: TextStyle(
                                           fontSize: 12,
-                                          color: Palette.primary,
+                                          color: Paletter.getPrimary(context),
                                         ),
                                       ),
                                     ),
@@ -232,7 +232,7 @@ class _RelaysPageState extends ConsumerState<RelaysPage> {
                                       child: Text(
                                         '•',
                                         style: TextStyle(
-                                          color: Palette.darkGray,
+                                          color: Paletter.getDarkGray(context),
                                         ),
                                       ),
                                     ),
@@ -255,7 +255,7 @@ class _RelaysPageState extends ConsumerState<RelaysPage> {
                                         'Terms of Service',
                                         style: TextStyle(
                                           fontSize: 12,
-                                          color: Palette.primary,
+                                          color: Paletter.getPrimary(context),
                                         ),
                                       ),
                                     ),
@@ -297,13 +297,13 @@ class _StatItem extends StatelessWidget {
       constraints: BoxConstraints(maxWidth: maxWidth),
       child: Column(
         children: [
-          Icon(icon, size: 20, color: Palette.gray),
+          Icon(icon, size: 20, color: Paletter.getGray(context)),
           const SizedBox(height: 4),
           Text(
             label,
             style: TextStyle(
               fontSize: 12,
-              color: Palette.gray,
+              color: Paletter.getGray(context),
             ),
           ),
           const SizedBox(height: 2),

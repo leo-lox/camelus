@@ -41,10 +41,10 @@ class InitalRouteSettingsState extends ConsumerState<InitalRouteSettings> {
     final selectedRoute = ref.watch(selectedRouteProvider);
 
     return Scaffold(
-      backgroundColor: Palette.background,
+      backgroundColor: Paletter.getBackground(context),
       appBar: AppBar(
         title: const Text('Initial Route Settings'),
-        backgroundColor: Palette.background,
+        backgroundColor: Paletter.getBackground(context),
       ),
       body: ListView.builder(
         itemCount: routes.length,
@@ -53,16 +53,16 @@ class InitalRouteSettingsState extends ConsumerState<InitalRouteSettings> {
           return ListTile(
             title: Text(
               route,
-              style: TextStyle(color: Palette.lightGray),
+              style: TextStyle(color: Paletter.getLightGray(context)),
             ),
             trailing: selectedRoute == route
-                ? Icon(PhosphorIcons.check(), color: Palette.white)
+                ? Icon(PhosphorIcons.check(), color: Paletter.getWhite(context))
                 : null,
             onTap: () {
               ref.read(selectedRouteProvider.notifier).state = route;
               ref.read(initalRouteProvider).saveInitialRoute(route);
             },
-            tileColor: Palette.background,
+            tileColor: Paletter.getBackground(context),
           );
         },
       ),

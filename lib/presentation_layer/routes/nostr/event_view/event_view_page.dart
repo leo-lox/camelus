@@ -162,10 +162,10 @@ class EventViewPageState extends ConsumerState<EventViewPage> {
     _flattenedComments = _flattenCommentTree(eventFeedState.comments);
 
     return Scaffold(
-      backgroundColor: Palette.background,
+      backgroundColor: Paletter.getBackground(context),
       appBar: AppBar(
-        foregroundColor: Palette.white,
-        backgroundColor: Palette.background,
+        foregroundColor: Paletter.getWhite(context),
+        backgroundColor: Paletter.getBackground(context),
         title: const Text("thread"),
       ),
       body: FlutterListView(

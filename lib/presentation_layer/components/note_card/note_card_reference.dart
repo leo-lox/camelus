@@ -64,14 +64,14 @@ class NoteCardReference extends ConsumerWidget {
           return Container(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: Palette.darkGray, width: 1.0),
+              border: Border.all(color: Paletter.getDarkGray(context), width: 1.0),
             ),
-            child: const Center(
+            child: Center(
               child: Padding(
                 padding: EdgeInsets.symmetric(horizontal: 0, vertical: 20),
                 child: Text(
                   "Note not found",
-                  style: TextStyle(color: Palette.white, fontSize: 17),
+                  style: TextStyle(color: Paletter.getWhite(context), fontSize: 17),
                 ),
               ),
             ),
@@ -100,7 +100,7 @@ class NoteCardReference extends ConsumerWidget {
                   child: Container(
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: Palette.darkGray, width: 1.0),
+                      border: Border.all(color: Paletter.getDarkGray(context), width: 1.0),
                     ),
                     child: NoteCard(
                       note: parsedNote,

@@ -20,7 +20,7 @@ class AppBottomNavigationBar extends ConsumerWidget {
 
     return NavigationBar(
       height: kBottomNavigationBarHeight,
-      backgroundColor: Palette.background,
+      backgroundColor: Paletter.getBackground(context),
       labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
       selectedIndex: navigationState.selectedTab.index,
       indicatorColor: Colors.transparent,
@@ -47,7 +47,7 @@ class AppBottomNavigationBar extends ConsumerWidget {
       icon: Builder(builder: (context) {
         final child = Icon(
           PhosphorIcons.house(),
-          color: isSelected ? Palette.primary : Palette.darkGray,
+          color: isSelected ? Paletter.getPrimary(context) : Paletter.getDarkGray(context),
           size: 23,
         );
 
@@ -68,10 +68,14 @@ class AppBottomNavigationBar extends ConsumerWidget {
     final isSelected = state.selectedTab == NavigationTab.search;
 
     return NavigationDestination(
-      icon: Icon(
-        PhosphorIcons.magnifyingGlass(),
-        color: isSelected ? Palette.primary : Palette.darkGray,
-        size: 23,
+      icon: Builder(
+        builder: (context) {
+          return Icon(
+            PhosphorIcons.magnifyingGlass(),
+            color: isSelected ? Paletter.getPrimary(context) : Paletter.getDarkGray(context),
+            size: 23,
+          );
+        }
       ),
       label: "search",
       tooltip: "search",
@@ -85,7 +89,7 @@ class AppBottomNavigationBar extends ConsumerWidget {
       icon: Builder(builder: (context) {
         final child = Icon(
           PhosphorIcons.bell(),
-          color: isSelected ? Palette.primary : Palette.darkGray,
+          color: isSelected ? Paletter.getPrimary(context) : Paletter.getDarkGray(context),
           size: 23,
         );
 

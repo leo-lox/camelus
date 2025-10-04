@@ -77,9 +77,9 @@ class ModerationSettingsPageState
           SnackBar(
             content: Text(
               'Error updating filter $e',
-              style: TextStyle(color: Palette.lightGray),
+              style: TextStyle(color: Paletter.getLightGray(context)),
             ),
-            backgroundColor: Palette.extraDarkGray,
+            backgroundColor: Paletter.getExtraDarkGray(context),
           ),
         );
       }
@@ -95,10 +95,10 @@ class ModerationSettingsPageState
     final isFilterEnabled = ref.watch(bloomFilterNotifierProvider);
 
     return Scaffold(
-      backgroundColor: Palette.background,
+      backgroundColor: Paletter.getBackground(context),
       appBar: AppBar(
         title: const Text('Moderation Settings'),
-        backgroundColor: Palette.background,
+        backgroundColor: Paletter.getBackground(context),
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -131,7 +131,7 @@ class ModerationSettingsPageState
                         height: 24,
                         child: CircularProgressIndicator(strokeWidth: 2))
                     : const Icon(Icons.security),
-                activeThumbColor: Palette.primary,
+                activeThumbColor: Paletter.getPrimary(context),
               ),
               const Divider(),
               const SizedBox(height: 16),

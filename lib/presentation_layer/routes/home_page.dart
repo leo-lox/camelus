@@ -60,14 +60,14 @@ class _HomePageState extends ConsumerState<HomePage> {
     );
   }
 
-  void _show(BuildContext ctx) {
+  void _show(BuildContext context) {
     showModalBottomSheet(
         isScrollControlled: true,
         elevation: 10,
-        backgroundColor: Palette.background,
+        backgroundColor: Paletter.getBackground(context),
         isDismissible: false,
-        context: ctx,
-        builder: (ctx) => BackdropFilter(
+        context: context,
+        builder: (context) => BackdropFilter(
               filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
               child: Padding(
                   padding: EdgeInsets.only(
@@ -131,7 +131,7 @@ class _HomePageState extends ConsumerState<HomePage> {
     return Scaffold(
       key: _scaffoldKey,
       drawer: NostrDrawer(pubkey: widget.pubkey),
-      backgroundColor: Palette.background,
+      backgroundColor: Paletter.getBackground(context),
       floatingActionButton: AnimatedSwitcher(
         duration: const Duration(milliseconds: 150),
         transitionBuilder: (Widget child, Animation<double> animation) {
@@ -143,10 +143,10 @@ class _HomePageState extends ConsumerState<HomePage> {
         child: isHomeSelected
             ? FloatingActionButton(
                 key: const ValueKey<String>('FAB'),
-                backgroundColor: Palette.primary,
+                backgroundColor: Paletter.getPrimary(context),
                 child: Icon(
                   PhosphorIcons.plus(),
-                  color: Palette.white,
+                  color: Paletter.getWhite(context),
                   size: 27,
                 ),
                 onPressed: () => {
@@ -197,7 +197,7 @@ class UpdateDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      backgroundColor: Palette.extraDarkGray,
+      backgroundColor: Paletter.getExtraDarkGray(context),
       title: Text(updateInfo.title),
       content: Text(updateInfo.body),
       actions: <Widget>[

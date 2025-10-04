@@ -167,9 +167,9 @@ ${_privateKey.mnemonicSentence}
   _onSubmit() async {
     if (!_termsAndConditions) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+        SnackBar(
           content: Text('Please read and accept the terms and conditions first',
-              style: TextStyle(color: Palette.black)),
+              style: TextStyle(color: Paletter.getBlack(context))),
         ),
       );
       return;
@@ -212,7 +212,7 @@ ${_privateKey.mnemonicSentence}
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Palette.background,
+      backgroundColor: Paletter.getBackground(context),
       body: Stack(
         children: [
           AnimatedOpacity(
@@ -226,10 +226,10 @@ ${_privateKey.mnemonicSentence}
                     child: Column(
                       children: [
                         const SizedBox(height: 20),
-                        const Text(
+                        Text(
                           "recovery phrase",
                           style: TextStyle(
-                            color: Palette.white,
+                            color: Paletter.getWhite(context),
                             fontSize: 22,
                             fontWeight: FontWeight.bold,
                           ),
@@ -247,17 +247,17 @@ ${_privateKey.mnemonicSentence}
                             children: [
                               ElevatedButton.icon(
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: Palette.black,
-                                  foregroundColor: Palette.white,
+                                  backgroundColor: Paletter.getBlack(context),
+                                  foregroundColor: Paletter.getWhite(context),
                                 ),
                                 onPressed: () => {
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
+                                    SnackBar(
                                       duration: Duration(seconds: 2),
                                       content: Text(
                                           'a new seed phrase has been generated',
                                           style:
-                                              TextStyle(color: Palette.black)),
+                                              TextStyle(color: Paletter.getBlack(context))),
                                     ),
                                   ),
                                   _generateKey()
@@ -268,17 +268,17 @@ ${_privateKey.mnemonicSentence}
                               const SizedBox(width: 5),
                               ElevatedButton.icon(
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: Palette.lightGray,
-                                  foregroundColor: Palette.black,
+                                  backgroundColor: Paletter.getLightGray(context),
+                                  foregroundColor: Paletter.getBlack(context),
                                 ),
                                 onPressed: () => {
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
+                                    SnackBar(
                                       duration: Duration(seconds: 2),
                                       content: Text(
                                           'copied seed phrase to clipboard',
                                           style:
-                                              TextStyle(color: Palette.black)),
+                                              TextStyle(color: Paletter.getBlack(context))),
                                     ),
                                   ),
                                   _copyKey()
@@ -321,14 +321,14 @@ ${_privateKey.mnemonicSentence}
                               _termsAndConditions = value!;
                             });
                           },
-                          activeColor: Palette.white,
-                          checkColor: Palette.black,
-                          fillColor: WidgetStateProperty.all(Palette.white),
+                          activeColor: Paletter.getWhite(context),
+                          checkColor: Paletter.getBlack(context),
+                          fillColor: WidgetStateProperty.all(Paletter.getWhite(context)),
                         ),
-                        const Text(
+                        Text(
                           "I have read and accept the ",
                           style: TextStyle(
-                            color: Palette.white,
+                            color: Paletter.getWhite(context),
                             fontSize: 12,
                             fontWeight: FontWeight.normal,
                           ),
@@ -339,10 +339,10 @@ ${_privateKey.mnemonicSentence}
                             launchUrl(url,
                                 mode: LaunchMode.externalApplication);
                           },
-                          child: const Text(
+                          child: Text(
                             "terms and conditions",
                             style: TextStyle(
-                              color: Palette.white,
+                              color: Paletter.getWhite(context),
                               fontSize: 12,
                               fontWeight: FontWeight.bold,
                               decoration: TextDecoration.underline,
@@ -356,10 +356,10 @@ ${_privateKey.mnemonicSentence}
                         Uri url = Uri.parse("https://camelus.app/privacy/");
                         launchUrl(url, mode: LaunchMode.externalApplication);
                       },
-                      child: const Text(
+                      child: Text(
                         "privacy policy",
                         style: TextStyle(
-                          color: Palette.white,
+                          color: Paletter.getWhite(context),
                           fontSize: 12,
                           fontWeight: FontWeight.bold,
                           decoration: TextDecoration.underline,

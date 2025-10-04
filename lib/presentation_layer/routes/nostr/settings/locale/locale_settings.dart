@@ -55,17 +55,17 @@ class LocaleSettingsPageState extends ConsumerState<LocaleSettingsPage> {
     final languageNotifier = ref.watch(languageProvider.notifier);
 
     return Scaffold(
-      backgroundColor: Palette.background,
+      backgroundColor: Paletter.getBackground(context),
       appBar: AppBar(
         title: const Text('Language Settings'),
-        backgroundColor: Palette.background,
+        backgroundColor: Paletter.getBackground(context),
       ),
       body: Column(
         children: [
           const SizedBox(height: 10),
           Text("notice: language is still in development!",
               style: TextStyle(
-                color: Palette.error,
+                color: Paletter.getError(context),
                 fontSize: 16,
               )),
           const SizedBox(height: 10),
@@ -73,10 +73,10 @@ class LocaleSettingsPageState extends ConsumerState<LocaleSettingsPage> {
           ListTile(
             title: Text(
               'Use System Language',
-              style: TextStyle(color: Palette.lightGray),
+              style: TextStyle(color: Paletter.getLightGray(context)),
             ),
             trailing: _isSystemLanguage
-                ? Icon(PhosphorIcons.check(), color: Palette.white)
+                ? Icon(PhosphorIcons.check(), color: Paletter.getWhite(context))
                 : null,
             onTap: () async {
               await languageNotifier.resetToSystemLanguage(context);
@@ -84,10 +84,10 @@ class LocaleSettingsPageState extends ConsumerState<LocaleSettingsPage> {
                 _isSystemLanguage = true;
               });
             },
-            tileColor: Palette.background,
+            tileColor: Paletter.getBackground(context),
           ),
 
-          const Divider(color: Palette.darkGray, height: 1),
+          Divider(color: Paletter.getDarkGray(context), height: 1),
 
           // Available languages list
           Expanded(
@@ -103,10 +103,10 @@ class LocaleSettingsPageState extends ConsumerState<LocaleSettingsPage> {
                 return ListTile(
                   title: Text(
                     localeInfo['name'],
-                    style: TextStyle(color: Palette.lightGray),
+                    style: TextStyle(color: Paletter.getLightGray(context)),
                   ),
                   trailing: isSelected
-                      ? Icon(PhosphorIcons.check(), color: Palette.white)
+                      ? Icon(PhosphorIcons.check(), color: Paletter.getWhite(context))
                       : null,
                   onTap: () async {
                     await languageNotifier.changeLanguage(locale);
@@ -114,7 +114,7 @@ class LocaleSettingsPageState extends ConsumerState<LocaleSettingsPage> {
                       _isSystemLanguage = false;
                     });
                   },
-                  tileColor: Palette.background,
+                  tileColor: Paletter.getBackground(context),
                 );
               },
             ),

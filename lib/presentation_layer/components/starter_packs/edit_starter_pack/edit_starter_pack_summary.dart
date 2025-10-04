@@ -111,7 +111,7 @@ class _EditStarterPackSummaryState extends ConsumerState<EditStarterPackSummary>
     );
 
     return Scaffold(
-      backgroundColor: Palette.background,
+      backgroundColor: Paletter.getBackground(context),
       body: Column(
         children: [
           Column(
@@ -187,9 +187,9 @@ class _EditStarterPackSummaryState extends ConsumerState<EditStarterPackSummary>
                                 padding: EdgeInsets.symmetric(
                                     horizontal: 16, vertical: 12),
                                 decoration: BoxDecoration(
-                                  color: Palette.extraDarkGray,
+                                  color: Paletter.getExtraDarkGray(context),
                                   borderRadius: BorderRadius.circular(8),
-                                  border: Border.all(color: Palette.gray),
+                                  border: Border.all(color: Paletter.getGray(context)),
                                 ),
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.center,

@@ -69,7 +69,7 @@ class _OnboardingInvitedByState extends ConsumerState<OnboardingInvitedBy> {
     final invitedSet = _getInvitedSet(ref);
 
     return Scaffold(
-      backgroundColor: Palette.background,
+      backgroundColor: Paletter.getBackground(context),
       body: inviteeLists.isLoading
           ? const Center(
               child: CircularProgressIndicator(),
@@ -84,8 +84,8 @@ class _OnboardingInvitedByState extends ConsumerState<OnboardingInvitedBy> {
                       begin: Alignment.topLeft,
                       end: Alignment.bottomCenter,
                       colors: [
-                        Palette.primary.withValues(alpha: 0.7),
-                        Palette.primary,
+                        Paletter.getPrimary(context).withValues(alpha: 0.7),
+                        Paletter.getPrimary(context),
                       ],
                     ),
                   ),
@@ -97,7 +97,7 @@ class _OnboardingInvitedByState extends ConsumerState<OnboardingInvitedBy> {
                         child: Text(
                           invitedSet?.title ?? '',
                           style: TextStyle(
-                            color: Palette.extraLightGray,
+                            color: Paletter.getExtraLightGray(context),
                             fontSize: 25,
                             fontWeight: FontWeight.bold,
                           ),
@@ -124,7 +124,7 @@ class _OnboardingInvitedByState extends ConsumerState<OnboardingInvitedBy> {
                                     TextSpan(
                                       text: inviteeMetadata.userMetadata?.name,
                                       style: TextStyle(
-                                        color: Palette.extraLightGray,
+                                        color: Paletter.getExtraLightGray(context),
                                         fontSize: 18,
                                         fontWeight: FontWeight.bold,
                                       ),
@@ -132,7 +132,7 @@ class _OnboardingInvitedByState extends ConsumerState<OnboardingInvitedBy> {
                                     TextSpan(
                                       text: ' invited you to join',
                                       style: TextStyle(
-                                        color: Palette.extraLightGray,
+                                        color: Paletter.getExtraLightGray(context),
                                         fontSize: 16,
                                       ),
                                     ),
@@ -148,10 +148,10 @@ class _OnboardingInvitedByState extends ConsumerState<OnboardingInvitedBy> {
                 ),
                 const SizedBox(height: 10),
                 if (invitedSet != null)
-                  const Text(
+                  Text(
                     "You'll follow these people right away",
                     style: TextStyle(
-                      color: Palette.extraLightGray,
+                      color: Paletter.getExtraLightGray(context),
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ),
@@ -196,8 +196,8 @@ class _OnboardingInvitedByState extends ConsumerState<OnboardingInvitedBy> {
                                   children: [
                                     Text(
                                       displayMetadata?.name ?? "",
-                                      style: const TextStyle(
-                                        color: Palette.white,
+                                      style: TextStyle(
+                                        color: Paletter.getWhite(context),
                                         fontSize: 16,
                                         fontWeight: FontWeight.w600,
                                       ),
@@ -206,8 +206,8 @@ class _OnboardingInvitedByState extends ConsumerState<OnboardingInvitedBy> {
                                     const SizedBox(height: 4),
                                     Text(
                                       displayMetadata?.about ?? "",
-                                      style: const TextStyle(
-                                        color: Palette.gray,
+                                      style: TextStyle(
+                                        color: Paletter.getGray(context),
                                         fontSize: 12,
                                       ),
                                       maxLines: 3,

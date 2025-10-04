@@ -165,14 +165,14 @@ class _EditRelaysViewState extends ConsumerState<EditRelaysView> {
                   padding: const EdgeInsets.only(left: 20, right: 20),
                   child: TextField(
                     controller: _relayNameController,
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       hintText: " add relay",
                       enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Palette.lightGray),
+                        borderSide: BorderSide(color: Paletter.getLightGray(context)),
                         borderRadius: BorderRadius.all(Radius.circular(30)),
                       ),
                       focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Palette.white),
+                        borderSide: BorderSide(color: Paletter.getWhite(context)),
                         borderRadius: BorderRadius.all(Radius.circular(30)),
                       ),
                     ),
@@ -195,7 +195,7 @@ class _EditRelaysViewState extends ConsumerState<EditRelaysView> {
                       padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(20),
-                        color: Palette.extraDarkGray,
+                        color: Paletter.getExtraDarkGray(context),
                       ),
                       height: 85,
                       width: double.infinity,
@@ -213,8 +213,8 @@ class _EditRelaysViewState extends ConsumerState<EditRelaysView> {
                             mainAxisAlignment: MainAxisAlignment.end,
                             children: [
                               Checkbox(
-                                activeColor: Palette.lightGray,
-                                checkColor: Palette.black,
+                                activeColor: Paletter.getLightGray(context),
+                                checkColor: Paletter.getBlack(context),
                                 value: relay.read,
                                 onChanged: (value) {
                                   setState(() {
@@ -223,7 +223,7 @@ class _EditRelaysViewState extends ConsumerState<EditRelaysView> {
                                   });
                                 },
 
-                                //activeColor: Palette.primary,
+                                //activeColor: Paletter.getPrimary(context),
                               ),
                               const Text(
                                 'read',
@@ -236,8 +236,8 @@ class _EditRelaysViewState extends ConsumerState<EditRelaysView> {
                             mainAxisAlignment: MainAxisAlignment.end,
                             children: [
                               Checkbox(
-                                activeColor: Palette.lightGray,
-                                checkColor: Palette.black,
+                                activeColor: Paletter.getLightGray(context),
+                                checkColor: Paletter.getBlack(context),
                                 value: relay.write,
                                 onChanged: (value) {
                                   setState(() {
@@ -257,9 +257,9 @@ class _EditRelaysViewState extends ConsumerState<EditRelaysView> {
                             mainAxisAlignment: MainAxisAlignment.end,
                             children: [
                               IconButton(
-                                icon: const Icon(
+                                icon: Icon(
                                   Icons.delete,
-                                  color: Palette.lightGray,
+                                  color: Paletter.getLightGray(context),
                                 ),
                                 onPressed: () {
                                   // confirm dialog

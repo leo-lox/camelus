@@ -106,9 +106,9 @@ class NoteCard extends ConsumerWidget {
           ),
         ],
         if (!hideBottomBar)
-          const Divider(
+          Divider(
             thickness: 0.3,
-            color: Palette.darkGray,
+            color: Paletter.getDarkGray(context),
           ),
       ],
     );
@@ -154,18 +154,18 @@ class NoteCard extends ConsumerWidget {
   }
 }
 
-void _writeReply(ctx, NostrNote note) {
+void _writeReply(context, NostrNote note) {
   showModalBottomSheet(
       isScrollControlled: true,
       elevation: 10,
-      backgroundColor: Palette.background,
+      backgroundColor: Paletter.getBackground(context),
       isDismissible: false,
-      context: ctx,
-      builder: (ctx) => BackdropFilter(
+      context: context,
+      builder: (context) => BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
             child: Padding(
                 padding: EdgeInsets.only(
-                    bottom: MediaQuery.of(ctx).viewInsets.bottom),
+                    bottom: MediaQuery.of(context).viewInsets.bottom),
                 child: WritePost(
                   context: PostContext(replyToNote: note),
                 )),

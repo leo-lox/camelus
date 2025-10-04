@@ -348,14 +348,14 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
     final profileState = ref.watch(profileProvider(widget.pubkey));
 
     return Scaffold(
-      backgroundColor: Palette.black,
+      backgroundColor: Paletter.getBlack(context),
       appBar: AppBar(
         title: const Text('Edit Profile'),
         actions: [
           Text(
             "${profileState.errBroadcasting ?? ''} ${profileState.profilePictureErr ?? ''} ${profileState.bannerPictureErr ?? ''}",
             style: TextStyle(
-              color: Palette.error,
+              color: Paletter.getError(context),
             ),
           ),
           const SizedBox(

@@ -46,8 +46,8 @@ class _StarterPackSelectionBottomSheetState
       filter: ImageFilter.blur(sigmaX: 2, sigmaY: 2),
       child: Container(
         padding: const EdgeInsets.all(20),
-        decoration: const BoxDecoration(
-          color: Palette.background,
+        decoration: BoxDecoration(
+          color: Paletter.getBackground(context),
           borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
         ),
         child: Column(
@@ -58,7 +58,7 @@ class _StarterPackSelectionBottomSheetState
             Text(
               'Add ${userToAddMetadata?.name ?? ""} to Starter Pack',
               style: TextStyle(
-                color: Palette.lightGray,
+                color: Paletter.getLightGray(context),
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
               ),
@@ -77,7 +77,7 @@ class _StarterPackSelectionBottomSheetState
       width: 40,
       height: 4,
       decoration: BoxDecoration(
-        color: Palette.gray,
+        color: Paletter.getGray(context),
         borderRadius: BorderRadius.circular(2),
       ),
     );
@@ -123,13 +123,13 @@ class _StarterPackSelectionBottomSheetState
         Icon(
           PhosphorIcons.listPlus(),
           size: 30,
-          color: Palette.gray,
+          color: Paletter.getGray(context),
         ),
         const SizedBox(height: 16),
         Text(
           'No starter packs found',
           style: TextStyle(
-            color: Palette.lightGray,
+            color: Paletter.getLightGray(context),
             fontSize: 16,
           ),
         ),
@@ -162,7 +162,7 @@ class _StarterPackSelectionBottomSheetState
               children: [
                 Icon(
                   PhosphorIcons.users(),
-                  color: Palette.gray,
+                  color: Paletter.getGray(context),
                   size: 20,
                 ),
                 const SizedBox(width: 16),
@@ -173,7 +173,7 @@ class _StarterPackSelectionBottomSheetState
                       Text(
                         pack.title ?? pack.name,
                         style: TextStyle(
-                          color: showCheck ? Palette.gray : Palette.lightGray,
+                          color: showCheck ? Paletter.getGray(context) : Paletter.getLightGray(context),
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
                         ),
@@ -182,7 +182,7 @@ class _StarterPackSelectionBottomSheetState
                         Text(
                           '${pack.elements.length} members',
                           style: TextStyle(
-                            color: Palette.gray,
+                            color: Paletter.getGray(context),
                             fontSize: 12,
                           ),
                         ),
@@ -205,7 +205,7 @@ class _StarterPackSelectionBottomSheetState
         height: 16,
         child: CircularProgressIndicator(
           strokeWidth: 2,
-          valueColor: AlwaysStoppedAnimation<Color>(Palette.gray),
+          valueColor: AlwaysStoppedAnimation<Color>(Paletter.getGray(context)),
         ),
       );
     }
@@ -213,14 +213,14 @@ class _StarterPackSelectionBottomSheetState
     if (showCheck) {
       return Icon(
         PhosphorIcons.check(),
-        color: wasJustAdded ? Palette.primary : Palette.gray,
+        color: wasJustAdded ? Paletter.getPrimary(context) : Paletter.getGray(context),
         size: 16,
       );
     }
 
     return Icon(
       PhosphorIcons.plus(),
-      color: Palette.gray,
+      color: Paletter.getGray(context),
       size: 16,
     );
   }
@@ -236,14 +236,14 @@ class _StarterPackSelectionBottomSheetState
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: BoxDecoration(
-              border: Border.all(color: Palette.gray.withValues(alpha: 0.3)),
+              border: Border.all(color: Paletter.getGray(context).withValues(alpha: 0.3)),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Row(
               children: [
                 Icon(
                   PhosphorIcons.plus(),
-                  color: Palette.gray,
+                  color: Paletter.getGray(context),
                   size: 20,
                 ),
                 const SizedBox(width: 16),
@@ -251,7 +251,7 @@ class _StarterPackSelectionBottomSheetState
                   child: Text(
                     'Create new starter pack',
                     style: TextStyle(
-                      color: Palette.lightGray,
+                      color: Paletter.getLightGray(context),
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
                     ),
@@ -327,7 +327,7 @@ class _StarterPackSelectionBottomSheetState
                 ),
               ],
             ),
-            backgroundColor: Palette.error,
+            backgroundColor: Paletter.getError(context),
             duration: const Duration(seconds: 3),
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(

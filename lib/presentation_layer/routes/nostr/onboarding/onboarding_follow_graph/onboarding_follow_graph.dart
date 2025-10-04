@@ -190,7 +190,7 @@ class _OnboardingFollowGraphState extends ConsumerState<OnboardingFollowGraph> {
   Widget build(BuildContext context) {
     const double miniViewCutoff = 0.35;
     return Scaffold(
-      backgroundColor: Palette.background,
+      backgroundColor: Paletter.getBackground(context),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
@@ -229,7 +229,7 @@ class _OnboardingFollowGraphState extends ConsumerState<OnboardingFollowGraph> {
                         duration: const Duration(milliseconds: 250),
                         curve: Curves.easeInOut,
                         decoration: BoxDecoration(
-                          color: Palette.extraDarkGray,
+                          color: Paletter.getExtraDarkGray(context),
                           border: Border.all(
                             color: data.selected
                                 ? Colors.white
@@ -261,7 +261,7 @@ class _OnboardingFollowGraphState extends ConsumerState<OnboardingFollowGraph> {
                     child: Container(
                       width: distance,
                       height: 2,
-                      color: Palette.darkGray,
+                      color: Paletter.getDarkGray(context),
                       alignment: Alignment.center,
                       child: _scale > 0.5
                           ? Text(
@@ -276,8 +276,8 @@ class _OnboardingFollowGraphState extends ConsumerState<OnboardingFollowGraph> {
               height: 10,
             ),
             Slider(
-              inactiveColor: Palette.extraDarkGray,
-              activeColor: Palette.lightGray,
+              inactiveColor: Paletter.getExtraDarkGray(context),
+              activeColor: Paletter.getLightGray(context),
               value: _scale,
               min: _graphController.minScale,
               max: 1.0,

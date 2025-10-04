@@ -59,7 +59,7 @@ class _CropAvatarState extends State<CropAvatar> {
     return Stack(
       children: [
         Crop(
-          baseColor: Palette.background,
+          baseColor: Paletter.getBackground(context),
           aspectRatio: widget.aspectRatio,
           //radius: 150,
 

@@ -20,9 +20,9 @@ class IconPattern extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            Palette.extraDarkGray,
-            Palette.extraDarkGray.withValues(alpha: 1),
-            Palette.extraDarkGray,
+            Paletter.getExtraDarkGray(context),
+            Paletter.getExtraDarkGray(context).withValues(alpha: 1),
+            Paletter.getExtraDarkGray(context),
           ],
         ),
       ),

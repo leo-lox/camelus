@@ -64,11 +64,11 @@ class _FollowerPageState extends ConsumerState<FollowerPage> {
   Widget build(BuildContext context) {
     final myContactList = ref.watch(contactListSelfStateProvider);
     return Scaffold(
-      backgroundColor: Palette.background,
+      backgroundColor: Paletter.getBackground(context),
       appBar: AppBar(
-        backgroundColor: Palette.background,
+        backgroundColor: Paletter.getBackground(context),
         title: Text(widget.title),
-        foregroundColor: Palette.white,
+        foregroundColor: Paletter.getWhite(context),
       ),
       body: ListView.builder(
           physics: const BouncingScrollPhysics(),

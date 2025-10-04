@@ -252,7 +252,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
         }
       },
       child: Scaffold(
-        backgroundColor: Palette.background,
+        backgroundColor: Paletter.getBackground(context),
         body: Column(
           children: [
             Builder(builder: (context) {
@@ -302,10 +302,10 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
-                        const Text(
+                        Text(
                           "trends",
                           style: TextStyle(
-                            color: Palette.white,
+                            color: Paletter.getWhite(context),
                             fontSize: 27,
                             fontWeight: FontWeight.bold,
                           ),
@@ -318,9 +318,9 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                               mode: LaunchMode.externalApplication,
                             );
                           },
-                          child: const Text(
+                          child: Text(
                             "by nostr.band",
-                            style: TextStyle(color: Palette.gray, fontSize: 14),
+                            style: TextStyle(color: Paletter.getGray(context), fontSize: 14),
                           ),
                         ),
                       ],
@@ -333,12 +333,12 @@ class _SearchPageState extends ConsumerState<SearchPage> {
               const SizedBox(height: 20),
 
               // starter packs section
-              const Padding(
+              Padding(
                 padding: EdgeInsets.only(left: 20, bottom: 10),
                 child: Text(
                   "recent starter packs",
                   style: TextStyle(
-                    color: Palette.white,
+                    color: Paletter.getWhite(context),
                     fontSize: 25,
                     fontWeight: FontWeight.bold,
                   ),
@@ -357,10 +357,10 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
+                    Text(
                       "trending people",
                       style: TextStyle(
-                        color: Palette.white,
+                        color: Paletter.getWhite(context),
                         fontSize: 25,
                         fontWeight: FontWeight.bold,
                       ),
@@ -390,7 +390,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
             // Search query display
             if (searchState.searchQuery.isNotEmpty) ...[
               _buildSearchQueryCard(searchState.searchQuery),
-              const Divider(color: Palette.extraDarkGray, height: 20),
+              Divider(color: Paletter.getExtraDarkGray(context), height: 20),
             ],
 
             // Loading indicator
@@ -427,12 +427,12 @@ class _SearchPageState extends ConsumerState<SearchPage> {
               if (searchState.searchResultsUsers.isEmpty &&
                   searchState.searchResultsNotes.isEmpty &&
                   searchState.searchQuery.isNotEmpty)
-                const Center(
+                Center(
                   child: Padding(
                     padding: EdgeInsets.all(20.0),
                     child: Text(
                       "No results found",
-                      style: TextStyle(color: Palette.gray, fontSize: 16),
+                      style: TextStyle(color: Paletter.getGray(context), fontSize: 16),
                     ),
                   ),
                 ),
@@ -453,10 +453,10 @@ class _SearchPageState extends ConsumerState<SearchPage> {
             Expanded(
               child: Text(
                 'Search for "$query"',
-                style: const TextStyle(color: Palette.white, fontSize: 16),
+                style: TextStyle(color: Paletter.getWhite(context), fontSize: 16),
               ),
             ),
-            Icon(PhosphorIcons.arrowUpLeft(), color: Palette.gray),
+            Icon(PhosphorIcons.arrowUpLeft(), color: Paletter.getGray(context)),
           ],
         ),
       ),
@@ -467,10 +467,10 @@ class _SearchPageState extends ConsumerState<SearchPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           "People",
           style: TextStyle(
-            color: Palette.white,
+            color: Paletter.getWhite(context),
             fontSize: 20,
             fontWeight: FontWeight.bold,
           ),
@@ -504,10 +504,10 @@ class _SearchPageState extends ConsumerState<SearchPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           "Notes",
           style: TextStyle(
-            color: Palette.white,
+            color: Paletter.getWhite(context),
             fontSize: 20,
             fontWeight: FontWeight.bold,
           ),
@@ -533,9 +533,9 @@ class _SearchPageState extends ConsumerState<SearchPage> {
           builder: (context, snapshot) {
             if (snapshot.hasError) {
               log(snapshot.error.toString());
-              return const Text(
+              return Text(
                 'Something went wrong',
-                style: TextStyle(color: Palette.gray),
+                style: TextStyle(color: Paletter.getGray(context)),
               );
             }
 
@@ -544,9 +544,9 @@ class _SearchPageState extends ConsumerState<SearchPage> {
             }
 
             if (snapshot.connectionState == ConnectionState.done) {
-              return const Text(
+              return Text(
                 'No connection',
-                style: TextStyle(color: Palette.gray),
+                style: TextStyle(color: Paletter.getGray(context)),
               );
             }
 
@@ -577,9 +577,9 @@ class _SearchPageState extends ConsumerState<SearchPage> {
           builder: (context, snapshot) {
             if (snapshot.hasError) {
               log(snapshot.error.toString());
-              return const Text(
+              return Text(
                 'Something went wrong',
-                style: TextStyle(color: Palette.gray),
+                style: TextStyle(color: Paletter.getGray(context)),
               );
             }
 
@@ -588,9 +588,9 @@ class _SearchPageState extends ConsumerState<SearchPage> {
             }
 
             if (snapshot.connectionState == ConnectionState.done) {
-              return const Text(
+              return Text(
                 'No connection',
-                style: TextStyle(color: Palette.gray),
+                style: TextStyle(color: Paletter.getGray(context)),
               );
             }
 
@@ -668,7 +668,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
 
 void _helpSearch(BuildContext context) {
   showModalBottomSheet(
-    backgroundColor: Palette.extraDarkGray,
+    backgroundColor: Paletter.getExtraDarkGray(context),
     context: context,
     shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.only(
@@ -683,11 +683,11 @@ void _helpSearch(BuildContext context) {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
-            children: const [
+            children: [
               Text(
                 'Search',
                 style: TextStyle(
-                  color: Palette.white,
+                  color: Paletter.getWhite(context),
                   fontSize: 30,
                   fontWeight: FontWeight.bold,
                 ),
@@ -736,8 +736,8 @@ class _SearchHelpItem extends StatelessWidget {
       children: [
         Text(
           title,
-          style: const TextStyle(
-            color: Palette.white,
+          style: TextStyle(
+            color: Paletter.getWhite(context),
             fontSize: 20,
             fontWeight: FontWeight.bold,
           ),
@@ -745,8 +745,8 @@ class _SearchHelpItem extends StatelessWidget {
         const SizedBox(height: 5),
         Text(
           description,
-          style: const TextStyle(
-            color: Palette.white,
+          style: TextStyle(
+            color: Paletter.getWhite(context),
             fontSize: 18,
           ),
         ),

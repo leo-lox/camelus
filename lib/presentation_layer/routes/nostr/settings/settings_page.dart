@@ -41,10 +41,10 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Palette.background,
+      backgroundColor: Paletter.getBackground(context),
       appBar: AppBar(
         title: const Text('Settings'),
-        backgroundColor: Palette.background,
+        backgroundColor: Paletter.getBackground(context),
       ),
       body: ListView(
         children: [

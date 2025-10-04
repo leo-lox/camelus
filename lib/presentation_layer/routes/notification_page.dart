@@ -64,11 +64,11 @@ class _NotificationPageState extends ConsumerState<NotificationPage>
         .toList();
 
     return Scaffold(
-      backgroundColor: Palette.background,
+      backgroundColor: Paletter.getBackground(context),
       appBar: AppBar(
         title:
             const Text('Notifications', style: TextStyle(color: Colors.white)),
-        backgroundColor: Palette.background,
+        backgroundColor: Paletter.getBackground(context),
         elevation: 0,
         actions: [
           if (notificationsState.newNotifications.isNotEmpty)
@@ -93,7 +93,7 @@ class _NotificationPageState extends ConsumerState<NotificationPage>
             controller: _tabController,
             labelColor: Colors.white,
             unselectedLabelColor: Colors.grey,
-            indicatorColor: Palette.primary,
+            indicatorColor: Paletter.getPrimary(context),
             tabs: const [
               Tab(text: "All"),
               Tab(text: "Mentions"),
@@ -199,7 +199,7 @@ class _NotificationPageState extends ConsumerState<NotificationPage>
 
     // Create a container with a highlight color if it's a new notification
     return Container(
-      color: isNew ? Palette.primary.withValues(alpha: 0.1) : null,
+      color: isNew ? Paletter.getPrimary(context).withValues(alpha: 0.1) : null,
       child: ListTile(
         leading: _getNotificationIcon(notification),
         title: Row(
@@ -288,7 +288,7 @@ class _NotificationPageState extends ConsumerState<NotificationPage>
 
       case NotificationType.reply:
         icon = PhosphorIcons.arrowBendUpLeft();
-        iconColor = Palette.primary;
+        iconColor = Paletter.getPrimary(context);
         break;
 
       case NotificationType.repost:
@@ -296,7 +296,7 @@ class _NotificationPageState extends ConsumerState<NotificationPage>
           'assets/icons/retweet.svg',
           height: 18,
           colorFilter: ColorFilter.mode(
-            Palette.repostActive,
+            Paletter.getRepostActive(context),
             BlendMode.srcATop,
           ),
         );
@@ -306,7 +306,7 @@ class _NotificationPageState extends ConsumerState<NotificationPage>
         break;
       default:
         icon = PhosphorIcons.question();
-        iconColor = Palette.primary;
+        iconColor = Paletter.getPrimary(context);
         break;
     }
 

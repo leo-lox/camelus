@@ -21,7 +21,7 @@ class RoundImageWithBorder extends StatelessWidget {
       height: size,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        border: Border.all(color: Palette.black, width: 2),
+        border: Border.all(color: Paletter.getBlack(context), width: 2),
       ),
       child: ClipOval(
         child: Image.memory(

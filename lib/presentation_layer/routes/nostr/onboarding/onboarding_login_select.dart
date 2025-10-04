@@ -30,7 +30,7 @@ class _OnboardingLoginSelectPageState
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: null,
-      backgroundColor: Palette.background,
+      backgroundColor: Paletter.getBackground(context),
       resizeToAvoidBottomInset: false,
       body: SafeArea(
         // input for the user to enter their private key, should be visible on a dark background.
@@ -47,7 +47,7 @@ class _OnboardingLoginSelectPageState
                   children: [
                     IconButton(
                       icon:
-                          Icon(PhosphorIcons.arrowLeft(), color: Palette.white),
+                          Icon(PhosphorIcons.arrowLeft(), color: Paletter.getWhite(context)),
                       onPressed: () => widget.onPressedBack!(),
                     ),
                   ],
@@ -56,14 +56,14 @@ class _OnboardingLoginSelectPageState
               SizedBox(
                 height: 200,
                 width: MediaQuery.of(context).size.width,
-                child: const Column(
+                child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
                       "login",
                       style: TextStyle(
-                        color: Palette.white,
+                        color: Paletter.getWhite(context),
                         fontSize: 40,
                         fontFamily: "Poppins",
                       ),

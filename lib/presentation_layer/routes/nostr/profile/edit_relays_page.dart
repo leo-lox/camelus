@@ -33,11 +33,11 @@ class _EditRelaysPageState extends ConsumerState<EditRelaysPage> {
     return PopScope(
       canPop: true,
       child: Scaffold(
-        backgroundColor: Palette.background,
+        backgroundColor: Paletter.getBackground(context),
         appBar: AppBar(
           title: const Text('Edit Relays'),
-          backgroundColor: Palette.background,
-          foregroundColor: Palette.lightGray,
+          backgroundColor: Paletter.getBackground(context),
+          foregroundColor: Paletter.getLightGray(context),
         ),
         // show loading indicator when reconnecting
         body: EditRelaysView(

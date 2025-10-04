@@ -75,11 +75,11 @@ class PostContentWidget extends ConsumerWidget {
                 decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(8),
                     border: Border.all(
-                      color: Palette.darkGray,
+                      color: Paletter.getDarkGray(context),
                     )),
                 child: LinkPreview(
                   linkStyle: TextStyle(
-                    color: Palette.primary,
+                    color: Paletter.getPrimary(context),
                     fontSize: _fontSize - 2,
                     decoration: TextDecoration.none,
                   ),
@@ -94,7 +94,7 @@ class PostContentWidget extends ConsumerWidget {
                   text: segment.metadata!,
                   textWidget: Text(
                     segment.content,
-                    style: TextStyle(color: Palette.primary),
+                    style: TextStyle(color: Paletter.getPrimary(context)),
                   ),
                   width: MediaQuery.of(context).size.width,
                 ),
@@ -156,14 +156,14 @@ class PostContentWidget extends ConsumerWidget {
                   children: [
                     Icon(
                       PhosphorIcons.warningOctagon(),
-                      color: Palette.error,
+                      color: Paletter.getError(context),
                       size: 32,
                     ),
                     const SizedBox(width: 8),
                     Text(
                       post.nostrNote.contentWarning!,
-                      style: const TextStyle(
-                        color: Palette.error,
+                      style: TextStyle(
+                        color: Paletter.getError(context),
                         fontWeight: FontWeight.bold,
                         fontSize: 18,
                       ),
@@ -221,7 +221,7 @@ class PostContentWidget extends ConsumerWidget {
         return TextSpan(
           text: user?.name != null ? "@${user?.name}" : segment.content,
           style: TextStyle(
-            color: Palette.primary,
+            color: Paletter.getPrimary(context),
             fontWeight: FontWeight.normal,
             fontSize: _fontSize,
           ),

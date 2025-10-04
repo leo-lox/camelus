@@ -110,7 +110,7 @@ class _PostSettingsState extends ConsumerState<PostSettings> {
     }
 
     return AlertDialog(
-      backgroundColor: Palette.extraDarkGray,
+      backgroundColor: Paletter.getExtraDarkGray(context),
       elevation: 24,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
@@ -164,8 +164,8 @@ class _PostSettingsState extends ConsumerState<PostSettings> {
             ],
 
             const SizedBox(height: 16),
-            const Divider(
-              color: Palette.darkGray,
+            Divider(
+              color: Paletter.getDarkGray(context),
             ),
             const SizedBox(height: 16),
 
@@ -206,7 +206,7 @@ class _PostSettingsState extends ConsumerState<PostSettings> {
         Switch(
           value: value,
           onChanged: onChanged,
-          activeThumbColor: Palette.white,
+          activeThumbColor: Paletter.getWhite(context),
         ),
       ],
     );
@@ -222,11 +222,11 @@ class _PostSettingsState extends ConsumerState<PostSettings> {
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Palette.gray),
+        border: Border.all(color: Paletter.getGray(context)),
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<String>(
-          dropdownColor: Palette.extraDarkGray,
+          dropdownColor: Paletter.getExtraDarkGray(context),
           value: state.selectedWarning,
           isExpanded: true,
           icon: const Icon(Icons.arrow_drop_down),
@@ -243,8 +243,8 @@ class _PostSettingsState extends ConsumerState<PostSettings> {
               child: Text(
                 value,
                 overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  color: Palette.white,
+                style: TextStyle(
+                  color: Paletter.getWhite(context),
                 ),
               ),
             );

@@ -28,7 +28,7 @@ class NoMoreNotes extends StatelessWidget {
           child: Text(
             text,
             style: TextStyle(
-              color: Palette.darkGray,
+              color: Paletter.getDarkGray(context),
               fontSize: 16,
             ),
           ),

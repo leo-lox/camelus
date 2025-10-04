@@ -32,9 +32,9 @@ class _BlockedUsersState extends ConsumerState<BlockedUsers> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Palette.background,
+      backgroundColor: Paletter.getBackground(context),
       appBar: AppBar(
-        backgroundColor: Palette.background,
+        backgroundColor: Paletter.getBackground(context),
         title: const Text('Blocked Users'),
       ),
       body: const Text('not implemented'),

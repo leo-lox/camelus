@@ -133,7 +133,7 @@ class _GenericFeedState extends ConsumerState<GenericFeed>
                   handle:
                       NestedScrollView.sliverOverlapAbsorberHandleFor(context),
                   sliver: SliverAppBar(
-                    backgroundColor: Palette.background,
+                    backgroundColor: Paletter.getBackground(context),
                     toolbarHeight: 0,
                     floating: true,
                     pinned: true,

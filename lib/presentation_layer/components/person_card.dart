@@ -52,8 +52,8 @@ class PersonCard extends ConsumerWidget {
                   if (name == '')
                     Text(
                       "${pubkey.substring(0, 7)}...${pubkey.substring(pubkey.length - 7, pubkey.length)}",
-                      style: const TextStyle(
-                        color: Palette.white,
+                      style: TextStyle(
+                        color: Paletter.getWhite(context),
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
                       ),
@@ -63,8 +63,8 @@ class PersonCard extends ConsumerWidget {
                       children: [
                         Text(
                           name,
-                          style: const TextStyle(
-                            color: Palette.white,
+                          style: TextStyle(
+                            color: Paletter.getWhite(context),
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
                           ),
@@ -86,8 +86,8 @@ class PersonCard extends ConsumerWidget {
                         : double.infinity,
                     child: Text(
                       about,
-                      style: const TextStyle(
-                        color: Palette.white,
+                      style: TextStyle(
+                        color: Paletter.getWhite(context),
                         fontSize: 12,
                         fontWeight: FontWeight.w400,
                       ),

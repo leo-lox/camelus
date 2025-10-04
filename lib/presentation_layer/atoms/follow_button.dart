@@ -8,47 +8,55 @@ Widget followButton({
   if (isFollowing) {
     return Container(
       margin: const EdgeInsets.only(top: 0, right: 10),
-      child: ElevatedButton(
-        onPressed: () {
-          onPressed();
-        },
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Palette.black,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-            side: const BorderSide(color: Palette.white, width: 1),
-          ),
-        ),
-        child: const Text(
-          'unfollow',
-          style: TextStyle(
-            color: Palette.white,
-            fontSize: 16,
-          ),
-        ),
+      child: Builder(
+        builder: (context) {
+          return ElevatedButton(
+            onPressed: () {
+              onPressed();
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Paletter.getBlack(context),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+                side: BorderSide(color: Paletter.getWhite(context), width: 1),
+              ),
+            ),
+            child: Text(
+              'unfollow',
+              style: TextStyle(
+                color: Paletter.getWhite(context),
+                fontSize: 16,
+              ),
+            ),
+          );
+        }
       ),
     );
   }
   return Container(
     margin: const EdgeInsets.only(top: 0, right: 10),
-    child: ElevatedButton(
-      onPressed: () {
-        onPressed();
-      },
-      style: ElevatedButton.styleFrom(
-        backgroundColor: Palette.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-          side: const BorderSide(color: Palette.black, width: 1),
-        ),
-      ),
-      child: const Text(
-        'follow',
-        style: TextStyle(
-          color: Palette.black,
-          fontSize: 16,
-        ),
-      ),
+    child: Builder(
+      builder: (context) {
+        return ElevatedButton(
+          onPressed: () {
+            onPressed();
+          },
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Paletter.getWhite(context),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+              side: BorderSide(color: Paletter.getBlack(context), width: 1),
+            ),
+          ),
+          child: Text(
+            'follow',
+            style: TextStyle(
+              color: Paletter.getBlack(context),
+              fontSize: 16,
+            ),
+          ),
+        );
+      }
     ),
   );
 }

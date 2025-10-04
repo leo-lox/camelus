@@ -100,7 +100,7 @@ class _BlockPageState extends ConsumerState<BlockPage> {
 
     if (_reportSuccessful) {
       return Scaffold(
-        backgroundColor: Palette.background,
+        backgroundColor: Paletter.getBackground(context),
         body: SafeArea(
           child: Center(
             child: Container(
@@ -111,17 +111,17 @@ class _BlockPageState extends ConsumerState<BlockPage> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Text(
+                  Text(
                     "report send",
                     style: TextStyle(
-                        color: Palette.white,
+                        color: Paletter.getWhite(context),
                         fontSize: 30,
                         fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 20),
-                  const Text(
+                  Text(
                     "thank you for your report",
-                    style: TextStyle(color: Palette.lightGray, fontSize: 20),
+                    style: TextStyle(color: Paletter.getLightGray(context), fontSize: 20),
                   ),
                   const SizedBox(height: 20),
                   SizedBox(
@@ -145,9 +145,9 @@ class _BlockPageState extends ConsumerState<BlockPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('block/report'),
-        backgroundColor: Palette.background,
+        backgroundColor: Paletter.getBackground(context),
       ),
-      backgroundColor: Palette.background,
+      backgroundColor: Paletter.getBackground(context),
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -160,13 +160,13 @@ class _BlockPageState extends ConsumerState<BlockPage> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Text('user',
+                      Text('user',
                           style: TextStyle(
-                              color: Palette.lightGray, fontSize: 20)),
+                              color: Paletter.getLightGray(context), fontSize: 20)),
                       const SizedBox(width: 10),
                       Text(user?.name ?? user?.nip05 ?? widget.userPubkey,
                           style: TextStyle(
-                              color: Palette.white,
+                              color: Paletter.getWhite(context),
                               fontSize: 20,
                               fontWeight: FontWeight.bold)),
                     ],
@@ -237,32 +237,32 @@ class _BlockPageState extends ConsumerState<BlockPage> {
                             hintText: widget.postId != null
                                 ? 'what is wrong with this post?'
                                 : 'what is wrong with this user?',
-                            hintStyle: const TextStyle(
-                                color: Palette.white, letterSpacing: 1.1),
+                            hintStyle: TextStyle(
+                                color: Paletter.getWhite(context), letterSpacing: 1.1),
                             filled: true,
-                            fillColor: Palette.extraDarkGray,
-                            enabledBorder: const OutlineInputBorder(
+                            fillColor: Paletter.getExtraDarkGray(context),
+                            enabledBorder: OutlineInputBorder(
                               borderRadius:
                                   BorderRadius.all(Radius.circular(10.0)),
                               borderSide:
-                                  BorderSide(color: Palette.extraDarkGray),
+                                  BorderSide(color: Paletter.getExtraDarkGray(context)),
                             ),
-                            focusedBorder: const OutlineInputBorder(
+                            focusedBorder: OutlineInputBorder(
                               borderRadius:
                                   BorderRadius.all(Radius.circular(10.0)),
-                              borderSide: BorderSide(color: Palette.background),
+                              borderSide: BorderSide(color: Paletter.getBackground(context)),
                             ),
                           ),
-                          style: const TextStyle(color: Palette.white),
+                          style: TextStyle(color: Paletter.getWhite(context)),
                           minLines: 3,
                           maxLines: 5,
                         ),
                       ),
                       const SizedBox(height: 30),
 
-                      const Text(
+                      Text(
                         "Reports are sent to the relays where you received the note from.",
-                        style: TextStyle(color: Palette.gray),
+                        style: TextStyle(color: Paletter.getGray(context)),
                       ),
 
                       const SizedBox(height: 10),
@@ -279,7 +279,7 @@ class _BlockPageState extends ConsumerState<BlockPage> {
                                 reportToCamelus = value;
                               });
                             },
-                            activeThumbColor: Palette.white,
+                            activeThumbColor: Paletter.getWhite(context),
                           ),
                         ],
                       ),

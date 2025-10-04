@@ -23,9 +23,9 @@ class BackButtonRound extends StatelessWidget {
             padding: const EdgeInsets.all(0),
             shape: const CircleBorder(),
           ),
-          child: const Icon(
+          child: Icon(
             Icons.arrow_back,
-            color: Palette.white,
+            color: Paletter.getWhite(context),
             size: 20,
           ),
         ),

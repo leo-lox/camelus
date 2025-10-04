@@ -113,9 +113,9 @@ class _EditStarterPackMetaState extends ConsumerState<EditStarterPackMeta> {
         .watch(editStarterPackProvider(widget.starterPackIdentifier).notifier);
 
     return Scaffold(
-      backgroundColor: Palette.background,
+      backgroundColor: Paletter.getBackground(context),
       appBar: AppBar(
-        backgroundColor: Palette.background,
+        backgroundColor: Paletter.getBackground(context),
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
@@ -184,7 +184,7 @@ class _EditStarterPackMetaState extends ConsumerState<EditStarterPackMeta> {
                               Container(
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(10),
-                                  color: Palette.black.withValues(alpha: 0.6),
+                                  color: Paletter.getBlack(context).withValues(alpha: 0.6),
                                 ),
                                 child: Center(
                                   child: Column(
@@ -235,7 +235,7 @@ class _EditStarterPackMetaState extends ConsumerState<EditStarterPackMeta> {
                       // Title input
                       Container(
                         decoration: BoxDecoration(
-                          color: Palette.extraDarkGray,
+                          color: Paletter.getExtraDarkGray(context),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: TextField(
@@ -251,8 +251,8 @@ class _EditStarterPackMetaState extends ConsumerState<EditStarterPackMeta> {
                             suffixText: '${starterPackData.title.length}/40',
                             suffixStyle: TextStyle(
                               color: starterPackData.title.length > 40
-                                  ? Palette.warn
-                                  : Palette.gray,
+                                  ? Paletter.getWarn(context)
+                                  : Paletter.getGray(context),
                               fontSize: 14,
                             ),
                           ),
@@ -278,7 +278,7 @@ class _EditStarterPackMetaState extends ConsumerState<EditStarterPackMeta> {
                       Container(
                         height: 200,
                         decoration: BoxDecoration(
-                          color: Palette.extraDarkGray,
+                          color: Paletter.getExtraDarkGray(context),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: TextField(

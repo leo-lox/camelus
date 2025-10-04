@@ -40,7 +40,6 @@ import 'presentation_layer/routes/nostr/settings/inital_route/inital_route_setti
 import 'presentation_layer/routes/nostr/settings/locale/locale_settings.dart';
 import 'presentation_layer/routes/nostr/settings/moderation/moderation_settings.dart';
 import 'presentation_layer/routes/nostr/settings/settings_page.dart';
-import 'theme.dart' as theme;
 
 const devDeviceFrame = true;
 
@@ -186,7 +185,18 @@ class MyApp extends ConsumerWidget {
         ),
         debugShowCheckedModeBanner: false,
         title: 'camelus',
-        theme: theme.themeMap["DARK"],
+        theme: ThemeData.from(
+          colorScheme: ColorScheme.fromSeed(
+            seedColor: Colors.blue,
+          ),
+        ),
+        darkTheme: ThemeData.from(
+          colorScheme: ColorScheme.fromSeed(
+            seedColor: Colors.blue,
+            brightness: Brightness.dark,
+          ),
+        ),
+        themeMode: ThemeMode.light,
         initialRoute: initialRoute,
         builder: (context, child) {
           if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
@@ -208,10 +218,10 @@ class MyApp extends ConsumerWidget {
                               child: Container(),
                             ),
                           ),
-                          const SizedBox(
+                          SizedBox(
                             width: 154,
                             child: WindowCaption(
-                              brightness: Brightness.dark,
+                              brightness: Theme.of(context).brightness,
                               backgroundColor: Colors.transparent,
                             ),
                           ),

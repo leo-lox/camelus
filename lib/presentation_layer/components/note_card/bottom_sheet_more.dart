@@ -41,8 +41,8 @@ class MoreOptionsBottomSheet extends ConsumerWidget {
       filter: ImageFilter.blur(sigmaX: 2, sigmaY: 2),
       child: Container(
         padding: const EdgeInsets.all(20),
-        decoration: const BoxDecoration(
-          color: Palette.background,
+        decoration: BoxDecoration(
+          color: Paletter.getBackground(context),
           borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
         ),
         child: Column(
@@ -59,13 +59,17 @@ class MoreOptionsBottomSheet extends ConsumerWidget {
   }
 
   Widget _buildHandle() {
-    return Container(
-      width: 40,
-      height: 4,
-      decoration: BoxDecoration(
-        color: Palette.gray,
-        borderRadius: BorderRadius.circular(2),
-      ),
+    return Builder(
+      builder: (context) {
+        return Container(
+          width: 40,
+          height: 4,
+          decoration: BoxDecoration(
+            color: Paletter.getGray(context),
+            borderRadius: BorderRadius.circular(2),
+          ),
+        );
+      }
     );
   }
 
@@ -84,13 +88,17 @@ class MoreOptionsBottomSheet extends ConsumerWidget {
                 option.leading,
                 const SizedBox(width: 16),
                 Expanded(
-                  child: Text(
-                    option.label,
-                    style: TextStyle(
-                      color: option.textColor ?? Palette.lightGray,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                    ),
+                  child: Builder(
+                    builder: (context) {
+                      return Text(
+                        option.label,
+                        style: TextStyle(
+                          color: option.textColor ?? Paletter.getLightGray(context),
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      );
+                    }
                   ),
                 ),
               ],
@@ -106,7 +114,7 @@ class MoreOptionsBottomSheet extends ConsumerWidget {
       BottomSheetOption(
         leading: Icon(
           PhosphorIcons.userCirclePlus(),
-          color: Palette.gray,
+          color: Paletter.getGray(context),
         ),
         label: 'add to starter pack',
         onTap: () => _showFollowPackSelection(context, ref),
@@ -114,7 +122,7 @@ class MoreOptionsBottomSheet extends ConsumerWidget {
       BottomSheetOption(
         leading: Icon(
           PhosphorIcons.speakerSimpleSlash(),
-          color: Palette.gray,
+          color: Paletter.getGray(context),
         ),
         label: 'Block/Report',
         onTap: () => _navigateToBlockPage(context),

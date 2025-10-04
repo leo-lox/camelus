@@ -170,7 +170,7 @@ Widget newPostsAvailable({
               height: 40,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(20),
-                color: Palette.primary,
+                color: Paletter.getPrimary(context),
               ),
               child: TextButton(
                 onPressed: () {
@@ -178,7 +178,7 @@ Widget newPostsAvailable({
                 },
                 child: Text(
                   name,
-                  style: const TextStyle(color: Palette.white),
+                  style: TextStyle(color: Paletter.getWhite(context)),
                 ),
               ),
             )

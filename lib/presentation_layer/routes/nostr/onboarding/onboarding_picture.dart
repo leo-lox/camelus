@@ -88,7 +88,7 @@ class _OnboardingPictureState extends ConsumerState<OnboardingPicture> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Palette.background,
+      backgroundColor: Paletter.getBackground(context),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -131,7 +131,7 @@ class _OnboardingPictureState extends ConsumerState<OnboardingPicture> {
                       child: SizedBox.fromSize(
                         size: const Size.square(125),
                         child: Container(
-                            color: Palette.background,
+                            color: Paletter.getBackground(context),
                             child:
                                 Image.memory(widget.signUpInfo.picture!.bytes)),
                       ),

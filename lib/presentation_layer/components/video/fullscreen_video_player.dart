@@ -122,9 +122,9 @@ class _FullScreenVideoPlayerState extends ConsumerState<FullScreenVideoPlayer> {
                       controller,
                       allowScrubbing: true,
                       colors: VideoProgressColors(
-                        backgroundColor: Palette.darkGray,
-                        bufferedColor: Palette.gray,
-                        playedColor: Palette.extraLightGray,
+                        backgroundColor: Paletter.getDarkGray(context),
+                        bufferedColor: Paletter.getGray(context),
+                        playedColor: Paletter.getExtraLightGray(context),
                       ),
                     ),
                     SizedBox(height: 10),

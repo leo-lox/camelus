@@ -128,7 +128,7 @@ class ImageGalleryState extends State<ImageGallery> {
   Container _topBar(BuildContext context) {
     return Container(
       width: MediaQuery.of(context).size.width,
-      color: Palette.background.withValues(alpha: 0.25),
+      color: Paletter.getBackground(context).withValues(alpha: 0.25),
       child: Row(
         children: [
           // Close button to exit the gallery.

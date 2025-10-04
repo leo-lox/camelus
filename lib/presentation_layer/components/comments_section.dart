@@ -53,11 +53,11 @@ class FlatCommentWidget extends StatelessWidget {
                   child: Container(
                     decoration: BoxDecoration(
                       border: Border.all(
-                        color: Palette.primary.withValues(alpha: 0.65),
+                        color: Paletter.getPrimary(context).withValues(alpha: 0.65),
                         width: 2.0,
                       ),
                       borderRadius: BorderRadius.circular(10.0),
-                      color: Palette.primary.withValues(alpha: 0.05),
+                      color: Paletter.getPrimary(context).withValues(alpha: 0.05),
                     ),
                   ),
                 ),
@@ -97,8 +97,8 @@ class DepthIndicator extends StatelessWidget {
             margin: const EdgeInsets.only(left: 12),
             decoration: BoxDecoration(
               color: isHighlighted && i == depth - 1
-                  ? Palette.primary
-                  : Palette.lightGray
+                  ? Paletter.getPrimary(context)
+                  : Paletter.getLightGray(context)
                       .withValues(alpha: _calculateOpacity(i + 1)),
               // borderRadius: BorderRadius.vertical(
               //   top: Radius.circular(25),

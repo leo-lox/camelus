@@ -70,7 +70,7 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              //color: Palette.extraDarkGray,
+              //color: Paletter.getExtraDarkGray(context),
               borderRadius: BorderRadius.circular(200),
             ),
             child: widget.leading ??
@@ -81,7 +81,7 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
                           PhosphorIcons.magnifyingGlass(),
                           size: 23,
                         ),
-                  color: Palette.white,
+                  color: Paletter.getWhite(context),
                   onPressed: () {
                     _searchController.clear();
                     // unfocus search bar
@@ -103,21 +103,21 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
                 isDense: true,
                 hintText: ' Search',
                 hintStyle:
-                    const TextStyle(color: Palette.white, letterSpacing: 1.1),
+                    TextStyle(color: Paletter.getWhite(context), letterSpacing: 1.1),
                 filled: true,
                 fillColor: _searchFocusNode.hasFocus
-                    ? Palette.background
-                    : Palette.extraDarkGray,
-                enabledBorder: const OutlineInputBorder(
+                    ? Paletter.getBackground(context)
+                    : Paletter.getExtraDarkGray(context),
+                enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.all(Radius.circular(50.0)),
-                  borderSide: BorderSide(color: Palette.extraDarkGray),
+                  borderSide: BorderSide(color: Paletter.getExtraDarkGray(context)),
                 ),
-                focusedBorder: const OutlineInputBorder(
+                focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.all(Radius.circular(25.0)),
-                  borderSide: BorderSide(color: Palette.background),
+                  borderSide: BorderSide(color: Paletter.getBackground(context)),
                 ),
               ),
-              style: const TextStyle(color: Palette.white),
+              style: TextStyle(color: Paletter.getWhite(context)),
               onChanged: (value) {
                 widget.onSearchChanged(value);
               },
@@ -140,7 +140,7 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
                   PhosphorIcons.question(),
                   size: 23,
                 ),
-                color: Palette.white,
+                color: Paletter.getWhite(context),
                 onPressed: () => widget.helpSearch(context),
               ),
             ),

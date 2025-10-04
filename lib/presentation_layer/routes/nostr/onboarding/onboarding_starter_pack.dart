@@ -100,9 +100,9 @@ class _OnboardingStarterPackState extends ConsumerState<OnboardingStarterPack> {
     final flattenedItems = _buildFlattenedItems();
 
     return Scaffold(
-      backgroundColor: Palette.background,
+      backgroundColor: Paletter.getBackground(context),
       appBar: AppBar(
-        backgroundColor: Palette.background,
+        backgroundColor: Paletter.getBackground(context),
         leading: Container(),
         leadingWidth: 0,
         title: widget.invitedByPubkey == null
@@ -194,9 +194,9 @@ class _OnboardingOpenStarterPackState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Palette.background,
+      backgroundColor: Paletter.getBackground(context),
       appBar: AppBar(
-        backgroundColor: Palette.background,
+        backgroundColor: Paletter.getBackground(context),
         title: Row(
           crossAxisAlignment: CrossAxisAlignment.baseline,
           textBaseline: TextBaseline.alphabetic,
@@ -218,7 +218,7 @@ class _OnboardingOpenStarterPackState
                     text:
                         "by ${ref.watch(metadataStateProvider(widget.followSet.pubKey)).userMetadata?.name ?? "Unknown"}",
                     style: TextStyle(
-                      color: Palette.gray,
+                      color: Paletter.getGray(context),
                       fontSize: 12,
                     ),
                   ),
@@ -242,7 +242,7 @@ class _OnboardingOpenStarterPackState
                   })
           ],
         ),
-        foregroundColor: Palette.white,
+        foregroundColor: Paletter.getWhite(context),
       ),
       body: Column(
         children: [
@@ -279,8 +279,8 @@ class _OnboardingOpenStarterPackState
                           children: [
                             Text(
                               displayMetadata?.name ?? "",
-                              style: const TextStyle(
-                                color: Palette.white,
+                              style: TextStyle(
+                                color: Paletter.getWhite(context),
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600,
                               ),
@@ -289,8 +289,8 @@ class _OnboardingOpenStarterPackState
                             const SizedBox(height: 4),
                             Text(
                               displayMetadata?.about ?? "",
-                              style: const TextStyle(
-                                color: Palette.gray,
+                              style: TextStyle(
+                                color: Paletter.getGray(context),
                                 fontSize: 12,
                               ),
                               maxLines: 3,
@@ -305,7 +305,7 @@ class _OnboardingOpenStarterPackState
                     selectedPubkeys.contains(displayPubkey)
                         ? PhosphorIcons.checkCircle()
                         : PhosphorIcons.circle(),
-                    color: Palette.white,
+                    color: Paletter.getWhite(context),
                   ),
                 );
               },

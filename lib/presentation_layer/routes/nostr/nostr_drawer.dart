@@ -43,7 +43,7 @@ class NostrDrawer extends ConsumerWidget {
         context: context,
         builder: (BuildContext context) {
           return Dialog(
-            backgroundColor: Palette.extraDarkGray,
+            backgroundColor: Paletter.getExtraDarkGray(context),
 
             //white border
             shape: RoundedRectangleBorder(
@@ -73,7 +73,7 @@ class NostrDrawer extends ConsumerWidget {
                     onTap: () => _copyToClipboard(context, nprofile),
                     child: Text(
                       "nostr:$nprofile",
-                      style: const TextStyle(color: Palette.lightGray),
+                      style: TextStyle(color: Paletter.getLightGray(context)),
                     ),
                   ),
                   const SizedBox(height: 20),
@@ -96,8 +96,8 @@ class NostrDrawer extends ConsumerWidget {
             child: Container(
               width: 35,
               height: 35,
-              decoration: const BoxDecoration(
-                color: Palette.primary,
+              decoration: BoxDecoration(
+                color: Paletter.getPrimary(context),
                 shape: BoxShape.circle,
               ),
               child: UserImage(
@@ -123,8 +123,8 @@ class NostrDrawer extends ConsumerWidget {
                       children: [
                         Text(
                           metadata?.name ?? '',
-                          style: const TextStyle(
-                              color: Palette.extraLightGray,
+                          style: TextStyle(
+                              color: Paletter.getExtraLightGray(context),
                               fontSize: 17,
                               fontWeight: FontWeight.bold),
                         ),
@@ -133,8 +133,8 @@ class NostrDrawer extends ConsumerWidget {
                         ),
                         Text(
                           metadata?.nip05 ?? '',
-                          style: const TextStyle(
-                            color: Palette.gray,
+                          style: TextStyle(
+                            color: Paletter.getGray(context),
                             fontSize: 15,
                           ),
                         ),
@@ -144,7 +144,7 @@ class NostrDrawer extends ConsumerWidget {
                 ),
                 //Icon(
                 //  Icons.arrow_drop_down_rounded,
-                //  color: Palette.primary,
+                //  color: Paletter.getPrimary(context),
                 //  size: 30,
                 //)
               ],
@@ -160,15 +160,15 @@ class NostrDrawer extends ConsumerWidget {
                   text: !myContactList.isLoading
                       ? myContactList.contactList.contacts.length.toString()
                       : 'n.a.',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    color: Palette.extraLightGray,
+                    color: Paletter.getExtraLightGray(context),
                   ),
-                  children: const [
+                  children: [
                     TextSpan(
                       text: ' Following  ',
                       style: TextStyle(
-                          color: Palette.gray,
+                          color: Paletter.getGray(context),
                           fontSize: 13,
                           fontWeight: FontWeight.normal),
                     )
@@ -179,17 +179,17 @@ class NostrDrawer extends ConsumerWidget {
                 width: 6,
               ),
               RichText(
-                  text: const TextSpan(
+                  text: TextSpan(
                       text: 'n.a.',
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
-                        color: Palette.extraLightGray,
+                        color: Paletter.getExtraLightGray(context),
                       ),
                       children: [
                     TextSpan(
                       text: 'Followers',
                       style: TextStyle(
-                          color: Palette.gray,
+                          color: Paletter.getGray(context),
                           fontSize: 13,
                           fontWeight: FontWeight.normal),
                     )
@@ -202,31 +202,43 @@ class NostrDrawer extends ConsumerWidget {
   }
 
   Widget _drawerItem({icon, label, onTap}) {
-    return ListTile(
-      onTap: onTap,
-      leading: SvgPicture.asset(
-        icon,
-        height: 25,
-        colorFilter: const ColorFilter.mode(Palette.gray, BlendMode.srcIn),
-      ),
-      title: Text(label,
-          style: const TextStyle(color: Palette.lightGray, fontSize: 17)),
+    return Builder(
+      builder: (context) {
+        return ListTile(
+          onTap: onTap,
+          leading: SvgPicture.asset(
+            icon,
+            height: 25,
+            colorFilter: ColorFilter.mode(Paletter.getGray(context), BlendMode.srcIn),
+          ),
+          title: Text(label,
+              style: TextStyle(color: Paletter.getLightGray(context), fontSize: 17)),
+        );
+      }
     );
   }
 
   Widget _textButton({text, onPressed}) {
     return TextButton(
         onPressed: onPressed,
-        child: Text(
-          text,
-          style: const TextStyle(color: Palette.extraLightGray, fontSize: 16),
+        child: Builder(
+          builder: (context) {
+            return Text(
+              text,
+              style: TextStyle(color: Paletter.getExtraLightGray(context), fontSize: 16),
+            );
+          }
         ));
   }
 
   Widget _divider() {
-    return const Divider(
-      thickness: 0.3,
-      color: Palette.darkGray,
+    return Builder(
+      builder: (context) {
+        return Divider(
+          thickness: 0.3,
+          color: Paletter.getDarkGray(context),
+        );
+      }
     );
   }
 
@@ -244,7 +256,7 @@ class NostrDrawer extends ConsumerWidget {
 
     return Drawer(
       child: Container(
-        color: Palette.background,
+        color: Paletter.getBackground(context),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -315,22 +327,22 @@ class NostrDrawer extends ConsumerWidget {
                       children: [
                         Text(
                           'v${snapshot.data?.version}',
-                          style: const TextStyle(
-                            color: Palette.gray,
+                          style: TextStyle(
+                            color: Paletter.getGray(context),
                             fontSize: 10,
                           ),
                         ),
                         Text(
                           'build ${snapshot.data?.buildNumber}',
-                          style: const TextStyle(
-                            color: Palette.gray,
+                          style: TextStyle(
+                            color: Paletter.getGray(context),
                             fontSize: 8,
                           ),
                         ),
                         Text(
                           '${snapshot.data?.buildSignature}',
-                          style: const TextStyle(
-                            color: Palette.gray,
+                          style: TextStyle(
+                            color: Paletter.getGray(context),
                             fontSize: 6,
                           ),
                         ),
@@ -346,7 +358,7 @@ class NostrDrawer extends ConsumerWidget {
                 children: [
                   SvgPicture.asset(
                     'assets/icons/sun.svg',
-                    colorFilter: ColorFilter.mode(Palette.primary, BlendMode.srcIn),
+                    colorFilter: ColorFilter.mode(Paletter.getPrimary(context), BlendMode.srcIn),
                     height: 22,
                     width: 22,
                   ),
@@ -356,7 +368,7 @@ class NostrDrawer extends ConsumerWidget {
                     },
                     child: SvgPicture.asset(
                       'assets/icons/qr-code.svg',
-                      colorFilter: const ColorFilter.mode(Palette.primary, BlendMode.srcIn),
+                      colorFilter: ColorFilter.mode(Paletter.getPrimary(context), BlendMode.srcIn),
                       height: 22,
                       width: 22,
                     ),
