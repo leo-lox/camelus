@@ -63,10 +63,14 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+    await windowManager.ensureInitialized();
     WindowOptions windowOptions = WindowOptions(
       titleBarStyle: TitleBarStyle.hidden,
     );
-    windowManager.waitUntilReadyToShow(windowOptions);
+    windowManager.waitUntilReadyToShow(windowOptions, () async {
+      await windowManager.show();
+      await windowManager.focus();
+    });
   }
 
   final initalData = await _getInitialData();
@@ -201,7 +205,9 @@ class MyApp extends ConsumerWidget {
                         children: [
                           Expanded(
                             child: DragToMoveArea(
-                              child: Container(),
+                              child: Container(
+                                color: Colors.transparent,
+                              ),
                             ),
                           ),
                           const SizedBox(
