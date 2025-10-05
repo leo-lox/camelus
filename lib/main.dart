@@ -28,6 +28,7 @@ import 'presentation_layer/providers/app_lifecycle_provider.dart';
 import 'presentation_layer/providers/db_app_provider.dart';
 import 'presentation_layer/providers/db_ndk_provider.dart';
 import 'presentation_layer/providers/inbox_outbox_provider.dart';
+import 'presentation_layer/providers/language_provider.dart';
 import 'presentation_layer/providers/ndk_provider.dart';
 import 'presentation_layer/providers/signer_provider.dart';
 import 'presentation_layer/routes/home_page.dart';
@@ -175,6 +176,8 @@ class MyApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, ref) {
+    final currentLocale = ref.watch(currentLocaleProvider);
+
     return Portal(
       child: MaterialApp(
         navigatorKey: navigatorKey,
@@ -187,6 +190,7 @@ class MyApp extends ConsumerWidget {
         ),
         debugShowCheckedModeBanner: false,
         title: 'camelus',
+        locale: currentLocale,
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         theme: lightTheme,

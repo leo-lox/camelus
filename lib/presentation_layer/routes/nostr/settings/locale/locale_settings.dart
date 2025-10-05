@@ -61,12 +61,6 @@ class LocaleSettingsPageState extends ConsumerState<LocaleSettingsPage> {
       body: Column(
         children: [
           const SizedBox(height: 10),
-          Text("notice: language is still in development!",
-              style: TextStyle(
-                color: Theme.of(context).colorScheme.error,
-                fontSize: 16,
-              )),
-          const SizedBox(height: 10),
 
           ListTile(
             title: Text(
