@@ -1,16 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../config/palette.dart';
 import '../../providers/app_bar_provider/app_bottom_bar_provider.dart';
 
 class AppBottomNavigationBar extends ConsumerWidget {
-  final PageController pageController;
-
   const AppBottomNavigationBar({
     super.key,
-    required this.pageController,
   });
 
   @override
@@ -28,8 +26,24 @@ class AppBottomNavigationBar extends ConsumerWidget {
         final tab = NavigationTab.values[index];
         notifier.selectTab(tab);
 
-        // Jump to the corresponding page
-        pageController.jumpToPage(index);
+        switch (index) {
+          case 0:
+            {
+              context.go('/');
+              break;
+            }
+
+          case 1:
+            {
+              context.go('/search');
+              break;
+            }
+          case 2:
+            {
+              context.go('/notifications');
+              break;
+            }
+        }
       },
       destinations: <NavigationDestination>[
         _buildHomeItem(navigationState, ref),

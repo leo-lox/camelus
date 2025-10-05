@@ -1,3 +1,7 @@
+import 'package:camelus/presentation_layer/components/app_bottom_navigation_bar/app_bottom_navigation_bar.dart';
+import 'package:camelus/presentation_layer/layouts/mobile_bottom_menu_layout.dart';
+import 'package:camelus/presentation_layer/routes/notification_page.dart';
+import 'package:camelus/presentation_layer/routes/search_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
@@ -36,33 +40,32 @@ final routes = [
           mainContent: child,
           rightSidebar: Container(color: Colors.deepOrange),
         ),
-        mobileContent: child,
+        mobileContent: MobileBottomMenuLayout(
+          mainContent: child,
+          bottomNavigationBar: AppBottomNavigationBar(),
+        ),
       );
     },
     routes: [
       GoRoute(
         path: '/',
-        builder: (context, state) => HomePage(
+        builder: (context, state) => const HomePage(
           initialTab: '/',
         ),
       ),
       GoRoute(
         path: '/posts-and-replies',
-        builder: (context, state) => HomePage(
+        builder: (context, state) => const HomePage(
           initialTab: '/posts-and-replies',
         ),
       ),
       GoRoute(
         path: '/search',
-        builder: (context, state) => HomePage(
-          initialPage: 1,
-        ),
+        builder: (context, state) => const SearchPage(),
       ),
       GoRoute(
         path: '/notifications',
-        builder: (context, state) => HomePage(
-          initialPage: 2,
-        ),
+        builder: (context, state) => const NotificationPage(),
       ),
       GoRoute(
         path: '/settings',
