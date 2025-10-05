@@ -36,7 +36,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
   }
 
   void _navigateToInitalRoute() {
-    context.push('/settings/inital-route');
+    context.push('/settings/initial-route');
   }
 
   @override
