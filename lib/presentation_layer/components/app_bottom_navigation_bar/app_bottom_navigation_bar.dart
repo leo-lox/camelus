@@ -39,7 +39,8 @@ class AppBottomNavigationBar extends ConsumerWidget {
     );
   }
 
-  NavigationDestination _buildHomeItem(BuildContext context, NavigationState state, WidgetRef ref) {
+  NavigationDestination _buildHomeItem(
+      BuildContext context, NavigationState state, WidgetRef ref) {
     final isSelected = state.selectedTab == NavigationTab.home;
 
     return NavigationDestination(
@@ -58,12 +59,15 @@ class AppBottomNavigationBar extends ConsumerWidget {
 
         return child;
       }),
-      tooltip: isSelected ? AppLocalizations.of(context)!.scrollToTop : AppLocalizations.of(context)!.home,
+      tooltip: isSelected
+          ? AppLocalizations.of(context)!.scrollToTop
+          : AppLocalizations.of(context)!.home,
       label: AppLocalizations.of(context)!.home,
     );
   }
 
-  NavigationDestination _buildSearchItem(BuildContext context, NavigationState state) {
+  NavigationDestination _buildSearchItem(
+      BuildContext context, NavigationState state) {
     final isSelected = state.selectedTab == NavigationTab.search;
 
     return NavigationDestination(
@@ -79,7 +83,8 @@ class AppBottomNavigationBar extends ConsumerWidget {
     );
   }
 
-  NavigationDestination _buildNotificationsItem(BuildContext context, NavigationState state) {
+  NavigationDestination _buildNotificationsItem(
+      BuildContext context, NavigationState state) {
     final isSelected = state.selectedTab == NavigationTab.notifications;
 
     return NavigationDestination(

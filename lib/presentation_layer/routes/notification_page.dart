@@ -243,7 +243,7 @@ class _NotificationPageState extends ConsumerState<NotificationPage>
             ),
             Text(
               timeago.format(DateTime.fromMillisecondsSinceEpoch(
-                  notification.createdAt * 1000)),
+                  notification.createdAt * 1000)), // TODO translate
               style: TextStyle(
                   color: Theme.of(context).colorScheme.onSurfaceVariant,
                   fontSize: 12),

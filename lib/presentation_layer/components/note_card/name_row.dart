@@ -41,7 +41,7 @@ class _NoteCardNameRowState extends ConsumerState<NoteCardNameRow> {
 
     if (difference.inDays < 2) {
       // Use timeago for posts less than 2 days old
-      dateText = timeago.format(postDateTime);
+      dateText = timeago.format(postDateTime); // TODO translate
     } else {
       // Use a human-readable date format for posts 2 days or older
       dateText = DateFormat('MMM d, yyyy').format(postDateTime);

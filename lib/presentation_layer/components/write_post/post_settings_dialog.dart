@@ -182,7 +182,8 @@ class _PostSettingsState extends ConsumerState<PostSettings> {
                   controller: _customWarningController,
                   decoration: InputDecoration(
                     labelText: AppLocalizations.of(context)!.customWarning,
-                    hintText: AppLocalizations.of(context)!.specifyContentWarning,
+                    hintText:
+                        AppLocalizations.of(context)!.specifyContentWarning,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
@@ -269,7 +270,8 @@ class _PostSettingsState extends ConsumerState<PostSettings> {
               notifier.setSelectedWarning(_displayToKey(context, newValue));
             }
           },
-          items: _getWarningOptions(context).map<DropdownMenuItem<String>>((String value) {
+          items: _getWarningOptions(context)
+              .map<DropdownMenuItem<String>>((String value) {
             return DropdownMenuItem<String>(
               value: value,
               child: Text(

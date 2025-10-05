@@ -136,7 +136,9 @@ class ProfilePage2 extends ConsumerWidget {
                       controller: tabController,
                       tabs: [
                         Tab(text: AppLocalizations.of(context)!.posts),
-                        Tab(text: AppLocalizations.of(context)!.postsAndReplies),
+                        Tab(
+                            text:
+                                AppLocalizations.of(context)!.postsAndReplies),
                         Tab(text: AppLocalizations.of(context)!.starterPacks),
                       ],
                       labelColor: Theme.of(context)
