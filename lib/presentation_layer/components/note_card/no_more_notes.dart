@@ -9,7 +9,7 @@ class NoMoreNotes extends StatelessWidget {
   const NoMoreNotes({
     super.key,
     this.renderCallback,
-    this.text = "No more notes to show",
+    this.text = "No more notes to show", // TODO translate
   });
 
   @override

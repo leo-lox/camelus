@@ -507,4 +507,13 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get routeNotifications => 'การแจ้งเตือน';
+
+  @override
+  String get scrollToTop => 'เลื่อนไปด้านบน';
+
+  @override
+  String get home => 'หน้าแรก';
+
+  @override
+  String get search => 'ค้นหา';
 }

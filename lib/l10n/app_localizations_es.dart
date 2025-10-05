@@ -511,4 +511,13 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get routeNotifications => 'Notificaciones';
+
+  @override
+  String get scrollToTop => 'Desplazarse hacia arriba';
+
+  @override
+  String get home => 'Inicio';
+
+  @override
+  String get search => 'Buscar';
 }

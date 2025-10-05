@@ -157,5 +157,8 @@
   "routeHome": "Accueil",
   "routePostsAndReplies": "Publications et Réponses",
   "routeSearch": "Rechercher",
-  "routeNotifications": "Notifications"
+  "routeNotifications": "Notifications",
+  "scrollToTop": "Faire défiler vers le haut",
+  "home": "Accueil",
+  "search": "Rechercher"
 }

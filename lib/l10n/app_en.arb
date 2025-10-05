@@ -666,5 +666,17 @@
   "routeNotifications": "Notifications",
   "@routeNotifications": {
     "description": "Notifications route label"
+  },
+  "scrollToTop": "scroll to top",
+  "@scrollToTop": {
+    "description": "Tooltip for scrolling to top"
+  },
+  "home": "home",
+  "@home": {
+    "description": "Home tab label"
+  },
+  "search": "search",
+  "@search": {
+    "description": "Search tab label"
   }
 }

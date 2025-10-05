@@ -512,4 +512,13 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get routeNotifications => 'Benachrichtigungen';
+
+  @override
+  String get scrollToTop => 'Nach oben scrollen';
+
+  @override
+  String get home => 'Startseite';
+
+  @override
+  String get search => 'Suchen';
 }

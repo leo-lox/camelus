@@ -1,3 +1,4 @@
+import 'package:camelus/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
@@ -30,15 +31,15 @@ class AppBottomNavigationBar extends ConsumerWidget {
         pageController.jumpToPage(index);
       },
       destinations: <NavigationDestination>[
-        _buildHomeItem(navigationState, ref),
-        _buildSearchItem(navigationState),
-        _buildNotificationsItem(navigationState),
+        _buildHomeItem(context, navigationState, ref),
+        _buildSearchItem(context, navigationState),
+        _buildNotificationsItem(context, navigationState),
         //_buildChatItem(navigationState),
       ],
     );
   }
 
-  NavigationDestination _buildHomeItem(NavigationState state, WidgetRef ref) {
+  NavigationDestination _buildHomeItem(BuildContext context, NavigationState state, WidgetRef ref) {
     final isSelected = state.selectedTab == NavigationTab.home;
 
     return NavigationDestination(
@@ -57,12 +58,12 @@ class AppBottomNavigationBar extends ConsumerWidget {
 
         return child;
       }),
-      tooltip: isSelected ? "scroll to top" : "home",
-      label: "home",
+      tooltip: isSelected ? AppLocalizations.of(context)!.scrollToTop : AppLocalizations.of(context)!.home,
+      label: AppLocalizations.of(context)!.home,
     );
   }
 
-  NavigationDestination _buildSearchItem(NavigationState state) {
+  NavigationDestination _buildSearchItem(BuildContext context, NavigationState state) {
     final isSelected = state.selectedTab == NavigationTab.search;
 
     return NavigationDestination(
@@ -73,12 +74,12 @@ class AppBottomNavigationBar extends ConsumerWidget {
           size: 23,
         );
       }),
-      label: "search",
-      tooltip: "search",
+      label: AppLocalizations.of(context)!.search,
+      tooltip: AppLocalizations.of(context)!.search,
     );
   }
 
-  NavigationDestination _buildNotificationsItem(NavigationState state) {
+  NavigationDestination _buildNotificationsItem(BuildContext context, NavigationState state) {
     final isSelected = state.selectedTab == NavigationTab.notifications;
 
     return NavigationDestination(
@@ -97,8 +98,8 @@ class AppBottomNavigationBar extends ConsumerWidget {
 
         return child;
       }),
-      label: "notifications",
-      tooltip: "notifications",
+      label: AppLocalizations.of(context)!.notifications,
+      tooltip: AppLocalizations.of(context)!.notifications,
     );
   }
 }

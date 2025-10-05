@@ -157,5 +157,8 @@
   "routeHome": "Startseite",
   "routePostsAndReplies": "Beiträge und Antworten",
   "routeSearch": "Suchen",
-  "routeNotifications": "Benachrichtigungen"
+  "routeNotifications": "Benachrichtigungen",
+  "scrollToTop": "Nach oben scrollen",
+  "home": "Startseite",
+  "search": "Suchen"
 }

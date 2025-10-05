@@ -496,4 +496,13 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get routeNotifications => '通知';
+
+  @override
+  String get scrollToTop => '滚动到顶部';
+
+  @override
+  String get home => '主页';
+
+  @override
+  String get search => '搜索';
 }

@@ -1057,6 +1057,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Notifications'**
   String get routeNotifications;
+
+  /// Tooltip for scrolling to top
+  ///
+  /// In en, this message translates to:
+  /// **'scroll to top'**
+  String get scrollToTop;
+
+  /// Home tab label
+  ///
+  /// In en, this message translates to:
+  /// **'home'**
+  String get home;
+
+  /// Search tab label
+  ///
+  /// In en, this message translates to:
+  /// **'search'**
+  String get search;
 }
 
 class _AppLocalizationsDelegate

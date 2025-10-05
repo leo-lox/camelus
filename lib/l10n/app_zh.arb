@@ -157,5 +157,8 @@
   "routeHome": "主页",
   "routePostsAndReplies": "帖子和回复",
   "routeSearch": "搜索",
-  "routeNotifications": "通知"
+  "routeNotifications": "通知",
+  "scrollToTop": "滚动到顶部",
+  "home": "主页",
+  "search": "搜索"
 }

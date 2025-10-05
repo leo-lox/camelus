@@ -511,4 +511,13 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get routeNotifications => 'Notificações';
+
+  @override
+  String get scrollToTop => 'Rolar para o topo';
+
+  @override
+  String get home => 'Início';
+
+  @override
+  String get search => 'Pesquisar';
 }

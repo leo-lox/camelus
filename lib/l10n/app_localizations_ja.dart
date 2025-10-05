@@ -498,4 +498,13 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get routeNotifications => '通知';
+
+  @override
+  String get scrollToTop => 'トップへスクロール';
+
+  @override
+  String get home => 'ホーム';
+
+  @override
+  String get search => '検索';
 }

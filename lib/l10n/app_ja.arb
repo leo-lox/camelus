@@ -157,5 +157,8 @@
   "routeHome": "ホーム",
   "routePostsAndReplies": "投稿と返信",
   "routeSearch": "検索",
-  "routeNotifications": "通知"
+  "routeNotifications": "通知",
+  "scrollToTop": "トップへスクロール",
+  "home": "ホーム",
+  "search": "検索"
 }

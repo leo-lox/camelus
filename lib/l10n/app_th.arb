@@ -157,5 +157,8 @@
   "routeHome": "หน้าแรก",
   "routePostsAndReplies": "โพสต์และการตอบกลับ",
   "routeSearch": "ค้นหา",
-  "routeNotifications": "การแจ้งเตือน"
+  "routeNotifications": "การแจ้งเตือน",
+  "scrollToTop": "เลื่อนไปด้านบน",
+  "home": "หน้าแรก",
+  "search": "ค้นหา"
 }
