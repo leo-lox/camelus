@@ -160,5 +160,8 @@
   "routeNotifications": "Benachrichtigungen",
   "scrollToTop": "Nach oben scrollen",
   "home": "Startseite",
-  "search": "Suchen"
+  "search": "Suchen",
+  "more": "Mehr",
+  "posts": "Beiträge",
+  "postsAndReplies": "Beiträge und Antworten"
 }

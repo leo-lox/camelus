@@ -521,4 +521,13 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get search => 'Suchen';
+
+  @override
+  String get more => 'Mehr';
+
+  @override
+  String get posts => 'Beiträge';
+
+  @override
+  String get postsAndReplies => 'Beiträge und Antworten';
 }

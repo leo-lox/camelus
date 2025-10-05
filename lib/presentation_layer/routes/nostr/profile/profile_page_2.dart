@@ -71,7 +71,7 @@ class ProfilePage2 extends ConsumerWidget {
                 actions: [
                   PopupMenuButton<String>(
                     color: Paletter.getExtraDarkGray(context),
-                    tooltip: "More",
+                    tooltip: AppLocalizations.of(context)!.more,
                     onSelected: (e) => {
                       //log(e),
                       // toast
@@ -135,9 +135,9 @@ class ProfilePage2 extends ConsumerWidget {
                     child: TabBar(
                       controller: tabController,
                       tabs: [
-                        Tab(text: 'Posts'),
-                        Tab(text: 'Posts & Replies'),
-                        Tab(text: 'Starter Packs'),
+                        Tab(text: AppLocalizations.of(context)!.posts),
+                        Tab(text: AppLocalizations.of(context)!.postsAndReplies),
+                        Tab(text: AppLocalizations.of(context)!.starterPacks),
                       ],
                       labelColor: Theme.of(context)
                           .colorScheme

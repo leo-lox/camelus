@@ -518,4 +518,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get search => 'search';
+
+  @override
+  String get more => 'More';
+
+  @override
+  String get posts => 'Posts';
+
+  @override
+  String get postsAndReplies => 'Posts & Replies';
 }

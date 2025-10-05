@@ -160,5 +160,8 @@
   "routeNotifications": "การแจ้งเตือน",
   "scrollToTop": "เลื่อนไปด้านบน",
   "home": "หน้าแรก",
-  "search": "ค้นหา"
+  "search": "ค้นหา",
+  "more": "เพิ่มเติม",
+  "posts": "โพสต์",
+  "postsAndReplies": "โพสต์และการตอบกลับ"
 }

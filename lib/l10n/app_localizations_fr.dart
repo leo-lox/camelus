@@ -526,4 +526,13 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get search => 'Rechercher';
+
+  @override
+  String get more => 'Plus';
+
+  @override
+  String get posts => 'Publications';
+
+  @override
+  String get postsAndReplies => 'Publications et Réponses';
 }

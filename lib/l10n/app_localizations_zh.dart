@@ -505,4 +505,13 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get search => '搜索';
+
+  @override
+  String get more => '更多';
+
+  @override
+  String get posts => '帖子';
+
+  @override
+  String get postsAndReplies => '帖子和回复';
 }

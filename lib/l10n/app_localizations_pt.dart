@@ -520,4 +520,13 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get search => 'Pesquisar';
+
+  @override
+  String get more => 'Mais';
+
+  @override
+  String get posts => 'Publicações';
+
+  @override
+  String get postsAndReplies => 'Publicações e Respostas';
 }

@@ -1075,6 +1075,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'search'**
   String get search;
+
+  /// More options tooltip
+  ///
+  /// In en, this message translates to:
+  /// **'More'**
+  String get more;
+
+  /// Posts tab label
+  ///
+  /// In en, this message translates to:
+  /// **'Posts'**
+  String get posts;
+
+  /// Posts and replies tab label
+  ///
+  /// In en, this message translates to:
+  /// **'Posts & Replies'**
+  String get postsAndReplies;
 }
 
 class _AppLocalizationsDelegate

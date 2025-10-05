@@ -160,5 +160,8 @@
   "routeNotifications": "通知",
   "scrollToTop": "滚动到顶部",
   "home": "主页",
-  "search": "搜索"
+  "search": "搜索",
+  "more": "更多",
+  "posts": "帖子",
+  "postsAndReplies": "帖子和回复"
 }

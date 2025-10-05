@@ -678,5 +678,17 @@
   "search": "search",
   "@search": {
     "description": "Search tab label"
+  },
+  "more": "More",
+  "@more": {
+    "description": "More options tooltip"
+  },
+  "posts": "Posts",
+  "@posts": {
+    "description": "Posts tab label"
+  },
+  "postsAndReplies": "Posts & Replies",
+  "@postsAndReplies": {
+    "description": "Posts and replies tab label"
   }
 }

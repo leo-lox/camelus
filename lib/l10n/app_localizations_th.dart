@@ -516,4 +516,13 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get search => 'ค้นหา';
+
+  @override
+  String get more => 'เพิ่มเติม';
+
+  @override
+  String get posts => 'โพสต์';
+
+  @override
+  String get postsAndReplies => 'โพสต์และการตอบกลับ';
 }

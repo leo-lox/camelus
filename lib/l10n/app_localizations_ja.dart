@@ -507,4 +507,13 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get search => '検索';
+
+  @override
+  String get more => 'その他';
+
+  @override
+  String get posts => '投稿';
+
+  @override
+  String get postsAndReplies => '投稿と返信';
 }

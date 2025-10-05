@@ -520,4 +520,13 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get search => 'Buscar';
+
+  @override
+  String get more => 'Más';
+
+  @override
+  String get posts => 'Publicaciones';
+
+  @override
+  String get postsAndReplies => 'Publicaciones y Respuestas';
 }
