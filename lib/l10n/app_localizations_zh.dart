@@ -439,4 +439,49 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get useSystemLanguage => '使用系统语言';
+
+  @override
+  String get edit => '编辑';
+
+  @override
+  String get postSettings => '帖子设置';
+
+  @override
+  String get enableContentWarning => '启用内容警告';
+
+  @override
+  String get warningType => '警告类型';
+
+  @override
+  String get customWarning => '自定义警告';
+
+  @override
+  String get specifyContentWarning => '指定内容警告';
+
+  @override
+  String get enableClientTag => '启用客户端标签';
+
+  @override
+  String get close => '关闭';
+
+  @override
+  String get sensitiveContent => '敏感内容';
+
+  @override
+  String get flashingLights => '闪烁灯光';
+
+  @override
+  String get loudNoises => '响亮噪音';
+
+  @override
+  String get graphicContent => '图形内容';
+
+  @override
+  String get discrimination => '歧视';
+
+  @override
+  String get health => '健康';
+
+  @override
+  String get abuse => '虐待';
 }

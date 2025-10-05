@@ -450,4 +450,49 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get useSystemLanguage => 'ใช้ภาษาระบบ';
+
+  @override
+  String get edit => 'แก้ไข';
+
+  @override
+  String get postSettings => 'การตั้งค่าโพสต์';
+
+  @override
+  String get enableContentWarning => 'เปิดใช้งานคำเตือนเนื้อหา';
+
+  @override
+  String get warningType => 'ประเภทคำเตือน';
+
+  @override
+  String get customWarning => 'คำเตือนแบบกำหนดเอง';
+
+  @override
+  String get specifyContentWarning => 'ระบุคำเตือนเนื้อหา';
+
+  @override
+  String get enableClientTag => 'เปิดใช้งานแท็กไคลเอนต์';
+
+  @override
+  String get close => 'ปิด';
+
+  @override
+  String get sensitiveContent => 'เนื้อหาที่ละเอียดอ่อน';
+
+  @override
+  String get flashingLights => 'แสงกะพริบ';
+
+  @override
+  String get loudNoises => 'เสียงดัง';
+
+  @override
+  String get graphicContent => 'เนื้อหากราฟิก';
+
+  @override
+  String get discrimination => 'การเลือกปฏิบัติ';
+
+  @override
+  String get health => 'สุขภาพ';
+
+  @override
+  String get abuse => 'การล่วงละเมิด';
 }

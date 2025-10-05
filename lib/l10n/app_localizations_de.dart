@@ -455,4 +455,49 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get useSystemLanguage => 'Systemsprache verwenden';
+
+  @override
+  String get edit => 'bearbeiten';
+
+  @override
+  String get postSettings => 'Beitragseinstellungen';
+
+  @override
+  String get enableContentWarning => 'Inhaltswarnung aktivieren';
+
+  @override
+  String get warningType => 'Warnungstyp';
+
+  @override
+  String get customWarning => 'Benutzerdefinierte Warnung';
+
+  @override
+  String get specifyContentWarning => 'Inhaltswarnung angeben';
+
+  @override
+  String get enableClientTag => 'Client-Tag aktivieren';
+
+  @override
+  String get close => 'Schließen';
+
+  @override
+  String get sensitiveContent => 'Sensible Inhalte';
+
+  @override
+  String get flashingLights => 'Blitzende Lichter';
+
+  @override
+  String get loudNoises => 'Laute Geräusche';
+
+  @override
+  String get graphicContent => 'Grafische Inhalte';
+
+  @override
+  String get discrimination => 'Diskriminierung';
+
+  @override
+  String get health => 'Gesundheit';
+
+  @override
+  String get abuse => 'Missbrauch';
 }

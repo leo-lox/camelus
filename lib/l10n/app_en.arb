@@ -590,5 +590,65 @@
   "useSystemLanguage": "Use System Language",
   "@useSystemLanguage": {
     "description": "Option to use device's system language"
+  },
+  "edit": "edit",
+  "@edit": {
+    "description": "Edit button label"
+  },
+  "postSettings": "Post Settings",
+  "@postSettings": {
+    "description": "Post settings dialog title"
+  },
+  "enableContentWarning": "Enable Content Warning",
+  "@enableContentWarning": {
+    "description": "Switch to enable content warning"
+  },
+  "warningType": "Warning Type:",
+  "@warningType": {
+    "description": "Label for warning type dropdown"
+  },
+  "customWarning": "Custom Warning",
+  "@customWarning": {
+    "description": "Custom warning input label"
+  },
+  "specifyContentWarning": "Specify content warning",
+  "@specifyContentWarning": {
+    "description": "Hint text for custom warning input"
+  },
+  "enableClientTag": "Enable Client Tag",
+  "@enableClientTag": {
+    "description": "Switch to enable client tag"
+  },
+  "close": "Close",
+  "@close": {
+    "description": "Close button label"
+  },
+  "sensitiveContent": "Sensitive Content",
+  "@sensitiveContent": {
+    "description": "Content warning option"
+  },
+  "flashingLights": "Flashing Lights/Patterns",
+  "@flashingLights": {
+    "description": "Content warning option"
+  },
+  "loudNoises": "Loud Noises",
+  "@loudNoises": {
+    "description": "Content warning option"
+  },
+  "graphicContent": "Graphic Content",
+  "@graphicContent": {
+    "description": "Content warning option"
+  },
+  "discrimination": "Discrimination",
+  "@discrimination": {
+    "description": "Content warning option"
+  },
+  "health": "Health",
+  "@health": {
+    "description": "Content warning option"
+  },
+  "abuse": "Abuse",
+  "@abuse": {
+    "description": "Content warning option"
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
+import 'package:camelus/l10n/app_localizations.dart';
 import '../../../config/palette.dart';
 
 class PostSettingsState {
@@ -74,7 +75,8 @@ class PostSettings extends ConsumerStatefulWidget {
 class _PostSettingsState extends ConsumerState<PostSettings> {
   late TextEditingController _customWarningController;
 
-  static const List<String> warningOptions = [
+  // English keys for internal storage
+  static const List<String> _warningKeys = [
     'Sensitive Content',
     'Flashing Lights/Patterns',
     'Loud Noises',
@@ -84,6 +86,35 @@ class _PostSettingsState extends ConsumerState<PostSettings> {
     'Abuse',
     'Other'
   ];
+
+  // Get localized display values
+  List<String> _getWarningOptions(BuildContext context) {
+    return [
+      AppLocalizations.of(context)!.sensitiveContent,
+      AppLocalizations.of(context)!.flashingLights,
+      AppLocalizations.of(context)!.loudNoises,
+      AppLocalizations.of(context)!.graphicContent,
+      AppLocalizations.of(context)!.discrimination,
+      AppLocalizations.of(context)!.health,
+      AppLocalizations.of(context)!.abuse,
+      AppLocalizations.of(context)!.other,
+    ];
+  }
+
+  // Convert key to localized display value
+  String _keyToDisplay(BuildContext context, String key) {
+    final index = _warningKeys.indexOf(key);
+    if (index == -1) return key;
+    return _getWarningOptions(context)[index];
+  }
+
+  // Convert localized display value to key
+  String _displayToKey(BuildContext context, String display) {
+    final options = _getWarningOptions(context);
+    final index = options.indexOf(display);
+    if (index == -1) return display;
+    return _warningKeys[index];
+  }
 
   @override
   void initState() {
@@ -115,7 +146,7 @@ class _PostSettingsState extends ConsumerState<PostSettings> {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
       ),
-      title: const Text('Post Settings'),
+      title: Text(AppLocalizations.of(context)!.postSettings),
       content: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -123,7 +154,7 @@ class _PostSettingsState extends ConsumerState<PostSettings> {
           children: [
             // Content Warning Switch
             _buildSwitchRow(
-              title: 'Enable Content Warning',
+              title: AppLocalizations.of(context)!.enableContentWarning,
               value: state.enableContentWarning,
               onChanged: (value) {
                 notifier.toggleContentWarning(value);
@@ -133,9 +164,9 @@ class _PostSettingsState extends ConsumerState<PostSettings> {
             // Only show dropdown if content warning is enabled
             if (state.enableContentWarning) ...[
               const SizedBox(height: 16),
-              const Text(
-                'Warning Type:',
-                style: TextStyle(fontSize: 16),
+              Text(
+                AppLocalizations.of(context)!.warningType,
+                style: const TextStyle(fontSize: 16),
               ),
               const SizedBox(height: 8),
               _buildDropdown(
@@ -150,8 +181,8 @@ class _PostSettingsState extends ConsumerState<PostSettings> {
                 TextField(
                   controller: _customWarningController,
                   decoration: InputDecoration(
-                    labelText: 'Custom Warning',
-                    hintText: 'Specify content warning',
+                    labelText: AppLocalizations.of(context)!.customWarning,
+                    hintText: AppLocalizations.of(context)!.specifyContentWarning,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
@@ -171,7 +202,7 @@ class _PostSettingsState extends ConsumerState<PostSettings> {
 
             // Client Tag Switch
             _buildSwitchRow(
-              title: 'Enable Client Tag',
+              title: AppLocalizations.of(context)!.enableClientTag,
               value: state.enableClientTag,
               onChanged: (value) {
                 notifier.toggleClientTag(value);
@@ -185,7 +216,7 @@ class _PostSettingsState extends ConsumerState<PostSettings> {
           onPressed: () {
             Navigator.of(context).pop();
           },
-          child: const Text('Close'),
+          child: Text(AppLocalizations.of(context)!.close),
         ),
       ],
     );
@@ -227,7 +258,7 @@ class _PostSettingsState extends ConsumerState<PostSettings> {
       child: DropdownButtonHideUnderline(
         child: DropdownButton<String>(
           dropdownColor: Paletter.getExtraDarkGray(context),
-          value: state.selectedWarning,
+          value: _keyToDisplay(context, state.selectedWarning),
           isExpanded: true,
           icon: const Icon(Icons.arrow_drop_down),
           elevation: 16,
@@ -235,10 +266,10 @@ class _PostSettingsState extends ConsumerState<PostSettings> {
               color: Theme.of(context).colorScheme.onSurface, fontSize: 16),
           onChanged: (String? newValue) {
             if (newValue != null) {
-              notifier.setSelectedWarning(newValue);
+              notifier.setSelectedWarning(_displayToKey(context, newValue));
             }
           },
-          items: warningOptions.map<DropdownMenuItem<String>>((String value) {
+          items: _getWarningOptions(context).map<DropdownMenuItem<String>>((String value) {
             return DropdownMenuItem<String>(
               value: value,
               child: Text(

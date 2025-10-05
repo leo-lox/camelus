@@ -943,6 +943,96 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Use System Language'**
   String get useSystemLanguage;
+
+  /// Edit button label
+  ///
+  /// In en, this message translates to:
+  /// **'edit'**
+  String get edit;
+
+  /// Post settings dialog title
+  ///
+  /// In en, this message translates to:
+  /// **'Post Settings'**
+  String get postSettings;
+
+  /// Switch to enable content warning
+  ///
+  /// In en, this message translates to:
+  /// **'Enable Content Warning'**
+  String get enableContentWarning;
+
+  /// Label for warning type dropdown
+  ///
+  /// In en, this message translates to:
+  /// **'Warning Type:'**
+  String get warningType;
+
+  /// Custom warning input label
+  ///
+  /// In en, this message translates to:
+  /// **'Custom Warning'**
+  String get customWarning;
+
+  /// Hint text for custom warning input
+  ///
+  /// In en, this message translates to:
+  /// **'Specify content warning'**
+  String get specifyContentWarning;
+
+  /// Switch to enable client tag
+  ///
+  /// In en, this message translates to:
+  /// **'Enable Client Tag'**
+  String get enableClientTag;
+
+  /// Close button label
+  ///
+  /// In en, this message translates to:
+  /// **'Close'**
+  String get close;
+
+  /// Content warning option
+  ///
+  /// In en, this message translates to:
+  /// **'Sensitive Content'**
+  String get sensitiveContent;
+
+  /// Content warning option
+  ///
+  /// In en, this message translates to:
+  /// **'Flashing Lights/Patterns'**
+  String get flashingLights;
+
+  /// Content warning option
+  ///
+  /// In en, this message translates to:
+  /// **'Loud Noises'**
+  String get loudNoises;
+
+  /// Content warning option
+  ///
+  /// In en, this message translates to:
+  /// **'Graphic Content'**
+  String get graphicContent;
+
+  /// Content warning option
+  ///
+  /// In en, this message translates to:
+  /// **'Discrimination'**
+  String get discrimination;
+
+  /// Content warning option
+  ///
+  /// In en, this message translates to:
+  /// **'Health'**
+  String get health;
+
+  /// Content warning option
+  ///
+  /// In en, this message translates to:
+  /// **'Abuse'**
+  String get abuse;
 }
 
 class _AppLocalizationsDelegate

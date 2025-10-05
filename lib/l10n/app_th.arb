@@ -138,5 +138,20 @@
   "workInProgress": "กำลังดำเนินการ",
   "update": "อัปเดต",
   "initialRouteSettings": "การตั้งค่าเส้นทางเริ่มต้น",
-  "useSystemLanguage": "ใช้ภาษาระบบ"
+  "useSystemLanguage": "ใช้ภาษาระบบ",
+  "edit": "แก้ไข",
+  "postSettings": "การตั้งค่าโพสต์",
+  "enableContentWarning": "เปิดใช้งานคำเตือนเนื้อหา",
+  "warningType": "ประเภทคำเตือน",
+  "customWarning": "คำเตือนแบบกำหนดเอง",
+  "specifyContentWarning": "ระบุคำเตือนเนื้อหา",
+  "enableClientTag": "เปิดใช้งานแท็กไคลเอนต์",
+  "close": "ปิด",
+  "sensitiveContent": "เนื้อหาที่ละเอียดอ่อน",
+  "flashingLights": "แสงกะพริบ",
+  "loudNoises": "เสียงดัง",
+  "graphicContent": "เนื้อหากราฟิก",
+  "discrimination": "การเลือกปฏิบัติ",
+  "health": "สุขภาพ",
+  "abuse": "การล่วงละเมิด"
 }

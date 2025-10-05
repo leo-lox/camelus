@@ -452,4 +452,49 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get useSystemLanguage => 'Use System Language';
+
+  @override
+  String get edit => 'edit';
+
+  @override
+  String get postSettings => 'Post Settings';
+
+  @override
+  String get enableContentWarning => 'Enable Content Warning';
+
+  @override
+  String get warningType => 'Warning Type:';
+
+  @override
+  String get customWarning => 'Custom Warning';
+
+  @override
+  String get specifyContentWarning => 'Specify content warning';
+
+  @override
+  String get enableClientTag => 'Enable Client Tag';
+
+  @override
+  String get close => 'Close';
+
+  @override
+  String get sensitiveContent => 'Sensitive Content';
+
+  @override
+  String get flashingLights => 'Flashing Lights/Patterns';
+
+  @override
+  String get loudNoises => 'Loud Noises';
+
+  @override
+  String get graphicContent => 'Graphic Content';
+
+  @override
+  String get discrimination => 'Discrimination';
+
+  @override
+  String get health => 'Health';
+
+  @override
+  String get abuse => 'Abuse';
 }

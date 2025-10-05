@@ -272,7 +272,7 @@ class _BuildProfileHeader extends ConsumerWidget {
                           ),
                         if (isOwnProfile)
                           longButton(
-                              name: AppLocalizations.of(context)!.save,
+                              name: AppLocalizations.of(context)!.edit,
                               onPressed: () {
                                 Navigator.pushNamed(
                                   context,

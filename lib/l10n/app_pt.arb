@@ -138,5 +138,20 @@
   "workInProgress": "trabalho em andamento",
   "update": "Atualizar",
   "initialRouteSettings": "Configurações de Rota Inicial",
-  "useSystemLanguage": "Usar idioma do sistema"
+  "useSystemLanguage": "Usar idioma do sistema",
+  "edit": "editar",
+  "postSettings": "Configurações de publicação",
+  "enableContentWarning": "Habilitar aviso de conteúdo",
+  "warningType": "Tipo de aviso",
+  "customWarning": "Aviso personalizado",
+  "specifyContentWarning": "Especificar aviso de conteúdo",
+  "enableClientTag": "Habilitar tag de cliente",
+  "close": "Fechar",
+  "sensitiveContent": "Conteúdo sensível",
+  "flashingLights": "Luzes intermitentes",
+  "loudNoises": "Ruídos altos",
+  "graphicContent": "Conteúdo gráfico",
+  "discrimination": "Discriminação",
+  "health": "Saúde",
+  "abuse": "Abuso"
 }

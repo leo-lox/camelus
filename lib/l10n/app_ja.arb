@@ -138,5 +138,20 @@
   "workInProgress": "作業中",
   "update": "更新",
   "initialRouteSettings": "初期ルート設定",
-  "useSystemLanguage": "システム言語を使用"
+  "useSystemLanguage": "システム言語を使用",
+  "edit": "編集",
+  "postSettings": "投稿設定",
+  "enableContentWarning": "コンテンツ警告を有効にする",
+  "warningType": "警告タイプ",
+  "customWarning": "カスタム警告",
+  "specifyContentWarning": "コンテンツ警告を指定",
+  "enableClientTag": "クライアントタグを有効にする",
+  "close": "閉じる",
+  "sensitiveContent": "センシティブなコンテンツ",
+  "flashingLights": "点滅する光",
+  "loudNoises": "大きな音",
+  "graphicContent": "グラフィックコンテンツ",
+  "discrimination": "差別",
+  "health": "健康",
+  "abuse": "虐待"
 }

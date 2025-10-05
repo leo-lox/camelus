@@ -441,4 +441,49 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get useSystemLanguage => 'システム言語を使用';
+
+  @override
+  String get edit => '編集';
+
+  @override
+  String get postSettings => '投稿設定';
+
+  @override
+  String get enableContentWarning => 'コンテンツ警告を有効にする';
+
+  @override
+  String get warningType => '警告タイプ';
+
+  @override
+  String get customWarning => 'カスタム警告';
+
+  @override
+  String get specifyContentWarning => 'コンテンツ警告を指定';
+
+  @override
+  String get enableClientTag => 'クライアントタグを有効にする';
+
+  @override
+  String get close => '閉じる';
+
+  @override
+  String get sensitiveContent => 'センシティブなコンテンツ';
+
+  @override
+  String get flashingLights => '点滅する光';
+
+  @override
+  String get loudNoises => '大きな音';
+
+  @override
+  String get graphicContent => 'グラフィックコンテンツ';
+
+  @override
+  String get discrimination => '差別';
+
+  @override
+  String get health => '健康';
+
+  @override
+  String get abuse => '虐待';
 }

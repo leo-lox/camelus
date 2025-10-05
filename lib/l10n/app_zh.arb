@@ -138,5 +138,20 @@
   "workInProgress": "正在进行中",
   "update": "更新",
   "initialRouteSettings": "初始路由设置",
-  "useSystemLanguage": "使用系统语言"
+  "useSystemLanguage": "使用系统语言",
+  "edit": "编辑",
+  "postSettings": "帖子设置",
+  "enableContentWarning": "启用内容警告",
+  "warningType": "警告类型",
+  "customWarning": "自定义警告",
+  "specifyContentWarning": "指定内容警告",
+  "enableClientTag": "启用客户端标签",
+  "close": "关闭",
+  "sensitiveContent": "敏感内容",
+  "flashingLights": "闪烁灯光",
+  "loudNoises": "响亮噪音",
+  "graphicContent": "图形内容",
+  "discrimination": "歧视",
+  "health": "健康",
+  "abuse": "虐待"
 }

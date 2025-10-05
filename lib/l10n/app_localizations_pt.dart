@@ -454,4 +454,49 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get useSystemLanguage => 'Usar idioma do sistema';
+
+  @override
+  String get edit => 'editar';
+
+  @override
+  String get postSettings => 'Configurações de publicação';
+
+  @override
+  String get enableContentWarning => 'Habilitar aviso de conteúdo';
+
+  @override
+  String get warningType => 'Tipo de aviso';
+
+  @override
+  String get customWarning => 'Aviso personalizado';
+
+  @override
+  String get specifyContentWarning => 'Especificar aviso de conteúdo';
+
+  @override
+  String get enableClientTag => 'Habilitar tag de cliente';
+
+  @override
+  String get close => 'Fechar';
+
+  @override
+  String get sensitiveContent => 'Conteúdo sensível';
+
+  @override
+  String get flashingLights => 'Luzes intermitentes';
+
+  @override
+  String get loudNoises => 'Ruídos altos';
+
+  @override
+  String get graphicContent => 'Conteúdo gráfico';
+
+  @override
+  String get discrimination => 'Discriminação';
+
+  @override
+  String get health => 'Saúde';
+
+  @override
+  String get abuse => 'Abuso';
 }
