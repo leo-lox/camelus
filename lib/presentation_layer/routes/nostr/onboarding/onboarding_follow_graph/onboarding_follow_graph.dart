@@ -199,12 +199,10 @@ class _OnboardingFollowGraphState extends ConsumerState<OnboardingFollowGraph> {
               child: ForceDirectedGraphWidget(
                 controller: _graphController,
                 onDraggingStart: (data) {
-                  setState(() {
-                  });
+                  setState(() {});
                 },
                 onDraggingEnd: (data) {
-                  setState(() {
-                  });
+                  setState(() {});
                 },
                 onDraggingUpdate: (data) {},
                 nodesBuilder: (context, data) {

@@ -240,7 +240,8 @@ class _OpenStarterPackState extends ConsumerState<OpenStarterPack> {
                 pinned: true,
                 expandedHeight: 200.0,
                 leading: IconButton(
-                  icon: Icon(Icons.arrow_back, color: Theme.of(context).colorScheme.onSurface),
+                  icon: Icon(Icons.arrow_back,
+                      color: Theme.of(context).colorScheme.onSurface),
                   onPressed: () => Navigator.pop(context),
                 ),
                 actions: [
@@ -273,10 +274,13 @@ class _OpenStarterPackState extends ConsumerState<OpenStarterPack> {
                           child: Row(
                             children: [
                               Icon(PhosphorIcons.pen(),
-                                  color: Theme.of(context).colorScheme.onSurface, size: 20),
+                                  color:
+                                      Theme.of(context).colorScheme.onSurface,
+                                  size: 20),
                               SizedBox(width: 8),
                               Text('Edit',
-                                  style: TextStyle(color: Paletter.getLightGray(context))),
+                                  style: TextStyle(
+                                      color: Paletter.getLightGray(context))),
                             ],
                           ),
                         ),
@@ -288,7 +292,8 @@ class _OpenStarterPackState extends ConsumerState<OpenStarterPack> {
                                   color: Colors.red, size: 20),
                               SizedBox(width: 8),
                               Text('Delete',
-                                  style: TextStyle(color: Paletter.getLightGray(context))),
+                                  style: TextStyle(
+                                      color: Paletter.getLightGray(context))),
                             ],
                           ),
                         ),
@@ -315,7 +320,10 @@ class _OpenStarterPackState extends ConsumerState<OpenStarterPack> {
                               height: 60,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
-                                color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .primary
+                                    .withValues(alpha: 0.2),
                               ),
                               child: myStarterSet.image != null
                                   ? ClipRRect(
@@ -329,7 +337,8 @@ class _OpenStarterPackState extends ConsumerState<OpenStarterPack> {
                                     )
                                   : Icon(
                                       PhosphorIcons.users(),
-                                      color: Theme.of(context).colorScheme.primary,
+                                      color:
+                                          Theme.of(context).colorScheme.primary,
                                       size: 30,
                                     ),
                             ),
@@ -342,7 +351,9 @@ class _OpenStarterPackState extends ConsumerState<OpenStarterPack> {
                                     myStarterSet.title ??
                                         widget.starterPackIdentifier.name,
                                     style: TextStyle(
-                                      color: Theme.of(context).colorScheme.onSurface,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSurface,
                                       fontSize: 24,
                                       fontWeight: FontWeight.bold,
                                     ),
@@ -404,7 +415,8 @@ class _OpenStarterPackState extends ConsumerState<OpenStarterPack> {
                               padding: EdgeInsets.symmetric(
                                   horizontal: 6, vertical: 2),
                               decoration: BoxDecoration(
-                                color: Paletter.getGray(context).withValues(alpha: 0.3),
+                                color: Paletter.getGray(context)
+                                    .withValues(alpha: 0.3),
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               child: Text(

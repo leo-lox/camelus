@@ -1,3 +1,4 @@
+import 'package:camelus/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
@@ -104,8 +105,8 @@ class _OnboardingStarterPackState extends ConsumerState<OnboardingStarterPack> {
         leading: Container(),
         leadingWidth: 0,
         title: widget.invitedByPubkey == null
-            ? const Text("Starter Packs")
-            : const Text("Additional Starter Packs"),
+            ? Text(AppLocalizations.of(context)!.starterPacks)
+            : Text(AppLocalizations.of(context)!.additionalStarterPacks),
       ),
       body: Column(
         children: [
@@ -123,8 +124,9 @@ class _OnboardingStarterPackState extends ConsumerState<OnboardingStarterPack> {
             height: 40,
             child: longButton(
               name: selectedPubkeys.isNotEmpty
-                  ? "continue with ${selectedPubkeys.length} accounts"
-                  : "select a starter pack",
+                  ? AppLocalizations.of(context)!
+                      .continueWithAccounts(selectedPubkeys.length)
+                  : AppLocalizations.of(context)!.selectStarterPack,
               onPressed: (() {
                 widget.submitCallback(selectedPubkeys);
               }),
@@ -211,8 +213,12 @@ class _OnboardingOpenStarterPackState
                   ),
                   const TextSpan(text: " "),
                   TextSpan(
-                    text:
-                        "by ${ref.watch(metadataStateProvider(widget.followSet.pubKey)).userMetadata?.name ?? "Unknown"}",
+                    text: AppLocalizations.of(context)!.by(ref
+                            .watch(
+                                metadataStateProvider(widget.followSet.pubKey))
+                            .userMetadata
+                            ?.name ??
+                        "Unknown"),
                     style: TextStyle(
                       color: Paletter.getGray(context),
                       fontSize: 12,
@@ -226,7 +232,7 @@ class _OnboardingOpenStarterPackState
             const Spacer(flex: 1),
             if (allSelected)
               longButton(
-                  name: "unselect all",
+                  name: AppLocalizations.of(context)!.unselectAll,
                   onPressed: () {
                     setState(() {
                       selectedPubkeys.removeWhere((element) {
@@ -313,8 +319,9 @@ class _OnboardingOpenStarterPackState
             height: 40,
             child: longButton(
               name: nothingOfOwnSelected
-                  ? "follow all"
-                  : "follow $ownSelectedCount accounts",
+                  ? AppLocalizations.of(context)!.followAll
+                  : AppLocalizations.of(context)!
+                      .followAccounts(ownSelectedCount),
               onPressed: (() {
                 setState(() {
                   if (nothingOfOwnSelected) {

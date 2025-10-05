@@ -1,27 +1,25 @@
 import 'dart:developer';
 import 'dart:io';
 
-import 'package:image_picker/image_picker.dart';
-
+import 'package:camelus/config/palette.dart';
+import 'package:camelus/data_layer/models/post_context.dart';
 import 'package:camelus/domain_layer/entities/user_metadata.dart';
+import 'package:camelus/domain_layer/usecases/remove_image_metadata.dart';
+import 'package:camelus/helpers/helpers.dart';
+import 'package:camelus/l10n/app_localizations.dart';
 import 'package:camelus/presentation_layer/atoms/picture.dart';
-
 import 'package:camelus/presentation_layer/providers/metadata_state_provider.dart';
+import 'package:camelus/presentation_layer/providers/search_provider.dart';
+import 'package:camelus/presentation_layer/providers/write_post_state.provider.dart';
+import 'package:camelus/config/default_suggestions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mentions/flutter_mentions.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:lottie/lottie.dart';
-import 'package:camelus/config/palette.dart';
-import 'package:camelus/helpers/helpers.dart';
-import 'package:camelus/data_layer/models/post_context.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
-import '../../config/default_suggestions.dart';
-
-import '../../domain_layer/usecases/remove_image_metadata.dart';
-import '../providers/search_provider.dart';
-import '../providers/write_post_state.provider.dart';
 import 'post_overflow.dart';
 import 'write_post/post_settings_dialog.dart';
 
@@ -57,8 +55,8 @@ class _WritePostState extends ConsumerState<WritePost> {
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('unspoorted image format'),
+        SnackBar(
+          content: Text(AppLocalizations.of(context)!.unsupportedImageFormat),
         ),
       );
     }
@@ -168,7 +166,7 @@ class _WritePostState extends ConsumerState<WritePost> {
               const SizedBox(
                 height: 20,
               ),
-              Text("error:",
+              Text(AppLocalizations.of(context)!.error,
                   style: TextStyle(
                     color: Theme.of(context).colorScheme.onSurface,
                     fontWeight: FontWeight.bold,
@@ -364,10 +362,11 @@ class _WritePostState extends ConsumerState<WritePost> {
         keyboardAppearance: Brightness.dark,
         suggestionPosition: SuggestionPosition.Top,
         focusNode: _focusNode,
-        style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 21),
+        style: TextStyle(
+            color: Theme.of(context).colorScheme.onSurface, fontSize: 21),
         decoration: InputDecoration(
           border: InputBorder.none,
-          hintText: "What's on your mind?",
+          hintText: AppLocalizations.of(context)!.whatsOnYourMind,
           hintStyle: TextStyle(
             color: Paletter.getGray(context),
             fontSize: 20,
@@ -529,7 +528,7 @@ class _TopBar extends ConsumerWidget {
           ),
           if (replyToPubkey == null)
             Text(
-              "write a post",
+              AppLocalizations.of(context)!.writePost,
               style: TextStyle(
                 color: Paletter.getLightGray(context),
                 fontSize: 20,
@@ -544,7 +543,8 @@ class _TopBar extends ConsumerWidget {
                   margin:
                       const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
                   child: Text(
-                    "reply to ${metadata?.name ?? getPubkeyHrShort(replyToPubkey!)}",
+                    AppLocalizations.of(context)!.replyTo(
+                        metadata?.name ?? getPubkeyHrShort(replyToPubkey!)),
                     overflow: TextOverflow.ellipsis,
                     maxLines: 2,
                     style: TextStyle(
@@ -566,7 +566,8 @@ class _TopBar extends ConsumerWidget {
                   icon: SvgPicture.asset(
                     height: 25,
                     'assets/icons/paper-plane-tilt.svg',
-                    colorFilter: ColorFilter.mode(Theme.of(context).colorScheme.primary, BlendMode.srcIn),
+                    colorFilter: ColorFilter.mode(
+                        Theme.of(context).colorScheme.primary, BlendMode.srcIn),
                   ),
                 )
               : Lottie.asset(

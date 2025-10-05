@@ -1,3 +1,4 @@
+import 'package:camelus/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -83,7 +84,10 @@ class _OnboardingInvitedByState extends ConsumerState<OnboardingInvitedBy> {
                       begin: Alignment.topLeft,
                       end: Alignment.bottomCenter,
                       colors: [
-                        Theme.of(context).colorScheme.primary.withValues(alpha: 0.7),
+                        Theme.of(context)
+                            .colorScheme
+                            .primary
+                            .withValues(alpha: 0.7),
                         Theme.of(context).colorScheme.primary,
                       ],
                     ),
@@ -123,15 +127,18 @@ class _OnboardingInvitedByState extends ConsumerState<OnboardingInvitedBy> {
                                     TextSpan(
                                       text: inviteeMetadata.userMetadata?.name,
                                       style: TextStyle(
-                                        color: Paletter.getExtraLightGray(context),
+                                        color:
+                                            Paletter.getExtraLightGray(context),
                                         fontSize: 18,
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),
                                     TextSpan(
-                                      text: ' invited you to join',
+                                      text: AppLocalizations.of(context)!
+                                          .invitedYouToJoin,
                                       style: TextStyle(
-                                        color: Paletter.getExtraLightGray(context),
+                                        color:
+                                            Paletter.getExtraLightGray(context),
                                         fontSize: 16,
                                       ),
                                     ),
@@ -148,7 +155,7 @@ class _OnboardingInvitedByState extends ConsumerState<OnboardingInvitedBy> {
                 const SizedBox(height: 10),
                 if (invitedSet != null)
                   Text(
-                    "You'll follow these people right away",
+                    AppLocalizations.of(context)!.youWillFollowThesePeople,
                     style: TextStyle(
                       color: Paletter.getExtraLightGray(context),
                       fontSize: 16,
@@ -158,13 +165,15 @@ class _OnboardingInvitedByState extends ConsumerState<OnboardingInvitedBy> {
                 const SizedBox(height: 10),
                 if (invitedSet == null)
                   Expanded(
-                    child: const Center(
+                    child: Center(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Text("👀 no starter pack found "),
+                          Text(
+                              AppLocalizations.of(context)!.noStarterPackFound),
                           SizedBox(height: 10),
-                          Text("no worries, you can still join Camelus!"),
+                          Text(AppLocalizations.of(context)!
+                              .noWorriesYouCanStillJoin),
                         ],
                       ),
                     ),
@@ -196,7 +205,9 @@ class _OnboardingInvitedByState extends ConsumerState<OnboardingInvitedBy> {
                                     Text(
                                       displayMetadata?.name ?? "",
                                       style: TextStyle(
-                                        color: Theme.of(context).colorScheme.onSurface,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSurface,
                                         fontSize: 16,
                                         fontWeight: FontWeight.w600,
                                       ),
@@ -232,7 +243,7 @@ class _OnboardingInvitedByState extends ConsumerState<OnboardingInvitedBy> {
                         width: 400,
                         height: 40,
                         child: longButton(
-                          name: "Join Camelus",
+                          name: AppLocalizations.of(context)!.joinCamelus,
                           onPressed: () {
                             onJoinWithStarterPack(invitedSet);
                           },
@@ -245,7 +256,8 @@ class _OnboardingInvitedByState extends ConsumerState<OnboardingInvitedBy> {
                           width: 400,
                           height: 40,
                           child: longButton(
-                            name: "Signup without a starter pack",
+                            name: AppLocalizations.of(context)!
+                                .signupWithoutStarterPack,
                             onPressed: () {
                               widget.nextCallback();
                             },

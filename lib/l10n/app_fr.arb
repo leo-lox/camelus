@@ -72,7 +72,7 @@
   "changesSavedSuccessfully": "Modifications enregistrées avec succès",
   "failedToSaveChanges": "Échec de l'enregistrement des modifications",
   "setupDefaultServers": "configurer les serveurs par défaut",
-  "default": " (par défaut)",
+  "defaultLabel": " (par défaut)",
   "restoreDefaults": "Restaurer les valeurs par défaut",
   "restoreDefaultsMessage": "Êtes-vous sûr de vouloir restaurer les serveurs par défaut? Cela supprimera tous les serveurs personnalisés.",
   "restore": "Restaurer",

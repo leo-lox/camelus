@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:camelus/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -75,7 +76,7 @@ class ModerationSettingsPageState
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              'Error updating filter $e',
+              AppLocalizations.of(context)!.errorUpdatingFilter(e.toString()),
             ),
           ),
         );
@@ -93,7 +94,7 @@ class ModerationSettingsPageState
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Moderation Settings'),
+        title: Text(AppLocalizations.of(context)!.moderationSettings),
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -101,23 +102,23 @@ class ModerationSettingsPageState
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                'Camelus Content Filtering',
-                style: TextStyle(
+              Text(
+                AppLocalizations.of(context)!.camelusContentFiltering,
+                style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                 ),
               ),
               const SizedBox(height: 8),
               Text(
-                'Enable content filtering to hide potentially inappropriate content.',
+                AppLocalizations.of(context)!.enableContentFilteringDescription,
                 style: TextStyle(
                   color: Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
               ),
               const SizedBox(height: 16),
               SwitchListTile(
-                title: const Text('Enable Content Filter'),
+                title: Text(AppLocalizations.of(context)!.enableContentFilter),
                 value: isFilterEnabled.isEnabled,
                 onChanged: _isLoading ? null : _toggleFilter,
                 secondary: _isLoading
@@ -131,7 +132,7 @@ class ModerationSettingsPageState
               const Divider(),
               const SizedBox(height: 16),
               Text(
-                'Note: Filters are applied locally (on device). When users report nostr content directly to camelus it gets added to the filter.',
+                AppLocalizations.of(context)!.contentFilterNote,
                 style: TextStyle(
                   fontSize: 12,
                   fontStyle: FontStyle.italic,

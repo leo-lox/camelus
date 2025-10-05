@@ -231,7 +231,8 @@ class _PostSettingsState extends ConsumerState<PostSettings> {
           isExpanded: true,
           icon: const Icon(Icons.arrow_drop_down),
           elevation: 16,
-          style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 16),
+          style: TextStyle(
+              color: Theme.of(context).colorScheme.onSurface, fontSize: 16),
           onChanged: (String? newValue) {
             if (newValue != null) {
               notifier.setSelectedWarning(newValue);

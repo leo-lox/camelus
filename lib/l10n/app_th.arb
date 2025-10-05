@@ -72,7 +72,7 @@
   "changesSavedSuccessfully": "บันทึกการเปลี่ยนแปลงสำเร็จ",
   "failedToSaveChanges": "บันทึกการเปลี่ยนแปลงล้มเหลว",
   "setupDefaultServers": "ตั้งค่าเซิร์ฟเวอร์เริ่มต้น",
-  "default": " (ค่าเริ่มต้น)",
+  "defaultLabel": " (ค่าเริ่มต้น)",
   "restoreDefaults": "คืนค่าเริ่มต้น",
   "restoreDefaultsMessage": "คุณแน่ใจหรือไม่ว่าต้องการคืนค่าเซิร์ฟเวอร์เริ่มต้น? นี่จะลบเซิร์ฟเวอร์ที่กำหนดเองทั้งหมด",
   "restore": "คืนค่า",

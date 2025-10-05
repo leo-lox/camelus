@@ -155,7 +155,8 @@ class _EditRelaysViewState extends ConsumerState<EditRelaysView> {
                 SizedBox(height: 20),
                 Text(
                   "reconnecting to relays...",
-                  style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+                  style:
+                      TextStyle(color: Theme.of(context).colorScheme.onSurface),
                 ),
               ],
             ))
@@ -168,15 +169,18 @@ class _EditRelaysViewState extends ConsumerState<EditRelaysView> {
                     decoration: InputDecoration(
                       hintText: " add relay",
                       enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Paletter.getLightGray(context)),
+                        borderSide:
+                            BorderSide(color: Paletter.getLightGray(context)),
                         borderRadius: BorderRadius.all(Radius.circular(30)),
                       ),
                       focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Theme.of(context).colorScheme.onSurface),
+                        borderSide: BorderSide(
+                            color: Theme.of(context).colorScheme.onSurface),
                         borderRadius: BorderRadius.all(Radius.circular(30)),
                       ),
                     ),
-                    style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+                    style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurface),
                     onSubmitted: (value) {
                       _addRelay();
                     },
@@ -205,7 +209,8 @@ class _EditRelaysViewState extends ConsumerState<EditRelaysView> {
                           const SizedBox(width: 15),
                           Text(
                             relay.url,
-                            style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+                            style: TextStyle(
+                                color: Theme.of(context).colorScheme.onSurface),
                           ),
                           const Spacer(),
                           // switch button read
@@ -225,7 +230,10 @@ class _EditRelaysViewState extends ConsumerState<EditRelaysView> {
                               ),
                               Text(
                                 'read',
-                                style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+                                style: TextStyle(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurface),
                               ),
                             ],
                           ),
@@ -244,7 +252,10 @@ class _EditRelaysViewState extends ConsumerState<EditRelaysView> {
                               ),
                               Text(
                                 'write',
-                                style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+                                style: TextStyle(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurface),
                               ),
                             ],
                           ),
@@ -291,7 +302,10 @@ class _EditRelaysViewState extends ConsumerState<EditRelaysView> {
                               ),
                               Text(
                                 'delete',
-                                style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+                                style: TextStyle(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurface),
                               ),
                             ],
                           ),

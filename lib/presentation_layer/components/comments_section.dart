@@ -53,11 +53,17 @@ class FlatCommentWidget extends StatelessWidget {
                   child: Container(
                     decoration: BoxDecoration(
                       border: Border.all(
-                        color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.65),
+                        color: Theme.of(context)
+                            .colorScheme
+                            .primary
+                            .withValues(alpha: 0.65),
                         width: 2.0,
                       ),
                       borderRadius: BorderRadius.circular(10.0),
-                      color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.05),
+                      color: Theme.of(context)
+                          .colorScheme
+                          .primary
+                          .withValues(alpha: 0.05),
                     ),
                   ),
                 ),

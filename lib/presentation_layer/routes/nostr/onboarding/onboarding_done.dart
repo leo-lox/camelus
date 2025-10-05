@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:math';
 
+import 'package:camelus/l10n/app_localizations.dart';
 import 'package:camelus/presentation_layer/components/full_screen_loading.dart';
 import 'package:camelus/presentation_layer/providers/ndk_provider.dart';
 import 'package:flutter/material.dart';
@@ -48,12 +49,7 @@ class _OnboardingDoneState extends ConsumerState<OnboardingDone> {
   bool _isLoading = false;
   double _loadingOpacity = 0.0;
 
-  List<String> loadingTexts = [
-    "setting up your account",
-    "following people",
-    "moving data",
-    "cleaning up"
-  ];
+  late List<String> loadingTexts;
 
   void _toggleVisibility() {
     setState(() {
@@ -114,7 +110,8 @@ ${_privateKey.mnemonicSentence}
     if (widget.userInfo.picture != null) {
       setState(() {
         // add to start
-        loadingTexts.insert(0, "uploading profile picture");
+        loadingTexts.insert(
+            0, AppLocalizations.of(context)!.uploadingProfilePicture);
       });
 
       try {
@@ -160,6 +157,17 @@ ${_privateKey.mnemonicSentence}
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    loadingTexts = [
+      AppLocalizations.of(context)!.settingUpYourAccount,
+      AppLocalizations.of(context)!.followingPeople,
+      AppLocalizations.of(context)!.movingData,
+      AppLocalizations.of(context)!.cleaningUp
+    ];
+  }
+
+  @override
   void dispose() {
     super.dispose();
   }
@@ -168,7 +176,7 @@ ${_privateKey.mnemonicSentence}
     if (!_termsAndConditions) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Please read and accept the terms and conditions first'),
+          content: Text(AppLocalizations.of(context)!.pleaseReadAndAcceptTerms),
         ),
       );
       return;
@@ -225,7 +233,7 @@ ${_privateKey.mnemonicSentence}
                       children: [
                         const SizedBox(height: 20),
                         Text(
-                          "recovery phrase",
+                          AppLocalizations.of(context)!.recoveryPhrase,
                           style: TextStyle(
                             color: Theme.of(context).colorScheme.onSurface,
                             fontSize: 22,
@@ -245,40 +253,47 @@ ${_privateKey.mnemonicSentence}
                             children: [
                               ElevatedButton.icon(
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: Theme.of(context).colorScheme.surface,
-                                  foregroundColor: Theme.of(context).colorScheme.onSurface,
+                                  backgroundColor:
+                                      Theme.of(context).colorScheme.surface,
+                                  foregroundColor:
+                                      Theme.of(context).colorScheme.onSurface,
                                 ),
                                 onPressed: () => {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
                                       duration: Duration(seconds: 2),
                                       content: Text(
-                                          'a new seed phrase has been generated'),
+                                          AppLocalizations.of(context)!
+                                              .newSeedPhraseGenerated),
                                     ),
                                   ),
                                   _generateKey()
                                 },
                                 icon: const Icon(Icons.refresh),
-                                label: const Text('regenerate'),
+                                label: Text(
+                                    AppLocalizations.of(context)!.regenerate),
                               ),
                               const SizedBox(width: 5),
                               ElevatedButton.icon(
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: Paletter.getLightGray(context),
-                                  foregroundColor: Theme.of(context).colorScheme.surface,
+                                  backgroundColor:
+                                      Paletter.getLightGray(context),
+                                  foregroundColor:
+                                      Theme.of(context).colorScheme.surface,
                                 ),
                                 onPressed: () => {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
                                       duration: Duration(seconds: 2),
                                       content: Text(
-                                          'copied seed phrase to clipboard'),
+                                          AppLocalizations.of(context)!
+                                              .copiedSeedPhraseToClipboard),
                                     ),
                                   ),
                                   _copyKey()
                                 },
                                 icon: const Icon(Icons.copy),
-                                label: const Text('copy'),
+                                label: Text(AppLocalizations.of(context)!.copy),
                               ),
                               const SizedBox(width: 5),
                               IconButton(
@@ -286,16 +301,17 @@ ${_privateKey.mnemonicSentence}
                                 icon: Icon(_isVisible
                                     ? Icons.visibility
                                     : Icons.visibility_off),
-                                tooltip:
-                                    _isVisible ? 'Hide words' : 'Show words',
+                                tooltip: _isVisible
+                                    ? AppLocalizations.of(context)!.hideWords
+                                    : AppLocalizations.of(context)!.showWords,
                               ),
                             ],
                           ),
                         ),
-                        const Padding(
+                        Padding(
                           padding: EdgeInsets.all(16),
-                          child: Text(
-                              "You need the recovery phrase to login again. Make sure to keep it safe!"),
+                          child: Text(AppLocalizations.of(context)!
+                              .recoveryPhraseWarning),
                         ),
                       ],
                     ),
@@ -317,7 +333,7 @@ ${_privateKey.mnemonicSentence}
                           },
                         ),
                         Text(
-                          "I have read and accept the ",
+                          AppLocalizations.of(context)!.iHaveReadAndAccept,
                           style: TextStyle(
                             color: Theme.of(context).colorScheme.onSurface,
                             fontSize: 12,
@@ -331,7 +347,7 @@ ${_privateKey.mnemonicSentence}
                                 mode: LaunchMode.externalApplication);
                           },
                           child: Text(
-                            "terms and conditions",
+                            AppLocalizations.of(context)!.termsAndConditions,
                             style: TextStyle(
                               color: Theme.of(context).colorScheme.onSurface,
                               fontSize: 12,
@@ -348,7 +364,7 @@ ${_privateKey.mnemonicSentence}
                         launchUrl(url, mode: LaunchMode.externalApplication);
                       },
                       child: Text(
-                        "privacy policy",
+                        AppLocalizations.of(context)!.privacyPolicy,
                         style: TextStyle(
                           color: Theme.of(context).colorScheme.onSurface,
                           fontSize: 12,
@@ -363,7 +379,7 @@ ${_privateKey.mnemonicSentence}
                       width: 400,
                       height: 40,
                       child: longButton(
-                        name: "publish account",
+                        name: AppLocalizations.of(context)!.publishAccount,
                         inverted: true,
                         onPressed: () => _onSubmit(),
                       ),
@@ -381,11 +397,11 @@ ${_privateKey.mnemonicSentence}
               duration: const Duration(seconds: 2),
               child: _isLoading
                   ? Center(
-                    child: FullScreenLoading(
-                      loadingTexts: loadingTexts,
-                      updateState: (function) => {},
-                    ),
-                  )
+                      child: FullScreenLoading(
+                        loadingTexts: loadingTexts,
+                        updateState: (function) => {},
+                      ),
+                    )
                   : const SizedBox.shrink(),
             ),
         ],

@@ -319,7 +319,8 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                           },
                           child: Text(
                             "by nostr.band",
-                            style: TextStyle(color: Paletter.getGray(context), fontSize: 14),
+                            style: TextStyle(
+                                color: Paletter.getGray(context), fontSize: 14),
                           ),
                         ),
                       ],
@@ -408,7 +409,9 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                   padding: const EdgeInsets.all(20.0),
                   child: Text(
                     'Error: ${searchState.error}',
-                    style: TextStyle(color: Theme.of(context).colorScheme.error, fontSize: 16),
+                    style: TextStyle(
+                        color: Theme.of(context).colorScheme.error,
+                        fontSize: 16),
                   ),
                 ),
               ),
@@ -431,7 +434,8 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                     padding: EdgeInsets.all(20.0),
                     child: Text(
                       "No results found",
-                      style: TextStyle(color: Paletter.getGray(context), fontSize: 16),
+                      style: TextStyle(
+                          color: Paletter.getGray(context), fontSize: 16),
                     ),
                   ),
                 ),
@@ -452,7 +456,9 @@ class _SearchPageState extends ConsumerState<SearchPage> {
             Expanded(
               child: Text(
                 'Search for "$query"',
-                style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 16),
+                style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface,
+                    fontSize: 16),
               ),
             ),
             Icon(PhosphorIcons.arrowUpLeft(), color: Paletter.getGray(context)),

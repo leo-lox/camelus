@@ -90,7 +90,9 @@ class _EditStarterPackContentState
                 trailing: IconButton(
                   icon: Icon(
                     PhosphorIcons.listNumbers(),
-                    color: _isReorderMode ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.onSurface,
+                    color: _isReorderMode
+                        ? Theme.of(context).colorScheme.primary
+                        : Theme.of(context).colorScheme.onSurface,
                   ),
                   onPressed: () {
                     setState(() {
@@ -194,7 +196,8 @@ class _EditStarterPackContentState
                 ),
                 Text(
                   "you can also use the three dots menu on every post to add a user to a pack",
-                  style: TextStyle(fontSize: 12, color: Paletter.getLightGray(context)),
+                  style: TextStyle(
+                      fontSize: 12, color: Paletter.getLightGray(context)),
                 ),
               ],
             ),

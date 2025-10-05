@@ -74,7 +74,8 @@ class LocaleSettingsPageState extends ConsumerState<LocaleSettingsPage> {
               style: TextStyle(color: Paletter.getLightGray(context)),
             ),
             trailing: _isSystemLanguage
-                ? Icon(PhosphorIcons.check(), color: Theme.of(context).colorScheme.onSurface)
+                ? Icon(PhosphorIcons.check(),
+                    color: Theme.of(context).colorScheme.onSurface)
                 : null,
             onTap: () async {
               await languageNotifier.resetToSystemLanguage(context);
@@ -104,7 +105,8 @@ class LocaleSettingsPageState extends ConsumerState<LocaleSettingsPage> {
                     style: TextStyle(color: Paletter.getLightGray(context)),
                   ),
                   trailing: isSelected
-                      ? Icon(PhosphorIcons.check(), color: Theme.of(context).colorScheme.onSurface)
+                      ? Icon(PhosphorIcons.check(),
+                          color: Theme.of(context).colorScheme.onSurface)
                       : null,
                   onTap: () async {
                     await languageNotifier.changeLanguage(locale);

@@ -313,8 +313,8 @@
   "@setupDefaultServers": {
     "description": "Button to setup default file servers"
   },
-  "default": " (default)",
-  "@default": {
+  "defaultLabel": " (default)",
+  "@defaultLabel": {
     "description": "Label suffix for default items"
   },
   "restoreDefaults": "Restore Defaults",

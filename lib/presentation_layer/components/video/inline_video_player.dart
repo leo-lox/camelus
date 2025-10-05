@@ -90,13 +90,17 @@ class InlineVideoPlayer extends ConsumerWidget {
                       },
                       child: videoState.showControls
                           ? Container(
-                              color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.54),
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .surface
+                                  .withValues(alpha: 0.54),
                               child: Center(
                                 child: Icon(
                                   videoState.isPlaying
                                       ? PhosphorIcons.pause()
                                       : PhosphorIcons.play(),
-                                  color: Theme.of(context).colorScheme.onSurface,
+                                  color:
+                                      Theme.of(context).colorScheme.onSurface,
                                   size: 64.0,
                                 ),
                               ),
@@ -164,18 +168,17 @@ class InlineVideoPlayer extends ConsumerWidget {
   }
 
   Widget _buildShimmerLoading(double width, double height) {
-    return Builder(
-      builder: (context) {
-        return Shimmer.fromColors(
-          baseColor: Paletter.getExtraDarkGray(context).withValues(alpha: 0.1),
-          highlightColor: Paletter.getExtraDarkGray(context).withValues(alpha: 0.7),
-          child: Container(
-            width: width,
-            height: height,
-            color: Theme.of(context).colorScheme.surface,
-          ),
-        );
-      }
-    );
+    return Builder(builder: (context) {
+      return Shimmer.fromColors(
+        baseColor: Paletter.getExtraDarkGray(context).withValues(alpha: 0.1),
+        highlightColor:
+            Paletter.getExtraDarkGray(context).withValues(alpha: 0.7),
+        child: Container(
+          width: width,
+          height: height,
+          color: Theme.of(context).colorScheme.surface,
+        ),
+      );
+    });
   }
 }

@@ -72,7 +72,7 @@
   "changesSavedSuccessfully": "更改保存成功",
   "failedToSaveChanges": "保存更改失败",
   "setupDefaultServers": "设置默认服务器",
-  "default": "（默认）",
+  "defaultLabel": "（默认）",
   "restoreDefaults": "恢复默认",
   "restoreDefaultsMessage": "您确定要恢复默认服务器吗？这将删除所有自定义服务器。",
   "restore": "恢复",

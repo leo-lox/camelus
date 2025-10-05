@@ -72,7 +72,7 @@
   "changesSavedSuccessfully": "Cambios guardados exitosamente",
   "failedToSaveChanges": "Error al guardar cambios",
   "setupDefaultServers": "configurar servidores predeterminados",
-  "default": " (predeterminado)",
+  "defaultLabel": " (predeterminado)",
   "restoreDefaults": "Restaurar Predeterminados",
   "restoreDefaultsMessage": "¿Estás seguro de que quieres restaurar los servidores predeterminados? Esto eliminará todos los servidores personalizados.",
   "restore": "Restaurar",

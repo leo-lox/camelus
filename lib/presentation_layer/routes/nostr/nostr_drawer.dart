@@ -1,6 +1,7 @@
 import 'package:camelus/domain_layer/entities/user_metadata.dart';
 
 import 'package:camelus/helpers/nprofile_helper.dart';
+import 'package:camelus/l10n/app_localizations.dart';
 
 import 'package:camelus/presentation_layer/atoms/my_profile_picture.dart';
 
@@ -30,7 +31,7 @@ class NostrDrawer extends ConsumerWidget {
   void _copyToClipboard(BuildContext context, String text) {
     Clipboard.setData(ClipboardData(text: text));
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Text("Copied to clipboard: $text"),
+      content: Text(AppLocalizations.of(context)!.copiedToClipboard(text)),
     ));
   }
 
@@ -56,8 +57,9 @@ class NostrDrawer extends ConsumerWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    "Share your Profile",
-                    style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+                    AppLocalizations.of(context)!.shareYourProfile,
+                    style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurface),
                   ),
                   const SizedBox(height: 40),
                   QrImageView(
@@ -166,7 +168,7 @@ class NostrDrawer extends ConsumerWidget {
                   ),
                   children: [
                     TextSpan(
-                      text: ' Following  ',
+                      text: ' ${AppLocalizations.of(context)!.following}  ',
                       style: TextStyle(
                           color: Paletter.getGray(context),
                           fontSize: 13,
@@ -187,7 +189,7 @@ class NostrDrawer extends ConsumerWidget {
                       ),
                       children: [
                     TextSpan(
-                      text: 'Followers',
+                      text: AppLocalizations.of(context)!.followers,
                       style: TextStyle(
                           color: Paletter.getGray(context),
                           fontSize: 13,
@@ -202,44 +204,41 @@ class NostrDrawer extends ConsumerWidget {
   }
 
   Widget _drawerItem({icon, label, onTap}) {
-    return Builder(
-      builder: (context) {
-        return ListTile(
-          onTap: onTap,
-          leading: SvgPicture.asset(
-            icon,
-            height: 25,
-            colorFilter: ColorFilter.mode(Paletter.getGray(context), BlendMode.srcIn),
-          ),
-          title: Text(label,
-              style: TextStyle(color: Paletter.getLightGray(context), fontSize: 17)),
-        );
-      }
-    );
+    return Builder(builder: (context) {
+      return ListTile(
+        onTap: onTap,
+        leading: SvgPicture.asset(
+          icon,
+          height: 25,
+          colorFilter:
+              ColorFilter.mode(Paletter.getGray(context), BlendMode.srcIn),
+        ),
+        title: Text(label,
+            style:
+                TextStyle(color: Paletter.getLightGray(context), fontSize: 17)),
+      );
+    });
   }
 
   Widget _textButton({text, onPressed}) {
     return TextButton(
         onPressed: onPressed,
-        child: Builder(
-          builder: (context) {
-            return Text(
-              text,
-              style: TextStyle(color: Paletter.getExtraLightGray(context), fontSize: 16),
-            );
-          }
-        ));
+        child: Builder(builder: (context) {
+          return Text(
+            text,
+            style: TextStyle(
+                color: Paletter.getExtraLightGray(context), fontSize: 16),
+          );
+        }));
   }
 
   Widget _divider() {
-    return Builder(
-      builder: (context) {
-        return Divider(
-          thickness: 0.3,
-          color: Paletter.getDarkGray(context),
-        );
-      }
-    );
+    return Builder(builder: (context) {
+      return Divider(
+        thickness: 0.3,
+        color: Paletter.getDarkGray(context),
+      );
+    });
   }
 
   // Add method to get version
@@ -262,33 +261,35 @@ class NostrDrawer extends ConsumerWidget {
           _drawerHeader(context, myUserMetadata, ref),
           _divider(),
           _drawerItem(
-              label: 'Profile',
+              label: AppLocalizations.of(context)!.profile,
               icon: 'assets/icons/user.svg',
               onTap: () {
                 navigateToProfile(context);
               }),
           _drawerItem(
-              label: 'Bookmarks',
+              label: AppLocalizations.of(context)!.bookmarks,
               icon: 'assets/icons/bookmark-simple.svg',
               onTap: () {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Not implemented yet'),
+                  SnackBar(
+                    content:
+                        Text(AppLocalizations.of(context)!.notImplementedYet),
                   ),
                 );
               }),
           _drawerItem(
-              label: 'Payments',
+              label: AppLocalizations.of(context)!.payments,
               icon: 'assets/icons/lightning.svg',
               onTap: () {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Not implemented yet'),
+                  SnackBar(
+                    content:
+                        Text(AppLocalizations.of(context)!.notImplementedYet),
                   ),
                 );
               }),
           _drawerItem(
-              label: 'Blocklist',
+              label: AppLocalizations.of(context)!.blocklist,
               icon: 'assets/icons/yin-yang.svg',
               onTap: () {
                 // navigate to blocklist
@@ -300,7 +301,7 @@ class NostrDrawer extends ConsumerWidget {
           Padding(
               padding: const EdgeInsets.only(left: 20),
               child: _textButton(
-                  text: 'Settings',
+                  text: AppLocalizations.of(context)!.settings,
                   onPressed: () {
                     Navigator.pushNamed(context, '/settings');
                   })),
@@ -308,7 +309,7 @@ class NostrDrawer extends ConsumerWidget {
           Padding(
               padding: const EdgeInsets.fromLTRB(20, 10, 15, 20),
               child: _textButton(
-                  text: 'Terms of Service',
+                  text: AppLocalizations.of(context)!.termsOfService,
                   onPressed: () {
                     // lauch url
                     Uri url = Uri.parse("https://camelus.app/terms");
@@ -356,7 +357,8 @@ class NostrDrawer extends ConsumerWidget {
               children: [
                 SvgPicture.asset(
                   'assets/icons/sun.svg',
-                  colorFilter: ColorFilter.mode(Theme.of(context).colorScheme.primary, BlendMode.srcIn),
+                  colorFilter: ColorFilter.mode(
+                      Theme.of(context).colorScheme.primary, BlendMode.srcIn),
                   height: 22,
                   width: 22,
                 ),
@@ -366,7 +368,8 @@ class NostrDrawer extends ConsumerWidget {
                   },
                   child: SvgPicture.asset(
                     'assets/icons/qr-code.svg',
-                    colorFilter: ColorFilter.mode(Theme.of(context).colorScheme.primary, BlendMode.srcIn),
+                    colorFilter: ColorFilter.mode(
+                        Theme.of(context).colorScheme.primary, BlendMode.srcIn),
                     height: 22,
                     width: 22,
                   ),

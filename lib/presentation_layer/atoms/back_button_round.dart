@@ -18,7 +18,8 @@ class BackButtonRound extends StatelessWidget {
             Navigator.pop(context);
           },
           style: ElevatedButton.styleFrom(
-            backgroundColor: Theme.of(context).colorScheme.surface.withValues(alpha: 0.54),
+            backgroundColor:
+                Theme.of(context).colorScheme.surface.withValues(alpha: 0.54),
             padding: const EdgeInsets.all(0),
             shape: const CircleBorder(),
           ),

@@ -63,7 +63,9 @@ class SkeletonNote extends StatelessWidget {
                           height: 18,
                           width: 120,
                           decoration: BoxDecoration(
-                            color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                            color: Theme.of(context)
+                                .colorScheme
+                                .surfaceContainerHighest,
                             borderRadius: BorderRadius.circular(2),
                           ),
                         ),
@@ -78,7 +80,9 @@ class SkeletonNote extends StatelessWidget {
                           height: 12,
                           width: MediaQuery.of(context).size.width / 2.5,
                           decoration: BoxDecoration(
-                            color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                            color: Theme.of(context)
+                                .colorScheme
+                                .surfaceContainerHighest,
                             borderRadius: BorderRadius.circular(2),
                           ),
                         ),
@@ -91,7 +95,9 @@ class SkeletonNote extends StatelessWidget {
                           height: 12,
                           width: 50,
                           decoration: BoxDecoration(
-                            color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                            color: Theme.of(context)
+                                .colorScheme
+                                .surfaceContainerHighest,
                             borderRadius: BorderRadius.circular(2),
                           ),
                         ),

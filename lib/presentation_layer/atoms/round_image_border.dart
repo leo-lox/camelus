@@ -2,7 +2,6 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 
-
 class RoundImageWithBorder extends StatelessWidget {
   final Uint8List image;
   final double size;
@@ -20,7 +19,8 @@ class RoundImageWithBorder extends StatelessWidget {
       height: size,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        border: Border.all(color: Theme.of(context).colorScheme.surface, width: 2),
+        border:
+            Border.all(color: Theme.of(context).colorScheme.surface, width: 2),
       ),
       child: ClipOval(
         child: Image.memory(

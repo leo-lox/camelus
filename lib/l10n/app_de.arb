@@ -72,7 +72,7 @@
   "changesSavedSuccessfully": "Änderungen erfolgreich gespeichert",
   "failedToSaveChanges": "Fehler beim Speichern der Änderungen",
   "setupDefaultServers": "Standardserver einrichten",
-  "default": " (Standard)",
+  "defaultLabel": " (Standard)",
   "restoreDefaults": "Standardeinstellungen wiederherstellen",
   "restoreDefaultsMessage": "Sind Sie sicher, dass Sie die Standardserver wiederherstellen möchten? Dadurch werden alle benutzerdefinierten Server entfernt.",
   "restore": "Wiederherstellen",

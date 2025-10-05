@@ -66,15 +66,13 @@ class AppBottomNavigationBar extends ConsumerWidget {
     final isSelected = state.selectedTab == NavigationTab.search;
 
     return NavigationDestination(
-      icon: Builder(
-        builder: (context) {
-          return Icon(
-            PhosphorIcons.magnifyingGlass(),
-            color: isSelected ? Theme.of(context).colorScheme.primary : null,
-            size: 23,
-          );
-        }
-      ),
+      icon: Builder(builder: (context) {
+        return Icon(
+          PhosphorIcons.magnifyingGlass(),
+          color: isSelected ? Theme.of(context).colorScheme.primary : null,
+          size: 23,
+        );
+      }),
       label: "search",
       tooltip: "search",
     );

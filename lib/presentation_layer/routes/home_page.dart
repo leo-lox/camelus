@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:camelus/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:camelus/presentation_layer/components/write_post.dart';
@@ -158,7 +159,7 @@ class _HomePageState extends ConsumerState<HomePage> {
               pubkey: widget.pubkey,
             ),
             Center(
-              child: Text('work in progress',
+              child: Text(AppLocalizations.of(context)!.workInProgress,
                   style: TextStyle(
                       color: Theme.of(context).colorScheme.onSurface)),
             )
@@ -191,11 +192,11 @@ class UpdateDialog extends StatelessWidget {
       content: Text(updateInfo.body),
       actions: <Widget>[
         TextButton(
-          child: const Text("Cancel"),
+          child: Text(AppLocalizations.of(context)!.cancel),
           onPressed: () => Navigator.of(context).pop(),
         ),
         TextButton(
-          child: const Text("Update"),
+          child: Text(AppLocalizations.of(context)!.update),
           onPressed: () {
             launchUrl(Uri.parse(updateInfo.url),
                 mode: LaunchMode.externalApplication);

@@ -72,7 +72,7 @@
   "changesSavedSuccessfully": "変更が正常に保存されました",
   "failedToSaveChanges": "変更の保存に失敗しました",
   "setupDefaultServers": "デフォルトサーバーをセットアップ",
-  "default": " (デフォルト)",
+  "defaultLabel": " (デフォルト)",
   "restoreDefaults": "デフォルトに戻す",
   "restoreDefaultsMessage": "デフォルトサーバーに戻してもよろしいですか？すべてのカスタムサーバーが削除されます。",
   "restore": "復元",

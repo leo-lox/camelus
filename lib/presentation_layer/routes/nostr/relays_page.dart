@@ -1,4 +1,5 @@
 import 'package:camelus/config/palette.dart';
+import 'package:camelus/l10n/app_localizations.dart';
 import 'package:camelus/presentation_layer/providers/ndk_provider.dart';
 
 import 'package:flutter/material.dart';
@@ -30,7 +31,7 @@ class _RelaysPageState extends ConsumerState<RelaysPage> {
           icon: Icon(PhosphorIcons.arrowLeft()),
           onPressed: () => Navigator.of(context).pop(),
         ),
-        title: const Text('Relays'),
+        title: Text(AppLocalizations.of(context)!.relays),
       ),
       body: SafeArea(
         child: StreamBuilder<Map<String, RelayConnectivity>>(
@@ -76,10 +77,12 @@ class _RelaysPageState extends ConsumerState<RelaysPage> {
                                           return Container(
                                             width: 50,
                                             height: 50,
-                                            color: Paletter.getLightGray(context),
+                                            color:
+                                                Paletter.getLightGray(context),
                                             child: Icon(
                                               PhosphorIcons.globe(),
-                                              color: Paletter.getDarkGray(context),
+                                              color:
+                                                  Paletter.getDarkGray(context),
                                             ),
                                           );
                                         },
@@ -143,18 +146,23 @@ class _RelaysPageState extends ConsumerState<RelaysPage> {
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
                               _StatItem(
+                                context: context,
                                 icon: PhosphorIcons.arrowDown(),
-                                label: 'Events Read',
+                                label: AppLocalizations.of(context)!.eventsRead,
                                 value: relay.stats.eventsRead.toString(),
                               ),
                               _StatItem(
+                                context: context,
                                 icon: PhosphorIcons.arrowUp(),
-                                label: 'Events Written',
+                                label:
+                                    AppLocalizations.of(context)!.eventsWritten,
                                 value: relay.stats.eventsWritten.toString(),
                               ),
                               _StatItem(
+                                context: context,
                                 icon: PhosphorIcons.lighthouse(),
-                                label: 'Connection Source',
+                                label: AppLocalizations.of(context)!
+                                    .connectionSource,
                                 value: relay.relay.connectionSource.name,
                               ),
                             ],
@@ -216,10 +224,13 @@ class _RelaysPageState extends ConsumerState<RelaysPage> {
                                             MaterialTapTargetSize.shrinkWrap,
                                       ),
                                       child: Text(
-                                        'Privacy Policy',
+                                        AppLocalizations.of(context)!
+                                            .privacyPolicy,
                                         style: TextStyle(
                                           fontSize: 12,
-                                          color: Theme.of(context).colorScheme.primary,
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .primary,
                                         ),
                                       ),
                                     ),
@@ -250,10 +261,13 @@ class _RelaysPageState extends ConsumerState<RelaysPage> {
                                             MaterialTapTargetSize.shrinkWrap,
                                       ),
                                       child: Text(
-                                        'Terms of Service',
+                                        AppLocalizations.of(context)!
+                                            .termsOfService,
                                         style: TextStyle(
                                           fontSize: 12,
-                                          color: Theme.of(context).colorScheme.primary,
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .primary,
                                         ),
                                       ),
                                     ),
@@ -268,7 +282,8 @@ class _RelaysPageState extends ConsumerState<RelaysPage> {
               );
             }
 
-            return const Center(child: Text("No data available"));
+            return Center(
+                child: Text(AppLocalizations.of(context)!.noDataAvailable));
           },
         ),
       ),
@@ -278,19 +293,21 @@ class _RelaysPageState extends ConsumerState<RelaysPage> {
 
 // Helper widget for stats display
 class _StatItem extends StatelessWidget {
+  final BuildContext context;
   final IconData icon;
   final String label;
   final String value;
   final double maxWidth = 120;
 
   const _StatItem({
+    required this.context,
     required this.icon,
     required this.label,
     required this.value,
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext buildContext) {
     return Container(
       constraints: BoxConstraints(maxWidth: maxWidth),
       child: Column(

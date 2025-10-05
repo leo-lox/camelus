@@ -1,3 +1,4 @@
+import 'package:camelus/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
@@ -42,7 +43,7 @@ class InitalRouteSettingsState extends ConsumerState<InitalRouteSettings> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Initial Route Settings'),
+        title: Text(AppLocalizations.of(context)!.initialRouteSettings),
       ),
       body: ListView.builder(
         itemCount: routes.length,
@@ -54,7 +55,8 @@ class InitalRouteSettingsState extends ConsumerState<InitalRouteSettings> {
               style: TextStyle(color: Paletter.getLightGray(context)),
             ),
             trailing: selectedRoute == route
-                ? Icon(PhosphorIcons.check(), color: Theme.of(context).colorScheme.onSurface)
+                ? Icon(PhosphorIcons.check(),
+                    color: Theme.of(context).colorScheme.onSurface)
                 : null,
             onTap: () {
               ref.read(selectedRouteProvider.notifier).state = route;

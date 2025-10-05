@@ -173,7 +173,9 @@ class _StarterPackSelectionBottomSheetState
                       Text(
                         pack.title ?? pack.name,
                         style: TextStyle(
-                          color: showCheck ? Paletter.getGray(context) : Paletter.getLightGray(context),
+                          color: showCheck
+                              ? Paletter.getGray(context)
+                              : Paletter.getLightGray(context),
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
                         ),
@@ -212,7 +214,9 @@ class _StarterPackSelectionBottomSheetState
     if (showCheck) {
       return Icon(
         PhosphorIcons.check(),
-        color: wasJustAdded ? Theme.of(context).colorScheme.primary : Paletter.getGray(context),
+        color: wasJustAdded
+            ? Theme.of(context).colorScheme.primary
+            : Paletter.getGray(context),
         size: 16,
       );
     }
@@ -235,7 +239,8 @@ class _StarterPackSelectionBottomSheetState
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: BoxDecoration(
-              border: Border.all(color: Paletter.getGray(context).withValues(alpha: 0.3)),
+              border: Border.all(
+                  color: Paletter.getGray(context).withValues(alpha: 0.3)),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Row(

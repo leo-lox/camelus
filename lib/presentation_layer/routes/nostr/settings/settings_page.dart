@@ -1,4 +1,5 @@
 import 'package:camelus/domain_layer/usecases/app_auth.dart';
+import 'package:camelus/l10n/app_localizations.dart';
 import 'package:camelus/presentation_layer/providers/ndk_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -40,37 +41,36 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Settings'),
+        title: Text(AppLocalizations.of(context)!.settings),
       ),
       body: ListView(
         children: [
           ListTile(
-            title: Text('Language Settings'),
+            title: Text(AppLocalizations.of(context)!.languageSettings),
             onTap: () {
               Navigator.pushNamed(context, '/settings/locale');
             },
           ),
           ListTile(
-            title: Text('Inital route'),
+            title: Text(AppLocalizations.of(context)!.initialRoute),
             onTap: () {
               _navigateToInitalRoute();
             },
           ),
           ListTile(
-            title:
-                Text('Moderation'),
+            title: Text(AppLocalizations.of(context)!.moderation),
             onTap: () {
               Navigator.pushNamed(context, '/settings/moderation');
             },
           ),
           ListTile(
-            title: const Text('File servers'),
+            title: Text(AppLocalizations.of(context)!.fileServers),
             onTap: () {
               _navigateToFileServers();
             },
           ),
           ListTile(
-            title: const Text('Logout'),
+            title: Text(AppLocalizations.of(context)!.logout),
             onTap: () {
               _logout();
             },
