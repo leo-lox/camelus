@@ -436,4 +436,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get initialRouteSettings => '初始路由设置';
+
+  @override
+  String get useSystemLanguage => '使用系统语言';
 }

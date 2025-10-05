@@ -137,5 +137,6 @@
   "thread": "เธรด",
   "workInProgress": "กำลังดำเนินการ",
   "update": "อัปเดต",
-  "initialRouteSettings": "การตั้งค่าเส้นทางเริ่มต้น"
+  "initialRouteSettings": "การตั้งค่าเส้นทางเริ่มต้น",
+  "useSystemLanguage": "ใช้ภาษาระบบ"
 }

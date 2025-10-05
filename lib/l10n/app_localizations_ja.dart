@@ -438,4 +438,7 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get initialRouteSettings => '初期ルート設定';
+
+  @override
+  String get useSystemLanguage => 'システム言語を使用';
 }

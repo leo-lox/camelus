@@ -937,6 +937,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Initial Route Settings'**
   String get initialRouteSettings;
+
+  /// Option to use device's system language
+  ///
+  /// In en, this message translates to:
+  /// **'Use System Language'**
+  String get useSystemLanguage;
 }
 
 class _AppLocalizationsDelegate

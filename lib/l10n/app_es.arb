@@ -137,5 +137,6 @@
   "thread": "hilo",
   "workInProgress": "trabajo en progreso",
   "update": "Actualizar",
-  "initialRouteSettings": "Configuración de Ruta Inicial"
+  "initialRouteSettings": "Configuración de Ruta Inicial",
+  "useSystemLanguage": "Usar idioma del sistema"
 }

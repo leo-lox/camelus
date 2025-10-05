@@ -447,4 +447,7 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get initialRouteSettings => 'การตั้งค่าเส้นทางเริ่มต้น';
+
+  @override
+  String get useSystemLanguage => 'ใช้ภาษาระบบ';
 }

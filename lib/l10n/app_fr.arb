@@ -137,5 +137,6 @@
   "thread": "fil",
   "workInProgress": "travail en cours",
   "update": "Mettre à jour",
-  "initialRouteSettings": "Paramètres de route initiale"
+  "initialRouteSettings": "Paramètres de route initiale",
+  "useSystemLanguage": "Utiliser la langue du système"
 }

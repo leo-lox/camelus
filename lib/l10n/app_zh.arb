@@ -137,5 +137,6 @@
   "thread": "话题",
   "workInProgress": "正在进行中",
   "update": "更新",
-  "initialRouteSettings": "初始路由设置"
+  "initialRouteSettings": "初始路由设置",
+  "useSystemLanguage": "使用系统语言"
 }

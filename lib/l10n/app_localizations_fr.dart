@@ -457,4 +457,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get initialRouteSettings => 'Paramètres de route initiale';
+
+  @override
+  String get useSystemLanguage => 'Utiliser la langue du système';
 }

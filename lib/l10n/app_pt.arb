@@ -137,5 +137,6 @@
   "thread": "tópico",
   "workInProgress": "trabalho em andamento",
   "update": "Atualizar",
-  "initialRouteSettings": "Configurações de Rota Inicial"
+  "initialRouteSettings": "Configurações de Rota Inicial",
+  "useSystemLanguage": "Usar idioma do sistema"
 }

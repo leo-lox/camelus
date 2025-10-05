@@ -451,4 +451,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get initialRouteSettings => 'Configuración de Ruta Inicial';
+
+  @override
+  String get useSystemLanguage => 'Usar idioma del sistema';
 }

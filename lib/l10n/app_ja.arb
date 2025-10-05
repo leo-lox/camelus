@@ -137,5 +137,6 @@
   "thread": "スレッド",
   "workInProgress": "作業中",
   "update": "更新",
-  "initialRouteSettings": "初期ルート設定"
+  "initialRouteSettings": "初期ルート設定",
+  "useSystemLanguage": "システム言語を使用"
 }

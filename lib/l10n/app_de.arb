@@ -137,5 +137,6 @@
   "thread": "Thread",
   "workInProgress": "in Arbeit",
   "update": "Aktualisieren",
-  "initialRouteSettings": "Anfangsroute-Einstellungen"
+  "initialRouteSettings": "Anfangsroute-Einstellungen",
+  "useSystemLanguage": "Systemsprache verwenden"
 }

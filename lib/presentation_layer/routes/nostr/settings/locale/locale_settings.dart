@@ -1,3 +1,4 @@
+import 'package:camelus/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
@@ -56,7 +57,7 @@ class LocaleSettingsPageState extends ConsumerState<LocaleSettingsPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Language Settings'),
+        title: Text(AppLocalizations.of(context)!.languageSettings),
       ),
       body: Column(
         children: [
@@ -64,7 +65,7 @@ class LocaleSettingsPageState extends ConsumerState<LocaleSettingsPage> {
 
           ListTile(
             title: Text(
-              'Use System Language',
+              AppLocalizations.of(context)!.useSystemLanguage,
               style: TextStyle(color: Paletter.getLightGray(context)),
             ),
             trailing: _isSystemLanguage

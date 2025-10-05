@@ -452,4 +452,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get initialRouteSettings => 'Anfangsroute-Einstellungen';
+
+  @override
+  String get useSystemLanguage => 'Systemsprache verwenden';
 }

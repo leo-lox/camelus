@@ -586,5 +586,9 @@
   "initialRouteSettings": "Initial Route Settings",
   "@initialRouteSettings": {
     "description": "Initial route settings page title"
+  },
+  "useSystemLanguage": "Use System Language",
+  "@useSystemLanguage": {
+    "description": "Option to use device's system language"
   }
 }
