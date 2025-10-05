@@ -6,7 +6,7 @@ import '../../../../../config/palette.dart';
 import '../../../../providers/inital_route_provider.dart';
 
 // Provider to store the selected route
-final selectedRouteProvider = StateProvider<String>((ref) => '/');
+final selectedRouteProvider = StateProvider<String>((ref) => '/home');
 
 class InitalRouteSettings extends ConsumerStatefulWidget {
   const InitalRouteSettings({super.key});
@@ -18,7 +18,7 @@ class InitalRouteSettings extends ConsumerStatefulWidget {
 class InitalRouteSettingsState extends ConsumerState<InitalRouteSettings> {
   // List of available routes
   final List<String> routes = [
-    '/',
+    '/home',
     '/posts-and-replies',
     '/search',
     '/notifications'

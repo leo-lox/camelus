@@ -108,7 +108,7 @@ Future<void> main() async {
   } else {
     final appDb = providerContainer.read(dbAppProvider);
     final savedRoute = await appDb.read('initalRoute');
-    initalRoute = savedRoute ?? '/';
+    initalRoute = savedRoute ?? '/home';
   }
 
   // check if firebase is supported on this platform

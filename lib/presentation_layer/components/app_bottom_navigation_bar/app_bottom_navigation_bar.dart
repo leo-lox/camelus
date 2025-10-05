@@ -29,7 +29,7 @@ class AppBottomNavigationBar extends ConsumerWidget {
         switch (index) {
           case 0:
             {
-              context.go('/');
+              context.go('/home');
               break;
             }
 

@@ -161,7 +161,7 @@ class _OnboardingLoginPageState extends ConsumerState<OnboardingLoginPage> {
     setState(() {});
 
     // ignore: use_build_context_synchronously
-    context.go('/');
+    context.go('/home');
   }
 
   bool _checkWord(String word) {

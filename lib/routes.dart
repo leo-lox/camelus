@@ -48,7 +48,7 @@ final routes = [
     },
     routes: [
       GoRoute(
-        path: '/',
+        path: '/home',
         builder: (context, state) => const HomePage(
           initialTab: '/',
         ),

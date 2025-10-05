@@ -94,11 +94,11 @@ class NostrSideMenu extends ConsumerWidget {
   }
 
   Widget _drawerItem(
-      {required IconData icon, label, onTap, String? routeName}) {
+      {required IconData icon, label, onTap, required String routeName}) {
     return Builder(
       builder: (context) {
-        final currentRoute = ModalRoute.of(context)?.settings.name;
-        final isSelected = currentRoute == routeName;
+        final currentRoute = GoRouterState.of(context).uri.toString();
+        final isSelected = currentRoute.contains(routeName);
 
         return Container(
           decoration: isSelected
@@ -157,7 +157,12 @@ class NostrSideMenu extends ConsumerWidget {
           leadingWidget,
           _divider(),
           _drawerItem(
-              icon: PhosphorIcons.house(), label: 'Home', routeName: '/'),
+              icon: PhosphorIcons.house(),
+              label: 'Home',
+              routeName: '/home',
+              onTap: () {
+                context.go('/home');
+              }),
           _drawerItem(
               label: 'Profile',
               routeName: '/nostr/profile',
