@@ -23,6 +23,7 @@ class LocaleSettingsPageState extends ConsumerState<LocaleSettingsPage> {
     {'name': 'Português', 'locale': const Locale('pt', 'BR')},
     {'name': 'Español', 'locale': const Locale('es', 'ES')},
     {'name': 'Français', 'locale': const Locale('fr', 'FR')},
+    {'name': 'Русский', 'locale': const Locale('ru', 'RU')},
   ];
 
   bool _isSystemLanguage = false;
