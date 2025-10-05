@@ -3,6 +3,7 @@ import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
 
 import 'domain_layer/entities/starter_pack_identifier.dart';
+import 'presentation_layer/components/drawer/nostr_side_menu.dart';
 import 'presentation_layer/components/starter_packs/edit_starter_pack/edit_starter_pack.dart';
 import 'presentation_layer/components/starter_packs/open_starter_pack.dart';
 import 'presentation_layer/layouts/responsive_layout.dart';
@@ -26,7 +27,12 @@ final routes = [
     builder: (context, state, child) {
       return ResponsiveLayout(
         desktopContent: ThreeColumnLayout(
-          leftSidebar: Container(color: Colors.amber),
+          leftSidebar: NostrSideMenu(
+            leadingWidget: Container(
+              color: Colors.amber,
+              height: 50,
+            ),
+          ),
           mainContent: child,
           rightSidebar: Container(color: Colors.deepOrange),
         ),

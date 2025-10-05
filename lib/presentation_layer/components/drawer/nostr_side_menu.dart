@@ -14,16 +14,14 @@ import '../../../helpers/nprofile_helper.dart';
 import '../../atoms/my_profile_picture.dart';
 import '../../providers/following_contact_state_provider.dart';
 import '../../providers/metadata_state_provider.dart';
+import '../../providers/ndk_provider.dart';
 
 class NostrSideMenu extends ConsumerWidget {
-  final String pubkey;
-
   final Widget leadingWidget;
   final Widget trailingWidget;
 
   const NostrSideMenu({
     super.key,
-    required this.pubkey,
     this.leadingWidget = const SizedBox(),
     this.trailingWidget = const SizedBox(),
   });
@@ -35,7 +33,7 @@ class NostrSideMenu extends ConsumerWidget {
     ));
   }
 
-  void openQrShareDialog(BuildContext context) async {
+  void openQrShareDialog(BuildContext context, String pubkey) async {
     String nprofile = await NprofileHelper()
         .getNprofile(pubkey, []); //todo: get recommended relays
 
@@ -91,7 +89,7 @@ class NostrSideMenu extends ConsumerWidget {
     return packageInfo;
   }
 
-  void navigateToProfile(BuildContext context) {
+  void navigateToProfile(BuildContext context, String pubkey) {
     context.push('/nostr/profile/$pubkey');
   }
 
@@ -148,6 +146,8 @@ class NostrSideMenu extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final currentUserPubkey = ref.read(ndkProvider).accounts.getPublicKey()!;
+
     return Container(
       color: Palette.background,
       child: Column(
@@ -163,7 +163,7 @@ class NostrSideMenu extends ConsumerWidget {
               routeName: '/nostr/profile',
               icon: PhosphorIcons.user(),
               onTap: () {
-                navigateToProfile(context);
+                navigateToProfile(context, currentUserPubkey);
               }),
           _drawerItem(
               label: 'Bookmarks',
@@ -262,7 +262,7 @@ class NostrSideMenu extends ConsumerWidget {
                 ),
                 GestureDetector(
                   onTap: () {
-                    openQrShareDialog(context);
+                    openQrShareDialog(context, currentUserPubkey);
                   },
                   child: SvgPicture.asset(
                     'assets/icons/qr-code.svg',

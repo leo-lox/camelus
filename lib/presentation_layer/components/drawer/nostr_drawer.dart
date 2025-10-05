@@ -145,7 +145,6 @@ class NostrDrawer extends ConsumerWidget {
     return Drawer(
       child: NostrSideMenu(
         leadingWidget: _drawerHeader(context, myUserMetadata, ref),
-        pubkey: pubkey,
       ),
     );
   }
