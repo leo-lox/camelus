@@ -60,14 +60,13 @@ class _HomePageState extends ConsumerState<HomePage> {
     );
   }
 
-  void _show(BuildContext ctx) {
+  void _show(BuildContext context) {
     showModalBottomSheet(
         isScrollControlled: true,
         elevation: 10,
-        backgroundColor: Palette.background,
         isDismissible: false,
-        context: ctx,
-        builder: (ctx) => BackdropFilter(
+        context: context,
+        builder: (context) => BackdropFilter(
               filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
               child: Padding(
                   padding: EdgeInsets.only(
@@ -95,7 +94,7 @@ class _HomePageState extends ConsumerState<HomePage> {
           visitorId: myVisitorId,
         );
       } catch (e) {
-        // 
+        //
       }
     });
   }
@@ -131,30 +130,19 @@ class _HomePageState extends ConsumerState<HomePage> {
     return Scaffold(
       key: _scaffoldKey,
       drawer: NostrDrawer(pubkey: widget.pubkey),
-      backgroundColor: Palette.background,
-      floatingActionButton: AnimatedSwitcher(
-        duration: const Duration(milliseconds: 150),
-        transitionBuilder: (Widget child, Animation<double> animation) {
-          return FadeTransition(
-            opacity: animation,
-            child: child,
-          );
-        },
-        child: isHomeSelected
-            ? FloatingActionButton(
-                key: const ValueKey<String>('FAB'),
-                backgroundColor: Palette.primary,
-                child: Icon(
-                  PhosphorIcons.plus(),
-                  color: Palette.white,
-                  size: 27,
-                ),
-                onPressed: () => {
-                  _show(context),
-                },
-              )
-            : null,
-      ),
+      floatingActionButton: isHomeSelected
+          ? FloatingActionButton(
+              key: const ValueKey<String>('FAB'),
+              child: Icon(
+                PhosphorIcons.plus(),
+                color: Theme.of(context).colorScheme.onSurface,
+                size: 27,
+              ),
+              onPressed: () => {
+                _show(context),
+              },
+            )
+          : null,
       body: SafeArea(
         child: PageView(
           controller: _myPage,
@@ -169,9 +157,10 @@ class _HomePageState extends ConsumerState<HomePage> {
             NotificationPage(
               pubkey: widget.pubkey,
             ),
-            const Center(
+            Center(
               child: Text('work in progress',
-                  style: TextStyle(color: Colors.white)),
+                  style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurface)),
             )
           ],
           onPageChanged: (index) {
@@ -197,7 +186,7 @@ class UpdateDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      backgroundColor: Palette.extraDarkGray,
+      backgroundColor: Paletter.getExtraDarkGray(context),
       title: Text(updateInfo.title),
       content: Text(updateInfo.body),
       actions: <Widget>[

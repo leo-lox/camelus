@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:camelus/config/palette.dart';
 import 'package:camelus/domain_layer/entities/nostr_tag.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -32,9 +31,7 @@ class _BlockedUsersState extends ConsumerState<BlockedUsers> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Palette.background,
       appBar: AppBar(
-        backgroundColor: Palette.background,
         title: const Text('Blocked Users'),
       ),
       body: const Text('not implemented'),

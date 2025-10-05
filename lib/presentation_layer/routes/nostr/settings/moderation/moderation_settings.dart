@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../../config/palette.dart';
 import '../../../../../domain_layer/entities/bloom_filter_data.dart';
 import '../../../../../helpers/bloom_filter_prehash.dart';
 import '../../../../providers/db_app_provider.dart';
@@ -77,9 +76,7 @@ class ModerationSettingsPageState
           SnackBar(
             content: Text(
               'Error updating filter $e',
-              style: TextStyle(color: Palette.lightGray),
             ),
-            backgroundColor: Palette.extraDarkGray,
           ),
         );
       }
@@ -95,10 +92,8 @@ class ModerationSettingsPageState
     final isFilterEnabled = ref.watch(bloomFilterNotifierProvider);
 
     return Scaffold(
-      backgroundColor: Palette.background,
       appBar: AppBar(
         title: const Text('Moderation Settings'),
-        backgroundColor: Palette.background,
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -114,10 +109,10 @@ class ModerationSettingsPageState
                 ),
               ),
               const SizedBox(height: 8),
-              const Text(
+              Text(
                 'Enable content filtering to hide potentially inappropriate content.',
                 style: TextStyle(
-                  color: Colors.grey,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
               ),
               const SizedBox(height: 16),
@@ -131,16 +126,16 @@ class ModerationSettingsPageState
                         height: 24,
                         child: CircularProgressIndicator(strokeWidth: 2))
                     : const Icon(Icons.security),
-                activeThumbColor: Palette.primary,
+                activeThumbColor: Theme.of(context).colorScheme.primary,
               ),
               const Divider(),
               const SizedBox(height: 16),
-              const Text(
+              Text(
                 'Note: Filters are applied locally (on device). When users report nostr content directly to camelus it gets added to the filter.',
                 style: TextStyle(
                   fontSize: 12,
                   fontStyle: FontStyle.italic,
-                  color: Colors.grey,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
               ),
             ],

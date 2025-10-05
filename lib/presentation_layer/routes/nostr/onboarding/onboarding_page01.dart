@@ -20,7 +20,6 @@ class _OnboardingPage01State extends ConsumerState<OnboardingPage01> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Palette.background,
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -31,14 +30,14 @@ class _OnboardingPage01State extends ConsumerState<OnboardingPage01> {
             Text(
               "welcome to",
               style: TextStyle(
-                color: Palette.extraLightGray,
+                color: Paletter.getExtraLightGray(context),
                 fontSize: MediaQuery.of(context).size.width / 22,
               ),
             ),
             Text(
               "camelus",
               style: TextStyle(
-                color: Palette.white,
+                color: Theme.of(context).colorScheme.onSurface,
                 fontSize: MediaQuery.of(context).size.width / 7,
                 fontFamily: 'Poppins',
               ),

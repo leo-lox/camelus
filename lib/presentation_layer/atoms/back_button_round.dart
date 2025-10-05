@@ -1,4 +1,3 @@
-import 'package:camelus/config/palette.dart';
 import 'package:flutter/material.dart';
 
 class BackButtonRound extends StatelessWidget {
@@ -19,13 +18,13 @@ class BackButtonRound extends StatelessWidget {
             Navigator.pop(context);
           },
           style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.black54,
+            backgroundColor: Theme.of(context).colorScheme.surface.withValues(alpha: 0.54),
             padding: const EdgeInsets.all(0),
             shape: const CircleBorder(),
           ),
-          child: const Icon(
+          child: Icon(
             Icons.arrow_back,
-            color: Palette.white,
+            color: Theme.of(context).colorScheme.onSurface,
             size: 20,
           ),
         ),

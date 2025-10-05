@@ -27,12 +27,12 @@ class PostOverflowIndicator extends StatelessWidget {
 
     // Determine color based on state
     final Color indicatorColor = isOverLimit
-        ? Palette.error
-        : (isApproachingLimit ? Colors.orange : Palette.primary);
+        ? Theme.of(context).colorScheme.error
+        : (isApproachingLimit ? Colors.orange : Theme.of(context).colorScheme.primary);
 
     final Color borderColor = isOverLimit
-        ? Palette.error
-        : (isApproachingLimit ? Colors.orange : Palette.gray);
+        ? Theme.of(context).colorScheme.error
+        : (isApproachingLimit ? Colors.orange : Paletter.getGray(context));
 
     // Calculate the number to display
     final int numberToDisplay =
@@ -57,8 +57,6 @@ class PostOverflowIndicator extends StatelessWidget {
         children: [
           CircularProgressIndicator(
             value: fillPercentage,
-            backgroundColor: Colors.transparent,
-            valueColor: AlwaysStoppedAnimation<Color>(indicatorColor),
             strokeWidth: 3,
           ),
           if (showNumber)

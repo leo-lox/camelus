@@ -6,7 +6,6 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 import '../../../../config/amber_url.dart';
-import '../../../../config/palette.dart';
 import '../../../../domain_layer/usecases/app_auth.dart';
 import '../../../atoms/long_button.dart';
 import '../../../providers/ndk_provider.dart';
@@ -54,9 +53,8 @@ class _OnboardingLoginAmberPageState
   void _onAmberLogin() async {
     if (!_termsAndConditions) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please read and accept the terms and conditions first',
-              style: TextStyle(color: Palette.black)),
+        SnackBar(
+          content: Text('Please read and accept the terms and conditions first'),
         ),
       );
       return;
@@ -83,7 +81,6 @@ class _OnboardingLoginAmberPageState
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: null,
-      backgroundColor: Palette.background,
       resizeToAvoidBottomInset: false,
       body: SafeArea(
         // input for the user to enter their private key, should be visible on a dark background.
@@ -100,7 +97,7 @@ class _OnboardingLoginAmberPageState
                   children: [
                     IconButton(
                       icon:
-                          Icon(PhosphorIcons.arrowLeft(), color: Palette.white),
+                          Icon(PhosphorIcons.arrowLeft(), color: Theme.of(context).colorScheme.onSurface),
                       onPressed: () => widget.onPressedBack!(),
                     ),
                   ],
@@ -109,14 +106,14 @@ class _OnboardingLoginAmberPageState
               SizedBox(
                 height: 200,
                 width: MediaQuery.of(context).size.width,
-                child: const Column(
+                child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
                       "login",
                       style: TextStyle(
-                        color: Palette.white,
+                        color: Theme.of(context).colorScheme.onSurface,
                         fontSize: 40,
                         fontFamily: "Poppins",
                       ),
@@ -137,15 +134,11 @@ class _OnboardingLoginAmberPageState
                         _termsAndConditions = value!;
                       });
                     },
-                    activeColor: Palette.white,
-                    checkColor: Palette.black,
-                    fillColor: WidgetStateProperty.all(Palette.white),
-                    //overlayColor: MaterialStateProperty.all(Palette.primary),
                   ),
-                  const Text(
+                  Text(
                     "I have read and accept the ",
                     style: TextStyle(
-                      color: Palette.white,
+                      color: Theme.of(context).colorScheme.onSurface,
                       fontSize: 12,
                       fontWeight: FontWeight.normal,
                     ),
@@ -155,10 +148,10 @@ class _OnboardingLoginAmberPageState
                       Uri url = Uri.parse("https://camelus.app/terms/");
                       launchUrl(url, mode: LaunchMode.externalApplication);
                     },
-                    child: const Text(
+                    child: Text(
                       "terms and conditions",
                       style: TextStyle(
-                        color: Palette.white,
+                        color: Theme.of(context).colorScheme.onSurface,
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
                         decoration: TextDecoration.underline,
@@ -173,10 +166,10 @@ class _OnboardingLoginAmberPageState
                   Uri url = Uri.parse("https://camelus.app/privacy/");
                   launchUrl(url, mode: LaunchMode.externalApplication);
                 },
-                child: const Text(
+                child: Text(
                   "privacy policy",
                   style: TextStyle(
-                    color: Palette.white,
+                    color: Theme.of(context).colorScheme.onSurface,
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
                     decoration: TextDecoration.underline,

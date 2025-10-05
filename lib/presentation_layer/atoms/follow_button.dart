@@ -1,4 +1,3 @@
-import 'package:camelus/config/palette.dart';
 import 'package:flutter/material.dart';
 
 Widget followButton({
@@ -8,47 +7,55 @@ Widget followButton({
   if (isFollowing) {
     return Container(
       margin: const EdgeInsets.only(top: 0, right: 10),
-      child: ElevatedButton(
-        onPressed: () {
-          onPressed();
-        },
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Palette.black,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-            side: const BorderSide(color: Palette.white, width: 1),
-          ),
-        ),
-        child: const Text(
-          'unfollow',
-          style: TextStyle(
-            color: Palette.white,
-            fontSize: 16,
-          ),
-        ),
+      child: Builder(
+        builder: (context) {
+          return ElevatedButton(
+            onPressed: () {
+              onPressed();
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Theme.of(context).colorScheme.surface,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+                side: BorderSide(color: Theme.of(context).colorScheme.onSurface, width: 1),
+              ),
+            ),
+            child: Text(
+              'unfollow',
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onSurface,
+                fontSize: 16,
+              ),
+            ),
+          );
+        }
       ),
     );
   }
   return Container(
     margin: const EdgeInsets.only(top: 0, right: 10),
-    child: ElevatedButton(
-      onPressed: () {
-        onPressed();
-      },
-      style: ElevatedButton.styleFrom(
-        backgroundColor: Palette.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-          side: const BorderSide(color: Palette.black, width: 1),
-        ),
-      ),
-      child: const Text(
-        'follow',
-        style: TextStyle(
-          color: Palette.black,
-          fontSize: 16,
-        ),
-      ),
+    child: Builder(
+      builder: (context) {
+        return ElevatedButton(
+          onPressed: () {
+            onPressed();
+          },
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Theme.of(context).colorScheme.onSurface,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+              side: BorderSide(color: Theme.of(context).colorScheme.surface, width: 1),
+            ),
+          ),
+          child: Text(
+            'follow',
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.surface,
+              fontSize: 16,
+            ),
+          ),
+        );
+      }
     ),
   );
 }

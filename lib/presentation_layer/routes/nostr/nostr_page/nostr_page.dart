@@ -93,7 +93,6 @@ class _NostrPageState extends ConsumerState<NostrPage>
                 snap: false,
                 pinned: false,
                 forceElevated: true,
-                backgroundColor: Palette.background,
                 leadingWidth: 48,
                 leading: LeadingWidget(
                   parentScaffoldKey: widget.parentScaffoldKey,
@@ -166,15 +165,15 @@ class TitleWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const badges.Badge(
+    return badges.Badge(
       badgeAnimation: badges.BadgeAnimation.fade(),
       showBadge: false,
-      badgeContent: Text("", style: TextStyle(color: Colors.white)),
+      badgeContent: Text("", style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
       child: Text(
         "camelus",
         style: TextStyle(
           letterSpacing: 1.2,
-          color: Palette.lightGray,
+          color: Paletter.getLightGray(context),
           fontSize: 20,
           fontWeight: FontWeight.normal,
           fontFamily: "Poppins",
@@ -219,8 +218,8 @@ class RelaysWidget extends ConsumerWidget {
               //if (!kReleaseMode)
               Text(
                 connectedCount.toString(),
-                style: const TextStyle(
-                  color: Palette.lightGray,
+                style: TextStyle(
+                  color: Paletter.getLightGray(context),
                 ),
                 key: ValueKey(connectedCount),
               ),

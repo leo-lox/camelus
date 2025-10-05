@@ -111,7 +111,6 @@ class _EditStarterPackSummaryState extends ConsumerState<EditStarterPackSummary>
     );
 
     return Scaffold(
-      backgroundColor: Palette.background,
       body: Column(
         children: [
           Column(
@@ -173,11 +172,11 @@ class _EditStarterPackSummaryState extends ConsumerState<EditStarterPackSummary>
                               textAlign: TextAlign.center,
                             ),
                             const SizedBox(height: 8),
-                            const Text(
+                            Text(
                               "Share it with your friends and help them discover amazing people!",
                               style: TextStyle(
                                 fontSize: 16,
-                                color: Colors.grey,
+                                color: Theme.of(context).colorScheme.onSurfaceVariant,
                               ),
                               textAlign: TextAlign.center,
                             ),
@@ -187,9 +186,9 @@ class _EditStarterPackSummaryState extends ConsumerState<EditStarterPackSummary>
                                 padding: EdgeInsets.symmetric(
                                     horizontal: 16, vertical: 12),
                                 decoration: BoxDecoration(
-                                  color: Palette.extraDarkGray,
+                                  color: Paletter.getExtraDarkGray(context),
                                   borderRadius: BorderRadius.circular(8),
-                                  border: Border.all(color: Palette.gray),
+                                  border: Border.all(color: Paletter.getGray(context)),
                                 ),
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.center,

@@ -49,7 +49,7 @@ class NoteCardRepost extends ConsumerWidget {
                 'assets/icons/retweet.svg',
                 height: 18,
                 colorFilter: ColorFilter.mode(
-                  Palette.repostActive,
+                  Color.fromARGB(255, 22, 163, 74),
                   BlendMode.srcATop,
                 ),
               ),
@@ -65,7 +65,7 @@ class NoteCardRepost extends ConsumerWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   text: TextSpan(
-                    style: TextStyle(color: Palette.gray),
+                    style: TextStyle(color: Paletter.getGray(context)),
                     children: [
                       TextSpan(
                         text: repostedByMetadata?.name ??
@@ -109,7 +109,7 @@ class NoteCardRepost extends ConsumerWidget {
                             "repostId: ${repostEvent.id} ${repostEvent.sources}",
                             style: TextStyle(
                               fontSize: 10,
-                              color: Palette.darkGray,
+                              color: Paletter.getDarkGray(context),
                             ),
                           ),
                         ],

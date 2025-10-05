@@ -61,9 +61,9 @@ class InReplyTo extends ConsumerWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           "reply to ",
-          style: TextStyle(fontSize: 14, color: Palette.gray),
+          style: TextStyle(fontSize: 14, color: Paletter.getGray(context)),
         ),
         GestureDetector(
           onTap: () {
@@ -71,8 +71,8 @@ class InReplyTo extends ConsumerWidget {
                 arguments: pubkeyFirst);
           },
           child: Text('@$valueFirst ',
-              style: const TextStyle(
-                  color: Palette.primary, fontSize: 14, height: 1.3)),
+              style: TextStyle(
+                  color: Theme.of(context).colorScheme.primary, fontSize: 14, height: 1.3)),
         ),
         if (valueSecond.isNotEmpty)
           GestureDetector(
@@ -81,13 +81,13 @@ class InReplyTo extends ConsumerWidget {
                   arguments: pubkeySecond);
             },
             child: Text('@$valueSecond ',
-                style: const TextStyle(
-                    color: Palette.primary, fontSize: 14, height: 1.3)),
+                style: TextStyle(
+                    color: Theme.of(context).colorScheme.primary, fontSize: 14, height: 1.3)),
           ),
         if (othersCount != 0)
           Text(' and $othersCount more',
-              style: const TextStyle(
-                  color: Palette.darkGray, fontSize: 14, height: 1.3))
+              style: TextStyle(
+                  color: Paletter.getDarkGray(context), fontSize: 14, height: 1.3))
       ],
     );
   }

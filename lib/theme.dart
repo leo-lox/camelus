@@ -1,41 +1,45 @@
 import 'package:flutter/material.dart';
 
-final Map<String, ThemeData> themeMap = {
-  "LIGHT": lightTheme,
-  "DARK": darkTheme
-};
-
-final ThemeData darkTheme = ThemeData(
-  primaryColor: Colors.white70,
-  colorScheme: const ColorScheme(
-    brightness: Brightness.dark,
-    error: Colors.red,
-    onError: Colors.orange,
-    onPrimary: Colors.blue,
-    onSecondary: Colors.blueAccent,
-    onSurface: Colors.white,
-    primary: Colors.blue,
-    secondary: Colors.blueAccent,
-    surface: Colors.white12,
-  ),
-);
-
 final ThemeData lightTheme = ThemeData(
-  primaryColor: Colors.black,
-  colorScheme: const ColorScheme(
-    brightness: Brightness.light,
-    error: Colors.red,
-    onError: Colors.orange,
-    onPrimary: Colors.blue,
-    onSecondary: Colors.blueAccent,
-    onSurface: Colors.teal,
-    primary: Colors.blue,
-    secondary: Colors.blueAccent,
-    surface: Colors.teal,
+  colorScheme: ColorScheme.fromSeed(
+    seedColor: Colors.blue,
+  ),
+  checkboxTheme: CheckboxThemeData(
+    fillColor: WidgetStateProperty.resolveWith((states) {
+      if (states.contains(WidgetState.selected)) {
+        return Colors.black;
+      }
+      return Colors.transparent;
+    }),
   ),
 );
 
-const TextStyle smallTextStyle =
-    TextStyle(color: Colors.white, fontSize: 10.0, letterSpacing: 0.09);
+final ThemeData darkTheme = ThemeData.from(
+  colorScheme: ColorScheme.fromSeed(
+    seedColor: Colors.blue,
+    brightness: Brightness.dark,
+  ),
+);
 
-const TextStyle warningStyle = TextStyle(color: Colors.red, fontSize: 16.0);
+final ThemeData camelusTheme = ThemeData(
+  colorScheme: ColorScheme.fromSeed(
+    seedColor: Colors.blue,
+    brightness: Brightness.dark,
+  ),
+  scaffoldBackgroundColor: Colors.black,
+  drawerTheme: DrawerThemeData(
+    backgroundColor: Colors.black,
+  ),
+  navigationBarTheme: NavigationBarThemeData(
+    backgroundColor: Colors.black,
+  ),
+  floatingActionButtonTheme: FloatingActionButtonThemeData(
+    backgroundColor: Colors.blue,
+  ),
+  dividerTheme: DividerThemeData(
+    color: Colors.black,
+  ),
+  appBarTheme: AppBarThemeData(
+    backgroundColor: Colors.black,
+  ),
+);

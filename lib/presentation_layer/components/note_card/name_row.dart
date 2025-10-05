@@ -71,8 +71,8 @@ class _NoteCardNameRowState extends ConsumerState<NoteCardNameRow> {
                         children: [
                           TextSpan(
                             text: widget.myMetadata?.name ?? npubHrShort,
-                            style: const TextStyle(
-                              color: Colors.white,
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.onSurface,
                               fontWeight: FontWeight.bold,
                               fontSize: 15,
                             ),
@@ -95,7 +95,7 @@ class _NoteCardNameRowState extends ConsumerState<NoteCardNameRow> {
         ),
         Text(
           dateText,
-          style: const TextStyle(color: Palette.gray, fontSize: 14),
+          style: TextStyle(color: Paletter.getGray(context), fontSize: 14),
         ),
         const SizedBox(width: 10),
       ],

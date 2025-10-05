@@ -43,7 +43,7 @@ class NostrDrawer extends ConsumerWidget {
         context: context,
         builder: (BuildContext context) {
           return Dialog(
-            backgroundColor: Palette.extraDarkGray,
+            backgroundColor: Paletter.getExtraDarkGray(context),
 
             //white border
             shape: RoundedRectangleBorder(
@@ -55,16 +55,16 @@ class NostrDrawer extends ConsumerWidget {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Text(
+                  Text(
                     "Share your Profile",
-                    style: TextStyle(color: Colors.white),
+                    style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
                   ),
                   const SizedBox(height: 40),
                   QrImageView(
                     data: "nostr:$nprofile",
                     version: QrVersions.auto,
                     size: 300.0,
-                    backgroundColor: Colors.white,
+                    backgroundColor: Theme.of(context).colorScheme.surface,
 
                     //embeddedImage: AssetImage('assets/app_icons/icon.png'),
                   ),
@@ -73,7 +73,7 @@ class NostrDrawer extends ConsumerWidget {
                     onTap: () => _copyToClipboard(context, nprofile),
                     child: Text(
                       "nostr:$nprofile",
-                      style: const TextStyle(color: Palette.lightGray),
+                      style: TextStyle(color: Paletter.getLightGray(context)),
                     ),
                   ),
                   const SizedBox(height: 20),
@@ -96,8 +96,8 @@ class NostrDrawer extends ConsumerWidget {
             child: Container(
               width: 35,
               height: 35,
-              decoration: const BoxDecoration(
-                color: Palette.primary,
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.primary,
                 shape: BoxShape.circle,
               ),
               child: UserImage(
@@ -123,8 +123,8 @@ class NostrDrawer extends ConsumerWidget {
                       children: [
                         Text(
                           metadata?.name ?? '',
-                          style: const TextStyle(
-                              color: Palette.extraLightGray,
+                          style: TextStyle(
+                              color: Paletter.getExtraLightGray(context),
                               fontSize: 17,
                               fontWeight: FontWeight.bold),
                         ),
@@ -133,8 +133,8 @@ class NostrDrawer extends ConsumerWidget {
                         ),
                         Text(
                           metadata?.nip05 ?? '',
-                          style: const TextStyle(
-                            color: Palette.gray,
+                          style: TextStyle(
+                            color: Paletter.getGray(context),
                             fontSize: 15,
                           ),
                         ),
@@ -144,7 +144,7 @@ class NostrDrawer extends ConsumerWidget {
                 ),
                 //Icon(
                 //  Icons.arrow_drop_down_rounded,
-                //  color: Palette.primary,
+                //  color: Theme.of(context).colorScheme.primary,
                 //  size: 30,
                 //)
               ],
@@ -160,15 +160,15 @@ class NostrDrawer extends ConsumerWidget {
                   text: !myContactList.isLoading
                       ? myContactList.contactList.contacts.length.toString()
                       : 'n.a.',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    color: Palette.extraLightGray,
+                    color: Paletter.getExtraLightGray(context),
                   ),
-                  children: const [
+                  children: [
                     TextSpan(
                       text: ' Following  ',
                       style: TextStyle(
-                          color: Palette.gray,
+                          color: Paletter.getGray(context),
                           fontSize: 13,
                           fontWeight: FontWeight.normal),
                     )
@@ -179,17 +179,17 @@ class NostrDrawer extends ConsumerWidget {
                 width: 6,
               ),
               RichText(
-                  text: const TextSpan(
+                  text: TextSpan(
                       text: 'n.a.',
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
-                        color: Palette.extraLightGray,
+                        color: Paletter.getExtraLightGray(context),
                       ),
                       children: [
                     TextSpan(
                       text: 'Followers',
                       style: TextStyle(
-                          color: Palette.gray,
+                          color: Paletter.getGray(context),
                           fontSize: 13,
                           fontWeight: FontWeight.normal),
                     )
@@ -202,31 +202,43 @@ class NostrDrawer extends ConsumerWidget {
   }
 
   Widget _drawerItem({icon, label, onTap}) {
-    return ListTile(
-      onTap: onTap,
-      leading: SvgPicture.asset(
-        icon,
-        height: 25,
-        colorFilter: const ColorFilter.mode(Palette.gray, BlendMode.srcIn),
-      ),
-      title: Text(label,
-          style: const TextStyle(color: Palette.lightGray, fontSize: 17)),
+    return Builder(
+      builder: (context) {
+        return ListTile(
+          onTap: onTap,
+          leading: SvgPicture.asset(
+            icon,
+            height: 25,
+            colorFilter: ColorFilter.mode(Paletter.getGray(context), BlendMode.srcIn),
+          ),
+          title: Text(label,
+              style: TextStyle(color: Paletter.getLightGray(context), fontSize: 17)),
+        );
+      }
     );
   }
 
   Widget _textButton({text, onPressed}) {
     return TextButton(
         onPressed: onPressed,
-        child: Text(
-          text,
-          style: const TextStyle(color: Palette.extraLightGray, fontSize: 16),
+        child: Builder(
+          builder: (context) {
+            return Text(
+              text,
+              style: TextStyle(color: Paletter.getExtraLightGray(context), fontSize: 16),
+            );
+          }
         ));
   }
 
   Widget _divider() {
-    return const Divider(
-      thickness: 0.3,
-      color: Palette.darkGray,
+    return Builder(
+      builder: (context) {
+        return Divider(
+          thickness: 0.3,
+          color: Paletter.getDarkGray(context),
+        );
+      }
     );
   }
 
@@ -243,129 +255,126 @@ class NostrDrawer extends ConsumerWidget {
         ref.watch(metadataStateProvider(pubkey)).userMetadata;
 
     return Drawer(
-      child: Container(
-        color: Palette.background,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _drawerHeader(context, myUserMetadata, ref),
-            _divider(),
-            _drawerItem(
-                label: 'Profile',
-                icon: 'assets/icons/user.svg',
-                onTap: () {
-                  navigateToProfile(context);
-                }),
-            _drawerItem(
-                label: 'Bookmarks',
-                icon: 'assets/icons/bookmark-simple.svg',
-                onTap: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Not implemented yet'),
-                    ),
-                  );
-                }),
-            _drawerItem(
-                label: 'Payments',
-                icon: 'assets/icons/lightning.svg',
-                onTap: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Not implemented yet'),
-                    ),
-                  );
-                }),
-            _drawerItem(
-                label: 'Blocklist',
-                icon: 'assets/icons/yin-yang.svg',
-                onTap: () {
-                  // navigate to blocklist
-                  Navigator.pushNamed(context, '/nostr/blockedUsers');
-                }),
-            const Spacer(),
-            const Spacer(),
-            _divider(),
-            Padding(
-                padding: const EdgeInsets.only(left: 20),
-                child: _textButton(
-                    text: 'Settings',
-                    onPressed: () {
-                      Navigator.pushNamed(context, '/settings');
-                    })),
-            const SizedBox(height: 10),
-            Padding(
-                padding: const EdgeInsets.fromLTRB(20, 10, 15, 20),
-                child: _textButton(
-                    text: 'Terms of Service',
-                    onPressed: () {
-                      // lauch url
-                      Uri url = Uri.parse("https://camelus.app/terms");
-                      launchUrl(url, mode: LaunchMode.externalApplication);
-                    })),
-            const Spacer(),
-            Padding(
-              padding: EdgeInsets.only(left: 20),
-              child: FutureBuilder(
-                  future: _getPackageInfo(),
-                  builder: (context, snapshot) {
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'v${snapshot.data?.version}',
-                          style: const TextStyle(
-                            color: Palette.gray,
-                            fontSize: 10,
-                          ),
-                        ),
-                        Text(
-                          'build ${snapshot.data?.buildNumber}',
-                          style: const TextStyle(
-                            color: Palette.gray,
-                            fontSize: 8,
-                          ),
-                        ),
-                        Text(
-                          '${snapshot.data?.buildSignature}',
-                          style: const TextStyle(
-                            color: Palette.gray,
-                            fontSize: 6,
-                          ),
-                        ),
-                      ],
-                    );
-                  }),
-            ),
-            _divider(),
-            Padding(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _drawerHeader(context, myUserMetadata, ref),
+          _divider(),
+          _drawerItem(
+              label: 'Profile',
+              icon: 'assets/icons/user.svg',
+              onTap: () {
+                navigateToProfile(context);
+              }),
+          _drawerItem(
+              label: 'Bookmarks',
+              icon: 'assets/icons/bookmark-simple.svg',
+              onTap: () {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Not implemented yet'),
+                  ),
+                );
+              }),
+          _drawerItem(
+              label: 'Payments',
+              icon: 'assets/icons/lightning.svg',
+              onTap: () {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Not implemented yet'),
+                  ),
+                );
+              }),
+          _drawerItem(
+              label: 'Blocklist',
+              icon: 'assets/icons/yin-yang.svg',
+              onTap: () {
+                // navigate to blocklist
+                Navigator.pushNamed(context, '/nostr/blockedUsers');
+              }),
+          const Spacer(),
+          const Spacer(),
+          _divider(),
+          Padding(
+              padding: const EdgeInsets.only(left: 20),
+              child: _textButton(
+                  text: 'Settings',
+                  onPressed: () {
+                    Navigator.pushNamed(context, '/settings');
+                  })),
+          const SizedBox(height: 10),
+          Padding(
               padding: const EdgeInsets.fromLTRB(20, 10, 15, 20),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  SvgPicture.asset(
-                    'assets/icons/sun.svg',
-                    colorFilter: ColorFilter.mode(Palette.primary, BlendMode.srcIn),
+              child: _textButton(
+                  text: 'Terms of Service',
+                  onPressed: () {
+                    // lauch url
+                    Uri url = Uri.parse("https://camelus.app/terms");
+                    launchUrl(url, mode: LaunchMode.externalApplication);
+                  })),
+          const Spacer(),
+          Padding(
+            padding: EdgeInsets.only(left: 20),
+            child: FutureBuilder(
+                future: _getPackageInfo(),
+                builder: (context, snapshot) {
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'v${snapshot.data?.version}',
+                        style: TextStyle(
+                          color: Paletter.getGray(context),
+                          fontSize: 10,
+                        ),
+                      ),
+                      Text(
+                        'build ${snapshot.data?.buildNumber}',
+                        style: TextStyle(
+                          color: Paletter.getGray(context),
+                          fontSize: 8,
+                        ),
+                      ),
+                      Text(
+                        '${snapshot.data?.buildSignature}',
+                        style: TextStyle(
+                          color: Paletter.getGray(context),
+                          fontSize: 6,
+                        ),
+                      ),
+                    ],
+                  );
+                }),
+          ),
+          _divider(),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 10, 15, 20),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                SvgPicture.asset(
+                  'assets/icons/sun.svg',
+                  colorFilter: ColorFilter.mode(Theme.of(context).colorScheme.primary, BlendMode.srcIn),
+                  height: 22,
+                  width: 22,
+                ),
+                GestureDetector(
+                  onTap: () {
+                    openQrShareDialog(context);
+                  },
+                  child: SvgPicture.asset(
+                    'assets/icons/qr-code.svg',
+                    colorFilter: ColorFilter.mode(Theme.of(context).colorScheme.primary, BlendMode.srcIn),
                     height: 22,
                     width: 22,
                   ),
-                  GestureDetector(
-                    onTap: () {
-                      openQrShareDialog(context);
-                    },
-                    child: SvgPicture.asset(
-                      'assets/icons/qr-code.svg',
-                      colorFilter: const ColorFilter.mode(Palette.primary, BlendMode.srcIn),
-                      height: 22,
-                      width: 22,
-                    ),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

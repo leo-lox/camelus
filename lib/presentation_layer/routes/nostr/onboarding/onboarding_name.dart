@@ -49,7 +49,6 @@ class _OnboardingNameState extends ConsumerState<OnboardingName> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Palette.background,
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -63,7 +62,7 @@ class _OnboardingNameState extends ConsumerState<OnboardingName> {
                   child: IconButton(
                     icon: Icon(
                       PhosphorIcons.arrowLeft(),
-                      color: Palette.white,
+                      color: Theme.of(context).colorScheme.onSurface,
                     ),
                     onPressed: () => widget.onPressedBack!(),
                   ),
@@ -84,11 +83,11 @@ class _OnboardingNameState extends ConsumerState<OnboardingName> {
                 focusNode: _nameFocusNode,
                 controller: _nameController,
                 autofillHints: const [AutofillHints.name],
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   hintText: 'what should we call you?',
                   contentPadding: EdgeInsets.all(0),
                   hintStyle: TextStyle(
-                    color: Palette.white,
+                    color: Theme.of(context).colorScheme.onSurface,
                     letterSpacing: 1.1,
                   ),
                   alignLabelWithHint: true,
@@ -97,8 +96,8 @@ class _OnboardingNameState extends ConsumerState<OnboardingName> {
                 onChanged: (value) {
                   widget.userInfo.name = value;
                 },
-                style: const TextStyle(
-                  color: Palette.lightGray,
+                style: TextStyle(
+                  color: Paletter.getLightGray(context),
                   letterSpacing: 1.1,
                   fontSize: 28, // Increase the font size
                 ),

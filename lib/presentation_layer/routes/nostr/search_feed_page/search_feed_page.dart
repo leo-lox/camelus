@@ -62,13 +62,13 @@ class _SearchFeedPageState extends State<SearchFeedPage> {
       builder: (context) => AlertDialog(
         title: const Text('Search Help'),
         content: const Text('Enter keywords to search for posts.'),
-        backgroundColor: Palette.darkGray,
-        titleTextStyle: const TextStyle(color: Palette.white, fontSize: 18),
-        contentTextStyle: const TextStyle(color: Palette.white),
+        backgroundColor: Paletter.getDarkGray(context),
+        titleTextStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 18),
+        contentTextStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('OK', style: TextStyle(color: Palette.primary)),
+            child: Text('OK', style: TextStyle(color: Theme.of(context).colorScheme.primary)),
           ),
         ],
       ),
@@ -94,7 +94,6 @@ class _SearchFeedPageState extends State<SearchFeedPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Palette.background,
       body: SafeArea(
         child: Column(
           children: [
