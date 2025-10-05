@@ -153,5 +153,9 @@
   "graphicContent": "图形内容",
   "discrimination": "歧视",
   "health": "健康",
-  "abuse": "虐待"
+  "abuse": "虐待",
+  "routeHome": "主页",
+  "routePostsAndReplies": "帖子和回复",
+  "routeSearch": "搜索",
+  "routeNotifications": "通知"
 }

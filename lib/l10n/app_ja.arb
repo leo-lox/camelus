@@ -153,5 +153,9 @@
   "graphicContent": "グラフィックコンテンツ",
   "discrimination": "差別",
   "health": "健康",
-  "abuse": "虐待"
+  "abuse": "虐待",
+  "routeHome": "ホーム",
+  "routePostsAndReplies": "投稿と返信",
+  "routeSearch": "検索",
+  "routeNotifications": "通知"
 }

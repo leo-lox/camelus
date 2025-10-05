@@ -484,4 +484,16 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get abuse => '虐待';
+
+  @override
+  String get routeHome => '主页';
+
+  @override
+  String get routePostsAndReplies => '帖子和回复';
+
+  @override
+  String get routeSearch => '搜索';
+
+  @override
+  String get routeNotifications => '通知';
 }

@@ -500,4 +500,16 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get abuse => 'Missbrauch';
+
+  @override
+  String get routeHome => 'Startseite';
+
+  @override
+  String get routePostsAndReplies => 'Beiträge und Antworten';
+
+  @override
+  String get routeSearch => 'Suchen';
+
+  @override
+  String get routeNotifications => 'Benachrichtigungen';
 }

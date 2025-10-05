@@ -505,4 +505,16 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get abuse => 'Abus';
+
+  @override
+  String get routeHome => 'Accueil';
+
+  @override
+  String get routePostsAndReplies => 'Publications et Réponses';
+
+  @override
+  String get routeSearch => 'Rechercher';
+
+  @override
+  String get routeNotifications => 'Notifications';
 }

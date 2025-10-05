@@ -495,4 +495,16 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get abuse => 'การล่วงละเมิด';
+
+  @override
+  String get routeHome => 'หน้าแรก';
+
+  @override
+  String get routePostsAndReplies => 'โพสต์และการตอบกลับ';
+
+  @override
+  String get routeSearch => 'ค้นหา';
+
+  @override
+  String get routeNotifications => 'การแจ้งเตือน';
 }

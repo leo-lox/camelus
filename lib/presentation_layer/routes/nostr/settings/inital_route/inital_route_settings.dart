@@ -25,6 +25,22 @@ class InitalRouteSettingsState extends ConsumerState<InitalRouteSettings> {
     '/notifications'
   ];
 
+  // Get localized route label
+  String _getRouteLabel(BuildContext context, String route) {
+    switch (route) {
+      case '/':
+        return AppLocalizations.of(context)!.routeHome;
+      case '/posts-and-replies':
+        return AppLocalizations.of(context)!.routePostsAndReplies;
+      case '/search':
+        return AppLocalizations.of(context)!.routeSearch;
+      case '/notifications':
+        return AppLocalizations.of(context)!.routeNotifications;
+      default:
+        return route;
+    }
+  }
+
   _laodInitialRoute() async {
     final loadedRoute = await ref.read(initalRouteProvider).getInitialRoute();
     ref.read(selectedRouteProvider.notifier).state = loadedRoute;
@@ -51,7 +67,7 @@ class InitalRouteSettingsState extends ConsumerState<InitalRouteSettings> {
           final route = routes[index];
           return ListTile(
             title: Text(
-              route,
+              _getRouteLabel(context, route),
               style: TextStyle(color: Paletter.getLightGray(context)),
             ),
             trailing: selectedRoute == route

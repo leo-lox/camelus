@@ -499,4 +499,16 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get abuse => 'Abuso';
+
+  @override
+  String get routeHome => 'Início';
+
+  @override
+  String get routePostsAndReplies => 'Publicações e Respostas';
+
+  @override
+  String get routeSearch => 'Pesquisar';
+
+  @override
+  String get routeNotifications => 'Notificações';
 }

@@ -1033,6 +1033,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Abuse'**
   String get abuse;
+
+  /// Home route label
+  ///
+  /// In en, this message translates to:
+  /// **'Home'**
+  String get routeHome;
+
+  /// Posts and replies route label
+  ///
+  /// In en, this message translates to:
+  /// **'Posts and Replies'**
+  String get routePostsAndReplies;
+
+  /// Search route label
+  ///
+  /// In en, this message translates to:
+  /// **'Search'**
+  String get routeSearch;
+
+  /// Notifications route label
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications'**
+  String get routeNotifications;
 }
 
 class _AppLocalizationsDelegate

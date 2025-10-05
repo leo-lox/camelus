@@ -486,4 +486,16 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get abuse => '虐待';
+
+  @override
+  String get routeHome => 'ホーム';
+
+  @override
+  String get routePostsAndReplies => '投稿と返信';
+
+  @override
+  String get routeSearch => '検索';
+
+  @override
+  String get routeNotifications => '通知';
 }

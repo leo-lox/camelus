@@ -650,5 +650,21 @@
   "abuse": "Abuse",
   "@abuse": {
     "description": "Content warning option"
+  },
+  "routeHome": "Home",
+  "@routeHome": {
+    "description": "Home route label"
+  },
+  "routePostsAndReplies": "Posts and Replies",
+  "@routePostsAndReplies": {
+    "description": "Posts and replies route label"
+  },
+  "routeSearch": "Search",
+  "@routeSearch": {
+    "description": "Search route label"
+  },
+  "routeNotifications": "Notifications",
+  "@routeNotifications": {
+    "description": "Notifications route label"
   }
 }

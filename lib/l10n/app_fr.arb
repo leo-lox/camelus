@@ -153,5 +153,9 @@
   "graphicContent": "Contenu graphique",
   "discrimination": "Discrimination",
   "health": "Santé",
-  "abuse": "Abus"
+  "abuse": "Abus",
+  "routeHome": "Accueil",
+  "routePostsAndReplies": "Publications et Réponses",
+  "routeSearch": "Rechercher",
+  "routeNotifications": "Notifications"
 }
