@@ -94,21 +94,26 @@ class NostrSideMenu extends ConsumerWidget {
     context.push('/nostr/profile/$pubkey');
   }
 
-  Widget _drawerItem(
-      {required IconData icon, label, onTap, required String routeName}) {
+  Widget _drawerItem({
+    required IconData icon,
+    label,
+    onTap,
+    required String routeName,
+  }) {
     return Builder(
       builder: (context) {
         final currentRoute = GoRouterState.of(context).uri.toString();
         final isSelected = currentRoute.contains(routeName);
 
         return Container(
+          width: 200,
           decoration: isSelected
               ? BoxDecoration(
                   color: Theme.of(context)
                       .colorScheme
                       .primary
                       .withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(100),
                 )
               : null,
           child: ListTile(
