@@ -9,21 +9,19 @@ import 'package:qr_flutter/qr_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../config/palette.dart';
-import '../../../domain_layer/entities/user_metadata.dart';
 import '../../../helpers/nprofile_helper.dart';
-import '../../atoms/my_profile_picture.dart';
-import '../../providers/following_contact_state_provider.dart';
-import '../../providers/metadata_state_provider.dart';
 import '../../providers/ndk_provider.dart';
 
 class NostrSideMenu extends ConsumerWidget {
   final Widget leadingWidget;
   final Widget trailingWidget;
+  final bool hideOnMobile;
 
   const NostrSideMenu({
     super.key,
     this.leadingWidget = const SizedBox(),
     this.trailingWidget = const SizedBox(),
+    this.hideOnMobile = false,
   });
 
   void _copyToClipboard(BuildContext context, String text) {
@@ -163,6 +161,22 @@ class NostrSideMenu extends ConsumerWidget {
               onTap: () {
                 context.go('/home');
               }),
+          if (!hideOnMobile)
+            _drawerItem(
+                icon: PhosphorIcons.magnifyingGlass(),
+                label: 'Explore',
+                routeName: '/search',
+                onTap: () {
+                  context.go('/search');
+                }),
+          if (!hideOnMobile)
+            _drawerItem(
+                icon: PhosphorIcons.bell(),
+                label: 'Notifications',
+                routeName: '/notifications',
+                onTap: () {
+                  context.go('/notifications');
+                }),
           _drawerItem(
               label: 'Profile',
               routeName: '/nostr/profile',

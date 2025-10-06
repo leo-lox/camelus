@@ -144,6 +144,7 @@ class NostrDrawer extends ConsumerWidget {
         ref.watch(metadataStateProvider(pubkey)).userMetadata;
     return Drawer(
       child: NostrSideMenu(
+        hideOnMobile: true,
         leadingWidget: _drawerHeader(context, myUserMetadata, ref),
       ),
     );
