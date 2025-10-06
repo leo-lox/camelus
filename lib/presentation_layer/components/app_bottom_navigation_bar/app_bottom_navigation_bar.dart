@@ -6,12 +6,6 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../providers/app_bar_provider/app_bottom_bar_provider.dart';
 
-const showOnRoutes = [
-  '/home',
-  '/search',
-  '/notifications',
-];
-
 class AppBottomNavigationBar extends ConsumerWidget {
   const AppBottomNavigationBar({
     super.key,
@@ -22,49 +16,40 @@ class AppBottomNavigationBar extends ConsumerWidget {
     final navigationState = ref.watch(appBottomNavigationBarProvider);
     final notifier = ref.read(appBottomNavigationBarProvider.notifier);
 
-    final currentRoute = GoRouterState.of(context).uri.toString();
+    return NavigationBar(
+      height: kBottomNavigationBarHeight,
+      labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
+      selectedIndex: navigationState.selectedTab.index,
+      indicatorColor: Colors.transparent,
+      onDestinationSelected: (int index) {
+        final tab = NavigationTab.values[index];
+        notifier.selectTab(tab);
 
-    final shouldShow = showOnRoutes.contains(currentRoute);
+        switch (index) {
+          case 0:
+            {
+              context.go('/home');
+              break;
+            }
 
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 250),
-      curve: Curves.easeInOut,
-      height: shouldShow ? kBottomNavigationBarHeight : 0,
-      child: NavigationBar(
-        height: kBottomNavigationBarHeight,
-        labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
-        selectedIndex: navigationState.selectedTab.index,
-        indicatorColor: Colors.transparent,
-        onDestinationSelected: (int index) {
-          final tab = NavigationTab.values[index];
-          notifier.selectTab(tab);
-
-          switch (index) {
-            case 0:
-              {
-                context.go('/home');
-                break;
-              }
-
-            case 1:
-              {
-                context.go('/search');
-                break;
-              }
-            case 2:
-              {
-                context.go('/notifications');
-                break;
-              }
-          }
-        },
-        destinations: <NavigationDestination>[
-          _buildHomeItem(context, navigationState, ref),
-          _buildSearchItem(context, navigationState),
-          _buildNotificationsItem(context, navigationState),
-          //_buildChatItem(navigationState),
-        ],
-      ),
+          case 1:
+            {
+              context.go('/search');
+              break;
+            }
+          case 2:
+            {
+              context.go('/notifications');
+              break;
+            }
+        }
+      },
+      destinations: <NavigationDestination>[
+        _buildHomeItem(context, navigationState, ref),
+        _buildSearchItem(context, navigationState),
+        _buildNotificationsItem(context, navigationState),
+        //_buildChatItem(navigationState),
+      ],
     );
   }
 
