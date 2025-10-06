@@ -1,9 +1,8 @@
 import 'package:camelus/domain_layer/entities/relay.dart';
+import 'package:camelus/l10n/app_localizations.dart';
 import 'package:camelus/presentation_layer/components/edit_relays_view.dart';
 
 import 'package:flutter/material.dart';
-import 'package:camelus/config/palette.dart';
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class EditRelaysPage extends ConsumerStatefulWidget {
@@ -33,11 +32,8 @@ class _EditRelaysPageState extends ConsumerState<EditRelaysPage> {
     return PopScope(
       canPop: true,
       child: Scaffold(
-        backgroundColor: Palette.background,
         appBar: AppBar(
-          title: const Text('Edit Relays'),
-          backgroundColor: Palette.background,
-          foregroundColor: Palette.lightGray,
+          title: Text(AppLocalizations.of(context)!.editRelays),
         ),
         // show loading indicator when reconnecting
         body: EditRelaysView(

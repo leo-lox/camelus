@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:math';
 
+import 'package:camelus/l10n/app_localizations.dart';
 import 'package:camelus/presentation_layer/components/full_screen_loading.dart';
 import 'package:camelus/presentation_layer/providers/ndk_provider.dart';
 import 'package:flutter/material.dart';
@@ -48,12 +49,7 @@ class _OnboardingDoneState extends ConsumerState<OnboardingDone> {
   bool _isLoading = false;
   double _loadingOpacity = 0.0;
 
-  List<String> loadingTexts = [
-    "setting up your account",
-    "following people",
-    "moving data",
-    "cleaning up"
-  ];
+  late List<String> loadingTexts;
 
   void _toggleVisibility() {
     setState(() {
@@ -114,7 +110,8 @@ ${_privateKey.mnemonicSentence}
     if (widget.userInfo.picture != null) {
       setState(() {
         // add to start
-        loadingTexts.insert(0, "uploading profile picture");
+        loadingTexts.insert(
+            0, AppLocalizations.of(context)!.uploadingProfilePicture);
       });
 
       try {
@@ -160,6 +157,17 @@ ${_privateKey.mnemonicSentence}
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    loadingTexts = [
+      AppLocalizations.of(context)!.settingUpYourAccount,
+      AppLocalizations.of(context)!.followingPeople,
+      AppLocalizations.of(context)!.movingData,
+      AppLocalizations.of(context)!.cleaningUp
+    ];
+  }
+
+  @override
   void dispose() {
     super.dispose();
   }
@@ -167,9 +175,8 @@ ${_privateKey.mnemonicSentence}
   _onSubmit() async {
     if (!_termsAndConditions) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please read and accept the terms and conditions first',
-              style: TextStyle(color: Palette.black)),
+        SnackBar(
+          content: Text(AppLocalizations.of(context)!.pleaseReadAndAcceptTerms),
         ),
       );
       return;
@@ -212,7 +219,6 @@ ${_privateKey.mnemonicSentence}
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Palette.background,
       body: Stack(
         children: [
           AnimatedOpacity(
@@ -226,10 +232,10 @@ ${_privateKey.mnemonicSentence}
                     child: Column(
                       children: [
                         const SizedBox(height: 20),
-                        const Text(
-                          "recovery phrase",
+                        Text(
+                          AppLocalizations.of(context)!.recoveryPhrase,
                           style: TextStyle(
-                            color: Palette.white,
+                            color: Theme.of(context).colorScheme.onSurface,
                             fontSize: 22,
                             fontWeight: FontWeight.bold,
                           ),
@@ -247,44 +253,47 @@ ${_privateKey.mnemonicSentence}
                             children: [
                               ElevatedButton.icon(
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: Palette.black,
-                                  foregroundColor: Palette.white,
+                                  backgroundColor:
+                                      Theme.of(context).colorScheme.surface,
+                                  foregroundColor:
+                                      Theme.of(context).colorScheme.onSurface,
                                 ),
                                 onPressed: () => {
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
+                                    SnackBar(
                                       duration: Duration(seconds: 2),
                                       content: Text(
-                                          'a new seed phrase has been generated',
-                                          style:
-                                              TextStyle(color: Palette.black)),
+                                          AppLocalizations.of(context)!
+                                              .newSeedPhraseGenerated),
                                     ),
                                   ),
                                   _generateKey()
                                 },
                                 icon: const Icon(Icons.refresh),
-                                label: const Text('regenerate'),
+                                label: Text(
+                                    AppLocalizations.of(context)!.regenerate),
                               ),
                               const SizedBox(width: 5),
                               ElevatedButton.icon(
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: Palette.lightGray,
-                                  foregroundColor: Palette.black,
+                                  backgroundColor:
+                                      Paletter.getLightGray(context),
+                                  foregroundColor:
+                                      Theme.of(context).colorScheme.surface,
                                 ),
                                 onPressed: () => {
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
+                                    SnackBar(
                                       duration: Duration(seconds: 2),
                                       content: Text(
-                                          'copied seed phrase to clipboard',
-                                          style:
-                                              TextStyle(color: Palette.black)),
+                                          AppLocalizations.of(context)!
+                                              .copiedSeedPhraseToClipboard),
                                     ),
                                   ),
                                   _copyKey()
                                 },
                                 icon: const Icon(Icons.copy),
-                                label: const Text('copy'),
+                                label: Text(AppLocalizations.of(context)!.copy),
                               ),
                               const SizedBox(width: 5),
                               IconButton(
@@ -292,16 +301,17 @@ ${_privateKey.mnemonicSentence}
                                 icon: Icon(_isVisible
                                     ? Icons.visibility
                                     : Icons.visibility_off),
-                                tooltip:
-                                    _isVisible ? 'Hide words' : 'Show words',
+                                tooltip: _isVisible
+                                    ? AppLocalizations.of(context)!.hideWords
+                                    : AppLocalizations.of(context)!.showWords,
                               ),
                             ],
                           ),
                         ),
-                        const Padding(
+                        Padding(
                           padding: EdgeInsets.all(16),
-                          child: Text(
-                              "You need the recovery phrase to login again. Make sure to keep it safe!"),
+                          child: Text(AppLocalizations.of(context)!
+                              .recoveryPhraseWarning),
                         ),
                       ],
                     ),
@@ -321,14 +331,11 @@ ${_privateKey.mnemonicSentence}
                               _termsAndConditions = value!;
                             });
                           },
-                          activeColor: Palette.white,
-                          checkColor: Palette.black,
-                          fillColor: WidgetStateProperty.all(Palette.white),
                         ),
-                        const Text(
-                          "I have read and accept the ",
+                        Text(
+                          AppLocalizations.of(context)!.iHaveReadAndAccept,
                           style: TextStyle(
-                            color: Palette.white,
+                            color: Theme.of(context).colorScheme.onSurface,
                             fontSize: 12,
                             fontWeight: FontWeight.normal,
                           ),
@@ -339,10 +346,10 @@ ${_privateKey.mnemonicSentence}
                             launchUrl(url,
                                 mode: LaunchMode.externalApplication);
                           },
-                          child: const Text(
-                            "terms and conditions",
+                          child: Text(
+                            AppLocalizations.of(context)!.termsAndConditions,
                             style: TextStyle(
-                              color: Palette.white,
+                              color: Theme.of(context).colorScheme.onSurface,
                               fontSize: 12,
                               fontWeight: FontWeight.bold,
                               decoration: TextDecoration.underline,
@@ -356,10 +363,10 @@ ${_privateKey.mnemonicSentence}
                         Uri url = Uri.parse("https://camelus.app/privacy/");
                         launchUrl(url, mode: LaunchMode.externalApplication);
                       },
-                      child: const Text(
-                        "privacy policy",
+                      child: Text(
+                        AppLocalizations.of(context)!.privacyPolicy,
                         style: TextStyle(
-                          color: Palette.white,
+                          color: Theme.of(context).colorScheme.onSurface,
                           fontSize: 12,
                           fontWeight: FontWeight.bold,
                           decoration: TextDecoration.underline,
@@ -372,7 +379,7 @@ ${_privateKey.mnemonicSentence}
                       width: 400,
                       height: 40,
                       child: longButton(
-                        name: "publish account",
+                        name: AppLocalizations.of(context)!.publishAccount,
                         inverted: true,
                         onPressed: () => _onSubmit(),
                       ),

@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
-import '../../../../config/palette.dart';
 import '../../../atoms/long_button.dart';
 
 class OnboardingLoginSelectPage extends ConsumerStatefulWidget {
@@ -30,7 +29,6 @@ class _OnboardingLoginSelectPageState
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: null,
-      backgroundColor: Palette.background,
       resizeToAvoidBottomInset: false,
       body: SafeArea(
         // input for the user to enter their private key, should be visible on a dark background.
@@ -46,8 +44,8 @@ class _OnboardingLoginSelectPageState
                 Row(
                   children: [
                     IconButton(
-                      icon:
-                          Icon(PhosphorIcons.arrowLeft(), color: Palette.white),
+                      icon: Icon(PhosphorIcons.arrowLeft(),
+                          color: Theme.of(context).colorScheme.onSurface),
                       onPressed: () => widget.onPressedBack!(),
                     ),
                   ],
@@ -56,14 +54,14 @@ class _OnboardingLoginSelectPageState
               SizedBox(
                 height: 200,
                 width: MediaQuery.of(context).size.width,
-                child: const Column(
+                child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
                       "login",
                       style: TextStyle(
-                        color: Palette.white,
+                        color: Theme.of(context).colorScheme.onSurface,
                         fontSize: 40,
                         fontFamily: "Poppins",
                       ),

@@ -10,8 +10,7 @@ List<String> camelusBootstrapRelays = [
   "wss://relay.camelus.app",
 ];
 
-final Map<String, ndk_entities.ReadWriteMarker>
-    defaultAccountCreationRelays = {
+final Map<String, ndk_entities.ReadWriteMarker> defaultAccountCreationRelays = {
   // read
   "wss://relay.nostr.band": ndk_entities.ReadWriteMarker.readOnly,
   "wss://nostr.wine": ndk_entities.ReadWriteMarker.readOnly,

@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:camelus/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -35,22 +36,22 @@ class SettingsFileServersPageState extends ConsumerState<SettingsFileServers> {
     final result = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: Palette.background,
-        title: const Text('Unsaved Changes',
-            style: TextStyle(color: Palette.white)),
-        content: const Text(
-          'You have unsaved changes. Do you want to discard them?',
-          style: TextStyle(color: Palette.white),
+        title: Text(AppLocalizations.of(context)!.unsavedChanges,
+            style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
+        content: Text(
+          AppLocalizations.of(context)!.unsavedChangesMessage,
+          style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('Cancel', style: TextStyle(color: Palette.gray)),
+            child: Text(AppLocalizations.of(context)!.cancel,
+                style: TextStyle(color: Paletter.getGray(context))),
           ),
           TextButton(
             onPressed: () => Navigator.of(context).pop(true),
-            child:
-                const Text('Discard', style: TextStyle(color: Palette.primary)),
+            child: Text(AppLocalizations.of(context)!.discard,
+                style: TextStyle(color: Theme.of(context).colorScheme.primary)),
           ),
         ],
       ),
@@ -77,27 +78,26 @@ class SettingsFileServersPageState extends ConsumerState<SettingsFileServers> {
         }
       },
       child: Scaffold(
-        backgroundColor: Palette.background,
         appBar: AppBar(
-          title: const Text('File Servers'),
-          backgroundColor: Palette.background,
+          title: Text(AppLocalizations.of(context)!.fileServers),
           actions: [
             if (hasUnsavedChanges)
               longButton(
-                name: "save changes",
+                name: AppLocalizations.of(context)!.saveChanges,
                 inverted: true,
                 onPressed: () async {
                   showDialog(
                     context: context,
                     barrierDismissible: false,
                     builder: (context) => AlertDialog(
-                      backgroundColor: Palette.background,
-                      content: const Row(
+                      content: Row(
                         children: [
-                          CircularProgressIndicator(color: Palette.white),
+                          CircularProgressIndicator(),
                           SizedBox(width: 20),
-                          Text('Saving...',
-                              style: TextStyle(color: Palette.white)),
+                          Text(AppLocalizations.of(context)!.saving,
+                              style: TextStyle(
+                                  color:
+                                      Theme.of(context).colorScheme.onSurface)),
                         ],
                       ),
                     ),
@@ -113,12 +113,11 @@ class SettingsFileServersPageState extends ConsumerState<SettingsFileServers> {
 
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text(
-                            success
-                                ? 'Changes saved successfully'
-                                : 'Failed to save changes',
-                            style: TextStyle(color: Palette.white)),
-                        backgroundColor: Palette.extraDarkGray,
+                        content: Text(success
+                            ? AppLocalizations.of(context)!
+                                .changesSavedSuccessfully
+                            : AppLocalizations.of(context)!
+                                .failedToSaveChanges),
                       ),
                     );
                   }
@@ -133,10 +132,7 @@ class SettingsFileServersPageState extends ConsumerState<SettingsFileServers> {
           children: [
             Expanded(
               child: fileServersAsync.when(
-                loading: () => const Center(
-                    child: CircularProgressIndicator(
-                  color: Palette.lightGray,
-                )),
+                loading: () => Center(child: CircularProgressIndicator()),
                 error: (error, stack) => Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -145,7 +141,8 @@ class SettingsFileServersPageState extends ConsumerState<SettingsFileServers> {
                       const SizedBox(height: 25),
                       longButton(
                           inverted: true,
-                          name: "setup default servers",
+                          name:
+                              AppLocalizations.of(context)!.setupDefaultServers,
                           onPressed: () {
                             ref
                                 .read(fileServersProvider.notifier)
@@ -177,12 +174,12 @@ class SettingsFileServersPageState extends ConsumerState<SettingsFileServers> {
                               children: [
                                 ReorderableDragStartListener(
                                   index: index,
-                                  child: const SizedBox(
+                                  child: SizedBox(
                                     width: 40,
                                     child: Center(
                                       child: Icon(
                                         Icons.drag_handle,
-                                        color: Palette.darkGray,
+                                        color: Paletter.getDarkGray(context),
                                       ),
                                     ),
                                   ),
@@ -191,8 +188,8 @@ class SettingsFileServersPageState extends ConsumerState<SettingsFileServers> {
                                   Icons.circle,
                                   size: 12,
                                   color: server.isOnline
-                                      ? Palette.primary
-                                      : Palette.darkGray,
+                                      ? Theme.of(context).colorScheme.primary
+                                      : Paletter.getDarkGray(context),
                                 ),
                                 const SizedBox(width: 16),
                                 Expanded(
@@ -200,22 +197,27 @@ class SettingsFileServersPageState extends ConsumerState<SettingsFileServers> {
                                     children: [
                                       Text(
                                         server.url,
-                                        style: const TextStyle(
+                                        style: TextStyle(
                                           fontSize: 16,
-                                          color: Palette.white,
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onSurface,
                                         ),
                                       ),
                                       if (index == 0)
-                                        const Text(' (default)',
-                                            style:
-                                                TextStyle(color: Palette.gray)),
+                                        Text(
+                                            AppLocalizations.of(context)!
+                                                .defaultLabel,
+                                            style: TextStyle(
+                                                color:
+                                                    Paletter.getGray(context))),
                                     ],
                                   ),
                                 ),
                                 IconButton(
-                                  icon: const Icon(
+                                  icon: Icon(
                                     Icons.delete,
-                                    color: Palette.gray,
+                                    color: Paletter.getGray(context),
                                   ),
                                   onPressed: () {
                                     ref
@@ -239,13 +241,15 @@ class SettingsFileServersPageState extends ConsumerState<SettingsFileServers> {
                               showDialog(
                                 context: context,
                                 builder: (context) => AlertDialog(
-                                  title: const Text('Restore Defaults'),
-                                  content: const Text(
-                                      'Are you sure you want to restore default servers? This will remove all custom servers.'),
+                                  title: Text(AppLocalizations.of(context)!
+                                      .restoreDefaults),
+                                  content: Text(AppLocalizations.of(context)!
+                                      .restoreDefaultsMessage),
                                   actions: [
                                     TextButton(
                                       onPressed: () => context.pop(),
-                                      child: const Text('Cancel'),
+                                      child: Text(
+                                          AppLocalizations.of(context)!.cancel),
                                     ),
                                     TextButton(
                                       onPressed: () {
@@ -254,16 +258,19 @@ class SettingsFileServersPageState extends ConsumerState<SettingsFileServers> {
                                             .restoreDefaults();
                                         context.pop();
                                       },
-                                      child: const Text('Restore'),
+                                      child: Text(AppLocalizations.of(context)!
+                                          .restore),
                                     ),
                                   ],
                                 ),
                               );
                             },
-                            icon:
-                                const Icon(Icons.restore, color: Palette.gray),
-                            label: const Text('Restore Defaults',
-                                style: TextStyle(color: Palette.gray)),
+                            icon: Icon(Icons.restore,
+                                color: Paletter.getGray(context)),
+                            label: Text(
+                                AppLocalizations.of(context)!.restoreDefaults,
+                                style: TextStyle(
+                                    color: Paletter.getGray(context))),
                           ),
                         ),
                       ),
@@ -279,27 +286,30 @@ class SettingsFileServersPageState extends ConsumerState<SettingsFileServers> {
                   Expanded(
                     child: TextField(
                       controller: _urlController,
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         isDense: true,
-                        hintText: 'Enter blossom URL',
-                        hintStyle:
-                            TextStyle(color: Palette.white, letterSpacing: 1.1),
+                        hintText: AppLocalizations.of(context)!.enterBlossomUrl,
+                        hintStyle: TextStyle(
+                            color: Theme.of(context).colorScheme.onSurface,
+                            letterSpacing: 1.1),
                         filled: true,
-                        fillColor: Palette.extraDarkGray,
+                        fillColor: Paletter.getExtraDarkGray(context),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.all(Radius.circular(50.0)),
-                          borderSide: BorderSide(color: Palette.extraDarkGray),
+                          borderSide: BorderSide(
+                              color: Paletter.getExtraDarkGray(context)),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.all(Radius.circular(25.0)),
-                          borderSide: BorderSide(color: Palette.background),
+                          borderSide: BorderSide(
+                              color: Theme.of(context).colorScheme.surface),
                         ),
                       ),
                     ),
                   ),
                   const SizedBox(width: 8),
                   longButton(
-                    name: "add",
+                    name: AppLocalizations.of(context)!.add,
                     inverted: true,
                     onPressed: () {
                       if (_urlController.text.isNotEmpty) {

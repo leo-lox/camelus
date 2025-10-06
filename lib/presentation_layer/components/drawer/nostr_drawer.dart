@@ -33,8 +33,8 @@ class NostrDrawer extends ConsumerWidget {
             child: Container(
               width: 35,
               height: 35,
-              decoration: const BoxDecoration(
-                color: Palette.primary,
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.surface,
                 shape: BoxShape.circle,
               ),
               child: UserImage(
@@ -60,8 +60,8 @@ class NostrDrawer extends ConsumerWidget {
                       children: [
                         Text(
                           metadata?.name ?? '',
-                          style: const TextStyle(
-                              color: Palette.extraLightGray,
+                          style: TextStyle(
+                              color: Theme.of(context).colorScheme.onSurface,
                               fontSize: 17,
                               fontWeight: FontWeight.bold),
                         ),
@@ -70,8 +70,9 @@ class NostrDrawer extends ConsumerWidget {
                         ),
                         Text(
                           metadata?.nip05 ?? '',
-                          style: const TextStyle(
-                            color: Palette.gray,
+                          style: TextStyle(
+                            color:
+                                Theme.of(context).colorScheme.onSurfaceVariant,
                             fontSize: 15,
                           ),
                         ),
@@ -97,15 +98,15 @@ class NostrDrawer extends ConsumerWidget {
                   text: !myContactList.isLoading
                       ? myContactList.contactList.contacts.length.toString()
                       : 'n.a.',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    color: Palette.extraLightGray,
+                    color: Paletter.getExtraLightGray(context),
                   ),
-                  children: const [
+                  children: [
                     TextSpan(
                       text: ' Following  ',
                       style: TextStyle(
-                          color: Palette.gray,
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
                           fontSize: 13,
                           fontWeight: FontWeight.normal),
                     )
@@ -116,17 +117,17 @@ class NostrDrawer extends ConsumerWidget {
                 width: 6,
               ),
               RichText(
-                  text: const TextSpan(
+                  text: TextSpan(
                       text: 'n.a.',
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
-                        color: Palette.extraLightGray,
+                        color: Paletter.getExtraLightGray(context),
                       ),
                       children: [
                     TextSpan(
                       text: 'Followers',
                       style: TextStyle(
-                          color: Palette.gray,
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
                           fontSize: 13,
                           fontWeight: FontWeight.normal),
                     )

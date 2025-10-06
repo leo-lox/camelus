@@ -18,7 +18,6 @@ class BottomActionRow extends StatefulWidget {
   final bool isLiked;
 
   static const iconSize = 24.0;
-  static const defaultColor = Palette.darkGray;
 
   const BottomActionRow({
     super.key,
@@ -102,6 +101,8 @@ class _BottomActionRowState extends State<BottomActionRow>
 
   @override
   Widget build(BuildContext context) {
+    final defaultColor = Paletter.getDarkGray(context);
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -110,12 +111,12 @@ class _BottomActionRowState extends State<BottomActionRow>
           icon: Icon(
             PhosphorIcons.chatTeardropText(),
             size: BottomActionRow.iconSize,
-            color: BottomActionRow.defaultColor,
+            color: defaultColor,
           ),
           count: widget.commentCount,
         ),
         _buildRetweetButton(
-          color: widget.isRetweeted ? Palette.repostActive : null,
+          color: widget.isRetweeted ? Color.fromARGB(255, 22, 163, 74) : null,
           onTap: widget.onRetweet,
           repostController: _repostController,
         ),
@@ -125,7 +126,7 @@ class _BottomActionRowState extends State<BottomActionRow>
           icon: Icon(
             PhosphorIcons.share(),
             size: BottomActionRow.iconSize,
-            color: BottomActionRow.defaultColor,
+            color: defaultColor,
           ),
         ),
         _buildActionButton(
@@ -133,7 +134,7 @@ class _BottomActionRowState extends State<BottomActionRow>
           icon: Icon(
             PhosphorIcons.dotsThree(PhosphorIconsStyle.bold),
             size: BottomActionRow.iconSize,
-            color: BottomActionRow.defaultColor,
+            color: defaultColor,
           ),
         )
       ],
@@ -141,6 +142,7 @@ class _BottomActionRowState extends State<BottomActionRow>
   }
 
   Widget _buildLikeButton() {
+    final defaultColor = Paletter.getDarkGray(context);
     return SizedBox(
       height: 35,
       width: 65,
@@ -160,15 +162,16 @@ class _BottomActionRowState extends State<BottomActionRow>
                       : PhosphorIcons.heart(),
                   size: BottomActionRow.iconSize,
                   color: widget.isLiked
-                      ? Palette.likeActive
-                      : BottomActionRow.defaultColor,
+                      ? Color.fromARGB(255, 230, 40, 85)
+                      : defaultColor,
                 ),
               ),
               if (widget.likeCount != null) ...[
                 const SizedBox(width: 5),
                 Text(
                   widget.likeCount.toString(),
-                  style: const TextStyle(color: Palette.gray, fontSize: 16),
+                  style:
+                      TextStyle(color: Paletter.getGray(context), fontSize: 16),
                 ),
               ],
             ],
@@ -185,6 +188,7 @@ class _BottomActionRowState extends State<BottomActionRow>
     int? count,
     Color? color,
   }) {
+    final defaultColor = Paletter.getDarkGray(context);
     return SizedBox(
       height: 35,
       width: 65,
@@ -202,7 +206,7 @@ class _BottomActionRowState extends State<BottomActionRow>
                   svgIcon,
                   height: 35,
                   colorFilter: ColorFilter.mode(
-                    color ?? BottomActionRow.defaultColor,
+                    color ?? defaultColor,
                     BlendMode.srcATop,
                   ),
                 ),
@@ -210,7 +214,8 @@ class _BottomActionRowState extends State<BottomActionRow>
                 const SizedBox(width: 5),
                 Text(
                   count.toString(),
-                  style: const TextStyle(color: Palette.gray, fontSize: 16),
+                  style:
+                      TextStyle(color: Paletter.getGray(context), fontSize: 16),
                 ),
               ],
             ],
@@ -227,43 +232,47 @@ Widget _buildRetweetButton({
   int? count,
   Color? color,
 }) {
-  return SizedBox(
-    height: 35,
-    width: 65,
-    child: InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(50),
-      child: Padding(
-        padding: const EdgeInsets.all(6.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            AnimatedBuilder(
-                animation: repostController,
-                child: SvgPicture.asset(
-                  'assets/icons/retweet.svg',
-                  height: 35,
-                  colorFilter: ColorFilter.mode(
-                    color ?? BottomActionRow.defaultColor,
-                    BlendMode.srcATop,
+  return Builder(builder: (context) {
+    final defaultColor = Paletter.getDarkGray(context);
+    return SizedBox(
+      height: 35,
+      width: 65,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(50),
+        child: Padding(
+          padding: const EdgeInsets.all(6.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              AnimatedBuilder(
+                  animation: repostController,
+                  child: SvgPicture.asset(
+                    'assets/icons/retweet.svg',
+                    height: 35,
+                    colorFilter: ColorFilter.mode(
+                      color ?? defaultColor,
+                      BlendMode.srcATop,
+                    ),
                   ),
+                  builder: (context, Widget? child) {
+                    return Transform.rotate(
+                      angle: repostController.value * 2 * math.pi,
+                      child: child,
+                    );
+                  }),
+              if (count != null) ...[
+                const SizedBox(width: 5),
+                Text(
+                  count.toString(),
+                  style:
+                      TextStyle(color: Paletter.getGray(context), fontSize: 16),
                 ),
-                builder: (context, Widget? child) {
-                  return Transform.rotate(
-                    angle: repostController.value * 2 * math.pi,
-                    child: child,
-                  );
-                }),
-            if (count != null) ...[
-              const SizedBox(width: 5),
-              Text(
-                count.toString(),
-                style: const TextStyle(color: Palette.gray, fontSize: 16),
-              ),
+              ],
             ],
-          ],
+          ),
         ),
       ),
-    ),
-  );
+    );
+  });
 }

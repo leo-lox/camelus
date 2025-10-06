@@ -1,5 +1,4 @@
 import 'package:camelus/presentation_layer/atoms/follow_button.dart';
-import 'package:camelus/config/palette.dart';
 import 'package:camelus/presentation_layer/atoms/my_profile_picture.dart';
 import 'package:camelus/presentation_layer/atoms/nip_05_text.dart';
 
@@ -52,8 +51,8 @@ class PersonCard extends ConsumerWidget {
                   if (name == '')
                     Text(
                       "${pubkey.substring(0, 7)}...${pubkey.substring(pubkey.length - 7, pubkey.length)}",
-                      style: const TextStyle(
-                        color: Palette.white,
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurface,
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
                       ),
@@ -63,8 +62,8 @@ class PersonCard extends ConsumerWidget {
                       children: [
                         Text(
                           name,
-                          style: const TextStyle(
-                            color: Palette.white,
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.onSurface,
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
                           ),
@@ -86,8 +85,8 @@ class PersonCard extends ConsumerWidget {
                         : double.infinity,
                     child: Text(
                       about,
-                      style: const TextStyle(
-                        color: Palette.white,
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurface,
                         fontSize: 12,
                         fontWeight: FontWeight.w400,
                       ),

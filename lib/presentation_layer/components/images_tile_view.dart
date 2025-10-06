@@ -132,23 +132,26 @@ class ImagesTileView extends StatelessWidget {
   }
 
   Widget _buildAdditionalImagesOverlay(int additionalImages) {
-    return Container(
-      decoration: BoxDecoration(
-        gradient: RadialGradient(
-          colors: [
-            Palette.black.withValues(alpha: 0.8),
-            Palette.extraDarkGray.withValues(alpha: 0.5),
-          ],
-          stops: const [0.0, 1.0],
+    return Builder(builder: (context) {
+      return Container(
+        decoration: BoxDecoration(
+          gradient: RadialGradient(
+            colors: [
+              Theme.of(context).colorScheme.surface.withValues(alpha: 0.8),
+              Paletter.getExtraDarkGray(context).withValues(alpha: 0.5),
+            ],
+            stops: const [0.0, 1.0],
+          ),
         ),
-      ),
-      child: Center(
-        child: Text(
-          '+$additionalImages',
-          style: const TextStyle(color: Colors.white, fontSize: 38),
+        child: Center(
+          child: Text(
+            '+$additionalImages',
+            style: TextStyle(
+                color: Theme.of(context).colorScheme.onSurface, fontSize: 38),
+          ),
         ),
-      ),
-    );
+      );
+    });
   }
 
   void _openGallery(BuildContext context, int index) {
@@ -168,15 +171,15 @@ class ImagesTileView extends StatelessWidget {
 }
 
 Widget _imageLoading() {
-  return Container(
-    decoration: BoxDecoration(
-      borderRadius: BorderRadius.circular(8),
-      color: Palette.extraDarkGray.withValues(alpha: 0.5),
-    ),
-    child: Center(
-      child: CircularProgressIndicator(
-        color: Palette.extraLightGray,
+  return Builder(builder: (context) {
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(8),
+        color: Paletter.getExtraDarkGray(context).withValues(alpha: 0.5),
       ),
-    ),
-  );
+      child: Center(
+        child: CircularProgressIndicator(),
+      ),
+    );
+  });
 }

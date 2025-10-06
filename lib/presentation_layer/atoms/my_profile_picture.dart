@@ -29,8 +29,8 @@ class UserImage extends StatelessWidget {
         child: Container(
           height: size,
           width: size,
-          decoration: const BoxDecoration(
-            color: Palette.primary,
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.primary,
             shape: BoxShape.circle,
           ),
           child: SvgPicture.network("${Dicebear.baseUrl}$pubkey"),
@@ -47,8 +47,8 @@ class UserImage extends StatelessWidget {
         child: SizedBox.fromSize(
           size: Size.fromRadius(size / 2),
           child: Container(
-            color: Palette.background,
-            child: const Icon(Icons.image, color: Palette.darkGray),
+            color: Theme.of(context).colorScheme.surface,
+            child: Icon(Icons.image, color: Paletter.getDarkGray(context)),
           ),
         ),
       );
@@ -59,14 +59,13 @@ class UserImage extends StatelessWidget {
       child: SizedBox.fromSize(
         size: Size.fromRadius(size / 2),
         child: Container(
-          color: Palette.background,
+          color: Theme.of(context).colorScheme.surface,
           child: CachedNetworkImage(
             imageUrl: pictureUrl,
             filterQuality: filterQuality,
             progressIndicatorBuilder: (context, url, downloadProgress) =>
                 CircularProgressIndicator(
               value: downloadProgress.progress,
-              color: Palette.darkGray,
             ),
             errorWidget: (context, url, error) => const Icon(Icons.error),
             cacheKey: pictureUrl,

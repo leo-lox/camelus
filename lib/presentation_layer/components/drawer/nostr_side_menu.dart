@@ -40,7 +40,7 @@ class NostrSideMenu extends ConsumerWidget {
         context: context,
         builder: (BuildContext context) {
           return Dialog(
-            backgroundColor: Palette.extraDarkGray,
+            backgroundColor: Theme.of(context).colorScheme.surface,
 
             //white border
             shape: RoundedRectangleBorder(
@@ -70,7 +70,8 @@ class NostrSideMenu extends ConsumerWidget {
                     onTap: () => _copyToClipboard(context, nprofile),
                     child: Text(
                       "nostr:$nprofile",
-                      style: const TextStyle(color: Palette.lightGray),
+                      style: TextStyle(
+                          color: Theme.of(context).colorScheme.onSurface),
                     ),
                   ),
                   const SizedBox(height: 20),
@@ -101,7 +102,10 @@ class NostrSideMenu extends ConsumerWidget {
         return Container(
           decoration: isSelected
               ? BoxDecoration(
-                  color: Palette.primary.withOpacity(0.1),
+                  color: Theme.of(context)
+                      .colorScheme
+                      .primary
+                      .withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                 )
               : null,
@@ -109,13 +113,17 @@ class NostrSideMenu extends ConsumerWidget {
             onTap: onTap,
             leading: Icon(
               icon,
-              color: isSelected ? Palette.primary : Palette.lightGray,
+              color: isSelected
+                  ? Theme.of(context).colorScheme.primary
+                  : Theme.of(context).colorScheme.onSurface,
               size: 22,
             ),
             title: Text(
               label,
               style: TextStyle(
-                color: isSelected ? Palette.primary : Palette.lightGray,
+                color: isSelected
+                    ? Theme.of(context).colorScheme.primary
+                    : Paletter.getLightGray(context),
                 fontSize: 17,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
               ),
@@ -126,19 +134,24 @@ class NostrSideMenu extends ConsumerWidget {
     );
   }
 
-  Widget _textButton({text, onPressed}) {
+  Widget _textButton({
+    text,
+    onPressed,
+    required BuildContext context,
+  }) {
     return TextButton(
         onPressed: onPressed,
         child: Text(
           text,
-          style: const TextStyle(color: Palette.extraLightGray, fontSize: 16),
+          style: TextStyle(
+              color: Paletter.getExtraLightGray(context), fontSize: 16),
         ));
   }
 
-  Widget _divider() {
-    return const Divider(
+  Widget _divider(BuildContext context) {
+    return Divider(
       thickness: 0.3,
-      color: Palette.darkGray,
+      color: Paletter.getDarkGray(context),
     );
   }
 
@@ -147,13 +160,13 @@ class NostrSideMenu extends ConsumerWidget {
     final currentUserPubkey = ref.read(ndkProvider).accounts.getPublicKey()!;
 
     return Container(
-      color: Palette.background,
+      color: Theme.of(context).colorScheme.surface,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           leadingWidget,
-          _divider(),
+          _divider(context),
           _drawerItem(
               icon: PhosphorIcons.house(),
               label: 'Home',
@@ -215,19 +228,22 @@ class NostrSideMenu extends ConsumerWidget {
               }),
           const Spacer(),
           const Spacer(),
-          _divider(),
+          _divider(context),
           Padding(
-              padding: const EdgeInsets.only(left: 20),
-              child: _textButton(
-                  text: 'Settings',
-                  onPressed: () {
-                    context.push("/settings");
-                  })),
+            padding: const EdgeInsets.only(left: 20),
+            child: _textButton(
+                text: 'Settings',
+                onPressed: () {
+                  context.push("/settings");
+                },
+                context: context),
+          ),
           const SizedBox(height: 10),
           Padding(
               padding: const EdgeInsets.fromLTRB(20, 10, 15, 20),
               child: _textButton(
                   text: 'Terms of Service',
+                  context: context,
                   onPressed: () {
                     // lauch url
                     Uri url = Uri.parse("https://camelus.app/terms");
@@ -244,22 +260,22 @@ class NostrSideMenu extends ConsumerWidget {
                     children: [
                       Text(
                         'v${snapshot.data?.version}',
-                        style: const TextStyle(
-                          color: Palette.gray,
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.onSurface,
                           fontSize: 10,
                         ),
                       ),
                       Text(
                         'build ${snapshot.data?.buildNumber}',
-                        style: const TextStyle(
-                          color: Palette.gray,
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.onSurface,
                           fontSize: 8,
                         ),
                       ),
                       Text(
                         '${snapshot.data?.buildSignature}',
-                        style: const TextStyle(
-                          color: Palette.gray,
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.onSurface,
                           fontSize: 6,
                         ),
                       ),
@@ -267,7 +283,7 @@ class NostrSideMenu extends ConsumerWidget {
                   );
                 }),
           ),
-          _divider(),
+          _divider(context),
           Padding(
             padding: const EdgeInsets.fromLTRB(20, 10, 15, 20),
             child: Row(
@@ -275,7 +291,7 @@ class NostrSideMenu extends ConsumerWidget {
               children: [
                 SvgPicture.asset(
                   'assets/icons/sun.svg',
-                  color: Palette.primary,
+                  color: Theme.of(context).colorScheme.primary,
                   height: 22,
                   width: 22,
                 ),
@@ -285,7 +301,7 @@ class NostrSideMenu extends ConsumerWidget {
                   },
                   child: SvgPicture.asset(
                     'assets/icons/qr-code.svg',
-                    color: Palette.primary,
+                    color: Theme.of(context).colorScheme.primary,
                     height: 22,
                     width: 22,
                   ),

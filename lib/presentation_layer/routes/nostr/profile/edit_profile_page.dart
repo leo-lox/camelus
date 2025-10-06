@@ -2,12 +2,12 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:camelus/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 
-import '../../../../config/palette.dart';
 import '../../../../domain_layer/entities/mem_file.dart';
 import '../../../../domain_layer/entities/user_metadata.dart';
 import '../../../atoms/crop_avatar.dart';
@@ -181,7 +181,7 @@ class ProfileNotifier extends StateNotifier<ProfileState> {
         state = state.copyWith(
           isUploadingProfile: false,
           profilePictureData: null,
-          profilePictureErr: "err uploading image, upload servers configured?",
+          profilePictureErr: "errorUploadingImage",
         );
       }
     } catch (e) {
@@ -221,7 +221,7 @@ class ProfileNotifier extends StateNotifier<ProfileState> {
         state = state.copyWith(
           isUploadingBanner: false,
           bannerPictureData: null,
-          bannerPictureErr: "err uploading image, upload servers configured?",
+          bannerPictureErr: "errorUploadingImage",
         );
       }
     } catch (e) {
@@ -349,35 +349,33 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
     final profileState = ref.watch(profileProvider(widget.pubkey));
 
     return Scaffold(
-      backgroundColor: Palette.black,
       appBar: AppBar(
-        title: const Text('Edit Profile'),
+        title: Text(AppLocalizations.of(context)!.editProfile),
         actions: [
           Text(
             "${profileState.errBroadcasting ?? ''} ${profileState.profilePictureErr ?? ''} ${profileState.bannerPictureErr ?? ''}",
             style: TextStyle(
-              color: Palette.error,
+              color: Theme.of(context).colorScheme.error,
             ),
           ),
           const SizedBox(
             width: 10,
           ),
           profileState.isSaving
-              ? const Padding(
+              ? Padding(
                   padding: EdgeInsets.all(16.0),
                   child: SizedBox(
                     width: 20,
                     height: 20,
                     child: CircularProgressIndicator(
                       strokeWidth: 2,
-                      color: Colors.white,
                     ),
                   ),
                 )
               : Padding(
                   padding: EdgeInsets.only(right: 11),
                   child: longButton(
-                      name: "save",
+                      name: AppLocalizations.of(context)!.save,
                       inverted: true,
                       onPressed: () async {
                         await ref
@@ -400,8 +398,9 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                   SpinnerCenter(),
                   SizedBox(height: 16),
                   Text(
-                    'Loading profile...',
-                    style: TextStyle(color: Colors.white),
+                    AppLocalizations.of(context)!.loadingProfile,
+                    style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurface),
                   ),
                 ],
               ),

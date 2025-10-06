@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:bip32/bip32.dart' as bip32;
+import 'package:camelus/l10n/app_localizations.dart';
 import 'package:camelus/presentation_layer/atoms/long_button.dart';
 import 'package:camelus/config/palette.dart';
 import 'package:camelus/helpers/bip340.dart';
@@ -59,8 +60,9 @@ class _OnboardingLoginPageState extends ConsumerState<OnboardingLoginPage> {
 
   void showPasteError() {
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Invalid private key or seed phrase'),
+      SnackBar(
+        content:
+            Text(AppLocalizations.of(context)!.invalidPrivateKeyOrSeedPhrase),
       ),
     );
   }
@@ -124,9 +126,8 @@ class _OnboardingLoginPageState extends ConsumerState<OnboardingLoginPage> {
   _onSubmit() async {
     if (!_termsAndConditions) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please read and accept the terms and conditions first',
-              style: TextStyle(color: Palette.black)),
+        SnackBar(
+          content: Text(AppLocalizations.of(context)!.pleaseReadAndAcceptTerms),
         ),
       );
       return;
@@ -138,8 +139,9 @@ class _OnboardingLoginPageState extends ConsumerState<OnboardingLoginPage> {
 
     if (myKeys == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please import your private key first'),
+        SnackBar(
+          content:
+              Text(AppLocalizations.of(context)!.pleaseImportPrivateKeyFirst),
         ),
       );
       return;
@@ -198,11 +200,10 @@ class _OnboardingLoginPageState extends ConsumerState<OnboardingLoginPage> {
 
     if (word.startsWith("npub")) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+        SnackBar(
           duration: Duration(seconds: 20),
           showCloseIcon: true,
-          content: Text(
-              'you entered a public key, please enter a private key, it starts with nsec1'),
+          content: Text(AppLocalizations.of(context)!.publicKeyErrorMessage),
         ),
       );
       return;
@@ -213,8 +214,7 @@ class _OnboardingLoginPageState extends ConsumerState<OnboardingLoginPage> {
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(
-              'word: $word is not valid, check if it is spelled correctly'),
+          content: Text(AppLocalizations.of(context)!.wordNotValid(word)),
         ),
       );
     }
@@ -234,7 +234,6 @@ class _OnboardingLoginPageState extends ConsumerState<OnboardingLoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: null,
-      backgroundColor: Palette.background,
       resizeToAvoidBottomInset: false,
       body: SafeArea(
         // input for the user to enter their private key, should be visible on a dark background.
@@ -255,7 +254,7 @@ class _OnboardingLoginPageState extends ConsumerState<OnboardingLoginPage> {
                             IconButton(
                               icon: Icon(
                                 PhosphorIcons.arrowLeft(),
-                                color: Palette.white,
+                                color: Theme.of(context).colorScheme.onSurface,
                               ),
                               onPressed: () => widget.onPressedBack!(),
                             ),
@@ -271,10 +270,10 @@ class _OnboardingLoginPageState extends ConsumerState<OnboardingLoginPage> {
                               width: MediaQuery.of(context).size.width,
                               height: 200,
                               decoration: BoxDecoration(
-                                color: Palette.extraDarkGray,
+                                color: Paletter.getExtraDarkGray(context),
                                 borderRadius: BorderRadius.circular(10),
                                 border: Border.all(
-                                  color: Palette.darkGray,
+                                  color: Paletter.getDarkGray(context),
                                   width: 1,
                                 ),
                               ),
@@ -289,16 +288,19 @@ class _OnboardingLoginPageState extends ConsumerState<OnboardingLoginPage> {
                                     MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(mneonicError ?? "",
-                                      style: const TextStyle(
-                                        color: Palette.error,
+                                      style: TextStyle(
+                                        color:
+                                            Theme.of(context).colorScheme.error,
                                         fontSize: 12,
                                       )),
                                   Text(
                                     "${_userWords.length}/${(_userWords.length <= 12 ? "12" : "24")}",
                                     style: TextStyle(
                                       color: (_userWords.length > 24)
-                                          ? Palette.error
-                                          : Palette.white,
+                                          ? Theme.of(context).colorScheme.error
+                                          : Theme.of(context)
+                                              .colorScheme
+                                              .onSurface,
                                       fontSize: 12,
                                     ),
                                   ),
@@ -311,14 +313,15 @@ class _OnboardingLoginPageState extends ConsumerState<OnboardingLoginPage> {
                         SizedBox(
                           height: 200,
                           width: MediaQuery.of(context).size.width,
-                          child: const Column(
+                          child: Column(
                             crossAxisAlignment: CrossAxisAlignment.center,
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Text(
-                                "login",
+                                AppLocalizations.of(context)!.login,
                                 style: TextStyle(
-                                  color: Palette.white,
+                                  color:
+                                      Theme.of(context).colorScheme.onSurface,
                                   fontSize: 40,
                                   fontFamily: "Poppins",
                                 ),
@@ -333,14 +336,14 @@ class _OnboardingLoginPageState extends ConsumerState<OnboardingLoginPage> {
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
-                            const Text("your public key is:"),
+                            Text(AppLocalizations.of(context)!.yourPublicKeyIs),
                             const SizedBox(height: 10),
                             Container(
                               decoration: BoxDecoration(
-                                color: Palette.extraDarkGray,
+                                color: Paletter.getExtraDarkGray(context),
                                 borderRadius: BorderRadius.circular(10),
                                 border: Border.all(
-                                  color: Palette.darkGray,
+                                  color: Paletter.getDarkGray(context),
                                   width: 1,
                                 ),
                               ),
@@ -369,28 +372,31 @@ class _OnboardingLoginPageState extends ConsumerState<OnboardingLoginPage> {
                           controller: _inputController,
                           enableIMEPersonalizedLearning: false,
                           textCapitalization: TextCapitalization.none,
-                          decoration: const InputDecoration(
+                          decoration: InputDecoration(
                             isDense: true,
-                            hintText: 'enter your seed phrase or nsec1',
+                            hintText: AppLocalizations.of(context)!
+                                .enterSeedPhraseOrNsec,
                             hintStyle: TextStyle(
-                                color: Palette.white, letterSpacing: 1.1),
+                                color: Theme.of(context).colorScheme.onSurface,
+                                letterSpacing: 1.1),
                             filled: true,
-                            fillColor: Palette.extraDarkGray,
+                            fillColor: Paletter.getExtraDarkGray(context),
                             enabledBorder: OutlineInputBorder(
                               borderRadius:
                                   BorderRadius.all(Radius.circular(10)),
-                              borderSide:
-                                  BorderSide(color: Palette.extraDarkGray),
+                              borderSide: BorderSide(
+                                  color: Paletter.getExtraDarkGray(context)),
                             ),
                             focusedBorder: OutlineInputBorder(
                               borderRadius:
                                   BorderRadius.all(Radius.circular(10)),
-                              borderSide: BorderSide(color: Palette.gray),
+                              borderSide:
+                                  BorderSide(color: Paletter.getGray(context)),
                             ),
                             errorBorder: OutlineInputBorder(
                               borderRadius:
                                   BorderRadius.all(Radius.circular(10)),
-                              borderSide: BorderSide(color: Palette.purple),
+                              borderSide: BorderSide(color: Colors.purple),
                             ),
                           ),
                         ),
@@ -410,17 +416,22 @@ class _OnboardingLoginPageState extends ConsumerState<OnboardingLoginPage> {
                                   _pasteFromClipboard();
                                 },
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: Palette.background,
+                                  backgroundColor:
+                                      Theme.of(context).colorScheme.surface,
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(20),
-                                    side: const BorderSide(
-                                        color: Palette.white, width: 1),
+                                    side: BorderSide(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSurface,
+                                        width: 1),
                                   ),
                                 ),
-                                child: const Text(
-                                  'paste',
+                                child: Text(
+                                  AppLocalizations.of(context)!.paste,
                                   style: TextStyle(
-                                    color: Palette.white,
+                                    color:
+                                        Theme.of(context).colorScheme.onSurface,
                                     fontSize: 16,
                                   ),
                                 ),
@@ -433,17 +444,22 @@ class _OnboardingLoginPageState extends ConsumerState<OnboardingLoginPage> {
                                   _addWords(_inputController.text);
                                 },
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: Palette.white,
+                                  backgroundColor:
+                                      Theme.of(context).colorScheme.onSurface,
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(20),
-                                    side: const BorderSide(
-                                        color: Palette.background, width: 1),
+                                    side: BorderSide(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSurface,
+                                        width: 1),
                                   ),
                                 ),
-                                child: const Text(
-                                  'add',
+                                child: Text(
+                                  AppLocalizations.of(context)!.add,
                                   style: TextStyle(
-                                    color: Palette.background,
+                                    color:
+                                        Theme.of(context).colorScheme.surface,
                                     fontSize: 16,
                                   ),
                                 ),
@@ -469,15 +485,11 @@ class _OnboardingLoginPageState extends ConsumerState<OnboardingLoginPage> {
                                 _termsAndConditions = value!;
                               });
                             },
-                            activeColor: Palette.white,
-                            checkColor: Palette.black,
-                            fillColor: WidgetStateProperty.all(Palette.white),
-                            //overlayColor: MaterialStateProperty.all(Palette.primary),
                           ),
-                          const Text(
-                            "I have read and accept the ",
+                          Text(
+                            AppLocalizations.of(context)!.iHaveReadAndAccept,
                             style: TextStyle(
-                              color: Palette.white,
+                              color: Theme.of(context).colorScheme.onSurface,
                               fontSize: 12,
                               fontWeight: FontWeight.normal,
                             ),
@@ -488,10 +500,10 @@ class _OnboardingLoginPageState extends ConsumerState<OnboardingLoginPage> {
                               launchUrl(url,
                                   mode: LaunchMode.externalApplication);
                             },
-                            child: const Text(
-                              "terms and conditions",
+                            child: Text(
+                              AppLocalizations.of(context)!.termsAndConditions,
                               style: TextStyle(
-                                color: Palette.white,
+                                color: Theme.of(context).colorScheme.onSurface,
                                 fontSize: 12,
                                 fontWeight: FontWeight.bold,
                                 decoration: TextDecoration.underline,
@@ -507,10 +519,10 @@ class _OnboardingLoginPageState extends ConsumerState<OnboardingLoginPage> {
                           Uri url = Uri.parse("https://camelus.app/privacy/");
                           launchUrl(url, mode: LaunchMode.externalApplication);
                         },
-                        child: const Text(
-                          "privacy policy",
+                        child: Text(
+                          AppLocalizations.of(context)!.privacyPolicy,
                           style: TextStyle(
-                            color: Palette.white,
+                            color: Theme.of(context).colorScheme.onSurface,
                             fontSize: 12,
                             fontWeight: FontWeight.bold,
                             decoration: TextDecoration.underline,
@@ -525,7 +537,7 @@ class _OnboardingLoginPageState extends ConsumerState<OnboardingLoginPage> {
                         width: 400,
                         height: 40,
                         child: longButton(
-                          name: "login",
+                          name: AppLocalizations.of(context)!.login,
                           inverted: true,
                           onPressed: () => _onSubmit(),
                         ),
@@ -563,10 +575,10 @@ class _OnboardingLoginPageState extends ConsumerState<OnboardingLoginPage> {
                       width: 100,
                       height: 40,
                       decoration: BoxDecoration(
-                        color: Palette.extraDarkGray,
+                        color: Paletter.getExtraDarkGray(context),
                         borderRadius: BorderRadius.circular(20),
                         border: Border.all(
-                          color: Palette.darkGray,
+                          color: Paletter.getDarkGray(context),
                           width: 1,
                         ),
                       ),
@@ -578,16 +590,16 @@ class _OnboardingLoginPageState extends ConsumerState<OnboardingLoginPage> {
                           children: [
                             Text(
                               (index + 1).toString(),
-                              style: const TextStyle(
-                                color: Palette.gray,
+                              style: TextStyle(
+                                color: Paletter.getGray(context),
                                 fontSize: 12,
                               ),
                             ),
                             const SizedBox(width: 5),
                             Text(
                               _userWords[index],
-                              style: const TextStyle(
-                                color: Palette.extraLightGray,
+                              style: TextStyle(
+                                color: Paletter.getExtraLightGray(context),
                                 fontSize: 16,
                               ),
                             ),
@@ -608,16 +620,16 @@ class _OnboardingLoginPageState extends ConsumerState<OnboardingLoginPage> {
                         children: [
                           Text(
                             (index + 1).toString(),
-                            style: const TextStyle(
-                              color: Palette.gray,
+                            style: TextStyle(
+                              color: Paletter.getGray(context),
                               fontSize: 12,
                             ),
                           ),
                           const SizedBox(width: 5),
                           Text(
                             _userWords[index],
-                            style: const TextStyle(
-                              color: Palette.extraLightGray,
+                            style: TextStyle(
+                              color: Paletter.getExtraLightGray(context),
                               fontSize: 16,
                             ),
                           ),

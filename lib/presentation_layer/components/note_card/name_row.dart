@@ -41,7 +41,7 @@ class _NoteCardNameRowState extends ConsumerState<NoteCardNameRow> {
 
     if (difference.inDays < 2) {
       // Use timeago for posts less than 2 days old
-      dateText = timeago.format(postDateTime);
+      dateText = timeago.format(postDateTime); // TODO translate
     } else {
       // Use a human-readable date format for posts 2 days or older
       dateText = DateFormat('MMM d, yyyy').format(postDateTime);
@@ -71,8 +71,8 @@ class _NoteCardNameRowState extends ConsumerState<NoteCardNameRow> {
                         children: [
                           TextSpan(
                             text: widget.myMetadata?.name ?? npubHrShort,
-                            style: const TextStyle(
-                              color: Colors.white,
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.onSurface,
                               fontWeight: FontWeight.bold,
                               fontSize: 15,
                             ),
@@ -95,7 +95,7 @@ class _NoteCardNameRowState extends ConsumerState<NoteCardNameRow> {
         ),
         Text(
           dateText,
-          style: const TextStyle(color: Palette.gray, fontSize: 14),
+          style: TextStyle(color: Paletter.getGray(context), fontSize: 14),
         ),
         const SizedBox(width: 10),
       ],

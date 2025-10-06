@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:camelus/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -142,7 +143,7 @@ class _EditProfileState extends ConsumerState<EditProfile> {
                   width: MediaQuery.of(context).size.width,
                   height: MediaQuery.of(context).size.height / 6,
                   decoration: BoxDecoration(
-                    color: Palette.darkGray,
+                    color: Paletter.getDarkGray(context),
                     image: widget.initialBanner != null
                         ? DecorationImage(
                             image: MemoryImage(widget.initialBanner!),
@@ -157,14 +158,17 @@ class _EditProfileState extends ConsumerState<EditProfile> {
                   Container(
                     width: MediaQuery.of(context).size.width,
                     height: MediaQuery.of(context).size.height / 6,
-                    color: Palette.black.withValues(alpha: 0.5),
+                    color: Theme.of(context)
+                        .colorScheme
+                        .surface
+                        .withValues(alpha: 0.5),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Text(
-                          "Uploading...",
+                        Text(
+                          AppLocalizations.of(context)!.uploading,
                           style: TextStyle(
-                            color: Palette.white,
+                            color: Theme.of(context).colorScheme.onSurface,
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
                           ),
@@ -174,10 +178,10 @@ class _EditProfileState extends ConsumerState<EditProfile> {
                           padding: const EdgeInsets.symmetric(horizontal: 32.0),
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(4),
-                            child: const LinearProgressIndicator(
-                              backgroundColor: Palette.gray,
-                              valueColor:
-                                  AlwaysStoppedAnimation<Color>(Palette.white),
+                            child: LinearProgressIndicator(
+                              backgroundColor: Paletter.getGray(context),
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                  Theme.of(context).colorScheme.onSurface),
                               minHeight: 6,
                             ),
                           ),
@@ -219,30 +223,29 @@ class _EditProfileState extends ConsumerState<EditProfile> {
           width: 102,
           height: 102,
           decoration: BoxDecoration(
-            color: Palette.black.withValues(alpha: 0.5),
+            color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.5),
             shape: BoxShape.circle,
             border: Border.all(
-              color: Palette.white,
+              color: Theme.of(context).colorScheme.onSurface,
               width: 3,
             ),
           ),
         ),
 
         // Circular progress indicator
-        const SizedBox(
+        SizedBox(
           width: 60,
           height: 60,
           child: CircularProgressIndicator(
-            valueColor: AlwaysStoppedAnimation<Color>(Palette.white),
             strokeWidth: 3,
           ),
         ),
 
         // Text in the center
-        const Text(
-          "Uploading",
+        Text(
+          AppLocalizations.of(context)!.uploadingCapitalized,
           style: TextStyle(
-            color: Palette.white,
+            color: Theme.of(context).colorScheme.onSurface,
             fontSize: 10,
             fontWeight: FontWeight.bold,
           ),
@@ -256,12 +259,19 @@ class _EditProfileState extends ConsumerState<EditProfile> {
       padding: const EdgeInsets.all(16.0),
       child: Column(
         children: [
-          _buildInputField('Name', _controllers['name']!),
-          _buildInputField('Bio', _controllers['about']!, isMultiline: true),
-          _buildInputField('Pronouns', _controllers['pronouns']!),
-          _buildInputField('Website', _controllers['website']!),
-          _buildInputField('Username (nip05)', _controllers['nip05']!),
-          _buildInputField('Lightning address', _controllers['lud16']!),
+          _buildInputField(
+              AppLocalizations.of(context)!.name, _controllers['name']!),
+          _buildInputField(
+              AppLocalizations.of(context)!.bio, _controllers['about']!,
+              isMultiline: true),
+          _buildInputField(AppLocalizations.of(context)!.pronouns,
+              _controllers['pronouns']!),
+          _buildInputField(
+              AppLocalizations.of(context)!.website, _controllers['website']!),
+          _buildInputField(
+              AppLocalizations.of(context)!.username, _controllers['nip05']!),
+          _buildInputField(AppLocalizations.of(context)!.lightningAddress,
+              _controllers['lud16']!),
         ],
       ),
     );
@@ -284,7 +294,18 @@ class _EditProfileState extends ConsumerState<EditProfile> {
         ),
         TextFormField(
           controller: controller, // Bind the controller to the input field.
-          decoration: textEditInputDecoration,
+          decoration: InputDecoration(
+            hintText: "",
+            contentPadding:
+                EdgeInsets.symmetric(vertical: 8.0, horizontal: 8.0),
+            enabledBorder: UnderlineInputBorder(
+              borderSide: BorderSide(
+                width: 1,
+                color: Paletter.getGray(
+                    context), // Border color for the text field.
+              ),
+            ),
+          ),
           maxLines: isMultiline ? null : 1,
           keyboardType: isMultiline
               ? TextInputType.multiline
@@ -294,14 +315,3 @@ class _EditProfileState extends ConsumerState<EditProfile> {
     );
   }
 }
-
-const textEditInputDecoration = InputDecoration(
-  hintText: "",
-  contentPadding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 8.0),
-  enabledBorder: UnderlineInputBorder(
-    borderSide: BorderSide(
-      width: 1,
-      color: Palette.gray, // Border color for the text field.
-    ),
-  ),
-);

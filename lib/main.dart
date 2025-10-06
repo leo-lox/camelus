@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:ui';
 
+import 'package:camelus/theme.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 
@@ -10,6 +11,7 @@ import 'package:window_manager/window_manager.dart';
 import 'package:flutter_mentions/flutter_mentions.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ndk/ndk.dart';
+import 'l10n/app_localizations.dart';
 //import 'package:device_preview/device_preview.dart';
 //import 'data_layer/db/object_box_ndk/db_object_box.dart';
 import 'config/camelus_config.dart';
@@ -25,6 +27,7 @@ import 'presentation_layer/providers/app_lifecycle_provider.dart';
 import 'presentation_layer/providers/db_app_provider.dart';
 import 'presentation_layer/providers/db_ndk_provider.dart';
 import 'presentation_layer/providers/inbox_outbox_provider.dart';
+import 'presentation_layer/providers/language_provider.dart';
 import 'presentation_layer/providers/ndk_provider.dart';
 import 'presentation_layer/providers/signer_provider.dart';
 import 'routes.dart';
@@ -162,6 +165,8 @@ class MyApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final currentLocale = ref.watch(currentLocaleProvider);
+
     final router = GoRouter(
       navigatorKey: navigatorKey,
       initialLocation: initialRoute,
@@ -180,7 +185,11 @@ class MyApp extends ConsumerWidget {
         ),
         debugShowCheckedModeBanner: false,
         title: 'camelus',
-        theme: theme.themeMap["DARK"],
+        locale: currentLocale,
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        theme: lightTheme,
+        darkTheme: darkTheme,
         builder: (context, child) {
           if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
             return DragToResizeArea(
@@ -200,10 +209,10 @@ class MyApp extends ConsumerWidget {
                               child: Container(),
                             ),
                           ),
-                          const SizedBox(
+                          SizedBox(
                             width: 154,
                             child: WindowCaption(
-                              brightness: Brightness.dark,
+                              brightness: Theme.of(context).brightness,
                               backgroundColor: Colors.transparent,
                             ),
                           ),

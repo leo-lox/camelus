@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:camelus/l10n/app_localizations.dart';
 import 'package:camelus/presentation_layer/components/edit_profile.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -31,7 +32,7 @@ class _OnboardingProfileState extends ConsumerState<OnboardingProfile> {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
       allowMultiple: false,
       type: FileType.image,
-      dialogTitle: "select image",
+      dialogTitle: AppLocalizations.of(context)!.selectImage,
     );
 
     if (result != null) {
@@ -44,8 +45,8 @@ class _OnboardingProfileState extends ConsumerState<OnboardingProfile> {
         if (!mounted) return null;
 
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('unspoorted image format'),
+          SnackBar(
+            content: Text(AppLocalizations.of(context)!.unsupportedImageFormat),
           ),
         );
       }
@@ -122,7 +123,6 @@ class _OnboardingProfileState extends ConsumerState<OnboardingProfile> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
       body: SafeArea(
         child: Stack(
           children: [
@@ -172,10 +172,13 @@ class _OnboardingProfileState extends ConsumerState<OnboardingProfile> {
               child: Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: Colors.black,
+                  color: Theme.of(context).colorScheme.surface,
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.1),
+                      color: Theme.of(context)
+                          .colorScheme
+                          .surface
+                          .withValues(alpha: 0.1),
                       blurRadius: 10,
                       offset: Offset(0, -5),
                     ),
@@ -185,7 +188,7 @@ class _OnboardingProfileState extends ConsumerState<OnboardingProfile> {
                   width: 400,
                   height: 40,
                   child: longButton(
-                    name: "next",
+                    name: AppLocalizations.of(context)!.next,
                     onPressed: (() {
                       FocusScope.of(context).unfocus();
                       widget.profileCallback();

@@ -26,8 +26,10 @@ class Nip05Text extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final style =
-        customStyle ?? const TextStyle(color: Colors.grey, fontSize: 12);
+    final style = customStyle ??
+        TextStyle(
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
+            fontSize: 12);
 
     if (nip05verified == null) {
       return Text(

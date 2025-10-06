@@ -1,9 +1,9 @@
+import 'package:camelus/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
-import '../../../config/palette.dart';
 import '../../providers/app_bar_provider/app_bottom_bar_provider.dart';
 
 class AppBottomNavigationBar extends ConsumerWidget {
@@ -18,7 +18,6 @@ class AppBottomNavigationBar extends ConsumerWidget {
 
     return NavigationBar(
       height: kBottomNavigationBarHeight,
-      backgroundColor: Palette.background,
       labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
       selectedIndex: navigationState.selectedTab.index,
       indicatorColor: Colors.transparent,
@@ -46,22 +45,23 @@ class AppBottomNavigationBar extends ConsumerWidget {
         }
       },
       destinations: <NavigationDestination>[
-        _buildHomeItem(navigationState, ref),
-        _buildSearchItem(navigationState),
-        _buildNotificationsItem(navigationState),
+        _buildHomeItem(context, navigationState, ref),
+        _buildSearchItem(context, navigationState),
+        _buildNotificationsItem(context, navigationState),
         //_buildChatItem(navigationState),
       ],
     );
   }
 
-  NavigationDestination _buildHomeItem(NavigationState state, WidgetRef ref) {
+  NavigationDestination _buildHomeItem(
+      BuildContext context, NavigationState state, WidgetRef ref) {
     final isSelected = state.selectedTab == NavigationTab.home;
 
     return NavigationDestination(
       icon: Builder(builder: (context) {
         final child = Icon(
           PhosphorIcons.house(),
-          color: isSelected ? Palette.primary : Palette.darkGray,
+          color: isSelected ? Theme.of(context).colorScheme.primary : null,
           size: 23,
         );
 
@@ -73,33 +73,39 @@ class AppBottomNavigationBar extends ConsumerWidget {
 
         return child;
       }),
-      tooltip: isSelected ? "scroll to top" : "home",
-      label: "home",
+      tooltip: isSelected
+          ? AppLocalizations.of(context)!.scrollToTop
+          : AppLocalizations.of(context)!.home,
+      label: AppLocalizations.of(context)!.home,
     );
   }
 
-  NavigationDestination _buildSearchItem(NavigationState state) {
+  NavigationDestination _buildSearchItem(
+      BuildContext context, NavigationState state) {
     final isSelected = state.selectedTab == NavigationTab.search;
 
     return NavigationDestination(
-      icon: Icon(
-        PhosphorIcons.magnifyingGlass(),
-        color: isSelected ? Palette.primary : Palette.darkGray,
-        size: 23,
-      ),
-      label: "search",
-      tooltip: "search",
+      icon: Builder(builder: (context) {
+        return Icon(
+          PhosphorIcons.magnifyingGlass(),
+          color: isSelected ? Theme.of(context).colorScheme.primary : null,
+          size: 23,
+        );
+      }),
+      label: AppLocalizations.of(context)!.search,
+      tooltip: AppLocalizations.of(context)!.search,
     );
   }
 
-  NavigationDestination _buildNotificationsItem(NavigationState state) {
+  NavigationDestination _buildNotificationsItem(
+      BuildContext context, NavigationState state) {
     final isSelected = state.selectedTab == NavigationTab.notifications;
 
     return NavigationDestination(
       icon: Builder(builder: (context) {
         final child = Icon(
           PhosphorIcons.bell(),
-          color: isSelected ? Palette.primary : Palette.darkGray,
+          color: isSelected ? Theme.of(context).colorScheme.primary : null,
           size: 23,
         );
 
@@ -111,8 +117,8 @@ class AppBottomNavigationBar extends ConsumerWidget {
 
         return child;
       }),
-      label: "notifications",
-      tooltip: "notifications",
+      label: AppLocalizations.of(context)!.notifications,
+      tooltip: AppLocalizations.of(context)!.notifications,
     );
   }
 }

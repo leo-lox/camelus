@@ -90,13 +90,17 @@ class InlineVideoPlayer extends ConsumerWidget {
                       },
                       child: videoState.showControls
                           ? Container(
-                              color: Colors.black54,
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .surface
+                                  .withValues(alpha: 0.54),
                               child: Center(
                                 child: Icon(
                                   videoState.isPlaying
                                       ? PhosphorIcons.pause()
                                       : PhosphorIcons.play(),
-                                  color: Colors.white,
+                                  color:
+                                      Theme.of(context).colorScheme.onSurface,
                                   size: 64.0,
                                 ),
                               ),
@@ -117,7 +121,7 @@ class InlineVideoPlayer extends ConsumerWidget {
                               videoState.volume == 0.0
                                   ? PhosphorIcons.speakerSlash()
                                   : PhosphorIcons.speakerHigh(),
-                              color: Colors.white,
+                              color: Theme.of(context).colorScheme.onSurface,
                             ),
                             onPressed: () {
                               if (videoState.volume == 0.0) {
@@ -132,7 +136,7 @@ class InlineVideoPlayer extends ConsumerWidget {
                           IconButton(
                             icon: Icon(
                               PhosphorIcons.cornersOut(),
-                              color: Colors.white,
+                              color: Theme.of(context).colorScheme.onSurface,
                             ),
                             onPressed: () {
                               enterFullScreen(context, ref);
@@ -150,9 +154,9 @@ class InlineVideoPlayer extends ConsumerWidget {
                         controller,
                         allowScrubbing: true,
                         colors: VideoProgressColors(
-                          backgroundColor: Palette.darkGray,
-                          bufferedColor: Palette.gray,
-                          playedColor: Palette.extraLightGray,
+                          backgroundColor: Paletter.getDarkGray(context),
+                          bufferedColor: Paletter.getGray(context),
+                          playedColor: Paletter.getExtraLightGray(context),
                         ),
                       ),
                     ),
@@ -164,14 +168,17 @@ class InlineVideoPlayer extends ConsumerWidget {
   }
 
   Widget _buildShimmerLoading(double width, double height) {
-    return Shimmer.fromColors(
-      baseColor: Palette.extraDarkGray.withValues(alpha: 0.1),
-      highlightColor: Palette.extraDarkGray.withValues(alpha: 0.7),
-      child: Container(
-        width: width,
-        height: height,
-        color: Colors.black,
-      ),
-    );
+    return Builder(builder: (context) {
+      return Shimmer.fromColors(
+        baseColor: Paletter.getExtraDarkGray(context).withValues(alpha: 0.1),
+        highlightColor:
+            Paletter.getExtraDarkGray(context).withValues(alpha: 0.7),
+        child: Container(
+          width: width,
+          height: height,
+          color: Theme.of(context).colorScheme.surface,
+        ),
+      );
+    });
   }
 }

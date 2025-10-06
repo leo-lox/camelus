@@ -76,11 +76,11 @@ class PostContentWidget extends ConsumerWidget {
                 decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(8),
                     border: Border.all(
-                      color: Palette.darkGray,
+                      color: Paletter.getDarkGray(context),
                     )),
                 child: LinkPreview(
                   linkStyle: TextStyle(
-                    color: Palette.primary,
+                    color: Theme.of(context).colorScheme.primary,
                     fontSize: _fontSize - 2,
                     decoration: TextDecoration.none,
                   ),
@@ -95,7 +95,8 @@ class PostContentWidget extends ConsumerWidget {
                   text: segment.metadata!,
                   textWidget: Text(
                     segment.content,
-                    style: TextStyle(color: Palette.primary),
+                    style:
+                        TextStyle(color: Theme.of(context).colorScheme.primary),
                   ),
                   width: MediaQuery.of(context).size.width,
                 ),
@@ -157,14 +158,14 @@ class PostContentWidget extends ConsumerWidget {
                   children: [
                     Icon(
                       PhosphorIcons.warningOctagon(),
-                      color: Palette.error,
+                      color: Theme.of(context).colorScheme.error,
                       size: 32,
                     ),
                     const SizedBox(width: 8),
                     Text(
                       post.nostrNote.contentWarning!,
-                      style: const TextStyle(
-                        color: Palette.error,
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.error,
                         fontWeight: FontWeight.bold,
                         fontSize: 18,
                       ),
@@ -222,7 +223,7 @@ class PostContentWidget extends ConsumerWidget {
         return TextSpan(
           text: user?.name != null ? "@${user?.name}" : segment.content,
           style: TextStyle(
-            color: Palette.primary,
+            color: Theme.of(context).colorScheme.primary,
             fontWeight: FontWeight.normal,
             fontSize: _fontSize,
           ),
@@ -234,7 +235,7 @@ class PostContentWidget extends ConsumerWidget {
         return TextSpan(
           text: segment.content,
           style: TextStyle(
-            color: Colors.blue,
+            color: Theme.of(context).colorScheme.primary,
             decoration: TextDecoration.none,
           ),
           recognizer: TapGestureRecognizer()

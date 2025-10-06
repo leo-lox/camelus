@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:camelus/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
@@ -44,7 +45,6 @@ class ProfilePage2 extends ConsumerWidget {
     final bool isOwnProfile = myPubkey == pubkey;
 
     return Scaffold(
-      backgroundColor: Palette.background,
       body: GenericFeed(
         feedPadding:
             EdgeInsets.only(top: MediaQuery.of(context).padding.top + 48),
@@ -67,12 +67,12 @@ class ProfilePage2 extends ConsumerWidget {
             SliverOverlapAbsorber(
               handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
               sliver: SliverAppBar(
-                surfaceTintColor: Palette.background,
+                surfaceTintColor: Theme.of(context).colorScheme.surface,
                 leading: BackButtonRound(),
                 actions: [
                   PopupMenuButton<String>(
-                    color: Palette.extraDarkGray,
-                    tooltip: "More",
+                    color: Paletter.getExtraDarkGray(context),
+                    tooltip: AppLocalizations.of(context)!.more,
                     onSelected: (e) => {
                       //log(e),
                       // toast
@@ -93,7 +93,7 @@ class ProfilePage2 extends ConsumerWidget {
                       return {'block'}.map((String choice) {
                         return PopupMenuItem<String>(
                           value: choice,
-                          child: Text(choice),
+                          child: Text(AppLocalizations.of(context)!.block),
                         );
                       }).toList();
                     },
@@ -107,7 +107,9 @@ class ProfilePage2 extends ConsumerWidget {
                 pinned: true,
                 floating: true,
                 forceElevated: innerBoxIsScrolled,
-                backgroundColor: Palette.black, // Add a background color
+                backgroundColor: Theme.of(context)
+                    .colorScheme
+                    .surface, // Add a background color
                 flexibleSpace: FlexibleSpaceBar(
                   background: _BuildProfileHeader(
                       isOwnProfile: isOwnProfile,
@@ -128,21 +130,27 @@ class ProfilePage2 extends ConsumerWidget {
                 bottom: PreferredSize(
                   preferredSize: Size.fromHeight(48),
                   child: Container(
-                    color:
-                        Palette.black, // Add a background color to the tab bar
+                    color: Theme.of(context)
+                        .colorScheme
+                        .surface, // Add a background color to the tab bar
                     child: TabBar(
                       controller: tabController,
                       tabs: [
-                        Tab(text: 'Posts'),
-                        Tab(text: 'Posts & Replies'),
-                        Tab(text: 'Starter Packs'),
+                        Tab(text: AppLocalizations.of(context)!.posts),
+                        Tab(
+                            text:
+                                AppLocalizations.of(context)!.postsAndReplies),
+                        Tab(text: AppLocalizations.of(context)!.starterPacks),
                       ],
-                      labelColor: Palette
-                          .lightGray, // Set the color of the selected tab
-                      unselectedLabelColor:
-                          Colors.grey, // Set the color of unselected tabs
-                      indicatorColor:
-                          Colors.blue, // Set the color of the indicator
+                      labelColor: Theme.of(context)
+                          .colorScheme
+                          .onSurface, // Set the color of the selected tab
+                      unselectedLabelColor: Theme.of(context)
+                          .colorScheme
+                          .onSurfaceVariant, // Set the color of unselected tabs
+                      indicatorColor: Theme.of(context)
+                          .colorScheme
+                          .primary, // Set the color of the indicator
                     ),
                   ),
                 ),
@@ -193,7 +201,7 @@ class _BuildProfileHeader extends ConsumerWidget {
                     )
                   : Container(
                       height: 150,
-                      color: Palette.extraDarkGray,
+                      color: Paletter.getExtraDarkGray(context),
                     ),
         ),
         // Profile Content
@@ -211,7 +219,9 @@ class _BuildProfileHeader extends ConsumerWidget {
                   children: [
                     Container(
                       decoration: BoxDecoration(
-                        border: Border.all(color: Palette.background, width: 2),
+                        border: Border.all(
+                            color: Theme.of(context).colorScheme.surface,
+                            width: 2),
                         shape: BoxShape.circle,
                       ),
                       child: UserImage(
@@ -238,18 +248,22 @@ class _BuildProfileHeader extends ConsumerWidget {
                                 }
                               },
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: Palette.background,
+                                backgroundColor:
+                                    Theme.of(context).colorScheme.surface,
                                 padding: const EdgeInsets.all(0),
-                                shape: const CircleBorder(
+                                shape: CircleBorder(
                                     side: BorderSide(
-                                        color: Palette.white, width: 1)),
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSurface,
+                                        width: 1)),
                               ),
                               child: SvgPicture.asset(
                                 "assets/icons/lightning-fill.svg",
                                 height: 25,
                                 width: 25,
                                 colorFilter: ColorFilter.mode(
-                                  Palette.white,
+                                  Theme.of(context).colorScheme.onSurface,
                                   BlendMode.srcIn,
                                 ),
                               ),
@@ -261,7 +275,7 @@ class _BuildProfileHeader extends ConsumerWidget {
                           ),
                         if (isOwnProfile)
                           longButton(
-                              name: "edit",
+                              name: AppLocalizations.of(context)!.edit,
                               onPressed: () {
                                 context.push(
                                     '/nostr/profile/${userMetadata.pubkey}/edit');
@@ -277,7 +291,7 @@ class _BuildProfileHeader extends ConsumerWidget {
                   style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
-                      color: Colors.white),
+                      color: Theme.of(context).colorScheme.onSurface),
                 ),
 
                 GestureDetector(
@@ -300,7 +314,7 @@ class _BuildProfileHeader extends ConsumerWidget {
                   child: SelectableText(
                     userMetadata.about ?? '',
                     style: TextStyle(
-                      color: Colors.white,
+                      color: Theme.of(context).colorScheme.onSurface,
                       overflow: TextOverflow.ellipsis,
                     ),
                     //maxLines: 2, // Adjust this value based on your needs
@@ -312,9 +326,9 @@ class _BuildProfileHeader extends ConsumerWidget {
                     displayFollowing(contacts.contactList, context),
                     SizedBox(width: 16),
                     Text(
-                      'n.a Followers',
+                      AppLocalizations.of(context)!.followers,
                       style: TextStyle(
-                        color: Palette.gray,
+                        color: Paletter.getGray(context),
                         fontSize: 14,
                       ),
                     ),
@@ -338,7 +352,7 @@ class _BuildProfileHeader extends ConsumerWidget {
             MaterialPageRoute(
               builder: (context) => FollowerPage(
                 contactList: contacts,
-                title: "Following",
+                title: AppLocalizations.of(context)!.following,
               ),
             ),
           );
@@ -349,16 +363,16 @@ class _BuildProfileHeader extends ConsumerWidget {
           children: [
             TextSpan(
               text: '$followingCount',
-              style: const TextStyle(
-                color: Palette.lightGray,
+              style: TextStyle(
+                color: Paletter.getLightGray(context),
                 fontWeight: FontWeight.bold,
                 fontSize: 14,
               ),
             ),
-            const TextSpan(
-              text: ' Following',
+            TextSpan(
+              text: ' ${AppLocalizations.of(context)!.following}',
               style: TextStyle(
-                color: Palette.gray,
+                color: Paletter.getGray(context),
                 fontSize: 14,
               ),
             ),
