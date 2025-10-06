@@ -20,35 +20,52 @@ class TrendingHashtagsWidget extends ConsumerWidget {
       ),
     );
 
-    return FutureBuilder<NostrBandHashtags?>(
-      future: nostrBandAsync,
-      builder: (context, snapshot) {
-        if (snapshot.hasError) {
-          log(snapshot.error.toString());
-          return Text(
-            'Something went wrong',
-            style: TextStyle(color: Paletter.getGray(context)),
-          );
-        }
-
-        if (snapshot.hasData && snapshot.data != null) {
-          return _buildHashtagsList(context, snapshot.data!, 10);
-        }
-
-        if (snapshot.connectionState == ConnectionState.done) {
-          return Text(
-            'No connection',
-            style: TextStyle(color: Paletter.getGray(context)),
-          );
-        }
-
-        return Column(
-          children: List.generate(
-            10,
-            (i) => const HashtagCardSkeleton(),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            "trending hashtags",
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.onSurface,
+              fontSize: 25,
+              fontWeight: FontWeight.bold,
+            ),
           ),
-        );
-      },
+          const SizedBox(height: 10),
+          FutureBuilder<NostrBandHashtags?>(
+            future: nostrBandAsync,
+            builder: (context, snapshot) {
+              if (snapshot.hasError) {
+                log(snapshot.error.toString());
+                return Text(
+                  'Something went wrong',
+                  style: TextStyle(color: Paletter.getGray(context)),
+                );
+              }
+
+              if (snapshot.hasData && snapshot.data != null) {
+                return _buildHashtagsList(context, snapshot.data!, 10);
+              }
+
+              if (snapshot.connectionState == ConnectionState.done) {
+                return Text(
+                  'No connection',
+                  style: TextStyle(color: Paletter.getGray(context)),
+                );
+              }
+
+              return Column(
+                children: List.generate(
+                  10,
+                  (i) => const HashtagCardSkeleton(),
+                ),
+              );
+            },
+          ),
+        ],
+      ),
     );
   }
 

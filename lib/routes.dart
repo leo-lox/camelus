@@ -1,8 +1,3 @@
-import 'dart:ui';
-
-import 'package:camelus/presentation_layer/atoms/long_button.dart';
-import 'package:camelus/presentation_layer/routes/home_page_desktop.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
 
@@ -12,13 +7,15 @@ import 'presentation_layer/components/drawer/nostr_side_menu.dart';
 import 'presentation_layer/components/drawer/nostr_side_menu_post_button.dart';
 import 'presentation_layer/components/drawer/side_menu_logo.dart';
 import 'presentation_layer/components/relays_connectivity_widget.dart';
+import 'presentation_layer/components/right_sidebar/right_siedbar.dart';
 import 'presentation_layer/components/starter_packs/edit_starter_pack/edit_starter_pack.dart';
 import 'presentation_layer/components/starter_packs/open_starter_pack.dart';
 import 'presentation_layer/components/update_check/update_check.dart';
-import 'presentation_layer/components/write_post.dart';
+
 import 'presentation_layer/layouts/mobile_bottom_menu_layout.dart';
 import 'presentation_layer/layouts/responsive_layout.dart';
 import 'presentation_layer/layouts/three_colum_layout.dart';
+import 'presentation_layer/routes/home_page_desktop.dart';
 import 'presentation_layer/routes/home_page_mobile.dart';
 import 'presentation_layer/routes/nostr/blockedUsers/blocked_users.dart';
 import 'presentation_layer/routes/nostr/event_view/event_view_page.dart';
@@ -61,7 +58,7 @@ final routes = [
                   ),
                 ),
                 mainContent: child,
-                rightSidebar: Container(color: Colors.deepOrange),
+                rightSidebar: RightSiedbar(),
               ),
               mobileContent: MobileBottomMenuLayout(
                 mainContent: child,
