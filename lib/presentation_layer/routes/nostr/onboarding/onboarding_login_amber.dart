@@ -54,7 +54,8 @@ class _OnboardingLoginAmberPageState
     if (!_termsAndConditions) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Please read and accept the terms and conditions first'),
+          content:
+              Text('Please read and accept the terms and conditions first'),
         ),
       );
       return;
@@ -96,8 +97,8 @@ class _OnboardingLoginAmberPageState
                 Row(
                   children: [
                     IconButton(
-                      icon:
-                          Icon(PhosphorIcons.arrowLeft(), color: Theme.of(context).colorScheme.onSurface),
+                      icon: Icon(PhosphorIcons.arrowLeft(),
+                          color: Theme.of(context).colorScheme.onSurface),
                       onPressed: () => widget.onPressedBack!(),
                     ),
                   ],

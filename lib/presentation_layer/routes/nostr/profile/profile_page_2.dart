@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:camelus/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
@@ -70,7 +71,7 @@ class ProfilePage2 extends ConsumerWidget {
                 actions: [
                   PopupMenuButton<String>(
                     color: Paletter.getExtraDarkGray(context),
-                    tooltip: "More",
+                    tooltip: AppLocalizations.of(context)!.more,
                     onSelected: (e) => {
                       //log(e),
                       // toast
@@ -91,7 +92,7 @@ class ProfilePage2 extends ConsumerWidget {
                       return {'block'}.map((String choice) {
                         return PopupMenuItem<String>(
                           value: choice,
-                          child: Text(choice),
+                          child: Text(AppLocalizations.of(context)!.block),
                         );
                       }).toList();
                     },
@@ -105,7 +106,9 @@ class ProfilePage2 extends ConsumerWidget {
                 pinned: true,
                 floating: true,
                 forceElevated: innerBoxIsScrolled,
-                backgroundColor: Theme.of(context).colorScheme.surface, // Add a background color
+                backgroundColor: Theme.of(context)
+                    .colorScheme
+                    .surface, // Add a background color
                 flexibleSpace: FlexibleSpaceBar(
                   background: _BuildProfileHeader(
                       isOwnProfile: isOwnProfile,
@@ -126,21 +129,27 @@ class ProfilePage2 extends ConsumerWidget {
                 bottom: PreferredSize(
                   preferredSize: Size.fromHeight(48),
                   child: Container(
-                    color:
-                        Theme.of(context).colorScheme.surface, // Add a background color to the tab bar
+                    color: Theme.of(context)
+                        .colorScheme
+                        .surface, // Add a background color to the tab bar
                     child: TabBar(
                       controller: tabController,
                       tabs: [
-                        Tab(text: 'Posts'),
-                        Tab(text: 'Posts & Replies'),
-                        Tab(text: 'Starter Packs'),
+                        Tab(text: AppLocalizations.of(context)!.posts),
+                        Tab(
+                            text:
+                                AppLocalizations.of(context)!.postsAndReplies),
+                        Tab(text: AppLocalizations.of(context)!.starterPacks),
                       ],
                       labelColor: Theme.of(context)
-                          .colorScheme.onSurface, // Set the color of the selected tab
-                      unselectedLabelColor:
-                          Theme.of(context).colorScheme.onSurfaceVariant, // Set the color of unselected tabs
-                      indicatorColor:
-                          Theme.of(context).colorScheme.primary, // Set the color of the indicator
+                          .colorScheme
+                          .onSurface, // Set the color of the selected tab
+                      unselectedLabelColor: Theme.of(context)
+                          .colorScheme
+                          .onSurfaceVariant, // Set the color of unselected tabs
+                      indicatorColor: Theme.of(context)
+                          .colorScheme
+                          .primary, // Set the color of the indicator
                     ),
                   ),
                 ),
@@ -209,7 +218,9 @@ class _BuildProfileHeader extends ConsumerWidget {
                   children: [
                     Container(
                       decoration: BoxDecoration(
-                        border: Border.all(color: Theme.of(context).colorScheme.surface, width: 2),
+                        border: Border.all(
+                            color: Theme.of(context).colorScheme.surface,
+                            width: 2),
                         shape: BoxShape.circle,
                       ),
                       child: UserImage(
@@ -236,11 +247,15 @@ class _BuildProfileHeader extends ConsumerWidget {
                                 }
                               },
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: Theme.of(context).colorScheme.surface,
+                                backgroundColor:
+                                    Theme.of(context).colorScheme.surface,
                                 padding: const EdgeInsets.all(0),
                                 shape: CircleBorder(
                                     side: BorderSide(
-                                        color: Theme.of(context).colorScheme.onSurface, width: 1)),
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSurface,
+                                        width: 1)),
                               ),
                               child: SvgPicture.asset(
                                 "assets/icons/lightning-fill.svg",
@@ -259,7 +274,7 @@ class _BuildProfileHeader extends ConsumerWidget {
                           ),
                         if (isOwnProfile)
                           longButton(
-                              name: "edit",
+                              name: AppLocalizations.of(context)!.edit,
                               onPressed: () {
                                 Navigator.pushNamed(
                                   context,
@@ -313,7 +328,7 @@ class _BuildProfileHeader extends ConsumerWidget {
                     displayFollowing(contacts.contactList, context),
                     SizedBox(width: 16),
                     Text(
-                      'n.a Followers',
+                      AppLocalizations.of(context)!.followers,
                       style: TextStyle(
                         color: Paletter.getGray(context),
                         fontSize: 14,
@@ -339,7 +354,7 @@ class _BuildProfileHeader extends ConsumerWidget {
             MaterialPageRoute(
               builder: (context) => FollowerPage(
                 contactList: contacts,
-                title: "Following",
+                title: AppLocalizations.of(context)!.following,
               ),
             ),
           );
@@ -357,7 +372,7 @@ class _BuildProfileHeader extends ConsumerWidget {
               ),
             ),
             TextSpan(
-              text: ' Following',
+              text: ' ${AppLocalizations.of(context)!.following}',
               style: TextStyle(
                 color: Paletter.getGray(context),
                 fontSize: 14,

@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:camelus/l10n/app_localizations.dart';
 import 'package:camelus/presentation_layer/atoms/my_profile_picture.dart';
 import 'package:camelus/presentation_layer/atoms/refresh_indicator_no_need.dart';
 import 'package:camelus/presentation_layer/components/note_card/note_card.dart';
@@ -63,13 +64,14 @@ class _NotificationPageState extends ConsumerState<NotificationPage>
 
     return Scaffold(
       appBar: AppBar(
-        title:
-            Text('Notifications', style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
+        title: Text(AppLocalizations.of(context)!.notifications,
+            style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
         elevation: 0,
         actions: [
           if (notificationsState.newNotifications.isNotEmpty)
             IconButton(
-              icon: Icon(Icons.check_circle_outline, color: Theme.of(context).colorScheme.onSurface),
+              icon: Icon(Icons.check_circle_outline,
+                  color: Theme.of(context).colorScheme.onSurface),
               onPressed: () {
                 // Mark all notifications as read
                 ref
@@ -88,7 +90,8 @@ class _NotificationPageState extends ConsumerState<NotificationPage>
           TabBar(
             controller: _tabController,
             labelColor: Theme.of(context).colorScheme.onSurface,
-            unselectedLabelColor: Theme.of(context).colorScheme.onSurfaceVariant,
+            unselectedLabelColor:
+                Theme.of(context).colorScheme.onSurfaceVariant,
             indicatorColor: Theme.of(context).colorScheme.primary,
             tabs: const [
               Tab(text: "All"),
@@ -129,16 +132,20 @@ class _NotificationPageState extends ConsumerState<NotificationPage>
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.notifications_off, color: Theme.of(context).colorScheme.onSurfaceVariant, size: 48),
+          Icon(Icons.notifications_off,
+              color: Theme.of(context).colorScheme.onSurfaceVariant, size: 48),
           SizedBox(height: 16),
           Text(
             message,
-            style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 16),
+            style: TextStyle(
+                color: Theme.of(context).colorScheme.onSurface, fontSize: 16),
           ),
           SizedBox(height: 8),
           Text(
             'When someone interacts with your posts,\nyou\'ll see it here',
-            style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant, fontSize: 14),
+            style: TextStyle(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+                fontSize: 14),
             textAlign: TextAlign.center,
           ),
         ],
@@ -195,7 +202,9 @@ class _NotificationPageState extends ConsumerState<NotificationPage>
 
     // Create a container with a highlight color if it's a new notification
     return Container(
-      color: isNew ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.1) : null,
+      color: isNew
+          ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.1)
+          : null,
       child: ListTile(
         leading: _getNotificationIcon(notification),
         title: Row(
@@ -225,7 +234,8 @@ class _NotificationPageState extends ConsumerState<NotificationPage>
                     ),
                     TextSpan(
                       text: _getNotificationText(notification),
-                      style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+                      style: TextStyle(
+                          color: Theme.of(context).colorScheme.onSurface),
                     ),
                   ],
                 ),
@@ -233,8 +243,10 @@ class _NotificationPageState extends ConsumerState<NotificationPage>
             ),
             Text(
               timeago.format(DateTime.fromMillisecondsSinceEpoch(
-                  notification.createdAt * 1000)),
-              style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant, fontSize: 12),
+                  notification.createdAt * 1000)), // TODO translate
+              style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  fontSize: 12),
             ),
           ],
         ),

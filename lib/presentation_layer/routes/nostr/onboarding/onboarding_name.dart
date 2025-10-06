@@ -1,3 +1,4 @@
+import 'package:camelus/l10n/app_localizations.dart';
 import 'package:camelus/presentation_layer/atoms/long_button.dart';
 import 'package:camelus/config/palette.dart';
 import 'package:camelus/domain_layer/entities/onboarding_user_info.dart';
@@ -84,7 +85,7 @@ class _OnboardingNameState extends ConsumerState<OnboardingName> {
                 controller: _nameController,
                 autofillHints: const [AutofillHints.name],
                 decoration: InputDecoration(
-                  hintText: 'what should we call you?',
+                  hintText: AppLocalizations.of(context)!.whatShouldWeCallYou,
                   contentPadding: EdgeInsets.all(0),
                   hintStyle: TextStyle(
                     color: Theme.of(context).colorScheme.onSurface,
@@ -114,7 +115,9 @@ class _OnboardingNameState extends ConsumerState<OnboardingName> {
               width: 400,
               height: 40,
               child: longButton(
-                name: nameSelected ? "next" : "skip",
+                name: nameSelected
+                    ? AppLocalizations.of(context)!.next
+                    : AppLocalizations.of(context)!.skip,
                 onPressed: (() {
                   _nameFocusNode.unfocus();
                   widget.submitCallback(_nameController.text);

@@ -176,7 +176,9 @@ class _EditStarterPackSummaryState extends ConsumerState<EditStarterPackSummary>
                               "Share it with your friends and help them discover amazing people!",
                               style: TextStyle(
                                 fontSize: 16,
-                                color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onSurfaceVariant,
                               ),
                               textAlign: TextAlign.center,
                             ),
@@ -188,7 +190,8 @@ class _EditStarterPackSummaryState extends ConsumerState<EditStarterPackSummary>
                                 decoration: BoxDecoration(
                                   color: Paletter.getExtraDarkGray(context),
                                   borderRadius: BorderRadius.circular(8),
-                                  border: Border.all(color: Paletter.getGray(context)),
+                                  border: Border.all(
+                                      color: Paletter.getGray(context)),
                                 ),
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.center,

@@ -10,6 +10,7 @@ import 'package:window_manager/window_manager.dart';
 import 'package:flutter_mentions/flutter_mentions.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ndk/ndk.dart';
+import 'l10n/app_localizations.dart';
 //import 'package:device_preview/device_preview.dart';
 //import 'data_layer/db/object_box_ndk/db_object_box.dart';
 import 'config/camelus_config.dart';
@@ -27,6 +28,7 @@ import 'presentation_layer/providers/app_lifecycle_provider.dart';
 import 'presentation_layer/providers/db_app_provider.dart';
 import 'presentation_layer/providers/db_ndk_provider.dart';
 import 'presentation_layer/providers/inbox_outbox_provider.dart';
+import 'presentation_layer/providers/language_provider.dart';
 import 'presentation_layer/providers/ndk_provider.dart';
 import 'presentation_layer/providers/signer_provider.dart';
 import 'presentation_layer/routes/home_page.dart';
@@ -174,6 +176,8 @@ class MyApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, ref) {
+    final currentLocale = ref.watch(currentLocaleProvider);
+
     return Portal(
       child: MaterialApp(
         navigatorKey: navigatorKey,
@@ -186,6 +190,9 @@ class MyApp extends ConsumerWidget {
         ),
         debugShowCheckedModeBanner: false,
         title: 'camelus',
+        locale: currentLocale,
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
         theme: lightTheme,
         darkTheme: darkTheme,
         initialRoute: initialRoute,

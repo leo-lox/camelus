@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:camelus/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -31,15 +32,17 @@ class _BlockPageState extends ConsumerState<BlockPage> {
   bool _reportSuccessful = false;
   bool _reportLoading = false;
 
-  final List<String> reportReasons = [
-    "impersonation",
-    "spam",
-    "illegal",
-    "profanity",
-    "nudity",
-    "malware",
-    "other",
-  ];
+  List<String> getReportReasons(BuildContext context) {
+    return [
+      AppLocalizations.of(context)!.impersonation,
+      AppLocalizations.of(context)!.spam,
+      AppLocalizations.of(context)!.illegal,
+      AppLocalizations.of(context)!.profanity,
+      AppLocalizations.of(context)!.nudity,
+      AppLocalizations.of(context)!.malware,
+      AppLocalizations.of(context)!.other,
+    ];
+  }
 
   @override
   void initState() {
@@ -111,7 +114,7 @@ class _BlockPageState extends ConsumerState<BlockPage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    "report send",
+                    AppLocalizations.of(context)!.reportSent,
                     style: TextStyle(
                         color: Theme.of(context).colorScheme.onSurface,
                         fontSize: 30,
@@ -119,8 +122,9 @@ class _BlockPageState extends ConsumerState<BlockPage> {
                   ),
                   const SizedBox(height: 20),
                   Text(
-                    "thank you for your report",
-                    style: TextStyle(color: Paletter.getLightGray(context), fontSize: 20),
+                    AppLocalizations.of(context)!.thankYouForReport,
+                    style: TextStyle(
+                        color: Paletter.getLightGray(context), fontSize: 20),
                   ),
                   const SizedBox(height: 20),
                   SizedBox(
@@ -128,7 +132,7 @@ class _BlockPageState extends ConsumerState<BlockPage> {
                     width: MediaQuery.of(context).size.width * 0.75,
                     child: longButton(
                         inverted: true,
-                        name: "go back",
+                        name: AppLocalizations.of(context)!.goBack,
                         onPressed: () => {
                               Navigator.pop(context),
                             }),
@@ -143,7 +147,7 @@ class _BlockPageState extends ConsumerState<BlockPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('block/report'),
+        title: Text(AppLocalizations.of(context)!.blockReportTitle),
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -157,9 +161,10 @@ class _BlockPageState extends ConsumerState<BlockPage> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text('user',
+                      Text(AppLocalizations.of(context)!.user,
                           style: TextStyle(
-                              color: Paletter.getLightGray(context), fontSize: 20)),
+                              color: Paletter.getLightGray(context),
+                              fontSize: 20)),
                       const SizedBox(width: 10),
                       Text(user?.name ?? user?.nip05 ?? widget.userPubkey,
                           style: TextStyle(
@@ -178,7 +183,7 @@ class _BlockPageState extends ConsumerState<BlockPage> {
                             height: 40,
                             width: MediaQuery.of(context).size.width * 0.75,
                             child: longButton(
-                                name: "loading",
+                                name: AppLocalizations.of(context)!.loading,
                                 loading: true,
                                 onPressed: () {}),
                           );
@@ -188,7 +193,9 @@ class _BlockPageState extends ConsumerState<BlockPage> {
                           height: 40,
                           width: MediaQuery.of(context).size.width * 0.75,
                           child: longButton(
-                              name: isUserBlocked ? "unblock" : "block",
+                              name: isUserBlocked
+                                  ? AppLocalizations.of(context)!.unblock
+                                  : AppLocalizations.of(context)!.block,
                               inverted: !isUserBlocked,
                               loading: requestLoading,
                               onPressed: () {
@@ -215,7 +222,7 @@ class _BlockPageState extends ConsumerState<BlockPage> {
                         shrinkWrap: true,
                         mainAxisSpacing: 10,
                         crossAxisSpacing: 10,
-                        children: reportReasons
+                        children: getReportReasons(context)
                             .map((reason) => longButton(
                                   name: reason,
                                   onPressed: () => {_setReportReason(reason)},
@@ -232,25 +239,30 @@ class _BlockPageState extends ConsumerState<BlockPage> {
                           decoration: InputDecoration(
                             isDense: true,
                             hintText: widget.postId != null
-                                ? 'what is wrong with this post?'
-                                : 'what is wrong with this user?',
+                                ? AppLocalizations.of(context)!
+                                    .whatIsWrongWithPost
+                                : AppLocalizations.of(context)!
+                                    .whatIsWrongWithUser,
                             hintStyle: TextStyle(
-                                color: Theme.of(context).colorScheme.onSurface, letterSpacing: 1.1),
+                                color: Theme.of(context).colorScheme.onSurface,
+                                letterSpacing: 1.1),
                             filled: true,
                             fillColor: Paletter.getExtraDarkGray(context),
                             enabledBorder: OutlineInputBorder(
                               borderRadius:
                                   BorderRadius.all(Radius.circular(10.0)),
-                              borderSide:
-                                  BorderSide(color: Paletter.getExtraDarkGray(context)),
+                              borderSide: BorderSide(
+                                  color: Paletter.getExtraDarkGray(context)),
                             ),
                             focusedBorder: OutlineInputBorder(
                               borderRadius:
                                   BorderRadius.all(Radius.circular(10.0)),
-                              borderSide: BorderSide(color: Theme.of(context).colorScheme.surface),
+                              borderSide: BorderSide(
+                                  color: Theme.of(context).colorScheme.surface),
                             ),
                           ),
-                          style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+                          style: TextStyle(
+                              color: Theme.of(context).colorScheme.onSurface),
                           minLines: 3,
                           maxLines: 5,
                         ),
@@ -258,7 +270,7 @@ class _BlockPageState extends ConsumerState<BlockPage> {
                       const SizedBox(height: 30),
 
                       Text(
-                        "Reports are sent to the relays where you received the note from.",
+                        AppLocalizations.of(context)!.reportsAreSentToRelays,
                         style: TextStyle(color: Paletter.getGray(context)),
                       ),
 
@@ -267,7 +279,8 @@ class _BlockPageState extends ConsumerState<BlockPage> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Text("Additionally, report to camelus directly"),
+                          Text(AppLocalizations.of(context)!
+                              .additionallyReportToCamelus),
                           const SizedBox(width: 10),
                           Switch(
                             value: reportToCamelus,
@@ -276,7 +289,8 @@ class _BlockPageState extends ConsumerState<BlockPage> {
                                 reportToCamelus = value;
                               });
                             },
-                            activeThumbColor: Theme.of(context).colorScheme.onSurface,
+                            activeThumbColor:
+                                Theme.of(context).colorScheme.onSurface,
                           ),
                         ],
                       ),
@@ -286,8 +300,8 @@ class _BlockPageState extends ConsumerState<BlockPage> {
                         width: MediaQuery.of(context).size.width * 0.75,
                         child: longButton(
                             name: widget.postId != null
-                                ? "report post"
-                                : "report user",
+                                ? AppLocalizations.of(context)!.reportPost
+                                : AppLocalizations.of(context)!.reportUser,
                             inverted: true,
                             loading: _reportLoading,
                             onPressed: () => {_submitReport()}),

@@ -116,7 +116,8 @@ class _EditStarterPackMetaState extends ConsumerState<EditStarterPackMeta> {
       appBar: AppBar(
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Theme.of(context).colorScheme.onSurface),
+          icon: Icon(Icons.arrow_back,
+              color: Theme.of(context).colorScheme.onSurface),
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text(
@@ -151,7 +152,10 @@ class _EditStarterPackMetaState extends ConsumerState<EditStarterPackMeta> {
                   Text(
                     'Invite your friends to follow your favorite people',
                     style: TextStyle(
-                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                      color: Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withValues(alpha: 0.7),
                       fontSize: 16,
                     ),
                     textAlign: TextAlign.center,
@@ -182,7 +186,10 @@ class _EditStarterPackMetaState extends ConsumerState<EditStarterPackMeta> {
                               Container(
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(10),
-                                  color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.6),
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .surface
+                                      .withValues(alpha: 0.6),
                                 ),
                                 child: Center(
                                   child: Column(
@@ -195,7 +202,9 @@ class _EditStarterPackMetaState extends ConsumerState<EditStarterPackMeta> {
                                       Text(
                                         'Uploading...',
                                         style: TextStyle(
-                                          color: Theme.of(context).colorScheme.onSurface,
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onSurface,
                                           fontSize: 12,
                                           fontWeight: FontWeight.w500,
                                         ),
@@ -221,7 +230,10 @@ class _EditStarterPackMetaState extends ConsumerState<EditStarterPackMeta> {
                         child: Text(
                           'Title',
                           style: TextStyle(
-                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSurface
+                                .withValues(alpha: 0.7),
                             fontSize: 16,
                           ),
                         ),
@@ -241,7 +253,8 @@ class _EditStarterPackMetaState extends ConsumerState<EditStarterPackMeta> {
                             starterPackNotifier.updateTitle(value);
                           },
                           style: TextStyle(
-                              color: Theme.of(context).colorScheme.onSurface, fontSize: 18),
+                              color: Theme.of(context).colorScheme.onSurface,
+                              fontSize: 18),
                           decoration: InputDecoration(
                             border: InputBorder.none,
                             contentPadding: const EdgeInsets.all(16),
@@ -263,7 +276,10 @@ class _EditStarterPackMetaState extends ConsumerState<EditStarterPackMeta> {
                         child: Text(
                           'Description',
                           style: TextStyle(
-                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSurface
+                                .withValues(alpha: 0.7),
                             fontSize: 16,
                           ),
                         ),
@@ -284,7 +300,8 @@ class _EditStarterPackMetaState extends ConsumerState<EditStarterPackMeta> {
                             starterPackNotifier.updateDescription(value);
                           },
                           style: TextStyle(
-                              color: Theme.of(context).colorScheme.onSurface, fontSize: 16),
+                              color: Theme.of(context).colorScheme.onSurface,
+                              fontSize: 16),
                           maxLines: null,
                           expands: true,
                           textAlignVertical: TextAlignVertical.top,

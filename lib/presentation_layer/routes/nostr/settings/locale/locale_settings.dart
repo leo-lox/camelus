@@ -1,3 +1,4 @@
+import 'package:camelus/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
@@ -22,6 +23,7 @@ class LocaleSettingsPageState extends ConsumerState<LocaleSettingsPage> {
     {'name': 'Português', 'locale': const Locale('pt', 'BR')},
     {'name': 'Español', 'locale': const Locale('es', 'ES')},
     {'name': 'Français', 'locale': const Locale('fr', 'FR')},
+    {'name': 'Русский', 'locale': const Locale('ru', 'RU')},
   ];
 
   bool _isSystemLanguage = false;
@@ -56,25 +58,20 @@ class LocaleSettingsPageState extends ConsumerState<LocaleSettingsPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Language Settings'),
+        title: Text(AppLocalizations.of(context)!.languageSettings),
       ),
       body: Column(
         children: [
           const SizedBox(height: 10),
-          Text("notice: language is still in development!",
-              style: TextStyle(
-                color: Theme.of(context).colorScheme.error,
-                fontSize: 16,
-              )),
-          const SizedBox(height: 10),
 
           ListTile(
             title: Text(
-              'Use System Language',
+              AppLocalizations.of(context)!.useSystemLanguage,
               style: TextStyle(color: Paletter.getLightGray(context)),
             ),
             trailing: _isSystemLanguage
-                ? Icon(PhosphorIcons.check(), color: Theme.of(context).colorScheme.onSurface)
+                ? Icon(PhosphorIcons.check(),
+                    color: Theme.of(context).colorScheme.onSurface)
                 : null,
             onTap: () async {
               await languageNotifier.resetToSystemLanguage(context);
@@ -104,7 +101,8 @@ class LocaleSettingsPageState extends ConsumerState<LocaleSettingsPage> {
                     style: TextStyle(color: Paletter.getLightGray(context)),
                   ),
                   trailing: isSelected
-                      ? Icon(PhosphorIcons.check(), color: Theme.of(context).colorScheme.onSurface)
+                      ? Icon(PhosphorIcons.check(),
+                          color: Theme.of(context).colorScheme.onSurface)
                       : null,
                   onTap: () async {
                     await languageNotifier.changeLanguage(locale);

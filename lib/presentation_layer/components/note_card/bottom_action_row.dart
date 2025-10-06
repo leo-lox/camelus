@@ -170,7 +170,8 @@ class _BottomActionRowState extends State<BottomActionRow>
                 const SizedBox(width: 5),
                 Text(
                   widget.likeCount.toString(),
-                  style: TextStyle(color: Paletter.getGray(context), fontSize: 16),
+                  style:
+                      TextStyle(color: Paletter.getGray(context), fontSize: 16),
                 ),
               ],
             ],
@@ -213,7 +214,8 @@ class _BottomActionRowState extends State<BottomActionRow>
                 const SizedBox(width: 5),
                 Text(
                   count.toString(),
-                  style: TextStyle(color: Paletter.getGray(context), fontSize: 16),
+                  style:
+                      TextStyle(color: Paletter.getGray(context), fontSize: 16),
                 ),
               ],
             ],
@@ -230,48 +232,47 @@ Widget _buildRetweetButton({
   int? count,
   Color? color,
 }) {
-  return Builder(
-    builder: (context) {
-      final defaultColor = Paletter.getDarkGray(context);
-      return SizedBox(
-        height: 35,
-        width: 65,
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(50),
-          child: Padding(
-            padding: const EdgeInsets.all(6.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                AnimatedBuilder(
-                    animation: repostController,
-                    child: SvgPicture.asset(
-                      'assets/icons/retweet.svg',
-                      height: 35,
-                      colorFilter: ColorFilter.mode(
-                        color ?? defaultColor,
-                        BlendMode.srcATop,
-                      ),
+  return Builder(builder: (context) {
+    final defaultColor = Paletter.getDarkGray(context);
+    return SizedBox(
+      height: 35,
+      width: 65,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(50),
+        child: Padding(
+          padding: const EdgeInsets.all(6.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              AnimatedBuilder(
+                  animation: repostController,
+                  child: SvgPicture.asset(
+                    'assets/icons/retweet.svg',
+                    height: 35,
+                    colorFilter: ColorFilter.mode(
+                      color ?? defaultColor,
+                      BlendMode.srcATop,
                     ),
-                    builder: (context, Widget? child) {
-                      return Transform.rotate(
-                        angle: repostController.value * 2 * math.pi,
-                        child: child,
-                      );
-                    }),
-                if (count != null) ...[
-                  const SizedBox(width: 5),
-                  Text(
-                    count.toString(),
-                    style: TextStyle(color: Paletter.getGray(context), fontSize: 16),
                   ),
-                ],
+                  builder: (context, Widget? child) {
+                    return Transform.rotate(
+                      angle: repostController.value * 2 * math.pi,
+                      child: child,
+                    );
+                  }),
+              if (count != null) ...[
+                const SizedBox(width: 5),
+                Text(
+                  count.toString(),
+                  style:
+                      TextStyle(color: Paletter.getGray(context), fontSize: 16),
+                ),
               ],
-            ),
+            ],
           ),
         ),
-      );
-    }
-  );
+      ),
+    );
+  });
 }

@@ -8,9 +8,14 @@ class Paletter {
   static const Color extraLightGray = Color(0xFFF5F8FA);
   static const Color extraDarkGray = Color(0xFF1A1A1A);
 
-  static Color getDarkGray(BuildContext context) => Theme.of(context).colorScheme.surfaceContainerHighest;
-  static Color getGray(BuildContext context) => Theme.of(context).colorScheme.inverseSurface;
-  static Color getLightGray(BuildContext context) => Theme.of(context).colorScheme.inverseSurface;
-  static Color getExtraLightGray(BuildContext context) => Theme.of(context).colorScheme.onSurface;
-  static Color getExtraDarkGray(BuildContext context) => Theme.of(context).colorScheme.surface;
+  static Color getDarkGray(BuildContext context) =>
+      Theme.of(context).colorScheme.surfaceContainerHighest;
+  static Color getGray(BuildContext context) =>
+      Theme.of(context).colorScheme.inverseSurface;
+  static Color getLightGray(BuildContext context) =>
+      Theme.of(context).colorScheme.inverseSurface;
+  static Color getExtraLightGray(BuildContext context) =>
+      Theme.of(context).colorScheme.onSurface;
+  static Color getExtraDarkGray(BuildContext context) =>
+      Theme.of(context).colorScheme.surface;
 }

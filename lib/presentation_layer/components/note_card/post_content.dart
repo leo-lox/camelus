@@ -94,7 +94,8 @@ class PostContentWidget extends ConsumerWidget {
                   text: segment.metadata!,
                   textWidget: Text(
                     segment.content,
-                    style: TextStyle(color: Theme.of(context).colorScheme.primary),
+                    style:
+                        TextStyle(color: Theme.of(context).colorScheme.primary),
                   ),
                   width: MediaQuery.of(context).size.width,
                 ),

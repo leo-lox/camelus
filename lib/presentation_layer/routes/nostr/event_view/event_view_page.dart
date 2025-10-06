@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:camelus/l10n/app_localizations.dart';
 import 'package:camelus/presentation_layer/components/note_card/note_card_container.dart';
 import 'package:camelus/presentation_layer/components/note_card/skeleton_note.dart';
 import 'package:flutter/material.dart';
@@ -162,7 +163,7 @@ class EventViewPageState extends ConsumerState<EventViewPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("thread"),
+        title: Text(AppLocalizations.of(context)!.thread),
       ),
       body: FlutterListView(
         controller: eventViewController,

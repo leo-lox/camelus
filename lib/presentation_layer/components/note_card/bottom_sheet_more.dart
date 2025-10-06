@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:camelus/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
@@ -59,18 +60,16 @@ class MoreOptionsBottomSheet extends ConsumerWidget {
   }
 
   Widget _buildHandle() {
-    return Builder(
-      builder: (context) {
-        return Container(
-          width: 40,
-          height: 4,
-          decoration: BoxDecoration(
-            color: Paletter.getGray(context),
-            borderRadius: BorderRadius.circular(2),
-          ),
-        );
-      }
-    );
+    return Builder(builder: (context) {
+      return Container(
+        width: 40,
+        height: 4,
+        decoration: BoxDecoration(
+          color: Paletter.getGray(context),
+          borderRadius: BorderRadius.circular(2),
+        ),
+      );
+    });
   }
 
   Widget _buildOptionTile(BottomSheetOption option) {
@@ -88,18 +87,17 @@ class MoreOptionsBottomSheet extends ConsumerWidget {
                 option.leading,
                 const SizedBox(width: 16),
                 Expanded(
-                  child: Builder(
-                    builder: (context) {
-                      return Text(
-                        option.label,
-                        style: TextStyle(
-                          color: option.textColor ?? Paletter.getLightGray(context),
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      );
-                    }
-                  ),
+                  child: Builder(builder: (context) {
+                    return Text(
+                      option.label,
+                      style: TextStyle(
+                        color:
+                            option.textColor ?? Paletter.getLightGray(context),
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    );
+                  }),
                 ),
               ],
             ),
@@ -116,7 +114,7 @@ class MoreOptionsBottomSheet extends ConsumerWidget {
           PhosphorIcons.userCirclePlus(),
           color: Paletter.getGray(context),
         ),
-        label: 'add to starter pack',
+        label: AppLocalizations.of(context)!.addToStarterPack,
         onTap: () => _showFollowPackSelection(context, ref),
       ),
       BottomSheetOption(
@@ -124,7 +122,7 @@ class MoreOptionsBottomSheet extends ConsumerWidget {
           PhosphorIcons.speakerSimpleSlash(),
           color: Paletter.getGray(context),
         ),
-        label: 'Block/Report',
+        label: AppLocalizations.of(context)!.blockReport,
         onTap: () => _navigateToBlockPage(context),
       ),
     ];

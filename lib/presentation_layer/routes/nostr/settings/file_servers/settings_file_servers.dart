@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:camelus/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -34,21 +35,22 @@ class SettingsFileServersPageState extends ConsumerState<SettingsFileServers> {
     final result = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Unsaved Changes',
+        title: Text(AppLocalizations.of(context)!.unsavedChanges,
             style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
         content: Text(
-          'You have unsaved changes. Do you want to discard them?',
+          AppLocalizations.of(context)!.unsavedChangesMessage,
           style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: Text('Cancel', style: TextStyle(color: Paletter.getGray(context))),
+            child: Text(AppLocalizations.of(context)!.cancel,
+                style: TextStyle(color: Paletter.getGray(context))),
           ),
           TextButton(
             onPressed: () => Navigator.of(context).pop(true),
-            child:
-                Text('Discard', style: TextStyle(color: Theme.of(context).colorScheme.primary)),
+            child: Text(AppLocalizations.of(context)!.discard,
+                style: TextStyle(color: Theme.of(context).colorScheme.primary)),
           ),
         ],
       ),
@@ -76,11 +78,11 @@ class SettingsFileServersPageState extends ConsumerState<SettingsFileServers> {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('File Servers'),
+          title: Text(AppLocalizations.of(context)!.fileServers),
           actions: [
             if (hasUnsavedChanges)
               longButton(
-                name: "save changes",
+                name: AppLocalizations.of(context)!.saveChanges,
                 inverted: true,
                 onPressed: () async {
                   showDialog(
@@ -91,8 +93,10 @@ class SettingsFileServersPageState extends ConsumerState<SettingsFileServers> {
                         children: [
                           CircularProgressIndicator(),
                           SizedBox(width: 20),
-                          Text('Saving...',
-                              style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
+                          Text(AppLocalizations.of(context)!.saving,
+                              style: TextStyle(
+                                  color:
+                                      Theme.of(context).colorScheme.onSurface)),
                         ],
                       ),
                     ),
@@ -108,10 +112,11 @@ class SettingsFileServersPageState extends ConsumerState<SettingsFileServers> {
 
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text(
-                            success
-                                ? 'Changes saved successfully'
-                                : 'Failed to save changes'),
+                        content: Text(success
+                            ? AppLocalizations.of(context)!
+                                .changesSavedSuccessfully
+                            : AppLocalizations.of(context)!
+                                .failedToSaveChanges),
                       ),
                     );
                   }
@@ -126,8 +131,7 @@ class SettingsFileServersPageState extends ConsumerState<SettingsFileServers> {
           children: [
             Expanded(
               child: fileServersAsync.when(
-                loading: () => Center(
-                    child: CircularProgressIndicator()),
+                loading: () => Center(child: CircularProgressIndicator()),
                 error: (error, stack) => Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -136,7 +140,8 @@ class SettingsFileServersPageState extends ConsumerState<SettingsFileServers> {
                       const SizedBox(height: 25),
                       longButton(
                           inverted: true,
-                          name: "setup default servers",
+                          name:
+                              AppLocalizations.of(context)!.setupDefaultServers,
                           onPressed: () {
                             ref
                                 .read(fileServersProvider.notifier)
@@ -193,13 +198,18 @@ class SettingsFileServersPageState extends ConsumerState<SettingsFileServers> {
                                         server.url,
                                         style: TextStyle(
                                           fontSize: 16,
-                                          color: Theme.of(context).colorScheme.onSurface,
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onSurface,
                                         ),
                                       ),
                                       if (index == 0)
-                                        Text(' (default)',
-                                            style:
-                                                TextStyle(color: Paletter.getGray(context))),
+                                        Text(
+                                            AppLocalizations.of(context)!
+                                                .defaultLabel,
+                                            style: TextStyle(
+                                                color:
+                                                    Paletter.getGray(context))),
                                     ],
                                   ),
                                 ),
@@ -230,13 +240,15 @@ class SettingsFileServersPageState extends ConsumerState<SettingsFileServers> {
                               showDialog(
                                 context: context,
                                 builder: (context) => AlertDialog(
-                                  title: const Text('Restore Defaults'),
-                                  content: const Text(
-                                      'Are you sure you want to restore default servers? This will remove all custom servers.'),
+                                  title: Text(AppLocalizations.of(context)!
+                                      .restoreDefaults),
+                                  content: Text(AppLocalizations.of(context)!
+                                      .restoreDefaultsMessage),
                                   actions: [
                                     TextButton(
                                       onPressed: () => Navigator.pop(context),
-                                      child: const Text('Cancel'),
+                                      child: Text(
+                                          AppLocalizations.of(context)!.cancel),
                                     ),
                                     TextButton(
                                       onPressed: () {
@@ -245,16 +257,19 @@ class SettingsFileServersPageState extends ConsumerState<SettingsFileServers> {
                                             .restoreDefaults();
                                         Navigator.pop(context);
                                       },
-                                      child: const Text('Restore'),
+                                      child: Text(AppLocalizations.of(context)!
+                                          .restore),
                                     ),
                                   ],
                                 ),
                               );
                             },
-                            icon:
-                                Icon(Icons.restore, color: Paletter.getGray(context)),
-                            label: Text('Restore Defaults',
-                                style: TextStyle(color: Paletter.getGray(context))),
+                            icon: Icon(Icons.restore,
+                                color: Paletter.getGray(context)),
+                            label: Text(
+                                AppLocalizations.of(context)!.restoreDefaults,
+                                style: TextStyle(
+                                    color: Paletter.getGray(context))),
                           ),
                         ),
                       ),
@@ -272,25 +287,28 @@ class SettingsFileServersPageState extends ConsumerState<SettingsFileServers> {
                       controller: _urlController,
                       decoration: InputDecoration(
                         isDense: true,
-                        hintText: 'Enter blossom URL',
-                        hintStyle:
-                            TextStyle(color: Theme.of(context).colorScheme.onSurface, letterSpacing: 1.1),
+                        hintText: AppLocalizations.of(context)!.enterBlossomUrl,
+                        hintStyle: TextStyle(
+                            color: Theme.of(context).colorScheme.onSurface,
+                            letterSpacing: 1.1),
                         filled: true,
                         fillColor: Paletter.getExtraDarkGray(context),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.all(Radius.circular(50.0)),
-                          borderSide: BorderSide(color: Paletter.getExtraDarkGray(context)),
+                          borderSide: BorderSide(
+                              color: Paletter.getExtraDarkGray(context)),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.all(Radius.circular(25.0)),
-                          borderSide: BorderSide(color: Theme.of(context).colorScheme.surface),
+                          borderSide: BorderSide(
+                              color: Theme.of(context).colorScheme.surface),
                         ),
                       ),
                     ),
                   ),
                   const SizedBox(width: 8),
                   longButton(
-                    name: "add",
+                    name: AppLocalizations.of(context)!.add,
                     inverted: true,
                     onPressed: () {
                       if (_urlController.text.isNotEmpty) {

@@ -102,19 +102,22 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
               decoration: InputDecoration(
                 isDense: true,
                 hintText: ' Search',
-                hintStyle:
-                    TextStyle(color: Theme.of(context).colorScheme.onSurface, letterSpacing: 1.1),
+                hintStyle: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface,
+                    letterSpacing: 1.1),
                 filled: true,
                 fillColor: _searchFocusNode.hasFocus
                     ? Theme.of(context).colorScheme.surface
                     : Paletter.getExtraDarkGray(context),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.all(Radius.circular(50.0)),
-                  borderSide: BorderSide(color: Paletter.getExtraDarkGray(context)),
+                  borderSide:
+                      BorderSide(color: Paletter.getExtraDarkGray(context)),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.all(Radius.circular(25.0)),
-                  borderSide: BorderSide(color: Theme.of(context).colorScheme.surface),
+                  borderSide:
+                      BorderSide(color: Theme.of(context).colorScheme.surface),
                 ),
               ),
               style: TextStyle(color: Theme.of(context).colorScheme.onSurface),

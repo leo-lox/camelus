@@ -168,7 +168,8 @@ class TitleWidget extends StatelessWidget {
     return badges.Badge(
       badgeAnimation: badges.BadgeAnimation.fade(),
       showBadge: false,
-      badgeContent: Text("", style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
+      badgeContent: Text("",
+          style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
       child: Text(
         "camelus",
         style: TextStyle(

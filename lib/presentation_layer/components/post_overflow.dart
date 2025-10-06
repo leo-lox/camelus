@@ -28,7 +28,9 @@ class PostOverflowIndicator extends StatelessWidget {
     // Determine color based on state
     final Color indicatorColor = isOverLimit
         ? Theme.of(context).colorScheme.error
-        : (isApproachingLimit ? Colors.orange : Theme.of(context).colorScheme.primary);
+        : (isApproachingLimit
+            ? Colors.orange
+            : Theme.of(context).colorScheme.primary);
 
     final Color borderColor = isOverLimit
         ? Theme.of(context).colorScheme.error

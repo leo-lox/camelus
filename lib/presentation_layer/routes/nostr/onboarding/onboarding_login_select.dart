@@ -44,8 +44,8 @@ class _OnboardingLoginSelectPageState
                 Row(
                   children: [
                     IconButton(
-                      icon:
-                          Icon(PhosphorIcons.arrowLeft(), color: Theme.of(context).colorScheme.onSurface),
+                      icon: Icon(PhosphorIcons.arrowLeft(),
+                          color: Theme.of(context).colorScheme.onSurface),
                       onPressed: () => widget.onPressedBack!(),
                     ),
                   ],

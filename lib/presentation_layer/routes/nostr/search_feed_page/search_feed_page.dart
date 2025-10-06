@@ -1,4 +1,5 @@
 import 'package:camelus/config/palette.dart';
+import 'package:camelus/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
@@ -60,15 +61,18 @@ class _SearchFeedPageState extends State<SearchFeedPage> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Search Help'),
-        content: const Text('Enter keywords to search for posts.'),
+        title: Text(AppLocalizations.of(context)!.searchHelp),
+        content: Text(AppLocalizations.of(context)!.searchHelpMessage),
         backgroundColor: Paletter.getDarkGray(context),
-        titleTextStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 18),
-        contentTextStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+        titleTextStyle: TextStyle(
+            color: Theme.of(context).colorScheme.onSurface, fontSize: 18),
+        contentTextStyle:
+            TextStyle(color: Theme.of(context).colorScheme.onSurface),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('OK', style: TextStyle(color: Theme.of(context).colorScheme.primary)),
+            child: Text(AppLocalizations.of(context)!.ok,
+                style: TextStyle(color: Theme.of(context).colorScheme.primary)),
           ),
         ],
       ),

@@ -50,7 +50,8 @@ class FileServersNotifier extends StateNotifier<AsyncValue<List<FileServer>>> {
           await ref.read(fileUploadProvider).getFileUploadServers([myPubkey!]);
 
       if (fetchedServers == null || fetchedServers.isEmpty) {
-        state = AsyncValue.error("no servers found", StackTrace.current);
+        state = AsyncValue.error(
+            "no servers found", StackTrace.current); // TODO add translation
         return;
       }
 
