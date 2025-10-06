@@ -15,12 +15,14 @@ import '../../providers/ndk_provider.dart';
 class NostrSideMenu extends ConsumerWidget {
   final Widget leadingWidget;
   final Widget trailingWidget;
+  final Widget trailingButtonWidget;
   final bool hideOnMobile;
 
   const NostrSideMenu({
     super.key,
     this.leadingWidget = const SizedBox(),
     this.trailingWidget = const SizedBox(),
+    this.trailingButtonWidget = const SizedBox(),
     this.hideOnMobile = false,
   });
 
@@ -226,6 +228,7 @@ class NostrSideMenu extends ConsumerWidget {
               onTap: () {
                 context.push('/nostr/blockedUsers');
               }),
+          trailingButtonWidget,
           const Spacer(),
           const Spacer(),
           _divider(context),

@@ -1,3 +1,6 @@
+import 'dart:ui';
+
+import 'package:camelus/presentation_layer/atoms/long_button.dart';
 import 'package:camelus/presentation_layer/routes/home_page_desktop.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -6,11 +9,13 @@ import 'package:go_router/go_router.dart';
 import 'domain_layer/entities/starter_pack_identifier.dart';
 import 'presentation_layer/components/app_bottom_navigation_bar/app_bottom_navigation_bar.dart';
 import 'presentation_layer/components/drawer/nostr_side_menu.dart';
+import 'presentation_layer/components/drawer/nostr_side_menu_post_button.dart';
 import 'presentation_layer/components/drawer/side_menu_logo.dart';
 import 'presentation_layer/components/relays_connectivity_widget.dart';
 import 'presentation_layer/components/starter_packs/edit_starter_pack/edit_starter_pack.dart';
 import 'presentation_layer/components/starter_packs/open_starter_pack.dart';
 import 'presentation_layer/components/update_check/update_check.dart';
+import 'presentation_layer/components/write_post.dart';
 import 'presentation_layer/layouts/mobile_bottom_menu_layout.dart';
 import 'presentation_layer/layouts/responsive_layout.dart';
 import 'presentation_layer/layouts/three_colum_layout.dart';
@@ -43,6 +48,10 @@ final routes = [
             return ResponsiveLayout(
               desktopContent: ThreeColumnLayout(
                 leftSidebar: NostrSideMenu(
+                  trailingButtonWidget: Padding(
+                      padding:
+                          const EdgeInsets.only(top: 40, left: 10, right: 10),
+                      child: NostrSideMenuPostButton()),
                   leadingWidget: SideMenuLogo(
                     trailingWidget: RelaysConnectivityWidget(
                       onTap: () {
