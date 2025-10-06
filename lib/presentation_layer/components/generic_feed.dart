@@ -137,6 +137,8 @@ class _GenericFeedState extends ConsumerState<GenericFeed>
                     pinned: true,
                     snap: widget.floatHeaderSlivers, // Snap if floating
                     forceElevated: innerBoxIsScrolled,
+                    backgroundColor: Theme.of(context).colorScheme.surface,
+                    surfaceTintColor: Theme.of(context).colorScheme.surface,
                     bottom: TabBar(
                       controller: _tabController!,
                       tabs: [

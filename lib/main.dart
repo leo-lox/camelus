@@ -181,6 +181,7 @@ class MyApp extends ConsumerWidget {
           dragDevices: {
             PointerDeviceKind.touch,
             PointerDeviceKind.mouse,
+            PointerDeviceKind.trackpad,
           },
         ),
         debugShowCheckedModeBanner: false,
