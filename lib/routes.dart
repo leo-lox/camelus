@@ -176,5 +176,13 @@ final routes = [
           path: '/onboarding',
           builder: (context, state) => const NostrOnboarding(),
         ),
+
+        /// needed to support old installations
+        GoRoute(
+          path: '/',
+          redirect: (context, state) {
+            return '/home';
+          },
+        ),
       ]),
 ];
