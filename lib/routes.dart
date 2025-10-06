@@ -1,3 +1,4 @@
+import 'package:camelus/presentation_layer/routes/home_page_desktop.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
@@ -11,7 +12,7 @@ import 'presentation_layer/components/update_check/update_check.dart';
 import 'presentation_layer/layouts/mobile_bottom_menu_layout.dart';
 import 'presentation_layer/layouts/responsive_layout.dart';
 import 'presentation_layer/layouts/three_colum_layout.dart';
-import 'presentation_layer/routes/home_page.dart';
+import 'presentation_layer/routes/home_page_mobile.dart';
 import 'presentation_layer/routes/nostr/blockedUsers/blocked_users.dart';
 import 'presentation_layer/routes/nostr/event_view/event_view_page.dart';
 import 'presentation_layer/routes/nostr/onboarding/onboarding.dart';
@@ -56,13 +57,16 @@ final routes = [
           routes: [
             GoRoute(
               path: '/home',
-              builder: (context, state) => const HomePage(
-                initialTab: '/',
+              builder: (context, state) => ResponsiveLayout(
+                desktopContent: const HomePageDesktop(),
+                mobileContent: const HomePageMobile(
+                  initialTab: '/',
+                ),
               ),
             ),
             GoRoute(
               path: '/posts-and-replies',
-              builder: (context, state) => const HomePage(
+              builder: (context, state) => const HomePageMobile(
                 initialTab: '/posts-and-replies',
               ),
             ),

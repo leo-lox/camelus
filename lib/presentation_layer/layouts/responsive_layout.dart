@@ -14,12 +14,18 @@ class ResponsiveLayout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        return constraints.maxWidth >= breakpoint
-            ? desktopContent
-            : mobileContent;
-      },
-    );
+    /// global width
+    final screenWidth = MediaQuery.of(context).size.width;
+
+    return screenWidth >= breakpoint ? desktopContent : mobileContent;
+
+    /// local width
+    //     return LayoutBuilder(
+    //   builder: (context, constraints) {
+    //     return constraints.maxWidth >= breakpoint
+    //         ? desktopContent
+    //         : mobileContent;
+    //   },
+    // );
   }
 }

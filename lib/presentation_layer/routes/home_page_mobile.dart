@@ -10,21 +10,21 @@ import '../providers/language_provider.dart';
 import '../providers/ndk_provider.dart';
 import 'nostr/nostr_page/nostr_page.dart';
 
-class HomePage extends ConsumerStatefulWidget {
+class HomePageMobile extends ConsumerStatefulWidget {
   final String? initialTab;
   final int initialPage;
 
-  const HomePage({
+  const HomePageMobile({
     super.key,
     this.initialTab,
     this.initialPage = 0,
   });
 
   @override
-  ConsumerState<HomePage> createState() => _HomePageState();
+  ConsumerState<HomePageMobile> createState() => _HomePageState();
 }
 
-class _HomePageState extends ConsumerState<HomePage> {
+class _HomePageState extends ConsumerState<HomePageMobile> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   void _show(BuildContext context) {
