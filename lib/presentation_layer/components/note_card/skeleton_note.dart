@@ -45,10 +45,7 @@ class SkeletonNote extends StatelessWidget {
                   child: const Icon(Icons.person),
                 ),
               ),
-              Container(
-                width: MediaQuery.of(context).size.width - 95,
-                margin: const EdgeInsets.only(left: 5, right: 10),
-                // color: Theme.of(context).colorScheme.surface,
+              Expanded(
                 child: Padding(
                   padding: const EdgeInsets.only(left: 10.0),
                   child: Column(
