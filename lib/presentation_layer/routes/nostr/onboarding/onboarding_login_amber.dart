@@ -1,6 +1,7 @@
 import 'package:amberflutter/amberflutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:url_launcher/url_launcher_string.dart';
@@ -10,7 +11,6 @@ import '../../../../domain_layer/usecases/app_auth.dart';
 import '../../../atoms/long_button.dart';
 import '../../../providers/ndk_provider.dart';
 import '../../../providers/signer_provider.dart';
-import '../../home_page.dart';
 
 class OnboardingLoginAmberPage extends ConsumerStatefulWidget {
   final Function? onPressedBack;
@@ -73,9 +73,7 @@ class _OnboardingLoginAmberPageState
 
     if (!mounted) return;
 
-    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
-      return HomePage(pubkey: amberSigner.publicKey);
-    }));
+    context.go('/home');
   }
 
   @override

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../../../config/palette.dart';
@@ -273,7 +274,7 @@ class _EditStarterPackSummaryState extends ConsumerState<EditStarterPackSummary>
                     inverted: false,
                     onPressed: () {
                       starterPackNotifier.reset();
-                      Navigator.pop(context);
+                      context.pop();
 
                       ref.invalidate(
                         editStarterPackProvider(widget.starterPackIdentifier),

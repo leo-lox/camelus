@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:camelus/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../config/palette.dart';
 import '../../../../domain_layer/entities/nostr_tag.dart';
@@ -134,7 +135,7 @@ class _BlockPageState extends ConsumerState<BlockPage> {
                         inverted: true,
                         name: AppLocalizations.of(context)!.goBack,
                         onPressed: () => {
-                              Navigator.pop(context),
+                              context.pop(),
                             }),
                   ),
                 ],

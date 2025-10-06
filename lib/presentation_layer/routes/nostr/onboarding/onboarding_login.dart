@@ -6,11 +6,11 @@ import 'package:camelus/presentation_layer/atoms/long_button.dart';
 import 'package:camelus/config/palette.dart';
 import 'package:camelus/helpers/bip340.dart';
 import 'package:camelus/helpers/helpers.dart';
-import 'package:camelus/presentation_layer/routes/home_page.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hex/hex.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ndk/ndk.dart';
@@ -162,11 +162,7 @@ class _OnboardingLoginPageState extends ConsumerState<OnboardingLoginPage> {
     setState(() {});
 
     // ignore: use_build_context_synchronously
-    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
-      return HomePage(pubkey: myKeys!.publicKey);
-    }));
-
-    //Navigator.popAndPushNamed(context, '/');
+    context.go('/home');
   }
 
   bool _checkWord(String word) {

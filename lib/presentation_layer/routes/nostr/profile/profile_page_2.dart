@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../config/palette.dart';
@@ -84,7 +85,7 @@ class ProfilePage2 extends ConsumerWidget {
                                   BlockPage(userPubkey: pubkey),
                             ),
                           ).then((value) => {
-                                Navigator.pop(context),
+                                context.pop(),
                               })
                         }
                     },
@@ -276,11 +277,8 @@ class _BuildProfileHeader extends ConsumerWidget {
                           longButton(
                               name: AppLocalizations.of(context)!.edit,
                               onPressed: () {
-                                Navigator.pushNamed(
-                                  context,
-                                  '/nostr/profile/edit',
-                                  arguments: userMetadata.pubkey,
-                                );
+                                context.push(
+                                    '/nostr/profile/${userMetadata.pubkey}/edit');
                               })
                       ],
                     ),

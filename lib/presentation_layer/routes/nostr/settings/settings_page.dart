@@ -3,6 +3,7 @@ import 'package:camelus/l10n/app_localizations.dart';
 import 'package:camelus/presentation_layer/providers/ndk_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 class SettingsPage extends ConsumerStatefulWidget {
   const SettingsPage({super.key});
@@ -26,15 +27,15 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
       return;
     }
 
-    Navigator.pushNamedAndRemoveUntil(context, '/onboarding', (route) => false);
+    context.go('/onboarding');
   }
 
   void _navigateToFileServers() {
-    Navigator.pushNamed(context, '/settings/file-servers');
+    context.push('/settings/file-servers');
   }
 
   void _navigateToInitalRoute() {
-    Navigator.pushNamed(context, '/settings/inital-route');
+    context.push('/settings/initial-route');
   }
 
   @override
@@ -48,7 +49,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
           ListTile(
             title: Text(AppLocalizations.of(context)!.languageSettings),
             onTap: () {
-              Navigator.pushNamed(context, '/settings/locale');
+              context.push('/settings/locale');
             },
           ),
           ListTile(
@@ -60,7 +61,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
           ListTile(
             title: Text(AppLocalizations.of(context)!.moderation),
             onTap: () {
-              Navigator.pushNamed(context, '/settings/moderation');
+              context.push('/settings/moderation');
             },
           ),
           ListTile(

@@ -1,6 +1,7 @@
 import 'package:camelus/config/palette.dart';
 import 'package:camelus/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../../domain_layer/entities/feed_filter.dart';
@@ -70,7 +71,7 @@ class _SearchFeedPageState extends State<SearchFeedPage> {
             TextStyle(color: Theme.of(context).colorScheme.onSurface),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => context.pop(),
             child: Text(AppLocalizations.of(context)!.ok,
                 style: TextStyle(color: Theme.of(context).colorScheme.primary)),
           ),
@@ -110,7 +111,8 @@ class _SearchFeedPageState extends State<SearchFeedPage> {
               leading: IconButton(
                 icon: Icon(PhosphorIcons.arrowLeft()),
                 onPressed: () {
-                  Navigator.pop(context);
+                  context.pop();
+                  ;
                 },
               ),
             ),

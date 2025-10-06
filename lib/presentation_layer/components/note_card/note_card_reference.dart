@@ -7,6 +7,7 @@ import 'package:camelus/presentation_layer/components/note_card/skeleton_note.da
 import 'package:camelus/presentation_layer/providers/get_notes_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../providers/metadata_state_provider.dart';
 import 'nostr_parser.dart';
@@ -95,9 +96,9 @@ class NoteCardReference extends ConsumerWidget {
                 const SizedBox(height: 20),
                 GestureDetector(
                   onTap: () {
-                    Navigator.pushNamed(context, "/nostr/event", arguments: {
-                      "root": note.id,
-                      "scrollIntoView": note.id,
+                    context.push('/nostr/event', extra: {
+                      'root': note.id,
+                      'scrollIntoView': note.id,
                     });
                   },
                   child: Container(

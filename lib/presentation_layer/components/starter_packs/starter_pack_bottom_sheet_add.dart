@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../config/palette.dart';
@@ -301,7 +302,7 @@ class _StarterPackSelectionBottomSheetState
       // Auto-close bottom sheet after success
       Future.delayed(const Duration(milliseconds: 1500)).then((_) {
         if (mounted) {
-          Navigator.pop(context);
+          context.pop();
         }
       });
     } catch (error) {
@@ -342,13 +343,10 @@ class _StarterPackSelectionBottomSheetState
   }
 
   void _createNewPack(BuildContext context) {
-    Navigator.pushNamed(
-      context,
-      '/edit-starter-pack',
-      arguments: StarterPackIdentifier(
-        name: "i-${Helpers().getRandomString(10)}",
-        pubkey: widget.currentUserPubkey,
-      ),
-    );
+    context.push('/edit-starter-pack',
+        extra: StarterPackIdentifier(
+          name: "i-${Helpers().getRandomString(10)}",
+          pubkey: widget.currentUserPubkey,
+        ));
   }
 }

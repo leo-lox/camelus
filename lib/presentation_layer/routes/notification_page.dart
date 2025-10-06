@@ -11,19 +11,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_list_view/flutter_list_view.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 import '../components/enable_notifications.dart';
 import '../components/note_card/no_more_notes.dart';
 import '../components/note_card/nostr_parser.dart';
+import '../providers/ndk_provider.dart';
 import '../providers/notification_feed_provider.dart';
 
 class NotificationPage extends ConsumerStatefulWidget {
-  final String pubkey;
   const NotificationPage({
     super.key,
-    required this.pubkey,
   });
 
   @override
@@ -48,8 +48,10 @@ class _NotificationPageState extends ConsumerState<NotificationPage>
 
   @override
   Widget build(BuildContext context) {
+    final currentUserPubkey = ref.read(ndkProvider).accounts.getPublicKey()!;
+
     final notificationsState =
-        ref.watch(notificationsStateProvider(widget.pubkey));
+        ref.watch(notificationsStateProvider(currentUserPubkey));
 
     // Combine both lists for display, with new notifications at the top
     final allNotifications = [
@@ -75,7 +77,8 @@ class _NotificationPageState extends ConsumerState<NotificationPage>
               onPressed: () {
                 // Mark all notifications as read
                 ref
-                    .read(notificationsStateProvider(widget.pubkey).notifier)
+                    .read(
+                        notificationsStateProvider(currentUserPubkey).notifier)
                     .integrateNewNotifications();
               },
             ),
@@ -108,7 +111,12 @@ class _NotificationPageState extends ConsumerState<NotificationPage>
                     await Future.delayed(Duration.zero);
                   },
                   child: _buildNotificationList(
-                      context, ref, allNotifications, notificationsState),
+                    context,
+                    ref,
+                    allNotifications,
+                    notificationsState,
+                    currentUserPubkey,
+                  ),
                 ),
 
                 // Mentions tab
@@ -117,7 +125,12 @@ class _NotificationPageState extends ConsumerState<NotificationPage>
                     await Future.delayed(Duration.zero);
                   },
                   child: _buildNotificationList(
-                      context, ref, mentionNotifications, notificationsState),
+                    context,
+                    ref,
+                    mentionNotifications,
+                    notificationsState,
+                    currentUserPubkey,
+                  ),
                 ),
               ],
             ),
@@ -153,8 +166,13 @@ class _NotificationPageState extends ConsumerState<NotificationPage>
     );
   }
 
-  Widget _buildNotificationList(BuildContext context, WidgetRef ref,
-      List<NostrNotification> notifications, NotificationViewModel state) {
+  Widget _buildNotificationList(
+    BuildContext context,
+    WidgetRef ref,
+    List<NostrNotification> notifications,
+    NotificationViewModel state,
+    String pubkey,
+  ) {
     if (notifications.isEmpty && state.endOfNotifications) {
       return _buildEmptyState("no notifications");
     }
@@ -176,7 +194,7 @@ class _NotificationPageState extends ConsumerState<NotificationPage>
               hideBottomAction: true,
               renderCallback: () {
                 ref
-                    .read(notificationsStateProvider(widget.pubkey).notifier)
+                    .read(notificationsStateProvider(pubkey).notifier)
                     .loadMore();
               },
             )),
@@ -389,11 +407,11 @@ class _NotificationPageState extends ConsumerState<NotificationPage>
   }
 
   void _navigateToPost(BuildContext context, NostrNotification notification) {
-    Navigator.pushNamed(context, "/nostr/event", arguments: <String, String?>{
-      "root": notification.sourceNote.getRootReply?.value ??
+    context.push('/nostr/event', extra: {
+      'root': notification.sourceNote.getRootReply?.value ??
           notification.targetNoteId ??
           notification.sourceNote.id,
-      "scrollIntoView": notification.sourceNote.id
+      'scrollIntoView': notification.sourceNote.id,
     });
   }
 }

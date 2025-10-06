@@ -1,7 +1,7 @@
 import '../repositories/app_db.dart';
 
 class InitialRoute {
-  static const defaultRoute = '/';
+  static const defaultRoute = '/home';
 
   final AppDb _appDb;
 

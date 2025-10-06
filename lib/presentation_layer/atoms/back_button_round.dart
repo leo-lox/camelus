@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class BackButtonRound extends StatelessWidget {
   const BackButtonRound({
@@ -15,7 +16,7 @@ class BackButtonRound extends StatelessWidget {
         height: 1,
         child: ElevatedButton(
           onPressed: () {
-            Navigator.pop(context);
+            context.pop();
           },
           style: ElevatedButton.styleFrom(
             backgroundColor:

@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:camelus/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../../config/palette.dart';
 import '../../../../atoms/long_button.dart';
@@ -246,7 +247,7 @@ class SettingsFileServersPageState extends ConsumerState<SettingsFileServers> {
                                       .restoreDefaultsMessage),
                                   actions: [
                                     TextButton(
-                                      onPressed: () => Navigator.pop(context),
+                                      onPressed: () => context.pop(),
                                       child: Text(
                                           AppLocalizations.of(context)!.cancel),
                                     ),
@@ -255,7 +256,7 @@ class SettingsFileServersPageState extends ConsumerState<SettingsFileServers> {
                                         ref
                                             .read(fileServersProvider.notifier)
                                             .restoreDefaults();
-                                        Navigator.pop(context);
+                                        context.pop();
                                       },
                                       child: Text(AppLocalizations.of(context)!
                                           .restore),

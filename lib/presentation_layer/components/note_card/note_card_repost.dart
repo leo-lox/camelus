@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../config/palette.dart';
 import '../../../domain_layer/entities/nostr_note.dart';
@@ -58,8 +59,7 @@ class NoteCardRepost extends ConsumerWidget {
                 onTap: () {
                   // navigate to the profile of the user who reposted
 
-                  Navigator.pushNamed(context, "/nostr/profile",
-                      arguments: repostEvent.pubkey);
+                  context.push('/nostr/profile/${repostEvent.pubkey}');
                 },
                 child: RichText(
                   maxLines: 1,

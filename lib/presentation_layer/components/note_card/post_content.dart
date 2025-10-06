@@ -4,6 +4,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_link_previewer/flutter_link_previewer.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
@@ -256,15 +257,11 @@ class PostContentWidget extends ConsumerWidget {
   }
 
   void _openUserProfile(BuildContext context, String pubkey) {
-    Navigator.pushNamed(
-      context,
-      "/nostr/profile",
-      arguments: pubkey,
-    );
+    context.push('/nostr/profile/$pubkey');
   }
 
   void _openHashtag(BuildContext context, String hashtag) {
-    Navigator.pushNamed(context, "/nostr/search", arguments: "#$hashtag");
+    context.push('/nostr/search', extra: "#$hashtag");
   }
 
   void _openLink(String url) {

@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:camelus/domain_layer/entities/parsed_post.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../config/palette.dart';
 import '../../../data_layer/models/post_context.dart';
@@ -145,8 +146,7 @@ class NoteCard extends ConsumerWidget {
 
   Widget _buildUserImage(BuildContext context) {
     return GestureDetector(
-      onTap: () => Navigator.pushNamed(context, "/nostr/profile",
-          arguments: note.pubkey),
+      onTap: () => context.push('/nostr/profile/${note.pubkey}'),
       child: UserImage(
         imageUrl: myMetadata?.picture,
         pubkey: note.pubkey,
