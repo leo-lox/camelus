@@ -6,6 +6,8 @@ import 'package:go_router/go_router.dart';
 import 'domain_layer/entities/starter_pack_identifier.dart';
 import 'presentation_layer/components/app_bottom_navigation_bar/app_bottom_navigation_bar.dart';
 import 'presentation_layer/components/drawer/nostr_side_menu.dart';
+import 'presentation_layer/components/drawer/side_menu_logo.dart';
+import 'presentation_layer/components/relays_connectivity_widget.dart';
 import 'presentation_layer/components/starter_packs/edit_starter_pack/edit_starter_pack.dart';
 import 'presentation_layer/components/starter_packs/open_starter_pack.dart';
 import 'presentation_layer/components/update_check/update_check.dart';
@@ -18,6 +20,7 @@ import 'presentation_layer/routes/nostr/event_view/event_view_page.dart';
 import 'presentation_layer/routes/nostr/onboarding/onboarding.dart';
 import 'presentation_layer/routes/nostr/profile/edit_profile_page.dart';
 import 'presentation_layer/routes/nostr/profile/profile_page_2.dart';
+import 'presentation_layer/routes/nostr/relays_page.dart';
 import 'presentation_layer/routes/nostr/search_feed_page/search_feed_page.dart';
 import 'presentation_layer/routes/nostr/settings/file_servers/settings_file_servers.dart';
 import 'presentation_layer/routes/nostr/settings/inital_route/inital_route_settings.dart';
@@ -40,9 +43,12 @@ final routes = [
             return ResponsiveLayout(
               desktopContent: ThreeColumnLayout(
                 leftSidebar: NostrSideMenu(
-                  leadingWidget: Container(
-                    color: Colors.amber,
-                    height: 50,
+                  leadingWidget: SideMenuLogo(
+                    trailingWidget: RelaysConnectivityWidget(
+                      onTap: () {
+                        context.push('/nostr/relays');
+                      },
+                    ),
                   ),
                 ),
                 mainContent: child,
@@ -108,6 +114,12 @@ final routes = [
                   rootNoteId: args['root'] as String,
                   openNoteId: args['scrollIntoView'] as String?,
                 );
+              },
+            ),
+            GoRoute(
+              path: '/nostr/relays',
+              builder: (context, state) {
+                return RelaysPage();
               },
             ),
             GoRoute(

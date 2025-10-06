@@ -7,14 +7,17 @@ import 'package:camelus/presentation_layer/providers/metadata_state_provider.dar
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:badges/badges.dart' as badges;
+import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../../config/palette.dart';
 import '../../../../domain_layer/entities/feed_filter.dart';
 
+import '../atoms/app_logo.dart';
 import '../atoms/my_profile_picture.dart';
 import '../components/drawer/nostr_drawer.dart';
 import '../components/generic_feed.dart';
+import '../components/relays_connectivity_widget.dart';
 import '../components/write_post.dart';
 import '../providers/following_contact_state_provider.dart';
 import '../providers/ndk_provider.dart';
@@ -54,28 +57,6 @@ class _HomePageMobileState extends ConsumerState<HomePageMobile>
                       bottom: MediaQuery.of(context).viewInsets.bottom),
                   child: const WritePost()),
             ));
-  }
-
-  void _openRelaysView(BuildContext context) {
-    Navigator.of(context).push(
-      PageRouteBuilder(
-        pageBuilder: (context, animation, secondaryAnimation) =>
-            const RelaysPage(),
-        transitionsBuilder: (context, animation, secondaryAnimation, child) {
-          return ScaleTransition(
-            alignment: Alignment.topRight,
-            scale: animation,
-            child: SlideTransition(
-              position: Tween<Offset>(
-                begin: const Offset(0.0, 0.2),
-                end: Offset.zero,
-              ).animate(animation),
-              child: child,
-            ),
-          );
-        },
-      ),
-    );
   }
 
   @override
@@ -128,12 +109,13 @@ class _HomePageMobileState extends ConsumerState<HomePageMobile>
                   leading: MobileFeedHeader(
                     scaffoldKey: _scaffoldKey,
                     pubkey: currentUserPubkey,
-                    onRelaysTap: () => _openRelaysView(context),
                   ),
                   centerTitle: true,
-                  title: const TitleWidget(),
+                  title: const AppLogo(),
                   actions: [
-                    RelaysWidget(onTap: () => _openRelaysView(context)),
+                    RelaysConnectivityWidget(
+                      onTap: () => context.push('/nostr/relays'),
+                    ),
                     if (Platform.isWindows ||
                         Platform.isLinux ||
                         Platform.isMacOS)
@@ -169,13 +151,11 @@ class _HomePageMobileState extends ConsumerState<HomePageMobile>
 class MobileFeedHeader extends ConsumerWidget {
   final GlobalKey<ScaffoldState> scaffoldKey;
   final String pubkey;
-  final VoidCallback onRelaysTap;
 
   const MobileFeedHeader({
     super.key,
     required this.scaffoldKey,
     required this.pubkey,
-    required this.onRelaysTap,
   });
 
   @override
@@ -191,78 +171,6 @@ class MobileFeedHeader extends ConsumerWidget {
           imageUrl: myMetadata?.picture,
           pubkey: pubkey,
         ),
-      ),
-    );
-  }
-}
-
-class TitleWidget extends StatelessWidget {
-  const TitleWidget({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return badges.Badge(
-      badgeAnimation: badges.BadgeAnimation.fade(),
-      showBadge: false,
-      badgeContent: Text("",
-          style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
-      child: Text(
-        "camelus",
-        style: TextStyle(
-          letterSpacing: 1.2,
-          color: Paletter.getLightGray(context),
-          fontSize: 20,
-          fontWeight: FontWeight.normal,
-          fontFamily: "Poppins",
-        ),
-      ),
-    );
-  }
-}
-
-class RelaysWidget extends ConsumerWidget {
-  final VoidCallback onTap;
-
-  const RelaysWidget({super.key, required this.onTap});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final ndk = ref.watch(ndkProvider);
-
-    return GestureDetector(
-      onTap: onTap,
-      child: StreamBuilder(
-        stream: ndk.connectivity.relayConnectivityChanges,
-        builder: (context, snapshot) {
-          final isConnected = snapshot.hasData &&
-              snapshot.data!.isNotEmpty &&
-              snapshot.data!.values.any((e) => e.isConnected);
-
-          final connectedCount = snapshot.hasData && snapshot.data!.isNotEmpty
-              ? snapshot.data!.values.where((e) => e.isConnected).length
-              : 0;
-
-          log("Stream updated: isConnected=$isConnected, count=$connectedCount");
-          return Row(
-            children: [
-              Icon(
-                isConnected
-                    ? PhosphorIcons.cellSignalFull()
-                    : PhosphorIcons.cellSignalSlash(),
-                key: ValueKey(isConnected),
-              ),
-              const SizedBox(width: 5),
-              Text(
-                connectedCount.toString(),
-                style: TextStyle(
-                  color: Paletter.getLightGray(context),
-                ),
-                key: ValueKey(connectedCount),
-              ),
-              const SizedBox(width: 5),
-            ],
-          );
-        },
       ),
     );
   }
