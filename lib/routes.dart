@@ -1,15 +1,14 @@
-import 'package:camelus/presentation_layer/components/app_bottom_navigation_bar/app_bottom_navigation_bar.dart';
-import 'package:camelus/presentation_layer/layouts/mobile_bottom_menu_layout.dart';
-import 'package:camelus/presentation_layer/routes/notification_page.dart';
-import 'package:camelus/presentation_layer/routes/search_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
 
 import 'domain_layer/entities/starter_pack_identifier.dart';
+import 'presentation_layer/components/app_bottom_navigation_bar/app_bottom_navigation_bar.dart';
 import 'presentation_layer/components/drawer/nostr_side_menu.dart';
 import 'presentation_layer/components/starter_packs/edit_starter_pack/edit_starter_pack.dart';
 import 'presentation_layer/components/starter_packs/open_starter_pack.dart';
+import 'presentation_layer/components/update_check/update_check.dart';
+import 'presentation_layer/layouts/mobile_bottom_menu_layout.dart';
 import 'presentation_layer/layouts/responsive_layout.dart';
 import 'presentation_layer/layouts/three_colum_layout.dart';
 import 'presentation_layer/routes/home_page.dart';
@@ -24,127 +23,136 @@ import 'presentation_layer/routes/nostr/settings/inital_route/inital_route_setti
 import 'presentation_layer/routes/nostr/settings/locale/locale_settings.dart';
 import 'presentation_layer/routes/nostr/settings/moderation/moderation_settings.dart';
 import 'presentation_layer/routes/nostr/settings/settings_page.dart';
+import 'presentation_layer/routes/notification_page.dart';
+import 'presentation_layer/routes/search_page.dart';
 
 final routes = [
-  // Shell route for persistent layout
+  /// global shell
   ShellRoute(
-    builder: (context, state, child) {
-      return ResponsiveLayout(
-        desktopContent: ThreeColumnLayout(
-          leftSidebar: NostrSideMenu(
-            leadingWidget: Container(
-              color: Colors.amber,
-              height: 50,
+      builder: (context, state, child) {
+        return UpdateCheck(child: child);
+      },
+      routes: [
+        // Shell route for persistent layout
+        ShellRoute(
+          builder: (context, state, child) {
+            return ResponsiveLayout(
+              desktopContent: ThreeColumnLayout(
+                leftSidebar: NostrSideMenu(
+                  leadingWidget: Container(
+                    color: Colors.amber,
+                    height: 50,
+                  ),
+                ),
+                mainContent: child,
+                rightSidebar: Container(color: Colors.deepOrange),
+              ),
+              mobileContent: MobileBottomMenuLayout(
+                mainContent: child,
+                bottomNavigationBar: AppBottomNavigationBar(),
+              ),
+            );
+          },
+          routes: [
+            GoRoute(
+              path: '/home',
+              builder: (context, state) => const HomePage(
+                initialTab: '/',
+              ),
             ),
-          ),
-          mainContent: child,
-          rightSidebar: Container(color: Colors.deepOrange),
-        ),
-        mobileContent: MobileBottomMenuLayout(
-          mainContent: child,
-          bottomNavigationBar: AppBottomNavigationBar(),
-        ),
-      );
-    },
-    routes: [
-      GoRoute(
-        path: '/home',
-        builder: (context, state) => const HomePage(
-          initialTab: '/',
-        ),
-      ),
-      GoRoute(
-        path: '/posts-and-replies',
-        builder: (context, state) => const HomePage(
-          initialTab: '/posts-and-replies',
-        ),
-      ),
-      GoRoute(
-        path: '/search',
-        builder: (context, state) => const SearchPage(),
-      ),
-      GoRoute(
-        path: '/notifications',
-        builder: (context, state) => const NotificationPage(),
-      ),
-      GoRoute(
-        path: '/settings',
-        builder: (context, state) => const SettingsPage(),
-        routes: [
-          GoRoute(
-            path: 'file-servers',
-            builder: (context, state) => const SettingsFileServers(),
-          ),
-          GoRoute(
-            path: 'initial-route',
-            builder: (context, state) => const InitalRouteSettings(),
-          ),
-          GoRoute(
-            path: 'locale',
-            builder: (context, state) => const LocaleSettingsPage(),
-          ),
-          GoRoute(
-            path: 'moderation',
-            builder: (context, state) => const ModerationSettingsPage(),
-          ),
-        ],
-      ),
-      GoRoute(
-        path: '/nostr/event',
-        builder: (context, state) {
-          final args = state.extra as Map<String, dynamic>;
-          return EventViewPage(
-            rootNoteId: args['root'] as String,
-            openNoteId: args['scrollIntoView'] as String?,
-          );
-        },
-      ),
-      GoRoute(
-        path: '/nostr/profile/:pubkey',
-        builder: (context, state) => ProfilePage2(
-          pubkey: state.pathParameters['pubkey']!,
-        ),
-        routes: [
-          GoRoute(
-            path: 'edit',
-            builder: (context, state) => EditProfilePage(
-              pubkey: state.pathParameters['pubkey']!,
+            GoRoute(
+              path: '/posts-and-replies',
+              builder: (context, state) => const HomePage(
+                initialTab: '/posts-and-replies',
+              ),
             ),
-          ),
-        ],
-      ),
-      GoRoute(
-        path: '/nostr/search',
-        pageBuilder: (context, state) => CustomTransitionPage(
-          key: state.pageKey,
-          child: SearchFeedPage(query: state.extra as String),
-          transitionDuration: Duration.zero,
-          reverseTransitionDuration: Duration.zero,
-          transitionsBuilder: (context, animation, secondaryAnimation, child) =>
-              child,
+            GoRoute(
+              path: '/search',
+              builder: (context, state) => const SearchPage(),
+            ),
+            GoRoute(
+              path: '/notifications',
+              builder: (context, state) => const NotificationPage(),
+            ),
+            GoRoute(
+              path: '/settings',
+              builder: (context, state) => const SettingsPage(),
+              routes: [
+                GoRoute(
+                  path: 'file-servers',
+                  builder: (context, state) => const SettingsFileServers(),
+                ),
+                GoRoute(
+                  path: 'initial-route',
+                  builder: (context, state) => const InitalRouteSettings(),
+                ),
+                GoRoute(
+                  path: 'locale',
+                  builder: (context, state) => const LocaleSettingsPage(),
+                ),
+                GoRoute(
+                  path: 'moderation',
+                  builder: (context, state) => const ModerationSettingsPage(),
+                ),
+              ],
+            ),
+            GoRoute(
+              path: '/nostr/event',
+              builder: (context, state) {
+                final args = state.extra as Map<String, dynamic>;
+                return EventViewPage(
+                  rootNoteId: args['root'] as String,
+                  openNoteId: args['scrollIntoView'] as String?,
+                );
+              },
+            ),
+            GoRoute(
+              path: '/nostr/profile/:pubkey',
+              builder: (context, state) => ProfilePage2(
+                pubkey: state.pathParameters['pubkey']!,
+              ),
+              routes: [
+                GoRoute(
+                  path: 'edit',
+                  builder: (context, state) => EditProfilePage(
+                    pubkey: state.pathParameters['pubkey']!,
+                  ),
+                ),
+              ],
+            ),
+            GoRoute(
+              path: '/nostr/search',
+              pageBuilder: (context, state) => CustomTransitionPage(
+                key: state.pageKey,
+                child: SearchFeedPage(query: state.extra as String),
+                transitionDuration: Duration.zero,
+                reverseTransitionDuration: Duration.zero,
+                transitionsBuilder:
+                    (context, animation, secondaryAnimation, child) => child,
+              ),
+            ),
+            GoRoute(
+              path: '/nostr/blockedUsers',
+              builder: (context, state) => const BlockedUsers(),
+            ),
+            GoRoute(
+              path: '/edit-starter-pack',
+              builder: (context, state) => EditStarterPack(
+                starterPackIdentifier: state.extra as StarterPackIdentifier,
+              ),
+            ),
+            GoRoute(
+              path: '/open-starter-pack',
+              builder: (context, state) => OpenStarterPack(
+                starterPackIdentifier: state.extra as StarterPackIdentifier,
+              ),
+            ),
+          ],
         ),
-      ),
-      GoRoute(
-        path: '/nostr/blockedUsers',
-        builder: (context, state) => const BlockedUsers(),
-      ),
-      GoRoute(
-        path: '/edit-starter-pack',
-        builder: (context, state) => EditStarterPack(
-          starterPackIdentifier: state.extra as StarterPackIdentifier,
+        // Routes outside the shell (no persistent layout)
+        GoRoute(
+          path: '/onboarding',
+          builder: (context, state) => const NostrOnboarding(),
         ),
-      ),
-      GoRoute(
-        path: '/open-starter-pack',
-        builder: (context, state) => OpenStarterPack(
-          starterPackIdentifier: state.extra as StarterPackIdentifier,
-        ),
-      ),
-    ],
-  ),
-  // Routes outside the shell (no persistent layout)
-  GoRoute(
-    path: '/onboarding',
-    builder: (context, state) => const NostrOnboarding(),
-  ),
+      ]),
 ];
