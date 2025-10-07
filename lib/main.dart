@@ -1,8 +1,6 @@
 import 'dart:io';
 import 'dart:ui';
 
-import 'package:camelus/theme.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 
 import 'package:flutter/material.dart';
@@ -16,14 +14,11 @@ import 'l10n/app_localizations.dart';
 //import 'data_layer/db/object_box_ndk/db_object_box.dart';
 import 'config/camelus_config.dart';
 
-import 'lifecycle/connectivity/connectivity.dart';
-import 'lifecycle/deep_links.dart';
 import 'domain_layer/usecases/app_auth.dart';
 import 'lifecycle/notifications/init_firebase.dart';
 import 'lifecycle/notifications/notifications_caller.dart';
 import 'objectbox_isolate.dart';
 import 'presentation_layer/init/init_moderation.dart';
-import 'presentation_layer/providers/app_lifecycle_provider.dart';
 import 'presentation_layer/providers/db_app_provider.dart';
 import 'presentation_layer/providers/db_ndk_provider.dart';
 import 'presentation_layer/providers/inbox_outbox_provider.dart';
@@ -31,7 +26,7 @@ import 'presentation_layer/providers/language_provider.dart';
 import 'presentation_layer/providers/ndk_provider.dart';
 import 'presentation_layer/providers/signer_provider.dart';
 import 'routes.dart';
-import 'theme.dart' as theme;
+import 'theme.dart';
 
 const devDeviceFrame = true;
 
@@ -140,15 +135,6 @@ Future<void> main() async {
       ),
     ),
   );
-
-  listenDeeplinks(
-    providerContainer: providerContainer,
-  );
-
-  listenToConnectivityChanges(providerContainer);
-
-  // init lifecycle
-  providerContainer.read(appLifecycleProvider);
 }
 
 class MyApp extends ConsumerWidget {
@@ -171,6 +157,8 @@ class MyApp extends ConsumerWidget {
       navigatorKey: navigatorKey,
       initialLocation: initialRoute,
       routes: routes,
+      redirect: (c, s) => redirects(c, s),
+      debugLogDiagnostics: true,
     );
 
     return Portal(
