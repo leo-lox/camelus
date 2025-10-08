@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:system_theme/system_theme.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:flutter_mentions/flutter_mentions.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -61,6 +62,8 @@ Future<void> main() async {
       windowOptions,
     );
   }
+
+  await SystemTheme.accentColor.load();
 
   final initalData = await _getInitialData();
 
@@ -197,6 +200,12 @@ class _MyAppState extends ConsumerState<MyApp> {
     final ThemeData darkTheme;
 
     switch (themeType) {
+      case ThemeType.system:
+        // Use system accent color
+        final systemAccentColor = SystemTheme.accentColor.accent;
+        lightTheme = theme.buildLightTheme(systemAccentColor);
+        darkTheme = theme.buildDarkTheme(systemAccentColor);
+        break;
       case ThemeType.camelus:
         lightTheme = theme.camelusLightTheme;
         darkTheme = theme.camelusDarkTheme;

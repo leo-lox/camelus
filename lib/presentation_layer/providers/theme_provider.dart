@@ -126,6 +126,7 @@ enum ThemeType {
   camelus,
   nostr,
   custom,
+  system,
 }
 
 class ThemeTypeNotifier extends StateNotifier<ThemeType> {
@@ -158,6 +159,8 @@ class ThemeTypeNotifier extends StateNotifier<ThemeType> {
         return 'nostr';
       case ThemeType.custom:
         return 'custom';
+      case ThemeType.system:
+        return 'system';
     }
   }
 
@@ -169,6 +172,8 @@ class ThemeTypeNotifier extends StateNotifier<ThemeType> {
         return ThemeType.nostr;
       case 'custom':
         return ThemeType.custom;
+      case 'system':
+        return ThemeType.system;
       default:
         return ThemeType.custom;
     }

@@ -37,6 +37,30 @@ class ThemeSettingsPage extends ConsumerWidget {
 
           ListTile(
             title: Text(
+              'System',
+              style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant),
+            ),
+            leading: Icon(
+              PhosphorIcons.circleHalf(),
+              color: Theme.of(context).colorScheme.onSurface,
+            ),
+            trailing: themeMode == ThemeMode.system
+                ? Icon(
+                    PhosphorIcons.check(),
+                    color: Theme.of(context).colorScheme.primary,
+                  )
+                : null,
+            onTap: () {
+              ref
+                  .read(themeModeProvider.notifier)
+                  .setThemeMode(ThemeMode.system);
+            },
+            tileColor: Theme.of(context).colorScheme.surface,
+          ),
+
+          ListTile(
+            title: Text(
               'Light',
               style: TextStyle(
                   color: Theme.of(context).colorScheme.onSurfaceVariant),
@@ -81,30 +105,6 @@ class ThemeSettingsPage extends ConsumerWidget {
             tileColor: Theme.of(context).colorScheme.surface,
           ),
 
-          ListTile(
-            title: Text(
-              'System',
-              style: TextStyle(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant),
-            ),
-            leading: Icon(
-              PhosphorIcons.circleHalf(),
-              color: Theme.of(context).colorScheme.onSurface,
-            ),
-            trailing: themeMode == ThemeMode.system
-                ? Icon(
-                    PhosphorIcons.check(),
-                    color: Theme.of(context).colorScheme.primary,
-                  )
-                : null,
-            onTap: () {
-              ref
-                  .read(themeModeProvider.notifier)
-                  .setThemeMode(ThemeMode.system);
-            },
-            tileColor: Theme.of(context).colorScheme.surface,
-          ),
-
           Divider(
               color: Theme.of(context).colorScheme.outlineVariant, height: 32),
 
@@ -119,6 +119,30 @@ class ThemeSettingsPage extends ConsumerWidget {
                 color: Theme.of(context).colorScheme.primary,
               ),
             ),
+          ),
+
+          ListTile(
+            title: Text(
+              'System',
+              style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant),
+            ),
+            leading: Icon(
+              PhosphorIcons.circleHalf(),
+              color: Theme.of(context).colorScheme.onSurface,
+            ),
+            trailing: themeType == ThemeType.system
+                ? Icon(
+                    PhosphorIcons.check(),
+                    color: Theme.of(context).colorScheme.primary,
+                  )
+                : null,
+            onTap: () {
+              ref
+                  .read(themeTypeProvider.notifier)
+                  .setThemeType(ThemeType.system);
+            },
+            tileColor: Theme.of(context).colorScheme.surface,
           ),
 
           ListTile(

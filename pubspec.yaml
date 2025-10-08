@@ -102,6 +102,7 @@ dependencies:
   timeago: ^3.7.1
   flutter_localizations:
     sdk: flutter
+  system_theme: ^3.1.2
 
   
 

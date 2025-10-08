@@ -11,6 +11,7 @@ list(APPEND FLUTTER_PLUGIN_LIST
   objectbox_flutter_libs
   screen_retriever_windows
   share_plus
+  system_theme
   url_launcher_windows
   window_manager
 )
