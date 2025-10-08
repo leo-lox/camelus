@@ -121,3 +121,60 @@ class ThemeColorNotifier extends StateNotifier<Color> {
 final themeColorProvider = StateNotifierProvider<ThemeColorNotifier, Color>((ref) {
   return ThemeColorNotifier(ref);
 });
+
+enum ThemeType {
+  camelus,
+  nostr,
+  custom,
+}
+
+class ThemeTypeNotifier extends StateNotifier<ThemeType> {
+  final Ref ref;
+
+  ThemeTypeNotifier(this.ref) : super(ThemeType.custom) {
+    _loadThemeType();
+  }
+
+  Future<void> _loadThemeType() async {
+    final appDb = ref.read(dbAppProvider);
+    final savedType = await appDb.read('themeType');
+
+    if (savedType != null) {
+      state = _themeTypeFromString(savedType);
+    }
+  }
+
+  Future<void> setThemeType(ThemeType type) async {
+    state = type;
+    final appDb = ref.read(dbAppProvider);
+    await appDb.save(key: 'themeType', value: _themeTypeToString(type));
+  }
+
+  String _themeTypeToString(ThemeType type) {
+    switch (type) {
+      case ThemeType.camelus:
+        return 'camelus';
+      case ThemeType.nostr:
+        return 'nostr';
+      case ThemeType.custom:
+        return 'custom';
+    }
+  }
+
+  ThemeType _themeTypeFromString(String typeString) {
+    switch (typeString) {
+      case 'camelus':
+        return ThemeType.camelus;
+      case 'nostr':
+        return ThemeType.nostr;
+      case 'custom':
+        return ThemeType.custom;
+      default:
+        return ThemeType.custom;
+    }
+  }
+}
+
+final themeTypeProvider = StateNotifierProvider<ThemeTypeNotifier, ThemeType>((ref) {
+  return ThemeTypeNotifier(ref);
+});

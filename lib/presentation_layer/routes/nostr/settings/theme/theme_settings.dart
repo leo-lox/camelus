@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../../providers/theme_provider.dart';
@@ -10,6 +11,7 @@ class ThemeSettingsPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final themeMode = ref.watch(themeModeProvider);
+    final themeType = ref.watch(themeTypeProvider);
     final themeColor = ref.watch(themeColorProvider);
 
     return Scaffold(
@@ -36,7 +38,8 @@ class ThemeSettingsPage extends ConsumerWidget {
           ListTile(
             title: Text(
               'Light',
-              style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
+              style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant),
             ),
             leading: Icon(
               PhosphorIcons.sun(),
@@ -49,7 +52,9 @@ class ThemeSettingsPage extends ConsumerWidget {
                   )
                 : null,
             onTap: () {
-              ref.read(themeModeProvider.notifier).setThemeMode(ThemeMode.light);
+              ref
+                  .read(themeModeProvider.notifier)
+                  .setThemeMode(ThemeMode.light);
             },
             tileColor: Theme.of(context).colorScheme.surface,
           ),
@@ -57,7 +62,8 @@ class ThemeSettingsPage extends ConsumerWidget {
           ListTile(
             title: Text(
               'Dark',
-              style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
+              style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant),
             ),
             leading: Icon(
               PhosphorIcons.moon(),
@@ -78,7 +84,8 @@ class ThemeSettingsPage extends ConsumerWidget {
           ListTile(
             title: Text(
               'System',
-              style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
+              style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant),
             ),
             leading: Icon(
               PhosphorIcons.circleHalf(),
@@ -91,18 +98,92 @@ class ThemeSettingsPage extends ConsumerWidget {
                   )
                 : null,
             onTap: () {
-              ref.read(themeModeProvider.notifier).setThemeMode(ThemeMode.system);
+              ref
+                  .read(themeModeProvider.notifier)
+                  .setThemeMode(ThemeMode.system);
             },
             tileColor: Theme.of(context).colorScheme.surface,
           ),
 
-          Divider(color: Theme.of(context).colorScheme.outlineVariant, height: 32),
+          Divider(
+              color: Theme.of(context).colorScheme.outlineVariant, height: 32),
 
-          // Theme Color Section
+          // Theme Selection Section
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: Text(
-              'Theme Color',
+              'Theme',
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: Theme.of(context).colorScheme.primary,
+              ),
+            ),
+          ),
+
+          ListTile(
+            title: Text(
+              'Camelus',
+              style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant),
+            ),
+            leading: Icon(
+              PhosphorIcons.palette(),
+              color: Theme.of(context).colorScheme.onSurface,
+            ),
+            trailing: themeType == ThemeType.camelus
+                ? Icon(
+                    PhosphorIcons.check(),
+                    color: Theme.of(context).colorScheme.primary,
+                  )
+                : null,
+            onTap: () {
+              ref
+                  .read(themeTypeProvider.notifier)
+                  .setThemeType(ThemeType.camelus);
+            },
+            tileColor: Theme.of(context).colorScheme.surface,
+          ),
+
+          ListTile(
+            title: Text(
+              'Nostr',
+              style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant),
+            ),
+            leading: SizedBox(
+              width: 24,
+              height: 24,
+              child: SvgPicture.asset(
+                'assets/icons/nostr.svg',
+                colorFilter: ColorFilter.mode(
+                  Theme.of(context).colorScheme.onSurface,
+                  BlendMode.srcIn,
+                ),
+              ),
+            ),
+            trailing: themeType == ThemeType.nostr
+                ? Icon(
+                    PhosphorIcons.check(),
+                    color: Theme.of(context).colorScheme.primary,
+                  )
+                : null,
+            onTap: () {
+              ref
+                  .read(themeTypeProvider.notifier)
+                  .setThemeType(ThemeType.nostr);
+            },
+            tileColor: Theme.of(context).colorScheme.surface,
+          ),
+
+          Divider(
+              color: Theme.of(context).colorScheme.outlineVariant, height: 32),
+
+          // Custom Color Theme Section
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Text(
+              'Custom Color Theme',
               style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
@@ -120,72 +201,118 @@ class ThemeSettingsPage extends ConsumerWidget {
                 _ColorOption(
                   color: Colors.blue,
                   label: 'Blue',
-                  isSelected: themeColor == Colors.blue,
+                  isSelected: themeType == ThemeType.custom &&
+                      themeColor == Colors.blue,
                   onTap: () {
-                    ref.read(themeColorProvider.notifier).setThemeColor(Colors.blue);
+                    ref
+                        .read(themeTypeProvider.notifier)
+                        .setThemeType(ThemeType.custom);
+                    ref
+                        .read(themeColorProvider.notifier)
+                        .setThemeColor(Colors.blue);
                   },
                 ),
                 _ColorOption(
                   color: Colors.purple,
                   label: 'Purple',
-                  isSelected: themeColor == Colors.purple,
+                  isSelected: themeType == ThemeType.custom &&
+                      themeColor == Colors.purple,
                   onTap: () {
-                    ref.read(themeColorProvider.notifier).setThemeColor(Colors.purple);
+                    ref
+                        .read(themeTypeProvider.notifier)
+                        .setThemeType(ThemeType.custom);
+                    ref
+                        .read(themeColorProvider.notifier)
+                        .setThemeColor(Colors.purple);
                   },
                 ),
                 _ColorOption(
                   color: Colors.green,
                   label: 'Green',
-                  isSelected: themeColor == Colors.green,
+                  isSelected: themeType == ThemeType.custom &&
+                      themeColor == Colors.green,
                   onTap: () {
-                    ref.read(themeColorProvider.notifier).setThemeColor(Colors.green);
+                    ref
+                        .read(themeTypeProvider.notifier)
+                        .setThemeType(ThemeType.custom);
+                    ref
+                        .read(themeColorProvider.notifier)
+                        .setThemeColor(Colors.green);
                   },
                 ),
                 _ColorOption(
                   color: Colors.orange,
                   label: 'Orange',
-                  isSelected: themeColor == Colors.orange,
+                  isSelected: themeType == ThemeType.custom &&
+                      themeColor == Colors.orange,
                   onTap: () {
-                    ref.read(themeColorProvider.notifier).setThemeColor(Colors.orange);
+                    ref
+                        .read(themeTypeProvider.notifier)
+                        .setThemeType(ThemeType.custom);
+                    ref
+                        .read(themeColorProvider.notifier)
+                        .setThemeColor(Colors.orange);
                   },
                 ),
                 _ColorOption(
                   color: Colors.red,
                   label: 'Red',
-                  isSelected: themeColor == Colors.red,
+                  isSelected:
+                      themeType == ThemeType.custom && themeColor == Colors.red,
                   onTap: () {
-                    ref.read(themeColorProvider.notifier).setThemeColor(Colors.red);
+                    ref
+                        .read(themeTypeProvider.notifier)
+                        .setThemeType(ThemeType.custom);
+                    ref
+                        .read(themeColorProvider.notifier)
+                        .setThemeColor(Colors.red);
                   },
                 ),
                 _ColorOption(
                   color: Colors.teal,
                   label: 'Teal',
-                  isSelected: themeColor == Colors.teal,
+                  isSelected: themeType == ThemeType.custom &&
+                      themeColor == Colors.teal,
                   onTap: () {
-                    ref.read(themeColorProvider.notifier).setThemeColor(Colors.teal);
+                    ref
+                        .read(themeTypeProvider.notifier)
+                        .setThemeType(ThemeType.custom);
+                    ref
+                        .read(themeColorProvider.notifier)
+                        .setThemeColor(Colors.teal);
                   },
                 ),
                 _ColorOption(
                   color: Colors.pink,
                   label: 'Pink',
-                  isSelected: themeColor == Colors.pink,
+                  isSelected: themeType == ThemeType.custom &&
+                      themeColor == Colors.pink,
                   onTap: () {
-                    ref.read(themeColorProvider.notifier).setThemeColor(Colors.pink);
+                    ref
+                        .read(themeTypeProvider.notifier)
+                        .setThemeType(ThemeType.custom);
+                    ref
+                        .read(themeColorProvider.notifier)
+                        .setThemeColor(Colors.pink);
                   },
                 ),
                 _ColorOption(
                   color: Colors.indigo,
                   label: 'Indigo',
-                  isSelected: themeColor == Colors.indigo,
+                  isSelected: themeType == ThemeType.custom &&
+                      themeColor == Colors.indigo,
                   onTap: () {
-                    ref.read(themeColorProvider.notifier).setThemeColor(Colors.indigo);
+                    ref
+                        .read(themeTypeProvider.notifier)
+                        .setThemeType(ThemeType.custom);
+                    ref
+                        .read(themeColorProvider.notifier)
+                        .setThemeColor(Colors.indigo);
                   },
                 ),
               ],
             ),
           ),
-
-          const SizedBox(height: 16),
         ],
       ),
     );

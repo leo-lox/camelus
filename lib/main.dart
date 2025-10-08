@@ -189,7 +189,27 @@ class _MyAppState extends ConsumerState<MyApp> {
   Widget build(BuildContext context) {
     final currentLocale = ref.watch(currentLocaleProvider);
     final themeMode = ref.watch(themeModeProvider);
+    final themeType = ref.watch(themeTypeProvider);
     final themeColor = ref.watch(themeColorProvider);
+
+    // Select theme based on theme type
+    final ThemeData lightTheme;
+    final ThemeData darkTheme;
+
+    switch (themeType) {
+      case ThemeType.camelus:
+        lightTheme = theme.camelusLightTheme;
+        darkTheme = theme.camelusDarkTheme;
+        break;
+      case ThemeType.nostr:
+        lightTheme = theme.nostrLightTheme;
+        darkTheme = theme.nostrDarkTheme;
+        break;
+      case ThemeType.custom:
+        lightTheme = theme.buildLightTheme(themeColor);
+        darkTheme = theme.buildDarkTheme(themeColor);
+        break;
+    }
 
     return Portal(
       child: MaterialApp.router(
@@ -207,8 +227,8 @@ class _MyAppState extends ConsumerState<MyApp> {
         locale: currentLocale,
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
-        theme: theme.buildLightTheme(themeColor),
-        darkTheme: theme.buildDarkTheme(themeColor),
+        theme: lightTheme,
+        darkTheme: darkTheme,
         themeMode: themeMode,
         builder: (context, child) {
           if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
