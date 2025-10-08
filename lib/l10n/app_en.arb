@@ -679,6 +679,10 @@
   "@search": {
     "description": "Search tab label"
   },
+  "explore": "Explore",
+  "@explore": {
+    "description": "Explore menu item"
+  },
   "more": "More",
   "@more": {
     "description": "More options tooltip"

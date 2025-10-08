@@ -528,6 +528,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get search => 'Rechercher';
 
   @override
+  String get explore => 'Explorer';
+
+  @override
   String get more => 'Plus';
 
   @override
