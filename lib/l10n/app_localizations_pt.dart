@@ -522,6 +522,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String get search => 'Pesquisar';
 
   @override
+  String get explore => 'Explorar';
+
+  @override
   String get more => 'Mais';
 
   @override

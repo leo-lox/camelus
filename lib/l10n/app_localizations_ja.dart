@@ -509,6 +509,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get search => '検索';
 
   @override
+  String get explore => '探検する';
+
+  @override
   String get more => 'その他';
 
   @override
