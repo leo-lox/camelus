@@ -2,6 +2,7 @@ import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
 
 import 'domain_layer/entities/starter_pack_identifier.dart';
+import 'lifecycle/app_init_shell.dart';
 import 'presentation_layer/components/app_bottom_navigation_bar/app_bottom_navigation_bar.dart';
 import 'presentation_layer/components/drawer/nostr_side_menu.dart';
 import 'presentation_layer/components/drawer/nostr_side_menu_post_button.dart';
@@ -10,8 +11,6 @@ import 'presentation_layer/components/relays_connectivity_widget.dart';
 import 'presentation_layer/components/right_sidebar/right_siedbar.dart';
 import 'presentation_layer/components/starter_packs/edit_starter_pack/edit_starter_pack.dart';
 import 'presentation_layer/components/starter_packs/open_starter_pack.dart';
-import 'presentation_layer/components/update_check/update_check.dart';
-
 import 'presentation_layer/layouts/mobile_bottom_menu_layout.dart';
 import 'presentation_layer/layouts/responsive_layout.dart';
 import 'presentation_layer/layouts/three_colum_layout.dart';
@@ -24,19 +23,41 @@ import 'presentation_layer/routes/nostr/profile/edit_profile_page.dart';
 import 'presentation_layer/routes/nostr/profile/profile_page_2.dart';
 import 'presentation_layer/routes/nostr/relays_page.dart';
 import 'presentation_layer/routes/nostr/search_feed_page/search_feed_page.dart';
+import 'presentation_layer/routes/notification_page.dart';
+import 'presentation_layer/routes/search_page.dart';
 import 'presentation_layer/routes/nostr/settings/file_servers/settings_file_servers.dart';
 import 'presentation_layer/routes/nostr/settings/inital_route/inital_route_settings.dart';
 import 'presentation_layer/routes/nostr/settings/locale/locale_settings.dart';
 import 'presentation_layer/routes/nostr/settings/moderation/moderation_settings.dart';
 import 'presentation_layer/routes/nostr/settings/settings_page.dart';
-import 'presentation_layer/routes/notification_page.dart';
-import 'presentation_layer/routes/search_page.dart';
+
+redirects(BuildContext context, GoRouterState state) {
+  final uri = state.uri;
+
+  // Handle myapp:userParam format
+  if (uri.scheme == 'camelus' &&
+      uri.authority.isEmpty &&
+      uri.path.isNotEmpty &&
+      !uri.path.startsWith('/')) {
+    final userParam = uri.path;
+    // Redirect to profile page with the user parameter
+    return '/nostr/profile/$userParam';
+  }
+
+  // Handle myapp://userParam format
+  if (uri.scheme == 'camelus' && uri.authority.isNotEmpty && uri.path == '/') {
+    final userParam = uri.authority;
+    return '/nostr/profile/$userParam';
+  }
+
+  return null; // No redirect needed
+}
 
 final routes = [
   /// global shell
   ShellRoute(
       builder: (context, state, child) {
-        return UpdateCheck(child: child);
+        return AppInitializationShell(child: child);
       },
       routes: [
         // Shell route for persistent layout
@@ -178,11 +199,12 @@ final routes = [
         ),
 
         /// needed to support old installations
-        GoRoute(
-          path: '/',
-          redirect: (context, state) {
-            return '/home';
-          },
-        ),
       ]),
+
+  GoRoute(
+    path: '/',
+    redirect: (context, state) {
+      return '/home';
+    },
+  ),
 ];

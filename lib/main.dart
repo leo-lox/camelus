@@ -1,8 +1,6 @@
 import 'dart:io';
 import 'dart:ui';
 
-import 'package:camelus/theme.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 
 import 'package:flutter/material.dart';
@@ -16,14 +14,11 @@ import 'l10n/app_localizations.dart';
 //import 'data_layer/db/object_box_ndk/db_object_box.dart';
 import 'config/camelus_config.dart';
 
-import 'lifecycle/connectivity/connectivity.dart';
-import 'lifecycle/deep_links.dart';
 import 'domain_layer/usecases/app_auth.dart';
 import 'lifecycle/notifications/init_firebase.dart';
 import 'lifecycle/notifications/notifications_caller.dart';
 import 'objectbox_isolate.dart';
 import 'presentation_layer/init/init_moderation.dart';
-import 'presentation_layer/providers/app_lifecycle_provider.dart';
 import 'presentation_layer/providers/db_app_provider.dart';
 import 'presentation_layer/providers/db_ndk_provider.dart';
 import 'presentation_layer/providers/inbox_outbox_provider.dart';
@@ -31,7 +26,7 @@ import 'presentation_layer/providers/language_provider.dart';
 import 'presentation_layer/providers/ndk_provider.dart';
 import 'presentation_layer/providers/signer_provider.dart';
 import 'routes.dart';
-import 'theme.dart' as theme;
+import 'theme.dart';
 
 const devDeviceFrame = true;
 
@@ -130,6 +125,14 @@ Future<void> main() async {
 
   InitModeration.initBloomFilter(provider: providerContainer);
 
+  final router = GoRouter(
+    navigatorKey: navigatorKey,
+    initialLocation: initalRoute,
+    routes: routes,
+    redirect: (c, s) => redirects(c, s),
+    debugLogDiagnostics: true,
+  );
+
   runApp(
     UncontrolledProviderScope(
       container: providerContainer,
@@ -137,41 +140,29 @@ Future<void> main() async {
         navigatorKey: navigatorKey,
         initialRoute: initalRoute,
         pubkey: mySigner?.getPublicKey() ?? '',
+        router: router,
       ),
     ),
   );
-
-  listenDeeplinks(
-    providerContainer: providerContainer,
-  );
-
-  listenToConnectivityChanges(providerContainer);
-
-  // init lifecycle
-  providerContainer.read(appLifecycleProvider);
 }
 
 class MyApp extends ConsumerWidget {
   final String initialRoute;
   final String pubkey;
   final GlobalKey<NavigatorState> navigatorKey;
+  final GoRouter router;
 
   const MyApp({
     super.key,
     required this.navigatorKey,
     required this.initialRoute,
     required this.pubkey,
+    required this.router,
   });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final currentLocale = ref.watch(currentLocaleProvider);
-
-    final router = GoRouter(
-      navigatorKey: navigatorKey,
-      initialLocation: initialRoute,
-      routes: routes,
-    );
 
     return Portal(
       child: MaterialApp.router(
