@@ -125,6 +125,14 @@ Future<void> main() async {
 
   InitModeration.initBloomFilter(provider: providerContainer);
 
+  final router = GoRouter(
+    navigatorKey: navigatorKey,
+    initialLocation: initalRoute,
+    routes: routes,
+    redirect: (c, s) => redirects(c, s),
+    debugLogDiagnostics: true,
+  );
+
   runApp(
     UncontrolledProviderScope(
       container: providerContainer,
@@ -132,6 +140,7 @@ Future<void> main() async {
         navigatorKey: navigatorKey,
         initialRoute: initalRoute,
         pubkey: mySigner?.getPublicKey() ?? '',
+        router: router,
       ),
     ),
   );
@@ -141,25 +150,19 @@ class MyApp extends ConsumerWidget {
   final String initialRoute;
   final String pubkey;
   final GlobalKey<NavigatorState> navigatorKey;
+  final GoRouter router;
 
   const MyApp({
     super.key,
     required this.navigatorKey,
     required this.initialRoute,
     required this.pubkey,
+    required this.router,
   });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final currentLocale = ref.watch(currentLocaleProvider);
-
-    final router = GoRouter(
-      navigatorKey: navigatorKey,
-      initialLocation: initialRoute,
-      routes: routes,
-      redirect: (c, s) => redirects(c, s),
-      debugLogDiagnostics: true,
-    );
 
     return Portal(
       child: MaterialApp.router(
