@@ -518,6 +518,9 @@ class AppLocalizationsTh extends AppLocalizations {
   String get search => 'ค้นหา';
 
   @override
+  String get explore => 'สำรวจ';
+
+  @override
   String get more => 'เพิ่มเติม';
 
   @override

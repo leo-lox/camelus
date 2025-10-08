@@ -520,6 +520,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get search => 'search';
 
   @override
+  String get explore => 'Explore';
+
+  @override
   String get more => 'More';
 
   @override
