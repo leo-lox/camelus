@@ -5,14 +5,6 @@ ThemeData buildLightTheme(Color seedColor) {
     colorScheme: ColorScheme.fromSeed(
       seedColor: seedColor,
     ),
-    checkboxTheme: CheckboxThemeData(
-      fillColor: WidgetStateProperty.resolveWith((states) {
-        if (states.contains(WidgetState.selected)) {
-          return Colors.black;
-        }
-        return Colors.transparent;
-      }),
-    ),
   );
 }
 
@@ -29,9 +21,14 @@ ThemeData buildDarkTheme(Color seedColor) {
 final ThemeData lightTheme = buildLightTheme(Colors.blue);
 final ThemeData darkTheme = buildDarkTheme(Colors.blue);
 
-final ThemeData camelusLightTheme = ThemeData(
-  colorScheme: ColorScheme.fromSeed(
-    seedColor: Colors.blue,
+final camelusLightColorScheme = ColorScheme.fromSeed(
+  seedColor: Colors.blue,
+  surface: Colors.white,
+);
+final camelusLightTheme = ThemeData(
+  colorScheme: camelusLightColorScheme,
+  floatingActionButtonTheme: FloatingActionButtonThemeData(
+    backgroundColor: camelusLightColorScheme.primary,
   ),
   scaffoldBackgroundColor: Colors.white,
   drawerTheme: DrawerThemeData(
@@ -40,21 +37,49 @@ final ThemeData camelusLightTheme = ThemeData(
   navigationBarTheme: NavigationBarThemeData(
     backgroundColor: Colors.white,
   ),
-  floatingActionButtonTheme: FloatingActionButtonThemeData(
-    backgroundColor: Colors.blue,
-  ),
   dividerTheme: DividerThemeData(
     color: Colors.white,
   ),
   appBarTheme: AppBarThemeData(
     backgroundColor: Colors.white,
   ),
+  cardTheme: CardThemeData(
+    color: Colors.white,
+  ),
+  dialogTheme: DialogThemeData(
+    backgroundColor: Colors.white,
+  ),
+  bottomSheetTheme: BottomSheetThemeData(
+    backgroundColor: Colors.white,
+  ),
+  popupMenuTheme: PopupMenuThemeData(
+    color: Colors.white,
+  ),
+  checkboxTheme: CheckboxThemeData(
+    fillColor: WidgetStateProperty.resolveWith((states) {
+      if (states.contains(WidgetState.selected)) {
+        return Colors.black;
+      }
+      return Colors.transparent;
+    }),
+    checkColor: WidgetStateProperty.resolveWith((states) {
+      if (states.contains(WidgetState.selected)) {
+        return Colors.white;
+      }
+      return Colors.transparent;
+    })
+  ),
 );
 
-final ThemeData camelusDarkTheme = ThemeData(
-  colorScheme: ColorScheme.fromSeed(
-    seedColor: Colors.blue,
-    brightness: Brightness.dark,
+final camelusDarkColorScheme = ColorScheme.fromSeed(
+  brightness: Brightness.dark,
+  seedColor: Colors.blue,
+  surface: Colors.black,
+);
+final camelusDarkTheme = ThemeData(
+  colorScheme: camelusDarkColorScheme,
+  floatingActionButtonTheme: FloatingActionButtonThemeData(
+    backgroundColor: camelusDarkColorScheme.primary,
   ),
   scaffoldBackgroundColor: Colors.black,
   drawerTheme: DrawerThemeData(
@@ -63,18 +88,41 @@ final ThemeData camelusDarkTheme = ThemeData(
   navigationBarTheme: NavigationBarThemeData(
     backgroundColor: Colors.black,
   ),
-  floatingActionButtonTheme: FloatingActionButtonThemeData(
-    backgroundColor: Colors.blue,
-  ),
   dividerTheme: DividerThemeData(
     color: Colors.black,
   ),
   appBarTheme: AppBarThemeData(
     backgroundColor: Colors.black,
   ),
+  cardTheme: CardThemeData(
+    color: Colors.black,
+  ),
+  dialogTheme: DialogThemeData(
+    backgroundColor: Colors.black,
+  ),
+  bottomSheetTheme: BottomSheetThemeData(
+    backgroundColor: Colors.black,
+  ),
+  popupMenuTheme: PopupMenuThemeData(
+    color: Colors.black,
+  ),
+  checkboxTheme: CheckboxThemeData(
+    fillColor: WidgetStateProperty.resolveWith((states) {
+      if (states.contains(WidgetState.selected)) {
+        return Colors.white;
+      }
+      return Colors.transparent;
+    }),
+    checkColor: WidgetStateProperty.resolveWith((states) {
+      if (states.contains(WidgetState.selected)) {
+        return Colors.black;
+      }
+      return Colors.transparent;
+    })
+  ),
 );
 
-final ThemeData nostrLightTheme = ThemeData(
+final nostrLightTheme = ThemeData(
   colorScheme: ColorScheme(
     brightness: Brightness.light,
     primary: Color(0xff342157),
@@ -125,7 +173,7 @@ final ThemeData nostrLightTheme = ThemeData(
   ),
 );
 
-final ThemeData nostrDarkTheme = ThemeData(
+final nostrDarkTheme = ThemeData(
   colorScheme: ColorScheme(
     brightness: Brightness.dark,
     primary: Color(0xfff6ecff),
