@@ -1,8 +1,6 @@
 import 'dart:io';
 import 'dart:ui';
 
-import 'package:camelus/theme.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 
 import 'package:flutter/material.dart';
@@ -30,6 +28,7 @@ import 'presentation_layer/providers/inbox_outbox_provider.dart';
 import 'presentation_layer/providers/language_provider.dart';
 import 'presentation_layer/providers/ndk_provider.dart';
 import 'presentation_layer/providers/signer_provider.dart';
+import 'presentation_layer/providers/theme_provider.dart';
 import 'routes.dart';
 import 'theme.dart' as theme;
 
@@ -151,7 +150,7 @@ Future<void> main() async {
   providerContainer.read(appLifecycleProvider);
 }
 
-class MyApp extends ConsumerWidget {
+class MyApp extends ConsumerStatefulWidget {
   final String initialRoute;
   final String pubkey;
   final GlobalKey<NavigatorState> navigatorKey;
@@ -164,18 +163,37 @@ class MyApp extends ConsumerWidget {
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final currentLocale = ref.watch(currentLocaleProvider);
+  ConsumerState<MyApp> createState() => _MyAppState();
+}
 
-    final router = GoRouter(
-      navigatorKey: navigatorKey,
-      initialLocation: initialRoute,
+class _MyAppState extends ConsumerState<MyApp> {
+  late final GoRouter _router;
+
+  @override
+  void initState() {
+    super.initState();
+    _router = GoRouter(
+      navigatorKey: widget.navigatorKey,
+      initialLocation: widget.initialRoute,
       routes: routes,
     );
+  }
+
+  @override
+  void dispose() {
+    _router.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final currentLocale = ref.watch(currentLocaleProvider);
+    final themeMode = ref.watch(themeModeProvider);
+    final themeColor = ref.watch(themeColorProvider);
 
     return Portal(
       child: MaterialApp.router(
-        routerConfig: router,
+        routerConfig: _router,
         scrollBehavior: const MaterialScrollBehavior().copyWith(
           scrollbars: false,
           dragDevices: {
@@ -189,8 +207,9 @@ class MyApp extends ConsumerWidget {
         locale: currentLocale,
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
-        theme: lightTheme,
-        darkTheme: darkTheme,
+        theme: theme.buildLightTheme(themeColor),
+        darkTheme: theme.buildDarkTheme(themeColor),
+        themeMode: themeMode,
         builder: (context, child) {
           if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
             return DragToResizeArea(

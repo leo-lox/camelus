@@ -29,6 +29,7 @@ import 'presentation_layer/routes/nostr/settings/inital_route/inital_route_setti
 import 'presentation_layer/routes/nostr/settings/locale/locale_settings.dart';
 import 'presentation_layer/routes/nostr/settings/moderation/moderation_settings.dart';
 import 'presentation_layer/routes/nostr/settings/settings_page.dart';
+import 'presentation_layer/routes/nostr/settings/theme/theme_settings.dart';
 import 'presentation_layer/routes/notification_page.dart';
 import 'presentation_layer/routes/search_page.dart';
 
@@ -109,6 +110,10 @@ final routes = [
                 GoRoute(
                   path: 'moderation',
                   builder: (context, state) => const ModerationSettingsPage(),
+                ),
+                GoRoute(
+                  path: 'theme',
+                  builder: (context, state) => const ThemeSettingsPage(),
                 ),
               ],
             ),
