@@ -19,11 +19,11 @@ class NostrTag {
   List<String> toList() {
     List<String> raw = [type, value];
 
-    if (recommendedRelay != null && recommendedRelay!.isNotEmpty) {
-      raw.add(recommendedRelay!);
-    }
     if (marker != null && marker!.isNotEmpty) {
+      raw.add(recommendedRelay ?? '');
       raw.add(marker!);
+    } else if (recommendedRelay != null && recommendedRelay!.isNotEmpty) {
+      raw.add(recommendedRelay!);
     }
 
     return raw;

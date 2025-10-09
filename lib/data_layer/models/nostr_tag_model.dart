@@ -32,11 +32,12 @@ class NostrTagModel extends NostrTag {
 
     if (value.isNotEmpty) {
       json.add(value);
-      if (recommendedRelay != null) {
+
+      if (marker != null) {
+        json.add(recommendedRelay ?? '');
+        json.add(marker);
+      } else if (recommendedRelay != null) {
         json.add(recommendedRelay);
-        if (marker != null) {
-          json.add(marker);
-        }
       }
     }
 
