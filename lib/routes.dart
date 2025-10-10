@@ -33,25 +33,7 @@ import 'presentation_layer/routes/nostr/settings/moderation/moderation_settings.
 import 'presentation_layer/routes/nostr/settings/settings_page.dart';
 
 redirects(BuildContext context, GoRouterState state) {
-  final uri = state.uri;
-
-  // Handle myapp:userParam format
-  if (uri.scheme == 'camelus' &&
-      uri.authority.isEmpty &&
-      uri.path.isNotEmpty &&
-      !uri.path.startsWith('/')) {
-    final userParam = uri.path;
-    // Redirect to profile page with the user parameter
-    return '/nostr/profile/$userParam';
-  }
-
-  // Handle myapp://userParam format
-  if (uri.scheme == 'camelus' && uri.authority.isNotEmpty && uri.path == '/') {
-    final userParam = uri.authority;
-    return '/nostr/profile/$userParam';
-  }
-
-  return null; // No redirect needed
+  return null;
 }
 
 final routes = [
