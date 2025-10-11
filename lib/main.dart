@@ -130,7 +130,7 @@ Future<void> main() async {
     initialLocation: initalRoute,
     routes: routes,
     redirect: (c, s) => redirects(c, s),
-    debugLogDiagnostics: true,
+    debugLogDiagnostics: false,
   );
 
   runApp(

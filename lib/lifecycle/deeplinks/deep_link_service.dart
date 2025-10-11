@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 import 'package:app_links/app_links.dart';
 import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
@@ -23,7 +24,7 @@ class DeepLinkService {
         _processDeepLink(uri);
       },
       onError: (err) {
-        print('Deep link error: $err');
+        log('Deep link error: $err');
       },
     );
   }
@@ -35,14 +36,14 @@ class DeepLinkService {
         _processDeepLink(uri);
       }
     } catch (e) {
-      print('Error handling initial link: $e');
+      log('Error handling initial link: $e');
     }
   }
 
   static void _processDeepLink(Uri uri) {
-    print('Processing deep link: $uri');
+    log('Processing deep link: $uri');
 
-    // Handle custom schemes (camelus:, myapp:, nostr:)
+    // Handle custom schemes (camelus:, nostr:)
     if (['camelus', 'nostr'].contains(uri.scheme)) {
       String? userParam;
 
@@ -57,10 +58,19 @@ class DeepLinkService {
           (uri.path == '/' || uri.path.isEmpty)) {
         userParam = uri.authority;
       }
+      // handle sheme:/ format (userParam as path with leading slash)
+      else if (uri.authority.isEmpty &&
+          uri.path.isNotEmpty &&
+          uri.path.startsWith('/')) {
+        userParam = uri.path.substring(1); // Remove leading slash
+      }
 
       if (userParam != null && userParam.isNotEmpty) {
-        print('Navigating to profile: $userParam');
-        _context?.go('/nostr/profile/$userParam');
+        try {
+          _context?.go("/$userParam");
+        } catch (e) {
+          _context?.go('/home');
+        }
         return;
       }
 
@@ -72,32 +82,16 @@ class DeepLinkService {
     // Handle HTTPS links (camelus.app)
     if (uri.scheme == 'https' && uri.host == 'camelus.app') {
       if (uri.pathSegments.isNotEmpty) {
-        final firstSegment = uri.pathSegments.first;
-
-        switch (firstSegment) {
-          case 'user':
-            if (uri.pathSegments.length > 1) {
-              final userParam = uri.pathSegments[1];
-              _context?.go('/nostr/profile/$userParam');
-              return;
-            }
-            break;
-          case 'i':
-            // Handle /i/ paths
-            _context?.go('/home');
-            return;
-          case 'ii':
-            // Handle /ii/ paths
-            _context?.go('/home');
-            return;
-          case 's':
-            // Handle /s/ paths
-            _context?.go('/search');
-            return;
+        // Default for camelus.app links
+        try {
+          _context?.go("/${uri.pathSegments.join('-_-')}");
+        } catch (e) {
+          _context?.go('/home');
         }
+        return;
       }
 
-      // Default for camelus.app links
+      // Fallback for other HTTPS links
       _context?.go('/home');
       return;
     }
@@ -106,7 +100,6 @@ class DeepLinkService {
     try {
       _context?.go(uri.path.isEmpty ? '/' : uri.path);
     } catch (e) {
-      print('Error navigating to ${uri.path}: $e');
       _context?.go('/home');
     }
   }
