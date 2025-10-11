@@ -1,4 +1,45 @@
 import 'package:flutter/material.dart';
+import 'package:system_theme/system_theme.dart';
+
+import 'presentation_layer/providers/theme_provider.dart';
+
+class ThemeVariants {
+  final ThemeData lightTheme;
+  final ThemeData darkTheme;
+
+  ThemeVariants({required this.lightTheme, required this.darkTheme});
+}
+
+ThemeVariants getThemeVariants({
+  required ThemeType themeType,
+  required Color themeColor,
+}) {
+  // Select theme based on theme type
+  final ThemeData lightTheme;
+  final ThemeData darkTheme;
+
+  switch (themeType) {
+    case ThemeType.system:
+      // Use system accent color
+      final systemAccentColor = SystemTheme.accentColor.accent;
+      lightTheme = buildLightTheme(systemAccentColor);
+      darkTheme = buildDarkTheme(systemAccentColor);
+      break;
+    case ThemeType.camelus:
+      lightTheme = camelusLightTheme;
+      darkTheme = camelusDarkTheme;
+      break;
+    case ThemeType.nostr:
+      lightTheme = nostrLightTheme;
+      darkTheme = nostrDarkTheme;
+      break;
+    case ThemeType.custom:
+      lightTheme = buildLightTheme(themeColor);
+      darkTheme = buildDarkTheme(themeColor);
+      break;
+  }
+  return ThemeVariants(lightTheme: lightTheme, darkTheme: darkTheme);
+}
 
 ThemeData buildLightTheme(Color seedColor) {
   return ThemeData(
@@ -55,20 +96,18 @@ final camelusLightTheme = ThemeData(
   popupMenuTheme: PopupMenuThemeData(
     color: Colors.white,
   ),
-  checkboxTheme: CheckboxThemeData(
-    fillColor: WidgetStateProperty.resolveWith((states) {
-      if (states.contains(WidgetState.selected)) {
-        return Colors.black;
-      }
-      return Colors.transparent;
-    }),
-    checkColor: WidgetStateProperty.resolveWith((states) {
-      if (states.contains(WidgetState.selected)) {
-        return Colors.white;
-      }
-      return Colors.transparent;
-    })
-  ),
+  checkboxTheme:
+      CheckboxThemeData(fillColor: WidgetStateProperty.resolveWith((states) {
+    if (states.contains(WidgetState.selected)) {
+      return Colors.black;
+    }
+    return Colors.transparent;
+  }), checkColor: WidgetStateProperty.resolveWith((states) {
+    if (states.contains(WidgetState.selected)) {
+      return Colors.white;
+    }
+    return Colors.transparent;
+  })),
 );
 
 final camelusDarkColorScheme = ColorScheme.fromSeed(
@@ -106,20 +145,18 @@ final camelusDarkTheme = ThemeData(
   popupMenuTheme: PopupMenuThemeData(
     color: Colors.black,
   ),
-  checkboxTheme: CheckboxThemeData(
-    fillColor: WidgetStateProperty.resolveWith((states) {
-      if (states.contains(WidgetState.selected)) {
-        return Colors.white;
-      }
-      return Colors.transparent;
-    }),
-    checkColor: WidgetStateProperty.resolveWith((states) {
-      if (states.contains(WidgetState.selected)) {
-        return Colors.black;
-      }
-      return Colors.transparent;
-    })
-  ),
+  checkboxTheme:
+      CheckboxThemeData(fillColor: WidgetStateProperty.resolveWith((states) {
+    if (states.contains(WidgetState.selected)) {
+      return Colors.white;
+    }
+    return Colors.transparent;
+  }), checkColor: WidgetStateProperty.resolveWith((states) {
+    if (states.contains(WidgetState.selected)) {
+      return Colors.black;
+    }
+    return Colors.transparent;
+  })),
 );
 
 final nostrLightTheme = ThemeData(

@@ -29,7 +29,7 @@ import 'presentation_layer/providers/ndk_provider.dart';
 import 'presentation_layer/providers/signer_provider.dart';
 import 'presentation_layer/providers/theme_provider.dart';
 import 'routes.dart';
-import 'theme.dart' as theme;
+import 'theme.dart' show getThemeVariants;
 
 const devDeviceFrame = true;
 
@@ -171,30 +171,10 @@ class MyApp extends ConsumerWidget {
     final themeType = ref.watch(themeTypeProvider);
     final themeColor = ref.watch(themeColorProvider);
 
-    // Select theme based on theme type
-    final ThemeData lightTheme;
-    final ThemeData darkTheme;
-
-    switch (themeType) {
-      case ThemeType.system:
-        // Use system accent color
-        final systemAccentColor = SystemTheme.accentColor.accent;
-        lightTheme = theme.buildLightTheme(systemAccentColor);
-        darkTheme = theme.buildDarkTheme(systemAccentColor);
-        break;
-      case ThemeType.camelus:
-        lightTheme = theme.camelusLightTheme;
-        darkTheme = theme.camelusDarkTheme;
-        break;
-      case ThemeType.nostr:
-        lightTheme = theme.nostrLightTheme;
-        darkTheme = theme.nostrDarkTheme;
-        break;
-      case ThemeType.custom:
-        lightTheme = theme.buildLightTheme(themeColor);
-        darkTheme = theme.buildDarkTheme(themeColor);
-        break;
-    }
+    final themeVariants = getThemeVariants(
+      themeType: themeType,
+      themeColor: themeColor,
+    );
 
     return Portal(
       child: MaterialApp.router(
@@ -212,8 +192,8 @@ class MyApp extends ConsumerWidget {
         locale: currentLocale,
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
-        theme: lightTheme,
-        darkTheme: darkTheme,
+        theme: themeVariants.lightTheme,
+        darkTheme: themeVariants.darkTheme,
         themeMode: themeMode,
         builder: (context, child) {
           if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
