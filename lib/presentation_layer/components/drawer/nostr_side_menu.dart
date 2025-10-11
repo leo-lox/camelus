@@ -213,7 +213,8 @@ class NostrSideMenu extends ConsumerWidget {
               onTap: () {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text(AppLocalizations.of(context)!.notImplementedYet),
+                    content:
+                        Text(AppLocalizations.of(context)!.notImplementedYet),
                   ),
                 );
               }),
@@ -224,7 +225,8 @@ class NostrSideMenu extends ConsumerWidget {
               onTap: () {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text(AppLocalizations.of(context)!.notImplementedYet),
+                    content:
+                        Text(AppLocalizations.of(context)!.notImplementedYet),
                   ),
                 );
               }),
@@ -301,10 +303,10 @@ class NostrSideMenu extends ConsumerWidget {
               children: [
                 IconButton(
                   onPressed: () {
-                    ref.read(themeModeProvider.notifier).toggleTheme();
+                    ref.read(themeProvider.notifier).toggleTheme();
                   },
                   icon: Icon(
-                    ref.watch(themeModeProvider) == ThemeMode.dark
+                    ref.watch(themeProvider).mode == ThemeMode.dark
                         ? PhosphorIcons.moon()
                         : PhosphorIcons.sun(),
                     color: Theme.of(context).colorScheme.primary,

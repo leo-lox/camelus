@@ -167,13 +167,11 @@ class MyApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final currentLocale = ref.watch(currentLocaleProvider);
 
-    final themeMode = ref.watch(themeModeProvider);
-    final themeType = ref.watch(themeTypeProvider);
-    final themeColor = ref.watch(themeColorProvider);
+    final themeState = ref.watch(themeProvider);
 
     final themeVariants = getThemeVariants(
-      themeType: themeType,
-      themeColor: themeColor,
+      themeType: themeState.type,
+      themeColor: themeState.color,
     );
 
     return Portal(
@@ -194,7 +192,7 @@ class MyApp extends ConsumerWidget {
         supportedLocales: AppLocalizations.supportedLocales,
         theme: themeVariants.lightTheme,
         darkTheme: themeVariants.darkTheme,
-        themeMode: themeMode,
+        themeMode: themeState.mode,
         builder: (context, child) {
           if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
             return DragToResizeArea(

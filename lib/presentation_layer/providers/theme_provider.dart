@@ -2,86 +2,129 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'db_app_provider.dart';
 
-class ThemeNotifier extends StateNotifier<ThemeMode> {
-  final Ref ref;
+enum ThemeType {
+  camelus,
+  nostr,
+  custom,
+  system,
+}
 
-  ThemeNotifier(this.ref) : super(ThemeMode.system) {
-    _loadThemeMode();
+class ThemeState {
+  final ThemeMode mode;
+  final Color color;
+  final ThemeType type;
+
+  const ThemeState({
+    required this.mode,
+    required this.color,
+    required this.type,
+  });
+
+  ThemeState copyWith({
+    ThemeMode? mode,
+    Color? color,
+    ThemeType? type,
+  }) {
+    return ThemeState(
+      mode: mode ?? this.mode,
+      color: color ?? this.color,
+      type: type ?? this.type,
+    );
   }
 
-  Future<void> _loadThemeMode() async {
-    final appDb = ref.read(dbAppProvider);
-    final savedTheme = await appDb.read('themeMode');
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is ThemeState &&
+        other.mode == mode &&
+        other.color == color &&
+        other.type == type;
+  }
 
-    if (savedTheme != null) {
-      switch (savedTheme) {
-        case 'light':
-          state = ThemeMode.light;
-          break;
-        case 'dark':
-          state = ThemeMode.dark;
-          break;
-        default:
-          state = ThemeMode.system;
-      }
-    }
+  @override
+  int get hashCode => mode.hashCode ^ color.hashCode ^ type.hashCode;
+}
+
+class ThemeNotifier extends StateNotifier<ThemeState> {
+  final Ref ref;
+
+  ThemeNotifier(this.ref)
+      : super(const ThemeState(
+          mode: ThemeMode.system,
+          color: Colors.blue,
+          type: ThemeType.custom,
+        )) {
+    _loadThemeSettings();
+  }
+
+  Future<void> _loadThemeSettings() async {
+    final appDb = ref.read(dbAppProvider);
+
+    final savedMode = await appDb.read('themeMode');
+    final savedColor = await appDb.read('themeColor');
+    final savedType = await appDb.read('themeType');
+
+    state = ThemeState(
+      mode: savedMode != null
+          ? _themeModeFromString(savedMode)
+          : ThemeMode.system,
+      color: savedColor != null ? _colorFromString(savedColor) : Colors.blue,
+      type: savedType != null
+          ? _themeTypeFromString(savedType)
+          : ThemeType.custom,
+    );
   }
 
   Future<void> setThemeMode(ThemeMode mode) async {
-    state = mode;
+    state = state.copyWith(mode: mode);
     final appDb = ref.read(dbAppProvider);
+    await appDb.save(key: 'themeMode', value: _themeModeToString(mode));
+  }
 
-    String themeString;
-    switch (mode) {
-      case ThemeMode.light:
-        themeString = 'light';
-        break;
-      case ThemeMode.dark:
-        themeString = 'dark';
-        break;
-      case ThemeMode.system:
-        themeString = 'system';
-        break;
-    }
+  Future<void> setThemeColor(Color color) async {
+    state = state.copyWith(color: color);
+    final appDb = ref.read(dbAppProvider);
+    await appDb.save(key: 'themeColor', value: _colorToString(color));
+  }
 
-    await appDb.save(key: 'themeMode', value: themeString);
+  Future<void> setThemeType(ThemeType type) async {
+    state = state.copyWith(type: type);
+    final appDb = ref.read(dbAppProvider);
+    await appDb.save(key: 'themeType', value: _themeTypeToString(type));
   }
 
   void toggleTheme() {
-    if (state == ThemeMode.light) {
+    if (state.mode == ThemeMode.light) {
       setThemeMode(ThemeMode.dark);
     } else {
       setThemeMode(ThemeMode.light);
     }
   }
-}
 
-final themeModeProvider = StateNotifierProvider<ThemeNotifier, ThemeMode>((ref) {
-  return ThemeNotifier(ref);
-});
-
-class ThemeColorNotifier extends StateNotifier<Color> {
-  final Ref ref;
-
-  ThemeColorNotifier(this.ref) : super(Colors.blue) {
-    _loadThemeColor();
-  }
-
-  Future<void> _loadThemeColor() async {
-    final appDb = ref.read(dbAppProvider);
-    final savedColor = await appDb.read('themeColor');
-
-    if (savedColor != null) {
-      state = _colorFromString(savedColor);
+  // Theme Mode conversion methods
+  String _themeModeToString(ThemeMode mode) {
+    switch (mode) {
+      case ThemeMode.light:
+        return 'light';
+      case ThemeMode.dark:
+        return 'dark';
+      case ThemeMode.system:
+        return 'system';
     }
   }
 
-  Future<void> setThemeColor(Color color) async {
-    state = color;
-    final appDb = ref.read(dbAppProvider);
-    await appDb.save(key: 'themeColor', value: _colorToString(color));
+  ThemeMode _themeModeFromString(String modeString) {
+    switch (modeString) {
+      case 'light':
+        return ThemeMode.light;
+      case 'dark':
+        return ThemeMode.dark;
+      default:
+        return ThemeMode.system;
+    }
   }
 
+  // Color conversion methods
   String _colorToString(Color color) {
     if (color == Colors.blue) return 'blue';
     if (color == Colors.purple) return 'purple';
@@ -116,41 +159,8 @@ class ThemeColorNotifier extends StateNotifier<Color> {
         return Colors.blue;
     }
   }
-}
 
-final themeColorProvider = StateNotifierProvider<ThemeColorNotifier, Color>((ref) {
-  return ThemeColorNotifier(ref);
-});
-
-enum ThemeType {
-  camelus,
-  nostr,
-  custom,
-  system,
-}
-
-class ThemeTypeNotifier extends StateNotifier<ThemeType> {
-  final Ref ref;
-
-  ThemeTypeNotifier(this.ref) : super(ThemeType.custom) {
-    _loadThemeType();
-  }
-
-  Future<void> _loadThemeType() async {
-    final appDb = ref.read(dbAppProvider);
-    final savedType = await appDb.read('themeType');
-
-    if (savedType != null) {
-      state = _themeTypeFromString(savedType);
-    }
-  }
-
-  Future<void> setThemeType(ThemeType type) async {
-    state = type;
-    final appDb = ref.read(dbAppProvider);
-    await appDb.save(key: 'themeType', value: _themeTypeToString(type));
-  }
-
+  // Theme Type conversion methods
   String _themeTypeToString(ThemeType type) {
     switch (type) {
       case ThemeType.camelus:
@@ -180,6 +190,6 @@ class ThemeTypeNotifier extends StateNotifier<ThemeType> {
   }
 }
 
-final themeTypeProvider = StateNotifierProvider<ThemeTypeNotifier, ThemeType>((ref) {
-  return ThemeTypeNotifier(ref);
+final themeProvider = StateNotifierProvider<ThemeNotifier, ThemeState>((ref) {
+  return ThemeNotifier(ref);
 });
