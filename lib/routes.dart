@@ -14,6 +14,7 @@ import 'presentation_layer/components/starter_packs/open_starter_pack.dart';
 import 'presentation_layer/layouts/mobile_bottom_menu_layout.dart';
 import 'presentation_layer/layouts/responsive_layout.dart';
 import 'presentation_layer/layouts/three_colum_layout.dart';
+import 'presentation_layer/routes/deeplink_reciever_page.dart';
 import 'presentation_layer/routes/home_page_desktop.dart';
 import 'presentation_layer/routes/home_page_mobile.dart';
 import 'presentation_layer/routes/nostr/blockedUsers/blocked_users.dart';
@@ -33,179 +34,168 @@ import 'presentation_layer/routes/nostr/settings/moderation/moderation_settings.
 import 'presentation_layer/routes/nostr/settings/settings_page.dart';
 
 redirects(BuildContext context, GoRouterState state) {
-  final uri = state.uri;
-
-  // Handle myapp:userParam format
-  if (uri.scheme == 'camelus' &&
-      uri.authority.isEmpty &&
-      uri.path.isNotEmpty &&
-      !uri.path.startsWith('/')) {
-    final userParam = uri.path;
-    // Redirect to profile page with the user parameter
-    return '/nostr/profile/$userParam';
-  }
-
-  // Handle myapp://userParam format
-  if (uri.scheme == 'camelus' && uri.authority.isNotEmpty && uri.path == '/') {
-    final userParam = uri.authority;
-    return '/nostr/profile/$userParam';
-  }
-
-  return null; // No redirect needed
+  return null;
 }
 
 final routes = [
   /// global shell
   ShellRoute(
-      builder: (context, state, child) {
-        return AppInitializationShell(child: child);
-      },
-      routes: [
-        // Shell route for persistent layout
-        ShellRoute(
-          builder: (context, state, child) {
-            return ResponsiveLayout(
-              desktopContent: ThreeColumnLayout(
-                leftSidebar: NostrSideMenu(
-                  trailingButtonWidget: Padding(
-                      padding:
-                          const EdgeInsets.only(top: 40, left: 10, right: 10),
-                      child: NostrSideMenuPostButton()),
-                  leadingWidget: SideMenuLogo(
-                    trailingWidget: RelaysConnectivityWidget(
-                      onTap: () {
-                        context.push('/nostr/relays');
-                      },
-                    ),
+    builder: (context, state, child) {
+      return AppInitializationShell(child: child);
+    },
+    routes: [
+      // Shell route for persistent layout
+      ShellRoute(
+        builder: (context, state, child) {
+          return ResponsiveLayout(
+            desktopContent: ThreeColumnLayout(
+              leftSidebar: NostrSideMenu(
+                trailingButtonWidget: Padding(
+                    padding:
+                        const EdgeInsets.only(top: 40, left: 10, right: 10),
+                    child: NostrSideMenuPostButton()),
+                leadingWidget: SideMenuLogo(
+                  trailingWidget: RelaysConnectivityWidget(
+                    onTap: () {
+                      context.push('/nostr/relays');
+                    },
                   ),
                 ),
-                mainContent: child,
-                rightSidebar: RightSiedbar(),
               ),
-              mobileContent: MobileBottomMenuLayout(
-                mainContent: child,
-                bottomNavigationBar: AppBottomNavigationBar(),
+              mainContent: child,
+              rightSidebar: RightSiedbar(),
+            ),
+            mobileContent: MobileBottomMenuLayout(
+              mainContent: child,
+              bottomNavigationBar: AppBottomNavigationBar(),
+            ),
+          );
+        },
+        routes: [
+          GoRoute(
+            path: '/home',
+            builder: (context, state) => ResponsiveLayout(
+              desktopContent: const HomePageDesktop(),
+              mobileContent: const HomePageMobile(
+                initialTab: '/',
               ),
-            );
-          },
-          routes: [
-            GoRoute(
-              path: '/home',
-              builder: (context, state) => ResponsiveLayout(
-                desktopContent: const HomePageDesktop(),
-                mobileContent: const HomePageMobile(
-                  initialTab: '/',
+            ),
+          ),
+          GoRoute(
+            path: '/posts-and-replies',
+            builder: (context, state) => const HomePageMobile(
+              initialTab: '/posts-and-replies',
+            ),
+          ),
+          GoRoute(
+            path: '/search',
+            builder: (context, state) => const SearchPage(),
+          ),
+          GoRoute(
+            path: '/notifications',
+            builder: (context, state) => const NotificationPage(),
+          ),
+          GoRoute(
+            path: '/settings',
+            builder: (context, state) => const SettingsPage(),
+            routes: [
+              GoRoute(
+                path: 'file-servers',
+                builder: (context, state) => const SettingsFileServers(),
+              ),
+              GoRoute(
+                path: 'initial-route',
+                builder: (context, state) => const InitalRouteSettings(),
+              ),
+              GoRoute(
+                path: 'locale',
+                builder: (context, state) => const LocaleSettingsPage(),
+              ),
+              GoRoute(
+                path: 'moderation',
+                builder: (context, state) => const ModerationSettingsPage(),
+              ),
+              GoRoute(
+                path: 'theme',
+                builder: (context, state) => const ThemeSettingsPage(),
+              ),
+            ],
+          ),
+          GoRoute(
+            path: '/nostr/event',
+            builder: (context, state) {
+              final args = state.extra as Map<String, dynamic>;
+              return EventViewPage(
+                rootNoteId: args['root'] as String,
+                openNoteId: args['scrollIntoView'] as String?,
+              );
+            },
+          ),
+          GoRoute(
+            path: '/nostr/relays',
+            builder: (context, state) {
+              return RelaysPage();
+            },
+          ),
+          GoRoute(
+            path: '/nostr/profile/:pubkey',
+            builder: (context, state) => ProfilePage2(
+              pubkey: state.pathParameters['pubkey']!,
+            ),
+            routes: [
+              GoRoute(
+                path: 'edit',
+                builder: (context, state) => EditProfilePage(
+                  pubkey: state.pathParameters['pubkey']!,
                 ),
               ),
+            ],
+          ),
+          GoRoute(
+            path: '/nostr/search',
+            pageBuilder: (context, state) => CustomTransitionPage(
+              key: state.pageKey,
+              child: SearchFeedPage(query: state.extra as String),
+              transitionDuration: Duration.zero,
+              reverseTransitionDuration: Duration.zero,
+              transitionsBuilder:
+                  (context, animation, secondaryAnimation, child) => child,
             ),
-            GoRoute(
-              path: '/posts-and-replies',
-              builder: (context, state) => const HomePageMobile(
-                initialTab: '/posts-and-replies',
-              ),
+          ),
+          GoRoute(
+            path: '/nostr/blockedUsers',
+            builder: (context, state) => const BlockedUsers(),
+          ),
+          GoRoute(
+            path: '/edit-starter-pack',
+            builder: (context, state) => EditStarterPack(
+              starterPackIdentifier: state.extra as StarterPackIdentifier,
             ),
-            GoRoute(
-              path: '/search',
-              builder: (context, state) => const SearchPage(),
+          ),
+          GoRoute(
+            path: '/open-starter-pack',
+            builder: (context, state) => OpenStarterPack(
+              starterPackIdentifier: state.extra as StarterPackIdentifier,
             ),
-            GoRoute(
-              path: '/notifications',
-              builder: (context, state) => const NotificationPage(),
-            ),
-            GoRoute(
-              path: '/settings',
-              builder: (context, state) => const SettingsPage(),
-              routes: [
-                GoRoute(
-                  path: 'file-servers',
-                  builder: (context, state) => const SettingsFileServers(),
-                ),
-                GoRoute(
-                  path: 'initial-route',
-                  builder: (context, state) => const InitalRouteSettings(),
-                ),
-                GoRoute(
-                  path: 'locale',
-                  builder: (context, state) => const LocaleSettingsPage(),
-                ),
-                GoRoute(
-                  path: 'moderation',
-                  builder: (context, state) => const ModerationSettingsPage(),
-                ),
-                GoRoute(
-                  path: 'theme',
-                  builder: (context, state) => const ThemeSettingsPage(),
-                ),
-              ],
-            ),
-            GoRoute(
-              path: '/nostr/event',
-              builder: (context, state) {
-                final args = state.extra as Map<String, dynamic>;
-                return EventViewPage(
-                  rootNoteId: args['root'] as String,
-                  openNoteId: args['scrollIntoView'] as String?,
-                );
-              },
-            ),
-            GoRoute(
-              path: '/nostr/relays',
-              builder: (context, state) {
-                return RelaysPage();
-              },
-            ),
-            GoRoute(
-              path: '/nostr/profile/:pubkey',
-              builder: (context, state) => ProfilePage2(
-                pubkey: state.pathParameters['pubkey']!,
-              ),
-              routes: [
-                GoRoute(
-                  path: 'edit',
-                  builder: (context, state) => EditProfilePage(
-                    pubkey: state.pathParameters['pubkey']!,
-                  ),
-                ),
-              ],
-            ),
-            GoRoute(
-              path: '/nostr/search',
-              pageBuilder: (context, state) => CustomTransitionPage(
-                key: state.pageKey,
-                child: SearchFeedPage(query: state.extra as String),
-                transitionDuration: Duration.zero,
-                reverseTransitionDuration: Duration.zero,
-                transitionsBuilder:
-                    (context, animation, secondaryAnimation, child) => child,
-              ),
-            ),
-            GoRoute(
-              path: '/nostr/blockedUsers',
-              builder: (context, state) => const BlockedUsers(),
-            ),
-            GoRoute(
-              path: '/edit-starter-pack',
-              builder: (context, state) => EditStarterPack(
-                starterPackIdentifier: state.extra as StarterPackIdentifier,
-              ),
-            ),
-            GoRoute(
-              path: '/open-starter-pack',
-              builder: (context, state) => OpenStarterPack(
-                starterPackIdentifier: state.extra as StarterPackIdentifier,
-              ),
-            ),
-          ],
-        ),
-        // Routes outside the shell (no persistent layout)
-        GoRoute(
-          path: '/onboarding',
-          builder: (context, state) => const NostrOnboarding(),
-        ),
+          ),
+        ],
+      ),
+      // Routes outside the shell (no persistent layout)
+      GoRoute(
+        path: '/onboarding',
+        builder: (context, state) => const NostrOnboarding(),
+      ),
 
-        /// needed to support old installations
-      ]),
+      GoRoute(
+        path: '/:id',
+        builder: (context, state) => DeeplinkRecieverPage(
+          userParam: state.pathParameters['id']!,
+        ),
+      ),
+    ],
+  ),
 
+  /// needed to support old installations
   GoRoute(
     path: '/',
     redirect: (context, state) {
