@@ -521,6 +521,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get search => 'поиск';
 
   @override
+  String get explore => 'Исследовать';
+
+  @override
   String get more => 'Ещё';
 
   @override

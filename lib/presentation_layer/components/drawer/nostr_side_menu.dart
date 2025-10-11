@@ -10,6 +10,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../../config/palette.dart';
 import '../../../helpers/nprofile_helper.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../providers/ndk_provider.dart';
 import '../../providers/theme_provider.dart';
 
@@ -30,7 +31,7 @@ class NostrSideMenu extends ConsumerWidget {
   void _copyToClipboard(BuildContext context, String text) {
     Clipboard.setData(ClipboardData(text: text));
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Text("Copied to clipboard: $text"),
+      content: Text(AppLocalizations.of(context)!.copiedToClipboard(text)),
     ));
   }
 
@@ -55,9 +56,9 @@ class NostrSideMenu extends ConsumerWidget {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Text(
-                    "Share your Profile",
-                    style: TextStyle(color: Colors.white),
+                  Text(
+                    AppLocalizations.of(context)!.shareYourProfile,
+                    style: const TextStyle(color: Colors.white),
                   ),
                   const SizedBox(height: 40),
                   QrImageView(
@@ -177,7 +178,7 @@ class NostrSideMenu extends ConsumerWidget {
           _divider(context),
           _drawerItem(
               icon: PhosphorIcons.house(),
-              label: 'Home',
+              label: AppLocalizations.of(context)!.routeHome,
               routeName: '/home',
               onTap: () {
                 context.go('/home');
@@ -185,7 +186,7 @@ class NostrSideMenu extends ConsumerWidget {
           if (!hideOnMobile)
             _drawerItem(
                 icon: PhosphorIcons.magnifyingGlass(),
-                label: 'Explore',
+                label: AppLocalizations.of(context)!.explore,
                 routeName: '/search',
                 onTap: () {
                   context.go('/search');
@@ -193,42 +194,42 @@ class NostrSideMenu extends ConsumerWidget {
           if (!hideOnMobile)
             _drawerItem(
                 icon: PhosphorIcons.bell(),
-                label: 'Notifications',
+                label: AppLocalizations.of(context)!.routeNotifications,
                 routeName: '/notifications',
                 onTap: () {
                   context.go('/notifications');
                 }),
           _drawerItem(
-              label: 'Profile',
+              label: AppLocalizations.of(context)!.profile,
               routeName: '/nostr/profile',
               icon: PhosphorIcons.user(),
               onTap: () {
                 navigateToProfile(context, currentUserPubkey);
               }),
           _drawerItem(
-              label: 'Bookmarks',
+              label: AppLocalizations.of(context)!.bookmarks,
               routeName: '/nostr/bookmarks',
               icon: PhosphorIcons.bookmarkSimple(),
               onTap: () {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Not implemented yet'),
+                  SnackBar(
+                    content: Text(AppLocalizations.of(context)!.notImplementedYet),
                   ),
                 );
               }),
           _drawerItem(
-              label: 'Payments',
+              label: AppLocalizations.of(context)!.payments,
               routeName: 'payments',
               icon: PhosphorIcons.lightning(),
               onTap: () {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Not implemented yet'),
+                  SnackBar(
+                    content: Text(AppLocalizations.of(context)!.notImplementedYet),
                   ),
                 );
               }),
           _drawerItem(
-              label: 'Blocklist',
+              label: AppLocalizations.of(context)!.blocklist,
               routeName: '/nostr/blockedUsers',
               icon: PhosphorIcons.yinYang(),
               onTap: () {
@@ -241,7 +242,7 @@ class NostrSideMenu extends ConsumerWidget {
           Padding(
             padding: const EdgeInsets.only(left: 20),
             child: _textButton(
-                text: 'Settings',
+                text: AppLocalizations.of(context)!.settings,
                 onPressed: () {
                   context.push("/settings");
                 },
@@ -251,7 +252,7 @@ class NostrSideMenu extends ConsumerWidget {
           Padding(
               padding: const EdgeInsets.fromLTRB(20, 10, 15, 20),
               child: _textButton(
-                  text: 'Terms of Service',
+                  text: AppLocalizations.of(context)!.termsOfService,
                   context: context,
                   onPressed: () {
                     // lauch url

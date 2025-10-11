@@ -1078,6 +1078,12 @@ abstract class AppLocalizations {
   /// **'search'**
   String get search;
 
+  /// Explore menu item
+  ///
+  /// In en, this message translates to:
+  /// **'Explore'**
+  String get explore;
+
   /// More options tooltip
   ///
   /// In en, this message translates to:

@@ -15,14 +15,12 @@ import 'l10n/app_localizations.dart';
 //import 'data_layer/db/object_box_ndk/db_object_box.dart';
 import 'config/camelus_config.dart';
 
-import 'lifecycle/connectivity/connectivity.dart';
-import 'lifecycle/deep_links.dart';
 import 'domain_layer/usecases/app_auth.dart';
 import 'lifecycle/notifications/init_firebase.dart';
 import 'lifecycle/notifications/notifications_caller.dart';
 import 'objectbox_isolate.dart';
 import 'presentation_layer/init/init_moderation.dart';
-import 'presentation_layer/providers/app_lifecycle_provider.dart';
+
 import 'presentation_layer/providers/db_app_provider.dart';
 import 'presentation_layer/providers/db_ndk_provider.dart';
 import 'presentation_layer/providers/inbox_outbox_provider.dart';
@@ -62,8 +60,6 @@ Future<void> main() async {
       windowOptions,
     );
   }
-
-  await SystemTheme.accentColor.load();
 
   final initalData = await _getInitialData();
 
@@ -132,6 +128,14 @@ Future<void> main() async {
 
   InitModeration.initBloomFilter(provider: providerContainer);
 
+  final router = GoRouter(
+    navigatorKey: navigatorKey,
+    initialLocation: initalRoute,
+    routes: routes,
+    redirect: (c, s) => redirects(c, s),
+    debugLogDiagnostics: true,
+  );
+
   runApp(
     UncontrolledProviderScope(
       container: providerContainer,
@@ -139,58 +143,30 @@ Future<void> main() async {
         navigatorKey: navigatorKey,
         initialRoute: initalRoute,
         pubkey: mySigner?.getPublicKey() ?? '',
+        router: router,
       ),
     ),
   );
-
-  listenDeeplinks(
-    providerContainer: providerContainer,
-  );
-
-  listenToConnectivityChanges(providerContainer);
-
-  // init lifecycle
-  providerContainer.read(appLifecycleProvider);
 }
 
-class MyApp extends ConsumerStatefulWidget {
+class MyApp extends ConsumerWidget {
   final String initialRoute;
   final String pubkey;
   final GlobalKey<NavigatorState> navigatorKey;
+  final GoRouter router;
 
   const MyApp({
     super.key,
     required this.navigatorKey,
     required this.initialRoute,
     required this.pubkey,
+    required this.router,
   });
 
   @override
-  ConsumerState<MyApp> createState() => _MyAppState();
-}
-
-class _MyAppState extends ConsumerState<MyApp> {
-  late final GoRouter _router;
-
-  @override
-  void initState() {
-    super.initState();
-    _router = GoRouter(
-      navigatorKey: widget.navigatorKey,
-      initialLocation: widget.initialRoute,
-      routes: routes,
-    );
-  }
-
-  @override
-  void dispose() {
-    _router.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final currentLocale = ref.watch(currentLocaleProvider);
+
     final themeMode = ref.watch(themeModeProvider);
     final themeType = ref.watch(themeTypeProvider);
     final themeColor = ref.watch(themeColorProvider);
@@ -222,7 +198,7 @@ class _MyAppState extends ConsumerState<MyApp> {
 
     return Portal(
       child: MaterialApp.router(
-        routerConfig: _router,
+        routerConfig: router,
         scrollBehavior: const MaterialScrollBehavior().copyWith(
           scrollbars: false,
           dragDevices: {

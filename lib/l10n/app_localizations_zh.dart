@@ -507,6 +507,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get search => '搜索';
 
   @override
+  String get explore => '探索';
+
+  @override
   String get more => '更多';
 
   @override
