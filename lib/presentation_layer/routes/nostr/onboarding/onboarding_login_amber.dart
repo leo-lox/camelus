@@ -1,4 +1,5 @@
 import 'package:amberflutter/amberflutter.dart';
+import 'package:camelus/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -55,7 +56,7 @@ class _OnboardingLoginAmberPageState
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content:
-              Text('Please read and accept the terms and conditions first'),
+              Text(AppLocalizations.of(context)!.pleaseReadAndAcceptTerms),
         ),
       );
       return;

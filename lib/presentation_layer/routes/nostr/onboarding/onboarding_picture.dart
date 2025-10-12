@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:camelus/l10n/app_localizations.dart';
 import 'package:camelus/presentation_layer/atoms/crop_avatar.dart';
 import 'package:camelus/domain_layer/entities/onboarding_user_info.dart';
 import 'package:file_picker/file_picker.dart';
@@ -46,8 +47,8 @@ class _OnboardingPictureState extends ConsumerState<OnboardingPicture> {
         if (!mounted) return;
 
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('unspoorted image format'),
+          SnackBar(
+            content: Text(AppLocalizations.of(context)!.unsupportedImageFormat),
           ),
         );
       }
@@ -100,7 +101,7 @@ class _OnboardingPictureState extends ConsumerState<OnboardingPicture> {
               crossAxisAlignment: CrossAxisAlignment.baseline,
               textBaseline: TextBaseline.alphabetic,
               children: [
-                const Text("Welcome ", style: TextStyle(fontSize: 20)),
+                Text(AppLocalizations.of(context)!.welcome, style: const TextStyle(fontSize: 20)),
                 const SizedBox(
                   width: 5,
                 ),

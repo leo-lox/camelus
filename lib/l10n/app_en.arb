@@ -694,5 +694,77 @@
   "postsAndReplies": "Posts & Replies",
   "@postsAndReplies": {
     "description": "Posts and replies tab label"
+  },
+  "themeSettings": "Theme Settings",
+  "@themeSettings": {
+    "description": "Theme settings page title"
+  },
+  "themeMode": "Theme Mode",
+  "@themeMode": {
+    "description": "Theme mode section title"
+  },
+  "system": "System",
+  "@system": {
+    "description": "System option for theme mode and type"
+  },
+  "light": "Light",
+  "@light": {
+    "description": "Light theme mode option"
+  },
+  "dark": "Dark",
+  "@dark": {
+    "description": "Dark theme mode option"
+  },
+  "theme": "Theme",
+  "@theme": {
+    "description": "Theme selection section title"
+  },
+  "camelus": "Camelus",
+  "@camelus": {
+    "description": "Camelus theme option"
+  },
+  "nostr": "Nostr",
+  "@nostr": {
+    "description": "Nostr theme option"
+  },
+  "customColorTheme": "Custom Color Theme",
+  "@customColorTheme": {
+    "description": "Custom color theme section title"
+  },
+  "blue": "Blue",
+  "@blue": {
+    "description": "Blue color option"
+  },
+  "purple": "Purple",
+  "@purple": {
+    "description": "Purple color option"
+  },
+  "green": "Green",
+  "@green": {
+    "description": "Green color option"
+  },
+  "orange": "Orange",
+  "@orange": {
+    "description": "Orange color option"
+  },
+  "red": "Red",
+  "@red": {
+    "description": "Red color option"
+  },
+  "teal": "Teal",
+  "@teal": {
+    "description": "Teal color option"
+  },
+  "pink": "Pink",
+  "@pink": {
+    "description": "Pink color option"
+  },
+  "indigo": "Indigo",
+  "@indigo": {
+    "description": "Indigo color option"
+  },
+  "welcome": "Welcome",
+  "@welcome": {
+    "description": "Welcome greeting text"
   }
 }

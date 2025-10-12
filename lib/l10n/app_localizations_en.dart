@@ -530,4 +530,58 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get postsAndReplies => 'Posts & Replies';
+
+  @override
+  String get themeSettings => 'Theme Settings';
+
+  @override
+  String get themeMode => 'Theme Mode';
+
+  @override
+  String get system => 'System';
+
+  @override
+  String get light => 'Light';
+
+  @override
+  String get dark => 'Dark';
+
+  @override
+  String get theme => 'Theme';
+
+  @override
+  String get camelus => 'Camelus';
+
+  @override
+  String get nostr => 'Nostr';
+
+  @override
+  String get customColorTheme => 'Custom Color Theme';
+
+  @override
+  String get blue => 'Blue';
+
+  @override
+  String get purple => 'Purple';
+
+  @override
+  String get green => 'Green';
+
+  @override
+  String get orange => 'Orange';
+
+  @override
+  String get red => 'Red';
+
+  @override
+  String get teal => 'Teal';
+
+  @override
+  String get pink => 'Pink';
+
+  @override
+  String get indigo => 'Indigo';
+
+  @override
+  String get welcome => 'Welcome';
 }
