@@ -528,4 +528,58 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get postsAndReplies => 'โพสต์และการตอบกลับ';
+
+  @override
+  String get themeSettings => 'การตั้งค่าธีม';
+
+  @override
+  String get themeMode => 'โหมดธีม';
+
+  @override
+  String get system => 'ระบบ';
+
+  @override
+  String get light => 'สว่าง';
+
+  @override
+  String get dark => 'มืด';
+
+  @override
+  String get theme => 'ธีม';
+
+  @override
+  String get camelus => 'Camelus';
+
+  @override
+  String get nostr => 'Nostr';
+
+  @override
+  String get customColorTheme => 'ธีมสีที่กำหนดเอง';
+
+  @override
+  String get blue => 'น้ำเงิน';
+
+  @override
+  String get purple => 'ม่วง';
+
+  @override
+  String get green => 'เขียว';
+
+  @override
+  String get orange => 'ส้ม';
+
+  @override
+  String get red => 'แดง';
+
+  @override
+  String get teal => 'เขียวน้ำทะเล';
+
+  @override
+  String get pink => 'ชมพู';
+
+  @override
+  String get indigo => 'คราม';
+
+  @override
+  String get welcome => 'ยินดีต้อนรับ';
 }

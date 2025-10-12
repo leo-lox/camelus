@@ -1101,6 +1101,114 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Posts & Replies'**
   String get postsAndReplies;
+
+  /// Theme settings page title
+  ///
+  /// In en, this message translates to:
+  /// **'Theme Settings'**
+  String get themeSettings;
+
+  /// Theme mode section title
+  ///
+  /// In en, this message translates to:
+  /// **'Theme Mode'**
+  String get themeMode;
+
+  /// System option for theme mode and type
+  ///
+  /// In en, this message translates to:
+  /// **'System'**
+  String get system;
+
+  /// Light theme mode option
+  ///
+  /// In en, this message translates to:
+  /// **'Light'**
+  String get light;
+
+  /// Dark theme mode option
+  ///
+  /// In en, this message translates to:
+  /// **'Dark'**
+  String get dark;
+
+  /// Theme selection section title
+  ///
+  /// In en, this message translates to:
+  /// **'Theme'**
+  String get theme;
+
+  /// Camelus theme option
+  ///
+  /// In en, this message translates to:
+  /// **'Camelus'**
+  String get camelus;
+
+  /// Nostr theme option
+  ///
+  /// In en, this message translates to:
+  /// **'Nostr'**
+  String get nostr;
+
+  /// Custom color theme section title
+  ///
+  /// In en, this message translates to:
+  /// **'Custom Color Theme'**
+  String get customColorTheme;
+
+  /// Blue color option
+  ///
+  /// In en, this message translates to:
+  /// **'Blue'**
+  String get blue;
+
+  /// Purple color option
+  ///
+  /// In en, this message translates to:
+  /// **'Purple'**
+  String get purple;
+
+  /// Green color option
+  ///
+  /// In en, this message translates to:
+  /// **'Green'**
+  String get green;
+
+  /// Orange color option
+  ///
+  /// In en, this message translates to:
+  /// **'Orange'**
+  String get orange;
+
+  /// Red color option
+  ///
+  /// In en, this message translates to:
+  /// **'Red'**
+  String get red;
+
+  /// Teal color option
+  ///
+  /// In en, this message translates to:
+  /// **'Teal'**
+  String get teal;
+
+  /// Pink color option
+  ///
+  /// In en, this message translates to:
+  /// **'Pink'**
+  String get pink;
+
+  /// Indigo color option
+  ///
+  /// In en, this message translates to:
+  /// **'Indigo'**
+  String get indigo;
+
+  /// Welcome greeting text
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome'**
+  String get welcome;
 }
 
 class _AppLocalizationsDelegate

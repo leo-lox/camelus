@@ -1,3 +1,4 @@
+import 'package:camelus/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -14,7 +15,7 @@ class ThemeSettingsPage extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Theme Settings'),
+        title: Text(AppLocalizations.of(context)!.themeSettings),
       ),
       body: ListView(
         children: [
@@ -24,7 +25,7 @@ class ThemeSettingsPage extends ConsumerWidget {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: Text(
-              'Theme Mode',
+              AppLocalizations.of(context)!.themeMode,
               style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
@@ -35,7 +36,7 @@ class ThemeSettingsPage extends ConsumerWidget {
 
           ListTile(
             title: Text(
-              'System',
+              AppLocalizations.of(context)!.system,
               style: TextStyle(
                   color: Theme.of(context).colorScheme.onSurfaceVariant),
             ),
@@ -57,7 +58,7 @@ class ThemeSettingsPage extends ConsumerWidget {
 
           ListTile(
             title: Text(
-              'Light',
+              AppLocalizations.of(context)!.light,
               style: TextStyle(
                   color: Theme.of(context).colorScheme.onSurfaceVariant),
             ),
@@ -79,7 +80,7 @@ class ThemeSettingsPage extends ConsumerWidget {
 
           ListTile(
             title: Text(
-              'Dark',
+              AppLocalizations.of(context)!.dark,
               style: TextStyle(
                   color: Theme.of(context).colorScheme.onSurfaceVariant),
             ),
@@ -106,7 +107,7 @@ class ThemeSettingsPage extends ConsumerWidget {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: Text(
-              'Theme',
+              AppLocalizations.of(context)!.theme,
               style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
@@ -117,7 +118,7 @@ class ThemeSettingsPage extends ConsumerWidget {
 
           ListTile(
             title: Text(
-              'System',
+              AppLocalizations.of(context)!.system,
               style: TextStyle(
                   color: Theme.of(context).colorScheme.onSurfaceVariant),
             ),
@@ -139,7 +140,7 @@ class ThemeSettingsPage extends ConsumerWidget {
 
           ListTile(
             title: Text(
-              'Camelus',
+              AppLocalizations.of(context)!.camelus,
               style: TextStyle(
                   color: Theme.of(context).colorScheme.onSurfaceVariant),
             ),
@@ -161,7 +162,7 @@ class ThemeSettingsPage extends ConsumerWidget {
 
           ListTile(
             title: Text(
-              'Nostr',
+              AppLocalizations.of(context)!.nostr,
               style: TextStyle(
                   color: Theme.of(context).colorScheme.onSurfaceVariant),
             ),
@@ -195,7 +196,7 @@ class ThemeSettingsPage extends ConsumerWidget {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: Text(
-              'Custom Color Theme',
+              AppLocalizations.of(context)!.customColorTheme,
               style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
@@ -211,8 +212,9 @@ class ThemeSettingsPage extends ConsumerWidget {
               runSpacing: 16,
               children: [
                 _ColorOption(
+                  context: context,
                   color: Colors.blue,
-                  label: 'Blue',
+                  label: AppLocalizations.of(context)!.blue,
                   isSelected: themeState.type == ThemeType.custom &&
                       themeState.color == Colors.blue,
                   onTap: () {
@@ -223,8 +225,9 @@ class ThemeSettingsPage extends ConsumerWidget {
                   },
                 ),
                 _ColorOption(
+                  context: context,
                   color: Colors.purple,
-                  label: 'Purple',
+                  label: AppLocalizations.of(context)!.purple,
                   isSelected: themeState.type == ThemeType.custom &&
                       themeState.color == Colors.purple,
                   onTap: () {
@@ -237,8 +240,9 @@ class ThemeSettingsPage extends ConsumerWidget {
                   },
                 ),
                 _ColorOption(
+                  context: context,
                   color: Colors.green,
-                  label: 'Green',
+                  label: AppLocalizations.of(context)!.green,
                   isSelected: themeState.type == ThemeType.custom &&
                       themeState.color == Colors.green,
                   onTap: () {
@@ -251,8 +255,9 @@ class ThemeSettingsPage extends ConsumerWidget {
                   },
                 ),
                 _ColorOption(
+                  context: context,
                   color: Colors.orange,
-                  label: 'Orange',
+                  label: AppLocalizations.of(context)!.orange,
                   isSelected: themeState.type == ThemeType.custom &&
                       themeState.color == Colors.orange,
                   onTap: () {
@@ -265,8 +270,9 @@ class ThemeSettingsPage extends ConsumerWidget {
                   },
                 ),
                 _ColorOption(
+                  context: context,
                   color: Colors.red,
-                  label: 'Red',
+                  label: AppLocalizations.of(context)!.red,
                   isSelected: themeState.type == ThemeType.custom &&
                       themeState.color == Colors.red,
                   onTap: () {
@@ -277,8 +283,9 @@ class ThemeSettingsPage extends ConsumerWidget {
                   },
                 ),
                 _ColorOption(
+                  context: context,
                   color: Colors.teal,
-                  label: 'Teal',
+                  label: AppLocalizations.of(context)!.teal,
                   isSelected: themeState.type == ThemeType.custom &&
                       themeState.color == Colors.teal,
                   onTap: () {
@@ -289,8 +296,9 @@ class ThemeSettingsPage extends ConsumerWidget {
                   },
                 ),
                 _ColorOption(
+                  context: context,
                   color: Colors.pink,
-                  label: 'Pink',
+                  label: AppLocalizations.of(context)!.pink,
                   isSelected: themeState.type == ThemeType.custom &&
                       themeState.color == Colors.pink,
                   onTap: () {
@@ -301,8 +309,9 @@ class ThemeSettingsPage extends ConsumerWidget {
                   },
                 ),
                 _ColorOption(
+                  context: context,
                   color: Colors.indigo,
-                  label: 'Indigo',
+                  label: AppLocalizations.of(context)!.indigo,
                   isSelected: themeState.type == ThemeType.custom &&
                       themeState.color == Colors.indigo,
                   onTap: () {
@@ -324,12 +333,14 @@ class ThemeSettingsPage extends ConsumerWidget {
 }
 
 class _ColorOption extends StatelessWidget {
+  final BuildContext context;
   final Color color;
   final String label;
   final bool isSelected;
   final VoidCallback onTap;
 
   const _ColorOption({
+    required this.context,
     required this.color,
     required this.label,
     required this.isSelected,
@@ -380,7 +391,6 @@ class _ColorOption extends StatelessWidget {
               color: isSelected
                   ? Theme.of(context).colorScheme.onSurface
                   : Theme.of(context).colorScheme.onSurfaceVariant,
-              fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
               fontSize: 12,
             ),
           ),
