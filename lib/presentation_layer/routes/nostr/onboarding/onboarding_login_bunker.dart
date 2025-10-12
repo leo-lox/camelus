@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:go_router/go_router.dart';
 import 'package:ndk/domain_layer/usecases/bunkers/models/bunker_connection.dart';
 import 'package:ndk/ndk.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
@@ -13,7 +14,6 @@ import '../../../../config/palette.dart';
 import '../../../atoms/long_button.dart';
 import '../../../providers/ndk_provider.dart';
 import '../../../providers/signer_provider.dart';
-import '../../home_page.dart';
 
 class OnboardingLoginBunkerPage extends ConsumerStatefulWidget {
   final Function? onPressedBack;
@@ -73,9 +73,13 @@ class _OnboardingLoginBunkerPageState
   void _onBunkerLogin() async {
     if (!_termsAndConditions) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+        SnackBar(
           content: Text('Please read and accept the terms and conditions first',
-              style: TextStyle(color: Palette.black)),
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onSurface,
+                fontSize: 12,
+                fontWeight: FontWeight.normal,
+              )),
         ),
       );
       return;
@@ -128,9 +132,7 @@ class _OnboardingLoginBunkerPageState
       if (!mounted) return;
 
       // Navigate to home page
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
-        return HomePage(pubkey: signer.getPublicKey());
-      }));
+      context.go('/home');
     } catch (e) {
       _showError('Failed to connect: ${e.toString()}');
       setState(() {
@@ -143,7 +145,7 @@ class _OnboardingLoginBunkerPageState
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: null,
-      backgroundColor: Palette.background,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       resizeToAvoidBottomInset: false,
       body: SafeArea(
         child: Container(
@@ -160,7 +162,7 @@ class _OnboardingLoginBunkerPageState
                     IconButton(
                       icon: Icon(
                         PhosphorIcons.arrowLeft(),
-                        color: Palette.white,
+                        color: Theme.of(context).colorScheme.onSurface,
                       ),
                       onPressed: () => widget.onPressedBack!(),
                     ),
@@ -170,14 +172,14 @@ class _OnboardingLoginBunkerPageState
               SizedBox(
                 height: 200,
                 width: MediaQuery.of(context).size.width,
-                child: const Column(
+                child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
                       "login",
                       style: TextStyle(
-                        color: Palette.white,
+                        color: Theme.of(context).colorScheme.onSurface,
                         fontSize: 40,
                         fontFamily: "Poppins",
                       ),
@@ -200,24 +202,26 @@ class _OnboardingLoginBunkerPageState
                   controller: _bunkerUrlController,
                   enableIMEPersonalizedLearning: false,
                   textCapitalization: TextCapitalization.none,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     isDense: true,
                     hintText: 'bunker://',
-                    hintStyle:
-                        TextStyle(color: Palette.white, letterSpacing: 1.1),
+                    hintStyle: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurface,
+                        letterSpacing: 1.1),
                     filled: true,
-                    fillColor: Palette.extraDarkGray,
+                    fillColor: Paletter.extraDarkGray,
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.all(Radius.circular(10)),
-                      borderSide: BorderSide(color: Palette.extraDarkGray),
+                      borderSide: BorderSide(color: Paletter.extraDarkGray),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.all(Radius.circular(10)),
-                      borderSide: BorderSide(color: Palette.gray),
+                      borderSide: BorderSide(color: Paletter.gray),
                     ),
                     errorBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.all(Radius.circular(10)),
-                      borderSide: BorderSide(color: Palette.purple),
+                      borderSide: BorderSide(
+                          color: Theme.of(context).colorScheme.error),
                     ),
                   ),
                 ),
@@ -236,17 +240,19 @@ class _OnboardingLoginBunkerPageState
                           _pasteFromClipboard();
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Palette.background,
+                          backgroundColor:
+                              Theme.of(context).colorScheme.surface,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(20),
-                            side: const BorderSide(
-                                color: Palette.white, width: 1),
+                            side: BorderSide(
+                                color: Theme.of(context).colorScheme.onSurface,
+                                width: 1),
                           ),
                         ),
-                        child: const Text(
+                        child: Text(
                           'paste',
                           style: TextStyle(
-                            color: Palette.white,
+                            color: Theme.of(context).colorScheme.onSurface,
                             fontSize: 16,
                           ),
                         ),
@@ -266,14 +272,15 @@ class _OnboardingLoginBunkerPageState
                         _termsAndConditions = value!;
                       });
                     },
-                    activeColor: Palette.white,
-                    checkColor: Palette.black,
-                    fillColor: WidgetStateProperty.all(Palette.white),
+                    activeColor: Theme.of(context).colorScheme.surface,
+                    checkColor: Theme.of(context).colorScheme.primary,
+                    fillColor: WidgetStateProperty.all(
+                        Theme.of(context).colorScheme.onSurface),
                   ),
-                  const Text(
+                  Text(
                     "I have read and accept the ",
                     style: TextStyle(
-                      color: Palette.white,
+                      color: Theme.of(context).colorScheme.onSurface,
                       fontSize: 12,
                       fontWeight: FontWeight.normal,
                     ),
@@ -283,10 +290,10 @@ class _OnboardingLoginBunkerPageState
                       Uri url = Uri.parse("https://camelus.app/terms/");
                       launchUrl(url, mode: LaunchMode.externalApplication);
                     },
-                    child: const Text(
+                    child: Text(
                       "terms and conditions",
                       style: TextStyle(
-                        color: Palette.white,
+                        color: Theme.of(context).colorScheme.onSurface,
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
                         decoration: TextDecoration.underline,
@@ -301,10 +308,10 @@ class _OnboardingLoginBunkerPageState
                   Uri url = Uri.parse("https://camelus.app/privacy/");
                   launchUrl(url, mode: LaunchMode.externalApplication);
                 },
-                child: const Text(
+                child: Text(
                   "privacy policy",
                   style: TextStyle(
-                    color: Palette.white,
+                    color: Theme.of(context).colorScheme.onSurface,
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
                     decoration: TextDecoration.underline,
