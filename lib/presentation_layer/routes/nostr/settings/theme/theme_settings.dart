@@ -411,7 +411,6 @@ class _ColorOption extends StatelessWidget {
               color: isSelected
                   ? Theme.of(context).colorScheme.onSurface
                   : Theme.of(context).colorScheme.onSurfaceVariant,
-              fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
               fontSize: 12,
             ),
           ),
