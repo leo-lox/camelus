@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 
 import '../../config/palette.dart';
 
@@ -15,8 +14,8 @@ class CameraUpload extends StatelessWidget {
     return Container(
       width: size,
       height: size,
-      decoration: const BoxDecoration(
-        color: Palette.extraLightGray,
+      decoration: BoxDecoration(
+        color: Paletter.getExtraLightGray(context),
         shape: BoxShape.circle,
       ),
       child: Stack(
@@ -25,20 +24,20 @@ class CameraUpload extends StatelessWidget {
           Icon(
             Icons.camera_alt,
             size: size / 3,
-            color: Palette.darkGray,
+            color: Paletter.getDarkGray(context),
           ),
           Positioned(
             bottom: 0,
             right: 0,
             child: Container(
               padding: const EdgeInsets.all(4),
-              decoration: const BoxDecoration(
-                color: Palette.darkGray,
+              decoration: BoxDecoration(
+                color: Paletter.getDarkGray(context),
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 Icons.add,
-                color: Colors.white,
+                color: Theme.of(context).colorScheme.onSurface,
                 size: size / 6,
               ),
             ),

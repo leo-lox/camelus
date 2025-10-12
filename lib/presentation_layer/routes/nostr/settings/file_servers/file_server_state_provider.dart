@@ -50,7 +50,8 @@ class FileServersNotifier extends StateNotifier<AsyncValue<List<FileServer>>> {
           await ref.read(fileUploadProvider).getFileUploadServers([myPubkey!]);
 
       if (fetchedServers == null || fetchedServers.isEmpty) {
-        state = AsyncValue.error("no servers found", StackTrace.current);
+        state = AsyncValue.error(
+            "no servers found", StackTrace.current); // TODO add translation
         return;
       }
 
@@ -93,7 +94,7 @@ class FileServersNotifier extends StateNotifier<AsyncValue<List<FileServer>>> {
 
   void restoreDefaults() {
     state = AsyncValue.data(
-        DEFAULT_BLOSSOM_SERVERS.map((url) => FileServer(url: url)).toList());
+        defaultBlossomServers.map((url) => FileServer(url: url)).toList());
 
     for (final server in state.value!) {
       _checkOnlineStatus(server);

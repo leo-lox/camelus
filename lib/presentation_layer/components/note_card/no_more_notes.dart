@@ -9,7 +9,7 @@ class NoMoreNotes extends StatelessWidget {
   const NoMoreNotes({
     super.key,
     this.renderCallback,
-    this.text = "No more notes to show",
+    this.text = "No more notes to show", // TODO translate
   });
 
   @override
@@ -28,7 +28,7 @@ class NoMoreNotes extends StatelessWidget {
           child: Text(
             text,
             style: TextStyle(
-              color: Palette.darkGray,
+              color: Paletter.getDarkGray(context),
               fontSize: 16,
             ),
           ),

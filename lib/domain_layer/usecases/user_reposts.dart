@@ -65,12 +65,12 @@ class UserReposts {
 
     final selectedSource = recivedOnRelays.isNotEmpty
         ? recivedOnRelays.first
-        : DEFAULT_ACCOUNT_CREATION_RELAYS.keys.last;
+        : defaultAccountCreationRelays.keys.last;
 
     final postToRepostModel = NostrNoteModel(
       id: postToRepost.id,
       pubkey: postToRepost.pubkey,
-      created_at: postToRepost.created_at,
+      createdAt: postToRepost.createdAt,
       kind: postToRepost.kind,
       content: postToRepost.content,
       sig: postToRepost.sig,
@@ -81,7 +81,7 @@ class UserReposts {
     final myRepost = NostrNote(
       content: jsonEncode(postToRepostModel.toJson()),
       pubkey: selfPubkey!,
-      created_at: now,
+      createdAt: now,
       kind: 6,
       id: "",
       sig: "",
@@ -89,7 +89,7 @@ class UserReposts {
         NostrTag(
           type: "e",
           value: postToRepost.id,
-          recommended_relay: selectedSource,
+          recommendedRelay: selectedSource,
         ),
         NostrTag(type: "p", value: postToRepost.pubkey),
       ],

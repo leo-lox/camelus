@@ -1,29 +1,27 @@
 import 'dart:async';
-import 'dart:convert';
-import 'dart:developer';
 
+import 'dart:developer';
+import 'dart:io';
+import 'package:camelus/presentation_layer/components/trends/trending_hashtags_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
-
 import '../../config/palette.dart';
 import '../../domain_layer/entities/contact_list.dart';
-import '../../domain_layer/entities/nostr_band_hashtags.dart';
-import '../../domain_layer/entities/nostr_band_people.dart';
 import '../../domain_layer/entities/nostr_note.dart';
 import '../../domain_layer/entities/user_metadata.dart';
 import '../../domain_layer/usecases/search.dart';
-import '../atoms/hashtag_card.dart';
 import '../components/note_card/nostr_parser.dart';
 import '../components/note_card/note_card_container.dart';
 import '../components/person_card.dart';
 import '../components/search_bar.dart';
 import '../components/starter_packs/trending_starter_packs/trending_starter_packs.dart';
+import '../components/trends/trending_people_widget.dart';
 import '../providers/app_bar_provider/app_bottom_bar_provider.dart';
 import '../providers/following_contact_state_provider.dart';
 import '../providers/ndk_provider.dart';
-import '../providers/nostr_band_provider.dart';
 import '../providers/search_provider.dart';
 import 'nostr/profile/profile_page_2.dart';
 
@@ -161,7 +159,6 @@ class _SearchPageState extends ConsumerState<SearchPage> {
   final FocusNode _searchFocusNode = FocusNode();
   StreamSubscription? _navigationSubscription;
 
-  @override
   bool get wantKeepAlive => false; // keep state alive when switching tabs
 
   @override
@@ -214,7 +211,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
 
   void _onSubmit(String value) {
     if (mounted) {
-      Navigator.pushNamed(context, '/nostr/search', arguments: value);
+      context.push('/nostr/search', extra: value);
     }
   }
 
@@ -252,16 +249,26 @@ class _SearchPageState extends ConsumerState<SearchPage> {
         }
       },
       child: Scaffold(
-        backgroundColor: Palette.background,
         body: Column(
           children: [
-            SearchBarWidget(
-              onSearchChanged: _onSearchChanged,
-              onSubmit: _onSubmit,
-              helpSearch: _helpSearch,
-              externalFocusNode: _searchFocusNode,
-              externalController: _searchController,
-            ),
+            Builder(builder: (context) {
+              final child = SearchBarWidget(
+                onSearchChanged: _onSearchChanged,
+                onSubmit: _onSubmit,
+                helpSearch: _helpSearch,
+                externalFocusNode: _searchFocusNode,
+                externalController: _searchController,
+              );
+
+              final isDesktop =
+                  Platform.isLinux || Platform.isMacOS || Platform.isWindows;
+              if (!isDesktop) return child;
+
+              return Padding(
+                padding: const EdgeInsets.only(top: 16),
+                child: child,
+              );
+            }),
             Expanded(
               child: searchState.isSearching
                   ? _buildSearchResults(searchState)
@@ -291,10 +298,10 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
-                        const Text(
+                        Text(
                           "trends",
                           style: TextStyle(
-                            color: Palette.white,
+                            color: Theme.of(context).colorScheme.onSurface,
                             fontSize: 27,
                             fontWeight: FontWeight.bold,
                           ),
@@ -307,14 +314,15 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                               mode: LaunchMode.externalApplication,
                             );
                           },
-                          child: const Text(
+                          child: Text(
                             "by nostr.band",
-                            style: TextStyle(color: Palette.gray, fontSize: 14),
+                            style: TextStyle(
+                                color: Paletter.getGray(context), fontSize: 14),
                           ),
                         ),
                       ],
                     ),
-                    _buildTrendingHashtags(),
+                    TrendingHashtagsWidget(),
                   ],
                 ),
               ),
@@ -322,12 +330,12 @@ class _SearchPageState extends ConsumerState<SearchPage> {
               const SizedBox(height: 20),
 
               // starter packs section
-              const Padding(
+              Padding(
                 padding: EdgeInsets.only(left: 20, bottom: 10),
                 child: Text(
                   "recent starter packs",
                   style: TextStyle(
-                    color: Palette.white,
+                    color: Theme.of(context).colorScheme.onSurface,
                     fontSize: 25,
                     fontWeight: FontWeight.bold,
                   ),
@@ -341,24 +349,9 @@ class _SearchPageState extends ConsumerState<SearchPage> {
               const SizedBox(height: 20),
 
               // trending people section
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      "trending people",
-                      style: TextStyle(
-                        color: Palette.white,
-                        fontSize: 25,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    _buildTrendingPeople(),
-                  ],
-                ),
-              ),
+              TrendingPeopleWidget(
+                onFollowChange: _changeFollowing,
+              )
             ],
           ),
         ),
@@ -379,7 +372,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
             // Search query display
             if (searchState.searchQuery.isNotEmpty) ...[
               _buildSearchQueryCard(searchState.searchQuery),
-              const Divider(color: Palette.extraDarkGray, height: 20),
+              Divider(color: Paletter.getExtraDarkGray(context), height: 20),
             ],
 
             // Loading indicator
@@ -398,7 +391,9 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                   padding: const EdgeInsets.all(20.0),
                   child: Text(
                     'Error: ${searchState.error}',
-                    style: const TextStyle(color: Colors.red, fontSize: 16),
+                    style: TextStyle(
+                        color: Theme.of(context).colorScheme.error,
+                        fontSize: 16),
                   ),
                 ),
               ),
@@ -416,12 +411,13 @@ class _SearchPageState extends ConsumerState<SearchPage> {
               if (searchState.searchResultsUsers.isEmpty &&
                   searchState.searchResultsNotes.isEmpty &&
                   searchState.searchQuery.isNotEmpty)
-                const Center(
+                Center(
                   child: Padding(
                     padding: EdgeInsets.all(20.0),
                     child: Text(
                       "No results found",
-                      style: TextStyle(color: Palette.gray, fontSize: 16),
+                      style: TextStyle(
+                          color: Paletter.getGray(context), fontSize: 16),
                     ),
                   ),
                 ),
@@ -442,10 +438,12 @@ class _SearchPageState extends ConsumerState<SearchPage> {
             Expanded(
               child: Text(
                 'Search for "$query"',
-                style: const TextStyle(color: Palette.white, fontSize: 16),
+                style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface,
+                    fontSize: 16),
               ),
             ),
-            Icon(PhosphorIcons.arrowUpLeft(), color: Palette.gray),
+            Icon(PhosphorIcons.arrowUpLeft(), color: Paletter.getGray(context)),
           ],
         ),
       ),
@@ -456,10 +454,10 @@ class _SearchPageState extends ConsumerState<SearchPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           "People",
           style: TextStyle(
-            color: Palette.white,
+            color: Theme.of(context).colorScheme.onSurface,
             fontSize: 20,
             fontWeight: FontWeight.bold,
           ),
@@ -493,10 +491,10 @@ class _SearchPageState extends ConsumerState<SearchPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           "Notes",
           style: TextStyle(
-            color: Palette.white,
+            color: Theme.of(context).colorScheme.onSurface,
             fontSize: 20,
             fontWeight: FontWeight.bold,
           ),
@@ -507,157 +505,11 @@ class _SearchPageState extends ConsumerState<SearchPage> {
       ],
     );
   }
-
-  Widget _buildTrendingHashtags() {
-    return Consumer(
-      builder: (context, ref, child) {
-        final nostrBandAsync = ref.watch(
-          nostrBandProvider.select(
-            (provider) => provider.getTrendingHashtags(),
-          ),
-        );
-
-        return FutureBuilder<NostrBandHashtags?>(
-          future: nostrBandAsync,
-          builder: (context, snapshot) {
-            if (snapshot.hasError) {
-              log(snapshot.error.toString());
-              return const Text(
-                'Something went wrong',
-                style: TextStyle(color: Palette.gray),
-              );
-            }
-
-            if (snapshot.hasData && snapshot.data != null) {
-              return _buildHashtagsList(snapshot.data!, 10);
-            }
-
-            if (snapshot.connectionState == ConnectionState.done) {
-              return const Text(
-                'No connection',
-                style: TextStyle(color: Palette.gray),
-              );
-            }
-
-            return Column(
-              children: List.generate(
-                10,
-                (i) => const HashtagCardSkeleton(),
-              ),
-            );
-          },
-        );
-      },
-    );
-  }
-
-  Widget _buildTrendingPeople() {
-    return Consumer(
-      builder: (context, ref, child) {
-        final contactList = ref.watch(contactListSelfStateProvider).contactList;
-        final nostrBandAsync = ref.watch(
-          nostrBandProvider.select(
-            (provider) => provider.getTrendingPeople(),
-          ),
-        );
-
-        return FutureBuilder<NostrBandPeople?>(
-          future: nostrBandAsync,
-          builder: (context, snapshot) {
-            if (snapshot.hasError) {
-              log(snapshot.error.toString());
-              return const Text(
-                'Something went wrong',
-                style: TextStyle(color: Palette.gray),
-              );
-            }
-
-            if (snapshot.hasData && snapshot.data != null) {
-              return _buildPeopleList(snapshot.data!, 10, contactList);
-            }
-
-            if (snapshot.connectionState == ConnectionState.done) {
-              return const Text(
-                'No connection',
-                style: TextStyle(color: Palette.gray),
-              );
-            }
-
-            return const Center(child: CircularProgressIndicator());
-          },
-        );
-      },
-    );
-  }
-
-  Widget _buildHashtagsList(NostrBandHashtags api, int limit) {
-    final hashtags = api.hashtags;
-    final displayLimit = limit > hashtags.length ? hashtags.length : limit;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: List.generate(
-        displayLimit,
-        (i) {
-          final hashtag = hashtags[i];
-          return HashtagCard(
-            index: i,
-            hashtag: hashtag.hashtag,
-            postsCount: hashtag.posts,
-            onTap: (hashtag) {
-              Navigator.pushNamed(
-                context,
-                '/nostr/search',
-                arguments: "#$hashtag",
-              );
-            },
-          );
-        },
-      ),
-    );
-  }
-
-  Widget _buildPeopleList(
-    NostrBandPeople api,
-    int limit,
-    ContactList contactList,
-  ) {
-    final profiles = api.profiles.take(limit).toList();
-
-    return Column(
-      children: profiles.map((profile) {
-        try {
-          final metadata = jsonDecode(profile.profile.content);
-          return PersonCard(
-            pubkey: profile.pubkey,
-            name: metadata['name'] ?? '',
-            pictureUrl: metadata['picture'] ?? '',
-            about: metadata['about'] ?? '',
-            nip05: metadata['nip05'],
-            isFollowing: contactList.contacts.contains(profile.pubkey),
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => ProfilePage2(pubkey: profile.pubkey),
-                ),
-              );
-            },
-            onFollowTab: (followState) =>
-                _changeFollowing(followState, profile.pubkey),
-          );
-        } catch (e) {
-          log('Error parsing profile metadata: $e');
-          return const SizedBox.shrink();
-        }
-      }).toList(),
-    );
-  }
 }
 
 void _helpSearch(BuildContext context) {
   showModalBottomSheet(
-    backgroundColor: Palette.extraDarkGray,
+    backgroundColor: Paletter.getExtraDarkGray(context),
     context: context,
     shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.only(
@@ -672,35 +524,35 @@ void _helpSearch(BuildContext context) {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
-            children: const [
-            Text(
-              'Search',
-              style: TextStyle(
-                color: Palette.white,
-                fontSize: 30,
-                fontWeight: FontWeight.bold,
+            children: [
+              Text(
+                'Search',
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface,
+                  fontSize: 30,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-            ),
-            SizedBox(height: 25),
-            _SearchHelpItem(
-              title: '#hashtag',
-              description: 'search for hashtags',
-            ),
-            SizedBox(height: 20),
-            _SearchHelpItem(
-              title: 'username',
-              description: 'works only if already in cache',
-            ),
-            SizedBox(height: 20),
-            _SearchHelpItem(
-              title: 'user@domain.tld',
-              description: 'nip05 address',
-            ),
-            SizedBox(height: 20),
-            _SearchHelpItem(
-              title: '@mastodon@domain.tld',
-              description: 'mastodon address (provided by mostr.pub)',
-            ),
+              SizedBox(height: 25),
+              _SearchHelpItem(
+                title: '#hashtag',
+                description: 'search for hashtags',
+              ),
+              SizedBox(height: 20),
+              _SearchHelpItem(
+                title: 'username',
+                description: 'works only if already in cache',
+              ),
+              SizedBox(height: 20),
+              _SearchHelpItem(
+                title: 'user@domain.tld',
+                description: 'nip05 address',
+              ),
+              SizedBox(height: 20),
+              _SearchHelpItem(
+                title: '@mastodon@domain.tld',
+                description: 'mastodon address (provided by mostr.pub)',
+              ),
             ],
           ),
         ),
@@ -725,8 +577,8 @@ class _SearchHelpItem extends StatelessWidget {
       children: [
         Text(
           title,
-          style: const TextStyle(
-            color: Palette.white,
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.onSurface,
             fontSize: 20,
             fontWeight: FontWeight.bold,
           ),
@@ -734,8 +586,8 @@ class _SearchHelpItem extends StatelessWidget {
         const SizedBox(height: 5),
         Text(
           description,
-          style: const TextStyle(
-            color: Palette.white,
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.onSurface,
             fontSize: 18,
           ),
         ),

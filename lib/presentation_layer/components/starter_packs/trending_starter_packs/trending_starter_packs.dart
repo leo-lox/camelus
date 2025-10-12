@@ -2,6 +2,7 @@ import 'package:camelus/presentation_layer/atoms/spinner_center.dart';
 import 'package:camelus/presentation_layer/components/starter_packs/starter_pack_card.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../domain_layer/entities/starter_pack_identifier.dart';
 import 'trending_starter_packs_state_provider.dart';
@@ -37,14 +38,11 @@ class TrendingStarterPacks extends ConsumerWidget {
                 key: ValueKey(myPack.id),
                 pack: myPack,
                 onTab: () {
-                  Navigator.pushNamed(
-                    context,
-                    '/open-starter-pack',
-                    arguments: StarterPackIdentifier(
-                      name: myPack.name,
-                      pubkey: myPack.pubKey,
-                    ),
-                  );
+                  context.push('/open-starter-pack',
+                      extra: StarterPackIdentifier(
+                        name: myPack.name,
+                        pubkey: myPack.pubKey,
+                      ));
                 },
               ),
             ),

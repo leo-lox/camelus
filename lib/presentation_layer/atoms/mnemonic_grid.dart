@@ -47,9 +47,9 @@ class MnemonicSentenceGrid extends StatelessWidget {
                   left: 4,
                   child: Text(
                     '${index + 1}',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 10,
-                      color: Palette.gray,
+                      color: Paletter.getGray(context),
                     ),
                   ),
                 ),

@@ -8,7 +8,6 @@ import '../../domain_layer/entities/nostr_note.dart';
 import '../../domain_layer/entities/nostr_tag.dart';
 import '../../helpers/nprofile_helper.dart';
 import '../components/write_post/post_settings_dialog.dart';
-import 'edit_relays_provider.dart';
 import 'file_upload_provider.dart';
 import 'get_notes_provider.dart';
 import 'ndk_provider.dart';
@@ -144,7 +143,7 @@ class WritePostNotifier extends Notifier<WritePostState> {
         final rootTag = NostrTag(
           type: "e",
           value: replyIsReplyToRoot.value,
-          recommended_relay: "",
+          recommendedRelay: "",
           marker: "root",
         );
         tags.add(rootTag);
@@ -153,7 +152,7 @@ class WritePostNotifier extends Notifier<WritePostState> {
         final rootTag = NostrTag(
           type: "e",
           value: state.replyToNote!.id,
-          recommended_relay: "",
+          recommendedRelay: "",
           marker: "root",
         );
         tags.add(rootTag);
@@ -163,7 +162,7 @@ class WritePostNotifier extends Notifier<WritePostState> {
       final replyTag = NostrTag(
         type: "e",
         value: state.replyToNote!.id,
-        recommended_relay: "",
+        recommendedRelay: "",
         marker: "reply",
       );
       tags.add(replyTag);
@@ -204,7 +203,7 @@ class WritePostNotifier extends Notifier<WritePostState> {
         tags.add(NostrTag(
             type: "p",
             value: pubkey,
-            recommended_relay:
+            recommendedRelay:
                 "" // todo  await editRelayProvider.getRelayHintsInbox(pubkey);
             // No marker for p tags according to NIP-10
             ));
@@ -218,7 +217,7 @@ class WritePostNotifier extends Notifier<WritePostState> {
           tags.add(NostrTag(
               type: "p",
               value: pubkey,
-              recommended_relay:
+              recommendedRelay:
                   "" //todo  await editRelayProvider.getRelayHintsInbox(pubkey);,
               ));
         }
@@ -302,7 +301,7 @@ class WritePostNotifier extends Notifier<WritePostState> {
         type: 'client',
         value: CamelusConfig.name,
         marker: CamelusConfig.identifierAddress,
-        recommended_relay: CamelusConfig.homeRelay,
+        recommendedRelay: CamelusConfig.homeRelay,
       ));
     }
 
@@ -311,7 +310,7 @@ class WritePostNotifier extends Notifier<WritePostState> {
         NostrNote(
           id: '',
           pubkey: pubkey,
-          created_at: now,
+          createdAt: now,
           kind: 1,
           content: content,
           sig: '',

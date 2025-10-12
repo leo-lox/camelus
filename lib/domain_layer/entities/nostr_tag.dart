@@ -5,25 +5,25 @@ class NostrTag {
 
   final String value;
 
-  final String? recommended_relay;
+  final String? recommendedRelay;
 
   final String? marker;
 
   NostrTag({
     required this.type,
     required this.value,
-    this.recommended_relay,
+    this.recommendedRelay,
     this.marker,
   });
 
   List<String> toList() {
     List<String> raw = [type, value];
 
-    if (recommended_relay != null && recommended_relay!.isNotEmpty) {
-      raw.add(recommended_relay!);
-    }
     if (marker != null && marker!.isNotEmpty) {
+      raw.add(recommendedRelay ?? '');
       raw.add(marker!);
+    } else if (recommendedRelay != null && recommendedRelay!.isNotEmpty) {
+      raw.add(recommendedRelay!);
     }
 
     return raw;
@@ -31,6 +31,6 @@ class NostrTag {
 
   @override
   String toString() {
-    return 'NostrTag{type: $type, value: $value, recommended_relay: $recommended_relay, marker: $marker}';
+    return 'NostrTag{type: $type, value: $value, recommended_relay: $recommendedRelay, marker: $marker}';
   }
 }

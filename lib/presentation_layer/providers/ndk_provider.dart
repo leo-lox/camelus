@@ -15,7 +15,7 @@ final ndkProvider = Provider<Ndk>((ref) {
     engine: NdkEngine.JIT,
     cache: db!,
     eventVerifier: eventVerifier,
-    bootstrapRelays: CAMELUS_BOOTSTRAP_RELAYS,
+    bootstrapRelays: camelusBootstrapRelays,
     logLevel: Logger.logLevels.warning,
     defaultBroadcastConsiderDonePercent: 0.2,
     eventOutFilters: [bloomFilterRef],

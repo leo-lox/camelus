@@ -1,11 +1,11 @@
 import 'package:camelus/config/palette.dart';
+import 'package:camelus/l10n/app_localizations.dart';
 import 'package:camelus/presentation_layer/providers/ndk_provider.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ndk/entities.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 class RelaysPage extends ConsumerStatefulWidget {
@@ -26,14 +26,12 @@ class _RelaysPageState extends ConsumerState<RelaysPage> {
     final ndk = ref.watch(ndkProvider);
 
     return Scaffold(
-      backgroundColor: Palette.background,
       appBar: AppBar(
-        backgroundColor: Palette.background,
         leading: IconButton(
           icon: Icon(PhosphorIcons.arrowLeft()),
           onPressed: () => Navigator.of(context).pop(),
         ),
-        title: const Text('Relays'),
+        title: Text(AppLocalizations.of(context)!.relays),
       ),
       body: SafeArea(
         child: StreamBuilder<Map<String, RelayConnectivity>>(
@@ -79,10 +77,12 @@ class _RelaysPageState extends ConsumerState<RelaysPage> {
                                           return Container(
                                             width: 50,
                                             height: 50,
-                                            color: Palette.lightGray,
+                                            color:
+                                                Paletter.getLightGray(context),
                                             child: Icon(
                                               PhosphorIcons.globe(),
-                                              color: Palette.darkGray,
+                                              color:
+                                                  Paletter.getDarkGray(context),
                                             ),
                                           );
                                         },
@@ -92,13 +92,13 @@ class _RelaysPageState extends ConsumerState<RelaysPage> {
                                       width: 50,
                                       height: 50,
                                       decoration: BoxDecoration(
-                                        color: Palette.lightGray,
+                                        color: Paletter.getLightGray(context),
                                         borderRadius:
                                             BorderRadius.circular(8.0),
                                       ),
                                       child: Icon(
                                         PhosphorIcons.globe(),
-                                        color: Palette.darkGray,
+                                        color: Paletter.getDarkGray(context),
                                       ),
                                     ),
                               const SizedBox(width: 16),
@@ -120,7 +120,7 @@ class _RelaysPageState extends ConsumerState<RelaysPage> {
                                       url,
                                       style: TextStyle(
                                         fontSize: 14,
-                                        color: Palette.gray,
+                                        color: Paletter.getGray(context),
                                       ),
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
@@ -133,8 +133,8 @@ class _RelaysPageState extends ConsumerState<RelaysPage> {
                                     ? PhosphorIcons.plugsConnected()
                                     : PhosphorIcons.plugs(),
                                 color: relay.isConnected
-                                    ? Palette.primary
-                                    : Palette.warn,
+                                    ? Theme.of(context).colorScheme.primary
+                                    : Colors.orangeAccent,
                                 size: 28,
                               ),
                             ],
@@ -146,18 +146,23 @@ class _RelaysPageState extends ConsumerState<RelaysPage> {
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
                               _StatItem(
+                                context: context,
                                 icon: PhosphorIcons.arrowDown(),
-                                label: 'Events Read',
+                                label: AppLocalizations.of(context)!.eventsRead,
                                 value: relay.stats.eventsRead.toString(),
                               ),
                               _StatItem(
+                                context: context,
                                 icon: PhosphorIcons.arrowUp(),
-                                label: 'Events Written',
+                                label:
+                                    AppLocalizations.of(context)!.eventsWritten,
                                 value: relay.stats.eventsWritten.toString(),
                               ),
                               _StatItem(
+                                context: context,
                                 icon: PhosphorIcons.lighthouse(),
-                                label: 'Connection Source',
+                                label: AppLocalizations.of(context)!
+                                    .connectionSource,
                                 value: relay.relay.connectionSource.name,
                               ),
                             ],
@@ -174,7 +179,7 @@ class _RelaysPageState extends ConsumerState<RelaysPage> {
                                 relay.relayInfo!.description,
                                 style: TextStyle(
                                   fontSize: 14,
-                                  color: Palette.lightGray,
+                                  color: Paletter.getLightGray(context),
                                 ),
                                 maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
@@ -189,7 +194,7 @@ class _RelaysPageState extends ConsumerState<RelaysPage> {
                                 "contact: ${relay.relayInfo!.contact}",
                                 style: TextStyle(
                                   fontSize: 14,
-                                  color: Palette.gray,
+                                  color: Paletter.getGray(context),
                                 ),
                                 maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
@@ -219,10 +224,13 @@ class _RelaysPageState extends ConsumerState<RelaysPage> {
                                             MaterialTapTargetSize.shrinkWrap,
                                       ),
                                       child: Text(
-                                        'Privacy Policy',
+                                        AppLocalizations.of(context)!
+                                            .privacyPolicy,
                                         style: TextStyle(
                                           fontSize: 12,
-                                          color: Palette.primary,
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .primary,
                                         ),
                                       ),
                                     ),
@@ -233,7 +241,7 @@ class _RelaysPageState extends ConsumerState<RelaysPage> {
                                       child: Text(
                                         '•',
                                         style: TextStyle(
-                                          color: Palette.darkGray,
+                                          color: Paletter.getDarkGray(context),
                                         ),
                                       ),
                                     ),
@@ -253,10 +261,13 @@ class _RelaysPageState extends ConsumerState<RelaysPage> {
                                             MaterialTapTargetSize.shrinkWrap,
                                       ),
                                       child: Text(
-                                        'Terms of Service',
+                                        AppLocalizations.of(context)!
+                                            .termsOfService,
                                         style: TextStyle(
                                           fontSize: 12,
-                                          color: Palette.primary,
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .primary,
                                         ),
                                       ),
                                     ),
@@ -271,7 +282,8 @@ class _RelaysPageState extends ConsumerState<RelaysPage> {
               );
             }
 
-            return const Center(child: Text("No data available"));
+            return Center(
+                child: Text(AppLocalizations.of(context)!.noDataAvailable));
           },
         ),
       ),
@@ -281,31 +293,32 @@ class _RelaysPageState extends ConsumerState<RelaysPage> {
 
 // Helper widget for stats display
 class _StatItem extends StatelessWidget {
+  final BuildContext context;
   final IconData icon;
   final String label;
   final String value;
-  final double maxWidth;
+  final double maxWidth = 120;
 
   const _StatItem({
+    required this.context,
     required this.icon,
     required this.label,
     required this.value,
-    this.maxWidth = 120,
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext buildContext) {
     return Container(
       constraints: BoxConstraints(maxWidth: maxWidth),
       child: Column(
         children: [
-          Icon(icon, size: 20, color: Palette.gray),
+          Icon(icon, size: 20, color: Paletter.getGray(context)),
           const SizedBox(height: 4),
           Text(
             label,
             style: TextStyle(
               fontSize: 12,
-              color: Palette.gray,
+              color: Paletter.getGray(context),
             ),
           ),
           const SizedBox(height: 2),

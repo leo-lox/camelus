@@ -1,3 +1,4 @@
+import 'package:camelus/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -69,7 +70,6 @@ class _OnboardingInvitedByState extends ConsumerState<OnboardingInvitedBy> {
     final invitedSet = _getInvitedSet(ref);
 
     return Scaffold(
-      backgroundColor: Palette.background,
       body: inviteeLists.isLoading
           ? const Center(
               child: CircularProgressIndicator(),
@@ -84,8 +84,11 @@ class _OnboardingInvitedByState extends ConsumerState<OnboardingInvitedBy> {
                       begin: Alignment.topLeft,
                       end: Alignment.bottomCenter,
                       colors: [
-                        Palette.primary.withOpacity(0.7),
-                        Palette.primary,
+                        Theme.of(context)
+                            .colorScheme
+                            .primary
+                            .withValues(alpha: 0.7),
+                        Theme.of(context).colorScheme.primary,
                       ],
                     ),
                   ),
@@ -97,7 +100,7 @@ class _OnboardingInvitedByState extends ConsumerState<OnboardingInvitedBy> {
                         child: Text(
                           invitedSet?.title ?? '',
                           style: TextStyle(
-                            color: Palette.extraLightGray,
+                            color: Paletter.getExtraLightGray(context),
                             fontSize: 25,
                             fontWeight: FontWeight.bold,
                           ),
@@ -124,15 +127,18 @@ class _OnboardingInvitedByState extends ConsumerState<OnboardingInvitedBy> {
                                     TextSpan(
                                       text: inviteeMetadata.userMetadata?.name,
                                       style: TextStyle(
-                                        color: Palette.extraLightGray,
+                                        color:
+                                            Paletter.getExtraLightGray(context),
                                         fontSize: 18,
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),
                                     TextSpan(
-                                      text: ' invited you to join',
+                                      text: AppLocalizations.of(context)!
+                                          .invitedYouToJoin,
                                       style: TextStyle(
-                                        color: Palette.extraLightGray,
+                                        color:
+                                            Paletter.getExtraLightGray(context),
                                         fontSize: 16,
                                       ),
                                     ),
@@ -148,10 +154,10 @@ class _OnboardingInvitedByState extends ConsumerState<OnboardingInvitedBy> {
                 ),
                 const SizedBox(height: 10),
                 if (invitedSet != null)
-                  const Text(
-                    "You'll follow these people right away",
+                  Text(
+                    AppLocalizations.of(context)!.youWillFollowThesePeople,
                     style: TextStyle(
-                      color: Palette.extraLightGray,
+                      color: Paletter.getExtraLightGray(context),
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ),
@@ -159,13 +165,15 @@ class _OnboardingInvitedByState extends ConsumerState<OnboardingInvitedBy> {
                 const SizedBox(height: 10),
                 if (invitedSet == null)
                   Expanded(
-                    child: const Center(
+                    child: Center(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Text("👀 no starter pack found "),
+                          Text(
+                              AppLocalizations.of(context)!.noStarterPackFound),
                           SizedBox(height: 10),
-                          Text("no worries, you can still join Camelus!"),
+                          Text(AppLocalizations.of(context)!
+                              .noWorriesYouCanStillJoin),
                         ],
                       ),
                     ),
@@ -196,8 +204,10 @@ class _OnboardingInvitedByState extends ConsumerState<OnboardingInvitedBy> {
                                   children: [
                                     Text(
                                       displayMetadata?.name ?? "",
-                                      style: const TextStyle(
-                                        color: Palette.white,
+                                      style: TextStyle(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSurface,
                                         fontSize: 16,
                                         fontWeight: FontWeight.w600,
                                       ),
@@ -206,8 +216,8 @@ class _OnboardingInvitedByState extends ConsumerState<OnboardingInvitedBy> {
                                     const SizedBox(height: 4),
                                     Text(
                                       displayMetadata?.about ?? "",
-                                      style: const TextStyle(
-                                        color: Palette.gray,
+                                      style: TextStyle(
+                                        color: Paletter.getGray(context),
                                         fontSize: 12,
                                       ),
                                       maxLines: 3,
@@ -233,7 +243,7 @@ class _OnboardingInvitedByState extends ConsumerState<OnboardingInvitedBy> {
                         width: 400,
                         height: 40,
                         child: longButton(
-                          name: "Join Camelus",
+                          name: AppLocalizations.of(context)!.joinCamelus,
                           onPressed: () {
                             onJoinWithStarterPack(invitedSet);
                           },
@@ -246,7 +256,8 @@ class _OnboardingInvitedByState extends ConsumerState<OnboardingInvitedBy> {
                           width: 400,
                           height: 40,
                           child: longButton(
-                            name: "Signup without a starter pack",
+                            name: AppLocalizations.of(context)!
+                                .signupWithoutStarterPack,
                             onPressed: () {
                               widget.nextCallback();
                             },

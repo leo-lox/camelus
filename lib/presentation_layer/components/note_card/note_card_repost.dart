@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../config/palette.dart';
 import '../../../domain_layer/entities/nostr_note.dart';
@@ -49,7 +50,7 @@ class NoteCardRepost extends ConsumerWidget {
                 'assets/icons/retweet.svg',
                 height: 18,
                 colorFilter: ColorFilter.mode(
-                  Palette.repostActive,
+                  Color.fromARGB(255, 22, 163, 74),
                   BlendMode.srcATop,
                 ),
               ),
@@ -58,14 +59,13 @@ class NoteCardRepost extends ConsumerWidget {
                 onTap: () {
                   // navigate to the profile of the user who reposted
 
-                  Navigator.pushNamed(context, "/nostr/profile",
-                      arguments: repostEvent.pubkey);
+                  context.push('/nostr/profile/${repostEvent.pubkey}');
                 },
                 child: RichText(
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   text: TextSpan(
-                    style: TextStyle(color: Palette.gray),
+                    style: TextStyle(color: Paletter.getGray(context)),
                     children: [
                       TextSpan(
                         text: repostedByMetadata?.name ??
@@ -94,7 +94,7 @@ class NoteCardRepost extends ConsumerWidget {
             if (!snapshot.hasData) {
               return Column(
                 children: [
-                  if (noteEtag.recommended_relay == null)
+                  if (noteEtag.recommendedRelay == null)
                     Padding(
                       padding: const EdgeInsets.all(16),
                       child: Column(
@@ -109,7 +109,7 @@ class NoteCardRepost extends ConsumerWidget {
                             "repostId: ${repostEvent.id} ${repostEvent.sources}",
                             style: TextStyle(
                               fontSize: 10,
-                              color: Palette.darkGray,
+                              color: Paletter.getDarkGray(context),
                             ),
                           ),
                         ],

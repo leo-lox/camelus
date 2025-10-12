@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:camelus/l10n/app_localizations.dart';
 import 'package:camelus/presentation_layer/atoms/my_profile_picture.dart';
 import 'package:camelus/presentation_layer/atoms/refresh_indicator_no_need.dart';
 import 'package:camelus/presentation_layer/components/note_card/note_card.dart';
@@ -8,21 +11,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_list_view/flutter_list_view.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:timeago/timeago.dart' as timeago;
-
-import '../../config/palette.dart';
 
 import '../components/enable_notifications.dart';
 import '../components/note_card/no_more_notes.dart';
 import '../components/note_card/nostr_parser.dart';
+import '../providers/ndk_provider.dart';
 import '../providers/notification_feed_provider.dart';
 
 class NotificationPage extends ConsumerStatefulWidget {
-  final String pubkey;
   const NotificationPage({
     super.key,
-    required this.pubkey,
   });
 
   @override
@@ -47,8 +48,10 @@ class _NotificationPageState extends ConsumerState<NotificationPage>
 
   @override
   Widget build(BuildContext context) {
+    final currentUserPubkey = ref.read(ndkProvider).accounts.getPublicKey()!;
+
     final notificationsState =
-        ref.watch(notificationsStateProvider(widget.pubkey));
+        ref.watch(notificationsStateProvider(currentUserPubkey));
 
     // Combine both lists for display, with new notifications at the top
     final allNotifications = [
@@ -62,23 +65,25 @@ class _NotificationPageState extends ConsumerState<NotificationPage>
         .toList();
 
     return Scaffold(
-      backgroundColor: Palette.background,
       appBar: AppBar(
-        title:
-            const Text('Notifications', style: TextStyle(color: Colors.white)),
-        backgroundColor: Palette.background,
+        title: Text(AppLocalizations.of(context)!.notifications,
+            style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
         elevation: 0,
         actions: [
           if (notificationsState.newNotifications.isNotEmpty)
             IconButton(
-              icon: const Icon(Icons.check_circle_outline, color: Colors.white),
+              icon: Icon(Icons.check_circle_outline,
+                  color: Theme.of(context).colorScheme.onSurface),
               onPressed: () {
                 // Mark all notifications as read
                 ref
-                    .read(notificationsStateProvider(widget.pubkey).notifier)
+                    .read(
+                        notificationsStateProvider(currentUserPubkey).notifier)
                     .integrateNewNotifications();
               },
             ),
+          if (Platform.isWindows || Platform.isLinux || Platform.isMacOS)
+            const SizedBox(width: 154),
         ],
       ),
       body: Column(
@@ -87,9 +92,10 @@ class _NotificationPageState extends ConsumerState<NotificationPage>
           PushNotificationToggle(),
           TabBar(
             controller: _tabController,
-            labelColor: Colors.white,
-            unselectedLabelColor: Colors.grey,
-            indicatorColor: Palette.primary,
+            labelColor: Theme.of(context).colorScheme.onSurface,
+            unselectedLabelColor:
+                Theme.of(context).colorScheme.onSurfaceVariant,
+            indicatorColor: Theme.of(context).colorScheme.primary,
             tabs: const [
               Tab(text: "All"),
               Tab(text: "Mentions"),
@@ -105,7 +111,12 @@ class _NotificationPageState extends ConsumerState<NotificationPage>
                     await Future.delayed(Duration.zero);
                   },
                   child: _buildNotificationList(
-                      context, ref, allNotifications, notificationsState),
+                    context,
+                    ref,
+                    allNotifications,
+                    notificationsState,
+                    currentUserPubkey,
+                  ),
                 ),
 
                 // Mentions tab
@@ -114,7 +125,12 @@ class _NotificationPageState extends ConsumerState<NotificationPage>
                     await Future.delayed(Duration.zero);
                   },
                   child: _buildNotificationList(
-                      context, ref, mentionNotifications, notificationsState),
+                    context,
+                    ref,
+                    mentionNotifications,
+                    notificationsState,
+                    currentUserPubkey,
+                  ),
                 ),
               ],
             ),
@@ -129,16 +145,20 @@ class _NotificationPageState extends ConsumerState<NotificationPage>
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.notifications_off, color: Colors.grey, size: 48),
+          Icon(Icons.notifications_off,
+              color: Theme.of(context).colorScheme.onSurfaceVariant, size: 48),
           SizedBox(height: 16),
           Text(
             message,
-            style: TextStyle(color: Colors.white, fontSize: 16),
+            style: TextStyle(
+                color: Theme.of(context).colorScheme.onSurface, fontSize: 16),
           ),
           SizedBox(height: 8),
           Text(
             'When someone interacts with your posts,\nyou\'ll see it here',
-            style: TextStyle(color: Colors.grey, fontSize: 14),
+            style: TextStyle(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+                fontSize: 14),
             textAlign: TextAlign.center,
           ),
         ],
@@ -146,8 +166,13 @@ class _NotificationPageState extends ConsumerState<NotificationPage>
     );
   }
 
-  Widget _buildNotificationList(BuildContext context, WidgetRef ref,
-      List<NostrNotification> notifications, NotificationViewModel state) {
+  Widget _buildNotificationList(
+    BuildContext context,
+    WidgetRef ref,
+    List<NostrNotification> notifications,
+    NotificationViewModel state,
+    String pubkey,
+  ) {
     if (notifications.isEmpty && state.endOfNotifications) {
       return _buildEmptyState("no notifications");
     }
@@ -169,7 +194,7 @@ class _NotificationPageState extends ConsumerState<NotificationPage>
               hideBottomAction: true,
               renderCallback: () {
                 ref
-                    .read(notificationsStateProvider(widget.pubkey).notifier)
+                    .read(notificationsStateProvider(pubkey).notifier)
                     .loadMore();
               },
             )),
@@ -195,7 +220,9 @@ class _NotificationPageState extends ConsumerState<NotificationPage>
 
     // Create a container with a highlight color if it's a new notification
     return Container(
-      color: isNew ? Palette.primary.withOpacity(0.1) : null,
+      color: isNew
+          ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.1)
+          : null,
       child: ListTile(
         leading: _getNotificationIcon(notification),
         title: Row(
@@ -215,9 +242,9 @@ class _NotificationPageState extends ConsumerState<NotificationPage>
                   children: [
                     TextSpan(
                       text: reactingUser.userMetadata?.name ?? '',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                        color: Theme.of(context).colorScheme.onSurface,
                       ),
                     ),
                     TextSpan(
@@ -225,7 +252,8 @@ class _NotificationPageState extends ConsumerState<NotificationPage>
                     ),
                     TextSpan(
                       text: _getNotificationText(notification),
-                      style: const TextStyle(color: Colors.white),
+                      style: TextStyle(
+                          color: Theme.of(context).colorScheme.onSurface),
                     ),
                   ],
                 ),
@@ -233,8 +261,10 @@ class _NotificationPageState extends ConsumerState<NotificationPage>
             ),
             Text(
               timeago.format(DateTime.fromMillisecondsSinceEpoch(
-                  notification.createdAt * 1000)),
-              style: const TextStyle(color: Colors.grey, fontSize: 12),
+                  notification.createdAt * 1000)), // TODO translate
+              style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  fontSize: 12),
             ),
           ],
         ),
@@ -274,7 +304,7 @@ class _NotificationPageState extends ConsumerState<NotificationPage>
       case NotificationType.reaction:
         if (notification.sourceNote.content == '+') {
           icon = PhosphorIcons.heart(PhosphorIconsStyle.bold);
-          iconColor = Colors.red;
+          iconColor = Theme.of(context).colorScheme.error;
         } else {
           return Text(
             notification.sourceNote.content,
@@ -284,7 +314,7 @@ class _NotificationPageState extends ConsumerState<NotificationPage>
 
       case NotificationType.reply:
         icon = PhosphorIcons.arrowBendUpLeft();
-        iconColor = Palette.primary;
+        iconColor = Theme.of(context).colorScheme.primary;
         break;
 
       case NotificationType.repost:
@@ -292,7 +322,7 @@ class _NotificationPageState extends ConsumerState<NotificationPage>
           'assets/icons/retweet.svg',
           height: 18,
           colorFilter: ColorFilter.mode(
-            Palette.repostActive,
+            Color.fromARGB(255, 22, 163, 74),
             BlendMode.srcATop,
           ),
         );
@@ -302,7 +332,7 @@ class _NotificationPageState extends ConsumerState<NotificationPage>
         break;
       default:
         icon = PhosphorIcons.question();
-        iconColor = Palette.primary;
+        iconColor = Theme.of(context).colorScheme.primary;
         break;
     }
 
@@ -347,7 +377,6 @@ class _NotificationPageState extends ConsumerState<NotificationPage>
           myMetadata: mentionUser.userMetadata,
           hideBottomBar: true,
         );
-        break;
       default:
         return Container();
     }
@@ -378,11 +407,11 @@ class _NotificationPageState extends ConsumerState<NotificationPage>
   }
 
   void _navigateToPost(BuildContext context, NostrNotification notification) {
-    Navigator.pushNamed(context, "/nostr/event", arguments: <String, String?>{
-      "root": notification.sourceNote.getRootReply?.value ??
+    context.push('/nostr/event', extra: {
+      'root': notification.sourceNote.getRootReply?.value ??
           notification.targetNoteId ??
           notification.sourceNote.id,
-      "scrollIntoView": notification.sourceNote.id
+      'scrollIntoView': notification.sourceNote.id,
     });
   }
 }

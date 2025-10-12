@@ -4,10 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class OnboardingPage01 extends ConsumerStatefulWidget {
-  Function loginCallback;
-  Function registerCallback;
+  final Function loginCallback;
+  final Function registerCallback;
 
-  OnboardingPage01({
+  const OnboardingPage01({
     super.key,
     required this.loginCallback,
     required this.registerCallback,
@@ -20,7 +20,6 @@ class _OnboardingPage01State extends ConsumerState<OnboardingPage01> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Palette.background,
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -31,14 +30,14 @@ class _OnboardingPage01State extends ConsumerState<OnboardingPage01> {
             Text(
               "welcome to",
               style: TextStyle(
-                color: Palette.extraLightGray,
+                color: Paletter.getExtraLightGray(context),
                 fontSize: MediaQuery.of(context).size.width / 22,
               ),
             ),
             Text(
               "camelus",
               style: TextStyle(
-                color: Palette.white,
+                color: Theme.of(context).colorScheme.onSurface,
                 fontSize: MediaQuery.of(context).size.width / 7,
                 fontFamily: 'Poppins',
               ),

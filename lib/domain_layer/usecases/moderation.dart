@@ -59,7 +59,7 @@ class Moderation {
     final now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
     final report = NostrNote(
       content: userReport,
-      created_at: now,
+      createdAt: now,
       id: "",
       kind: _reportKind,
       pubkey: pubkeySubmittingReport,

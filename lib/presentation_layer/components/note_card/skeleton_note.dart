@@ -33,22 +33,19 @@ class SkeletonNote extends StatelessWidget {
             children: [
               // profile picture
               Shimmer.fromColors(
-                baseColor: Palette.extraDarkGray,
-                highlightColor: Palette.darkGray,
+                baseColor: Paletter.getExtraDarkGray(context),
+                highlightColor: Paletter.getDarkGray(context),
                 child: Container(
                   height: 60,
                   width: 60,
-                  decoration: const BoxDecoration(
-                    color: Palette.primary,
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.primary,
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(Icons.person),
                 ),
               ),
-              Container(
-                width: MediaQuery.of(context).size.width - 95,
-                margin: const EdgeInsets.only(left: 5, right: 10),
-                color: Palette.background,
+              Expanded(
                 child: Padding(
                   padding: const EdgeInsets.only(left: 10.0),
                   child: Column(
@@ -57,13 +54,15 @@ class SkeletonNote extends StatelessWidget {
                     children: [
                       // username
                       Shimmer.fromColors(
-                        baseColor: Palette.extraDarkGray,
-                        highlightColor: Palette.darkGray,
+                        baseColor: Paletter.getExtraDarkGray(context),
+                        highlightColor: Paletter.getDarkGray(context),
                         child: Container(
                           height: 18,
                           width: 120,
                           decoration: BoxDecoration(
-                            color: Colors.grey[300],
+                            color: Theme.of(context)
+                                .colorScheme
+                                .surfaceContainerHighest,
                             borderRadius: BorderRadius.circular(2),
                           ),
                         ),
@@ -72,26 +71,30 @@ class SkeletonNote extends StatelessWidget {
                       const SizedBox(height: 10),
 
                       Shimmer.fromColors(
-                        baseColor: Palette.extraDarkGray,
-                        highlightColor: Palette.darkGray,
+                        baseColor: Paletter.getExtraDarkGray(context),
+                        highlightColor: Paletter.getDarkGray(context),
                         child: Container(
                           height: 12,
                           width: MediaQuery.of(context).size.width / 2.5,
                           decoration: BoxDecoration(
-                            color: Colors.grey[300],
+                            color: Theme.of(context)
+                                .colorScheme
+                                .surfaceContainerHighest,
                             borderRadius: BorderRadius.circular(2),
                           ),
                         ),
                       ),
                       const SizedBox(height: 10),
                       Shimmer.fromColors(
-                        baseColor: Palette.extraDarkGray,
-                        highlightColor: Palette.darkGray,
+                        baseColor: Paletter.getExtraDarkGray(context),
+                        highlightColor: Paletter.getDarkGray(context),
                         child: Container(
                           height: 12,
                           width: 50,
                           decoration: BoxDecoration(
-                            color: Colors.grey[300],
+                            color: Theme.of(context)
+                                .colorScheme
+                                .surfaceContainerHighest,
                             borderRadius: BorderRadius.circular(2),
                           ),
                         ),

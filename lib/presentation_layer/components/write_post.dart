@@ -1,28 +1,28 @@
 import 'dart:developer';
 import 'dart:io';
 
+import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 
+import 'package:camelus/config/palette.dart';
+import 'package:camelus/data_layer/models/post_context.dart';
 import 'package:camelus/domain_layer/entities/user_metadata.dart';
+import 'package:camelus/domain_layer/usecases/remove_image_metadata.dart';
+import 'package:camelus/helpers/helpers.dart';
+import 'package:camelus/l10n/app_localizations.dart';
 import 'package:camelus/presentation_layer/atoms/picture.dart';
-
 import 'package:camelus/presentation_layer/providers/metadata_state_provider.dart';
-import 'package:file_picker/file_picker.dart';
+import 'package:camelus/presentation_layer/providers/search_provider.dart';
+import 'package:camelus/presentation_layer/providers/write_post_state.provider.dart';
+import 'package:camelus/config/default_suggestions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mentions/flutter_mentions.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:lottie/lottie.dart';
-import 'package:camelus/config/palette.dart';
-import 'package:camelus/helpers/helpers.dart';
-import 'package:camelus/data_layer/models/post_context.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
-import '../../config/default_suggestions.dart';
-
-import '../../domain_layer/usecases/remove_image_metadata.dart';
-import '../providers/search_provider.dart';
-import '../providers/write_post_state.provider.dart';
 import 'post_overflow.dart';
 import 'write_post/post_settings_dialog.dart';
 
@@ -58,8 +58,8 @@ class _WritePostState extends ConsumerState<WritePost> {
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('unspoorted image format'),
+        SnackBar(
+          content: Text(AppLocalizations.of(context)!.unsupportedImageFormat),
         ),
       );
     }
@@ -123,27 +123,6 @@ class _WritePostState extends ConsumerState<WritePost> {
     });
   }
 
-  _showErrorMsg(String msg) {
-    // alert dialog
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text("error"),
-          content: Text(msg),
-          actions: [
-            TextButton(
-              child: const Text("ok"),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
-
   void _initServices() async {}
 
   @override
@@ -190,9 +169,9 @@ class _WritePostState extends ConsumerState<WritePost> {
               const SizedBox(
                 height: 20,
               ),
-              Text("error:",
+              Text(AppLocalizations.of(context)!.error,
                   style: TextStyle(
-                    color: Palette.white,
+                    color: Theme.of(context).colorScheme.onSurface,
                     fontWeight: FontWeight.bold,
                   )),
               SizedBox(
@@ -213,8 +192,8 @@ class _WritePostState extends ConsumerState<WritePost> {
           padding: const EdgeInsets.only(top: 0, left: 0, right: 0),
           alignment: Alignment.topLeft,
           // round  corners
-          decoration: const BoxDecoration(
-            color: Palette.extraDarkGray,
+          decoration: BoxDecoration(
+            color: Paletter.getExtraDarkGray(context),
             borderRadius: BorderRadius.only(
               topLeft: Radius.circular(20),
               topRight: Radius.circular(20),
@@ -234,7 +213,7 @@ class _WritePostState extends ConsumerState<WritePost> {
                 submitPostCallback: () => writePostNotifier.submitPost().then(
                   (value) {
                     if (!mounted) return;
-                    Navigator.pop(context);
+                    context.pop();
                   },
                 ),
               ),
@@ -294,8 +273,8 @@ class _WritePostState extends ConsumerState<WritePost> {
                   child: SvgPicture.asset(
                     height: 25,
                     'assets/icons/x.svg',
-                    colorFilter: const ColorFilter.mode(
-                      Palette.gray,
+                    colorFilter: ColorFilter.mode(
+                      Paletter.getGray(context),
                       BlendMode.srcIn,
                     ),
                   ),
@@ -320,7 +299,7 @@ class _WritePostState extends ConsumerState<WritePost> {
             _buildActionButton(
               icon: Icon(
                 PhosphorIcons.image(),
-                color: Palette.gray,
+                color: Paletter.getGray(context),
                 size: 25,
               ),
               onPressed: _addImage,
@@ -328,7 +307,7 @@ class _WritePostState extends ConsumerState<WritePost> {
             _buildActionButton(
               icon: Icon(
                 PhosphorIcons.gearSix(),
-                color: Palette.gray,
+                color: Paletter.getGray(context),
                 size: 25,
               ),
               onPressed: () => _showPostSettingsDialog(context),
@@ -378,7 +357,7 @@ class _WritePostState extends ConsumerState<WritePost> {
       padding: const EdgeInsets.only(left: 20, right: 20),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10),
-        //border: Border.all(color: Palette.primary), //debug
+        //border: Border.all(color: Theme.of(context).colorScheme.primary), //debug
       ),
       child: FlutterMentions(
         key: _textEditingControllerKey,
@@ -386,12 +365,13 @@ class _WritePostState extends ConsumerState<WritePost> {
         keyboardAppearance: Brightness.dark,
         suggestionPosition: SuggestionPosition.Top,
         focusNode: _focusNode,
-        style: const TextStyle(color: Palette.white, fontSize: 21),
-        decoration: const InputDecoration(
+        style: TextStyle(
+            color: Theme.of(context).colorScheme.onSurface, fontSize: 21),
+        decoration: InputDecoration(
           border: InputBorder.none,
-          hintText: "What's on your mind?",
+          hintText: AppLocalizations.of(context)!.whatsOnYourMind,
           hintStyle: TextStyle(
-            color: Palette.gray,
+            color: Paletter.getGray(context),
             fontSize: 20,
           ),
         ),
@@ -415,7 +395,7 @@ class _WritePostState extends ConsumerState<WritePost> {
           }
         },
         suggestionListDecoration: BoxDecoration(
-          color: Palette.extraDarkGray,
+          color: Paletter.getExtraDarkGray(context),
           borderRadius: BorderRadius.circular(20),
         ),
         mentions: [
@@ -429,7 +409,7 @@ class _WritePostState extends ConsumerState<WritePost> {
                       child: SizedBox.fromSize(
                         size: const Size.fromRadius(30), // Image radius
                         child: Container(
-                          color: Palette.background,
+                          color: Theme.of(context).colorScheme.surface,
                           child: simplePicture(data['picture'], data['id']),
                         ),
                       ),
@@ -442,15 +422,15 @@ class _WritePostState extends ConsumerState<WritePost> {
                       children: <Widget>[
                         Text(
                           data['name'] ?? "",
-                          style: const TextStyle(
-                            color: Palette.lightGray,
+                          style: TextStyle(
+                            color: Paletter.getLightGray(context),
                             fontSize: 20,
                           ),
                         ),
                         Text(
                           '${data['nip05'] ?? ""}',
-                          style: const TextStyle(
-                            color: Palette.gray,
+                          style: TextStyle(
+                            color: Paletter.getGray(context),
                             fontSize: 12,
                           ),
                         ),
@@ -463,7 +443,7 @@ class _WritePostState extends ConsumerState<WritePost> {
             trigger: "@",
             matchAll: true,
             disableMarkup: false,
-            style: const TextStyle(color: Palette.primary),
+            style: TextStyle(color: Theme.of(context).colorScheme.primary),
             data: _mentionsSearchResults,
           ),
           Mention(
@@ -480,8 +460,8 @@ class _WritePostState extends ConsumerState<WritePost> {
                       children: <Widget>[
                         Text(
                           data['display'] != null ? "#${data['display']}" : "",
-                          style: const TextStyle(
-                            color: Palette.lightGray,
+                          style: TextStyle(
+                            color: Paletter.getLightGray(context),
                             fontSize: 20,
                           ),
                         ),
@@ -494,7 +474,7 @@ class _WritePostState extends ConsumerState<WritePost> {
             trigger: "#",
             matchAll: true,
             disableMarkup: true,
-            style: const TextStyle(color: Palette.purple),
+            style: TextStyle(color: Colors.purple),
             data: _mentionsSearchResultsHashTags,
           ),
         ],
@@ -538,22 +518,22 @@ class _TopBar extends ConsumerWidget {
           IconButton(
             onPressed: (() {
               ref.read(writePostStateProvider.notifier).clearPost();
-              Navigator.pop(context);
+              context.pop();
             }),
             icon: SvgPicture.asset(
               height: 25,
               'assets/icons/x.svg',
-              colorFilter: const ColorFilter.mode(
-                Palette.gray,
+              colorFilter: ColorFilter.mode(
+                Paletter.getGray(context),
                 BlendMode.srcIn,
               ),
             ),
           ),
           if (replyToPubkey == null)
-            const Text(
-              "write a post",
+            Text(
+              AppLocalizations.of(context)!.writePost,
               style: TextStyle(
-                color: Palette.lightGray,
+                color: Paletter.getLightGray(context),
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
               ),
@@ -563,13 +543,15 @@ class _TopBar extends ConsumerWidget {
               child: SizedBox(
                 width: MediaQuery.of(context).size.width * 0.6,
                 child: Container(
-                  margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                  margin:
+                      const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
                   child: Text(
-                    "reply to ${metadata?.name ?? getPubkeyHrShort(replyToPubkey!)}",
+                    AppLocalizations.of(context)!.replyTo(
+                        metadata?.name ?? getPubkeyHrShort(replyToPubkey!)),
                     overflow: TextOverflow.ellipsis,
                     maxLines: 2,
-                    style: const TextStyle(
-                      color: Palette.lightGray,
+                    style: TextStyle(
+                      color: Paletter.getLightGray(context),
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
                     ),
@@ -577,7 +559,7 @@ class _TopBar extends ConsumerWidget {
                 ),
               ),
             ),
-      
+
           // if submitLoading is true, show spinner
           !submitLoading
               ? IconButton(
@@ -587,7 +569,8 @@ class _TopBar extends ConsumerWidget {
                   icon: SvgPicture.asset(
                     height: 25,
                     'assets/icons/paper-plane-tilt.svg',
-                    color: Palette.primary,
+                    colorFilter: ColorFilter.mode(
+                        Theme.of(context).colorScheme.primary, BlendMode.srcIn),
                   ),
                 )
               : Lottie.asset(

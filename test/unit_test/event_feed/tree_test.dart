@@ -11,7 +11,7 @@ void main() {
     final rootNote = NostrNote(
       id: 'root123',
       pubkey: 'pubkey1',
-      created_at: 1635000000,
+      createdAt: 1635000000,
       kind: 1,
       content: 'This is the root note.',
       sig: 'sig1',
@@ -22,7 +22,7 @@ void main() {
     final reply1 = NostrNote(
       id: 'reply1',
       pubkey: 'pubkey2',
-      created_at: 1635000100,
+      createdAt: 1635000100,
       kind: 1,
       content: 'This is a reply to the root note.',
       sig: 'sig2',
@@ -32,7 +32,7 @@ void main() {
     final reply2 = NostrNote(
       id: 'reply2',
       pubkey: 'pubkey3',
-      created_at: 1635000200,
+      createdAt: 1635000200,
       kind: 1,
       content: 'Another reply to the root note.',
       sig: 'sig3',
@@ -43,7 +43,7 @@ void main() {
     final nestedReply1 = NostrNote(
       id: 'nestedReply1',
       pubkey: 'pubkey4',
-      created_at: 1635000300,
+      createdAt: 1635000300,
       kind: 1,
       content: 'A reply to the first reply.',
       sig: 'sig4',
@@ -56,7 +56,7 @@ void main() {
     final nestedReply2 = NostrNote(
       id: 'nestedReply2',
       pubkey: 'pubkey5',
-      created_at: 1635000400,
+      createdAt: 1635000400,
       kind: 1,
       content: 'A reply to the second reply.',
       sig: 'sig5',
@@ -70,7 +70,7 @@ void main() {
     final nestedNestedReply1 = NostrNote(
       id: 'nestedNestedReply1',
       pubkey: 'pubkey6',
-      created_at: 1635000500,
+      createdAt: 1635000500,
       kind: 1,
       content: 'A reply to the first nested reply.',
       sig: 'sig6',
@@ -83,7 +83,7 @@ void main() {
     final nestedNestedReply2 = NostrNote(
       id: 'nestedNestedReply2',
       pubkey: 'pubkey7',
-      created_at: 1635000600,
+      createdAt: 1635000600,
       kind: 1,
       content: 'A reply to the second nested reply.',
       sig: 'sig7',
@@ -96,7 +96,7 @@ void main() {
     final notFoundReply = NostrNote(
       id: 'notFoundReply',
       pubkey: 'pubkey8',
-      created_at: 1635000700,
+      createdAt: 1635000700,
       kind: 1,
       content: 'A reply to a note that does not exist.',
       sig: 'sig8',

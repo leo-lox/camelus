@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/foundation.dart';
 
 import '../../../domain_layer/entities/nostr_note.dart';
@@ -6,9 +8,15 @@ import '../../../helpers/helpers.dart';
 import '../../../helpers/nprofile_helper.dart';
 
 class NostrParser {
+  static const bool useThread = false;
+
   /// parses the event in a seperate thread
   static Future<ParsedPost> parseEvent(NostrNote event) async {
-    return compute((e) => _parse(e), event);
+    if (useThread) {
+      return compute((e) => _parse(e), event);
+    }
+
+    return _parse(event);
   }
 
   /// parses the event in current thread
@@ -22,7 +30,11 @@ class NostrParser {
 
   /// parses multiple event in seperate thread
   static Future<List<ParsedPost>> parseEvents(List<NostrNote> events) async {
-    return compute((e) => _parseEvents(e), events);
+    if (useThread) {
+      return compute((e) => _parseEvents(e), events);
+    }
+
+    return _parseEvents(events);
   }
 
   static List<ParsedPost> _parseEvents(List<NostrNote> events) {
@@ -93,11 +105,15 @@ class NostrParser {
 
       // Parse different types
       if (matchText.startsWith(RegExp(r'nostr:(nprofile|npub)[a-zA-Z0-9]+'))) {
-        segments.add(ContentSegment(
-          content: matchText,
-          type: ContentType.mention,
-          metadata: _extractUserIdFromNostr(matchText),
-        ));
+        try {
+          segments.add(ContentSegment(
+            content: matchText,
+            type: ContentType.mention,
+            metadata: _extractUserIdFromNostr(matchText),
+          ));
+        } catch (e) {
+          log('Error parsing Nostr reference: $matchText', error: e);
+        }
       } else if (matchText.startsWith('nostr:note1')) {
         segments.add(ContentSegment(
           content: 'Note reference',

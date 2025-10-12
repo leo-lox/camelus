@@ -4,9 +4,9 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_link_previewer/flutter_link_previewer.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:url_launcher/url_launcher_string.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 
 import '../../../config/palette.dart';
 import '../../../domain_layer/entities/parsed_post.dart';
@@ -76,11 +76,11 @@ class PostContentWidget extends ConsumerWidget {
                 decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(8),
                     border: Border.all(
-                      color: Palette.darkGray,
+                      color: Paletter.getDarkGray(context),
                     )),
                 child: LinkPreview(
                   linkStyle: TextStyle(
-                    color: Palette.primary,
+                    color: Theme.of(context).colorScheme.primary,
                     fontSize: _fontSize - 2,
                     decoration: TextDecoration.none,
                   ),
@@ -95,7 +95,8 @@ class PostContentWidget extends ConsumerWidget {
                   text: segment.metadata!,
                   textWidget: Text(
                     segment.content,
-                    style: TextStyle(color: Palette.primary),
+                    style:
+                        TextStyle(color: Theme.of(context).colorScheme.primary),
                   ),
                   width: MediaQuery.of(context).size.width,
                 ),
@@ -157,14 +158,14 @@ class PostContentWidget extends ConsumerWidget {
                   children: [
                     Icon(
                       PhosphorIcons.warningOctagon(),
-                      color: Palette.error,
+                      color: Theme.of(context).colorScheme.error,
                       size: 32,
                     ),
                     const SizedBox(width: 8),
                     Text(
                       post.nostrNote.contentWarning!,
-                      style: const TextStyle(
-                        color: Palette.error,
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.error,
                         fontWeight: FontWeight.bold,
                         fontSize: 18,
                       ),
@@ -195,28 +196,6 @@ class PostContentWidget extends ConsumerWidget {
       case ContentType.image:
         return Container();
 
-        /// inline image could be here
-        return Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8.0),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(8.0),
-            child: CachedNetworkImage(
-              imageUrl: segment.metadata!,
-              placeholder: (context, url) => Container(
-                height: 200,
-                color: Colors.grey[300],
-                child: const Center(child: CircularProgressIndicator()),
-              ),
-              errorWidget: (context, url, error) => Container(
-                height: 200,
-                color: Colors.grey[300],
-                child: const Icon(Icons.error),
-              ),
-              fit: BoxFit.cover,
-            ),
-          ),
-        );
-
       case ContentType.video:
         return InlineVideoPlayer(
           videoId: segment.metadata!,
@@ -244,7 +223,7 @@ class PostContentWidget extends ConsumerWidget {
         return TextSpan(
           text: user?.name != null ? "@${user?.name}" : segment.content,
           style: TextStyle(
-            color: Palette.primary,
+            color: Theme.of(context).colorScheme.primary,
             fontWeight: FontWeight.normal,
             fontSize: _fontSize,
           ),
@@ -256,7 +235,7 @@ class PostContentWidget extends ConsumerWidget {
         return TextSpan(
           text: segment.content,
           style: TextStyle(
-            color: Colors.blue,
+            color: Theme.of(context).colorScheme.primary,
             decoration: TextDecoration.none,
           ),
           recognizer: TapGestureRecognizer()
@@ -278,15 +257,11 @@ class PostContentWidget extends ConsumerWidget {
   }
 
   void _openUserProfile(BuildContext context, String pubkey) {
-    Navigator.pushNamed(
-      context,
-      "/nostr/profile",
-      arguments: pubkey,
-    );
+    context.push('/nostr/profile/$pubkey');
   }
 
   void _openHashtag(BuildContext context, String hashtag) {
-    Navigator.pushNamed(context, "/nostr/search", arguments: "#$hashtag");
+    context.push('/nostr/search', extra: "#$hashtag");
   }
 
   void _openLink(String url) {

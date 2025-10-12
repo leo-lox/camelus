@@ -61,7 +61,6 @@ class _EditStarterPackContentState
         ref.watch(editStarterPackProvider(widget.starterPackIdentifier));
 
     return Scaffold(
-      backgroundColor: Palette.background,
       body: Column(
         children: [
           Column(
@@ -91,7 +90,9 @@ class _EditStarterPackContentState
                 trailing: IconButton(
                   icon: Icon(
                     PhosphorIcons.listNumbers(),
-                    color: _isReorderMode ? Palette.primary : Palette.white,
+                    color: _isReorderMode
+                        ? Theme.of(context).colorScheme.primary
+                        : Theme.of(context).colorScheme.onSurface,
                   ),
                   onPressed: () {
                     setState(() {
@@ -185,7 +186,7 @@ class _EditStarterPackContentState
             );
           }),
         if (starterPackData.selectedUsers.isEmpty && !searchState.isSearching)
-          const Center(
+          Center(
             heightFactor: 5,
             child: Column(
               children: [
@@ -195,7 +196,8 @@ class _EditStarterPackContentState
                 ),
                 Text(
                   "you can also use the three dots menu on every post to add a user to a pack",
-                  style: TextStyle(fontSize: 12, color: Palette.lightGray),
+                  style: TextStyle(
+                      fontSize: 12, color: Paletter.getLightGray(context)),
                 ),
               ],
             ),
@@ -241,8 +243,8 @@ class PersonSelect extends ConsumerWidget {
               children: [
                 Text(
                   metadata?.name ?? "",
-                  style: const TextStyle(
-                    color: Palette.white,
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface,
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
                   ),
@@ -255,8 +257,8 @@ class PersonSelect extends ConsumerWidget {
                 const SizedBox(height: 4),
                 Text(
                   metadata?.about ?? "",
-                  style: const TextStyle(
-                    color: Palette.gray,
+                  style: TextStyle(
+                    color: Paletter.getGray(context),
                     fontSize: 12,
                   ),
                   maxLines: 3,
@@ -273,7 +275,7 @@ class PersonSelect extends ConsumerWidget {
           if (!isReorderMode)
             Icon(
               selected ? PhosphorIcons.checkCircle() : PhosphorIcons.circle(),
-              color: Palette.white,
+              color: Theme.of(context).colorScheme.onSurface,
             ),
           if (isReorderMode)
             ReorderableDragStartListener(
