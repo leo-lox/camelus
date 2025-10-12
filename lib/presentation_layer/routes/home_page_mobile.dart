@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'dart:io';
 import 'dart:ui';
 
@@ -6,11 +5,9 @@ import 'package:camelus/presentation_layer/atoms/spinner_center.dart';
 import 'package:camelus/presentation_layer/providers/metadata_state_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:badges/badges.dart' as badges;
 import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
-import '../../../../config/palette.dart';
 import '../../../../domain_layer/entities/feed_filter.dart';
 
 import '../atoms/app_logo.dart';
@@ -21,7 +18,6 @@ import '../components/relays_connectivity_widget.dart';
 import '../components/write_post.dart';
 import '../providers/following_contact_state_provider.dart';
 import '../providers/ndk_provider.dart';
-import 'nostr/relays_page.dart';
 
 class HomePageMobile extends ConsumerStatefulWidget {
   final String? initialTab;

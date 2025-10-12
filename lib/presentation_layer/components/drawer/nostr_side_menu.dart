@@ -12,6 +12,7 @@ import '../../../config/palette.dart';
 import '../../../helpers/nprofile_helper.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../providers/ndk_provider.dart';
+import '../../providers/theme_provider.dart';
 
 class NostrSideMenu extends ConsumerWidget {
   final Widget leadingWidget;
@@ -212,7 +213,8 @@ class NostrSideMenu extends ConsumerWidget {
               onTap: () {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text(AppLocalizations.of(context)!.notImplementedYet),
+                    content:
+                        Text(AppLocalizations.of(context)!.notImplementedYet),
                   ),
                 );
               }),
@@ -223,7 +225,8 @@ class NostrSideMenu extends ConsumerWidget {
               onTap: () {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text(AppLocalizations.of(context)!.notImplementedYet),
+                    content:
+                        Text(AppLocalizations.of(context)!.notImplementedYet),
                   ),
                 );
               }),
@@ -298,19 +301,28 @@ class NostrSideMenu extends ConsumerWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                SvgPicture.asset(
-                  'assets/icons/sun.svg',
-                  color: Theme.of(context).colorScheme.primary,
-                  height: 22,
-                  width: 22,
+                IconButton(
+                  onPressed: () {
+                    ref.read(themeProvider.notifier).toggleTheme();
+                  },
+                  icon: Icon(
+                    ref.watch(themeProvider).mode == ThemeMode.dark
+                        ? PhosphorIcons.moon()
+                        : PhosphorIcons.sun(),
+                    color: Theme.of(context).colorScheme.primary,
+                    size: 22,
+                  ),
                 ),
-                GestureDetector(
-                  onTap: () {
+                IconButton(
+                  onPressed: () {
                     openQrShareDialog(context, currentUserPubkey);
                   },
-                  child: SvgPicture.asset(
+                  icon: SvgPicture.asset(
                     'assets/icons/qr-code.svg',
-                    color: Theme.of(context).colorScheme.primary,
+                    colorFilter: ColorFilter.mode(
+                      Theme.of(context).colorScheme.primary,
+                      BlendMode.srcIn,
+                    ),
                     height: 22,
                     width: 22,
                   ),

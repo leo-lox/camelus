@@ -8,6 +8,7 @@ list(APPEND FLUTTER_PLUGIN_LIST
   gtk
   objectbox_flutter_libs
   screen_retriever_linux
+  system_theme
   url_launcher_linux
   window_manager
 )

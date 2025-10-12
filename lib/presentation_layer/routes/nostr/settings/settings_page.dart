@@ -53,6 +53,12 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
             },
           ),
           ListTile(
+            title: Text(AppLocalizations.of(context)!.theme),
+            onTap: () {
+              context.push('/settings/theme');
+            },
+          ),
+          ListTile(
             title: Text(AppLocalizations.of(context)!.initialRoute),
             onTap: () {
               _navigateToInitalRoute();

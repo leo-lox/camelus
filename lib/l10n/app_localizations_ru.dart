@@ -531,4 +531,58 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get postsAndReplies => 'Посты и ответы';
+
+  @override
+  String get themeSettings => 'Настройки Темы';
+
+  @override
+  String get themeMode => 'Режим Темы';
+
+  @override
+  String get system => 'Система';
+
+  @override
+  String get light => 'Светлая';
+
+  @override
+  String get dark => 'Тёмная';
+
+  @override
+  String get theme => 'Тема';
+
+  @override
+  String get camelus => 'Camelus';
+
+  @override
+  String get nostr => 'Nostr';
+
+  @override
+  String get customColorTheme => 'Пользовательская Цветовая Тема';
+
+  @override
+  String get blue => 'Синий';
+
+  @override
+  String get purple => 'Фиолетовый';
+
+  @override
+  String get green => 'Зелёный';
+
+  @override
+  String get orange => 'Оранжевый';
+
+  @override
+  String get red => 'Красный';
+
+  @override
+  String get teal => 'Бирюзовый';
+
+  @override
+  String get pink => 'Розовый';
+
+  @override
+  String get indigo => 'Индиго';
+
+  @override
+  String get welcome => 'Добро пожаловать';
 }
