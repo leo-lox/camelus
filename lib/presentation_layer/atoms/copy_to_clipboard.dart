@@ -2,23 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
-import '../../config/palette.dart';
-
 class CopyClipboardButton extends StatefulWidget {
   final String value;
   final String copyText;
   final String copyDoneText;
 
   final Color backgroundColor;
-  final Color primaryColor;
 
   const CopyClipboardButton({
     super.key,
     required this.value,
     this.copyText = 'Copy',
     this.copyDoneText = 'Copied to Clipboard!',
-    this.backgroundColor = Palette.white,
-    this.primaryColor = Palette.primary,
+    this.backgroundColor = Colors.white,
   });
 
   @override
@@ -38,8 +34,9 @@ class _CopyClipboardButtonState extends State<CopyClipboardButton> {
             Icon(_copied ? PhosphorIcons.check() : PhosphorIcons.copySimple()),
         label: Text(_copied ? widget.copyDoneText : widget.copyText),
         style: ElevatedButton.styleFrom(
-          backgroundColor:
-              _copied ? widget.backgroundColor : widget.primaryColor,
+          backgroundColor: _copied
+              ? widget.backgroundColor
+              : Theme.of(context).colorScheme.primary,
           foregroundColor: widget.backgroundColor,
           padding: const EdgeInsets.symmetric(vertical: 16),
           shape: RoundedRectangleBorder(

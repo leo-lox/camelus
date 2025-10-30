@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:ndk/entities.dart' as ndk_entities;
 import 'wallet_account_card_placeholder.dart';
 import 'wallet_accounts_card.dart';
@@ -65,7 +66,7 @@ class _WalletsCarouselState extends State<WalletsCarousel> {
           child: _CardMaxWidth(
             child: WalletAccountCardPlaceholder(
               onTap: () {
-                Navigator.pushNamed(context, '/wallet/add_mint');
+                context.push('/wallet/add_mint');
               },
             ),
           ),
@@ -114,11 +115,7 @@ class _WalletsCarouselState extends State<WalletsCarousel> {
               child: GestureDetector(
                 onTap: () {
                   if (mintUrl != null) {
-                    Navigator.pushNamed(
-                      context,
-                      '/wallet/mint_details',
-                      arguments: mintUrl,
-                    );
+                    context.push('/wallet/mint_details', extra: mintUrl);
                   }
                 },
                 child: WalletAccountsCard(

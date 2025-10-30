@@ -16,11 +16,11 @@ class WalletAccountCardPlaceholder extends StatelessWidget {
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
-          color: Palette.extraDarkGray,
+          color: Paletter.extraDarkGray,
           borderRadius: BorderRadius.circular(18.0),
           border: Border.all(
             width: 1,
-            color: Palette.gray,
+            color: Paletter.gray,
           ),
         ),
         child: Center(

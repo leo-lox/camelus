@@ -24,7 +24,7 @@ class WalletCard extends StatelessWidget {
     required this.onTap,
     this.isSelected = false,
     this.isDisabled = false,
-    this.backgroundColor = Palette.extraDarkGray,
+    this.backgroundColor = Paletter.extraDarkGray,
     this.tralling,
     this.showBalances = true,
   });
@@ -44,7 +44,10 @@ class WalletCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               CircleAvatar(
-                backgroundColor: Palette.primary.withValues(alpha: 0.8),
+                backgroundColor: Theme.of(context)
+                    .colorScheme
+                    .primary
+                    .withValues(alpha: 0.8),
                 child: Text(wallet.name.substring(0, 2).toUpperCase(),
                     style: TextStyle(color: Colors.white, fontSize: 12)),
               ),
@@ -60,14 +63,15 @@ class WalletCard extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
-                          color: isDisabled ? Palette.gray : Palette.white,
+                          color: isDisabled ? Paletter.gray : Colors.white,
                         ),
                       ),
                       Text(
                         wallet.id,
                         style: TextStyle(
                           fontSize: 14,
-                          color: isDisabled ? Palette.gray : Palette.lightGray,
+                          color:
+                              isDisabled ? Paletter.gray : Paletter.lightGray,
                         ),
                       ),
                     ],
@@ -82,7 +86,7 @@ class WalletCard extends StatelessWidget {
                     Text(
                       "${WalletNumberFormatting.formatAmount(amount: b.amount, unit: b.unit)} ${b.unit}",
                       style: TextStyle(
-                        color: Palette.white,
+                        color: Colors.white,
                       ),
                     ),
                 ]),

@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../config/palette.dart';
 import '../../atoms/my_profile_picture.dart';
+import '../../components/drawer/nostr_drawer.dart';
 import '../../components/wallet/payment_history_short.dart';
 import '../../components/wallet/wallet_actions_strip.dart';
 import '../../components/wallet/wallet_friends_strip.dart';
@@ -11,7 +13,6 @@ import '../../components/wallet/wallets_carousel.dart';
 import '../../components/wallet/wallets_select_bottom_sheet.dart';
 import '../../providers/metadata_state_provider.dart';
 import '../../providers/ndk_provider.dart';
-import '../nostr/nostr_drawer.dart';
 import 'wallet_navigation.dart';
 import 'wallet_pay/wallet_pay_state_provider.dart';
 import 'wallet_providers/wallet_combined_state_provider.dart';
@@ -54,8 +55,8 @@ class _WalletDashboardState extends ConsumerState<WalletDashboard>
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Palette.background,
-        surfaceTintColor: Palette.background,
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        surfaceTintColor: Theme.of(context).colorScheme.surface,
         leading: Builder(
           builder: (context) {
             final myMetadata =
@@ -80,12 +81,12 @@ class _WalletDashboardState extends ConsumerState<WalletDashboard>
               size: 30,
             ),
             onPressed: () {
-              Navigator.pushNamed(context, '/wallet/add_mint');
+              context.push('/wallet/add_mint');
             },
           ),
         ],
       ),
-      backgroundColor: Palette.background,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       drawer: NostrDrawer(pubkey: myUserPubkey),
       body: SafeArea(
         child: Column(
@@ -121,7 +122,7 @@ class _WalletDashboardState extends ConsumerState<WalletDashboard>
                   rcvNotifier.reset();
                   rcvNotifier.updateRecieveToWalletId(selectedId);
                   if (mounted) {
-                    Navigator.pushNamed(context, '/wallet/receive');
+                    context.push('/wallet/receive');
                   }
                 }
               },
@@ -137,7 +138,7 @@ class _WalletDashboardState extends ConsumerState<WalletDashboard>
                   payNotifier.reset();
                   payNotifier.updatePayFromWalletId(selectedId);
                   if (mounted) {
-                    Navigator.pushNamed(context, '/wallet/pay');
+                    context.push('/wallet/pay');
                   }
                 }
               },
@@ -152,11 +153,7 @@ class _WalletDashboardState extends ConsumerState<WalletDashboard>
                 transactions: combinedWallet.recentTransactions,
                 pendingTransactions: combinedWallet.pendingTransactions,
                 onTap: (tx) {
-                  Navigator.pushNamed(
-                    context,
-                    '/wallet/transactions/detail',
-                    arguments: tx,
-                  );
+                  context.push('/wallet/transactions/detail', extra: tx);
                 },
               ),
             )

@@ -20,11 +20,11 @@ class WalletTransactionListPage extends ConsumerWidget {
     final grouped = _groupByDay(state.transactions);
 
     return Scaffold(
-      backgroundColor: Palette.background,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
           elevation: 0,
-          backgroundColor: Palette.background,
-          foregroundColor: Palette.white,
+          backgroundColor: Theme.of(context).colorScheme.surface,
+          foregroundColor: Colors.white,
           title: const Text('Transactions'),
           leading: IconButton(
             icon: Icon(PhosphorIcons.caretLeft(), size: 24),
@@ -116,19 +116,19 @@ class _DateHeader extends StatelessWidget {
     return Row(
       children: [
         Expanded(
-            child: Divider(color: Palette.darkGray.withValues(alpha: 0.4))),
+            child: Divider(color: Paletter.darkGray.withValues(alpha: 0.4))),
         Container(
           margin: const EdgeInsets.symmetric(horizontal: 12),
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
           decoration: BoxDecoration(
-            color: Palette.extraDarkGray,
+            color: Paletter.extraDarkGray,
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: Palette.darkGray.withValues(alpha: 0.4)),
+            border: Border.all(color: Paletter.darkGray.withValues(alpha: 0.4)),
           ),
           child: Text(
             label,
             style: TextStyle(
-              color: Palette.white,
+              color: Colors.white,
               fontSize: 12.5,
               fontWeight: FontWeight.w600,
               letterSpacing: 0.2,
@@ -136,7 +136,7 @@ class _DateHeader extends StatelessWidget {
           ),
         ),
         Expanded(
-            child: Divider(color: Palette.darkGray.withValues(alpha: 0.4))),
+            child: Divider(color: Paletter.darkGray.withValues(alpha: 0.4))),
       ],
     );
   }
@@ -153,12 +153,12 @@ class _EmptyTransactions extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.receipt_long_outlined, size: 48, color: Palette.gray),
+            Icon(Icons.receipt_long_outlined, size: 48, color: Paletter.gray),
             const SizedBox(height: 12),
             Text(
               'No transactions available',
               style: TextStyle(
-                color: Palette.white,
+                color: Colors.white,
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
               ),
@@ -168,7 +168,7 @@ class _EmptyTransactions extends StatelessWidget {
               'Your recent activity will show up here.',
               textAlign: TextAlign.center,
               style: TextStyle(
-                color: Palette.lightGray,
+                color: Paletter.lightGray,
                 fontSize: 13.5,
               ),
             ),

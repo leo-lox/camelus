@@ -108,7 +108,7 @@ class _WalletPaySelectAmountState extends ConsumerState<WalletReceiveAmount> {
   showSnackBar(BuildContext context, String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        backgroundColor: Palette.warn,
+        backgroundColor: Theme.of(context).colorScheme.error,
         content: Text(
           message,
           style: TextStyle(color: Colors.white),
@@ -142,7 +142,7 @@ class _WalletPaySelectAmountState extends ConsumerState<WalletReceiveAmount> {
     return Scaffold(
       appBar: widget.title != null
           ? AppBar(
-              backgroundColor: Palette.background,
+              backgroundColor: Theme.of(context).colorScheme.surface,
               title: Text(widget.title!),
               leading: IconButton(
                 icon: const Icon(Icons.arrow_back),
@@ -152,7 +152,7 @@ class _WalletPaySelectAmountState extends ConsumerState<WalletReceiveAmount> {
               ),
             )
           : null,
-      backgroundColor: Palette.background,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.fromLTRB(16, 24, 16, 16),
@@ -180,7 +180,7 @@ class _WalletPaySelectAmountState extends ConsumerState<WalletReceiveAmount> {
                       PhosphorIcons.notePencil(),
                       size: 25,
                     ),
-                    color: Palette.primary,
+                    color: Theme.of(context).colorScheme.primary,
                     onPressed: () async {
                       final selectedId = await showWalletsSelectBottomSheet(
                         context: context,
@@ -245,8 +245,8 @@ class _WalletPaySelectAmountState extends ConsumerState<WalletReceiveAmount> {
                       ),
                     },
                     showHaptics: true,
-                    trackColor: Palette.extraDarkGray,
-                    activeColor: Palette.primary,
+                    trackColor: Paletter.extraDarkGray,
+                    activeColor: Theme.of(context).colorScheme.primary,
                   ),
                 ),
               ),

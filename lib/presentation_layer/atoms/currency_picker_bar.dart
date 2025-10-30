@@ -159,13 +159,13 @@ class _CurrencyPickerBarState extends State<CurrencyPickerBar>
 
     final trackColor = widget.trackColor ??
         (widget.isDark
-            ? Palette.extraDarkGray.withValues(alpha: 0.22)
-            : Palette.lightGray.withValues(alpha: 0.85));
+            ? Paletter.extraDarkGray.withValues(alpha: 0.22)
+            : Paletter.lightGray.withValues(alpha: 0.85));
 
     final inactiveColor = widget.inactiveColor ??
         (widget.isDark
-            ? Palette.primary.withValues(alpha: 0.88)
-            : Palette.primary.withValues(alpha: 0.9));
+            ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.88)
+            : Theme.of(context).colorScheme.primary.withValues(alpha: 0.9));
 
     final activeColor = widget.activeColor ?? theme.colorScheme.primary;
 
@@ -306,8 +306,8 @@ class _CurrencyPickerBarState extends State<CurrencyPickerBar>
                       isDark: widget.isDark,
                       borderWidth: 3,
                       shadowColor: widget.isDark
-                          ? Palette.black.withValues(alpha: 0.5)
-                          : Palette.black.withValues(alpha: 0.15),
+                          ? Colors.black.withValues(alpha: 0.5)
+                          : Colors.black.withValues(alpha: 0.15),
                       highlightColor: widget.isDark
                           ? Colors.white.withValues(alpha: 0.08)
                           : Colors.white.withValues(alpha: 0.18),
@@ -327,8 +327,8 @@ class _LensRing extends StatelessWidget {
   const _LensRing({
     required this.isDark,
     this.borderWidth = 3,
-    this.shadowColor = Palette.gray,
-    this.highlightColor = Palette.gray,
+    this.shadowColor = Paletter.gray,
+    this.highlightColor = Paletter.gray,
   });
 
   final bool isDark;
@@ -344,7 +344,9 @@ class _LensRing extends StatelessWidget {
           shape: BoxShape.circle,
           border: Border.all(
             width: borderWidth,
-            color: isDark ? Palette.darkGray : Palette.background,
+            color: isDark
+                ? Paletter.darkGray
+                : Theme.of(context).colorScheme.surface,
           ),
           boxShadow: [
             BoxShadow(

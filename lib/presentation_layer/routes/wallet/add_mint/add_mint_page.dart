@@ -127,10 +127,10 @@ class AddMintPage extends ConsumerWidget {
     final notifier = ref.read(addMintProvider.notifier);
 
     return Scaffold(
-      backgroundColor: Palette.background,
+      backgroundColor: Theme.of(context).colorScheme.background,
       appBar: AppBar(
         title: const Text('Add Mint'),
-        backgroundColor: Palette.background,
+        backgroundColor: Theme.of(context).colorScheme.background,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -151,8 +151,8 @@ class AddMintPage extends ConsumerWidget {
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: LinearProgressIndicator(
                 value: validationState.isValidating ? null : 0.0,
-                backgroundColor: Palette.background,
-                color: Palette.white,
+                backgroundColor: Theme.of(context).colorScheme.surface,
+                color: Theme.of(context).colorScheme.primary,
                 borderRadius: BorderRadius.circular(12),
               ),
             ),
@@ -164,11 +164,11 @@ class AddMintPage extends ConsumerWidget {
                 hintText: 'Enter mint address...',
                 border: const OutlineInputBorder(),
                 focusedBorder: const OutlineInputBorder(
-                  borderSide: BorderSide(color: Palette.white),
+                  borderSide: BorderSide(color: Paletter.darkGray),
                   borderRadius: BorderRadius.all(Radius.circular(12)),
                 ),
                 enabledBorder: const OutlineInputBorder(
-                  borderSide: BorderSide(color: Palette.darkGray),
+                  borderSide: BorderSide(color: Paletter.darkGray),
                   borderRadius: BorderRadius.all(Radius.circular(12)),
                 ),
                 suffixIcon: _buildValidationIcon(validationState),
@@ -215,7 +215,7 @@ class AddMintPage extends ConsumerWidget {
     if (state.isValid == true) {
       return Icon(
         PhosphorIcons.checkCircle(),
-        color: Palette.success,
+        color: Colors.green,
       );
     }
 

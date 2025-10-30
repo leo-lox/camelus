@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:ndk/entities.dart' as ndk_entities;
 
 import '../../../../../config/palette.dart';
@@ -37,10 +38,7 @@ class WalletReceiveType extends ConsumerWidget {
 
     ecashCompleter.receiveEcash(tokenString: userClipboard);
     if (!context.mounted) return;
-    Navigator.pushReplacementNamed(
-      context,
-      '/wallet/receive/ecash',
-    );
+    context.pushReplacement('/wallet/receive/ecash');
   }
 
   Future<String?> _handleReadClipboard() async {
@@ -56,8 +54,8 @@ class WalletReceiveType extends ConsumerWidget {
     if (!context.mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(message, style: TextStyle(color: Palette.white)),
-        backgroundColor: Palette.error,
+        content: Text(message, style: TextStyle(color: Colors.white)),
+        backgroundColor: Theme.of(context).colorScheme.error,
       ),
     );
   }
@@ -69,9 +67,9 @@ class WalletReceiveType extends ConsumerWidget {
     final stateNotifier = ref.watch(walletRecieverProvider.notifier);
 
     return Scaffold(
-      backgroundColor: Palette.background,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
-        backgroundColor: Palette.background,
+        backgroundColor: Theme.of(context).colorScheme.surface,
         title: const Text('Receive'),
         leading: Container(),
         leadingWidth: 0,
@@ -234,7 +232,7 @@ class _WalletsList extends StatelessWidget {
               Text(
                 "${WalletNumberFormatting.formatAmount(amount: b.amount, unit: b.unit)} ${b.unit}",
                 style: TextStyle(
-                  color: Palette.white,
+                  color: Colors.white,
                 ),
               ),
           ]),

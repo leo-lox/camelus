@@ -17,11 +17,11 @@ class MintInfoCardSmall extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       elevation: 4,
-      color: Palette.background,
+      color: Theme.of(context).colorScheme.surface,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
         side: BorderSide(
-          color: Palette.white.withValues(alpha: 0.5),
+          color: Colors.white.withValues(alpha: 0.5),
           width: 1,
         ),
       ),
@@ -60,7 +60,7 @@ class MintInfoCardSmall extends StatelessWidget {
                         Text(
                           mintInfo.name ?? 'Unknown Mint',
                           style: TextStyle(
-                            color: Palette.white,
+                            color: Colors.white,
                             fontSize: 22,
                             fontWeight: FontWeight.bold,
                           ),
@@ -71,7 +71,7 @@ class MintInfoCardSmall extends StatelessWidget {
                           Text(
                             '${mintInfo.version}',
                             style: TextStyle(
-                              color: Palette.gray,
+                              color: Paletter.gray,
                               fontSize: 12,
                             ),
                           ),
@@ -88,7 +88,7 @@ class MintInfoCardSmall extends StatelessWidget {
                 Text(
                   mintInfo.description!,
                   style: TextStyle(
-                    color: Palette.lightGray,
+                    color: Paletter.lightGray,
                     fontSize: 14,
                   ),
                   maxLines: 2,
@@ -103,10 +103,13 @@ class MintInfoCardSmall extends StatelessWidget {
                   width: double.infinity,
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: Palette.gray.withValues(alpha: 0.1),
+                    color: Paletter.gray.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
                     border: Border.all(
-                      color: Palette.primary.withValues(alpha: 0.5),
+                      color: Theme.of(context)
+                          .colorScheme
+                          .primary
+                          .withValues(alpha: 0.5),
                     ),
                   ),
                   child: Row(
@@ -114,14 +117,14 @@ class MintInfoCardSmall extends StatelessWidget {
                       Icon(
                         PhosphorIcons.megaphone(),
                         size: 16,
-                        color: Palette.primary,
+                        color: Theme.of(context).colorScheme.primary,
                       ),
                       const SizedBox(width: 6),
                       Expanded(
                         child: Text(
                           mintInfo.motd!,
                           style: TextStyle(
-                            color: Palette.white,
+                            color: Colors.white,
                             fontSize: 16,
                           ),
                           maxLines: 1,
@@ -139,7 +142,7 @@ class MintInfoCardSmall extends StatelessWidget {
                 Text(
                   'Supported Units',
                   style: TextStyle(
-                    color: Palette.lightGray,
+                    color: Paletter.lightGray,
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
                   ),
@@ -160,7 +163,7 @@ class MintInfoCardSmall extends StatelessWidget {
                       child: Text(
                         unit.toUpperCase(),
                         style: TextStyle(
-                          color: Palette.white,
+                          color: Colors.white,
                           fontSize: 12,
                         ),
                       ),
@@ -175,7 +178,7 @@ class MintInfoCardSmall extends StatelessWidget {
                 Text(
                   'Contact',
                   style: TextStyle(
-                    color: Palette.lightGray,
+                    color: Paletter.lightGray,
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
                   ),
@@ -189,14 +192,14 @@ class MintInfoCardSmall extends StatelessWidget {
                         Icon(
                           PhosphorIcons.userCircle(),
                           size: 14,
-                          color: Palette.lightGray,
+                          color: Paletter.lightGray,
                         ),
                         const SizedBox(width: 6),
                         Expanded(
                           child: Text(
                             contact.info,
                             style: TextStyle(
-                              color: Palette.white,
+                              color: Colors.white,
                               fontSize: 12,
                             ),
                             maxLines: 1,
@@ -217,7 +220,7 @@ class MintInfoCardSmall extends StatelessWidget {
                     Icon(
                       PhosphorIcons.link(),
                       size: 16,
-                      color: Palette.lightGray,
+                      color: Paletter.lightGray,
                     ),
                     const SizedBox(width: 4),
                     Text(
@@ -232,7 +235,7 @@ class MintInfoCardSmall extends StatelessWidget {
                     child: Text(
                       url,
                       style: TextStyle(
-                        color: Palette.lightGray,
+                        color: Paletter.lightGray,
                         fontSize: 12,
                       ),
                       maxLines: 1,
@@ -261,13 +264,13 @@ class MintInfoCardSmall extends StatelessWidget {
                             Icon(
                               Icons.description_outlined,
                               size: 12,
-                              color: Palette.lightGray,
+                              color: Paletter.lightGray,
                             ),
                             const SizedBox(width: 4),
                             Text(
                               'Terms of Service',
                               style: TextStyle(
-                                color: Palette.lightGray,
+                                color: Paletter.lightGray,
                                 fontSize: 12,
                               ),
                             ),
@@ -289,13 +292,13 @@ class MintInfoCardSmall extends StatelessWidget {
       width: 48,
       height: 48,
       decoration: BoxDecoration(
-        color: Palette.darkGray,
+        color: Paletter.darkGray,
         borderRadius: BorderRadius.circular(8),
       ),
       child: Icon(
         PhosphorIcons.bank(),
         size: 24,
-        color: Palette.gray,
+        color: Paletter.gray,
       ),
     );
   }

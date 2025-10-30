@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../../../config/palette.dart';
@@ -15,7 +16,7 @@ class WalletReceiveEcashCompleterPage extends ConsumerWidget {
     final walletState = ref.watch(walletReceiveEcashCompleterProvider);
 
     return Scaffold(
-      backgroundColor: Palette.background,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: null,
       body: SafeArea(
         child: Padding(
@@ -24,7 +25,7 @@ class WalletReceiveEcashCompleterPage extends ConsumerWidget {
             children: [
               Spacer(flex: 1),
               // Status Card
-              _buildStatusCard(walletState),
+              _buildStatusCard(walletState, context),
 
               Spacer(flex: 7),
 
@@ -37,7 +38,7 @@ class WalletReceiveEcashCompleterPage extends ConsumerWidget {
                     Text(
                       '+',
                       style: const TextStyle(
-                        color: Palette.lightGray,
+                        color: Paletter.lightGray,
                         fontSize: 28,
                       ),
                     ),
@@ -46,7 +47,7 @@ class WalletReceiveEcashCompleterPage extends ConsumerWidget {
                       WalletNumberFormatting.formatAmount(
                           amount: walletState.amount!, unit: walletState.unit!),
                       style: const TextStyle(
-                        color: Palette.white,
+                        color: Colors.white,
                         fontSize: 48,
                         fontWeight: FontWeight.bold,
                       ),
@@ -55,7 +56,7 @@ class WalletReceiveEcashCompleterPage extends ConsumerWidget {
                     Text(
                       walletState.unit ?? '',
                       style: const TextStyle(
-                          fontSize: 16, color: Palette.lightGray),
+                          fontSize: 16, color: Paletter.lightGray),
                     ),
                   ],
                 ),
@@ -73,7 +74,7 @@ class WalletReceiveEcashCompleterPage extends ConsumerWidget {
                     child: Text(
                       walletState.memo!,
                       style: const TextStyle(
-                        color: Palette.white,
+                        color: Colors.white,
                         fontSize: 16,
                       ),
                       textAlign: TextAlign.center,
@@ -96,15 +97,14 @@ class WalletReceiveEcashCompleterPage extends ConsumerWidget {
         child: Padding(
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
           child: longButton(
-              name: "close",
-              onPressed: () => {Navigator.of(context).pop()},
-              inverted: true),
+              name: "close", onPressed: () => {context.pop()}, inverted: true),
         ),
       ),
     );
   }
 
-  Widget _buildStatusCard(WalletRcvEcashCompleterState state) {
+  Widget _buildStatusCard(
+      WalletRcvEcashCompleterState state, BuildContext context) {
     IconData icon;
     Color color;
     String title;
@@ -112,22 +112,22 @@ class WalletReceiveEcashCompleterPage extends ConsumerWidget {
 
     if (state.isPending) {
       icon = PhosphorIcons.hourglass();
-      color = Palette.primary;
+      color = Theme.of(context).colorScheme.primary;
       title = 'Processing';
       subtitle = 'Receiving...';
     } else if (state.isError) {
       icon = PhosphorIcons.warningCircle();
-      color = Palette.error;
+      color = Theme.of(context).colorScheme.error;
       title = 'Failed';
       subtitle = 'transaction failed';
     } else if (state.isSuccess) {
       icon = PhosphorIcons.checkCircle();
-      color = Palette.success;
+      color = Colors.green;
       title = 'Success';
       subtitle = 'received successfully';
     } else {
       icon = PhosphorIcons.info();
-      color = Palette.gray;
+      color = Paletter.gray;
       title = 'Ready';
       subtitle = 'waiting for transaction';
     }

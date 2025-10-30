@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import 'package:ndk/entities.dart' as ndk_entities;
@@ -23,7 +24,7 @@ class WalletReceiveRequest extends ConsumerWidget {
   showSnackBar(BuildContext context, String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        backgroundColor: Palette.warn,
+        backgroundColor: Theme.of(context).colorScheme.error,
         content: Text(
           message,
           style: TextStyle(color: Colors.white),
@@ -55,7 +56,8 @@ class WalletReceiveRequest extends ConsumerWidget {
           Container(
             width: double.infinity,
             decoration: BoxDecoration(
-              color: Palette.primary.withValues(alpha: 0.9),
+              color:
+                  Theme.of(context).colorScheme.primary.withValues(alpha: 0.9),
               borderRadius: BorderRadius.only(
                 bottomLeft: Radius.circular(20),
                 bottomRight: Radius.circular(20),
@@ -89,12 +91,13 @@ class WalletReceiveRequest extends ConsumerWidget {
                         IconButton(
                           icon: Icon(
                             Icons.close,
-                            color: Palette.lightGray,
+                            color: Paletter.lightGray,
                             size: 24,
                           ),
                           onPressed: () {
                             rcvNotifier.reset();
-                            Navigator.of(context).pop();
+
+                            context.pop();
                           },
                         ),
                       ],
@@ -113,7 +116,7 @@ class WalletReceiveRequest extends ConsumerWidget {
                                 ),
                                 padding: EdgeInsets.all(16),
                                 decoration: BoxDecoration(
-                                  color: Palette.white,
+                                  color: Colors.white,
                                   borderRadius: BorderRadius.circular(12),
                                 ),
                                 child: PrettyQrView.data(
@@ -136,8 +139,8 @@ class WalletReceiveRequest extends ConsumerWidget {
                                     aspectRatio: 1.0,
                                     child: Container(
                                       decoration: BoxDecoration(
-                                        color: Palette.black
-                                            .withValues(alpha: 0.7),
+                                        color:
+                                            Colors.black.withValues(alpha: 0.7),
                                         borderRadius: BorderRadius.circular(12),
                                       ),
                                       child: Column(
@@ -146,14 +149,14 @@ class WalletReceiveRequest extends ConsumerWidget {
                                         children: [
                                           Icon(
                                             PhosphorIcons.checkCircle(),
-                                            color: Palette.success,
+                                            color: Colors.green,
                                             size: 64,
                                           ),
                                           SizedBox(height: 8),
                                           Text(
                                             'Request has been payed',
                                             style: TextStyle(
-                                              color: Palette.white,
+                                              color: Colors.white,
                                               fontSize: 16,
                                             ),
                                           ),
@@ -172,8 +175,7 @@ class WalletReceiveRequest extends ConsumerWidget {
                             child: CopyClipboardButton(
                               value: state.request!,
                               copyText: "Copy invoice",
-                              backgroundColor: Palette.extraDarkGray,
-                              primaryColor: Palette.extraLightGray,
+                              backgroundColor: Paletter.extraDarkGray,
                             ),
                           ),
                         ],
@@ -194,7 +196,7 @@ class WalletReceiveRequest extends ConsumerWidget {
                     Text(
                       state.requestErr!,
                       style: TextStyle(
-                        color: Palette.error,
+                        color: Theme.of(context).colorScheme.error,
                         fontSize: 14,
                       ),
                     ),
@@ -227,10 +229,7 @@ class WalletReceiveRequest extends ConsumerWidget {
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
           child: longButton(
               name: "close",
-              onPressed: () => {
-                    rcvNotifier.reset(),
-                    Navigator.of(context).pop(),
-                  },
+              onPressed: () => {rcvNotifier.reset(), context.pop()},
               inverted: true),
         ),
       ),
@@ -271,7 +270,8 @@ class ContactReciever extends StatelessWidget {
       child: Row(
         children: [
           CircleAvatar(
-            backgroundColor: Palette.primary.withValues(alpha: 0.8),
+            backgroundColor:
+                Theme.of(context).colorScheme.primary.withValues(alpha: 0.8),
             child:
                 Text('NA', style: TextStyle(color: Colors.white, fontSize: 12)),
           ),
@@ -307,7 +307,8 @@ class TokenReciever extends StatelessWidget {
       child: Row(
         children: [
           CircleAvatar(
-            backgroundColor: Palette.primary.withValues(alpha: 0.8),
+            backgroundColor:
+                Theme.of(context).colorScheme.primary.withValues(alpha: 0.8),
             child:
                 Text('TK', style: TextStyle(color: Colors.white, fontSize: 12)),
           ),
@@ -317,14 +318,14 @@ class TokenReciever extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('receiver',
-                    style: TextStyle(color: Palette.gray, fontSize: 12)),
+                    style: TextStyle(color: Paletter.gray, fontSize: 12)),
                 Text('Token',
                     style: TextStyle(
-                        color: Palette.white,
+                        color: Colors.white,
                         fontSize: 16,
                         fontWeight: FontWeight.bold)),
                 Text('send as a <cashu> token or qr code',
-                    style: TextStyle(color: Palette.lightGray, fontSize: 14)),
+                    style: TextStyle(color: Paletter.lightGray, fontSize: 14)),
               ],
             ),
           ),
@@ -346,7 +347,8 @@ class WalletReciever extends StatelessWidget {
       child: Row(
         children: [
           CircleAvatar(
-            backgroundColor: Palette.primary.withValues(alpha: 0.8),
+            backgroundColor:
+                Theme.of(context).colorScheme.primary.withValues(alpha: 0.8),
             child:
                 Text('NA', style: TextStyle(color: Colors.white, fontSize: 12)),
           ),

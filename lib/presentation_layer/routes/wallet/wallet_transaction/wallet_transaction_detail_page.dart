@@ -15,9 +15,9 @@ class WalletTransactionDetailPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
-      backgroundColor: Palette.background,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
-        backgroundColor: Palette.background,
+        backgroundColor: Theme.of(context).colorScheme.surface,
         title: Text('Transaction Detail'),
       ),
       body: Padding(

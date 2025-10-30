@@ -1,3 +1,4 @@
+import 'package:ndk/domain_layer/entities/cashu/cashu_user_seedphrase.dart';
 import 'package:ndk/ndk.dart';
 import 'package:riverpod/riverpod.dart';
 
@@ -12,14 +13,16 @@ final ndkProvider = Provider<Ndk>((ref) {
   final bloomFilterRef = ref.read(bloomFilterReferenceProvider);
 
   final NdkConfig ndkConfig = NdkConfig(
-    engine: NdkEngine.JIT,
-    cache: db!,
-    eventVerifier: eventVerifier,
-    bootstrapRelays: camelusBootstrapRelays,
-    logLevel: Logger.logLevels.warning,
-    defaultBroadcastConsiderDonePercent: 0.2,
-    eventOutFilters: [bloomFilterRef],
-  );
+      engine: NdkEngine.JIT,
+      cache: db!,
+      eventVerifier: eventVerifier,
+      bootstrapRelays: camelusBootstrapRelays,
+      logLevel: Logger.logLevels.warning,
+      defaultBroadcastConsiderDonePercent: 0.2,
+      eventOutFilters: [bloomFilterRef],
+      cashuUserSeedphrase: CashuUserSeedphrase(
+          seedPhrase:
+              "market grid grocery useless into bag earn dove measure stay elephant bright"));
 
   final ndk = Ndk(ndkConfig);
   return ndk;

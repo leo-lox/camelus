@@ -55,9 +55,9 @@ class WalletSelectReciever extends ConsumerWidget {
     final paymentStateNotifier = ref.watch(walletPayStateProvider.notifier);
 
     return Scaffold(
-      backgroundColor: Palette.background,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
-        backgroundColor: Palette.background,
+        backgroundColor: Theme.of(context).colorScheme.surface,
         title: const Text('Pay to'),
         leading: Container(),
         leadingWidth: 0,
@@ -81,16 +81,17 @@ class WalletSelectReciever extends ConsumerWidget {
                 isDense: true,
                 hintText: ' Search by name',
                 hintStyle:
-                    const TextStyle(color: Palette.white, letterSpacing: 1.1),
+                    const TextStyle(color: Colors.white, letterSpacing: 1.1),
                 filled: true,
-                fillColor: Palette.background,
+                fillColor: Theme.of(context).colorScheme.surface,
                 enabledBorder: const OutlineInputBorder(
                   borderRadius: BorderRadius.all(Radius.circular(50.0)),
-                  borderSide: BorderSide(color: Palette.extraDarkGray),
+                  borderSide: BorderSide(color: Paletter.extraDarkGray),
                 ),
-                focusedBorder: const OutlineInputBorder(
+                focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.all(Radius.circular(25.0)),
-                  borderSide: BorderSide(color: Palette.background),
+                  borderSide:
+                      BorderSide(color: Theme.of(context).colorScheme.surface),
                 ),
               ),
             ),
@@ -274,7 +275,7 @@ class _ContactsList extends StatelessWidget {
                 Helpers.shortHr(
                   c.pubkey,
                 ),
-            style: TextStyle(color: Palette.gray),
+            style: TextStyle(color: Paletter.gray),
           ),
           onTap: () => onTap(c),
         );
@@ -329,7 +330,7 @@ class _WalletsList extends StatelessWidget {
               Text(
                 "${WalletNumberFormatting.formatAmount(amount: b.amount, unit: b.unit)} ${b.unit}",
                 style: TextStyle(
-                  color: Palette.white,
+                  color: Colors.white,
                 ),
               ),
           ]),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:ndk/entities.dart' as ndk_entities;
 import 'package:phosphor_flutter/phosphor_flutter.dart';
@@ -26,7 +27,7 @@ class WalletTransactionCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final amount = tx.changeAmount;
 
-    final transactionStatus = _getTransactionStatus(tx);
+    final transactionStatus = _getTransactionStatus(tx, context);
 
     final dt = _fromUnixSeconds(_bestDate(tx) ?? 0);
     final formattedDate = _formatDate(dt, includeDate: showDate);
@@ -40,10 +41,10 @@ class WalletTransactionCard extends StatelessWidget {
 
     return Card(
       elevation: 0,
-      color: Palette.extraDarkGray.withValues(alpha: 0.75),
+      color: Paletter.extraDarkGray.withValues(alpha: 0.75),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: Palette.darkGray.withValues(alpha: 0.25)),
+        side: BorderSide(color: Paletter.darkGray.withValues(alpha: 0.25)),
       ),
       margin: const EdgeInsets.symmetric(vertical: 6),
       child: ListTile(
@@ -60,7 +61,7 @@ class WalletTransactionCard extends StatelessWidget {
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
           style: TextStyle(
-            color: Palette.white,
+            color: Colors.white,
             fontWeight: FontWeight.w600,
           ),
         ),
@@ -68,7 +69,7 @@ class WalletTransactionCard extends StatelessWidget {
           "${cashuTx != null ? _removeHttpPrefix(cashuTx.mintUrl) : ""}  • ${cashuTx != null ? _txType(cashuTx) : ''}",
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
-          style: TextStyle(color: Palette.extraLightGray),
+          style: TextStyle(color: Paletter.extraLightGray),
         ),
         trailing: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -88,18 +89,14 @@ class WalletTransactionCard extends StatelessWidget {
             Text(
               formattedDate,
               style: TextStyle(
-                color: Palette.gray,
+                color: Paletter.gray,
                 fontSize: 12,
               ),
             ),
           ],
         ),
         onTap: () {
-          Navigator.pushNamed(
-            context,
-            '/wallet/transactions/detail',
-            arguments: tx,
-          );
+          context.push('/wallet/transactions/detail', extra: tx);
         },
       ),
     );
@@ -159,7 +156,8 @@ class TransactionStatus {
   });
 }
 
-TransactionStatus _getTransactionStatus(ndk_entities.WalletTransaction tx) {
+TransactionStatus _getTransactionStatus(
+    ndk_entities.WalletTransaction tx, BuildContext context) {
   final isDraft = tx.state == ndk_entities.WalletTransactionState.draft;
   final isPending = tx.state == ndk_entities.WalletTransactionState.pending;
   final isFailed = tx.state == ndk_entities.WalletTransactionState.failed;
@@ -177,19 +175,19 @@ TransactionStatus _getTransactionStatus(ndk_entities.WalletTransaction tx) {
     return TransactionStatus(
       label: 'Failed ${isIncoming ? 'Incoming' : 'Outgoing'}',
       icon: PhosphorIcons.warningCircle(),
-      color: Palette.error,
+      color: Theme.of(context).colorScheme.error,
       isStrikethrough: true,
     );
   } else if (isCanceled) {
     return TransactionStatus(
       label: 'Canceled ${isIncoming ? 'Incoming' : 'Outgoing'}',
       icon: PhosphorIcons.xCircle(),
-      color: Palette.warn,
+      color: Theme.of(context).colorScheme.onError,
       isStrikethrough: true,
     );
   } else {
     // Successful transaction
-    final color = isIncoming ? Palette.success : Palette.gray;
+    final color = isIncoming ? Colors.green : Paletter.gray;
     final icon =
         isIncoming ? PhosphorIcons.arrowDown() : PhosphorIcons.arrowUp();
 

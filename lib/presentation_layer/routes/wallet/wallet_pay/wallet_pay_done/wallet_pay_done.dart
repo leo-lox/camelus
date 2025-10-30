@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:ndk/entities.dart' as ndk_entities;
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
@@ -21,7 +22,7 @@ class WalletPayDone extends ConsumerWidget {
     final payNotifier = ref.watch(walletPayStateProvider.notifier);
 
     return Scaffold(
-      backgroundColor: Palette.background,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: null,
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -37,7 +38,8 @@ class WalletPayDone extends ConsumerWidget {
               name: "close",
               onPressed: () {
                 payNotifier.reset();
-                Navigator.of(context).pop();
+
+                context.pop();
               },
               inverted: true),
         ),
@@ -101,18 +103,18 @@ class ErrorStep extends StatelessWidget {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        const Icon(
+        Icon(
           Icons.error_outline,
-          color: Palette.error,
+          color: Theme.of(context).colorScheme.error,
           size: 80,
         ),
         const SizedBox(height: 24),
-        const Text(
+        Text(
           'Error',
           style: TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.bold,
-            color: Palette.error,
+            color: Theme.of(context).colorScheme.error,
           ),
         ),
         const SizedBox(height: 16),
@@ -125,9 +127,9 @@ class ErrorStep extends StatelessWidget {
           ),
           child: Text(
             errorMessage ?? 'An unknown error occurred',
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 16,
-              color: Palette.error,
+              color: Theme.of(context).colorScheme.onError,
             ),
             textAlign: TextAlign.center,
           ),
@@ -167,7 +169,7 @@ class SuccessStep extends StatelessWidget {
               style: TextStyle(
                 fontSize: 48,
                 fontWeight: FontWeight.bold,
-                color: Palette.white,
+                color: Colors.white,
               ),
             ),
             const SizedBox(width: 16),
@@ -176,7 +178,7 @@ class SuccessStep extends StatelessWidget {
               style: TextStyle(
                 fontSize: 48,
                 fontWeight: FontWeight.bold,
-                color: Palette.extraLightGray,
+                color: Paletter.extraLightGray,
               ),
             ),
           ],
@@ -190,7 +192,7 @@ class SuccessStep extends StatelessWidget {
           width: 240,
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: Palette.white,
+            color: Colors.white,
             borderRadius: BorderRadius.circular(8),
           ),
           child: AnimatedQr(
@@ -243,16 +245,16 @@ class TransactionState extends ConsumerWidget {
 
     if (myTransaction.state == ndk_entities.WalletTransactionState.pending) {
       icon = PhosphorIcons.hourglass();
-      color = Palette.lightGray;
+      color = Paletter.lightGray;
       title = 'pending ecash';
     } else if (myTransaction.state ==
         ndk_entities.WalletTransactionState.failed) {
       icon = PhosphorIcons.warningCircle();
-      color = Palette.error;
+      color = Theme.of(context).colorScheme.surface;
       title = 'failed';
     } else {
       icon = PhosphorIcons.checkCircle();
-      color = Palette.success;
+      color = Colors.green;
       title = 'ecash claimed';
     }
 

@@ -24,9 +24,9 @@ class MintInfoPage extends ConsumerWidget {
 
     if (mintInfoFilter.isEmpty) {
       return Scaffold(
-        backgroundColor: Palette.background,
+        backgroundColor: Theme.of(context).colorScheme.surface,
         appBar: AppBar(
-          backgroundColor: Palette.background,
+          backgroundColor: Theme.of(context).colorScheme.surface,
           title: Text('Mint Info'),
         ),
         body: Center(
@@ -38,9 +38,9 @@ class MintInfoPage extends ConsumerWidget {
     final myWallet = mintInfoFilter.first as CashuWallet;
 
     return Scaffold(
-      backgroundColor: Palette.background,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
-        backgroundColor: Palette.background,
+        backgroundColor: Theme.of(context).colorScheme.surface,
         title: Text('Mint Info'),
       ),
       body: SingleChildScrollView(

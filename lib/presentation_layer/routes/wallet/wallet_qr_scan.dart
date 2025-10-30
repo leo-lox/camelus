@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
@@ -81,10 +82,8 @@ class _QrScan extends ConsumerState<WalletQrScan> {
             final ecashTokenString =
                 next.navigationData!['cashuTokenString'] as String;
             rcvProvider.receiveEcash(tokenString: ecashTokenString);
-            Navigator.pushNamed(
-              context,
-              '/wallet/receive/ecash',
-            );
+
+            context.push('/wallet/receive/ecash');
             ref.read(walletNavigationProvider.notifier).changeDashboardPage(1);
             break;
           case QRNavigationTarget.sendPage:
@@ -106,7 +105,8 @@ class _QrScan extends ConsumerState<WalletQrScan> {
               return Center(
                 child: Text(
                   'Error: $p1',
-                  style: const TextStyle(color: Palette.error, fontSize: 16),
+                  style: TextStyle(
+                      color: Theme.of(context).colorScheme.error, fontSize: 16),
                 ),
               );
             },
@@ -135,7 +135,7 @@ class _QrScan extends ConsumerState<WalletQrScan> {
                 height: 250,
                 decoration: BoxDecoration(
                   border: Border.all(
-                    color: Palette.white,
+                    color: Colors.white,
                     width: 2,
                   ),
                   borderRadius: BorderRadius.circular(20),
@@ -151,7 +151,7 @@ class _QrScan extends ConsumerState<WalletQrScan> {
               height: 120,
               width: double.infinity,
               decoration: BoxDecoration(
-                color: Palette.black.withValues(alpha: 0.8),
+                color: Colors.black.withValues(alpha: 0.8),
                 borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(20),
                   topRight: Radius.circular(20),
@@ -180,8 +180,9 @@ class _QrScan extends ConsumerState<WalletQrScan> {
                           ),
                           label: const Text('paste from clipboard'),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Palette.primary,
-                            foregroundColor: Palette.white,
+                            backgroundColor:
+                                Theme.of(context).colorScheme.primary,
+                            foregroundColor: Colors.white,
                           ),
                         ),
                       ],
@@ -198,8 +199,8 @@ class _QrScan extends ConsumerState<WalletQrScan> {
               right: 20,
               child: LinearProgressIndicator(
                 borderRadius: BorderRadius.circular(20),
-                backgroundColor: Palette.extraDarkGray,
-                color: Palette.white,
+                backgroundColor: Paletter.extraDarkGray,
+                color: Colors.white,
               ),
             ),
 
@@ -222,8 +223,8 @@ class _QrScan extends ConsumerState<WalletQrScan> {
                           ),
                           child: Text(
                             qrScannerState.error ?? "",
-                            style: const TextStyle(
-                              color: Palette.warn,
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.error,
                               fontSize: 16,
                             ),
                             textAlign: TextAlign.center,

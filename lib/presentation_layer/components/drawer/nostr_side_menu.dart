@@ -220,15 +220,10 @@ class NostrSideMenu extends ConsumerWidget {
               }),
           _drawerItem(
               label: AppLocalizations.of(context)!.payments,
-              routeName: 'payments',
               icon: PhosphorIcons.lightning(),
+              routeName: '/wallet/dashboard',
               onTap: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content:
-                        Text(AppLocalizations.of(context)!.notImplementedYet),
-                  ),
-                );
+                context.push('/wallet/dashboard');
               }),
           _drawerItem(
               label: AppLocalizations.of(context)!.blocklist,

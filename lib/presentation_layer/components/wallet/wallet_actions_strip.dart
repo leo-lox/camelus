@@ -87,13 +87,13 @@ Widget _actionButton({
         ),
         child: Icon(
           iconData,
-          color: iconColor ?? Palette.gray,
+          color: iconColor ?? Paletter.gray,
           size: 23,
         ),
       ),
       Text(
         text,
-        style: TextStyle(color: textColor ?? Palette.gray),
+        style: TextStyle(color: textColor ?? Paletter.gray),
       )
     ],
   );

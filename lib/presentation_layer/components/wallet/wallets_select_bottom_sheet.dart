@@ -14,7 +14,7 @@ Future<String?> showWalletsSelectBottomSheet({
   return showModalBottomSheet<String>(
     context: context,
     isScrollControlled: true,
-    backgroundColor: Palette.background,
+    backgroundColor: Theme.of(context).colorScheme.surface,
     builder: (ctx) {
       final size = MediaQuery.of(ctx).size;
 
@@ -28,10 +28,11 @@ Future<String?> showWalletsSelectBottomSheet({
           // upper bound
           constraints: BoxConstraints(maxHeight: size.height * maxHeightFactor),
           decoration: BoxDecoration(
-            color: Palette.background,
+            color: Theme.of(context).colorScheme.surface,
             borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-            boxShadow: const [
-              BoxShadow(blurRadius: 16, color: Palette.background)
+            boxShadow: [
+              BoxShadow(
+                  blurRadius: 16, color: Theme.of(context).colorScheme.surface)
             ],
           ),
           child: Material(
@@ -55,7 +56,7 @@ Future<String?> showWalletsSelectBottomSheet({
                     child: Text(
                       title,
                       style: TextStyle(
-                        color: Palette.white,
+                        color: Colors.white,
                         fontSize: 20,
                         fontWeight: FontWeight.w600,
                       ),
@@ -84,7 +85,8 @@ Future<String?> showWalletsSelectBottomSheet({
                             isSelected: isSelected,
                             onTap: (id) => Navigator.of(ctx).pop(id),
                             tralling: Radio(
-                              activeColor: Palette.primary,
+                              activeColor:
+                                  Theme.of(context).colorScheme.primary,
                               value: wallet.id,
                               groupValue: isSelected ? wallet.id : null,
                               onChanged: (value) {
