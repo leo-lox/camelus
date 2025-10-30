@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:camelus/domain_layer/entities/parsed_post.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../config/palette.dart';
 import '../../../data_layer/models/post_context.dart';
@@ -42,7 +43,7 @@ class NoteCard extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        if (note.nostrNote.sig_valid != true) _buildInvalidSignature(),
+        if (note.nostrNote.sigValid != true) _buildInvalidSignature(),
         Padding(
           padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
           child: Row(
@@ -106,9 +107,9 @@ class NoteCard extends ConsumerWidget {
           ),
         ],
         if (!hideBottomBar)
-          const Divider(
+          Divider(
             thickness: 0.3,
-            color: Palette.darkGray,
+            color: Paletter.getDarkGray(context),
           ),
       ],
     );
@@ -119,7 +120,7 @@ class NoteCard extends ConsumerWidget {
       height: 50,
       child: Center(
         child: Text(
-          "Missing note:  ${note.nostrNote.getDirectReply?.recommended_relay},  ${note.nostrNote.getRootReply?.recommended_relay}",
+          "Missing note:  ${note.nostrNote.getDirectReply?.recommendedRelay},  ${note.nostrNote.getRootReply?.recommendedRelay}",
           style: const TextStyle(color: Colors.purple, fontSize: 20),
         ),
       ),
@@ -128,14 +129,16 @@ class NoteCard extends ConsumerWidget {
 
   Widget _buildInvalidSignature() {
     return Center(
-      child: Container(
-        decoration: const BoxDecoration(
-          color: Colors.red,
-          borderRadius: BorderRadius.all(Radius.circular(25)),
-        ),
-        child: const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 25, vertical: 8),
-          child: Text("Invalid signature!", style: TextStyle(fontSize: 15)),
+      child: Builder(
+        builder: (context) => Container(
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.error,
+            borderRadius: BorderRadius.all(Radius.circular(25)),
+          ),
+          child: const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 25, vertical: 8),
+            child: Text("Invalid signature!", style: TextStyle(fontSize: 15)),
+          ),
         ),
       ),
     );
@@ -143,8 +146,7 @@ class NoteCard extends ConsumerWidget {
 
   Widget _buildUserImage(BuildContext context) {
     return GestureDetector(
-      onTap: () => Navigator.pushNamed(context, "/nostr/profile",
-          arguments: note.pubkey),
+      onTap: () => context.push('/nostr/profile/${note.pubkey}'),
       child: UserImage(
         imageUrl: myMetadata?.picture,
         pubkey: note.pubkey,
@@ -154,18 +156,17 @@ class NoteCard extends ConsumerWidget {
   }
 }
 
-void _writeReply(ctx, NostrNote note) {
+void _writeReply(context, NostrNote note) {
   showModalBottomSheet(
       isScrollControlled: true,
       elevation: 10,
-      backgroundColor: Palette.background,
       isDismissible: false,
-      context: ctx,
-      builder: (ctx) => BackdropFilter(
+      context: context,
+      builder: (context) => BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
             child: Padding(
                 padding: EdgeInsets.only(
-                    bottom: MediaQuery.of(ctx).viewInsets.bottom),
+                    bottom: MediaQuery.of(context).viewInsets.bottom),
                 child: WritePost(
                   context: PostContext(replyToNote: note),
                 )),

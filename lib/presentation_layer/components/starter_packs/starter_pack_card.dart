@@ -80,10 +80,10 @@ class _StarterPackCardState extends ConsumerState<StarterPackCard> {
                         maxLines: 3,
                         textAlign: TextAlign.justify,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.normal,
-                          color: Palette.gray,
+                          color: Paletter.getGray(context),
                         ),
                       ),
 
@@ -96,7 +96,7 @@ class _StarterPackCardState extends ConsumerState<StarterPackCard> {
                             "by",
                             style: TextStyle(
                               fontSize: 14,
-                              color: Palette.gray,
+                              color: Paletter.getGray(context),
                             ),
                           ),
                           const SizedBox(width: 4),
@@ -105,7 +105,7 @@ class _StarterPackCardState extends ConsumerState<StarterPackCard> {
                                 _pubkeyToHrBech32Short(widget.pack.pubKey),
                             style: TextStyle(
                               fontSize: 14,
-                              color: Palette.gray,
+                              color: Paletter.getGray(context),
                             ),
                           ),
                           const SizedBox(width: 8),
@@ -152,7 +152,7 @@ class _StarterPackCardState extends ConsumerState<StarterPackCard> {
                         "+${(widget.pack.pubKeys.length - 5)}",
                         style: TextStyle(
                           fontSize: 16,
-                          color: Palette.lightGray,
+                          color: Paletter.getLightGray(context),
                           fontWeight: FontWeight.w500,
                         ),
                       ),

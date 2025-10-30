@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../domain_layer/entities/nostr_list.dart';
 import '../../../domain_layer/entities/starter_pack_identifier.dart';
@@ -38,8 +39,8 @@ class StarterPacksList extends ConsumerWidget {
               name: "create starter pack",
               inverted: true,
               onPressed: () {
-                Navigator.pushNamed(context, '/edit-starter-pack',
-                    arguments: StarterPackIdentifier(
+                context.push('/edit-starter-pack',
+                    extra: StarterPackIdentifier(
                       name: "i-${Helpers().getRandomString(10)}", //create new
                       pubkey: pubkey,
                     ));
@@ -72,8 +73,8 @@ class StarterPacksList extends ConsumerWidget {
                       name: "create another",
                       inverted: true,
                       onPressed: () {
-                        Navigator.pushNamed(context, '/edit-starter-pack',
-                            arguments: StarterPackIdentifier(
+                        context.push('/edit-starter-pack',
+                            extra: StarterPackIdentifier(
                               name:
                                   "i-${Helpers().getRandomString(10)}", //create new
                               pubkey: pubkey,
@@ -91,8 +92,8 @@ class StarterPacksList extends ConsumerWidget {
               child: StarterPackCard(
                 pack: starterPacks,
                 onTab: () {
-                  Navigator.pushNamed(context, '/open-starter-pack',
-                      arguments: StarterPackIdentifier(
+                  context.push('/open-starter-pack',
+                      extra: StarterPackIdentifier(
                         name: starterPacks.name,
                         pubkey: pubkey,
                       ));

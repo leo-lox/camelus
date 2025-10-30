@@ -5,8 +5,9 @@ import 'package:camelus/helpers/nevent_helper.dart';
 import 'package:camelus/domain_layer/entities/nostr_note.dart';
 import 'package:camelus/presentation_layer/components/note_card/skeleton_note.dart';
 import 'package:camelus/presentation_layer/providers/get_notes_provider.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../providers/metadata_state_provider.dart';
 import 'nostr_parser.dart';
@@ -64,14 +65,17 @@ class NoteCardReference extends ConsumerWidget {
           return Container(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: Palette.darkGray, width: 1.0),
+              border:
+                  Border.all(color: Paletter.getDarkGray(context), width: 1.0),
             ),
-            child: const Center(
+            child: Center(
               child: Padding(
                 padding: EdgeInsets.symmetric(horizontal: 0, vertical: 20),
                 child: Text(
                   "Note not found",
-                  style: TextStyle(color: Palette.white, fontSize: 17),
+                  style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurface,
+                      fontSize: 17),
                 ),
               ),
             ),
@@ -92,15 +96,16 @@ class NoteCardReference extends ConsumerWidget {
                 const SizedBox(height: 20),
                 GestureDetector(
                   onTap: () {
-                    Navigator.pushNamed(context, "/nostr/event", arguments: {
-                      "root": note.id,
-                      "scrollIntoView": note.id,
+                    context.push('/nostr/event', extra: {
+                      'root': note.id,
+                      'scrollIntoView': note.id,
                     });
                   },
                   child: Container(
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: Palette.darkGray, width: 1.0),
+                      border: Border.all(
+                          color: Paletter.getDarkGray(context), width: 1.0),
                     ),
                     child: NoteCard(
                       note: parsedNote,

@@ -4,7 +4,6 @@ import 'package:flutter_list_view/flutter_list_view.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../config/feeds_config.dart';
-import '../../config/palette.dart';
 import '../../domain_layer/entities/feed_filter.dart';
 import '../atoms/new_posts_available.dart';
 import '../atoms/refresh_indicator_no_need.dart';
@@ -133,12 +132,13 @@ class _GenericFeedState extends ConsumerState<GenericFeed>
                   handle:
                       NestedScrollView.sliverOverlapAbsorberHandleFor(context),
                   sliver: SliverAppBar(
-                    backgroundColor: Palette.background,
                     toolbarHeight: 0,
                     floating: true,
                     pinned: true,
                     snap: widget.floatHeaderSlivers, // Snap if floating
                     forceElevated: innerBoxIsScrolled,
+                    backgroundColor: Theme.of(context).colorScheme.surface,
+                    surfaceTintColor: Theme.of(context).colorScheme.surface,
                     bottom: TabBar(
                       controller: _tabController!,
                       tabs: [

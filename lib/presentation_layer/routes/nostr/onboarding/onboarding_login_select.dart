@@ -3,18 +3,20 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 
-import '../../../../config/palette.dart';
 import '../../../atoms/long_button.dart';
 
 class OnboardingLoginSelectPage extends ConsumerStatefulWidget {
   final Function onPressedSeedPhraseLogin;
   final Function onPressedAmberLogin;
+  final Function? onPressedBack;
 
   const OnboardingLoginSelectPage({
     super.key,
     required this.onPressedSeedPhraseLogin,
     required this.onPressedAmberLogin,
+    this.onPressedBack,
   });
   @override
   ConsumerState<OnboardingLoginSelectPage> createState() =>
@@ -27,7 +29,6 @@ class _OnboardingLoginSelectPageState
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: null,
-      backgroundColor: Palette.background,
       resizeToAvoidBottomInset: false,
       body: SafeArea(
         // input for the user to enter their private key, should be visible on a dark background.
@@ -39,18 +40,28 @@ class _OnboardingLoginSelectPageState
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              const SizedBox(height: 20),
+              if (widget.onPressedBack != null)
+                Row(
+                  children: [
+                    IconButton(
+                      icon: Icon(PhosphorIcons.arrowLeft(),
+                          color: Theme.of(context).colorScheme.onSurface),
+                      onPressed: () => widget.onPressedBack!(),
+                    ),
+                  ],
+                ),
+              if (widget.onPressedBack == null) const SizedBox(height: 20),
               SizedBox(
                 height: 200,
                 width: MediaQuery.of(context).size.width,
-                child: const Column(
+                child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
                       "login",
                       style: TextStyle(
-                        color: Palette.white,
+                        color: Theme.of(context).colorScheme.onSurface,
                         fontSize: 40,
                         fontFamily: "Poppins",
                       ),
@@ -62,8 +73,9 @@ class _OnboardingLoginSelectPageState
                 flex: 1,
               ),
               if (Platform.isAndroid)
-                SizedBox(
-                  width: MediaQuery.of(context).size.width,
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  width: 400,
                   height: 40,
                   child: longButton(
                     name: "amber login",
@@ -74,8 +86,9 @@ class _OnboardingLoginSelectPageState
               const SizedBox(
                 height: 20,
               ),
-              SizedBox(
-                width: MediaQuery.of(context).size.width,
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                width: 400,
                 height: 40,
                 child: longButton(
                   name: "seed phrase login",

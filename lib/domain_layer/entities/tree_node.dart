@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+
 class TreeNode<T> {
   final T value;
   TreeNode<T>? parent;
@@ -33,7 +35,9 @@ class TreeNode<T> {
   }
 
   void printTree([String prefix = '']) {
-    print('$prefix${value.toString()}');
+    if (kDebugMode) {
+      print('$prefix${value.toString()}');
+    }
     for (var i = 0; i < _children.length; i++) {
       var child = _children[i];
       var isLastChild = i == _children.length - 1;

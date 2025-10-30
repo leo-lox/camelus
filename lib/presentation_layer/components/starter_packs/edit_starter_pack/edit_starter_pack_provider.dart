@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ndk/shared/nips/nip19/nip19.dart';
 
@@ -180,7 +181,9 @@ class EditStarterPackNotifier extends StateNotifier<StarterPackData> {
       //server down
     }
 
-    print(result);
+    if (kDebugMode) {
+      print(result);
+    }
 
     state = state.copyWith(
       broadcasting: false,

@@ -178,7 +178,7 @@ class PushNotificationToggleState
                 Switch(
                   value: notificationsEnabled,
                   onChanged: toggleNotifications,
-                  activeColor: Palette.white,
+                  activeThumbColor: Theme.of(context).colorScheme.onSurface,
                 ),
             ],
           ),
@@ -188,7 +188,7 @@ class PushNotificationToggleState
                 ? 'You will receive notifications about new replies.'
                 : 'Enable notifications to get notified about new replies',
             style: TextStyle(
-              color: Palette.gray,
+              color: Paletter.getGray(context),
               fontSize: 14,
             ),
           ),
@@ -199,7 +199,7 @@ class PushNotificationToggleState
               child: Text(
                 'Note: You previously denied notifications. Please enable them in your device settings to receive notifications.',
                 style: TextStyle(
-                  color: Palette.warn,
+                  color: Colors.orangeAccent,
                   fontSize: 12,
                   fontStyle: FontStyle.italic,
                 ),

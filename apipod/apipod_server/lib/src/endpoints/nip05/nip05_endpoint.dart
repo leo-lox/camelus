@@ -1,7 +1,7 @@
 import 'package:serverpod/serverpod.dart';
 
 import '../../generated/protocol.dart';
-import 'disallowedWords.dart';
+import 'disallowed_words.dart';
 import 'name_suggestions.dart';
 
 class Nip05Endpoint extends Endpoint {

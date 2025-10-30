@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>de.lox.dev.camelus</id>
+  <name>Camelus</name>
+  <summary>Nostr client for freedom lovers</summary>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-3.0</project_license>
+
+  <description>
+    <p>
+      Microblogging. No algorithms, no ads, connect with people who matter.
+    </p>
+    <p>Features:</p>
+    <ul>
+      <li>Send and receive Nostr notes</li>
+      <li>Media sharing and previews</li>
+      <li>Clean, Ad-Free Experience: Focus on content that matters, not distractions</li>
+      <li>Your Space, Your Rules: Control what you want to see and customize your feed</li>
+      <li>Lightning Fast: Designed to be responsive even on slower connections</li>
+      <li>Privacy First: Your data stays yours - we don't track or sell your information</li>
+    </ul>
+  </description>
+
+  <launchable type="desktop-id">de.lox.dev.camelus.desktop</launchable>
+
+  <url type="homepage">https://camelus.app/</url>
+  <url type="bugtracker">https://github.com/camelus-hq/camelus/issues</url>
+
+  <screenshots>
+    <screenshot type="default">
+      <caption>Main application window</caption>
+    </screenshot>
+  </screenshots>
+
+  <provides>
+    <binary>camelus</binary>
+  </provides>
+
+  <releases>
+    <release version="1.7.3" date="2025-10-03">
+      <description>
+        <p>Latest release with bug fixes and improvements</p>
+      </description>
+    </release>
+  </releases>
+
+  <content_rating type="oars-1.1">
+    <content_attribute id="social-chat">intense</content_attribute>
+    <content_attribute id="social-info">intense</content_attribute>
+  </content_rating>
+</component>

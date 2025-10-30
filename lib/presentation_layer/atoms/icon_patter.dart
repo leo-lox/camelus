@@ -20,9 +20,9 @@ class IconPattern extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            Palette.extraDarkGray,
-            Palette.extraDarkGray.withValues(alpha: 1),
-            Palette.extraDarkGray,
+            Paletter.getExtraDarkGray(context),
+            Paletter.getExtraDarkGray(context).withValues(alpha: 1),
+            Paletter.getExtraDarkGray(context),
           ],
         ),
       ),
@@ -45,7 +45,7 @@ class IconPattern extends StatelessWidget {
               top: row * 30.0 - 10,
               child: Icon(
                 icons[index % icons.length],
-                color: Colors.white.withValues(
+                color: Theme.of(context).colorScheme.onSurface.withValues(
                     alpha: 0.09 + (index % 3) * 0.02), // varying opacity
                 size: 20 + (index % 3) * 4, // varying sizes
               ),

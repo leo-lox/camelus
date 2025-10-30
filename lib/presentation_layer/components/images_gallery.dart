@@ -1,5 +1,4 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:camelus/config/palette.dart';
 import 'package:flutter/material.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:flutter/services.dart';
@@ -128,7 +127,7 @@ class ImageGalleryState extends State<ImageGallery> {
   Container _topBar(BuildContext context) {
     return Container(
       width: MediaQuery.of(context).size.width,
-      color: Palette.background.withValues(alpha: 0.25),
+      color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.25),
       child: Row(
         children: [
           // Close button to exit the gallery.

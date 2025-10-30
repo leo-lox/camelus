@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:ndk/ndk.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
+import '../../config/push_config.dart';
+
 /// Represents a Nostr relay connection
 class Relay {
   /// The WebSocket URL of the relay
@@ -69,8 +71,10 @@ class Relay {
         onError: _handleError,
       );
 
-      // Emit open event
-      _openController.add(this);
+      _ws!.ready.then((value) {
+        // Emit open event
+        _openController.add(this);
+      });
     } catch (e) {
       _errorController.add(e);
       if (options.reconnect) {
@@ -87,7 +91,6 @@ class Relay {
         switch (data[0]) {
           case 'EVENT':
             if (data.length < 3) return;
-            final subId = data[1];
             final event = Nip01Event.fromJson(data[2]);
             _eventController.add(event);
             break;
@@ -138,6 +141,7 @@ class Relay {
         _reconnecting = false;
         reconnectDelay = 100; // reset reconnect delay
         reconnectAttempts = 0;
+        _handleOpen();
       } catch (e) {
         reconnectDelay = (reconnectDelay * 1.5).toInt();
         reconnectAttempts = reconnectAttempts + 1;
@@ -149,6 +153,15 @@ class Relay {
         _scheduleReconnect();
       }
     });
+  }
+
+  /// Resubscribe after reconnect
+  void _handleOpen() {
+    subscribe(
+      PushConfig.subscriptionId,
+      PushConfig.subscriptionFilter,
+    );
+    print("Resubscribed to $url after reconnect");
   }
 
   /// Waits until the connection is established

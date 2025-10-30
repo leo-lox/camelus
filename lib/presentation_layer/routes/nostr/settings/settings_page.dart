@@ -1,15 +1,15 @@
 import 'package:camelus/domain_layer/usecases/app_auth.dart';
+import 'package:camelus/l10n/app_localizations.dart';
 import 'package:camelus/presentation_layer/providers/ndk_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-import '../../../../config/palette.dart';
+import 'package:go_router/go_router.dart';
 
 class SettingsPage extends ConsumerStatefulWidget {
   const SettingsPage({super.key});
 
   @override
-  _SettingsPageState createState() => _SettingsPageState();
+  ConsumerState<SettingsPage> createState() => _SettingsPageState();
 }
 
 class _SettingsPageState extends ConsumerState<SettingsPage> {
@@ -27,57 +27,57 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
       return;
     }
 
-    Navigator.pushNamedAndRemoveUntil(context, '/onboarding', (route) => false);
+    context.go('/onboarding');
   }
 
   void _navigateToFileServers() {
-    Navigator.pushNamed(context, '/settings/file-servers');
+    context.push('/settings/file-servers');
   }
 
   void _navigateToInitalRoute() {
-    Navigator.pushNamed(context, '/settings/inital-route');
+    context.push('/settings/initial-route');
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Palette.background,
       appBar: AppBar(
-        title: const Text('Settings'),
-        backgroundColor: Palette.background,
+        title: Text(AppLocalizations.of(context)!.settings),
       ),
       body: ListView(
         children: [
           ListTile(
-            title: const Text('Language Settings',
-                style: TextStyle(color: Colors.white)),
+            title: Text(AppLocalizations.of(context)!.languageSettings),
             onTap: () {
-              Navigator.pushNamed(context, '/settings/locale');
+              context.push('/settings/locale');
             },
           ),
           ListTile(
-            title: const Text('Inital route',
-                style: TextStyle(color: Colors.white)),
+            title: Text(AppLocalizations.of(context)!.theme),
+            onTap: () {
+              context.push('/settings/theme');
+            },
+          ),
+          ListTile(
+            title: Text(AppLocalizations.of(context)!.initialRoute),
             onTap: () {
               _navigateToInitalRoute();
             },
           ),
           ListTile(
-            title:
-                const Text('Moderation', style: TextStyle(color: Colors.white)),
+            title: Text(AppLocalizations.of(context)!.moderation),
             onTap: () {
-              Navigator.pushNamed(context, '/settings/moderation');
+              context.push('/settings/moderation');
             },
           ),
           ListTile(
-            title: const Text('File servers',
-                style: TextStyle(color: Colors.white)),
+            title: Text(AppLocalizations.of(context)!.fileServers),
             onTap: () {
               _navigateToFileServers();
             },
           ),
           ListTile(
-            title: const Text('Logout', style: TextStyle(color: Colors.white)),
+            title: Text(AppLocalizations.of(context)!.logout),
             onTap: () {
               _logout();
             },

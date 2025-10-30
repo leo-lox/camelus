@@ -140,13 +140,14 @@ class _EditRelaysViewState extends ConsumerState<EditRelaysView> {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async {
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) async {
+        if (didPop) return;
         await _checkClose();
-        return false;
       },
       child: reconnecting
-          ? const Center(
+          ? Center(
               child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -154,7 +155,8 @@ class _EditRelaysViewState extends ConsumerState<EditRelaysView> {
                 SizedBox(height: 20),
                 Text(
                   "reconnecting to relays...",
-                  style: TextStyle(color: Colors.white),
+                  style:
+                      TextStyle(color: Theme.of(context).colorScheme.onSurface),
                 ),
               ],
             ))
@@ -164,18 +166,21 @@ class _EditRelaysViewState extends ConsumerState<EditRelaysView> {
                   padding: const EdgeInsets.only(left: 20, right: 20),
                   child: TextField(
                     controller: _relayNameController,
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       hintText: " add relay",
                       enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Palette.lightGray),
+                        borderSide:
+                            BorderSide(color: Paletter.getLightGray(context)),
                         borderRadius: BorderRadius.all(Radius.circular(30)),
                       ),
                       focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Palette.white),
+                        borderSide: BorderSide(
+                            color: Theme.of(context).colorScheme.onSurface),
                         borderRadius: BorderRadius.all(Radius.circular(30)),
                       ),
                     ),
-                    style: const TextStyle(color: Colors.white),
+                    style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurface),
                     onSubmitted: (value) {
                       _addRelay();
                     },
@@ -194,7 +199,7 @@ class _EditRelaysViewState extends ConsumerState<EditRelaysView> {
                       padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(20),
-                        color: Palette.extraDarkGray,
+                        color: Paletter.getExtraDarkGray(context),
                       ),
                       height: 85,
                       width: double.infinity,
@@ -204,7 +209,8 @@ class _EditRelaysViewState extends ConsumerState<EditRelaysView> {
                           const SizedBox(width: 15),
                           Text(
                             relay.url,
-                            style: const TextStyle(color: Colors.white),
+                            style: TextStyle(
+                                color: Theme.of(context).colorScheme.onSurface),
                           ),
                           const Spacer(),
                           // switch button read
@@ -212,8 +218,6 @@ class _EditRelaysViewState extends ConsumerState<EditRelaysView> {
                             mainAxisAlignment: MainAxisAlignment.end,
                             children: [
                               Checkbox(
-                                activeColor: Palette.lightGray,
-                                checkColor: Palette.black,
                                 value: relay.read,
                                 onChanged: (value) {
                                   setState(() {
@@ -222,11 +226,14 @@ class _EditRelaysViewState extends ConsumerState<EditRelaysView> {
                                   });
                                 },
 
-                                //activeColor: Palette.primary,
+                                //activeColor: Theme.of(context).colorScheme.primary,
                               ),
-                              const Text(
+                              Text(
                                 'read',
-                                style: TextStyle(color: Colors.white),
+                                style: TextStyle(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurface),
                               ),
                             ],
                           ),
@@ -235,8 +242,6 @@ class _EditRelaysViewState extends ConsumerState<EditRelaysView> {
                             mainAxisAlignment: MainAxisAlignment.end,
                             children: [
                               Checkbox(
-                                activeColor: Palette.lightGray,
-                                checkColor: Palette.black,
                                 value: relay.write,
                                 onChanged: (value) {
                                   setState(() {
@@ -245,9 +250,12 @@ class _EditRelaysViewState extends ConsumerState<EditRelaysView> {
                                   });
                                 },
                               ),
-                              const Text(
+                              Text(
                                 'write',
-                                style: TextStyle(color: Colors.white),
+                                style: TextStyle(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurface),
                               ),
                             ],
                           ),
@@ -256,9 +264,9 @@ class _EditRelaysViewState extends ConsumerState<EditRelaysView> {
                             mainAxisAlignment: MainAxisAlignment.end,
                             children: [
                               IconButton(
-                                icon: const Icon(
+                                icon: Icon(
                                   Icons.delete,
-                                  color: Palette.lightGray,
+                                  color: Paletter.getLightGray(context),
                                 ),
                                 onPressed: () {
                                   // confirm dialog
@@ -292,9 +300,12 @@ class _EditRelaysViewState extends ConsumerState<EditRelaysView> {
                                   );
                                 },
                               ),
-                              const Text(
+                              Text(
                                 'delete',
-                                style: TextStyle(color: Colors.white),
+                                style: TextStyle(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurface),
                               ),
                             ],
                           ),

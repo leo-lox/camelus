@@ -15,7 +15,7 @@ publish_to: "none" # Remove this line if you wish to publish to pub.dev
 # In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 1.7.1+65
+version: 1.7.4+66
 
 environment:
   sdk: ">=3.0.0 <4.0.0"
@@ -54,7 +54,6 @@ dependencies:
   flutter_mentions: ^2.0.1
   photo_view: ^0.15.0
   qr_flutter: ^4.0.0
-  matomo_tracker: ^5.1.0
   shared_preferences: ^2.3.4
 
   custom_refresh_indicator: ^4.0.1
@@ -74,11 +73,11 @@ dependencies:
   objectbox: ^4.3.0 
   objectbox_flutter_libs: any
   amberflutter: ^0.0.9
-  intl: ^0.19.0
+  intl: any
   app_links: ^6.3.2
   phosphor_flutter: ^2.1.0
   ## ndk imnports
-  ndk: ^0.5.0
+  ndk: ^0.5.1
   ndk_rust_verifier: ^0.4.0
   ndk_amber: ^0.3.1
   ndk_objectbox: ^0.2.5
@@ -88,8 +87,8 @@ dependencies:
   serverpod_flutter: 2.8.0
   apipod_client:
     path: ./apipod/apipod_client
-  firebase_messaging: ^15.2.4
-  firebase_core: ^3.12.1
+  firebase_messaging: ^16.0.2
+  firebase_core: ^4.1.1
   flutter_local_notifications: ^19.4.2
   path: ^1.9.1
   share_plus: ^11.0.0
@@ -102,6 +101,12 @@ dependencies:
   bc_ur_dart: ^0.1.19
   mobile_scanner: ^7.0.1
   bolt11_decoder: ^1.0.2
+  window_manager: ^0.5.1
+  go_router: ^16.2.4
+  timeago: ^3.7.1
+  flutter_localizations:
+    sdk: flutter
+  system_theme: ^3.1.2
 
   
 
@@ -135,8 +140,8 @@ dependency_overrides:
     path: ../fx-wallet-packages/packages/bc_ur_dart
   bip32:
     git: 
-      url: https://github.com/ejayjeon/bip32-dart.git
-      ref: 44f24d495c037f3042f6071be55b9a6c8f5a2492
+      url: https://github.com/5eeman/bip32-dart.git
+      ref: 9db7cf7c9e3a4e61f145ca43b01469c6464dce89
 
 
 
@@ -165,6 +170,7 @@ dev_dependencies:
 # The following section is specific to Flutter packages.
 
 flutter:
+  generate: true
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.

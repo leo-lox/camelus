@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:ndk/ndk.dart' as ndk;
 
@@ -152,7 +153,9 @@ class NotificationsRepositoryImpl implements NotificationsRepository {
       );
     } catch (e) {
       // If there's an error, we'll fall back to default notification
-      print('Error downloading avatar image: $e');
+      if (kDebugMode) {
+        print('Error downloading avatar image: $e');
+      }
     }
 
     // If we couldn't set up the avatar notification, fall back to default

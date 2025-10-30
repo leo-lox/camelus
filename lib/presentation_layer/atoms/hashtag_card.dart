@@ -56,19 +56,19 @@ class HashtagCard extends StatelessWidget {
                 const SizedBox(width: 25),
                 Text(
                   postsCount.toString(),
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w400,
-                    color: Palette.gray,
+                    color: Paletter.getGray(context),
                   ),
                 ),
                 const SizedBox(width: 8),
-                const Text(
+                Text(
                   "posts",
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w400,
-                    color: Palette.gray,
+                    color: Paletter.getGray(context),
                   ),
                 ),
               ],
@@ -97,7 +97,7 @@ class HashtagCardSkeleton extends StatelessWidget {
                 width: 20,
                 height: 20,
                 decoration: BoxDecoration(
-                  color: Palette.extraDarkGray,
+                  color: Paletter.getExtraDarkGray(context),
                   borderRadius: BorderRadius.circular(5),
                 ),
               ),
@@ -107,7 +107,7 @@ class HashtagCardSkeleton extends StatelessWidget {
                 width: 80 + (140 * (Random().nextDouble() * 1.0)),
                 height: 40,
                 decoration: BoxDecoration(
-                  color: Palette.extraDarkGray,
+                  color: Paletter.getExtraDarkGray(context),
                   borderRadius: BorderRadius.circular(5),
                 ),
               ),
@@ -121,7 +121,7 @@ class HashtagCardSkeleton extends StatelessWidget {
                 width: 100,
                 height: 20,
                 decoration: BoxDecoration(
-                  color: Palette.extraDarkGray,
+                  color: Paletter.getExtraDarkGray(context),
                   borderRadius: BorderRadius.circular(5),
                 ),
               ),

@@ -1,10 +1,6 @@
 import 'dart:async';
-import 'package:camelus/presentation_layer/atoms/my_profile_picture.dart';
-import 'package:camelus/presentation_layer/atoms/spinner_center.dart';
-import 'package:camelus/config/palette.dart';
-import 'package:camelus/helpers/helpers.dart';
 import 'package:camelus/domain_layer/entities/nostr_tag.dart';
-import 'package:camelus/presentation_layer/providers/metadata_provider.dart';
+import 'package:camelus/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -36,12 +32,10 @@ class _BlockedUsersState extends ConsumerState<BlockedUsers> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Palette.background,
       appBar: AppBar(
-        backgroundColor: Palette.background,
-        title: const Text('Blocked Users'),
+        title: Text(AppLocalizations.of(context)!.blockedUsers),
       ),
-      body: const Text('not implemented'),
+      body: Text(AppLocalizations.of(context)!.notImplemented),
     );
   }
 }

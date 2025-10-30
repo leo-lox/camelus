@@ -1,4 +1,4 @@
-import 'dart:typed_data';
+import 'package:flutter/foundation.dart';
 import 'package:image/image.dart' as img;
 import 'dart:io';
 import '../../helpers/helpers.dart';
@@ -52,7 +52,9 @@ class RemoveImageMetadata {
         name: randomValues,
       );
     } catch (e) {
-      print('Error in fileToMemFile: $e');
+      if (kDebugMode) {
+        print('Error in fileToMemFile: $e');
+      }
       rethrow;
     }
   }
