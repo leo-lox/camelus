@@ -24,6 +24,7 @@ import 'presentation_layer/routes/nostr/profile/edit_profile_page.dart';
 import 'presentation_layer/routes/nostr/profile/profile_page_2.dart';
 import 'presentation_layer/routes/nostr/relays_page.dart';
 import 'presentation_layer/routes/nostr/search_feed_page/search_feed_page.dart';
+import 'presentation_layer/routes/nostr/settings/theme/theme_settings.dart';
 import 'presentation_layer/routes/notification_page.dart';
 import 'presentation_layer/routes/search_page.dart';
 import 'presentation_layer/routes/nostr/settings/file_servers/settings_file_servers.dart';
@@ -113,6 +114,10 @@ final routes = [
               GoRoute(
                 path: 'moderation',
                 builder: (context, state) => const ModerationSettingsPage(),
+              ),
+              GoRoute(
+                path: 'theme',
+                builder: (context, state) => const ThemeSettingsPage(),
               ),
             ],
           ),

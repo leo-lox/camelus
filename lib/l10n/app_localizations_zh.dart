@@ -517,4 +517,58 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get postsAndReplies => '帖子和回复';
+
+  @override
+  String get themeSettings => '主题设置';
+
+  @override
+  String get themeMode => '主题模式';
+
+  @override
+  String get system => '系统';
+
+  @override
+  String get light => '浅色';
+
+  @override
+  String get dark => '深色';
+
+  @override
+  String get theme => '主题';
+
+  @override
+  String get camelus => 'Camelus';
+
+  @override
+  String get nostr => 'Nostr';
+
+  @override
+  String get customColorTheme => '自定义颜色主题';
+
+  @override
+  String get blue => '蓝色';
+
+  @override
+  String get purple => '紫色';
+
+  @override
+  String get green => '绿色';
+
+  @override
+  String get orange => '橙色';
+
+  @override
+  String get red => '红色';
+
+  @override
+  String get teal => '青色';
+
+  @override
+  String get pink => '粉色';
+
+  @override
+  String get indigo => '靛蓝色';
+
+  @override
+  String get welcome => '欢迎';
 }

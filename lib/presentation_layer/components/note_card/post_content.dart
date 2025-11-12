@@ -48,6 +48,7 @@ class PostContentWidget extends ConsumerWidget {
               child: RichText(
                 text: TextSpan(
                     style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurface,
                       fontSize: _fontSize,
                       height: 1.2,
                       wordSpacing: 1.05,
@@ -123,6 +124,7 @@ class PostContentWidget extends ConsumerWidget {
         RichText(
           text: TextSpan(
             style: TextStyle(
+              color: Theme.of(context).colorScheme.onSurface,
               fontSize: _fontSize,
               height: 1.2,
               wordSpacing: 1.05,
@@ -214,7 +216,10 @@ class PostContentWidget extends ConsumerWidget {
       case ContentType.text:
         return TextSpan(
           text: segment.content,
-          style: TextStyle(fontSize: _fontSize),
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.onSurface,
+            fontSize: _fontSize,
+          ),
         );
 
       case ContentType.mention:
@@ -251,7 +256,10 @@ class PostContentWidget extends ConsumerWidget {
       default:
         return TextSpan(
           text: segment.content,
-          style: TextStyle(fontSize: _fontSize),
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.onSurface,
+            fontSize: _fontSize,
+          ),
         );
     }
   }

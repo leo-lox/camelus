@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:system_theme/system_theme.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:flutter_mentions/flutter_mentions.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -19,14 +20,16 @@ import 'lifecycle/notifications/init_firebase.dart';
 import 'lifecycle/notifications/notifications_caller.dart';
 import 'objectbox_isolate.dart';
 import 'presentation_layer/init/init_moderation.dart';
+
 import 'presentation_layer/providers/db_app_provider.dart';
 import 'presentation_layer/providers/db_ndk_provider.dart';
 import 'presentation_layer/providers/inbox_outbox_provider.dart';
 import 'presentation_layer/providers/language_provider.dart';
 import 'presentation_layer/providers/ndk_provider.dart';
 import 'presentation_layer/providers/signer_provider.dart';
+import 'presentation_layer/providers/theme_provider.dart';
 import 'routes.dart';
-import 'theme.dart';
+import 'theme.dart' show getThemeVariants;
 
 const devDeviceFrame = true;
 
@@ -164,6 +167,13 @@ class MyApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final currentLocale = ref.watch(currentLocaleProvider);
 
+    final themeState = ref.watch(themeProvider);
+
+    final themeVariants = getThemeVariants(
+      themeType: themeState.type,
+      themeColor: themeState.color,
+    );
+
     return Portal(
       child: MaterialApp.router(
         routerConfig: router,
@@ -180,8 +190,9 @@ class MyApp extends ConsumerWidget {
         locale: currentLocale,
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
-        theme: lightTheme,
-        darkTheme: darkTheme,
+        theme: themeVariants.lightTheme,
+        darkTheme: themeVariants.darkTheme,
+        themeMode: themeState.mode,
         builder: (context, child) {
           if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
             return DragToResizeArea(

@@ -519,4 +519,58 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get postsAndReplies => '投稿と返信';
+
+  @override
+  String get themeSettings => 'テーマ設定';
+
+  @override
+  String get themeMode => 'テーマモード';
+
+  @override
+  String get system => 'システム';
+
+  @override
+  String get light => 'ライト';
+
+  @override
+  String get dark => 'ダーク';
+
+  @override
+  String get theme => 'テーマ';
+
+  @override
+  String get camelus => 'Camelus';
+
+  @override
+  String get nostr => 'Nostr';
+
+  @override
+  String get customColorTheme => 'カスタムカラーテーマ';
+
+  @override
+  String get blue => '青';
+
+  @override
+  String get purple => '紫';
+
+  @override
+  String get green => '緑';
+
+  @override
+  String get orange => 'オレンジ';
+
+  @override
+  String get red => '赤';
+
+  @override
+  String get teal => 'ティール';
+
+  @override
+  String get pink => 'ピンク';
+
+  @override
+  String get indigo => 'インディゴ';
+
+  @override
+  String get welcome => 'ようこそ';
 }
