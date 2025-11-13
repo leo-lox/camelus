@@ -1,5 +1,7 @@
 import 'dart:developer';
 
+import 'package:camelus/presentation_layer/providers/ndk_provider.dart';
+import 'package:camelus/presentation_layer/providers/signer_provider.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -199,7 +201,11 @@ class _DeeplinkRecieverPageState extends ConsumerState<DeeplinkRecieverPage> {
         ? _decodePubkey(inviteData.listNpub!)
         : null;
 
-    final mySigner = await AppAuth.getEventSigner();
+    final startupAcc = await AppAuth.getStartupAccountData();
+    final mySigner = await AppAuth.loginWithStoredAccount(
+        startupAccountData: startupAcc,
+        signerNoti: ref.read(signerProvider.notifier),
+        ndk: ref.read(ndkProvider));
 
     if (mySigner != null) {
       _navigateToStarterPack(

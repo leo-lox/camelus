@@ -1,13 +1,14 @@
+import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:amberflutter/amberflutter.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:ndk/ndk.dart';
 import 'package:ndk/shared/nips/nip19/nip19.dart';
 import 'package:ndk_amber/ndk_amber.dart';
-
-import '../entities/key_pair.dart';
+import 'package:riverpod/riverpod.dart';
+import '../../presentation_layer/providers/signer_provider.dart';
+import '../entities/stored_account.dart';
 
 /// This class is used to store and retrive user information from secure storage. \
 /// the storage keys [nostrKeys] and [amber] are used to store the user's keypair and amber public key respectively.
@@ -75,55 +76,128 @@ class AppAuth {
     return amberSigner;
   }
 
-  static Future<KeyPair?> _setupKeys() async {
-    var nostrKeysString = await secureStorage.read(key: "nostrKeys");
-    if (nostrKeysString == null) {
-      return null;
+  /// tries to login with stored account data
+  /// returns the event signer if successful, null otherwise
+  static Future<EventSigner?> loginWithStoredAccount({
+    required StartupAccountData startupAccountData,
+    required SingerNotifier signerNoti,
+    required Ndk ndk,
+  }) async {
+    switch (startupAccountData.loginType) {
+      case LoginType.privateKey:
+        final keyPair = startupAccountData.account!.keyPair!;
+        final signer = Bip340EventSigner(
+          privateKey: keyPair.privateKey,
+          publicKey: keyPair.publicKey,
+        );
+        ndk.accounts.loginExternalSigner(signer: signer);
+        signerNoti.setSigner(signer);
+
+        return signer;
+      case LoginType.amber:
+        final amberPubkey = startupAccountData.account!.pubkey!;
+        final amberSigner = await _amberLogin(amberPubkey);
+
+        ndk.accounts.loginExternalSigner(signer: amberSigner);
+        signerNoti.setSigner(amberSigner);
+
+        return amberSigner;
+
+      case LoginType.bunkerConnection:
+        if (startupAccountData.account!.bunkerConnection == null) {
+          return null;
+        }
+        final connection = startupAccountData.account!.bunkerConnection!;
+        try {
+          print("Logging in with bunker connection");
+          await ndk.accounts.loginWithBunkerConnection(
+            connection: connection,
+            bunkers: ndk.bunkers,
+            authCallback: (a) {
+              print("Bunker auth callback: $a");
+            },
+          );
+          print("Logged in with bunker connection");
+          final signer = ndk.accounts.getLoggedAccount()!.signer;
+          signerNoti.setSigner(signer);
+          return signer;
+        } catch (_) {
+          return null;
+        }
+
+      case LoginType.register:
+        return null;
     }
-    final myKeyPair = KeyPair.fromJson(json.decode(nostrKeysString));
-    return myKeyPair;
   }
 
-  /// gets the current used event signer based on storage
-  /// null if no valid event signer is found => user needs to register
-  static Future<EventSigner?> getEventSigner() async {
-    final myKeyPair = await _setupKeys();
+  static Future<StartupAccountData> getStartupAccountData() async {
+    final activeAccountPubkey =
+        await secureStorage.read(key: "activeAccountPubkey");
+    final storedAccountsString =
+        await secureStorage.read(key: "storedAccounts");
 
-    if (myKeyPair != null) {
-      final signer = Bip340EventSigner(
-        privateKey: myKeyPair.privateKey,
-        publicKey: myKeyPair.publicKey,
+    if (activeAccountPubkey == null || storedAccountsString == null) {
+      return StartupAccountData(
+        loginType: LoginType.register,
       );
-      return signer;
     }
 
-    // no amber on other platforms
-    if (!Platform.isAndroid) {
-      return null;
-    }
-    // check if amber is used
-    final amberInstalled = await amber.isAppInstalled();
+    final storedAccounts = jsonDecode(storedAccountsString) as List;
+    final storedAccountsList =
+        storedAccounts.map((e) => LocalStorageAccount.fromJson(e)).toList();
 
-    if (!amberInstalled) {
-      return null;
-    }
-    final amberPubkey = await secureStorage.read(key: "amber");
+    // check if pubkey matches
 
-    // not registered with amber
-    if (amberPubkey == null) {
-      return null;
+    LocalStorageAccount matchedAccount;
+    try {
+      matchedAccount = storedAccountsList.firstWhere(
+        (account) => account.pubkey == activeAccountPubkey,
+      );
+    } catch (e) {
+      // if no match found, use last account or register if list is empty
+      matchedAccount = storedAccountsList.isNotEmpty
+          ? storedAccountsList.last
+          : LocalStorageAccount(loginType: LoginType.register);
     }
 
-    // ok to login with amber
-    return await _amberLogin(amberPubkey);
+    return StartupAccountData(
+      loginType: matchedAccount.loginType,
+      account: matchedAccount,
+    );
+  }
+
+  static Future<void> addStoredAccount({
+    required LocalStorageAccount account,
+    bool setActive = true,
+  }) async {
+    final storedAccountsString =
+        await secureStorage.read(key: "storedAccounts");
+    List<LocalStorageAccount> storedAccounts = [];
+    if (storedAccountsString != null) {
+      final storedAccountsJson = jsonDecode(storedAccountsString) as List;
+      storedAccounts = storedAccountsJson
+          .map((e) => LocalStorageAccount.fromJson(e))
+          .toList();
+    }
+    storedAccounts.add(account);
+    await secureStorage.write(
+      key: "storedAccounts",
+      value: jsonEncode(storedAccounts.map((e) => e.toJson()).toList()),
+    );
+    if (setActive && account.pubkey != null) {
+      await secureStorage.write(
+        key: "activeAccountPubkey",
+        value: account.pubkey!,
+      );
+    }
   }
 
   /// deltes the keys from storage.
   /// This is used to log out the user
-  static Future<void> clearKeys() async {
-    secureStorage.delete(
-      key: "nostrKeys",
+  static Future<void> clearAllAccounts() async {
+    await secureStorage.delete(
+      key: "activeAccountPubkey",
     );
-    secureStorage.delete(key: "amber");
+    await secureStorage.delete(key: "storedAccounts");
   }
 }

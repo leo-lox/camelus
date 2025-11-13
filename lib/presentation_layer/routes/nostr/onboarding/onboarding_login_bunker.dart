@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:camelus/domain_layer/usecases/app_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -11,6 +12,7 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../config/palette.dart';
+import '../../../../domain_layer/entities/stored_account.dart';
 import '../../../atoms/long_button.dart';
 import '../../../providers/ndk_provider.dart';
 import '../../../providers/signer_provider.dart';
@@ -96,14 +98,11 @@ class _OnboardingLoginBunkerPageState
 
     try {
       final ndk = ref.read(ndkProvider);
-      // final ndk = Ndk.defaultConfig();
 
-      print("1");
       final connection = await ndk.accounts.loginWithBunkerUrl(
         bunkerUrl: _bunkerUrl!,
         bunkers: ndk.bunkers,
       );
-      print("2");
 
       if (connection == null) {
         _showError('Failed to connect to bunker');
@@ -113,17 +112,19 @@ class _OnboardingLoginBunkerPageState
         return;
       }
 
-      // Get the signer from the logged account
-      final signer = ndk.accounts.getLoggedAccount()!.signer;
-
-      // Store bunker connection in secure storage as JSON
-      await secureStorage.write(
-        key: "bunkerConnection",
-        value: json.encode(connection.toJson()),
+      // create stored account
+      final storedAccount = LocalStorageAccount(
+        loginType: LoginType.bunkerConnection,
+        pubkey: connection.remotePubkey,
+        bunkerConnection: connection,
       );
 
-      // Set the signer in the provider
-      ref.read(signerProvider.notifier).setSigner(signer);
+      await AppAuth.addStoredAccount(account: storedAccount, setActive: true);
+      final startupData = await AppAuth.getStartupAccountData();
+      await AppAuth.loginWithStoredAccount(
+          startupAccountData: startupData,
+          signerNoti: ref.read(signerProvider.notifier),
+          ndk: ndk);
 
       setState(() {
         _bunkerLoading = false;
