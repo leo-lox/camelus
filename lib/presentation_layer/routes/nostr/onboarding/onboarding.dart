@@ -12,6 +12,7 @@ import 'onboarding_page01.dart';
 import 'onboarding_picture.dart';
 import 'onboarding_profile.dart';
 import 'onboarding_starter_pack.dart';
+import 'onboarding_username.dart';
 
 class NostrOnboarding extends ConsumerStatefulWidget {
   const NostrOnboarding({
@@ -86,7 +87,7 @@ class _NostrOnboardingState extends ConsumerState<NostrOnboarding>
   void initState() {
     super.initState();
     _tabController = TabController(
-      length: 6,
+      length: 7,
       initialIndex: 0,
       vsync: this,
     );
@@ -204,6 +205,13 @@ class _NostrOnboardingState extends ConsumerState<NostrOnboarding>
                     curve: Curves.easeInOut,
                     duration: const Duration(milliseconds: 500),
                   );
+                },
+              ),
+              OnboardingUsername(
+                userInfo: signUpInfo,
+                submitCallback: (username) {
+                  signUpInfo.nip05 = username;
+                  _nextTab();
                 },
               ),
               OnboardingPicture(
