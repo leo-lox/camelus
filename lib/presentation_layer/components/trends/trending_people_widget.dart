@@ -39,8 +39,9 @@ class TrendingPeopleWidget extends ConsumerWidget {
           ),
           const SizedBox(height: 10),
           _TrendingPeopleList(
-              onFollowChange: onFollowChange,
-              showFollowButton: showFollowButton),
+            onFollowChange: onFollowChange,
+            showFollowButton: showFollowButton,
+          ),
         ],
       ),
     );
@@ -78,7 +79,12 @@ class _TrendingPeopleList extends ConsumerWidget {
 
         if (snapshot.hasData && snapshot.data != null) {
           return _buildPeopleList(
-              context, snapshot.data!, 10, contactList, showFollowButton);
+            context,
+            snapshot.data!,
+            10,
+            contactList,
+            showFollowButton,
+          );
         }
 
         if (snapshot.connectionState == ConnectionState.done) {
