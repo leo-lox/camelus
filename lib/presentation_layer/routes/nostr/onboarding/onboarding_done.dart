@@ -19,7 +19,9 @@ import '../../../../domain_layer/entities/generated_private_key.dart';
 import '../../../../domain_layer/entities/key_pair.dart';
 import '../../../../domain_layer/entities/nip_65.dart';
 import '../../../../domain_layer/entities/onboarding_user_info.dart';
+import '../../../../domain_layer/entities/stored_account.dart';
 import '../../../../domain_layer/entities/user_metadata.dart';
+import '../../../../domain_layer/usecases/app_auth.dart';
 import '../../../../domain_layer/usecases/generate_private_key.dart';
 import '../../../atoms/long_button.dart';
 import '../../../atoms/mnemonic_grid.dart';
@@ -193,18 +195,19 @@ ${_privateKey.mnemonicSentence}
       publicKeyHr: _privateKey.publicKeyHr,
     );
 
-    final bip340Signer = Bip340EventSigner(
-      privateKey: myKeyPair.privateKey,
-      publicKey: myKeyPair.publicKey,
+    // create stored account
+    final storedAccount = LocalStorageAccount(
+      loginType: LoginType.privateKey,
+      pubkey: myKeyPair.publicKey,
+      keyPair: myKeyPair,
     );
 
-    ref.read(ndkProvider).accounts.loginExternalSigner(signer: bip340Signer);
-    ref.read(signerProvider.notifier).setSigner(bip340Signer);
-
-    // save in storage
-    const storage = FlutterSecureStorage();
-    await storage.write(
-        key: "nostrKeys", value: json.encode(myKeyPair.toJson()));
+    await AppAuth.addStoredAccount(account: storedAccount, setActive: true);
+    final startupData = await AppAuth.getStartupAccountData();
+    await AppAuth.loginWithStoredAccount(
+        startupAccountData: startupData,
+        signerNoti: ref.read(signerProvider.notifier),
+        ndk: ref.read(ndkProvider));
 
     await _broadcastAcc();
 
