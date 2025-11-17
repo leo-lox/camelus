@@ -71,4 +71,52 @@ class NostrListRepositoryImpl implements NostrListRepository {
     }
     return NostrStarterPackModel.fromNDK(ndkSet);
   }
+
+  @override
+  Future<NostrList?> getSingleList({
+    required int kind,
+  }) async {
+    final signer = dartNdkSource.dartNdk.accounts.getLoggedAccount()?.signer;
+    if (signer == null) return null;
+
+    final ndkList = await dartNdkSource.dartNdk.lists.getSingleNip51List(
+      kind,
+      signer,
+      forceRefresh: false,
+    );
+
+    if (ndkList == null) return null;
+    return NostrListModel.fromNDK(ndkList);
+  }
+
+  @override
+  Future<NostrList> addElementToList({
+    required String tag,
+    required String value,
+    required int kind,
+    bool private = false,
+  }) async {
+    final ndkList = await dartNdkSource.dartNdk.lists.addElementToList(
+      tag: tag,
+      value: value,
+      kind: kind,
+      private: private,
+    );
+    return NostrListModel.fromNDK(ndkList);
+  }
+
+  @override
+  Future<NostrList?> removeElementFromList({
+    required String tag,
+    required String value,
+    required int kind,
+  }) async {
+    final ndkList = await dartNdkSource.dartNdk.lists.removeElementFromList(
+      tag: tag,
+      value: value,
+      kind: kind,
+    );
+    if (ndkList == null) return null;
+    return NostrListModel.fromNDK(ndkList);
+  }
 }

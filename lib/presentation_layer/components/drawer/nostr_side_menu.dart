@@ -211,12 +211,7 @@ class NostrSideMenu extends ConsumerWidget {
               routeName: '/nostr/bookmarks',
               icon: PhosphorIcons.bookmarkSimple(),
               onTap: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content:
-                        Text(AppLocalizations.of(context)!.notImplementedYet),
-                  ),
-                );
+                context.push('/nostr/bookmarks');
               }),
           _drawerItem(
               label: AppLocalizations.of(context)!.payments,
