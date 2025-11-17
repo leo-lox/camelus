@@ -38,8 +38,8 @@ class _BookmarksPageState extends ConsumerState<BookmarksPage>
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text("AppLocalizations.of(context)!.delete"),
-        content: Text('Remove this bookmark?\n\n"$notePreview"'),
+        title: Text(AppLocalizations.of(context)!.removeBookmark),
+        content: Text('"$notePreview"'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -52,11 +52,13 @@ class _BookmarksPageState extends ConsumerState<BookmarksPage>
                   .removeBookmark(eventId, isPrivate);
               Navigator.pop(context);
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Bookmark removed')),
+                SnackBar(
+                  content: Text(AppLocalizations.of(context)!.bookmarkRemoved),
+                ),
               );
             },
             child: Text(
-              "AppLocalizations.of(context)!.delete",
+              AppLocalizations.of(context)!.removeBookmark,
               style: TextStyle(color: Theme.of(context).colorScheme.error),
             ),
           ),
@@ -79,8 +81,8 @@ class _BookmarksPageState extends ConsumerState<BookmarksPage>
             const SizedBox(height: 16),
             Text(
               isPrivate
-                  ? 'No private bookmarks yet'
-                  : 'No public bookmarks yet',
+                  ? AppLocalizations.of(context)!.noPrivateBookmarks
+                  : AppLocalizations.of(context)!.noPublicBookmarks,
               style: TextStyle(
                 color: Theme.of(context).colorScheme.outline,
               ),
@@ -188,7 +190,7 @@ class _BookmarksPageState extends ConsumerState<BookmarksPage>
                 children: [
                   Icon(PhosphorIcons.lock(), size: 16),
                   const SizedBox(width: 8),
-                  const Text('Private'),
+                  Text(AppLocalizations.of(context)!.privateBookmarks),
                   if (bookmarksState.privateBookmarks.isNotEmpty)
                     Container(
                       margin: const EdgeInsets.only(left: 8),
@@ -212,7 +214,7 @@ class _BookmarksPageState extends ConsumerState<BookmarksPage>
                 children: [
                   Icon(PhosphorIcons.globeHemisphereWest(), size: 16),
                   const SizedBox(width: 8),
-                  const Text('Public'),
+                  Text(AppLocalizations.of(context)!.publicBookmarks),
                   if (bookmarksState.publicBookmarks.isNotEmpty)
                     Container(
                       margin: const EdgeInsets.only(left: 8),

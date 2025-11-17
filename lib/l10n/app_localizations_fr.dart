@@ -188,6 +188,42 @@ class AppLocalizationsFr extends AppLocalizations {
   String get bookmarks => 'Favoris';
 
   @override
+  String get removeBookmark => 'Supprimer ce favori?';
+
+  @override
+  String get bookmarkRemoved => 'Favori supprimé';
+
+  @override
+  String get noPrivateBookmarks => 'Pas encore de favoris privés';
+
+  @override
+  String get noPublicBookmarks => 'Pas encore de favoris publics';
+
+  @override
+  String get privateBookmarks => 'Privé';
+
+  @override
+  String get publicBookmarks => 'Public';
+
+  @override
+  String get addToBookmarks => 'Ajouter aux favoris';
+
+  @override
+  String get removeFromBookmarks => 'Retirer des favoris';
+
+  @override
+  String get addingToBookmarks => 'Ajout aux favoris...';
+
+  @override
+  String get removingFromBookmarks => 'Suppression des favoris...';
+
+  @override
+  String get failedToAddBookmark => 'Échec de l\'ajout du favori';
+
+  @override
+  String get failedToRemoveBookmark => 'Échec de la suppression du favori';
+
+  @override
   String get notImplementedYet => 'Pas encore implémenté';
 
   @override

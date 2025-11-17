@@ -430,6 +430,78 @@ abstract class AppLocalizations {
   /// **'Bookmarks'**
   String get bookmarks;
 
+  /// Confirmation dialog title for removing bookmark
+  ///
+  /// In en, this message translates to:
+  /// **'Remove this bookmark?'**
+  String get removeBookmark;
+
+  /// Snackbar message when bookmark is removed
+  ///
+  /// In en, this message translates to:
+  /// **'Bookmark removed'**
+  String get bookmarkRemoved;
+
+  /// Empty state message for private bookmarks
+  ///
+  /// In en, this message translates to:
+  /// **'No private bookmarks yet'**
+  String get noPrivateBookmarks;
+
+  /// Empty state message for public bookmarks
+  ///
+  /// In en, this message translates to:
+  /// **'No public bookmarks yet'**
+  String get noPublicBookmarks;
+
+  /// Private bookmarks tab label
+  ///
+  /// In en, this message translates to:
+  /// **'Private'**
+  String get privateBookmarks;
+
+  /// Public bookmarks tab label
+  ///
+  /// In en, this message translates to:
+  /// **'Public'**
+  String get publicBookmarks;
+
+  /// Button label to add note to bookmarks
+  ///
+  /// In en, this message translates to:
+  /// **'Add to bookmarks'**
+  String get addToBookmarks;
+
+  /// Button label to remove note from bookmarks
+  ///
+  /// In en, this message translates to:
+  /// **'Remove from bookmarks'**
+  String get removeFromBookmarks;
+
+  /// Loading message when adding bookmark
+  ///
+  /// In en, this message translates to:
+  /// **'Adding to bookmarks...'**
+  String get addingToBookmarks;
+
+  /// Loading message when removing bookmark
+  ///
+  /// In en, this message translates to:
+  /// **'Removing from bookmarks...'**
+  String get removingFromBookmarks;
+
+  /// Error message when adding bookmark fails
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to add bookmark'**
+  String get failedToAddBookmark;
+
+  /// Error message when removing bookmark fails
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to remove bookmark'**
+  String get failedToRemoveBookmark;
+
   /// Snackbar message for unimplemented features
   ///
   /// In en, this message translates to:

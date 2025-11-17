@@ -52,7 +52,6 @@
   "following": "关注中",
   "followers": "关注者",
   "profile": "个人资料",
-  "bookmarks": "书签",
   "notImplementedYet": "尚未实现",
   "payments": "支付",
   "blocklist": "黑名单",
@@ -182,5 +181,18 @@
   "teal": "青色",
   "pink": "粉色",
   "indigo": "靛蓝色",
-  "welcome": "欢迎"
+  "welcome": "欢迎",
+  "bookmarks": "书签",
+  "removeBookmark": "删除此书签？",
+  "bookmarkRemoved": "书签已删除",
+  "noPrivateBookmarks": "还没有私密书签",
+  "noPublicBookmarks": "还没有公开书签",
+  "privateBookmarks": "私密",
+  "publicBookmarks": "公开",
+  "addToBookmarks": "添加到书签",
+  "removeFromBookmarks": "从书签中移除",
+  "addingToBookmarks": "正在添加到书签...",
+  "removingFromBookmarks": "正在从书签中移除...",
+  "failedToAddBookmark": "添加书签失败",
+  "failedToRemoveBookmark": "删除书签失败"
 }

@@ -186,6 +186,42 @@ class AppLocalizationsPt extends AppLocalizations {
   String get bookmarks => 'Favoritos';
 
   @override
+  String get removeBookmark => 'Remover este favorito?';
+
+  @override
+  String get bookmarkRemoved => 'Favorito removido';
+
+  @override
+  String get noPrivateBookmarks => 'Ainda não há favoritos privados';
+
+  @override
+  String get noPublicBookmarks => 'Ainda não há favoritos públicos';
+
+  @override
+  String get privateBookmarks => 'Privado';
+
+  @override
+  String get publicBookmarks => 'Público';
+
+  @override
+  String get addToBookmarks => 'Adicionar aos favoritos';
+
+  @override
+  String get removeFromBookmarks => 'Remover dos favoritos';
+
+  @override
+  String get addingToBookmarks => 'Adicionando aos favoritos...';
+
+  @override
+  String get removingFromBookmarks => 'Removendo dos favoritos...';
+
+  @override
+  String get failedToAddBookmark => 'Falha ao adicionar favorito';
+
+  @override
+  String get failedToRemoveBookmark => 'Falha ao remover favorito';
+
+  @override
   String get notImplementedYet => 'Ainda não implementado';
 
   @override

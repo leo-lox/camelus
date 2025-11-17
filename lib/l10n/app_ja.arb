@@ -52,7 +52,6 @@
   "following": "フォロー中",
   "followers": "フォロワー",
   "profile": "プロフィール",
-  "bookmarks": "ブックマーク",
   "notImplementedYet": "まだ実装されていません",
   "payments": "支払い",
   "blocklist": "ブロックリスト",
@@ -182,5 +181,18 @@
   "teal": "ティール",
   "pink": "ピンク",
   "indigo": "インディゴ",
-  "welcome": "ようこそ"
+  "welcome": "ようこそ",
+  "bookmarks": "ブックマーク",
+  "removeBookmark": "このブックマークを削除しますか？",
+  "bookmarkRemoved": "ブックマークを削除しました",
+  "noPrivateBookmarks": "まだプライベートブックマークはありません",
+  "noPublicBookmarks": "まだパブリックブックマークはありません",
+  "privateBookmarks": "プライベート",
+  "publicBookmarks": "パブリック",
+  "addToBookmarks": "ブックマークに追加",
+  "removeFromBookmarks": "ブックマークから削除",
+  "addingToBookmarks": "ブックマークに追加中...",
+  "removingFromBookmarks": "ブックマークから削除中...",
+  "failedToAddBookmark": "ブックマークの追加に失敗しました",
+  "failedToRemoveBookmark": "ブックマークの削除に失敗しました"
 }

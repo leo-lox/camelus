@@ -185,6 +185,42 @@ class AppLocalizationsEn extends AppLocalizations {
   String get bookmarks => 'Bookmarks';
 
   @override
+  String get removeBookmark => 'Remove this bookmark?';
+
+  @override
+  String get bookmarkRemoved => 'Bookmark removed';
+
+  @override
+  String get noPrivateBookmarks => 'No private bookmarks yet';
+
+  @override
+  String get noPublicBookmarks => 'No public bookmarks yet';
+
+  @override
+  String get privateBookmarks => 'Private';
+
+  @override
+  String get publicBookmarks => 'Public';
+
+  @override
+  String get addToBookmarks => 'Add to bookmarks';
+
+  @override
+  String get removeFromBookmarks => 'Remove from bookmarks';
+
+  @override
+  String get addingToBookmarks => 'Adding to bookmarks...';
+
+  @override
+  String get removingFromBookmarks => 'Removing from bookmarks...';
+
+  @override
+  String get failedToAddBookmark => 'Failed to add bookmark';
+
+  @override
+  String get failedToRemoveBookmark => 'Failed to remove bookmark';
+
+  @override
   String get notImplementedYet => 'Not implemented yet';
 
   @override

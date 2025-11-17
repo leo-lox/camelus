@@ -180,7 +180,43 @@ class AppLocalizationsTh extends AppLocalizations {
   String get profile => 'โปรไฟล์';
 
   @override
-  String get bookmarks => 'บุ๊คมาร์ก';
+  String get bookmarks => 'บุ๊กมาร์ก';
+
+  @override
+  String get removeBookmark => 'ลบบุ๊กมาร์กนี้หรือไม่?';
+
+  @override
+  String get bookmarkRemoved => 'ลบบุ๊กมาร์กแล้ว';
+
+  @override
+  String get noPrivateBookmarks => 'ยังไม่มีบุ๊กมาร์กส่วนตัว';
+
+  @override
+  String get noPublicBookmarks => 'ยังไม่มีบุ๊กมาร์กสาธารณะ';
+
+  @override
+  String get privateBookmarks => 'ส่วนตัว';
+
+  @override
+  String get publicBookmarks => 'สาธารณะ';
+
+  @override
+  String get addToBookmarks => 'เพิ่มไปยังบุ๊กมาร์ก';
+
+  @override
+  String get removeFromBookmarks => 'ลบออกจากบุ๊กมาร์ก';
+
+  @override
+  String get addingToBookmarks => 'กำลังเพิ่มไปยังบุ๊กมาร์ก...';
+
+  @override
+  String get removingFromBookmarks => 'กำลังลบออกจากบุ๊กมาร์ก...';
+
+  @override
+  String get failedToAddBookmark => 'ไม่สามารถเพิ่มบุ๊กมาร์กได้';
+
+  @override
+  String get failedToRemoveBookmark => 'ไม่สามารถลบบุ๊กมาร์กได้';
 
   @override
   String get notImplementedYet => 'ยังไม่ได้นำไปใช้';

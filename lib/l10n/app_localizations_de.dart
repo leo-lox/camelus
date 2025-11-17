@@ -187,6 +187,44 @@ class AppLocalizationsDe extends AppLocalizations {
   String get bookmarks => 'Lesezeichen';
 
   @override
+  String get removeBookmark => 'Dieses Lesezeichen entfernen?';
+
+  @override
+  String get bookmarkRemoved => 'Lesezeichen entfernt';
+
+  @override
+  String get noPrivateBookmarks => 'Noch keine privaten Lesezeichen';
+
+  @override
+  String get noPublicBookmarks => 'Noch keine öffentlichen Lesezeichen';
+
+  @override
+  String get privateBookmarks => 'Privat';
+
+  @override
+  String get publicBookmarks => 'Öffentlich';
+
+  @override
+  String get addToBookmarks => 'Zu Lesezeichen hinzufügen';
+
+  @override
+  String get removeFromBookmarks => 'Aus Lesezeichen entfernen';
+
+  @override
+  String get addingToBookmarks => 'Wird zu Lesezeichen hinzugefügt...';
+
+  @override
+  String get removingFromBookmarks => 'Wird aus Lesezeichen entfernt...';
+
+  @override
+  String get failedToAddBookmark =>
+      'Lesezeichen konnte nicht hinzugefügt werden';
+
+  @override
+  String get failedToRemoveBookmark =>
+      'Lesezeichen konnte nicht entfernt werden';
+
+  @override
   String get notImplementedYet => 'Noch nicht implementiert';
 
   @override

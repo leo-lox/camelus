@@ -178,6 +178,42 @@ class AppLocalizationsZh extends AppLocalizations {
   String get bookmarks => '书签';
 
   @override
+  String get removeBookmark => '删除此书签？';
+
+  @override
+  String get bookmarkRemoved => '书签已删除';
+
+  @override
+  String get noPrivateBookmarks => '还没有私密书签';
+
+  @override
+  String get noPublicBookmarks => '还没有公开书签';
+
+  @override
+  String get privateBookmarks => '私密';
+
+  @override
+  String get publicBookmarks => '公开';
+
+  @override
+  String get addToBookmarks => '添加到书签';
+
+  @override
+  String get removeFromBookmarks => '从书签中移除';
+
+  @override
+  String get addingToBookmarks => '正在添加到书签...';
+
+  @override
+  String get removingFromBookmarks => '正在从书签中移除...';
+
+  @override
+  String get failedToAddBookmark => '添加书签失败';
+
+  @override
+  String get failedToRemoveBookmark => '删除书签失败';
+
+  @override
   String get notImplementedYet => '尚未实现';
 
   @override

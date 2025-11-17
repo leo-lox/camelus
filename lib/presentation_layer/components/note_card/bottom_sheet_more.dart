@@ -155,8 +155,8 @@ class _MoreOptionsBottomSheetState
               Expanded(
                 child: Text(
                   isBookmarked
-                      ? 'Removing from bookmarks...'
-                      : 'Adding to bookmarks...',
+                      ? AppLocalizations.of(context)!.removingFromBookmarks
+                      : AppLocalizations.of(context)!.addingToBookmarks,
                   style: TextStyle(
                     color: Paletter.getLightGray(context),
                     fontSize: 16,
@@ -210,7 +210,7 @@ class _MoreOptionsBottomSheetState
             PhosphorIcons.bookmarkSimple(PhosphorIconsStyle.fill),
             color: Theme.of(context).colorScheme.primary,
           ),
-          label: 'Remove from bookmarks',
+          label: AppLocalizations.of(context)!.removeFromBookmarks,
           onTap: () => _removeFromBookmarks(context, ref, isPrivateBookmark),
           textColor: Theme.of(context).colorScheme.primary,
         ),
@@ -223,7 +223,7 @@ class _MoreOptionsBottomSheetState
           PhosphorIcons.bookmarkSimple(),
           color: Paletter.getGray(context),
         ),
-        label: 'Add to bookmarks',
+        label: AppLocalizations.of(context)!.addToBookmarks,
         onTap: () => _addToBookmarks(context, ref),
       ),
     );
@@ -316,7 +316,7 @@ class _MoreOptionsBottomSheetState
       if (mounted) {
         setState(() {
           _isAddingBookmark = false;
-          _errorMessage = 'Failed to add bookmark';
+          _errorMessage = AppLocalizations.of(context)!.failedToAddBookmark;
         });
 
         // Clear error after 3 seconds
@@ -359,7 +359,7 @@ class _MoreOptionsBottomSheetState
       if (mounted) {
         setState(() {
           _isAddingBookmark = false;
-          _errorMessage = 'Failed to remove bookmark';
+          _errorMessage = AppLocalizations.of(context)!.failedToRemoveBookmark;
         });
 
         // Clear error after 3 seconds
