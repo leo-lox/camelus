@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:amberflutter/amberflutter.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:ndk/ndk.dart';
 import 'package:ndk/shared/nips/nip19/nip19.dart';
@@ -12,8 +13,10 @@ import '../entities/stored_account.dart';
 /// This class is used to store and retrive user information from secure storage. \
 /// the storage keys [nostrKeys] and [amber] are used to store the user's keypair and amber public key respectively.
 class AppAuth {
-  static const accountStorageKey = "storedAccounts";
-  static const activeAccountPubkeyStorageKey = "activeAccountPubkey";
+  static const accountStorageKey =
+      kDebugMode ? "DEV_storedAccounts" : "storedAccounts";
+  static const activeAccountPubkeyStorageKey =
+      kDebugMode ? "DEV_activeAccountPubkey" : "activeAccountPubkey";
 
   static FlutterSecureStorage secureStorage = const FlutterSecureStorage();
   static final amber = Amberflutter();
