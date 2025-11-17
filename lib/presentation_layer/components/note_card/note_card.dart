@@ -46,30 +46,30 @@ class NoteCard extends ConsumerWidget {
         if (note.nostrNote.sigValid != true) _buildInvalidSignature(),
         Padding(
           padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
-          child: Row(
+          child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildUserImage(context),
-              const SizedBox(width: 10),
-              Flexible(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    NoteCardNameRow(
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildUserImage(context),
+                  const SizedBox(width: 10),
+                  Flexible(
+                    child: NoteCardNameRow(
                       key: ValueKey("${note.id}name_row"),
                       createdAt: note.created_at,
                       myMetadata: myMetadata,
                       pubkey: note.pubkey,
                     ),
-                    const SizedBox(height: 10),
-                    PostContentWidget(
-                      key: ValueKey("${note.id}split_content"),
-                      post: note,
-                      fontSize: fontSize,
-                    )
-                  ],
-                ),
+                  ),
+                ],
               ),
+              const SizedBox(height: 10),
+              PostContentWidget(
+                key: ValueKey("${note.id}split_content"),
+                post: note,
+                fontSize: fontSize,
+              )
             ],
           ),
         ),

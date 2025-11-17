@@ -178,7 +178,7 @@ Widget newPostsAvailable({
                 child: Text(
                   name,
                   style:
-                      TextStyle(color: Theme.of(context).colorScheme.onSurface),
+                      TextStyle(color: Theme.of(context).colorScheme.onPrimary),
                 ),
               ),
             )
