@@ -10,7 +10,8 @@ import '../../atoms/hashtag_card.dart';
 import '../../providers/nostr_band_provider.dart';
 
 class TrendingHashtagsWidget extends ConsumerWidget {
-  const TrendingHashtagsWidget({super.key});
+  final bool showHeading;
+  const TrendingHashtagsWidget({super.key, this.showHeading = true});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -25,14 +26,15 @@ class TrendingHashtagsWidget extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            "trending hashtags",
-            style: TextStyle(
-              color: Theme.of(context).colorScheme.onSurface,
-              fontSize: 25,
-              fontWeight: FontWeight.bold,
+          if (showHeading)
+            Text(
+              "trending hashtags",
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onSurface,
+                fontSize: 25,
+                fontWeight: FontWeight.bold,
+              ),
             ),
-          ),
           const SizedBox(height: 10),
           FutureBuilder<NostrBandHashtags?>(
             future: nostrBandAsync,

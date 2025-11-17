@@ -101,7 +101,10 @@ class _OnboardingPictureState extends ConsumerState<OnboardingPicture> {
               crossAxisAlignment: CrossAxisAlignment.baseline,
               textBaseline: TextBaseline.alphabetic,
               children: [
-                Text(AppLocalizations.of(context)!.welcome, style: const TextStyle(fontSize: 20)),
+                Text(
+                  AppLocalizations.of(context)!.welcome,
+                  style: const TextStyle(fontSize: 20),
+                ),
                 const SizedBox(
                   width: 5,
                 ),

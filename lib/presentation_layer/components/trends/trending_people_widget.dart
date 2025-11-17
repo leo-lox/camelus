@@ -13,11 +13,13 @@ import '../../routes/nostr/profile/profile_page_2.dart';
 import '../person_card.dart';
 
 class TrendingPeopleWidget extends ConsumerWidget {
+  final bool showFollowButton;
   final Function(bool, String) onFollowChange;
 
   const TrendingPeopleWidget({
     super.key,
     required this.onFollowChange,
+    this.showFollowButton = true,
   });
 
   @override
@@ -36,7 +38,10 @@ class TrendingPeopleWidget extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: 10),
-          _TrendingPeopleList(onFollowChange: onFollowChange),
+          _TrendingPeopleList(
+            onFollowChange: onFollowChange,
+            showFollowButton: showFollowButton,
+          ),
         ],
       ),
     );
@@ -44,10 +49,12 @@ class TrendingPeopleWidget extends ConsumerWidget {
 }
 
 class _TrendingPeopleList extends ConsumerWidget {
+  final bool showFollowButton;
   final Function(bool, String) onFollowChange;
 
   const _TrendingPeopleList({
     required this.onFollowChange,
+    required this.showFollowButton,
   });
 
   @override
@@ -71,7 +78,13 @@ class _TrendingPeopleList extends ConsumerWidget {
         }
 
         if (snapshot.hasData && snapshot.data != null) {
-          return _buildPeopleList(context, snapshot.data!, 10, contactList);
+          return _buildPeopleList(
+            context,
+            snapshot.data!,
+            10,
+            contactList,
+            showFollowButton,
+          );
         }
 
         if (snapshot.connectionState == ConnectionState.done) {
@@ -91,6 +104,7 @@ class _TrendingPeopleList extends ConsumerWidget {
     NostrBandPeople api,
     int limit,
     ContactList contactList,
+    bool showFollowButton,
   ) {
     final profiles = api.profiles.take(limit).toList();
 
@@ -104,6 +118,7 @@ class _TrendingPeopleList extends ConsumerWidget {
             pictureUrl: metadata['picture'] ?? '',
             about: metadata['about'] ?? '',
             nip05: metadata['nip05'],
+            showFollowButton: showFollowButton,
             isFollowing: contactList.contacts.contains(profile.pubkey),
             onTap: () {
               Navigator.push(

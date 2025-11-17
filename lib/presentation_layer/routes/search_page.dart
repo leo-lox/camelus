@@ -322,7 +322,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                         ),
                       ],
                     ),
-                    TrendingHashtagsWidget(),
+                    TrendingHashtagsWidget(showHeading: false),
                   ],
                 ),
               ),

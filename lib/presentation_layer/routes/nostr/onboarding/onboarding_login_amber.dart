@@ -55,8 +55,7 @@ class _OnboardingLoginAmberPageState
     if (!_termsAndConditions) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content:
-              Text(AppLocalizations.of(context)!.pleaseReadAndAcceptTerms),
+          content: Text(AppLocalizations.of(context)!.pleaseReadAndAcceptTerms),
         ),
       );
       return;
