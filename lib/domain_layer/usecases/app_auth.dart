@@ -6,13 +6,15 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:ndk/ndk.dart';
 import 'package:ndk/shared/nips/nip19/nip19.dart';
 import 'package:ndk_amber/ndk_amber.dart';
-import 'package:riverpod/riverpod.dart';
 import '../../presentation_layer/providers/signer_provider.dart';
 import '../entities/stored_account.dart';
 
 /// This class is used to store and retrive user information from secure storage. \
 /// the storage keys [nostrKeys] and [amber] are used to store the user's keypair and amber public key respectively.
 class AppAuth {
+  static const accountStorageKey = "storedAccounts";
+  static const activeAccountPubkeyStorageKey = "activeAccountPubkey";
+
   static FlutterSecureStorage secureStorage = const FlutterSecureStorage();
   static final amber = Amberflutter();
 
@@ -132,9 +134,9 @@ class AppAuth {
 
   static Future<StartupAccountData> getStartupAccountData() async {
     final activeAccountPubkey =
-        await secureStorage.read(key: "activeAccountPubkey");
+        await secureStorage.read(key: AppAuth.activeAccountPubkeyStorageKey);
     final storedAccountsString =
-        await secureStorage.read(key: "storedAccounts");
+        await secureStorage.read(key: AppAuth.accountStorageKey);
 
     if (activeAccountPubkey == null || storedAccountsString == null) {
       return StartupAccountData(
@@ -171,7 +173,7 @@ class AppAuth {
     bool setActive = true,
   }) async {
     final storedAccountsString =
-        await secureStorage.read(key: "storedAccounts");
+        await secureStorage.read(key: AppAuth.accountStorageKey);
     List<LocalStorageAccount> storedAccounts = [];
     if (storedAccountsString != null) {
       final storedAccountsJson = jsonDecode(storedAccountsString) as List;
@@ -181,12 +183,12 @@ class AppAuth {
     }
     storedAccounts.add(account);
     await secureStorage.write(
-      key: "storedAccounts",
+      key: AppAuth.accountStorageKey,
       value: jsonEncode(storedAccounts.map((e) => e.toJson()).toList()),
     );
     if (setActive && account.pubkey != null) {
       await secureStorage.write(
-        key: "activeAccountPubkey",
+        key: AppAuth.activeAccountPubkeyStorageKey,
         value: account.pubkey!,
       );
     }
@@ -196,8 +198,8 @@ class AppAuth {
   /// This is used to log out the user
   static Future<void> clearAllAccounts() async {
     await secureStorage.delete(
-      key: "activeAccountPubkey",
+      key: AppAuth.activeAccountPubkeyStorageKey,
     );
-    await secureStorage.delete(key: "storedAccounts");
+    await secureStorage.delete(key: AppAuth.accountStorageKey);
   }
 }
