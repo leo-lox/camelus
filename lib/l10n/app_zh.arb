@@ -194,5 +194,6 @@
   "addingToBookmarks": "正在添加到书签...",
   "removingFromBookmarks": "正在从书签中移除...",
   "failedToAddBookmark": "添加书签失败",
-  "failedToRemoveBookmark": "删除书签失败"
+  "failedToRemoveBookmark": "删除书签失败",
+  "pleaseLoginToManageFileServers": "请登录以管理文件服务器"
 }

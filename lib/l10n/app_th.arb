@@ -194,5 +194,6 @@
   "addingToBookmarks": "กำลังเพิ่มไปยังบุ๊กมาร์ก...",
   "removingFromBookmarks": "กำลังลบออกจากบุ๊กมาร์ก...",
   "failedToAddBookmark": "ไม่สามารถเพิ่มบุ๊กมาร์กได้",
-  "failedToRemoveBookmark": "ไม่สามารถลบบุ๊กมาร์กได้"
+  "failedToRemoveBookmark": "ไม่สามารถลบบุ๊กมาร์กได้",
+  "pleaseLoginToManageFileServers": "โปรดเข้าสู่ระบบเพื่อจัดการเซิร์ฟเวอร์ไฟล์"
 }

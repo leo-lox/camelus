@@ -607,4 +607,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get welcome => '欢迎';
+
+  @override
+  String get pleaseLoginToManageFileServers => '请登录以管理文件服务器';
 }

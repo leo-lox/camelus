@@ -628,4 +628,8 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get welcome => 'Bienvenue';
+
+  @override
+  String get pleaseLoginToManageFileServers =>
+      'Veuillez vous connecter pour gérer les serveurs de fichiers';
 }

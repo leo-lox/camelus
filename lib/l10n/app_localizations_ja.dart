@@ -609,4 +609,7 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get welcome => 'ようこそ';
+
+  @override
+  String get pleaseLoginToManageFileServers => 'ファイルサーバーを管理するにはログインしてください';
 }

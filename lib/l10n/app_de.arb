@@ -194,5 +194,6 @@
   "addingToBookmarks": "Wird zu Lesezeichen hinzugefügt...",
   "removingFromBookmarks": "Wird aus Lesezeichen entfernt...",
   "failedToAddBookmark": "Lesezeichen konnte nicht hinzugefügt werden",
-  "failedToRemoveBookmark": "Lesezeichen konnte nicht entfernt werden"
+  "failedToRemoveBookmark": "Lesezeichen konnte nicht entfernt werden",
+  "pleaseLoginToManageFileServers": "Bitte melden Sie sich an, um Dateiserver zu verwalten"
 }

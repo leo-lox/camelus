@@ -1281,6 +1281,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Welcome'**
   String get welcome;
+
+  /// Message shown when user is not logged in on file servers page
+  ///
+  /// In en, this message translates to:
+  /// **'Please login to manage file servers'**
+  String get pleaseLoginToManageFileServers;
 }
 
 class _AppLocalizationsDelegate

@@ -620,4 +620,8 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get welcome => 'Welcome';
+
+  @override
+  String get pleaseLoginToManageFileServers =>
+      'Please login to manage file servers';
 }

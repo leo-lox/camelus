@@ -621,4 +621,8 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get welcome => 'Добро пожаловать';
+
+  @override
+  String get pleaseLoginToManageFileServers =>
+      'Пожалуйста, войдите, чтобы управлять файловыми серверами';
 }

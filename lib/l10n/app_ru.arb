@@ -194,5 +194,6 @@
   "addingToBookmarks": "Добавление в закладки...",
   "removingFromBookmarks": "Удаление из закладок...",
   "failedToAddBookmark": "Не удалось добавить закладку",
-  "failedToRemoveBookmark": "Не удалось удалить закладку"
+  "failedToRemoveBookmark": "Не удалось удалить закладку",
+  "pleaseLoginToManageFileServers": "Пожалуйста, войдите, чтобы управлять файловыми серверами"
 }

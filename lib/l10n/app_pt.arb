@@ -194,5 +194,6 @@
   "addingToBookmarks": "Adicionando aos favoritos...",
   "removingFromBookmarks": "Removendo dos favoritos...",
   "failedToAddBookmark": "Falha ao adicionar favorito",
-  "failedToRemoveBookmark": "Falha ao remover favorito"
+  "failedToRemoveBookmark": "Falha ao remover favorito",
+  "pleaseLoginToManageFileServers": "Por favor, faça login para gerenciar servidores de arquivos"
 }

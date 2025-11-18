@@ -6,7 +6,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../../config/palette.dart';
+import '../../../../../domain_layer/usecases/app_auth.dart';
 import '../../../../atoms/long_button.dart';
+import '../../../../providers/ndk_provider.dart';
 import 'file_server_state_provider.dart';
 
 class SettingsFileServers extends ConsumerStatefulWidget {
@@ -73,6 +75,41 @@ class SettingsFileServersPageState extends ConsumerState<SettingsFileServers> {
     final hasUnsavedChanges = ref
         .read(fileServersProvider.notifier)
         .hasUnsavedChanges;
+
+    final ndk = ref.watch(ndkProvider);
+    final canSign = !ndk.accounts.cannotSign;
+
+    if (!canSign) {
+      return Scaffold(
+        appBar: AppBar(title: Text(AppLocalizations.of(context)!.fileServers)),
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  AppLocalizations.of(context)!.pleaseLoginToManageFileServers,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface,
+                    fontSize: 16,
+                  ),
+                ),
+                const SizedBox(height: 25),
+                longButton(
+                  name: AppLocalizations.of(context)!.login,
+                  inverted: true,
+                  onPressed: () {
+                    context.go('/onboarding');
+                  },
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
 
     return PopScope(
       canPop: !hasUnsavedChanges,

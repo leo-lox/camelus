@@ -618,4 +618,8 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get welcome => 'ยินดีต้อนรับ';
+
+  @override
+  String get pleaseLoginToManageFileServers =>
+      'โปรดเข้าสู่ระบบเพื่อจัดการเซิร์ฟเวอร์ไฟล์';
 }

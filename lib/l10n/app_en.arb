@@ -814,5 +814,9 @@
   "welcome": "Welcome",
   "@welcome": {
     "description": "Welcome greeting text"
+  },
+  "pleaseLoginToManageFileServers": "Please login to manage file servers",
+  "@pleaseLoginToManageFileServers": {
+    "description": "Message shown when user is not logged in on file servers page"
   }
 }

@@ -625,4 +625,8 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get welcome => 'Willkommen';
+
+  @override
+  String get pleaseLoginToManageFileServers =>
+      'Bitte melden Sie sich an, um Dateiserver zu verwalten';
 }
