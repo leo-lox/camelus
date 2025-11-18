@@ -100,9 +100,7 @@ void main() {
       kind: 1,
       content: 'A reply to a note that does not exist.',
       sig: 'sig8',
-      tags: [
-        NostrTag(type: 'e', value: 'notFound', marker: 'root'),
-      ],
+      tags: [NostrTag(type: 'e', value: 'notFound', marker: 'root')],
     );
 
     // Create a list of all notes
@@ -115,7 +113,7 @@ void main() {
         nestedNestedReply1,
         nestedNestedReply2,
         notFoundReply,
-      ])
+      ]),
     ];
 
     test('test building tree', () {
@@ -142,10 +140,14 @@ void main() {
       // third level replies
 
       expect(tree[0].children[0].children.length, 2);
-      expect(tree[0].children[0].children[0].value.id,
-          equals(nestedNestedReply1.id));
-      expect(tree[0].children[0].children[1].value.id,
-          equals(nestedNestedReply2.id));
+      expect(
+        tree[0].children[0].children[0].value.id,
+        equals(nestedNestedReply1.id),
+      );
+      expect(
+        tree[0].children[0].children[1].value.id,
+        equals(nestedNestedReply2.id),
+      );
 
       expect(tree[1].children[0].children.length, 0);
     });

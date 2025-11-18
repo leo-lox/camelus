@@ -123,10 +123,7 @@ class SearchStateNotifier extends StateNotifier<SearchState> {
       }
     } catch (e) {
       if (query == state.searchQuery) {
-        state = state.copyWith(
-          isLoading: false,
-          error: e.toString(),
-        );
+        state = state.copyWith(isLoading: false, error: e.toString());
       }
     }
   }
@@ -143,9 +140,9 @@ class SearchStateNotifier extends StateNotifier<SearchState> {
 
 final searchStateProvider =
     StateNotifierProvider<SearchStateNotifier, SearchState>((ref) {
-  final searchService = ref.read(searchProvider);
-  return SearchStateNotifier(searchService);
-});
+      final searchService = ref.read(searchProvider);
+      return SearchStateNotifier(searchService);
+    });
 
 class SearchPage extends ConsumerStatefulWidget {
   const SearchPage({super.key});
@@ -220,8 +217,9 @@ class _SearchPageState extends ConsumerState<SearchPage> {
       final selfPubkey = ref.read(ndkProvider).accounts.getPublicKey();
       if (selfPubkey == null) return;
 
-      final myContactListNotifier =
-          ref.read(contactListStateProvider(selfPubkey).notifier);
+      final myContactListNotifier = ref.read(
+        contactListStateProvider(selfPubkey).notifier,
+      );
 
       if (followChange) {
         await myContactListNotifier.followUser(pubkey);
@@ -251,24 +249,26 @@ class _SearchPageState extends ConsumerState<SearchPage> {
       child: Scaffold(
         body: Column(
           children: [
-            Builder(builder: (context) {
-              final child = SearchBarWidget(
-                onSearchChanged: _onSearchChanged,
-                onSubmit: _onSubmit,
-                helpSearch: _helpSearch,
-                externalFocusNode: _searchFocusNode,
-                externalController: _searchController,
-              );
+            Builder(
+              builder: (context) {
+                final child = SearchBarWidget(
+                  onSearchChanged: _onSearchChanged,
+                  onSubmit: _onSubmit,
+                  helpSearch: _helpSearch,
+                  externalFocusNode: _searchFocusNode,
+                  externalController: _searchController,
+                );
 
-              final isDesktop =
-                  Platform.isLinux || Platform.isMacOS || Platform.isWindows;
-              if (!isDesktop) return child;
+                final isDesktop =
+                    Platform.isLinux || Platform.isMacOS || Platform.isWindows;
+                if (!isDesktop) return child;
 
-              return Padding(
-                padding: const EdgeInsets.only(top: 16),
-                child: child,
-              );
-            }),
+                return Padding(
+                  padding: const EdgeInsets.only(top: 16),
+                  child: child,
+                );
+              },
+            ),
             Expanded(
               child: searchState.isSearching
                   ? _buildSearchResults(searchState)
@@ -317,7 +317,9 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                           child: Text(
                             "by nostr.band",
                             style: TextStyle(
-                                color: Paletter.getGray(context), fontSize: 14),
+                              color: Paletter.getGray(context),
+                              fontSize: 14,
+                            ),
                           ),
                         ),
                       ],
@@ -341,17 +343,12 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                   ),
                 ),
               ),
-              const SizedBox(
-                height: 280,
-                child: TrendingStarterPacks(),
-              ),
+              const SizedBox(height: 280, child: TrendingStarterPacks()),
 
               const SizedBox(height: 20),
 
               // trending people section
-              TrendingPeopleWidget(
-                onFollowChange: _changeFollowing,
-              )
+              TrendingPeopleWidget(onFollowChange: _changeFollowing),
             ],
           ),
         ),
@@ -362,8 +359,9 @@ class _SearchPageState extends ConsumerState<SearchPage> {
   Widget _buildSearchResults(SearchState searchState) {
     return Consumer(
       builder: (context, ref, child) {
-        final myContactList =
-            ref.watch(contactListSelfStateProvider).contactList;
+        final myContactList = ref
+            .watch(contactListSelfStateProvider)
+            .contactList;
 
         return ListView(
           physics: const BouncingScrollPhysics(),
@@ -392,8 +390,9 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                   child: Text(
                     'Error: ${searchState.error}',
                     style: TextStyle(
-                        color: Theme.of(context).colorScheme.error,
-                        fontSize: 16),
+                      color: Theme.of(context).colorScheme.error,
+                      fontSize: 16,
+                    ),
                   ),
                 ),
               ),
@@ -402,7 +401,9 @@ class _SearchPageState extends ConsumerState<SearchPage> {
             if (!searchState.isLoading && searchState.error == null) ...[
               if (searchState.searchResultsUsers.isNotEmpty)
                 _buildUsersSection(
-                    searchState.searchResultsUsers, myContactList),
+                  searchState.searchResultsUsers,
+                  myContactList,
+                ),
 
               if (searchState.searchResultsNotes.isNotEmpty)
                 _buildNotesSection(searchState.searchResultsNotes),
@@ -417,7 +418,9 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                     child: Text(
                       "No results found",
                       style: TextStyle(
-                          color: Paletter.getGray(context), fontSize: 16),
+                        color: Paletter.getGray(context),
+                        fontSize: 16,
+                      ),
                     ),
                   ),
                 ),
@@ -439,8 +442,9 @@ class _SearchPageState extends ConsumerState<SearchPage> {
               child: Text(
                 'Search for "$query"',
                 style: TextStyle(
-                    color: Theme.of(context).colorScheme.onSurface,
-                    fontSize: 16),
+                  color: Theme.of(context).colorScheme.onSurface,
+                  fontSize: 16,
+                ),
               ),
             ),
             Icon(PhosphorIcons.arrowUpLeft(), color: Paletter.getGray(context)),
@@ -463,25 +467,27 @@ class _SearchPageState extends ConsumerState<SearchPage> {
           ),
         ),
         const SizedBox(height: 10),
-        ...users.map((user) => PersonCard(
-              showFollowButton: false,
-              pubkey: user.pubkey,
-              name: user.name ?? '',
-              pictureUrl: user.picture ?? '',
-              about: user.about ?? '',
-              nip05: user.nip05,
-              isFollowing: contactList.contacts.contains(user.pubkey),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => ProfilePage2(pubkey: user.pubkey),
-                  ),
-                );
-              },
-              onFollowTab: (followState) =>
-                  _changeFollowing(followState, user.pubkey),
-            )),
+        ...users.map(
+          (user) => PersonCard(
+            showFollowButton: false,
+            pubkey: user.pubkey,
+            name: user.name ?? '',
+            pictureUrl: user.picture ?? '',
+            about: user.about ?? '',
+            nip05: user.nip05,
+            isFollowing: contactList.contacts.contains(user.pubkey),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ProfilePage2(pubkey: user.pubkey),
+                ),
+              );
+            },
+            onFollowTab: (followState) =>
+                _changeFollowing(followState, user.pubkey),
+          ),
+        ),
         const SizedBox(height: 20),
       ],
     );
@@ -500,8 +506,9 @@ class _SearchPageState extends ConsumerState<SearchPage> {
           ),
         ),
         const SizedBox(height: 10),
-        ...notes.map((note) =>
-            NoteCardContainer(note: NostrParser.parseEventSync(note))),
+        ...notes.map(
+          (note) => NoteCardContainer(note: NostrParser.parseEventSync(note)),
+        ),
       ],
     );
   }
@@ -565,10 +572,7 @@ class _SearchHelpItem extends StatelessWidget {
   final String title;
   final String description;
 
-  const _SearchHelpItem({
-    required this.title,
-    required this.description,
-  });
+  const _SearchHelpItem({required this.title, required this.description});
 
   @override
   Widget build(BuildContext context) {

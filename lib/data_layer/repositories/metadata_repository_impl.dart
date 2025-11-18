@@ -23,8 +23,8 @@ class MetadataRepositoryImpl implements MetadataRepository {
   Stream<UserMetadata> getMetadataByPubkey(String pubkey) async* {
     final myMetadata = dartNdkSource.dartNdk.metadata.loadMetadata(pubkey);
 
-    final Stream<ndk_entities.Metadata?> myMetadataStream =
-        myMetadata.asStream();
+    final Stream<ndk_entities.Metadata?> myMetadataStream = myMetadata
+        .asStream();
 
     await for (final event in myMetadataStream) {
       if (event != null) {
@@ -42,8 +42,10 @@ class MetadataRepositoryImpl implements MetadataRepository {
         // If there was originally a NIP-05 identifier, perform verification
         if (originalNip05 != null && originalNip05.isNotEmpty) {
           // Perform NIP-05 verification
-          final nip05Result = await dartNdkSource.dartNdk.nip05
-              .check(nip05: originalNip05, pubkey: pubkey);
+          final nip05Result = await dartNdkSource.dartNdk.nip05.check(
+            nip05: originalNip05,
+            pubkey: pubkey,
+          );
 
           // If verification succeeds, set NIP-05 to the original value
           if (nip05Result.valid) {
@@ -64,8 +66,9 @@ class MetadataRepositoryImpl implements MetadataRepository {
 
     final ndkMetadata = myMetadataModel.toNDKMetadata();
 
-    final result =
-        await dartNdkSource.dartNdk.metadata.broadcastMetadata(ndkMetadata);
+    final result = await dartNdkSource.dartNdk.metadata.broadcastMetadata(
+      ndkMetadata,
+    );
     return UserMetadataModel.fromNDKMetadata(result);
   }
 

@@ -30,10 +30,7 @@ class BottomSheetOption {
 class MoreOptionsBottomSheet extends ConsumerWidget {
   final NostrNote note;
 
-  const MoreOptionsBottomSheet({
-    super.key,
-    required this.note,
-  });
+  const MoreOptionsBottomSheet({super.key, required this.note});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -61,16 +58,18 @@ class MoreOptionsBottomSheet extends ConsumerWidget {
   }
 
   Widget _buildHandle() {
-    return Builder(builder: (context) {
-      return Container(
-        width: 40,
-        height: 4,
-        decoration: BoxDecoration(
-          color: Paletter.getGray(context),
-          borderRadius: BorderRadius.circular(2),
-        ),
-      );
-    });
+    return Builder(
+      builder: (context) {
+        return Container(
+          width: 40,
+          height: 4,
+          decoration: BoxDecoration(
+            color: Paletter.getGray(context),
+            borderRadius: BorderRadius.circular(2),
+          ),
+        );
+      },
+    );
   }
 
   Widget _buildOptionTile(BottomSheetOption option) {
@@ -88,17 +87,20 @@ class MoreOptionsBottomSheet extends ConsumerWidget {
                 option.leading,
                 const SizedBox(width: 16),
                 Expanded(
-                  child: Builder(builder: (context) {
-                    return Text(
-                      option.label,
-                      style: TextStyle(
-                        color:
-                            option.textColor ?? Paletter.getLightGray(context),
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    );
-                  }),
+                  child: Builder(
+                    builder: (context) {
+                      return Text(
+                        option.label,
+                        style: TextStyle(
+                          color:
+                              option.textColor ??
+                              Paletter.getLightGray(context),
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      );
+                    },
+                  ),
                 ),
               ],
             ),
@@ -155,10 +157,8 @@ class MoreOptionsBottomSheet extends ConsumerWidget {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => BlockPage(
-          postId: note.id,
-          userPubkey: note.pubkey,
-        ),
+        builder: (context) =>
+            BlockPage(postId: note.id, userPubkey: note.pubkey),
       ),
     );
   }

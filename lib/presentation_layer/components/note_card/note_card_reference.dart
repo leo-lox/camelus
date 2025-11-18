@@ -16,10 +16,7 @@ import 'nostr_parser.dart';
 class NoteCardReference extends ConsumerWidget {
   final String word;
 
-  const NoteCardReference({
-    super.key,
-    required this.word,
-  });
+  const NoteCardReference({super.key, required this.word});
 
   String? _getNostrId(String word) {
     final cleanedWord = word.replaceAll("nostr:", "");
@@ -56,17 +53,17 @@ class NoteCardReference extends ConsumerWidget {
       future: notesProvider.getNote(nostrId).first,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(
-            child: SkeletonNote(hideBottomAction: true),
-          );
+          return const Center(child: SkeletonNote(hideBottomAction: true));
         }
 
         if (snapshot.hasError || !snapshot.hasData) {
           return Container(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(10),
-              border:
-                  Border.all(color: Paletter.getDarkGray(context), width: 1.0),
+              border: Border.all(
+                color: Paletter.getDarkGray(context),
+                width: 1.0,
+              ),
             ),
             child: Center(
               child: Padding(
@@ -74,8 +71,9 @@ class NoteCardReference extends ConsumerWidget {
                 child: Text(
                   "Note not found",
                   style: TextStyle(
-                      color: Theme.of(context).colorScheme.onSurface,
-                      fontSize: 17),
+                    color: Theme.of(context).colorScheme.onSurface,
+                    fontSize: 17,
+                  ),
                 ),
               ),
             ),
@@ -88,24 +86,27 @@ class NoteCardReference extends ConsumerWidget {
 
         return Consumer(
           builder: (context, ref, child) {
-            final metadata =
-                ref.watch(metadataStateProvider(note.pubkey)).userMetadata;
+            final metadata = ref
+                .watch(metadataStateProvider(note.pubkey))
+                .userMetadata;
 
             return Column(
               children: [
                 const SizedBox(height: 20),
                 GestureDetector(
                   onTap: () {
-                    context.push('/nostr/event', extra: {
-                      'root': note.id,
-                      'scrollIntoView': note.id,
-                    });
+                    context.push(
+                      '/nostr/event',
+                      extra: {'root': note.id, 'scrollIntoView': note.id},
+                    );
                   },
                   child: Container(
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(10),
                       border: Border.all(
-                          color: Paletter.getDarkGray(context), width: 1.0),
+                        color: Paletter.getDarkGray(context),
+                        width: 1.0,
+                      ),
                     ),
                     child: NoteCard(
                       note: parsedNote,

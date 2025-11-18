@@ -12,9 +12,10 @@ class Profiles {
   List<String> relays;
   NostrNote profile;
 
-  Profiles(
-      {required this.pubkey,
-      required this.newFollowersCount,
-      required this.relays,
-      required this.profile});
+  Profiles({
+    required this.pubkey,
+    required this.newFollowersCount,
+    required this.relays,
+    required this.profile,
+  });
 }

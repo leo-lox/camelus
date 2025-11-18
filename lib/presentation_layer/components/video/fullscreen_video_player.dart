@@ -49,9 +49,7 @@ class _FullScreenVideoPlayerState extends ConsumerState<FullScreenVideoPlayer> {
       ]);
     } else {
       // Portrait or square video - keep portrait
-      SystemChrome.setPreferredOrientations([
-        DeviceOrientation.portraitUp,
-      ]);
+      SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
     }
   }
 
@@ -67,8 +65,9 @@ class _FullScreenVideoPlayerState extends ConsumerState<FullScreenVideoPlayer> {
   @override
   Widget build(BuildContext context) {
     final videoState = ref.watch(videoPlayerProvider(widget.videoId));
-    final videoStateNoti =
-        ref.watch(videoPlayerProvider(widget.videoId).notifier);
+    final videoStateNoti = ref.watch(
+      videoPlayerProvider(widget.videoId).notifier,
+    );
     final controller = widget.controller;
 
     return Scaffold(
@@ -141,11 +140,15 @@ class _FullScreenVideoPlayerState extends ConsumerState<FullScreenVideoPlayer> {
                           ),
                           onPressed: () {
                             if (videoState.volume == 0.0) {
-                              videoStateNoti.setVolume(1.0,
-                                  userInteraction: true);
+                              videoStateNoti.setVolume(
+                                1.0,
+                                userInteraction: true,
+                              );
                             } else {
-                              videoStateNoti.setVolume(0.0,
-                                  userInteraction: true);
+                              videoStateNoti.setVolume(
+                                0.0,
+                                userInteraction: true,
+                              );
                             }
                           },
                         ),
@@ -169,11 +172,7 @@ class _FullScreenVideoPlayerState extends ConsumerState<FullScreenVideoPlayer> {
                 top: MediaQuery.of(context).padding.top + 10,
                 left: 10,
                 child: IconButton(
-                  icon: Icon(
-                    Icons.arrow_back,
-                    color: Colors.white,
-                    size: 32,
-                  ),
+                  icon: Icon(Icons.arrow_back, color: Colors.white, size: 32),
                   onPressed: () {
                     Navigator.of(context).pop();
                   },

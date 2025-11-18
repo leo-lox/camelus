@@ -5,11 +5,7 @@ class TLV {
   final int length;
   final Uint8List value;
 
-  TLV({
-    required this.type,
-    required this.length,
-    required this.value,
-  });
+  TLV({required this.type, required this.length, required this.value});
 }
 
 class TlvUtils {

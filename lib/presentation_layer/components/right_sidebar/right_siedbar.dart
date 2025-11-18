@@ -20,7 +20,7 @@ class RightSiedbar extends StatelessWidget {
                 throw UnimplementedError();
               },
               showFollowButton: false,
-            )
+            ),
           ],
         ),
       ),

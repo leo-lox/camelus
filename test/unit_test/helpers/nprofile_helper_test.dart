@@ -23,7 +23,7 @@ void main() {
       Map<String, dynamic> expected = {
         "pubkey":
             "3bf0c63fcb93463407af97a5e5ee64fa883d107ef9e558472c4eb9aaaefa459d",
-        "relays": ["wss://r.x.com", "wss://djbas.sadkb.com"]
+        "relays": ["wss://r.x.com", "wss://djbas.sadkb.com"],
       };
 
       var result = nprofileHelper.bech32toMap(nprofile);
@@ -37,7 +37,7 @@ void main() {
       Map<String, dynamic> map = {
         "pubkey":
             "3bf0c63fcb93463407af97a5e5ee64fa883d107ef9e558472c4eb9aaaefa459d",
-        "relays": ["wss://r.x.com", "wss://djbas.sadkb.com"]
+        "relays": ["wss://r.x.com", "wss://djbas.sadkb.com"],
       };
 
       String expected =

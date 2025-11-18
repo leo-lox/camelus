@@ -49,14 +49,18 @@ class _RelaysPageState extends ConsumerState<RelaysPage> {
                   final relay = entry.value;
 
                   // Check if this relay has privacy policy or terms of service
-                  final hasPrivacyPolicy = relay.relayInfo != null &&
+                  final hasPrivacyPolicy =
+                      relay.relayInfo != null &&
                       relay.relayInfo!.privacyPolicy.isNotEmpty;
-                  final hasTermsOfService = relay.relayInfo != null &&
+                  final hasTermsOfService =
+                      relay.relayInfo != null &&
                       relay.relayInfo!.termsOfService.isNotEmpty;
 
                   return Card(
-                    margin:
-                        const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                    margin: const EdgeInsets.symmetric(
+                      vertical: 8,
+                      horizontal: 12,
+                    ),
                     child: Padding(
                       padding: const EdgeInsets.all(12.0),
                       child: Column(
@@ -74,18 +78,20 @@ class _RelaysPageState extends ConsumerState<RelaysPage> {
                                         fit: BoxFit.cover,
                                         errorBuilder:
                                             (context, error, stackTrace) {
-                                          return Container(
-                                            width: 50,
-                                            height: 50,
-                                            color:
-                                                Paletter.getLightGray(context),
-                                            child: Icon(
-                                              PhosphorIcons.globe(),
-                                              color:
-                                                  Paletter.getDarkGray(context),
-                                            ),
-                                          );
-                                        },
+                                              return Container(
+                                                width: 50,
+                                                height: 50,
+                                                color: Paletter.getLightGray(
+                                                  context,
+                                                ),
+                                                child: Icon(
+                                                  PhosphorIcons.globe(),
+                                                  color: Paletter.getDarkGray(
+                                                    context,
+                                                  ),
+                                                ),
+                                              );
+                                            },
                                       ),
                                     )
                                   : Container(
@@ -93,8 +99,9 @@ class _RelaysPageState extends ConsumerState<RelaysPage> {
                                       height: 50,
                                       decoration: BoxDecoration(
                                         color: Paletter.getLightGray(context),
-                                        borderRadius:
-                                            BorderRadius.circular(8.0),
+                                        borderRadius: BorderRadius.circular(
+                                          8.0,
+                                        ),
                                       ),
                                       child: Icon(
                                         PhosphorIcons.globe(),
@@ -154,22 +161,22 @@ class _RelaysPageState extends ConsumerState<RelaysPage> {
                               _StatItem(
                                 context: context,
                                 icon: PhosphorIcons.arrowUp(),
-                                label:
-                                    AppLocalizations.of(context)!.eventsWritten,
+                                label: AppLocalizations.of(
+                                  context,
+                                )!.eventsWritten,
                                 value: relay.stats.eventsWritten.toString(),
                               ),
                               _StatItem(
                                 context: context,
                                 icon: PhosphorIcons.lighthouse(),
-                                label: AppLocalizations.of(context)!
-                                    .connectionSource,
+                                label: AppLocalizations.of(
+                                  context,
+                                )!.connectionSource,
                                 value: relay.relay.connectionSource.name,
                               ),
                             ],
                           ),
-                          const SizedBox(
-                            height: 10,
-                          ),
+                          const SizedBox(height: 10),
 
                           if (relay.relayInfo != null &&
                               relay.relayInfo!.description.isNotEmpty)
@@ -218,26 +225,30 @@ class _RelaysPageState extends ConsumerState<RelaysPage> {
                                       },
                                       style: TextButton.styleFrom(
                                         padding: const EdgeInsets.symmetric(
-                                            horizontal: 8, vertical: 4),
+                                          horizontal: 8,
+                                          vertical: 4,
+                                        ),
                                         minimumSize: Size.zero,
                                         tapTargetSize:
                                             MaterialTapTargetSize.shrinkWrap,
                                       ),
                                       child: Text(
-                                        AppLocalizations.of(context)!
-                                            .privacyPolicy,
+                                        AppLocalizations.of(
+                                          context,
+                                        )!.privacyPolicy,
                                         style: TextStyle(
                                           fontSize: 12,
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .primary,
+                                          color: Theme.of(
+                                            context,
+                                          ).colorScheme.primary,
                                         ),
                                       ),
                                     ),
                                   if (hasPrivacyPolicy && hasTermsOfService)
                                     Padding(
                                       padding: const EdgeInsets.symmetric(
-                                          horizontal: 8),
+                                        horizontal: 8,
+                                      ),
                                       child: Text(
                                         '•',
                                         style: TextStyle(
@@ -255,19 +266,22 @@ class _RelaysPageState extends ConsumerState<RelaysPage> {
                                       },
                                       style: TextButton.styleFrom(
                                         padding: const EdgeInsets.symmetric(
-                                            horizontal: 8, vertical: 4),
+                                          horizontal: 8,
+                                          vertical: 4,
+                                        ),
                                         minimumSize: Size.zero,
                                         tapTargetSize:
                                             MaterialTapTargetSize.shrinkWrap,
                                       ),
                                       child: Text(
-                                        AppLocalizations.of(context)!
-                                            .termsOfService,
+                                        AppLocalizations.of(
+                                          context,
+                                        )!.termsOfService,
                                         style: TextStyle(
                                           fontSize: 12,
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .primary,
+                                          color: Theme.of(
+                                            context,
+                                          ).colorScheme.primary,
                                         ),
                                       ),
                                     ),
@@ -283,7 +297,8 @@ class _RelaysPageState extends ConsumerState<RelaysPage> {
             }
 
             return Center(
-                child: Text(AppLocalizations.of(context)!.noDataAvailable));
+              child: Text(AppLocalizations.of(context)!.noDataAvailable),
+            );
           },
         ),
       ),
@@ -316,18 +331,12 @@ class _StatItem extends StatelessWidget {
           const SizedBox(height: 4),
           Text(
             label,
-            style: TextStyle(
-              fontSize: 12,
-              color: Paletter.getGray(context),
-            ),
+            style: TextStyle(fontSize: 12, color: Paletter.getGray(context)),
           ),
           const SizedBox(height: 2),
           Text(
             value,
-            style: const TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
-            ),
+            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
             maxLines: 3,
             overflow: TextOverflow.ellipsis,
           ),

@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 class RefreshIndicatorNoNeed extends StatelessWidget {
   final Widget child;
   final Future<void> Function()
-      onRefresh; // The callback function to trigger the refresh.
+  onRefresh; // The callback function to trigger the refresh.
 
   const RefreshIndicatorNoNeed({
     super.key,
@@ -20,11 +20,7 @@ class RefreshIndicatorNoNeed extends StatelessWidget {
   Widget build(BuildContext context) {
     return CustomRefreshIndicator(
       // Custom builder for the refresh indicator.
-      builder: (
-        BuildContext context,
-        Widget child,
-        IndicatorController controller,
-      ) {
+      builder: (BuildContext context, Widget child, IndicatorController controller) {
         return Stack(
           children: <Widget>[
             _MyIndicator(
@@ -77,7 +73,6 @@ class _MyIndicator extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
               decoration: BoxDecoration(
                 //backgroundBlendMode: BlendMode.clear,
-
                 borderRadius: BorderRadius.circular(20),
                 color: Paletter.getExtraDarkGray(context),
               ),

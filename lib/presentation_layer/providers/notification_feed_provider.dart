@@ -14,8 +14,8 @@ import 'get_notes_provider.dart';
 // Provider for managing notification state
 final notificationsStateProvider =
     NotifierProvider.family<NotificationsState, NotificationViewModel, String>(
-  NotificationsState.new,
-);
+      NotificationsState.new,
+    );
 
 class NotificationsState extends FamilyNotifier<NotificationViewModel, String> {
   static const String subscriptionId = "notifications-sub";
@@ -51,9 +51,7 @@ class NotificationsState extends FamilyNotifier<NotificationViewModel, String> {
   void integrateNewNotifications() {
     _addTimelineNotifications(state.newNotifications);
 
-    state = state.copyWith(
-      newNotifications: [],
-    );
+    state = state.copyWith(newNotifications: []);
 
     ref
         .read(appBottomNavigationBarProvider.notifier)
@@ -93,7 +91,9 @@ class NotificationsState extends FamilyNotifier<NotificationViewModel, String> {
 
   // Helper to convert notes to notification objects
   List<NostrNotification> _convertToNotifications(
-      List<NostrNote> notes, String userPubkey) {
+    List<NostrNote> notes,
+    String userPubkey,
+  ) {
     return notes.map((note) {
       NotificationType type;
       String? targetNoteId;
@@ -103,8 +103,10 @@ class NotificationsState extends FamilyNotifier<NotificationViewModel, String> {
         r'nostr:(nprofile|npub)[a-zA-Z0-9]+',
         caseSensitive: false,
       );
-      final List<String> foundProfiles =
-          exp.allMatches(note.content).map((match) => match.group(0)!).toList();
+      final List<String> foundProfiles = exp
+          .allMatches(note.content)
+          .map((match) => match.group(0)!)
+          .toList();
 
       for (var profile in foundProfiles) {
         profile = profile.replaceFirst('nostr:', '');
@@ -122,18 +124,10 @@ class NotificationsState extends FamilyNotifier<NotificationViewModel, String> {
 
       if (note.kind == 7) {
         type = NotificationType.reaction;
-        targetNoteId = note.tags
-            .firstWhere(
-              (tag) => tag.type == 'e',
-            )
-            .value;
+        targetNoteId = note.tags.firstWhere((tag) => tag.type == 'e').value;
       } else if (note.kind == 6) {
         type = NotificationType.repost;
-        targetNoteId = note.tags
-            .firstWhere(
-              (tag) => tag.type == 'e',
-            )
-            .value;
+        targetNoteId = note.tags.firstWhere((tag) => tag.type == 'e').value;
       } else if (foundPubkeysContent.contains(userPubkey)) {
         type = NotificationType.mention;
       } else if (note.getTagPubkeys.last.value == userPubkey) {
@@ -205,9 +199,9 @@ class NotificationsState extends FamilyNotifier<NotificationViewModel, String> {
         .bufferTime(const Duration(milliseconds: 100))
         .where((events) => events.isNotEmpty)
         .listen((data) {
-      final notifications = _convertToNotifications(data, userPubkey);
-      _addTimelineNotifications(notifications);
-    });
+          final notifications = _convertToNotifications(data, userPubkey);
+          _addTimelineNotifications(notifications);
+        });
 
     final notes = await notesStream.toList();
     if (notes.isEmpty) {
@@ -219,22 +213,23 @@ class NotificationsState extends FamilyNotifier<NotificationViewModel, String> {
   // Add notifications to the timeline
   void _addTimelineNotifications(List<NostrNotification> notifications) {
     notifications = notifications.where((notification) {
-      return !state.timelineNotifications
-          .any((element) => element.id == notification.id);
+      return !state.timelineNotifications.any(
+        (element) => element.id == notification.id,
+      );
     }).toList();
 
     state = state.copyWith(
-        timelineNotifications: [
-      ...state.timelineNotifications,
-      ...notifications
-    ]..sort((a, b) => b.createdAt.compareTo(a.createdAt)));
+      timelineNotifications: [...state.timelineNotifications, ...notifications]
+        ..sort((a, b) => b.createdAt.compareTo(a.createdAt)),
+    );
   }
 
   // Add new notifications
   void _addNewNotifications(List<NostrNotification> notifications) {
     state = state.copyWith(
-        newNotifications: [...state.newNotifications, ...notifications]
-          ..sort((a, b) => b.createdAt.compareTo(a.createdAt)));
+      newNotifications: [...state.newNotifications, ...notifications]
+        ..sort((a, b) => b.createdAt.compareTo(a.createdAt)),
+    );
 
     ref
         .read(appBottomNavigationBarProvider.notifier)

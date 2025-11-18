@@ -37,22 +37,23 @@ class _OnboardingFollowGraphState extends ConsumerState<OnboardingFollowGraph> {
 
   late final ForceDirectedGraphController<GraphNodeData> _graphController =
       ForceDirectedGraphController(
-    graph: ForceDirectedGraph(
-        config: const GraphConfig(
-      length: 200,
-      elasticity: 0.5,
-      // maxStaticFriction: 20,
-      repulsionRange: 250,
-      repulsion: 70,
-    )),
-  )..setOnScaleChange((scale) {
-          // can use to optimize the performance
-          // if scale is too small, can use simple node and edge builder to improve performance
-          if (!mounted) return;
-          setState(() {
-            _scale = scale;
-          });
+        graph: ForceDirectedGraph(
+          config: const GraphConfig(
+            length: 200,
+            elasticity: 0.5,
+            // maxStaticFriction: 20,
+            repulsionRange: 250,
+            repulsion: 70,
+          ),
+        ),
+      )..setOnScaleChange((scale) {
+        // can use to optimize the performance
+        // if scale is too small, can use simple node and edge builder to improve performance
+        if (!mounted) return;
+        setState(() {
+          _scale = scale;
         });
+      });
 
   final Set<GraphNodeData> _nodes = {};
   final Map<String, String> _edges = {};
@@ -66,8 +67,9 @@ class _OnboardingFollowGraphState extends ConsumerState<OnboardingFollowGraph> {
 
     if (addedByPubkey != null) {
       try {
-        final rootNode = _graphController.graph.nodes
-            .firstWhere((data) => data.data.pubkey == addedByPubkey);
+        final rootNode = _graphController.graph.nodes.firstWhere(
+          (data) => data.data.pubkey == addedByPubkey,
+        );
 
         _graphController.addEdgeByData(data, rootNode.data);
         _edges[data.pubkey] = rootNode.data.pubkey;
@@ -79,8 +81,10 @@ class _OnboardingFollowGraphState extends ConsumerState<OnboardingFollowGraph> {
 
   /// adds all the contacts (with cutoff) from a given pubkey (from node)
   addContactsOfPubkey(String pubkey, {int cutoff = 3}) async {
-    final List<String> contacts =
-        _nodes.firstWhere((n) => n.pubkey == pubkey).contactList.contacts;
+    final List<String> contacts = _nodes
+        .firstWhere((n) => n.pubkey == pubkey)
+        .contactList
+        .contacts;
 
     for (int i = 0; i < contacts.length; i++) {
       if (i > cutoff) {
@@ -221,29 +225,30 @@ class _OnboardingFollowGraphState extends ConsumerState<OnboardingFollowGraph> {
                       });
                     },
                     child: AnimatedContainer(
-                        width: _scale > miniViewCutoff ? 250 : 60,
-                        height: _scale > miniViewCutoff ? 84 : 60,
-                        duration: const Duration(milliseconds: 250),
-                        curve: Curves.easeInOut,
-                        decoration: BoxDecoration(
-                          color: Paletter.getExtraDarkGray(context),
-                          border: Border.all(
-                            color: data.selected
-                                ? Theme.of(context).colorScheme.onSurface
-                                : Colors.transparent,
-                            width: 2,
-                          ),
-                          borderRadius: BorderRadius.circular(12),
+                      width: _scale > miniViewCutoff ? 250 : 60,
+                      height: _scale > miniViewCutoff ? 84 : 60,
+                      duration: const Duration(milliseconds: 250),
+                      curve: Curves.easeInOut,
+                      decoration: BoxDecoration(
+                        color: Paletter.getExtraDarkGray(context),
+                        border: Border.all(
+                          color: data.selected
+                              ? Theme.of(context).colorScheme.onSurface
+                              : Colors.transparent,
+                          width: 2,
                         ),
-                        alignment: Alignment.center,
-                        child: _scale > miniViewCutoff
-                            ? GraphProfile(metadata: data.userMetadata)
-                            : UserImage(
-                                imageUrl: data.userMetadata.picture,
-                                pubkey: data.userMetadata.pubkey,
-                                filterQuality: FilterQuality.low,
-                                disableGif: true,
-                              )),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      alignment: Alignment.center,
+                      child: _scale > miniViewCutoff
+                          ? GraphProfile(metadata: data.userMetadata)
+                          : UserImage(
+                              imageUrl: data.userMetadata.picture,
+                              pubkey: data.userMetadata.pubkey,
+                              filterQuality: FilterQuality.low,
+                              disableGif: true,
+                            ),
+                    ),
                   );
                 },
                 edgesBuilder: (context, a, b, distance) {
@@ -262,16 +267,15 @@ class _OnboardingFollowGraphState extends ConsumerState<OnboardingFollowGraph> {
                       alignment: Alignment.center,
                       child: _scale > 0.5
                           ? Text(
-                              '${a.userMetadata.name} <-> ${b.userMetadata.name}')
+                              '${a.userMetadata.name} <-> ${b.userMetadata.name}',
+                            )
                           : null,
                     ),
                   );
                 },
               ),
             ),
-            const SizedBox(
-              height: 10,
-            ),
+            const SizedBox(height: 10),
             Slider(
               inactiveColor: Paletter.getExtraDarkGray(context),
               activeColor: Paletter.getLightGray(context),
@@ -296,9 +300,7 @@ class _OnboardingFollowGraphState extends ConsumerState<OnboardingFollowGraph> {
                 inverted: true,
               ),
             ),
-            const SizedBox(
-              height: 15,
-            ),
+            const SizedBox(height: 15),
           ],
         ),
       ),

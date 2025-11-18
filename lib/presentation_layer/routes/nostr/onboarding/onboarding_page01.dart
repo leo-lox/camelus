@@ -24,9 +24,7 @@ class _OnboardingPage01State extends ConsumerState<OnboardingPage01> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Spacer(
-              flex: 10,
-            ),
+            const Spacer(flex: 10),
             Text(
               "welcome to",
               style: TextStyle(
@@ -42,9 +40,7 @@ class _OnboardingPage01State extends ConsumerState<OnboardingPage01> {
                 fontFamily: 'Poppins',
               ),
             ),
-            const Spacer(
-              flex: 10,
-            ),
+            const Spacer(flex: 10),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               width: 400,
@@ -57,9 +53,7 @@ class _OnboardingPage01State extends ConsumerState<OnboardingPage01> {
                 inverted: true,
               ),
             ),
-            const SizedBox(
-              height: 30,
-            ),
+            const SizedBox(height: 30),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               width: 400,
@@ -72,9 +66,7 @@ class _OnboardingPage01State extends ConsumerState<OnboardingPage01> {
                 inverted: false,
               ),
             ),
-            const Spacer(
-              flex: 2,
-            ),
+            const Spacer(flex: 2),
           ],
         ),
       ),

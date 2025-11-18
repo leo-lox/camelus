@@ -32,32 +32,30 @@ class NotificationDataSource {
     // iOS initialization settings
     const DarwinInitializationSettings initializationSettingsIOS =
         DarwinInitializationSettings(
-      requestAlertPermission: true,
-      requestBadgePermission: true,
-      requestSoundPermission: true,
-    );
+          requestAlertPermission: true,
+          requestBadgePermission: true,
+          requestSoundPermission: true,
+        );
 
     const WindowsInitializationSettings initializationSettingsWindows =
         WindowsInitializationSettings(
-      appName: "camelus",
-      appUserModelId: CamelusConfig.appUserModelId,
-      guid: CamelusConfig.notificationGUid,
-    );
+          appName: "camelus",
+          appUserModelId: CamelusConfig.appUserModelId,
+          guid: CamelusConfig.notificationGUid,
+        );
 
     const LinuxInitializationSettings initializationSettingsLinux =
-        LinuxInitializationSettings(
-      defaultActionName: "camelus",
-    );
+        LinuxInitializationSettings(defaultActionName: "camelus");
 
     // Initialization settings
     const InitializationSettings initializationSettings =
         InitializationSettings(
-      android: initializationSettingsAndroid,
-      iOS: initializationSettingsIOS,
-      windows: initializationSettingsWindows,
-      linux: initializationSettingsLinux,
-      macOS: initializationSettingsIOS,
-    );
+          android: initializationSettingsAndroid,
+          iOS: initializationSettingsIOS,
+          windows: initializationSettingsWindows,
+          linux: initializationSettingsLinux,
+          macOS: initializationSettingsIOS,
+        );
 
     // Initialize the plugin
     await notificationsPlugin.initialize(
@@ -79,7 +77,8 @@ class NotificationDataSource {
 
     await notificationsPlugin
         .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>()
+          AndroidFlutterLocalNotificationsPlugin
+        >()
         ?.createNotificationChannel(channel);
   }
 }

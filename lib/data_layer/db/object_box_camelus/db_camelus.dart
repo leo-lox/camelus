@@ -33,8 +33,10 @@ class DbAppImpl implements AppDb {
     // run transaction to get the id of the key and then delete it
     _objectBox.store.runInTransaction(TxMode.write, () {
       final keyBox = _objectBox.store.box<DbKeyValue>();
-      final keyToDelete =
-          keyBox.query(DbKeyValue_.key.equals(key)).build().findFirst();
+      final keyToDelete = keyBox
+          .query(DbKeyValue_.key.equals(key))
+          .build()
+          .findFirst();
       if (keyToDelete != null) {
         keyBox.remove(keyToDelete.dbId);
       }
@@ -45,8 +47,10 @@ class DbAppImpl implements AppDb {
   Future<String?> read(String key) async {
     await _dbRdy;
     final keyBox = _objectBox.store.box<DbKeyValue>();
-    final keyValue =
-        keyBox.query(DbKeyValue_.key.equals(key)).build().findFirst();
+    final keyValue = keyBox
+        .query(DbKeyValue_.key.equals(key))
+        .build()
+        .findFirst();
     return Future.value(keyValue?.value);
   }
 
@@ -57,8 +61,10 @@ class DbAppImpl implements AppDb {
     _objectBox.store.runInTransaction(TxMode.write, () {
       // check if key already exists
       final keyBox = _objectBox.store.box<DbKeyValue>();
-      final DbKeyValue? keyValue =
-          keyBox.query(DbKeyValue_.key.equals(key)).build().findFirst();
+      final DbKeyValue? keyValue = keyBox
+          .query(DbKeyValue_.key.equals(key))
+          .build()
+          .findFirst();
       // update
       if (keyValue != null) {
         keyValue.value = value;
@@ -66,9 +72,10 @@ class DbAppImpl implements AppDb {
       } else {
         // insert
         final newKeyValue = DbKeyValue(key: key, value: value);
-        _objectBox.store
-            .box<DbKeyValue>()
-            .put(newKeyValue, mode: PutMode.insert);
+        _objectBox.store.box<DbKeyValue>().put(
+          newKeyValue,
+          mode: PutMode.insert,
+        );
       }
     });
   }

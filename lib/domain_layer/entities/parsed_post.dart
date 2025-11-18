@@ -52,12 +52,4 @@ class ContentSegment {
   });
 }
 
-enum ContentType {
-  text,
-  mention,
-  hashtag,
-  link,
-  image,
-  video,
-  noteReference,
-}
+enum ContentType { text, mention, hashtag, link, image, video, noteReference }

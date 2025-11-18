@@ -49,8 +49,9 @@ class _WritePostState extends ConsumerState<WritePost> {
 
     try {
       for (final image in result) {
-        final myImage =
-            await RemoveImageMetadata.fileToMemFile(File(image.path));
+        final myImage = await RemoveImageMetadata.fileToMemFile(
+          File(image.path),
+        );
         ref.read(writePostStateProvider.notifier).addImage(myImage);
       }
     } catch (e) {
@@ -92,16 +93,18 @@ class _WritePostState extends ConsumerState<WritePost> {
       // find user in _mentionsSearchResults and add it to results
       // to keep the data
 
-      var user = _mentionsSearchResults.firstWhere((element) {
-        return element['id'] == mention;
-      },
-          // should not happen
-          orElse: () => {
-                "id": mention,
-                "display": mention,
-                "picture": "",
-                "nip05": "",
-              });
+      var user = _mentionsSearchResults.firstWhere(
+        (element) {
+          return element['id'] == mention;
+        },
+        // should not happen
+        orElse: () => {
+          "id": mention,
+          "display": mention,
+          "picture": "",
+          "nip05": "",
+        },
+      );
 
       results.add(user);
     }
@@ -134,8 +137,9 @@ class _WritePostState extends ConsumerState<WritePost> {
           .read(writePostStateProvider.notifier)
           .updateReplyToNote(widget.context?.replyToNote);
 
-      _textEditingControllerKey.currentState?.controller?.text =
-          ref.read(writePostStateProvider).markupText;
+      _textEditingControllerKey.currentState?.controller?.text = ref
+          .read(writePostStateProvider)
+          .markupText;
     });
   }
 
@@ -161,27 +165,20 @@ class _WritePostState extends ConsumerState<WritePost> {
       mainAxisSize: MainAxisSize.min,
       children: [
         // horizontal line fading out to both sides
-
         if (writePostState.isError)
           Column(
             children: [
-              const SizedBox(
-                height: 20,
-              ),
-              Text(AppLocalizations.of(context)!.error,
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.onSurface,
-                    fontWeight: FontWeight.bold,
-                  )),
-              SizedBox(
-                height: 5,
-              ),
+              const SizedBox(height: 20),
               Text(
-                writePostState.errorText,
+                AppLocalizations.of(context)!.error,
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-              SizedBox(
-                height: 20,
-              )
+              SizedBox(height: 5),
+              Text(writePostState.errorText),
+              SizedBox(height: 20),
             ],
           ),
 
@@ -202,23 +199,18 @@ class _WritePostState extends ConsumerState<WritePost> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const SizedBox(
-                height: 5,
-              ),
+              const SizedBox(height: 5),
 
               _TopBar(
                 replyToPubkey: writePostState.replyToNote?.pubkey,
                 submitLoading: writePostState.isSubmitting,
-                submitPostCallback: () => writePostNotifier.submitPost().then(
-                  (value) {
-                    if (!mounted) return;
-                    context.pop();
-                  },
-                ),
+                submitPostCallback: () =>
+                    writePostNotifier.submitPost().then((value) {
+                      if (!mounted) return;
+                      context.pop();
+                    }),
               ),
-              const SizedBox(
-                height: 20,
-              ),
+              const SizedBox(height: 20),
               // large text field
               _writingArea(),
               // image preview
@@ -226,11 +218,9 @@ class _WritePostState extends ConsumerState<WritePost> {
 
               // bottom row
               _bottomRow(),
-              // to left
 
-              const SizedBox(
-                height: 5,
-              ),
+              // to left
+              const SizedBox(height: 5),
             ],
           ),
         ),
@@ -292,9 +282,7 @@ class _WritePostState extends ConsumerState<WritePost> {
       children: [
         Row(
           children: [
-            SizedBox(
-              width: 10,
-            ),
+            SizedBox(width: 10),
             _buildActionButton(
               icon: Icon(
                 PhosphorIcons.image(),
@@ -365,14 +353,13 @@ class _WritePostState extends ConsumerState<WritePost> {
         suggestionPosition: SuggestionPosition.Top,
         focusNode: _focusNode,
         style: TextStyle(
-            color: Theme.of(context).colorScheme.onSurface, fontSize: 21),
+          color: Theme.of(context).colorScheme.onSurface,
+          fontSize: 21,
+        ),
         decoration: InputDecoration(
           border: InputBorder.none,
           hintText: AppLocalizations.of(context)!.whatsOnYourMind,
-          hintStyle: TextStyle(
-            color: Paletter.getGray(context),
-            fontSize: 20,
-          ),
+          hintStyle: TextStyle(color: Paletter.getGray(context), fontSize: 20),
         ),
         maxLines: 10,
         minLines: 5,
@@ -413,9 +400,7 @@ class _WritePostState extends ConsumerState<WritePost> {
                         ),
                       ),
                     ),
-                    const SizedBox(
-                      width: 20.0,
-                    ),
+                    const SizedBox(width: 20.0),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
@@ -434,7 +419,7 @@ class _WritePostState extends ConsumerState<WritePost> {
                           ),
                         ),
                       ],
-                    )
+                    ),
                   ],
                 ),
               );
@@ -451,9 +436,7 @@ class _WritePostState extends ConsumerState<WritePost> {
                 padding: const EdgeInsets.all(10.0),
                 child: Row(
                   children: <Widget>[
-                    const SizedBox(
-                      width: 20.0,
-                    ),
+                    const SizedBox(width: 20.0),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
@@ -465,7 +448,7 @@ class _WritePostState extends ConsumerState<WritePost> {
                           ),
                         ),
                       ],
-                    )
+                    ),
                   ],
                 ),
               );
@@ -542,11 +525,14 @@ class _TopBar extends ConsumerWidget {
               child: SizedBox(
                 width: MediaQuery.of(context).size.width * 0.6,
                 child: Container(
-                  margin:
-                      const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                  margin: const EdgeInsets.symmetric(
+                    vertical: 5,
+                    horizontal: 10,
+                  ),
                   child: Text(
                     AppLocalizations.of(context)!.replyTo(
-                        metadata?.name ?? getPubkeyHrShort(replyToPubkey!)),
+                      metadata?.name ?? getPubkeyHrShort(replyToPubkey!),
+                    ),
                     overflow: TextOverflow.ellipsis,
                     maxLines: 2,
                     style: TextStyle(
@@ -569,7 +555,9 @@ class _TopBar extends ConsumerWidget {
                     height: 25,
                     'assets/icons/paper-plane-tilt.svg',
                     colorFilter: ColorFilter.mode(
-                        Theme.of(context).colorScheme.primary, BlendMode.srcIn),
+                      Theme.of(context).colorScheme.primary,
+                      BlendMode.srcIn,
+                    ),
                   ),
                 )
               : Lottie.asset(
@@ -577,7 +565,7 @@ class _TopBar extends ConsumerWidget {
                   height: 40,
                   width: 64,
                   alignment: Alignment.topCenter,
-                )
+                ),
         ],
       ),
     );

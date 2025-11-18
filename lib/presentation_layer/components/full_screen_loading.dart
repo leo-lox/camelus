@@ -23,7 +23,7 @@ class _FullScreenLoadingState extends State<FullScreenLoading>
     with TickerProviderStateMixin {
   late AnimationController _blobController; // Controls blob animation.
   late AnimationController
-      _textController; // Controls text fade-in/out animation.
+  _textController; // Controls text fade-in/out animation.
   late Animation<double> _textOpacity;
   int _currentTextIndex = 0;
   late List<Blob> blobs;
@@ -121,8 +121,8 @@ class _FullScreenLoadingState extends State<FullScreenLoading>
                   child: Text(
                     _showSuccessMessage && _successMessage != null
                         ? _successMessage! // Display success message.
-                        : widget.loadingTexts[
-                            _currentTextIndex], // Display loading text.
+                        : widget
+                              .loadingTexts[_currentTextIndex], // Display loading text.
                     style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
@@ -135,7 +135,7 @@ class _FullScreenLoadingState extends State<FullScreenLoading>
                 );
               },
             ),
-          )
+          ),
         ],
       ),
     );
@@ -154,7 +154,9 @@ class BlobPainter extends CustomPainter {
     // Paint each blob on the canvas.
     for (var blob in blobs) {
       blob.update(
-          animationValue, size); // Update blob properties based on animation.
+        animationValue,
+        size,
+      ); // Update blob properties based on animation.
       _drawBlob(canvas, blob); // Draw the blob.
     }
   }
@@ -162,14 +164,16 @@ class BlobPainter extends CustomPainter {
   // Draws an individual blob on the canvas.
   void _drawBlob(Canvas canvas, Blob blob) {
     final paint = Paint()
-      ..shader = RadialGradient(
-        colors: [
-          blob.color.withValues(alpha: 0.85),
-          blob.color.withValues(alpha: 0.0),
-        ],
-        stops: const [0.0, 1.0],
-      ).createShader(
-          Rect.fromCircle(center: blob.position, radius: blob.radius))
+      ..shader =
+          RadialGradient(
+            colors: [
+              blob.color.withValues(alpha: 0.85),
+              blob.color.withValues(alpha: 0.0),
+            ],
+            stops: const [0.0, 1.0],
+          ).createShader(
+            Rect.fromCircle(center: blob.position, radius: blob.radius),
+          )
       ..blendMode = BlendMode.xor; // Blend mode for rendering blobs.
 
     canvas.drawCircle(blob.position, blob.radius, paint);

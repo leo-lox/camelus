@@ -149,17 +149,19 @@ class _EditRelaysViewState extends ConsumerState<EditRelaysView> {
       child: reconnecting
           ? Center(
               child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                CircularProgressIndicator(),
-                SizedBox(height: 20),
-                Text(
-                  "reconnecting to relays...",
-                  style:
-                      TextStyle(color: Theme.of(context).colorScheme.onSurface),
-                ),
-              ],
-            ))
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CircularProgressIndicator(),
+                  SizedBox(height: 20),
+                  Text(
+                    "reconnecting to relays...",
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
+                  ),
+                ],
+              ),
+            )
           : ListView(
               children: [
                 Padding(
@@ -169,18 +171,21 @@ class _EditRelaysViewState extends ConsumerState<EditRelaysView> {
                     decoration: InputDecoration(
                       hintText: " add relay",
                       enabledBorder: OutlineInputBorder(
-                        borderSide:
-                            BorderSide(color: Paletter.getLightGray(context)),
+                        borderSide: BorderSide(
+                          color: Paletter.getLightGray(context),
+                        ),
                         borderRadius: BorderRadius.all(Radius.circular(30)),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderSide: BorderSide(
-                            color: Theme.of(context).colorScheme.onSurface),
+                          color: Theme.of(context).colorScheme.onSurface,
+                        ),
                         borderRadius: BorderRadius.all(Radius.circular(30)),
                       ),
                     ),
                     style: TextStyle(
-                        color: Theme.of(context).colorScheme.onSurface),
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
                     onSubmitted: (value) {
                       _addRelay();
                     },
@@ -189,10 +194,7 @@ class _EditRelaysViewState extends ConsumerState<EditRelaysView> {
                 const SizedBox(height: 20),
                 for (var relay in myRelays)
                   Padding(
-                    padding: const EdgeInsets.only(
-                      left: 10,
-                      right: 10,
-                    ),
+                    padding: const EdgeInsets.only(left: 10, right: 10),
                     child: Container(
                       margin: const EdgeInsets.only(bottom: 10),
                       //round corners
@@ -210,7 +212,8 @@ class _EditRelaysViewState extends ConsumerState<EditRelaysView> {
                           Text(
                             relay.url,
                             style: TextStyle(
-                                color: Theme.of(context).colorScheme.onSurface),
+                              color: Theme.of(context).colorScheme.onSurface,
+                            ),
                           ),
                           const Spacer(),
                           // switch button read
@@ -231,9 +234,10 @@ class _EditRelaysViewState extends ConsumerState<EditRelaysView> {
                               Text(
                                 'read',
                                 style: TextStyle(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onSurface),
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.onSurface,
+                                ),
                               ),
                             ],
                           ),
@@ -253,9 +257,10 @@ class _EditRelaysViewState extends ConsumerState<EditRelaysView> {
                               Text(
                                 'write',
                                 style: TextStyle(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onSurface),
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.onSurface,
+                                ),
                               ),
                             ],
                           ),
@@ -276,7 +281,8 @@ class _EditRelaysViewState extends ConsumerState<EditRelaysView> {
                                       return AlertDialog(
                                         title: const Text("Delete relay"),
                                         content: const Text(
-                                            "Are you sure you want to delete this relay?"),
+                                          "Are you sure you want to delete this relay?",
+                                        ),
                                         actions: [
                                           TextButton(
                                             child: const Text("Cancel"),
@@ -303,9 +309,10 @@ class _EditRelaysViewState extends ConsumerState<EditRelaysView> {
                               Text(
                                 'delete',
                                 style: TextStyle(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onSurface),
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.onSurface,
+                                ),
                               ),
                             ],
                           ),
@@ -315,8 +322,11 @@ class _EditRelaysViewState extends ConsumerState<EditRelaysView> {
                   ),
                 const SizedBox(height: 10),
                 Padding(
-                  padding:
-                      const EdgeInsets.only(left: 20, right: 20, bottom: 10),
+                  padding: const EdgeInsets.only(
+                    left: 20,
+                    right: 20,
+                    bottom: 10,
+                  ),
                   child: longButton(
                     name: "save",
                     onPressed: _saveRelays,

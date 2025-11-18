@@ -29,12 +29,14 @@ class InlineVideoPlayer extends ConsumerWidget {
   void enterFullScreen(BuildContext context, WidgetRef ref) {
     final videoState = ref.read(videoPlayerProvider(videoId));
 
-    Navigator.of(context).push(MaterialPageRoute(
-      builder: (context) => FullScreenVideoPlayer(
-        controller: videoState.controller!,
-        videoId: videoId,
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => FullScreenVideoPlayer(
+          controller: videoState.controller!,
+          videoId: videoId,
+        ),
       ),
-    ));
+    );
   }
 
   @override
@@ -47,120 +49,128 @@ class InlineVideoPlayer extends ConsumerWidget {
       children: [
         Center(
           child: controller != null
-              ? Stack(children: [
-                  AspectRatio(
-                    aspectRatio: controller.value.aspectRatio,
-                    child: VisibilityDetector(
-                      key: Key('video-$videoId'),
-                      onVisibilityChanged: (visibilityInfo) {
-                        final visiblePercentage =
-                            visibilityInfo.visibleFraction * 100;
-                        final isAuthorTrusted = ref
-                            .read(moderationStateProvider.notifier)
-                            .isPubkeyTrusted(authorPubkey!);
-                        if (visiblePercentage >= 90) {
-                          if (authorPubkey == null) return;
+              ? Stack(
+                  children: [
+                    AspectRatio(
+                      aspectRatio: controller.value.aspectRatio,
+                      child: VisibilityDetector(
+                        key: Key('video-$videoId'),
+                        onVisibilityChanged: (visibilityInfo) {
+                          final visiblePercentage =
+                              visibilityInfo.visibleFraction * 100;
+                          final isAuthorTrusted = ref
+                              .read(moderationStateProvider.notifier)
+                              .isPubkeyTrusted(authorPubkey!);
+                          if (visiblePercentage >= 90) {
+                            if (authorPubkey == null) return;
 
-                          if (!isAuthorTrusted) {
-                            videoStateNoti.showControls();
-                            return;
+                            if (!isAuthorTrusted) {
+                              videoStateNoti.showControls();
+                              return;
+                            }
+
+                            videoStateNoti.play();
+                          } else {
+                            videoStateNoti.pause(
+                              userInteraction: !isAuthorTrusted,
+                            );
                           }
-
-                          videoStateNoti.play();
-                        } else {
-                          videoStateNoti.pause(
-                              userInteraction: !isAuthorTrusted);
-                        }
-                      },
-                      child: GestureDetector(
+                        },
+                        child: GestureDetector(
                           onTap: () {
                             videoStateNoti.showControls();
                           },
-                          child: VideoPlayer(controller)),
-                    ),
-                  ),
-                  Positioned.fill(
-                    child: GestureDetector(
-                      onTap: () {
-                        if (videoState.isPlaying) {
-                          videoStateNoti.pause(userInteraction: true);
-                        } else {
-                          videoStateNoti.play(userInteraction: true);
-                        }
-                      },
-                      child: videoState.showControls
-                          ? Container(
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .surface
-                                  .withValues(alpha: 0.54),
-                              child: Center(
-                                child: Icon(
-                                  videoState.isPlaying
-                                      ? PhosphorIcons.pause()
-                                      : PhosphorIcons.play(),
-                                  color:
-                                      Theme.of(context).colorScheme.onSurface,
-                                  size: 64.0,
-                                ),
-                              ),
-                            )
-                          : Container(),
-                    ),
-                  ),
-                  if (videoState.showControls)
-                    Positioned(
-                      bottom: 10,
-                      left: 10,
-                      right: 10,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          IconButton(
-                            icon: Icon(
-                              videoState.volume == 0.0
-                                  ? PhosphorIcons.speakerSlash()
-                                  : PhosphorIcons.speakerHigh(),
-                              color: Theme.of(context).colorScheme.onSurface,
-                            ),
-                            onPressed: () {
-                              if (videoState.volume == 0.0) {
-                                videoStateNoti.setVolume(1.0,
-                                    userInteraction: true);
-                              } else {
-                                videoStateNoti.setVolume(0.0,
-                                    userInteraction: true);
-                              }
-                            },
-                          ),
-                          IconButton(
-                            icon: Icon(
-                              PhosphorIcons.cornersOut(),
-                              color: Theme.of(context).colorScheme.onSurface,
-                            ),
-                            onPressed: () {
-                              enterFullScreen(context, ref);
-                            },
-                          ),
-                        ],
-                      ),
-                    ),
-                  if (videoState.showControls)
-                    Positioned(
-                      bottom: 5,
-                      left: 10,
-                      right: 10,
-                      child: VideoProgressIndicator(
-                        controller,
-                        allowScrubbing: true,
-                        colors: VideoProgressColors(
-                          backgroundColor: Paletter.getDarkGray(context),
-                          bufferedColor: Paletter.getGray(context),
-                          playedColor: Paletter.getExtraLightGray(context),
+                          child: VideoPlayer(controller),
                         ),
                       ),
                     ),
-                ])
+                    Positioned.fill(
+                      child: GestureDetector(
+                        onTap: () {
+                          if (videoState.isPlaying) {
+                            videoStateNoti.pause(userInteraction: true);
+                          } else {
+                            videoStateNoti.play(userInteraction: true);
+                          }
+                        },
+                        child: videoState.showControls
+                            ? Container(
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.surface.withValues(alpha: 0.54),
+                                child: Center(
+                                  child: Icon(
+                                    videoState.isPlaying
+                                        ? PhosphorIcons.pause()
+                                        : PhosphorIcons.play(),
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.onSurface,
+                                    size: 64.0,
+                                  ),
+                                ),
+                              )
+                            : Container(),
+                      ),
+                    ),
+                    if (videoState.showControls)
+                      Positioned(
+                        bottom: 10,
+                        left: 10,
+                        right: 10,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            IconButton(
+                              icon: Icon(
+                                videoState.volume == 0.0
+                                    ? PhosphorIcons.speakerSlash()
+                                    : PhosphorIcons.speakerHigh(),
+                                color: Theme.of(context).colorScheme.onSurface,
+                              ),
+                              onPressed: () {
+                                if (videoState.volume == 0.0) {
+                                  videoStateNoti.setVolume(
+                                    1.0,
+                                    userInteraction: true,
+                                  );
+                                } else {
+                                  videoStateNoti.setVolume(
+                                    0.0,
+                                    userInteraction: true,
+                                  );
+                                }
+                              },
+                            ),
+                            IconButton(
+                              icon: Icon(
+                                PhosphorIcons.cornersOut(),
+                                color: Theme.of(context).colorScheme.onSurface,
+                              ),
+                              onPressed: () {
+                                enterFullScreen(context, ref);
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                    if (videoState.showControls)
+                      Positioned(
+                        bottom: 5,
+                        left: 10,
+                        right: 10,
+                        child: VideoProgressIndicator(
+                          controller,
+                          allowScrubbing: true,
+                          colors: VideoProgressColors(
+                            backgroundColor: Paletter.getDarkGray(context),
+                            bufferedColor: Paletter.getGray(context),
+                            playedColor: Paletter.getExtraLightGray(context),
+                          ),
+                        ),
+                      ),
+                  ],
+                )
               : _buildShimmerLoading(100, 100),
         ),
       ],
@@ -168,17 +178,20 @@ class InlineVideoPlayer extends ConsumerWidget {
   }
 
   Widget _buildShimmerLoading(double width, double height) {
-    return Builder(builder: (context) {
-      return Shimmer.fromColors(
-        baseColor: Paletter.getExtraDarkGray(context).withValues(alpha: 0.1),
-        highlightColor:
-            Paletter.getExtraDarkGray(context).withValues(alpha: 0.7),
-        child: Container(
-          width: width,
-          height: height,
-          color: Theme.of(context).colorScheme.surface,
-        ),
-      );
-    });
+    return Builder(
+      builder: (context) {
+        return Shimmer.fromColors(
+          baseColor: Paletter.getExtraDarkGray(context).withValues(alpha: 0.1),
+          highlightColor: Paletter.getExtraDarkGray(
+            context,
+          ).withValues(alpha: 0.7),
+          child: Container(
+            width: width,
+            height: height,
+            color: Theme.of(context).colorScheme.surface,
+          ),
+        );
+      },
+    );
   }
 }

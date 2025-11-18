@@ -37,11 +37,13 @@ class _StarterPackSelectionBottomSheetState
 
   @override
   Widget build(BuildContext context) {
-    final followSetsList =
-        ref.watch(nostrListsFollowStateProvider(widget.currentUserPubkey));
+    final followSetsList = ref.watch(
+      nostrListsFollowStateProvider(widget.currentUserPubkey),
+    );
 
-    final userToAddMetadata =
-        ref.watch(metadataStateProvider(widget.userPubkey)).userMetadata;
+    final userToAddMetadata = ref
+        .watch(metadataStateProvider(widget.userPubkey))
+        .userMetadata;
 
     return BackdropFilter(
       filter: ImageFilter.blur(sigmaX: 2, sigmaY: 2),
@@ -84,13 +86,13 @@ class _StarterPackSelectionBottomSheetState
     );
   }
 
-  Widget _buildContent(BuildContext context, WidgetRef ref,
-      NostrListsFollowState followSetsList) {
+  Widget _buildContent(
+    BuildContext context,
+    WidgetRef ref,
+    NostrListsFollowState followSetsList,
+  ) {
     if (followSetsList.isLoading) {
-      return const Padding(
-        padding: EdgeInsets.all(40),
-        child: SpinnerCenter(),
-      );
+      return const Padding(padding: EdgeInsets.all(40), child: SpinnerCenter());
     }
 
     if (followSetsList.publicNostrFollowSets.isEmpty) {
@@ -103,7 +105,8 @@ class _StarterPackSelectionBottomSheetState
       ),
       child: ListView.builder(
         shrinkWrap: true,
-        itemCount: followSetsList.publicNostrFollowSets.length +
+        itemCount:
+            followSetsList.publicNostrFollowSets.length +
             1, // +1 for create new option
         itemBuilder: (context, index) {
           if (index == followSetsList.publicNostrFollowSets.length) {
@@ -129,10 +132,7 @@ class _StarterPackSelectionBottomSheetState
         const SizedBox(height: 16),
         Text(
           'No starter packs found',
-          style: TextStyle(
-            color: Paletter.getLightGray(context),
-            fontSize: 16,
-          ),
+          style: TextStyle(color: Paletter.getLightGray(context), fontSize: 16),
         ),
         const SizedBox(height: 40),
         _buildCreateNewOption(context),
@@ -141,10 +141,14 @@ class _StarterPackSelectionBottomSheetState
   }
 
   Widget _buildPackOption(
-      BuildContext context, WidgetRef ref, NostrStarterPack pack) {
+    BuildContext context,
+    WidgetRef ref,
+    NostrStarterPack pack,
+  ) {
     final isLoading = _loadingPacks.contains(pack.name);
-    final isUserInPack =
-        pack.elements.any((element) => element.value == widget.userPubkey);
+    final isUserInPack = pack.elements.any(
+      (element) => element.value == widget.userPubkey,
+    );
     final wasJustAdded = _successPacks.contains(pack.name);
     final showCheck = isUserInPack || wasJustAdded;
 
@@ -206,9 +210,7 @@ class _StarterPackSelectionBottomSheetState
       return SizedBox(
         width: 16,
         height: 16,
-        child: CircularProgressIndicator(
-          strokeWidth: 2,
-        ),
+        child: CircularProgressIndicator(strokeWidth: 2),
       );
     }
 
@@ -241,7 +243,8 @@ class _StarterPackSelectionBottomSheetState
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: BoxDecoration(
               border: Border.all(
-                  color: Paletter.getGray(context).withValues(alpha: 0.3)),
+                color: Paletter.getGray(context).withValues(alpha: 0.3),
+              ),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Row(
@@ -271,7 +274,10 @@ class _StarterPackSelectionBottomSheetState
   }
 
   void _addUserToPack(
-      BuildContext context, WidgetRef ref, NostrStarterPack pack) async {
+    BuildContext context,
+    WidgetRef ref,
+    NostrStarterPack pack,
+  ) async {
     // Set loading state
     setState(() {
       _loadingPacks.add(pack.name);
@@ -280,7 +286,9 @@ class _StarterPackSelectionBottomSheetState
     try {
       final listsP = ref.read(nostrListProvider);
       await listsP.addUserToStarterPack(
-          name: pack.name, pubkey: widget.userPubkey);
+        name: pack.name,
+        pubkey: widget.userPubkey,
+      );
 
       // Set success state
       setState(() {
@@ -293,9 +301,7 @@ class _StarterPackSelectionBottomSheetState
       Future.delayed(const Duration(milliseconds: 200)).then((_) {
         if (mounted) {
           ref.invalidate(nostrListProvider);
-          ref.invalidate(
-            nostrListsFollowStateProvider(myUserPubkey!),
-          );
+          ref.invalidate(nostrListsFollowStateProvider(myUserPubkey!));
         }
       });
 
@@ -316,17 +322,12 @@ class _StarterPackSelectionBottomSheetState
           SnackBar(
             content: Row(
               children: [
-                Icon(
-                  PhosphorIcons.warning(),
-                  size: 20,
-                ),
+                Icon(PhosphorIcons.warning(), size: 20),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
                     'Failed to add user to ${pack.title ?? pack.name}',
-                    style: const TextStyle(
-                      fontWeight: FontWeight.w500,
-                    ),
+                    style: const TextStyle(fontWeight: FontWeight.w500),
                   ),
                 ),
               ],
@@ -343,10 +344,12 @@ class _StarterPackSelectionBottomSheetState
   }
 
   void _createNewPack(BuildContext context) {
-    context.push('/edit-starter-pack',
-        extra: StarterPackIdentifier(
-          name: "i-${Helpers().getRandomString(10)}",
-          pubkey: widget.currentUserPubkey,
-        ));
+    context.push(
+      '/edit-starter-pack',
+      extra: StarterPackIdentifier(
+        name: "i-${Helpers().getRandomString(10)}",
+        pubkey: widget.currentUserPubkey,
+      ),
+    );
   }
 }

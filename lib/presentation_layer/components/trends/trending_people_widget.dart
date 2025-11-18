@@ -61,9 +61,7 @@ class _TrendingPeopleList extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final contactList = ref.watch(contactListSelfStateProvider).contactList;
     final nostrBandAsync = ref.watch(
-      nostrBandProvider.select(
-        (provider) => provider.getTrendingPeople(),
-      ),
+      nostrBandProvider.select((provider) => provider.getTrendingPeople()),
     );
 
     return FutureBuilder<NostrBandPeople?>(
