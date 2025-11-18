@@ -245,7 +245,7 @@ class _OnboardingInvitedByState extends ConsumerState<OnboardingInvitedBy> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       SizedBox(
-                        width: 400,
+                        width: double.infinity,
                         height: 40,
                         child: longButton(
                           name: AppLocalizations.of(context)!.joinCamelus,
@@ -258,7 +258,7 @@ class _OnboardingInvitedByState extends ConsumerState<OnboardingInvitedBy> {
                       const SizedBox(height: 15),
                       if (invitedSet != null)
                         SizedBox(
-                          width: 400,
+                          width: double.infinity,
                           height: 40,
                           child: longButton(
                             name: AppLocalizations.of(

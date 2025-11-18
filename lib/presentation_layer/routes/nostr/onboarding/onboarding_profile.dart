@@ -184,7 +184,7 @@ class _OnboardingProfileState extends ConsumerState<OnboardingProfile> {
                   ],
                 ),
                 child: SizedBox(
-                  width: 400,
+                  width: double.infinity,
                   height: 40,
                   child: longButton(
                     name: AppLocalizations.of(context)!.next,

@@ -286,18 +286,20 @@ class _OnboardingFollowGraphState extends ConsumerState<OnboardingFollowGraph> {
                 _graphController.scale = value;
               },
             ),
-            Container(
+            Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
-              width: 400,
-              height: 40,
-              child: longButton(
-                loading: _loading,
-                disabled: followedList.length < followTarget,
-                name: "follow ${followedList.length}/$followTarget",
-                onPressed: (() {
-                  widget.submitCallback(followedList);
-                }),
-                inverted: true,
+              child: SizedBox(
+                width: double.infinity,
+                height: 40,
+                child: longButton(
+                  loading: _loading,
+                  disabled: followedList.length < followTarget,
+                  name: "follow ${followedList.length}/$followTarget",
+                  onPressed: (() {
+                    widget.submitCallback(followedList);
+                  }),
+                  inverted: true,
+                ),
               ),
             ),
             const SizedBox(height: 15),
