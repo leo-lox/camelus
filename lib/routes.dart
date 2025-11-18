@@ -18,6 +18,7 @@ import 'presentation_layer/routes/deeplink_reciever_page.dart';
 import 'presentation_layer/routes/home_page_desktop.dart';
 import 'presentation_layer/routes/home_page_mobile.dart';
 import 'presentation_layer/routes/nostr/blockedUsers/blocked_users.dart';
+import 'presentation_layer/routes/nostr/bookmarks/bookmarks_page.dart';
 import 'presentation_layer/routes/nostr/event_view/event_view_page.dart';
 import 'presentation_layer/routes/nostr/onboarding/onboarding.dart';
 import 'presentation_layer/routes/nostr/profile/edit_profile_page.dart';
@@ -156,6 +157,10 @@ final routes = [
               transitionsBuilder:
                   (context, animation, secondaryAnimation, child) => child,
             ),
+          ),
+          GoRoute(
+            path: '/nostr/bookmarks',
+            builder: (context, state) => const BookmarksPage(),
           ),
           GoRoute(
             path: '/nostr/blockedUsers',

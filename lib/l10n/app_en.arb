@@ -237,6 +237,54 @@
   "@bookmarks": {
     "description": "Bookmarks menu item"
   },
+  "removeBookmark": "Remove this bookmark?",
+  "@removeBookmark": {
+    "description": "Confirmation dialog title for removing bookmark"
+  },
+  "bookmarkRemoved": "Bookmark removed",
+  "@bookmarkRemoved": {
+    "description": "Snackbar message when bookmark is removed"
+  },
+  "noPrivateBookmarks": "No private bookmarks yet",
+  "@noPrivateBookmarks": {
+    "description": "Empty state message for private bookmarks"
+  },
+  "noPublicBookmarks": "No public bookmarks yet",
+  "@noPublicBookmarks": {
+    "description": "Empty state message for public bookmarks"
+  },
+  "privateBookmarks": "Private",
+  "@privateBookmarks": {
+    "description": "Private bookmarks tab label"
+  },
+  "publicBookmarks": "Public",
+  "@publicBookmarks": {
+    "description": "Public bookmarks tab label"
+  },
+  "addToBookmarks": "Add to bookmarks",
+  "@addToBookmarks": {
+    "description": "Button label to add note to bookmarks"
+  },
+  "removeFromBookmarks": "Remove from bookmarks",
+  "@removeFromBookmarks": {
+    "description": "Button label to remove note from bookmarks"
+  },
+  "addingToBookmarks": "Adding to bookmarks...",
+  "@addingToBookmarks": {
+    "description": "Loading message when adding bookmark"
+  },
+  "removingFromBookmarks": "Removing from bookmarks...",
+  "@removingFromBookmarks": {
+    "description": "Loading message when removing bookmark"
+  },
+  "failedToAddBookmark": "Failed to add bookmark",
+  "@failedToAddBookmark": {
+    "description": "Error message when adding bookmark fails"
+  },
+  "failedToRemoveBookmark": "Failed to remove bookmark",
+  "@failedToRemoveBookmark": {
+    "description": "Error message when removing bookmark fails"
+  },
   "notImplementedYet": "Not implemented yet",
   "@notImplementedYet": {
     "description": "Snackbar message for unimplemented features"

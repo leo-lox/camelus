@@ -186,6 +186,42 @@ class AppLocalizationsRu extends AppLocalizations {
   String get bookmarks => 'Закладки';
 
   @override
+  String get removeBookmark => 'Удалить эту закладку?';
+
+  @override
+  String get bookmarkRemoved => 'Закладка удалена';
+
+  @override
+  String get noPrivateBookmarks => 'Пока нет приватных закладок';
+
+  @override
+  String get noPublicBookmarks => 'Пока нет публичных закладок';
+
+  @override
+  String get privateBookmarks => 'Приватные';
+
+  @override
+  String get publicBookmarks => 'Публичные';
+
+  @override
+  String get addToBookmarks => 'Добавить в закладки';
+
+  @override
+  String get removeFromBookmarks => 'Удалить из закладок';
+
+  @override
+  String get addingToBookmarks => 'Добавление в закладки...';
+
+  @override
+  String get removingFromBookmarks => 'Удаление из закладок...';
+
+  @override
+  String get failedToAddBookmark => 'Не удалось добавить закладку';
+
+  @override
+  String get failedToRemoveBookmark => 'Не удалось удалить закладку';
+
+  @override
   String get notImplementedYet => 'Ещё не реализовано';
 
   @override

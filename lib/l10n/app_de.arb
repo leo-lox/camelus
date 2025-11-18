@@ -52,7 +52,6 @@
   "following": "Folge ich",
   "followers": "Follower",
   "profile": "Profil",
-  "bookmarks": "Lesezeichen",
   "notImplementedYet": "Noch nicht implementiert",
   "payments": "Zahlungen",
   "blocklist": "Blockierliste",
@@ -182,5 +181,18 @@
   "teal": "Türkis",
   "pink": "Rosa",
   "indigo": "Indigo",
-  "welcome": "Willkommen"
+  "welcome": "Willkommen",
+  "bookmarks": "Lesezeichen",
+  "removeBookmark": "Dieses Lesezeichen entfernen?",
+  "bookmarkRemoved": "Lesezeichen entfernt",
+  "noPrivateBookmarks": "Noch keine privaten Lesezeichen",
+  "noPublicBookmarks": "Noch keine öffentlichen Lesezeichen",
+  "privateBookmarks": "Privat",
+  "publicBookmarks": "Öffentlich",
+  "addToBookmarks": "Zu Lesezeichen hinzufügen",
+  "removeFromBookmarks": "Aus Lesezeichen entfernen",
+  "addingToBookmarks": "Wird zu Lesezeichen hinzugefügt...",
+  "removingFromBookmarks": "Wird aus Lesezeichen entfernt...",
+  "failedToAddBookmark": "Lesezeichen konnte nicht hinzugefügt werden",
+  "failedToRemoveBookmark": "Lesezeichen konnte nicht entfernt werden"
 }

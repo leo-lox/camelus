@@ -178,6 +178,42 @@ class AppLocalizationsJa extends AppLocalizations {
   String get bookmarks => 'ブックマーク';
 
   @override
+  String get removeBookmark => 'このブックマークを削除しますか？';
+
+  @override
+  String get bookmarkRemoved => 'ブックマークを削除しました';
+
+  @override
+  String get noPrivateBookmarks => 'まだプライベートブックマークはありません';
+
+  @override
+  String get noPublicBookmarks => 'まだパブリックブックマークはありません';
+
+  @override
+  String get privateBookmarks => 'プライベート';
+
+  @override
+  String get publicBookmarks => 'パブリック';
+
+  @override
+  String get addToBookmarks => 'ブックマークに追加';
+
+  @override
+  String get removeFromBookmarks => 'ブックマークから削除';
+
+  @override
+  String get addingToBookmarks => 'ブックマークに追加中...';
+
+  @override
+  String get removingFromBookmarks => 'ブックマークから削除中...';
+
+  @override
+  String get failedToAddBookmark => 'ブックマークの追加に失敗しました';
+
+  @override
+  String get failedToRemoveBookmark => 'ブックマークの削除に失敗しました';
+
+  @override
   String get notImplementedYet => 'まだ実装されていません';
 
   @override

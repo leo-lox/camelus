@@ -204,6 +204,14 @@ class NostrSideMenu extends ConsumerWidget {
               },
             ),
           _drawerItem(
+            label: AppLocalizations.of(context)!.bookmarks,
+            routeName: '/nostr/bookmarks',
+            icon: PhosphorIcons.bookmarkSimple(),
+            onTap: () {
+              context.push('/nostr/bookmarks');
+            },
+          ),
+          _drawerItem(
             label: AppLocalizations.of(context)!.profile,
             routeName: '/nostr/profile',
             icon: PhosphorIcons.user(),
@@ -211,20 +219,7 @@ class NostrSideMenu extends ConsumerWidget {
               navigateToProfile(context, currentUserPubkey);
             },
           ),
-          _drawerItem(
-            label: AppLocalizations.of(context)!.bookmarks,
-            routeName: '/nostr/bookmarks',
-            icon: PhosphorIcons.bookmarkSimple(),
-            onTap: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(
-                    AppLocalizations.of(context)!.notImplementedYet,
-                  ),
-                ),
-              );
-            },
-          ),
+
           _drawerItem(
             label: AppLocalizations.of(context)!.payments,
             routeName: 'payments',

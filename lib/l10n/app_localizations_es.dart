@@ -186,6 +186,42 @@ class AppLocalizationsEs extends AppLocalizations {
   String get bookmarks => 'Marcadores';
 
   @override
+  String get removeBookmark => '¿Eliminar este marcador?';
+
+  @override
+  String get bookmarkRemoved => 'Marcador eliminado';
+
+  @override
+  String get noPrivateBookmarks => 'Aún no hay marcadores privados';
+
+  @override
+  String get noPublicBookmarks => 'Aún no hay marcadores públicos';
+
+  @override
+  String get privateBookmarks => 'Privado';
+
+  @override
+  String get publicBookmarks => 'Público';
+
+  @override
+  String get addToBookmarks => 'Agregar a marcadores';
+
+  @override
+  String get removeFromBookmarks => 'Eliminar de marcadores';
+
+  @override
+  String get addingToBookmarks => 'Agregando a marcadores...';
+
+  @override
+  String get removingFromBookmarks => 'Eliminando de marcadores...';
+
+  @override
+  String get failedToAddBookmark => 'No se pudo agregar el marcador';
+
+  @override
+  String get failedToRemoveBookmark => 'No se pudo eliminar el marcador';
+
+  @override
   String get notImplementedYet => 'Aún no implementado';
 
   @override

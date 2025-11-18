@@ -52,7 +52,6 @@
   "following": "Подписки",
   "followers": "Подписчики",
   "profile": "Профиль",
-  "bookmarks": "Закладки",
   "notImplementedYet": "Ещё не реализовано",
   "payments": "Платежи",
   "blocklist": "Список блокировок",
@@ -182,5 +181,18 @@
   "teal": "Бирюзовый",
   "pink": "Розовый",
   "indigo": "Индиго",
-  "welcome": "Добро пожаловать"
+  "welcome": "Добро пожаловать",
+  "bookmarks": "Закладки",
+  "removeBookmark": "Удалить эту закладку?",
+  "bookmarkRemoved": "Закладка удалена",
+  "noPrivateBookmarks": "Пока нет приватных закладок",
+  "noPublicBookmarks": "Пока нет публичных закладок",
+  "privateBookmarks": "Приватные",
+  "publicBookmarks": "Публичные",
+  "addToBookmarks": "Добавить в закладки",
+  "removeFromBookmarks": "Удалить из закладок",
+  "addingToBookmarks": "Добавление в закладки...",
+  "removingFromBookmarks": "Удаление из закладок...",
+  "failedToAddBookmark": "Не удалось добавить закладку",
+  "failedToRemoveBookmark": "Не удалось удалить закладку"
 }

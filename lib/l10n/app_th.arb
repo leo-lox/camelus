@@ -52,7 +52,6 @@
   "following": "กำลังติดตาม",
   "followers": "ผู้ติดตาม",
   "profile": "โปรไฟล์",
-  "bookmarks": "บุ๊คมาร์ก",
   "notImplementedYet": "ยังไม่ได้นำไปใช้",
   "payments": "การชำระเงิน",
   "blocklist": "รายการบล็อก",
@@ -182,5 +181,18 @@
   "teal": "เขียวน้ำทะเล",
   "pink": "ชมพู",
   "indigo": "คราม",
-  "welcome": "ยินดีต้อนรับ"
+  "welcome": "ยินดีต้อนรับ",
+  "bookmarks": "บุ๊กมาร์ก",
+  "removeBookmark": "ลบบุ๊กมาร์กนี้หรือไม่?",
+  "bookmarkRemoved": "ลบบุ๊กมาร์กแล้ว",
+  "noPrivateBookmarks": "ยังไม่มีบุ๊กมาร์กส่วนตัว",
+  "noPublicBookmarks": "ยังไม่มีบุ๊กมาร์กสาธารณะ",
+  "privateBookmarks": "ส่วนตัว",
+  "publicBookmarks": "สาธารณะ",
+  "addToBookmarks": "เพิ่มไปยังบุ๊กมาร์ก",
+  "removeFromBookmarks": "ลบออกจากบุ๊กมาร์ก",
+  "addingToBookmarks": "กำลังเพิ่มไปยังบุ๊กมาร์ก...",
+  "removingFromBookmarks": "กำลังลบออกจากบุ๊กมาร์ก...",
+  "failedToAddBookmark": "ไม่สามารถเพิ่มบุ๊กมาร์กได้",
+  "failedToRemoveBookmark": "ไม่สามารถลบบุ๊กมาร์กได้"
 }

@@ -52,7 +52,6 @@
   "following": "Seguindo",
   "followers": "Seguidores",
   "profile": "Perfil",
-  "bookmarks": "Favoritos",
   "notImplementedYet": "Ainda não implementado",
   "payments": "Pagamentos",
   "blocklist": "Lista de Bloqueados",
@@ -182,5 +181,18 @@
   "teal": "Azul-petróleo",
   "pink": "Rosa",
   "indigo": "Índigo",
-  "welcome": "Bem-vindo"
+  "welcome": "Bem-vindo",
+  "bookmarks": "Favoritos",
+  "removeBookmark": "Remover este favorito?",
+  "bookmarkRemoved": "Favorito removido",
+  "noPrivateBookmarks": "Ainda não há favoritos privados",
+  "noPublicBookmarks": "Ainda não há favoritos públicos",
+  "privateBookmarks": "Privado",
+  "publicBookmarks": "Público",
+  "addToBookmarks": "Adicionar aos favoritos",
+  "removeFromBookmarks": "Remover dos favoritos",
+  "addingToBookmarks": "Adicionando aos favoritos...",
+  "removingFromBookmarks": "Removendo dos favoritos...",
+  "failedToAddBookmark": "Falha ao adicionar favorito",
+  "failedToRemoveBookmark": "Falha ao remover favorito"
 }
