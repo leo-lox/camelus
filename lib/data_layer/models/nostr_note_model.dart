@@ -44,8 +44,9 @@ class NostrNoteModel extends NostrNote {
       return tags.isNotEmpty;
     }).toList();
 
-    final myTags =
-        sanitizedTags.map((tag) => NostrTagModel.fromJson(tag)).toList();
+    final myTags = sanitizedTags
+        .map((tag) => NostrTagModel.fromJson(tag))
+        .toList();
 
     return NostrNoteModel(
       id: nip01event.id,
@@ -93,12 +94,12 @@ class NostrNoteModel extends NostrNote {
   }
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'pubkey': pubkey,
-        'created_at': createdAt,
-        'kind': kind,
-        'content': content,
-        'sig': sig,
-        'tags': tags,
-      };
+    'id': id,
+    'pubkey': pubkey,
+    'created_at': createdAt,
+    'kind': kind,
+    'content': content,
+    'sig': sig,
+    'tags': tags,
+  };
 }

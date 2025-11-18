@@ -17,7 +17,8 @@ class FileUpload {
   }
 
   Future<List<ndk_entities.RelayBroadcastResponse>> setFileUploadServers(
-      List<String> servers) {
+    List<String> servers,
+  ) {
     return fileUploadRepository.setFileUploadServers(servers);
   }
 

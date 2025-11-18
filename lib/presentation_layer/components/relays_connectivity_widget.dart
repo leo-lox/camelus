@@ -19,7 +19,8 @@ class RelaysConnectivityWidget extends ConsumerWidget {
       child: StreamBuilder(
         stream: ndk.connectivity.relayConnectivityChanges,
         builder: (context, snapshot) {
-          final isConnected = snapshot.hasData &&
+          final isConnected =
+              snapshot.hasData &&
               snapshot.data!.isNotEmpty &&
               snapshot.data!.values.any((e) => e.isConnected);
 
@@ -39,9 +40,7 @@ class RelaysConnectivityWidget extends ConsumerWidget {
               const SizedBox(width: 5),
               Text(
                 connectedCount.toString(),
-                style: TextStyle(
-                  color: Paletter.getLightGray(context),
-                ),
+                style: TextStyle(color: Paletter.getLightGray(context)),
                 key: ValueKey(connectedCount),
               ),
               const SizedBox(width: 5),

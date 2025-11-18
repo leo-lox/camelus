@@ -38,8 +38,9 @@ class _EditStarterPackMetaState extends ConsumerState<EditStarterPackMeta> {
 
     // Listen to provider changes and update controllers
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final data =
-          ref.read(editStarterPackProvider(widget.starterPackIdentifier));
+      final data = ref.read(
+        editStarterPackProvider(widget.starterPackIdentifier),
+      );
       _titleController.text = data.title;
       _descriptionController.text = data.description ?? "";
     });
@@ -78,7 +79,8 @@ class _EditStarterPackMetaState extends ConsumerState<EditStarterPackMeta> {
     ).then((value) async {
       if (value != null) {
         final stateNoti = ref.read(
-            editStarterPackProvider(widget.starterPackIdentifier).notifier);
+          editStarterPackProvider(widget.starterPackIdentifier).notifier,
+        );
         stateNoti.updateImage(imageUploading: true);
 
         final editedFile = MemFile(
@@ -96,8 +98,9 @@ class _EditStarterPackMetaState extends ConsumerState<EditStarterPackMeta> {
   }
 
   Future<String?> _uploadImage(MemFile imageData) async {
-    final uploadResult =
-        await ref.read(fileUploadProvider).uploadImage(imageData);
+    final uploadResult = await ref
+        .read(fileUploadProvider)
+        .uploadImage(imageData);
     final hostedImageUrl = uploadResult
         .firstWhere((e) => e.descriptor?.url.isNotEmpty == true)
         .descriptor
@@ -107,17 +110,21 @@ class _EditStarterPackMetaState extends ConsumerState<EditStarterPackMeta> {
 
   @override
   Widget build(BuildContext context) {
-    final starterPackData =
-        ref.watch(editStarterPackProvider(widget.starterPackIdentifier));
-    final starterPackNotifier = ref
-        .watch(editStarterPackProvider(widget.starterPackIdentifier).notifier);
+    final starterPackData = ref.watch(
+      editStarterPackProvider(widget.starterPackIdentifier),
+    );
+    final starterPackNotifier = ref.watch(
+      editStarterPackProvider(widget.starterPackIdentifier).notifier,
+    );
 
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back,
-              color: Theme.of(context).colorScheme.onSurface),
+          icon: Icon(
+            Icons.arrow_back,
+            color: Theme.of(context).colorScheme.onSurface,
+          ),
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text(
@@ -152,10 +159,9 @@ class _EditStarterPackMetaState extends ConsumerState<EditStarterPackMeta> {
                   Text(
                     'Invite your friends to follow your favorite people',
                     style: TextStyle(
-                      color: Theme.of(context)
-                          .colorScheme
-                          .onSurface
-                          .withValues(alpha: 0.7),
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.onSurface.withValues(alpha: 0.7),
                       fontSize: 16,
                     ),
                     textAlign: TextAlign.center,
@@ -186,25 +192,22 @@ class _EditStarterPackMetaState extends ConsumerState<EditStarterPackMeta> {
                               Container(
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(10),
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .surface
-                                      .withValues(alpha: 0.6),
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.surface.withValues(alpha: 0.6),
                                 ),
                                 child: Center(
                                   child: Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
-                                      CircularProgressIndicator(
-                                        strokeWidth: 2,
-                                      ),
+                                      CircularProgressIndicator(strokeWidth: 2),
                                       SizedBox(height: 8),
                                       Text(
                                         'Uploading...',
                                         style: TextStyle(
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .onSurface,
+                                          color: Theme.of(
+                                            context,
+                                          ).colorScheme.onSurface,
                                           fontSize: 12,
                                           fontWeight: FontWeight.w500,
                                         ),
@@ -230,10 +233,9 @@ class _EditStarterPackMetaState extends ConsumerState<EditStarterPackMeta> {
                         child: Text(
                           'Title',
                           style: TextStyle(
-                            color: Theme.of(context)
-                                .colorScheme
-                                .onSurface
-                                .withValues(alpha: 0.7),
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onSurface.withValues(alpha: 0.7),
                             fontSize: 16,
                           ),
                         ),
@@ -253,8 +255,9 @@ class _EditStarterPackMetaState extends ConsumerState<EditStarterPackMeta> {
                             starterPackNotifier.updateTitle(value);
                           },
                           style: TextStyle(
-                              color: Theme.of(context).colorScheme.onSurface,
-                              fontSize: 18),
+                            color: Theme.of(context).colorScheme.onSurface,
+                            fontSize: 18,
+                          ),
                           decoration: InputDecoration(
                             border: InputBorder.none,
                             contentPadding: const EdgeInsets.all(16),
@@ -276,10 +279,9 @@ class _EditStarterPackMetaState extends ConsumerState<EditStarterPackMeta> {
                         child: Text(
                           'Description',
                           style: TextStyle(
-                            color: Theme.of(context)
-                                .colorScheme
-                                .onSurface
-                                .withValues(alpha: 0.7),
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onSurface.withValues(alpha: 0.7),
                             fontSize: 16,
                           ),
                         ),
@@ -300,8 +302,9 @@ class _EditStarterPackMetaState extends ConsumerState<EditStarterPackMeta> {
                             starterPackNotifier.updateDescription(value);
                           },
                           style: TextStyle(
-                              color: Theme.of(context).colorScheme.onSurface,
-                              fontSize: 16),
+                            color: Theme.of(context).colorScheme.onSurface,
+                            fontSize: 16,
+                          ),
                           maxLines: null,
                           expands: true,
                           textAlignVertical: TextAlignVertical.top,
@@ -324,14 +327,16 @@ class _EditStarterPackMetaState extends ConsumerState<EditStarterPackMeta> {
             child: SafeArea(
               top: false,
               child: SizedBox(
-                  width: double.infinity,
-                  height: 40,
-                  child: longButton(
-                      name: "next",
-                      inverted: true,
-                      onPressed: () {
-                        widget.onNext();
-                      })),
+                width: double.infinity,
+                height: 40,
+                child: longButton(
+                  name: "next",
+                  inverted: true,
+                  onPressed: () {
+                    widget.onNext();
+                  },
+                ),
+              ),
             ),
           ),
         ],

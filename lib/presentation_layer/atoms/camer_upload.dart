@@ -4,10 +4,7 @@ import '../../config/palette.dart';
 
 class CameraUpload extends StatelessWidget {
   final double size;
-  const CameraUpload({
-    super.key,
-    this.size = 50,
-  });
+  const CameraUpload({super.key, this.size = 50});
 
   @override
   Widget build(BuildContext context) {

@@ -9,10 +9,7 @@ import 'edit_starter_pack_meta.dart';
 class EditStarterPack extends ConsumerStatefulWidget {
   final StarterPackIdentifier starterPackIdentifier;
 
-  const EditStarterPack({
-    super.key,
-    required this.starterPackIdentifier,
-  });
+  const EditStarterPack({super.key, required this.starterPackIdentifier});
 
   @override
   ConsumerState<EditStarterPack> createState() => _EditStarterPackState();
@@ -30,13 +27,13 @@ class _EditStarterPackState extends ConsumerState<EditStarterPack>
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-        child: PageView(
-      controller: _horizontalPageController,
-      physics: scrollLock
-          ? const NeverScrollableScrollPhysics()
-          : const AlwaysScrollableScrollPhysics(),
-      children: [
-        EditStarterPackMeta(
+      child: PageView(
+        controller: _horizontalPageController,
+        physics: scrollLock
+            ? const NeverScrollableScrollPhysics()
+            : const AlwaysScrollableScrollPhysics(),
+        children: [
+          EditStarterPackMeta(
             starterPackIdentifier: widget.starterPackIdentifier,
             onNext: () {
               _horizontalPageController.animateToPage(
@@ -44,25 +41,28 @@ class _EditStarterPackState extends ConsumerState<EditStarterPack>
                 duration: const Duration(milliseconds: 200),
                 curve: Curves.easeInOut,
               );
-            }),
-        EditStarterPackContent(
-          starterPackIdentifier: widget.starterPackIdentifier,
-          onNext: () {
-            _horizontalPageController.animateToPage(
-              2,
-              duration: const Duration(milliseconds: 200),
-              curve: Curves.easeInOut,
-            );
-          },
-        ),
-        EditStarterPackSummary(
+            },
+          ),
+          EditStarterPackContent(
+            starterPackIdentifier: widget.starterPackIdentifier,
+            onNext: () {
+              _horizontalPageController.animateToPage(
+                2,
+                duration: const Duration(milliseconds: 200),
+                curve: Curves.easeInOut,
+              );
+            },
+          ),
+          EditStarterPackSummary(
             starterPackIdentifier: widget.starterPackIdentifier,
             onNext: () {
               setState(() {
                 scrollLock = true;
               });
-            })
-      ],
-    ));
+            },
+          ),
+        ],
+      ),
+    );
   }
 }

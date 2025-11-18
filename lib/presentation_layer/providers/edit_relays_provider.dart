@@ -20,8 +20,10 @@ final editRelaysProvider = Provider<EditRelays>((ref) {
 
   // Create an instance of `EditRelays` use case by providing the repository
   // and the public key retrieved from the signer.
-  final EditRelays editRelays =
-      EditRelays(editRelayRepository, ndk.accounts.getPublicKey());
+  final EditRelays editRelays = EditRelays(
+    editRelayRepository,
+    ndk.accounts.getPublicKey(),
+  );
 
   // Return the initialized use case.
   return editRelays;

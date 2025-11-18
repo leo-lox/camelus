@@ -125,7 +125,8 @@ class ModerationSettingsPageState
                     ? const SizedBox(
                         width: 24,
                         height: 24,
-                        child: CircularProgressIndicator(strokeWidth: 2))
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
                     : const Icon(Icons.security),
                 activeThumbColor: Theme.of(context).colorScheme.primary,
               ),

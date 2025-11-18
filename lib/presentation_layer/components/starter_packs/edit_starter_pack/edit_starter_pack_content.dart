@@ -32,22 +32,25 @@ class _EditStarterPackContentState
   bool _isReorderMode = false;
 
   _addToSelection(String userPubkey) {
-    final starterPackNotifier = ref
-        .read(editStarterPackProvider(widget.starterPackIdentifier).notifier);
+    final starterPackNotifier = ref.read(
+      editStarterPackProvider(widget.starterPackIdentifier).notifier,
+    );
 
     starterPackNotifier.addUser(userPubkey);
   }
 
   _removeFromSelection(String userPubkey) {
-    final starterPackNotifier = ref
-        .read(editStarterPackProvider(widget.starterPackIdentifier).notifier);
+    final starterPackNotifier = ref.read(
+      editStarterPackProvider(widget.starterPackIdentifier).notifier,
+    );
 
     starterPackNotifier.removeUser(userPubkey);
   }
 
   _reorderUser(int oldIndex, int newIndex) {
-    final starterPackNotifier = ref
-        .read(editStarterPackProvider(widget.starterPackIdentifier).notifier);
+    final starterPackNotifier = ref.read(
+      editStarterPackProvider(widget.starterPackIdentifier).notifier,
+    );
 
     starterPackNotifier.reorderUser(oldIndex, newIndex);
   }
@@ -57,8 +60,9 @@ class _EditStarterPackContentState
     final searchService = ref.read(searchProvider);
     final searchState = ref.watch(searchStateProvider);
     final searchNotifier = ref.watch(searchStateProvider.notifier);
-    final starterPackData =
-        ref.watch(editStarterPackProvider(widget.starterPackIdentifier));
+    final starterPackData = ref.watch(
+      editStarterPackProvider(widget.starterPackIdentifier),
+    );
 
     return Scaffold(
       body: Column(
@@ -117,17 +121,19 @@ class _EditStarterPackContentState
               child: SafeArea(
                 top: false,
                 child: SizedBox(
-                    width: double.infinity,
-                    height: 40,
-                    child: longButton(
-                        name: starterPackData.selectedUsers.isEmpty
-                            ? "add users to continue"
-                            : "continue with ${starterPackData.selectedUsers.length} people",
-                        inverted: true,
-                        disabled: starterPackData.selectedUsers.isEmpty,
-                        onPressed: () {
-                          widget.onNext();
-                        })),
+                  width: double.infinity,
+                  height: 40,
+                  child: longButton(
+                    name: starterPackData.selectedUsers.isEmpty
+                        ? "add users to continue"
+                        : "continue with ${starterPackData.selectedUsers.length} people",
+                    inverted: true,
+                    disabled: starterPackData.selectedUsers.isEmpty,
+                    onPressed: () {
+                      widget.onNext();
+                    },
+                  ),
+                ),
               ),
             ),
         ],
@@ -156,7 +162,9 @@ class _EditStarterPackContentState
   }
 
   Widget _buildNormalList(
-      SearchState searchState, StarterPackData starterPackData) {
+    SearchState searchState,
+    StarterPackData starterPackData,
+  ) {
     return ListView(
       physics: const BouncingScrollPhysics(),
       children: [
@@ -190,18 +198,17 @@ class _EditStarterPackContentState
             heightFactor: 5,
             child: Column(
               children: [
-                Text(
-                  "search to add user",
-                  style: TextStyle(fontSize: 18),
-                ),
+                Text("search to add user", style: TextStyle(fontSize: 18)),
                 Text(
                   "you can also use the three dots menu on every post to add a user to a pack",
                   style: TextStyle(
-                      fontSize: 12, color: Paletter.getLightGray(context)),
+                    fontSize: 12,
+                    color: Paletter.getLightGray(context),
+                  ),
                 ),
               ],
             ),
-          )
+          ),
       ],
     );
   }
@@ -227,15 +234,13 @@ class PersonSelect extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final metadata = ref.watch(metadataStateProvider(pubkey)).userMetadata;
     return ListTile(
-      onTap:
-          isReorderMode ? null : () => onTab(), // Disable tap in reorder mode
+      onTap: isReorderMode
+          ? null
+          : () => onTab(), // Disable tap in reorder mode
       title: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          UserImage(
-            imageUrl: metadata?.picture,
-            pubkey: pubkey,
-          ),
+          UserImage(imageUrl: metadata?.picture, pubkey: pubkey),
           const SizedBox(width: 16),
           Expanded(
             child: Column(
@@ -250,10 +255,7 @@ class PersonSelect extends ConsumerWidget {
                   ),
                   overflow: TextOverflow.ellipsis,
                 ),
-                Nip05Text(
-                  pubkey: pubkey,
-                  nip05verified: metadata?.nip05,
-                ),
+                Nip05Text(pubkey: pubkey, nip05verified: metadata?.nip05),
                 const SizedBox(height: 4),
                 Text(
                   metadata?.about ?? "",
@@ -286,7 +288,7 @@ class PersonSelect extends ConsumerWidget {
                 width: 50,
                 child: Icon(PhosphorIcons.dotsSixVertical()),
               ),
-            )
+            ),
         ],
       ),
     );

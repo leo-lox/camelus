@@ -9,10 +9,7 @@ class InviteData {
     this.listNpub,
   });
 
-  InviteData.empty()
-      : inviteByNpub = "",
-        listName = "",
-        listNpub = null;
+  InviteData.empty() : inviteByNpub = "", listName = "", listNpub = null;
 
   bool get isEmpty => inviteByNpub.isEmpty && listName.isEmpty;
 }

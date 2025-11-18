@@ -66,14 +66,19 @@ class _SearchFeedPageState extends State<SearchFeedPage> {
         content: Text(AppLocalizations.of(context)!.searchHelpMessage),
         backgroundColor: Paletter.getDarkGray(context),
         titleTextStyle: TextStyle(
-            color: Theme.of(context).colorScheme.onSurface, fontSize: 18),
-        contentTextStyle:
-            TextStyle(color: Theme.of(context).colorScheme.onSurface),
+          color: Theme.of(context).colorScheme.onSurface,
+          fontSize: 18,
+        ),
+        contentTextStyle: TextStyle(
+          color: Theme.of(context).colorScheme.onSurface,
+        ),
         actions: [
           TextButton(
             onPressed: () => context.pop(),
-            child: Text(AppLocalizations.of(context)!.ok,
-                style: TextStyle(color: Theme.of(context).colorScheme.primary)),
+            child: Text(
+              AppLocalizations.of(context)!.ok,
+              style: TextStyle(color: Theme.of(context).colorScheme.primary),
+            ),
           ),
         ],
       ),

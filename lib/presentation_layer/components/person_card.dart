@@ -70,12 +70,9 @@ class PersonCard extends ConsumerWidget {
                         ),
                       ],
                     ),
-                  // nip 05
 
-                  Nip05Text(
-                    pubkey: pubkey,
-                    nip05verified: nip05,
-                  ),
+                  // nip 05
+                  Nip05Text(pubkey: pubkey, nip05verified: nip05),
 
                   const SizedBox(height: 4),
                   SizedBox(
@@ -102,10 +99,11 @@ class PersonCard extends ConsumerWidget {
             //follow and unfollow button
             if (showFollowButton)
               followButton(
-                  isFollowing: isFollowing,
-                  onPressed: () {
-                    onFollowTab(!isFollowing);
-                  }),
+                isFollowing: isFollowing,
+                onPressed: () {
+                  onFollowTab(!isFollowing);
+                },
+              ),
           ],
         ),
       ),

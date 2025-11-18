@@ -11,8 +11,5 @@ class DbKeyValue {
   @Property()
   String value = '';
 
-  DbKeyValue({
-    required this.key,
-    required this.value,
-  });
+  DbKeyValue({required this.key, required this.value});
 }

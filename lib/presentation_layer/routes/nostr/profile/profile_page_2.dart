@@ -29,10 +29,7 @@ import 'follower_page.dart';
 
 class ProfilePage2 extends ConsumerWidget {
   final String pubkey;
-  const ProfilePage2({
-    super.key,
-    required this.pubkey,
-  });
+  const ProfilePage2({super.key, required this.pubkey});
 
   @override
   Widget build(BuildContext context, ref) {
@@ -46,118 +43,121 @@ class ProfilePage2 extends ConsumerWidget {
 
     return Scaffold(
       body: GenericFeed(
-        feedPadding:
-            EdgeInsets.only(top: MediaQuery.of(context).padding.top + 48),
-        additionalTabViews: [
-          StarterPacksList(
-            pubkey: pubkey,
-          ),
-        ],
+        feedPadding: EdgeInsets.only(
+          top: MediaQuery.of(context).padding.top + 48,
+        ),
+        additionalTabViews: [StarterPacksList(pubkey: pubkey)],
         feedFilter: FeedFilter(
           authors: [pubkey],
           kinds: [1, 6],
           feedId: 'profile-${pubkey.substring(10, 20)}',
         ),
-        customHeaderSliverBuilder: (
-          BuildContext context,
-          bool innerBoxIsScrolled,
-          TabController tabController,
-        ) {
-          return <Widget>[
-            SliverOverlapAbsorber(
-              handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
-              sliver: SliverAppBar(
-                surfaceTintColor: Theme.of(context).colorScheme.surface,
-                leading: BackButtonRound(),
-                actions: [
-                  PopupMenuButton<String>(
-                    color: Paletter.getExtraDarkGray(context),
-                    tooltip: AppLocalizations.of(context)!.more,
-                    onSelected: (e) => {
-                      //log(e),
-                      // toast
-                      if (e == "block")
-                        {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  BlockPage(userPubkey: pubkey),
-                            ),
-                          ).then((value) => {
-                                context.pop(),
-                              })
-                        }
-                    },
-                    itemBuilder: (BuildContext context) {
-                      return {'block'}.map((String choice) {
-                        return PopupMenuItem<String>(
-                          value: choice,
-                          child: Text(AppLocalizations.of(context)!.block),
-                        );
-                      }).toList();
-                    },
+        customHeaderSliverBuilder:
+            (
+              BuildContext context,
+              bool innerBoxIsScrolled,
+              TabController tabController,
+            ) {
+              return <Widget>[
+                SliverOverlapAbsorber(
+                  handle: NestedScrollView.sliverOverlapAbsorberHandleFor(
+                    context,
                   ),
-                  if (Platform.isWindows ||
-                      Platform.isLinux ||
-                      Platform.isMacOS)
-                    const SizedBox(width: 154),
-                ],
-                expandedHeight: 400,
-                pinned: true,
-                floating: true,
-                forceElevated: innerBoxIsScrolled,
-                backgroundColor: Theme.of(context)
-                    .colorScheme
-                    .surface, // Add a background color
-                flexibleSpace: FlexibleSpaceBar(
-                  background: _BuildProfileHeader(
-                      isOwnProfile: isOwnProfile,
-                      userMetadata: UserMetadata(
-                        pubkey: pubkey,
-                        eventId: '',
-                        lastFetch: myMetadata?.lastFetch ?? 0,
-                        name: myMetadata?.name,
-                        picture: myMetadata?.picture,
-                        banner: myMetadata?.banner,
-                        nip05: myMetadata?.nip05,
-                        about: myMetadata?.about,
-                        website: myMetadata?.website,
-                        lud06: myMetadata?.lud06,
-                        lud16: myMetadata?.lud16,
-                      )),
-                ),
-                bottom: PreferredSize(
-                  preferredSize: Size.fromHeight(48),
-                  child: Container(
-                    color: Theme.of(context)
-                        .colorScheme
-                        .surface, // Add a background color to the tab bar
-                    child: TabBar(
-                      controller: tabController,
-                      tabs: [
-                        Tab(text: AppLocalizations.of(context)!.posts),
-                        Tab(
-                            text:
-                                AppLocalizations.of(context)!.postsAndReplies),
-                        Tab(text: AppLocalizations.of(context)!.starterPacks),
-                      ],
-                      labelColor: Theme.of(context)
-                          .colorScheme
-                          .onSurface, // Set the color of the selected tab
-                      unselectedLabelColor: Theme.of(context)
-                          .colorScheme
-                          .onSurfaceVariant, // Set the color of unselected tabs
-                      indicatorColor: Theme.of(context)
-                          .colorScheme
-                          .primary, // Set the color of the indicator
+                  sliver: SliverAppBar(
+                    surfaceTintColor: Theme.of(context).colorScheme.surface,
+                    leading: BackButtonRound(),
+                    actions: [
+                      PopupMenuButton<String>(
+                        color: Paletter.getExtraDarkGray(context),
+                        tooltip: AppLocalizations.of(context)!.more,
+                        onSelected: (e) => {
+                          //log(e),
+                          // toast
+                          if (e == "block")
+                            {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      BlockPage(userPubkey: pubkey),
+                                ),
+                              ).then((value) => {context.pop()}),
+                            },
+                        },
+                        itemBuilder: (BuildContext context) {
+                          return {'block'}.map((String choice) {
+                            return PopupMenuItem<String>(
+                              value: choice,
+                              child: Text(AppLocalizations.of(context)!.block),
+                            );
+                          }).toList();
+                        },
+                      ),
+                      if (Platform.isWindows ||
+                          Platform.isLinux ||
+                          Platform.isMacOS)
+                        const SizedBox(width: 154),
+                    ],
+                    expandedHeight: 400,
+                    pinned: true,
+                    floating: true,
+                    forceElevated: innerBoxIsScrolled,
+                    backgroundColor: Theme.of(
+                      context,
+                    ).colorScheme.surface, // Add a background color
+                    flexibleSpace: FlexibleSpaceBar(
+                      background: _BuildProfileHeader(
+                        isOwnProfile: isOwnProfile,
+                        userMetadata: UserMetadata(
+                          pubkey: pubkey,
+                          eventId: '',
+                          lastFetch: myMetadata?.lastFetch ?? 0,
+                          name: myMetadata?.name,
+                          picture: myMetadata?.picture,
+                          banner: myMetadata?.banner,
+                          nip05: myMetadata?.nip05,
+                          about: myMetadata?.about,
+                          website: myMetadata?.website,
+                          lud06: myMetadata?.lud06,
+                          lud16: myMetadata?.lud16,
+                        ),
+                      ),
+                    ),
+                    bottom: PreferredSize(
+                      preferredSize: Size.fromHeight(48),
+                      child: Container(
+                        color: Theme.of(context)
+                            .colorScheme
+                            .surface, // Add a background color to the tab bar
+                        child: TabBar(
+                          controller: tabController,
+                          tabs: [
+                            Tab(text: AppLocalizations.of(context)!.posts),
+                            Tab(
+                              text: AppLocalizations.of(
+                                context,
+                              )!.postsAndReplies,
+                            ),
+                            Tab(
+                              text: AppLocalizations.of(context)!.starterPacks,
+                            ),
+                          ],
+                          labelColor: Theme.of(context)
+                              .colorScheme
+                              .onSurface, // Set the color of the selected tab
+                          unselectedLabelColor: Theme.of(context)
+                              .colorScheme
+                              .onSurfaceVariant, // Set the color of unselected tabs
+                          indicatorColor: Theme.of(context)
+                              .colorScheme
+                              .primary, // Set the color of the indicator
+                        ),
+                      ),
                     ),
                   ),
                 ),
-              ),
-            ),
-          ];
-        },
+              ];
+            },
       ),
     );
   }
@@ -188,21 +188,19 @@ class _BuildProfileHeader extends ConsumerWidget {
           right: 0,
           child:
               (userMetadata.banner != null && userMetadata.banner!.isNotEmpty)
-                  ? Container(
-                      height: 150, // Adjust the height as needed
-                      decoration: BoxDecoration(
-                        image: DecorationImage(
-                          image: NetworkImage(
-                            userMetadata.banner!,
-                          ),
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                    )
-                  : Container(
-                      height: 150,
-                      color: Paletter.getExtraDarkGray(context),
+              ? Container(
+                  height: 150, // Adjust the height as needed
+                  decoration: BoxDecoration(
+                    image: DecorationImage(
+                      image: NetworkImage(userMetadata.banner!),
+                      fit: BoxFit.cover,
                     ),
+                  ),
+                )
+              : Container(
+                  height: 150,
+                  color: Paletter.getExtraDarkGray(context),
+                ),
         ),
         // Profile Content
         Positioned(
@@ -220,8 +218,9 @@ class _BuildProfileHeader extends ConsumerWidget {
                     Container(
                       decoration: BoxDecoration(
                         border: Border.all(
-                            color: Theme.of(context).colorScheme.surface,
-                            width: 2),
+                          color: Theme.of(context).colorScheme.surface,
+                          width: 2,
+                        ),
                         shape: BoxShape.circle,
                       ),
                       child: UserImage(
@@ -236,7 +235,10 @@ class _BuildProfileHeader extends ConsumerWidget {
                             userMetadata.lud16 != null)
                           Container(
                             margin: const EdgeInsets.only(
-                                top: 0, right: 0, left: 0),
+                              top: 0,
+                              right: 0,
+                              left: 0,
+                            ),
                             child: ElevatedButton(
                               onPressed: () {
                                 if (userMetadata.lud06 != null &&
@@ -248,15 +250,18 @@ class _BuildProfileHeader extends ConsumerWidget {
                                 }
                               },
                               style: ElevatedButton.styleFrom(
-                                backgroundColor:
-                                    Theme.of(context).colorScheme.surface,
+                                backgroundColor: Theme.of(
+                                  context,
+                                ).colorScheme.surface,
                                 padding: const EdgeInsets.all(0),
                                 shape: CircleBorder(
-                                    side: BorderSide(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .onSurface,
-                                        width: 1)),
+                                  side: BorderSide(
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.onSurface,
+                                    width: 1,
+                                  ),
+                                ),
                               ),
                               child: SvgPicture.asset(
                                 "assets/icons/lightning-fill.svg",
@@ -270,16 +275,16 @@ class _BuildProfileHeader extends ConsumerWidget {
                             ),
                           ),
                         if (!isOwnProfile)
-                          _FollowButton(
-                            pubkey: userMetadata.pubkey,
-                          ),
+                          _FollowButton(pubkey: userMetadata.pubkey),
                         if (isOwnProfile)
                           longButton(
-                              name: AppLocalizations.of(context)!.edit,
-                              onPressed: () {
-                                context.push(
-                                    '/nostr/profile/${userMetadata.pubkey}/edit');
-                              })
+                            name: AppLocalizations.of(context)!.edit,
+                            onPressed: () {
+                              context.push(
+                                '/nostr/profile/${userMetadata.pubkey}/edit',
+                              );
+                            },
+                          ),
                       ],
                     ),
                   ],
@@ -289,9 +294,10 @@ class _BuildProfileHeader extends ConsumerWidget {
                   userMetadata.name ??
                       _pubkeyToHrBech32Short(userMetadata.pubkey),
                   style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Theme.of(context).colorScheme.onSurface),
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
                 ),
 
                 GestureDetector(
@@ -371,10 +377,7 @@ class _BuildProfileHeader extends ConsumerWidget {
             ),
             TextSpan(
               text: ' ${AppLocalizations.of(context)!.following}',
-              style: TextStyle(
-                color: Paletter.getGray(context),
-                fontSize: 14,
-              ),
+              style: TextStyle(color: Paletter.getGray(context), fontSize: 14),
             ),
           ],
         ),
@@ -386,9 +389,7 @@ class _BuildProfileHeader extends ConsumerWidget {
 class _FollowButton extends ConsumerStatefulWidget {
   final String pubkey;
 
-  const _FollowButton({
-    required this.pubkey,
-  });
+  const _FollowButton({required this.pubkey});
 
   @override
   _FollowButtonState createState() => _FollowButtonState();
@@ -403,8 +404,9 @@ class _FollowButtonState extends ConsumerState<_FollowButton> {
   @override
   Widget build(BuildContext context) {
     final selfPubkey = ref.watch(ndkProvider).accounts.getPublicKey();
-    final myContactListNotifier =
-        ref.watch(contactListStateProvider(selfPubkey!).notifier);
+    final myContactListNotifier = ref.watch(
+      contactListStateProvider(selfPubkey!).notifier,
+    );
 
     final myContactListState = ref.watch(contactListSelfStateProvider);
 

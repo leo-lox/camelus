@@ -71,7 +71,7 @@ class NavigationNotifier extends StateNotifier<NavigationState> {
   final NavigationEvents events = NavigationEvents();
 
   NavigationNotifier()
-      : super(NavigationState(selectedTab: NavigationTab.home));
+    : super(NavigationState(selectedTab: NavigationTab.home));
 
   void selectTab(NavigationTab tab) {
     final previousTab = state.selectedTab;
@@ -128,8 +128,8 @@ class NavigationNotifier extends StateNotifier<NavigationState> {
 
 final appBottomNavigationBarProvider =
     StateNotifierProvider<NavigationNotifier, NavigationState>((ref) {
-  return NavigationNotifier();
-});
+      return NavigationNotifier();
+    });
 
 final appBottomNavigationBarEventsProvider = Provider<NavigationEvents>((ref) {
   final notifier = ref.watch(appBottomNavigationBarProvider.notifier);

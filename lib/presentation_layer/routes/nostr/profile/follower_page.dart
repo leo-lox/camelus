@@ -32,8 +32,9 @@ class _FollowerPageState extends ConsumerState<FollowerPage> {
     ContactList currentOwnContacts,
   ) async {
     final selfPubkey = ref.watch(ndkProvider).accounts.getPublicKey();
-    final myContactListNotifier =
-        ref.watch(contactListStateProvider(selfPubkey!).notifier);
+    final myContactListNotifier = ref.watch(
+      contactListStateProvider(selfPubkey!).notifier,
+    );
 
     List<String> newContacts = [...currentOwnContacts.contacts];
 
@@ -63,54 +64,53 @@ class _FollowerPageState extends ConsumerState<FollowerPage> {
   Widget build(BuildContext context) {
     final myContactList = ref.watch(contactListSelfStateProvider);
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
+      appBar: AppBar(title: Text(widget.title)),
       body: ListView.builder(
-          physics: const BouncingScrollPhysics(),
-          itemCount: widget.contactList.contacts.length,
-          itemBuilder: (context, index) {
-            final displayPubkey = widget.contactList.contacts[index];
+        physics: const BouncingScrollPhysics(),
+        itemCount: widget.contactList.contacts.length,
+        itemBuilder: (context, index) {
+          final displayPubkey = widget.contactList.contacts[index];
 
-            final displayMetadata =
-                ref.watch(metadataStateProvider(displayPubkey)).userMetadata;
-            return personCard(
-              displayPubkey,
-              displayMetadata,
-              myContactList.contactList,
-              context,
-            );
-          }),
+          final displayMetadata = ref
+              .watch(metadataStateProvider(displayPubkey))
+              .userMetadata;
+          return personCard(
+            displayPubkey,
+            displayMetadata,
+            myContactList.contactList,
+            context,
+          );
+        },
+      ),
     );
   }
 
-  PersonCard personCard(String displayPubkey, UserMetadata? metadata,
-      ContactList ownContactList, BuildContext context) {
+  PersonCard personCard(
+    String displayPubkey,
+    UserMetadata? metadata,
+    ContactList ownContactList,
+    BuildContext context,
+  ) {
     return PersonCard(
       pubkey: displayPubkey,
       name: metadata?.name ?? "",
       pictureUrl: metadata?.picture ?? "",
       about: metadata?.about ?? "",
       nip05: metadata?.nip05,
-      isFollowing:
-          ownContactList.contacts.any((element) => element == displayPubkey),
+      isFollowing: ownContactList.contacts.any(
+        (element) => element == displayPubkey,
+      ),
       onTap: () {
         // navigate to profile page
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => ProfilePage2(
-              pubkey: displayPubkey,
-            ),
+            builder: (context) => ProfilePage2(pubkey: displayPubkey),
           ),
         );
       },
       onFollowTab: (followState) {
-        _changeFollowing(
-          followState,
-          displayPubkey,
-          ownContactList,
-        );
+        _changeFollowing(followState, displayPubkey, ownContactList);
       },
     );
   }

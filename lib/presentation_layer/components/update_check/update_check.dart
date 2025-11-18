@@ -10,10 +10,7 @@ import '../../providers/language_provider.dart';
 
 class UpdateCheck extends ConsumerStatefulWidget {
   final Widget child;
-  const UpdateCheck({
-    super.key,
-    required this.child,
-  });
+  const UpdateCheck({super.key, required this.child});
 
   @override
   ConsumerState<UpdateCheck> createState() => _UpdateCheckState();
@@ -79,8 +76,10 @@ class UpdateDialog extends StatelessWidget {
         TextButton(
           child: Text(AppLocalizations.of(context)!.update),
           onPressed: () {
-            launchUrl(Uri.parse(updateInfo.url),
-                mode: LaunchMode.externalApplication);
+            launchUrl(
+              Uri.parse(updateInfo.url),
+              mode: LaunchMode.externalApplication,
+            );
             Navigator.of(context).pop();
           },
         ),

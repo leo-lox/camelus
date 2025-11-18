@@ -69,9 +69,7 @@ class _OnboardingNameState extends ConsumerState<OnboardingName> {
                   ),
                 ),
               ),
-            const Spacer(
-              flex: 20,
-            ),
+            const Spacer(flex: 20),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               width: MediaQuery.of(context).size.width * 0.95,
@@ -104,12 +102,8 @@ class _OnboardingNameState extends ConsumerState<OnboardingName> {
                 ),
               ),
             ),
-            const SizedBox(
-              height: 10,
-            ),
-            const Spacer(
-              flex: 1,
-            ),
+            const SizedBox(height: 10),
+            const Spacer(flex: 1),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               width: 400,
@@ -125,9 +119,7 @@ class _OnboardingNameState extends ConsumerState<OnboardingName> {
                 inverted: nameSelected,
               ),
             ),
-            const SizedBox(
-              height: 15,
-            ),
+            const SizedBox(height: 15),
           ],
         ),
       ),

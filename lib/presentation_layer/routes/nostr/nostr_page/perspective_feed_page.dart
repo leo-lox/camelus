@@ -9,10 +9,7 @@ import '../../../providers/following_provider.dart';
 class PerspectiveFeedPage extends ConsumerWidget {
   final String perspeciveOfPubkey;
 
-  const PerspectiveFeedPage({
-    super.key,
-    required this.perspeciveOfPubkey,
-  });
+  const PerspectiveFeedPage({super.key, required this.perspeciveOfPubkey});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

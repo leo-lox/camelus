@@ -11,10 +11,8 @@ class UserReposts {
   final NoteRepository _noteRepository;
   final String? selfPubkey;
 
-  UserReposts({
-    required NoteRepository noteRepository,
-    this.selfPubkey,
-  }) : _noteRepository = noteRepository;
+  UserReposts({required NoteRepository noteRepository, this.selfPubkey})
+    : _noteRepository = noteRepository;
 
   Future<bool> isPostSelfReposted({required String postId}) async {
     if (selfPubkey == null) {
@@ -54,9 +52,7 @@ class UserReposts {
   /// repost a post \
   /// [postToRepost] the post to repost \
   ///
-  Future<void> repostPost({
-    required NostrNote postToRepost,
-  }) {
+  Future<void> repostPost({required NostrNote postToRepost}) {
     if (selfPubkey == null) {
       throw Exception("selfPubkey is null");
     }
@@ -116,8 +112,6 @@ class UserReposts {
       throw Exception("Repost event not found");
     }
 
-    return _noteRepository.deleteNote(
-      myRepostEvent.id,
-    );
+    return _noteRepository.deleteNote(myRepostEvent.id);
   }
 }

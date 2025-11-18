@@ -52,8 +52,10 @@ class ImageGalleryState extends State<ImageGallery> {
   /// Resets the status bar visibility to default when the widget is disposed.
   void _resetStatusBar() {
     if (!_hideStatusBarWhileViewing) return;
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
-        overlays: SystemUiOverlay.values);
+    SystemChrome.setEnabledSystemUIMode(
+      SystemUiMode.manual,
+      overlays: SystemUiOverlay.values,
+    );
   }
 
   @override
@@ -109,7 +111,9 @@ class ImageGalleryState extends State<ImageGallery> {
                     Center(
                       child: Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 5),
+                          horizontal: 10,
+                          vertical: 5,
+                        ),
                         child: widget.bottomBarWidget,
                       ),
                     ),
@@ -177,7 +181,8 @@ class ImageGalleryState extends State<ImageGallery> {
           heroAttributes: widget.heroTag != null
               ? PhotoViewHeroAttributes(
                   tag:
-                      'image-${widget.imageUrls[widget.defaultImageIndex]}-${widget.heroTag}')
+                      'image-${widget.imageUrls[widget.defaultImageIndex]}-${widget.heroTag}',
+                )
               : null,
           minScale: PhotoViewComputedScale.contained * 1,
           maxScale: PhotoViewComputedScale.covered * 2,

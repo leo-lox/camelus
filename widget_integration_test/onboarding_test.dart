@@ -12,22 +12,27 @@ void main() {
 
     // Rest of your test...
     expect(find.text('camelus'), findsOneWidget);
-    expect(find.widgetWithText(ElevatedButton, 'join the conversation'),
-        findsOneWidget);
+    expect(
+      find.widgetWithText(ElevatedButton, 'join the conversation'),
+      findsOneWidget,
+    );
     expect(find.widgetWithText(ElevatedButton, 'login'), findsOneWidget);
   });
 
   testWidgets('terms not accepted', (WidgetTester tester) async {
-    await tester
-        .pumpWidget(createWidgetUnderTest(child: OnboardingLoginPage()));
+    await tester.pumpWidget(
+      createWidgetUnderTest(child: OnboardingLoginPage()),
+    );
 
     // Rest of your test...
     await tester.tap(find.widgetWithText(ElevatedButton, 'login'));
     await tester.pumpAndSettle();
 
     expect(find.byType(SnackBar), findsOneWidget);
-    expect(find.text('Please read and accept the terms and conditions first'),
-        findsOneWidget);
+    expect(
+      find.text('Please read and accept the terms and conditions first'),
+      findsOneWidget,
+    );
   });
 }
 

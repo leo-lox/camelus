@@ -9,10 +9,7 @@ class PostLikeState {
   final bool isLiked;
   final bool isLoading;
 
-  PostLikeState({
-    required this.isLiked,
-    required this.isLoading,
-  });
+  PostLikeState({required this.isLiked, required this.isLoading});
 
   PostLikeState copyWith({bool? isLiked, bool? isLoading}) {
     return PostLikeState(
@@ -29,7 +26,7 @@ class PostLikeNotifier extends StateNotifier<PostLikeState> {
   final String _postAuthorPubkey;
 
   PostLikeNotifier(this._userReactions, this._postId, this._postAuthorPubkey)
-      : super(PostLikeState(isLiked: false, isLoading: true)) {
+    : super(PostLikeState(isLiked: false, isLoading: true)) {
     _initializeLikeState();
   }
 
@@ -65,9 +62,10 @@ class PostLikeNotifier extends StateNotifier<PostLikeState> {
 // Create the provider family \
 // first arg is the postId, second is the postAuthorPubkey
 final postLikeProvider =
-    StateNotifierProvider.family<PostLikeNotifier, PostLikeState, NostrNote>(
-  (ref, arg) {
-    final userReactions = ref.watch(reactionsProvider);
-    return PostLikeNotifier(userReactions, arg.id, arg.pubkey);
-  },
-);
+    StateNotifierProvider.family<PostLikeNotifier, PostLikeState, NostrNote>((
+      ref,
+      arg,
+    ) {
+      final userReactions = ref.watch(reactionsProvider);
+      return PostLikeNotifier(userReactions, arg.id, arg.pubkey);
+    });

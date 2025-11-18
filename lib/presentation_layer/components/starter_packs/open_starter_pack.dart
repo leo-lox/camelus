@@ -28,10 +28,7 @@ import '../person_card.dart';
 class OpenStarterPack extends ConsumerStatefulWidget {
   final StarterPackIdentifier starterPackIdentifier;
 
-  const OpenStarterPack({
-    super.key,
-    required this.starterPackIdentifier,
-  });
+  const OpenStarterPack({super.key, required this.starterPackIdentifier});
 
   @override
   ConsumerState<OpenStarterPack> createState() => _OpenStarterPackState();
@@ -43,8 +40,9 @@ class _OpenStarterPackState extends ConsumerState<OpenStarterPack> {
 
   _onShare(WidgetRef ref) async {
     final inboxOutboxP = ref.read(inboxOutboxProvider);
-    final nip65data =
-        await inboxOutboxP.getNip65data(widget.starterPackIdentifier.pubkey);
+    final nip65data = await inboxOutboxP.getNip65data(
+      widget.starterPackIdentifier.pubkey,
+    );
 
     final outboxRelays = nip65data?.relays.entries
         .where((element) => element.value.isWrite)
@@ -83,23 +81,19 @@ class _OpenStarterPackState extends ConsumerState<OpenStarterPack> {
 
     SharePlus.instance.share(
       ShareParams(
-        uri: Uri(
-          scheme: 'https',
-          host: 'camelus.app',
-          path: urlPath,
-        ),
+        uri: Uri(scheme: 'https', host: 'camelus.app', path: urlPath),
       ),
     );
   }
 
-  _onEdit(
-    BuildContext context,
-  ) {
-    context.push('/edit-starter-pack',
-        extra: StarterPackIdentifier(
-          name: widget.starterPackIdentifier.name,
-          pubkey: widget.starterPackIdentifier.pubkey,
-        ));
+  _onEdit(BuildContext context) {
+    context.push(
+      '/edit-starter-pack',
+      extra: StarterPackIdentifier(
+        name: widget.starterPackIdentifier.name,
+        pubkey: widget.starterPackIdentifier.pubkey,
+      ),
+    );
   }
 
   _showDeleteConfirmationDialog(BuildContext context) {
@@ -165,11 +159,7 @@ class _OpenStarterPackState extends ConsumerState<OpenStarterPack> {
   _navigateToProfile(BuildContext context, String pubkey) {
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (context) => ProfilePage2(
-          pubkey: pubkey,
-        ),
-      ),
+      MaterialPageRoute(builder: (context) => ProfilePage2(pubkey: pubkey)),
     );
   }
 
@@ -181,7 +171,8 @@ class _OpenStarterPackState extends ConsumerState<OpenStarterPack> {
 
     final starterSets = ref
         .watch(
-            nostrListsFollowStateProvider(widget.starterPackIdentifier.pubkey))
+          nostrListsFollowStateProvider(widget.starterPackIdentifier.pubkey),
+        )
         .publicNostrFollowSets;
     final myStarterSet = starterSets
         .where((e) => e.name == widget.starterPackIdentifier.name)
@@ -191,11 +182,7 @@ class _OpenStarterPackState extends ConsumerState<OpenStarterPack> {
         myPubkey == widget.starterPackIdentifier.pubkey;
 
     if (_isDeleting) {
-      return Scaffold(
-        body: Center(
-          child: SpinnerCenter(),
-        ),
-      );
+      return Scaffold(body: Center(child: SpinnerCenter()));
     }
 
     if (_deleteSuccess) {
@@ -205,10 +192,7 @@ class _OpenStarterPackState extends ConsumerState<OpenStarterPack> {
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(
-                "deletion requested",
-                style: TextStyle(fontSize: 25),
-              ),
+              Text("deletion requested", style: TextStyle(fontSize: 25)),
               SizedBox(height: 25),
               longButton(
                 name: "go back",
@@ -223,11 +207,7 @@ class _OpenStarterPackState extends ConsumerState<OpenStarterPack> {
     }
 
     if (myStarterSet == null) {
-      return Scaffold(
-        body: Center(
-          child: Text("unknown starter pack"),
-        ),
-      );
+      return Scaffold(body: Center(child: Text("unknown starter pack")));
     }
 
     return DefaultTabController(
@@ -241,8 +221,10 @@ class _OpenStarterPackState extends ConsumerState<OpenStarterPack> {
                 pinned: true,
                 expandedHeight: 200.0,
                 leading: IconButton(
-                  icon: Icon(Icons.arrow_back,
-                      color: Theme.of(context).colorScheme.onSurface),
+                  icon: Icon(
+                    Icons.arrow_back,
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
                   onPressed: () => Navigator.pop(context),
                 ),
                 actions: [
@@ -274,14 +256,18 @@ class _OpenStarterPackState extends ConsumerState<OpenStarterPack> {
                           value: 'edit',
                           child: Row(
                             children: [
-                              Icon(PhosphorIcons.pen(),
-                                  color:
-                                      Theme.of(context).colorScheme.onSurface,
-                                  size: 20),
+                              Icon(
+                                PhosphorIcons.pen(),
+                                color: Theme.of(context).colorScheme.onSurface,
+                                size: 20,
+                              ),
                               SizedBox(width: 8),
-                              Text('Edit',
-                                  style: TextStyle(
-                                      color: Paletter.getLightGray(context))),
+                              Text(
+                                'Edit',
+                                style: TextStyle(
+                                  color: Paletter.getLightGray(context),
+                                ),
+                              ),
                             ],
                           ),
                         ),
@@ -289,12 +275,18 @@ class _OpenStarterPackState extends ConsumerState<OpenStarterPack> {
                           value: 'delete',
                           child: Row(
                             children: [
-                              Icon(PhosphorIcons.trash(),
-                                  color: Colors.red, size: 20),
+                              Icon(
+                                PhosphorIcons.trash(),
+                                color: Colors.red,
+                                size: 20,
+                              ),
                               SizedBox(width: 8),
-                              Text('Delete',
-                                  style: TextStyle(
-                                      color: Paletter.getLightGray(context))),
+                              Text(
+                                'Delete',
+                                style: TextStyle(
+                                  color: Paletter.getLightGray(context),
+                                ),
+                              ),
                             ],
                           ),
                         ),
@@ -321,10 +313,9 @@ class _OpenStarterPackState extends ConsumerState<OpenStarterPack> {
                               height: 60,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .primary
-                                    .withValues(alpha: 0.2),
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.primary.withValues(alpha: 0.2),
                               ),
                               child: myStarterSet.image != null
                                   ? ClipRRect(
@@ -338,8 +329,9 @@ class _OpenStarterPackState extends ConsumerState<OpenStarterPack> {
                                     )
                                   : Icon(
                                       PhosphorIcons.users(),
-                                      color:
-                                          Theme.of(context).colorScheme.primary,
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.primary,
                                       size: 30,
                                     ),
                             ),
@@ -352,9 +344,9 @@ class _OpenStarterPackState extends ConsumerState<OpenStarterPack> {
                                     myStarterSet.title ??
                                         widget.starterPackIdentifier.name,
                                     style: TextStyle(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onSurface,
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.onSurface,
                                       fontSize: 24,
                                       fontWeight: FontWeight.bold,
                                     ),
@@ -414,10 +406,13 @@ class _OpenStarterPackState extends ConsumerState<OpenStarterPack> {
                             const SizedBox(width: 8),
                             Container(
                               padding: EdgeInsets.symmetric(
-                                  horizontal: 6, vertical: 2),
+                                horizontal: 6,
+                                vertical: 2,
+                              ),
                               decoration: BoxDecoration(
-                                color: Paletter.getGray(context)
-                                    .withValues(alpha: 0.3),
+                                color: Paletter.getGray(
+                                  context,
+                                ).withValues(alpha: 0.3),
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               child: Text(
@@ -431,9 +426,7 @@ class _OpenStarterPackState extends ConsumerState<OpenStarterPack> {
                           ],
                         ),
                       ),
-                      Tab(
-                        text: "preview",
-                      ),
+                      Tab(text: "preview"),
                     ],
                   ),
                 ),
@@ -451,14 +444,17 @@ class _OpenStarterPackState extends ConsumerState<OpenStarterPack> {
                       .watch(metadataStateProvider(displayPubkey))
                       .userMetadata;
 
-                  final myContactListNotifier =
-                      ref.watch(contactListStateProvider(myPubkey!).notifier);
-                  final myContactListState =
-                      ref.watch(contactListStateProvider(myPubkey));
+                  final myContactListNotifier = ref.watch(
+                    contactListStateProvider(myPubkey!).notifier,
+                  );
+                  final myContactListState = ref.watch(
+                    contactListStateProvider(myPubkey),
+                  );
 
                   return PersonCard(
                     pubkey: displayPubkey,
-                    name: displayMetadata?.name ??
+                    name:
+                        displayMetadata?.name ??
                         Helpers().shortHr(displayPubkey),
                     pictureUrl: displayMetadata?.picture ?? "",
                     about: displayMetadata?.about ?? "",
@@ -483,7 +479,7 @@ class _OpenStarterPackState extends ConsumerState<OpenStarterPack> {
                   feedId: "p-starter-pck-${myStarterSet.name}",
                   authors: myStarterSet.elements.map((e) => e.value).toList(),
                 ),
-              )
+              ),
             ],
           ),
         ),
@@ -505,7 +501,10 @@ class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
 
   @override
   Widget build(
-      BuildContext context, double shrinkOffset, bool overlapsContent) {
+    BuildContext context,
+    double shrinkOffset,
+    bool overlapsContent,
+  ) {
     return Container(
       color: Theme.of(context).colorScheme.surface,
       child: _tabBar,

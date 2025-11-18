@@ -14,9 +14,7 @@ import '../get_notes_provider.dart';
 /// [String] represents the root event ID.
 /// Provides an [EventFeedState] that holds the [FeedEventViewModel] for the given event.
 final eventFeedStateProvider = NotifierProvider.autoDispose
-    .family<EventFeedState, FeedEventViewModel, String>(
-  EventFeedState.new,
-);
+    .family<EventFeedState, FeedEventViewModel, String>(EventFeedState.new);
 
 /// The [EventFeedState] class is a state notifier for managing the feed state of an event.
 /// It handles fetching, updating and cleaning up the data for a root note and its comments.
@@ -102,20 +100,21 @@ class EventFeedState
         .bufferTime(const Duration(milliseconds: 700))
         .where((events) => events.isNotEmpty)
         .listen((replies) {
-      final parsedReplies = NostrParser.parseEventsSync(replies);
-      final newSet = {...state.unprocessedCommentsSet, ...parsedReplies};
+          final parsedReplies = NostrParser.parseEventsSync(replies);
+          final newSet = {...state.unprocessedCommentsSet, ...parsedReplies};
 
-      state = state.copyWith(
-        unprocessedCommentsSet: newSet,
-        comments: RepliesTree.buildRepliesTree(
-          rootNoteId: rootNoteId,
-          replies: newSet.toList(), // avoids duplicates
-        ),
-      );
-    }).onDone(() {
-      /// setup subscription for new replies
-      _subNewNotes(rootNoteId);
-    });
+          state = state.copyWith(
+            unprocessedCommentsSet: newSet,
+            comments: RepliesTree.buildRepliesTree(
+              rootNoteId: rootNoteId,
+              replies: newSet.toList(), // avoids duplicates
+            ),
+          );
+        })
+        .onDone(() {
+          /// setup subscription for new replies
+          _subNewNotes(rootNoteId);
+        });
   }
 
   /// Subcribes to new notes for the given root note ID.
@@ -125,8 +124,9 @@ class EventFeedState
 
     // find oldest comment in unprocessedCommentsSet
     final oldestComment = state.unprocessedCommentsSet.isNotEmpty
-        ? state.unprocessedCommentsSet
-            .reduce((a, b) => a.created_at < b.created_at ? a : b)
+        ? state.unprocessedCommentsSet.reduce(
+            (a, b) => a.created_at < b.created_at ? a : b,
+          )
         : null;
 
     final repliesStream = notesP.genericNostrSubscription(
@@ -134,23 +134,24 @@ class EventFeedState
       eTags: [rootNoteId],
       kinds: [ndk_entities.Nip01Event.kTextNodeKind],
       since: oldestComment != null
-          ? oldestComment.created_at + 1 // +1 to avoid duplicates
+          ? oldestComment.created_at +
+                1 // +1 to avoid duplicates
           : now,
     );
     _commentNotesSub = repliesStream
         .bufferTime(const Duration(seconds: 1))
         .where((events) => events.isNotEmpty)
         .listen((replies) {
-      final parsedReplies = NostrParser.parseEventsSync(replies);
-      final newSet = {...state.unprocessedCommentsSet, ...parsedReplies};
-      state = state.copyWith(
-        unprocessedCommentsSet: newSet,
-        comments: RepliesTree.buildRepliesTree(
-          rootNoteId: rootNoteId,
-          replies: newSet.toList(),
-        ),
-      );
-    });
+          final parsedReplies = NostrParser.parseEventsSync(replies);
+          final newSet = {...state.unprocessedCommentsSet, ...parsedReplies};
+          state = state.copyWith(
+            unprocessedCommentsSet: newSet,
+            comments: RepliesTree.buildRepliesTree(
+              rootNoteId: rootNoteId,
+              replies: newSet.toList(),
+            ),
+          );
+        });
   }
 
   _cancelNewNotesSub() {

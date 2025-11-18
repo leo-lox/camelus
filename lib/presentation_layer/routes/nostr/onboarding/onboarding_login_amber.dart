@@ -16,10 +16,7 @@ import '../../../providers/signer_provider.dart';
 class OnboardingLoginAmberPage extends ConsumerStatefulWidget {
   final Function? onPressedBack;
 
-  const OnboardingLoginAmberPage({
-    super.key,
-    this.onPressedBack,
-  });
+  const OnboardingLoginAmberPage({super.key, this.onPressedBack});
   @override
   ConsumerState<OnboardingLoginAmberPage> createState() =>
       _OnboardingLoginAmberPageState();
@@ -55,8 +52,7 @@ class _OnboardingLoginAmberPageState
     if (!_termsAndConditions) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content:
-              Text(AppLocalizations.of(context)!.pleaseReadAndAcceptTerms),
+          content: Text(AppLocalizations.of(context)!.pleaseReadAndAcceptTerms),
         ),
       );
       return;
@@ -96,8 +92,10 @@ class _OnboardingLoginAmberPageState
                 Row(
                   children: [
                     IconButton(
-                      icon: Icon(PhosphorIcons.arrowLeft(),
-                          color: Theme.of(context).colorScheme.onSurface),
+                      icon: Icon(
+                        PhosphorIcons.arrowLeft(),
+                        color: Theme.of(context).colorScheme.onSurface,
+                      ),
                       onPressed: () => widget.onPressedBack!(),
                     ),
                   ],
@@ -121,9 +119,7 @@ class _OnboardingLoginAmberPageState
                   ],
                 ),
               ),
-              const Spacer(
-                flex: 1,
-              ),
+              const Spacer(flex: 1),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [

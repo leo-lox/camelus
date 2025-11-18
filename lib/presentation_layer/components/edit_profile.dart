@@ -158,10 +158,9 @@ class _EditProfileState extends ConsumerState<EditProfile> {
                   Container(
                     width: MediaQuery.of(context).size.width,
                     height: MediaQuery.of(context).size.height / 6,
-                    color: Theme.of(context)
-                        .colorScheme
-                        .surface
-                        .withValues(alpha: 0.5),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.surface.withValues(alpha: 0.5),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -181,7 +180,8 @@ class _EditProfileState extends ConsumerState<EditProfile> {
                             child: LinearProgressIndicator(
                               backgroundColor: Paletter.getGray(context),
                               valueColor: AlwaysStoppedAnimation<Color>(
-                                  Theme.of(context).colorScheme.onSurface),
+                                Theme.of(context).colorScheme.onSurface,
+                              ),
                               minHeight: 6,
                             ),
                           ),
@@ -203,7 +203,9 @@ class _EditProfileState extends ConsumerState<EditProfile> {
                   widget.initialPicture == null
                       ? const CameraUpload(size: 100)
                       : RoundImageWithBorder(
-                          image: widget.initialPicture!, size: 102),
+                          image: widget.initialPicture!,
+                          size: 102,
+                        ),
                   if (isUploadingPicture) _buildUploadingProfilePicture(),
                 ],
               ),
@@ -236,9 +238,7 @@ class _EditProfileState extends ConsumerState<EditProfile> {
         SizedBox(
           width: 60,
           height: 60,
-          child: CircularProgressIndicator(
-            strokeWidth: 3,
-          ),
+          child: CircularProgressIndicator(strokeWidth: 3),
         ),
 
         // Text in the center
@@ -260,25 +260,40 @@ class _EditProfileState extends ConsumerState<EditProfile> {
       child: Column(
         children: [
           _buildInputField(
-              AppLocalizations.of(context)!.name, _controllers['name']!),
+            AppLocalizations.of(context)!.name,
+            _controllers['name']!,
+          ),
           _buildInputField(
-              AppLocalizations.of(context)!.bio, _controllers['about']!,
-              isMultiline: true),
-          _buildInputField(AppLocalizations.of(context)!.pronouns,
-              _controllers['pronouns']!),
+            AppLocalizations.of(context)!.bio,
+            _controllers['about']!,
+            isMultiline: true,
+          ),
           _buildInputField(
-              AppLocalizations.of(context)!.website, _controllers['website']!),
+            AppLocalizations.of(context)!.pronouns,
+            _controllers['pronouns']!,
+          ),
           _buildInputField(
-              AppLocalizations.of(context)!.username, _controllers['nip05']!),
-          _buildInputField(AppLocalizations.of(context)!.lightningAddress,
-              _controllers['lud16']!),
+            AppLocalizations.of(context)!.website,
+            _controllers['website']!,
+          ),
+          _buildInputField(
+            AppLocalizations.of(context)!.username,
+            _controllers['nip05']!,
+          ),
+          _buildInputField(
+            AppLocalizations.of(context)!.lightningAddress,
+            _controllers['lud16']!,
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildInputField(String label, TextEditingController controller,
-      {bool isMultiline = false}) {
+  Widget _buildInputField(
+    String label,
+    TextEditingController controller, {
+    bool isMultiline = false,
+  }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -296,13 +311,16 @@ class _EditProfileState extends ConsumerState<EditProfile> {
           controller: controller, // Bind the controller to the input field.
           decoration: InputDecoration(
             hintText: "",
-            contentPadding:
-                EdgeInsets.symmetric(vertical: 8.0, horizontal: 8.0),
+            contentPadding: EdgeInsets.symmetric(
+              vertical: 8.0,
+              horizontal: 8.0,
+            ),
             enabledBorder: UnderlineInputBorder(
               borderSide: BorderSide(
                 width: 1,
                 color: Paletter.getGray(
-                    context), // Border color for the text field.
+                  context,
+                ), // Border color for the text field.
               ),
             ),
           ),
