@@ -12,6 +12,7 @@ import '../../../../config/palette.dart';
 import '../../../../domain_layer/entities/contact_list.dart';
 import '../../../../domain_layer/entities/feed_filter.dart';
 import '../../../../domain_layer/entities/user_metadata.dart';
+import '../../../../domain_layer/usecases/app_auth.dart';
 import '../../../../helpers/helpers.dart';
 import '../../../../helpers/nprofile_helper.dart';
 import '../../../atoms/back_button_round.dart';
@@ -403,6 +404,18 @@ class _FollowButtonState extends ConsumerState<_FollowButton> {
 
   @override
   Widget build(BuildContext context) {
+    final ndk = ref.watch(ndkProvider);
+    final canSign = !ndk.accounts.cannotSign;
+
+    if (!canSign) {
+      return followButton(
+        isFollowing: false,
+        onPressed: () {
+          AppAuth.showLoginPrompt(context);
+        },
+      );
+    }
+
     final selfPubkey = ref.watch(ndkProvider).accounts.getPublicKey();
     final myContactListNotifier = ref.watch(
       contactListStateProvider(selfPubkey!).notifier,
