@@ -14,8 +14,9 @@ class DbCamelusInit {
   static Future<DbCamelusInit> create() async {
     final docsDir = await getApplicationDocumentsDirectory();
     // Future<Store> openStore() {...} is defined in the generated objectbox.g.dart
-    final store =
-        await openStore(directory: p.join(docsDir.path, "camelus-obx-default"));
+    final store = await openStore(
+      directory: p.join(docsDir.path, "camelus-obx-default"),
+    );
     return DbCamelusInit._create(store);
   }
 }

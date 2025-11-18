@@ -22,7 +22,7 @@ class InitalRouteSettingsState extends ConsumerState<InitalRouteSettings> {
     '/home',
     '/posts-and-replies',
     '/search',
-    '/notifications'
+    '/notifications',
   ];
 
   // Get localized route label
@@ -71,8 +71,10 @@ class InitalRouteSettingsState extends ConsumerState<InitalRouteSettings> {
               style: TextStyle(color: Paletter.getLightGray(context)),
             ),
             trailing: selectedRoute == route
-                ? Icon(PhosphorIcons.check(),
-                    color: Theme.of(context).colorScheme.onSurface)
+                ? Icon(
+                    PhosphorIcons.check(),
+                    color: Theme.of(context).colorScheme.onSurface,
+                  )
                 : null,
             onTap: () {
               ref.read(selectedRouteProvider.notifier).state = route;

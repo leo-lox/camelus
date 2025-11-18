@@ -32,13 +32,9 @@ class _EditRelaysPageState extends ConsumerState<EditRelaysPage> {
     return PopScope(
       canPop: true,
       child: Scaffold(
-        appBar: AppBar(
-          title: Text(AppLocalizations.of(context)!.editRelays),
-        ),
+        appBar: AppBar(title: Text(AppLocalizations.of(context)!.editRelays)),
         // show loading indicator when reconnecting
-        body: EditRelaysView(
-          onSave: onSave,
-        ),
+        body: EditRelaysView(onSave: onSave),
       ),
     );
   }

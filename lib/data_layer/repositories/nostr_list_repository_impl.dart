@@ -6,9 +6,7 @@ import '../models/nostr_lists_model.dart';
 class NostrListRepositoryImpl implements NostrListRepository {
   final DartNdkSource dartNdkSource;
 
-  NostrListRepositoryImpl({
-    required this.dartNdkSource,
-  });
+  NostrListRepositoryImpl({required this.dartNdkSource});
 
   @override
   Stream<List<NostrStarterPack>?> getPublicNostrStarterPacks({
@@ -38,8 +36,9 @@ class NostrListRepositoryImpl implements NostrListRepository {
   Future<NostrStarterPack> broadcastStarterPack({
     required NostrStarterPack starterPack,
   }) async {
-    final ndkStarterPack =
-        NostrStarterPackModel.fromEntity(starterPack).toNDK();
+    final ndkStarterPack = NostrStarterPackModel.fromEntity(
+      starterPack,
+    ).toNDK();
     final result = await dartNdkSource.dartNdk.lists.setCompleteSet(
       set: ndkStarterPack,
       kind: NostrList.starterPack,

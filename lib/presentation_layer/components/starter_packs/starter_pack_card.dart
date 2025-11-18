@@ -13,11 +13,7 @@ import '../../providers/metadata_state_provider.dart';
 class StarterPackCard extends ConsumerStatefulWidget {
   final NostrStarterPack pack;
   final Function? onTab;
-  const StarterPackCard({
-    super.key,
-    required this.pack,
-    this.onTab,
-  });
+  const StarterPackCard({super.key, required this.pack, this.onTab});
 
   @override
   ConsumerState<StarterPackCard> createState() => _StarterPackCardState();
@@ -26,8 +22,9 @@ class StarterPackCard extends ConsumerStatefulWidget {
 class _StarterPackCardState extends ConsumerState<StarterPackCard> {
   @override
   Widget build(BuildContext context) {
-    final creatorMetadata =
-        ref.watch(metadataStateProvider(widget.pack.pubKey)).userMetadata;
+    final creatorMetadata = ref
+        .watch(metadataStateProvider(widget.pack.pubKey))
+        .userMetadata;
     return InkWell(
       borderRadius: BorderRadius.circular(12),
       onTap: widget.onTab != null ? () => widget.onTab!() : null,
@@ -38,9 +35,7 @@ class _StarterPackCardState extends ConsumerState<StarterPackCard> {
       child: Card(
         // margin: const EdgeInsets.all(16),
         clipBehavior: Clip.antiAlias,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         child: Stack(
           children: [
             Column(

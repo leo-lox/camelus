@@ -20,16 +20,15 @@ import 'package:bip39_mnemonic/bip39_mnemonic.dart';
 
 import '../../../../domain_layer/entities/key_pair.dart';
 
+import '../../../../domain_layer/entities/stored_account.dart';
+import '../../../../domain_layer/usecases/app_auth.dart';
 import '../../../providers/ndk_provider.dart';
 import '../../../providers/signer_provider.dart';
 
 class OnboardingLoginPage extends ConsumerStatefulWidget {
   final Function? onPressedBack;
 
-  const OnboardingLoginPage({
-    super.key,
-    this.onPressedBack,
-  });
+  const OnboardingLoginPage({super.key, this.onPressedBack});
   @override
   ConsumerState<OnboardingLoginPage> createState() =>
       _OnboardingLoginPageState();
@@ -60,8 +59,9 @@ class _OnboardingLoginPageState extends ConsumerState<OnboardingLoginPage> {
   void showPasteError() {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content:
-            Text(AppLocalizations.of(context)!.invalidPrivateKeyOrSeedPhrase),
+        content: Text(
+          AppLocalizations.of(context)!.invalidPrivateKeyOrSeedPhrase,
+        ),
       ),
     );
   }
@@ -139,25 +139,28 @@ class _OnboardingLoginPageState extends ConsumerState<OnboardingLoginPage> {
     if (myKeys == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content:
-              Text(AppLocalizations.of(context)!.pleaseImportPrivateKeyFirst),
+          content: Text(
+            AppLocalizations.of(context)!.pleaseImportPrivateKeyFirst,
+          ),
         ),
       );
       return;
     }
 
-    // store in secure storage
-    const storage = FlutterSecureStorage();
-    await storage.write(key: "nostrKeys", value: json.encode(myKeys!.toJson()));
-    // save in provider
-
-    final bip340Signer = Bip340EventSigner(
-      privateKey: myKeys!.privateKey,
-      publicKey: myKeys!.publicKey,
+    // create stored account
+    final storedAccount = LocalStorageAccount(
+      loginType: LoginType.privateKey,
+      pubkey: myKeys!.publicKey,
+      keyPair: myKeys,
     );
 
-    ref.watch(ndkProvider).accounts.loginExternalSigner(signer: bip340Signer);
-    ref.read(signerProvider.notifier).setSigner(bip340Signer);
+    await AppAuth.addStoredAccount(account: storedAccount, setActive: true);
+    final startupData = await AppAuth.getStartupAccountData();
+    await AppAuth.loginWithStoredAccount(
+      startupAccountData: startupData,
+      signerNoti: ref.read(signerProvider.notifier),
+      ndk: ref.read(ndkProvider),
+    );
 
     setState(() {});
 
@@ -236,318 +239,357 @@ class _OnboardingLoginPageState extends ConsumerState<OnboardingLoginPage> {
       resizeToAvoidBottomInset: false,
       body: SafeArea(
         // input for the user to enter their private key, should be visible on a dark background.
-        child: LayoutBuilder(builder: (context, constraints) {
-          return SingleChildScrollView(
-            child: ConstrainedBox(
-              constraints: BoxConstraints(minHeight: constraints.maxHeight),
-              child: IntrinsicHeight(
-                child: Padding(
-                  padding: const EdgeInsets.all(30),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      if (widget.onPressedBack != null)
-                        Row(
-                          children: [
-                            IconButton(
-                              icon: Icon(
-                                PhosphorIcons.arrowLeft(),
-                                color: Theme.of(context).colorScheme.onSurface,
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return SingleChildScrollView(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                child: IntrinsicHeight(
+                  child: Padding(
+                    padding: const EdgeInsets.all(30),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        if (widget.onPressedBack != null)
+                          Row(
+                            children: [
+                              IconButton(
+                                icon: Icon(
+                                  PhosphorIcons.arrowLeft(),
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.onSurface,
+                                ),
+                                onPressed: () => widget.onPressedBack!(),
                               ),
-                              onPressed: () => widget.onPressedBack!(),
-                            ),
-                          ],
-                        ),
-                      if (widget.onPressedBack == null)
-                        const SizedBox(height: 20),
+                            ],
+                          ),
+                        if (widget.onPressedBack == null)
+                          const SizedBox(height: 20),
 
-                      if (_userWords.isNotEmpty)
-                        Column(
-                          children: [
-                            Container(
-                              width: MediaQuery.of(context).size.width,
-                              height: 200,
-                              decoration: BoxDecoration(
-                                color: Paletter.getExtraDarkGray(context),
-                                borderRadius: BorderRadius.circular(10),
-                                border: Border.all(
-                                  color: Paletter.getDarkGray(context),
-                                  width: 1,
+                        if (_userWords.isNotEmpty)
+                          Column(
+                            children: [
+                              Container(
+                                width: MediaQuery.of(context).size.width,
+                                height: 200,
+                                decoration: BoxDecoration(
+                                  color: Paletter.getExtraDarkGray(context),
+                                  borderRadius: BorderRadius.circular(10),
+                                  border: Border.all(
+                                    color: Paletter.getDarkGray(context),
+                                    width: 1,
+                                  ),
+                                ),
+                                child: seedPhraseCheck(),
+                              ),
+                              const SizedBox(height: 5),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                ),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      mneonicError ?? "",
+                                      style: TextStyle(
+                                        color: Theme.of(
+                                          context,
+                                        ).colorScheme.error,
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                    Text(
+                                      "${_userWords.length}/${(_userWords.length <= 12 ? "12" : "24")}",
+                                      style: TextStyle(
+                                        color: (_userWords.length > 24)
+                                            ? Theme.of(
+                                                context,
+                                              ).colorScheme.error
+                                            : Theme.of(
+                                                context,
+                                              ).colorScheme.onSurface,
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
-                              child: seedPhraseCheck(),
-                            ),
-                            const SizedBox(height: 5),
-                            Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 10),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(mneonicError ?? "",
-                                      style: TextStyle(
-                                        color:
-                                            Theme.of(context).colorScheme.error,
-                                        fontSize: 12,
-                                      )),
-                                  Text(
-                                    "${_userWords.length}/${(_userWords.length <= 12 ? "12" : "24")}",
-                                    style: TextStyle(
-                                      color: (_userWords.length > 24)
-                                          ? Theme.of(context).colorScheme.error
-                                          : Theme.of(context)
-                                              .colorScheme
-                                              .onSurface,
-                                      fontSize: 12,
-                                    ),
+                            ],
+                          ),
+                        if (_userWords.isEmpty)
+                          SizedBox(
+                            height: 200,
+                            width: MediaQuery.of(context).size.width,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  AppLocalizations.of(context)!.login,
+                                  style: TextStyle(
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.onSurface,
+                                    fontSize: 40,
+                                    fontFamily: "Poppins",
                                   ),
-                                ],
-                              ),
-                            )
-                          ],
-                        ),
-                      if (_userWords.isEmpty)
-                        SizedBox(
-                          height: 200,
-                          width: MediaQuery.of(context).size.width,
+                                ),
+                              ],
+                            ),
+                          ),
+
+                        AnimatedOpacity(
+                          opacity: (_userNsec != null && myKeys != null)
+                              ? 1
+                              : 0,
+                          duration: const Duration(milliseconds: 300),
                           child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisAlignment: MainAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.end,
                             children: [
                               Text(
-                                AppLocalizations.of(context)!.login,
-                                style: TextStyle(
-                                  color:
-                                      Theme.of(context).colorScheme.onSurface,
-                                  fontSize: 40,
-                                  fontFamily: "Poppins",
+                                AppLocalizations.of(context)!.yourPublicKeyIs,
+                              ),
+                              const SizedBox(height: 10),
+                              Container(
+                                decoration: BoxDecoration(
+                                  color: Paletter.getExtraDarkGray(context),
+                                  borderRadius: BorderRadius.circular(10),
+                                  border: Border.all(
+                                    color: Paletter.getDarkGray(context),
+                                    width: 1,
+                                  ),
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: SizedBox(
+                                    height: 40,
+                                    child: Text(myKeys?.publicKeyHr ?? ""),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 15),
+                            ],
+                          ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                          width: 400,
+                          child: TextField(
+                            onSubmitted: (value) {
+                              _addWords(value);
+                              _inputFocusNode.requestFocus();
+                            },
+                            focusNode: _inputFocusNode,
+                            autofillHints: Language.english.list,
+                            controller: _inputController,
+                            enableIMEPersonalizedLearning: false,
+                            textCapitalization: TextCapitalization.none,
+                            decoration: InputDecoration(
+                              isDense: true,
+                              hintText: AppLocalizations.of(
+                                context,
+                              )!.enterSeedPhraseOrNsec,
+                              hintStyle: TextStyle(
+                                color: Theme.of(context).colorScheme.onSurface,
+                                letterSpacing: 1.1,
+                              ),
+                              filled: true,
+                              fillColor: Paletter.getExtraDarkGray(context),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(10),
+                                ),
+                                borderSide: BorderSide(
+                                  color: Paletter.getExtraDarkGray(context),
+                                ),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(10),
+                                ),
+                                borderSide: BorderSide(
+                                  color: Paletter.getGray(context),
+                                ),
+                              ),
+                              errorBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(10),
+                                ),
+                                borderSide: BorderSide(color: Colors.purple),
+                              ),
+                            ),
+                          ),
+                        ),
+
+                        const SizedBox(height: 15),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                          width: 400,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              SizedBox(
+                                height: 31,
+                                child: ElevatedButton(
+                                  onPressed: () {
+                                    _pasteFromClipboard();
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Theme.of(
+                                      context,
+                                    ).colorScheme.surface,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(20),
+                                      side: BorderSide(
+                                        color: Theme.of(
+                                          context,
+                                        ).colorScheme.onSurface,
+                                        width: 1,
+                                      ),
+                                    ),
+                                  ),
+                                  child: Text(
+                                    AppLocalizations.of(context)!.paste,
+                                    style: TextStyle(
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.onSurface,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              SizedBox(
+                                height: 31,
+                                child: ElevatedButton(
+                                  onPressed: () {
+                                    _addWords(_inputController.text);
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Theme.of(
+                                      context,
+                                    ).colorScheme.onSurface,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(20),
+                                      side: BorderSide(
+                                        color: Theme.of(
+                                          context,
+                                        ).colorScheme.onSurface,
+                                        width: 1,
+                                      ),
+                                    ),
+                                  ),
+                                  child: Text(
+                                    AppLocalizations.of(context)!.add,
+                                    style: TextStyle(
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.surface,
+                                      fontSize: 16,
+                                    ),
+                                  ),
                                 ),
                               ),
                             ],
                           ),
                         ),
 
-                      AnimatedOpacity(
-                        opacity: (_userNsec != null && myKeys != null) ? 1 : 0,
-                        duration: const Duration(milliseconds: 300),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.end,
+                        const SizedBox(height: 50),
+
+                        // checkbox to accept the privacy policy
+                        const SizedBox(height: 15),
+
+                        const Spacer(flex: 1),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Text(AppLocalizations.of(context)!.yourPublicKeyIs),
-                            const SizedBox(height: 10),
-                            Container(
-                              decoration: BoxDecoration(
-                                color: Paletter.getExtraDarkGray(context),
-                                borderRadius: BorderRadius.circular(10),
-                                border: Border.all(
-                                  color: Paletter.getDarkGray(context),
-                                  width: 1,
-                                ),
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: SizedBox(
-                                  height: 40,
-                                  child: Text(myKeys?.publicKeyHr ?? ""),
-                                ),
-                              ),
+                            Checkbox(
+                              value: _termsAndConditions,
+                              onChanged: (value) {
+                                setState(() {
+                                  _termsAndConditions = value!;
+                                });
+                              },
                             ),
-                            const SizedBox(height: 15),
-                          ],
-                        ),
-                      ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
-                        width: 400,
-                        child: TextField(
-                          onSubmitted: (value) {
-                            _addWords(value);
-                            _inputFocusNode.requestFocus();
-                          },
-                          focusNode: _inputFocusNode,
-                          autofillHints: Language.english.list,
-                          controller: _inputController,
-                          enableIMEPersonalizedLearning: false,
-                          textCapitalization: TextCapitalization.none,
-                          decoration: InputDecoration(
-                            isDense: true,
-                            hintText: AppLocalizations.of(context)!
-                                .enterSeedPhraseOrNsec,
-                            hintStyle: TextStyle(
-                                color: Theme.of(context).colorScheme.onSurface,
-                                letterSpacing: 1.1),
-                            filled: true,
-                            fillColor: Paletter.getExtraDarkGray(context),
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(10)),
-                              borderSide: BorderSide(
-                                  color: Paletter.getExtraDarkGray(context)),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(10)),
-                              borderSide:
-                                  BorderSide(color: Paletter.getGray(context)),
-                            ),
-                            errorBorder: OutlineInputBorder(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(10)),
-                              borderSide: BorderSide(color: Colors.purple),
-                            ),
-                          ),
-                        ),
-                      ),
-
-                      const SizedBox(height: 15),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
-                        width: 400,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            SizedBox(
-                              height: 31,
-                              child: ElevatedButton(
-                                onPressed: () {
-                                  _pasteFromClipboard();
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor:
-                                      Theme.of(context).colorScheme.surface,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(20),
-                                    side: BorderSide(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .onSurface,
-                                        width: 1),
-                                  ),
-                                ),
-                                child: Text(
-                                  AppLocalizations.of(context)!.paste,
-                                  style: TextStyle(
-                                    color:
-                                        Theme.of(context).colorScheme.onSurface,
-                                    fontSize: 16,
-                                  ),
-                                ),
-                              ),
-                            ),
-                            SizedBox(
-                              height: 31,
-                              child: ElevatedButton(
-                                onPressed: () {
-                                  _addWords(_inputController.text);
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor:
-                                      Theme.of(context).colorScheme.onSurface,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(20),
-                                    side: BorderSide(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .onSurface,
-                                        width: 1),
-                                  ),
-                                ),
-                                child: Text(
-                                  AppLocalizations.of(context)!.add,
-                                  style: TextStyle(
-                                    color:
-                                        Theme.of(context).colorScheme.surface,
-                                    fontSize: 16,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-
-                      const SizedBox(height: 50),
-                      // checkbox to accept the privacy policy
-
-                      const SizedBox(height: 15),
-
-                      const Spacer(flex: 1),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Checkbox(
-                            value: _termsAndConditions,
-                            onChanged: (value) {
-                              setState(() {
-                                _termsAndConditions = value!;
-                              });
-                            },
-                          ),
-                          Text(
-                            AppLocalizations.of(context)!.iHaveReadAndAccept,
-                            style: TextStyle(
-                              color: Theme.of(context).colorScheme.onSurface,
-                              fontSize: 12,
-                              fontWeight: FontWeight.normal,
-                            ),
-                          ),
-                          GestureDetector(
-                            onTap: () {
-                              Uri url = Uri.parse("https://camelus.app/terms/");
-                              launchUrl(url,
-                                  mode: LaunchMode.externalApplication);
-                            },
-                            child: Text(
-                              AppLocalizations.of(context)!.termsAndConditions,
+                            Text(
+                              AppLocalizations.of(context)!.iHaveReadAndAccept,
                               style: TextStyle(
                                 color: Theme.of(context).colorScheme.onSurface,
                                 fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                                decoration: TextDecoration.underline,
+                                fontWeight: FontWeight.normal,
                               ),
                             ),
-                          ),
-                        ],
-                      ),
+                            GestureDetector(
+                              onTap: () {
+                                Uri url = Uri.parse(
+                                  "https://camelus.app/terms/",
+                                );
+                                launchUrl(
+                                  url,
+                                  mode: LaunchMode.externalApplication,
+                                );
+                              },
+                              child: Text(
+                                AppLocalizations.of(
+                                  context,
+                                )!.termsAndConditions,
+                                style: TextStyle(
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.onSurface,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                  decoration: TextDecoration.underline,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
 
-                      const SizedBox(height: 5),
-                      GestureDetector(
-                        onTap: () {
-                          Uri url = Uri.parse("https://camelus.app/privacy/");
-                          launchUrl(url, mode: LaunchMode.externalApplication);
-                        },
-                        child: Text(
-                          AppLocalizations.of(context)!.privacyPolicy,
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.onSurface,
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                            decoration: TextDecoration.underline,
+                        const SizedBox(height: 5),
+                        GestureDetector(
+                          onTap: () {
+                            Uri url = Uri.parse("https://camelus.app/privacy/");
+                            launchUrl(
+                              url,
+                              mode: LaunchMode.externalApplication,
+                            );
+                          },
+                          child: Text(
+                            AppLocalizations.of(context)!.privacyPolicy,
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.onSurface,
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                              decoration: TextDecoration.underline,
+                            ),
                           ),
                         ),
-                      ),
 
-                      const SizedBox(height: 20),
+                        const SizedBox(height: 20),
 
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
-                        width: 400,
-                        height: 40,
-                        child: longButton(
-                          name: AppLocalizations.of(context)!.login,
-                          inverted: true,
-                          onPressed: () => _onSubmit(),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                          width: 400,
+                          height: 40,
+                          child: longButton(
+                            name: AppLocalizations.of(context)!.login,
+                            inverted: true,
+                            onPressed: () => _onSubmit(),
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
-          );
-        }),
+            );
+          },
+        ),
       ),
     );
   }
@@ -562,56 +604,24 @@ class _OnboardingLoginPageState extends ConsumerState<OnboardingLoginPage> {
           crossAxisCount: 3,
           childAspectRatio: (20 / 9),
           dragStartBehavior: DragStartBehavior.start,
-          children: List.generate(
-            _userWords.length,
-            (index) {
-              return LongPressDraggable<int>(
-                data: index,
-                feedback: Material(
-                  color: Colors.transparent,
-                  child: Center(
-                    child: Container(
-                      width: 100,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        color: Paletter.getExtraDarkGray(context),
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(
-                          color: Paletter.getDarkGray(context),
-                          width: 1,
-                        ),
-                      ),
-                      child: Center(
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.baseline,
-                          textBaseline: TextBaseline.alphabetic,
-                          children: [
-                            Text(
-                              (index + 1).toString(),
-                              style: TextStyle(
-                                color: Paletter.getGray(context),
-                                fontSize: 12,
-                              ),
-                            ),
-                            const SizedBox(width: 5),
-                            Text(
-                              _userWords[index],
-                              style: TextStyle(
-                                color: Paletter.getExtraLightGray(context),
-                                fontSize: 16,
-                              ),
-                            ),
-                          ],
-                        ),
+          children: List.generate(_userWords.length, (index) {
+            return LongPressDraggable<int>(
+              data: index,
+              feedback: Material(
+                color: Colors.transparent,
+                child: Center(
+                  child: Container(
+                    width: 100,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: Paletter.getExtraDarkGray(context),
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(
+                        color: Paletter.getDarkGray(context),
+                        width: 1,
                       ),
                     ),
-                  ),
-                ),
-                child: DragTarget<int>(
-                  builder: (BuildContext context, List<int?> candidateData,
-                      List<dynamic> rejectedData) {
-                    return Center(
+                    child: Center(
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.baseline,
@@ -634,20 +644,53 @@ class _OnboardingLoginPageState extends ConsumerState<OnboardingLoginPage> {
                           ),
                         ],
                       ),
-                    );
-                  },
-                  onWillAcceptWithDetails: (data) => data.data != index,
-                  onAcceptWithDetails: (data) {
-                    setState(() {
-                      String temp = _userWords[data.data];
-                      _userWords[data.data] = _userWords[index];
-                      _userWords[index] = temp;
-                    });
-                  },
+                    ),
+                  ),
                 ),
-              );
-            },
-          ),
+              ),
+              child: DragTarget<int>(
+                builder:
+                    (
+                      BuildContext context,
+                      List<int?> candidateData,
+                      List<dynamic> rejectedData,
+                    ) {
+                      return Center(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.baseline,
+                          textBaseline: TextBaseline.alphabetic,
+                          children: [
+                            Text(
+                              (index + 1).toString(),
+                              style: TextStyle(
+                                color: Paletter.getGray(context),
+                                fontSize: 12,
+                              ),
+                            ),
+                            const SizedBox(width: 5),
+                            Text(
+                              _userWords[index],
+                              style: TextStyle(
+                                color: Paletter.getExtraLightGray(context),
+                                fontSize: 16,
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                onWillAcceptWithDetails: (data) => data.data != index,
+                onAcceptWithDetails: (data) {
+                  setState(() {
+                    String temp = _userWords[data.data];
+                    _userWords[data.data] = _userWords[index];
+                    _userWords[index] = temp;
+                  });
+                },
+              ),
+            );
+          }),
         ),
       ),
     );

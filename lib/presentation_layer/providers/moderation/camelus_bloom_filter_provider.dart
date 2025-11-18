@@ -31,10 +31,14 @@ class BloomFilterNotifier extends Notifier<BloomFilterState> {
   @override
   BloomFilterState build() {
     return BloomFilterState(
-      filterProfiles:
-          BloomFilterPrehash(falsePositiveProbability: 0.001, numItems: 1),
-      filterEvents:
-          BloomFilterPrehash(falsePositiveProbability: 0.001, numItems: 1),
+      filterProfiles: BloomFilterPrehash(
+        falsePositiveProbability: 0.001,
+        numItems: 1,
+      ),
+      filterEvents: BloomFilterPrehash(
+        falsePositiveProbability: 0.001,
+        numItems: 1,
+      ),
       isEnabled: true,
     );
   }
@@ -56,8 +60,8 @@ class BloomFilterNotifier extends Notifier<BloomFilterState> {
 
 final bloomFilterNotifierProvider =
     NotifierProvider<BloomFilterNotifier, BloomFilterState>(() {
-  return BloomFilterNotifier();
-});
+      return BloomFilterNotifier();
+    });
 
 final camelusBloomFilterProvider = Provider<ndk.EventFilter>((ref) {
   final bloomFilterState = ref.watch(bloomFilterNotifierProvider);
@@ -72,10 +76,14 @@ final camelusBloomFilterProvider = Provider<ndk.EventFilter>((ref) {
 final bloomFilterReferenceProvider = Provider<MyProfilesBloomFilter>((ref) {
   // Create a mutable filter instance
   final filter = MyProfilesBloomFilter(
-    bloomFilterProfiles:
-        BloomFilterPrehash(falsePositiveProbability: 0.001, numItems: 1),
-    bloomFilterEvents:
-        BloomFilterPrehash(falsePositiveProbability: 0.001, numItems: 1),
+    bloomFilterProfiles: BloomFilterPrehash(
+      falsePositiveProbability: 0.001,
+      numItems: 1,
+    ),
+    bloomFilterEvents: BloomFilterPrehash(
+      falsePositiveProbability: 0.001,
+      numItems: 1,
+    ),
     enabled: true,
   );
 
@@ -100,9 +108,9 @@ class MyProfilesBloomFilter implements ndk.EventFilter {
     required BloomFilterPrehash bloomFilterProfiles,
     required BloomFilterPrehash bloomFilterEvents,
     required bool enabled,
-  })  : _bloomFilterProfiles = bloomFilterProfiles,
-        _bloomFilterEvents = bloomFilterEvents,
-        _enabled = enabled;
+  }) : _bloomFilterProfiles = bloomFilterProfiles,
+       _bloomFilterEvents = bloomFilterEvents,
+       _enabled = enabled;
 
   void updateFilter({
     BloomFilterPrehash? newFilterProfiles,

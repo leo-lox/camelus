@@ -18,7 +18,7 @@ publish_to: "none" # Remove this line if you wish to publish to pub.dev
 version: 1.7.4+66
 
 environment:
-  sdk: ">=3.0.0 <4.0.0"
+  sdk: ">=3.9.2 <4.0.0"
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -113,7 +113,7 @@ dependency_overrides:
     git:
       url: https://github.com/relaystr/ndk.git
       path: packages/ndk
-      ref: tmp-camelus-1-7-4
+      ref: 175-refactor-list-usecase
   #ndk_rust_verifier:
   #  path: ../ndk/packages/rust_verifier
     #git:

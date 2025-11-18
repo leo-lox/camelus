@@ -9,7 +9,8 @@ Future<CacheManager> getDbWithIsolate() async {
   final rootToken = RootIsolateToken.instance;
   if (rootToken == null) {
     throw StateError(
-        'Cannot get the root isolate token. This is required for plugins to work in background isolates.');
+      'Cannot get the root isolate token. This is required for plugins to work in background isolates.',
+    );
   }
   final dbIsolateManager = DbIsolateManager();
   await dbIsolateManager.start();

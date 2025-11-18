@@ -24,8 +24,10 @@ main() {
       await tester.tap(find.widgetWithText(ElevatedButton, 'next'));
       await tester.pumpAndSettle();
       expect(find.byType(SnackBar), findsOneWidget);
-      expect(find.text('Please read and accept the terms and conditions first'),
-          findsOneWidget);
+      expect(
+        find.text('Please read and accept the terms and conditions first'),
+        findsOneWidget,
+      );
       await tester.pumpAndSettle();
 
       await tester.tap(find.byType(Checkbox));

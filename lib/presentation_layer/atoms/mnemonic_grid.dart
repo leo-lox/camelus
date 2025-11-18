@@ -33,14 +33,8 @@ class MnemonicSentenceGrid extends StatelessWidget {
               children: [
                 Center(
                   child: isVisible
-                      ? Text(
-                          words[index],
-                          style: const TextStyle(fontSize: 16),
-                        )
-                      : const Text(
-                          '••••',
-                          style: TextStyle(fontSize: 16),
-                        ),
+                      ? Text(words[index], style: const TextStyle(fontSize: 16))
+                      : const Text('••••', style: TextStyle(fontSize: 16)),
                 ),
                 Positioned(
                   top: 2,

@@ -6,6 +6,7 @@ import 'onboarding_done.dart';
 import 'onboarding_invited_by.dart';
 import 'onboarding_login.dart';
 import 'onboarding_login_amber.dart';
+import 'onboarding_login_bunker.dart';
 import 'onboarding_login_select.dart';
 import 'onboarding_name.dart';
 import 'onboarding_page01.dart';
@@ -14,9 +15,7 @@ import 'onboarding_profile.dart';
 import 'onboarding_starter_pack.dart';
 
 class NostrOnboarding extends ConsumerStatefulWidget {
-  const NostrOnboarding({
-    super.key,
-  });
+  const NostrOnboarding({super.key});
 
   @override
   ConsumerState<NostrOnboarding> createState() => _NostrOnboardingState();
@@ -78,21 +77,20 @@ class _NostrOnboardingState extends ConsumerState<NostrOnboarding>
   }
 
   _navigateToLogin() {
-    _horizontalPageController.animateToPage(0,
-        duration: const Duration(milliseconds: 500), curve: Curves.easeInOut);
+    _horizontalPageController.animateToPage(
+      0,
+      duration: const Duration(milliseconds: 500),
+      curve: Curves.easeInOut,
+    );
   }
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(
-      length: 6,
-      initialIndex: 0,
-      vsync: this,
-    );
+    _tabController = TabController(length: 6, initialIndex: 0, vsync: this);
 
     _loginTabController = TabController(
-      length: 3,
+      length: 4,
       initialIndex: 0,
       vsync: this,
     );
@@ -122,8 +120,9 @@ class _NostrOnboardingState extends ConsumerState<NostrOnboarding>
         children: [
           TabBarView(
             controller: _loginTabController,
-            physics:
-                pageLockLogin ? const NeverScrollableScrollPhysics() : null,
+            physics: pageLockLogin
+                ? const NeverScrollableScrollPhysics()
+                : null,
             children: [
               OnboardingLoginSelectPage(
                 onPressedAmberLogin: () {
@@ -136,6 +135,13 @@ class _NostrOnboardingState extends ConsumerState<NostrOnboarding>
                 onPressedSeedPhraseLogin: () {
                   _loginTabController.animateTo(
                     1,
+                    curve: Curves.easeInOut,
+                    duration: const Duration(milliseconds: 500),
+                  );
+                },
+                onPressedBunkerLogin: () {
+                  _loginTabController.animateTo(
+                    3,
                     curve: Curves.easeInOut,
                     duration: const Duration(milliseconds: 500),
                   );
@@ -158,6 +164,15 @@ class _NostrOnboardingState extends ConsumerState<NostrOnboarding>
                 },
               ),
               OnboardingLoginAmberPage(
+                onPressedBack: () {
+                  _loginTabController.animateTo(
+                    0,
+                    curve: Curves.easeInOut,
+                    duration: const Duration(milliseconds: 500),
+                  );
+                },
+              ),
+              OnboardingLoginBunkerPage(
                 onPressedBack: () {
                   _loginTabController.animateTo(
                     0,
@@ -233,7 +248,7 @@ class _NostrOnboardingState extends ConsumerState<NostrOnboarding>
               //   },
               //   userInfo: signUpInfo,
               // ),
-              OnboardingDone(submitCallback: () {}, userInfo: signUpInfo)
+              OnboardingDone(submitCallback: () {}, userInfo: signUpInfo),
             ],
           ),
         ],

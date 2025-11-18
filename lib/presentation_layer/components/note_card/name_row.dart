@@ -35,8 +35,9 @@ class _NoteCardNameRowState extends ConsumerState<NoteCardNameRow> {
     _initSequence();
 
     final now = DateTime.now();
-    final postDateTime =
-        DateTime.fromMillisecondsSinceEpoch(widget.createdAt * 1000);
+    final postDateTime = DateTime.fromMillisecondsSinceEpoch(
+      widget.createdAt * 1000,
+    );
     final difference = now.difference(postDateTime);
 
     if (difference.inDays < 2) {

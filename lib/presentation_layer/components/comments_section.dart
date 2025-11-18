@@ -37,10 +37,7 @@ class FlatCommentWidget extends StatelessWidget {
           left: 0,
           top: 0,
           bottom: 0,
-          child: DepthIndicator(
-            isHighlighted: false,
-            depth: comment.depth,
-          ),
+          child: DepthIndicator(isHighlighted: false, depth: comment.depth),
         ),
         Padding(
           padding: EdgeInsets.only(left: comment.depth * 16.0),
@@ -53,17 +50,15 @@ class FlatCommentWidget extends StatelessWidget {
                   child: Container(
                     decoration: BoxDecoration(
                       border: Border.all(
-                        color: Theme.of(context)
-                            .colorScheme
-                            .primary
-                            .withValues(alpha: 0.65),
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.primary.withValues(alpha: 0.65),
                         width: 2.0,
                       ),
                       borderRadius: BorderRadius.circular(10.0),
-                      color: Theme.of(context)
-                          .colorScheme
-                          .primary
-                          .withValues(alpha: 0.05),
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.primary.withValues(alpha: 0.05),
                     ),
                   ),
                 ),
@@ -104,14 +99,15 @@ class DepthIndicator extends StatelessWidget {
             decoration: BoxDecoration(
               color: isHighlighted && i == depth - 1
                   ? Theme.of(context).colorScheme.primary
-                  : Paletter.getLightGray(context)
-                      .withValues(alpha: _calculateOpacity(i + 1)),
+                  : Paletter.getLightGray(
+                      context,
+                    ).withValues(alpha: _calculateOpacity(i + 1)),
               // borderRadius: BorderRadius.vertical(
               //   top: Radius.circular(25),
               //   bottom: Radius.circular(25),
               // ),
             ),
-          )
+          ),
       ],
     );
   }

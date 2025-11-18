@@ -16,17 +16,15 @@ class Notifications {
   final ndk.EventSigner? _eventSigner;
   final InboxOutbox _inboxOutbox;
 
-  Notifications(
-      {required NotificationsRepository notificationsRepository,
-      required ndk.EventSigner? eventSigner,
-      required InboxOutbox inboxOutbox})
-      : _notificationsRepo = notificationsRepository,
-        _eventSigner = eventSigner,
-        _inboxOutbox = inboxOutbox;
+  Notifications({
+    required NotificationsRepository notificationsRepository,
+    required ndk.EventSigner? eventSigner,
+    required InboxOutbox inboxOutbox,
+  }) : _notificationsRepo = notificationsRepository,
+       _eventSigner = eventSigner,
+       _inboxOutbox = inboxOutbox;
 
-  Future<bool> registerDevice({
-    required String token,
-  }) async {
+  Future<bool> registerDevice({required String token}) async {
     if (_eventSigner == null) {
       throw Exception("cannot register device without signer");
     }
@@ -57,18 +55,10 @@ class Notifications {
       content: "",
       sig: "",
       tags: [
-        NostrTag(
-          type: "challenge",
-          value: token,
-        ),
-        ...readRelays.map(
-          (relayUrl) {
-            return NostrTag(
-              type: "relay",
-              value: relayUrl,
-            );
-          },
-        ),
+        NostrTag(type: "challenge", value: token),
+        ...readRelays.map((relayUrl) {
+          return NostrTag(type: "relay", value: relayUrl);
+        }),
 
         //NostrTag(type: "relay", value: "ws://localhost:10547")
       ],
@@ -130,11 +120,13 @@ class Notifications {
         final replyId = nostrNote.getDirectReply?.value;
         final rootId = nostrNote.getRootReply?.value;
 
-        navigatorKey.currentState
-            ?.pushNamed("/nostr/event", arguments: <String, String?>{
-          "root": rootId ?? replyId ?? nostrNote.id,
-          "scrollIntoView": replyId,
-        });
+        navigatorKey.currentState?.pushNamed(
+          "/nostr/event",
+          arguments: <String, String?>{
+            "root": rootId ?? replyId ?? nostrNote.id,
+            "scrollIntoView": replyId,
+          },
+        );
       }
     }
   }

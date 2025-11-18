@@ -42,8 +42,10 @@ class VerifyNip05 {
 
     _inFlight.add(nip05);
 
-    var result =
-        await _nip05Repository.requestNip05(nip05: nip05, pubkey: pubkey);
+    var result = await _nip05Repository.requestNip05(
+      nip05: nip05,
+      pubkey: pubkey,
+    );
     _inFlight.remove(nip05);
 
     return result;

@@ -14,8 +14,12 @@ class Helpers {
   final Random _rnd = Random();
 
   String getRandomString(int length) {
-    return String.fromCharCodes(Iterable.generate(
-        length, (_) => _chars.codeUnitAt(_rnd.nextInt(_chars.length))));
+    return String.fromCharCodes(
+      Iterable.generate(
+        length,
+        (_) => _chars.codeUnitAt(_rnd.nextInt(_chars.length)),
+      ),
+    );
   }
 
   String getUuid() {
@@ -51,8 +55,9 @@ class Helpers {
       return [HEX.encode(eightBitWords), bech32.hrp];
     } catch (e) {
       developer.log(
-          'decodeBech32 error: $e, \n \n String is: $bech32String \n \n',
-          error: e);
+        'decodeBech32 error: $e, \n \n String is: $bech32String \n \n',
+        error: e,
+      );
     }
     return ["", ""];
   }

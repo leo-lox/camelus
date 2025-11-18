@@ -16,7 +16,8 @@ class BloomFilterPrehash {
   }) {
     if (falsePositiveProbability <= 0 || falsePositiveProbability >= 1) {
       throw ArgumentError(
-          "False positive probability must be in range (0, 1).");
+        "False positive probability must be in range (0, 1).",
+      );
     }
     if (numItems <= 0) {
       throw ArgumentError("Number of items must be positive.");
@@ -117,10 +118,14 @@ class BloomFilterPrehash {
 
     // Extract two 8-byte chunks from different parts of the hash
     // and use them as our two independent hash functions
-    final String chunk1 =
-        hexHash.substring(0, 16); // First 16 hex chars (8 bytes)
-    final String chunk2 =
-        hexHash.substring(32, 48); // Another 16 hex chars from the middle
+    final String chunk1 = hexHash.substring(
+      0,
+      16,
+    ); // First 16 hex chars (8 bytes)
+    final String chunk2 = hexHash.substring(
+      32,
+      48,
+    ); // Another 16 hex chars from the middle
 
     // Convert to integers
     final BigInt hash1 = BigInt.parse(chunk1, radix: 16);

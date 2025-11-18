@@ -7,9 +7,7 @@ import '../models/app_update_model.dart';
 class AppUpdateRepositoryImpl implements AppUpdateRepository {
   final ServerpodDataSource serverpodDataSource;
 
-  AppUpdateRepositoryImpl({
-    required this.serverpodDataSource,
-  });
+  AppUpdateRepositoryImpl({required this.serverpodDataSource});
 
   @override
   Future<AppUpdate> checkAppUpdate() async {

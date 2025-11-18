@@ -20,7 +20,10 @@ class NeventHelper {
 
   /// Generates a list of TLV objects
   List<TLV> _generateTlvList(
-      String eventId, String? authorPubkey, List<String> relays) {
+    String eventId,
+    String? authorPubkey,
+    List<String> relays,
+  ) {
     final List<TLV> tlvList = [];
     tlvList.add(_generateEventIdTlv(eventId));
 
@@ -52,8 +55,9 @@ class NeventHelper {
   /// TLV type 2
   /// [authorPubkey] must be 32 bytes long
   TLV _generateAuthorPubkeyTlv(String authorPubkey) {
-    final Uint8List authorPubkeyBytes =
-        Uint8List.fromList(HEX.decode(authorPubkey));
+    final Uint8List authorPubkeyBytes = Uint8List.fromList(
+      HEX.decode(authorPubkey),
+    );
     return TLV(type: 2, length: 32, value: authorPubkeyBytes);
   }
 

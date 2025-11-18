@@ -28,11 +28,13 @@ class NostrListModel extends NostrList {
       kind: kind,
       createdAt: createdAt,
       elements: elements
-          .map((e) => NostrListElementModel(
-                tag: e.tag,
-                value: e.value,
-                private: e.private,
-              ).toNDK())
+          .map(
+            (e) => NostrListElementModel(
+              tag: e.tag,
+              value: e.value,
+              private: e.private,
+            ).toNDK(),
+          )
           .toList(),
     );
   }
@@ -56,8 +58,9 @@ class NostrStarterPackModel extends NostrStarterPack {
       pubKey: ndkSet.pubKey,
       name: ndkSet.name,
       createdAt: ndkSet.createdAt,
-      elements:
-          ndkSet.elements.map((e) => NostrListElementModel.fromNDK(e)).toList(),
+      elements: ndkSet.elements
+          .map((e) => NostrListElementModel.fromNDK(e))
+          .toList(),
       title: ndkSet.title,
       kind: ndkSet.kind,
       description: ndkSet.description,
@@ -93,11 +96,13 @@ class NostrStarterPackModel extends NostrStarterPack {
       kind: NostrList.starterPack,
       createdAt: createdAt,
       elements: elements
-          .map((e) => NostrListElementModel(
-                tag: e.tag,
-                value: e.value,
-                private: e.private,
-              ).toNDK())
+          .map(
+            (e) => NostrListElementModel(
+              tag: e.tag,
+              value: e.value,
+              private: e.private,
+            ).toNDK(),
+          )
           .toList(),
     );
 
@@ -117,7 +122,8 @@ class NostrListElementModel extends NostrListElement {
 
   // Convert from Nip51ListElement (NDK) to Nip51ListElementModel
   static NostrListElementModel fromNDK(
-      ndk_entities.Nip51ListElement ndkElement) {
+    ndk_entities.Nip51ListElement ndkElement,
+  ) {
     return NostrListElementModel(
       tag: ndkElement.tag,
       value: ndkElement.value,

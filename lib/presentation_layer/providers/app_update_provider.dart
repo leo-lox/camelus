@@ -10,8 +10,9 @@ import 'serverpod_provider.dart';
 final appUpdateProvider = Provider<CheckAppUpdate>((ref) {
   final serverpodDs = ref.watch(serverpodProvider);
 
-  final AppUpdateRepository appUpdateRepository =
-      AppUpdateRepositoryImpl(serverpodDataSource: serverpodDs);
+  final AppUpdateRepository appUpdateRepository = AppUpdateRepositoryImpl(
+    serverpodDataSource: serverpodDs,
+  );
 
   final CheckAppUpdate appUpdate = CheckAppUpdate(appUpdateRepository);
 

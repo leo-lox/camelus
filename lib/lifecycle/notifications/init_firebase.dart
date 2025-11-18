@@ -34,8 +34,9 @@ Future<void> initializeFirebase({
       (data) => firebaseMessagingOpenedApp(data, provider),
     );
 
-    FirebaseMessaging.onMessage
-        .listen((data) => firebaseMessagingAppOpen(data, provider));
+    FirebaseMessaging.onMessage.listen(
+      (data) => firebaseMessagingAppOpen(data, provider),
+    );
 
     /// listen to token refresh
     FirebaseMessaging.instance.onTokenRefresh.listen((newToken) async {

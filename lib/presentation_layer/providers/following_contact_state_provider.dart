@@ -11,15 +11,9 @@ class ContactListState {
   final bool isLoading;
   final ContactList contactList;
 
-  ContactListState({
-    required this.isLoading,
-    required this.contactList,
-  });
+  ContactListState({required this.isLoading, required this.contactList});
 
-  ContactListState copyWith({
-    bool? isLoading,
-    ContactList? contactList,
-  }) {
+  ContactListState copyWith({bool? isLoading, ContactList? contactList}) {
     return ContactListState(
       isLoading: isLoading ?? this.isLoading,
       contactList: contactList ?? this.contactList,
@@ -29,10 +23,11 @@ class ContactListState {
 
 final contactListStateProvider =
     StateNotifierProvider.family<ContactListNotifier, ContactListState, String>(
-        (ref, pubkey) {
-  final follow = ref.watch(followingProvider);
-  return ContactListNotifier(pubkey, follow);
-});
+      (ref, pubkey) {
+        final follow = ref.watch(followingProvider);
+        return ContactListNotifier(pubkey, follow);
+      },
+    );
 
 /// convinience provider
 final contactListSelfStateProvider = Provider<ContactListState>((ref) {
@@ -46,47 +41,45 @@ class ContactListNotifier extends StateNotifier<ContactListState> {
 
   StreamSubscription<ContactList?>? _subscription;
 
-  ContactListNotifier(
-    this._pubkey,
-    this._followUseCase,
-  ) : super(
-          ContactListState(
-            isLoading: true,
-            contactList: ContactList(
-                pubKey: _pubkey,
-                contacts: [],
-                contactRelays: [],
-                petnames: [],
-                followedTags: [],
-                followedCommunities: [],
-                followedEvents: [],
-                sources: [],
-                createdAt: 0,
-                loadedTimestamp: null),
+  ContactListNotifier(this._pubkey, this._followUseCase)
+    : super(
+        ContactListState(
+          isLoading: true,
+          contactList: ContactList(
+            pubKey: _pubkey,
+            contacts: [],
+            contactRelays: [],
+            petnames: [],
+            followedTags: [],
+            followedCommunities: [],
+            followedEvents: [],
+            sources: [],
+            createdAt: 0,
+            loadedTimestamp: null,
           ),
-        ) {
+        ),
+      ) {
     _initializeState();
   }
 
   void _initializeState() {
-    _subscription = _followUseCase.getContactsStream(_pubkey).listen(
-      (contactList) {
-        state = state.copyWith(
-          isLoading: false,
-          contactList: contactList,
+    _subscription = _followUseCase
+        .getContactsStream(_pubkey)
+        .listen(
+          (contactList) {
+            state = state.copyWith(isLoading: false, contactList: contactList);
+          },
+          onError: (error) {
+            state = state.copyWith(
+              isLoading: false,
+              contactList: null, // Set to null on error
+            );
+            // Handle the error appropriately, e.g., log it
+            if (kDebugMode) {
+              print('Error fetching contact list: $error');
+            }
+          },
         );
-      },
-      onError: (error) {
-        state = state.copyWith(
-          isLoading: false,
-          contactList: null, // Set to null on error
-        );
-        // Handle the error appropriately, e.g., log it
-        if (kDebugMode) {
-          print('Error fetching contact list: $error');
-        }
-      },
-    );
   }
 
   Future followUser(String pubkey) async {

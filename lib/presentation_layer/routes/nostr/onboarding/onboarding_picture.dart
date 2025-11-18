@@ -63,9 +63,7 @@ class _OnboardingPictureState extends ConsumerState<OnboardingPicture> {
     Navigator.push(
       context,
       MaterialPageRoute<Uint8List>(
-        builder: (context) => CropAvatar(
-          imageData: imageData,
-        ),
+        builder: (context) => CropAvatar(imageData: imageData),
       ),
     ).then((value) {
       if (value != null) {
@@ -93,18 +91,17 @@ class _OnboardingPictureState extends ConsumerState<OnboardingPicture> {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            const Spacer(
-              flex: 1,
-            ),
+            const Spacer(flex: 1),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.baseline,
               textBaseline: TextBaseline.alphabetic,
               children: [
-                Text(AppLocalizations.of(context)!.welcome, style: const TextStyle(fontSize: 20)),
-                const SizedBox(
-                  width: 5,
+                Text(
+                  AppLocalizations.of(context)!.welcome,
+                  style: const TextStyle(fontSize: 20),
                 ),
+                const SizedBox(width: 5),
                 Text(
                   widget.signUpInfo.name ?? '',
                   style: const TextStyle(
@@ -114,31 +111,25 @@ class _OnboardingPictureState extends ConsumerState<OnboardingPicture> {
                 ),
               ],
             ),
-            const Spacer(
-              flex: 1,
-            ),
+            const Spacer(flex: 1),
             InkWell(
               borderRadius: BorderRadius.all(Radius.circular(50)),
               onTap: () {
                 _pickFile();
               },
               child: widget.signUpInfo.picture == null
-                  ? const CameraUpload(
-                      size: 125,
-                    )
+                  ? const CameraUpload(size: 125)
                   : ClipOval(
                       child: SizedBox.fromSize(
                         size: const Size.square(125),
                         child: Container(
-                            color: Theme.of(context).colorScheme.surface,
-                            child:
-                                Image.memory(widget.signUpInfo.picture!.bytes)),
+                          color: Theme.of(context).colorScheme.surface,
+                          child: Image.memory(widget.signUpInfo.picture!.bytes),
+                        ),
                       ),
                     ),
             ),
-            const Spacer(
-              flex: 1,
-            ),
+            const Spacer(flex: 1),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               width: 400,
@@ -151,9 +142,7 @@ class _OnboardingPictureState extends ConsumerState<OnboardingPicture> {
                 inverted: pictureSelected,
               ),
             ),
-            const SizedBox(
-              height: 15,
-            ),
+            const SizedBox(height: 15),
           ],
         ),
       ),

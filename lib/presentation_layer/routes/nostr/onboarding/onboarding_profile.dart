@@ -115,7 +115,7 @@ class _OnboardingProfileState extends ConsumerState<OnboardingProfile> {
             mimeType: file.mimeType,
             name: file.name,
           );
-        })
+        }),
       },
     );
   }
@@ -175,10 +175,9 @@ class _OnboardingProfileState extends ConsumerState<OnboardingProfile> {
                   color: Theme.of(context).colorScheme.surface,
                   boxShadow: [
                     BoxShadow(
-                      color: Theme.of(context)
-                          .colorScheme
-                          .surface
-                          .withValues(alpha: 0.1),
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.surface.withValues(alpha: 0.1),
                       blurRadius: 10,
                       offset: Offset(0, -5),
                     ),

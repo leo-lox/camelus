@@ -12,9 +12,7 @@ class LanguageState {
   const LanguageState({required this.locale});
 
   LanguageState copyWith({Locale? locale}) {
-    return LanguageState(
-      locale: locale ?? this.locale,
-    );
+    return LanguageState(locale: locale ?? this.locale);
   }
 }
 
@@ -25,7 +23,7 @@ class LanguageNotifier extends StateNotifier<LanguageState> {
 
   // Initialize with a default locale first
   LanguageNotifier(this._appDb)
-      : super(const LanguageState(locale: Locale('en'))) {
+    : super(const LanguageState(locale: Locale('en'))) {
     // Then load the saved locale asynchronously
     _initializeLocale();
   }
@@ -74,8 +72,9 @@ class LanguageNotifier extends StateNotifier<LanguageState> {
     // Save to app database
     if (locale.countryCode != null) {
       await _appDb.save(
-          key: _dbLangKey,
-          value: '${locale.languageCode}_${locale.countryCode}');
+        key: _dbLangKey,
+        value: '${locale.languageCode}_${locale.countryCode}',
+      );
     } else {
       await _appDb.save(key: _dbLangKey, value: locale.languageCode);
     }
@@ -98,11 +97,12 @@ class LanguageNotifier extends StateNotifier<LanguageState> {
 }
 
 // StateNotifierProvider for language
-final languageProvider =
-    StateNotifierProvider<LanguageNotifier, LanguageState>((ref) {
-  final appDb = ref.watch(dbAppProvider);
-  return LanguageNotifier(appDb);
-});
+final languageProvider = StateNotifierProvider<LanguageNotifier, LanguageState>(
+  (ref) {
+    final appDb = ref.watch(dbAppProvider);
+    return LanguageNotifier(appDb);
+  },
+);
 
 // Provider to get current locale
 final currentLocaleProvider = Provider<Locale>((ref) {

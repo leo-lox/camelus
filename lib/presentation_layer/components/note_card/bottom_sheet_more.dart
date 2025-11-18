@@ -33,10 +33,7 @@ class BottomSheetOption {
 class MoreOptionsBottomSheet extends ConsumerStatefulWidget {
   final NostrNote note;
 
-  const MoreOptionsBottomSheet({
-    super.key,
-    required this.note,
-  });
+  const MoreOptionsBottomSheet({super.key, required this.note});
 
   @override
   ConsumerState<MoreOptionsBottomSheet> createState() =>
@@ -74,16 +71,18 @@ class _MoreOptionsBottomSheetState
   }
 
   Widget _buildHandle() {
-    return Builder(builder: (context) {
-      return Container(
-        width: 40,
-        height: 4,
-        decoration: BoxDecoration(
-          color: Paletter.getGray(context),
-          borderRadius: BorderRadius.circular(2),
-        ),
-      );
-    });
+    return Builder(
+      builder: (context) {
+        return Container(
+          width: 40,
+          height: 4,
+          decoration: BoxDecoration(
+            color: Paletter.getGray(context),
+            borderRadius: BorderRadius.circular(2),
+          ),
+        );
+      },
+    );
   }
 
   Widget _buildOptionTile(BottomSheetOption option) {
@@ -101,17 +100,20 @@ class _MoreOptionsBottomSheetState
                 option.leading,
                 const SizedBox(width: 16),
                 Expanded(
-                  child: Builder(builder: (context) {
-                    return Text(
-                      option.label,
-                      style: TextStyle(
-                        color:
-                            option.textColor ?? Paletter.getLightGray(context),
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    );
-                  }),
+                  child: Builder(
+                    builder: (context) {
+                      return Text(
+                        option.label,
+                        style: TextStyle(
+                          color:
+                              option.textColor ??
+                              Paletter.getLightGray(context),
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      );
+                    },
+                  ),
                 ),
               ],
             ),
@@ -127,18 +129,17 @@ class _MoreOptionsBottomSheetState
     // Check if note is already bookmarked (in either public or private)
     final isBookmarked =
         bookmarksState.publicBookmarks.any((n) => n.id == widget.note.id) ||
-            bookmarksState.privateBookmarks.any((n) => n.id == widget.note.id);
-    final isPrivateBookmark =
         bookmarksState.privateBookmarks.any((n) => n.id == widget.note.id);
+    final isPrivateBookmark = bookmarksState.privateBookmarks.any(
+      (n) => n.id == widget.note.id,
+    );
 
     if (_isAddingBookmark) {
       return Padding(
         padding: const EdgeInsets.symmetric(vertical: 4),
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(8),
-          ),
+          decoration: BoxDecoration(borderRadius: BorderRadius.circular(8)),
           child: Row(
             children: [
               SizedBox(
@@ -280,10 +281,8 @@ class _MoreOptionsBottomSheetState
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => BlockPage(
-          postId: widget.note.id,
-          userPubkey: widget.note.pubkey,
-        ),
+        builder: (context) =>
+            BlockPage(postId: widget.note.id, userPubkey: widget.note.pubkey),
       ),
     );
   }
@@ -332,7 +331,10 @@ class _MoreOptionsBottomSheetState
   }
 
   Future<void> _removeFromBookmarks(
-      BuildContext context, WidgetRef ref, bool isPrivate) async {
+    BuildContext context,
+    WidgetRef ref,
+    bool isPrivate,
+  ) async {
     setState(() {
       _isAddingBookmark = true;
       _errorMessage = null;

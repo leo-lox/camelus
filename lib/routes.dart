@@ -52,9 +52,9 @@ final routes = [
             desktopContent: ThreeColumnLayout(
               leftSidebar: NostrSideMenu(
                 trailingButtonWidget: Padding(
-                    padding:
-                        const EdgeInsets.only(top: 40, left: 10, right: 10),
-                    child: NostrSideMenuPostButton()),
+                  padding: const EdgeInsets.only(top: 40, left: 10, right: 10),
+                  child: NostrSideMenuPostButton(),
+                ),
                 leadingWidget: SideMenuLogo(
                   trailingWidget: RelaysConnectivityWidget(
                     onTap: () {
@@ -77,16 +77,13 @@ final routes = [
             path: '/home',
             builder: (context, state) => ResponsiveLayout(
               desktopContent: const HomePageDesktop(),
-              mobileContent: const HomePageMobile(
-                initialTab: '/',
-              ),
+              mobileContent: const HomePageMobile(initialTab: '/'),
             ),
           ),
           GoRoute(
             path: '/posts-and-replies',
-            builder: (context, state) => const HomePageMobile(
-              initialTab: '/posts-and-replies',
-            ),
+            builder: (context, state) =>
+                const HomePageMobile(initialTab: '/posts-and-replies'),
           ),
           GoRoute(
             path: '/search',
@@ -140,15 +137,13 @@ final routes = [
           ),
           GoRoute(
             path: '/nostr/profile/:pubkey',
-            builder: (context, state) => ProfilePage2(
-              pubkey: state.pathParameters['pubkey']!,
-            ),
+            builder: (context, state) =>
+                ProfilePage2(pubkey: state.pathParameters['pubkey']!),
             routes: [
               GoRoute(
                 path: 'edit',
-                builder: (context, state) => EditProfilePage(
-                  pubkey: state.pathParameters['pubkey']!,
-                ),
+                builder: (context, state) =>
+                    EditProfilePage(pubkey: state.pathParameters['pubkey']!),
               ),
             ],
           ),
@@ -193,9 +188,8 @@ final routes = [
 
       GoRoute(
         path: '/:id',
-        builder: (context, state) => DeeplinkRecieverPage(
-          userParam: state.pathParameters['id']!,
-        ),
+        builder: (context, state) =>
+            DeeplinkRecieverPage(userParam: state.pathParameters['id']!),
       ),
     ],
   ),

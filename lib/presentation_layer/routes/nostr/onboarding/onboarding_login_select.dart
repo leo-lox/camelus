@@ -10,12 +10,14 @@ import '../../../atoms/long_button.dart';
 class OnboardingLoginSelectPage extends ConsumerStatefulWidget {
   final Function onPressedSeedPhraseLogin;
   final Function onPressedAmberLogin;
+  final Function onPressedBunkerLogin;
   final Function? onPressedBack;
 
   const OnboardingLoginSelectPage({
     super.key,
     required this.onPressedSeedPhraseLogin,
     required this.onPressedAmberLogin,
+    required this.onPressedBunkerLogin,
     this.onPressedBack,
   });
   @override
@@ -44,8 +46,10 @@ class _OnboardingLoginSelectPageState
                 Row(
                   children: [
                     IconButton(
-                      icon: Icon(PhosphorIcons.arrowLeft(),
-                          color: Theme.of(context).colorScheme.onSurface),
+                      icon: Icon(
+                        PhosphorIcons.arrowLeft(),
+                        color: Theme.of(context).colorScheme.onSurface,
+                      ),
                       onPressed: () => widget.onPressedBack!(),
                     ),
                   ],
@@ -69,9 +73,7 @@ class _OnboardingLoginSelectPageState
                   ],
                 ),
               ),
-              const Spacer(
-                flex: 1,
-              ),
+              const Spacer(flex: 1),
               if (Platform.isAndroid)
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -83,9 +85,7 @@ class _OnboardingLoginSelectPageState
                     onPressed: () => widget.onPressedAmberLogin(),
                   ),
                 ),
-              const SizedBox(
-                height: 20,
-              ),
+              const SizedBox(height: 20),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 width: 400,
@@ -94,6 +94,17 @@ class _OnboardingLoginSelectPageState
                   name: "seed phrase login",
                   inverted: false,
                   onPressed: () => widget.onPressedSeedPhraseLogin(),
+                ),
+              ),
+              const SizedBox(height: 20),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                width: 400,
+                height: 40,
+                child: longButton(
+                  name: "bunker login",
+                  inverted: false,
+                  onPressed: () => widget.onPressedBunkerLogin(),
                 ),
               ),
             ],

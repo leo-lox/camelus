@@ -31,23 +31,21 @@ class TrendingStarterPackNotifier
     extends StateNotifier<TrendingStarterPackState> {
   final Ndk ndk;
   TrendingStarterPackNotifier({required this.ndk})
-      : super(
-          TrendingStarterPackState(
-            isLoading: true,
-            starterPacks: [],
-          ),
-        ) {
+    : super(TrendingStarterPackState(isLoading: true, starterPacks: [])) {
     _loadData();
   }
 
   void _loadData() async {
-    final ndkResp = ndk.requests.query(filters: [
-      Filter(limit: 3, kinds: [NostrList.starterPack])
-    ]);
+    final ndkResp = ndk.requests.query(
+      filters: [
+        Filter(limit: 3, kinds: [NostrList.starterPack]),
+      ],
+    );
 
     List<NostrStarterPack> myPacks = [];
-    final StreamSubscription<Nip01Event> subscription =
-        ndkResp.stream.listen((event) async {
+    final StreamSubscription<Nip01Event> subscription = ndkResp.stream.listen((
+      event,
+    ) async {
       final ndkSet = await Nip51Set.fromEvent(event, null);
       if (ndkSet == null) return;
       final rcvPack = NostrStarterPackModel.fromNDK(ndkSet);
@@ -60,8 +58,11 @@ class TrendingStarterPackNotifier
   }
 }
 
-final trendingStarterPacksStateProvider = StateNotifierProvider<
-    TrendingStarterPackNotifier, TrendingStarterPackState>((ref) {
-  final ndkP = ref.watch(ndkProvider);
-  return TrendingStarterPackNotifier(ndk: ndkP);
-});
+final trendingStarterPacksStateProvider =
+    StateNotifierProvider<
+      TrendingStarterPackNotifier,
+      TrendingStarterPackState
+    >((ref) {
+      final ndkP = ref.watch(ndkProvider);
+      return TrendingStarterPackNotifier(ndk: ndkP);
+    });
