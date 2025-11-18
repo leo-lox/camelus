@@ -4,12 +4,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../../config/onboard_conf.dart';
-import '../../../../config/palette.dart';
 import '../../../../domain_layer/entities/nostr_list.dart';
 import '../../../../domain_layer/entities/onboarding_user_info.dart';
 import '../../../atoms/long_button.dart';
 import '../../../atoms/my_profile_picture.dart';
 import '../../../atoms/spinner_center.dart';
+import '../../../components/responsive_center.dart';
 import '../../../components/starter_packs/starter_pack_card.dart';
 import '../../../providers/metadata_state_provider.dart';
 import '../../../providers/nostr_lists_follow_state_provider.dart';
@@ -118,21 +118,22 @@ class _OnboardingStarterPackState extends ConsumerState<OnboardingStarterPack> {
             ),
           ),
           const SizedBox(height: 8),
-          Container(
+          Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
-            width: 400,
-            height: 40,
-            child: longButton(
-              name: selectedPubkeys.isNotEmpty
-                  ? AppLocalizations.of(
-                      context,
-                    )!.continueWithAccounts(selectedPubkeys.length)
-                  : AppLocalizations.of(context)!.selectStarterPack,
-              onPressed: (() {
-                widget.submitCallback(selectedPubkeys);
-              }),
-              disabled: selectedPubkeys.isEmpty,
-              inverted: true,
+            child: SizedBox(
+              width: double.infinity,
+              height: 40,
+              child: longButton(
+                name: selectedPubkeys.isNotEmpty
+                    ? AppLocalizations.of(
+                        context,
+                      )!.continueWithAccounts(selectedPubkeys.length)
+                    : AppLocalizations.of(context)!.selectStarterPack,
+                onPressed: (() {
+                  widget.submitCallback(selectedPubkeys);
+                }),
+                disabled: selectedPubkeys.isEmpty,
+                inverted: true,
             ),
           ),
           const SizedBox(height: 15),
@@ -230,7 +231,7 @@ class _OnboardingOpenStarterPackState
                             "Unknown",
                       ),
                       style: TextStyle(
-                        color: Paletter.getGray(context),
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
                         fontSize: 12,
                       ),
                     ),
@@ -303,7 +304,7 @@ class _OnboardingOpenStarterPackState
                             Text(
                               displayMetadata?.about ?? "",
                               style: TextStyle(
-                                color: Paletter.getGray(context),
+                                color: Theme.of(context).colorScheme.onSurfaceVariant,
                                 fontSize: 12,
                               ),
                               maxLines: 3,
@@ -325,18 +326,19 @@ class _OnboardingOpenStarterPackState
             ),
           ),
           const SizedBox(height: 15),
-          Container(
+          Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
-            width: 400,
-            height: 40,
-            child: longButton(
-              name: nothingOfOwnSelected
-                  ? AppLocalizations.of(context)!.followAll
-                  : AppLocalizations.of(
-                      context,
-                    )!.followAccounts(ownSelectedCount),
-              onPressed: (() {
-                setState(() {
+            child: SizedBox(
+              width: double.infinity,
+              height: 40,
+              child: longButton(
+                name: nothingOfOwnSelected
+                    ? AppLocalizations.of(context)!.followAll
+                    : AppLocalizations.of(
+                        context,
+                      )!.followAccounts(ownSelectedCount),
+                onPressed: (() {
+                  setState(() {
                   if (nothingOfOwnSelected) {
                     selectedPubkeys.addAll(
                       widget.followSet.elements.map((e) => e.value),

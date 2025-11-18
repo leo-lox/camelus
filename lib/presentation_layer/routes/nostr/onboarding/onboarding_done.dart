@@ -289,9 +289,9 @@ ${_privateKey.mnemonicSentence}
                               const SizedBox(width: 5),
                               ElevatedButton.icon(
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: Paletter.getLightGray(
+                                  backgroundColor: Theme.of(
                                     context,
-                                  ),
+                                  ).colorScheme.inverseSurface,
                                   foregroundColor: Theme.of(
                                     context,
                                   ).colorScheme.surface,
