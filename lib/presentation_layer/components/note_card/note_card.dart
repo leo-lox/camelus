@@ -1,6 +1,5 @@
 import 'dart:ui';
 
-import 'package:camelus/domain_layer/entities/parsed_post.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -8,7 +7,9 @@ import 'package:go_router/go_router.dart';
 import '../../../config/palette.dart';
 import '../../../data_layer/models/post_context.dart';
 import '../../../domain_layer/entities/nostr_note.dart';
+import '../../../domain_layer/entities/parsed_post.dart';
 import '../../../domain_layer/entities/user_metadata.dart';
+import '../../../domain_layer/usecases/app_auth.dart';
 import '../../atoms/my_profile_picture.dart';
 import '../../providers/ndk_provider.dart';
 import '../../providers/reactions_state_provider.dart';
@@ -34,29 +35,6 @@ class NoteCard extends ConsumerWidget {
     this.hideBottomBar = false,
     this.fontSize = 17,
   });
-
-  void _showLoginPrompt(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Login Required'),
-        content: Text('Please login to interact with posts'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text('Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-              context.push('/onboarding');
-            },
-            child: Text('Login'),
-          ),
-        ],
-      ),
-    );
-  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -110,14 +88,14 @@ class NoteCard extends ConsumerWidget {
                 key: ValueKey("${note.id}bottom_action_row"),
                 onComment: () {
                   if (!canSign) {
-                    _showLoginPrompt(context);
+                    AppAuth.showLoginPrompt(context);
                     return;
                   }
                   _writeReply(context, note.nostrNote);
                 },
                 onLike: () {
                   if (!canSign) {
-                    _showLoginPrompt(context);
+                    AppAuth.showLoginPrompt(context);
                     return;
                   }
                   ref
@@ -132,7 +110,7 @@ class NoteCard extends ConsumerWidget {
                     .isReposted,
                 onRetweet: () {
                   if (!canSign) {
-                    _showLoginPrompt(context);
+                    AppAuth.showLoginPrompt(context);
                     return;
                   }
                   ref
@@ -141,7 +119,13 @@ class NoteCard extends ConsumerWidget {
                 },
                 onShare: () =>
                     openBottomSheetShare(context, ref, note.nostrNote),
-                onMore: () => openBottomSheetMore(context, note.nostrNote),
+                onMore: () {
+                  if (!canSign) {
+                    AppAuth.showLoginPrompt(context);
+                    return;
+                  }
+                  return openBottomSheetMore(context, note.nostrNote);
+                },
               ),
             ),
           ),

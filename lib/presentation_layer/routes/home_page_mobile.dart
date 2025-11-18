@@ -67,15 +67,15 @@ class _HomePageMobileState extends ConsumerState<HomePageMobile>
     }
 
     // If no pubkey (read-only mode), show a default feed
-    final authors = currentUserPubkey != null 
+    final authors = currentUserPubkey != null
         ? (myContactList.contactList.contacts.isNotEmpty
-            ? [...myContactList.contactList.contacts, currentUserPubkey]
-            : [currentUserPubkey])
+              ? [...myContactList.contactList.contacts, currentUserPubkey]
+              : [currentUserPubkey])
         : myContactList.contactList.contacts;
 
     return Scaffold(
       key: _scaffoldKey,
-      drawer: currentUserPubkey != null 
+      drawer: currentUserPubkey != null
           ? NostrDrawer(pubkey: currentUserPubkey)
           : null,
       backgroundColor: Theme.of(context).colorScheme.surface,
@@ -89,7 +89,15 @@ class _HomePageMobileState extends ConsumerState<HomePageMobile>
               ),
               onPressed: () => _show(context),
             )
-          : null,
+          : FloatingActionButton(
+              backgroundColor: Theme.of(context).colorScheme.onPrimary,
+              child: Icon(
+                PhosphorIcons.signIn(),
+                color: Theme.of(context).colorScheme.onSurface,
+                size: 27,
+              ),
+              onPressed: () => context.push('/onboarding'),
+            ),
       body: SafeArea(
         child: GenericFeed(
           key: PageStorageKey('homeFeed-${currentUserPubkey ?? "readonly"}'),

@@ -2,7 +2,7 @@ import 'package:ndk/ndk.dart';
 
 import 'key_pair.dart';
 
-enum LoginType { register, privateKey, amber, bunkerConnection, readOnly }
+enum LoginType { register, privateKey, amber, bunkerConnection, readOnly, anon }
 
 class StartupAccountData {
   final LoginType loginType;

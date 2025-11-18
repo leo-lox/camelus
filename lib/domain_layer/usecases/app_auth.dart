@@ -3,7 +3,9 @@ import 'dart:convert';
 
 import 'package:amberflutter/amberflutter.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:go_router/go_router.dart';
 import 'package:ndk/data_layer/repositories/signers/nip46_event_signer.dart';
 import 'package:ndk/ndk.dart';
 import 'package:ndk/shared/nips/nip19/nip19.dart';
@@ -130,8 +132,13 @@ class AppAuth {
       case LoginType.readOnly:
         // For read-only accounts, use NDK's loginReadOnlyPubkey
         if (startupAccountData.account?.pubkey != null) {
-          ndk.accounts.loginReadOnlyPubkey(startupAccountData.account!.pubkey!);
+          ndk.accounts.loginPublicKey(
+            pubkey: startupAccountData.account!.pubkey!,
+          );
         }
+        return null;
+
+      case LoginType.anon:
         return null;
 
       case LoginType.register:
@@ -148,7 +155,7 @@ class AppAuth {
     );
 
     if (activeAccountPubkey == null || storedAccountsString == null) {
-      return StartupAccountData(loginType: LoginType.register);
+      return StartupAccountData(loginType: LoginType.anon);
     }
 
     final storedAccounts = jsonDecode(storedAccountsString) as List;
@@ -167,7 +174,7 @@ class AppAuth {
       // if no match found, use last account or register if list is empty
       matchedAccount = storedAccountsList.isNotEmpty
           ? storedAccountsList.last
-          : LocalStorageAccount(loginType: LoginType.register);
+          : LocalStorageAccount(loginType: LoginType.anon);
     }
 
     return StartupAccountData(
@@ -208,5 +215,28 @@ class AppAuth {
   static Future<void> clearAllAccounts() async {
     await secureStorage.delete(key: AppAuth.activeAccountPubkeyStorageKey);
     await secureStorage.delete(key: AppAuth.accountStorageKey);
+  }
+
+  static void showLoginPrompt(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Login/Registration Required'),
+        content: Text('Please login/register to interact with posts'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              context.push('/onboarding');
+            },
+            child: Text('Login/Register'),
+          ),
+        ],
+      ),
+    );
   }
 }

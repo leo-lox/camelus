@@ -41,7 +41,7 @@ final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  //AppAuth.clearAllAccounts();
+  //await AppAuth.clearAllAccounts();
 
   if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
     await windowManager.ensureInitialized();
@@ -53,9 +53,6 @@ Future<void> main() async {
 
   final startupAccData = await AppAuth.getStartupAccountData();
 
-  print(startupAccData.loginType);
-  print(startupAccData.account?.toJson());
-
   // Create a ProviderContainer
   final providerContainer = ProviderContainer();
 
@@ -65,13 +62,13 @@ Future<void> main() async {
 
   // If no account exists, login with a read-only account to show feed
   StartupAccountData effectiveStartupData = startupAccData;
-  if (startupAccData.loginType == LoginType.register) {
+  if (startupAccData.loginType == LoginType.anon) {
     // Use a default read-only pubkey for anonymous browsing
     effectiveStartupData = StartupAccountData(
-      loginType: LoginType.readOnly,
+      loginType: LoginType.anon,
       account: LocalStorageAccount(
         loginType: LoginType.readOnly,
-        pubkey: defaultReadOnlyPubkey,
+        pubkey: CamelusConfig.defaultAnonReadPubkey,
       ),
     );
   }
@@ -92,9 +89,8 @@ Future<void> main() async {
 
   final String initalRoute;
 
-  // get inital route - always go to home with read-only, or onboarding if explicitly register
-  if (startupAccData.loginType == LoginType.register) {
-    initalRoute = '/home'; // Changed to show feed first instead of onboarding
+  if (startupAccData.loginType == LoginType.anon) {
+    initalRoute = '/home';
   } else {
     final appDb = providerContainer.read(dbAppProvider);
     final savedRoute = await appDb.read('initalRoute');

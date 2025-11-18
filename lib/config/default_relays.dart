@@ -21,9 +21,3 @@ final Map<String, ndk_entities.ReadWriteMarker> defaultAccountCreationRelays = {
   "wss://nos.lol": ndk_entities.ReadWriteMarker.readWrite,
   "wss://relay.snort.social": ndk_entities.ReadWriteMarker.readWrite,
 };
-
-/// Default read-only pubkey for anonymous users (before login)
-/// This is a well-known public account used to populate the feed for new users
-/// Users can follow popular accounts through this read-only view
-const String defaultReadOnlyPubkey =
-    "3bf0c63fcb93463407af97a5e5ee64fa883d107ef9e558472c4eb9aaaefa459d"; // fiatjaf's pubkey

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../domain_layer/usecases/app_auth.dart';
 import '../../atoms/long_button.dart';
 import '../../providers/ndk_provider.dart';
 import '../write_post.dart';
@@ -25,26 +26,8 @@ class NostrSideMenuPostButton extends ConsumerWidget {
         onPressed: () {
           if (!canSign) {
             // Show login dialog instead
-            showDialog(
-              context: context,
-              builder: (context) => AlertDialog(
-                title: Text('Login Required'),
-                content: Text('Please login to create posts'),
-                actions: [
-                  TextButton(
-                    onPressed: () => Navigator.pop(context),
-                    child: Text('Cancel'),
-                  ),
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                      context.push('/onboarding');
-                    },
-                    child: Text('Login'),
-                  ),
-                ],
-              ),
-            );
+            AppAuth.showLoginPrompt(context);
+
             return;
           }
 
