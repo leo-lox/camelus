@@ -63,8 +63,42 @@ class UserImage extends StatelessWidget {
           child: CachedNetworkImage(
             imageUrl: pictureUrl,
             filterQuality: filterQuality,
-            progressIndicatorBuilder: (context, url, downloadProgress) =>
-                CircularProgressIndicator(value: downloadProgress.progress),
+            progressIndicatorBuilder: (context, url, downloadProgress) {
+              final progress = downloadProgress.progress ?? 0.0;
+
+              return Stack(
+                children: [
+                  // Background SVG avatar
+                  Container(
+                    height: size,
+                    width: size,
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.primary,
+                      shape: BoxShape.circle,
+                    ),
+                    child: SvgPicture.network("${Dicebear.baseUrl}$pubkey"),
+                  ),
+                  // Transparency overlay that slides up as progress increases
+                  Positioned.fill(
+                    child: Align(
+                      alignment: Alignment.bottomCenter,
+                      child: FractionallySizedBox(
+                        heightFactor: 1 - progress,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.black.withOpacity(0.5),
+                            borderRadius: BorderRadius.vertical(
+                              top: Radius.circular(size / 2),
+                              bottom: Radius.circular(size / 2),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              );
+            },
             errorWidget: (context, url, error) => const Icon(Icons.error),
             cacheKey: pictureUrl,
             memCacheWidth: cacheHeight ?? 150,
