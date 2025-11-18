@@ -10,14 +10,12 @@ import '../models/nostr_note_model.dart';
 class ModerationRepositoryImpl implements ModerationRepository {
   final ServerpodDataSource server;
 
-  ModerationRepositoryImpl({
-    required this.server,
-  });
+  ModerationRepositoryImpl({required this.server});
 
   @override
   Future<BloomFilterData?> fetchBloomFilterProfiles() async {
-    final sp.BloomFilterData? data =
-        await server.client.moderation.getProfileBloomFilter();
+    final sp.BloomFilterData? data = await server.client.moderation
+        .getProfileBloomFilter();
     if (data == null) {
       return null;
     }
@@ -27,8 +25,8 @@ class ModerationRepositoryImpl implements ModerationRepository {
 
   @override
   Future<BloomFilterData?> fetchBloomFilterEvents() async {
-    final sp.BloomFilterData? data =
-        await server.client.moderation.getEventBloomFilter();
+    final sp.BloomFilterData? data = await server.client.moderation
+        .getEventBloomFilter();
     if (data == null) {
       return null;
     }

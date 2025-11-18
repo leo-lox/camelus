@@ -42,7 +42,7 @@ class NostrList {
     bookmarksSet,
     curationSet,
     interestsSet,
-    emojisSet
+    emojisSet,
   ];
 
   static const List<String> possibleTags = [
@@ -53,7 +53,7 @@ class NostrList {
     thread,
     ressource,
     emoji,
-    A
+    A,
   ];
 
   String? id;
@@ -78,14 +78,20 @@ class NostrList {
 
   set privateRelays(List<String> list) {
     elements.removeWhere((element) => element.tag == relay && element.private);
-    elements.addAll(list
-        .map((url) => NostrListElement(tag: relay, value: url, private: true)));
+    elements.addAll(
+      list.map(
+        (url) => NostrListElement(tag: relay, value: url, private: true),
+      ),
+    );
   }
 
   set publicRelays(List<String> list) {
     elements.removeWhere((element) => element.tag == relay && !element.private);
-    elements.addAll(list.map(
-        (url) => NostrListElement(tag: relay, value: url, private: false)));
+    elements.addAll(
+      list.map(
+        (url) => NostrListElement(tag: relay, value: url, private: false),
+      ),
+    );
   }
 
   late int createdAt;
@@ -129,14 +135,16 @@ class NostrList {
       final value = tag[1];
       if (possibleTags.contains(tagName)) {
         elements.add(
-            NostrListElement(tag: tagName, value: value, private: private));
+          NostrListElement(tag: tagName, value: value, private: private),
+        );
       }
     }
   }
 
   void addRelay(String relayUrl, bool private) {
-    elements
-        .add(NostrListElement(tag: relay, value: relayUrl, private: private));
+    elements.add(
+      NostrListElement(tag: relay, value: relayUrl, private: private),
+    );
   }
 
   void addElement(String tag, String value, bool private) {
@@ -145,12 +153,14 @@ class NostrList {
 
   void removeRelay(String relayUrl) {
     elements.removeWhere(
-        (element) => element.tag == relay && element.value == relayUrl);
+      (element) => element.tag == relay && element.value == relayUrl,
+    );
   }
 
   void removeElement(String tag, String value) {
-    elements
-        .removeWhere((element) => element.tag == tag && element.value == value);
+    elements.removeWhere(
+      (element) => element.tag == tag && element.value == value,
+    );
   }
 }
 

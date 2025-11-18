@@ -17,8 +17,9 @@ import '../images_tile_view.dart';
 import '../video/inline_video_player.dart';
 import 'note_card_reference.dart';
 
-final isContentRevealedProvider =
-    StateProvider.family<bool, String>((ref, postId) => false);
+final isContentRevealedProvider = StateProvider.family<bool, String>(
+  (ref, postId) => false,
+);
 
 class PostContentWidget extends ConsumerWidget {
   final ParsedPost post;
@@ -47,13 +48,14 @@ class PostContentWidget extends ConsumerWidget {
               padding: const EdgeInsets.only(bottom: 8.0),
               child: RichText(
                 text: TextSpan(
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.onSurface,
-                      fontSize: _fontSize,
-                      height: 1.2,
-                      wordSpacing: 1.05,
-                    ),
-                    children: [...currentTextSpans]),
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface,
+                    fontSize: _fontSize,
+                    height: 1.2,
+                    wordSpacing: 1.05,
+                  ),
+                  children: [...currentTextSpans],
+                ),
               ),
             ),
           );
@@ -75,10 +77,9 @@ class PostContentWidget extends ConsumerWidget {
               onTap: () => _openLink(segment.metadata!),
               child: Container(
                 decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(
-                      color: Paletter.getDarkGray(context),
-                    )),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Paletter.getDarkGray(context)),
+                ),
                 child: LinkPreview(
                   linkStyle: TextStyle(
                     color: Theme.of(context).colorScheme.primary,
@@ -88,16 +89,21 @@ class PostContentWidget extends ConsumerWidget {
                   enableAnimation: true,
                   onPreviewDataFetched: (data) {
                     ref
-                        .read(linkPreviewProvider(segment.metadata!).notifier)
-                        .state = data;
+                            .read(
+                              linkPreviewProvider(segment.metadata!).notifier,
+                            )
+                            .state =
+                        data;
                   },
-                  previewData:
-                      ref.watch(linkPreviewProvider(segment.metadata!)),
+                  previewData: ref.watch(
+                    linkPreviewProvider(segment.metadata!),
+                  ),
                   text: segment.metadata!,
                   textWidget: Text(
                     segment.content,
-                    style:
-                        TextStyle(color: Theme.of(context).colorScheme.primary),
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
                   ),
                   width: MediaQuery.of(context).size.width,
                 ),
@@ -108,13 +114,15 @@ class PostContentWidget extends ConsumerWidget {
       }
 
       if (segment.type == ContentType.noteReference) {
-        widgets.add(Padding(
-          padding: EdgeInsetsGeometry.only(bottom: 8),
-          child: NoteCardReference(
-            key: ValueKey(segment.metadata),
-            word: segment.metadata!,
+        widgets.add(
+          Padding(
+            padding: EdgeInsetsGeometry.only(bottom: 8),
+            child: NoteCardReference(
+              key: ValueKey(segment.metadata),
+              word: segment.metadata!,
+            ),
           ),
-        ));
+        );
       }
     }
 
@@ -139,54 +147,59 @@ class PostContentWidget extends ConsumerWidget {
       widgets.add(ImagesTileView(images: post.imageUrls));
     }
 
-    return Stack(children: [
-      ImageFiltered(
+    return Stack(
+      children: [
+        ImageFiltered(
           imageFilter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
           enabled: hasContentWarning && !isContentRevealed,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: widgets,
-          )),
-      if (hasContentWarning && !isContentRevealed)
-        Center(
-          child: Container(
-            alignment: Alignment.center,
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      PhosphorIcons.warningOctagon(),
-                      color: Theme.of(context).colorScheme.error,
-                      size: 32,
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      post.nostrNote.contentWarning!,
-                      style: TextStyle(
+          ),
+        ),
+        if (hasContentWarning && !isContentRevealed)
+          Center(
+            child: Container(
+              alignment: Alignment.center,
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        PhosphorIcons.warningOctagon(),
                         color: Theme.of(context).colorScheme.error,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 18,
+                        size: 32,
                       ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                longButton(
+                      const SizedBox(width: 8),
+                      Text(
+                        post.nostrNote.contentWarning!,
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.error,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  longButton(
                     name: "show",
                     onPressed: () {
                       ref
-                          .read(isContentRevealedProvider(post.id).notifier)
-                          .state = true;
-                    }),
-              ],
+                              .read(isContentRevealedProvider(post.id).notifier)
+                              .state =
+                          true;
+                    },
+                  ),
+                ],
+              ),
             ),
           ),
-        ),
-    ]);
+      ],
+    );
   }
 
   bool _isMediaType(ContentType type) {
@@ -211,7 +224,10 @@ class PostContentWidget extends ConsumerWidget {
   }
 
   TextSpan _buildTextSpan(
-      ContentSegment segment, WidgetRef ref, BuildContext context) {
+    ContentSegment segment,
+    WidgetRef ref,
+    BuildContext context,
+  ) {
     switch (segment.type) {
       case ContentType.text:
         return TextSpan(
@@ -223,8 +239,9 @@ class PostContentWidget extends ConsumerWidget {
         );
 
       case ContentType.mention:
-        final user =
-            ref.watch(metadataStateProvider(segment.metadata!)).userMetadata;
+        final user = ref
+            .watch(metadataStateProvider(segment.metadata!))
+            .userMetadata;
         return TextSpan(
           text: user?.name != null ? "@${user?.name}" : segment.content,
           style: TextStyle(

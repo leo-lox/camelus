@@ -14,9 +14,7 @@ class ThemeSettingsPage extends ConsumerWidget {
     final themeState = ref.watch(themeProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(AppLocalizations.of(context)!.themeSettings),
-      ),
+      appBar: AppBar(title: Text(AppLocalizations.of(context)!.themeSettings)),
       body: ListView(
         children: [
           const SizedBox(height: 10),
@@ -38,7 +36,8 @@ class ThemeSettingsPage extends ConsumerWidget {
             title: Text(
               AppLocalizations.of(context)!.system,
               style: TextStyle(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant),
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
             ),
             leading: Icon(
               PhosphorIcons.circleHalf(),
@@ -60,7 +59,8 @@ class ThemeSettingsPage extends ConsumerWidget {
             title: Text(
               AppLocalizations.of(context)!.light,
               style: TextStyle(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant),
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
             ),
             leading: Icon(
               PhosphorIcons.sun(),
@@ -82,7 +82,8 @@ class ThemeSettingsPage extends ConsumerWidget {
             title: Text(
               AppLocalizations.of(context)!.dark,
               style: TextStyle(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant),
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
             ),
             leading: Icon(
               PhosphorIcons.moon(),
@@ -101,7 +102,9 @@ class ThemeSettingsPage extends ConsumerWidget {
           ),
 
           Divider(
-              color: Theme.of(context).colorScheme.outlineVariant, height: 32),
+            color: Theme.of(context).colorScheme.outlineVariant,
+            height: 32,
+          ),
 
           // Theme Selection Section
           Padding(
@@ -120,7 +123,8 @@ class ThemeSettingsPage extends ConsumerWidget {
             title: Text(
               AppLocalizations.of(context)!.system,
               style: TextStyle(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant),
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
             ),
             leading: Icon(
               PhosphorIcons.circleHalf(),
@@ -142,7 +146,8 @@ class ThemeSettingsPage extends ConsumerWidget {
             title: Text(
               AppLocalizations.of(context)!.camelus,
               style: TextStyle(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant),
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
             ),
             leading: Icon(
               PhosphorIcons.palette(),
@@ -164,7 +169,8 @@ class ThemeSettingsPage extends ConsumerWidget {
             title: Text(
               AppLocalizations.of(context)!.nostr,
               style: TextStyle(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant),
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
             ),
             leading: SizedBox(
               width: 24,
@@ -190,7 +196,9 @@ class ThemeSettingsPage extends ConsumerWidget {
           ),
 
           Divider(
-              color: Theme.of(context).colorScheme.outlineVariant, height: 32),
+            color: Theme.of(context).colorScheme.outlineVariant,
+            height: 32,
+          ),
 
           // Custom Color Theme Section
           Padding(
@@ -215,7 +223,8 @@ class ThemeSettingsPage extends ConsumerWidget {
                   context: context,
                   color: Colors.blue,
                   label: AppLocalizations.of(context)!.blue,
-                  isSelected: themeState.type == ThemeType.custom &&
+                  isSelected:
+                      themeState.type == ThemeType.custom &&
                       themeState.color == Colors.blue,
                   onTap: () {
                     ref
@@ -228,7 +237,8 @@ class ThemeSettingsPage extends ConsumerWidget {
                   context: context,
                   color: Colors.purple,
                   label: AppLocalizations.of(context)!.purple,
-                  isSelected: themeState.type == ThemeType.custom &&
+                  isSelected:
+                      themeState.type == ThemeType.custom &&
                       themeState.color == Colors.purple,
                   onTap: () {
                     ref
@@ -243,7 +253,8 @@ class ThemeSettingsPage extends ConsumerWidget {
                   context: context,
                   color: Colors.green,
                   label: AppLocalizations.of(context)!.green,
-                  isSelected: themeState.type == ThemeType.custom &&
+                  isSelected:
+                      themeState.type == ThemeType.custom &&
                       themeState.color == Colors.green,
                   onTap: () {
                     ref
@@ -258,7 +269,8 @@ class ThemeSettingsPage extends ConsumerWidget {
                   context: context,
                   color: Colors.orange,
                   label: AppLocalizations.of(context)!.orange,
-                  isSelected: themeState.type == ThemeType.custom &&
+                  isSelected:
+                      themeState.type == ThemeType.custom &&
                       themeState.color == Colors.orange,
                   onTap: () {
                     ref
@@ -273,7 +285,8 @@ class ThemeSettingsPage extends ConsumerWidget {
                   context: context,
                   color: Colors.red,
                   label: AppLocalizations.of(context)!.red,
-                  isSelected: themeState.type == ThemeType.custom &&
+                  isSelected:
+                      themeState.type == ThemeType.custom &&
                       themeState.color == Colors.red,
                   onTap: () {
                     ref
@@ -286,7 +299,8 @@ class ThemeSettingsPage extends ConsumerWidget {
                   context: context,
                   color: Colors.teal,
                   label: AppLocalizations.of(context)!.teal,
-                  isSelected: themeState.type == ThemeType.custom &&
+                  isSelected:
+                      themeState.type == ThemeType.custom &&
                       themeState.color == Colors.teal,
                   onTap: () {
                     ref
@@ -299,7 +313,8 @@ class ThemeSettingsPage extends ConsumerWidget {
                   context: context,
                   color: Colors.pink,
                   label: AppLocalizations.of(context)!.pink,
-                  isSelected: themeState.type == ThemeType.custom &&
+                  isSelected:
+                      themeState.type == ThemeType.custom &&
                       themeState.color == Colors.pink,
                   onTap: () {
                     ref
@@ -312,7 +327,8 @@ class ThemeSettingsPage extends ConsumerWidget {
                   context: context,
                   color: Colors.indigo,
                   label: AppLocalizations.of(context)!.indigo,
-                  isSelected: themeState.type == ThemeType.custom &&
+                  isSelected:
+                      themeState.type == ThemeType.custom &&
                       themeState.color == Colors.indigo,
                   onTap: () {
                     ref

@@ -37,15 +37,10 @@ class NostrDrawer extends ConsumerWidget {
                 color: Theme.of(context).colorScheme.surface,
                 shape: BoxShape.circle,
               ),
-              child: UserImage(
-                imageUrl: metadata?.picture,
-                pubkey: pubkey,
-              ),
+              child: UserImage(imageUrl: metadata?.picture, pubkey: pubkey),
             ),
           ),
-          const SizedBox(
-            height: 8,
-          ),
+          const SizedBox(height: 8),
           GestureDetector(
             onTap: () => navigateToProfile(context),
             child: Row(
@@ -61,18 +56,18 @@ class NostrDrawer extends ConsumerWidget {
                         Text(
                           metadata?.name ?? '',
                           style: TextStyle(
-                              color: Theme.of(context).colorScheme.onSurface,
-                              fontSize: 17,
-                              fontWeight: FontWeight.bold),
+                            color: Theme.of(context).colorScheme.onSurface,
+                            fontSize: 17,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
-                        const SizedBox(
-                          height: 3,
-                        ),
+                        const SizedBox(height: 3),
                         Text(
                           metadata?.nip05 ?? '',
                           style: TextStyle(
-                            color:
-                                Theme.of(context).colorScheme.onSurfaceVariant,
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onSurfaceVariant,
                             fontSize: 15,
                           ),
                         ),
@@ -88,9 +83,7 @@ class NostrDrawer extends ConsumerWidget {
               ],
             ),
           ),
-          const SizedBox(
-            height: 15,
-          ),
+          const SizedBox(height: 15),
           Row(
             children: [
               RichText(
@@ -106,32 +99,34 @@ class NostrDrawer extends ConsumerWidget {
                     TextSpan(
                       text: ' Following  ',
                       style: TextStyle(
-                          color: Theme.of(context).colorScheme.onSurfaceVariant,
-                          fontSize: 13,
-                          fontWeight: FontWeight.normal),
-                    )
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        fontSize: 13,
+                        fontWeight: FontWeight.normal,
+                      ),
+                    ),
                   ],
                 ),
               ),
-              const SizedBox(
-                width: 6,
-              ),
+              const SizedBox(width: 6),
               RichText(
-                  text: TextSpan(
-                      text: 'n.a.',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Paletter.getExtraLightGray(context),
-                      ),
-                      children: [
+                text: TextSpan(
+                  text: 'n.a.',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Paletter.getExtraLightGray(context),
+                  ),
+                  children: [
                     TextSpan(
                       text: 'Followers',
                       style: TextStyle(
-                          color: Theme.of(context).colorScheme.onSurfaceVariant,
-                          fontSize: 13,
-                          fontWeight: FontWeight.normal),
-                    )
-                  ])),
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        fontSize: 13,
+                        fontWeight: FontWeight.normal,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ],
           ),
         ],
@@ -141,8 +136,9 @@ class NostrDrawer extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final myUserMetadata =
-        ref.watch(metadataStateProvider(pubkey)).userMetadata;
+    final myUserMetadata = ref
+        .watch(metadataStateProvider(pubkey))
+        .userMetadata;
     return Drawer(
       child: NostrSideMenu(
         hideOnMobile: true,

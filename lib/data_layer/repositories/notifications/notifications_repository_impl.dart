@@ -35,10 +35,7 @@ class NotificationsRepositoryImpl implements NotificationsRepository {
     }
 
     await eventSigner!.sign(ndkEvent);
-    return serverpodDs.client.nostrPush.register(
-      token,
-      [ndkEvent],
-    );
+    return serverpodDs.client.nostrPush.register(token, [ndkEvent]);
   }
 
   @override
@@ -52,22 +49,23 @@ class NotificationsRepositoryImpl implements NotificationsRepository {
     // Android notification details
     final AndroidNotificationDetails androidNotificationDetails =
         AndroidNotificationDetails(
-      'nostr_notifications',
-      'Nostr Notifications',
-      channelDescription: 'This channel is used to receive nostr notifications',
-      importance: Importance.defaultImportance,
-      priority: Priority.defaultPriority,
-      showWhen: true,
-      icon: 'ic_notification',
-    );
+          'nostr_notifications',
+          'Nostr Notifications',
+          channelDescription:
+              'This channel is used to receive nostr notifications',
+          importance: Importance.defaultImportance,
+          priority: Priority.defaultPriority,
+          showWhen: true,
+          icon: 'ic_notification',
+        );
 
     // iOS notification details
     const DarwinNotificationDetails iosNotificationDetails =
         DarwinNotificationDetails(
-      presentAlert: true,
-      presentBadge: true,
-      presentSound: true,
-    );
+          presentAlert: true,
+          presentBadge: true,
+          presentSound: true,
+        );
 
     // General notification details
     final NotificationDetails notificationDetails = NotificationDetails(
@@ -120,10 +118,7 @@ class NotificationsRepositoryImpl implements NotificationsRepository {
 
         // Use person-to-person messaging style
         styleInformation: MessagingStyleInformation(
-          Person(
-            name: title,
-            key: pubkey,
-          ),
+          Person(name: title, key: pubkey),
           conversationTitle: type,
           groupConversation: threadIdentifier != null,
           messages: [
@@ -159,8 +154,10 @@ class NotificationsRepositoryImpl implements NotificationsRepository {
     }
 
     // If we couldn't set up the avatar notification, fall back to default
-    androidNotificationDetails ??=
-        _createDefaultAndroidNotification(title, body);
+    androidNotificationDetails ??= _createDefaultAndroidNotification(
+      title,
+      body,
+    );
     iosNotificationDetails ??= const DarwinNotificationDetails(
       presentAlert: true,
       presentBadge: true,
@@ -183,9 +180,11 @@ class NotificationsRepositoryImpl implements NotificationsRepository {
     );
   }
 
-// Helper method for creating default Android notification with messaging style
+  // Helper method for creating default Android notification with messaging style
   AndroidNotificationDetails _createDefaultAndroidNotification(
-      String title, String body) {
+    String title,
+    String body,
+  ) {
     return AndroidNotificationDetails(
       'nostr_notifications',
       'Nostr Notifications',
@@ -197,7 +196,8 @@ class NotificationsRepositoryImpl implements NotificationsRepository {
         Person(
           name: title,
           icon: FlutterBitmapAssetAndroidIcon(
-              "assets/images/list_placeholder.png"),
+            "assets/images/list_placeholder.png",
+          ),
         ),
         conversationTitle: 'New Message',
         messages: [
@@ -207,7 +207,8 @@ class NotificationsRepositoryImpl implements NotificationsRepository {
             Person(
               name: title,
               icon: FlutterBitmapAssetAndroidIcon(
-                  "assets/images/list_placeholder.png"),
+                "assets/images/list_placeholder.png",
+              ),
             ),
           ),
         ],

@@ -94,10 +94,9 @@ class NostrParser {
       if (match.start > lastEnd) {
         final textContent = content.substring(lastEnd, match.start);
         if (textContent.isNotEmpty) {
-          segments.add(ContentSegment(
-            content: textContent,
-            type: ContentType.text,
-          ));
+          segments.add(
+            ContentSegment(content: textContent, type: ContentType.text),
+          );
         }
       }
 
@@ -106,47 +105,59 @@ class NostrParser {
       // Parse different types
       if (matchText.startsWith(RegExp(r'nostr:(nprofile|npub)[a-zA-Z0-9]+'))) {
         try {
-          segments.add(ContentSegment(
-            content: matchText,
-            type: ContentType.mention,
-            metadata: _extractUserIdFromNostr(matchText),
-          ));
+          segments.add(
+            ContentSegment(
+              content: matchText,
+              type: ContentType.mention,
+              metadata: _extractUserIdFromNostr(matchText),
+            ),
+          );
         } catch (e) {
           log('Error parsing Nostr reference: $matchText', error: e);
         }
       } else if (matchText.startsWith('nostr:note1')) {
-        segments.add(ContentSegment(
-          content: 'Note reference',
-          type: ContentType.noteReference,
-          metadata: _extractNoteIdFromNostr(matchText),
-        ));
+        segments.add(
+          ContentSegment(
+            content: 'Note reference',
+            type: ContentType.noteReference,
+            metadata: _extractNoteIdFromNostr(matchText),
+          ),
+        );
       } else if (matchText.startsWith('#')) {
-        segments.add(ContentSegment(
-          content: matchText,
-          type: ContentType.hashtag,
-          metadata: matchText.substring(1), // Remove #
-        ));
+        segments.add(
+          ContentSegment(
+            content: matchText,
+            type: ContentType.hashtag,
+            metadata: matchText.substring(1), // Remove #
+          ),
+        );
       } else if (match.group(3) != null) {
         // Image URL
-        segments.add(ContentSegment(
-          content: '', // No text for images
-          type: ContentType.image,
-          metadata: matchText,
-        ));
+        segments.add(
+          ContentSegment(
+            content: '', // No text for images
+            type: ContentType.image,
+            metadata: matchText,
+          ),
+        );
       } else if (match.group(4) != null) {
         // Video URL
-        segments.add(ContentSegment(
-          content: '', // No text for videos
-          type: ContentType.video,
-          metadata: matchText,
-        ));
+        segments.add(
+          ContentSegment(
+            content: '', // No text for videos
+            type: ContentType.video,
+            metadata: matchText,
+          ),
+        );
       } else if (match.group(5) != null) {
         // Other links
-        segments.add(ContentSegment(
-          content: _shortenUrl(matchText),
-          type: ContentType.link,
-          metadata: matchText,
-        ));
+        segments.add(
+          ContentSegment(
+            content: _shortenUrl(matchText),
+            type: ContentType.link,
+            metadata: matchText,
+          ),
+        );
       }
 
       lastEnd = match.end;
@@ -156,10 +167,9 @@ class NostrParser {
     if (lastEnd < content.length) {
       final remainingText = content.substring(lastEnd);
       if (remainingText.isNotEmpty) {
-        segments.add(ContentSegment(
-          content: remainingText,
-          type: ContentType.text,
-        ));
+        segments.add(
+          ContentSegment(content: remainingText, type: ContentType.text),
+        );
       }
     }
 

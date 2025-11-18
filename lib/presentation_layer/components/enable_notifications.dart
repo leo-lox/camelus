@@ -163,17 +163,10 @@ class PushNotificationToggleState
             children: [
               const Text(
                 'Push Notifications',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
               if (isLoading)
-                const SizedBox(
-                  width: 24,
-                  height: 24,
-                  child: SpinnerCenter(),
-                )
+                const SizedBox(width: 24, height: 24, child: SpinnerCenter())
               else
                 Switch(
                   value: notificationsEnabled,
@@ -187,10 +180,7 @@ class PushNotificationToggleState
             notificationsEnabled
                 ? 'You will receive notifications about new replies.'
                 : 'Enable notifications to get notified about new replies',
-            style: TextStyle(
-              color: Paletter.getGray(context),
-              fontSize: 14,
-            ),
+            style: TextStyle(color: Paletter.getGray(context), fontSize: 14),
           ),
           // Only show the hint message if permissions were explicitly denied
           if (notificationsDenied)

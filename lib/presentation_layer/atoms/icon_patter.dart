@@ -5,10 +5,7 @@ import '../../config/palette.dart';
 
 class IconPattern extends StatelessWidget {
   final BorderRadiusGeometry? borderRadius;
-  const IconPattern({
-    super.key,
-    this.borderRadius,
-  });
+  const IconPattern({super.key, this.borderRadius});
 
   @override
   Widget build(BuildContext context) {
@@ -46,7 +43,8 @@ class IconPattern extends StatelessWidget {
               child: Icon(
                 icons[index % icons.length],
                 color: Theme.of(context).colorScheme.onSurface.withValues(
-                    alpha: 0.09 + (index % 3) * 0.02), // varying opacity
+                  alpha: 0.09 + (index % 3) * 0.02,
+                ), // varying opacity
                 size: 20 + (index % 3) * 4, // varying sizes
               ),
             );

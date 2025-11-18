@@ -30,18 +30,10 @@ class AppAuth {
     }
     final amberValue = await amber.getPublicKey(
       permissions: [
-        const Permission(
-          type: "nip04_encrypt",
-        ),
-        const Permission(
-          type: "nip04_decrypt",
-        ),
-        const Permission(
-          type: "nip44_encrypt",
-        ),
-        const Permission(
-          type: "nip44_decrypt",
-        ),
+        const Permission(type: "nip04_encrypt"),
+        const Permission(type: "nip04_decrypt"),
+        const Permission(type: "nip44_encrypt"),
+        const Permission(type: "nip44_decrypt"),
         const Permission(type: "sign_event", kind: 0),
         const Permission(type: "sign_event", kind: 1),
         const Permission(type: "sign_event", kind: 2),
@@ -59,8 +51,10 @@ class AppAuth {
     final pubkeyHex = Nip19.decode(npub);
 
     final amberFlutterDS = AmberFlutterDS(amber);
-    final amberSigner =
-        AmberEventSigner(publicKey: pubkeyHex, amberFlutterDS: amberFlutterDS);
+    final amberSigner = AmberEventSigner(
+      publicKey: pubkeyHex,
+      amberFlutterDS: amberFlutterDS,
+    );
     return amberSigner;
   }
 
@@ -71,7 +65,9 @@ class AppAuth {
     }
     final amberFlutterDS = AmberFlutterDS(amber);
     final amberSigner = AmberEventSigner(
-        publicKey: amberPubkey, amberFlutterDS: amberFlutterDS);
+      publicKey: amberPubkey,
+      amberFlutterDS: amberFlutterDS,
+    );
     return amberSigner;
   }
 
@@ -121,9 +117,7 @@ class AppAuth {
   /// deltes the keys from storage.
   /// This is used to log out the user
   static Future<void> clearKeys() async {
-    secureStorage.delete(
-      key: "nostrKeys",
-    );
+    secureStorage.delete(key: "nostrKeys");
     secureStorage.delete(key: "amber");
   }
 }

@@ -5,16 +5,15 @@ import 'package:ndk/ndk.dart';
 import '../../presentation_layer/providers/ndk_provider.dart';
 
 void listenToConnectivityChanges(WidgetRef ref) {
-  Connectivity()
-      .onConnectivityChanged
+  Connectivity().onConnectivityChanged
       .skip(1) // do not fire on app startup
       .listen((List<ConnectivityResult> result) {
-    if (result.any((e) => e == ConnectivityResult.none)) {
-      return;
-    }
-    final ndkInstance = ref.read(ndkProvider);
-    ndkTryReconnect(ndkInstance);
-  });
+        if (result.any((e) => e == ConnectivityResult.none)) {
+          return;
+        }
+        final ndkInstance = ref.read(ndkProvider);
+        ndkTryReconnect(ndkInstance);
+      });
 }
 
 void ndkTryReconnect(Ndk ndkInstance) {

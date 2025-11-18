@@ -11,8 +11,9 @@ final searchProvider = Provider<Search>((ref) {
 
   final DartNdkSource dartNdkSource = DartNdkSource(ndk);
 
-  final SearchRepository searchRepo =
-      SearchRepositoryImpl(dartNdkSource: dartNdkSource);
+  final SearchRepository searchRepo = SearchRepositoryImpl(
+    dartNdkSource: dartNdkSource,
+  );
 
   final Search search = Search(searchRepo);
 

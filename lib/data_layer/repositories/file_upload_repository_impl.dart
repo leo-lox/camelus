@@ -20,10 +20,12 @@ class FileUploadRepositoryImpl implements FileUploadRepository {
 
   @override
   Future<List<ndk_entities.BlobUploadResult>> uploadMemFile(
-      MemFile memFile) async {
+    MemFile memFile,
+  ) async {
     final model = MemFileModel.fromMemFile(memFile);
-    final result =
-        await dartNdkSource.dartNdk.files.upload(file: model.toNdk());
+    final result = await dartNdkSource.dartNdk.files.upload(
+      file: model.toNdk(),
+    );
     return result;
   }
 
@@ -36,11 +38,7 @@ class FileUploadRepositoryImpl implements FileUploadRepository {
       throw Exception("No mime type found");
     }
 
-    final memFile = MemFile(
-      bytes: bytes,
-      mimeType: mimeType,
-      name: filename,
-    );
+    final memFile = MemFile(bytes: bytes, mimeType: mimeType, name: filename);
     return uploadMemFile(memFile);
   }
 

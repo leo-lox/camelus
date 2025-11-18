@@ -31,12 +31,13 @@ final ndkProviderLight = Provider<Ndk>((ref) {
   final db = ref.read(dbNdkProvider);
 
   final NdkConfig ndkConfig = NdkConfig(
-      cache: db!,
-      eventVerifier: eventVerifier,
-      bootstrapRelays: [],
-      logLevel: Logger.logLevels.warning,
-      eventOutFilters: [],
-      defaultQueryTimeout: Duration(seconds: 5));
+    cache: db!,
+    eventVerifier: eventVerifier,
+    bootstrapRelays: [],
+    logLevel: Logger.logLevels.warning,
+    eventOutFilters: [],
+    defaultQueryTimeout: Duration(seconds: 5),
+  );
 
   final ndk = Ndk(ndkConfig);
   return ndk;

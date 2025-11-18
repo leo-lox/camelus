@@ -14,7 +14,8 @@ class BloomFilter {
   }) {
     if (falsePositiveProbability <= 0 || falsePositiveProbability >= 1) {
       throw ArgumentError(
-          "False positive probability must be in range (0, 1).");
+        "False positive probability must be in range (0, 1).",
+      );
     }
     if (numItems <= 0) {
       throw ArgumentError("Number of items must be positive.");

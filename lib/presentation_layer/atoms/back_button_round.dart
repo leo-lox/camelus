@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 class BackButtonRound extends StatelessWidget {
-  const BackButtonRound({
-    super.key,
-  });
+  const BackButtonRound({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -19,8 +17,9 @@ class BackButtonRound extends StatelessWidget {
             context.pop();
           },
           style: ElevatedButton.styleFrom(
-            backgroundColor:
-                Theme.of(context).colorScheme.surface.withValues(alpha: 0.54),
+            backgroundColor: Theme.of(
+              context,
+            ).colorScheme.surface.withValues(alpha: 0.54),
             padding: const EdgeInsets.all(0),
             shape: const CircleBorder(),
           ),

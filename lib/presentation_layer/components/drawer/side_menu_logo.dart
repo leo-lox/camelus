@@ -3,10 +3,7 @@ import 'package:flutter/material.dart';
 
 class SideMenuLogo extends StatelessWidget {
   final Widget? trailingWidget;
-  const SideMenuLogo({
-    super.key,
-    this.trailingWidget,
-  });
+  const SideMenuLogo({super.key, this.trailingWidget});
 
   @override
   Widget build(BuildContext context) {
@@ -15,10 +12,7 @@ class SideMenuLogo extends StatelessWidget {
       child: Row(
         children: [
           AppLogo(),
-          if (trailingWidget != null) ...[
-            const Spacer(),
-            trailingWidget!,
-          ]
+          if (trailingWidget != null) ...[const Spacer(), trailingWidget!],
         ],
       ),
     );

@@ -22,9 +22,7 @@ class OverlappingAvatars extends StatelessWidget {
             Positioned(
               left: i * avatarSize * (1 - overlap),
               child: Container(
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                ),
+                decoration: BoxDecoration(shape: BoxShape.circle),
                 child: ClipOval(
                   clipBehavior: Clip.antiAlias,
                   child: SizedBox(

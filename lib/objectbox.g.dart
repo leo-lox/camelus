@@ -20,30 +20,34 @@ export 'package:objectbox/objectbox.dart'; // so that callers only have to impor
 
 final _entities = <obx_int.ModelEntity>[
   obx_int.ModelEntity(
-      id: const obx_int.IdUid(5, 6462764810841603998),
-      name: 'DbKeyValue',
-      lastPropertyId: const obx_int.IdUid(3, 7709695228344755827),
-      flags: 0,
-      properties: <obx_int.ModelProperty>[
-        obx_int.ModelProperty(
-            id: const obx_int.IdUid(1, 9167192968750793916),
-            name: 'dbId',
-            type: 6,
-            flags: 1),
-        obx_int.ModelProperty(
-            id: const obx_int.IdUid(2, 2800279101748505891),
-            name: 'key',
-            type: 9,
-            flags: 2080,
-            indexId: const obx_int.IdUid(1, 6758634951668169698)),
-        obx_int.ModelProperty(
-            id: const obx_int.IdUid(3, 7709695228344755827),
-            name: 'value',
-            type: 9,
-            flags: 0)
-      ],
-      relations: <obx_int.ModelRelation>[],
-      backlinks: <obx_int.ModelBacklink>[])
+    id: const obx_int.IdUid(5, 6462764810841603998),
+    name: 'DbKeyValue',
+    lastPropertyId: const obx_int.IdUid(3, 7709695228344755827),
+    flags: 0,
+    properties: <obx_int.ModelProperty>[
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(1, 9167192968750793916),
+        name: 'dbId',
+        type: 6,
+        flags: 1,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(2, 2800279101748505891),
+        name: 'key',
+        type: 9,
+        flags: 2080,
+        indexId: const obx_int.IdUid(1, 6758634951668169698),
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(3, 7709695228344755827),
+        name: 'value',
+        type: 9,
+        flags: 0,
+      ),
+    ],
+    relations: <obx_int.ModelRelation>[],
+    backlinks: <obx_int.ModelBacklink>[],
+  ),
 ];
 
 /// Shortcut for [obx.Store.new] that passes [getObjectBoxModel] and for Flutter
@@ -57,131 +61,138 @@ final _entities = <obx_int.ModelEntity>[
 /// For Flutter apps, also calls `loadObjectBoxLibraryAndroidCompat()` from
 /// the ObjectBox Flutter library to fix loading the native ObjectBox library
 /// on Android 6 and older.
-Future<obx.Store> openStore(
-    {String? directory,
-    int? maxDBSizeInKB,
-    int? maxDataSizeInKB,
-    int? fileMode,
-    int? maxReaders,
-    bool queriesCaseSensitiveDefault = true,
-    String? macosApplicationGroup}) async {
+Future<obx.Store> openStore({
+  String? directory,
+  int? maxDBSizeInKB,
+  int? maxDataSizeInKB,
+  int? fileMode,
+  int? maxReaders,
+  bool queriesCaseSensitiveDefault = true,
+  String? macosApplicationGroup,
+}) async {
   await loadObjectBoxLibraryAndroidCompat();
-  return obx.Store(getObjectBoxModel(),
-      directory: directory ?? (await defaultStoreDirectory()).path,
-      maxDBSizeInKB: maxDBSizeInKB,
-      maxDataSizeInKB: maxDataSizeInKB,
-      fileMode: fileMode,
-      maxReaders: maxReaders,
-      queriesCaseSensitiveDefault: queriesCaseSensitiveDefault,
-      macosApplicationGroup: macosApplicationGroup);
+  return obx.Store(
+    getObjectBoxModel(),
+    directory: directory ?? (await defaultStoreDirectory()).path,
+    maxDBSizeInKB: maxDBSizeInKB,
+    maxDataSizeInKB: maxDataSizeInKB,
+    fileMode: fileMode,
+    maxReaders: maxReaders,
+    queriesCaseSensitiveDefault: queriesCaseSensitiveDefault,
+    macosApplicationGroup: macosApplicationGroup,
+  );
 }
 
 /// Returns the ObjectBox model definition for this project for use with
 /// [obx.Store.new].
 obx_int.ModelDefinition getObjectBoxModel() {
   final model = obx_int.ModelInfo(
-      entities: _entities,
-      lastEntityId: const obx_int.IdUid(7, 7121738077069950407),
-      lastIndexId: const obx_int.IdUid(1, 6758634951668169698),
-      lastRelationId: const obx_int.IdUid(0, 0),
-      lastSequenceId: const obx_int.IdUid(0, 0),
-      retiredEntityUids: const [
-        2806451883182902305,
-        7045118365482088719,
-        5777745579062928149,
-        1057608640111619122,
-        5273186663970464575,
-        7121738077069950407
-      ],
-      retiredIndexUids: const [],
-      retiredPropertyUids: const [
-        4498920375281389613,
-        8374817962340320695,
-        118913156440761227,
-        3988977713679332869,
-        7505788900917168131,
-        3802357609372255783,
-        9126320631476430358,
-        6459494981709908887,
-        1170388422710485888,
-        6328239475695679116,
-        3268815470426490725,
-        2242751383943128321,
-        4330169555137470934,
-        3464231542098784192,
-        5392082724079921345,
-        34763608585221932,
-        7195627064586611851,
-        6392999448563320747,
-        5403911428383475473,
-        8521496281434389408,
-        4624017895028219975,
-        2625185019158752804,
-        5133118682109775824,
-        7319656810309498589,
-        625565655505635253,
-        8889142161852307322,
-        2607671529139599209,
-        1742261979313979521,
-        1912458014025441431,
-        7665287738979309858,
-        5998738483503256564,
-        3052396182256255852,
-        2256270652353437209,
-        5695875884701701406,
-        4549740388197145640,
-        271290166028924796,
-        1088413477167386291,
-        801123517618886949,
-        4009580019178375753,
-        7088655004465366886,
-        3168250410311883614,
-        5527505727715720917,
-        8071628081619445263,
-        7737168682838543815,
-        5681969525518525911,
-        1626955690315208675,
-        2279200721602944096,
-        7429007344040003737,
-        1857705759697671386,
-        3769539562209329664
-      ],
-      retiredRelationUids: const [],
-      modelVersion: 5,
-      modelVersionParserMinimum: 5,
-      version: 1);
+    entities: _entities,
+    lastEntityId: const obx_int.IdUid(7, 7121738077069950407),
+    lastIndexId: const obx_int.IdUid(1, 6758634951668169698),
+    lastRelationId: const obx_int.IdUid(0, 0),
+    lastSequenceId: const obx_int.IdUid(0, 0),
+    retiredEntityUids: const [
+      2806451883182902305,
+      7045118365482088719,
+      5777745579062928149,
+      1057608640111619122,
+      5273186663970464575,
+      7121738077069950407,
+    ],
+    retiredIndexUids: const [],
+    retiredPropertyUids: const [
+      4498920375281389613,
+      8374817962340320695,
+      118913156440761227,
+      3988977713679332869,
+      7505788900917168131,
+      3802357609372255783,
+      9126320631476430358,
+      6459494981709908887,
+      1170388422710485888,
+      6328239475695679116,
+      3268815470426490725,
+      2242751383943128321,
+      4330169555137470934,
+      3464231542098784192,
+      5392082724079921345,
+      34763608585221932,
+      7195627064586611851,
+      6392999448563320747,
+      5403911428383475473,
+      8521496281434389408,
+      4624017895028219975,
+      2625185019158752804,
+      5133118682109775824,
+      7319656810309498589,
+      625565655505635253,
+      8889142161852307322,
+      2607671529139599209,
+      1742261979313979521,
+      1912458014025441431,
+      7665287738979309858,
+      5998738483503256564,
+      3052396182256255852,
+      2256270652353437209,
+      5695875884701701406,
+      4549740388197145640,
+      271290166028924796,
+      1088413477167386291,
+      801123517618886949,
+      4009580019178375753,
+      7088655004465366886,
+      3168250410311883614,
+      5527505727715720917,
+      8071628081619445263,
+      7737168682838543815,
+      5681969525518525911,
+      1626955690315208675,
+      2279200721602944096,
+      7429007344040003737,
+      1857705759697671386,
+      3769539562209329664,
+    ],
+    retiredRelationUids: const [],
+    modelVersion: 5,
+    modelVersionParserMinimum: 5,
+    version: 1,
+  );
 
   final bindings = <Type, obx_int.EntityDefinition>{
     DbKeyValue: obx_int.EntityDefinition<DbKeyValue>(
-        model: _entities[0],
-        toOneRelations: (DbKeyValue object) => [],
-        toManyRelations: (DbKeyValue object) => {},
-        getId: (DbKeyValue object) => object.dbId,
-        setId: (DbKeyValue object, int id) {
-          object.dbId = id;
-        },
-        objectToFB: (DbKeyValue object, fb.Builder fbb) {
-          final keyOffset = fbb.writeString(object.key);
-          final valueOffset = fbb.writeString(object.value);
-          fbb.startTable(4);
-          fbb.addInt64(0, object.dbId);
-          fbb.addOffset(1, keyOffset);
-          fbb.addOffset(2, valueOffset);
-          fbb.finish(fbb.endTable());
-          return object.dbId;
-        },
-        objectFromFB: (obx.Store store, ByteData fbData) {
-          final buffer = fb.BufferContext(fbData);
-          final rootOffset = buffer.derefObject(0);
-          final keyParam = const fb.StringReader(asciiOptimization: true)
-              .vTableGet(buffer, rootOffset, 6, '');
-          final valueParam = const fb.StringReader(asciiOptimization: true)
-              .vTableGet(buffer, rootOffset, 8, '');
-          final object = DbKeyValue(key: keyParam, value: valueParam)
-            ..dbId = const fb.Int64Reader().vTableGet(buffer, rootOffset, 4, 0);
+      model: _entities[0],
+      toOneRelations: (DbKeyValue object) => [],
+      toManyRelations: (DbKeyValue object) => {},
+      getId: (DbKeyValue object) => object.dbId,
+      setId: (DbKeyValue object, int id) {
+        object.dbId = id;
+      },
+      objectToFB: (DbKeyValue object, fb.Builder fbb) {
+        final keyOffset = fbb.writeString(object.key);
+        final valueOffset = fbb.writeString(object.value);
+        fbb.startTable(4);
+        fbb.addInt64(0, object.dbId);
+        fbb.addOffset(1, keyOffset);
+        fbb.addOffset(2, valueOffset);
+        fbb.finish(fbb.endTable());
+        return object.dbId;
+      },
+      objectFromFB: (obx.Store store, ByteData fbData) {
+        final buffer = fb.BufferContext(fbData);
+        final rootOffset = buffer.derefObject(0);
+        final keyParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGet(buffer, rootOffset, 6, '');
+        final valueParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGet(buffer, rootOffset, 8, '');
+        final object = DbKeyValue(key: keyParam, value: valueParam)
+          ..dbId = const fb.Int64Reader().vTableGet(buffer, rootOffset, 4, 0);
 
-          return object;
-        })
+        return object;
+      },
+    ),
   };
 
   return obx_int.ModelDefinition(model, bindings);
@@ -190,14 +201,17 @@ obx_int.ModelDefinition getObjectBoxModel() {
 /// [DbKeyValue] entity fields to define ObjectBox queries.
 class DbKeyValue_ {
   /// See [DbKeyValue.dbId].
-  static final dbId =
-      obx.QueryIntegerProperty<DbKeyValue>(_entities[0].properties[0]);
+  static final dbId = obx.QueryIntegerProperty<DbKeyValue>(
+    _entities[0].properties[0],
+  );
 
   /// See [DbKeyValue.key].
-  static final key =
-      obx.QueryStringProperty<DbKeyValue>(_entities[0].properties[1]);
+  static final key = obx.QueryStringProperty<DbKeyValue>(
+    _entities[0].properties[1],
+  );
 
   /// See [DbKeyValue.value].
-  static final value =
-      obx.QueryStringProperty<DbKeyValue>(_entities[0].properties[2]);
+  static final value = obx.QueryStringProperty<DbKeyValue>(
+    _entities[0].properties[2],
+  );
 }

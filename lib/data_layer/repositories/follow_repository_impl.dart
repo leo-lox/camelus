@@ -17,8 +17,9 @@ class FollowRepositoryImpl implements FollowRepository {
 
   @override
   Future<ContactList?> getContacts(String npub, {int? timeout}) async {
-    final contactListNdk =
-        await dartNdkSource.dartNdk.follows.getContactList(npub);
+    final contactListNdk = await dartNdkSource.dartNdk.follows.getContactList(
+      npub,
+    );
 
     if (contactListNdk == null) {
       return null;
@@ -53,22 +54,27 @@ class FollowRepositoryImpl implements FollowRepository {
     final contactListModel = ContactListModel.fromContactList(contactList);
     final ndkContactList = contactListModel.toNdk();
 
-    return dartNdkSource.dartNdk.follows
-        .broadcastSetContactList(ndkContactList);
+    return dartNdkSource.dartNdk.follows.broadcastSetContactList(
+      ndkContactList,
+    );
   }
 
   @override
   Future<ContactList?> followUser(String npub) async {
-    final ndk_entities.ContactList newContactList =
-        await dartNdkSource.dartNdk.follows.broadcastAddContact(npub);
+    final ndk_entities.ContactList newContactList = await dartNdkSource
+        .dartNdk
+        .follows
+        .broadcastAddContact(npub);
 
     return ContactListModel.fromNdk(newContactList);
   }
 
   @override
   Future<ContactList?> unfollowUser(String npub) async {
-    final ndk_entities.ContactList? newContactList =
-        await dartNdkSource.dartNdk.follows.broadcastRemoveContact(npub);
+    final ndk_entities.ContactList? newContactList = await dartNdkSource
+        .dartNdk
+        .follows
+        .broadcastRemoveContact(npub);
 
     if (newContactList == null) {
       return null;

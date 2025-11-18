@@ -37,18 +37,21 @@ class _OnboardingInvitedByState extends ConsumerState<OnboardingInvitedBy> {
       return;
     }
 
-    widget.userInfo.followPubkeys
-        .addAll(invitedSet.elements.map((e) => e.value));
+    widget.userInfo.followPubkeys.addAll(
+      invitedSet.elements.map((e) => e.value),
+    );
 
     // remove duplicates
-    widget.userInfo.followPubkeys =
-        widget.userInfo.followPubkeys.toSet().toList();
+    widget.userInfo.followPubkeys = widget.userInfo.followPubkeys
+        .toSet()
+        .toList();
     widget.nextCallback();
   }
 
   NostrStarterPack? _getInvitedSet(WidgetRef ref) {
-    final inviteeLists =
-        ref.watch(nostrListsFollowStateProvider(widget.listPubkey));
+    final inviteeLists = ref.watch(
+      nostrListsFollowStateProvider(widget.listPubkey),
+    );
 
     for (final set in inviteeLists.publicNostrFollowSets) {
       if (set.name == widget.listName) {
@@ -60,20 +63,20 @@ class _OnboardingInvitedByState extends ConsumerState<OnboardingInvitedBy> {
 
   @override
   Widget build(BuildContext context) {
-    final inviteeLists =
-        ref.watch(nostrListsFollowStateProvider(widget.invitedByPubkey));
+    final inviteeLists = ref.watch(
+      nostrListsFollowStateProvider(widget.invitedByPubkey),
+    );
 
-    final inviteeMetadata =
-        ref.watch(metadataStateProvider(widget.invitedByPubkey));
+    final inviteeMetadata = ref.watch(
+      metadataStateProvider(widget.invitedByPubkey),
+    );
 
     /// filter the invited set by the inviteListName
     final invitedSet = _getInvitedSet(ref);
 
     return Scaffold(
       body: inviteeLists.isLoading
-          ? const Center(
-              child: CircularProgressIndicator(),
-            )
+          ? const Center(child: CircularProgressIndicator())
           : Column(
               children: [
                 // Header section (1/4 of the screen)
@@ -84,10 +87,9 @@ class _OnboardingInvitedByState extends ConsumerState<OnboardingInvitedBy> {
                       begin: Alignment.topLeft,
                       end: Alignment.bottomCenter,
                       colors: [
-                        Theme.of(context)
-                            .colorScheme
-                            .primary
-                            .withValues(alpha: 0.7),
+                        Theme.of(
+                          context,
+                        ).colorScheme.primary.withValues(alpha: 0.7),
                         Theme.of(context).colorScheme.primary,
                       ],
                     ),
@@ -127,18 +129,21 @@ class _OnboardingInvitedByState extends ConsumerState<OnboardingInvitedBy> {
                                     TextSpan(
                                       text: inviteeMetadata.userMetadata?.name,
                                       style: TextStyle(
-                                        color:
-                                            Paletter.getExtraLightGray(context),
+                                        color: Paletter.getExtraLightGray(
+                                          context,
+                                        ),
                                         fontSize: 18,
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),
                                     TextSpan(
-                                      text: AppLocalizations.of(context)!
-                                          .invitedYouToJoin,
+                                      text: AppLocalizations.of(
+                                        context,
+                                      )!.invitedYouToJoin,
                                       style: TextStyle(
-                                        color:
-                                            Paletter.getExtraLightGray(context),
+                                        color: Paletter.getExtraLightGray(
+                                          context,
+                                        ),
                                         fontSize: 16,
                                       ),
                                     ),
@@ -170,10 +175,14 @@ class _OnboardingInvitedByState extends ConsumerState<OnboardingInvitedBy> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                              AppLocalizations.of(context)!.noStarterPackFound),
+                            AppLocalizations.of(context)!.noStarterPackFound,
+                          ),
                           SizedBox(height: 10),
-                          Text(AppLocalizations.of(context)!
-                              .noWorriesYouCanStillJoin),
+                          Text(
+                            AppLocalizations.of(
+                              context,
+                            )!.noWorriesYouCanStillJoin,
+                          ),
                         ],
                       ),
                     ),
@@ -182,7 +191,8 @@ class _OnboardingInvitedByState extends ConsumerState<OnboardingInvitedBy> {
                   Expanded(
                     child: ListView.builder(
                       itemCount: invitedSet
-                          .elements.length, // Adjust based on your data
+                          .elements
+                          .length, // Adjust based on your data
                       itemBuilder: (context, index) {
                         final displayPubkey = invitedSet.elements[index].value;
 
@@ -205,9 +215,9 @@ class _OnboardingInvitedByState extends ConsumerState<OnboardingInvitedBy> {
                                     Text(
                                       displayMetadata?.name ?? "",
                                       style: TextStyle(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .onSurface,
+                                        color: Theme.of(
+                                          context,
+                                        ).colorScheme.onSurface,
                                         fontSize: 16,
                                         fontWeight: FontWeight.w600,
                                       ),
@@ -256,8 +266,9 @@ class _OnboardingInvitedByState extends ConsumerState<OnboardingInvitedBy> {
                           width: 400,
                           height: 40,
                           child: longButton(
-                            name: AppLocalizations.of(context)!
-                                .signupWithoutStarterPack,
+                            name: AppLocalizations.of(
+                              context,
+                            )!.signupWithoutStarterPack,
                             onPressed: () {
                               widget.nextCallback();
                             },

@@ -56,9 +56,7 @@ Future<void> main() async {
     WindowOptions windowOptions = WindowOptions(
       titleBarStyle: TitleBarStyle.hidden,
     );
-    windowManager.waitUntilReadyToShow(
-      windowOptions,
-    );
+    windowManager.waitUntilReadyToShow(windowOptions);
   }
 
   final initalData = await _getInitialData();
@@ -87,18 +85,16 @@ Future<void> main() async {
   // we have a signer, so we can set it
   if (mySigner != null) {
     /// ndk login
-    providerContainer.read(ndkProvider).accounts.loginExternalSigner(
-          signer: mySigner,
-        );
+    providerContainer
+        .read(ndkProvider)
+        .accounts
+        .loginExternalSigner(signer: mySigner);
     providerContainer.read(signerProvider.notifier).setSigner(mySigner);
 
     /// get fresh nip65 data on startup
     final myPubkey = mySigner.getPublicKey();
     final inboxOutboxP = providerContainer.read(inboxOutboxProvider);
-    inboxOutboxP.getNip65data(
-      myPubkey,
-      forceRefresh: false,
-    );
+    inboxOutboxP.getNip65data(myPubkey, forceRefresh: false);
   }
 
   final String initalRoute;
@@ -113,7 +109,8 @@ Future<void> main() async {
   }
 
   // check if firebase is supported on this platform
-  final bool firebaseSupported = (defaultTargetPlatform == TargetPlatform.iOS ||
+  final bool firebaseSupported =
+      (defaultTargetPlatform == TargetPlatform.iOS ||
       defaultTargetPlatform == TargetPlatform.android ||
       kIsWeb);
 
@@ -207,11 +204,7 @@ class MyApp extends ConsumerWidget {
                       height: 32,
                       child: Row(
                         children: [
-                          Expanded(
-                            child: DragToMoveArea(
-                              child: Container(),
-                            ),
-                          ),
+                          Expanded(child: DragToMoveArea(child: Container())),
                           SizedBox(
                             width: 154,
                             child: WindowCaption(

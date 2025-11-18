@@ -29,15 +29,37 @@ void main() {
       ];
 
       Uint8List encodedData = TlvUtils.encode(tlvList);
-      Uint8List expectedEncodedData =
-          Uint8List.fromList([0, 4, 1, 2, 3, 4, 1, 3, 5, 6, 7]);
+      Uint8List expectedEncodedData = Uint8List.fromList([
+        0,
+        4,
+        1,
+        2,
+        3,
+        4,
+        1,
+        3,
+        5,
+        6,
+        7,
+      ]);
 
       expect(encodedData, expectedEncodedData);
     });
 
     test('decode should return correct TLV list', () {
-      Uint8List encodedData =
-          Uint8List.fromList([0, 4, 1, 2, 3, 4, 1, 3, 5, 6, 7]);
+      Uint8List encodedData = Uint8List.fromList([
+        0,
+        4,
+        1,
+        2,
+        3,
+        4,
+        1,
+        3,
+        5,
+        6,
+        7,
+      ]);
       List<TLV> decodedTlvList = TlvUtils.decode(encodedData);
 
       List<TLV> expectedTlvList = [

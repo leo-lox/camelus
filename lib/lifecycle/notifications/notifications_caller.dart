@@ -56,11 +56,13 @@ Future<void> firebaseMessagingAppOpen(
 /// (FCM msg with notification, not data only)
 Future<void> checkForInitialMessage() async {
   // Get any messages which caused the application to open from a terminated state
-  RemoteMessage? initialMessage =
-      await FirebaseMessaging.instance.getInitialMessage();
+  RemoteMessage? initialMessage = await FirebaseMessaging.instance
+      .getInitialMessage();
 
   if (initialMessage != null) {
     // Handle the initial message
-    log('Application opened from terminated state with message: ${initialMessage.data}');
+    log(
+      'Application opened from terminated state with message: ${initialMessage.data}',
+    );
   }
 }

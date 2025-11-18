@@ -10,10 +10,7 @@ import 'deeplinks/deep_link_service.dart';
 class AppInitializationShell extends ConsumerStatefulWidget {
   final Widget child;
 
-  const AppInitializationShell({
-    super.key,
-    required this.child,
-  });
+  const AppInitializationShell({super.key, required this.child});
 
   @override
   ConsumerState<AppInitializationShell> createState() =>

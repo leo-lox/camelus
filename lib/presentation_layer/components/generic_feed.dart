@@ -21,7 +21,7 @@ class GenericFeed extends ConsumerStatefulWidget {
 
   // Optional custom header and configuration for floating headers
   final List<Widget> Function(BuildContext, bool, TabController)?
-      customHeaderSliverBuilder;
+  customHeaderSliverBuilder;
   final bool floatHeaderSlivers;
 
   final List<Widget> additionalTabViews;
@@ -89,8 +89,9 @@ class _GenericFeedState extends ConsumerState<GenericFeed>
 
     // Initialize providers for navigation and feed state
     final navBarP = ref.read(appBottomNavigationBarEventsProvider);
-    final genericFeedStateNotifier =
-        ref.read(genericFeedStateProvider(widget.feedFilter).notifier);
+    final genericFeedStateNotifier = ref.read(
+      genericFeedStateProvider(widget.feedFilter).notifier,
+    );
 
     // Listen to home tab events and refresh the feed
     _homeBarSub = navBarP.onHomeTabSelected.listen((_) {
@@ -111,26 +112,29 @@ class _GenericFeedState extends ConsumerState<GenericFeed>
   @override
   Widget build(BuildContext context) {
     // Watch the state of the generic feed and its notifier
-    final genericFeedStateP =
-        ref.watch(genericFeedStateProvider(widget.feedFilter));
-    final genericFeedStateNotifier =
-        ref.watch(genericFeedStateProvider(widget.feedFilter).notifier);
+    final genericFeedStateP = ref.watch(
+      genericFeedStateProvider(widget.feedFilter),
+    );
+    final genericFeedStateNotifier = ref.watch(
+      genericFeedStateProvider(widget.feedFilter).notifier,
+    );
 
     return NestedScrollView(
       floatHeaderSlivers: widget.floatHeaderSlivers,
       controller: _scrollController,
       headerSliverBuilder: widget.customHeaderSliverBuilder != null
           ? (context, innerBoxIsScrolled) => widget.customHeaderSliverBuilder!(
-                context,
-                innerBoxIsScrolled,
-                _tabController!,
-              )
+              context,
+              innerBoxIsScrolled,
+              _tabController!,
+            )
           : (BuildContext context, bool innerBoxIsScrolled) {
               // Default header builder
               return <Widget>[
                 SliverOverlapAbsorber(
-                  handle:
-                      NestedScrollView.sliverOverlapAbsorberHandleFor(context),
+                  handle: NestedScrollView.sliverOverlapAbsorberHandleFor(
+                    context,
+                  ),
                   sliver: SliverAppBar(
                     toolbarHeight: 0,
                     floating: true,
@@ -185,7 +189,8 @@ class _GenericFeedState extends ConsumerState<GenericFeed>
                     await Future.delayed(Duration.zero);
                   },
                   child: ScrollablePostsAndRepliesList(
-                      feedFilter: widget.feedFilter),
+                    feedFilter: widget.feedFilter,
+                  ),
                 ),
                 if (genericFeedStateP.newRootAndReplyNotes.isNotEmpty)
                   Positioned(
@@ -218,20 +223,17 @@ class _GenericFeedState extends ConsumerState<GenericFeed>
 class ScrollablePostsList extends ConsumerWidget {
   final FeedFilter feedFilter;
 
-  const ScrollablePostsList({
-    super.key,
-    required this.feedFilter,
-  });
+  const ScrollablePostsList({super.key, required this.feedFilter});
 
   @override
   Widget build(BuildContext context, ref) {
     final genericFeedStateP = ref.watch(genericFeedStateProvider(feedFilter));
-    final genericFeedStateNoti =
-        ref.read(genericFeedStateProvider(feedFilter).notifier);
+    final genericFeedStateNoti = ref.read(
+      genericFeedStateProvider(feedFilter).notifier,
+    );
 
     return FlutterListView(
-        delegate: FlutterListViewDelegate(
-      (BuildContext context, int index) {
+      delegate: FlutterListViewDelegate((BuildContext context, int index) {
         if (index == genericFeedStateP.timelineRootNotes.length) {
           if (genericFeedStateP.endOfRootNotes) {
             return NoMoreNotes();
@@ -244,10 +246,7 @@ class ScrollablePostsList extends ConsumerWidget {
         }
         final note = genericFeedStateP.timelineRootNotes[index];
         if (note.kind == 1) {
-          return NoteCardContainer(
-            key: PageStorageKey(note.id),
-            note: note,
-          );
+          return NoteCardContainer(key: PageStorageKey(note.id), note: note);
         } else if (note.kind == 6) {
           return NoteCardRepost(
             key: PageStorageKey(note.id),
@@ -255,9 +254,8 @@ class ScrollablePostsList extends ConsumerWidget {
           );
         }
         return Container();
-      },
-      childCount: genericFeedStateP.timelineRootNotes.length + 1,
-    ));
+      }, childCount: genericFeedStateP.timelineRootNotes.length + 1),
+    );
   }
 }
 
@@ -265,20 +263,17 @@ class ScrollablePostsList extends ConsumerWidget {
 class ScrollablePostsAndRepliesList extends ConsumerWidget {
   final FeedFilter feedFilter;
 
-  const ScrollablePostsAndRepliesList({
-    super.key,
-    required this.feedFilter,
-  });
+  const ScrollablePostsAndRepliesList({super.key, required this.feedFilter});
 
   @override
   Widget build(BuildContext context, ref) {
     final genericFeedStateP = ref.watch(genericFeedStateProvider(feedFilter));
-    final genericFeedStateNoti =
-        ref.read(genericFeedStateProvider(feedFilter).notifier);
+    final genericFeedStateNoti = ref.read(
+      genericFeedStateProvider(feedFilter).notifier,
+    );
 
     return FlutterListView(
-        delegate: FlutterListViewDelegate(
-      (BuildContext context, int index) {
+      delegate: FlutterListViewDelegate((BuildContext context, int index) {
         if (index == genericFeedStateP.timelineRootAndReplyNotes.length) {
           if (genericFeedStateP.endOfRootAndReplyNotes) {
             return NoMoreNotes();
@@ -292,12 +287,7 @@ class ScrollablePostsAndRepliesList extends ConsumerWidget {
         final note = genericFeedStateP.timelineRootAndReplyNotes[index];
 
         if (note.kind == 1) {
-          return NoteCardContainer(
-            key: PageStorageKey(
-              note.id,
-            ),
-            note: note,
-          );
+          return NoteCardContainer(key: PageStorageKey(note.id), note: note);
         } else if (note.kind == 6) {
           return NoteCardRepost(
             key: PageStorageKey(note.id),
@@ -305,8 +295,7 @@ class ScrollablePostsAndRepliesList extends ConsumerWidget {
           );
         }
         return Container();
-      },
-      childCount: genericFeedStateP.timelineRootAndReplyNotes.length + 1,
-    ));
+      }, childCount: genericFeedStateP.timelineRootAndReplyNotes.length + 1),
+    );
   }
 }
