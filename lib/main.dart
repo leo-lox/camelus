@@ -5,11 +5,13 @@ import 'package:flutter/foundation.dart';
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:ndk/shared/nips/nip01/key_pair.dart';
 import 'package:system_theme/system_theme.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:flutter_mentions/flutter_mentions.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ndk/ndk.dart';
+import 'domain_layer/entities/stored_account.dart';
 import 'l10n/app_localizations.dart';
 //import 'package:device_preview/device_preview.dart';
 //import 'data_layer/db/object_box_ndk/db_object_box.dart';
@@ -33,23 +35,12 @@ import 'theme.dart' show getThemeVariants;
 
 const devDeviceFrame = true;
 
-/// first is route, second is pubkey
-Future<List<dynamic>> _getInitialData() async {
-  final mySigner = await AppAuth.getEventSigner();
-
-  if (mySigner == null) {
-    final initialRoute = '/onboarding';
-
-    return [initialRoute, null];
-  }
-
-  return [null, mySigner];
-}
-
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  //AppAuth.clearAllAccounts();
 
   if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
     await windowManager.ensureInitialized();
@@ -59,7 +50,10 @@ Future<void> main() async {
     windowManager.waitUntilReadyToShow(windowOptions);
   }
 
-  final initalData = await _getInitialData();
+  final startupAccData = await AppAuth.getStartupAccountData();
+
+  print(startupAccData.loginType);
+  print(startupAccData.account?.toJson());
 
   // currently incompatible with recent flutter sdk https://github.com/aloisdeniel/flutter_device_preview/issues/244
   // if (kDebugMode && devDeviceFrame) {
@@ -73,8 +67,6 @@ Future<void> main() async {
   //   return;
   // }
 
-  final mySigner = initalData[1] as EventSigner?;
-
   // Create a ProviderContainer
   final providerContainer = ProviderContainer();
 
@@ -82,15 +74,14 @@ Future<void> main() async {
 
   providerContainer.read(dbNdkProvider.notifier).setDB(cacheManager);
 
+  final mySigner = await AppAuth.loginWithStoredAccount(
+    startupAccountData: startupAccData,
+    signerNoti: providerContainer.read(signerProvider.notifier),
+    ndk: providerContainer.read(ndkProvider),
+  );
+
   // we have a signer, so we can set it
   if (mySigner != null) {
-    /// ndk login
-    providerContainer
-        .read(ndkProvider)
-        .accounts
-        .loginExternalSigner(signer: mySigner);
-    providerContainer.read(signerProvider.notifier).setSigner(mySigner);
-
     /// get fresh nip65 data on startup
     final myPubkey = mySigner.getPublicKey();
     final inboxOutboxP = providerContainer.read(inboxOutboxProvider);
@@ -100,8 +91,8 @@ Future<void> main() async {
   final String initalRoute;
 
   // get inital route
-  if (initalData[0] != null) {
-    initalRoute = initalData[0];
+  if (startupAccData.loginType == LoginType.register) {
+    initalRoute = '/onboarding';
   } else {
     final appDb = providerContainer.read(dbAppProvider);
     final savedRoute = await appDb.read('initalRoute');

@@ -20,6 +20,8 @@ import 'package:bip39_mnemonic/bip39_mnemonic.dart';
 
 import '../../../../domain_layer/entities/key_pair.dart';
 
+import '../../../../domain_layer/entities/stored_account.dart';
+import '../../../../domain_layer/usecases/app_auth.dart';
 import '../../../providers/ndk_provider.dart';
 import '../../../providers/signer_provider.dart';
 
@@ -145,18 +147,20 @@ class _OnboardingLoginPageState extends ConsumerState<OnboardingLoginPage> {
       return;
     }
 
-    // store in secure storage
-    const storage = FlutterSecureStorage();
-    await storage.write(key: "nostrKeys", value: json.encode(myKeys!.toJson()));
-    // save in provider
-
-    final bip340Signer = Bip340EventSigner(
-      privateKey: myKeys!.privateKey,
-      publicKey: myKeys!.publicKey,
+    // create stored account
+    final storedAccount = LocalStorageAccount(
+      loginType: LoginType.privateKey,
+      pubkey: myKeys!.publicKey,
+      keyPair: myKeys,
     );
 
-    ref.watch(ndkProvider).accounts.loginExternalSigner(signer: bip340Signer);
-    ref.read(signerProvider.notifier).setSigner(bip340Signer);
+    await AppAuth.addStoredAccount(account: storedAccount, setActive: true);
+    final startupData = await AppAuth.getStartupAccountData();
+    await AppAuth.loginWithStoredAccount(
+      startupAccountData: startupData,
+      signerNoti: ref.read(signerProvider.notifier),
+      ndk: ref.read(ndkProvider),
+    );
 
     setState(() {});
 

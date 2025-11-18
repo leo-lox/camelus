@@ -19,7 +19,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
   }
 
   void _logout() async {
-    await AppAuth.clearKeys();
+    await AppAuth.clearAllAccounts();
 
     ref.read(ndkProvider).accounts.logout();
 

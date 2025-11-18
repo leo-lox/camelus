@@ -1068,14 +1068,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "5.1.1"
-  logger:
-    dependency: transitive
-    description:
-      name: logger
-      sha256: a7967e31b703831a893bbc3c3dd11db08126fe5f369b5c648a36f821979f5be3
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.6.2"
   logging:
     dependency: transitive
     description:
@@ -1135,12 +1127,10 @@ packages:
   ndk:
     dependency: "direct main"
     description:
-      path: "packages/ndk"
-      ref: tmp-camelus-1-7-4
-      resolved-ref: "1264d9bd65f4cc998ce776951217adb3a7118a9f"
-      url: "https://github.com/relaystr/ndk.git"
-    source: git
-    version: "0.6.0-dev.0"
+      path: "../ndk/packages/ndk"
+      relative: true
+    source: path
+    version: "0.6.0-dev.12"
   ndk_amber:
     dependency: "direct main"
     description:

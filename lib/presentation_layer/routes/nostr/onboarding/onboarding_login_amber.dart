@@ -8,6 +8,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 import '../../../../config/amber_url.dart';
+import '../../../../domain_layer/entities/stored_account.dart';
 import '../../../../domain_layer/usecases/app_auth.dart';
 import '../../../atoms/long_button.dart';
 import '../../../providers/ndk_provider.dart';
@@ -63,8 +64,19 @@ class _OnboardingLoginAmberPageState
 
     final amberSigner = await AppAuth.amberRegister();
 
-    ref.read(ndkProvider).accounts.loginExternalSigner(signer: amberSigner);
-    ref.read(signerProvider.notifier).setSigner(amberSigner);
+    // create stored account
+    final storedAccount = LocalStorageAccount(
+      loginType: LoginType.amber,
+      pubkey: amberSigner.publicKey,
+    );
+
+    await AppAuth.addStoredAccount(account: storedAccount, setActive: true);
+    final startupData = await AppAuth.getStartupAccountData();
+    await AppAuth.loginWithStoredAccount(
+      startupAccountData: startupData,
+      signerNoti: ref.read(signerProvider.notifier),
+      ndk: ref.read(ndkProvider),
+    );
 
     setState(() {});
 
