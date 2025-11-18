@@ -11,6 +11,7 @@ import 'package:window_manager/window_manager.dart';
 import 'package:flutter_mentions/flutter_mentions.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ndk/ndk.dart';
+import 'config/default_relays.dart';
 import 'domain_layer/entities/stored_account.dart';
 import 'l10n/app_localizations.dart';
 //import 'package:device_preview/device_preview.dart';
@@ -55,18 +56,6 @@ Future<void> main() async {
   print(startupAccData.loginType);
   print(startupAccData.account?.toJson());
 
-  // currently incompatible with recent flutter sdk https://github.com/aloisdeniel/flutter_device_preview/issues/244
-  // if (kDebugMode && devDeviceFrame) {
-  //   runApp(
-  //     DevicePreview(
-  //       enabled: kDebugMode,
-  //       builder: (context) =>
-  //           MyApp(initialRoute: initalData[0], pubkey: initalData[1]),
-  //     ),
-  //   );
-  //   return;
-  // }
-
   // Create a ProviderContainer
   final providerContainer = ProviderContainer();
 
@@ -74,8 +63,21 @@ Future<void> main() async {
 
   providerContainer.read(dbNdkProvider.notifier).setDB(cacheManager);
 
+  // If no account exists, login with a read-only account to show feed
+  StartupAccountData effectiveStartupData = startupAccData;
+  if (startupAccData.loginType == LoginType.register) {
+    // Use a default read-only pubkey for anonymous browsing
+    effectiveStartupData = StartupAccountData(
+      loginType: LoginType.readOnly,
+      account: LocalStorageAccount(
+        loginType: LoginType.readOnly,
+        pubkey: defaultReadOnlyPubkey,
+      ),
+    );
+  }
+
   final mySigner = await AppAuth.loginWithStoredAccount(
-    startupAccountData: startupAccData,
+    startupAccountData: effectiveStartupData,
     signerNoti: providerContainer.read(signerProvider.notifier),
     ndk: providerContainer.read(ndkProvider),
   );
@@ -90,9 +92,9 @@ Future<void> main() async {
 
   final String initalRoute;
 
-  // get inital route
+  // get inital route - always go to home with read-only, or onboarding if explicitly register
   if (startupAccData.loginType == LoginType.register) {
-    initalRoute = '/onboarding';
+    initalRoute = '/home'; // Changed to show feed first instead of onboarding
   } else {
     final appDb = providerContainer.read(dbAppProvider);
     final savedRoute = await appDb.read('initalRoute');

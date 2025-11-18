@@ -127,6 +127,13 @@ class AppAuth {
           return null;
         }
 
+      case LoginType.readOnly:
+        // For read-only accounts, use NDK's loginReadOnlyPubkey
+        if (startupAccountData.account?.pubkey != null) {
+          ndk.accounts.loginReadOnlyPubkey(startupAccountData.account!.pubkey!);
+        }
+        return null;
+
       case LoginType.register:
         return null;
     }

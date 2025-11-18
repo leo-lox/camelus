@@ -46,7 +46,42 @@ class _NotificationPageState extends ConsumerState<NotificationPage>
 
   @override
   Widget build(BuildContext context) {
-    final currentUserPubkey = ref.read(ndkProvider).accounts.getPublicKey()!;
+    final currentUserPubkey = ref.read(ndkProvider).accounts.getPublicKey();
+    
+    // If not logged in, show a message to login
+    if (currentUserPubkey == null) {
+      return Scaffold(
+        appBar: AppBar(
+          title: Text(
+            AppLocalizations.of(context)!.notifications,
+            style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+          ),
+          elevation: 0,
+        ),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                PhosphorIcons.userCircle(),
+                size: 64,
+                color: Theme.of(context).colorScheme.primary,
+              ),
+              SizedBox(height: 16),
+              Text(
+                'Please login to view notifications',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: () => context.push('/onboarding'),
+                child: Text('Login'),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
 
     final notificationsState = ref.watch(
       notificationsStateProvider(currentUserPubkey),
