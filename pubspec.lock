@@ -1127,9 +1127,11 @@ packages:
   ndk:
     dependency: "direct main"
     description:
-      path: "../ndk/packages/ndk"
-      relative: true
-    source: path
+      path: "packages/ndk"
+      ref: "175-refactor-list-usecase"
+      resolved-ref: "9bcdbe619978309df8731f0f4356c3d6490c7b7a"
+      url: "https://github.com/relaystr/ndk.git"
+    source: git
     version: "0.6.0-dev.12"
   ndk_amber:
     dependency: "direct main"
