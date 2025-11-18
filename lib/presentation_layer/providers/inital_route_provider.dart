@@ -4,8 +4,6 @@ import 'db_app_provider.dart';
 
 final initalRouteProvider = Provider<InitialRoute>((ref) {
   final appDb = ref.read(dbAppProvider);
-  final InitialRoute initialRouteUsecase = InitialRoute(
-    appDb: appDb,
-  );
+  final InitialRoute initialRouteUsecase = InitialRoute(appDb: appDb);
   return initialRouteUsecase;
 });

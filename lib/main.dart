@@ -47,9 +47,7 @@ Future<void> main() async {
     WindowOptions windowOptions = WindowOptions(
       titleBarStyle: TitleBarStyle.hidden,
     );
-    windowManager.waitUntilReadyToShow(
-      windowOptions,
-    );
+    windowManager.waitUntilReadyToShow(windowOptions);
   }
 
   final startupAccData = await AppAuth.getStartupAccountData();
@@ -87,10 +85,7 @@ Future<void> main() async {
     /// get fresh nip65 data on startup
     final myPubkey = mySigner.getPublicKey();
     final inboxOutboxP = providerContainer.read(inboxOutboxProvider);
-    inboxOutboxP.getNip65data(
-      myPubkey,
-      forceRefresh: false,
-    );
+    inboxOutboxP.getNip65data(myPubkey, forceRefresh: false);
   }
 
   final String initalRoute;
@@ -105,7 +100,8 @@ Future<void> main() async {
   }
 
   // check if firebase is supported on this platform
-  final bool firebaseSupported = (defaultTargetPlatform == TargetPlatform.iOS ||
+  final bool firebaseSupported =
+      (defaultTargetPlatform == TargetPlatform.iOS ||
       defaultTargetPlatform == TargetPlatform.android ||
       kIsWeb);
 
@@ -199,11 +195,7 @@ class MyApp extends ConsumerWidget {
                       height: 32,
                       child: Row(
                         children: [
-                          Expanded(
-                            child: DragToMoveArea(
-                              child: Container(),
-                            ),
-                          ),
+                          Expanded(child: DragToMoveArea(child: Container())),
                           SizedBox(
                             width: 154,
                             child: WindowCaption(

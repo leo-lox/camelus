@@ -3,9 +3,5 @@ class Relay {
   bool read;
   bool write;
 
-  Relay({
-    required this.url,
-    required this.read,
-    required this.write,
-  });
+  Relay({required this.url, required this.read, required this.write});
 }

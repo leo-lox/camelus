@@ -2,21 +2,13 @@ import 'package:ndk/ndk.dart';
 
 import 'key_pair.dart';
 
-enum LoginType {
-  register,
-  privateKey,
-  amber,
-  bunkerConnection,
-}
+enum LoginType { register, privateKey, amber, bunkerConnection }
 
 class StartupAccountData {
   final LoginType loginType;
   final LocalStorageAccount? account;
 
-  StartupAccountData({
-    required this.loginType,
-    this.account,
-  });
+  StartupAccountData({required this.loginType, this.account});
 }
 
 class LocalStorageAccount {
@@ -42,11 +34,13 @@ class LocalStorageAccount {
   factory LocalStorageAccount.fromJson(Map<String, dynamic> json) {
     return LocalStorageAccount(
       loginType: LoginType.values.firstWhere(
-          (e) => e.toString() == json['loginType'],
-          orElse: () => LoginType.register),
+        (e) => e.toString() == json['loginType'],
+        orElse: () => LoginType.register,
+      ),
       pubkey: json['pubkey'],
-      keyPair:
-          json['keyPair'] != null ? KeyPair.fromJson(json['keyPair']) : null,
+      keyPair: json['keyPair'] != null
+          ? KeyPair.fromJson(json['keyPair'])
+          : null,
       bunkerConnection: json['bunkerConnection'] != null
           ? BunkerConnection.fromJson(json['bunkerConnection'])
           : null,

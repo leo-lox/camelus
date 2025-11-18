@@ -42,11 +42,7 @@ ThemeVariants getThemeVariants({
 }
 
 ThemeData buildLightTheme(Color seedColor) {
-  return ThemeData(
-    colorScheme: ColorScheme.fromSeed(
-      seedColor: seedColor,
-    ),
-  );
+  return ThemeData(colorScheme: ColorScheme.fromSeed(seedColor: seedColor));
 }
 
 ThemeData buildDarkTheme(Color seedColor) {
@@ -72,42 +68,28 @@ final camelusLightTheme = ThemeData(
     backgroundColor: camelusLightColorScheme.primary,
   ),
   scaffoldBackgroundColor: Colors.white,
-  drawerTheme: DrawerThemeData(
-    backgroundColor: Colors.white,
+  drawerTheme: DrawerThemeData(backgroundColor: Colors.white),
+  navigationBarTheme: NavigationBarThemeData(backgroundColor: Colors.white),
+  dividerTheme: DividerThemeData(color: Colors.white),
+  appBarTheme: AppBarThemeData(backgroundColor: Colors.white),
+  cardTheme: CardThemeData(color: Colors.white),
+  dialogTheme: DialogThemeData(backgroundColor: Colors.white),
+  bottomSheetTheme: BottomSheetThemeData(backgroundColor: Colors.white),
+  popupMenuTheme: PopupMenuThemeData(color: Colors.white),
+  checkboxTheme: CheckboxThemeData(
+    fillColor: WidgetStateProperty.resolveWith((states) {
+      if (states.contains(WidgetState.selected)) {
+        return Colors.black;
+      }
+      return Colors.transparent;
+    }),
+    checkColor: WidgetStateProperty.resolveWith((states) {
+      if (states.contains(WidgetState.selected)) {
+        return Colors.white;
+      }
+      return Colors.transparent;
+    }),
   ),
-  navigationBarTheme: NavigationBarThemeData(
-    backgroundColor: Colors.white,
-  ),
-  dividerTheme: DividerThemeData(
-    color: Colors.white,
-  ),
-  appBarTheme: AppBarThemeData(
-    backgroundColor: Colors.white,
-  ),
-  cardTheme: CardThemeData(
-    color: Colors.white,
-  ),
-  dialogTheme: DialogThemeData(
-    backgroundColor: Colors.white,
-  ),
-  bottomSheetTheme: BottomSheetThemeData(
-    backgroundColor: Colors.white,
-  ),
-  popupMenuTheme: PopupMenuThemeData(
-    color: Colors.white,
-  ),
-  checkboxTheme:
-      CheckboxThemeData(fillColor: WidgetStateProperty.resolveWith((states) {
-    if (states.contains(WidgetState.selected)) {
-      return Colors.black;
-    }
-    return Colors.transparent;
-  }), checkColor: WidgetStateProperty.resolveWith((states) {
-    if (states.contains(WidgetState.selected)) {
-      return Colors.white;
-    }
-    return Colors.transparent;
-  })),
 );
 
 final camelusDarkColorScheme = ColorScheme.fromSeed(
@@ -121,42 +103,28 @@ final camelusDarkTheme = ThemeData(
     backgroundColor: camelusDarkColorScheme.primary,
   ),
   scaffoldBackgroundColor: Colors.black,
-  drawerTheme: DrawerThemeData(
-    backgroundColor: Colors.black,
+  drawerTheme: DrawerThemeData(backgroundColor: Colors.black),
+  navigationBarTheme: NavigationBarThemeData(backgroundColor: Colors.black),
+  dividerTheme: DividerThemeData(color: Colors.black),
+  appBarTheme: AppBarThemeData(backgroundColor: Colors.black),
+  cardTheme: CardThemeData(color: Colors.black),
+  dialogTheme: DialogThemeData(backgroundColor: Colors.black),
+  bottomSheetTheme: BottomSheetThemeData(backgroundColor: Colors.black),
+  popupMenuTheme: PopupMenuThemeData(color: Colors.black),
+  checkboxTheme: CheckboxThemeData(
+    fillColor: WidgetStateProperty.resolveWith((states) {
+      if (states.contains(WidgetState.selected)) {
+        return Colors.white;
+      }
+      return Colors.transparent;
+    }),
+    checkColor: WidgetStateProperty.resolveWith((states) {
+      if (states.contains(WidgetState.selected)) {
+        return Colors.black;
+      }
+      return Colors.transparent;
+    }),
   ),
-  navigationBarTheme: NavigationBarThemeData(
-    backgroundColor: Colors.black,
-  ),
-  dividerTheme: DividerThemeData(
-    color: Colors.black,
-  ),
-  appBarTheme: AppBarThemeData(
-    backgroundColor: Colors.black,
-  ),
-  cardTheme: CardThemeData(
-    color: Colors.black,
-  ),
-  dialogTheme: DialogThemeData(
-    backgroundColor: Colors.black,
-  ),
-  bottomSheetTheme: BottomSheetThemeData(
-    backgroundColor: Colors.black,
-  ),
-  popupMenuTheme: PopupMenuThemeData(
-    color: Colors.black,
-  ),
-  checkboxTheme:
-      CheckboxThemeData(fillColor: WidgetStateProperty.resolveWith((states) {
-    if (states.contains(WidgetState.selected)) {
-      return Colors.white;
-    }
-    return Colors.transparent;
-  }), checkColor: WidgetStateProperty.resolveWith((states) {
-    if (states.contains(WidgetState.selected)) {
-      return Colors.black;
-    }
-    return Colors.transparent;
-  })),
 );
 
 final nostrLightTheme = ThemeData(

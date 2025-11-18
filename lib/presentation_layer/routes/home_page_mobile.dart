@@ -23,11 +23,7 @@ class HomePageMobile extends ConsumerStatefulWidget {
   final String? initialTab;
   final int initialPage;
 
-  const HomePageMobile({
-    super.key,
-    this.initialTab,
-    this.initialPage = 0,
-  });
+  const HomePageMobile({super.key, this.initialTab, this.initialPage = 0});
 
   @override
   ConsumerState<HomePageMobile> createState() => _HomePageMobileState();
@@ -42,17 +38,20 @@ class _HomePageMobileState extends ConsumerState<HomePageMobile>
 
   void _show(BuildContext context) {
     showModalBottomSheet(
-        isScrollControlled: true,
-        elevation: 10,
-        isDismissible: false,
-        context: context,
-        builder: (context) => BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
-              child: Padding(
-                  padding: EdgeInsets.only(
-                      bottom: MediaQuery.of(context).viewInsets.bottom),
-                  child: const WritePost()),
-            ));
+      isScrollControlled: true,
+      elevation: 10,
+      isDismissible: false,
+      context: context,
+      builder: (context) => BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+        child: Padding(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom,
+          ),
+          child: const WritePost(),
+        ),
+      ),
+    );
   }
 
   @override
@@ -64,9 +63,7 @@ class _HomePageMobileState extends ConsumerState<HomePageMobile>
     final myContactList = ref.watch(contactListSelfStateProvider);
 
     if (myContactList.isLoading) {
-      return Scaffold(
-        body: Center(child: SpinnerCenter()),
-      );
+      return Scaffold(body: Center(child: SpinnerCenter()));
     }
 
     return Scaffold(
@@ -87,50 +84,52 @@ class _HomePageMobileState extends ConsumerState<HomePageMobile>
           key: PageStorageKey('homeFeed-$currentUserPubkey'),
           floatHeaderSlivers: true,
           initialTab: initialTabIndex,
-          customHeaderSliverBuilder: (
-            BuildContext context,
-            bool innerBoxIsScrolled,
-            TabController tabController,
-          ) {
-            return <Widget>[
-              SliverOverlapAbsorber(
-                handle:
-                    NestedScrollView.sliverOverlapAbsorberHandleFor(context),
-                sliver: SliverAppBar(
-                  floating: true,
-                  snap: false,
-                  pinned: false,
-                  forceElevated: true,
-                  leadingWidth: 48,
-                  leading: MobileFeedHeader(
-                    scaffoldKey: _scaffoldKey,
-                    pubkey: currentUserPubkey,
-                  ),
-                  centerTitle: true,
-                  title: const AppLogo(),
-                  actions: [
-                    RelaysConnectivityWidget(
-                      onTap: () => context.push('/nostr/relays'),
+          customHeaderSliverBuilder:
+              (
+                BuildContext context,
+                bool innerBoxIsScrolled,
+                TabController tabController,
+              ) {
+                return <Widget>[
+                  SliverOverlapAbsorber(
+                    handle: NestedScrollView.sliverOverlapAbsorberHandleFor(
+                      context,
                     ),
-                    if (Platform.isWindows ||
-                        Platform.isLinux ||
-                        Platform.isMacOS)
-                      const SizedBox(width: 154),
-                  ],
-                  bottom: PreferredSize(
-                    preferredSize: const Size.fromHeight(40),
-                    child: TabBar(
-                      controller: tabController,
-                      tabs: [
-                        Tab(text: "Posts"),
-                        Tab(text: "Posts and Replies"),
+                    sliver: SliverAppBar(
+                      floating: true,
+                      snap: false,
+                      pinned: false,
+                      forceElevated: true,
+                      leadingWidth: 48,
+                      leading: MobileFeedHeader(
+                        scaffoldKey: _scaffoldKey,
+                        pubkey: currentUserPubkey,
+                      ),
+                      centerTitle: true,
+                      title: const AppLogo(),
+                      actions: [
+                        RelaysConnectivityWidget(
+                          onTap: () => context.push('/nostr/relays'),
+                        ),
+                        if (Platform.isWindows ||
+                            Platform.isLinux ||
+                            Platform.isMacOS)
+                          const SizedBox(width: 154),
                       ],
+                      bottom: PreferredSize(
+                        preferredSize: const Size.fromHeight(40),
+                        child: TabBar(
+                          controller: tabController,
+                          tabs: [
+                            Tab(text: "Posts"),
+                            Tab(text: "Posts and Replies"),
+                          ],
+                        ),
+                      ),
                     ),
                   ),
-                ),
-              ),
-            ];
-          },
+                ];
+              },
           feedFilter: FeedFilter(
             feedId: "homeFeed",
             kinds: [1, 6],
@@ -163,10 +162,7 @@ class MobileFeedHeader extends ConsumerWidget {
       onTap: () => scaffoldKey.currentState!.openDrawer(),
       child: Padding(
         padding: const EdgeInsets.all(9.0),
-        child: UserImage(
-          imageUrl: myMetadata?.picture,
-          pubkey: pubkey,
-        ),
+        child: UserImage(imageUrl: myMetadata?.picture, pubkey: pubkey),
       ),
     );
   }

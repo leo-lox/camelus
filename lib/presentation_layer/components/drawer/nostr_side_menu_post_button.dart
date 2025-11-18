@@ -25,9 +25,11 @@ class NostrSideMenuPostButton extends StatelessWidget {
             builder: (context) => BackdropFilter(
               filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
               child: Padding(
-                  padding: EdgeInsets.only(
-                      bottom: MediaQuery.of(context).viewInsets.bottom),
-                  child: const WritePost()),
+                padding: EdgeInsets.only(
+                  bottom: MediaQuery.of(context).viewInsets.bottom,
+                ),
+                child: const WritePost(),
+              ),
             ),
           );
         },

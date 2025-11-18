@@ -112,7 +112,8 @@ class ProfileNotifier extends StateNotifier<ProfileState> {
   final String pubkey;
 
   ProfileNotifier(this.ref, this.pubkey)
-      : super(ProfileState(
+    : super(
+        ProfileState(
           pubkey: pubkey,
           name: '',
           about: '',
@@ -122,7 +123,8 @@ class ProfileNotifier extends StateNotifier<ProfileState> {
           lud16: '',
           pronouns: '',
           isLoading: true,
-        ));
+        ),
+      );
 
   // Methods to update individual profile fields
   void updateName(String name) {
@@ -163,8 +165,9 @@ class ProfileNotifier extends StateNotifier<ProfileState> {
       state = state.copyWith(profilePictureData: imageFile.bytes);
 
       //upload
-      final uploadResult =
-          await ref.read(fileUploadProvider).uploadImage(imageFile);
+      final uploadResult = await ref
+          .read(fileUploadProvider)
+          .uploadImage(imageFile);
       final hostedImageUrl = uploadResult
           .firstWhere((e) => e.descriptor?.url.isNotEmpty == true)
           .descriptor
@@ -203,8 +206,9 @@ class ProfileNotifier extends StateNotifier<ProfileState> {
       state = state.copyWith(bannerPictureData: imageFile.bytes);
 
       // Upload  image
-      final uploadResult =
-          await ref.read(fileUploadProvider).uploadImage(imageFile);
+      final uploadResult = await ref
+          .read(fileUploadProvider)
+          .uploadImage(imageFile);
       final hostedImageUrl = uploadResult
           .firstWhere((e) => e.descriptor?.url.isNotEmpty == true)
           .descriptor
@@ -282,14 +286,18 @@ class ProfileNotifier extends StateNotifier<ProfileState> {
 
         // fetch images
         if (myMetadata.picture != null && myMetadata.picture!.isNotEmpty) {
-          metadataProv.downloadImageUrl(myMetadata.picture!).then((data) => {
-                state = state.copyWith(profilePictureData: data),
-              });
+          metadataProv
+              .downloadImageUrl(myMetadata.picture!)
+              .then(
+                (data) => {state = state.copyWith(profilePictureData: data)},
+              );
         }
         if (myMetadata.banner != null && myMetadata.banner!.isNotEmpty) {
-          metadataProv.downloadImageUrl(myMetadata.banner!).then((data) => {
-                state = state.copyWith(bannerPictureData: data),
-              });
+          metadataProv
+              .downloadImageUrl(myMetadata.banner!)
+              .then(
+                (data) => {state = state.copyWith(bannerPictureData: data)},
+              );
         }
 
         // Update state with metadata
@@ -320,16 +328,13 @@ class ProfileNotifier extends StateNotifier<ProfileState> {
 // Provider for the profile state that takes a pubkey parameter
 final profileProvider =
     StateNotifierProvider.family<ProfileNotifier, ProfileState, String>(
-  (ref, pubkey) => ProfileNotifier(ref, pubkey),
-);
+      (ref, pubkey) => ProfileNotifier(ref, pubkey),
+    );
 
 class EditProfilePage extends ConsumerStatefulWidget {
   final String pubkey;
 
-  const EditProfilePage({
-    super.key,
-    required this.pubkey,
-  });
+  const EditProfilePage({super.key, required this.pubkey});
 
   @override
   ConsumerState<EditProfilePage> createState() => _EditProfilePageState();
@@ -341,7 +346,8 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
     super.initState();
     // Load profile data when the page is initialized
     Future.microtask(
-        () => ref.read(profileProvider(widget.pubkey).notifier).loadProfile());
+      () => ref.read(profileProvider(widget.pubkey).notifier).loadProfile(),
+    );
   }
 
   @override
@@ -354,37 +360,32 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
         actions: [
           Text(
             "${profileState.errBroadcasting ?? ''} ${profileState.profilePictureErr ?? ''} ${profileState.bannerPictureErr ?? ''}",
-            style: TextStyle(
-              color: Theme.of(context).colorScheme.error,
-            ),
+            style: TextStyle(color: Theme.of(context).colorScheme.error),
           ),
-          const SizedBox(
-            width: 10,
-          ),
+          const SizedBox(width: 10),
           profileState.isSaving
               ? Padding(
                   padding: EdgeInsets.all(16.0),
                   child: SizedBox(
                     width: 20,
                     height: 20,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                    ),
+                    child: CircularProgressIndicator(strokeWidth: 2),
                   ),
                 )
               : Padding(
                   padding: EdgeInsets.only(right: 11),
                   child: longButton(
-                      name: AppLocalizations.of(context)!.save,
-                      inverted: true,
-                      onPressed: () async {
-                        await ref
-                            .read(profileProvider(widget.pubkey).notifier)
-                            .saveProfile();
-                        if (mounted && !profileState.isSaving) {
-                          context.pop();
-                        }
-                      }),
+                    name: AppLocalizations.of(context)!.save,
+                    inverted: true,
+                    onPressed: () async {
+                      await ref
+                          .read(profileProvider(widget.pubkey).notifier)
+                          .saveProfile();
+                      if (mounted && !profileState.isSaving) {
+                        context.pop();
+                      }
+                    },
+                  ),
                 ),
           if (Platform.isWindows || Platform.isLinux || Platform.isMacOS)
             const SizedBox(width: 154),
@@ -400,7 +401,8 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                   Text(
                     AppLocalizations.of(context)!.loadingProfile,
                     style: TextStyle(
-                        color: Theme.of(context).colorScheme.onSurface),
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
                   ),
                 ],
               ),

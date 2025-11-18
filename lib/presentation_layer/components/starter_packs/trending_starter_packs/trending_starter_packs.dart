@@ -15,9 +15,7 @@ class TrendingStarterPacks extends ConsumerWidget {
     final state = ref.watch(trendingStarterPacksStateProvider);
 
     if (state.isLoading) {
-      return Center(
-        child: SpinnerCenter(),
-      );
+      return Center(child: SpinnerCenter());
     }
 
     return SizedBox(
@@ -30,19 +28,18 @@ class TrendingStarterPacks extends ConsumerWidget {
           return SizedBox(
             width: MediaQuery.of(context).size.width * 0.70,
             child: Container(
-              margin: EdgeInsets.only(
-                left: index == 0 ? 8.0 : 0.0,
-                right: 4.0,
-              ),
+              margin: EdgeInsets.only(left: index == 0 ? 8.0 : 0.0, right: 4.0),
               child: StarterPackCard(
                 key: ValueKey(myPack.id),
                 pack: myPack,
                 onTab: () {
-                  context.push('/open-starter-pack',
-                      extra: StarterPackIdentifier(
-                        name: myPack.name,
-                        pubkey: myPack.pubKey,
-                      ));
+                  context.push(
+                    '/open-starter-pack',
+                    extra: StarterPackIdentifier(
+                      name: myPack.name,
+                      pubkey: myPack.pubKey,
+                    ),
+                  );
                 },
               ),
             ),

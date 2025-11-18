@@ -22,10 +22,7 @@ import '../providers/serverpod_provider.dart';
 class DeeplinkRecieverPage extends ConsumerStatefulWidget {
   final String userParam;
 
-  const DeeplinkRecieverPage({
-    super.key,
-    required this.userParam,
-  });
+  const DeeplinkRecieverPage({super.key, required this.userParam});
 
   @override
   ConsumerState<DeeplinkRecieverPage> createState() =>
@@ -48,10 +45,7 @@ class _DeeplinkRecieverPageState extends ConsumerState<DeeplinkRecieverPage> {
         final reconstructedPath = segments.join("/");
 
         try {
-          _camelusLinks(
-            path: "/$reconstructedPath",
-            ref: ref,
-          );
+          _camelusLinks(path: "/$reconstructedPath", ref: ref);
         } catch (e) {
           setState(() {
             userErrorMsg = "Error processing link: $e";
@@ -61,10 +55,7 @@ class _DeeplinkRecieverPageState extends ConsumerState<DeeplinkRecieverPage> {
       } else if (!widget.userParam.contains("/")) {
         /// check if its nostr code
         try {
-          _nostrDecode(
-            nostrCode: widget.userParam,
-            providerContainer: ref,
-          );
+          _nostrDecode(nostrCode: widget.userParam, providerContainer: ref);
         } catch (e) {
           setState(() {
             userErrorMsg = "Error processing link: $e";
@@ -75,25 +66,18 @@ class _DeeplinkRecieverPageState extends ConsumerState<DeeplinkRecieverPage> {
     });
   }
 
-  _pushProfile({
-    required String pubkey,
-  }) {
+  _pushProfile({required String pubkey}) {
     context.go('/nostr/profile/$pubkey');
   }
 
-  _pushNote({
-    required String noteId,
-  }) {
+  _pushNote({required String noteId}) {
     context.go('/nostr/event', extra: {"root": noteId});
   }
 
   void _navigateToStarterPack(String listName, String pubkey) {
     context.go(
       '/open-starter-pack',
-      extra: StarterPackIdentifier(
-        name: listName,
-        pubkey: pubkey,
-      ),
+      extra: StarterPackIdentifier(name: listName, pubkey: pubkey),
     );
   }
 
@@ -107,31 +91,26 @@ class _DeeplinkRecieverPageState extends ConsumerState<DeeplinkRecieverPage> {
     if (myMatch.contains("nprofile")) {
       // remove the "nostr:" part
 
-      Map<String, dynamic> nProfileDecode =
-          NprofileHelper().bech32toMap(myMatch);
+      Map<String, dynamic> nProfileDecode = NprofileHelper().bech32toMap(
+        myMatch,
+      );
 
       myPubkeyHex = nProfileDecode['pubkey'];
 
-      _pushProfile(
-        pubkey: myPubkeyHex,
-      );
+      _pushProfile(pubkey: myPubkeyHex);
     } else if (myMatch.contains("npub")) {
       final List decode = Helpers().decodeBech32(myMatch);
 
       myPubkeyHex = decode[0];
 
-      _pushProfile(
-        pubkey: myPubkeyHex,
-      );
+      _pushProfile(pubkey: myPubkeyHex);
     } else if (myMatch.contains("note1")) {
       final decode = Helpers().decodeBech32(myMatch);
       final String noteId = decode[1];
       if (noteId.isEmpty) {
         return;
       }
-      _pushNote(
-        noteId: noteId,
-      );
+      _pushNote(noteId: noteId);
     } else if (myMatch.contains("nevent")) {
       final map = NeventHelper().bech32ToMap(myMatch);
       final String eventId = map['eventId'];
@@ -140,9 +119,7 @@ class _DeeplinkRecieverPageState extends ConsumerState<DeeplinkRecieverPage> {
         return;
       }
 
-      _pushNote(
-        noteId: eventId,
-      );
+      _pushNote(noteId: eventId);
     } else if (myMatch.contains("@")) {
       final nip05P = providerContainer.read(nip05provider);
       final nip05Data = await nip05P.get(myMatch);
@@ -175,10 +152,7 @@ class _DeeplinkRecieverPageState extends ConsumerState<DeeplinkRecieverPage> {
     }
   }
 
-  Future<void> _handleInviteLink(
-    String path,
-    WidgetRef ref,
-  ) async {
+  Future<void> _handleInviteLink(String path, WidgetRef ref) async {
     final pathSegments = path.split("/");
     if (pathSegments.length < 3) return;
 
@@ -203,9 +177,10 @@ class _DeeplinkRecieverPageState extends ConsumerState<DeeplinkRecieverPage> {
 
     final startupAcc = await AppAuth.getStartupAccountData();
     final mySigner = await AppAuth.loginWithStoredAccount(
-        startupAccountData: startupAcc,
-        signerNoti: ref.read(signerProvider.notifier),
-        ndk: ref.read(ndkProvider));
+      startupAccountData: startupAcc,
+      signerNoti: ref.read(signerProvider.notifier),
+      ndk: ref.read(ndkProvider),
+    );
 
     if (mySigner != null) {
       _navigateToStarterPack(
@@ -271,10 +246,7 @@ class _DeeplinkRecieverPageState extends ConsumerState<DeeplinkRecieverPage> {
     }
   }
 
-  Future<void> _handleUserLink(
-    String path,
-    WidgetRef ref,
-  ) async {
+  Future<void> _handleUserLink(String path, WidgetRef ref) async {
     final pathSegments = path.split("/");
     if (pathSegments.length < 3) return;
 
@@ -304,8 +276,10 @@ class _DeeplinkRecieverPageState extends ConsumerState<DeeplinkRecieverPage> {
               ),
             ),
             const SizedBox(height: 4),
-            Text(widget.userParam,
-                style: const TextStyle(fontFamily: 'monospace')),
+            Text(
+              widget.userParam,
+              style: const TextStyle(fontFamily: 'monospace'),
+            ),
             const SizedBox(height: 20),
             if (loading) const SpinnerCenter(),
             if (!loading) Text('no matching action found'),
@@ -320,7 +294,7 @@ class _DeeplinkRecieverPageState extends ConsumerState<DeeplinkRecieverPage> {
               onPressed: () {
                 context.go('/home');
               },
-            )
+            ),
           ],
         ),
       ),

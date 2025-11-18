@@ -19,8 +19,8 @@ class EventViewPage extends ConsumerStatefulWidget {
     super.key,
     required String? openNoteId,
     required String rootNoteId,
-  })  : _openNoteId = openNoteId,
-        _rootNoteId = rootNoteId;
+  }) : _openNoteId = openNoteId,
+       _rootNoteId = rootNoteId;
 
   @override
   EventViewPageState createState() => EventViewPageState();
@@ -55,8 +55,11 @@ class EventViewPageState extends ConsumerState<EventViewPage> {
       return;
     }
     if (noteId == widget._rootNoteId) {
-      eventViewController.sliverController.animateToIndex(0,
-          duration: Duration(milliseconds: 200), curve: Curves.easeInOut);
+      eventViewController.sliverController.animateToIndex(
+        0,
+        duration: Duration(milliseconds: 200),
+        curve: Curves.easeInOut,
+      );
       return;
     }
 
@@ -64,8 +67,11 @@ class EventViewPageState extends ConsumerState<EventViewPage> {
     for (int i = 0; i < _flattenedComments.length; i++) {
       if (_flattenedComments[i].note.id == noteId) {
         // Add 1 to account for the root note at index 0
-        eventViewController.sliverController.animateToIndex(i + 1,
-            duration: Duration(milliseconds: 300), curve: Curves.easeInOutExpo);
+        eventViewController.sliverController.animateToIndex(
+          i + 1,
+          duration: Duration(milliseconds: 300),
+          curve: Curves.easeInOutExpo,
+        );
         return;
       }
     }
@@ -89,7 +95,8 @@ class EventViewPageState extends ConsumerState<EventViewPage> {
 
   // Flatten the comment tree into a list with depth information
   List<FlattenedComment> _flattenCommentTree(
-      List<TreeNode<ParsedPost>> comments) {
+    List<TreeNode<ParsedPost>> comments,
+  ) {
     List<FlattenedComment> result = [];
 
     // Sort direct replies to root by creation time (oldest first)
@@ -99,16 +106,21 @@ class EventViewPageState extends ConsumerState<EventViewPage> {
     // Process each top-level comment
     for (final comment in sortedComments) {
       // Add the comment itself
-      result.add(FlattenedComment(
-        note: comment.value,
-        depth: 0,
-        ancestorHasSibling: [false],
-      ));
+      result.add(
+        FlattenedComment(
+          note: comment.value,
+          depth: 0,
+          ancestorHasSibling: [false],
+        ),
+      );
 
       // Add all its children recursively (with child comments sorted by creation time)
       if (comment.children.isNotEmpty) {
-        result.addAll(_flattenChildComments(
-            comment.children, 1, [comment != sortedComments.last]));
+        result.addAll(
+          _flattenChildComments(comment.children, 1, [
+            comment != sortedComments.last,
+          ]),
+        );
       }
     }
 
@@ -117,9 +129,10 @@ class EventViewPageState extends ConsumerState<EventViewPage> {
 
   // Helper method to recursively flatten child comments
   List<FlattenedComment> _flattenChildComments(
-      List<TreeNode<ParsedPost>> children,
-      int depth,
-      List<bool> ancestorHasSibling) {
+    List<TreeNode<ParsedPost>> children,
+    int depth,
+    List<bool> ancestorHasSibling,
+  ) {
     List<FlattenedComment> result = [];
 
     // Sort child comments by creation time (older first)
@@ -131,16 +144,22 @@ class EventViewPageState extends ConsumerState<EventViewPage> {
       final isLastChild = i == sortedChildren.length - 1;
 
       // Add the child comment
-      result.add(FlattenedComment(
-        note: child.value,
-        depth: depth,
-        ancestorHasSibling: [...ancestorHasSibling, !isLastChild],
-      ));
+      result.add(
+        FlattenedComment(
+          note: child.value,
+          depth: depth,
+          ancestorHasSibling: [...ancestorHasSibling, !isLastChild],
+        ),
+      );
 
       // Add all its children recursively
       if (child.children.isNotEmpty) {
-        result.addAll(_flattenChildComments(
-            child.children, depth + 1, [...ancestorHasSibling, !isLastChild]));
+        result.addAll(
+          _flattenChildComments(child.children, depth + 1, [
+            ...ancestorHasSibling,
+            !isLastChild,
+          ]),
+        );
       }
     }
 
@@ -155,16 +174,15 @@ class EventViewPageState extends ConsumerState<EventViewPage> {
       });
     }
 
-    final eventFeedState =
-        ref.watch(eventFeedStateProvider(widget._rootNoteId));
+    final eventFeedState = ref.watch(
+      eventFeedStateProvider(widget._rootNoteId),
+    );
 
     // Flatten the comment tree
     _flattenedComments = _flattenCommentTree(eventFeedState.comments);
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(AppLocalizations.of(context)!.thread),
-      ),
+      appBar: AppBar(title: Text(AppLocalizations.of(context)!.thread)),
       body: FlutterListView(
         controller: eventViewController,
         delegate: FlutterListViewDelegate(

@@ -7,9 +7,7 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 import '../../providers/app_bar_provider/app_bottom_bar_provider.dart';
 
 class AppBottomNavigationBar extends ConsumerWidget {
-  const AppBottomNavigationBar({
-    super.key,
-  });
+  const AppBottomNavigationBar({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -54,25 +52,28 @@ class AppBottomNavigationBar extends ConsumerWidget {
   }
 
   NavigationDestination _buildHomeItem(
-      BuildContext context, NavigationState state, WidgetRef ref) {
+    BuildContext context,
+    NavigationState state,
+    WidgetRef ref,
+  ) {
     final isSelected = state.selectedTab == NavigationTab.home;
 
     return NavigationDestination(
-      icon: Builder(builder: (context) {
-        final child = Icon(
-          PhosphorIcons.house(),
-          color: isSelected ? Theme.of(context).colorScheme.primary : null,
-          size: 23,
-        );
-
-        if (state.newNotesCountHome > 0) {
-          return Badge(
-            child: child,
+      icon: Builder(
+        builder: (context) {
+          final child = Icon(
+            PhosphorIcons.house(),
+            color: isSelected ? Theme.of(context).colorScheme.primary : null,
+            size: 23,
           );
-        }
 
-        return child;
-      }),
+          if (state.newNotesCountHome > 0) {
+            return Badge(child: child);
+          }
+
+          return child;
+        },
+      ),
       tooltip: isSelected
           ? AppLocalizations.of(context)!.scrollToTop
           : AppLocalizations.of(context)!.home,
@@ -81,42 +82,48 @@ class AppBottomNavigationBar extends ConsumerWidget {
   }
 
   NavigationDestination _buildSearchItem(
-      BuildContext context, NavigationState state) {
+    BuildContext context,
+    NavigationState state,
+  ) {
     final isSelected = state.selectedTab == NavigationTab.search;
 
     return NavigationDestination(
-      icon: Builder(builder: (context) {
-        return Icon(
-          PhosphorIcons.magnifyingGlass(),
-          color: isSelected ? Theme.of(context).colorScheme.primary : null,
-          size: 23,
-        );
-      }),
+      icon: Builder(
+        builder: (context) {
+          return Icon(
+            PhosphorIcons.magnifyingGlass(),
+            color: isSelected ? Theme.of(context).colorScheme.primary : null,
+            size: 23,
+          );
+        },
+      ),
       label: AppLocalizations.of(context)!.search,
       tooltip: AppLocalizations.of(context)!.search,
     );
   }
 
   NavigationDestination _buildNotificationsItem(
-      BuildContext context, NavigationState state) {
+    BuildContext context,
+    NavigationState state,
+  ) {
     final isSelected = state.selectedTab == NavigationTab.notifications;
 
     return NavigationDestination(
-      icon: Builder(builder: (context) {
-        final child = Icon(
-          PhosphorIcons.bell(),
-          color: isSelected ? Theme.of(context).colorScheme.primary : null,
-          size: 23,
-        );
-
-        if (state.newNotesCountNotifications > 0) {
-          return Badge(
-            child: child,
+      icon: Builder(
+        builder: (context) {
+          final child = Icon(
+            PhosphorIcons.bell(),
+            color: isSelected ? Theme.of(context).colorScheme.primary : null,
+            size: 23,
           );
-        }
 
-        return child;
-      }),
+          if (state.newNotesCountNotifications > 0) {
+            return Badge(child: child);
+          }
+
+          return child;
+        },
+      ),
       label: AppLocalizations.of(context)!.notifications,
       tooltip: AppLocalizations.of(context)!.notifications,
     );

@@ -14,10 +14,12 @@ import '../entities/stored_account.dart';
 /// This class is used to store and retrive user information from secure storage. \
 /// the storage keys [nostrKeys] and [amber] are used to store the user's keypair and amber public key respectively.
 class AppAuth {
-  static const accountStorageKey =
-      kDebugMode ? "DEV_storedAccounts" : "storedAccounts";
-  static const activeAccountPubkeyStorageKey =
-      kDebugMode ? "DEV_activeAccountPubkey" : "activeAccountPubkey";
+  static const accountStorageKey = kDebugMode
+      ? "DEV_storedAccounts"
+      : "storedAccounts";
+  static const activeAccountPubkeyStorageKey = kDebugMode
+      ? "DEV_activeAccountPubkey"
+      : "activeAccountPubkey";
 
   static FlutterSecureStorage secureStorage = const FlutterSecureStorage();
   static final amber = Amberflutter();
@@ -37,18 +39,10 @@ class AppAuth {
     }
     final amberValue = await amber.getPublicKey(
       permissions: [
-        const Permission(
-          type: "nip04_encrypt",
-        ),
-        const Permission(
-          type: "nip04_decrypt",
-        ),
-        const Permission(
-          type: "nip44_encrypt",
-        ),
-        const Permission(
-          type: "nip44_decrypt",
-        ),
+        const Permission(type: "nip04_encrypt"),
+        const Permission(type: "nip04_decrypt"),
+        const Permission(type: "nip44_encrypt"),
+        const Permission(type: "nip44_decrypt"),
         const Permission(type: "sign_event", kind: 0),
         const Permission(type: "sign_event", kind: 1),
         const Permission(type: "sign_event", kind: 2),
@@ -66,8 +60,10 @@ class AppAuth {
     final pubkeyHex = Nip19.decode(npub);
 
     final amberFlutterDS = AmberFlutterDS(amber);
-    final amberSigner =
-        AmberEventSigner(publicKey: pubkeyHex, amberFlutterDS: amberFlutterDS);
+    final amberSigner = AmberEventSigner(
+      publicKey: pubkeyHex,
+      amberFlutterDS: amberFlutterDS,
+    );
     return amberSigner;
   }
 
@@ -78,7 +74,9 @@ class AppAuth {
     }
     final amberFlutterDS = AmberFlutterDS(amber);
     final amberSigner = AmberEventSigner(
-        publicKey: amberPubkey, amberFlutterDS: amberFlutterDS);
+      publicKey: amberPubkey,
+      amberFlutterDS: amberFlutterDS,
+    );
     return amberSigner;
   }
 
@@ -135,20 +133,21 @@ class AppAuth {
   }
 
   static Future<StartupAccountData> getStartupAccountData() async {
-    final activeAccountPubkey =
-        await secureStorage.read(key: AppAuth.activeAccountPubkeyStorageKey);
-    final storedAccountsString =
-        await secureStorage.read(key: AppAuth.accountStorageKey);
+    final activeAccountPubkey = await secureStorage.read(
+      key: AppAuth.activeAccountPubkeyStorageKey,
+    );
+    final storedAccountsString = await secureStorage.read(
+      key: AppAuth.accountStorageKey,
+    );
 
     if (activeAccountPubkey == null || storedAccountsString == null) {
-      return StartupAccountData(
-        loginType: LoginType.register,
-      );
+      return StartupAccountData(loginType: LoginType.register);
     }
 
     final storedAccounts = jsonDecode(storedAccountsString) as List;
-    final storedAccountsList =
-        storedAccounts.map((e) => LocalStorageAccount.fromJson(e)).toList();
+    final storedAccountsList = storedAccounts
+        .map((e) => LocalStorageAccount.fromJson(e))
+        .toList();
 
     // check if pubkey matches
 
@@ -174,8 +173,9 @@ class AppAuth {
     required LocalStorageAccount account,
     bool setActive = true,
   }) async {
-    final storedAccountsString =
-        await secureStorage.read(key: AppAuth.accountStorageKey);
+    final storedAccountsString = await secureStorage.read(
+      key: AppAuth.accountStorageKey,
+    );
     List<LocalStorageAccount> storedAccounts = [];
     if (storedAccountsString != null) {
       final storedAccountsJson = jsonDecode(storedAccountsString) as List;
@@ -199,9 +199,7 @@ class AppAuth {
   /// deltes the keys from storage.
   /// This is used to log out the user
   static Future<void> clearAllAccounts() async {
-    await secureStorage.delete(
-      key: AppAuth.activeAccountPubkeyStorageKey,
-    );
+    await secureStorage.delete(key: AppAuth.activeAccountPubkeyStorageKey);
     await secureStorage.delete(key: AppAuth.accountStorageKey);
   }
 }

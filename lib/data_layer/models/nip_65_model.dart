@@ -26,7 +26,8 @@ class Nip65Model extends Nip65 {
   }
 
   factory Nip65Model.fromNdkUserRelayList(
-      ndk_entities.UserRelayList userRelayList) {
+    ndk_entities.UserRelayList userRelayList,
+  ) {
     return Nip65Model(
       createdAt: userRelayList.createdAt,
       pubKey: userRelayList.pubKey,

@@ -16,29 +16,25 @@ import 'skeleton_note.dart';
 class NoteCardRepost extends ConsumerWidget {
   final NostrNote repostEvent;
 
-  const NoteCardRepost({
-    super.key,
-    required this.repostEvent,
-  });
+  const NoteCardRepost({super.key, required this.repostEvent});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final notesP = ref.read(getNotesProvider);
-    final repostedByMetadata =
-        ref.watch(metadataStateProvider(repostEvent.pubkey)).userMetadata;
+    final repostedByMetadata = ref
+        .watch(metadataStateProvider(repostEvent.pubkey))
+        .userMetadata;
 
     final noteEtag = repostEvent.tags.cast<NostrTag?>().firstWhere(
-          (element) => element?.type == 'e',
-          orElse: () => null,
-        );
+      (element) => element?.type == 'e',
+      orElse: () => null,
+    );
 
     if (noteEtag == null) {
       return Text("Repost has no information where to fetch the post");
     }
 
-    final displayNoteStream = notesP.getNote(
-      noteEtag.value,
-    );
+    final displayNoteStream = notesP.getNote(noteEtag.value);
 
     return Column(
       children: [
@@ -68,19 +64,15 @@ class NoteCardRepost extends ConsumerWidget {
                     style: TextStyle(color: Paletter.getGray(context)),
                     children: [
                       TextSpan(
-                        text: repostedByMetadata?.name ??
+                        text:
+                            repostedByMetadata?.name ??
                             Helpers().shortHr(repostEvent.pubkey),
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 15,
                         ),
                       ),
-                      TextSpan(
-                        text: ' shared',
-                        style: TextStyle(
-                          fontSize: 14,
-                        ),
-                      ),
+                      TextSpan(text: ' shared', style: TextStyle(fontSize: 14)),
                     ],
                   ),
                 ),
@@ -100,10 +92,12 @@ class NoteCardRepost extends ConsumerWidget {
                       child: Column(
                         children: [
                           Text(
-                              "loading might fail, the repost has no information where to fetch the post"),
+                            "loading might fail, the repost has no information where to fetch the post",
+                          ),
                           SizedBox(height: 10),
                           Text(
-                              "This is a bug, please report it to the developers"),
+                            "This is a bug, please report it to the developers",
+                          ),
                           SizedBox(height: 10),
                           Text(
                             "repostId: ${repostEvent.id} ${repostEvent.sources}",

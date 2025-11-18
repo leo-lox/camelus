@@ -8,10 +8,7 @@ class Follow {
 
   final FollowRepository followRepository;
 
-  Follow({
-    required this.selfPubkey,
-    required this.followRepository,
-  });
+  Follow({required this.selfPubkey, required this.followRepository});
 
   _checkSelfPubkey() {
     if (selfPubkey() == null) {

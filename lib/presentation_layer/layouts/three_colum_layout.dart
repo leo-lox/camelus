@@ -37,16 +37,21 @@ class ThreeColumnLayout extends StatelessWidget {
             // With right sidebar: use remaining space but respect min/max
             final availableWidth =
                 constraints.maxWidth - leftSidebarWidth - rightSidebarWidth;
-            mainContentWidth =
-                availableWidth.clamp(minMainContentWidth, maxMainContentWidth);
+            mainContentWidth = availableWidth.clamp(
+              minMainContentWidth,
+              maxMainContentWidth,
+            );
           } else {
             // Without right sidebar: use remaining space but respect min/max
             final availableWidth = constraints.maxWidth - leftSidebarWidth;
-            mainContentWidth =
-                availableWidth.clamp(minMainContentWidth, maxMainContentWidth);
+            mainContentWidth = availableWidth.clamp(
+              minMainContentWidth,
+              maxMainContentWidth,
+            );
           }
 
-          final totalWidth = leftSidebarWidth +
+          final totalWidth =
+              leftSidebarWidth +
               mainContentWidth +
               (showRightSidebar ? rightSidebarWidth : 0);
 
@@ -56,15 +61,9 @@ class ThreeColumnLayout extends StatelessWidget {
               child: Row(
                 children: [
                   SizedBox(width: leftSidebarWidth, child: leftSidebar),
-                  SizedBox(
-                    width: mainContentWidth,
-                    child: mainContent,
-                  ),
+                  SizedBox(width: mainContentWidth, child: mainContent),
                   if (showRightSidebar)
-                    SizedBox(
-                      width: rightSidebarWidth,
-                      child: rightSidebar,
-                    ),
+                    SizedBox(width: rightSidebarWidth, child: rightSidebar),
                 ],
               ),
             ),

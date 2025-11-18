@@ -12,9 +12,7 @@ import 'inbox_outbox_provider.dart';
 
 // Provider for managing state related to generic feed
 final genericFeedStateProvider = NotifierProvider.autoDispose
-    .family<GenericFeedState, FeedViewModel, FeedFilter>(
-  GenericFeedState.new,
-);
+    .family<GenericFeedState, FeedViewModel, FeedFilter>(GenericFeedState.new);
 
 // State management for a generic feed
 class GenericFeedState
@@ -51,10 +49,7 @@ class GenericFeedState
     _addRootTimelineEvents(state.newRootNotes);
     _addRootAndReplyTimelineEvents(state.newRootAndReplyNotes);
 
-    state = state.copyWith(
-      newRootNotes: [],
-      newRootAndReplyNotes: [],
-    );
+    state = state.copyWith(newRootNotes: [], newRootAndReplyNotes: []);
   }
 
   // Sets up a subscription to listen for feed updates
@@ -90,8 +85,9 @@ class GenericFeedState
     final rootAndReplyNotes = networkNotes;
 
     final parsedRootNotes = await NostrParser.parseEvents(rootNotes);
-    final parsedRootAndReplyNotes =
-        await NostrParser.parseEvents(rootAndReplyNotes);
+    final parsedRootAndReplyNotes = await NostrParser.parseEvents(
+      rootAndReplyNotes,
+    );
 
     _addNewRootEvents(parsedRootNotes); // Add new root events
     _addNewRootAndReplyEvents(
@@ -116,8 +112,11 @@ class GenericFeedState
   }
 
   // Fetches network notes based on the filter and cutoff time
-  Stream<NostrNote> _fetchNetworkNotes(FeedFilter filter, int cutoff,
-      {int? limit}) {
+  Stream<NostrNote> _fetchNetworkNotes(
+    FeedFilter filter,
+    int cutoff, {
+    int? limit,
+  }) {
     final notesP = ref.watch(getNotesProvider);
     return notesP.genericNostrQuery(
       requestId: "q-${filter.feedId}",
@@ -137,12 +136,14 @@ class GenericFeedState
     final rootAndReplyNotes = networkNotes;
 
     final parsedRootNotes = await NostrParser.parseEvents(rootNotes);
-    final parsedRootAndReplyNotes =
-        await NostrParser.parseEvents(rootAndReplyNotes);
+    final parsedRootAndReplyNotes = await NostrParser.parseEvents(
+      rootAndReplyNotes,
+    );
 
     _addRootTimelineEvents(parsedRootNotes); // Add root notes to the timeline
     _addRootAndReplyTimelineEvents(
-        parsedRootAndReplyNotes); // Add root and reply notes
+      parsedRootAndReplyNotes,
+    ); // Add root and reply notes
   }
 
   // Loads more notes for infinite scrolling
@@ -184,35 +185,38 @@ class GenericFeedState
     }).toList();
 
     state = state.copyWith(
-        timelineRootNotes: [...state.timelineRootNotes, ...events]
-          ..sort((a, b) => b.created_at.compareTo(a.created_at)));
+      timelineRootNotes: [...state.timelineRootNotes, ...events]
+        ..sort((a, b) => b.created_at.compareTo(a.created_at)),
+    );
   }
 
   // Helper to add new root events
   void _addNewRootEvents(List<ParsedPost> events) {
     state = state.copyWith(
-        newRootNotes: [...state.newRootNotes, ...events]
-          ..sort((a, b) => b.created_at.compareTo(a.created_at)));
+      newRootNotes: [...state.newRootNotes, ...events]
+        ..sort((a, b) => b.created_at.compareTo(a.created_at)),
+    );
   }
 
   // Helper to add root and reply timeline events
   void _addRootAndReplyTimelineEvents(List<ParsedPost> events) {
     events = events.where((event) {
-      return !state.timelineRootAndReplyNotes
-          .any((element) => element.id == event.id);
+      return !state.timelineRootAndReplyNotes.any(
+        (element) => element.id == event.id,
+      );
     }).toList();
 
     state = state.copyWith(
-        timelineRootAndReplyNotes: [
-      ...state.timelineRootAndReplyNotes,
-      ...events
-    ]..sort((a, b) => b.created_at.compareTo(a.created_at)));
+      timelineRootAndReplyNotes: [...state.timelineRootAndReplyNotes, ...events]
+        ..sort((a, b) => b.created_at.compareTo(a.created_at)),
+    );
   }
 
   // Helper to add new root and reply events
   void _addNewRootAndReplyEvents(List<ParsedPost> events) {
     state = state.copyWith(
-        newRootAndReplyNotes: [...state.newRootAndReplyNotes, ...events]
-          ..sort((a, b) => b.created_at.compareTo(a.created_at)));
+      newRootAndReplyNotes: [...state.newRootAndReplyNotes, ...events]
+        ..sort((a, b) => b.created_at.compareTo(a.created_at)),
+    );
   }
 }

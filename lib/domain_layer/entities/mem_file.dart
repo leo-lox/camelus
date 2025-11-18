@@ -5,9 +5,5 @@ class MemFile {
   final String mimeType;
   final String name;
 
-  MemFile({
-    required this.bytes,
-    required this.mimeType,
-    required this.name,
-  });
+  MemFile({required this.bytes, required this.mimeType, required this.name});
 }

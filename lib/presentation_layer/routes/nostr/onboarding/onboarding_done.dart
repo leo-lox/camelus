@@ -68,7 +68,8 @@ class _OnboardingDoneState extends ConsumerState<OnboardingDone> {
   }
 
   void _copyKey() {
-    final clipData = """
+    final clipData =
+        """
 Public Key:
 ${_privateKey.publicKeyHr}
 
@@ -90,8 +91,9 @@ ${_privateKey.mnemonicSentence}
 
     final metadataP = ref.watch(metadataProvider);
 
-    final myContactListNotifier =
-        ref.watch(contactListStateProvider(_privateKey.publicKey).notifier);
+    final myContactListNotifier = ref.watch(
+      contactListStateProvider(_privateKey.publicKey).notifier,
+    );
 
     final inboxOutboxP = ref.read(inboxOutboxProvider);
     final fileUploadP = ref.watch(fileUploadProvider);
@@ -113,23 +115,23 @@ ${_privateKey.mnemonicSentence}
       setState(() {
         // add to start
         loadingTexts.insert(
-            0, AppLocalizations.of(context)!.uploadingProfilePicture);
+          0,
+          AppLocalizations.of(context)!.uploadingProfilePicture,
+        );
       });
 
       try {
-        uploadedPicture =
-            (await fileUploadP.uploadImage(widget.userInfo.picture!))[0]
-                .descriptor!
-                .url;
+        uploadedPicture = (await fileUploadP.uploadImage(
+          widget.userInfo.picture!,
+        ))[0].descriptor!.url;
       } catch (_) {}
     }
 
     if (widget.userInfo.banner != null) {
       try {
-        uploadedBanner =
-            (await fileUploadP.uploadImage(widget.userInfo.banner!))[0]
-                .descriptor!
-                .url;
+        uploadedBanner = (await fileUploadP.uploadImage(
+          widget.userInfo.banner!,
+        ))[0].descriptor!.url;
       } catch (_) {}
     }
 
@@ -165,7 +167,7 @@ ${_privateKey.mnemonicSentence}
       AppLocalizations.of(context)!.settingUpYourAccount,
       AppLocalizations.of(context)!.followingPeople,
       AppLocalizations.of(context)!.movingData,
-      AppLocalizations.of(context)!.cleaningUp
+      AppLocalizations.of(context)!.cleaningUp,
     ];
   }
 
@@ -205,9 +207,10 @@ ${_privateKey.mnemonicSentence}
     await AppAuth.addStoredAccount(account: storedAccount, setActive: true);
     final startupData = await AppAuth.getStartupAccountData();
     await AppAuth.loginWithStoredAccount(
-        startupAccountData: startupData,
-        signerNoti: ref.read(signerProvider.notifier),
-        ndk: ref.read(ndkProvider));
+      startupAccountData: startupData,
+      signerNoti: ref.read(signerProvider.notifier),
+      ndk: ref.read(ndkProvider),
+    );
 
     await _broadcastAcc();
 
@@ -254,44 +257,53 @@ ${_privateKey.mnemonicSentence}
                             children: [
                               ElevatedButton.icon(
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor:
-                                      Theme.of(context).colorScheme.surface,
-                                  foregroundColor:
-                                      Theme.of(context).colorScheme.onSurface,
+                                  backgroundColor: Theme.of(
+                                    context,
+                                  ).colorScheme.surface,
+                                  foregroundColor: Theme.of(
+                                    context,
+                                  ).colorScheme.onSurface,
                                 ),
                                 onPressed: () => {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
                                       duration: Duration(seconds: 2),
                                       content: Text(
-                                          AppLocalizations.of(context)!
-                                              .newSeedPhraseGenerated),
+                                        AppLocalizations.of(
+                                          context,
+                                        )!.newSeedPhraseGenerated,
+                                      ),
                                     ),
                                   ),
-                                  _generateKey()
+                                  _generateKey(),
                                 },
                                 icon: const Icon(Icons.refresh),
                                 label: Text(
-                                    AppLocalizations.of(context)!.regenerate),
+                                  AppLocalizations.of(context)!.regenerate,
+                                ),
                               ),
                               const SizedBox(width: 5),
                               ElevatedButton.icon(
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor:
-                                      Paletter.getLightGray(context),
-                                  foregroundColor:
-                                      Theme.of(context).colorScheme.surface,
+                                  backgroundColor: Paletter.getLightGray(
+                                    context,
+                                  ),
+                                  foregroundColor: Theme.of(
+                                    context,
+                                  ).colorScheme.surface,
                                 ),
                                 onPressed: () => {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
                                       duration: Duration(seconds: 2),
                                       content: Text(
-                                          AppLocalizations.of(context)!
-                                              .copiedSeedPhraseToClipboard),
+                                        AppLocalizations.of(
+                                          context,
+                                        )!.copiedSeedPhraseToClipboard,
+                                      ),
                                     ),
                                   ),
-                                  _copyKey()
+                                  _copyKey(),
                                 },
                                 icon: const Icon(Icons.copy),
                                 label: Text(AppLocalizations.of(context)!.copy),
@@ -299,9 +311,11 @@ ${_privateKey.mnemonicSentence}
                               const SizedBox(width: 5),
                               IconButton(
                                 onPressed: _toggleVisibility,
-                                icon: Icon(_isVisible
-                                    ? Icons.visibility
-                                    : Icons.visibility_off),
+                                icon: Icon(
+                                  _isVisible
+                                      ? Icons.visibility
+                                      : Icons.visibility_off,
+                                ),
                                 tooltip: _isVisible
                                     ? AppLocalizations.of(context)!.hideWords
                                     : AppLocalizations.of(context)!.showWords,
@@ -311,8 +325,9 @@ ${_privateKey.mnemonicSentence}
                         ),
                         Padding(
                           padding: EdgeInsets.all(16),
-                          child: Text(AppLocalizations.of(context)!
-                              .recoveryPhraseWarning),
+                          child: Text(
+                            AppLocalizations.of(context)!.recoveryPhraseWarning,
+                          ),
                         ),
                       ],
                     ),
@@ -344,8 +359,10 @@ ${_privateKey.mnemonicSentence}
                         GestureDetector(
                           onTap: () {
                             Uri url = Uri.parse("https://camelus.app/terms/");
-                            launchUrl(url,
-                                mode: LaunchMode.externalApplication);
+                            launchUrl(
+                              url,
+                              mode: LaunchMode.externalApplication,
+                            );
                           },
                           child: Text(
                             AppLocalizations.of(context)!.termsAndConditions,

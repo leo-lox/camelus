@@ -10,9 +10,7 @@ abstract class NostrListRepository {
     required NostrStarterPack starterPack,
   });
 
-  Future deleteStarterPack({
-    required String name,
-  });
+  Future deleteStarterPack({required String name});
 
   Future<NostrStarterPack?> addUserToStarterPack({
     required String name,

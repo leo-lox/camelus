@@ -12,11 +12,7 @@ class NoteCardContainer extends ConsumerWidget {
   final ParsedPost note;
   final double? fontSize;
 
-  const NoteCardContainer({
-    super.key,
-    required this.note,
-    this.fontSize,
-  });
+  const NoteCardContainer({super.key, required this.note, this.fontSize});
 
   static void _onNoteTab(BuildContext context, ParsedPost myNote) {
     var refEvents = myNote.nostrNote.getTagEvents;
@@ -39,16 +35,17 @@ class NoteCardContainer extends ConsumerWidget {
     String root,
     String? scrollIntoView,
   ) {
-    context.push('/nostr/event', extra: {
-      'root': root,
-      'scrollIntoView': scrollIntoView,
-    });
+    context.push(
+      '/nostr/event',
+      extra: {'root': root, 'scrollIntoView': scrollIntoView},
+    );
   }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final myMetadata =
-        ref.watch(metadataStateProvider(note.pubkey)).userMetadata;
+    final myMetadata = ref
+        .watch(metadataStateProvider(note.pubkey))
+        .userMetadata;
 
     return GestureDetector(
       onTap: () => _onNoteTab(context, note),

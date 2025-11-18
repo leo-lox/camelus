@@ -32,9 +32,7 @@ class _BlockedUsersState extends ConsumerState<BlockedUsers> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(AppLocalizations.of(context)!.blockedUsers),
-      ),
+      appBar: AppBar(title: Text(AppLocalizations.of(context)!.blockedUsers)),
       body: Text(AppLocalizations.of(context)!.notImplemented),
     );
   }

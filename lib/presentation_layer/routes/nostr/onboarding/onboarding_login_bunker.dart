@@ -20,10 +20,7 @@ import '../../../providers/signer_provider.dart';
 class OnboardingLoginBunkerPage extends ConsumerStatefulWidget {
   final Function? onPressedBack;
 
-  const OnboardingLoginBunkerPage({
-    super.key,
-    this.onPressedBack,
-  });
+  const OnboardingLoginBunkerPage({super.key, this.onPressedBack});
   @override
   ConsumerState<OnboardingLoginBunkerPage> createState() =>
       _OnboardingLoginBunkerPageState();
@@ -65,23 +62,23 @@ class _OnboardingLoginBunkerPageState
   }
 
   void _showError(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-      ),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
   }
 
   void _onBunkerLogin() async {
     if (!_termsAndConditions) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Please read and accept the terms and conditions first',
-              style: TextStyle(
-                color: Theme.of(context).colorScheme.onSurface,
-                fontSize: 12,
-                fontWeight: FontWeight.normal,
-              )),
+          content: Text(
+            'Please read and accept the terms and conditions first',
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.onSurface,
+              fontSize: 12,
+              fontWeight: FontWeight.normal,
+            ),
+          ),
         ),
       );
       return;
@@ -122,9 +119,10 @@ class _OnboardingLoginBunkerPageState
       await AppAuth.addStoredAccount(account: storedAccount, setActive: true);
       final startupData = await AppAuth.getStartupAccountData();
       await AppAuth.loginWithStoredAccount(
-          startupAccountData: startupData,
-          signerNoti: ref.read(signerProvider.notifier),
-          ndk: ndk);
+        startupAccountData: startupData,
+        signerNoti: ref.read(signerProvider.notifier),
+        ndk: ndk,
+      );
 
       setState(() {
         _bunkerLoading = false;
@@ -207,8 +205,9 @@ class _OnboardingLoginBunkerPageState
                     isDense: true,
                     hintText: 'bunker://',
                     hintStyle: TextStyle(
-                        color: Theme.of(context).colorScheme.onSurface,
-                        letterSpacing: 1.1),
+                      color: Theme.of(context).colorScheme.onSurface,
+                      letterSpacing: 1.1,
+                    ),
                     filled: true,
                     fillColor: Paletter.extraDarkGray,
                     enabledBorder: OutlineInputBorder(
@@ -222,7 +221,8 @@ class _OnboardingLoginBunkerPageState
                     errorBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.all(Radius.circular(10)),
                       borderSide: BorderSide(
-                          color: Theme.of(context).colorScheme.error),
+                        color: Theme.of(context).colorScheme.error,
+                      ),
                     ),
                   ),
                 ),
@@ -241,13 +241,15 @@ class _OnboardingLoginBunkerPageState
                           _pasteFromClipboard();
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor:
-                              Theme.of(context).colorScheme.surface,
+                          backgroundColor: Theme.of(
+                            context,
+                          ).colorScheme.surface,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(20),
                             side: BorderSide(
-                                color: Theme.of(context).colorScheme.onSurface,
-                                width: 1),
+                              color: Theme.of(context).colorScheme.onSurface,
+                              width: 1,
+                            ),
                           ),
                         ),
                         child: Text(
@@ -276,7 +278,8 @@ class _OnboardingLoginBunkerPageState
                     activeColor: Theme.of(context).colorScheme.surface,
                     checkColor: Theme.of(context).colorScheme.primary,
                     fillColor: WidgetStateProperty.all(
-                        Theme.of(context).colorScheme.onSurface),
+                      Theme.of(context).colorScheme.onSurface,
+                    ),
                   ),
                   Text(
                     "I have read and accept the ",

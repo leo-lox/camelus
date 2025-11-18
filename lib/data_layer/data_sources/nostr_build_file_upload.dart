@@ -26,8 +26,9 @@ class NostrBuildFileUpload {
     var responseString = await response.stream.transform(utf8.decoder).join();
 
     // extract url https://image.nostr.build/random00values.jpg
-    final RegExp urlPattern =
-        RegExp(r'https:\/\/image\.nostr\.build\S+\.(?:jpg|jpeg|png|gif)');
+    final RegExp urlPattern = RegExp(
+      r'https:\/\/image\.nostr\.build\S+\.(?:jpg|jpeg|png|gif)',
+    );
     final Match? urlMatch = urlPattern.firstMatch(responseString);
     if (urlMatch != null) {
       final String myUrl = urlMatch.group(0)!;

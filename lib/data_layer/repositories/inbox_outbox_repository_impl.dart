@@ -6,9 +6,7 @@ import '../models/nip_65_model.dart';
 class InboxOutboxRepositoryImpl implements InboxOutboxRepository {
   final DartNdkSource dartNdkSource;
 
-  InboxOutboxRepositoryImpl({
-    required this.dartNdkSource,
-  });
+  InboxOutboxRepositoryImpl({required this.dartNdkSource});
   @override
   Future<Nip65> setNip65data(Nip65 newNip65) async {
     final Nip65Model nip65model = Nip65Model(
@@ -27,11 +25,8 @@ class InboxOutboxRepositoryImpl implements InboxOutboxRepository {
 
   @override
   Future<Nip65?> getNip65data(String npub, {bool forceRefresh = false}) async {
-    final ndkData =
-        await dartNdkSource.dartNdk.userRelayLists.getSingleUserRelayList(
-      npub,
-      forceRefresh: forceRefresh,
-    );
+    final ndkData = await dartNdkSource.dartNdk.userRelayLists
+        .getSingleUserRelayList(npub, forceRefresh: forceRefresh);
     if (ndkData == null) return null;
 
     final data = Nip65Model.fromNdkUserRelayList(ndkData);
@@ -39,12 +34,14 @@ class InboxOutboxRepositoryImpl implements InboxOutboxRepository {
   }
 
   @override
-  Future<void> updateCache(List<String> pubkeys,
-      {bool forceRefresh = false}) async {
+  Future<void> updateCache(
+    List<String> pubkeys, {
+    bool forceRefresh = false,
+  }) async {
     await dartNdkSource.dartNdk.userRelayLists
         .loadMissingRelayListsFromNip65OrNip02(
-      pubkeys,
-      forceRefresh: forceRefresh,
-    );
+          pubkeys,
+          forceRefresh: forceRefresh,
+        );
   }
 }

@@ -15,8 +15,9 @@ Future<void> processFcmData({
   required ProviderContainer provider,
   bool isBackground = false,
 }) async {
-  final Map<String, dynamic> encryptedEventJson =
-      jsonDecode(data['encryptedEvent']);
+  final Map<String, dynamic> encryptedEventJson = jsonDecode(
+    data['encryptedEvent'],
+  );
 
   final encryptedWrapEvent = Nip01Event.fromJson(encryptedEventJson);
 
@@ -24,8 +25,9 @@ Future<void> processFcmData({
       ? provider.read(ndkProviderLight)
       : provider.read(ndkProvider);
 
-  final unwrappedEvent =
-      await ndk.giftWrap.unwrapEvent(wrappedEvent: encryptedWrapEvent);
+  final unwrappedEvent = await ndk.giftWrap.unwrapEvent(
+    wrappedEvent: encryptedWrapEvent,
+  );
 
   final notiProvider = await provider.read(notificationsProvider.future);
 
@@ -41,8 +43,10 @@ Future<void> processFcmData({
     final lastPtag = unwrappedEvent.pTags.last;
     final likleyDirectReply = myPubkey == lastPtag;
 
-    final threadId =
-        unwrappedEvent.getTags('e').where((t) => t[3] == 'root').firstOrNull;
+    final threadId = unwrappedEvent
+        .getTags('e')
+        .where((t) => t[3] == 'root')
+        .firstOrNull;
 
     final payload = {
       "note": jsonEncode(unwrappedEvent.toJson()),
@@ -51,7 +55,8 @@ Future<void> processFcmData({
 
     /// display notification
     await notiProvider.displayLocalAvatarNotification(
-      title: metadata.name ??
+      title:
+          metadata.name ??
           metadata.nip05 ??
           "${metadata.pubkey.substring(0, 15)}...",
       body: unwrappedEvent.content.length < 280

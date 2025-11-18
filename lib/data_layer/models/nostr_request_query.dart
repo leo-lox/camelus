@@ -15,13 +15,13 @@ class NostrRequestQuery implements NostrRequest {
   });
 
   NostrRequestQuery.clone(NostrRequestQuery obj)
-      : this(
-          subscriptionId: obj.subscriptionId,
-          body: NostrRequestQueryBody.clone(obj.body),
-          body2: obj.body2 == null
-              ? null
-              : NostrRequestQueryBody.clone(obj.body2!),
-        );
+    : this(
+        subscriptionId: obj.subscriptionId,
+        body: NostrRequestQueryBody.clone(obj.body),
+        body2: obj.body2 == null
+            ? null
+            : NostrRequestQueryBody.clone(obj.body2!),
+      );
 
   List<String> get getAllPossiblePubkeys {
     List<String> result = [];
@@ -45,11 +45,13 @@ class NostrRequestQuery implements NostrRequest {
   NostrRequestQuery mergeQuery(NostrRequestQuery toIntegrate) {
     if (subscriptionId != toIntegrate.subscriptionId) {
       throw Exception(
-          "Cannot merge two NostrRequestQuery with different subscriptionId");
+        "Cannot merge two NostrRequestQuery with different subscriptionId",
+      );
     }
     var newBody = NostrRequestQueryBody.clone(body);
-    var newBody2 =
-        NostrRequestQueryBody.clone(body2 ?? NostrRequestQueryBody(kinds: []));
+    var newBody2 = NostrRequestQueryBody.clone(
+      body2 ?? NostrRequestQueryBody(kinds: []),
+    );
     newBody.ids?.addAll(toIntegrate.body.ids ?? []);
     newBody.authors?.addAll(toIntegrate.body.authors ?? []);
     newBody.kinds.addAll(toIntegrate.body.kinds);
@@ -116,17 +118,17 @@ class NostrRequestQueryBody {
   });
 
   NostrRequestQueryBody.clone(NostrRequestQueryBody obj)
-      : this(
-          ids: obj.ids == null ? null : List<String>.from(obj.ids!),
-          authors: obj.authors == null ? null : List<String>.from(obj.authors!),
-          kinds: List<int>.from(obj.kinds),
-          hastagE: obj.hastagE == null ? null : List<String>.from(obj.hastagE!),
-          hastagP: obj.hastagP == null ? null : List<String>.from(obj.hastagP!),
-          hastagT: obj.hastagT == null ? null : List<String>.from(obj.hastagT!),
-          since: obj.since,
-          until: obj.until,
-          limit: obj.limit,
-        );
+    : this(
+        ids: obj.ids == null ? null : List<String>.from(obj.ids!),
+        authors: obj.authors == null ? null : List<String>.from(obj.authors!),
+        kinds: List<int>.from(obj.kinds),
+        hastagE: obj.hastagE == null ? null : List<String>.from(obj.hastagE!),
+        hastagP: obj.hastagP == null ? null : List<String>.from(obj.hastagP!),
+        hastagT: obj.hastagT == null ? null : List<String>.from(obj.hastagT!),
+        since: obj.since,
+        until: obj.until,
+        limit: obj.limit,
+      );
 
   Map<String, dynamic> toMap() {
     var body = {

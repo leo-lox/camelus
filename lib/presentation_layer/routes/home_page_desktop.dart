@@ -21,9 +21,7 @@ class HomePageDesktop extends ConsumerWidget {
     return SafeArea(
       child: GenericFeed(
         key: PageStorageKey('homeFeed-$currentUserPubkey'),
-        feedPadding: EdgeInsets.only(
-          top: 50,
-        ),
+        feedPadding: EdgeInsets.only(top: 50),
         floatHeaderSlivers: true,
         initialTab: 0,
         feedFilter: FeedFilter(

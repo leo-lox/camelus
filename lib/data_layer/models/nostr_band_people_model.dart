@@ -6,12 +6,11 @@ class NostrBandPeopleModel extends NostrBandPeople {
 
   factory NostrBandPeopleModel.fromJson(Map<String, dynamic> json) {
     List<dynamic> profilesJson = json['profiles'] ?? [];
-    List<ProfilesModel> profiles =
-        profilesJson.map((profile) => ProfilesModel.fromJson(profile)).toList();
+    List<ProfilesModel> profiles = profilesJson
+        .map((profile) => ProfilesModel.fromJson(profile))
+        .toList();
 
-    return NostrBandPeopleModel(
-      profiles: profiles,
-    );
+    return NostrBandPeopleModel(profiles: profiles);
   }
 
   Map<String, dynamic> toJson() {

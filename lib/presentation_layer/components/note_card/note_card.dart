@@ -46,29 +46,29 @@ class NoteCard extends ConsumerWidget {
         if (note.nostrNote.sigValid != true) _buildInvalidSignature(),
         Padding(
           padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
-          child: Row(
+          child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildUserImage(context),
-              const SizedBox(width: 10),
-              Flexible(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    NoteCardNameRow(
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildUserImage(context),
+                  const SizedBox(width: 10),
+                  Flexible(
+                    child: NoteCardNameRow(
                       key: ValueKey("${note.id}name_row"),
                       createdAt: note.created_at,
                       myMetadata: myMetadata,
                       pubkey: note.pubkey,
                     ),
-                    const SizedBox(height: 10),
-                    PostContentWidget(
-                      key: ValueKey("${note.id}split_content"),
-                      post: note,
-                      fontSize: fontSize,
-                    )
-                  ],
-                ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
+              PostContentWidget(
+                key: ValueKey("${note.id}split_content"),
+                post: note,
+                fontSize: fontSize,
               ),
             ],
           ),
@@ -92,8 +92,9 @@ class NoteCard extends ConsumerWidget {
                 retweetLoading: ref
                     .watch(postRepostProvider(note.nostrNote))
                     .toggleRepostLoading,
-                isRetweeted:
-                    ref.watch(postRepostProvider(note.nostrNote)).isReposted,
+                isRetweeted: ref
+                    .watch(postRepostProvider(note.nostrNote))
+                    .isReposted,
                 onRetweet: () {
                   ref
                       .read(postRepostProvider(note.nostrNote).notifier)
@@ -107,10 +108,7 @@ class NoteCard extends ConsumerWidget {
           ),
         ],
         if (!hideBottomBar)
-          Divider(
-            thickness: 0.3,
-            color: Paletter.getDarkGray(context),
-          ),
+          Divider(thickness: 0.3, color: Paletter.getDarkGray(context)),
       ],
     );
   }
@@ -158,17 +156,18 @@ class NoteCard extends ConsumerWidget {
 
 void _writeReply(context, NostrNote note) {
   showModalBottomSheet(
-      isScrollControlled: true,
-      elevation: 10,
-      isDismissible: false,
-      context: context,
-      builder: (context) => BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
-            child: Padding(
-                padding: EdgeInsets.only(
-                    bottom: MediaQuery.of(context).viewInsets.bottom),
-                child: WritePost(
-                  context: PostContext(replyToNote: note),
-                )),
-          ));
+    isScrollControlled: true,
+    elevation: 10,
+    isDismissible: false,
+    context: context,
+    builder: (context) => BackdropFilter(
+      filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+      child: Padding(
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom,
+        ),
+        child: WritePost(context: PostContext(replyToNote: note)),
+      ),
+    ),
+  );
 }

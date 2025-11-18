@@ -14,15 +14,13 @@ import 'starter_pack_card.dart';
 class StarterPacksList extends ConsumerWidget {
   final String pubkey;
 
-  const StarterPacksList({
-    super.key,
-    required this.pubkey,
-  });
+  const StarterPacksList({super.key, required this.pubkey});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    NostrListsFollowState followSetsList =
-        ref.watch(nostrListsFollowStateProvider(pubkey));
+    NostrListsFollowState followSetsList = ref.watch(
+      nostrListsFollowStateProvider(pubkey),
+    );
     final ndk = ref.watch(ndkProvider);
     final myPubkey = ndk.accounts.getPublicKey();
 
@@ -36,71 +34,73 @@ class StarterPacksList extends ConsumerWidget {
       if (isOwnProfile) {
         return Center(
           child: longButton(
-              name: "create starter pack",
-              inverted: true,
-              onPressed: () {
-                context.push('/edit-starter-pack',
-                    extra: StarterPackIdentifier(
-                      name: "i-${Helpers().getRandomString(10)}", //create new
-                      pubkey: pubkey,
-                    ));
-              }),
+            name: "create starter pack",
+            inverted: true,
+            onPressed: () {
+              context.push(
+                '/edit-starter-pack',
+                extra: StarterPackIdentifier(
+                  name: "i-${Helpers().getRandomString(10)}", //create new
+                  pubkey: pubkey,
+                ),
+              );
+            },
+          ),
         );
       }
 
-      return Center(
-        child: Text("No starter packs found"),
-      );
+      return Center(child: Text("No starter packs found"));
     }
 
     return Padding(
       padding: const EdgeInsets.only(top: 50),
       child: ListView.builder(
-          itemCount: isOwnProfile
-              ? followSetsList.publicNostrFollowSets.length + 1
-              : followSetsList.publicNostrFollowSets.length,
-          itemBuilder: (
-            context,
-            followSetsIndex,
-          ) {
-            if (followSetsIndex ==
-                    followSetsList.publicNostrFollowSets.length &&
-                isOwnProfile) {
-              return Container(
-                padding: EdgeInsets.only(top: 18, bottom: 50),
-                child: Center(
-                  child: longButton(
-                      name: "create another",
-                      inverted: true,
-                      onPressed: () {
-                        context.push('/edit-starter-pack',
-                            extra: StarterPackIdentifier(
-                              name:
-                                  "i-${Helpers().getRandomString(10)}", //create new
-                              pubkey: pubkey,
-                            ));
-                      }),
-                ),
-              );
-            }
-            final NostrStarterPack starterPacks =
-                followSetsList.publicNostrFollowSets[followSetsIndex];
-            if (starterPacks.elements.isEmpty) return Container();
-
+        itemCount: isOwnProfile
+            ? followSetsList.publicNostrFollowSets.length + 1
+            : followSetsList.publicNostrFollowSets.length,
+        itemBuilder: (context, followSetsIndex) {
+          if (followSetsIndex == followSetsList.publicNostrFollowSets.length &&
+              isOwnProfile) {
             return Container(
-              padding: EdgeInsets.fromLTRB(8, 2, 8, 2),
-              child: StarterPackCard(
-                pack: starterPacks,
-                onTab: () {
-                  context.push('/open-starter-pack',
+              padding: EdgeInsets.only(top: 18, bottom: 50),
+              child: Center(
+                child: longButton(
+                  name: "create another",
+                  inverted: true,
+                  onPressed: () {
+                    context.push(
+                      '/edit-starter-pack',
                       extra: StarterPackIdentifier(
-                        name: starterPacks.name,
+                        name: "i-${Helpers().getRandomString(10)}", //create new
                         pubkey: pubkey,
-                      ));
-                },
+                      ),
+                    );
+                  },
+                ),
               ),
             );
-          }),
+          }
+          final NostrStarterPack starterPacks =
+              followSetsList.publicNostrFollowSets[followSetsIndex];
+          if (starterPacks.elements.isEmpty) return Container();
+
+          return Container(
+            padding: EdgeInsets.fromLTRB(8, 2, 8, 2),
+            child: StarterPackCard(
+              pack: starterPacks,
+              onTab: () {
+                context.push(
+                  '/open-starter-pack',
+                  extra: StarterPackIdentifier(
+                    name: starterPacks.name,
+                    pubkey: pubkey,
+                  ),
+                );
+              },
+            ),
+          );
+        },
+      ),
     );
   }
 }

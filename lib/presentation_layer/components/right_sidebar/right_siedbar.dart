@@ -15,9 +15,12 @@ class RightSiedbar extends StatelessWidget {
           children: [
             TrendingHashtagsWidget(),
             const SizedBox(height: 20),
-            TrendingPeopleWidget(onFollowChange: (change, pubkey) {
-              throw UnimplementedError();
-            })
+            TrendingPeopleWidget(
+              onFollowChange: (change, pubkey) {
+                throw UnimplementedError();
+              },
+              showFollowButton: false,
+            ),
           ],
         ),
       ),

@@ -145,46 +145,49 @@ Widget newPostsAvailable({
   double dismissThreshold = 0.2,
   SwipeableFadeOutController? controller,
 }) {
-  return StatefulBuilder(builder: (context, setState) {
-    final swipeableKey = GlobalKey<SwipeableFadeOutState>();
+  return StatefulBuilder(
+    builder: (context, setState) {
+      final swipeableKey = GlobalKey<SwipeableFadeOutState>();
 
-    // If a controller was provided, attach the state to it
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (controller != null && swipeableKey.currentState != null) {
-        controller.attach(swipeableKey.currentState!);
-      }
-    });
+      // If a controller was provided, attach the state to it
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (controller != null && swipeableKey.currentState != null) {
+          controller.attach(swipeableKey.currentState!);
+        }
+      });
 
-    return SwipeableFadeOut(
-      key: swipeableKey,
-      onDismissed: onDismissed,
-      dismissThreshold: dismissThreshold,
-      child: Padding(
-        padding: const EdgeInsets.only(top: 15),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            Container(
-              width: 120,
-              height: 40,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(20),
-                color: Theme.of(context).colorScheme.primary,
-              ),
-              child: TextButton(
-                onPressed: () {
-                  onPressed();
-                },
-                child: Text(
-                  name,
-                  style:
-                      TextStyle(color: Theme.of(context).colorScheme.onSurface),
+      return SwipeableFadeOut(
+        key: swipeableKey,
+        onDismissed: onDismissed,
+        dismissThreshold: dismissThreshold,
+        child: Padding(
+          padding: const EdgeInsets.only(top: 15),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              Container(
+                width: 120,
+                height: 40,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+                child: TextButton(
+                  onPressed: () {
+                    onPressed();
+                  },
+                  child: Text(
+                    name,
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onPrimary,
+                    ),
+                  ),
                 ),
               ),
-            )
-          ],
+            ],
+          ),
         ),
-      ),
-    );
-  });
+      );
+    },
+  );
 }

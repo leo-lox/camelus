@@ -39,13 +39,14 @@ class NostrNote {
 
   factory NostrNote.empty({String? id, String? pubkey, int? kind}) {
     return NostrNote(
-        id: id ?? 'missing',
-        pubkey: pubkey ?? 'missing',
-        createdAt: 0,
-        kind: kind ?? 1,
-        content: 'missing event',
-        sig: '',
-        tags: []);
+      id: id ?? 'missing',
+      pubkey: pubkey ?? 'missing',
+      createdAt: 0,
+      kind: kind ?? 1,
+      content: 'missing event',
+      sig: '',
+      tags: [],
+    );
   }
 
   @override

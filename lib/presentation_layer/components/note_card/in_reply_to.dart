@@ -9,10 +9,7 @@ import '../../../helpers/helpers.dart';
 import '../../providers/metadata_state_provider.dart';
 
 class InReplyTo extends ConsumerWidget {
-  const InReplyTo({
-    super.key,
-    required this.myNote,
-  });
+  const InReplyTo({super.key, required this.myNote});
 
   final NostrNote myNote;
 
@@ -46,13 +43,15 @@ class InReplyTo extends ConsumerWidget {
 
       if (i == 0) {
         pubkeyFirst = tag.value;
-        final myMetadata =
-            ref.watch(metadataStateProvider(pubkeyFirst)).userMetadata;
+        final myMetadata = ref
+            .watch(metadataStateProvider(pubkeyFirst))
+            .userMetadata;
         valueFirst = myMetadata?.name ?? _formatPubkey(pubkeyFirst);
       } else if (i == 1) {
         pubkeySecond = tag.value;
-        final myMetadata =
-            ref.watch(metadataStateProvider(pubkeySecond)).userMetadata;
+        final myMetadata = ref
+            .watch(metadataStateProvider(pubkeySecond))
+            .userMetadata;
         valueSecond = myMetadata?.name ?? _formatPubkey(pubkeySecond);
       } else {
         othersCount++;
@@ -70,29 +69,38 @@ class InReplyTo extends ConsumerWidget {
           onTap: () {
             context.push('/nostr/profile/$pubkeyFirst');
           },
-          child: Text('@$valueFirst ',
-              style: TextStyle(
-                  color: Theme.of(context).colorScheme.primary,
-                  fontSize: 14,
-                  height: 1.3)),
+          child: Text(
+            '@$valueFirst ',
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.primary,
+              fontSize: 14,
+              height: 1.3,
+            ),
+          ),
         ),
         if (valueSecond.isNotEmpty)
           GestureDetector(
             onTap: () {
               context.push('/nostr/profile/$pubkeySecond');
             },
-            child: Text('@$valueSecond ',
-                style: TextStyle(
-                    color: Theme.of(context).colorScheme.primary,
-                    fontSize: 14,
-                    height: 1.3)),
+            child: Text(
+              '@$valueSecond ',
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.primary,
+                fontSize: 14,
+                height: 1.3,
+              ),
+            ),
           ),
         if (othersCount != 0)
-          Text(' and $othersCount more',
-              style: TextStyle(
-                  color: Paletter.getDarkGray(context),
-                  fontSize: 14,
-                  height: 1.3))
+          Text(
+            ' and $othersCount more',
+            style: TextStyle(
+              color: Paletter.getDarkGray(context),
+              fontSize: 14,
+              height: 1.3,
+            ),
+          ),
       ],
     );
   }
