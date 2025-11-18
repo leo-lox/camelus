@@ -252,343 +252,368 @@ class _OnboardingLoginPageState extends ConsumerState<OnboardingLoginPage> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                        if (widget.onPressedBack != null)
-                          Row(
-                            children: [
-                              IconButton(
-                                icon: Icon(
-                                  PhosphorIcons.arrowLeft(),
-                                  color: Theme.of(
-                                    context,
-                                  ).colorScheme.onSurface,
-                                ),
-                                onPressed: () => widget.onPressedBack!(),
-                              ),
-                            ],
-                          ),
-                        if (widget.onPressedBack == null)
-                          const SizedBox(height: 20),
-
-                        if (_userWords.isNotEmpty)
-                          Column(
-                            children: [
-                              Container(
-                                width: double.infinity,
-                                height: 200,
-                                decoration: BoxDecoration(
-                                  color: Theme.of(context).colorScheme.surfaceContainerLow,
-                                  borderRadius: BorderRadius.circular(10),
-                                  border: Border.all(
-                                    color: Theme.of(context).colorScheme.outline,
-                                    width: 1,
-                                  ),
-                                ),
-                                child: seedPhraseCheck(),
-                              ),
-                              const SizedBox(height: 5),
-                              Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 10,
-                                ),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                      mneonicError ?? "",
-                                      style: TextStyle(
-                                        color: Theme.of(
-                                          context,
-                                        ).colorScheme.error,
-                                        fontSize: 12,
-                                      ),
-                                    ),
-                                    Text(
-                                      "${_userWords.length}/${(_userWords.length <= 12 ? "12" : "24")}",
-                                      style: TextStyle(
-                                        color: (_userWords.length > 24)
-                                            ? Theme.of(
-                                                context,
-                                              ).colorScheme.error
-                                            : Theme.of(
-                                                context,
-                                              ).colorScheme.onSurface,
-                                        fontSize: 12,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        if (_userWords.isEmpty)
-                          SizedBox(
-                            height: 200,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              mainAxisAlignment: MainAxisAlignment.center,
+                          if (widget.onPressedBack != null)
+                            Row(
                               children: [
-                                Text(
-                                  AppLocalizations.of(context)!.login,
-                                  style: TextStyle(
+                                IconButton(
+                                  icon: Icon(
+                                    PhosphorIcons.arrowLeft(),
                                     color: Theme.of(
                                       context,
                                     ).colorScheme.onSurface,
-                                    fontSize: 40,
-                                    fontFamily: "Poppins",
+                                  ),
+                                  onPressed: () => widget.onPressedBack!(),
+                                ),
+                              ],
+                            ),
+                          if (widget.onPressedBack == null)
+                            const SizedBox(height: 20),
+
+                          if (_userWords.isNotEmpty)
+                            Column(
+                              children: [
+                                Container(
+                                  width: double.infinity,
+                                  height: 200,
+                                  decoration: BoxDecoration(
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.surfaceContainerLow,
+                                    borderRadius: BorderRadius.circular(10),
+                                    border: Border.all(
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.outline,
+                                      width: 1,
+                                    ),
+                                  ),
+                                  child: seedPhraseCheck(),
+                                ),
+                                const SizedBox(height: 5),
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        mneonicError ?? "",
+                                        style: TextStyle(
+                                          color: Theme.of(
+                                            context,
+                                          ).colorScheme.error,
+                                          fontSize: 12,
+                                        ),
+                                      ),
+                                      Text(
+                                        "${_userWords.length}/${(_userWords.length <= 12 ? "12" : "24")}",
+                                        style: TextStyle(
+                                          color: (_userWords.length > 24)
+                                              ? Theme.of(
+                                                  context,
+                                                ).colorScheme.error
+                                              : Theme.of(
+                                                  context,
+                                                ).colorScheme.onSurface,
+                                          fontSize: 12,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          if (_userWords.isEmpty)
+                            SizedBox(
+                              height: 200,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    AppLocalizations.of(context)!.login,
+                                    style: TextStyle(
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.onSurface,
+                                      fontSize: 40,
+                                      fontFamily: "Poppins",
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+
+                          AnimatedOpacity(
+                            opacity: (_userNsec != null && myKeys != null)
+                                ? 1
+                                : 0,
+                            duration: const Duration(milliseconds: 300),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                Text(
+                                  AppLocalizations.of(context)!.yourPublicKeyIs,
+                                ),
+                                const SizedBox(height: 10),
+                                Container(
+                                  decoration: BoxDecoration(
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.surfaceContainerLow,
+                                    borderRadius: BorderRadius.circular(10),
+                                    border: Border.all(
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.outline,
+                                      width: 1,
+                                    ),
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: SizedBox(
+                                      height: 40,
+                                      child: Text(myKeys?.publicKeyHr ?? ""),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(height: 15),
+                              ],
+                            ),
+                          ),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 20),
+                            child: TextField(
+                              onSubmitted: (value) {
+                                _addWords(value);
+                                _inputFocusNode.requestFocus();
+                              },
+                              focusNode: _inputFocusNode,
+                              autofillHints: Language.english.list,
+                              controller: _inputController,
+                              enableIMEPersonalizedLearning: false,
+                              textCapitalization: TextCapitalization.none,
+                              decoration: InputDecoration(
+                                isDense: true,
+                                hintText: AppLocalizations.of(
+                                  context,
+                                )!.enterSeedPhraseOrNsec,
+                                hintStyle: TextStyle(
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.onSurfaceVariant,
+                                  letterSpacing: 1.1,
+                                ),
+                                filled: true,
+                                fillColor: Theme.of(
+                                  context,
+                                ).colorScheme.surfaceContainerLow,
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.all(
+                                    Radius.circular(10),
+                                  ),
+                                  borderSide: BorderSide(
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.outline,
+                                  ),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.all(
+                                    Radius.circular(10),
+                                  ),
+                                  borderSide: BorderSide(
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.primary,
+                                  ),
+                                ),
+                                errorBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.all(
+                                    Radius.circular(10),
+                                  ),
+                                  borderSide: BorderSide(
+                                    color: Theme.of(context).colorScheme.error,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+
+                          const SizedBox(height: 15),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 20),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                SizedBox(
+                                  height: 31,
+                                  child: ElevatedButton(
+                                    onPressed: () {
+                                      _pasteFromClipboard();
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Theme.of(
+                                        context,
+                                      ).colorScheme.surface,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(20),
+                                        side: BorderSide(
+                                          color: Theme.of(
+                                            context,
+                                          ).colorScheme.onSurface,
+                                          width: 1,
+                                        ),
+                                      ),
+                                    ),
+                                    child: Text(
+                                      AppLocalizations.of(context)!.paste,
+                                      style: TextStyle(
+                                        color: Theme.of(
+                                          context,
+                                        ).colorScheme.onSurface,
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(
+                                  height: 31,
+                                  child: ElevatedButton(
+                                    onPressed: () {
+                                      _addWords(_inputController.text);
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Theme.of(
+                                        context,
+                                      ).colorScheme.onSurface,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(20),
+                                        side: BorderSide(
+                                          color: Theme.of(
+                                            context,
+                                          ).colorScheme.onSurface,
+                                          width: 1,
+                                        ),
+                                      ),
+                                    ),
+                                    child: Text(
+                                      AppLocalizations.of(context)!.add,
+                                      style: TextStyle(
+                                        color: Theme.of(
+                                          context,
+                                        ).colorScheme.surface,
+                                        fontSize: 16,
+                                      ),
+                                    ),
                                   ),
                                 ),
                               ],
                             ),
                           ),
 
-                        AnimatedOpacity(
-                          opacity: (_userNsec != null && myKeys != null)
-                              ? 1
-                              : 0,
-                          duration: const Duration(milliseconds: 300),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.end,
+                          const SizedBox(height: 50),
+
+                          // checkbox to accept the privacy policy
+                          const SizedBox(height: 15),
+
+                          const Spacer(flex: 1),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
                             children: [
+                              Checkbox(
+                                value: _termsAndConditions,
+                                onChanged: (value) {
+                                  setState(() {
+                                    _termsAndConditions = value!;
+                                  });
+                                },
+                              ),
                               Text(
-                                AppLocalizations.of(context)!.yourPublicKeyIs,
-                              ),
-                              const SizedBox(height: 10),
-                              Container(
-                                decoration: BoxDecoration(
-                                  color: Theme.of(context).colorScheme.surfaceContainerLow,
-                                  borderRadius: BorderRadius.circular(10),
-                                  border: Border.all(
-                                    color: Theme.of(context).colorScheme.outline,
-                                    width: 1,
-                                  ),
-                                ),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: SizedBox(
-                                    height: 40,
-                                    child: Text(myKeys?.publicKeyHr ?? ""),
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(height: 15),
-                            ],
-                          ),
-                        ),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 20),
-                          child: TextField(
-                            onSubmitted: (value) {
-                              _addWords(value);
-                              _inputFocusNode.requestFocus();
-                            },
-                            focusNode: _inputFocusNode,
-                            autofillHints: Language.english.list,
-                            controller: _inputController,
-                            enableIMEPersonalizedLearning: false,
-                            textCapitalization: TextCapitalization.none,
-                            decoration: InputDecoration(
-                              isDense: true,
-                              hintText: AppLocalizations.of(
-                                context,
-                              )!.enterSeedPhraseOrNsec,
-                              hintStyle: TextStyle(
-                                color: Theme.of(context).colorScheme.onSurfaceVariant,
-                                letterSpacing: 1.1,
-                              ),
-                              filled: true,
-                              fillColor: Theme.of(context).colorScheme.surfaceContainerLow,
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.all(
-                                  Radius.circular(10),
-                                ),
-                                borderSide: BorderSide(
-                                  color: Theme.of(context).colorScheme.outline,
-                                ),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.all(
-                                  Radius.circular(10),
-                                ),
-                                borderSide: BorderSide(
-                                  color: Theme.of(context).colorScheme.primary,
-                                ),
-                              ),
-                              errorBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.all(
-                                  Radius.circular(10),
-                                ),
-                                borderSide: BorderSide(color: Theme.of(context).colorScheme.error),
-                              ),
-                            ),
-                          ),
-                        ),
-
-                        const SizedBox(height: 15),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 20),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              SizedBox(
-                                height: 31,
-                                child: ElevatedButton(
-                                  onPressed: () {
-                                    _pasteFromClipboard();
-                                  },
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Theme.of(
-                                      context,
-                                    ).colorScheme.surface,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(20),
-                                      side: BorderSide(
-                                        color: Theme.of(
-                                          context,
-                                        ).colorScheme.onSurface,
-                                        width: 1,
-                                      ),
-                                    ),
-                                  ),
-                                  child: Text(
-                                    AppLocalizations.of(context)!.paste,
-                                    style: TextStyle(
-                                      color: Theme.of(
-                                        context,
-                                      ).colorScheme.onSurface,
-                                      fontSize: 16,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              SizedBox(
-                                height: 31,
-                                child: ElevatedButton(
-                                  onPressed: () {
-                                    _addWords(_inputController.text);
-                                  },
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Theme.of(
-                                      context,
-                                    ).colorScheme.onSurface,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(20),
-                                      side: BorderSide(
-                                        color: Theme.of(
-                                          context,
-                                        ).colorScheme.onSurface,
-                                        width: 1,
-                                      ),
-                                    ),
-                                  ),
-                                  child: Text(
-                                    AppLocalizations.of(context)!.add,
-                                    style: TextStyle(
-                                      color: Theme.of(
-                                        context,
-                                      ).colorScheme.surface,
-                                      fontSize: 16,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-
-                        const SizedBox(height: 50),
-
-                        // checkbox to accept the privacy policy
-                        const SizedBox(height: 15),
-
-                        const Spacer(flex: 1),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Checkbox(
-                              value: _termsAndConditions,
-                              onChanged: (value) {
-                                setState(() {
-                                  _termsAndConditions = value!;
-                                });
-                              },
-                            ),
-                            Text(
-                              AppLocalizations.of(context)!.iHaveReadAndAccept,
-                              style: TextStyle(
-                                color: Theme.of(context).colorScheme.onSurface,
-                                fontSize: 12,
-                                fontWeight: FontWeight.normal,
-                              ),
-                            ),
-                            GestureDetector(
-                              onTap: () {
-                                Uri url = Uri.parse(
-                                  "https://camelus.app/terms/",
-                                );
-                                launchUrl(
-                                  url,
-                                  mode: LaunchMode.externalApplication,
-                                );
-                              },
-                              child: Text(
                                 AppLocalizations.of(
                                   context,
-                                )!.termsAndConditions,
+                                )!.iHaveReadAndAccept,
                                 style: TextStyle(
                                   color: Theme.of(
                                     context,
                                   ).colorScheme.onSurface,
                                   fontSize: 12,
-                                  fontWeight: FontWeight.bold,
-                                  decoration: TextDecoration.underline,
+                                  fontWeight: FontWeight.normal,
                                 ),
                               ),
-                            ),
-                          ],
-                        ),
+                              GestureDetector(
+                                onTap: () {
+                                  Uri url = Uri.parse(
+                                    "https://camelus.app/terms/",
+                                  );
+                                  launchUrl(
+                                    url,
+                                    mode: LaunchMode.externalApplication,
+                                  );
+                                },
+                                child: Text(
+                                  AppLocalizations.of(
+                                    context,
+                                  )!.termsAndConditions,
+                                  style: TextStyle(
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.onSurface,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                    decoration: TextDecoration.underline,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
 
-                        const SizedBox(height: 5),
-                        GestureDetector(
-                          onTap: () {
-                            Uri url = Uri.parse("https://camelus.app/privacy/");
-                            launchUrl(
-                              url,
-                              mode: LaunchMode.externalApplication,
-                            );
-                          },
-                          child: Text(
-                            AppLocalizations.of(context)!.privacyPolicy,
-                            style: TextStyle(
-                              color: Theme.of(context).colorScheme.onSurface,
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
-                              decoration: TextDecoration.underline,
+                          const SizedBox(height: 5),
+                          GestureDetector(
+                            onTap: () {
+                              Uri url = Uri.parse(
+                                "https://camelus.app/privacy/",
+                              );
+                              launchUrl(
+                                url,
+                                mode: LaunchMode.externalApplication,
+                              );
+                            },
+                            child: Text(
+                              AppLocalizations.of(context)!.privacyPolicy,
+                              style: TextStyle(
+                                color: Theme.of(context).colorScheme.onSurface,
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                                decoration: TextDecoration.underline,
+                              ),
                             ),
                           ),
-                        ),
 
-                        const SizedBox(height: 20),
+                          const SizedBox(height: 20),
 
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 20),
-                          child: SizedBox(
-                            width: double.infinity,
-                            height: 40,
-                            child: longButton(
-                              name: AppLocalizations.of(context)!.login,
-                              inverted: true,
-                              onPressed: () => _onSubmit(),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 20),
+                            child: SizedBox(
+                              width: double.infinity,
+                              height: 40,
+                              child: longButton(
+                                name: AppLocalizations.of(context)!.login,
+                                inverted: true,
+                                onPressed: () => _onSubmit(),
+                              ),
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ),
-              ),
-            );
-          },
+              );
+            },
+          ),
         ),
       ),
     );
@@ -630,7 +655,9 @@ class _OnboardingLoginPageState extends ConsumerState<OnboardingLoginPage> {
                           Text(
                             (index + 1).toString(),
                             style: TextStyle(
-                              color: Theme.of(context).colorScheme.onSurfaceVariant,
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.onSurfaceVariant,
                               fontSize: 12,
                             ),
                           ),
@@ -664,7 +691,9 @@ class _OnboardingLoginPageState extends ConsumerState<OnboardingLoginPage> {
                             Text(
                               (index + 1).toString(),
                               style: TextStyle(
-                                color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.onSurfaceVariant,
                                 fontSize: 12,
                               ),
                             ),

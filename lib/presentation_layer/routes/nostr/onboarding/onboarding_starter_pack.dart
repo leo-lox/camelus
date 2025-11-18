@@ -134,6 +134,7 @@ class _OnboardingStarterPackState extends ConsumerState<OnboardingStarterPack> {
                 }),
                 disabled: selectedPubkeys.isEmpty,
                 inverted: true,
+              ),
             ),
           ),
           const SizedBox(height: 15),
@@ -304,7 +305,9 @@ class _OnboardingOpenStarterPackState
                             Text(
                               displayMetadata?.about ?? "",
                               style: TextStyle(
-                                color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.onSurfaceVariant,
                                 fontSize: 12,
                               ),
                               maxLines: 3,
@@ -339,16 +342,17 @@ class _OnboardingOpenStarterPackState
                       )!.followAccounts(ownSelectedCount),
                 onPressed: (() {
                   setState(() {
-                  if (nothingOfOwnSelected) {
-                    selectedPubkeys.addAll(
-                      widget.followSet.elements.map((e) => e.value),
-                    );
-                  }
-                  Navigator.pop(context, selectedPubkeys);
-                });
-              }),
-              disabled: false,
-              inverted: true,
+                    if (nothingOfOwnSelected) {
+                      selectedPubkeys.addAll(
+                        widget.followSet.elements.map((e) => e.value),
+                      );
+                    }
+                    Navigator.pop(context, selectedPubkeys);
+                  });
+                }),
+                disabled: false,
+                inverted: true,
+              ),
             ),
           ),
           const SizedBox(height: 15),

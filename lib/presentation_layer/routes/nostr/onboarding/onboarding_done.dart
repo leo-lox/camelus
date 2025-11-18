@@ -239,196 +239,219 @@ ${_privateKey.mnemonicSentence}
                         padding: const EdgeInsets.symmetric(horizontal: 20),
                         child: Column(
                           children: [
-                        const SizedBox(height: 20),
-                        Text(
-                          AppLocalizations.of(context)!.recoveryPhrase,
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.onSurface,
-                            fontSize: 22,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 25),
-                        MnemonicSentenceGrid(
-                          words: _privateKey.mnemonicWords,
-                          isVisible: _isVisible,
-                        ),
-                        const SizedBox(height: 25),
-                        Padding(
-                          padding: const EdgeInsets.all(10.0),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              ElevatedButton.icon(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Theme.of(
-                                    context,
-                                  ).colorScheme.surface,
-                                  foregroundColor: Theme.of(
-                                    context,
-                                  ).colorScheme.onSurface,
-                                ),
-                                onPressed: () => {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      duration: Duration(seconds: 2),
-                                      content: Text(
-                                        AppLocalizations.of(
-                                          context,
-                                        )!.newSeedPhraseGenerated,
+                            const SizedBox(height: 20),
+                            Text(
+                              AppLocalizations.of(context)!.recoveryPhrase,
+                              style: TextStyle(
+                                color: Theme.of(context).colorScheme.onSurface,
+                                fontSize: 22,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(height: 25),
+                            MnemonicSentenceGrid(
+                              words: _privateKey.mnemonicWords,
+                              isVisible: _isVisible,
+                            ),
+                            const SizedBox(height: 25),
+                            Padding(
+                              padding: const EdgeInsets.all(10.0),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  ElevatedButton.icon(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Theme.of(
+                                        context,
+                                      ).colorScheme.surface,
+                                      foregroundColor: Theme.of(
+                                        context,
+                                      ).colorScheme.onSurface,
+                                    ),
+                                    onPressed: () => {
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        SnackBar(
+                                          duration: Duration(seconds: 2),
+                                          content: Text(
+                                            AppLocalizations.of(
+                                              context,
+                                            )!.newSeedPhraseGenerated,
+                                          ),
+                                        ),
                                       ),
+                                      _generateKey(),
+                                    },
+                                    icon: const Icon(Icons.refresh),
+                                    label: Text(
+                                      AppLocalizations.of(context)!.regenerate,
                                     ),
                                   ),
-                                  _generateKey(),
-                                },
-                                icon: const Icon(Icons.refresh),
-                                label: Text(
-                                  AppLocalizations.of(context)!.regenerate,
-                                ),
-                              ),
-                              const SizedBox(width: 5),
-                              ElevatedButton.icon(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Theme.of(
-                                    context,
-                                  ).colorScheme.inverseSurface,
-                                  foregroundColor: Theme.of(
-                                    context,
-                                  ).colorScheme.surface,
-                                ),
-                                onPressed: () => {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      duration: Duration(seconds: 2),
-                                      content: Text(
-                                        AppLocalizations.of(
-                                          context,
-                                        )!.copiedSeedPhraseToClipboard,
+                                  const SizedBox(width: 5),
+                                  ElevatedButton.icon(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Theme.of(
+                                        context,
+                                      ).colorScheme.inverseSurface,
+                                      foregroundColor: Theme.of(
+                                        context,
+                                      ).colorScheme.surface,
+                                    ),
+                                    onPressed: () => {
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        SnackBar(
+                                          duration: Duration(seconds: 2),
+                                          content: Text(
+                                            AppLocalizations.of(
+                                              context,
+                                            )!.copiedSeedPhraseToClipboard,
+                                          ),
+                                        ),
                                       ),
+                                      _copyKey(),
+                                    },
+                                    icon: const Icon(Icons.copy),
+                                    label: Text(
+                                      AppLocalizations.of(context)!.copy,
                                     ),
                                   ),
-                                  _copyKey(),
-                                },
-                                icon: const Icon(Icons.copy),
-                                label: Text(AppLocalizations.of(context)!.copy),
+                                  const SizedBox(width: 5),
+                                  IconButton(
+                                    onPressed: _toggleVisibility,
+                                    icon: Icon(
+                                      _isVisible
+                                          ? Icons.visibility
+                                          : Icons.visibility_off,
+                                    ),
+                                    tooltip: _isVisible
+                                        ? AppLocalizations.of(
+                                            context,
+                                          )!.hideWords
+                                        : AppLocalizations.of(
+                                            context,
+                                          )!.showWords,
+                                  ),
+                                ],
                               ),
-                              const SizedBox(width: 5),
-                              IconButton(
-                                onPressed: _toggleVisibility,
-                                icon: Icon(
-                                  _isVisible
-                                      ? Icons.visibility
-                                      : Icons.visibility_off,
-                                ),
-                                tooltip: _isVisible
-                                    ? AppLocalizations.of(context)!.hideWords
-                                    : AppLocalizations.of(context)!.showWords,
+                            ),
+                            Padding(
+                              padding: EdgeInsets.all(16),
+                              child: Text(
+                                AppLocalizations.of(
+                                  context,
+                                )!.recoveryPhraseWarning,
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
-                        Padding(
-                          padding: EdgeInsets.all(16),
-                          child: Text(
-                            AppLocalizations.of(context)!.recoveryPhraseWarning,
-                          ),
-                        ),
-                      ],
+                      ),
                     ),
                   ),
-                ),
-                // Fixed bottom section
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Checkbox(
-                            value: _termsAndConditions,
-                            onChanged: (value) {
-                              setState(() {
-                                _termsAndConditions = value!;
-                              });
-                            },
-                          ),
-                          Text(
-                            AppLocalizations.of(context)!.iHaveReadAndAccept,
-                            style: TextStyle(
-                              color: Theme.of(context).colorScheme.onSurface,
-                              fontSize: 12,
-                              fontWeight: FontWeight.normal,
+                  // Fixed bottom section
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Checkbox(
+                              value: _termsAndConditions,
+                              onChanged: (value) {
+                                setState(() {
+                                  _termsAndConditions = value!;
+                                });
+                              },
                             ),
-                          ),
-                          GestureDetector(
-                            onTap: () {
-                              Uri url = Uri.parse("https://camelus.app/terms/");
-                              launchUrl(
-                                url,
-                                mode: LaunchMode.externalApplication,
-                              );
-                            },
-                            child: Text(
-                              AppLocalizations.of(context)!.termsAndConditions,
+                            Text(
+                              AppLocalizations.of(context)!.iHaveReadAndAccept,
                               style: TextStyle(
                                 color: Theme.of(context).colorScheme.onSurface,
                                 fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                                decoration: TextDecoration.underline,
+                                fontWeight: FontWeight.normal,
                               ),
                             ),
-                          ),
-                        ],
-                      ),
-                      GestureDetector(
-                        onTap: () {
-                          Uri url = Uri.parse("https://camelus.app/privacy/");
-                          launchUrl(url, mode: LaunchMode.externalApplication);
-                        },
-                        child: Text(
-                          AppLocalizations.of(context)!.privacyPolicy,
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.onSurface,
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                            decoration: TextDecoration.underline,
+                            GestureDetector(
+                              onTap: () {
+                                Uri url = Uri.parse(
+                                  "https://camelus.app/terms/",
+                                );
+                                launchUrl(
+                                  url,
+                                  mode: LaunchMode.externalApplication,
+                                );
+                              },
+                              child: Text(
+                                AppLocalizations.of(
+                                  context,
+                                )!.termsAndConditions,
+                                style: TextStyle(
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.onSurface,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                  decoration: TextDecoration.underline,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        GestureDetector(
+                          onTap: () {
+                            Uri url = Uri.parse("https://camelus.app/privacy/");
+                            launchUrl(
+                              url,
+                              mode: LaunchMode.externalApplication,
+                            );
+                          },
+                          child: Text(
+                            AppLocalizations.of(context)!.privacyPolicy,
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.onSurface,
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                              decoration: TextDecoration.underline,
+                            ),
                           ),
                         ),
-                      ),
-                      const SizedBox(height: 50),
-                      SizedBox(
-                        width: double.infinity,
-                        height: 40,
-                        child: longButton(
-                          name: AppLocalizations.of(context)!.publishAccount,
-                          inverted: true,
-                          onPressed: () => _onSubmit(),
+                        const SizedBox(height: 50),
+                        SizedBox(
+                          width: double.infinity,
+                          height: 40,
+                          child: longButton(
+                            name: AppLocalizations.of(context)!.publishAccount,
+                            inverted: true,
+                            onPressed: () => _onSubmit(),
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 20),
-                    ],
+                        const SizedBox(height: 20),
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-          if (_isLoading)
-            AnimatedOpacity(
-              opacity: _loadingOpacity,
-              curve: Curves.easeInOut,
-              duration: const Duration(seconds: 2),
-              child: _isLoading
-                  ? Center(
-                      child: FullScreenLoading(
-                        loadingTexts: loadingTexts,
-                        updateState: (function) => {},
-                      ),
-                    )
-                  : const SizedBox.shrink(),
-            ),
-        ],
+            if (_isLoading)
+              AnimatedOpacity(
+                opacity: _loadingOpacity,
+                curve: Curves.easeInOut,
+                duration: const Duration(seconds: 2),
+                child: _isLoading
+                    ? Center(
+                        child: FullScreenLoading(
+                          loadingTexts: loadingTexts,
+                          updateState: (function) => {},
+                        ),
+                      )
+                    : const SizedBox.shrink(),
+              ),
+          ],
+        ),
       ),
     );
   }
