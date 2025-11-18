@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../atoms/long_button.dart';
+import '../../../components/responsive_center.dart';
 
 class OnboardingLoginSelectPage extends ConsumerStatefulWidget {
   final Function onPressedSeedPhraseLogin;
@@ -33,10 +34,8 @@ class _OnboardingLoginSelectPageState
       appBar: null,
       resizeToAvoidBottomInset: false,
       body: SafeArea(
-        // input for the user to enter their private key, should be visible on a dark background.
-        child: Container(
-          width: MediaQuery.of(context).size.width,
-          height: MediaQuery.of(context).size.height,
+        child: ResponsiveCenter(
+          maxWidth: 600,
           padding: const EdgeInsets.all(30),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -57,7 +56,6 @@ class _OnboardingLoginSelectPageState
               if (widget.onPressedBack == null) const SizedBox(height: 20),
               SizedBox(
                 height: 200,
-                width: MediaQuery.of(context).size.width,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -75,36 +73,42 @@ class _OnboardingLoginSelectPageState
               ),
               const Spacer(flex: 1),
               if (Platform.isAndroid)
-                Container(
+                Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
-                  width: 400,
-                  height: 40,
-                  child: longButton(
-                    name: "amber login",
-                    inverted: false,
-                    onPressed: () => widget.onPressedAmberLogin(),
+                  child: SizedBox(
+                    width: double.infinity,
+                    height: 40,
+                    child: longButton(
+                      name: "amber login",
+                      inverted: false,
+                      onPressed: () => widget.onPressedAmberLogin(),
+                    ),
                   ),
                 ),
               const SizedBox(height: 20),
-              Container(
+              Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
-                width: 400,
-                height: 40,
-                child: longButton(
-                  name: "seed phrase login",
-                  inverted: false,
-                  onPressed: () => widget.onPressedSeedPhraseLogin(),
+                child: SizedBox(
+                  width: double.infinity,
+                  height: 40,
+                  child: longButton(
+                    name: "seed phrase login",
+                    inverted: false,
+                    onPressed: () => widget.onPressedSeedPhraseLogin(),
+                  ),
                 ),
               ),
               const SizedBox(height: 20),
-              Container(
+              Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
-                width: 400,
-                height: 40,
-                child: longButton(
-                  name: "bunker login",
-                  inverted: false,
-                  onPressed: () => widget.onPressedBunkerLogin(),
+                child: SizedBox(
+                  width: double.infinity,
+                  height: 40,
+                  child: longButton(
+                    name: "bunker login",
+                    inverted: false,
+                    onPressed: () => widget.onPressedBunkerLogin(),
+                  ),
                 ),
               ),
             ],

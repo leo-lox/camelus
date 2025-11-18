@@ -1,5 +1,5 @@
 import 'package:camelus/presentation_layer/atoms/long_button.dart';
-import 'package:camelus/config/palette.dart';
+import 'package:camelus/presentation_layer/components/responsive_center.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -20,50 +20,62 @@ class _OnboardingPage01State extends ConsumerState<OnboardingPage01> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
+      body: ResponsiveCenter(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const Spacer(flex: 10),
-            Text(
-              "welcome to",
-              style: TextStyle(
-                color: Paletter.getExtraLightGray(context),
-                fontSize: MediaQuery.of(context).size.width / 22,
-              ),
+            LayoutBuilder(
+              builder: (context, constraints) {
+                return Text(
+                  "welcome to",
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    fontSize: constraints.maxWidth > 600 ? 32 : constraints.maxWidth / 22,
+                  ),
+                );
+              },
             ),
-            Text(
-              "camelus",
-              style: TextStyle(
-                color: Theme.of(context).colorScheme.onSurface,
-                fontSize: MediaQuery.of(context).size.width / 7,
-                fontFamily: 'Poppins',
-              ),
+            LayoutBuilder(
+              builder: (context, constraints) {
+                return Text(
+                  "camelus",
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface,
+                    fontSize: constraints.maxWidth > 600 ? 80 : constraints.maxWidth / 7,
+                    fontFamily: 'Poppins',
+                  ),
+                );
+              },
             ),
             const Spacer(flex: 10),
-            Container(
+            Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
-              width: 400,
-              height: 40,
-              child: longButton(
-                name: "join the conversation",
-                onPressed: (() {
-                  widget.registerCallback();
-                }),
-                inverted: true,
+              child: SizedBox(
+                width: double.infinity,
+                height: 40,
+                child: longButton(
+                  name: "join the conversation",
+                  onPressed: (() {
+                    widget.registerCallback();
+                  }),
+                  inverted: true,
+                ),
               ),
             ),
             const SizedBox(height: 30),
-            Container(
+            Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
-              width: 400,
-              height: 40,
-              child: longButton(
-                name: "login",
-                onPressed: (() {
-                  widget.loginCallback();
-                }),
-                inverted: false,
+              child: SizedBox(
+                width: double.infinity,
+                height: 40,
+                child: longButton(
+                  name: "login",
+                  onPressed: (() {
+                    widget.loginCallback();
+                  }),
+                  inverted: false,
+                ),
               ),
             ),
             const Spacer(flex: 2),

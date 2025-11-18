@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:camelus/domain_layer/usecases/app_auth.dart';
+import 'package:camelus/presentation_layer/components/responsive_center.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -11,7 +12,6 @@ import 'package:ndk/ndk.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../../../../config/palette.dart';
 import '../../../../domain_layer/entities/stored_account.dart';
 import '../../../atoms/long_button.dart';
 import '../../../providers/ndk_provider.dart';
@@ -147,9 +147,8 @@ class _OnboardingLoginBunkerPageState
       backgroundColor: Theme.of(context).colorScheme.surface,
       resizeToAvoidBottomInset: false,
       body: SafeArea(
-        child: Container(
-          width: MediaQuery.of(context).size.width,
-          height: MediaQuery.of(context).size.height,
+        child: ResponsiveCenter(
+          maxWidth: 700,
           padding: const EdgeInsets.all(30),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -170,7 +169,6 @@ class _OnboardingLoginBunkerPageState
               if (widget.onPressedBack == null) const SizedBox(height: 20),
               SizedBox(
                 height: 200,
-                width: MediaQuery.of(context).size.width,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -187,9 +185,8 @@ class _OnboardingLoginBunkerPageState
                 ),
               ),
               const Spacer(flex: 1),
-              Container(
+              Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
-                width: 400,
                 child: TextField(
                   onSubmitted: (value) {
                     _validateBunkerUrl(value);
@@ -205,18 +202,22 @@ class _OnboardingLoginBunkerPageState
                     isDense: true,
                     hintText: 'bunker://',
                     hintStyle: TextStyle(
-                      color: Theme.of(context).colorScheme.onSurface,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
                       letterSpacing: 1.1,
                     ),
                     filled: true,
-                    fillColor: Paletter.extraDarkGray,
+                    fillColor: Theme.of(context).colorScheme.surfaceContainerLow,
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.all(Radius.circular(10)),
-                      borderSide: BorderSide(color: Paletter.extraDarkGray),
+                      borderSide: BorderSide(
+                        color: Theme.of(context).colorScheme.outline,
+                      ),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.all(Radius.circular(10)),
-                      borderSide: BorderSide(color: Paletter.gray),
+                      borderSide: BorderSide(
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
                     ),
                     errorBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.all(Radius.circular(10)),
@@ -228,9 +229,8 @@ class _OnboardingLoginBunkerPageState
                 ),
               ),
               const SizedBox(height: 15),
-              Container(
+              Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
-                width: 400,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -323,15 +323,17 @@ class _OnboardingLoginBunkerPageState
                 ),
               ),
               const SizedBox(height: 20),
-              Container(
+              Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
-                width: 400,
-                height: 40,
-                child: longButton(
-                  name: "connect",
-                  inverted: true,
-                  loading: _bunkerLoading,
-                  onPressed: () => _onBunkerLogin(),
+                child: SizedBox(
+                  width: double.infinity,
+                  height: 40,
+                  child: longButton(
+                    name: "connect",
+                    inverted: true,
+                    loading: _bunkerLoading,
+                    onPressed: () => _onBunkerLogin(),
+                  ),
                 ),
               ),
             ],

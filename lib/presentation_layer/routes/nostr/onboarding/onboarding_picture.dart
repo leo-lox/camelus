@@ -3,6 +3,7 @@ import 'dart:typed_data';
 
 import 'package:camelus/l10n/app_localizations.dart';
 import 'package:camelus/presentation_layer/atoms/crop_avatar.dart';
+import 'package:camelus/presentation_layer/components/responsive_center.dart';
 import 'package:camelus/domain_layer/entities/onboarding_user_info.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -86,7 +87,8 @@ class _OnboardingPictureState extends ConsumerState<OnboardingPicture> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
+      body: ResponsiveCenter(
+        maxWidth: 600,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -130,16 +132,18 @@ class _OnboardingPictureState extends ConsumerState<OnboardingPicture> {
                     ),
             ),
             const Spacer(flex: 1),
-            Container(
+            Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
-              width: 400,
-              height: 40,
-              child: longButton(
-                name: pictureSelected ? "next" : "skip",
-                onPressed: (() {
-                  widget.pictureCallback();
-                }),
-                inverted: pictureSelected,
+              child: SizedBox(
+                width: double.infinity,
+                height: 40,
+                child: longButton(
+                  name: pictureSelected ? "next" : "skip",
+                  onPressed: (() {
+                    widget.pictureCallback();
+                  }),
+                  inverted: pictureSelected,
+                ),
               ),
             ),
             const SizedBox(height: 15),

@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:camelus/l10n/app_localizations.dart';
 import 'package:camelus/presentation_layer/components/full_screen_loading.dart';
+import 'package:camelus/presentation_layer/components/responsive_center.dart';
 import 'package:camelus/presentation_layer/providers/ndk_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -14,7 +15,6 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../config/default_blossom.dart';
 import '../../../../config/default_relays.dart';
-import '../../../../config/palette.dart';
 import '../../../../domain_layer/entities/generated_private_key.dart';
 import '../../../../domain_layer/entities/key_pair.dart';
 import '../../../../domain_layer/entities/nip_65.dart';
@@ -223,18 +223,22 @@ ${_privateKey.mnemonicSentence}
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(
-        children: [
-          AnimatedOpacity(
-            duration: const Duration(seconds: 3),
-            opacity: max(1 - _loadingOpacity, 0.07),
-            curve: Curves.easeOut,
-            child: Column(
-              children: [
-                Expanded(
-                  child: SingleChildScrollView(
-                    child: Column(
-                      children: [
+      body: ResponsiveCenter(
+        maxWidth: 700,
+        child: Stack(
+          children: [
+            AnimatedOpacity(
+              duration: const Duration(seconds: 3),
+              opacity: max(1 - _loadingOpacity, 0.07),
+              curve: Curves.easeOut,
+              child: Column(
+                children: [
+                  Expanded(
+                    child: SingleChildScrollView(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: Column(
+                          children: [
                         const SizedBox(height: 20),
                         Text(
                           AppLocalizations.of(context)!.recoveryPhrase,
@@ -334,76 +338,78 @@ ${_privateKey.mnemonicSentence}
                   ),
                 ),
                 // Fixed bottom section
-                Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Checkbox(
-                          value: _termsAndConditions,
-                          onChanged: (value) {
-                            setState(() {
-                              _termsAndConditions = value!;
-                            });
-                          },
-                        ),
-                        Text(
-                          AppLocalizations.of(context)!.iHaveReadAndAccept,
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.onSurface,
-                            fontSize: 12,
-                            fontWeight: FontWeight.normal,
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Checkbox(
+                            value: _termsAndConditions,
+                            onChanged: (value) {
+                              setState(() {
+                                _termsAndConditions = value!;
+                              });
+                            },
                           ),
-                        ),
-                        GestureDetector(
-                          onTap: () {
-                            Uri url = Uri.parse("https://camelus.app/terms/");
-                            launchUrl(
-                              url,
-                              mode: LaunchMode.externalApplication,
-                            );
-                          },
-                          child: Text(
-                            AppLocalizations.of(context)!.termsAndConditions,
+                          Text(
+                            AppLocalizations.of(context)!.iHaveReadAndAccept,
                             style: TextStyle(
                               color: Theme.of(context).colorScheme.onSurface,
                               fontSize: 12,
-                              fontWeight: FontWeight.bold,
-                              decoration: TextDecoration.underline,
+                              fontWeight: FontWeight.normal,
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        Uri url = Uri.parse("https://camelus.app/privacy/");
-                        launchUrl(url, mode: LaunchMode.externalApplication);
-                      },
-                      child: Text(
-                        AppLocalizations.of(context)!.privacyPolicy,
-                        style: TextStyle(
-                          color: Theme.of(context).colorScheme.onSurface,
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                          decoration: TextDecoration.underline,
+                          GestureDetector(
+                            onTap: () {
+                              Uri url = Uri.parse("https://camelus.app/terms/");
+                              launchUrl(
+                                url,
+                                mode: LaunchMode.externalApplication,
+                              );
+                            },
+                            child: Text(
+                              AppLocalizations.of(context)!.termsAndConditions,
+                              style: TextStyle(
+                                color: Theme.of(context).colorScheme.onSurface,
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                                decoration: TextDecoration.underline,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          Uri url = Uri.parse("https://camelus.app/privacy/");
+                          launchUrl(url, mode: LaunchMode.externalApplication);
+                        },
+                        child: Text(
+                          AppLocalizations.of(context)!.privacyPolicy,
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.onSurface,
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                            decoration: TextDecoration.underline,
+                          ),
                         ),
                       ),
-                    ),
-                    const SizedBox(height: 50),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      width: 400,
-                      height: 40,
-                      child: longButton(
-                        name: AppLocalizations.of(context)!.publishAccount,
-                        inverted: true,
-                        onPressed: () => _onSubmit(),
+                      const SizedBox(height: 50),
+                      SizedBox(
+                        width: double.infinity,
+                        height: 40,
+                        child: longButton(
+                          name: AppLocalizations.of(context)!.publishAccount,
+                          inverted: true,
+                          onPressed: () => _onSubmit(),
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 20),
-                  ],
+                      const SizedBox(height: 20),
+                    ],
+                  ),
                 ),
               ],
             ),

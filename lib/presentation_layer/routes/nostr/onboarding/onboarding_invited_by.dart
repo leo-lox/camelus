@@ -2,7 +2,6 @@ import 'package:camelus/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../config/palette.dart';
 import '../../../../domain_layer/entities/nostr_list.dart';
 import '../../../../domain_layer/entities/onboarding_user_info.dart';
 import '../../../atoms/long_button.dart';
@@ -102,7 +101,7 @@ class _OnboardingInvitedByState extends ConsumerState<OnboardingInvitedBy> {
                         child: Text(
                           invitedSet?.title ?? '',
                           style: TextStyle(
-                            color: Paletter.getExtraLightGray(context),
+                            color: Theme.of(context).colorScheme.onPrimary,
                             fontSize: 25,
                             fontWeight: FontWeight.bold,
                           ),
@@ -129,9 +128,7 @@ class _OnboardingInvitedByState extends ConsumerState<OnboardingInvitedBy> {
                                     TextSpan(
                                       text: inviteeMetadata.userMetadata?.name,
                                       style: TextStyle(
-                                        color: Paletter.getExtraLightGray(
-                                          context,
-                                        ),
+                                        color: Theme.of(context).colorScheme.onPrimary,
                                         fontSize: 18,
                                         fontWeight: FontWeight.bold,
                                       ),
@@ -141,9 +138,7 @@ class _OnboardingInvitedByState extends ConsumerState<OnboardingInvitedBy> {
                                         context,
                                       )!.invitedYouToJoin,
                                       style: TextStyle(
-                                        color: Paletter.getExtraLightGray(
-                                          context,
-                                        ),
+                                        color: Theme.of(context).colorScheme.onPrimary,
                                         fontSize: 16,
                                       ),
                                     ),
@@ -162,7 +157,7 @@ class _OnboardingInvitedByState extends ConsumerState<OnboardingInvitedBy> {
                   Text(
                     AppLocalizations.of(context)!.youWillFollowThesePeople,
                     style: TextStyle(
-                      color: Paletter.getExtraLightGray(context),
+                      color: Theme.of(context).colorScheme.onSurface,
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ),
@@ -227,7 +222,7 @@ class _OnboardingInvitedByState extends ConsumerState<OnboardingInvitedBy> {
                                     Text(
                                       displayMetadata?.about ?? "",
                                       style: TextStyle(
-                                        color: Paletter.getGray(context),
+                                        color: Theme.of(context).colorScheme.onSurfaceVariant,
                                         fontSize: 12,
                                       ),
                                       maxLines: 3,
