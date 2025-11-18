@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:amberflutter/amberflutter.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:ndk/data_layer/repositories/signers/nip46_event_signer.dart';
 import 'package:ndk/ndk.dart';
 import 'package:ndk/shared/nips/nip19/nip19.dart';
 import 'package:ndk_amber/ndk_amber.dart';
@@ -112,18 +113,16 @@ class AppAuth {
         if (startupAccountData.account!.bunkerConnection == null) {
           return null;
         }
-        final connection = startupAccountData.account!.bunkerConnection!;
+
         try {
-          print("Logging in with bunker connection");
-          await ndk.accounts.loginWithBunkerConnection(
-            connection: connection,
-            bunkers: ndk.bunkers,
-            authCallback: (a) {
-              print("Bunker auth callback: $a");
-            },
+          final signer = Nip46EventSigner(
+            connection: startupAccountData.account!.bunkerConnection!,
+            requests: ndk.requests,
+            broadcast: ndk.broadcast,
+            cachedPublicKey: startupAccountData.account?.pubkey!,
           );
-          print("Logged in with bunker connection");
-          final signer = ndk.accounts.getLoggedAccount()!.signer;
+          ndk.accounts.loginExternalSigner(signer: signer);
+
           signerNoti.setSigner(signer);
           return signer;
         } catch (_) {
