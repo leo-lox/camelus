@@ -10,6 +10,7 @@ import '../../../data_layer/models/post_context.dart';
 import '../../../domain_layer/entities/nostr_note.dart';
 import '../../../domain_layer/entities/user_metadata.dart';
 import '../../atoms/my_profile_picture.dart';
+import '../../providers/ndk_provider.dart';
 import '../../providers/reactions_state_provider.dart';
 import '../../providers/reposts_state_provider.dart';
 import '../bottom_sheet_share.dart';
@@ -34,11 +35,37 @@ class NoteCard extends ConsumerWidget {
     this.fontSize = 17,
   });
 
+  void _showLoginPrompt(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Login Required'),
+        content: Text('Please login to interact with posts'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              context.push('/onboarding');
+            },
+            child: Text('Login'),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     if (note.pubkey == 'missing') {
       return _buildMissingNote();
     }
+
+    final ndk = ref.watch(ndkProvider);
+    final canSign = !ndk.accounts.cannotSign;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -82,9 +109,17 @@ class NoteCard extends ConsumerWidget {
                 isLiked: ref.watch(postLikeProvider(note.nostrNote)).isLiked,
                 key: ValueKey("${note.id}bottom_action_row"),
                 onComment: () {
+                  if (!canSign) {
+                    _showLoginPrompt(context);
+                    return;
+                  }
                   _writeReply(context, note.nostrNote);
                 },
                 onLike: () {
+                  if (!canSign) {
+                    _showLoginPrompt(context);
+                    return;
+                  }
                   ref
                       .read(postLikeProvider(note.nostrNote).notifier)
                       .toggleLike();
@@ -96,6 +131,10 @@ class NoteCard extends ConsumerWidget {
                     .watch(postRepostProvider(note.nostrNote))
                     .isReposted,
                 onRetweet: () {
+                  if (!canSign) {
+                    _showLoginPrompt(context);
+                    return;
+                  }
                   ref
                       .read(postRepostProvider(note.nostrNote).notifier)
                       .toggleRepost();
