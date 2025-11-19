@@ -1129,10 +1129,10 @@ packages:
     description:
       path: "packages/ndk"
       ref: "175-refactor-list-usecase"
-      resolved-ref: "9bcdbe619978309df8731f0f4356c3d6490c7b7a"
+      resolved-ref: "28657a45bf9d8afb10e53599a99b5ca8e9c89104"
       url: "https://github.com/relaystr/ndk.git"
     source: git
-    version: "0.6.0-dev.12"
+    version: "0.6.0-dev.16"
   ndk_amber:
     dependency: "direct main"
     description:
