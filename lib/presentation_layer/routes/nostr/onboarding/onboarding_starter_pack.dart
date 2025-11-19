@@ -108,37 +108,40 @@ class _OnboardingStarterPackState extends ConsumerState<OnboardingStarterPack> {
             ? Text(AppLocalizations.of(context)!.starterPacks)
             : Text(AppLocalizations.of(context)!.additionalStarterPacks),
       ),
-      body: Column(
-        children: [
-          Expanded(
-            child: ListView.builder(
-              itemCount: flattenedItems.length,
-              itemBuilder: (context, index) =>
-                  _buildItemWidget(flattenedItems[index]),
-            ),
-          ),
-          const SizedBox(height: 8),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: SizedBox(
-              width: double.infinity,
-              height: 40,
-              child: longButton(
-                name: selectedPubkeys.isNotEmpty
-                    ? AppLocalizations.of(
-                        context,
-                      )!.continueWithAccounts(selectedPubkeys.length)
-                    : AppLocalizations.of(context)!.selectStarterPack,
-                onPressed: (() {
-                  widget.submitCallback(selectedPubkeys);
-                }),
-                disabled: selectedPubkeys.isEmpty,
-                inverted: true,
+      body: ResponsiveCenter(
+        maxWidth: 800,
+        child: Column(
+          children: [
+            Expanded(
+              child: ListView.builder(
+                itemCount: flattenedItems.length,
+                itemBuilder: (context, index) =>
+                    _buildItemWidget(flattenedItems[index]),
               ),
             ),
-          ),
-          const SizedBox(height: 15),
-        ],
+            const SizedBox(height: 8),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: SizedBox(
+                width: double.infinity,
+                height: 40,
+                child: longButton(
+                  name: selectedPubkeys.isNotEmpty
+                      ? AppLocalizations.of(
+                          context,
+                        )!.continueWithAccounts(selectedPubkeys.length)
+                      : AppLocalizations.of(context)!.selectStarterPack,
+                  onPressed: (() {
+                    widget.submitCallback(selectedPubkeys);
+                  }),
+                  disabled: selectedPubkeys.isEmpty,
+                  inverted: true,
+                ),
+              ),
+            ),
+            const SizedBox(height: 15),
+          ],
+        ),
       ),
     );
   }

@@ -12,6 +12,7 @@ import '../../../../domain_layer/entities/onboarding_user_info.dart';
 import '../../../../domain_layer/usecases/remove_image_metadata.dart';
 import '../../../atoms/crop_avatar.dart';
 import '../../../atoms/long_button.dart';
+import '../../../components/responsive_center.dart';
 
 class OnboardingProfile extends ConsumerStatefulWidget {
   final OnboardingUserInfo signUpInfo;
@@ -124,80 +125,83 @@ class _OnboardingProfileState extends ConsumerState<OnboardingProfile> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: Stack(
-          children: [
-            SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.only(bottom: 80),
-                child: EditProfile(
-                  initialName: widget.signUpInfo.name ?? '',
-                  onNameChanged: (value) {
-                    widget.signUpInfo.name = value;
-                  },
-                  initialPicture: widget.signUpInfo.picture?.bytes,
-                  pictureCallback: () => _onClickPicture(),
-                  initialBanner: widget.signUpInfo.banner?.bytes,
-                  bannerCallback: () => _onClickBanner(),
-                  initialAbout: widget.signUpInfo.about ?? '',
-                  onAboutChanged: (value) {
-                    widget.signUpInfo.about = value;
-                  },
-                  initialPronouns: widget.signUpInfo.pronouns ?? '',
-                  onPronounsChanged: (value) {
-                    widget.signUpInfo.pronouns = value;
-                  },
-                  initialNip05: widget.signUpInfo.nip05 ?? '',
-                  onNip05Changed: (value) {
-                    widget.signUpInfo.nip05 = value;
-                  },
-                  initialWebsite: widget.signUpInfo.website ?? '',
-                  onWebsiteChanged: (value) {
-                    widget.signUpInfo.website = value;
-                  },
-                  initialLud06: widget.signUpInfo.lud06,
-                  onLud06Changed: (value) {
-                    widget.signUpInfo.lud06 = value;
-                  },
-                  initialLud16: widget.signUpInfo.lud16,
-                  onLud16Changed: (value) {
-                    widget.signUpInfo.lud16 = value;
-                  },
-                ),
-              ),
-            ),
-            Positioned(
-              left: 0,
-              right: 0,
-              bottom: 0,
-              child: Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.surface,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Theme.of(
-                        context,
-                      ).colorScheme.surface.withValues(alpha: 0.1),
-                      blurRadius: 10,
-                      offset: Offset(0, -5),
-                    ),
-                  ],
-                ),
-                child: SizedBox(
-                  width: double.infinity,
-                  height: 40,
-                  child: longButton(
-                    name: AppLocalizations.of(context)!.next,
-                    onPressed: (() {
-                      FocusScope.of(context).unfocus();
-                      widget.profileCallback();
-                    }),
-                    inverted: true,
+        child: ResponsiveCenter(
+          maxWidth: 800,
+          child: Stack(
+            children: [
+              SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.only(bottom: 80),
+                  child: EditProfile(
+                    initialName: widget.signUpInfo.name ?? '',
+                    onNameChanged: (value) {
+                      widget.signUpInfo.name = value;
+                    },
+                    initialPicture: widget.signUpInfo.picture?.bytes,
+                    pictureCallback: () => _onClickPicture(),
+                    initialBanner: widget.signUpInfo.banner?.bytes,
+                    bannerCallback: () => _onClickBanner(),
+                    initialAbout: widget.signUpInfo.about ?? '',
+                    onAboutChanged: (value) {
+                      widget.signUpInfo.about = value;
+                    },
+                    initialPronouns: widget.signUpInfo.pronouns ?? '',
+                    onPronounsChanged: (value) {
+                      widget.signUpInfo.pronouns = value;
+                    },
+                    initialNip05: widget.signUpInfo.nip05 ?? '',
+                    onNip05Changed: (value) {
+                      widget.signUpInfo.nip05 = value;
+                    },
+                    initialWebsite: widget.signUpInfo.website ?? '',
+                    onWebsiteChanged: (value) {
+                      widget.signUpInfo.website = value;
+                    },
+                    initialLud06: widget.signUpInfo.lud06,
+                    onLud06Changed: (value) {
+                      widget.signUpInfo.lud06 = value;
+                    },
+                    initialLud16: widget.signUpInfo.lud16,
+                    onLud16Changed: (value) {
+                      widget.signUpInfo.lud16 = value;
+                    },
                   ),
                 ),
               ),
-            ),
-          ],
+              Positioned(
+                left: 0,
+                right: 0,
+                bottom: 0,
+                child: Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.surface,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.surface.withValues(alpha: 0.1),
+                        blurRadius: 10,
+                        offset: Offset(0, -5),
+                      ),
+                    ],
+                  ),
+                  child: SizedBox(
+                    width: double.infinity,
+                    height: 40,
+                    child: longButton(
+                      name: AppLocalizations.of(context)!.next,
+                      onPressed: (() {
+                        FocusScope.of(context).unfocus();
+                        widget.profileCallback();
+                      }),
+                      inverted: true,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
