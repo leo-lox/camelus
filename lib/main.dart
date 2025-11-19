@@ -195,7 +195,9 @@ class MyApp extends ConsumerWidget {
                       height: 32,
                       child: Row(
                         children: [
-                          Expanded(child: DragToMoveArea(child: Container())),
+                          const Expanded(
+                            child: DragToMoveArea(child: SizedBox()),
+                          ),
                           SizedBox(
                             width: 154,
                             child: WindowCaption(

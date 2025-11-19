@@ -87,6 +87,7 @@ class StarterPacksList extends ConsumerWidget {
           return Container(
             padding: EdgeInsets.fromLTRB(8, 2, 8, 2),
             child: StarterPackCard(
+              key: ValueKey('starterPackCard-${starterPacks.name}-$pubkey'),
               pack: starterPacks,
               onTab: () {
                 context.push(

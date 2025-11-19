@@ -6,10 +6,16 @@ import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import '../../../../domain_layer/entities/nostr_note.dart';
+import '../../../../domain_layer/entities/parsed_post.dart';
 import '../../../atoms/spinner_center.dart';
 import '../../../components/note_card/note_card_container.dart';
 
 import 'bookmarks_state_provider.dart';
+
+final parsedNotesProvider = FutureProvider.family
+    .autoDispose<ParsedPost, NostrNote>((ref, note) {
+      return NostrParser.parseEvent(note);
+    });
 
 class BookmarksPage extends ConsumerStatefulWidget {
   const BookmarksPage({super.key});
@@ -83,9 +89,7 @@ class _BookmarksPageState extends ConsumerState<BookmarksPage>
               isPrivate
                   ? AppLocalizations.of(context)!.noPrivateBookmarks
                   : AppLocalizations.of(context)!.noPublicBookmarks,
-              style: TextStyle(
-                color: Theme.of(context).colorScheme.outline,
-              ),
+              style: TextStyle(color: Theme.of(context).colorScheme.outline),
             ),
           ],
         ),
@@ -107,10 +111,7 @@ class _BookmarksPageState extends ConsumerState<BookmarksPage>
             color: Theme.of(context).colorScheme.error,
             alignment: Alignment.centerRight,
             padding: const EdgeInsets.only(right: 20),
-            child: Icon(
-              PhosphorIcons.trash(),
-              color: Colors.white,
-            ),
+            child: Icon(PhosphorIcons.trash(), color: Colors.white),
           ),
           confirmDismiss: (direction) async {
             _showDeleteDialog(note.id, isPrivate, notePreview);
@@ -141,22 +142,21 @@ class _BookmarksPageState extends ConsumerState<BookmarksPage>
               // ),
               const Divider(height: 1),
               FutureBuilder(
-                  future: NostrParser.parseEvent(note),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const SpinnerCenter();
-                    } else if (snapshot.hasError) {
-                      return ListTile(
-                        title: Text('Error loading note'),
-                        subtitle: Text(snapshot.error.toString()),
-                      );
-                    } else {
-                      final parsedPost = snapshot.data!;
-                      return NoteCardContainer(
-                        note: parsedPost,
-                      );
-                    }
-                  }),
+                future: ref.read(parsedNotesProvider(note).future),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const SpinnerCenter();
+                  } else if (snapshot.hasError) {
+                    return ListTile(
+                      title: Text('Error loading note'),
+                      subtitle: Text(snapshot.error.toString()),
+                    );
+                  } else {
+                    final parsedPost = snapshot.data!;
+                    return NoteCardContainer(note: parsedPost);
+                  }
+                },
+              ),
             ],
           ),
         );
@@ -195,7 +195,9 @@ class _BookmarksPageState extends ConsumerState<BookmarksPage>
                     Container(
                       margin: const EdgeInsets.only(left: 8),
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 6, vertical: 2),
+                        horizontal: 6,
+                        vertical: 2,
+                      ),
                       decoration: BoxDecoration(
                         color: Theme.of(context).colorScheme.primaryContainer,
                         borderRadius: BorderRadius.circular(10),
@@ -219,7 +221,9 @@ class _BookmarksPageState extends ConsumerState<BookmarksPage>
                     Container(
                       margin: const EdgeInsets.only(left: 8),
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 6, vertical: 2),
+                        horizontal: 6,
+                        vertical: 2,
+                      ),
                       decoration: BoxDecoration(
                         color: Theme.of(context).colorScheme.primaryContainer,
                         borderRadius: BorderRadius.circular(10),

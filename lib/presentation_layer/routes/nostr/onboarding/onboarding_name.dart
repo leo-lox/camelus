@@ -25,18 +25,17 @@ class OnboardingName extends ConsumerStatefulWidget {
 class _OnboardingNameState extends ConsumerState<OnboardingName> {
   final TextEditingController _nameController = TextEditingController();
   final FocusNode _nameFocusNode = FocusNode();
-
-  bool nameSelected = false;
+  final ValueNotifier<bool> _nameNotEmpty = ValueNotifier(false);
 
   @override
   void initState() {
     super.initState();
     _nameController.text = widget.userInfo.name ?? '';
+    _nameNotEmpty.value = _nameController.text.isNotEmpty;
 
+    // Use ValueNotifier instead of setState
     _nameController.addListener(() {
-      setState(() {
-        nameSelected = _nameController.text.isNotEmpty;
-      });
+      _nameNotEmpty.value = _nameController.text.isNotEmpty;
     });
   }
 
@@ -44,6 +43,7 @@ class _OnboardingNameState extends ConsumerState<OnboardingName> {
   void dispose() {
     _nameController.dispose();
     _nameFocusNode.dispose();
+    _nameNotEmpty.dispose();
     super.dispose();
   }
 
@@ -74,7 +74,7 @@ class _OnboardingNameState extends ConsumerState<OnboardingName> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: TextField(
-                textAlign: TextAlign.justify,
+                textAlign: TextAlign.start,
                 cursorRadius: const Radius.circular(50),
                 maxLines: 2,
                 textAlignVertical: TextAlignVertical.center,
@@ -84,10 +84,9 @@ class _OnboardingNameState extends ConsumerState<OnboardingName> {
                 autofillHints: const [AutofillHints.name],
                 decoration: InputDecoration(
                   hintText: AppLocalizations.of(context)!.whatShouldWeCallYou,
-                  contentPadding: EdgeInsets.all(0),
+                  contentPadding: EdgeInsets.zero,
                   hintStyle: TextStyle(
                     color: Theme.of(context).colorScheme.onSurface,
-                    letterSpacing: 1.1,
                   ),
                   alignLabelWithHint: true,
                   border: InputBorder.none,
@@ -97,7 +96,7 @@ class _OnboardingNameState extends ConsumerState<OnboardingName> {
                 },
                 style: TextStyle(
                   color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  letterSpacing: 1.1,
+
                   fontSize: 28,
                 ),
               ),
@@ -109,15 +108,20 @@ class _OnboardingNameState extends ConsumerState<OnboardingName> {
               child: SizedBox(
                 width: double.infinity,
                 height: 40,
-                child: longButton(
-                  name: nameSelected
-                      ? AppLocalizations.of(context)!.next
-                      : AppLocalizations.of(context)!.skip,
-                  onPressed: (() {
-                    _nameFocusNode.unfocus();
-                    widget.submitCallback(_nameController.text);
-                  }),
-                  inverted: nameSelected,
+                child: ValueListenableBuilder<bool>(
+                  valueListenable: _nameNotEmpty,
+                  builder: (context, nameSelected, _) {
+                    return longButton(
+                      name: nameSelected
+                          ? AppLocalizations.of(context)!.next
+                          : AppLocalizations.of(context)!.skip,
+                      onPressed: () {
+                        _nameFocusNode.unfocus();
+                        widget.submitCallback(_nameController.text);
+                      },
+                      inverted: nameSelected,
+                    );
+                  },
                 ),
               ),
             ),
