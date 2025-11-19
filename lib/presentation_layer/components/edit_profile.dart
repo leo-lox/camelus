@@ -4,7 +4,6 @@ import 'package:camelus/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../config/palette.dart';
 import '../atoms/camer_upload.dart';
 import '../atoms/round_image_border.dart';
 
@@ -143,7 +142,9 @@ class _EditProfileState extends ConsumerState<EditProfile> {
                   width: MediaQuery.of(context).size.width,
                   height: MediaQuery.of(context).size.height / 6,
                   decoration: BoxDecoration(
-                    color: Paletter.getDarkGray(context),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.surfaceContainerHighest,
                     image: widget.initialBanner != null
                         ? DecorationImage(
                             image: MemoryImage(widget.initialBanner!),
@@ -160,7 +161,7 @@ class _EditProfileState extends ConsumerState<EditProfile> {
                     height: MediaQuery.of(context).size.height / 6,
                     color: Theme.of(
                       context,
-                    ).colorScheme.surface.withValues(alpha: 0.5),
+                    ).colorScheme.surface.withValues(alpha: 0.8),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -178,9 +179,11 @@ class _EditProfileState extends ConsumerState<EditProfile> {
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(4),
                             child: LinearProgressIndicator(
-                              backgroundColor: Paletter.getGray(context),
+                              backgroundColor: Theme.of(
+                                context,
+                              ).colorScheme.surfaceContainerHighest,
                               valueColor: AlwaysStoppedAnimation<Color>(
-                                Theme.of(context).colorScheme.onSurface,
+                                Theme.of(context).colorScheme.primary,
                               ),
                               minHeight: 6,
                             ),
@@ -225,10 +228,10 @@ class _EditProfileState extends ConsumerState<EditProfile> {
           width: 102,
           height: 102,
           decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.5),
+            color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.9),
             shape: BoxShape.circle,
             border: Border.all(
-              color: Theme.of(context).colorScheme.onSurface,
+              color: Theme.of(context).colorScheme.primary,
               width: 3,
             ),
           ),
@@ -238,7 +241,10 @@ class _EditProfileState extends ConsumerState<EditProfile> {
         SizedBox(
           width: 60,
           height: 60,
-          child: CircularProgressIndicator(strokeWidth: 3),
+          child: CircularProgressIndicator(
+            strokeWidth: 3,
+            color: Theme.of(context).colorScheme.primary,
+          ),
         ),
 
         // Text in the center
@@ -300,17 +306,24 @@ class _EditProfileState extends ConsumerState<EditProfile> {
         Padding(
           padding: const EdgeInsets.only(top: 16.0, bottom: 8.0, left: 8.0),
           child: Text(
-            label, // Display the label of the input field.
+            label,
             style: TextStyle(
-              color: const Color.fromARGB(213, 245, 248, 250),
-              fontSize: MediaQuery.of(context).size.width / 28,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
             ),
           ),
         ),
         TextFormField(
-          controller: controller, // Bind the controller to the input field.
+          controller: controller,
+          style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
           decoration: InputDecoration(
             hintText: "",
+            hintStyle: TextStyle(
+              color: Theme.of(
+                context,
+              ).colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
+            ),
             contentPadding: EdgeInsets.symmetric(
               vertical: 8.0,
               horizontal: 8.0,
@@ -318,16 +331,20 @@ class _EditProfileState extends ConsumerState<EditProfile> {
             enabledBorder: UnderlineInputBorder(
               borderSide: BorderSide(
                 width: 1,
-                color: Paletter.getGray(
-                  context,
-                ), // Border color for the text field.
+                color: Theme.of(context).colorScheme.outline,
+              ),
+            ),
+            focusedBorder: UnderlineInputBorder(
+              borderSide: BorderSide(
+                width: 2,
+                color: Theme.of(context).colorScheme.primary,
               ),
             ),
           ),
           maxLines: isMultiline ? null : 1,
           keyboardType: isMultiline
               ? TextInputType.multiline
-              : TextInputType.text, // Set keyboard type.
+              : TextInputType.text,
         ),
       ],
     );
