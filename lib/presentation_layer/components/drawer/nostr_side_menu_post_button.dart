@@ -2,15 +2,22 @@ import 'dart:ui';
 
 import 'package:camelus/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
+import '../../../domain_layer/usecases/app_auth.dart';
 import '../../atoms/long_button.dart';
+import '../../providers/ndk_provider.dart';
 import '../write_post.dart';
 
-class NostrSideMenuPostButton extends StatelessWidget {
+class NostrSideMenuPostButton extends ConsumerWidget {
   const NostrSideMenuPostButton({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final ndk = ref.watch(ndkProvider);
+    final canSign = !ndk.accounts.cannotSign;
+
     return SizedBox(
       width: double.infinity,
       height: 40,
@@ -18,6 +25,13 @@ class NostrSideMenuPostButton extends StatelessWidget {
         inverted: true,
         name: AppLocalizations.of(context)!.post,
         onPressed: () {
+          if (!canSign) {
+            // Show login dialog instead
+            AppAuth.showLoginPrompt(context);
+
+            return;
+          }
+
           showModalBottomSheet(
             isScrollControlled: true,
             elevation: 10,

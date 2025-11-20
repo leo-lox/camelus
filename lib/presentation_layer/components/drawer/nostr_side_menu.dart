@@ -169,7 +169,7 @@ class NostrSideMenu extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final currentUserPubkey = ref.read(ndkProvider).accounts.getPublicKey()!;
+    final currentUserPubkey = ref.read(ndkProvider).accounts.getPublicKey();
 
     return Container(
       color: Theme.of(context).colorScheme.surface,
@@ -205,45 +205,56 @@ class NostrSideMenu extends ConsumerWidget {
                 context.go('/notifications');
               },
             ),
-          _drawerItem(
-            label: AppLocalizations.of(context)!.bookmarks,
-            routeName: '/nostr/bookmarks',
-            icon: PhosphorIcons.bookmarkSimple(),
-            onTap: () {
-              context.push('/nostr/bookmarks');
-            },
-          ),
-          _drawerItem(
-            label: AppLocalizations.of(context)!.profile,
-            routeName: '/nostr/profile',
-            icon: PhosphorIcons.user(),
-            onTap: () {
-              navigateToProfile(context, currentUserPubkey);
-            },
-          ),
-
-          _drawerItem(
-            label: AppLocalizations.of(context)!.payments,
-            routeName: 'payments',
-            icon: PhosphorIcons.lightning(),
-            onTap: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(
-                    AppLocalizations.of(context)!.notImplementedYet,
+          if (currentUserPubkey != null) ...[
+            _drawerItem(
+              label: AppLocalizations.of(context)!.bookmarks,
+              routeName: '/nostr/bookmarks',
+              icon: PhosphorIcons.bookmarkSimple(),
+              onTap: () {
+                context.push('/nostr/bookmarks');
+              },
+            ),
+            _drawerItem(
+              label: AppLocalizations.of(context)!.profile,
+              routeName: '/nostr/profile',
+              icon: PhosphorIcons.user(),
+              onTap: () {
+                navigateToProfile(context, currentUserPubkey);
+              },
+            ),
+            _drawerItem(
+              label: AppLocalizations.of(context)!.payments,
+              routeName: 'payments',
+              icon: PhosphorIcons.lightning(),
+              onTap: () {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      AppLocalizations.of(context)!.notImplementedYet,
+                    ),
                   ),
-                ),
-              );
-            },
-          ),
-          _drawerItem(
-            label: AppLocalizations.of(context)!.blocklist,
-            routeName: '/nostr/blockedUsers',
-            icon: PhosphorIcons.yinYang(),
-            onTap: () {
-              context.push('/nostr/blockedUsers');
-            },
-          ),
+                );
+              },
+            ),
+            _drawerItem(
+              label: AppLocalizations.of(context)!.blocklist,
+              routeName: '/nostr/blockedUsers',
+              icon: PhosphorIcons.yinYang(),
+              onTap: () {
+                context.push('/nostr/blockedUsers');
+              },
+            ),
+          ] else ...[
+            // Show login option when not authenticated
+            _drawerItem(
+              label: 'Login',
+              routeName: '/onboarding',
+              icon: PhosphorIcons.signIn(),
+              onTap: () {
+                context.push('/onboarding');
+              },
+            ),
+          ],
           trailingButtonWidget,
           const Spacer(),
           const Spacer(),
@@ -324,20 +335,21 @@ class NostrSideMenu extends ConsumerWidget {
                     size: 22,
                   ),
                 ),
-                IconButton(
-                  onPressed: () {
-                    openQrShareDialog(context, currentUserPubkey);
-                  },
-                  icon: SvgPicture.asset(
-                    'assets/icons/qr-code.svg',
-                    colorFilter: ColorFilter.mode(
-                      Theme.of(context).colorScheme.primary,
-                      BlendMode.srcIn,
+                if (currentUserPubkey != null)
+                  IconButton(
+                    onPressed: () {
+                      openQrShareDialog(context, currentUserPubkey);
+                    },
+                    icon: SvgPicture.asset(
+                      'assets/icons/qr-code.svg',
+                      colorFilter: ColorFilter.mode(
+                        Theme.of(context).colorScheme.primary,
+                        BlendMode.srcIn,
+                      ),
+                      height: 22,
+                      width: 22,
                     ),
-                    height: 22,
-                    width: 22,
                   ),
-                ),
               ],
             ),
           ),

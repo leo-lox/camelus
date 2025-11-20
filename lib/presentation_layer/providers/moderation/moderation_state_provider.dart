@@ -17,24 +17,32 @@ class ModerationState {
 
 final moderationStateProvider =
     StateNotifierProvider<ModerationNotifier, ModerationState>((ref) {
-      final myUserPubkey = ref.read(ndkProvider).accounts.getPublicKey()!;
+      final myUserPubkey = ref.read(ndkProvider).accounts.getPublicKey();
+
+      // If no pubkey (read-only mode), return empty moderation state
+      if (myUserPubkey == null) {
+        return ModerationNotifier(ref: ref, myUserPubkey: null);
+      }
 
       return ModerationNotifier(ref: ref, myUserPubkey: myUserPubkey);
     });
 
 class ModerationNotifier extends StateNotifier<ModerationState> {
   final Ref ref;
-  final String myUserPubkey;
+  final String? myUserPubkey;
 
   ModerationNotifier({required this.ref, required this.myUserPubkey})
     : super(ModerationState(trustedPubkeys: {})) {
+    // Skip setup if no pubkey (read-only mode)
+    if (myUserPubkey == null) return;
+
     // Listen to contact changes
-    ref.listen(contactListStateProvider(myUserPubkey), (previous, next) {
+    ref.listen(contactListStateProvider(myUserPubkey!), (previous, next) {
       _updateTrustedPubkeys(next);
     });
 
     // Load initial state
-    final contacts = ref.read(contactListStateProvider(myUserPubkey));
+    final contacts = ref.read(contactListStateProvider(myUserPubkey!));
     _updateTrustedPubkeys(contacts);
   }
 

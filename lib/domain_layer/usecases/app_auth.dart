@@ -1,13 +1,18 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:ui';
 
 import 'package:amberflutter/amberflutter.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:go_router/go_router.dart';
 import 'package:ndk/data_layer/repositories/signers/nip46_event_signer.dart';
 import 'package:ndk/ndk.dart';
 import 'package:ndk/shared/nips/nip19/nip19.dart';
 import 'package:ndk_amber/ndk_amber.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
+import '../../l10n/app_localizations.dart';
 import '../../presentation_layer/providers/signer_provider.dart';
 import '../entities/stored_account.dart';
 
@@ -127,6 +132,18 @@ class AppAuth {
           return null;
         }
 
+      case LoginType.readOnly:
+        // For read-only accounts, use NDK's loginReadOnlyPubkey
+        if (startupAccountData.account?.pubkey != null) {
+          ndk.accounts.loginPublicKey(
+            pubkey: startupAccountData.account!.pubkey!,
+          );
+        }
+        return null;
+
+      case LoginType.anon:
+        return null;
+
       case LoginType.register:
         return null;
     }
@@ -141,7 +158,7 @@ class AppAuth {
     );
 
     if (activeAccountPubkey == null || storedAccountsString == null) {
-      return StartupAccountData(loginType: LoginType.register);
+      return StartupAccountData(loginType: LoginType.anon);
     }
 
     final storedAccounts = jsonDecode(storedAccountsString) as List;
@@ -160,7 +177,7 @@ class AppAuth {
       // if no match found, use last account or register if list is empty
       matchedAccount = storedAccountsList.isNotEmpty
           ? storedAccountsList.last
-          : LocalStorageAccount(loginType: LoginType.register);
+          : LocalStorageAccount(loginType: LoginType.anon);
     }
 
     return StartupAccountData(
@@ -201,5 +218,43 @@ class AppAuth {
   static Future<void> clearAllAccounts() async {
     await secureStorage.delete(key: AppAuth.activeAccountPubkeyStorageKey);
     await secureStorage.delete(key: AppAuth.accountStorageKey);
+  }
+
+  static void showLoginPrompt(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+        child: AlertDialog(
+          icon: Icon(
+            PhosphorIcons.lockKey(),
+            size: 48,
+            color: Theme.of(context).colorScheme.primary,
+          ),
+          title: Text(
+            AppLocalizations.of(context)!.loginRegistrationRequired,
+            textAlign: TextAlign.center,
+          ),
+          content: Text(
+            AppLocalizations.of(context)!.pleaseLoginToInteract,
+            textAlign: TextAlign.center,
+          ),
+          actionsAlignment: MainAxisAlignment.center,
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(AppLocalizations.of(context)!.cancel),
+            ),
+            FilledButton(
+              onPressed: () {
+                Navigator.pop(context);
+                context.push('/onboarding');
+              },
+              child: Text(AppLocalizations.of(context)!.loginRegister),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

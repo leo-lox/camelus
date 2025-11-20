@@ -29,10 +29,30 @@ final contactListStateProvider =
       },
     );
 
-/// convinience provider
+/// convenience provider
 final contactListSelfStateProvider = Provider<ContactListState>((ref) {
   final selfPubkey = ref.watch(ndkProvider).accounts.getPublicKey();
-  return ref.watch(contactListStateProvider(selfPubkey!));
+  
+  // If no pubkey (read-only mode), return empty contact list
+  if (selfPubkey == null) {
+    return ContactListState(
+      isLoading: false,
+      contactList: ContactList(
+        pubKey: '',
+        contacts: [],
+        contactRelays: [],
+        petnames: [],
+        followedTags: [],
+        followedCommunities: [],
+        followedEvents: [],
+        sources: [],
+        createdAt: 0,
+        loadedTimestamp: null,
+      ),
+    );
+  }
+  
+  return ref.watch(contactListStateProvider(selfPubkey));
 });
 
 class ContactListNotifier extends StateNotifier<ContactListState> {

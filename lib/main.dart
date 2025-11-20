@@ -9,6 +9,7 @@ import 'package:window_manager/window_manager.dart';
 import 'package:flutter_mentions/flutter_mentions.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ndk/ndk.dart';
+import 'config/default_relays.dart';
 import 'domain_layer/entities/stored_account.dart';
 import 'l10n/app_localizations.dart';
 //import 'package:device_preview/device_preview.dart';
@@ -38,7 +39,7 @@ final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  //AppAuth.clearAllAccounts();
+  //await AppAuth.clearAllAccounts();
 
   if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
     await windowManager.ensureInitialized();
@@ -74,8 +75,21 @@ Future<void> main() async {
 
   providerContainer.read(dbNdkProvider.notifier).setDB(cacheManager);
 
+  // If no account exists, login with a read-only account to show feed
+  StartupAccountData effectiveStartupData = startupAccData;
+  if (startupAccData.loginType == LoginType.anon) {
+    // Use a default read-only pubkey for anonymous browsing
+    effectiveStartupData = StartupAccountData(
+      loginType: LoginType.anon,
+      account: LocalStorageAccount(
+        loginType: LoginType.readOnly,
+        pubkey: CamelusConfig.defaultAnonReadPubkey,
+      ),
+    );
+  }
+
   final mySigner = await AppAuth.loginWithStoredAccount(
-    startupAccountData: startupAccData,
+    startupAccountData: effectiveStartupData,
     signerNoti: providerContainer.read(signerProvider.notifier),
     ndk: providerContainer.read(ndkProvider),
   );
@@ -90,9 +104,8 @@ Future<void> main() async {
 
   final String initalRoute;
 
-  // get inital route
-  if (startupAccData.loginType == LoginType.register) {
-    initalRoute = '/onboarding';
+  if (startupAccData.loginType == LoginType.anon) {
+    initalRoute = '/home';
   } else {
     final appDb = providerContainer.read(dbAppProvider);
     final savedRoute = await appDb.read('initalRoute');

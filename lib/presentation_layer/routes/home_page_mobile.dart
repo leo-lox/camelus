@@ -59,7 +59,7 @@ class _HomePageMobileState extends ConsumerState<HomePageMobile>
   Widget build(BuildContext context) {
     super.build(context);
 
-    final currentUserPubkey = ref.read(ndkProvider).accounts.getPublicKey()!;
+    final currentUserPubkey = ref.read(ndkProvider).accounts.getPublicKey();
     final initialTabIndex = widget.initialTab == "/posts-and-replies" ? 1 : 0;
     final myContactList = ref.watch(contactListSelfStateProvider);
 
@@ -67,22 +67,41 @@ class _HomePageMobileState extends ConsumerState<HomePageMobile>
       return Scaffold(body: Center(child: SpinnerCenter()));
     }
 
+    // If no pubkey (read-only mode), show a default feed
+    final authors = currentUserPubkey != null
+        ? (myContactList.contactList.contacts.isNotEmpty
+              ? [...myContactList.contactList.contacts, currentUserPubkey]
+              : [currentUserPubkey])
+        : myContactList.contactList.contacts;
+
     return Scaffold(
       key: _scaffoldKey,
-      drawer: NostrDrawer(pubkey: currentUserPubkey),
+      drawer: currentUserPubkey != null
+          ? NostrDrawer(pubkey: currentUserPubkey)
+          : null,
       backgroundColor: Theme.of(context).colorScheme.surface,
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: Theme.of(context).colorScheme.onPrimary,
-        child: Icon(
-          PhosphorIcons.plus(),
-          color: Theme.of(context).colorScheme.onSurface,
-          size: 27,
-        ),
-        onPressed: () => _show(context),
-      ),
+      floatingActionButton: currentUserPubkey != null
+          ? FloatingActionButton(
+              backgroundColor: Theme.of(context).colorScheme.onPrimary,
+              child: Icon(
+                PhosphorIcons.plus(),
+                color: Theme.of(context).colorScheme.onSurface,
+                size: 27,
+              ),
+              onPressed: () => _show(context),
+            )
+          : FloatingActionButton(
+              backgroundColor: Theme.of(context).colorScheme.onPrimary,
+              child: Icon(
+                PhosphorIcons.signIn(),
+                color: Theme.of(context).colorScheme.onSurface,
+                size: 27,
+              ),
+              onPressed: () => context.push('/onboarding'),
+            ),
       body: SafeArea(
         child: GenericFeed(
-          key: PageStorageKey('homeFeed-$currentUserPubkey'),
+          key: PageStorageKey('homeFeed-${currentUserPubkey ?? "readonly"}'),
           floatHeaderSlivers: true,
           initialTab: initialTabIndex,
           customHeaderSliverBuilder:
@@ -138,9 +157,7 @@ class _HomePageMobileState extends ConsumerState<HomePageMobile>
           feedFilter: FeedFilter(
             feedId: "homeFeed",
             kinds: [1, 6],
-            authors: myContactList.contactList.contacts.isNotEmpty
-                ? [...myContactList.contactList.contacts, currentUserPubkey]
-                : [currentUserPubkey],
+            authors: authors.isNotEmpty ? authors : null,
           ),
         ),
       ),
@@ -150,7 +167,7 @@ class _HomePageMobileState extends ConsumerState<HomePageMobile>
 
 class MobileFeedHeader extends ConsumerWidget {
   final GlobalKey<ScaffoldState> scaffoldKey;
-  final String pubkey;
+  final String? pubkey;
 
   const MobileFeedHeader({
     super.key,
@@ -160,14 +177,22 @@ class MobileFeedHeader extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final myMetadata = ref.watch(metadataStateProvider(pubkey)).userMetadata;
+    // If no pubkey (read-only mode), show a login button
+    if (pubkey == null) {
+      return IconButton(
+        icon: Icon(PhosphorIcons.userCircle()),
+        onPressed: () => context.push('/onboarding'),
+      );
+    }
+
+    final myMetadata = ref.watch(metadataStateProvider(pubkey!)).userMetadata;
 
     return InkWell(
       borderRadius: BorderRadius.circular(100),
       onTap: () => scaffoldKey.currentState!.openDrawer(),
       child: Padding(
         padding: const EdgeInsets.all(9.0),
-        child: UserImage(imageUrl: myMetadata?.picture, pubkey: pubkey),
+        child: UserImage(imageUrl: myMetadata?.picture, pubkey: pubkey!),
       ),
     );
   }

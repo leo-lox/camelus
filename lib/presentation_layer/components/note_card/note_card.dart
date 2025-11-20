@@ -1,15 +1,17 @@
 import 'dart:ui';
 
-import 'package:camelus/domain_layer/entities/parsed_post.dart';
-import 'package:camelus/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../data_layer/models/post_context.dart';
 import '../../../domain_layer/entities/nostr_note.dart';
+import '../../../domain_layer/entities/parsed_post.dart';
 import '../../../domain_layer/entities/user_metadata.dart';
+import '../../../domain_layer/usecases/app_auth.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../atoms/my_profile_picture.dart';
+import '../../providers/ndk_provider.dart';
 import '../../providers/reactions_state_provider.dart';
 import '../../providers/reposts_state_provider.dart';
 import '../bottom_sheet_share.dart';
@@ -39,6 +41,9 @@ class NoteCard extends ConsumerWidget {
     if (note.pubkey == 'missing') {
       return _buildMissingNote();
     }
+
+    final ndk = ref.watch(ndkProvider);
+    final canSign = !ndk.accounts.cannotSign;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -82,9 +87,17 @@ class NoteCard extends ConsumerWidget {
                 isLiked: ref.watch(postLikeProvider(note.nostrNote)).isLiked,
                 key: ValueKey("${note.id}bottom_action_row"),
                 onComment: () {
+                  if (!canSign) {
+                    AppAuth.showLoginPrompt(context);
+                    return;
+                  }
                   _writeReply(context, note.nostrNote);
                 },
                 onLike: () {
+                  if (!canSign) {
+                    AppAuth.showLoginPrompt(context);
+                    return;
+                  }
                   ref
                       .read(postLikeProvider(note.nostrNote).notifier)
                       .toggleLike();
@@ -96,13 +109,23 @@ class NoteCard extends ConsumerWidget {
                     .watch(postRepostProvider(note.nostrNote))
                     .isReposted,
                 onRetweet: () {
+                  if (!canSign) {
+                    AppAuth.showLoginPrompt(context);
+                    return;
+                  }
                   ref
                       .read(postRepostProvider(note.nostrNote).notifier)
                       .toggleRepost();
                 },
                 onShare: () =>
                     openBottomSheetShare(context, ref, note.nostrNote),
-                onMore: () => openBottomSheetMore(context, note.nostrNote),
+                onMore: () {
+                  if (!canSign) {
+                    AppAuth.showLoginPrompt(context);
+                    return;
+                  }
+                  return openBottomSheetMore(context, note.nostrNote);
+                },
               ),
             ),
           ),

@@ -2,6 +2,9 @@ import 'package:camelus/l10n/app_localizations.dart';
 import 'package:camelus/presentation_layer/atoms/long_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+
+import '../../../../l10n/app_localizations.dart';
 
 class OnboardingPage01 extends ConsumerStatefulWidget {
   final Function loginCallback;
@@ -64,6 +67,19 @@ class _OnboardingPage01State extends ConsumerState<OnboardingPage01> {
                   widget.loginCallback();
                 }),
                 inverted: false,
+              ),
+            ),
+            const SizedBox(height: 30),
+            TextButton(
+              onPressed: () {
+                context.go('/home');
+              },
+              child: Text(
+                AppLocalizations.of(context)!.browseWithoutLogin,
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface,
+                  fontSize: 14,
+                ),
               ),
             ),
             const Spacer(flex: 2),
