@@ -7,7 +7,6 @@ import 'package:ndk/shared/nips/nip19/nip19.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:share_plus/share_plus.dart';
 
-import '../../../config/palette.dart';
 import '../../../domain_layer/entities/feed_filter.dart';
 import '../../../domain_layer/entities/starter_pack_identifier.dart';
 import '../../../helpers/helpers.dart';
@@ -101,14 +100,16 @@ class _OpenStarterPackState extends ConsumerState<OpenStarterPack> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          backgroundColor: Paletter.getExtraDarkGray(context),
+          backgroundColor: Theme.of(context).colorScheme.surface,
           title: Text(
             'Delete Starter Pack',
             style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
           ),
           content: Text(
             'Are you sure you want to delete this starter pack? This action cannot be undone.',
-            style: TextStyle(color: Paletter.getLightGray(context)),
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.inverseSurface,
+            ),
           ),
           actions: [
             TextButton(
@@ -117,7 +118,9 @@ class _OpenStarterPackState extends ConsumerState<OpenStarterPack> {
               },
               child: Text(
                 'Cancel',
-                style: TextStyle(color: Paletter.getLightGray(context)),
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.inverseSurface,
+                ),
               ),
             ),
             TextButton(
@@ -240,7 +243,7 @@ class _OpenStarterPackState extends ConsumerState<OpenStarterPack> {
                         PhosphorIcons.dotsThreeVertical(),
                         color: Theme.of(context).colorScheme.onSurface,
                       ),
-                      color: Paletter.getExtraDarkGray(context),
+                      color: Theme.of(context).colorScheme.surface,
                       onSelected: (String value) {
                         switch (value) {
                           case 'edit':
@@ -265,7 +268,9 @@ class _OpenStarterPackState extends ConsumerState<OpenStarterPack> {
                               Text(
                                 'Edit',
                                 style: TextStyle(
-                                  color: Paletter.getLightGray(context),
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.inverseSurface,
                                 ),
                               ),
                             ],
@@ -284,7 +289,9 @@ class _OpenStarterPackState extends ConsumerState<OpenStarterPack> {
                               Text(
                                 'Delete',
                                 style: TextStyle(
-                                  color: Paletter.getLightGray(context),
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.inverseSurface,
                                 ),
                               ),
                             ],
@@ -356,7 +363,9 @@ class _OpenStarterPackState extends ConsumerState<OpenStarterPack> {
                                   Text(
                                     "Starter pack by ${isOwnStarterPack ? "you" : ref.watch(metadataStateProvider(widget.starterPackIdentifier.pubkey)).userMetadata?.name ?? Helpers().shortHr(widget.starterPackIdentifier.pubkey)}",
                                     style: TextStyle(
-                                      color: Paletter.getGray(context),
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.inverseSurface,
                                       fontSize: 14,
                                     ),
                                   ),
@@ -371,7 +380,9 @@ class _OpenStarterPackState extends ConsumerState<OpenStarterPack> {
                           Text(
                             myStarterSet.description!,
                             style: TextStyle(
-                              color: Paletter.getLightGray(context),
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.inverseSurface,
                               fontSize: 14,
                             ),
                           ),
@@ -388,7 +399,9 @@ class _OpenStarterPackState extends ConsumerState<OpenStarterPack> {
                     indicatorColor: Theme.of(context).colorScheme.primary,
                     indicatorWeight: 3,
                     labelColor: Theme.of(context).colorScheme.onSurface,
-                    unselectedLabelColor: Paletter.getGray(context),
+                    unselectedLabelColor: Theme.of(
+                      context,
+                    ).colorScheme.inverseSurface,
                     labelStyle: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
@@ -410,16 +423,19 @@ class _OpenStarterPackState extends ConsumerState<OpenStarterPack> {
                                 vertical: 2,
                               ),
                               decoration: BoxDecoration(
-                                color: Paletter.getGray(
-                                  context,
-                                ).withValues(alpha: 0.3),
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .inverseSurface
+                                    .withValues(alpha: 0.3),
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               child: Text(
                                 "${myStarterSet.elements.length}",
                                 style: TextStyle(
                                   fontSize: 12,
-                                  color: Paletter.getLightGray(context),
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.inverseSurface,
                                 ),
                               ),
                             ),

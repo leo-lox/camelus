@@ -4,7 +4,6 @@ import 'dart:io';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 
-import 'package:camelus/config/palette.dart';
 import 'package:camelus/data_layer/models/post_context.dart';
 import 'package:camelus/domain_layer/entities/user_metadata.dart';
 import 'package:camelus/domain_layer/usecases/remove_image_metadata.dart';
@@ -189,7 +188,7 @@ class _WritePostState extends ConsumerState<WritePost> {
           alignment: Alignment.topLeft,
           // round  corners
           decoration: BoxDecoration(
-            color: Paletter.getExtraDarkGray(context),
+            color: Theme.of(context).colorScheme.surface,
             borderRadius: BorderRadius.only(
               topLeft: Radius.circular(20),
               topRight: Radius.circular(20),
@@ -263,7 +262,7 @@ class _WritePostState extends ConsumerState<WritePost> {
                     height: 25,
                     'assets/icons/x.svg',
                     colorFilter: ColorFilter.mode(
-                      Paletter.getGray(context),
+                      Theme.of(context).colorScheme.inverseSurface,
                       BlendMode.srcIn,
                     ),
                   ),
@@ -286,7 +285,7 @@ class _WritePostState extends ConsumerState<WritePost> {
             _buildActionButton(
               icon: Icon(
                 PhosphorIcons.image(),
-                color: Paletter.getGray(context),
+                color: Theme.of(context).colorScheme.inverseSurface,
                 size: 25,
               ),
               onPressed: _addImage,
@@ -294,7 +293,7 @@ class _WritePostState extends ConsumerState<WritePost> {
             _buildActionButton(
               icon: Icon(
                 PhosphorIcons.gearSix(),
-                color: Paletter.getGray(context),
+                color: Theme.of(context).colorScheme.inverseSurface,
                 size: 25,
               ),
               onPressed: () => _showPostSettingsDialog(context),
@@ -359,7 +358,10 @@ class _WritePostState extends ConsumerState<WritePost> {
         decoration: InputDecoration(
           border: InputBorder.none,
           hintText: AppLocalizations.of(context)!.whatsOnYourMind,
-          hintStyle: TextStyle(color: Paletter.getGray(context), fontSize: 20),
+          hintStyle: TextStyle(
+            color: Theme.of(context).colorScheme.inverseSurface,
+            fontSize: 20,
+          ),
         ),
         maxLines: 10,
         minLines: 5,
@@ -381,7 +383,7 @@ class _WritePostState extends ConsumerState<WritePost> {
           }
         },
         suggestionListDecoration: BoxDecoration(
-          color: Paletter.getExtraDarkGray(context),
+          color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(20),
         ),
         mentions: [
@@ -407,14 +409,14 @@ class _WritePostState extends ConsumerState<WritePost> {
                         Text(
                           data['name'] ?? "",
                           style: TextStyle(
-                            color: Paletter.getLightGray(context),
+                            color: Theme.of(context).colorScheme.inverseSurface,
                             fontSize: 20,
                           ),
                         ),
                         Text(
                           '${data['nip05'] ?? ""}',
                           style: TextStyle(
-                            color: Paletter.getGray(context),
+                            color: Theme.of(context).colorScheme.inverseSurface,
                             fontSize: 12,
                           ),
                         ),
@@ -443,7 +445,7 @@ class _WritePostState extends ConsumerState<WritePost> {
                         Text(
                           data['display'] != null ? "#${data['display']}" : "",
                           style: TextStyle(
-                            color: Paletter.getLightGray(context),
+                            color: Theme.of(context).colorScheme.inverseSurface,
                             fontSize: 20,
                           ),
                         ),
@@ -506,7 +508,7 @@ class _TopBar extends ConsumerWidget {
               height: 25,
               'assets/icons/x.svg',
               colorFilter: ColorFilter.mode(
-                Paletter.getGray(context),
+                Theme.of(context).colorScheme.inverseSurface,
                 BlendMode.srcIn,
               ),
             ),
@@ -515,7 +517,7 @@ class _TopBar extends ConsumerWidget {
             Text(
               AppLocalizations.of(context)!.writePost,
               style: TextStyle(
-                color: Paletter.getLightGray(context),
+                color: Theme.of(context).colorScheme.inverseSurface,
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
               ),
@@ -536,7 +538,7 @@ class _TopBar extends ConsumerWidget {
                     overflow: TextOverflow.ellipsis,
                     maxLines: 2,
                     style: TextStyle(
-                      color: Paletter.getLightGray(context),
+                      color: Theme.of(context).colorScheme.inverseSurface,
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
                     ),

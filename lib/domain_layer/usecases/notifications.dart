@@ -29,7 +29,7 @@ class Notifications {
       throw Exception("cannot register device without signer");
     }
 
-    final myPubkey = _eventSigner!.getPublicKey();
+    final myPubkey = _eventSigner.getPublicKey();
 
     final nip65data = await _inboxOutbox.getNip65data(myPubkey);
 

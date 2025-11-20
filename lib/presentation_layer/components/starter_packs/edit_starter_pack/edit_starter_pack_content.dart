@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
-import '../../../../config/palette.dart';
 import '../../../../domain_layer/entities/starter_pack_identifier.dart';
 
 import '../../../atoms/long_button.dart';
@@ -203,7 +202,7 @@ class _EditStarterPackContentState
                   "you can also use the three dots menu on every post to add a user to a pack",
                   style: TextStyle(
                     fontSize: 12,
-                    color: Paletter.getLightGray(context),
+                    color: Theme.of(context).colorScheme.inverseSurface,
                   ),
                 ),
               ],
@@ -260,7 +259,7 @@ class PersonSelect extends ConsumerWidget {
                 Text(
                   metadata?.about ?? "",
                   style: TextStyle(
-                    color: Paletter.getGray(context),
+                    color: Theme.of(context).colorScheme.inverseSurface,
                     fontSize: 12,
                   ),
                   maxLines: 3,

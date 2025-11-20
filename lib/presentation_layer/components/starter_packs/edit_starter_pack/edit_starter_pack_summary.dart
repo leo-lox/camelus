@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:share_plus/share_plus.dart';
 
-import '../../../../config/palette.dart';
 import '../../../../domain_layer/entities/nostr_list.dart';
 import '../../../../domain_layer/entities/starter_pack_identifier.dart';
 import '../../../atoms/long_button.dart';
@@ -185,10 +184,12 @@ class _EditStarterPackSummaryState extends ConsumerState<EditStarterPackSummary>
                                   vertical: 12,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: Paletter.getExtraDarkGray(context),
+                                  color: Theme.of(context).colorScheme.surface,
                                   borderRadius: BorderRadius.circular(8),
                                   border: Border.all(
-                                    color: Paletter.getGray(context),
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.inverseSurface,
                                   ),
                                 ),
                                 child: Row(

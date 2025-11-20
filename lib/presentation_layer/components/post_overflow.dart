@@ -1,4 +1,3 @@
-import 'package:camelus/config/palette.dart';
 import 'package:flutter/material.dart';
 
 class PostOverflowIndicator extends StatelessWidget {
@@ -30,12 +29,16 @@ class PostOverflowIndicator extends StatelessWidget {
     final Color indicatorColor = isOverLimit
         ? Theme.of(context).colorScheme.error
         : (isApproachingLimit
-              ? Colors.orange
+              ? Colors
+                    .orange //! hard coded colors
               : Theme.of(context).colorScheme.primary);
 
     final Color borderColor = isOverLimit
         ? Theme.of(context).colorScheme.error
-        : (isApproachingLimit ? Colors.orange : Paletter.getGray(context));
+        : (isApproachingLimit
+              ? Colors
+                    .orange //! hard coded colors
+              : Theme.of(context).colorScheme.inverseSurface);
 
     // Calculate the number to display
     final int numberToDisplay = isOverLimit

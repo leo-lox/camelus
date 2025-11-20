@@ -4,7 +4,6 @@ import 'package:camelus/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../config/palette.dart';
 import '../atoms/camer_upload.dart';
 import '../atoms/round_image_border.dart';
 
@@ -143,7 +142,9 @@ class _EditProfileState extends ConsumerState<EditProfile> {
                   width: MediaQuery.of(context).size.width,
                   height: MediaQuery.of(context).size.height / 6,
                   decoration: BoxDecoration(
-                    color: Paletter.getDarkGray(context),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.surfaceContainerHighest,
                     image: widget.initialBanner != null
                         ? DecorationImage(
                             image: MemoryImage(widget.initialBanner!),
@@ -178,7 +179,9 @@ class _EditProfileState extends ConsumerState<EditProfile> {
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(4),
                             child: LinearProgressIndicator(
-                              backgroundColor: Paletter.getGray(context),
+                              backgroundColor: Theme.of(
+                                context,
+                              ).colorScheme.inverseSurface,
                               valueColor: AlwaysStoppedAnimation<Color>(
                                 Theme.of(context).colorScheme.onSurface,
                               ),
@@ -318,9 +321,9 @@ class _EditProfileState extends ConsumerState<EditProfile> {
             enabledBorder: UnderlineInputBorder(
               borderSide: BorderSide(
                 width: 1,
-                color: Paletter.getGray(
-                  context,
-                ), // Border color for the text field.
+                color: Theme.of(context)
+                    .colorScheme
+                    .inverseSurface, // Border color for the text field.
               ),
             ),
           ),

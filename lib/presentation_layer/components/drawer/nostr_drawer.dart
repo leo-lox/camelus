@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import 'package:camelus/config/palette.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -93,7 +92,7 @@ class NostrDrawer extends ConsumerWidget {
                       : 'n.a.',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    color: Paletter.getExtraLightGray(context),
+                    color: Theme.of(context).colorScheme.onSurface,
                   ),
                   children: [
                     TextSpan(
@@ -113,7 +112,7 @@ class NostrDrawer extends ConsumerWidget {
                   text: 'n.a.',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    color: Paletter.getExtraLightGray(context),
+                    color: Theme.of(context).colorScheme.onSurface,
                   ),
                   children: [
                     TextSpan(

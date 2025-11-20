@@ -1,4 +1,3 @@
-import 'package:camelus/config/palette.dart';
 import 'package:flutter/material.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
@@ -70,7 +69,7 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              //color: Paletter.getExtraDarkGray(context),
+              //color: Theme.of(context).colorScheme.surface,
               borderRadius: BorderRadius.circular(200),
             ),
             child:
@@ -107,11 +106,11 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
                 filled: true,
                 fillColor: _searchFocusNode.hasFocus
                     ? Theme.of(context).colorScheme.surface
-                    : Paletter.getExtraDarkGray(context),
+                    : Theme.of(context).colorScheme.surface,
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.all(Radius.circular(50.0)),
                   borderSide: BorderSide(
-                    color: Paletter.getExtraDarkGray(context),
+                    color: Theme.of(context).colorScheme.surface,
                   ),
                 ),
                 focusedBorder: OutlineInputBorder(

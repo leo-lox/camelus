@@ -12,7 +12,6 @@ import '../../domain_layer/entities/invite_data.dart';
 import '../../domain_layer/entities/starter_pack_identifier.dart';
 import '../../domain_layer/usecases/app_auth.dart';
 import '../../helpers/helpers.dart';
-import '../../helpers/nevent_helper.dart';
 import '../../helpers/nprofile_helper.dart';
 import '../atoms/long_button.dart';
 import '../atoms/spinner_center.dart';

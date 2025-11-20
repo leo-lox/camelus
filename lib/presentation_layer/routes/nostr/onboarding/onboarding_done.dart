@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:math';
 
 import 'package:camelus/l10n/app_localizations.dart';
@@ -6,15 +5,12 @@ import 'package:camelus/presentation_layer/components/full_screen_loading.dart';
 import 'package:camelus/presentation_layer/providers/ndk_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:ndk/ndk.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../config/default_blossom.dart';
 import '../../../../config/default_relays.dart';
-import '../../../../config/palette.dart';
 import '../../../../domain_layer/entities/generated_private_key.dart';
 import '../../../../domain_layer/entities/key_pair.dart';
 import '../../../../domain_layer/entities/nip_65.dart';
@@ -285,9 +281,9 @@ ${_privateKey.mnemonicSentence}
                               const SizedBox(width: 5),
                               ElevatedButton.icon(
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: Paletter.getLightGray(
+                                  backgroundColor: Theme.of(
                                     context,
-                                  ),
+                                  ).colorScheme.inverseSurface,
                                   foregroundColor: Theme.of(
                                     context,
                                   ).colorScheme.surface,

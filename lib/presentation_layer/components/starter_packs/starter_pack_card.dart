@@ -2,7 +2,6 @@ import 'package:camelus/presentation_layer/atoms/my_profile_picture.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../config/palette.dart';
 import '../../../domain_layer/entities/nostr_list.dart';
 import '../../../helpers/helpers.dart';
 import '../../../helpers/nprofile_helper.dart';
@@ -78,7 +77,7 @@ class _StarterPackCardState extends ConsumerState<StarterPackCard> {
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.normal,
-                          color: Paletter.getGray(context),
+                          color: Theme.of(context).colorScheme.inverseSurface,
                         ),
                       ),
 
@@ -91,7 +90,9 @@ class _StarterPackCardState extends ConsumerState<StarterPackCard> {
                             "by",
                             style: TextStyle(
                               fontSize: 14,
-                              color: Paletter.getGray(context),
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.inverseSurface,
                             ),
                           ),
                           const SizedBox(width: 4),
@@ -100,7 +101,9 @@ class _StarterPackCardState extends ConsumerState<StarterPackCard> {
                                 _pubkeyToHrBech32Short(widget.pack.pubKey),
                             style: TextStyle(
                               fontSize: 14,
-                              color: Paletter.getGray(context),
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.inverseSurface,
                             ),
                           ),
                           const SizedBox(width: 8),
@@ -147,7 +150,7 @@ class _StarterPackCardState extends ConsumerState<StarterPackCard> {
                         "+${(widget.pack.pubKeys.length - 5)}",
                         style: TextStyle(
                           fontSize: 16,
-                          color: Paletter.getLightGray(context),
+                          color: Theme.of(context).colorScheme.inverseSurface,
                           fontWeight: FontWeight.w500,
                         ),
                       ),

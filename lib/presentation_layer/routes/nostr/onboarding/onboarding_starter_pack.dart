@@ -4,7 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../../config/onboard_conf.dart';
-import '../../../../config/palette.dart';
 import '../../../../domain_layer/entities/nostr_list.dart';
 import '../../../../domain_layer/entities/onboarding_user_info.dart';
 import '../../../atoms/long_button.dart';
@@ -230,7 +229,7 @@ class _OnboardingOpenStarterPackState
                             "Unknown",
                       ),
                       style: TextStyle(
-                        color: Paletter.getGray(context),
+                        color: Theme.of(context).colorScheme.inverseSurface,
                         fontSize: 12,
                       ),
                     ),
@@ -303,7 +302,9 @@ class _OnboardingOpenStarterPackState
                             Text(
                               displayMetadata?.about ?? "",
                               style: TextStyle(
-                                color: Paletter.getGray(context),
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.inverseSurface,
                                 fontSize: 12,
                               ),
                               maxLines: 3,

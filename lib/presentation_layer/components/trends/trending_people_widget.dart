@@ -4,7 +4,6 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../config/palette.dart';
 import '../../../domain_layer/entities/contact_list.dart';
 import '../../../domain_layer/entities/nostr_band_people.dart';
 import '../../providers/following_contact_state_provider.dart';
@@ -70,8 +69,10 @@ class _TrendingPeopleList extends ConsumerWidget {
         if (snapshot.hasError) {
           log(snapshot.error.toString());
           return Text(
-            'Something went wrong',
-            style: TextStyle(color: Paletter.getGray(context)),
+            'Something went wrong', // TODO translate
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.inverseSurface,
+            ),
           );
         }
 
@@ -87,8 +88,10 @@ class _TrendingPeopleList extends ConsumerWidget {
 
         if (snapshot.connectionState == ConnectionState.done) {
           return Text(
-            'No connection',
-            style: TextStyle(color: Paletter.getGray(context)),
+            'No connection', // TODO translate
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.inverseSurface,
+            ),
           );
         }
 

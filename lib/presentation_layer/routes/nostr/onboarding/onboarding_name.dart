@@ -1,6 +1,5 @@
 import 'package:camelus/l10n/app_localizations.dart';
 import 'package:camelus/presentation_layer/atoms/long_button.dart';
-import 'package:camelus/config/palette.dart';
 import 'package:camelus/domain_layer/entities/onboarding_user_info.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -96,7 +95,7 @@ class _OnboardingNameState extends ConsumerState<OnboardingName> {
                   widget.userInfo.name = value;
                 },
                 style: TextStyle(
-                  color: Paletter.getLightGray(context),
+                  color: Theme.of(context).colorScheme.inverseSurface,
                   letterSpacing: 1.1,
                   fontSize: 28, // Increase the font size
                 ),

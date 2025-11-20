@@ -1,7 +1,6 @@
 import 'dart:developer';
 import 'package:camelus/domain_layer/entities/relay.dart';
 import 'package:camelus/presentation_layer/atoms/long_button.dart';
-import 'package:camelus/config/palette.dart';
 import 'package:camelus/presentation_layer/providers/edit_relays_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -172,7 +171,7 @@ class _EditRelaysViewState extends ConsumerState<EditRelaysView> {
                       hintText: " add relay",
                       enabledBorder: OutlineInputBorder(
                         borderSide: BorderSide(
-                          color: Paletter.getLightGray(context),
+                          color: Theme.of(context).colorScheme.inverseSurface,
                         ),
                         borderRadius: BorderRadius.all(Radius.circular(30)),
                       ),
@@ -201,7 +200,7 @@ class _EditRelaysViewState extends ConsumerState<EditRelaysView> {
                       padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(20),
-                        color: Paletter.getExtraDarkGray(context),
+                        color: Theme.of(context).colorScheme.surface,
                       ),
                       height: 85,
                       width: double.infinity,
@@ -271,7 +270,9 @@ class _EditRelaysViewState extends ConsumerState<EditRelaysView> {
                               IconButton(
                                 icon: Icon(
                                   Icons.delete,
-                                  color: Paletter.getLightGray(context),
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.inverseSurface,
                                 ),
                                 onPressed: () {
                                   // confirm dialog

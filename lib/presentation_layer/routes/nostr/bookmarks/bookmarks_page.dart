@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
-import 'package:timeago/timeago.dart' as timeago;
 import '../../../../domain_layer/entities/nostr_note.dart';
 import '../../../atoms/spinner_center.dart';
 import '../../../components/note_card/note_card_container.dart';
@@ -83,9 +82,7 @@ class _BookmarksPageState extends ConsumerState<BookmarksPage>
               isPrivate
                   ? AppLocalizations.of(context)!.noPrivateBookmarks
                   : AppLocalizations.of(context)!.noPublicBookmarks,
-              style: TextStyle(
-                color: Theme.of(context).colorScheme.outline,
-              ),
+              style: TextStyle(color: Theme.of(context).colorScheme.outline),
             ),
           ],
         ),
@@ -110,7 +107,7 @@ class _BookmarksPageState extends ConsumerState<BookmarksPage>
             child: Icon(
               PhosphorIcons.trash(),
               color: Colors.white,
-            ),
+            ), //! hard coded color
           ),
           confirmDismiss: (direction) async {
             _showDeleteDialog(note.id, isPrivate, notePreview);
@@ -141,22 +138,21 @@ class _BookmarksPageState extends ConsumerState<BookmarksPage>
               // ),
               const Divider(height: 1),
               FutureBuilder(
-                  future: NostrParser.parseEvent(note),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const SpinnerCenter();
-                    } else if (snapshot.hasError) {
-                      return ListTile(
-                        title: Text('Error loading note'),
-                        subtitle: Text(snapshot.error.toString()),
-                      );
-                    } else {
-                      final parsedPost = snapshot.data!;
-                      return NoteCardContainer(
-                        note: parsedPost,
-                      );
-                    }
-                  }),
+                future: NostrParser.parseEvent(note),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const SpinnerCenter();
+                  } else if (snapshot.hasError) {
+                    return ListTile(
+                      title: Text('Error loading note'), // TODO translate
+                      subtitle: Text(snapshot.error.toString()),
+                    );
+                  } else {
+                    final parsedPost = snapshot.data!;
+                    return NoteCardContainer(note: parsedPost);
+                  }
+                },
+              ),
             ],
           ),
         );
@@ -195,7 +191,9 @@ class _BookmarksPageState extends ConsumerState<BookmarksPage>
                     Container(
                       margin: const EdgeInsets.only(left: 8),
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 6, vertical: 2),
+                        horizontal: 6,
+                        vertical: 2,
+                      ),
                       decoration: BoxDecoration(
                         color: Theme.of(context).colorScheme.primaryContainer,
                         borderRadius: BorderRadius.circular(10),
@@ -219,7 +217,9 @@ class _BookmarksPageState extends ConsumerState<BookmarksPage>
                     Container(
                       margin: const EdgeInsets.only(left: 8),
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 6, vertical: 2),
+                        horizontal: 6,
+                        vertical: 2,
+                      ),
                       decoration: BoxDecoration(
                         color: Theme.of(context).colorScheme.primaryContainer,
                         borderRadius: BorderRadius.circular(10),

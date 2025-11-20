@@ -1,5 +1,4 @@
 import 'package:camelus/presentation_layer/atoms/long_button.dart';
-import 'package:camelus/config/palette.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -28,7 +27,7 @@ class _OnboardingPage01State extends ConsumerState<OnboardingPage01> {
             Text(
               "welcome to",
               style: TextStyle(
-                color: Paletter.getExtraLightGray(context),
+                color: Theme.of(context).colorScheme.onSurface,
                 fontSize: MediaQuery.of(context).size.width / 22,
               ),
             ),

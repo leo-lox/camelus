@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../../config/palette.dart';
 import '../../../../domain_layer/entities/nostr_tag.dart';
 import '../../../atoms/long_button.dart';
 import '../../../providers/metadata_state_provider.dart';
@@ -121,7 +120,7 @@ class _BlockPageState extends ConsumerState<BlockPage> {
                   Text(
                     AppLocalizations.of(context)!.thankYouForReport,
                     style: TextStyle(
-                      color: Paletter.getLightGray(context),
+                      color: Theme.of(context).colorScheme.inverseSurface,
                       fontSize: 20,
                     ),
                   ),
@@ -162,7 +161,7 @@ class _BlockPageState extends ConsumerState<BlockPage> {
                       Text(
                         AppLocalizations.of(context)!.user,
                         style: TextStyle(
-                          color: Paletter.getLightGray(context),
+                          color: Theme.of(context).colorScheme.inverseSurface,
                           fontSize: 20,
                         ),
                       ),
@@ -258,13 +257,13 @@ class _BlockPageState extends ConsumerState<BlockPage> {
                               letterSpacing: 1.1,
                             ),
                             filled: true,
-                            fillColor: Paletter.getExtraDarkGray(context),
+                            fillColor: Theme.of(context).colorScheme.surface,
                             enabledBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.all(
                                 Radius.circular(10.0),
                               ),
                               borderSide: BorderSide(
-                                color: Paletter.getExtraDarkGray(context),
+                                color: Theme.of(context).colorScheme.surface,
                               ),
                             ),
                             focusedBorder: OutlineInputBorder(
@@ -287,7 +286,9 @@ class _BlockPageState extends ConsumerState<BlockPage> {
 
                       Text(
                         AppLocalizations.of(context)!.reportsAreSentToRelays,
-                        style: TextStyle(color: Paletter.getGray(context)),
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.inverseSurface,
+                        ),
                       ),
 
                       const SizedBox(height: 10),

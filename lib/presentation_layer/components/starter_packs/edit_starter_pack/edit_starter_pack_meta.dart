@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 
-import '../../../../config/palette.dart';
 import '../../../../domain_layer/entities/mem_file.dart';
 import '../../../../domain_layer/entities/starter_pack_identifier.dart';
 import '../../../atoms/crop_avatar.dart';
@@ -246,7 +245,7 @@ class _EditStarterPackMetaState extends ConsumerState<EditStarterPackMeta> {
                       // Title input
                       Container(
                         decoration: BoxDecoration(
-                          color: Paletter.getExtraDarkGray(context),
+                          color: Theme.of(context).colorScheme.surface,
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: TextField(
@@ -264,8 +263,10 @@ class _EditStarterPackMetaState extends ConsumerState<EditStarterPackMeta> {
                             suffixText: '${starterPackData.title.length}/40',
                             suffixStyle: TextStyle(
                               color: starterPackData.title.length > 40
-                                  ? Colors.orangeAccent
-                                  : Paletter.getGray(context),
+                                  ? Colors.orangeAccent //! hard coded color
+                                  : Theme.of(
+                                      context,
+                                    ).colorScheme.inverseSurface,
                               fontSize: 14,
                             ),
                           ),
@@ -293,7 +294,7 @@ class _EditStarterPackMetaState extends ConsumerState<EditStarterPackMeta> {
                       Container(
                         height: 200,
                         decoration: BoxDecoration(
-                          color: Paletter.getExtraDarkGray(context),
+                          color: Theme.of(context).colorScheme.surface,
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: TextField(

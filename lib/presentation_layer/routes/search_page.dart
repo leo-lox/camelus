@@ -8,7 +8,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
-import '../../config/palette.dart';
 import '../../domain_layer/entities/contact_list.dart';
 import '../../domain_layer/entities/nostr_note.dart';
 import '../../domain_layer/entities/user_metadata.dart';
@@ -317,7 +316,9 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                           child: Text(
                             "by nostr.band",
                             style: TextStyle(
-                              color: Paletter.getGray(context),
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.inverseSurface,
                               fontSize: 14,
                             ),
                           ),
@@ -370,7 +371,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
             // Search query display
             if (searchState.searchQuery.isNotEmpty) ...[
               _buildSearchQueryCard(searchState.searchQuery),
-              Divider(color: Paletter.getExtraDarkGray(context), height: 20),
+              Divider(color: Theme.of(context).colorScheme.surface, height: 20),
             ],
 
             // Loading indicator
@@ -418,7 +419,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                     child: Text(
                       "No results found",
                       style: TextStyle(
-                        color: Paletter.getGray(context),
+                        color: Theme.of(context).colorScheme.inverseSurface,
                         fontSize: 16,
                       ),
                     ),
@@ -447,7 +448,10 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                 ),
               ),
             ),
-            Icon(PhosphorIcons.arrowUpLeft(), color: Paletter.getGray(context)),
+            Icon(
+              PhosphorIcons.arrowUpLeft(),
+              color: Theme.of(context).colorScheme.inverseSurface,
+            ),
           ],
         ),
       ),
@@ -516,7 +520,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
 
 void _helpSearch(BuildContext context) {
   showModalBottomSheet(
-    backgroundColor: Paletter.getExtraDarkGray(context),
+    backgroundColor: Theme.of(context).colorScheme.surface,
     context: context,
     shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.only(

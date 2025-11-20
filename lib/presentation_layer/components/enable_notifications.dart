@@ -7,7 +7,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../config/palette.dart';
 import '../atoms/spinner_center.dart';
 import '../providers/db_app_provider.dart';
 import '../providers/notifications_provider.dart';
@@ -178,18 +177,23 @@ class PushNotificationToggleState
           const SizedBox(height: 8),
           Text(
             notificationsEnabled
+                // TODO translate
                 ? 'You will receive notifications about new replies.'
                 : 'Enable notifications to get notified about new replies',
-            style: TextStyle(color: Paletter.getGray(context), fontSize: 14),
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.inverseSurface,
+              fontSize: 14,
+            ),
           ),
           // Only show the hint message if permissions were explicitly denied
           if (notificationsDenied)
             Padding(
               padding: const EdgeInsets.only(top: 8.0),
               child: Text(
+                // TODO translate
                 'Note: You previously denied notifications. Please enable them in your device settings to receive notifications.',
                 style: TextStyle(
-                  color: Colors.orangeAccent,
+                  color: Colors.orangeAccent, // hard coded color
                   fontSize: 12,
                   fontStyle: FontStyle.italic,
                 ),
