@@ -87,8 +87,29 @@ class _SearchPageState extends ConsumerState<SearchPage> {
   }
 
   void _onSubmit(String value) {
-    if (mounted) {
-      context.push('/nostr/search', extra: value);
+    if (!mounted) return;
+
+    final trimmedValue = value.trim();
+
+    // 1. Check for Nostr Bech32 patterns (npub, note, nevent, nprofile, naddr)
+    // This regex allows optional "nostr:" prefix and matches the bech32 string
+    final nostrRegex = RegExp(
+      r'^(?:nostr:)?((?:npub1|note1|nevent1|nprofile1|naddr1)[a-z0-9]+)$',
+      caseSensitive: false,
+    );
+
+    final match = nostrRegex.firstMatch(trimmedValue);
+
+    if (match != null) {
+      // Extract the code without the 'nostr:' prefix if it existed
+      final code = match.group(1)!;
+
+      // 2. Push to the root route which is handled by DeeplinkRecieverPage
+      // See lib/routes.dart line 188
+      context.push('/$code');
+    } else {
+      // 3. Fallback to standard text search
+      context.push('/nostr/search', extra: trimmedValue);
     }
   }
 
