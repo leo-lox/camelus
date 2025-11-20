@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:camelus/domain_layer/usecases/app_auth.dart';
 import 'package:camelus/presentation_layer/components/responsive_center.dart';
 import 'package:flutter/material.dart';
@@ -7,8 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:go_router/go_router.dart';
-import 'package:ndk/domain_layer/usecases/bunkers/models/bunker_connection.dart';
-import 'package:ndk/ndk.dart';
+
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -206,7 +203,9 @@ class _OnboardingLoginBunkerPageState
                       letterSpacing: 1.1,
                     ),
                     filled: true,
-                    fillColor: Theme.of(context).colorScheme.surfaceContainerLow,
+                    fillColor: Theme.of(
+                      context,
+                    ).colorScheme.surfaceContainerLow,
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.all(Radius.circular(10)),
                       borderSide: BorderSide(
@@ -275,11 +274,6 @@ class _OnboardingLoginBunkerPageState
                         _termsAndConditions = value!;
                       });
                     },
-                    activeColor: Theme.of(context).colorScheme.surface,
-                    checkColor: Theme.of(context).colorScheme.primary,
-                    fillColor: WidgetStateProperty.all(
-                      Theme.of(context).colorScheme.onSurface,
-                    ),
                   ),
                   Text(
                     "I have read and accept the ",
