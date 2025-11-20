@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:camelus/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -102,11 +103,11 @@ class _OpenStarterPackState extends ConsumerState<OpenStarterPack> {
         return AlertDialog(
           backgroundColor: Theme.of(context).colorScheme.surface,
           title: Text(
-            'Delete Starter Pack',
+            AppLocalizations.of(context)!.deleteStarterPack,
             style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
           ),
           content: Text(
-            'Are you sure you want to delete this starter pack? This action cannot be undone.',
+            AppLocalizations.of(context)!.deleteStarterPackConfirm,
             style: TextStyle(
               color: Theme.of(context).colorScheme.inverseSurface,
             ),
@@ -195,10 +196,13 @@ class _OpenStarterPackState extends ConsumerState<OpenStarterPack> {
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text("deletion requested", style: TextStyle(fontSize: 25)),
+              Text(
+                AppLocalizations.of(context)!.deletionRequested,
+                style: TextStyle(fontSize: 25),
+              ),
               SizedBox(height: 25),
               longButton(
-                name: "go back",
+                name: AppLocalizations.of(context)!.goBack,
                 onPressed: () {
                   context.pop();
                 },
@@ -210,7 +214,11 @@ class _OpenStarterPackState extends ConsumerState<OpenStarterPack> {
     }
 
     if (myStarterSet == null) {
-      return Scaffold(body: Center(child: Text("unknown starter pack")));
+      return Scaffold(
+        body: Center(
+          child: Text(AppLocalizations.of(context)!.unknownStarterPack),
+        ),
+      );
     }
 
     return DefaultTabController(
@@ -232,7 +240,7 @@ class _OpenStarterPackState extends ConsumerState<OpenStarterPack> {
                 ),
                 actions: [
                   longButton(
-                    name: "share",
+                    name: AppLocalizations.of(context)!.share,
                     onPressed: () => _onShare(ref),
                     inverted: false,
                   ),
@@ -415,7 +423,7 @@ class _OpenStarterPackState extends ConsumerState<OpenStarterPack> {
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Text("People"),
+                            Text(AppLocalizations.of(context)!.people),
                             const SizedBox(width: 8),
                             Container(
                               padding: EdgeInsets.symmetric(
@@ -442,7 +450,7 @@ class _OpenStarterPackState extends ConsumerState<OpenStarterPack> {
                           ],
                         ),
                       ),
-                      Tab(text: "preview"),
+                      Tab(text: AppLocalizations.of(context)!.preview),
                     ],
                   ),
                 ),

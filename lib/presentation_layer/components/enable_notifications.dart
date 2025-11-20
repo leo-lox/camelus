@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:developer';
 import 'dart:io';
 
+import 'package:camelus/l10n/app_localizations.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -160,8 +161,8 @@ class PushNotificationToggleState
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                'Push Notifications',
+              Text(
+                AppLocalizations.of(context)!.pushNotifications,
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
               if (isLoading)
@@ -177,9 +178,8 @@ class PushNotificationToggleState
           const SizedBox(height: 8),
           Text(
             notificationsEnabled
-                // TODO translate
-                ? 'You will receive notifications about new replies.'
-                : 'Enable notifications to get notified about new replies',
+                ? AppLocalizations.of(context)!.receiveNotificationsAboutReplies
+                : AppLocalizations.of(context)!.enableNotificationsForReplies,
             style: TextStyle(
               color: Theme.of(context).colorScheme.inverseSurface,
               fontSize: 14,
@@ -190,8 +190,7 @@ class PushNotificationToggleState
             Padding(
               padding: const EdgeInsets.only(top: 8.0),
               child: Text(
-                // TODO translate
-                'Note: You previously denied notifications. Please enable them in your device settings to receive notifications.',
+                AppLocalizations.of(context)!.notificationsDeniedInSettings,
                 style: TextStyle(
                   color: Colors.orangeAccent, // hard coded color
                   fontSize: 12,

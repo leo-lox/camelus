@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:camelus/l10n/app_localizations.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_link_previewer/flutter_link_previewer.dart';
@@ -189,7 +190,7 @@ class PostContentWidget extends ConsumerWidget {
                   ),
                   const SizedBox(height: 16),
                   longButton(
-                    name: "show",
+                    name: AppLocalizations.of(context)!.show,
                     onPressed: () {
                       ref
                               .read(isContentRevealedProvider(post.id).notifier)

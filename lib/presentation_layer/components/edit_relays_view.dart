@@ -1,5 +1,6 @@
 import 'dart:developer';
 import 'package:camelus/domain_layer/entities/relay.dart';
+import 'package:camelus/l10n/app_localizations.dart';
 import 'package:camelus/presentation_layer/atoms/long_button.dart';
 import 'package:camelus/presentation_layer/providers/edit_relays_provider.dart';
 import 'package:flutter/material.dart';
@@ -45,12 +46,13 @@ class _EditRelaysViewState extends ConsumerState<EditRelaysView> {
       showDialog(
         context: context,
         builder: (BuildContext context) {
+          final l10n = AppLocalizations.of(context)!;
           return AlertDialog(
-            title: const Text("Relay already exists"),
-            content: const Text("A relay with this name already exists."),
+            title: Text(l10n.relayAlreadyExists),
+            content: Text(l10n.relayAlreadyExistsMessage),
             actions: [
               TextButton(
-                child: const Text("OK"),
+                child: Text(l10n.ok),
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
@@ -114,18 +116,19 @@ class _EditRelaysViewState extends ConsumerState<EditRelaysView> {
     showDialog(
       context: context,
       builder: (BuildContext context) {
+        final l10n = AppLocalizations.of(context)!;
         return AlertDialog(
-          title: const Text("Discard changes?"),
-          content: const Text("Do you want to discard your changes?"),
+          title: Text(l10n.discardChanges),
+          content: Text(l10n.discardChangesMessage),
           actions: [
             TextButton(
-              child: const Text("Cancel"),
+              child: Text(l10n.cancel),
               onPressed: () {
                 Navigator.of(context).pop();
               },
             ),
             TextButton(
-              child: const Text("Discard"),
+              child: Text(l10n.discard),
               onPressed: () {
                 Navigator.of(context).pop();
                 Navigator.of(context).pop();
@@ -153,7 +156,7 @@ class _EditRelaysViewState extends ConsumerState<EditRelaysView> {
                   CircularProgressIndicator(),
                   SizedBox(height: 20),
                   Text(
-                    "reconnecting to relays...",
+                    AppLocalizations.of(context)!.reconnectingToRelays,
                     style: TextStyle(
                       color: Theme.of(context).colorScheme.onSurface,
                     ),
@@ -168,7 +171,7 @@ class _EditRelaysViewState extends ConsumerState<EditRelaysView> {
                   child: TextField(
                     controller: _relayNameController,
                     decoration: InputDecoration(
-                      hintText: " add relay",
+                      hintText: AppLocalizations.of(context)!.addRelay,
                       enabledBorder: OutlineInputBorder(
                         borderSide: BorderSide(
                           color: Theme.of(context).colorScheme.inverseSurface,
@@ -231,7 +234,7 @@ class _EditRelaysViewState extends ConsumerState<EditRelaysView> {
                                 //activeColor: Theme.of(context).colorScheme.primary,
                               ),
                               Text(
-                                'read',
+                                AppLocalizations.of(context)!.read,
                                 style: TextStyle(
                                   color: Theme.of(
                                     context,
@@ -254,7 +257,7 @@ class _EditRelaysViewState extends ConsumerState<EditRelaysView> {
                                 },
                               ),
                               Text(
-                                'write',
+                                AppLocalizations.of(context)!.write,
                                 style: TextStyle(
                                   color: Theme.of(
                                     context,
@@ -279,20 +282,23 @@ class _EditRelaysViewState extends ConsumerState<EditRelaysView> {
                                   showDialog(
                                     context: context,
                                     builder: (BuildContext context) {
+                                      final l10n = AppLocalizations.of(
+                                        context,
+                                      )!;
                                       return AlertDialog(
-                                        title: const Text("Delete relay"),
-                                        content: const Text(
-                                          "Are you sure you want to delete this relay?",
+                                        title: Text(l10n.deleteRelay),
+                                        content: Text(
+                                          l10n.unsavedChangesMessage,
                                         ),
                                         actions: [
                                           TextButton(
-                                            child: const Text("Cancel"),
+                                            child: Text(l10n.cancel),
                                             onPressed: () {
                                               Navigator.of(context).pop();
                                             },
                                           ),
                                           TextButton(
-                                            child: const Text("Delete"),
+                                            child: Text(l10n.delete),
                                             onPressed: () {
                                               setState(() {
                                                 touched = true;
@@ -308,7 +314,7 @@ class _EditRelaysViewState extends ConsumerState<EditRelaysView> {
                                 },
                               ),
                               Text(
-                                'delete',
+                                AppLocalizations.of(context)!.delete,
                                 style: TextStyle(
                                   color: Theme.of(
                                     context,
@@ -329,7 +335,7 @@ class _EditRelaysViewState extends ConsumerState<EditRelaysView> {
                     bottom: 10,
                   ),
                   child: longButton(
-                    name: "save",
+                    name: AppLocalizations.of(context)!.save,
                     onPressed: _saveRelays,
                     inverted: true,
                     disabled: !touched,

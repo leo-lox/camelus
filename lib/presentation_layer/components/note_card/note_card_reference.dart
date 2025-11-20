@@ -1,3 +1,4 @@
+import 'package:camelus/l10n/app_localizations.dart';
 import 'package:camelus/presentation_layer/components/note_card/note_card.dart';
 import 'package:camelus/helpers/helpers.dart';
 import 'package:camelus/helpers/nevent_helper.dart';
@@ -68,7 +69,7 @@ class NoteCardReference extends ConsumerWidget {
               child: Padding(
                 padding: EdgeInsets.symmetric(horizontal: 0, vertical: 20),
                 child: Text(
-                  "Note not found",
+                  AppLocalizations.of(context)!.noteNotFound,
                   style: TextStyle(
                     color: Theme.of(context).colorScheme.onSurface,
                     fontSize: 17,

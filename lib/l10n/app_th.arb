@@ -194,5 +194,171 @@
   "addingToBookmarks": "กำลังเพิ่มไปยังบุ๊กมาร์ก...",
   "removingFromBookmarks": "กำลังลบออกจากบุ๊กมาร์ก...",
   "failedToAddBookmark": "ไม่สามารถเพิ่มบุ๊กมาร์กได้",
-  "failedToRemoveBookmark": "ไม่สามารถลบบุ๊กมาร์กได้"
+  "failedToRemoveBookmark": "ไม่สามารถลบบุ๊กมาร์กได้",
+  "all": "ทั้งหมด",
+  "mentions": "การกล่าวถึง",
+  "preview": "ตัวอย่าง",
+  "relayAlreadyExists": "รีเลย์มีอยู่แล้ว",
+  "relayAlreadyExistsMessage": "รีเลย์นี้ถูกเพิ่มแล้ว",
+  "discardChanges": "ยกเลิกการเปลี่ยนแปลง",
+  "discardChangesMessage": "คุณต้องการยกเลิกการเปลี่ยนแปลงหรือไม่?",
+  "deleteRelay": "ลบรีเลย์",
+  "delete": "ลบ",
+  "noTextFoundInClipboard": "ไม่พบข้อความในคลิปบอร์ด",
+  "pleaseEnterValidBunkerUrl": "กรุณาป้อน URL bunker ที่ถูกต้อง",
+  "failedToConnectToBunker": "ไม่สามารถเชื่อมต่อกับ bunker ได้",
+  "reactedToYourPost": "ตอบสนองต่อโพสต์ของคุณ",
+  "repliedToYourPost": "ตอบกลับโพสต์ของคุณ",
+  "mentionedYouInThread": "กล่าวถึงคุณในเธรด",
+  "repostedYourPost": "แชร์โพสต์ของคุณ",
+  "mentionedYou": "กล่าวถึงคุณ",
+  "interactedWithYourPost": "โต้ตอบกับโพสต์ของคุณ",
+  "whenSomeoneInteractsWithYourPosts": "เมื่อมีคนโต้ตอบกับโพสต์ของคุณ",
+  "noNotifications": "ไม่มีการแจ้งเตือน",
+  "endOfNotifications": "สิ้นสุดการแจ้งเตือน",
+  "trends": "เทรนด์",
+  "recentStarterPacks": "แพ็กเกจเริ่มต้นล่าสุด",
+  "noResultsFound": "ไม่พบผลลัพธ์",
+  "people": "ผู้คน",
+  "notes": "โน้ต",
+  "searchForHashtags": "ค้นหาแฮชแท็ก",
+  "nip05Address": "ที่อยู่ NIP-05",
+  "repostHasNoInformation": "การโพสต์ซ้ำนี้ไม่มีข้อมูล",
+  "invalidSignature": "ลายเซ็นไม่ถูกต้อง",
+  "deletionRequested": "ขอการลบ",
+  "unknownStarterPack": "แพ็กเกจเริ่มต้นที่ไม่รู้จัก",
+  "noStarterPacksFound": "ไม่พบแพ็กเกจเริ่มต้น",
+  "searchToAddUser": "ค้นหาเพื่อเพิ่มผู้ใช้",
+  "noServersFound": "ไม่พบเซิร์ฟเวอร์",
+  "noFilterFound": "ไม่พบตัวกรอง",
+  "replyToPrefix": "ตอบกลับถึง",
+  "andMoreCount": "และอีก {count} รายการ",
+  "@andMoreCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "noteNotFound": "ไม่พบโน้ต",
+  "shared": " แชร์",
+  "loadingMightFail": "การโหลดอาจล้มเหลว",
+  "bugReportMessage": "รายงานข้อบกพร่อง",
+  "noMoreNotesToShow": "ไม่มีโน้ตเพิ่มเติมให้แสดง",
+  "trendingPeople": "ผู้คนที่กำลังมาแรง",
+  "trendingHashtags": "แฮชแท็กที่กำลังมาแรง",
+  "somethingWentWrong": "เกิดข้อผิดพลาดบางอย่าง",
+  "noConnection": "ไม่มีการเชื่อมต่อ",
+  "reconnectingToRelays": "กำลังเชื่อมต่อกับรีเลย์อีกครั้ง",
+  "addRelay": "เพิ่มรีเลย์",
+  "read": "อ่าน",
+  "write": "เขียน",
+  "starterPack": "แพ็กเกจเริ่มต้น",
+  "deleteStarterPack": "ลบแพ็กเกจเริ่มต้น",
+  "deleteStarterPackConfirm": "คุณแน่ใจหรือไม่ว่าต้องการลบแพ็กเกจเริ่มต้นนี้? การดำเนินการนี้ไม่สามารถยกเลิกได้",
+  "share": "แชร์",
+  "starterPackBy": "แพ็กเกจเริ่มต้นโดย {author}",
+  "@starterPackBy": {
+    "placeholders": {
+      "author": {
+        "type": "String"
+      }
+    }
+  },
+  "you": "คุณ",
+  "addToStarterPackTitle": "เพิ่ม {name} ไปยังแพ็กเกจเริ่มต้น",
+  "@addToStarterPackTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "createNewStarterPack": "สร้างแพ็กเกจเริ่มต้นใหม่",
+  "upload": "อัปโหลด",
+  "createYourStarterPack": "สร้างแพ็กเกจเริ่มต้นของคุณ",
+  "inviteFriendsToFollow": "เชิญเพื่อนของคุณให้ติดตามคนโปรดของคุณ",
+  "title": "ชื่อเรื่อง",
+  "description": "คำอธิบาย",
+  "yourStarterPack": "แพ็กเกจเริ่มต้นของคุณ",
+  "shareWithFriends": "แชร์กับเพื่อนของคุณและช่วยพวกเขาค้นพบคนที่น่าทึ่ง!",
+  "shareStarterPack": "แชร์แพ็กเกจเริ่มต้น",
+  "publishStarterPack": "เผยแพร่แพ็กเกจเริ่มต้น",
+  "addUsersToContinue": "เพิ่มผู้ใช้เพื่อดำเนินการต่อ",
+  "addUserMenuHint": "เพิ่มผู้ใช้ไปยังรายการ",
+  "show": "แสดง",
+  "pushNotifications": "การแจ้งเตือนแบบพุช",
+  "receiveNotificationsAboutReplies": "รับการแจ้งเตือนเกี่ยวกับการตอบกลับ",
+  "enableNotificationsForReplies": "เปิดใช้งานการแจ้งเตือนสำหรับการตอบกลับ",
+  "notificationsDeniedInSettings": "การแจ้งเตือนถูกปฏิเสธในการตั้งค่า",
+  "welcomeTo": "ยินดีต้อนรับสู่",
+  "joinTheConversation": "เข้าร่วมการสนทนา",
+  "errorLoadingNote": "เกิดข้อผิดพลาดในการโหลดโน้ต",
+  "errorPrefix": "ข้อผิดพลาด: {error}",
+  "@errorPrefix": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "errorProcessingLink": "เกิดข้อผิดพลาดในการประมวลผลลิงก์",
+  "processingLink": "กำลังประมวลผลลิงก์",
+  "noMatchingActionFound": "ไม่พบการดำเนินการที่ตรงกัน",
+  "worksOnlyIfInCache": "ใช้งานได้เฉพาะเมื่ออยู่ในแคช",
+  "mastodonAddress": "ที่อยู่ Mastodon",
+  "amberLogin": "เข้าสู่ระบบ Amber",
+  "seedPhraseLogin": "เข้าสู่ระบบด้วยวลีเริ่มต้น",
+  "bunkerLogin": "เข้าสู่ระบบ Bunker",
+  "iHaveReadAndAcceptThe": "ฉันได้อ่านและยอมรับ",
+  "installAmber": "ติดตั้ง Amber",
+  "authoriseAmber": "อนุญาต Amber",
+  "connect": "เชื่อมต่อ",
+  "followCount": "ดำเนินการต่อกับ {count}/{target} คน",
+  "@followCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "target": {
+        "type": "int"
+      }
+    }
+  },
+  "notAvailable": "ไม่พร้อมใช้งาน",
+  "post": "โพสต์",
+  "newPostsCount": "{count} โพสต์ใหม่",
+  "@newPostsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "noteReference": "การอ้างอิงโน้ต",
+  "createStarterPack": "สร้างแพ็กเกจเริ่มต้น",
+  "createAnother": "สร้างอีกอัน",
+  "starterPackIsLive": "🎉 แพ็กเกจเริ่มต้นของคุณเผยแพร่แล้ว!",
+  "searchHint": "ค้นหา",
+  "bunkerUrlHint": "bunker://",
+  "continueWithPeople": "ดำเนินการต่อกับ {count} คน",
+  "@continueWithPeople": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "unknown": "ไม่ทราบ",
+  "follow": "ติดตาม",
+  "unfollow": "เลิกติดตาม",
+  "invalidBunkerUrl": "URL bunker ไม่ถูกต้อง ต้องเริ่มต้นด้วย bunker://",
+  "failedToConnectWithError": "ไม่สามารถเชื่อมต่อได้: {error}",
+  "@failedToConnectWithError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  }
 }

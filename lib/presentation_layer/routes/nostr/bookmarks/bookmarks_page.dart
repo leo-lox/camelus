@@ -144,7 +144,9 @@ class _BookmarksPageState extends ConsumerState<BookmarksPage>
                     return const SpinnerCenter();
                   } else if (snapshot.hasError) {
                     return ListTile(
-                      title: Text('Error loading note'), // TODO translate
+                      title: Text(
+                        AppLocalizations.of(context)!.errorLoadingNote,
+                      ),
                       subtitle: Text(snapshot.error.toString()),
                     );
                   } else {

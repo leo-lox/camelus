@@ -226,7 +226,7 @@ class _OnboardingOpenStarterPackState
                                 )
                                 .userMetadata
                                 ?.name ??
-                            "Unknown",
+                            AppLocalizations.of(context)!.unknown,
                       ),
                       style: TextStyle(
                         color: Theme.of(context).colorScheme.inverseSurface,

@@ -1,3 +1,4 @@
+import 'package:camelus/l10n/app_localizations.dart';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
@@ -71,7 +72,7 @@ class _EditStarterPackMetaState extends ConsumerState<EditStarterPackMeta> {
           targetWidth: 400,
           roundUi: false,
           aspectRatio: 16 / 6,
-          buttonText: "upload",
+          buttonText: AppLocalizations.of(context)!.upload,
           imageData: uneditedImage,
         ),
       ),
@@ -146,7 +147,7 @@ class _EditStarterPackMetaState extends ConsumerState<EditStarterPackMeta> {
                   const SizedBox(height: 40),
                   // Title
                   Text(
-                    'create your starter pack',
+                    AppLocalizations.of(context)!.createYourStarterPack,
                     style: TextStyle(
                       color: Theme.of(context).colorScheme.onSurface,
                       fontSize: 28,
@@ -156,7 +157,7 @@ class _EditStarterPackMetaState extends ConsumerState<EditStarterPackMeta> {
                   ),
                   // Subtitle
                   Text(
-                    'Invite your friends to follow your favorite people',
+                    AppLocalizations.of(context)!.inviteFriendsToFollow,
                     style: TextStyle(
                       color: Theme.of(
                         context,
@@ -202,7 +203,7 @@ class _EditStarterPackMetaState extends ConsumerState<EditStarterPackMeta> {
                                       CircularProgressIndicator(strokeWidth: 2),
                                       SizedBox(height: 8),
                                       Text(
-                                        'Uploading...',
+                                        AppLocalizations.of(context)!.uploading,
                                         style: TextStyle(
                                           color: Theme.of(
                                             context,
@@ -230,7 +231,7 @@ class _EditStarterPackMetaState extends ConsumerState<EditStarterPackMeta> {
                       Align(
                         alignment: Alignment.centerLeft,
                         child: Text(
-                          'Title',
+                          AppLocalizations.of(context)!.title,
                           style: TextStyle(
                             color: Theme.of(
                               context,
@@ -263,7 +264,8 @@ class _EditStarterPackMetaState extends ConsumerState<EditStarterPackMeta> {
                             suffixText: '${starterPackData.title.length}/40',
                             suffixStyle: TextStyle(
                               color: starterPackData.title.length > 40
-                                  ? Colors.orangeAccent //! hard coded color
+                                  ? Colors
+                                        .orangeAccent //! hard coded color
                                   : Theme.of(
                                       context,
                                     ).colorScheme.inverseSurface,
@@ -278,7 +280,7 @@ class _EditStarterPackMetaState extends ConsumerState<EditStarterPackMeta> {
                       Align(
                         alignment: Alignment.centerLeft,
                         child: Text(
-                          'Description',
+                          AppLocalizations.of(context)!.description,
                           style: TextStyle(
                             color: Theme.of(
                               context,
@@ -331,7 +333,7 @@ class _EditStarterPackMetaState extends ConsumerState<EditStarterPackMeta> {
                 width: double.infinity,
                 height: 40,
                 child: longButton(
-                  name: "next",
+                  name: AppLocalizations.of(context)!.next,
                   inverted: true,
                   onPressed: () {
                     widget.onNext();

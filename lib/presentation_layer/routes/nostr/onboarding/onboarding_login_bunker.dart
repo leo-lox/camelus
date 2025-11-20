@@ -1,4 +1,5 @@
 import 'package:camelus/domain_layer/usecases/app_auth.dart';
+import 'package:camelus/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -35,7 +36,7 @@ class _OnboardingLoginBunkerPageState
   void _pasteFromClipboard() async {
     final data = await Clipboard.getData(Clipboard.kTextPlain);
     if (data == null || data.text == null) {
-      _showError('No text found in clipboard');
+      _showError(AppLocalizations.of(context)!.noTextFoundInClipboard);
       return;
     }
     _bunkerUrlController.text = data.text!;
@@ -49,7 +50,7 @@ class _OnboardingLoginBunkerPageState
         _bunkerUrl = url;
       });
     } else {
-      _showError('Invalid bunker URL. Must start with bunker://');
+      _showError(AppLocalizations.of(context)!.invalidBunkerUrl);
       setState(() {
         _bunkerUrl = null;
       });
@@ -63,11 +64,12 @@ class _OnboardingLoginBunkerPageState
   }
 
   void _onBunkerLogin() async {
+    final l10n = AppLocalizations.of(context)!;
     if (!_termsAndConditions) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            'Please read and accept the terms and conditions first',
+            l10n.pleaseReadAndAcceptTerms,
             style: TextStyle(
               color: Theme.of(context).colorScheme.onSurface,
               fontSize: 12,
@@ -80,7 +82,7 @@ class _OnboardingLoginBunkerPageState
     }
 
     if (_bunkerUrl == null || _bunkerUrl!.isEmpty) {
-      _showError('Please enter a valid bunker URL');
+      _showError(l10n.pleaseEnterValidBunkerUrl);
       return;
     }
 
@@ -97,7 +99,7 @@ class _OnboardingLoginBunkerPageState
       );
 
       if (connection == null) {
-        _showError('Failed to connect to bunker');
+        _showError(AppLocalizations.of(context)!.failedToConnectToBunker);
         setState(() {
           _bunkerLoading = false;
         });
@@ -128,7 +130,9 @@ class _OnboardingLoginBunkerPageState
       // Navigate to home page
       context.go('/home');
     } catch (e) {
-      _showError('Failed to connect: ${e.toString()}');
+      _showError(
+        AppLocalizations.of(context)!.failedToConnectWithError(e.toString()),
+      );
       setState(() {
         _bunkerLoading = false;
       });
@@ -198,7 +202,7 @@ class _OnboardingLoginBunkerPageState
                   textCapitalization: TextCapitalization.none,
                   decoration: InputDecoration(
                     isDense: true,
-                    hintText: 'bunker://',
+                    hintText: AppLocalizations.of(context)!.bunkerUrlHint,
                     hintStyle: TextStyle(
                       color: Theme.of(context).colorScheme.onSurface,
                       letterSpacing: 1.1,
@@ -281,7 +285,7 @@ class _OnboardingLoginBunkerPageState
                     ),
                   ),
                   Text(
-                    "I have read and accept the ",
+                    AppLocalizations.of(context)!.iHaveReadAndAcceptThe,
                     style: TextStyle(
                       color: Theme.of(context).colorScheme.onSurface,
                       fontSize: 12,
@@ -327,7 +331,7 @@ class _OnboardingLoginBunkerPageState
                 width: 400,
                 height: 40,
                 child: longButton(
-                  name: "connect",
+                  name: AppLocalizations.of(context)!.connect,
                   inverted: true,
                   loading: _bunkerLoading,
                   onPressed: () => _onBunkerLogin(),

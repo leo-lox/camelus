@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:developer';
 
+import 'package:camelus/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -29,7 +30,7 @@ class TrendingPeopleWidget extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            "trending people",
+            AppLocalizations.of(context)!.trendingPeople,
             style: TextStyle(
               color: Theme.of(context).colorScheme.onSurface,
               fontSize: 25,
@@ -69,7 +70,7 @@ class _TrendingPeopleList extends ConsumerWidget {
         if (snapshot.hasError) {
           log(snapshot.error.toString());
           return Text(
-            'Something went wrong', // TODO translate
+            AppLocalizations.of(context)!.somethingWentWrong,
             style: TextStyle(
               color: Theme.of(context).colorScheme.inverseSurface,
             ),
@@ -88,7 +89,7 @@ class _TrendingPeopleList extends ConsumerWidget {
 
         if (snapshot.connectionState == ConnectionState.done) {
           return Text(
-            'No connection', // TODO translate
+            AppLocalizations.of(context)!.noConnection,
             style: TextStyle(
               color: Theme.of(context).colorScheme.inverseSurface,
             ),

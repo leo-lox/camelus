@@ -1,3 +1,4 @@
+import 'package:camelus/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
@@ -98,7 +99,7 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
               focusNode: _searchFocusNode,
               decoration: InputDecoration(
                 isDense: true,
-                hintText: ' Search',
+                hintText: ' ${AppLocalizations.of(context)!.searchHint}',
                 hintStyle: TextStyle(
                   color: Theme.of(context).colorScheme.onSurface,
                   letterSpacing: 1.1,

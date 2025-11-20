@@ -153,7 +153,11 @@ class SettingsFileServersPageState extends ConsumerState<SettingsFileServers> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text('Error: $error'),
+                      Text(
+                        AppLocalizations.of(
+                          context,
+                        )!.errorPrefix(error.toString()),
+                      ),
                       const SizedBox(height: 25),
                       longButton(
                         inverted: true,

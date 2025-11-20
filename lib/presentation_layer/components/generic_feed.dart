@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:camelus/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_list_view/flutter_list_view.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -146,8 +147,10 @@ class _GenericFeedState extends ConsumerState<GenericFeed>
                     bottom: TabBar(
                       controller: _tabController!,
                       tabs: [
-                        const Tab(text: "Posts"),
-                        const Tab(text: "Posts and Replies"),
+                        Tab(text: AppLocalizations.of(context)!.posts),
+                        Tab(
+                          text: AppLocalizations.of(context)!.postsAndReplies,
+                        ),
                       ],
                     ),
                   ),
@@ -172,7 +175,9 @@ class _GenericFeedState extends ConsumerState<GenericFeed>
                   newPostsAvailable(
                     controller: newPostsController,
                     dismissThreshold: NEW_POSTS_DISMISS_THRESHOLD,
-                    name: "${genericFeedStateP.newRootNotes.length} new posts",
+                    name: AppLocalizations.of(
+                      context,
+                    )!.newPostsCount(genericFeedStateP.newRootNotes.length),
                     onPressed: () {
                       genericFeedStateNotifier.integrateNewNotes();
                       _scrollToTop();
@@ -201,8 +206,9 @@ class _GenericFeedState extends ConsumerState<GenericFeed>
                       controller: newPostsController,
                       onDismissed: _newPostControllerDismissed,
                       dismissThreshold: NEW_POSTS_DISMISS_THRESHOLD,
-                      name:
-                          "${genericFeedStateP.newRootAndReplyNotes.length} new posts",
+                      name: AppLocalizations.of(context)!.newPostsCount(
+                        genericFeedStateP.newRootAndReplyNotes.length,
+                      ),
                       onPressed: () {
                         genericFeedStateNotifier.integrateNewNotes();
                         _scrollToTop();

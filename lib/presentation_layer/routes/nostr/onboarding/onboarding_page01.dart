@@ -1,3 +1,4 @@
+import 'package:camelus/l10n/app_localizations.dart';
 import 'package:camelus/presentation_layer/atoms/long_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -25,14 +26,14 @@ class _OnboardingPage01State extends ConsumerState<OnboardingPage01> {
           children: [
             const Spacer(flex: 10),
             Text(
-              "welcome to",
+              AppLocalizations.of(context)!.welcomeTo,
               style: TextStyle(
                 color: Theme.of(context).colorScheme.onSurface,
                 fontSize: MediaQuery.of(context).size.width / 22,
               ),
             ),
             Text(
-              "camelus",
+              AppLocalizations.of(context)!.camelus,
               style: TextStyle(
                 color: Theme.of(context).colorScheme.onSurface,
                 fontSize: MediaQuery.of(context).size.width / 7,
@@ -45,7 +46,7 @@ class _OnboardingPage01State extends ConsumerState<OnboardingPage01> {
               width: 400,
               height: 40,
               child: longButton(
-                name: "join the conversation",
+                name: AppLocalizations.of(context)!.joinTheConversation,
                 onPressed: (() {
                   widget.registerCallback();
                 }),
@@ -58,7 +59,7 @@ class _OnboardingPage01State extends ConsumerState<OnboardingPage01> {
               width: 400,
               height: 40,
               child: longButton(
-                name: "login",
+                name: AppLocalizations.of(context)!.login,
                 onPressed: (() {
                   widget.loginCallback();
                 }),

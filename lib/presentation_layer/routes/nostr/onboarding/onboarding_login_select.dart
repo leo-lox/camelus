@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:camelus/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -63,7 +64,7 @@ class _OnboardingLoginSelectPageState
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      "login",
+                      AppLocalizations.of(context)!.login,
                       style: TextStyle(
                         color: Theme.of(context).colorScheme.onSurface,
                         fontSize: 40,
@@ -80,7 +81,7 @@ class _OnboardingLoginSelectPageState
                   width: 400,
                   height: 40,
                   child: longButton(
-                    name: "amber login",
+                    name: AppLocalizations.of(context)!.amberLogin,
                     inverted: false,
                     onPressed: () => widget.onPressedAmberLogin(),
                   ),
@@ -91,7 +92,7 @@ class _OnboardingLoginSelectPageState
                 width: 400,
                 height: 40,
                 child: longButton(
-                  name: "seed phrase login",
+                  name: AppLocalizations.of(context)!.seedPhraseLogin,
                   inverted: false,
                   onPressed: () => widget.onPressedSeedPhraseLogin(),
                 ),
@@ -102,7 +103,7 @@ class _OnboardingLoginSelectPageState
                 width: 400,
                 height: 40,
                 child: longButton(
-                  name: "bunker login",
+                  name: AppLocalizations.of(context)!.bunkerLogin,
                   inverted: false,
                   onPressed: () => widget.onPressedBunkerLogin(),
                 ),

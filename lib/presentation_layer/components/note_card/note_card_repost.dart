@@ -1,3 +1,4 @@
+import 'package:camelus/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
@@ -30,7 +31,7 @@ class NoteCardRepost extends ConsumerWidget {
     );
 
     if (noteEtag == null) {
-      return Text("Repost has no information where to fetch the post");
+      return Text(AppLocalizations.of(context)!.repostHasNoInformation);
     }
 
     final displayNoteStream = notesP.getNote(noteEtag.value);
@@ -73,7 +74,10 @@ class NoteCardRepost extends ConsumerWidget {
                           fontSize: 15,
                         ),
                       ),
-                      TextSpan(text: ' shared', style: TextStyle(fontSize: 14)),
+                      TextSpan(
+                        text: AppLocalizations.of(context)!.shared,
+                        style: TextStyle(fontSize: 14),
+                      ),
                     ],
                   ),
                 ),

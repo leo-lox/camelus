@@ -1,3 +1,4 @@
+import 'package:camelus/l10n/app_localizations.dart';
 import 'package:camelus/presentation_layer/atoms/long_button.dart';
 import 'package:camelus/domain_layer/entities/onboarding_user_info.dart';
 import 'package:camelus/presentation_layer/atoms/my_profile_picture.dart';
@@ -294,7 +295,9 @@ class _OnboardingFollowGraphState extends ConsumerState<OnboardingFollowGraph> {
               child: longButton(
                 loading: _loading,
                 disabled: followedList.length < followTarget,
-                name: "follow ${followedList.length}/$followTarget",
+                name: AppLocalizations.of(
+                  context,
+                )!.followCount(followedList.length, followTarget),
                 onPressed: (() {
                   widget.submitCallback(followedList);
                 }),

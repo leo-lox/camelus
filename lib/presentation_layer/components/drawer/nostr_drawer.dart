@@ -1,3 +1,4 @@
+import 'package:camelus/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -96,7 +97,7 @@ class NostrDrawer extends ConsumerWidget {
                   ),
                   children: [
                     TextSpan(
-                      text: ' Following  ',
+                      text: ' ${AppLocalizations.of(context)!.following}  ',
                       style: TextStyle(
                         color: Theme.of(context).colorScheme.onSurfaceVariant,
                         fontSize: 13,
@@ -109,14 +110,14 @@ class NostrDrawer extends ConsumerWidget {
               const SizedBox(width: 6),
               RichText(
                 text: TextSpan(
-                  text: 'n.a.',
+                  text: AppLocalizations.of(context)!.notAvailable,
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     color: Theme.of(context).colorScheme.onSurface,
                   ),
                   children: [
                     TextSpan(
-                      text: 'Followers',
+                      text: AppLocalizations.of(context)!.followers,
                       style: TextStyle(
                         color: Theme.of(context).colorScheme.onSurfaceVariant,
                         fontSize: 13,

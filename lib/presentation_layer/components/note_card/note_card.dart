@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:camelus/domain_layer/entities/parsed_post.dart';
+import 'package:camelus/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -135,9 +136,12 @@ class NoteCard extends ConsumerWidget {
             color: Theme.of(context).colorScheme.error,
             borderRadius: BorderRadius.all(Radius.circular(25)),
           ),
-          child: const Padding(
+          child: Padding(
             padding: EdgeInsets.symmetric(horizontal: 25, vertical: 8),
-            child: Text("Invalid signature!", style: TextStyle(fontSize: 15)),
+            child: Text(
+              AppLocalizations.of(context)!.invalidSignature,
+              style: TextStyle(fontSize: 15),
+            ),
           ),
         ),
       ),

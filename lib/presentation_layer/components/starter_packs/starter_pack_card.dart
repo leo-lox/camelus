@@ -1,3 +1,4 @@
+import 'package:camelus/l10n/app_localizations.dart';
 import 'package:camelus/presentation_layer/atoms/my_profile_picture.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -62,7 +63,8 @@ class _StarterPackCardState extends ConsumerState<StarterPackCard> {
                     children: [
                       // Title
                       Text(
-                        widget.pack.title ?? "Starter Pack",
+                        widget.pack.title ??
+                            AppLocalizations.of(context)!.starterPack,
                         style: const TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
