@@ -253,7 +253,10 @@ class _EditStarterPackMetaState extends ConsumerState<EditStarterPackMeta> {
                           onChanged: starterPackNotifier.updateTitle,
                           style: TextStyle(fontSize: 18),
                           decoration: InputDecoration(
-                            filled: true,
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+
                             contentPadding: const EdgeInsets.all(16),
                             suffixText: '${starterPackData.title.length}/40',
                             suffixStyle: TextStyle(
@@ -297,8 +300,10 @@ class _EditStarterPackMetaState extends ConsumerState<EditStarterPackMeta> {
                           maxLines: null,
                           expands: true,
                           textAlignVertical: TextAlignVertical.top,
-                          decoration: const InputDecoration(
-                            filled: true,
+                          decoration: InputDecoration(
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
                             contentPadding: EdgeInsets.all(16),
                           ),
                         ),
