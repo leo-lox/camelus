@@ -250,12 +250,10 @@ class _EditStarterPackMetaState extends ConsumerState<EditStarterPackMeta> {
                         ),
                         child: TextField(
                           controller: _titleController,
-                          onChanged: (value) {
-                            starterPackNotifier.updateTitle(value);
-                          },
+                          onChanged: starterPackNotifier.updateTitle,
                           style: TextStyle(fontSize: 18),
                           decoration: InputDecoration(
-                            border: InputBorder.none,
+                            filled: true,
                             contentPadding: const EdgeInsets.all(16),
                             suffixText: '${starterPackData.title.length}/40',
                             suffixStyle: TextStyle(
@@ -294,15 +292,13 @@ class _EditStarterPackMetaState extends ConsumerState<EditStarterPackMeta> {
                         ),
                         child: TextField(
                           controller: _descriptionController,
-                          onChanged: (value) {
-                            starterPackNotifier.updateDescription(value);
-                          },
+                          onChanged: starterPackNotifier.updateDescription,
                           style: TextStyle(fontSize: 16),
                           maxLines: null,
                           expands: true,
                           textAlignVertical: TextAlignVertical.top,
                           decoration: const InputDecoration(
-                            border: InputBorder.none,
+                            filled: true,
                             contentPadding: EdgeInsets.all(16),
                           ),
                         ),
