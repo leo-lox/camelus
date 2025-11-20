@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:camelus/config/dicebear.dart';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -38,6 +39,31 @@ class UserImage extends StatelessWidget {
     }
 
     final pictureUrl = imageUrl!;
+
+    // Check if it's a data URI
+    if (pictureUrl.startsWith('data:')) {
+      try {
+        final base64String = pictureUrl.split(',').last;
+        final bytes = base64Decode(base64String);
+        return ClipOval(
+          child: SizedBox.fromSize(
+            size: Size.fromRadius(size / 2),
+            child: Container(
+              color: Theme.of(context).colorScheme.surface,
+              child: Image.memory(
+                bytes,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return Icon(Icons.error);
+                },
+              ),
+            ),
+          ),
+        );
+      } catch (e) {
+        // Fallback if decoding fails
+      }
+    }
 
     // Check if it's a GIF and should be disabled
     if (disableGif && pictureUrl.toLowerCase().endsWith('.gif')) {

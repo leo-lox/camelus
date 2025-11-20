@@ -9,140 +9,20 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
-import '../../domain_layer/entities/contact_list.dart';
-import '../../domain_layer/entities/nostr_note.dart';
-import '../../domain_layer/entities/user_metadata.dart';
-import '../../domain_layer/usecases/search.dart';
-import '../components/note_card/nostr_parser.dart';
-import '../components/note_card/note_card_container.dart';
-import '../components/person_card.dart';
-import '../components/search_bar.dart';
-import '../components/starter_packs/trending_starter_packs/trending_starter_packs.dart';
-import '../components/trends/trending_people_widget.dart';
-import '../providers/app_bar_provider/app_bottom_bar_provider.dart';
-import '../providers/following_contact_state_provider.dart';
-import '../providers/ndk_provider.dart';
-import '../providers/search_provider.dart';
-import 'nostr/profile/profile_page_2.dart';
-
-class SearchState {
-  final bool isSearching;
-  final String searchQuery;
-  final bool isLoading;
-  final List<UserMetadata> searchResultsUsers;
-  final List<NostrNote> searchResultsNotes;
-  final String? error;
-
-  const SearchState({
-    this.isSearching = false,
-    this.searchQuery = '',
-    this.isLoading = false,
-    this.searchResultsUsers = const [],
-    this.searchResultsNotes = const [],
-    this.error,
-  });
-
-  SearchState copyWith({
-    bool? isSearching,
-    String? searchQuery,
-    bool? isLoading,
-    List<UserMetadata>? searchResultsUsers,
-    List<NostrNote>? searchResultsNotes,
-    String? error,
-  }) {
-    return SearchState(
-      isSearching: isSearching ?? this.isSearching,
-      searchQuery: searchQuery ?? this.searchQuery,
-      isLoading: isLoading ?? this.isLoading,
-      searchResultsUsers: searchResultsUsers ?? this.searchResultsUsers,
-      searchResultsNotes: searchResultsNotes ?? this.searchResultsNotes,
-      error: error,
-    );
-  }
-}
-
-class SearchStateNotifier extends StateNotifier<SearchState> {
-  SearchStateNotifier(this._searchService) : super(const SearchState());
-
-  final Search _searchService;
-  Timer? _debounceTimer;
-
-  @override
-  void dispose() {
-    _debounceTimer?.cancel();
-    super.dispose();
-  }
-
-  void setSearching(bool isSearching) {
-    if (state.isSearching != isSearching) {
-      state = state.copyWith(isSearching: isSearching);
-    }
-  }
-
-  void setSearchQuery(String query) {
-    state = state.copyWith(searchQuery: query, error: null);
-
-    // Cancel previous timer
-    _debounceTimer?.cancel();
-
-    if (query.isEmpty) {
-      clearSearch(stillSearching: true);
-      return;
-    }
-
-    if (query.length < 2) {
-      clearSearch(stillSearching: true);
-      return;
-    }
-
-    // Debounce search
-    _debounceTimer = Timer(const Duration(milliseconds: 50), () {
-      _performSearch(query);
-    });
-  }
-
-  Future<void> _performSearch(String query) async {
-    if (query != state.searchQuery) return; // query changed, ignore
-
-    state = state.copyWith(isLoading: true, error: null);
-
-    try {
-      // perform searches in parallel
-      final results = await Future.wait([
-        _searchService.searchMetadata(query),
-        _searchService.searchNotes(search: query, kinds: [1], limit: 10),
-      ]);
-
-      // only update if query hasn't changed
-      if (query == state.searchQuery) {
-        state = state.copyWith(
-          isLoading: false,
-          searchResultsUsers: results[0] as List<UserMetadata>,
-          searchResultsNotes: results[1] as List<NostrNote>,
-        );
-      }
-    } catch (e) {
-      if (query == state.searchQuery) {
-        state = state.copyWith(isLoading: false, error: e.toString());
-      }
-    }
-  }
-
-  void clearSearch({bool stillSearching = false}) {
-    _debounceTimer?.cancel();
-    state = SearchState(isSearching: stillSearching);
-  }
-
-  void setSearchResultsUsers(List<UserMetadata> users) {
-    state = state.copyWith(searchResultsUsers: users);
-  }
-}
-
-final searchStateProvider =
-    StateNotifierProvider<SearchStateNotifier, SearchState>((ref) {
-      final searchService = ref.read(searchProvider);
-      return SearchStateNotifier(searchService);
-    });
+import '../../../domain_layer/entities/contact_list.dart';
+import '../../../domain_layer/entities/nostr_note.dart';
+import '../../../domain_layer/entities/user_metadata.dart';
+import '../../components/note_card/nostr_parser.dart';
+import '../../components/note_card/note_card_container.dart';
+import '../../components/person_card.dart';
+import '../../components/search_bar.dart';
+import '../../components/starter_packs/trending_starter_packs/trending_starter_packs.dart';
+import '../../components/trends/trending_people_widget.dart';
+import '../../providers/app_bar_provider/app_bottom_bar_provider.dart';
+import '../../providers/following_contact_state_provider.dart';
+import '../../providers/ndk_provider.dart';
+import '../nostr/profile/profile_page_2.dart';
+import 'search_state_notifier.dart';
 
 class SearchPage extends ConsumerStatefulWidget {
   const SearchPage({super.key});
@@ -207,8 +87,29 @@ class _SearchPageState extends ConsumerState<SearchPage> {
   }
 
   void _onSubmit(String value) {
-    if (mounted) {
-      context.push('/nostr/search', extra: value);
+    if (!mounted) return;
+
+    final trimmedValue = value.trim();
+
+    // 1. Check for Nostr Bech32 patterns (npub, note, nevent, nprofile, naddr)
+    // This regex allows optional "nostr:" prefix and matches the bech32 string
+    final nostrRegex = RegExp(
+      r'^(?:nostr:)?((?:npub1|note1|nevent1|nprofile1|naddr1)[a-z0-9]+)$',
+      caseSensitive: false,
+    );
+
+    final match = nostrRegex.firstMatch(trimmedValue);
+
+    if (match != null) {
+      // Extract the code without the 'nostr:' prefix if it existed
+      final code = match.group(1)!;
+
+      // 2. Push to the root route which is handled by DeeplinkRecieverPage
+      // See lib/routes.dart line 188
+      context.push('/$code');
+    } else {
+      // 3. Fallback to standard text search
+      context.push('/nostr/search', extra: trimmedValue);
     }
   }
 

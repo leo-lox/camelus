@@ -27,7 +27,7 @@ import 'presentation_layer/routes/nostr/relays_page.dart';
 import 'presentation_layer/routes/nostr/search_feed_page/search_feed_page.dart';
 import 'presentation_layer/routes/nostr/settings/theme/theme_settings.dart';
 import 'presentation_layer/routes/notification_page.dart';
-import 'presentation_layer/routes/search_page.dart';
+import 'presentation_layer/routes/search/search_page.dart';
 import 'presentation_layer/routes/nostr/settings/file_servers/settings_file_servers.dart';
 import 'presentation_layer/routes/nostr/settings/inital_route/inital_route_settings.dart';
 import 'presentation_layer/routes/nostr/settings/locale/locale_settings.dart';

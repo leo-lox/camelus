@@ -10,7 +10,7 @@ import '../../../atoms/my_profile_picture.dart';
 import '../../../atoms/nip_05_text.dart';
 import '../../../providers/metadata_state_provider.dart';
 import '../../../providers/search_provider.dart';
-import '../../../routes/search_page.dart';
+import '../../../routes/search/search_state_notifier.dart';
 import '../../search_bar.dart';
 import 'edit_starter_pack_provider.dart';
 
