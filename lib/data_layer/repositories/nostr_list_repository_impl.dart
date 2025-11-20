@@ -72,15 +72,10 @@ class NostrListRepositoryImpl implements NostrListRepository {
   }
 
   @override
-  Future<NostrList?> getSingleList({
-    required int kind,
-  }) async {
-    final signer = dartNdkSource.dartNdk.accounts.getLoggedAccount()?.signer;
-    if (signer == null) return null;
-
+  Future<NostrList?> getSingleList({required int kind}) async {
     final ndkList = await dartNdkSource.dartNdk.lists.getSingleNip51List(
       kind,
-      signer,
+
       forceRefresh: false,
     );
 
