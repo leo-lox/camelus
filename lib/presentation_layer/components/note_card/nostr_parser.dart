@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:flutter/foundation.dart';
+import 'package:ndk/shared/nips/nip19/nip19.dart';
 
 import '../../../domain_layer/entities/nostr_note.dart';
 import '../../../domain_layer/entities/parsed_post.dart';
@@ -123,6 +124,18 @@ class NostrParser {
             metadata: _extractNoteIdFromNostr(matchText),
           ),
         );
+      } else if (matchText.startsWith('nostr:nevent1')) {
+        final short = matchText.replaceFirst('nostr:', '');
+        final nevent = Nip19.decodeNevent(short);
+        if (nevent.kind == 1) {
+          segments.add(
+            ContentSegment(
+              content: 'Note reference',
+              type: ContentType.noteReference,
+              metadata: matchText,
+            ),
+          );
+        }
       } else if (matchText.startsWith('#')) {
         segments.add(
           ContentSegment(

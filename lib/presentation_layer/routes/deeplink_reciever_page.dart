@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:ndk/shared/nips/nip19/nip19.dart';
 
 import '../../domain_layer/entities/invite_data.dart';
 import '../../domain_layer/entities/starter_pack_identifier.dart';
@@ -112,14 +113,11 @@ class _DeeplinkRecieverPageState extends ConsumerState<DeeplinkRecieverPage> {
       }
       _pushNote(noteId: noteId);
     } else if (myMatch.contains("nevent")) {
-      final map = NeventHelper().bech32ToMap(myMatch);
-      final String eventId = map['eventId'];
+      final nevent = Nip19.decodeNevent(myMatch);
 
-      if (eventId.isEmpty) {
-        return;
+      if (nevent.kind == 1) {
+        _pushNote(noteId: nevent.eventId);
       }
-
-      _pushNote(noteId: eventId);
     } else if (myMatch.contains("@")) {
       final nip05P = providerContainer.read(nip05provider);
       final nip05Data = await nip05P.get(myMatch);
