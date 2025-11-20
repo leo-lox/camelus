@@ -1,15 +1,15 @@
 import 'dart:ui';
 
-import 'package:camelus/domain_layer/entities/parsed_post.dart';
-import 'package:camelus/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../data_layer/models/post_context.dart';
 import '../../../domain_layer/entities/nostr_note.dart';
+import '../../../domain_layer/entities/parsed_post.dart';
 import '../../../domain_layer/entities/user_metadata.dart';
 import '../../../domain_layer/usecases/app_auth.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../atoms/my_profile_picture.dart';
 import '../../providers/ndk_provider.dart';
 import '../../providers/reactions_state_provider.dart';
