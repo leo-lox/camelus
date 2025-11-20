@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../../config/palette.dart';
 import '../../domain_layer/entities/parsed_post.dart';
 import 'note_card/note_card_container.dart';
 
@@ -99,9 +98,9 @@ class DepthIndicator extends StatelessWidget {
             decoration: BoxDecoration(
               color: isHighlighted && i == depth - 1
                   ? Theme.of(context).colorScheme.primary
-                  : Paletter.getLightGray(
-                      context,
-                    ).withValues(alpha: _calculateOpacity(i + 1)),
+                  : Theme.of(context).colorScheme.inverseSurface.withValues(
+                      alpha: _calculateOpacity(i + 1),
+                    ),
               // borderRadius: BorderRadius.vertical(
               //   top: Radius.circular(25),
               //   bottom: Radius.circular(25),

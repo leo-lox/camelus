@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:camelus/l10n/app_localizations.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_link_previewer/flutter_link_previewer.dart';
@@ -8,7 +9,6 @@ import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
-import '../../../config/palette.dart';
 import '../../../domain_layer/entities/parsed_post.dart';
 import '../../atoms/long_button.dart';
 import '../../providers/link_preview_state_provider.dart';
@@ -78,7 +78,11 @@ class PostContentWidget extends ConsumerWidget {
               child: Container(
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Paletter.getDarkGray(context)),
+                  border: Border.all(
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.surfaceContainerHighest,
+                  ),
                 ),
                 child: LinkPreview(
                   linkStyle: TextStyle(
@@ -186,7 +190,7 @@ class PostContentWidget extends ConsumerWidget {
                   ),
                   const SizedBox(height: 16),
                   longButton(
-                    name: "show",
+                    name: AppLocalizations.of(context)!.show,
                     onPressed: () {
                       ref
                               .read(isContentRevealedProvider(post.id).notifier)

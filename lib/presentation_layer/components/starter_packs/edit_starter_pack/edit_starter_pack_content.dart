@@ -1,8 +1,8 @@
+import 'package:camelus/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
-import '../../../../config/palette.dart';
 import '../../../../domain_layer/entities/starter_pack_identifier.dart';
 
 import '../../../atoms/long_button.dart';
@@ -125,8 +125,10 @@ class _EditStarterPackContentState
                   height: 40,
                   child: longButton(
                     name: starterPackData.selectedUsers.isEmpty
-                        ? "add users to continue"
-                        : "continue with ${starterPackData.selectedUsers.length} people",
+                        ? AppLocalizations.of(context)!.addUsersToContinue
+                        : AppLocalizations.of(context)!.continueWithPeople(
+                            starterPackData.selectedUsers.length,
+                          ),
                     inverted: true,
                     disabled: starterPackData.selectedUsers.isEmpty,
                     onPressed: () {
@@ -198,12 +200,15 @@ class _EditStarterPackContentState
             heightFactor: 5,
             child: Column(
               children: [
-                Text("search to add user", style: TextStyle(fontSize: 18)),
                 Text(
-                  "you can also use the three dots menu on every post to add a user to a pack",
+                  AppLocalizations.of(context)!.searchToAddUser,
+                  style: TextStyle(fontSize: 18),
+                ),
+                Text(
+                  AppLocalizations.of(context)!.addUserMenuHint,
                   style: TextStyle(
                     fontSize: 12,
-                    color: Paletter.getLightGray(context),
+                    color: Theme.of(context).colorScheme.inverseSurface,
                   ),
                 ),
               ],
@@ -260,7 +265,7 @@ class PersonSelect extends ConsumerWidget {
                 Text(
                   metadata?.about ?? "",
                   style: TextStyle(
-                    color: Paletter.getGray(context),
+                    color: Theme.of(context).colorScheme.inverseSurface,
                     fontSize: 12,
                   ),
                   maxLines: 3,

@@ -1,3 +1,4 @@
+import 'package:camelus/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 
 Widget followButton({
@@ -24,7 +25,7 @@ Widget followButton({
               ),
             ),
             child: Text(
-              'unfollow',
+              AppLocalizations.of(context)!.unfollow,
               style: TextStyle(
                 color: Theme.of(context).colorScheme.onSurface,
                 fontSize: 16,
@@ -54,7 +55,7 @@ Widget followButton({
             ),
           ),
           child: Text(
-            'follow',
+            AppLocalizations.of(context)!.follow,
             style: TextStyle(
               color: Theme.of(context).colorScheme.surface,
               fontSize: 16,

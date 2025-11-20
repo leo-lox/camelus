@@ -1,10 +1,10 @@
 import 'dart:developer';
 
+import 'package:camelus/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../config/palette.dart';
 import '../../../domain_layer/entities/nostr_band_hashtags.dart';
 import '../../atoms/hashtag_card.dart';
 import '../../providers/nostr_band_provider.dart';
@@ -26,7 +26,7 @@ class TrendingHashtagsWidget extends ConsumerWidget {
         children: [
           if (showHeading)
             Text(
-              "trending hashtags",
+              AppLocalizations.of(context)!.trendingHashtags,
               style: TextStyle(
                 color: Theme.of(context).colorScheme.onSurface,
                 fontSize: 25,
@@ -40,8 +40,10 @@ class TrendingHashtagsWidget extends ConsumerWidget {
               if (snapshot.hasError) {
                 log(snapshot.error.toString());
                 return Text(
-                  'Something went wrong',
-                  style: TextStyle(color: Paletter.getGray(context)),
+                  AppLocalizations.of(context)!.somethingWentWrong,
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.inverseSurface,
+                  ),
                 );
               }
 
@@ -51,8 +53,10 @@ class TrendingHashtagsWidget extends ConsumerWidget {
 
               if (snapshot.connectionState == ConnectionState.done) {
                 return Text(
-                  'No connection',
-                  style: TextStyle(color: Paletter.getGray(context)),
+                  AppLocalizations.of(context)!.noConnection,
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.inverseSurface,
+                  ),
                 );
               }
 

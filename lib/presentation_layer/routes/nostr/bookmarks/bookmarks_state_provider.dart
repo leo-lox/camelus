@@ -39,11 +39,13 @@ class BookmarksNotifier extends StateNotifier<BookmarksState> {
   StreamSubscription? _subscription;
 
   BookmarksNotifier(this.ref)
-      : super(BookmarksState(
+    : super(
+        BookmarksState(
           isLoading: true,
           publicBookmarks: [],
           privateBookmarks: [],
-        )) {
+        ),
+      ) {
     _loadBookmarks();
   }
 
@@ -127,13 +129,15 @@ class BookmarksNotifier extends StateNotifier<BookmarksState> {
     // Update local state
     if (isPrivate) {
       state = state.copyWith(
-        privateBookmarks:
-            state.privateBookmarks.where((n) => n.id != eventId).toList(),
+        privateBookmarks: state.privateBookmarks
+            .where((n) => n.id != eventId)
+            .toList(),
       );
     } else {
       state = state.copyWith(
-        publicBookmarks:
-            state.publicBookmarks.where((n) => n.id != eventId).toList(),
+        publicBookmarks: state.publicBookmarks
+            .where((n) => n.id != eventId)
+            .toList(),
       );
     }
   }
@@ -147,5 +151,5 @@ class BookmarksNotifier extends StateNotifier<BookmarksState> {
 
 final bookmarksStateProvider =
     StateNotifierProvider<BookmarksNotifier, BookmarksState>((ref) {
-  return BookmarksNotifier(ref);
-});
+      return BookmarksNotifier(ref);
+    });

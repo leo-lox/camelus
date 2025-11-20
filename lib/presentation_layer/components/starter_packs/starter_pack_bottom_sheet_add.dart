@@ -5,7 +5,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
-import '../../../config/palette.dart';
 import '../../../domain_layer/entities/nostr_list.dart';
 import '../../../domain_layer/entities/starter_pack_identifier.dart';
 import '../../../helpers/helpers.dart';
@@ -61,7 +60,7 @@ class _StarterPackSelectionBottomSheetState
             Text(
               'Add ${userToAddMetadata?.name ?? ""} to Starter Pack',
               style: TextStyle(
-                color: Paletter.getLightGray(context),
+                color: Theme.of(context).colorScheme.inverseSurface,
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
               ),
@@ -80,7 +79,7 @@ class _StarterPackSelectionBottomSheetState
       width: 40,
       height: 4,
       decoration: BoxDecoration(
-        color: Paletter.getGray(context),
+        color: Theme.of(context).colorScheme.inverseSurface,
         borderRadius: BorderRadius.circular(2),
       ),
     );
@@ -127,12 +126,15 @@ class _StarterPackSelectionBottomSheetState
         Icon(
           PhosphorIcons.listPlus(),
           size: 30,
-          color: Paletter.getGray(context),
+          color: Theme.of(context).colorScheme.inverseSurface,
         ),
         const SizedBox(height: 16),
         Text(
           'No starter packs found',
-          style: TextStyle(color: Paletter.getLightGray(context), fontSize: 16),
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.inverseSurface,
+            fontSize: 16,
+          ),
         ),
         const SizedBox(height: 40),
         _buildCreateNewOption(context),
@@ -167,7 +169,7 @@ class _StarterPackSelectionBottomSheetState
               children: [
                 Icon(
                   PhosphorIcons.users(),
-                  color: Paletter.getGray(context),
+                  color: Theme.of(context).colorScheme.inverseSurface,
                   size: 20,
                 ),
                 const SizedBox(width: 16),
@@ -179,8 +181,8 @@ class _StarterPackSelectionBottomSheetState
                         pack.title ?? pack.name,
                         style: TextStyle(
                           color: showCheck
-                              ? Paletter.getGray(context)
-                              : Paletter.getLightGray(context),
+                              ? Theme.of(context).colorScheme.inverseSurface
+                              : Theme.of(context).colorScheme.inverseSurface,
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
                         ),
@@ -189,7 +191,7 @@ class _StarterPackSelectionBottomSheetState
                         Text(
                           '${pack.elements.length} members',
                           style: TextStyle(
-                            color: Paletter.getGray(context),
+                            color: Theme.of(context).colorScheme.inverseSurface,
                             fontSize: 12,
                           ),
                         ),
@@ -219,14 +221,14 @@ class _StarterPackSelectionBottomSheetState
         PhosphorIcons.check(),
         color: wasJustAdded
             ? Theme.of(context).colorScheme.primary
-            : Paletter.getGray(context),
+            : Theme.of(context).colorScheme.inverseSurface,
         size: 16,
       );
     }
 
     return Icon(
       PhosphorIcons.plus(),
-      color: Paletter.getGray(context),
+      color: Theme.of(context).colorScheme.inverseSurface,
       size: 16,
     );
   }
@@ -243,7 +245,9 @@ class _StarterPackSelectionBottomSheetState
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: BoxDecoration(
               border: Border.all(
-                color: Paletter.getGray(context).withValues(alpha: 0.3),
+                color: Theme.of(
+                  context,
+                ).colorScheme.inverseSurface.withValues(alpha: 0.3),
               ),
               borderRadius: BorderRadius.circular(8),
             ),
@@ -251,7 +255,7 @@ class _StarterPackSelectionBottomSheetState
               children: [
                 Icon(
                   PhosphorIcons.plus(),
-                  color: Paletter.getGray(context),
+                  color: Theme.of(context).colorScheme.inverseSurface,
                   size: 20,
                 ),
                 const SizedBox(width: 16),
@@ -259,7 +263,7 @@ class _StarterPackSelectionBottomSheetState
                   child: Text(
                     'Create new starter pack',
                     style: TextStyle(
-                      color: Paletter.getLightGray(context),
+                      color: Theme.of(context).colorScheme.inverseSurface,
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
                     ),

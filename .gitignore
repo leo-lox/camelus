@@ -79,3 +79,6 @@ dart_defines.json
 .flatpak-builder/
 build-dir/
 *.flatpak
+
+/lib/l10n/*.dart
+/untranslated-messages.txt

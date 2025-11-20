@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
-import '../../../../../config/palette.dart';
 import '../../../../providers/inital_route_provider.dart';
 
 // Provider to store the selected route
@@ -68,7 +67,9 @@ class InitalRouteSettingsState extends ConsumerState<InitalRouteSettings> {
           return ListTile(
             title: Text(
               _getRouteLabel(context, route),
-              style: TextStyle(color: Paletter.getLightGray(context)),
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.inverseSurface,
+              ),
             ),
             trailing: selectedRoute == route
                 ? Icon(

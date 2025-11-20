@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../config/palette.dart';
 import '../../../domain_layer/entities/nostr_note.dart';
 import '../../../domain_layer/entities/nostr_tag.dart';
 import '../../../helpers/helpers.dart';
@@ -63,7 +62,10 @@ class InReplyTo extends ConsumerWidget {
       children: [
         Text(
           "reply to ",
-          style: TextStyle(fontSize: 14, color: Paletter.getGray(context)),
+          style: TextStyle(
+            fontSize: 14,
+            color: Theme.of(context).colorScheme.inverseSurface,
+          ),
         ),
         GestureDetector(
           onTap: () {
@@ -96,7 +98,7 @@ class InReplyTo extends ConsumerWidget {
           Text(
             ' and $othersCount more',
             style: TextStyle(
-              color: Paletter.getDarkGray(context),
+              color: Theme.of(context).colorScheme.surfaceContainerHighest,
               fontSize: 14,
               height: 1.3,
             ),

@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:ui';
 
+import 'package:camelus/l10n/app_localizations.dart';
 import 'package:camelus/presentation_layer/atoms/spinner_center.dart';
 import 'package:camelus/presentation_layer/providers/metadata_state_provider.dart';
 import 'package:flutter/material.dart';
@@ -121,8 +122,12 @@ class _HomePageMobileState extends ConsumerState<HomePageMobile>
                         child: TabBar(
                           controller: tabController,
                           tabs: [
-                            Tab(text: "Posts"),
-                            Tab(text: "Posts and Replies"),
+                            Tab(text: AppLocalizations.of(context)!.posts),
+                            Tab(
+                              text: AppLocalizations.of(
+                                context,
+                              )!.postsAndReplies,
+                            ),
                           ],
                         ),
                       ),

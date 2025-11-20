@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../../config/palette.dart';
 
 class NoMoreNotes extends StatelessWidget {
   final Function? renderCallback;
@@ -28,7 +27,7 @@ class NoMoreNotes extends StatelessWidget {
           child: Text(
             text,
             style: TextStyle(
-              color: Paletter.getDarkGray(context),
+              color: Theme.of(context).colorScheme.surfaceContainerHighest,
               fontSize: 16,
             ),
           ),

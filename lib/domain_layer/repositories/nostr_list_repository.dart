@@ -18,9 +18,7 @@ abstract class NostrListRepository {
   });
 
   /// Get a single list (kind 10000-10030) for the logged-in user
-  Future<NostrList?> getSingleList({
-    required int kind,
-  });
+  Future<NostrList?> getSingleList({required int kind});
 
   /// Add an element to a list (kind 10000-10030)
   Future<NostrList> addElementToList({

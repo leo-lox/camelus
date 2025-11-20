@@ -2,8 +2,6 @@ import 'package:camelus/presentation_layer/components/note_card/bottom_action_ro
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
 
-import '../../../config/palette.dart';
-
 class SkeletonNote extends StatelessWidget {
   final Function? renderCallback;
   final bool hideBottomAction;
@@ -33,8 +31,10 @@ class SkeletonNote extends StatelessWidget {
             children: [
               // profile picture
               Shimmer.fromColors(
-                baseColor: Paletter.getExtraDarkGray(context),
-                highlightColor: Paletter.getDarkGray(context),
+                baseColor: Theme.of(context).colorScheme.surface,
+                highlightColor: Theme.of(
+                  context,
+                ).colorScheme.surfaceContainerHighest,
                 child: Container(
                   height: 60,
                   width: 60,
@@ -54,8 +54,10 @@ class SkeletonNote extends StatelessWidget {
                     children: [
                       // username
                       Shimmer.fromColors(
-                        baseColor: Paletter.getExtraDarkGray(context),
-                        highlightColor: Paletter.getDarkGray(context),
+                        baseColor: Theme.of(context).colorScheme.surface,
+                        highlightColor: Theme.of(
+                          context,
+                        ).colorScheme.surfaceContainerHighest,
                         child: Container(
                           height: 18,
                           width: 120,
@@ -71,8 +73,10 @@ class SkeletonNote extends StatelessWidget {
                       const SizedBox(height: 10),
 
                       Shimmer.fromColors(
-                        baseColor: Paletter.getExtraDarkGray(context),
-                        highlightColor: Paletter.getDarkGray(context),
+                        baseColor: Theme.of(context).colorScheme.surface,
+                        highlightColor: Theme.of(
+                          context,
+                        ).colorScheme.surfaceContainerHighest,
                         child: Container(
                           height: 12,
                           width: MediaQuery.of(context).size.width / 2.5,
@@ -86,8 +90,10 @@ class SkeletonNote extends StatelessWidget {
                       ),
                       const SizedBox(height: 10),
                       Shimmer.fromColors(
-                        baseColor: Paletter.getExtraDarkGray(context),
-                        highlightColor: Paletter.getDarkGray(context),
+                        baseColor: Theme.of(context).colorScheme.surface,
+                        highlightColor: Theme.of(
+                          context,
+                        ).colorScheme.surfaceContainerHighest,
                         child: Container(
                           height: 12,
                           width: 50,

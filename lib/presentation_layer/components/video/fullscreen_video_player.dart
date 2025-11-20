@@ -5,7 +5,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:video_player/video_player.dart';
 
-import '../../../config/palette.dart';
 import 'video_player_state_provider.dart';
 
 class FullScreenVideoPlayer extends ConsumerStatefulWidget {
@@ -121,9 +120,13 @@ class _FullScreenVideoPlayerState extends ConsumerState<FullScreenVideoPlayer> {
                       controller,
                       allowScrubbing: true,
                       colors: VideoProgressColors(
-                        backgroundColor: Paletter.getDarkGray(context),
-                        bufferedColor: Paletter.getGray(context),
-                        playedColor: Paletter.getExtraLightGray(context),
+                        backgroundColor: Theme.of(
+                          context,
+                        ).colorScheme.surfaceContainerHighest,
+                        bufferedColor: Theme.of(
+                          context,
+                        ).colorScheme.inverseSurface,
+                        playedColor: Theme.of(context).colorScheme.onSurface,
                       ),
                     ),
                     SizedBox(height: 10),

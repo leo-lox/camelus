@@ -1,19 +1,14 @@
-import 'dart:convert';
-
 import 'package:bip32/bip32.dart' as bip32;
 import 'package:camelus/l10n/app_localizations.dart';
 import 'package:camelus/presentation_layer/atoms/long_button.dart';
-import 'package:camelus/config/palette.dart';
 import 'package:camelus/helpers/bip340.dart';
 import 'package:camelus/helpers/helpers.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hex/hex.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:ndk/ndk.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:bip39_mnemonic/bip39_mnemonic.dart';
@@ -275,10 +270,12 @@ class _OnboardingLoginPageState extends ConsumerState<OnboardingLoginPage> {
                                 width: MediaQuery.of(context).size.width,
                                 height: 200,
                                 decoration: BoxDecoration(
-                                  color: Paletter.getExtraDarkGray(context),
+                                  color: Theme.of(context).colorScheme.surface,
                                   borderRadius: BorderRadius.circular(10),
                                   border: Border.all(
-                                    color: Paletter.getDarkGray(context),
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.surfaceContainerHighest,
                                     width: 1,
                                   ),
                                 ),
@@ -356,10 +353,12 @@ class _OnboardingLoginPageState extends ConsumerState<OnboardingLoginPage> {
                               const SizedBox(height: 10),
                               Container(
                                 decoration: BoxDecoration(
-                                  color: Paletter.getExtraDarkGray(context),
+                                  color: Theme.of(context).colorScheme.surface,
                                   borderRadius: BorderRadius.circular(10),
                                   border: Border.all(
-                                    color: Paletter.getDarkGray(context),
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.surfaceContainerHighest,
                                     width: 1,
                                   ),
                                 ),
@@ -393,33 +392,22 @@ class _OnboardingLoginPageState extends ConsumerState<OnboardingLoginPage> {
                               hintText: AppLocalizations.of(
                                 context,
                               )!.enterSeedPhraseOrNsec,
-                              hintStyle: TextStyle(
-                                color: Theme.of(context).colorScheme.onSurface,
-                                letterSpacing: 1.1,
-                              ),
+                              hintStyle: TextStyle(letterSpacing: 1.1),
                               filled: true,
-                              fillColor: Paletter.getExtraDarkGray(context),
                               enabledBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.all(
                                   Radius.circular(10),
-                                ),
-                                borderSide: BorderSide(
-                                  color: Paletter.getExtraDarkGray(context),
                                 ),
                               ),
                               focusedBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.all(
                                   Radius.circular(10),
                                 ),
-                                borderSide: BorderSide(
-                                  color: Paletter.getGray(context),
-                                ),
                               ),
                               errorBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.all(
                                   Radius.circular(10),
                                 ),
-                                borderSide: BorderSide(color: Colors.purple),
                               ),
                             ),
                           ),
@@ -614,10 +602,12 @@ class _OnboardingLoginPageState extends ConsumerState<OnboardingLoginPage> {
                     width: 100,
                     height: 40,
                     decoration: BoxDecoration(
-                      color: Paletter.getExtraDarkGray(context),
+                      color: Theme.of(context).colorScheme.surface,
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(
-                        color: Paletter.getDarkGray(context),
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.surfaceContainerHighest,
                         width: 1,
                       ),
                     ),
@@ -630,7 +620,9 @@ class _OnboardingLoginPageState extends ConsumerState<OnboardingLoginPage> {
                           Text(
                             (index + 1).toString(),
                             style: TextStyle(
-                              color: Paletter.getGray(context),
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.inverseSurface,
                               fontSize: 12,
                             ),
                           ),
@@ -638,7 +630,7 @@ class _OnboardingLoginPageState extends ConsumerState<OnboardingLoginPage> {
                           Text(
                             _userWords[index],
                             style: TextStyle(
-                              color: Paletter.getExtraLightGray(context),
+                              color: Theme.of(context).colorScheme.onSurface,
                               fontSize: 16,
                             ),
                           ),
@@ -664,7 +656,9 @@ class _OnboardingLoginPageState extends ConsumerState<OnboardingLoginPage> {
                             Text(
                               (index + 1).toString(),
                               style: TextStyle(
-                                color: Paletter.getGray(context),
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.inverseSurface,
                                 fontSize: 12,
                               ),
                             ),
@@ -672,7 +666,7 @@ class _OnboardingLoginPageState extends ConsumerState<OnboardingLoginPage> {
                             Text(
                               _userWords[index],
                               style: TextStyle(
-                                color: Paletter.getExtraLightGray(context),
+                                color: Theme.of(context).colorScheme.onSurface,
                                 fontSize: 16,
                               ),
                             ),

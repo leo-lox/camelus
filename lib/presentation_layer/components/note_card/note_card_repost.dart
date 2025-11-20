@@ -1,9 +1,9 @@
+import 'package:camelus/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../config/palette.dart';
 import '../../../domain_layer/entities/nostr_note.dart';
 import '../../../domain_layer/entities/nostr_tag.dart';
 import '../../../helpers/helpers.dart';
@@ -31,7 +31,7 @@ class NoteCardRepost extends ConsumerWidget {
     );
 
     if (noteEtag == null) {
-      return Text("Repost has no information where to fetch the post");
+      return Text(AppLocalizations.of(context)!.repostHasNoInformation);
     }
 
     final displayNoteStream = notesP.getNote(noteEtag.value);
@@ -61,7 +61,9 @@ class NoteCardRepost extends ConsumerWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   text: TextSpan(
-                    style: TextStyle(color: Paletter.getGray(context)),
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.inverseSurface,
+                    ),
                     children: [
                       TextSpan(
                         text:
@@ -72,7 +74,10 @@ class NoteCardRepost extends ConsumerWidget {
                           fontSize: 15,
                         ),
                       ),
-                      TextSpan(text: ' shared', style: TextStyle(fontSize: 14)),
+                      TextSpan(
+                        text: AppLocalizations.of(context)!.shared,
+                        style: TextStyle(fontSize: 14),
+                      ),
                     ],
                   ),
                 ),
@@ -103,7 +108,9 @@ class NoteCardRepost extends ConsumerWidget {
                             "repostId: ${repostEvent.id} ${repostEvent.sources}",
                             style: TextStyle(
                               fontSize: 10,
-                              color: Paletter.getDarkGray(context),
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.surfaceContainerHighest,
                             ),
                           ),
                         ],

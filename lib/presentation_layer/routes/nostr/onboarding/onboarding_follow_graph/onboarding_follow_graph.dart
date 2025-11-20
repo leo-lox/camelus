@@ -1,5 +1,5 @@
+import 'package:camelus/l10n/app_localizations.dart';
 import 'package:camelus/presentation_layer/atoms/long_button.dart';
-import 'package:camelus/config/palette.dart';
 import 'package:camelus/domain_layer/entities/onboarding_user_info.dart';
 import 'package:camelus/presentation_layer/atoms/my_profile_picture.dart';
 import 'package:camelus/presentation_layer/providers/metadata_provider.dart';
@@ -230,7 +230,7 @@ class _OnboardingFollowGraphState extends ConsumerState<OnboardingFollowGraph> {
                       duration: const Duration(milliseconds: 250),
                       curve: Curves.easeInOut,
                       decoration: BoxDecoration(
-                        color: Paletter.getExtraDarkGray(context),
+                        color: Theme.of(context).colorScheme.surface,
                         border: Border.all(
                           color: data.selected
                               ? Theme.of(context).colorScheme.onSurface
@@ -263,7 +263,9 @@ class _OnboardingFollowGraphState extends ConsumerState<OnboardingFollowGraph> {
                     child: Container(
                       width: distance,
                       height: 2,
-                      color: Paletter.getDarkGray(context),
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.surfaceContainerHighest,
                       alignment: Alignment.center,
                       child: _scale > 0.5
                           ? Text(
@@ -277,8 +279,8 @@ class _OnboardingFollowGraphState extends ConsumerState<OnboardingFollowGraph> {
             ),
             const SizedBox(height: 10),
             Slider(
-              inactiveColor: Paletter.getExtraDarkGray(context),
-              activeColor: Paletter.getLightGray(context),
+              inactiveColor: Theme.of(context).colorScheme.surface,
+              activeColor: Theme.of(context).colorScheme.inverseSurface,
               value: _scale,
               min: _graphController.minScale,
               max: 1.0,
@@ -293,7 +295,9 @@ class _OnboardingFollowGraphState extends ConsumerState<OnboardingFollowGraph> {
               child: longButton(
                 loading: _loading,
                 disabled: followedList.length < followTarget,
-                name: "follow ${followedList.length}/$followTarget",
+                name: AppLocalizations.of(
+                  context,
+                )!.followCount(followedList.length, followTarget),
                 onPressed: (() {
                   widget.submitCallback(followedList);
                 }),

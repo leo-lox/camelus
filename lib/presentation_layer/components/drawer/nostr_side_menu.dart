@@ -8,7 +8,6 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../../../config/palette.dart';
 import '../../../helpers/nprofile_helper.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../providers/ndk_provider.dart';
@@ -137,7 +136,7 @@ class NostrSideMenu extends ConsumerWidget {
               style: TextStyle(
                 color: isSelected
                     ? Theme.of(context).colorScheme.primary
-                    : Paletter.getLightGray(context),
+                    : Theme.of(context).colorScheme.inverseSurface,
                 fontSize: 17,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
               ),
@@ -154,7 +153,7 @@ class NostrSideMenu extends ConsumerWidget {
       child: Text(
         text,
         style: TextStyle(
-          color: Paletter.getExtraLightGray(context),
+          color: Theme.of(context).colorScheme.onSurface,
           fontSize: 16,
         ),
       ),
@@ -162,7 +161,10 @@ class NostrSideMenu extends ConsumerWidget {
   }
 
   Widget _divider(BuildContext context) {
-    return Divider(thickness: 0.3, color: Paletter.getDarkGray(context));
+    return Divider(
+      thickness: 0.3,
+      color: Theme.of(context).colorScheme.surfaceContainerHighest,
+    );
   }
 
   @override

@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../../config/palette.dart';
-
 class AppLogo extends StatelessWidget {
   const AppLogo({super.key});
 
@@ -11,7 +9,7 @@ class AppLogo extends StatelessWidget {
       "camelus",
       style: TextStyle(
         letterSpacing: 1.2,
-        color: Paletter.getLightGray(context),
+        color: Theme.of(context).colorScheme.inverseSurface,
         fontSize: 20,
         fontWeight: FontWeight.normal,
         fontFamily: "Poppins",
