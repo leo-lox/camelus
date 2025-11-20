@@ -42,4 +42,12 @@ class HttpRequestDataSource {
     }
     return response.bodyBytes;
   }
+
+  Future<http.Response> postRequest(
+    String url, {
+    Map<String, String>? headers,
+    Object? body,
+  }) async {
+    return await _client.post(Uri.parse(url), headers: headers, body: body);
+  }
 }

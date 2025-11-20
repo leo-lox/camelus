@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:developer';
 import 'package:http/http.dart' as http;
 import 'package:camelus/helpers/nprofile_helper.dart';
+import 'package:camelus/data_layer/data_sources/http_request_data_source.dart';
 
 import 'package:riverpod/riverpod.dart';
 
@@ -48,9 +49,11 @@ class SearchState {
 }
 
 class SearchStateNotifier extends StateNotifier<SearchState> {
-  SearchStateNotifier(this._searchService) : super(const SearchState());
+  SearchStateNotifier(this._searchService, this._httpRequestDataSource)
+    : super(const SearchState());
 
   final Search _searchService;
+  final HttpRequestDataSource _httpRequestDataSource;
   Timer? _debounceTimer;
 
   @override
@@ -160,8 +163,8 @@ class SearchStateNotifier extends StateNotifier<SearchState> {
 
   Future<List<UserMetadata>> _searchNpubWorld(String query) async {
     try {
-      final response = await http.post(
-        Uri.parse('https://npub.world/?/search'),
+      final response = await _httpRequestDataSource.postRequest(
+        'https://npub.world/?/search',
         headers: {
           'Origin': 'https://npub.world',
           'Referer': 'https://npub.world/',
@@ -261,5 +264,7 @@ class SearchStateNotifier extends StateNotifier<SearchState> {
 final searchStateProvider =
     StateNotifierProvider<SearchStateNotifier, SearchState>((ref) {
       final searchService = ref.read(searchProvider);
-      return SearchStateNotifier(searchService);
+      final client = http.Client();
+      final httpRequestDataSource = HttpRequestDataSource(client);
+      return SearchStateNotifier(searchService, httpRequestDataSource);
     });
