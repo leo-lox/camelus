@@ -1,4 +1,8 @@
 import 'dart:async';
+import 'dart:convert';
+import 'dart:developer';
+import 'package:http/http.dart' as http;
+import 'package:camelus/helpers/nprofile_helper.dart';
 
 import 'package:riverpod/riverpod.dart';
 
@@ -86,28 +90,162 @@ class SearchStateNotifier extends StateNotifier<SearchState> {
   Future<void> _performSearch(String query) async {
     if (query != state.searchQuery) return; // query changed, ignore
 
-    state = state.copyWith(isLoading: true, error: null);
+    state = state.copyWith(
+      isLoading: true,
+      error: null,
+      searchResultsUsers: [],
+      searchResultsNotes: [],
+    );
 
-    try {
-      // perform searches in parallel
-      final results = await Future.wait([
-        _searchService.searchMetadata(query),
-        _searchService.searchNotes(search: query, kinds: [1], limit: 10),
-      ]);
+    final t1 = _searchService
+        .searchMetadata(query)
+        .then((users) {
+          if (query == state.searchQuery) _addUsers(users);
+        })
+        .catchError((e) {
+          log('Error searching metadata: $e');
+          return null;
+        });
 
-      // only update if query hasn't changed
-      if (query == state.searchQuery) {
-        state = state.copyWith(
-          isLoading: false,
-          searchResultsUsers: results[0] as List<UserMetadata>,
-          searchResultsNotes: results[1] as List<NostrNote>,
-        );
-      }
-    } catch (e) {
-      if (query == state.searchQuery) {
-        state = state.copyWith(isLoading: false, error: e.toString());
+    final t2 = _searchService
+        .searchNotes(search: query, kinds: [1], limit: 10)
+        .then((notes) {
+          if (query == state.searchQuery) {
+            state = state.copyWith(searchResultsNotes: notes);
+          }
+        })
+        .catchError((e) {
+          log('Error searching notes: $e');
+          return null;
+        });
+
+    final t3 = _searchNpubWorld(query)
+        .then((users) {
+          if (query == state.searchQuery) _addUsers(users);
+        })
+        .catchError((e) {
+          log('Error searching npub world: $e');
+          return null;
+        });
+
+    await Future.wait([t1, t2, t3]);
+
+    if (query == state.searchQuery) {
+      state = state.copyWith(isLoading: false);
+    }
+  }
+
+  void _addUsers(List<UserMetadata> newUsers) {
+    final currentUsers = state.searchResultsUsers;
+    final Map<String, UserMetadata> uniqueUsers = {};
+
+    for (final user in currentUsers) {
+      uniqueUsers[user.pubkey] = user;
+    }
+
+    for (final user in newUsers) {
+      if (uniqueUsers.containsKey(user.pubkey)) {
+        final existing = uniqueUsers[user.pubkey]!;
+        // Prefer user with eventId (from relay) over empty eventId (from npub.world)
+        if (existing.eventId.isEmpty && user.eventId.isNotEmpty) {
+          uniqueUsers[user.pubkey] = user;
+        }
+      } else {
+        uniqueUsers[user.pubkey] = user;
       }
     }
+
+    state = state.copyWith(searchResultsUsers: uniqueUsers.values.toList());
+  }
+
+  Future<List<UserMetadata>> _searchNpubWorld(String query) async {
+    try {
+      final response = await http.post(
+        Uri.parse('https://npub.world/?/search'),
+        headers: {
+          'Origin': 'https://npub.world',
+          'Referer': 'https://npub.world/',
+        },
+        body: {'q': query, 'limit': '10'},
+      );
+
+      if (response.statusCode == 200) {
+        final jsonResponse = jsonDecode(response.body);
+        if (jsonResponse['type'] == 'success' && jsonResponse['data'] != null) {
+          final String dataString = jsonResponse['data'];
+          final List<dynamic> data = jsonDecode(dataString);
+
+          if (data.isEmpty) return [];
+
+          final List<dynamic> indices = data[0];
+          final List<UserMetadata> users = [];
+
+          for (final index in indices) {
+            if (index is int && index < data.length) {
+              final schemaMap = data[index];
+              if (schemaMap is Map) {
+                final npubIndex = schemaMap['npub'];
+                final nameIndex = schemaMap['name'];
+                final pictureIndex = schemaMap['picture'];
+                final nip05Index = schemaMap['nip05'];
+
+                String? npub;
+                String? name;
+                String? picture;
+                String? nip05;
+
+                if (npubIndex is int &&
+                    npubIndex >= 0 &&
+                    npubIndex < data.length) {
+                  npub = data[npubIndex];
+                }
+                if (nameIndex is int &&
+                    nameIndex >= 0 &&
+                    nameIndex < data.length) {
+                  name = data[nameIndex];
+                }
+                if (pictureIndex is int &&
+                    pictureIndex >= 0 &&
+                    pictureIndex < data.length) {
+                  picture = data[pictureIndex];
+                }
+                if (nip05Index is int &&
+                    nip05Index >= 0 &&
+                    nip05Index < data.length) {
+                  nip05 = data[nip05Index];
+                }
+
+                if (npub != null) {
+                  try {
+                    final pubkey = NprofileHelper().nprofileOrNpubToMap(
+                      npub,
+                    )['pubkey'];
+                    users.add(
+                      UserMetadata(
+                        eventId: '',
+                        pubkey: pubkey,
+                        lastFetch:
+                            DateTime.now().millisecondsSinceEpoch ~/ 1000,
+                        name: "$name",
+                        picture: picture,
+                        nip05: nip05,
+                        about: "provided by npub.world",
+                      ),
+                    );
+                  } catch (e) {
+                    // Ignore invalid npubs
+                  }
+                }
+              }
+            }
+          }
+          return users;
+        }
+      }
+    } catch (e) {
+      log('Error searching npub.world: $e');
+    }
+    return [];
   }
 
   void clearSearch({bool stillSearching = false}) {
