@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:camelus/l10n/app_localizations.dart';
 import 'package:camelus/presentation_layer/components/full_screen_loading.dart';
+import 'package:camelus/presentation_layer/components/responsive_center.dart';
 import 'package:camelus/presentation_layer/providers/ndk_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -219,149 +220,194 @@ ${_privateKey.mnemonicSentence}
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(
-        children: [
-          AnimatedOpacity(
-            duration: const Duration(seconds: 3),
-            opacity: max(1 - _loadingOpacity, 0.07),
-            curve: Curves.easeOut,
-            child: Column(
-              children: [
-                Expanded(
-                  child: SingleChildScrollView(
-                    child: Column(
-                      children: [
-                        const SizedBox(height: 20),
-                        Text(
-                          AppLocalizations.of(context)!.recoveryPhrase,
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.onSurface,
-                            fontSize: 22,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 25),
-                        MnemonicSentenceGrid(
-                          words: _privateKey.mnemonicWords,
-                          isVisible: _isVisible,
-                        ),
-                        const SizedBox(height: 25),
-                        Padding(
-                          padding: const EdgeInsets.all(10.0),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              ElevatedButton.icon(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Theme.of(
-                                    context,
-                                  ).colorScheme.surface,
-                                  foregroundColor: Theme.of(
-                                    context,
-                                  ).colorScheme.onSurface,
-                                ),
-                                onPressed: () => {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      duration: Duration(seconds: 2),
-                                      content: Text(
-                                        AppLocalizations.of(
-                                          context,
-                                        )!.newSeedPhraseGenerated,
+      body: ResponsiveCenter(
+        maxWidth: 700,
+        child: Stack(
+          children: [
+            AnimatedOpacity(
+              duration: const Duration(seconds: 3),
+              opacity: max(1 - _loadingOpacity, 0.07),
+              curve: Curves.easeOut,
+              child: Column(
+                children: [
+                  Expanded(
+                    child: SingleChildScrollView(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: Column(
+                          children: [
+                            const SizedBox(height: 20),
+                            Text(
+                              AppLocalizations.of(context)!.recoveryPhrase,
+                              style: TextStyle(
+                                color: Theme.of(context).colorScheme.onSurface,
+                                fontSize: 22,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(height: 25),
+                            MnemonicSentenceGrid(
+                              words: _privateKey.mnemonicWords,
+                              isVisible: _isVisible,
+                            ),
+                            const SizedBox(height: 25),
+                            Padding(
+                              padding: const EdgeInsets.all(10.0),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  ElevatedButton.icon(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Theme.of(
+                                        context,
+                                      ).colorScheme.surface,
+                                      foregroundColor: Theme.of(
+                                        context,
+                                      ).colorScheme.onSurface,
+                                    ),
+                                    onPressed: () => {
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        SnackBar(
+                                          duration: Duration(seconds: 2),
+                                          content: Text(
+                                            AppLocalizations.of(
+                                              context,
+                                            )!.newSeedPhraseGenerated,
+                                          ),
+                                        ),
                                       ),
+                                      _generateKey(),
+                                    },
+                                    icon: const Icon(Icons.refresh),
+                                    label: Text(
+                                      AppLocalizations.of(context)!.regenerate,
                                     ),
                                   ),
-                                  _generateKey(),
-                                },
-                                icon: const Icon(Icons.refresh),
-                                label: Text(
-                                  AppLocalizations.of(context)!.regenerate,
-                                ),
-                              ),
-                              const SizedBox(width: 5),
-                              ElevatedButton.icon(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Theme.of(
-                                    context,
-                                  ).colorScheme.inverseSurface,
-                                  foregroundColor: Theme.of(
-                                    context,
-                                  ).colorScheme.surface,
-                                ),
-                                onPressed: () => {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      duration: Duration(seconds: 2),
-                                      content: Text(
-                                        AppLocalizations.of(
-                                          context,
-                                        )!.copiedSeedPhraseToClipboard,
+                                  const SizedBox(width: 5),
+                                  ElevatedButton.icon(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Theme.of(
+                                        context,
+                                      ).colorScheme.inverseSurface,
+                                      foregroundColor: Theme.of(
+                                        context,
+                                      ).colorScheme.surface,
+                                    ),
+                                    onPressed: () => {
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        SnackBar(
+                                          duration: Duration(seconds: 2),
+                                          content: Text(
+                                            AppLocalizations.of(
+                                              context,
+                                            )!.copiedSeedPhraseToClipboard,
+                                          ),
+                                        ),
                                       ),
+                                      _copyKey(),
+                                    },
+                                    icon: const Icon(Icons.copy),
+                                    label: Text(
+                                      AppLocalizations.of(context)!.copy,
                                     ),
                                   ),
-                                  _copyKey(),
-                                },
-                                icon: const Icon(Icons.copy),
-                                label: Text(AppLocalizations.of(context)!.copy),
+                                  const SizedBox(width: 5),
+                                  IconButton(
+                                    onPressed: _toggleVisibility,
+                                    icon: Icon(
+                                      _isVisible
+                                          ? Icons.visibility
+                                          : Icons.visibility_off,
+                                    ),
+                                    tooltip: _isVisible
+                                        ? AppLocalizations.of(
+                                            context,
+                                          )!.hideWords
+                                        : AppLocalizations.of(
+                                            context,
+                                          )!.showWords,
+                                  ),
+                                ],
                               ),
-                              const SizedBox(width: 5),
-                              IconButton(
-                                onPressed: _toggleVisibility,
-                                icon: Icon(
-                                  _isVisible
-                                      ? Icons.visibility
-                                      : Icons.visibility_off,
-                                ),
-                                tooltip: _isVisible
-                                    ? AppLocalizations.of(context)!.hideWords
-                                    : AppLocalizations.of(context)!.showWords,
+                            ),
+                            Padding(
+                              padding: EdgeInsets.all(16),
+                              child: Text(
+                                AppLocalizations.of(
+                                  context,
+                                )!.recoveryPhraseWarning,
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
-                        Padding(
-                          padding: EdgeInsets.all(16),
-                          child: Text(
-                            AppLocalizations.of(context)!.recoveryPhraseWarning,
-                          ),
-                        ),
-                      ],
+                      ),
                     ),
                   ),
-                ),
-                // Fixed bottom section
-                Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                  // Fixed bottom section
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
                       children: [
-                        Checkbox(
-                          value: _termsAndConditions,
-                          onChanged: (value) {
-                            setState(() {
-                              _termsAndConditions = value!;
-                            });
-                          },
-                        ),
-                        Text(
-                          AppLocalizations.of(context)!.iHaveReadAndAccept,
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.onSurface,
-                            fontSize: 12,
-                            fontWeight: FontWeight.normal,
-                          ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Checkbox(
+                              value: _termsAndConditions,
+                              onChanged: (value) {
+                                setState(() {
+                                  _termsAndConditions = value!;
+                                });
+                              },
+                            ),
+                            Text(
+                              AppLocalizations.of(context)!.iHaveReadAndAccept,
+                              style: TextStyle(
+                                color: Theme.of(context).colorScheme.onSurface,
+                                fontSize: 12,
+                                fontWeight: FontWeight.normal,
+                              ),
+                            ),
+                            GestureDetector(
+                              onTap: () {
+                                Uri url = Uri.parse(
+                                  "https://camelus.app/terms/",
+                                );
+                                launchUrl(
+                                  url,
+                                  mode: LaunchMode.externalApplication,
+                                );
+                              },
+                              child: Text(
+                                AppLocalizations.of(
+                                  context,
+                                )!.termsAndConditions,
+                                style: TextStyle(
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.onSurface,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                  decoration: TextDecoration.underline,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                         GestureDetector(
                           onTap: () {
-                            Uri url = Uri.parse("https://camelus.app/terms/");
+                            Uri url = Uri.parse("https://camelus.app/privacy/");
                             launchUrl(
                               url,
                               mode: LaunchMode.externalApplication,
                             );
                           },
                           child: Text(
-                            AppLocalizations.of(context)!.termsAndConditions,
+                            AppLocalizations.of(context)!.privacyPolicy,
                             style: TextStyle(
                               color: Theme.of(context).colorScheme.onSurface,
                               fontSize: 12,
@@ -370,55 +416,39 @@ ${_privateKey.mnemonicSentence}
                             ),
                           ),
                         ),
+                        const SizedBox(height: 50),
+                        SizedBox(
+                          width: double.infinity,
+                          height: 40,
+                          child: longButton(
+                            name: AppLocalizations.of(context)!.publishAccount,
+                            inverted: true,
+                            onPressed: () => _onSubmit(),
+                          ),
+                        ),
+                        const SizedBox(height: 20),
                       ],
                     ),
-                    GestureDetector(
-                      onTap: () {
-                        Uri url = Uri.parse("https://camelus.app/privacy/");
-                        launchUrl(url, mode: LaunchMode.externalApplication);
-                      },
-                      child: Text(
-                        AppLocalizations.of(context)!.privacyPolicy,
-                        style: TextStyle(
-                          color: Theme.of(context).colorScheme.onSurface,
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                          decoration: TextDecoration.underline,
+                  ),
+                ],
+              ),
+            ),
+            if (_isLoading)
+              AnimatedOpacity(
+                opacity: _loadingOpacity,
+                curve: Curves.easeInOut,
+                duration: const Duration(seconds: 2),
+                child: _isLoading
+                    ? Center(
+                        child: FullScreenLoading(
+                          loadingTexts: loadingTexts,
+                          updateState: (function) => {},
                         ),
-                      ),
-                    ),
-                    const SizedBox(height: 50),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      width: 400,
-                      height: 40,
-                      child: longButton(
-                        name: AppLocalizations.of(context)!.publishAccount,
-                        inverted: true,
-                        onPressed: () => _onSubmit(),
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          if (_isLoading)
-            AnimatedOpacity(
-              opacity: _loadingOpacity,
-              curve: Curves.easeInOut,
-              duration: const Duration(seconds: 2),
-              child: _isLoading
-                  ? Center(
-                      child: FullScreenLoading(
-                        loadingTexts: loadingTexts,
-                        updateState: (function) => {},
-                      ),
-                    )
-                  : const SizedBox.shrink(),
-            ),
-        ],
+                      )
+                    : const SizedBox.shrink(),
+              ),
+          ],
+        ),
       ),
     );
   }

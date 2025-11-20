@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
+import '../../../components/responsive_center.dart';
+
 class OnboardingName extends ConsumerStatefulWidget {
   final Function submitCallback;
   final Function? onPressedBack;
@@ -24,18 +26,17 @@ class OnboardingName extends ConsumerStatefulWidget {
 class _OnboardingNameState extends ConsumerState<OnboardingName> {
   final TextEditingController _nameController = TextEditingController();
   final FocusNode _nameFocusNode = FocusNode();
-
-  bool nameSelected = false;
+  final ValueNotifier<bool> _nameNotEmpty = ValueNotifier(false);
 
   @override
   void initState() {
     super.initState();
     _nameController.text = widget.userInfo.name ?? '';
+    _nameNotEmpty.value = _nameController.text.isNotEmpty;
 
+    // Use ValueNotifier instead of setState
     _nameController.addListener(() {
-      setState(() {
-        nameSelected = _nameController.text.isNotEmpty;
-      });
+      _nameNotEmpty.value = _nameController.text.isNotEmpty;
     });
   }
 
@@ -43,13 +44,15 @@ class _OnboardingNameState extends ConsumerState<OnboardingName> {
   void dispose() {
     _nameController.dispose();
     _nameFocusNode.dispose();
+    _nameNotEmpty.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
+      body: ResponsiveCenter(
+        maxWidth: 800,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -69,11 +72,10 @@ class _OnboardingNameState extends ConsumerState<OnboardingName> {
                 ),
               ),
             const Spacer(flex: 20),
-            Container(
+            Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
-              width: MediaQuery.of(context).size.width * 0.95,
               child: TextField(
-                textAlign: TextAlign.justify,
+                textAlign: TextAlign.start,
                 cursorRadius: const Radius.circular(50),
                 maxLines: 2,
                 textAlignVertical: TextAlignVertical.center,
@@ -99,19 +101,26 @@ class _OnboardingNameState extends ConsumerState<OnboardingName> {
             ),
             const SizedBox(height: 10),
             const Spacer(flex: 1),
-            Container(
+            Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
-              width: 400,
-              height: 40,
-              child: longButton(
-                name: nameSelected
-                    ? AppLocalizations.of(context)!.next
-                    : AppLocalizations.of(context)!.skip,
-                onPressed: (() {
-                  _nameFocusNode.unfocus();
-                  widget.submitCallback(_nameController.text);
-                }),
-                inverted: nameSelected,
+              child: SizedBox(
+                width: double.infinity,
+                height: 40,
+                child: ValueListenableBuilder<bool>(
+                  valueListenable: _nameNotEmpty,
+                  builder: (context, nameSelected, _) {
+                    return longButton(
+                      name: nameSelected
+                          ? AppLocalizations.of(context)!.next
+                          : AppLocalizations.of(context)!.skip,
+                      onPressed: () {
+                        _nameFocusNode.unfocus();
+                        widget.submitCallback(_nameController.text);
+                      },
+                      inverted: nameSelected,
+                    );
+                  },
+                ),
               ),
             ),
             const SizedBox(height: 15),

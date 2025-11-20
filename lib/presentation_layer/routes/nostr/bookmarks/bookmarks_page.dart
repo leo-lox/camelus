@@ -5,10 +5,16 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import '../../../../domain_layer/entities/nostr_note.dart';
+import '../../../../domain_layer/entities/parsed_post.dart';
 import '../../../atoms/spinner_center.dart';
 import '../../../components/note_card/note_card_container.dart';
 
 import 'bookmarks_state_provider.dart';
+
+final parsedNotesProvider = FutureProvider.family
+    .autoDispose<ParsedPost, NostrNote>((ref, note) {
+      return NostrParser.parseEvent(note);
+    });
 
 class BookmarksPage extends ConsumerStatefulWidget {
   const BookmarksPage({super.key});
@@ -138,7 +144,7 @@ class _BookmarksPageState extends ConsumerState<BookmarksPage>
               // ),
               const Divider(height: 1),
               FutureBuilder(
-                future: NostrParser.parseEvent(note),
+                future: ref.read(parsedNotesProvider(note).future),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const SpinnerCenter();

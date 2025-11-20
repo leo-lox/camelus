@@ -10,6 +10,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../domain_layer/entities/stored_account.dart';
 import '../../../atoms/long_button.dart';
+import '../../../components/responsive_center.dart';
 import '../../../providers/ndk_provider.dart';
 import '../../../providers/signer_provider.dart';
 
@@ -146,9 +147,8 @@ class _OnboardingLoginBunkerPageState
       backgroundColor: Theme.of(context).colorScheme.surface,
       resizeToAvoidBottomInset: false,
       body: SafeArea(
-        child: Container(
-          width: MediaQuery.of(context).size.width,
-          height: MediaQuery.of(context).size.height,
+        child: ResponsiveCenter(
+          maxWidth: 700,
           padding: const EdgeInsets.all(30),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -169,7 +169,6 @@ class _OnboardingLoginBunkerPageState
               if (widget.onPressedBack == null) const SizedBox(height: 20),
               SizedBox(
                 height: 200,
-                width: MediaQuery.of(context).size.width,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -186,9 +185,8 @@ class _OnboardingLoginBunkerPageState
                 ),
               ),
               const Spacer(flex: 1),
-              Container(
+              Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
-                width: 400,
                 child: TextField(
                   onSubmitted: (value) {
                     _validateBunkerUrl(value);
@@ -218,9 +216,8 @@ class _OnboardingLoginBunkerPageState
                 ),
               ),
               const SizedBox(height: 15),
-              Container(
+              Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
-                width: 400,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -265,11 +262,6 @@ class _OnboardingLoginBunkerPageState
                         _termsAndConditions = value!;
                       });
                     },
-                    activeColor: Theme.of(context).colorScheme.surface,
-                    checkColor: Theme.of(context).colorScheme.primary,
-                    fillColor: WidgetStateProperty.all(
-                      Theme.of(context).colorScheme.onSurface,
-                    ),
                   ),
                   Text(
                     AppLocalizations.of(context)!.iHaveReadAndAcceptThe,
@@ -313,10 +305,9 @@ class _OnboardingLoginBunkerPageState
                 ),
               ),
               const SizedBox(height: 20),
-              Container(
+              Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
-                width: 400,
-                height: 40,
+
                 child: longButton(
                   name: AppLocalizations.of(context)!.connect,
                   inverted: true,

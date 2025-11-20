@@ -6,6 +6,8 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../l10n/app_localizations.dart';
 
+import '../../../components/responsive_center.dart';
+
 class OnboardingPage01 extends ConsumerStatefulWidget {
   final Function loginCallback;
   final Function registerCallback;
@@ -23,7 +25,7 @@ class _OnboardingPage01State extends ConsumerState<OnboardingPage01> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
+      body: ResponsiveCenter(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -44,10 +46,9 @@ class _OnboardingPage01State extends ConsumerState<OnboardingPage01> {
               ),
             ),
             const Spacer(flex: 10),
-            Container(
+            Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
-              width: 400,
-              height: 40,
+
               child: longButton(
                 name: AppLocalizations.of(context)!.joinTheConversation,
                 onPressed: (() {
@@ -57,10 +58,9 @@ class _OnboardingPage01State extends ConsumerState<OnboardingPage01> {
               ),
             ),
             const SizedBox(height: 30),
-            Container(
+            Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
-              width: 400,
-              height: 40,
+
               child: longButton(
                 name: AppLocalizations.of(context)!.login,
                 onPressed: (() {

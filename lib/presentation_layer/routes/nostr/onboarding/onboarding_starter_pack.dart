@@ -9,6 +9,7 @@ import '../../../../domain_layer/entities/onboarding_user_info.dart';
 import '../../../atoms/long_button.dart';
 import '../../../atoms/my_profile_picture.dart';
 import '../../../atoms/spinner_center.dart';
+import '../../../components/responsive_center.dart';
 import '../../../components/starter_packs/starter_pack_card.dart';
 import '../../../providers/metadata_state_provider.dart';
 import '../../../providers/nostr_lists_follow_state_provider.dart';
@@ -107,35 +108,40 @@ class _OnboardingStarterPackState extends ConsumerState<OnboardingStarterPack> {
             ? Text(AppLocalizations.of(context)!.starterPacks)
             : Text(AppLocalizations.of(context)!.additionalStarterPacks),
       ),
-      body: Column(
-        children: [
-          Expanded(
-            child: ListView.builder(
-              itemCount: flattenedItems.length,
-              itemBuilder: (context, index) =>
-                  _buildItemWidget(flattenedItems[index]),
+      body: ResponsiveCenter(
+        maxWidth: 800,
+        child: Column(
+          children: [
+            Expanded(
+              child: ListView.builder(
+                itemCount: flattenedItems.length,
+                itemBuilder: (context, index) =>
+                    _buildItemWidget(flattenedItems[index]),
+              ),
             ),
-          ),
-          const SizedBox(height: 8),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            width: 400,
-            height: 40,
-            child: longButton(
-              name: selectedPubkeys.isNotEmpty
-                  ? AppLocalizations.of(
-                      context,
-                    )!.continueWithAccounts(selectedPubkeys.length)
-                  : AppLocalizations.of(context)!.selectStarterPack,
-              onPressed: (() {
-                widget.submitCallback(selectedPubkeys);
-              }),
-              disabled: selectedPubkeys.isEmpty,
-              inverted: true,
+            const SizedBox(height: 8),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: SizedBox(
+                width: double.infinity,
+                height: 40,
+                child: longButton(
+                  name: selectedPubkeys.isNotEmpty
+                      ? AppLocalizations.of(
+                          context,
+                        )!.continueWithAccounts(selectedPubkeys.length)
+                      : AppLocalizations.of(context)!.selectStarterPack,
+                  onPressed: (() {
+                    widget.submitCallback(selectedPubkeys);
+                  }),
+                  disabled: selectedPubkeys.isEmpty,
+                  inverted: true,
+                ),
+              ),
             ),
-          ),
-          const SizedBox(height: 15),
-        ],
+            const SizedBox(height: 15),
+          ],
+        ),
       ),
     );
   }
@@ -326,28 +332,30 @@ class _OnboardingOpenStarterPackState
             ),
           ),
           const SizedBox(height: 15),
-          Container(
+          Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
-            width: 400,
-            height: 40,
-            child: longButton(
-              name: nothingOfOwnSelected
-                  ? AppLocalizations.of(context)!.followAll
-                  : AppLocalizations.of(
-                      context,
-                    )!.followAccounts(ownSelectedCount),
-              onPressed: (() {
-                setState(() {
-                  if (nothingOfOwnSelected) {
-                    selectedPubkeys.addAll(
-                      widget.followSet.elements.map((e) => e.value),
-                    );
-                  }
-                  Navigator.pop(context, selectedPubkeys);
-                });
-              }),
-              disabled: false,
-              inverted: true,
+            child: SizedBox(
+              width: double.infinity,
+              height: 40,
+              child: longButton(
+                name: nothingOfOwnSelected
+                    ? AppLocalizations.of(context)!.followAll
+                    : AppLocalizations.of(
+                        context,
+                      )!.followAccounts(ownSelectedCount),
+                onPressed: (() {
+                  setState(() {
+                    if (nothingOfOwnSelected) {
+                      selectedPubkeys.addAll(
+                        widget.followSet.elements.map((e) => e.value),
+                      );
+                    }
+                    Navigator.pop(context, selectedPubkeys);
+                  });
+                }),
+                disabled: false,
+                inverted: true,
+              ),
             ),
           ),
           const SizedBox(height: 15),

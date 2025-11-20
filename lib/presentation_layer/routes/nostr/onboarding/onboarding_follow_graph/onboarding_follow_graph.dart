@@ -288,7 +288,7 @@ class _OnboardingFollowGraphState extends ConsumerState<OnboardingFollowGraph> {
                 _graphController.scale = value;
               },
             ),
-            Container(
+            Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               width: 400,
               height: 40,

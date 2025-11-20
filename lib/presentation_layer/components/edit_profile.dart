@@ -161,7 +161,7 @@ class _EditProfileState extends ConsumerState<EditProfile> {
                     height: MediaQuery.of(context).size.height / 6,
                     color: Theme.of(
                       context,
-                    ).colorScheme.surface.withValues(alpha: 0.5),
+                    ).colorScheme.surface.withValues(alpha: 0.8),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -183,7 +183,7 @@ class _EditProfileState extends ConsumerState<EditProfile> {
                                 context,
                               ).colorScheme.inverseSurface,
                               valueColor: AlwaysStoppedAnimation<Color>(
-                                Theme.of(context).colorScheme.onSurface,
+                                Theme.of(context).colorScheme.primary,
                               ),
                               minHeight: 6,
                             ),
@@ -228,10 +228,10 @@ class _EditProfileState extends ConsumerState<EditProfile> {
           width: 102,
           height: 102,
           decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.5),
+            color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.9),
             shape: BoxShape.circle,
             border: Border.all(
-              color: Theme.of(context).colorScheme.onSurface,
+              color: Theme.of(context).colorScheme.primary,
               width: 3,
             ),
           ),
@@ -241,7 +241,10 @@ class _EditProfileState extends ConsumerState<EditProfile> {
         SizedBox(
           width: 60,
           height: 60,
-          child: CircularProgressIndicator(strokeWidth: 3),
+          child: CircularProgressIndicator(
+            strokeWidth: 3,
+            color: Theme.of(context).colorScheme.primary,
+          ),
         ),
 
         // Text in the center
@@ -303,17 +306,24 @@ class _EditProfileState extends ConsumerState<EditProfile> {
         Padding(
           padding: const EdgeInsets.only(top: 16.0, bottom: 8.0, left: 8.0),
           child: Text(
-            label, // Display the label of the input field.
+            label,
             style: TextStyle(
-              color: const Color.fromARGB(213, 245, 248, 250),
-              fontSize: MediaQuery.of(context).size.width / 28,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
             ),
           ),
         ),
         TextFormField(
-          controller: controller, // Bind the controller to the input field.
+          controller: controller,
+          style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
           decoration: InputDecoration(
             hintText: "",
+            hintStyle: TextStyle(
+              color: Theme.of(
+                context,
+              ).colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
+            ),
             contentPadding: EdgeInsets.symmetric(
               vertical: 8.0,
               horizontal: 8.0,
@@ -325,7 +335,7 @@ class _EditProfileState extends ConsumerState<EditProfile> {
           maxLines: isMultiline ? null : 1,
           keyboardType: isMultiline
               ? TextInputType.multiline
-              : TextInputType.text, // Set keyboard type.
+              : TextInputType.text,
         ),
       ],
     );
