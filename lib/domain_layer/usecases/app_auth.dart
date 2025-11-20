@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:ui';
 
 import 'package:amberflutter/amberflutter.dart';
 import 'package:flutter/foundation.dart';
@@ -222,34 +223,37 @@ class AppAuth {
   static void showLoginPrompt(BuildContext context) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        icon: Icon(
-          PhosphorIcons.lockKey(),
-          size: 48,
-          color: Theme.of(context).colorScheme.primary,
-        ),
-        title: Text(
-          AppLocalizations.of(context)!.loginRegistrationRequired,
-          textAlign: TextAlign.center,
-        ),
-        content: Text(
-          AppLocalizations.of(context)!.pleaseLoginToInteract,
-          textAlign: TextAlign.center,
-        ),
-        actionsAlignment: MainAxisAlignment.center,
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(AppLocalizations.of(context)!.cancel),
+      builder: (context) => BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+        child: AlertDialog(
+          icon: Icon(
+            PhosphorIcons.lockKey(),
+            size: 48,
+            color: Theme.of(context).colorScheme.primary,
           ),
-          FilledButton(
-            onPressed: () {
-              Navigator.pop(context);
-              context.push('/onboarding');
-            },
-            child: Text(AppLocalizations.of(context)!.loginRegister),
+          title: Text(
+            AppLocalizations.of(context)!.loginRegistrationRequired,
+            textAlign: TextAlign.center,
           ),
-        ],
+          content: Text(
+            AppLocalizations.of(context)!.pleaseLoginToInteract,
+            textAlign: TextAlign.center,
+          ),
+          actionsAlignment: MainAxisAlignment.center,
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(AppLocalizations.of(context)!.cancel),
+            ),
+            FilledButton(
+              onPressed: () {
+                Navigator.pop(context);
+                context.push('/onboarding');
+              },
+              child: Text(AppLocalizations.of(context)!.loginRegister),
+            ),
+          ],
+        ),
       ),
     );
   }
