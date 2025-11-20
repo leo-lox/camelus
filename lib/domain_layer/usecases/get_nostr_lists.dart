@@ -39,12 +39,8 @@ class GetNostrLists {
 
   /// Get a single list (kind 10000-10030) for the logged-in user
   /// Use this for bookmarks (10003), mutes (10000), pins (10001), etc.
-  Future<NostrList?> getSingleList({
-    required int kind,
-  }) {
-    return _nostrListRepository.getSingleList(
-      kind: kind,
-    );
+  Future<NostrList?> getSingleList({required int kind}) {
+    return _nostrListRepository.getSingleList(kind: kind);
   }
 
   /// Add an element to a list

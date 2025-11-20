@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
-import '../../config/palette.dart';
 import '../providers/ndk_provider.dart';
 
 class RelaysConnectivityWidget extends ConsumerWidget {
@@ -40,7 +39,9 @@ class RelaysConnectivityWidget extends ConsumerWidget {
               const SizedBox(width: 5),
               Text(
                 connectedCount.toString(),
-                style: TextStyle(color: Paletter.getLightGray(context)),
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.inverseSurface,
+                ),
                 key: ValueKey(connectedCount),
               ),
               const SizedBox(width: 5),

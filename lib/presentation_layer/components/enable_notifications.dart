@@ -2,12 +2,12 @@ import 'dart:async';
 import 'dart:developer';
 import 'dart:io';
 
+import 'package:camelus/l10n/app_localizations.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../config/palette.dart';
 import '../atoms/spinner_center.dart';
 import '../providers/db_app_provider.dart';
 import '../providers/notifications_provider.dart';
@@ -161,8 +161,8 @@ class PushNotificationToggleState
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                'Push Notifications',
+              Text(
+                AppLocalizations.of(context)!.pushNotifications,
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
               if (isLoading)
@@ -178,18 +178,21 @@ class PushNotificationToggleState
           const SizedBox(height: 8),
           Text(
             notificationsEnabled
-                ? 'You will receive notifications about new replies.'
-                : 'Enable notifications to get notified about new replies',
-            style: TextStyle(color: Paletter.getGray(context), fontSize: 14),
+                ? AppLocalizations.of(context)!.receiveNotificationsAboutReplies
+                : AppLocalizations.of(context)!.enableNotificationsForReplies,
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.inverseSurface,
+              fontSize: 14,
+            ),
           ),
           // Only show the hint message if permissions were explicitly denied
           if (notificationsDenied)
             Padding(
               padding: const EdgeInsets.only(top: 8.0),
               child: Text(
-                'Note: You previously denied notifications. Please enable them in your device settings to receive notifications.',
+                AppLocalizations.of(context)!.notificationsDeniedInSettings,
                 style: TextStyle(
-                  color: Colors.orangeAccent,
+                  color: Colors.orangeAccent, // hard coded color
                   fontSize: 12,
                   fontStyle: FontStyle.italic,
                 ),

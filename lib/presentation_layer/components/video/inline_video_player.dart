@@ -6,7 +6,6 @@ import 'package:shimmer/shimmer.dart';
 import 'package:video_player/video_player.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 
-import '../../../config/palette.dart';
 import '../../providers/moderation/moderation_state_provider.dart';
 import 'fullscreen_video_player.dart';
 import 'video_player_state_provider.dart';
@@ -163,9 +162,15 @@ class InlineVideoPlayer extends ConsumerWidget {
                           controller,
                           allowScrubbing: true,
                           colors: VideoProgressColors(
-                            backgroundColor: Paletter.getDarkGray(context),
-                            bufferedColor: Paletter.getGray(context),
-                            playedColor: Paletter.getExtraLightGray(context),
+                            backgroundColor: Theme.of(
+                              context,
+                            ).colorScheme.surfaceContainerHighest,
+                            bufferedColor: Theme.of(
+                              context,
+                            ).colorScheme.inverseSurface,
+                            playedColor: Theme.of(
+                              context,
+                            ).colorScheme.onSurface,
                           ),
                         ),
                       ),
@@ -181,10 +186,12 @@ class InlineVideoPlayer extends ConsumerWidget {
     return Builder(
       builder: (context) {
         return Shimmer.fromColors(
-          baseColor: Paletter.getExtraDarkGray(context).withValues(alpha: 0.1),
-          highlightColor: Paletter.getExtraDarkGray(
+          baseColor: Theme.of(
             context,
-          ).withValues(alpha: 0.7),
+          ).colorScheme.surface.withValues(alpha: 0.1),
+          highlightColor: Theme.of(
+            context,
+          ).colorScheme.surface.withValues(alpha: 0.7),
           child: Container(
             width: width,
             height: height,

@@ -1,6 +1,5 @@
 import 'dart:math';
 
-import 'package:camelus/config/palette.dart';
 import 'package:flutter/material.dart';
 
 class HashtagCard extends StatelessWidget {
@@ -59,7 +58,7 @@ class HashtagCard extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w400,
-                    color: Paletter.getGray(context),
+                    color: Theme.of(context).colorScheme.inverseSurface,
                   ),
                 ),
                 const SizedBox(width: 8),
@@ -68,7 +67,7 @@ class HashtagCard extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w400,
-                    color: Paletter.getGray(context),
+                    color: Theme.of(context).colorScheme.inverseSurface,
                   ),
                 ),
               ],
@@ -97,7 +96,7 @@ class HashtagCardSkeleton extends StatelessWidget {
                 width: 20,
                 height: 20,
                 decoration: BoxDecoration(
-                  color: Paletter.getExtraDarkGray(context),
+                  color: Theme.of(context).colorScheme.surface,
                   borderRadius: BorderRadius.circular(5),
                 ),
               ),
@@ -107,7 +106,7 @@ class HashtagCardSkeleton extends StatelessWidget {
                 width: 80 + (140 * (Random().nextDouble() * 1.0)),
                 height: 40,
                 decoration: BoxDecoration(
-                  color: Paletter.getExtraDarkGray(context),
+                  color: Theme.of(context).colorScheme.surface,
                   borderRadius: BorderRadius.circular(5),
                 ),
               ),
@@ -121,7 +120,7 @@ class HashtagCardSkeleton extends StatelessWidget {
                 width: 100,
                 height: 20,
                 decoration: BoxDecoration(
-                  color: Paletter.getExtraDarkGray(context),
+                  color: Theme.of(context).colorScheme.surface,
                   borderRadius: BorderRadius.circular(5),
                 ),
               ),

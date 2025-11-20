@@ -201,5 +201,171 @@
   "browseWithoutLogin": "无需登录即可浏览",
   "loginRegistrationRequired": "需要登录/注册",
   "pleaseLoginToInteract": "请登录/注册以与帖子互动",
-  "loginRegister": "登录/注册"
+  "loginRegister": "登录/注册",
+  "all": "全部",
+  "mentions": "提及",
+  "preview": "预览",
+  "relayAlreadyExists": "中继器已存在",
+  "relayAlreadyExistsMessage": "此中继器已添加",
+  "discardChanges": "放弃更改",
+  "discardChangesMessage": "要放弃更改吗？",
+  "deleteRelay": "删除中继器",
+  "delete": "删除",
+  "noTextFoundInClipboard": "剪贴板中未找到文本",
+  "pleaseEnterValidBunkerUrl": "请输入有效的 Bunker URL",
+  "failedToConnectToBunker": "连接 Bunker 失败",
+  "reactedToYourPost": "对你的帖子做出了反应",
+  "repliedToYourPost": "回复了你的帖子",
+  "mentionedYouInThread": "在话题中提及了你",
+  "repostedYourPost": "转发了你的帖子",
+  "mentionedYou": "提及了你",
+  "interactedWithYourPost": "与你的帖子互动了",
+  "whenSomeoneInteractsWithYourPosts": "当有人与你的帖子互动时",
+  "noNotifications": "没有通知",
+  "endOfNotifications": "通知结束",
+  "trends": "趋势",
+  "recentStarterPacks": "最近的入门包",
+  "noResultsFound": "未找到结果",
+  "people": "用户",
+  "notes": "笔记",
+  "searchForHashtags": "搜索话题标签",
+  "nip05Address": "NIP-05 地址",
+  "repostHasNoInformation": "此转发不包含信息",
+  "invalidSignature": "无效签名",
+  "deletionRequested": "已请求删除",
+  "unknownStarterPack": "未知入门包",
+  "noStarterPacksFound": "未找到入门包",
+  "searchToAddUser": "搜索以添加用户",
+  "noServersFound": "未找到服务器",
+  "noFilterFound": "未找到过滤器",
+  "replyToPrefix": "回复给",
+  "andMoreCount": "和其他{count}个",
+  "@andMoreCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "noteNotFound": "未找到笔记",
+  "shared": " 转发了",
+  "loadingMightFail": "加载可能失败",
+  "bugReportMessage": "报告错误",
+  "noMoreNotesToShow": "没有更多笔记可显示",
+  "trendingPeople": "热门用户",
+  "trendingHashtags": "热门话题标签",
+  "somethingWentWrong": "出现问题",
+  "noConnection": "无连接",
+  "reconnectingToRelays": "正在重新连接到中继器",
+  "addRelay": "添加中继器",
+  "read": "读取",
+  "write": "写入",
+  "starterPack": "入门包",
+  "deleteStarterPack": "删除入门包",
+  "deleteStarterPackConfirm": "确定要删除此入门包吗？此操作无法撤销。",
+  "share": "分享",
+  "starterPackBy": "{author}的入门包",
+  "@starterPackBy": {
+    "placeholders": {
+      "author": {
+        "type": "String"
+      }
+    }
+  },
+  "you": "你",
+  "addToStarterPackTitle": "将{name}添加到入门包",
+  "@addToStarterPackTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "createNewStarterPack": "创建新入门包",
+  "upload": "上传",
+  "createYourStarterPack": "创建你的入门包",
+  "inviteFriendsToFollow": "邀请你的朋友关注你喜欢的人",
+  "title": "标题",
+  "description": "描述",
+  "yourStarterPack": "你的入门包",
+  "shareWithFriends": "与朋友分享，帮助他们发现优秀的人！",
+  "shareStarterPack": "分享入门包",
+  "publishStarterPack": "发布入门包",
+  "addUsersToContinue": "添加用户以继续",
+  "addUserMenuHint": "将用户添加到列表",
+  "show": "显示",
+  "pushNotifications": "推送通知",
+  "receiveNotificationsAboutReplies": "接收有关回复的通知",
+  "enableNotificationsForReplies": "启用回复通知",
+  "notificationsDeniedInSettings": "通知已在设置中被拒绝",
+  "welcomeTo": "欢迎来到",
+  "joinTheConversation": "加入对话",
+  "errorLoadingNote": "加载笔记时出错",
+  "errorPrefix": "错误：{error}",
+  "@errorPrefix": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "errorProcessingLink": "处理链接时出错",
+  "processingLink": "正在处理链接",
+  "noMatchingActionFound": "未找到匹配的操作",
+  "worksOnlyIfInCache": "仅在缓存中有效",
+  "mastodonAddress": "Mastodon 地址",
+  "amberLogin": "Amber 登录",
+  "seedPhraseLogin": "助记词登录",
+  "bunkerLogin": "Bunker 登录",
+  "iHaveReadAndAcceptThe": "我已阅读并接受",
+  "installAmber": "安装 Amber",
+  "authoriseAmber": "授权 Amber",
+  "connect": "连接",
+  "followCount": "继续关注{count}/{target}人",
+  "@followCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "target": {
+        "type": "int"
+      }
+    }
+  },
+  "notAvailable": "不可用",
+  "post": "发布",
+  "newPostsCount": "{count}条新帖子",
+  "@newPostsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "noteReference": "笔记引用",
+  "createStarterPack": "创建入门包",
+  "createAnother": "创建另一个",
+  "starterPackIsLive": "🎉 你的入门包已发布！",
+  "searchHint": "搜索",
+  "bunkerUrlHint": "bunker://",
+  "continueWithPeople": "继续关注{count}人",
+  "@continueWithPeople": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "unknown": "未知",
+  "follow": "关注",
+  "unfollow": "取消关注",
+  "invalidBunkerUrl": "无效的 Bunker URL。必须以 bunker:// 开头",
+  "failedToConnectWithError": "连接失败：{error}",
+  "@failedToConnectWithError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  }
 }

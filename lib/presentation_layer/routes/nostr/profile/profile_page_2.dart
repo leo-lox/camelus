@@ -8,7 +8,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../../../../config/palette.dart';
 import '../../../../domain_layer/entities/contact_list.dart';
 import '../../../../domain_layer/entities/feed_filter.dart';
 import '../../../../domain_layer/entities/user_metadata.dart';
@@ -69,7 +68,7 @@ class ProfilePage2 extends ConsumerWidget {
                     leading: BackButtonRound(),
                     actions: [
                       PopupMenuButton<String>(
-                        color: Paletter.getExtraDarkGray(context),
+                        color: Theme.of(context).colorScheme.surface,
                         tooltip: AppLocalizations.of(context)!.more,
                         onSelected: (e) => {
                           //log(e),
@@ -200,7 +199,7 @@ class _BuildProfileHeader extends ConsumerWidget {
                 )
               : Container(
                   height: 150,
-                  color: Paletter.getExtraDarkGray(context),
+                  color: Theme.of(context).colorScheme.surface,
                 ),
         ),
         // Profile Content
@@ -335,7 +334,7 @@ class _BuildProfileHeader extends ConsumerWidget {
                     Text(
                       AppLocalizations.of(context)!.followers,
                       style: TextStyle(
-                        color: Paletter.getGray(context),
+                        color: Theme.of(context).colorScheme.inverseSurface,
                         fontSize: 14,
                       ),
                     ),
@@ -371,14 +370,17 @@ class _BuildProfileHeader extends ConsumerWidget {
             TextSpan(
               text: '$followingCount',
               style: TextStyle(
-                color: Paletter.getLightGray(context),
+                color: Theme.of(context).colorScheme.inverseSurface,
                 fontWeight: FontWeight.bold,
                 fontSize: 14,
               ),
             ),
             TextSpan(
               text: ' ${AppLocalizations.of(context)!.following}',
-              style: TextStyle(color: Paletter.getGray(context), fontSize: 14),
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.inverseSurface,
+                fontSize: 14,
+              ),
             ),
           ],
         ),

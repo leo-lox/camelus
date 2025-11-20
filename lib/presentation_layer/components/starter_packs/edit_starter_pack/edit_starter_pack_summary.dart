@@ -1,9 +1,9 @@
+import 'package:camelus/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:share_plus/share_plus.dart';
 
-import '../../../../config/palette.dart';
 import '../../../../domain_layer/entities/nostr_list.dart';
 import '../../../../domain_layer/entities/starter_pack_identifier.dart';
 import '../../../atoms/long_button.dart';
@@ -131,7 +131,7 @@ class _EditStarterPackSummaryState extends ConsumerState<EditStarterPackSummary>
                         child: Column(
                           children: [
                             Text(
-                              "your starter pack",
+                              AppLocalizations.of(context)!.yourStarterPack,
                               style: const TextStyle(fontSize: 30),
                               textAlign: TextAlign.center,
                             ),
@@ -158,8 +158,8 @@ class _EditStarterPackSummaryState extends ConsumerState<EditStarterPackSummary>
                         padding: const EdgeInsets.symmetric(horizontal: 24),
                         child: Column(
                           children: [
-                            const Text(
-                              "🎉 Your starter pack is live!",
+                            Text(
+                              AppLocalizations.of(context)!.starterPackIsLive,
                               style: TextStyle(
                                 fontSize: 24,
                                 fontWeight: FontWeight.bold,
@@ -168,7 +168,7 @@ class _EditStarterPackSummaryState extends ConsumerState<EditStarterPackSummary>
                             ),
                             const SizedBox(height: 8),
                             Text(
-                              "Share it with your friends and help them discover amazing people!",
+                              AppLocalizations.of(context)!.shareWithFriends,
                               style: TextStyle(
                                 fontSize: 16,
                                 color: Theme.of(
@@ -185,10 +185,12 @@ class _EditStarterPackSummaryState extends ConsumerState<EditStarterPackSummary>
                                   vertical: 12,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: Paletter.getExtraDarkGray(context),
+                                  color: Theme.of(context).colorScheme.surface,
                                   borderRadius: BorderRadius.circular(8),
                                   border: Border.all(
-                                    color: Paletter.getGray(context),
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.inverseSurface,
                                   ),
                                 ),
                                 child: Row(
@@ -210,7 +212,9 @@ class _EditStarterPackSummaryState extends ConsumerState<EditStarterPackSummary>
                               width: double.infinity,
                               height: 40,
                               child: longButton(
-                                name: "share starter pack",
+                                name: AppLocalizations.of(
+                                  context,
+                                )!.shareStarterPack,
                                 inverted: true,
                                 disabled: false,
                                 onPressed: () {
@@ -245,7 +249,7 @@ class _EditStarterPackSummaryState extends ConsumerState<EditStarterPackSummary>
                   width: double.infinity,
                   height: 40,
                   child: longButton(
-                    name: "publish starter pack",
+                    name: AppLocalizations.of(context)!.publishStarterPack,
                     inverted: true,
                     disabled: starterPackData.selectedUsers.isEmpty,
                     loading: starterPackData.broadcasting,
@@ -267,7 +271,7 @@ class _EditStarterPackSummaryState extends ConsumerState<EditStarterPackSummary>
                   width: double.infinity,
                   height: 40,
                   child: longButton(
-                    name: "close",
+                    name: AppLocalizations.of(context)!.close,
                     inverted: false,
                     onPressed: () {
                       starterPackNotifier.reset();

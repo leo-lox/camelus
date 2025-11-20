@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:camelus/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -22,7 +23,7 @@ class NostrSideMenuPostButton extends ConsumerWidget {
       height: 40,
       child: longButton(
         inverted: true,
-        name: "post",
+        name: AppLocalizations.of(context)!.post,
         onPressed: () {
           if (!canSign) {
             // Show login dialog instead

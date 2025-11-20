@@ -197,7 +197,7 @@ class NostrParser {
       return decoded['pubkey'] ?? '';
     } else if (encoded.startsWith('npub')) {
       final decoded = Helpers().decodeBech32(encoded);
-      return decoded[0] ?? '';
+      return decoded[0];
     }
     return nostrRef;
   }

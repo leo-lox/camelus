@@ -1,10 +1,10 @@
+import 'package:camelus/l10n/app_localizations.dart';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 
-import '../../../../config/palette.dart';
 import '../../../../domain_layer/entities/mem_file.dart';
 import '../../../../domain_layer/entities/starter_pack_identifier.dart';
 import '../../../atoms/crop_avatar.dart';
@@ -72,7 +72,7 @@ class _EditStarterPackMetaState extends ConsumerState<EditStarterPackMeta> {
           targetWidth: 400,
           roundUi: false,
           aspectRatio: 16 / 6,
-          buttonText: "upload",
+          buttonText: AppLocalizations.of(context)!.upload,
           imageData: uneditedImage,
         ),
       ),
@@ -147,7 +147,7 @@ class _EditStarterPackMetaState extends ConsumerState<EditStarterPackMeta> {
                   const SizedBox(height: 40),
                   // Title
                   Text(
-                    'create your starter pack',
+                    AppLocalizations.of(context)!.createYourStarterPack,
                     style: TextStyle(
                       color: Theme.of(context).colorScheme.onSurface,
                       fontSize: 28,
@@ -157,7 +157,7 @@ class _EditStarterPackMetaState extends ConsumerState<EditStarterPackMeta> {
                   ),
                   // Subtitle
                   Text(
-                    'Invite your friends to follow your favorite people',
+                    AppLocalizations.of(context)!.inviteFriendsToFollow,
                     style: TextStyle(
                       color: Theme.of(
                         context,
@@ -203,7 +203,7 @@ class _EditStarterPackMetaState extends ConsumerState<EditStarterPackMeta> {
                                       CircularProgressIndicator(strokeWidth: 2),
                                       SizedBox(height: 8),
                                       Text(
-                                        'Uploading...',
+                                        AppLocalizations.of(context)!.uploading,
                                         style: TextStyle(
                                           color: Theme.of(
                                             context,
@@ -231,7 +231,7 @@ class _EditStarterPackMetaState extends ConsumerState<EditStarterPackMeta> {
                       Align(
                         alignment: Alignment.centerLeft,
                         child: Text(
-                          'Title',
+                          AppLocalizations.of(context)!.title,
                           style: TextStyle(
                             color: Theme.of(
                               context,
@@ -246,26 +246,24 @@ class _EditStarterPackMetaState extends ConsumerState<EditStarterPackMeta> {
                       // Title input
                       Container(
                         decoration: BoxDecoration(
-                          color: Paletter.getExtraDarkGray(context),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: TextField(
                           controller: _titleController,
-                          onChanged: (value) {
-                            starterPackNotifier.updateTitle(value);
-                          },
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.onSurface,
-                            fontSize: 18,
-                          ),
+                          onChanged: starterPackNotifier.updateTitle,
+                          style: TextStyle(fontSize: 18),
                           decoration: InputDecoration(
-                            border: InputBorder.none,
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+
                             contentPadding: const EdgeInsets.all(16),
                             suffixText: '${starterPackData.title.length}/40',
                             suffixStyle: TextStyle(
                               color: starterPackData.title.length > 40
-                                  ? Colors.orangeAccent
-                                  : Paletter.getGray(context),
+                                  ? Colors
+                                        .orangeAccent //! hard coded color
+                                  : null,
                               fontSize: 14,
                             ),
                           ),
@@ -277,7 +275,7 @@ class _EditStarterPackMetaState extends ConsumerState<EditStarterPackMeta> {
                       Align(
                         alignment: Alignment.centerLeft,
                         child: Text(
-                          'Description',
+                          AppLocalizations.of(context)!.description,
                           style: TextStyle(
                             color: Theme.of(
                               context,
@@ -293,23 +291,19 @@ class _EditStarterPackMetaState extends ConsumerState<EditStarterPackMeta> {
                       Container(
                         height: 200,
                         decoration: BoxDecoration(
-                          color: Paletter.getExtraDarkGray(context),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: TextField(
                           controller: _descriptionController,
-                          onChanged: (value) {
-                            starterPackNotifier.updateDescription(value);
-                          },
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.onSurface,
-                            fontSize: 16,
-                          ),
+                          onChanged: starterPackNotifier.updateDescription,
+                          style: TextStyle(fontSize: 16),
                           maxLines: null,
                           expands: true,
                           textAlignVertical: TextAlignVertical.top,
-                          decoration: const InputDecoration(
-                            border: InputBorder.none,
+                          decoration: InputDecoration(
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
                             contentPadding: EdgeInsets.all(16),
                           ),
                         ),
@@ -330,7 +324,7 @@ class _EditStarterPackMetaState extends ConsumerState<EditStarterPackMeta> {
                 width: double.infinity,
                 height: 40,
                 child: longButton(
-                  name: "next",
+                  name: AppLocalizations.of(context)!.next,
                   inverted: true,
                   onPressed: () {
                     widget.onNext();

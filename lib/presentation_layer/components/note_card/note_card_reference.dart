@@ -1,5 +1,5 @@
+import 'package:camelus/l10n/app_localizations.dart';
 import 'package:camelus/presentation_layer/components/note_card/note_card.dart';
-import 'package:camelus/config/palette.dart';
 import 'package:camelus/helpers/helpers.dart';
 import 'package:camelus/helpers/nevent_helper.dart';
 import 'package:camelus/domain_layer/entities/nostr_note.dart';
@@ -61,7 +61,7 @@ class NoteCardReference extends ConsumerWidget {
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(10),
               border: Border.all(
-                color: Paletter.getDarkGray(context),
+                color: Theme.of(context).colorScheme.surfaceContainerHighest,
                 width: 1.0,
               ),
             ),
@@ -69,7 +69,7 @@ class NoteCardReference extends ConsumerWidget {
               child: Padding(
                 padding: EdgeInsets.symmetric(horizontal: 0, vertical: 20),
                 child: Text(
-                  "Note not found",
+                  AppLocalizations.of(context)!.noteNotFound,
                   style: TextStyle(
                     color: Theme.of(context).colorScheme.onSurface,
                     fontSize: 17,
@@ -104,7 +104,9 @@ class NoteCardReference extends ConsumerWidget {
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(10),
                       border: Border.all(
-                        color: Paletter.getDarkGray(context),
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.surfaceContainerHighest,
                         width: 1.0,
                       ),
                     ),

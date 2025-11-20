@@ -5,8 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../../../config/palette.dart';
-import '../../../../../domain_layer/usecases/app_auth.dart';
 import '../../../../atoms/long_button.dart';
 import '../../../../providers/ndk_provider.dart';
 import 'file_server_state_provider.dart';
@@ -52,7 +50,9 @@ class SettingsFileServersPageState extends ConsumerState<SettingsFileServers> {
             onPressed: () => Navigator.of(context).pop(false),
             child: Text(
               AppLocalizations.of(context)!.cancel,
-              style: TextStyle(color: Paletter.getGray(context)),
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.inverseSurface,
+              ),
             ),
           ),
           TextButton(
@@ -189,7 +189,11 @@ class SettingsFileServersPageState extends ConsumerState<SettingsFileServers> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text('Error: $error'),
+                      Text(
+                        AppLocalizations.of(
+                          context,
+                        )!.errorPrefix(error.toString()),
+                      ),
                       const SizedBox(height: 25),
                       longButton(
                         inverted: true,
@@ -231,7 +235,9 @@ class SettingsFileServersPageState extends ConsumerState<SettingsFileServers> {
                                     child: Center(
                                       child: Icon(
                                         Icons.drag_handle,
-                                        color: Paletter.getDarkGray(context),
+                                        color: Theme.of(
+                                          context,
+                                        ).colorScheme.surfaceContainerHighest,
                                       ),
                                     ),
                                   ),
@@ -241,7 +247,9 @@ class SettingsFileServersPageState extends ConsumerState<SettingsFileServers> {
                                   size: 12,
                                   color: server.isOnline
                                       ? Theme.of(context).colorScheme.primary
-                                      : Paletter.getDarkGray(context),
+                                      : Theme.of(
+                                          context,
+                                        ).colorScheme.surfaceContainerHighest,
                                 ),
                                 const SizedBox(width: 16),
                                 Expanded(
@@ -262,7 +270,9 @@ class SettingsFileServersPageState extends ConsumerState<SettingsFileServers> {
                                             context,
                                           )!.defaultLabel,
                                           style: TextStyle(
-                                            color: Paletter.getGray(context),
+                                            color: Theme.of(
+                                              context,
+                                            ).colorScheme.inverseSurface,
                                           ),
                                         ),
                                     ],
@@ -271,7 +281,9 @@ class SettingsFileServersPageState extends ConsumerState<SettingsFileServers> {
                                 IconButton(
                                   icon: Icon(
                                     Icons.delete,
-                                    color: Paletter.getGray(context),
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.inverseSurface,
                                   ),
                                   onPressed: () {
                                     ref
@@ -329,12 +341,16 @@ class SettingsFileServersPageState extends ConsumerState<SettingsFileServers> {
                             },
                             icon: Icon(
                               Icons.restore,
-                              color: Paletter.getGray(context),
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.inverseSurface,
                             ),
                             label: Text(
                               AppLocalizations.of(context)!.restoreDefaults,
                               style: TextStyle(
-                                color: Paletter.getGray(context),
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.inverseSurface,
                               ),
                             ),
                           ),
@@ -355,23 +371,13 @@ class SettingsFileServersPageState extends ConsumerState<SettingsFileServers> {
                       decoration: InputDecoration(
                         isDense: true,
                         hintText: AppLocalizations.of(context)!.enterBlossomUrl,
-                        hintStyle: TextStyle(
-                          color: Theme.of(context).colorScheme.onSurface,
-                          letterSpacing: 1.1,
-                        ),
+                        hintStyle: TextStyle(letterSpacing: 1.1),
                         filled: true,
-                        fillColor: Paletter.getExtraDarkGray(context),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.all(Radius.circular(50.0)),
-                          borderSide: BorderSide(
-                            color: Paletter.getExtraDarkGray(context),
-                          ),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.all(Radius.circular(25.0)),
-                          borderSide: BorderSide(
-                            color: Theme.of(context).colorScheme.surface,
-                          ),
                         ),
                       ),
                     ),

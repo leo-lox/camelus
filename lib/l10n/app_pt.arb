@@ -201,5 +201,171 @@
   "browseWithoutLogin": "Navegar sem fazer login",
   "loginRegistrationRequired": "Login/Registro necessário",
   "pleaseLoginToInteract": "Por favor, faça login/registre-se para interagir com publicações",
-  "loginRegister": "Login/Registro"
+  "loginRegister": "Login/Registro",
+  "all": "Todos",
+  "mentions": "Menções",
+  "preview": "Visualização",
+  "relayAlreadyExists": "O relay já existe",
+  "relayAlreadyExistsMessage": "Este relay já foi adicionado",
+  "discardChanges": "Descartar alterações",
+  "discardChangesMessage": "Deseja descartar as alterações?",
+  "deleteRelay": "Excluir relay",
+  "delete": "Excluir",
+  "noTextFoundInClipboard": "Nenhum texto encontrado na área de transferência",
+  "pleaseEnterValidBunkerUrl": "Por favor, insira uma URL de bunker válida",
+  "failedToConnectToBunker": "Falha ao conectar ao bunker",
+  "reactedToYourPost": "reagiu à sua publicação",
+  "repliedToYourPost": "respondeu à sua publicação",
+  "mentionedYouInThread": "mencionou você em um tópico",
+  "repostedYourPost": "compartilhou sua publicação",
+  "mentionedYou": "mencionou você",
+  "interactedWithYourPost": "interagiu com sua publicação",
+  "whenSomeoneInteractsWithYourPosts": "Quando alguém interage com suas publicações",
+  "noNotifications": "Sem notificações",
+  "endOfNotifications": "Fim das notificações",
+  "trends": "Tendências",
+  "recentStarterPacks": "Pacotes iniciais recentes",
+  "noResultsFound": "Nenhum resultado encontrado",
+  "people": "Pessoas",
+  "notes": "Notas",
+  "searchForHashtags": "Pesquisar hashtags",
+  "nip05Address": "Endereço NIP-05",
+  "repostHasNoInformation": "Este repost não contém informações",
+  "invalidSignature": "Assinatura inválida",
+  "deletionRequested": "Exclusão solicitada",
+  "unknownStarterPack": "Pacote inicial desconhecido",
+  "noStarterPacksFound": "Nenhum pacote inicial encontrado",
+  "searchToAddUser": "Pesquisar para adicionar usuário",
+  "noServersFound": "Nenhum servidor encontrado",
+  "noFilterFound": "Nenhum filtro encontrado",
+  "replyToPrefix": "responder a",
+  "andMoreCount": "e mais {count}",
+  "@andMoreCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "noteNotFound": "Nota não encontrada",
+  "shared": " compartilhou",
+  "loadingMightFail": "O carregamento pode falhar",
+  "bugReportMessage": "Relatar bug",
+  "noMoreNotesToShow": "Não há mais notas para mostrar",
+  "trendingPeople": "Pessoas em alta",
+  "trendingHashtags": "Hashtags em alta",
+  "somethingWentWrong": "Algo deu errado",
+  "noConnection": "Sem conexão",
+  "reconnectingToRelays": "Reconectando aos relays",
+  "addRelay": "Adicionar relay",
+  "read": "Ler",
+  "write": "Escrever",
+  "starterPack": "Pacote inicial",
+  "deleteStarterPack": "Excluir pacote inicial",
+  "deleteStarterPackConfirm": "Tem certeza de que deseja excluir este pacote inicial? Esta ação não pode ser desfeita.",
+  "share": "Compartilhar",
+  "starterPackBy": "Pacote inicial de {author}",
+  "@starterPackBy": {
+    "placeholders": {
+      "author": {
+        "type": "String"
+      }
+    }
+  },
+  "you": "você",
+  "addToStarterPackTitle": "Adicionar {name} ao pacote inicial",
+  "@addToStarterPackTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "createNewStarterPack": "Criar novo pacote inicial",
+  "upload": "Enviar",
+  "createYourStarterPack": "Crie seu pacote inicial",
+  "inviteFriendsToFollow": "Convide seus amigos para seguir suas pessoas favoritas",
+  "title": "Título",
+  "description": "Descrição",
+  "yourStarterPack": "seu pacote inicial",
+  "shareWithFriends": "Compartilhe com seus amigos e ajude-os a descobrir pessoas incríveis!",
+  "shareStarterPack": "compartilhar pacote inicial",
+  "publishStarterPack": "publicar pacote inicial",
+  "addUsersToContinue": "adicionar usuários para continuar",
+  "addUserMenuHint": "Adicionar usuário à lista",
+  "show": "Mostrar",
+  "pushNotifications": "Notificações push",
+  "receiveNotificationsAboutReplies": "Receber notificações sobre respostas",
+  "enableNotificationsForReplies": "Ativar notificações para respostas",
+  "notificationsDeniedInSettings": "Notificações negadas nas configurações",
+  "welcomeTo": "Bem-vindo ao",
+  "joinTheConversation": "Junte-se à conversa",
+  "errorLoadingNote": "Erro ao carregar nota",
+  "errorPrefix": "Erro: {error}",
+  "@errorPrefix": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "errorProcessingLink": "Erro ao processar link",
+  "processingLink": "Processando link",
+  "noMatchingActionFound": "Nenhuma ação correspondente encontrada",
+  "worksOnlyIfInCache": "Funciona apenas se estiver em cache",
+  "mastodonAddress": "Endereço Mastodon",
+  "amberLogin": "Login Amber",
+  "seedPhraseLogin": "Login com frase-semente",
+  "bunkerLogin": "Login Bunker",
+  "iHaveReadAndAcceptThe": "Eu li e aceito os",
+  "installAmber": "Instalar Amber",
+  "authoriseAmber": "Autorizar Amber",
+  "connect": "Conectar",
+  "followCount": "continuar com {count}/{target} pessoas",
+  "@followCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "target": {
+        "type": "int"
+      }
+    }
+  },
+  "notAvailable": "Não disponível",
+  "post": "Publicar",
+  "newPostsCount": "{count} novas publicações",
+  "@newPostsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "noteReference": "Referência de nota",
+  "createStarterPack": "Criar pacote inicial",
+  "createAnother": "Criar outro",
+  "starterPackIsLive": "🎉 Seu pacote inicial está ativo!",
+  "searchHint": "Pesquisar",
+  "bunkerUrlHint": "bunker://",
+  "continueWithPeople": "continuar com {count} pessoas",
+  "@continueWithPeople": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "unknown": "Desconhecido",
+  "follow": "seguir",
+  "unfollow": "deixar de seguir",
+  "invalidBunkerUrl": "URL de bunker inválida. Deve começar com bunker://",
+  "failedToConnectWithError": "Falha ao conectar: {error}",
+  "@failedToConnectWithError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  }
 }

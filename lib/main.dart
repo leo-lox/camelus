@@ -5,8 +5,6 @@ import 'package:flutter/foundation.dart';
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:ndk/shared/nips/nip01/key_pair.dart';
-import 'package:system_theme/system_theme.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:flutter_mentions/flutter_mentions.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -52,6 +50,23 @@ Future<void> main() async {
   }
 
   final startupAccData = await AppAuth.getStartupAccountData();
+
+  if (kDebugMode) {
+    print(startupAccData.loginType);
+    print(startupAccData.account?.toJson());
+  }
+
+  // currently incompatible with recent flutter sdk https://github.com/aloisdeniel/flutter_device_preview/issues/244
+  // if (kDebugMode && devDeviceFrame) {
+  //   runApp(
+  //     DevicePreview(
+  //       enabled: kDebugMode,
+  //       builder: (context) =>
+  //           MyApp(initialRoute: initalData[0], pubkey: initalData[1]),
+  //     ),
+  //   );
+  //   return;
+  // }
 
   // Create a ProviderContainer
   final providerContainer = ProviderContainer();

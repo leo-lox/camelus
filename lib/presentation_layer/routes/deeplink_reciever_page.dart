@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:camelus/l10n/app_localizations.dart';
 import 'package:camelus/presentation_layer/providers/ndk_provider.dart';
 import 'package:camelus/presentation_layer/providers/signer_provider.dart';
 import 'package:flutter/foundation.dart';
@@ -12,7 +13,6 @@ import '../../domain_layer/entities/invite_data.dart';
 import '../../domain_layer/entities/starter_pack_identifier.dart';
 import '../../domain_layer/usecases/app_auth.dart';
 import '../../helpers/helpers.dart';
-import '../../helpers/nevent_helper.dart';
 import '../../helpers/nprofile_helper.dart';
 import '../atoms/long_button.dart';
 import '../atoms/spinner_center.dart';
@@ -269,7 +269,7 @@ class _DeeplinkRecieverPageState extends ConsumerState<DeeplinkRecieverPage> {
             const SizedBox(height: 20),
             Center(
               child: Text(
-                'processing link:',
+                AppLocalizations.of(context)!.processingLink,
                 style: Theme.of(context).textTheme.titleLarge,
               ),
             ),
@@ -280,7 +280,8 @@ class _DeeplinkRecieverPageState extends ConsumerState<DeeplinkRecieverPage> {
             ),
             const SizedBox(height: 20),
             if (loading) const SpinnerCenter(),
-            if (!loading) Text('no matching action found'),
+            if (!loading)
+              Text(AppLocalizations.of(context)!.noMatchingActionFound),
             if (!loading && userErrorMsg != "")
               Text(
                 userErrorMsg,
@@ -288,7 +289,7 @@ class _DeeplinkRecieverPageState extends ConsumerState<DeeplinkRecieverPage> {
               ),
             const SizedBox(height: 20),
             longButton(
-              name: "home",
+              name: AppLocalizations.of(context)!.home,
               onPressed: () {
                 context.go('/home');
               },

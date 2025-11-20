@@ -135,9 +135,9 @@ class _NotificationPageState extends ConsumerState<NotificationPage>
               context,
             ).colorScheme.onSurfaceVariant,
             indicatorColor: Theme.of(context).colorScheme.primary,
-            tabs: const [
-              Tab(text: "All"),
-              Tab(text: "Mentions"),
+            tabs: [
+              Tab(text: AppLocalizations.of(context)!.all),
+              Tab(text: AppLocalizations.of(context)!.mentions),
             ],
           ),
           Expanded(
@@ -199,7 +199,7 @@ class _NotificationPageState extends ConsumerState<NotificationPage>
           ),
           SizedBox(height: 8),
           Text(
-            'When someone interacts with your posts,\nyou\'ll see it here',
+            AppLocalizations.of(context)!.whenSomeoneInteractsWithYourPosts,
             style: TextStyle(
               color: Theme.of(context).colorScheme.onSurfaceVariant,
               fontSize: 14,
@@ -219,7 +219,7 @@ class _NotificationPageState extends ConsumerState<NotificationPage>
     String pubkey,
   ) {
     if (notifications.isEmpty && state.endOfNotifications) {
-      return _buildEmptyState("no notifications");
+      return _buildEmptyState(AppLocalizations.of(context)!.noNotifications);
     }
 
     return FlutterListView(
@@ -227,7 +227,9 @@ class _NotificationPageState extends ConsumerState<NotificationPage>
         // Handle the loading indicator at the end
         if (index == notifications.length) {
           if (state.endOfNotifications) {
-            return NoMoreNotes(text: "end of notifications");
+            return NoMoreNotes(
+              text: AppLocalizations.of(context)!.endOfNotifications,
+            );
           }
           return Padding(
             padding: const EdgeInsets.symmetric(vertical: 16.0),
@@ -328,19 +330,20 @@ class _NotificationPageState extends ConsumerState<NotificationPage>
 
   // Get appropriate text based on notification type
   String _getNotificationText(NostrNotification notification) {
+    final l10n = AppLocalizations.of(context)!;
     switch (notification.type) {
       case NotificationType.reaction:
-        return "reacted to your post";
+        return l10n.reactedToYourPost;
       case NotificationType.reply:
-        return "replied to your post";
+        return l10n.repliedToYourPost;
       case NotificationType.threadReply:
-        return "mentiend you in a thread";
+        return l10n.mentionedYouInThread;
       case NotificationType.repost:
-        return "reposted your post";
+        return l10n.repostedYourPost;
       case NotificationType.mention:
-        return "mentioned you";
+        return l10n.mentionedYou;
       default:
-        return "interacted with your post";
+        return l10n.interactedWithYourPost;
     }
   }
 
