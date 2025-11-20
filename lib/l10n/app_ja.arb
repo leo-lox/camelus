@@ -194,5 +194,171 @@
   "addingToBookmarks": "ブックマークに追加中...",
   "removingFromBookmarks": "ブックマークから削除中...",
   "failedToAddBookmark": "ブックマークの追加に失敗しました",
-  "failedToRemoveBookmark": "ブックマークの削除に失敗しました"
+  "failedToRemoveBookmark": "ブックマークの削除に失敗しました",
+  "all": "すべて",
+  "mentions": "メンション",
+  "preview": "プレビュー",
+  "relayAlreadyExists": "リレーは既に存在します",
+  "relayAlreadyExistsMessage": "このリレーは既に追加されています",
+  "discardChanges": "変更を破棄",
+  "discardChangesMessage": "変更を破棄しますか？",
+  "deleteRelay": "リレーを削除",
+  "delete": "削除",
+  "noTextFoundInClipboard": "クリップボードにテキストが見つかりません",
+  "pleaseEnterValidBunkerUrl": "有効なBunker URLを入力してください",
+  "failedToConnectToBunker": "Bunkerへの接続に失敗しました",
+  "reactedToYourPost": "があなたの投稿に反応しました",
+  "repliedToYourPost": "があなたの投稿に返信しました",
+  "mentionedYouInThread": "がスレッドであなたをメンションしました",
+  "repostedYourPost": "があなたの投稿をシェアしました",
+  "mentionedYou": "があなたをメンションしました",
+  "interactedWithYourPost": "があなたの投稿に反応しました",
+  "whenSomeoneInteractsWithYourPosts": "誰かがあなたの投稿に反応したとき",
+  "noNotifications": "通知はありません",
+  "endOfNotifications": "通知の終わり",
+  "trends": "トレンド",
+  "recentStarterPacks": "最近のスターターパック",
+  "noResultsFound": "結果が見つかりません",
+  "people": "ユーザー",
+  "notes": "ノート",
+  "searchForHashtags": "ハッシュタグを検索",
+  "nip05Address": "NIP-05アドレス",
+  "repostHasNoInformation": "このリポストには情報がありません",
+  "invalidSignature": "無効な署名",
+  "deletionRequested": "削除がリクエストされました",
+  "unknownStarterPack": "不明なスターターパック",
+  "noStarterPacksFound": "スターターパックが見つかりません",
+  "searchToAddUser": "ユーザーを追加するには検索してください",
+  "noServersFound": "サーバーが見つかりません",
+  "noFilterFound": "フィルターが見つかりません",
+  "replyToPrefix": "返信先",
+  "andMoreCount": "他{count}件",
+  "@andMoreCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "noteNotFound": "ノートが見つかりません",
+  "shared": " がシェアしました",
+  "loadingMightFail": "読み込みに失敗する可能性があります",
+  "bugReportMessage": "バグを報告",
+  "noMoreNotesToShow": "表示するノートはもうありません",
+  "trendingPeople": "トレンドのユーザー",
+  "trendingHashtags": "トレンドのハッシュタグ",
+  "somethingWentWrong": "エラーが発生しました",
+  "noConnection": "接続がありません",
+  "reconnectingToRelays": "リレーに再接続中",
+  "addRelay": "リレーを追加",
+  "read": "読み取り",
+  "write": "書き込み",
+  "starterPack": "スターターパック",
+  "deleteStarterPack": "スターターパックを削除",
+  "deleteStarterPackConfirm": "このスターターパックを削除してもよろしいですか？この操作は元に戻せません。",
+  "share": "共有",
+  "starterPackBy": "{author}のスターターパック",
+  "@starterPackBy": {
+    "placeholders": {
+      "author": {
+        "type": "String"
+      }
+    }
+  },
+  "you": "あなた",
+  "addToStarterPackTitle": "{name}をスターターパックに追加",
+  "@addToStarterPackTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "createNewStarterPack": "新しいスターターパックを作成",
+  "upload": "アップロード",
+  "createYourStarterPack": "スターターパックを作成",
+  "inviteFriendsToFollow": "お気に入りのユーザーをフォローするよう友達を招待",
+  "title": "タイトル",
+  "description": "説明",
+  "yourStarterPack": "あなたのスターターパック",
+  "shareWithFriends": "友達と共有して、素敵な人を発見する手助けをしましょう！",
+  "shareStarterPack": "スターターパックを共有",
+  "publishStarterPack": "スターターパックを公開",
+  "addUsersToContinue": "続けるにはユーザーを追加",
+  "addUserMenuHint": "リストにユーザーを追加",
+  "show": "表示",
+  "pushNotifications": "プッシュ通知",
+  "receiveNotificationsAboutReplies": "返信についての通知を受け取る",
+  "enableNotificationsForReplies": "返信の通知を有効にする",
+  "notificationsDeniedInSettings": "設定で通知が拒否されています",
+  "welcomeTo": "ようこそ",
+  "joinTheConversation": "会話に参加",
+  "errorLoadingNote": "ノートの読み込みエラー",
+  "errorPrefix": "エラー: {error}",
+  "@errorPrefix": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "errorProcessingLink": "リンクの処理エラー",
+  "processingLink": "リンクを処理中",
+  "noMatchingActionFound": "一致するアクションが見つかりません",
+  "worksOnlyIfInCache": "キャッシュにある場合のみ機能します",
+  "mastodonAddress": "Mastodonアドレス",
+  "amberLogin": "Amberログイン",
+  "seedPhraseLogin": "シードフレーズログイン",
+  "bunkerLogin": "Bunkerログイン",
+  "iHaveReadAndAcceptThe": "私は読んで同意します",
+  "installAmber": "Amberをインストール",
+  "authoriseAmber": "Amberを認証",
+  "connect": "接続",
+  "followCount": "{count}/{target}人で続ける",
+  "@followCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "target": {
+        "type": "int"
+      }
+    }
+  },
+  "notAvailable": "利用できません",
+  "post": "投稿",
+  "newPostsCount": "{count}件の新しい投稿",
+  "@newPostsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "noteReference": "ノート参照",
+  "createStarterPack": "スターターパックを作成",
+  "createAnother": "別のものを作成",
+  "starterPackIsLive": "🎉 スターターパックが公開されました！",
+  "searchHint": "検索",
+  "bunkerUrlHint": "bunker://",
+  "continueWithPeople": "{count}人で続ける",
+  "@continueWithPeople": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "unknown": "不明",
+  "follow": "フォロー",
+  "unfollow": "フォロー解除",
+  "invalidBunkerUrl": "無効なBunker URLです。bunker://で始まる必要があります",
+  "failedToConnectWithError": "接続に失敗しました: {error}",
+  "@failedToConnectWithError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  }
 }

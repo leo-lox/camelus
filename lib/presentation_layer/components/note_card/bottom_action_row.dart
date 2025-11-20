@@ -1,4 +1,3 @@
-import 'package:camelus/config/palette.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
@@ -102,7 +101,7 @@ class _BottomActionRowState extends State<BottomActionRow>
 
   @override
   Widget build(BuildContext context) {
-    final defaultColor = Paletter.getDarkGray(context);
+    final defaultColor = Theme.of(context).colorScheme.surfaceContainerHighest;
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -143,7 +142,7 @@ class _BottomActionRowState extends State<BottomActionRow>
   }
 
   Widget _buildLikeButton() {
-    final defaultColor = Paletter.getDarkGray(context);
+    final defaultColor = Theme.of(context).colorScheme.surfaceContainerHighest;
     return SizedBox(
       height: 35,
       width: 65,
@@ -172,7 +171,7 @@ class _BottomActionRowState extends State<BottomActionRow>
                 Text(
                   widget.likeCount.toString(),
                   style: TextStyle(
-                    color: Paletter.getGray(context),
+                    color: Theme.of(context).colorScheme.inverseSurface,
                     fontSize: 16,
                   ),
                 ),
@@ -191,7 +190,7 @@ class _BottomActionRowState extends State<BottomActionRow>
     int? count,
     Color? color,
   }) {
-    final defaultColor = Paletter.getDarkGray(context);
+    final defaultColor = Theme.of(context).colorScheme.surfaceContainerHighest;
     return SizedBox(
       height: 35,
       width: 65,
@@ -218,7 +217,7 @@ class _BottomActionRowState extends State<BottomActionRow>
                 Text(
                   count.toString(),
                   style: TextStyle(
-                    color: Paletter.getGray(context),
+                    color: Theme.of(context).colorScheme.inverseSurface,
                     fontSize: 16,
                   ),
                 ),
@@ -239,7 +238,9 @@ Widget _buildRetweetButton({
 }) {
   return Builder(
     builder: (context) {
-      final defaultColor = Paletter.getDarkGray(context);
+      final defaultColor = Theme.of(
+        context,
+      ).colorScheme.surfaceContainerHighest;
       return SizedBox(
         height: 35,
         width: 65,
@@ -273,7 +274,7 @@ Widget _buildRetweetButton({
                   Text(
                     count.toString(),
                     style: TextStyle(
-                      color: Paletter.getGray(context),
+                      color: Theme.of(context).colorScheme.inverseSurface,
                       fontSize: 16,
                     ),
                   ),

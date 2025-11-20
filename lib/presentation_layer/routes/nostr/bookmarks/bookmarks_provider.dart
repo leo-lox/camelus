@@ -11,8 +11,9 @@ final bookmarksProvider = Provider<GetNostrLists>((ref) {
   final NostrListRepository listsRepo = NostrListRepositoryImpl(
     dartNdkSource: dartNdkSource,
   );
-  final GetNostrLists getBookmarks =
-      GetNostrLists(nostrListRepository: listsRepo);
+  final GetNostrLists getBookmarks = GetNostrLists(
+    nostrListRepository: listsRepo,
+  );
 
   return getBookmarks;
 });

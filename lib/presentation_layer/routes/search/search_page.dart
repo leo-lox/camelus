@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'dart:developer';
 import 'dart:io';
+import 'package:camelus/l10n/app_localizations.dart';
 import 'package:camelus/presentation_layer/components/trends/trending_hashtags_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -200,7 +201,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
                         Text(
-                          "trends",
+                          AppLocalizations.of(context)!.trends,
                           style: TextStyle(
                             color: Theme.of(context).colorScheme.onSurface,
                             fontSize: 27,
@@ -218,7 +219,9 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                           child: Text(
                             "by nostr.band",
                             style: TextStyle(
-                              color: Paletter.getGray(context),
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.inverseSurface,
                               fontSize: 14,
                             ),
                           ),
@@ -236,7 +239,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
               Padding(
                 padding: EdgeInsets.only(left: 20, bottom: 10),
                 child: Text(
-                  "recent starter packs",
+                  AppLocalizations.of(context)!.recentStarterPacks,
                   style: TextStyle(
                     color: Theme.of(context).colorScheme.onSurface,
                     fontSize: 25,
@@ -271,7 +274,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
             // Search query display
             if (searchState.searchQuery.isNotEmpty) ...[
               _buildSearchQueryCard(searchState.searchQuery),
-              Divider(color: Paletter.getExtraDarkGray(context), height: 20),
+              Divider(color: Theme.of(context).colorScheme.surface, height: 20),
             ],
 
             // Loading indicator
@@ -317,9 +320,9 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                   child: Padding(
                     padding: EdgeInsets.all(20.0),
                     child: Text(
-                      "No results found",
+                      AppLocalizations.of(context)!.noResultsFound,
                       style: TextStyle(
-                        color: Paletter.getGray(context),
+                        color: Theme.of(context).colorScheme.inverseSurface,
                         fontSize: 16,
                       ),
                     ),
@@ -348,7 +351,10 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                 ),
               ),
             ),
-            Icon(PhosphorIcons.arrowUpLeft(), color: Paletter.getGray(context)),
+            Icon(
+              PhosphorIcons.arrowUpLeft(),
+              color: Theme.of(context).colorScheme.inverseSurface,
+            ),
           ],
         ),
       ),
@@ -360,7 +366,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          "People",
+          AppLocalizations.of(context)!.people,
           style: TextStyle(
             color: Theme.of(context).colorScheme.onSurface,
             fontSize: 20,
@@ -399,7 +405,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          "Notes",
+          AppLocalizations.of(context)!.notes,
           style: TextStyle(
             color: Theme.of(context).colorScheme.onSurface,
             fontSize: 20,
@@ -417,7 +423,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
 
 void _helpSearch(BuildContext context) {
   showModalBottomSheet(
-    backgroundColor: Paletter.getExtraDarkGray(context),
+    backgroundColor: Theme.of(context).colorScheme.surface,
     context: context,
     shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.only(
@@ -444,22 +450,22 @@ void _helpSearch(BuildContext context) {
               SizedBox(height: 25),
               _SearchHelpItem(
                 title: '#hashtag',
-                description: 'search for hashtags',
+                description: AppLocalizations.of(context)!.searchForHashtags,
               ),
               SizedBox(height: 20),
               _SearchHelpItem(
-                title: 'username',
-                description: 'works only if already in cache',
+                title: AppLocalizations.of(context)!.username,
+                description: AppLocalizations.of(context)!.worksOnlyIfInCache,
               ),
               SizedBox(height: 20),
               _SearchHelpItem(
                 title: 'user@domain.tld',
-                description: 'nip05 address',
+                description: AppLocalizations.of(context)!.nip05Address,
               ),
               SizedBox(height: 20),
               _SearchHelpItem(
                 title: '@mastodon@domain.tld',
-                description: 'mastodon address (provided by mostr.pub)',
+                description: AppLocalizations.of(context)!.mastodonAddress,
               ),
             ],
           ),

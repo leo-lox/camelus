@@ -1,7 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
 import 'package:camelus/l10n/app_localizations.dart';
-import '../../../config/palette.dart';
 
 class PostSettingsState {
   final bool enableContentWarning;
@@ -139,7 +138,7 @@ class _PostSettingsState extends ConsumerState<PostSettings> {
     }
 
     return AlertDialog(
-      backgroundColor: Paletter.getExtraDarkGray(context),
+      backgroundColor: Theme.of(context).colorScheme.surface,
       elevation: 24,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       title: Text(AppLocalizations.of(context)!.postSettings),
@@ -189,7 +188,9 @@ class _PostSettingsState extends ConsumerState<PostSettings> {
             ],
 
             const SizedBox(height: 16),
-            Divider(color: Paletter.getDarkGray(context)),
+            Divider(
+              color: Theme.of(context).colorScheme.surfaceContainerHighest,
+            ),
             const SizedBox(height: 16),
 
             // Client Tag Switch
@@ -242,11 +243,11 @@ class _PostSettingsState extends ConsumerState<PostSettings> {
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Paletter.getGray(context)),
+        border: Border.all(color: Theme.of(context).colorScheme.inverseSurface),
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<String>(
-          dropdownColor: Paletter.getExtraDarkGray(context),
+          dropdownColor: Theme.of(context).colorScheme.surface,
           value: _keyToDisplay(context, state.selectedWarning),
           isExpanded: true,
           icon: const Icon(Icons.arrow_drop_down),
