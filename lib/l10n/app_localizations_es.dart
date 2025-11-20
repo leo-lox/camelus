@@ -625,5 +625,24 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get pleaseLoginToManageFileServers =>
-      'Por favor, inicia sesión para administrar servidores de archivos';
+      'Por favor, inicia sesión para administrar los servidores de archivos';
+
+  @override
+  String get welcomeTo => 'bienvenido a';
+
+  @override
+  String get joinTheConversation => 'únete a la conversación';
+
+  @override
+  String get browseWithoutLogin => 'Navegar sin iniciar sesión';
+
+  @override
+  String get loginRegistrationRequired => 'Inicio de sesión/Registro requerido';
+
+  @override
+  String get pleaseLoginToInteract =>
+      'Por favor, inicia sesión/regístrate para interactuar con las publicaciones';
+
+  @override
+  String get loginRegister => 'Iniciar sesión/Registrarse';
 }

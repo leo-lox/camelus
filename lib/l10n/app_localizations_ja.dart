@@ -612,4 +612,22 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get pleaseLoginToManageFileServers => 'ファイルサーバーを管理するにはログインしてください';
+
+  @override
+  String get welcomeTo => 'ようこそ';
+
+  @override
+  String get joinTheConversation => '会話に参加する';
+
+  @override
+  String get browseWithoutLogin => 'ログインせずに閲覧';
+
+  @override
+  String get loginRegistrationRequired => 'ログイン/登録が必要です';
+
+  @override
+  String get pleaseLoginToInteract => '投稿とやり取りするにはログイン/登録してください';
+
+  @override
+  String get loginRegister => 'ログイン/登録';
 }

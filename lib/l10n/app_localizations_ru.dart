@@ -625,4 +625,23 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get pleaseLoginToManageFileServers =>
       'Пожалуйста, войдите, чтобы управлять файловыми серверами';
+
+  @override
+  String get welcomeTo => 'добро пожаловать в';
+
+  @override
+  String get joinTheConversation => 'присоединиться к разговору';
+
+  @override
+  String get browseWithoutLogin => 'Просмотр без входа';
+
+  @override
+  String get loginRegistrationRequired => 'Требуется вход/регистрация';
+
+  @override
+  String get pleaseLoginToInteract =>
+      'Пожалуйста, войдите/зарегистрируйтесь, чтобы взаимодействовать с постами';
+
+  @override
+  String get loginRegister => 'Войти/Зарегистрироваться';
 }

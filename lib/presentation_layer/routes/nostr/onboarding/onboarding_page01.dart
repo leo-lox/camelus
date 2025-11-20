@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../l10n/app_localizations.dart';
+
 class OnboardingPage01 extends ConsumerStatefulWidget {
   final Function loginCallback;
   final Function registerCallback;
@@ -27,7 +29,7 @@ class _OnboardingPage01State extends ConsumerState<OnboardingPage01> {
           children: [
             const Spacer(flex: 10),
             Text(
-              "welcome to",
+              AppLocalizations.of(context)!.welcomeTo,
               style: TextStyle(
                 color: Paletter.getExtraLightGray(context),
                 fontSize: MediaQuery.of(context).size.width / 22,
@@ -47,7 +49,7 @@ class _OnboardingPage01State extends ConsumerState<OnboardingPage01> {
               width: 400,
               height: 40,
               child: longButton(
-                name: "join the conversation",
+                name: AppLocalizations.of(context)!.joinTheConversation,
                 onPressed: (() {
                   widget.registerCallback();
                 }),
@@ -60,7 +62,7 @@ class _OnboardingPage01State extends ConsumerState<OnboardingPage01> {
               width: 400,
               height: 40,
               child: longButton(
-                name: "login",
+                name: AppLocalizations.of(context)!.login,
                 onPressed: (() {
                   widget.loginCallback();
                 }),
@@ -73,7 +75,7 @@ class _OnboardingPage01State extends ConsumerState<OnboardingPage01> {
                 context.go('/home');
               },
               child: Text(
-                "Browse without login",
+                AppLocalizations.of(context)!.browseWithoutLogin,
                 style: TextStyle(
                   color: Paletter.getExtraLightGray(context),
                   fontSize: 14,

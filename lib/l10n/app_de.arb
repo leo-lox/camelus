@@ -195,5 +195,11 @@
   "removingFromBookmarks": "Wird aus Lesezeichen entfernt...",
   "failedToAddBookmark": "Lesezeichen konnte nicht hinzugefügt werden",
   "failedToRemoveBookmark": "Lesezeichen konnte nicht entfernt werden",
-  "pleaseLoginToManageFileServers": "Bitte melden Sie sich an, um Dateiserver zu verwalten"
+  "pleaseLoginToManageFileServers": "Bitte melden Sie sich an, um Dateiserver zu verwalten",
+  "welcomeTo": "Willkommen bei",
+  "joinTheConversation": "An der Konversation teilnehmen",
+  "browseWithoutLogin": "Ohne Anmeldung durchsuchen",
+  "loginRegistrationRequired": "Anmeldung/Registrierung erforderlich",
+  "pleaseLoginToInteract": "Bitte melden Sie sich an/registrieren Sie sich, um mit Beiträgen zu interagieren",
+  "loginRegister": "Anmelden/Registrieren"
 }

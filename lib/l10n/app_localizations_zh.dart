@@ -610,4 +610,22 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get pleaseLoginToManageFileServers => '请登录以管理文件服务器';
+
+  @override
+  String get welcomeTo => '欢迎来到';
+
+  @override
+  String get joinTheConversation => '加入对话';
+
+  @override
+  String get browseWithoutLogin => '无需登录即可浏览';
+
+  @override
+  String get loginRegistrationRequired => '需要登录/注册';
+
+  @override
+  String get pleaseLoginToInteract => '请登录/注册以与帖子互动';
+
+  @override
+  String get loginRegister => '登录/注册';
 }

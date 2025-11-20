@@ -10,6 +10,7 @@ import 'package:ndk/data_layer/repositories/signers/nip46_event_signer.dart';
 import 'package:ndk/ndk.dart';
 import 'package:ndk/shared/nips/nip19/nip19.dart';
 import 'package:ndk_amber/ndk_amber.dart';
+import '../../l10n/app_localizations.dart';
 import '../../presentation_layer/providers/signer_provider.dart';
 import '../entities/stored_account.dart';
 
@@ -221,19 +222,19 @@ class AppAuth {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Login/Registration Required'),
-        content: Text('Please login/register to interact with posts'),
+        title: Text(AppLocalizations.of(context)!.loginRegistrationRequired),
+        content: Text(AppLocalizations.of(context)!.pleaseLoginToInteract),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('Cancel'),
+            child: Text(AppLocalizations.of(context)!.cancel),
           ),
           ElevatedButton(
             onPressed: () {
               Navigator.pop(context);
               context.push('/onboarding');
             },
-            child: Text('Login/Register'),
+            child: Text(AppLocalizations.of(context)!.loginRegister),
           ),
         ],
       ),

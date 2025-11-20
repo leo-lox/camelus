@@ -195,5 +195,11 @@
   "removingFromBookmarks": "Удаление из закладок...",
   "failedToAddBookmark": "Не удалось добавить закладку",
   "failedToRemoveBookmark": "Не удалось удалить закладку",
-  "pleaseLoginToManageFileServers": "Пожалуйста, войдите, чтобы управлять файловыми серверами"
+  "pleaseLoginToManageFileServers": "Пожалуйста, войдите, чтобы управлять файловыми серверами",
+  "welcomeTo": "добро пожаловать в",
+  "joinTheConversation": "присоединиться к разговору",
+  "browseWithoutLogin": "Просмотр без входа",
+  "loginRegistrationRequired": "Требуется вход/регистрация",
+  "pleaseLoginToInteract": "Пожалуйста, войдите/зарегистрируйтесь, чтобы взаимодействовать с постами",
+  "loginRegister": "Войти/Зарегистрироваться"
 }

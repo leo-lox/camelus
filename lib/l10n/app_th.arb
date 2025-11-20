@@ -195,5 +195,11 @@
   "removingFromBookmarks": "กำลังลบออกจากบุ๊กมาร์ก...",
   "failedToAddBookmark": "ไม่สามารถเพิ่มบุ๊กมาร์กได้",
   "failedToRemoveBookmark": "ไม่สามารถลบบุ๊กมาร์กได้",
-  "pleaseLoginToManageFileServers": "โปรดเข้าสู่ระบบเพื่อจัดการเซิร์ฟเวอร์ไฟล์"
+  "pleaseLoginToManageFileServers": "โปรดเข้าสู่ระบบเพื่อจัดการเซิร์ฟเวอร์ไฟล์",
+  "welcomeTo": "ยินดีต้อนรับสู่",
+  "joinTheConversation": "เข้าร่วมการสนทนา",
+  "browseWithoutLogin": "เรียกดูโดยไม่ต้องเข้าสู่ระบบ",
+  "loginRegistrationRequired": "ต้องเข้าสู่ระบบ/ลงทะเบียน",
+  "pleaseLoginToInteract": "โปรดเข้าสู่ระบบ/ลงทะเบียนเพื่อโต้ตอบกับโพสต์",
+  "loginRegister": "เข้าสู่ระบบ/ลงทะเบียน"
 }

@@ -632,4 +632,23 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get pleaseLoginToManageFileServers =>
       'Veuillez vous connecter pour gérer les serveurs de fichiers';
+
+  @override
+  String get welcomeTo => 'bienvenue à';
+
+  @override
+  String get joinTheConversation => 'rejoindre la conversation';
+
+  @override
+  String get browseWithoutLogin => 'Parcourir sans se connecter';
+
+  @override
+  String get loginRegistrationRequired => 'Connexion/Inscription requise';
+
+  @override
+  String get pleaseLoginToInteract =>
+      'Veuillez vous connecter/vous inscrire pour interagir avec les publications';
+
+  @override
+  String get loginRegister => 'Se connecter/S\'inscrire';
 }

@@ -624,4 +624,23 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get pleaseLoginToManageFileServers =>
       'Please login to manage file servers';
+
+  @override
+  String get welcomeTo => 'welcome to';
+
+  @override
+  String get joinTheConversation => 'join the conversation';
+
+  @override
+  String get browseWithoutLogin => 'Browse without login';
+
+  @override
+  String get loginRegistrationRequired => 'Login/Registration Required';
+
+  @override
+  String get pleaseLoginToInteract =>
+      'Please login/register to interact with posts';
+
+  @override
+  String get loginRegister => 'Login/Register';
 }

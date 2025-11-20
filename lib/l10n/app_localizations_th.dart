@@ -622,4 +622,23 @@ class AppLocalizationsTh extends AppLocalizations {
   @override
   String get pleaseLoginToManageFileServers =>
       'โปรดเข้าสู่ระบบเพื่อจัดการเซิร์ฟเวอร์ไฟล์';
+
+  @override
+  String get welcomeTo => 'ยินดีต้อนรับสู่';
+
+  @override
+  String get joinTheConversation => 'เข้าร่วมการสนทนา';
+
+  @override
+  String get browseWithoutLogin => 'เรียกดูโดยไม่ต้องเข้าสู่ระบบ';
+
+  @override
+  String get loginRegistrationRequired => 'ต้องเข้าสู่ระบบ/ลงทะเบียน';
+
+  @override
+  String get pleaseLoginToInteract =>
+      'โปรดเข้าสู่ระบบ/ลงทะเบียนเพื่อโต้ตอบกับโพสต์';
+
+  @override
+  String get loginRegister => 'เข้าสู่ระบบ/ลงทะเบียน';
 }

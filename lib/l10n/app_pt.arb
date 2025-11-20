@@ -195,5 +195,11 @@
   "removingFromBookmarks": "Removendo dos favoritos...",
   "failedToAddBookmark": "Falha ao adicionar favorito",
   "failedToRemoveBookmark": "Falha ao remover favorito",
-  "pleaseLoginToManageFileServers": "Por favor, faça login para gerenciar servidores de arquivos"
+  "pleaseLoginToManageFileServers": "Por favor, faça login para gerenciar servidores de arquivos",
+  "welcomeTo": "bem-vindo ao",
+  "joinTheConversation": "participe da conversa",
+  "browseWithoutLogin": "Navegar sem fazer login",
+  "loginRegistrationRequired": "Login/Registro necessário",
+  "pleaseLoginToInteract": "Por favor, faça login/registre-se para interagir com publicações",
+  "loginRegister": "Login/Registro"
 }

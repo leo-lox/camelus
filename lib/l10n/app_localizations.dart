@@ -1287,6 +1287,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Please login to manage file servers'**
   String get pleaseLoginToManageFileServers;
+
+  /// Welcome greeting prefix on onboarding page
+  ///
+  /// In en, this message translates to:
+  /// **'welcome to'**
+  String get welcomeTo;
+
+  /// Button text to register/join Camelus
+  ///
+  /// In en, this message translates to:
+  /// **'join the conversation'**
+  String get joinTheConversation;
+
+  /// Button text to browse app without logging in
+  ///
+  /// In en, this message translates to:
+  /// **'Browse without login'**
+  String get browseWithoutLogin;
+
+  /// Dialog title prompting user to login or register
+  ///
+  /// In en, this message translates to:
+  /// **'Login/Registration Required'**
+  String get loginRegistrationRequired;
+
+  /// Message explaining user needs to login to interact with content
+  ///
+  /// In en, this message translates to:
+  /// **'Please login/register to interact with posts'**
+  String get pleaseLoginToInteract;
+
+  /// Button text for login or register action
+  ///
+  /// In en, this message translates to:
+  /// **'Login/Register'**
+  String get loginRegister;
 }
 
 class _AppLocalizationsDelegate

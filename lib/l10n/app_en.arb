@@ -818,5 +818,29 @@
   "pleaseLoginToManageFileServers": "Please login to manage file servers",
   "@pleaseLoginToManageFileServers": {
     "description": "Message shown when user is not logged in on file servers page"
+  },
+  "welcomeTo": "welcome to",
+  "@welcomeTo": {
+    "description": "Welcome greeting prefix on onboarding page"
+  },
+  "joinTheConversation": "join the conversation",
+  "@joinTheConversation": {
+    "description": "Button text to register/join Camelus"
+  },
+  "browseWithoutLogin": "Browse without login",
+  "@browseWithoutLogin": {
+    "description": "Button text to browse app without logging in"
+  },
+  "loginRegistrationRequired": "Login/Registration Required",
+  "@loginRegistrationRequired": {
+    "description": "Dialog title prompting user to login or register"
+  },
+  "pleaseLoginToInteract": "Please login/register to interact with posts",
+  "@pleaseLoginToInteract": {
+    "description": "Message explaining user needs to login to interact with content"
+  },
+  "loginRegister": "Login/Register",
+  "@loginRegister": {
+    "description": "Button text for login or register action"
   }
 }

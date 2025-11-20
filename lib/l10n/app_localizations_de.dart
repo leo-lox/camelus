@@ -629,4 +629,24 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get pleaseLoginToManageFileServers =>
       'Bitte melden Sie sich an, um Dateiserver zu verwalten';
+
+  @override
+  String get welcomeTo => 'Willkommen bei';
+
+  @override
+  String get joinTheConversation => 'An der Konversation teilnehmen';
+
+  @override
+  String get browseWithoutLogin => 'Ohne Anmeldung durchsuchen';
+
+  @override
+  String get loginRegistrationRequired =>
+      'Anmeldung/Registrierung erforderlich';
+
+  @override
+  String get pleaseLoginToInteract =>
+      'Bitte melden Sie sich an/registrieren Sie sich, um mit Beiträgen zu interagieren';
+
+  @override
+  String get loginRegister => 'Anmelden/Registrieren';
 }
