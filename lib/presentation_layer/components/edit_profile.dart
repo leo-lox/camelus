@@ -319,12 +319,7 @@ class _EditProfileState extends ConsumerState<EditProfile> {
               horizontal: 8.0,
             ),
             enabledBorder: UnderlineInputBorder(
-              borderSide: BorderSide(
-                width: 1,
-                color: Theme.of(context)
-                    .colorScheme
-                    .inverseSurface, // Border color for the text field.
-              ),
+              borderSide: BorderSide(width: 1),
             ),
           ),
           maxLines: isMultiline ? null : 1,

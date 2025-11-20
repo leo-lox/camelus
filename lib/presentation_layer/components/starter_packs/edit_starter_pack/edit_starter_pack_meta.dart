@@ -246,7 +246,6 @@ class _EditStarterPackMetaState extends ConsumerState<EditStarterPackMeta> {
                       // Title input
                       Container(
                         decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.surface,
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: TextField(
@@ -254,10 +253,7 @@ class _EditStarterPackMetaState extends ConsumerState<EditStarterPackMeta> {
                           onChanged: (value) {
                             starterPackNotifier.updateTitle(value);
                           },
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.onSurface,
-                            fontSize: 18,
-                          ),
+                          style: TextStyle(fontSize: 18),
                           decoration: InputDecoration(
                             border: InputBorder.none,
                             contentPadding: const EdgeInsets.all(16),
@@ -266,9 +262,7 @@ class _EditStarterPackMetaState extends ConsumerState<EditStarterPackMeta> {
                               color: starterPackData.title.length > 40
                                   ? Colors
                                         .orangeAccent //! hard coded color
-                                  : Theme.of(
-                                      context,
-                                    ).colorScheme.inverseSurface,
+                                  : null,
                               fontSize: 14,
                             ),
                           ),
@@ -296,7 +290,6 @@ class _EditStarterPackMetaState extends ConsumerState<EditStarterPackMeta> {
                       Container(
                         height: 200,
                         decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.surface,
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: TextField(
@@ -304,10 +297,7 @@ class _EditStarterPackMetaState extends ConsumerState<EditStarterPackMeta> {
                           onChanged: (value) {
                             starterPackNotifier.updateDescription(value);
                           },
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.onSurface,
-                            fontSize: 16,
-                          ),
+                          style: TextStyle(fontSize: 16),
                           maxLines: null,
                           expands: true,
                           textAlignVertical: TextAlignVertical.top,

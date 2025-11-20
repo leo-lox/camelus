@@ -173,20 +173,11 @@ class _EditRelaysViewState extends ConsumerState<EditRelaysView> {
                     decoration: InputDecoration(
                       hintText: AppLocalizations.of(context)!.addRelay,
                       enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(
-                          color: Theme.of(context).colorScheme.inverseSurface,
-                        ),
                         borderRadius: BorderRadius.all(Radius.circular(30)),
                       ),
                       focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(
-                          color: Theme.of(context).colorScheme.onSurface,
-                        ),
                         borderRadius: BorderRadius.all(Radius.circular(30)),
                       ),
-                    ),
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.onSurface,
                     ),
                     onSubmitted: (value) {
                       _addRelay();

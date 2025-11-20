@@ -84,10 +84,7 @@ class _OnboardingNameState extends ConsumerState<OnboardingName> {
                 decoration: InputDecoration(
                   hintText: AppLocalizations.of(context)!.whatShouldWeCallYou,
                   contentPadding: EdgeInsets.all(0),
-                  hintStyle: TextStyle(
-                    color: Theme.of(context).colorScheme.onSurface,
-                    letterSpacing: 1.1,
-                  ),
+                  hintStyle: TextStyle(letterSpacing: 1.1),
                   alignLabelWithHint: true,
                   border: InputBorder.none,
                 ),
@@ -95,7 +92,6 @@ class _OnboardingNameState extends ConsumerState<OnboardingName> {
                   widget.userInfo.name = value;
                 },
                 style: TextStyle(
-                  color: Theme.of(context).colorScheme.inverseSurface,
                   letterSpacing: 1.1,
                   fontSize: 28, // Increase the font size
                 ),

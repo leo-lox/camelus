@@ -252,31 +252,18 @@ class _BlockPageState extends ConsumerState<BlockPage> {
                                 : AppLocalizations.of(
                                     context,
                                   )!.whatIsWrongWithUser,
-                            hintStyle: TextStyle(
-                              color: Theme.of(context).colorScheme.onSurface,
-                              letterSpacing: 1.1,
-                            ),
+                            hintStyle: TextStyle(letterSpacing: 1.1),
                             filled: true,
-                            fillColor: Theme.of(context).colorScheme.surface,
                             enabledBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.all(
                                 Radius.circular(10.0),
-                              ),
-                              borderSide: BorderSide(
-                                color: Theme.of(context).colorScheme.surface,
                               ),
                             ),
                             focusedBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.all(
                                 Radius.circular(10.0),
                               ),
-                              borderSide: BorderSide(
-                                color: Theme.of(context).colorScheme.surface,
-                              ),
                             ),
-                          ),
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.onSurface,
                           ),
                           minLines: 3,
                           maxLines: 5,
