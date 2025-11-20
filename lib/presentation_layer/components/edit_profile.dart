@@ -181,11 +181,7 @@ class _EditProfileState extends ConsumerState<EditProfile> {
                             child: LinearProgressIndicator(
                               backgroundColor: Theme.of(
                                 context,
-<<<<<<< HEAD
-                              ).colorScheme.surfaceContainerHighest,
-=======
                               ).colorScheme.inverseSurface,
->>>>>>> dev
                               valueColor: AlwaysStoppedAnimation<Color>(
                                 Theme.of(context).colorScheme.primary,
                               ),
@@ -333,20 +329,7 @@ class _EditProfileState extends ConsumerState<EditProfile> {
               horizontal: 8.0,
             ),
             enabledBorder: UnderlineInputBorder(
-<<<<<<< HEAD
-              borderSide: BorderSide(
-                width: 1,
-                color: Theme.of(context).colorScheme.outline,
-              ),
-            ),
-            focusedBorder: UnderlineInputBorder(
-              borderSide: BorderSide(
-                width: 2,
-                color: Theme.of(context).colorScheme.primary,
-              ),
-=======
               borderSide: BorderSide(width: 1),
->>>>>>> dev
             ),
           ),
           maxLines: isMultiline ? null : 1,
