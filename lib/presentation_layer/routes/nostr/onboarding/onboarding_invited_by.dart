@@ -101,7 +101,7 @@ class _OnboardingInvitedByState extends ConsumerState<OnboardingInvitedBy> {
                         child: Text(
                           invitedSet?.title ?? '',
                           style: TextStyle(
-                            color: Theme.of(context).colorScheme.onPrimary,
+                            color: Theme.of(context).colorScheme.onSurface,
                             fontSize: 25,
                             fontWeight: FontWeight.bold,
                           ),
@@ -128,7 +128,9 @@ class _OnboardingInvitedByState extends ConsumerState<OnboardingInvitedBy> {
                                     TextSpan(
                                       text: inviteeMetadata.userMetadata?.name,
                                       style: TextStyle(
-                                        color: Theme.of(context).colorScheme.onPrimary,
+                                        color: Theme.of(
+                                          context,
+                                        ).colorScheme.onSurface,
                                         fontSize: 18,
                                         fontWeight: FontWeight.bold,
                                       ),
@@ -138,7 +140,9 @@ class _OnboardingInvitedByState extends ConsumerState<OnboardingInvitedBy> {
                                         context,
                                       )!.invitedYouToJoin,
                                       style: TextStyle(
-                                        color: Theme.of(context).colorScheme.onPrimary,
+                                        color: Theme.of(
+                                          context,
+                                        ).colorScheme.onSurface,
                                         fontSize: 16,
                                       ),
                                     ),
@@ -222,7 +226,9 @@ class _OnboardingInvitedByState extends ConsumerState<OnboardingInvitedBy> {
                                     Text(
                                       displayMetadata?.about ?? "",
                                       style: TextStyle(
-                                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                        color: Theme.of(
+                                          context,
+                                        ).colorScheme.inverseSurface,
                                         fontSize: 12,
                                       ),
                                       maxLines: 3,

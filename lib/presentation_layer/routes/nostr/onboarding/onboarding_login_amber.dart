@@ -119,7 +119,7 @@ class _OnboardingLoginAmberPageState
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      "login",
+                      AppLocalizations.of(context)!.login,
                       style: TextStyle(
                         color: Theme.of(context).colorScheme.onSurface,
                         fontSize: 40,
@@ -142,7 +142,7 @@ class _OnboardingLoginAmberPageState
                     },
                   ),
                   Text(
-                    "I have read and accept the ",
+                    AppLocalizations.of(context)!.iHaveReadAndAcceptThe,
                     style: TextStyle(
                       color: Theme.of(context).colorScheme.onSurface,
                       fontSize: 12,
@@ -155,7 +155,7 @@ class _OnboardingLoginAmberPageState
                       launchUrl(url, mode: LaunchMode.externalApplication);
                     },
                     child: Text(
-                      "terms and conditions",
+                      AppLocalizations.of(context)!.termsAndConditions,
                       style: TextStyle(
                         color: Theme.of(context).colorScheme.onSurface,
                         fontSize: 12,
@@ -173,7 +173,7 @@ class _OnboardingLoginAmberPageState
                   launchUrl(url, mode: LaunchMode.externalApplication);
                 },
                 child: Text(
-                  "privacy policy",
+                  AppLocalizations.of(context)!.privacyPolicy,
                   style: TextStyle(
                     color: Theme.of(context).colorScheme.onSurface,
                     fontSize: 12,
@@ -186,28 +186,22 @@ class _OnboardingLoginAmberPageState
               if (!_amberInstalled)
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: SizedBox(
-                    width: double.infinity,
-                    height: 40,
-                    child: longButton(
-                      name: "install amber",
-                      inverted: true,
-                      onPressed: () => _promtAmberInstall(),
-                    ),
+
+                  child: longButton(
+                    name: AppLocalizations.of(context)!.installAmber,
+                    inverted: true,
+                    onPressed: () => _promtAmberInstall(),
                   ),
                 ),
               if (_amberInstalled)
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: SizedBox(
-                    width: double.infinity,
-                    height: 40,
-                    child: longButton(
-                      name: "authorise amber",
-                      inverted: true,
-                      loading: _amberLoading,
-                      onPressed: () => _onAmberLogin(),
-                    ),
+
+                  child: longButton(
+                    name: AppLocalizations.of(context)!.authoriseAmber,
+                    inverted: true,
+                    loading: _amberLoading,
+                    onPressed: () => _onAmberLogin(),
                   ),
                 ),
             ],

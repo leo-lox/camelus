@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:math';
 
 import 'package:camelus/l10n/app_localizations.dart';
@@ -7,10 +6,8 @@ import 'package:camelus/presentation_layer/components/responsive_center.dart';
 import 'package:camelus/presentation_layer/providers/ndk_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:ndk/ndk.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../config/default_blossom.dart';

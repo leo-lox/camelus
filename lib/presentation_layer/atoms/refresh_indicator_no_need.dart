@@ -1,4 +1,3 @@
-import 'package:camelus/config/palette.dart';
 import 'package:custom_refresh_indicator/custom_refresh_indicator.dart';
 import 'package:flutter/material.dart';
 
@@ -74,7 +73,7 @@ class _MyIndicator extends StatelessWidget {
               decoration: BoxDecoration(
                 //backgroundBlendMode: BlendMode.clear,
                 borderRadius: BorderRadius.circular(20),
-                color: Paletter.getExtraDarkGray(context),
+                color: Theme.of(context).colorScheme.surface,
               ),
               child: Text(
                 'no need 😉', // The custom message displayed when the refresh indicator is active.

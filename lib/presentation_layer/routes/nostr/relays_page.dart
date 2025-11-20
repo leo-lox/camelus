@@ -1,4 +1,3 @@
-import 'package:camelus/config/palette.dart';
 import 'package:camelus/l10n/app_localizations.dart';
 import 'package:camelus/presentation_layer/providers/ndk_provider.dart';
 
@@ -81,14 +80,14 @@ class _RelaysPageState extends ConsumerState<RelaysPage> {
                                               return Container(
                                                 width: 50,
                                                 height: 50,
-                                                color: Paletter.getLightGray(
+                                                color: Theme.of(
                                                   context,
-                                                ),
+                                                ).colorScheme.inverseSurface,
                                                 child: Icon(
                                                   PhosphorIcons.globe(),
-                                                  color: Paletter.getDarkGray(
-                                                    context,
-                                                  ),
+                                                  color: Theme.of(context)
+                                                      .colorScheme
+                                                      .surfaceContainerHighest,
                                                 ),
                                               );
                                             },
@@ -98,14 +97,18 @@ class _RelaysPageState extends ConsumerState<RelaysPage> {
                                       width: 50,
                                       height: 50,
                                       decoration: BoxDecoration(
-                                        color: Paletter.getLightGray(context),
+                                        color: Theme.of(
+                                          context,
+                                        ).colorScheme.inverseSurface,
                                         borderRadius: BorderRadius.circular(
                                           8.0,
                                         ),
                                       ),
                                       child: Icon(
                                         PhosphorIcons.globe(),
-                                        color: Paletter.getDarkGray(context),
+                                        color: Theme.of(
+                                          context,
+                                        ).colorScheme.surfaceContainerHighest,
                                       ),
                                     ),
                               const SizedBox(width: 16),
@@ -127,7 +130,9 @@ class _RelaysPageState extends ConsumerState<RelaysPage> {
                                       url,
                                       style: TextStyle(
                                         fontSize: 14,
-                                        color: Paletter.getGray(context),
+                                        color: Theme.of(
+                                          context,
+                                        ).colorScheme.inverseSurface,
                                       ),
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
@@ -141,7 +146,7 @@ class _RelaysPageState extends ConsumerState<RelaysPage> {
                                     : PhosphorIcons.plugs(),
                                 color: relay.isConnected
                                     ? Theme.of(context).colorScheme.primary
-                                    : Colors.orangeAccent,
+                                    : Colors.orangeAccent, //! hard coded color
                                 size: 28,
                               ),
                             ],
@@ -186,7 +191,9 @@ class _RelaysPageState extends ConsumerState<RelaysPage> {
                                 relay.relayInfo!.description,
                                 style: TextStyle(
                                   fontSize: 14,
-                                  color: Paletter.getLightGray(context),
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.inverseSurface,
                                 ),
                                 maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
@@ -201,7 +208,9 @@ class _RelaysPageState extends ConsumerState<RelaysPage> {
                                 "contact: ${relay.relayInfo!.contact}",
                                 style: TextStyle(
                                   fontSize: 14,
-                                  color: Paletter.getGray(context),
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.inverseSurface,
                                 ),
                                 maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
@@ -252,7 +261,9 @@ class _RelaysPageState extends ConsumerState<RelaysPage> {
                                       child: Text(
                                         '•',
                                         style: TextStyle(
-                                          color: Paletter.getDarkGray(context),
+                                          color: Theme.of(
+                                            context,
+                                          ).colorScheme.surfaceContainerHighest,
                                         ),
                                       ),
                                     ),
@@ -327,11 +338,18 @@ class _StatItem extends StatelessWidget {
       constraints: BoxConstraints(maxWidth: maxWidth),
       child: Column(
         children: [
-          Icon(icon, size: 20, color: Paletter.getGray(context)),
+          Icon(
+            icon,
+            size: 20,
+            color: Theme.of(context).colorScheme.inverseSurface,
+          ),
           const SizedBox(height: 4),
           Text(
             label,
-            style: TextStyle(fontSize: 12, color: Paletter.getGray(context)),
+            style: TextStyle(
+              fontSize: 12,
+              color: Theme.of(context).colorScheme.inverseSurface,
+            ),
           ),
           const SizedBox(height: 2),
           Text(

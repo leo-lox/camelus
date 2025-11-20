@@ -1,3 +1,4 @@
+import 'package:camelus/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -34,7 +35,7 @@ class StarterPacksList extends ConsumerWidget {
       if (isOwnProfile) {
         return Center(
           child: longButton(
-            name: "create starter pack",
+            name: AppLocalizations.of(context)!.createStarterPack,
             inverted: true,
             onPressed: () {
               context.push(
@@ -49,7 +50,9 @@ class StarterPacksList extends ConsumerWidget {
         );
       }
 
-      return Center(child: Text("No starter packs found"));
+      return Center(
+        child: Text(AppLocalizations.of(context)!.noStarterPacksFound),
+      );
     }
 
     return Padding(
@@ -65,7 +68,7 @@ class StarterPacksList extends ConsumerWidget {
               padding: EdgeInsets.only(top: 18, bottom: 50),
               child: Center(
                 child: longButton(
-                  name: "create another",
+                  name: AppLocalizations.of(context)!.createAnother,
                   inverted: true,
                   onPressed: () {
                     context.push(

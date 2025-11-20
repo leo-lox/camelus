@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../../config/palette.dart';
-
 class CameraUpload extends StatelessWidget {
   final double size;
   const CameraUpload({super.key, this.size = 50});
@@ -12,7 +10,7 @@ class CameraUpload extends StatelessWidget {
       width: size,
       height: size,
       decoration: BoxDecoration(
-        color: Paletter.getExtraLightGray(context),
+        color: Theme.of(context).colorScheme.onSurface,
         shape: BoxShape.circle,
       ),
       child: Stack(
@@ -21,7 +19,7 @@ class CameraUpload extends StatelessWidget {
           Icon(
             Icons.camera_alt,
             size: size / 3,
-            color: Paletter.getDarkGray(context),
+            color: Theme.of(context).colorScheme.surfaceContainerHighest,
           ),
           Positioned(
             bottom: 0,
@@ -29,7 +27,7 @@ class CameraUpload extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.all(4),
               decoration: BoxDecoration(
-                color: Paletter.getDarkGray(context),
+                color: Theme.of(context).colorScheme.surfaceContainerHighest,
                 shape: BoxShape.circle,
               ),
               child: Icon(

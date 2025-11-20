@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../config/palette.dart';
 
 class MnemonicSentenceGrid extends StatelessWidget {
   final List<String> words;
@@ -43,7 +42,7 @@ class MnemonicSentenceGrid extends StatelessWidget {
                     '${index + 1}',
                     style: TextStyle(
                       fontSize: 10,
-                      color: Paletter.getGray(context),
+                      color: Theme.of(context).colorScheme.inverseSurface,
                     ),
                   ),
                 ),

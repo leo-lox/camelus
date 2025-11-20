@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:camelus/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -61,7 +62,7 @@ class _OnboardingLoginSelectPageState
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      "login",
+                      AppLocalizations.of(context)!.login,
                       style: TextStyle(
                         color: Theme.of(context).colorScheme.onSurface,
                         fontSize: 40,
@@ -75,40 +76,31 @@ class _OnboardingLoginSelectPageState
               if (Platform.isAndroid)
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: SizedBox(
-                    width: double.infinity,
-                    height: 40,
-                    child: longButton(
-                      name: "amber login",
-                      inverted: false,
-                      onPressed: () => widget.onPressedAmberLogin(),
-                    ),
+
+                  child: longButton(
+                    name: AppLocalizations.of(context)!.amberLogin,
+                    inverted: false,
+                    onPressed: () => widget.onPressedAmberLogin(),
                   ),
                 ),
               const SizedBox(height: 20),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: SizedBox(
-                  width: double.infinity,
-                  height: 40,
-                  child: longButton(
-                    name: "seed phrase login",
-                    inverted: false,
-                    onPressed: () => widget.onPressedSeedPhraseLogin(),
-                  ),
+
+                child: longButton(
+                  name: AppLocalizations.of(context)!.seedPhraseLogin,
+                  inverted: false,
+                  onPressed: () => widget.onPressedSeedPhraseLogin(),
                 ),
               ),
               const SizedBox(height: 20),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: SizedBox(
-                  width: double.infinity,
-                  height: 40,
-                  child: longButton(
-                    name: "bunker login",
-                    inverted: false,
-                    onPressed: () => widget.onPressedBunkerLogin(),
-                  ),
+
+                child: longButton(
+                  name: AppLocalizations.of(context)!.bunkerLogin,
+                  inverted: false,
+                  onPressed: () => widget.onPressedBunkerLogin(),
                 ),
               ),
             ],

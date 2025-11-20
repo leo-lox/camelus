@@ -194,5 +194,171 @@
   "addingToBookmarks": "Ajout aux favoris...",
   "removingFromBookmarks": "Suppression des favoris...",
   "failedToAddBookmark": "Échec de l'ajout du favori",
-  "failedToRemoveBookmark": "Échec de la suppression du favori"
+  "failedToRemoveBookmark": "Échec de la suppression du favori",
+  "all": "Tous",
+  "mentions": "Mentions",
+  "preview": "Aperçu",
+  "relayAlreadyExists": "Le relais existe déjà",
+  "relayAlreadyExistsMessage": "Ce relais a déjà été ajouté",
+  "discardChanges": "Annuler les modifications",
+  "discardChangesMessage": "Voulez-vous annuler les modifications?",
+  "deleteRelay": "Supprimer le relais",
+  "delete": "Supprimer",
+  "noTextFoundInClipboard": "Aucun texte trouvé dans le presse-papiers",
+  "pleaseEnterValidBunkerUrl": "Veuillez entrer une URL bunker valide",
+  "failedToConnectToBunker": "Échec de la connexion au bunker",
+  "reactedToYourPost": "a réagi à votre publication",
+  "repliedToYourPost": "a répondu à votre publication",
+  "mentionedYouInThread": "vous a mentionné dans un fil",
+  "repostedYourPost": "a partagé votre publication",
+  "mentionedYou": "vous a mentionné",
+  "interactedWithYourPost": "a interagi avec votre publication",
+  "whenSomeoneInteractsWithYourPosts": "Quand quelqu'un interagit avec vos publications",
+  "noNotifications": "Aucune notification",
+  "endOfNotifications": "Fin des notifications",
+  "trends": "Tendances",
+  "recentStarterPacks": "Packs de démarrage récents",
+  "noResultsFound": "Aucun résultat trouvé",
+  "people": "Personnes",
+  "notes": "Notes",
+  "searchForHashtags": "Rechercher des hashtags",
+  "nip05Address": "Adresse NIP-05",
+  "repostHasNoInformation": "Ce repost ne contient aucune information",
+  "invalidSignature": "Signature invalide",
+  "deletionRequested": "Suppression demandée",
+  "unknownStarterPack": "Pack de démarrage inconnu",
+  "noStarterPacksFound": "Aucun pack de démarrage trouvé",
+  "searchToAddUser": "Rechercher pour ajouter un utilisateur",
+  "noServersFound": "Aucun serveur trouvé",
+  "noFilterFound": "Aucun filtre trouvé",
+  "replyToPrefix": "répondre à",
+  "andMoreCount": "et {count} de plus",
+  "@andMoreCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "noteNotFound": "Note introuvable",
+  "shared": " a partagé",
+  "loadingMightFail": "Le chargement pourrait échouer",
+  "bugReportMessage": "Signaler un bug",
+  "noMoreNotesToShow": "Plus de notes à afficher",
+  "trendingPeople": "Personnes tendance",
+  "trendingHashtags": "Hashtags tendance",
+  "somethingWentWrong": "Quelque chose s'est mal passé",
+  "noConnection": "Aucune connexion",
+  "reconnectingToRelays": "Reconnexion aux relais",
+  "addRelay": "Ajouter un relais",
+  "read": "Lire",
+  "write": "Écrire",
+  "starterPack": "Pack de démarrage",
+  "deleteStarterPack": "Supprimer le pack de démarrage",
+  "deleteStarterPackConfirm": "Êtes-vous sûr de vouloir supprimer ce pack de démarrage? Cette action ne peut pas être annulée.",
+  "share": "Partager",
+  "starterPackBy": "Pack de démarrage par {author}",
+  "@starterPackBy": {
+    "placeholders": {
+      "author": {
+        "type": "String"
+      }
+    }
+  },
+  "you": "vous",
+  "addToStarterPackTitle": "Ajouter {name} au pack de démarrage",
+  "@addToStarterPackTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "createNewStarterPack": "Créer un nouveau pack de démarrage",
+  "upload": "Télécharger",
+  "createYourStarterPack": "Créez votre pack de démarrage",
+  "inviteFriendsToFollow": "Invitez vos amis à suivre vos personnes préférées",
+  "title": "Titre",
+  "description": "Description",
+  "yourStarterPack": "votre pack de démarrage",
+  "shareWithFriends": "Partagez-le avec vos amis et aidez-les à découvrir des personnes formidables!",
+  "shareStarterPack": "partager le pack de démarrage",
+  "publishStarterPack": "publier le pack de démarrage",
+  "addUsersToContinue": "ajouter des utilisateurs pour continuer",
+  "addUserMenuHint": "Ajouter un utilisateur à la liste",
+  "show": "Afficher",
+  "pushNotifications": "Notifications push",
+  "receiveNotificationsAboutReplies": "Recevoir des notifications concernant les réponses",
+  "enableNotificationsForReplies": "Activer les notifications pour les réponses",
+  "notificationsDeniedInSettings": "Notifications refusées dans les paramètres",
+  "welcomeTo": "Bienvenue à",
+  "joinTheConversation": "Rejoignez la conversation",
+  "errorLoadingNote": "Erreur lors du chargement de la note",
+  "errorPrefix": "Erreur: {error}",
+  "@errorPrefix": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "errorProcessingLink": "Erreur lors du traitement du lien",
+  "processingLink": "Traitement du lien",
+  "noMatchingActionFound": "Aucune action correspondante trouvée",
+  "worksOnlyIfInCache": "Fonctionne uniquement si en cache",
+  "mastodonAddress": "Adresse Mastodon",
+  "amberLogin": "Connexion Amber",
+  "seedPhraseLogin": "Connexion par phrase de récupération",
+  "bunkerLogin": "Connexion Bunker",
+  "iHaveReadAndAcceptThe": "J'ai lu et j'accepte les",
+  "installAmber": "Installer Amber",
+  "authoriseAmber": "Autoriser Amber",
+  "connect": "Connecter",
+  "followCount": "continuer avec {count}/{target} personnes",
+  "@followCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "target": {
+        "type": "int"
+      }
+    }
+  },
+  "notAvailable": "Non disponible",
+  "post": "Publier",
+  "newPostsCount": "{count} nouvelles publications",
+  "@newPostsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "noteReference": "Référence de note",
+  "createStarterPack": "Créer un pack de démarrage",
+  "createAnother": "Créer un autre",
+  "starterPackIsLive": "🎉 Votre pack de démarrage est en ligne!",
+  "searchHint": "Rechercher",
+  "bunkerUrlHint": "bunker://",
+  "continueWithPeople": "continuer avec {count} personnes",
+  "@continueWithPeople": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "unknown": "Inconnu",
+  "follow": "suivre",
+  "unfollow": "ne plus suivre",
+  "invalidBunkerUrl": "URL bunker invalide. Doit commencer par bunker://",
+  "failedToConnectWithError": "Échec de la connexion: {error}",
+  "@failedToConnectWithError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  }
 }

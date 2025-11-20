@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
-import 'package:timeago/timeago.dart' as timeago;
 import '../../../../domain_layer/entities/nostr_note.dart';
 import '../../../../domain_layer/entities/parsed_post.dart';
 import '../../../atoms/spinner_center.dart';
@@ -111,7 +110,10 @@ class _BookmarksPageState extends ConsumerState<BookmarksPage>
             color: Theme.of(context).colorScheme.error,
             alignment: Alignment.centerRight,
             padding: const EdgeInsets.only(right: 20),
-            child: Icon(PhosphorIcons.trash(), color: Colors.white),
+            child: Icon(
+              PhosphorIcons.trash(),
+              color: Colors.white,
+            ), //! hard coded color
           ),
           confirmDismiss: (direction) async {
             _showDeleteDialog(note.id, isPrivate, notePreview);
@@ -148,7 +150,9 @@ class _BookmarksPageState extends ConsumerState<BookmarksPage>
                     return const SpinnerCenter();
                   } else if (snapshot.hasError) {
                     return ListTile(
-                      title: Text('Error loading note'),
+                      title: Text(
+                        AppLocalizations.of(context)!.errorLoadingNote,
+                      ),
                       subtitle: Text(snapshot.error.toString()),
                     );
                   } else {

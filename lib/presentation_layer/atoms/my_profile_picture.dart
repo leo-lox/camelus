@@ -1,6 +1,5 @@
 import 'package:camelus/config/dicebear.dart';
 import 'package:flutter/material.dart';
-import 'package:camelus/config/palette.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -48,7 +47,10 @@ class UserImage extends StatelessWidget {
           size: Size.fromRadius(size / 2),
           child: Container(
             color: Theme.of(context).colorScheme.surface,
-            child: Icon(Icons.image, color: Paletter.getDarkGray(context)),
+            child: Icon(
+              Icons.image,
+              color: Theme.of(context).colorScheme.surfaceContainerHighest,
+            ),
           ),
         ),
       );
@@ -86,7 +88,9 @@ class UserImage extends StatelessWidget {
                         heightFactor: 1 - progress,
                         child: Container(
                           decoration: BoxDecoration(
-                            color: Colors.black.withOpacity(0.5),
+                            color: Colors.black.withValues(
+                              alpha: 0.5,
+                            ), //! hard coded color
                             borderRadius: BorderRadius.vertical(
                               top: Radius.circular(size / 2),
                               bottom: Radius.circular(size / 2),

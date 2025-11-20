@@ -1,4 +1,3 @@
-import 'package:camelus/config/palette.dart';
 import 'package:flutter/material.dart';
 
 /// Creates a custom long button widget.
@@ -19,12 +18,14 @@ Widget longButton({
         // Disable the button if `disabled` is true and not in a loading state.
         onPressed: disabled && !loading ? null : onPressed,
         style: ElevatedButton.styleFrom(
-          disabledBackgroundColor: Paletter.getDarkGray(context),
+          disabledBackgroundColor: Theme.of(
+            context,
+          ).colorScheme.surfaceContainerHighest,
           foregroundColor: inverted
               ? Theme.of(context).colorScheme.surface
-              : Paletter.getLightGray(context),
+              : Theme.of(context).colorScheme.inverseSurface,
           backgroundColor: inverted
-              ? Paletter.getExtraLightGray(context)
+              ? Theme.of(context).colorScheme.onSurface
               : Theme.of(context).colorScheme.surface,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
@@ -60,7 +61,7 @@ Widget _progress() {
     child: Builder(
       builder: (context) {
         return LinearProgressIndicator(
-          backgroundColor: Paletter.getGray(context),
+          backgroundColor: Theme.of(context).colorScheme.inverseSurface,
           color: Theme.of(context).colorScheme.surface,
         );
       },

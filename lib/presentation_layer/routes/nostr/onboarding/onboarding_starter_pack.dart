@@ -232,10 +232,10 @@ class _OnboardingOpenStarterPackState
                                 )
                                 .userMetadata
                                 ?.name ??
-                            "Unknown",
+                            AppLocalizations.of(context)!.unknown,
                       ),
                       style: TextStyle(
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        color: Theme.of(context).colorScheme.inverseSurface,
                         fontSize: 12,
                       ),
                     ),
@@ -310,7 +310,7 @@ class _OnboardingOpenStarterPackState
                               style: TextStyle(
                                 color: Theme.of(
                                   context,
-                                ).colorScheme.onSurfaceVariant,
+                                ).colorScheme.inverseSurface,
                                 fontSize: 12,
                               ),
                               maxLines: 3,

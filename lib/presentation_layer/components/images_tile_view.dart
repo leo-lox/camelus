@@ -1,5 +1,4 @@
 import 'package:camelus/presentation_layer/components/images_gallery.dart';
-import 'package:camelus/config/palette.dart';
 import 'package:camelus/helpers/helpers.dart';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -146,7 +145,7 @@ class ImagesTileView extends StatelessWidget {
             gradient: RadialGradient(
               colors: [
                 Theme.of(context).colorScheme.surface.withValues(alpha: 0.8),
-                Paletter.getExtraDarkGray(context).withValues(alpha: 0.5),
+                Theme.of(context).colorScheme.surface.withValues(alpha: 0.5),
               ],
               stops: const [0.0, 1.0],
             ),
@@ -187,7 +186,7 @@ Widget _imageLoading() {
       return Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(8),
-          color: Paletter.getExtraDarkGray(context).withValues(alpha: 0.5),
+          color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.5),
         ),
         child: Center(child: CircularProgressIndicator()),
       );

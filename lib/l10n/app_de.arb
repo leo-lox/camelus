@@ -194,5 +194,171 @@
   "addingToBookmarks": "Wird zu Lesezeichen hinzugefügt...",
   "removingFromBookmarks": "Wird aus Lesezeichen entfernt...",
   "failedToAddBookmark": "Lesezeichen konnte nicht hinzugefügt werden",
-  "failedToRemoveBookmark": "Lesezeichen konnte nicht entfernt werden"
+  "failedToRemoveBookmark": "Lesezeichen konnte nicht entfernt werden",
+  "all": "Alle",
+  "mentions": "Erwähnungen",
+  "preview": "Vorschau",
+  "relayAlreadyExists": "Relay existiert bereits",
+  "relayAlreadyExistsMessage": "Dieses Relay wurde bereits hinzugefügt",
+  "discardChanges": "Änderungen verwerfen",
+  "discardChangesMessage": "Möchten Sie die Änderungen verwerfen?",
+  "deleteRelay": "Relay löschen",
+  "delete": "Löschen",
+  "noTextFoundInClipboard": "Kein Text in der Zwischenablage gefunden",
+  "pleaseEnterValidBunkerUrl": "Bitte geben Sie eine gültige Bunker-URL ein",
+  "failedToConnectToBunker": "Verbindung zum Bunker fehlgeschlagen",
+  "reactedToYourPost": "hat auf Ihren Beitrag reagiert",
+  "repliedToYourPost": "hat auf Ihren Beitrag geantwortet",
+  "mentionedYouInThread": "hat Sie in einem Thread erwähnt",
+  "repostedYourPost": "hat Ihren Beitrag geteilt",
+  "mentionedYou": "hat Sie erwähnt",
+  "interactedWithYourPost": "hat mit Ihrem Beitrag interagiert",
+  "whenSomeoneInteractsWithYourPosts": "Wenn jemand mit Ihren Beiträgen interagiert",
+  "noNotifications": "Keine Benachrichtigungen",
+  "endOfNotifications": "Ende der Benachrichtigungen",
+  "trends": "Trends",
+  "recentStarterPacks": "Neueste Starter-Pakete",
+  "noResultsFound": "Keine Ergebnisse gefunden",
+  "people": "Personen",
+  "notes": "Notizen",
+  "searchForHashtags": "Nach Hashtags suchen",
+  "nip05Address": "NIP-05 Adresse",
+  "repostHasNoInformation": "Dieser Repost enthält keine Informationen",
+  "invalidSignature": "Ungültige Signatur",
+  "deletionRequested": "Löschung angefordert",
+  "unknownStarterPack": "Unbekanntes Starter-Paket",
+  "noStarterPacksFound": "Keine Starter-Pakete gefunden",
+  "searchToAddUser": "Suchen, um Benutzer hinzuzufügen",
+  "noServersFound": "Keine Server gefunden",
+  "noFilterFound": "Kein Filter gefunden",
+  "replyToPrefix": "antworten an",
+  "andMoreCount": "und {count} weitere",
+  "@andMoreCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "noteNotFound": "Notiz nicht gefunden",
+  "shared": " geteilt",
+  "loadingMightFail": "Laden könnte fehlschlagen",
+  "bugReportMessage": "Fehler melden",
+  "noMoreNotesToShow": "Keine weiteren Notizen anzuzeigen",
+  "trendingPeople": "Angesagte Personen",
+  "trendingHashtags": "Angesagte Hashtags",
+  "somethingWentWrong": "Etwas ist schief gelaufen",
+  "noConnection": "Keine Verbindung",
+  "reconnectingToRelays": "Verbindung zu Relays wird wiederhergestellt",
+  "addRelay": "Relay hinzufügen",
+  "read": "Lesen",
+  "write": "Schreiben",
+  "starterPack": "Starter-Paket",
+  "deleteStarterPack": "Starter-Paket löschen",
+  "deleteStarterPackConfirm": "Möchten Sie dieses Starter-Paket wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.",
+  "share": "Teilen",
+  "starterPackBy": "Starter-Paket von {author}",
+  "@starterPackBy": {
+    "placeholders": {
+      "author": {
+        "type": "String"
+      }
+    }
+  },
+  "you": "Sie",
+  "addToStarterPackTitle": "{name} zum Starter-Paket hinzufügen",
+  "@addToStarterPackTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "createNewStarterPack": "Neues Starter-Paket erstellen",
+  "upload": "Hochladen",
+  "createYourStarterPack": "Erstellen Sie Ihr Starter-Paket",
+  "inviteFriendsToFollow": "Laden Sie Ihre Freunde ein, Ihren Lieblingspersonen zu folgen",
+  "title": "Titel",
+  "description": "Beschreibung",
+  "yourStarterPack": "Ihr Starter-Paket",
+  "shareWithFriends": "Teilen Sie es mit Ihren Freunden und helfen Sie ihnen, großartige Leute zu entdecken!",
+  "shareStarterPack": "Starter-Paket teilen",
+  "publishStarterPack": "Starter-Paket veröffentlichen",
+  "addUsersToContinue": "Benutzer hinzufügen, um fortzufahren",
+  "addUserMenuHint": "Benutzer zur Liste hinzufügen",
+  "show": "Anzeigen",
+  "pushNotifications": "Push-Benachrichtigungen",
+  "receiveNotificationsAboutReplies": "Benachrichtigungen über Antworten erhalten",
+  "enableNotificationsForReplies": "Benachrichtigungen für Antworten aktivieren",
+  "notificationsDeniedInSettings": "Benachrichtigungen in den Einstellungen verweigert",
+  "welcomeTo": "Willkommen bei",
+  "joinTheConversation": "Treten Sie der Konversation bei",
+  "errorLoadingNote": "Fehler beim Laden der Notiz",
+  "errorPrefix": "Fehler: {error}",
+  "@errorPrefix": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "errorProcessingLink": "Fehler beim Verarbeiten des Links",
+  "processingLink": "Link wird verarbeitet",
+  "noMatchingActionFound": "Keine passende Aktion gefunden",
+  "worksOnlyIfInCache": "Funktioniert nur, wenn im Cache",
+  "mastodonAddress": "Mastodon-Adresse",
+  "amberLogin": "Amber-Anmeldung",
+  "seedPhraseLogin": "Seed-Phrase-Anmeldung",
+  "bunkerLogin": "Bunker-Anmeldung",
+  "iHaveReadAndAcceptThe": "Ich habe gelesen und akzeptiere die",
+  "installAmber": "Amber installieren",
+  "authoriseAmber": "Amber autorisieren",
+  "connect": "Verbinden",
+  "followCount": "mit {count}/{target} Personen fortfahren",
+  "@followCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "target": {
+        "type": "int"
+      }
+    }
+  },
+  "notAvailable": "Nicht verfügbar",
+  "post": "Beitrag",
+  "newPostsCount": "{count} neue Beiträge",
+  "@newPostsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "noteReference": "Notizreferenz",
+  "createStarterPack": "Starter-Paket erstellen",
+  "createAnother": "Weiteres erstellen",
+  "starterPackIsLive": "🎉 Ihr Starter-Paket ist live!",
+  "searchHint": "Suchen",
+  "bunkerUrlHint": "bunker://",
+  "continueWithPeople": "mit {count} Personen fortfahren",
+  "@continueWithPeople": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "unknown": "Unbekannt",
+  "follow": "Folgen",
+  "unfollow": "Entfolgen",
+  "invalidBunkerUrl": "Ungültige Bunker-URL. Muss mit bunker:// beginnen",
+  "failedToConnectWithError": "Verbindung fehlgeschlagen: {error}",
+  "@failedToConnectWithError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  }
 }

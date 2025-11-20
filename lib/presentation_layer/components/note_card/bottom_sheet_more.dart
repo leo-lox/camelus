@@ -6,7 +6,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
-import '../../../config/palette.dart';
 import '../../../domain_layer/entities/nostr_list.dart';
 import '../../../domain_layer/entities/nostr_note.dart';
 import '../../providers/ndk_provider.dart';
@@ -77,7 +76,7 @@ class _MoreOptionsBottomSheetState
           width: 40,
           height: 4,
           decoration: BoxDecoration(
-            color: Paletter.getGray(context),
+            color: Theme.of(context).colorScheme.inverseSurface,
             borderRadius: BorderRadius.circular(2),
           ),
         );
@@ -107,7 +106,7 @@ class _MoreOptionsBottomSheetState
                         style: TextStyle(
                           color:
                               option.textColor ??
-                              Paletter.getLightGray(context),
+                              Theme.of(context).colorScheme.inverseSurface,
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
                         ),
@@ -148,7 +147,7 @@ class _MoreOptionsBottomSheetState
                 child: CircularProgressIndicator(
                   strokeWidth: 2,
                   valueColor: AlwaysStoppedAnimation<Color>(
-                    Paletter.getGray(context),
+                    Theme.of(context).colorScheme.inverseSurface,
                   ),
                 ),
               ),
@@ -159,7 +158,7 @@ class _MoreOptionsBottomSheetState
                       ? AppLocalizations.of(context)!.removingFromBookmarks
                       : AppLocalizations.of(context)!.addingToBookmarks,
                   style: TextStyle(
-                    color: Paletter.getLightGray(context),
+                    color: Theme.of(context).colorScheme.inverseSurface,
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
                   ),
@@ -178,7 +177,7 @@ class _MoreOptionsBottomSheetState
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(8),
-            color: Theme.of(context).colorScheme.error.withOpacity(0.1),
+            color: Theme.of(context).colorScheme.error.withValues(alpha: 0.1),
           ),
           child: Row(
             children: [
@@ -222,7 +221,7 @@ class _MoreOptionsBottomSheetState
       BottomSheetOption(
         leading: Icon(
           PhosphorIcons.bookmarkSimple(),
-          color: Paletter.getGray(context),
+          color: Theme.of(context).colorScheme.inverseSurface,
         ),
         label: AppLocalizations.of(context)!.addToBookmarks,
         onTap: () => _addToBookmarks(context, ref),
@@ -236,7 +235,7 @@ class _MoreOptionsBottomSheetState
         BottomSheetOption(
           leading: Icon(
             PhosphorIcons.userCirclePlus(),
-            color: Paletter.getGray(context),
+            color: Theme.of(context).colorScheme.inverseSurface,
           ),
           label: AppLocalizations.of(context)!.addToStarterPack,
           onTap: () => _showFollowPackSelection(context, ref),
@@ -247,7 +246,7 @@ class _MoreOptionsBottomSheetState
         BottomSheetOption(
           leading: Icon(
             PhosphorIcons.speakerSimpleSlash(),
-            color: Paletter.getGray(context),
+            color: Theme.of(context).colorScheme.inverseSurface,
           ),
           label: AppLocalizations.of(context)!.blockReport,
           onTap: () => _navigateToBlockPage(context),
