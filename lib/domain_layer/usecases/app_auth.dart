@@ -10,6 +10,7 @@ import 'package:ndk/data_layer/repositories/signers/nip46_event_signer.dart';
 import 'package:ndk/ndk.dart';
 import 'package:ndk/shared/nips/nip19/nip19.dart';
 import 'package:ndk_amber/ndk_amber.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import '../../l10n/app_localizations.dart';
 import '../../presentation_layer/providers/signer_provider.dart';
 import '../entities/stored_account.dart';
@@ -222,14 +223,26 @@ class AppAuth {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(AppLocalizations.of(context)!.loginRegistrationRequired),
-        content: Text(AppLocalizations.of(context)!.pleaseLoginToInteract),
+        icon: Icon(
+          PhosphorIcons.lockKey(),
+          size: 48,
+          color: Theme.of(context).colorScheme.primary,
+        ),
+        title: Text(
+          AppLocalizations.of(context)!.loginRegistrationRequired,
+          textAlign: TextAlign.center,
+        ),
+        content: Text(
+          AppLocalizations.of(context)!.pleaseLoginToInteract,
+          textAlign: TextAlign.center,
+        ),
+        actionsAlignment: MainAxisAlignment.center,
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
             child: Text(AppLocalizations.of(context)!.cancel),
           ),
-          ElevatedButton(
+          FilledButton(
             onPressed: () {
               Navigator.pop(context);
               context.push('/onboarding');
