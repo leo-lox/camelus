@@ -77,7 +77,7 @@ class _OnboardingPage01State extends ConsumerState<OnboardingPage01> {
               child: Text(
                 AppLocalizations.of(context)!.browseWithoutLogin,
                 style: TextStyle(
-                  color: Paletter.getExtraLightGray(context),
+                  color: Theme.of(context).colorScheme.onSurface,
                   fontSize: 14,
                 ),
               ),
