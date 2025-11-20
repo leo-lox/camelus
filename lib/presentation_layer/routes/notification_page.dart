@@ -47,7 +47,7 @@ class _NotificationPageState extends ConsumerState<NotificationPage>
   @override
   Widget build(BuildContext context) {
     final currentUserPubkey = ref.read(ndkProvider).accounts.getPublicKey();
-    
+
     // If not logged in, show a message to login
     if (currentUserPubkey == null) {
       return Scaffold(
@@ -56,7 +56,6 @@ class _NotificationPageState extends ConsumerState<NotificationPage>
             AppLocalizations.of(context)!.notifications,
             style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
           ),
-          elevation: 0,
         ),
         body: Center(
           child: Column(
