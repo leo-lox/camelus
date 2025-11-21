@@ -1,8 +1,8 @@
 import 'dart:async';
 
 import 'package:camelus/presentation_layer/providers/ndk_provider.dart';
+import 'package:flutter_riverpod/legacy.dart';
 import 'package:ndk/ndk.dart';
-import 'package:riverpod/riverpod.dart';
 
 import '../../../../data_layer/models/nostr_lists_model.dart';
 import '../../../../domain_layer/entities/nostr_list.dart';

@@ -1,3 +1,4 @@
+import 'package:flutter_riverpod/legacy.dart';
 import 'package:ndk/ndk.dart';
 import 'package:riverpod/riverpod.dart';
 

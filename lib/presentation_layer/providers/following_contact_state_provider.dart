@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter_riverpod/legacy.dart';
 import 'package:riverpod/riverpod.dart';
 import 'dart:async';
 
@@ -32,7 +33,7 @@ final contactListStateProvider =
 /// convenience provider
 final contactListSelfStateProvider = Provider<ContactListState>((ref) {
   final selfPubkey = ref.watch(ndkProvider).accounts.getPublicKey();
-  
+
   // If no pubkey (read-only mode), return empty contact list
   if (selfPubkey == null) {
     return ContactListState(
@@ -51,7 +52,7 @@ final contactListSelfStateProvider = Provider<ContactListState>((ref) {
       ),
     );
   }
-  
+
   return ref.watch(contactListStateProvider(selfPubkey));
 });
 
