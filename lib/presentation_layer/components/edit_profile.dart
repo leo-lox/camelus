@@ -320,19 +320,34 @@ class _EditProfileState extends ConsumerState<EditProfile> {
           decoration: InputDecoration(
             hintText: "",
             hintStyle: TextStyle(
-              color: Theme.of(
-                context,
-              ).colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+              letterSpacing: 1.1,
             ),
             contentPadding: EdgeInsets.symmetric(
               vertical: 8.0,
               horizontal: 8.0,
             ),
-            enabledBorder: UnderlineInputBorder(
-              borderSide: BorderSide(width: 1),
+            filled: true,
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.all(Radius.circular(10)),
+              borderSide: BorderSide(
+                //color: Theme.of(context).colorScheme.outline,
+              ),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.all(Radius.circular(10)),
+              borderSide: BorderSide(
+                color: Theme.of(context).colorScheme.primary,
+              ),
+            ),
+            errorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.all(Radius.circular(10)),
+              borderSide: BorderSide(
+                color: Theme.of(context).colorScheme.error,
+              ),
             ),
           ),
-          maxLines: isMultiline ? null : 1,
+          maxLines: isMultiline ? 3 : 1,
           keyboardType: isMultiline
               ? TextInputType.multiline
               : TextInputType.text,
