@@ -77,30 +77,39 @@ class _OnboardingLoginSelectPageState
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
 
-                  child: longButton(
-                    name: AppLocalizations.of(context)!.amberLogin,
-                    inverted: false,
-                    onPressed: () => widget.onPressedAmberLogin(),
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: longButton(
+                      name: AppLocalizations.of(context)!.amberLogin,
+                      inverted: false,
+                      onPressed: () => widget.onPressedAmberLogin(),
+                    ),
                   ),
                 ),
               const SizedBox(height: 20),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
 
-                child: longButton(
-                  name: AppLocalizations.of(context)!.seedPhraseLogin,
-                  inverted: false,
-                  onPressed: () => widget.onPressedSeedPhraseLogin(),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: longButton(
+                    name: AppLocalizations.of(context)!.seedPhraseLogin,
+                    inverted: false,
+                    onPressed: () => widget.onPressedSeedPhraseLogin(),
+                  ),
                 ),
               ),
               const SizedBox(height: 20),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
 
-                child: longButton(
-                  name: AppLocalizations.of(context)!.bunkerLogin,
-                  inverted: false,
-                  onPressed: () => widget.onPressedBunkerLogin(),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: longButton(
+                    name: AppLocalizations.of(context)!.bunkerLogin,
+                    inverted: false,
+                    onPressed: () => widget.onPressedBunkerLogin(),
+                  ),
                 ),
               ),
             ],

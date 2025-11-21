@@ -308,11 +308,14 @@ class _OnboardingLoginBunkerPageState
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
 
-                child: longButton(
-                  name: AppLocalizations.of(context)!.connect,
-                  inverted: true,
-                  loading: _bunkerLoading,
-                  onPressed: () => _onBunkerLogin(),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: longButton(
+                    name: AppLocalizations.of(context)!.connect,
+                    inverted: true,
+                    loading: _bunkerLoading,
+                    onPressed: () => _onBunkerLogin(),
+                  ),
                 ),
               ),
             ],

@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:camelus/l10n/app_localizations.dart';
 import 'package:camelus/presentation_layer/atoms/long_button.dart';
 import 'package:flutter/material.dart';
@@ -34,14 +36,14 @@ class _OnboardingPage01State extends ConsumerState<OnboardingPage01> {
               AppLocalizations.of(context)!.welcomeTo,
               style: TextStyle(
                 color: Theme.of(context).colorScheme.onSurface,
-                fontSize: MediaQuery.of(context).size.width / 22,
+                fontSize: min(MediaQuery.of(context).size.width / 22, 40),
               ),
             ),
             Text(
               AppLocalizations.of(context)!.camelus,
               style: TextStyle(
                 color: Theme.of(context).colorScheme.onSurface,
-                fontSize: MediaQuery.of(context).size.width / 7,
+                fontSize: min(MediaQuery.of(context).size.width / 7, 120),
                 fontFamily: 'Poppins',
               ),
             ),
@@ -49,24 +51,32 @@ class _OnboardingPage01State extends ConsumerState<OnboardingPage01> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
 
-              child: longButton(
-                name: AppLocalizations.of(context)!.joinTheConversation,
-                onPressed: (() {
-                  widget.registerCallback();
-                }),
-                inverted: true,
+              child: SizedBox(
+                width: double.infinity,
+                height: 40,
+                child: longButton(
+                  name: AppLocalizations.of(context)!.joinTheConversation,
+                  onPressed: (() {
+                    widget.registerCallback();
+                  }),
+                  inverted: true,
+                ),
               ),
             ),
-            const SizedBox(height: 30),
+            const SizedBox(height: 20),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
 
-              child: longButton(
-                name: AppLocalizations.of(context)!.login,
-                onPressed: (() {
-                  widget.loginCallback();
-                }),
-                inverted: false,
+              child: SizedBox(
+                width: double.infinity,
+                height: 40,
+                child: longButton(
+                  name: AppLocalizations.of(context)!.login,
+                  onPressed: (() {
+                    widget.loginCallback();
+                  }),
+                  inverted: false,
+                ),
               ),
             ),
             const SizedBox(height: 30),
