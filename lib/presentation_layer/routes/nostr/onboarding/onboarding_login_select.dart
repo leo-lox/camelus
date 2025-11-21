@@ -79,6 +79,7 @@ class _OnboardingLoginSelectPageState
 
                   child: SizedBox(
                     width: double.infinity,
+                    height: 35,
                     child: longButton(
                       name: AppLocalizations.of(context)!.amberLogin,
                       inverted: false,
@@ -92,6 +93,7 @@ class _OnboardingLoginSelectPageState
 
                 child: SizedBox(
                   width: double.infinity,
+                  height: 35,
                   child: longButton(
                     name: AppLocalizations.of(context)!.seedPhraseLogin,
                     inverted: false,
@@ -105,6 +107,7 @@ class _OnboardingLoginSelectPageState
 
                 child: SizedBox(
                   width: double.infinity,
+                  height: 35,
                   child: longButton(
                     name: AppLocalizations.of(context)!.bunkerLogin,
                     inverted: false,

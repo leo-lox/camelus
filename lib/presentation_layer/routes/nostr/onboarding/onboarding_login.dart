@@ -172,7 +172,7 @@ class _OnboardingLoginPageState extends ConsumerState<OnboardingLoginPage> {
 
   void _addWords(String words) {
     List<String> wordList = words.split(' ');
-    for (var word in wordList) {
+    for (final word in wordList) {
       _addWord(word);
     }
     setState(() {
