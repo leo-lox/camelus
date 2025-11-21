@@ -330,9 +330,8 @@ class _EditProfileState extends ConsumerState<EditProfile> {
             filled: true,
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.all(Radius.circular(10)),
-              borderSide: BorderSide(
-                //color: Theme.of(context).colorScheme.outline,
-              ),
+
+              borderSide: BorderSide(color: Colors.transparent),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.all(Radius.circular(10)),
