@@ -77,7 +77,7 @@ class EventFeedState extends Notifier<FeedEventViewModel> {
   }
 
   /// Fetches the root note and its replies for the given rootNoteId.
-  _initialFetch(String rootNoteId) {
+  void _initialFetch(String rootNoteId) {
     final notesP = ref.watch(getNotesProvider);
     // Subscribes to updates for the root note.
 
@@ -117,7 +117,7 @@ class EventFeedState extends Notifier<FeedEventViewModel> {
   }
 
   /// Subcribes to new notes for the given root note ID.
-  _subNewNotes(String rootNoteId) {
+  void _subNewNotes(String rootNoteId) {
     final notesP = ref.watch(getNotesProvider);
     final now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
 
