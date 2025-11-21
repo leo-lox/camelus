@@ -15,27 +15,18 @@ final genericFeedStateProvider = NotifierProvider.autoDispose
     .family<GenericFeedState, FeedViewModel, FeedFilter>(GenericFeedState.new);
 
 // State management for a generic feed
-class GenericFeedState
-    extends AutoDisposeFamilyNotifier<FeedViewModel, FeedFilter> {
-  // Resets the state and disposes of active subscriptions
-  Future<void> _resetStateDispose() async {
-    final notesP = ref.watch(getNotesProvider);
-    await notesP.closeSubscription("sub-${arg.feedId}");
-    state = FeedViewModel(
-      timelineRootNotes: [],
-      newRootNotes: [],
-      timelineRootAndReplyNotes: [],
-      newRootAndReplyNotes: [],
-    );
-  }
+class GenericFeedState extends Notifier<FeedViewModel> {
+  final FeedFilter feedFilter;
+  GenericFeedState(this.feedFilter);
 
   @override
-  FeedViewModel build(FeedFilter arg) {
+  FeedViewModel build() {
+    final notesP = ref.read(getNotesProvider);
     // Ensures resources are cleaned up when provider is disposed
-    ref.onDispose(() {
-      _resetStateDispose();
+    ref.onDispose(() async {
+      await notesP.closeSubscription("sub-${feedFilter.feedId}");
     });
-    _setupSubscription(arg); // Initialize data subscription
+    _setupSubscription(feedFilter); // Initialize data subscription
     return FeedViewModel(
       timelineRootNotes: [],
       newRootNotes: [],
@@ -148,8 +139,8 @@ class GenericFeedState
 
   // Loads more notes for infinite scrolling
   Future<void> loadMore() async {
-    int cutoff = await _getCutoffTime(arg.feedId);
-    await _saveCutoffTime(arg.feedId);
+    int cutoff = await _getCutoffTime(feedFilter.feedId);
+    await _saveCutoffTime(feedFilter.feedId);
 
     if (state.timelineRootAndReplyNotes.isNotEmpty) {
       cutoff = state.timelineRootAndReplyNotes.last.created_at - 1;
@@ -157,7 +148,11 @@ class GenericFeedState
 
     final rootNotesBeforeCount = state.timelineRootNotes.length;
 
-    final networkNotesStream = _fetchNetworkNotes(arg, cutoff, limit: 20);
+    final networkNotesStream = _fetchNetworkNotes(
+      feedFilter,
+      cutoff,
+      limit: 20,
+    );
 
     networkNotesStream
         .bufferTime(const Duration(milliseconds: 100))

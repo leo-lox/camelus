@@ -17,27 +17,20 @@ final notificationsStateProvider =
       NotificationsState.new,
     );
 
-class NotificationsState extends FamilyNotifier<NotificationViewModel, String> {
+class NotificationsState extends Notifier<NotificationViewModel> {
+  final String userPubkey;
+  NotificationsState(this.userPubkey);
+
   static const String subscriptionId = "notifications-sub";
   static const String notificationCutoffKey = "notifications-cutoff";
 
-  Future<void> _resetStateDispose() async {
-    final notesP = ref.watch(getNotesProvider);
-    await notesP.closeSubscription(subscriptionId);
-    state = NotificationViewModel(
-      timelineNotifications: [],
-      newNotifications: [],
-    );
-  }
-
   @override
-  NotificationViewModel build(String arg) {
+  NotificationViewModel build() {
+    final notesP = ref.read(getNotesProvider);
     // Clean up when provider is disposed
-    ref.onDispose(() {
-      _resetStateDispose();
+    ref.onDispose(() async {
+      await notesP.closeSubscription(subscriptionId);
     });
-
-    final userPubkey = arg;
 
     _setupSubscription(userPubkey);
 
@@ -78,8 +71,6 @@ class NotificationsState extends FamilyNotifier<NotificationViewModel, String> {
 
   // Process incoming notifications
   Future<void> _processNewNotifications(List<NostrNote> notes) async {
-    final userPubkey = arg;
-
     // Filter notes that are interactions with the user's content
     // and convert them to notification objects
     final notifications = _convertToNotifications(notes, userPubkey);
@@ -182,8 +173,6 @@ class NotificationsState extends FamilyNotifier<NotificationViewModel, String> {
     if (state.timelineNotifications.isNotEmpty) {
       cutoff = state.timelineNotifications.last.createdAt - 1;
     }
-
-    final userPubkey = arg;
 
     final notesP = ref.watch(getNotesProvider);
     final notesStream = notesP.genericNostrQuery(

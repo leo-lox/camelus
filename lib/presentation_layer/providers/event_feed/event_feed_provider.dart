@@ -18,8 +18,10 @@ final eventFeedStateProvider = NotifierProvider.autoDispose
 
 /// The [EventFeedState] class is a state notifier for managing the feed state of an event.
 /// It handles fetching, updating and cleaning up the data for a root note and its comments.
-class EventFeedState
-    extends AutoDisposeFamilyNotifier<FeedEventViewModel, String> {
+class EventFeedState extends Notifier<FeedEventViewModel> {
+  final String rootEventId;
+  EventFeedState(this.rootEventId);
+
   // Stream subscriptions for root note and comment notes.
   StreamSubscription? _rootNoteSub;
   StreamSubscription? _commentNotesSub;
@@ -28,13 +30,6 @@ class EventFeedState
 
   /// Resets the state and disposes of active resources like stream subscriptions.
   Future<void> resetStateDispose() async {
-    // Resets the state to an empty FeedEventViewModel.
-    state = FeedEventViewModel(
-      comments: [],
-      unprocessedCommentsSet: {},
-      rootNote: null,
-    );
-
     // Cancels the subscriptions to the streams if active.
     _commentNotesSub?.cancel();
     _rootNoteSub?.cancel();
@@ -46,17 +41,21 @@ class EventFeedState
 
   /// Called when the notifier is first built. Initializes the event feed and subscriptions.
   @override
-  FeedEventViewModel build(String arg) {
+  FeedEventViewModel build() {
+    final notesP = ref.read(getNotesProvider);
+
     /// auto dispose delay
     final link = ref.keepAlive();
     Timer? timer;
 
     ref.onCancel(() {
-      _cancelNewNotesSub();
+      notesP.closeSubscription("replies-sub-$threadId");
+
+      _commentNotesSub?.cancel();
       timer = Timer(Duration(minutes: 2), () => link.close());
     });
     ref.onResume(() {
-      _subNewNotes(arg);
+      _subNewNotes(rootEventId);
       timer?.cancel();
     });
 
@@ -67,7 +66,7 @@ class EventFeedState
     });
 
     // Performs the initial fetch for the root note and its replies.
-    _initialFetch(arg);
+    _initialFetch(rootEventId);
 
     // Returns the initial state of the event feed.
     return FeedEventViewModel(
@@ -152,12 +151,5 @@ class EventFeedState
             ),
           );
         });
-  }
-
-  _cancelNewNotesSub() {
-    final notesP = ref.watch(getNotesProvider);
-    notesP.closeSubscription("replies-sub-$threadId");
-
-    _commentNotesSub?.cancel();
   }
 }
