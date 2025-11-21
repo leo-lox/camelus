@@ -367,5 +367,9 @@
         "type": "String"
       }
     }
+  },
+  "byUsingCamelusYouAgree": "使用 Camelus 即表示您同意 ",
+  "@byUsingCamelusYouAgree": {
+    "description": "Text before terms and conditions link on onboarding page"
   }
 }

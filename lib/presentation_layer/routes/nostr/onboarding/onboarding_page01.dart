@@ -5,6 +5,7 @@ import 'package:camelus/presentation_layer/atoms/long_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../l10n/app_localizations.dart';
 
@@ -79,7 +80,7 @@ class _OnboardingPage01State extends ConsumerState<OnboardingPage01> {
                 ),
               ),
             ),
-            const SizedBox(height: 30),
+            const SizedBox(height: 20),
             TextButton(
               onPressed: () {
                 context.go('/home');
@@ -92,7 +93,53 @@ class _OnboardingPage01State extends ConsumerState<OnboardingPage01> {
                 ),
               ),
             ),
-            const Spacer(flex: 2),
+            const Spacer(flex: 1),
+            Column(
+              children: [
+                Text(
+                  AppLocalizations.of(context)!.byUsingCamelusYouAgree,
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface,
+                    fontSize: 12,
+                    fontWeight: FontWeight.normal,
+                  ),
+                ),
+                GestureDetector(
+                  onTap: () {
+                    Uri url = Uri.parse("https://camelus.app/terms/");
+                    launchUrl(url, mode: LaunchMode.externalApplication);
+                  },
+                  child: Text(
+                    AppLocalizations.of(context)!.termsAndConditions,
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurface,
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                      decoration: TextDecoration.underline,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 5),
+            GestureDetector(
+              onTap: () {
+                Uri url = Uri.parse("https://camelus.app/privacy/");
+                launchUrl(url, mode: LaunchMode.externalApplication);
+              },
+              child: Text(
+                AppLocalizations.of(context)!.privacyPolicy,
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface,
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                  decoration: TextDecoration.underline,
+                ),
+              ),
+            ),
+
+            const Spacer(flex: 1),
           ],
         ),
       ),

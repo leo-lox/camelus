@@ -71,6 +71,8 @@ Future<void> main() async {
   // Create a ProviderContainer
   final providerContainer = ProviderContainer();
 
+  final appDb = providerContainer.read(dbAppProvider);
+
   final CacheManager cacheManager = await getDbMainThread();
 
   providerContainer.read(dbNdkProvider.notifier).setDB(cacheManager);
@@ -105,9 +107,12 @@ Future<void> main() async {
   final String initalRoute;
 
   if (startupAccData.loginType == LoginType.anon) {
-    initalRoute = '/home';
+    if ((Platform.isAndroid || Platform.isIOS)) {
+      initalRoute = '/onboarding';
+    } else {
+      initalRoute = '/home';
+    }
   } else {
-    final appDb = providerContainer.read(dbAppProvider);
     final savedRoute = await appDb.read('initalRoute');
     initalRoute = savedRoute ?? '/home';
   }
