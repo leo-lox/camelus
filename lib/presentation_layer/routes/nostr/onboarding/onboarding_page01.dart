@@ -1,8 +1,11 @@
+import 'dart:math';
+
 import 'package:camelus/l10n/app_localizations.dart';
 import 'package:camelus/presentation_layer/atoms/long_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../l10n/app_localizations.dart';
 
@@ -34,14 +37,14 @@ class _OnboardingPage01State extends ConsumerState<OnboardingPage01> {
               AppLocalizations.of(context)!.welcomeTo,
               style: TextStyle(
                 color: Theme.of(context).colorScheme.onSurface,
-                fontSize: MediaQuery.of(context).size.width / 22,
+                fontSize: min(MediaQuery.of(context).size.width / 22, 40),
               ),
             ),
             Text(
               AppLocalizations.of(context)!.camelus,
               style: TextStyle(
                 color: Theme.of(context).colorScheme.onSurface,
-                fontSize: MediaQuery.of(context).size.width / 7,
+                fontSize: min(MediaQuery.of(context).size.width / 7, 120),
                 fontFamily: 'Poppins',
               ),
             ),
@@ -49,27 +52,35 @@ class _OnboardingPage01State extends ConsumerState<OnboardingPage01> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
 
-              child: longButton(
-                name: AppLocalizations.of(context)!.joinTheConversation,
-                onPressed: (() {
-                  widget.registerCallback();
-                }),
-                inverted: true,
+              child: SizedBox(
+                width: double.infinity,
+                height: 40,
+                child: longButton(
+                  name: AppLocalizations.of(context)!.joinTheConversation,
+                  onPressed: (() {
+                    widget.registerCallback();
+                  }),
+                  inverted: true,
+                ),
               ),
             ),
-            const SizedBox(height: 30),
+            const SizedBox(height: 20),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
 
-              child: longButton(
-                name: AppLocalizations.of(context)!.login,
-                onPressed: (() {
-                  widget.loginCallback();
-                }),
-                inverted: false,
+              child: SizedBox(
+                width: double.infinity,
+                height: 40,
+                child: longButton(
+                  name: AppLocalizations.of(context)!.login,
+                  onPressed: (() {
+                    widget.loginCallback();
+                  }),
+                  inverted: false,
+                ),
               ),
             ),
-            const SizedBox(height: 30),
+            const SizedBox(height: 20),
             TextButton(
               onPressed: () {
                 context.go('/home');
@@ -82,7 +93,53 @@ class _OnboardingPage01State extends ConsumerState<OnboardingPage01> {
                 ),
               ),
             ),
-            const Spacer(flex: 2),
+            const Spacer(flex: 1),
+            Column(
+              children: [
+                Text(
+                  AppLocalizations.of(context)!.byUsingCamelusYouAgree,
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface,
+                    fontSize: 12,
+                    fontWeight: FontWeight.normal,
+                  ),
+                ),
+                GestureDetector(
+                  onTap: () {
+                    Uri url = Uri.parse("https://camelus.app/terms/");
+                    launchUrl(url, mode: LaunchMode.externalApplication);
+                  },
+                  child: Text(
+                    AppLocalizations.of(context)!.termsAndConditions,
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurface,
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                      decoration: TextDecoration.underline,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 5),
+            GestureDetector(
+              onTap: () {
+                Uri url = Uri.parse("https://camelus.app/privacy/");
+                launchUrl(url, mode: LaunchMode.externalApplication);
+              },
+              child: Text(
+                AppLocalizations.of(context)!.privacyPolicy,
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface,
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                  decoration: TextDecoration.underline,
+                ),
+              ),
+            ),
+
+            const Spacer(flex: 1),
           ],
         ),
       ),

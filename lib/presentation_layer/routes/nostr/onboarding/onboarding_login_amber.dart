@@ -197,11 +197,14 @@ class _OnboardingLoginAmberPageState
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
 
-                  child: longButton(
-                    name: AppLocalizations.of(context)!.authoriseAmber,
-                    inverted: true,
-                    loading: _amberLoading,
-                    onPressed: () => _onAmberLogin(),
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: longButton(
+                      name: AppLocalizations.of(context)!.authoriseAmber,
+                      inverted: true,
+                      loading: _amberLoading,
+                      onPressed: () => _onAmberLogin(),
+                    ),
                   ),
                 ),
             ],

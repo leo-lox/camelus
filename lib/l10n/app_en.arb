@@ -1318,5 +1318,9 @@
         "type": "String"
       }
     }
+  },
+  "byUsingCamelusYouAgree": "By using Camelus you agree to ",
+  "@byUsingCamelusYouAgree": {
+    "description": "Text before terms and conditions link on onboarding page"
   }
 }
