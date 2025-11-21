@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:camelus/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 
 import '../atoms/camer_upload.dart';
 import '../atoms/round_image_border.dart';

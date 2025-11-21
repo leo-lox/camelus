@@ -1,6 +1,8 @@
 import 'package:camelus/presentation_layer/providers/following_contact_state_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:flutter_riverpod/legacy.dart';
+
 import '../ndk_provider.dart';
 
 class ModerationState {
@@ -37,7 +39,10 @@ class ModerationNotifier extends StateNotifier<ModerationState> {
     if (myUserPubkey == null) return;
 
     // Listen to contact changes
-    ref.listen(contactListStateProvider(myUserPubkey!), (previous, next) {
+    ref.listen<ContactListState>(contactListStateProvider(myUserPubkey!), (
+      previous,
+      next,
+    ) {
       _updateTrustedPubkeys(next);
     });
 

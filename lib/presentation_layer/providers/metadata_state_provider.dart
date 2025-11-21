@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 
 import '../../domain_layer/entities/user_metadata.dart';
 import '../../domain_layer/usecases/get_user_metadata.dart';

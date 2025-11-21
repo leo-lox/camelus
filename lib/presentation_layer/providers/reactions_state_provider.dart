@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 
 import '../../domain_layer/entities/nostr_note.dart';
 import '../../domain_layer/usecases/user_reactions.dart';
