@@ -290,8 +290,6 @@ class _OnboardingFollowGraphState extends ConsumerState<OnboardingFollowGraph> {
             ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
-              width: 400,
-              height: 40,
               child: longButton(
                 loading: _loading,
                 disabled: followedList.length < followTarget,
