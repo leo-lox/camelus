@@ -42,7 +42,7 @@ class NostrSideMenu extends ConsumerWidget {
       [],
     ); //todo: get recommended relays
 
-    // ignore: use_build_context_synchronously
+    if (!context.mounted) return;
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -113,7 +113,7 @@ class NostrSideMenu extends ConsumerWidget {
         final isSelected = currentRoute.contains(routeName);
 
         return Container(
-          width: 200,
+          //width: 200,
           decoration: isSelected
               ? BoxDecoration(
                   color: Theme.of(
@@ -179,85 +179,96 @@ class NostrSideMenu extends ConsumerWidget {
         children: [
           leadingWidget,
           _divider(context),
-          _drawerItem(
-            icon: PhosphorIcons.house(),
-            label: AppLocalizations.of(context)!.routeHome,
-            routeName: '/home',
-            onTap: () {
-              context.go('/home');
-            },
-          ),
-          if (!hideOnMobile)
-            _drawerItem(
-              icon: PhosphorIcons.magnifyingGlass(),
-              label: AppLocalizations.of(context)!.explore,
-              routeName: '/search',
-              onTap: () {
-                context.go('/search');
-              },
-            ),
-          if (!hideOnMobile)
-            _drawerItem(
-              icon: PhosphorIcons.bell(),
-              label: AppLocalizations.of(context)!.routeNotifications,
-              routeName: '/notifications',
-              onTap: () {
-                context.go('/notifications');
-              },
-            ),
-          if (currentUserPubkey != null) ...[
-            _drawerItem(
-              label: AppLocalizations.of(context)!.bookmarks,
-              routeName: '/nostr/bookmarks',
-              icon: PhosphorIcons.bookmarkSimple(),
-              onTap: () {
-                context.push('/nostr/bookmarks');
-              },
-            ),
-            _drawerItem(
-              label: AppLocalizations.of(context)!.profile,
-              routeName: '/nostr/profile',
-              icon: PhosphorIcons.user(),
-              onTap: () {
-                navigateToProfile(context, currentUserPubkey);
-              },
-            ),
-            _drawerItem(
-              label: AppLocalizations.of(context)!.payments,
-              routeName: 'payments',
-              icon: PhosphorIcons.lightning(),
-              onTap: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      AppLocalizations.of(context)!.notImplementedYet,
+          Expanded(
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.only(left: 8.0, right: 23.0),
+                child: Column(
+                  spacing: 2,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _drawerItem(
+                      icon: PhosphorIcons.house(),
+                      label: AppLocalizations.of(context)!.routeHome,
+                      routeName: '/home',
+                      onTap: () {
+                        context.go('/home');
+                      },
                     ),
-                  ),
-                );
-              },
+                    if (!hideOnMobile)
+                      _drawerItem(
+                        icon: PhosphorIcons.magnifyingGlass(),
+                        label: AppLocalizations.of(context)!.explore,
+                        routeName: '/search',
+                        onTap: () {
+                          context.go('/search');
+                        },
+                      ),
+                    if (!hideOnMobile)
+                      _drawerItem(
+                        icon: PhosphorIcons.bell(),
+                        label: AppLocalizations.of(context)!.routeNotifications,
+                        routeName: '/notifications',
+                        onTap: () {
+                          context.go('/notifications');
+                        },
+                      ),
+                    if (currentUserPubkey != null) ...[
+                      _drawerItem(
+                        label: AppLocalizations.of(context)!.bookmarks,
+                        routeName: '/nostr/bookmarks',
+                        icon: PhosphorIcons.bookmarkSimple(),
+                        onTap: () {
+                          context.push('/nostr/bookmarks');
+                        },
+                      ),
+                      _drawerItem(
+                        label: AppLocalizations.of(context)!.profile,
+                        routeName: '/nostr/profile',
+                        icon: PhosphorIcons.user(),
+                        onTap: () {
+                          navigateToProfile(context, currentUserPubkey);
+                        },
+                      ),
+                      _drawerItem(
+                        label: AppLocalizations.of(context)!.payments,
+                        routeName: 'payments',
+                        icon: PhosphorIcons.lightning(),
+                        onTap: () {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                AppLocalizations.of(context)!.notImplementedYet,
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                      _drawerItem(
+                        label: AppLocalizations.of(context)!.blocklist,
+                        routeName: '/nostr/blockedUsers',
+                        icon: PhosphorIcons.yinYang(),
+                        onTap: () {
+                          context.push('/nostr/blockedUsers');
+                        },
+                      ),
+                    ] else ...[
+                      // Show login option when not authenticated
+                      _drawerItem(
+                        label: 'Login',
+                        routeName: '/onboarding',
+                        icon: PhosphorIcons.signIn(),
+                        onTap: () {
+                          context.push('/onboarding');
+                        },
+                      ),
+                    ],
+                    trailingButtonWidget,
+                  ],
+                ),
+              ),
             ),
-            _drawerItem(
-              label: AppLocalizations.of(context)!.blocklist,
-              routeName: '/nostr/blockedUsers',
-              icon: PhosphorIcons.yinYang(),
-              onTap: () {
-                context.push('/nostr/blockedUsers');
-              },
-            ),
-          ] else ...[
-            // Show login option when not authenticated
-            _drawerItem(
-              label: 'Login',
-              routeName: '/onboarding',
-              icon: PhosphorIcons.signIn(),
-              onTap: () {
-                context.push('/onboarding');
-              },
-            ),
-          ],
-          trailingButtonWidget,
-          const Spacer(),
-          const Spacer(),
+          ),
           _divider(context),
           Padding(
             padding: const EdgeInsets.only(left: 20),
@@ -282,7 +293,7 @@ class NostrSideMenu extends ConsumerWidget {
               },
             ),
           ),
-          const Spacer(),
+
           Padding(
             padding: EdgeInsets.only(left: 20),
             child: FutureBuilder(
