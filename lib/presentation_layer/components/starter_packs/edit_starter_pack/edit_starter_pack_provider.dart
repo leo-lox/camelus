@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 import 'package:ndk/shared/nips/nip19/nip19.dart';
 
 import '../../../../data_layer/data_sources/serverpod_data_source.dart';

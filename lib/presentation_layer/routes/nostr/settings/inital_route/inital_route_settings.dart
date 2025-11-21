@@ -1,6 +1,7 @@
 import 'package:camelus/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../../providers/inital_route_provider.dart';
