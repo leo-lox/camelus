@@ -70,17 +70,17 @@ dependencies:
   rxdart: ^0.28.0
   shimmer: ^3.0.0
   flutter_force_directed_graph: ^1.0.7
-  objectbox: ^4.3.0 
+  objectbox: ^5.0.0
   objectbox_flutter_libs: any
   amberflutter: ^0.0.9
   intl: any
   app_links: ^6.3.2
   phosphor_flutter: ^2.1.0
   ## ndk imnports
-  ndk: ^0.5.1
-  ndk_rust_verifier: ^0.4.0
-  ndk_amber: ^0.3.1
-  ndk_objectbox: ^0.2.5
+  ndk: ^0.6.0
+  ndk_rust_verifier: ^0.4.2
+  ndk_amber: ^0.3.3
+  ndk_objectbox: ^0.2.7
   image: ^4.3.0
   flutter_list_view: ^1.1.29
   xxh3: ^1.2.0
@@ -108,12 +108,12 @@ dependencies:
 
 
 dependency_overrides:
-  ndk:
+  #ndk:
     #path: ../ndk/packages/ndk
-    git:
-      url: https://github.com/relaystr/ndk.git
-      path: packages/ndk
-      ref: 175-refactor-list-usecase
+    #git:
+    #  url: https://github.com/relaystr/ndk.git
+    #  path: packages/ndk
+    #  ref: 175-refactor-list-usecase
   #ndk_rust_verifier:
   #  path: ../ndk/packages/rust_verifier
     #git:
