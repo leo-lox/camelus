@@ -149,6 +149,7 @@ ${_privateKey.mnemonicSentence}
 
     await metadataP.broadcastMetadata(userMetadata);
     await myContactListNotifier.setContacts(widget.userInfo.followPubkeys);
+    return Future.value();
   }
 
   @override

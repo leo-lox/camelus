@@ -16,5 +16,5 @@ class CamelusConfig {
   /// This is a well-known public account used to populate the feed for new users
   /// Users can follow popular accounts through this read-only view
   static const String defaultAnonReadPubkey =
-      "76c71aae3a491f1d9eec47cba17e229cda4113a0bbb6e6ae1776d7643e29cafa";
+      "4f8d40fda6f397d8a8e0208edafc05b59f67fa66700d0e8e66633e203b23225f";
 }
