@@ -123,7 +123,7 @@ class _HomePageMobileState extends ConsumerState<HomePageMobile>
                       floating: true,
                       snap: false,
                       pinned: false,
-                      forceElevated: true,
+
                       leadingWidth: 48,
                       leading: MobileFeedHeader(
                         scaffoldKey: _scaffoldKey,
