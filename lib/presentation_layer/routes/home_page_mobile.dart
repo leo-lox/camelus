@@ -116,6 +116,10 @@ class _HomePageMobileState extends ConsumerState<HomePageMobile>
                       context,
                     ),
                     sliver: SliverAppBar(
+                      surfaceTintColor: Theme.of(context).colorScheme.surface,
+                      shadowColor: Theme.of(context).colorScheme.surface,
+                      backgroundColor: Theme.of(context).colorScheme.surface,
+
                       floating: true,
                       snap: false,
                       pinned: false,
@@ -126,7 +130,7 @@ class _HomePageMobileState extends ConsumerState<HomePageMobile>
                         pubkey: currentUserPubkey,
                       ),
                       centerTitle: true,
-                      title: const AppLogo(),
+                      //title: const AppLogo(),
                       actions: [
                         RelaysConnectivityWidget(
                           onTap: () => context.push('/nostr/relays'),
@@ -140,6 +144,18 @@ class _HomePageMobileState extends ConsumerState<HomePageMobile>
                         preferredSize: const Size.fromHeight(40),
                         child: TabBar(
                           controller: tabController,
+                          indicatorColor: Theme.of(context).colorScheme.primary,
+                          // rounded underline indicator
+                          indicator: UnderlineTabIndicator(
+                            borderSide: BorderSide(
+                              width: 2.5,
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
+
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+
+                          dividerHeight: 0,
                           tabs: [
                             Tab(text: AppLocalizations.of(context)!.posts),
                             Tab(
