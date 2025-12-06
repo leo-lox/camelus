@@ -213,7 +213,7 @@ class NostrBandEndpoint extends Endpoint {
             relays: (p['relays'] as List<dynamic>)
                 .map((item) => item as String)
                 .toList(),
-            profile: Nip01Event.fromJson(p['profile']),
+            profile: Nip01EventModel.fromJson(p['profile']),
           ),
         );
       }

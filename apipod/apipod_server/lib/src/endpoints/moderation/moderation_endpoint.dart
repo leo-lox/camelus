@@ -1,4 +1,4 @@
-import 'package:ndk/ndk.dart';
+import 'package:ndk/ndk.dart' hide LogLevel;
 import 'package:serverpod/serverpod.dart';
 
 import '../../config/service_config.dart';
@@ -84,9 +84,11 @@ class ModerationEndpoint extends Endpoint {
   ) async {
     final event = reportEvent;
 
-    event.validSig = await Bip340EventVerifier().verify(event);
+    final isSigValid = await Bip340EventVerifier().verify(event);
 
-    if (event.validSig != null && !event.validSig!) {
+    final verifiedEvent = event.copyWith(validSig: isSigValid);
+
+    if (verifiedEvent.validSig != null && !verifiedEvent.validSig!) {
       session.log("invalid sig", level: LogLevel.info);
       return "invalid sig";
     }
@@ -94,13 +96,13 @@ class ModerationEndpoint extends Endpoint {
     session.log("report", level: LogLevel.info);
 
     DateTime now = DateTime.now();
-    final isEventReport = event.getFirstTag('e') != null;
+    final isEventReport = verifiedEvent.getFirstTag('e') != null;
 
-    if (ServiceConfig.trustedPubkeys.contains(event.pubKey)) {
+    if (ServiceConfig.trustedPubkeys.contains(verifiedEvent.pubKey)) {
       final process = ProcessReport();
 
       return process.processEvent(
-        event: event,
+        event: verifiedEvent,
         session: session,
         isEventReport: isEventReport,
       );
@@ -111,8 +113,8 @@ class ModerationEndpoint extends Endpoint {
       session,
       ReportsIncoming(
         createdAt: now,
-        report: event,
-        author: event.pubKey,
+        report: Nip01EventModel.fromEntity(verifiedEvent),
+        author: verifiedEvent.pubKey,
         type: isEventReport ? "event" : "profile",
         processed: false,
       ),

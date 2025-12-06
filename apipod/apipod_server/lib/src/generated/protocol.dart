@@ -26,7 +26,8 @@ import 'nostr_band/nostr_band_profiles.dart' as _i14;
 import 'reports_incoming.dart' as _i15;
 import 'short_links/short_link_invite_data.dart' as _i16;
 import 'subscription.dart' as _i17;
-import 'package:ndk/domain_layer/entities/nip_01_event.dart' as _i18;
+import 'package:ndk/data_layer/models/nip_01_event_model.dart' as _i18;
+import 'package:ndk/domain_layer/entities/nip_01_event.dart' as _i19;
 export 'app_update_data.dart';
 export 'bloom_filter_data.dart';
 export 'bloom_filter_events.dart';
@@ -413,7 +414,7 @@ class Protocol extends _i1.SerializationManagerServer {
           columnType: _i2.ColumnType.json,
           isNullable: false,
           dartType:
-              'package:ndk/domain_layer/entities/nip_01_event.dart:Nip01Event',
+              'package:ndk/data_layer/models/nip_01_event_model.dart:Nip01EventModel',
         ),
         _i2.ColumnDefinition(
           name: 'author',
@@ -662,15 +663,15 @@ class Protocol extends _i1.SerializationManagerServer {
           .map((e) => deserialize<_i14.NostrBandProfiles>(e))
           .toList() as T;
     }
-    if (t == _i18.Nip01Event) {
-      return _i18.Nip01Event.fromJson(data) as T;
+    if (t == _i18.Nip01EventModel) {
+      return _i18.Nip01EventModel.fromJson(data) as T;
     }
-    if (t == List<_i18.Nip01Event>) {
-      return (data as List).map((e) => deserialize<_i18.Nip01Event>(e)).toList()
+    if (t == List<_i19.Nip01Event>) {
+      return (data as List).map((e) => deserialize<_i19.Nip01Event>(e)).toList()
           as T;
     }
-    if (t == _i1.getType<_i18.Nip01Event?>()) {
-      return (data != null ? _i18.Nip01Event.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i18.Nip01EventModel?>()) {
+      return (data != null ? _i18.Nip01EventModel.fromJson(data) : null) as T;
     }
     try {
       return _i2.Protocol().deserialize<T>(data, t);
@@ -682,8 +683,8 @@ class Protocol extends _i1.SerializationManagerServer {
   String? getClassNameForObject(Object? data) {
     String? className = super.getClassNameForObject(data);
     if (className != null) return className;
-    if (data is _i18.Nip01Event) {
-      return 'Nip01Event';
+    if (data is _i18.Nip01EventModel) {
+      return 'Nip01EventModel';
     }
     if (data is _i3.AppUpdateData) {
       return 'AppUpdateData';
@@ -743,8 +744,8 @@ class Protocol extends _i1.SerializationManagerServer {
     if (dataClassName is! String) {
       return super.deserializeByClassName(data);
     }
-    if (dataClassName == 'Nip01Event') {
-      return deserialize<_i18.Nip01Event>(data['data']);
+    if (dataClassName == 'Nip01EventModel') {
+      return deserialize<_i18.Nip01EventModel>(data['data']);
     }
     if (dataClassName == 'AppUpdateData') {
       return deserialize<_i3.AppUpdateData>(data['data']);

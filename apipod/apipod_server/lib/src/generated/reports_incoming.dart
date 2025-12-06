@@ -10,7 +10,7 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
-import 'package:ndk/domain_layer/entities/nip_01_event.dart' as _i2;
+import 'package:ndk/data_layer/models/nip_01_event_model.dart' as _i2;
 
 abstract class ReportsIncoming
     implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
@@ -26,7 +26,7 @@ abstract class ReportsIncoming
   factory ReportsIncoming({
     int? id,
     required DateTime createdAt,
-    required _i2.Nip01Event report,
+    required _i2.Nip01EventModel report,
     required String author,
     required String type,
     required bool processed,
@@ -37,7 +37,7 @@ abstract class ReportsIncoming
       id: jsonSerialization['id'] as int?,
       createdAt:
           _i1.DateTimeJsonExtension.fromJson(jsonSerialization['createdAt']),
-      report: _i2.Nip01Event.fromJson(jsonSerialization['report']),
+      report: _i2.Nip01EventModel.fromJson(jsonSerialization['report']),
       author: jsonSerialization['author'] as String,
       type: jsonSerialization['type'] as String,
       processed: jsonSerialization['processed'] as bool,
@@ -53,7 +53,7 @@ abstract class ReportsIncoming
 
   DateTime createdAt;
 
-  _i2.Nip01Event report;
+  _i2.Nip01EventModel report;
 
   String author;
 
@@ -70,7 +70,7 @@ abstract class ReportsIncoming
   ReportsIncoming copyWith({
     int? id,
     DateTime? createdAt,
-    _i2.Nip01Event? report,
+    _i2.Nip01EventModel? report,
     String? author,
     String? type,
     bool? processed,
@@ -139,7 +139,7 @@ class _ReportsIncomingImpl extends ReportsIncoming {
   _ReportsIncomingImpl({
     int? id,
     required DateTime createdAt,
-    required _i2.Nip01Event report,
+    required _i2.Nip01EventModel report,
     required String author,
     required String type,
     required bool processed,
@@ -159,7 +159,7 @@ class _ReportsIncomingImpl extends ReportsIncoming {
   ReportsIncoming copyWith({
     Object? id = _Undefined,
     DateTime? createdAt,
-    _i2.Nip01Event? report,
+    _i2.Nip01EventModel? report,
     String? author,
     String? type,
     bool? processed,

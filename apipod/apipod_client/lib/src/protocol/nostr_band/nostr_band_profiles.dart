@@ -10,7 +10,7 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
-import 'package:ndk/domain_layer/entities/nip_01_event.dart' as _i2;
+import 'package:ndk/data_layer/models/nip_01_event_model.dart' as _i2;
 
 abstract class NostrBandProfiles implements _i1.SerializableModel {
   NostrBandProfiles._({
@@ -24,7 +24,7 @@ abstract class NostrBandProfiles implements _i1.SerializableModel {
     required String pubkey,
     required int newFollowersCount,
     required List<String> relays,
-    required _i2.Nip01Event profile,
+    required _i2.Nip01EventModel profile,
   }) = _NostrBandProfilesImpl;
 
   factory NostrBandProfiles.fromJson(Map<String, dynamic> jsonSerialization) {
@@ -34,7 +34,7 @@ abstract class NostrBandProfiles implements _i1.SerializableModel {
       relays: (jsonSerialization['relays'] as List)
           .map((e) => e as String)
           .toList(),
-      profile: _i2.Nip01Event.fromJson(jsonSerialization['profile']),
+      profile: _i2.Nip01EventModel.fromJson(jsonSerialization['profile']),
     );
   }
 
@@ -44,7 +44,7 @@ abstract class NostrBandProfiles implements _i1.SerializableModel {
 
   List<String> relays;
 
-  _i2.Nip01Event profile;
+  _i2.Nip01EventModel profile;
 
   /// Returns a shallow copy of this [NostrBandProfiles]
   /// with some or all fields replaced by the given arguments.
@@ -53,7 +53,7 @@ abstract class NostrBandProfiles implements _i1.SerializableModel {
     String? pubkey,
     int? newFollowersCount,
     List<String>? relays,
-    _i2.Nip01Event? profile,
+    _i2.Nip01EventModel? profile,
   });
   @override
   Map<String, dynamic> toJson() {
@@ -76,7 +76,7 @@ class _NostrBandProfilesImpl extends NostrBandProfiles {
     required String pubkey,
     required int newFollowersCount,
     required List<String> relays,
-    required _i2.Nip01Event profile,
+    required _i2.Nip01EventModel profile,
   }) : super._(
           pubkey: pubkey,
           newFollowersCount: newFollowersCount,
@@ -92,7 +92,7 @@ class _NostrBandProfilesImpl extends NostrBandProfiles {
     String? pubkey,
     int? newFollowersCount,
     List<String>? relays,
-    _i2.Nip01Event? profile,
+    _i2.Nip01EventModel? profile,
   }) {
     return NostrBandProfiles(
       pubkey: pubkey ?? this.pubkey,
