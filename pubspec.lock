@@ -1136,26 +1136,26 @@ packages:
     dependency: "direct main"
     description:
       name: ndk_amber
-      sha256: d5222d79eb7526021df1289cc59894e045ae80748714bd56e35f24b4d13b99a6
+      sha256: "5f8ae32ea5a7991e171fd0ef4458dba5dcc54d6f17547c8fdc0ecadafaa046fd"
       url: "https://pub.dev"
     source: hosted
-    version: "0.3.3"
+    version: "0.3.3-dev.10"
   ndk_objectbox:
     dependency: "direct main"
     description:
       name: ndk_objectbox
-      sha256: "2df6d27e31c787fa53e766d54bf5fa3831f8a82b475b0416e096bb1abcdee80a"
+      sha256: "8391cccc59de3504f877f8077d89a4a9168fb594490b936ad819e0732d94f962"
       url: "https://pub.dev"
     source: hosted
-    version: "0.2.7"
+    version: "0.2.7-dev.10"
   ndk_rust_verifier:
     dependency: "direct main"
     description:
       name: ndk_rust_verifier
-      sha256: "177933f601d2afe3217734ea759c618ee624f79a1959ee5214ec184d06516728"
+      sha256: "85a540d426d71c3f2730cb304cdca54d67cc99b93bddd96948ab06ab3660e9ad"
       url: "https://pub.dev"
     source: hosted
-    version: "0.4.2"
+    version: "0.4.2-dev.10"
   nm:
     dependency: transitive
     description:
