@@ -4,6 +4,7 @@ import 'package:camelus/helpers/helpers.dart';
 import 'package:camelus/helpers/tlv_helpers.dart';
 import 'package:hex/hex.dart';
 
+@Deprecated("Ndk has NIP-19 features")
 class NprofileHelper {
   NprofileHelper();
 

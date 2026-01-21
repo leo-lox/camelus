@@ -217,6 +217,15 @@ class NostrSideMenu extends ConsumerWidget {
                           context.go('/notifications');
                         },
                       ),
+                    if (!hideOnMobile && currentUserPubkey != null)
+                      _drawerItem(
+                        icon: PhosphorIcons.chatCircle(),
+                        label: 'Messages',
+                        routeName: '/messages',
+                        onTap: () {
+                          context.go('/messages');
+                        },
+                      ),
                     if (currentUserPubkey != null) ...[
                       _drawerItem(
                         label: AppLocalizations.of(context)!.bookmarks,

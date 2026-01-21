@@ -17,9 +17,9 @@
         {
           "id": "2:2800279101748505891",
           "name": "key",
+          "indexId": "1:6758634951668169698",
           "type": 9,
-          "flags": 2080,
-          "indexId": "1:6758634951668169698"
+          "flags": 2080
         },
         {
           "id": "3:7709695228344755827",
@@ -28,10 +28,115 @@
         }
       ],
       "relations": []
+    },
+    {
+      "id": "8:3975513628429198363",
+      "lastPropertyId": "6:2742432485449068091",
+      "name": "DbNip17Conversation",
+      "properties": [
+        {
+          "id": "1:6999061108098420076",
+          "name": "dbId",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:7897634050693751168",
+          "name": "peerPubkey",
+          "indexId": "2:260264514658655485",
+          "type": 9,
+          "flags": 2080
+        },
+        {
+          "id": "3:5607779732579424544",
+          "name": "lastMessageAt",
+          "indexId": "3:7121289968116030117",
+          "type": 6,
+          "flags": 8
+        },
+        {
+          "id": "4:6882319243029140676",
+          "name": "unreadCount",
+          "type": 6
+        },
+        {
+          "id": "5:6806636582718635661",
+          "name": "lastMessagePreview",
+          "type": 9
+        },
+        {
+          "id": "6:2742432485449068091",
+          "name": "lastMessageIsOutgoing",
+          "type": 1
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "9:5397343319776606099",
+      "lastPropertyId": "9:1722632928186673259",
+      "name": "DbNip17Message",
+      "properties": [
+        {
+          "id": "1:509468057691192248",
+          "name": "dbId",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:1727686959524727948",
+          "name": "eventId",
+          "indexId": "4:4273920321718796537",
+          "type": 9,
+          "flags": 2080
+        },
+        {
+          "id": "3:8944279925784220604",
+          "name": "senderPubkey",
+          "indexId": "5:340404848375234632",
+          "type": 9,
+          "flags": 2048
+        },
+        {
+          "id": "4:2663038676832014131",
+          "name": "peerPubkey",
+          "indexId": "6:3321131166522027961",
+          "type": 9,
+          "flags": 2048
+        },
+        {
+          "id": "5:546086632833565918",
+          "name": "content",
+          "type": 9
+        },
+        {
+          "id": "6:6488761390827796675",
+          "name": "createdAt",
+          "indexId": "7:5085530051442188719",
+          "type": 6,
+          "flags": 8
+        },
+        {
+          "id": "7:8574897161242827898",
+          "name": "tags",
+          "type": 9
+        },
+        {
+          "id": "8:6213102138247121219",
+          "name": "replyToEventId",
+          "type": 9
+        },
+        {
+          "id": "9:1722632928186673259",
+          "name": "isOutgoing",
+          "type": 1
+        }
+      ],
+      "relations": []
     }
   ],
-  "lastEntityId": "7:7121738077069950407",
-  "lastIndexId": "1:6758634951668169698",
+  "lastEntityId": "9:5397343319776606099",
+  "lastIndexId": "7:5085530051442188719",
   "lastRelationId": "0:0",
   "lastSequenceId": "0:0",
   "modelVersion": 5,
