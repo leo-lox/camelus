@@ -77,6 +77,8 @@ class _DmThreadPageState extends ConsumerState<DmThreadPage> {
 
     return Scaffold(
       appBar: AppBar(
+        scrolledUnderElevation: 0,
+        backgroundColor: Theme.of(context).colorScheme.surface,
         leading: IconButton(
           icon: Icon(
             PhosphorIcons.arrowLeft(),

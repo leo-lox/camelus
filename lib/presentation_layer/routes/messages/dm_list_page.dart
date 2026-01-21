@@ -71,11 +71,12 @@ class _DmListPageState extends ConsumerState<DmListPage> {
 
     return Scaffold(
       appBar: AppBar(
+        scrolledUnderElevation: 0,
+        backgroundColor: Theme.of(context).colorScheme.surface,
         title: Text(
           'Messages',
           style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
         ),
-        elevation: 0,
         actions: [
           IconButton(
             icon: Icon(
