@@ -21,7 +21,7 @@ class FeedViewModel {
     this.endOfRootAndReplyNotes = false,
   });
 
-  copyWith({
+  FeedViewModel copyWith({
     List<ParsedPost>? timelineRootNotes,
     List<ParsedPost>? newRootNotes,
     List<ParsedPost>? timelineRootAndReplyNotes,

@@ -22,7 +22,7 @@ class LocalStorageAccount {
     this.keyPair,
     this.bunkerConnection,
   });
-  toJson() {
+  Map<String, Object?> toJson() {
     return {
       'loginType': loginType.toString(),
       'pubkey': pubkey,

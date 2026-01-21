@@ -443,14 +443,14 @@ class _FollowButtonState extends ConsumerState<_FollowButton> {
   }
 }
 
-_pubkeyToHrBech32Short(pubkey) {
+String _pubkeyToHrBech32Short(pubkey) {
   final bech = Helpers().encodeBech32(pubkey, "npub");
   final bechShort = NprofileHelper().bech32toHr(bech, cutLength: 11);
 
   return bechShort;
 }
 
-_openLightningAddress(String lu06) async {
+Future<void> _openLightningAddress(String lu06) async {
   final Uri lightningLaunchUri = Uri(
     scheme: 'lightning',
     path: lu06.toString(),

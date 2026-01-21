@@ -11,7 +11,6 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../../domain_layer/entities/feed_filter.dart';
 
-import '../atoms/app_logo.dart';
 import '../atoms/my_profile_picture.dart';
 import '../components/drawer/nostr_drawer.dart';
 import '../components/generic_feed.dart';

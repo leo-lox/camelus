@@ -58,7 +58,7 @@ class _OnboardingProfileState extends ConsumerState<OnboardingProfile> {
     }
   }
 
-  _openCropImagePopup({
+  void _openCropImagePopup({
     required Uint8List imageData,
     required Function(Uint8List) callback,
     double aspectRatio = 1,
@@ -82,7 +82,7 @@ class _OnboardingProfileState extends ConsumerState<OnboardingProfile> {
   }
 
   /// pick a new picture and crop
-  _onClickPicture() async {
+  Future<void> _onClickPicture() async {
     final file = await _pickFile();
     if (file == null) return;
 
@@ -101,7 +101,7 @@ class _OnboardingProfileState extends ConsumerState<OnboardingProfile> {
   }
 
   /// pick a new banner and crop
-  _onClickBanner() async {
+  Future<void> _onClickBanner() async {
     final file = await _pickFile();
     if (file == null) return;
 

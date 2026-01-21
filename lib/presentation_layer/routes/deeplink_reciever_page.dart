@@ -67,11 +67,11 @@ class _DeeplinkRecieverPageState extends ConsumerState<DeeplinkRecieverPage> {
     });
   }
 
-  _pushProfile({required String pubkey}) {
+  void _pushProfile({required String pubkey}) {
     context.go('/nostr/profile/$pubkey');
   }
 
-  _pushNote({required String noteId}) {
+  void _pushNote({required String noteId}) {
     context.go('/nostr/event', extra: {"root": noteId});
   }
 
@@ -82,7 +82,7 @@ class _DeeplinkRecieverPageState extends ConsumerState<DeeplinkRecieverPage> {
     );
   }
 
-  _nostrDecode({
+  Future<void> _nostrDecode({
     required String nostrCode,
     required WidgetRef providerContainer,
   }) async {

@@ -60,7 +60,7 @@ class _OnboardingFollowGraphState extends ConsumerState<OnboardingFollowGraph> {
   double _scale = 1.0;
 
   /// if addedBy Pubkey drawas a edge to the old and new node
-  addNode(GraphNodeData data, {String? addedByPubkey}) async {
+  Future<void> addNode(GraphNodeData data, {String? addedByPubkey}) async {
     // add data
 
     _graphController.addNode(data);
@@ -80,7 +80,7 @@ class _OnboardingFollowGraphState extends ConsumerState<OnboardingFollowGraph> {
   }
 
   /// adds all the contacts (with cutoff) from a given pubkey (from node)
-  addContactsOfPubkey(String pubkey, {int cutoff = 3}) async {
+  Future<void> addContactsOfPubkey(String pubkey, {int cutoff = 3}) async {
     final List<String> contacts = _nodes
         .firstWhere((n) => n.pubkey == pubkey)
         .contactList
@@ -103,7 +103,7 @@ class _OnboardingFollowGraphState extends ConsumerState<OnboardingFollowGraph> {
   }
 
   /// removes the subtree
-  removeAncestors(String pubkey) {
+  void removeAncestors(String pubkey) {
     final pubkeyNode = _nodes.firstWhere((n) => n.pubkey == pubkey);
 
     final List<GraphNodeData> ancestors = [];
@@ -130,7 +130,7 @@ class _OnboardingFollowGraphState extends ConsumerState<OnboardingFollowGraph> {
   }
 
   /// fetches and adds a node to the graph
-  addPubkeyNode(String pubkey, {String? addedByPubkey}) async {
+  Future<void> addPubkeyNode(String pubkey, {String? addedByPubkey}) async {
     try {
       _fetchNodePubkeyData(pubkey).then((mynode) {
         addNode(mynode, addedByPubkey: addedByPubkey);
@@ -142,7 +142,7 @@ class _OnboardingFollowGraphState extends ConsumerState<OnboardingFollowGraph> {
     }
   }
 
-  _addRecommendations() async {
+  Future<void> _addRecommendations() async {
     final List<GraphNodeData> recommendationsNodes = [];
 
     for (final pubkey in ONBOARD_RECOMMANDATIONS) {

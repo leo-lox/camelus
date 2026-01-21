@@ -34,7 +34,7 @@ import 'presentation_layer/routes/nostr/settings/locale/locale_settings.dart';
 import 'presentation_layer/routes/nostr/settings/moderation/moderation_settings.dart';
 import 'presentation_layer/routes/nostr/settings/settings_page.dart';
 
-redirects(BuildContext context, GoRouterState state) {
+Null redirects(BuildContext context, GoRouterState state) {
   return null;
 }
 

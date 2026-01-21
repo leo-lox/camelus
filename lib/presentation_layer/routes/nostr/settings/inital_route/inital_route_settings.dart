@@ -41,7 +41,7 @@ class InitalRouteSettingsState extends ConsumerState<InitalRouteSettings> {
     }
   }
 
-  _laodInitialRoute() async {
+  Future<void> _laodInitialRoute() async {
     final loadedRoute = await ref.read(initalRouteProvider).getInitialRoute();
     ref.read(selectedRouteProvider.notifier).state = loadedRoute;
   }

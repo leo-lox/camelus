@@ -40,7 +40,7 @@ class WritePostState {
     this.hashtagsInPost = const [],
   });
 
-  copyWith({
+  WritePostState copyWith({
     List<MemFile>? images,
     NostrNote? replyToNote,
     bool clearReplyToNote = false,
@@ -67,17 +67,17 @@ class WritePostState {
 }
 
 class WritePostNotifier extends Notifier<WritePostState> {
-  addImage(MemFile image) {
+  void addImage(MemFile image) {
     state = state.copyWith(images: [...state.images, image]);
   }
 
-  updateMarkup(String markupText) {
+  void updateMarkup(String markupText) {
     state = state.copyWith(markupText: markupText);
     extractMentions();
     extractHashtags();
   }
 
-  extractMentions() {
+  void extractMentions() {
     final mentionKeys = <String>[];
     final keyRegex = RegExp(r'@\[__(.*?)__\]');
 
@@ -89,7 +89,7 @@ class WritePostNotifier extends Notifier<WritePostState> {
     state.mentionedInPost = mentionKeys;
   }
 
-  extractHashtags() {
+  void extractHashtags() {
     final hashtagKeys = <String>[];
     final keyRegex = RegExp(r'#\w+');
 

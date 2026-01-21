@@ -71,7 +71,7 @@ class _EditRelaysViewState extends ConsumerState<EditRelaysView> {
     _relayNameController.clear();
   }
 
-  _saveRelays() async {
+  Future<void> _saveRelays() async {
     log("saving relays $myRelays");
     setState(() {
       loading = true;
@@ -107,7 +107,7 @@ class _EditRelaysViewState extends ConsumerState<EditRelaysView> {
     super.dispose();
   }
 
-  _checkClose() async {
+  Future<void> _checkClose() async {
     if (!touched) {
       Navigator.of(context).pop();
       return;

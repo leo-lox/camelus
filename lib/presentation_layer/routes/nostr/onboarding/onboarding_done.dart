@@ -174,7 +174,7 @@ ${_privateKey.mnemonicSentence}
     super.dispose();
   }
 
-  _onSubmit() async {
+  Future<void> _onSubmit() async {
     if (!_termsAndConditions) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(

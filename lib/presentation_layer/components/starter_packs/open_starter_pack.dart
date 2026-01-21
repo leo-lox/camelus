@@ -38,7 +38,7 @@ class _OpenStarterPackState extends ConsumerState<OpenStarterPack> {
   bool _isDeleting = false;
   bool _deleteSuccess = false;
 
-  _onShare(WidgetRef ref) async {
+  Future<void> _onShare(WidgetRef ref) async {
     final inboxOutboxP = ref.read(inboxOutboxProvider);
     final nip65data = await inboxOutboxP.getNip65data(
       widget.starterPackIdentifier.pubkey,
@@ -86,7 +86,7 @@ class _OpenStarterPackState extends ConsumerState<OpenStarterPack> {
     );
   }
 
-  _onEdit(BuildContext context) {
+  void _onEdit(BuildContext context) {
     context.push(
       '/edit-starter-pack',
       extra: StarterPackIdentifier(
@@ -96,7 +96,7 @@ class _OpenStarterPackState extends ConsumerState<OpenStarterPack> {
     );
   }
 
-  _showDeleteConfirmationDialog(BuildContext context) {
+  void _showDeleteConfirmationDialog(BuildContext context) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -140,7 +140,7 @@ class _OpenStarterPackState extends ConsumerState<OpenStarterPack> {
     );
   }
 
-  _onDelete(WidgetRef ref, BuildContext context) async {
+  Future<void> _onDelete(WidgetRef ref, BuildContext context) async {
     setState(() {
       _isDeleting = true;
     });
@@ -160,7 +160,7 @@ class _OpenStarterPackState extends ConsumerState<OpenStarterPack> {
     );
   }
 
-  _navigateToProfile(BuildContext context, String pubkey) {
+  void _navigateToProfile(BuildContext context, String pubkey) {
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => ProfilePage2(pubkey: pubkey)),

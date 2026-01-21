@@ -118,7 +118,7 @@ class _OnboardingLoginPageState extends ConsumerState<OnboardingLoginPage> {
     }
   }
 
-  _onSubmit() async {
+  Future<void> _onSubmit() async {
     if (!_termsAndConditions) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(

@@ -42,7 +42,7 @@ class _WritePostState extends ConsumerState<WritePost> {
   List<Map<String, dynamic>> _mentionsSearchResults = [];
   List<Map<String, dynamic>> _mentionsSearchResultsHashTags = [];
 
-  _addImage() async {
+  Future<void> _addImage() async {
     final ImagePicker picker = ImagePicker();
     final result = await picker.pickMultiImage();
 
@@ -64,7 +64,7 @@ class _WritePostState extends ConsumerState<WritePost> {
     }
   }
 
-  _searchMentions(search) async {
+  Future<void> _searchMentions(search) async {
     final writePostState = ref.read(writePostStateProvider);
     final searchService = ref.read(searchProvider);
     List<Map<String, dynamic>> results = [];
@@ -114,7 +114,7 @@ class _WritePostState extends ConsumerState<WritePost> {
   }
 
   /// todo: build this properly
-  _searchHashtags(String search) async {
+  Future<void> _searchHashtags(String search) async {
     List<Map<String, dynamic>> results = [];
 
     results = defaultHashtagSuggestions;
@@ -478,7 +478,7 @@ class _TopBar extends ConsumerWidget {
     required this.submitPostCallback,
   });
 
-  getPubkeyHrShort(String pubkey) {
+  String getPubkeyHrShort(String pubkey) {
     final pubkeyHr = Helpers().encodeBech32(pubkey, "npub");
     final pubkeyHrShort =
         "${pubkeyHr.substring(0, 5)}...${pubkeyHr.substring(pubkeyHr.length - 5)}";
