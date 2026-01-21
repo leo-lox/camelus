@@ -11,6 +11,7 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
 import 'package:ndk/domain_layer/entities/nip_01_event.dart' as _i2;
+import 'package:ndk/data_layer/models/nip_01_event_model.dart' as _i3;
 
 abstract class ReportsIncoming
     implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
@@ -37,7 +38,7 @@ abstract class ReportsIncoming
       id: jsonSerialization['id'] as int?,
       createdAt:
           _i1.DateTimeJsonExtension.fromJson(jsonSerialization['createdAt']),
-      report: _i2.Nip01Event.fromJson(jsonSerialization['report']),
+      report: _i3.Nip01EventModel.fromJson(jsonSerialization['report']),
       author: jsonSerialization['author'] as String,
       type: jsonSerialization['type'] as String,
       processed: jsonSerialization['processed'] as bool,
@@ -80,7 +81,7 @@ abstract class ReportsIncoming
     return {
       if (id != null) 'id': id,
       'createdAt': createdAt.toJson(),
-      'report': report.toJson(),
+      'report': _i3.Nip01EventModel.fromEntity(report).toJson(),
       'author': author,
       'type': type,
       'processed': processed,
@@ -96,7 +97,7 @@ abstract class ReportsIncoming
 // ignore: unnecessary_type_check
           report is _i1.ProtocolSerialization
               ? (report as _i1.ProtocolSerialization).toJsonForProtocol()
-              : report.toJson(),
+              : _i3.Nip01EventModel.fromEntity(report).toJson(),
       'author': author,
       'type': type,
       'processed': processed,
