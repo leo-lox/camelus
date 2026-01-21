@@ -290,8 +290,7 @@ class _BuildProfileHeader extends ConsumerWidget {
                 ),
                 SizedBox(height: 10),
                 Text(
-                  userMetadata.name ??
-                      Helpers().shortHr(userMetadata.pubkey),
+                  userMetadata.name ?? Helpers().shortHr(userMetadata.pubkey),
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
@@ -441,7 +440,6 @@ class _FollowButtonState extends ConsumerState<_FollowButton> {
     }
   }
 }
-
 
 Future<void> _openLightningAddress(String lu06) async {
   final Uri lightningLaunchUri = Uri(

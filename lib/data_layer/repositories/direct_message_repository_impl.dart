@@ -34,8 +34,8 @@ class DirectMessageRepositoryImpl implements DirectMessageRepository {
   // StreamControllers for manual updates
   final StreamController<List<DmConversation>> _conversationsController =
       StreamController<List<DmConversation>>.broadcast();
-  final Map<String, StreamController<List<DirectMessage>>> _messagesControllers =
-      {};
+  final Map<String, StreamController<List<DirectMessage>>>
+  _messagesControllers = {};
   final StreamController<int> _unreadCountController =
       StreamController<int>.broadcast();
 
@@ -112,7 +112,9 @@ class DirectMessageRepositoryImpl implements DirectMessageRepository {
   /// Get NIP-65 inbox relays (read-capable relays) for a pubkey.
   Future<List<String>> _getNip65InboxRelays(String pubkey) async {
     try {
-      final userRelayList = await ndk.userRelayLists.getSingleUserRelayList(pubkey);
+      final userRelayList = await ndk.userRelayLists.getSingleUserRelayList(
+        pubkey,
+      );
       if (userRelayList == null) {
         return [];
       }
@@ -282,10 +284,7 @@ class DirectMessageRepositoryImpl implements DirectMessageRepository {
     final dmRelays = await _getDmInboxRelays(myPubkey);
 
     // Base filter for gap detection
-    final baseFilter = Filter(
-      kinds: [1059],
-      pTags: [myPubkey],
-    );
+    final baseFilter = Filter(kinds: [1059], pTags: [myPubkey]);
 
     // Find gaps in the requested range
     final gaps = await ndk.fetchedRanges.findGaps(
@@ -303,11 +302,7 @@ class DirectMessageRepositoryImpl implements DirectMessageRepository {
 
     // Fetch each gap
     for (final gap in gaps) {
-      await _fetchRange(
-        since: gap.since,
-        until: gap.until,
-        dmRelays: dmRelays,
-      );
+      await _fetchRange(since: gap.since, until: gap.until, dmRelays: dmRelays);
     }
   }
 
@@ -344,7 +339,9 @@ class DirectMessageRepositoryImpl implements DirectMessageRepository {
       }
     }
 
-    log('DM: Range fetch completed - received=$receivedCount, processed=$processedCount');
+    log(
+      'DM: Range fetch completed - received=$receivedCount, processed=$processedCount',
+    );
 
     // Record the fetched range
     final dmRelaysForRange = dmRelays.isNotEmpty ? dmRelays : ['default'];
@@ -364,9 +361,7 @@ class DirectMessageRepositoryImpl implements DirectMessageRepository {
     final store = await getStore();
     final box = store.box<DbNip17Message>();
 
-    final query = box.query()
-        .order(DbNip17Message_.createdAt)
-        .build();
+    final query = box.query().order(DbNip17Message_.createdAt).build();
     final oldestMessage = query.findFirst();
     query.close();
 
@@ -382,21 +377,22 @@ class DirectMessageRepositoryImpl implements DirectMessageRepository {
     final fetchUntil = oldestTimestamp - 1; // Just before the oldest
     final fetchSince = oldestTimestamp - (30 * 24 * 60 * 60); // 30 days before
 
-    log('DM: Loading older messages before $oldestTimestamp (since=$fetchSince until=$fetchUntil)');
+    log(
+      'DM: Loading older messages before $oldestTimestamp (since=$fetchSince until=$fetchUntil)',
+    );
 
     final previousCount = box.count();
     await fetchMessages(since: fetchSince, until: fetchUntil);
     final newCount = box.count();
 
     final foundNew = newCount > previousCount;
-    log('DM: Load older completed - found ${newCount - previousCount} new messages');
+    log(
+      'DM: Load older completed - found ${newCount - previousCount} new messages',
+    );
 
     // If no new messages found, record that we've fetched from the beginning
     if (!foundNew) {
-      final filter = Filter(
-        kinds: [1059],
-        pTags: [myPubkey],
-      );
+      final filter = Filter(kinds: [1059], pTags: [myPubkey]);
       final dmRelays = await _getDmInboxRelays(myPubkey);
       final relaysForRange = dmRelays.isNotEmpty ? dmRelays : ['default'];
 
@@ -431,10 +427,7 @@ class DirectMessageRepositoryImpl implements DirectMessageRepository {
 
   @override
   Future<bool> hasReachedBeginning(String peerPubkey) async {
-    final filter = Filter(
-      kinds: [1059],
-      pTags: [myPubkey],
-    );
+    final filter = Filter(kinds: [1059], pTags: [myPubkey]);
 
     // Get all fetched ranges for this filter (Map<relayUrl, RelayFetchedRanges>)
     final rangesMap = await ndk.fetchedRanges.getForFilter(filter);
@@ -442,7 +435,9 @@ class DirectMessageRepositoryImpl implements DirectMessageRepository {
     // Check if any relay has reached the oldest (oldest == 0)
     final hasReachedOldest = rangesMap.values.any((r) => r.reachedOldest);
 
-    log('DM: hasReachedBeginning($peerPubkey): $hasReachedOldest (relays=${rangesMap.length})');
+    log(
+      'DM: hasReachedBeginning($peerPubkey): $hasReachedOldest (relays=${rangesMap.length})',
+    );
 
     return hasReachedOldest;
   }
@@ -467,7 +462,9 @@ class DirectMessageRepositoryImpl implements DirectMessageRepository {
       limit: 0, // Real-time subscription
     );
 
-    log('DM: Starting subscription on relays=${dmRelays.isNotEmpty ? dmRelays : "default"}');
+    log(
+      'DM: Starting subscription on relays=${dmRelays.isNotEmpty ? dmRelays : "default"}',
+    );
 
     _dmSubscription = ndk.requests.subscription(
       filter: filter,
@@ -519,7 +516,10 @@ class DirectMessageRepositoryImpl implements DirectMessageRepository {
       await cacheDecryptedMessage(message);
 
       // Update conversation
-      await _updateConversation(message, incrementUnread: isRealTime && !message.isOutgoing);
+      await _updateConversation(
+        message,
+        incrementUnread: isRealTime && !message.isOutgoing,
+      );
 
       // Notify listeners
       _notifyMessagesChanged(message.peerPubkey);
@@ -577,8 +577,12 @@ class DirectMessageRepositoryImpl implements DirectMessageRepository {
       final recipientRelays = await _getDmInboxRelays(recipientPubkey);
       final myRelays = await _getDmInboxRelays(myPubkey);
 
-      log('DM: Broadcasting to recipient relays: ${recipientRelays.isNotEmpty ? recipientRelays : "default"}');
-      log('DM: Broadcasting to my relays: ${myRelays.isNotEmpty ? myRelays : "default"}');
+      log(
+        'DM: Broadcasting to recipient relays: ${recipientRelays.isNotEmpty ? recipientRelays : "default"}',
+      );
+      log(
+        'DM: Broadcasting to my relays: ${myRelays.isNotEmpty ? myRelays : "default"}',
+      );
 
       // 4. Broadcast gift wraps
       // Broadcast to recipient's relays
@@ -601,7 +605,11 @@ class DirectMessageRepositoryImpl implements DirectMessageRepository {
         content: content,
         createdAt: now,
         isOutgoing: true,
-        tags: tags.map((t) => NostrTagModel(type: t[0], value: t.length > 1 ? t[1] : '')).toList(),
+        tags: tags
+            .map(
+              (t) => NostrTagModel(type: t[0], value: t.length > 1 ? t[1] : ''),
+            )
+            .toList(),
       );
 
       await cacheDecryptedMessage(localMessage);
@@ -623,9 +631,7 @@ class DirectMessageRepositoryImpl implements DirectMessageRepository {
     final store = await getStore();
     final box = store.box<DbNip17Message>();
 
-    final query = box
-        .query(DbNip17Message_.eventId.equals(giftWrapId))
-        .build();
+    final query = box.query(DbNip17Message_.eventId.equals(giftWrapId)).build();
     final db = query.findFirst();
     query.close();
 
@@ -640,9 +646,7 @@ class DirectMessageRepositoryImpl implements DirectMessageRepository {
     final box = store.box<DbNip17Message>();
 
     // Check if already exists
-    final query = box
-        .query(DbNip17Message_.eventId.equals(message.id))
-        .build();
+    final query = box.query(DbNip17Message_.eventId.equals(message.id)).build();
     final existing = query.findFirst();
     query.close();
 

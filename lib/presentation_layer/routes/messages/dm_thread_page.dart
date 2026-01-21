@@ -25,7 +25,8 @@ class DmThreadPage extends ConsumerStatefulWidget {
 class _DmThreadPageState extends ConsumerState<DmThreadPage> {
   final TextEditingController _messageController = TextEditingController();
   final FocusNode _messageFocusNode = FocusNode();
-  final FlutterListViewController _scrollController = FlutterListViewController();
+  final FlutterListViewController _scrollController =
+      FlutterListViewController();
 
   /// Decoded hex pubkey from the identifier
   late final String _peerPubkey;
@@ -71,9 +72,8 @@ class _DmThreadPageState extends ConsumerState<DmThreadPage> {
     final metadataState = ref.watch(metadataStateProvider(_peerPubkey));
     final metadata = metadataState.userMetadata;
 
-    final displayName = metadata?.name ??
-        metadata?.name ??
-        '${_peerPubkey.substring(0, 8)}...';
+    final displayName =
+        metadata?.name ?? metadata?.name ?? '${_peerPubkey.substring(0, 8)}...';
 
     return Scaffold(
       appBar: AppBar(
@@ -126,9 +126,7 @@ class _DmThreadPageState extends ConsumerState<DmThreadPage> {
       ),
       body: Column(
         children: [
-          Expanded(
-            child: _buildMessageList(context, state),
-          ),
+          Expanded(child: _buildMessageList(context, state)),
           _buildMessageInput(context, state),
         ],
       ),
@@ -165,31 +163,30 @@ class _DmThreadPageState extends ConsumerState<DmThreadPage> {
     }
 
     // Group messages with date separators + end of history marker
-    final messagesWithSeparators = _buildMessageListWithSeparators(state.messages);
+    final messagesWithSeparators = _buildMessageListWithSeparators(
+      state.messages,
+    );
     // Add 1 for the "beginning of conversation" or "load more" indicator
     final totalCount = messagesWithSeparators.length + 1;
 
     return FlutterListView(
       controller: _scrollController,
       reverse: true,
-      delegate: FlutterListViewDelegate(
-        (context, index) {
-          // Last item (visually at top when scrolled) is the beginning/load more indicator
-          if (index == messagesWithSeparators.length) {
-            return _buildEndOfHistoryIndicator(context, state);
-          }
+      delegate: FlutterListViewDelegate((context, index) {
+        // Last item (visually at top when scrolled) is the beginning/load more indicator
+        if (index == messagesWithSeparators.length) {
+          return _buildEndOfHistoryIndicator(context, state);
+        }
 
-          final item = messagesWithSeparators[index];
-          if (item is int) {
-            // Date separator
-            return DmDateSeparator(timestamp: item);
-          } else {
-            // Message
-            return DmMessageBubble(message: item as DirectMessage);
-          }
-        },
-        childCount: totalCount,
-      ),
+        final item = messagesWithSeparators[index];
+        if (item is int) {
+          // Date separator
+          return DmDateSeparator(timestamp: item);
+        } else {
+          // Message
+          return DmMessageBubble(message: item as DirectMessage);
+        }
+      }, childCount: totalCount),
     );
   }
 
@@ -202,8 +199,11 @@ class _DmThreadPageState extends ConsumerState<DmThreadPage> {
     int? lastDateKey;
 
     for (final message in reversed) {
-      final dateTime = DateTime.fromMillisecondsSinceEpoch(message.createdAt * 1000);
-      final dateKey = dateTime.year * 10000 + dateTime.month * 100 + dateTime.day;
+      final dateTime = DateTime.fromMillisecondsSinceEpoch(
+        message.createdAt * 1000,
+      );
+      final dateKey =
+          dateTime.year * 10000 + dateTime.month * 100 + dateTime.day;
 
       if (lastDateKey != dateKey) {
         // Insert date separator after (below in reversed list) the first message of a new day
@@ -219,7 +219,10 @@ class _DmThreadPageState extends ConsumerState<DmThreadPage> {
     return result;
   }
 
-  Widget _buildEndOfHistoryIndicator(BuildContext context, DmThreadState state) {
+  Widget _buildEndOfHistoryIndicator(
+    BuildContext context,
+    DmThreadState state,
+  ) {
     // Loading older messages
     if (state.isLoadingOlder) {
       return Container(
@@ -245,7 +248,9 @@ class _DmThreadPageState extends ConsumerState<DmThreadPage> {
       child: Center(
         child: TextButton.icon(
           onPressed: () {
-            ref.read(dmThreadProvider(_peerPubkey).notifier).loadOlderMessages();
+            ref
+                .read(dmThreadProvider(_peerPubkey).notifier)
+                .loadOlderMessages();
           },
           icon: Icon(PhosphorIcons.arrowUp()),
           label: const Text('Load older messages'),
@@ -263,17 +268,13 @@ class _DmThreadPageState extends ConsumerState<DmThreadPage> {
       padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 24),
       child: Column(
         children: [
-          UserImage(
-            imageUrl: metadata?.picture,
-            pubkey: _peerPubkey,
-            size: 64,
-          ),
+          UserImage(imageUrl: metadata?.picture, pubkey: _peerPubkey, size: 64),
           const SizedBox(height: 16),
           Text(
             displayName,
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w600,
-                ),
+            style: Theme.of(
+              context,
+            ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
           ),
           const SizedBox(height: 8),
           Row(
@@ -288,8 +289,8 @@ class _DmThreadPageState extends ConsumerState<DmThreadPage> {
               Text(
                 'End-to-end encrypted',
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
+                  color: Theme.of(context).colorScheme.primary,
+                ),
               ),
             ],
           ),
@@ -303,8 +304,8 @@ class _DmThreadPageState extends ConsumerState<DmThreadPage> {
             child: Text(
               'This is the beginning of your conversation',
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  ),
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
             ),
           ),
         ],
@@ -315,9 +316,8 @@ class _DmThreadPageState extends ConsumerState<DmThreadPage> {
   Widget _buildEmptyThreadState(BuildContext context) {
     final metadataState = ref.watch(metadataStateProvider(_peerPubkey));
     final metadata = metadataState.userMetadata;
-    final displayName = metadata?.name ??
-        metadata?.name ??
-        '${_peerPubkey.substring(0, 8)}...';
+    final displayName =
+        metadata?.name ?? metadata?.name ?? '${_peerPubkey.substring(0, 8)}...';
 
     return Center(
       child: Padding(
@@ -334,15 +334,15 @@ class _DmThreadPageState extends ConsumerState<DmThreadPage> {
             Text(
               displayName,
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurface,
-                  ),
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
             ),
             const SizedBox(height: 8),
             Text(
               'Start your encrypted conversation',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  ),
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 8),
@@ -358,8 +358,8 @@ class _DmThreadPageState extends ConsumerState<DmThreadPage> {
                 Text(
                   'End-to-end encrypted with NIP-17',
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
                 ),
               ],
             ),
@@ -380,9 +380,7 @@ class _DmThreadPageState extends ConsumerState<DmThreadPage> {
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
         border: Border(
-          top: BorderSide(
-            color: Theme.of(context).colorScheme.outlineVariant,
-          ),
+          top: BorderSide(color: Theme.of(context).colorScheme.outlineVariant),
         ),
       ),
       child: Row(
@@ -402,7 +400,9 @@ class _DmThreadPageState extends ConsumerState<DmThreadPage> {
                   borderSide: BorderSide.none,
                 ),
                 filled: true,
-                fillColor: Theme.of(context).colorScheme.surfaceContainerHighest,
+                fillColor: Theme.of(
+                  context,
+                ).colorScheme.surfaceContainerHighest,
                 contentPadding: const EdgeInsets.symmetric(
                   horizontal: 16,
                   vertical: 10,

@@ -5,6 +5,7 @@ import 'package:ndk/shared/nips/nip19/nip19.dart';
 
 import '../../../domain_layer/entities/nostr_note.dart';
 import '../../../domain_layer/entities/parsed_post.dart';
+
 class NostrParser {
   static const bool useThread = false;
 

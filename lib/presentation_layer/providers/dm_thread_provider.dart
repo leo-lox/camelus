@@ -60,11 +60,11 @@ class DmThreadState {
 /// ```
 final dmThreadProvider =
     StateNotifierProvider.family<DmThreadNotifier, DmThreadState, String>((
-  ref,
-  peerPubkey,
-) {
-  return DmThreadNotifier(ref, peerPubkey);
-});
+      ref,
+      peerPubkey,
+    ) {
+      return DmThreadNotifier(ref, peerPubkey);
+    });
 
 class DmThreadNotifier extends StateNotifier<DmThreadState> {
   final Ref ref;
@@ -74,7 +74,7 @@ class DmThreadNotifier extends StateNotifier<DmThreadState> {
   StreamSubscription? _newMessageSubscription;
 
   DmThreadNotifier(this.ref, this.peerPubkey)
-      : super(DmThreadState(peerPubkey: peerPubkey, isLoading: true)) {
+    : super(DmThreadState(peerPubkey: peerPubkey, isLoading: true)) {
     _setupMessagesWatch();
   }
 
@@ -97,39 +97,41 @@ class DmThreadNotifier extends StateNotifier<DmThreadState> {
     }
 
     // Watch messages from local cache
-    _messagesSubscription = repository.watchMessages(peerPubkey).listen(
-      (messages) {
-        // Update messages immediately (no loading delay)
-        state = state.copyWith(
-          messages: messages,
-          isLoading: false,
-          hasError: false,
-        );
+    _messagesSubscription = repository
+        .watchMessages(peerPubkey)
+        .listen(
+          (messages) {
+            // Update messages immediately (no loading delay)
+            state = state.copyWith(
+              messages: messages,
+              isLoading: false,
+              hasError: false,
+            );
 
-        // Check hasReachedBeginning async (non-blocking)
-        repository.hasReachedBeginning(peerPubkey).then((reachedBeginning) {
-          state = state.copyWith(hasReachedBeginning: reachedBeginning);
-        });
-      },
-      onError: (error) {
-        log('DM Thread: Error watching messages: $error');
-        state = state.copyWith(
-          isLoading: false,
-          hasError: true,
-          errorMessage: error.toString(),
+            // Check hasReachedBeginning async (non-blocking)
+            repository.hasReachedBeginning(peerPubkey).then((reachedBeginning) {
+              state = state.copyWith(hasReachedBeginning: reachedBeginning);
+            });
+          },
+          onError: (error) {
+            log('DM Thread: Error watching messages: $error');
+            state = state.copyWith(
+              isLoading: false,
+              hasError: true,
+              errorMessage: error.toString(),
+            );
+          },
         );
-      },
-    );
 
     // Subscribe to new messages and filter for this conversation
-    _newMessageSubscription = repository.subscribeToNewMessages().listen(
-      (message) {
-        if (message.peerPubkey == peerPubkey) {
-          log('DM Thread: New message in conversation');
-          // Messages will auto-update via watchMessages
-        }
-      },
-    );
+    _newMessageSubscription = repository.subscribeToNewMessages().listen((
+      message,
+    ) {
+      if (message.peerPubkey == peerPubkey) {
+        log('DM Thread: New message in conversation');
+        // Messages will auto-update via watchMessages
+      }
+    });
 
     // Mark as read when viewing
     _markAsRead();

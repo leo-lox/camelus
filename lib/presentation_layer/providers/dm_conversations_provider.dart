@@ -114,10 +114,7 @@ class DmConversationsNotifier extends Notifier<DmConversationsState> {
 
     try {
       await repository.fetchMessages(since: since);
-      state = state.copyWith(
-        isLoading: false,
-        initialFetchDone: true,
-      );
+      state = state.copyWith(isLoading: false, initialFetchDone: true);
     } catch (e) {
       log('DM: Error fetching messages: $e');
       state = state.copyWith(

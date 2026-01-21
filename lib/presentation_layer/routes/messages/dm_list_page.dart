@@ -164,15 +164,15 @@ class _DmListPageState extends ConsumerState<DmListPage> {
             Text(
               'No messages yet',
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurface,
-                  ),
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
             ),
             const SizedBox(height: 8),
             Text(
               'Start a conversation by tapping the pencil icon',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  ),
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
               textAlign: TextAlign.center,
             ),
           ],

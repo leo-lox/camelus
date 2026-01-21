@@ -46,7 +46,8 @@ class DmConversation {
       lastMessageAt: lastMessageAt ?? this.lastMessageAt,
       unreadCount: unreadCount ?? this.unreadCount,
       lastMessagePreview: lastMessagePreview ?? this.lastMessagePreview,
-      lastMessageIsOutgoing: lastMessageIsOutgoing ?? this.lastMessageIsOutgoing,
+      lastMessageIsOutgoing:
+          lastMessageIsOutgoing ?? this.lastMessageIsOutgoing,
       lastMessage: lastMessage ?? this.lastMessage,
     );
   }

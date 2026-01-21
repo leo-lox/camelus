@@ -30,14 +30,16 @@ class _DmRelaysSettingsState extends ConsumerState<DmRelaysSettings> {
     if (success) {
       _relayController.clear();
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Relay added')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Relay added')));
       }
     } else {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Failed to add relay (may already exist)')),
+          const SnackBar(
+            content: Text('Failed to add relay (may already exist)'),
+          ),
         );
       }
     }
@@ -66,13 +68,14 @@ class _DmRelaysSettingsState extends ConsumerState<DmRelaysSettings> {
     );
 
     if (confirmed == true) {
-      final success =
-          await ref.read(dmRelayListProvider.notifier).removeRelay(relayUrl);
+      final success = await ref
+          .read(dmRelayListProvider.notifier)
+          .removeRelay(relayUrl);
 
       if (success && mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Relay removed')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Relay removed')));
       }
     }
   }
@@ -208,15 +211,15 @@ class _DmRelaysSettingsState extends ConsumerState<DmRelaysSettings> {
             Text(
               'No DM relays configured',
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurface,
-                  ),
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
             ),
             const SizedBox(height: 8),
             Text(
               'Add relays where you want to receive private messages. Without DM relays, your NIP-65 inbox relays will be used as fallback.',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  ),
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 24),

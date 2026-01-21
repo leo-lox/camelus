@@ -24,8 +24,8 @@ class DmConversationTile extends ConsumerWidget {
     );
     final metadata = metadataState.userMetadata;
 
-    final displayName = metadata?.name ??
-        '${conversation.peerPubkey.substring(0, 8)}...';
+    final displayName =
+        metadata?.name ?? '${conversation.peerPubkey.substring(0, 8)}...';
 
     return ListTile(
       onTap: onTap,

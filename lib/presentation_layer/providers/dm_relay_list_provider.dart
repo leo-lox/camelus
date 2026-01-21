@@ -42,7 +42,8 @@ class DmRelayListNotifier extends StateNotifier<DmRelayListState> {
   final Ndk ndk;
   final String? myPubkey;
 
-  DmRelayListNotifier(this.ndk, this.myPubkey) : super(const DmRelayListState()) {
+  DmRelayListNotifier(this.ndk, this.myPubkey)
+    : super(const DmRelayListState()) {
     if (myPubkey != null) {
       fetchRelays();
     }
@@ -140,9 +141,7 @@ class DmRelayListNotifier extends StateNotifier<DmRelayListState> {
       );
 
       // Broadcast to user's write relays
-      final broadcastResponse = ndk.broadcast.broadcast(
-        nostrEvent: event,
-      );
+      final broadcastResponse = ndk.broadcast.broadcast(nostrEvent: event);
 
       await broadcastResponse.broadcastDoneFuture;
 
@@ -160,7 +159,7 @@ class DmRelayListNotifier extends StateNotifier<DmRelayListState> {
 /// Provider for DM relay list
 final dmRelayListProvider =
     StateNotifierProvider<DmRelayListNotifier, DmRelayListState>((ref) {
-  final ndk = ref.watch(ndkProvider);
-  final myPubkey = ndk.accounts.getPublicKey();
-  return DmRelayListNotifier(ndk, myPubkey);
-});
+      final ndk = ref.watch(ndkProvider);
+      final myPubkey = ndk.accounts.getPublicKey();
+      return DmRelayListNotifier(ndk, myPubkey);
+    });

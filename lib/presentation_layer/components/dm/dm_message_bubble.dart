@@ -21,8 +21,9 @@ class DmMessageBubble extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
       child: Row(
-        mainAxisAlignment:
-            isOutgoing ? MainAxisAlignment.end : MainAxisAlignment.start,
+        mainAxisAlignment: isOutgoing
+            ? MainAxisAlignment.end
+            : MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           if (!isOutgoing) const SizedBox(width: 40),
@@ -61,10 +62,9 @@ class DmMessageBubble extends StatelessWidget {
                       _formatTime(message.createdAt),
                       style: TextStyle(
                         color: isOutgoing
-                            ? Theme.of(context)
-                                .colorScheme
-                                .onPrimary
-                                .withValues(alpha: 0.7)
+                            ? Theme.of(
+                                context,
+                              ).colorScheme.onPrimary.withValues(alpha: 0.7)
                             : Theme.of(context).colorScheme.onSurfaceVariant,
                         fontSize: 11,
                       ),
