@@ -86,42 +86,49 @@ class _DmThreadPageState extends ConsumerState<DmThreadPage> {
           ),
           onPressed: () => context.pop(),
         ),
-        title: InkWell(
-          onTap: () => context.push('/nostr/$_peerPubkey'),
-          child: Row(
-            children: [
-              UserImage(
-                imageUrl: metadata?.picture,
-                pubkey: _peerPubkey,
-                size: 36,
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      displayName,
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: Theme.of(context).colorScheme.onSurface,
-                      ),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    if (metadata?.nip05 != null)
+        title: MouseRegion(
+          cursor: SystemMouseCursors.click,
+          child: GestureDetector(
+            onTap: () => context.push('/nostr/profile/$_peerPubkey'),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                UserImage(
+                  imageUrl: metadata?.picture,
+                  pubkey: _peerPubkey,
+                  size: 36,
+                ),
+                const SizedBox(width: 12),
+                Flexible(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
                       Text(
-                        metadata!.nip05!,
+                        displayName,
                         style: TextStyle(
-                          fontSize: 12,
-                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: Theme.of(context).colorScheme.onSurface,
                         ),
                         overflow: TextOverflow.ellipsis,
                       ),
-                  ],
+                      if (metadata?.nip05 != null)
+                        Text(
+                          metadata!.nip05!,
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onSurfaceVariant,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
         elevation: 0,
