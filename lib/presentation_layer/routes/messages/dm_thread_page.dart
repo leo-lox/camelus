@@ -205,7 +205,12 @@ class _DmThreadPageState extends ConsumerState<DmThreadPage> {
           return DmDateSeparator(timestamp: item);
         } else {
           // Message
-          return DmMessageBubble(message: item as DirectMessage);
+          return DmMessageBubble(
+            message: item as DirectMessage,
+            onDelete: (messageId) => ref
+                .read(dmThreadProvider(_peerPubkey).notifier)
+                .deleteMessage(messageId),
+          );
         }
       }, childCount: totalCount),
     );

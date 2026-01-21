@@ -63,6 +63,13 @@ abstract class DirectMessageRepository {
   /// Cache a decrypted message to avoid re-decryption
   Future<void> cacheDecryptedMessage(DirectMessage message);
 
+  // ============ Deletion ============
+
+  /// Delete a message by broadcasting a kind 5 delete event
+  /// and removing it from local cache.
+  /// [messageId] is the gift wrap event ID.
+  Future<bool> deleteMessage(String messageId);
+
   // ============ Cleanup ============
 
   /// Close any active subscriptions

@@ -201,6 +201,34 @@ class DmThreadNotifier extends StateNotifier<DmThreadState> {
       state = state.copyWith(isLoadingOlder: false);
     }
   }
+
+  /// Delete a message (optimistic UI)
+  Future<bool> deleteMessage(String messageId) async {
+    final repository = ref.read(dmRepositoryProvider);
+    if (repository == null) return false;
+
+    // Optimistic update: remove from UI immediately
+    final originalMessages = state.messages;
+    state = state.copyWith(
+      messages: originalMessages.where((m) => m.id != messageId).toList(),
+    );
+
+    try {
+      final success = await repository.deleteMessage(messageId);
+      if (success) {
+        log('DM Thread: Message deleted successfully');
+      } else {
+        // Restore on failure
+        state = state.copyWith(messages: originalMessages);
+      }
+      return success;
+    } catch (e) {
+      log('DM Thread: Error deleting message: $e');
+      // Restore on error
+      state = state.copyWith(messages: originalMessages);
+      return false;
+    }
+  }
 }
 
 /// Provider to check if we have an existing conversation with a peer

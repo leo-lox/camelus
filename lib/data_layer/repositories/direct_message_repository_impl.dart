@@ -700,6 +700,106 @@ class DirectMessageRepositoryImpl implements DirectMessageRepository {
     return '${content.substring(0, maxLength)}...';
   }
 
+  // ============ Deletion ============
+
+  @override
+  Future<bool> deleteMessage(String messageId) async {
+    try {
+      // Get the message to find peer pubkey for conversation update
+      final message = await getCachedMessage(messageId);
+      if (message == null) {
+        log('DM: Cannot delete - message $messageId not found in cache');
+        return false;
+      }
+
+      // NIP-59: "relays SHOULD delete kind 1059 events whose p-tag matches
+      // the signer of NIP-09 deletions". Since the gift wrap's p-tag is our
+      // pubkey (we're the recipient), we can request deletion.
+      final deleteEvent = Nip01Event(
+        pubKey: myPubkey,
+        kind: 5,
+        tags: [
+          ['e', messageId],
+        ],
+        content: '',
+        createdAt: DateTime.now().millisecondsSinceEpoch ~/ 1000,
+      );
+
+      final signedEvent = await ndk.accounts.sign(deleteEvent);
+
+      // Broadcast to DM relays
+      final dmRelays = await _getDmInboxRelays(myPubkey);
+      ndk.broadcast.broadcast(
+        nostrEvent: signedEvent,
+        specificRelays: dmRelays.isNotEmpty ? dmRelays : null,
+      );
+
+      log('DM: Broadcasted delete request for message $messageId');
+
+      // Delete from local cache
+      final store = await getStore();
+      final box = store.box<DbNip17Message>();
+
+      final query = box
+          .query(DbNip17Message_.eventId.equals(messageId))
+          .build();
+      final dbMessage = query.findFirst();
+      query.close();
+
+      if (dbMessage != null) {
+        box.remove(dbMessage.dbId);
+        log('DM: Removed message from local cache');
+      }
+
+      // Update conversation (recalculate last message)
+      await _recalculateConversation(message.peerPubkey);
+
+      // Notify listeners
+      _notifyMessagesChanged(message.peerPubkey);
+      _notifyConversationsChanged();
+
+      return true;
+    } catch (e) {
+      log('DM: Error deleting message $messageId: $e');
+      return false;
+    }
+  }
+
+  /// Recalculate conversation metadata after message deletion
+  Future<void> _recalculateConversation(String peerPubkey) async {
+    final store = await getStore();
+    final messageBox = store.box<DbNip17Message>();
+    final conversationBox = store.box<DbNip17Conversation>();
+
+    // Get the latest message for this peer
+    final query = messageBox
+        .query(DbNip17Message_.peerPubkey.equals(peerPubkey))
+        .order(DbNip17Message_.createdAt, flags: Order.descending)
+        .build();
+    final latestMessage = query.findFirst();
+    query.close();
+
+    // Get the conversation
+    final convQuery = conversationBox
+        .query(DbNip17Conversation_.peerPubkey.equals(peerPubkey))
+        .build();
+    final conversation = convQuery.findFirst();
+    convQuery.close();
+
+    if (conversation == null) return;
+
+    if (latestMessage == null) {
+      // No more messages - delete the conversation
+      conversationBox.remove(conversation.dbId);
+    } else {
+      // Update with latest message
+      conversation.lastMessageAt = latestMessage.createdAt;
+      conversation.lastMessagePreview = _truncatePreview(latestMessage.content);
+      conversation.lastMessageIsOutgoing = latestMessage.isOutgoing;
+      conversationBox.put(conversation);
+    }
+  }
+
   // ============ Cleanup ============
 
   @override
