@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_list_view/flutter_list_view.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -35,6 +36,17 @@ class _DmThreadPageState extends ConsumerState<DmThreadPage> {
   void initState() {
     super.initState();
     _peerPubkey = _decodeIdentifier(widget.peerIdentifier);
+    _messageFocusNode.onKeyEvent = _handleKeyEvent;
+  }
+
+  KeyEventResult _handleKeyEvent(FocusNode node, KeyEvent event) {
+    if (event is KeyDownEvent &&
+        event.logicalKey == LogicalKeyboardKey.enter &&
+        !HardwareKeyboard.instance.isShiftPressed) {
+      _sendMessage();
+      return KeyEventResult.handled;
+    }
+    return KeyEventResult.ignored;
   }
 
   /// Decode hex, npub, or nprofile to hex pubkey
@@ -393,7 +405,7 @@ class _DmThreadPageState extends ConsumerState<DmThreadPage> {
         ),
       ),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.end,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Expanded(
             child: TextField(
@@ -419,8 +431,7 @@ class _DmThreadPageState extends ConsumerState<DmThreadPage> {
               ),
               maxLines: 5,
               minLines: 1,
-              textInputAction: TextInputAction.send,
-              onSubmitted: (_) => _sendMessage(),
+              textInputAction: TextInputAction.newline,
             ),
           ),
           const SizedBox(width: 8),
