@@ -13,7 +13,6 @@ import '../../../../domain_layer/entities/feed_filter.dart';
 import '../../../../domain_layer/entities/user_metadata.dart';
 import '../../../../domain_layer/usecases/app_auth.dart';
 import '../../../../helpers/helpers.dart';
-import '../../../../helpers/nprofile_helper.dart';
 import '../../../atoms/back_button_round.dart';
 import '../../../atoms/follow_button.dart';
 import '../../../atoms/long_button.dart';
@@ -292,7 +291,7 @@ class _BuildProfileHeader extends ConsumerWidget {
                 SizedBox(height: 10),
                 Text(
                   userMetadata.name ??
-                      _pubkeyToHrBech32Short(userMetadata.pubkey),
+                      Helpers().shortHr(userMetadata.pubkey),
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
@@ -443,12 +442,6 @@ class _FollowButtonState extends ConsumerState<_FollowButton> {
   }
 }
 
-String _pubkeyToHrBech32Short(String pubkey) {
-  final bech = Helpers().encodeBech32(pubkey, "npub");
-  final bechShort = NprofileHelper().bech32toHr(bech, cutLength: 11);
-
-  return bechShort;
-}
 
 Future<void> _openLightningAddress(String lu06) async {
   final Uri lightningLaunchUri = Uri(

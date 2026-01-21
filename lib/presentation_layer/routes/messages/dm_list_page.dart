@@ -3,8 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
-import '../../../helpers/helpers.dart';
-import '../../../helpers/nprofile_helper.dart';
+import 'package:ndk/shared/nips/nip19/nip19.dart';
 import '../../components/dm/dm_conversation_tile.dart';
 import '../../providers/dm_conversations_provider.dart';
 import '../../providers/ndk_provider.dart';
@@ -140,10 +139,7 @@ class _DmListPageState extends ConsumerState<DmListPage> {
       ),
       itemBuilder: (context, index) {
         final conversation = state.conversations[index];
-        final nprofile = NprofileHelper().mapToBech32({
-          'pubkey': conversation.peerPubkey,
-          'relays': <String>[],
-        });
+        final nprofile = Nip19.encodeNprofile(pubkey: conversation.peerPubkey);
         return DmConversationTile(
           conversation: conversation,
           onTap: () => context.push('/messages/$nprofile'),
@@ -221,20 +217,16 @@ class _DmListPageState extends ConsumerState<DmListPage> {
 
               // Decode input to hex pubkey
               if (input.startsWith('nprofile')) {
-                final map = NprofileHelper().bech32toMap(input);
-                hexPubkey = map['pubkey'] as String;
+                final decoded = Nip19.decodeNprofile(input);
+                hexPubkey = decoded.pubkey;
               } else if (input.startsWith('npub')) {
-                final decoded = Helpers().decodeBech32(input);
-                hexPubkey = decoded[0];
+                hexPubkey = Nip19.decode(input);
               } else {
                 hexPubkey = input; // Assume hex
               }
 
               // Create nprofile for navigation
-              final nprofile = NprofileHelper().mapToBech32({
-                'pubkey': hexPubkey,
-                'relays': <String>[],
-              });
+              final nprofile = Nip19.encodeNprofile(pubkey: hexPubkey);
 
               Navigator.of(context).pop();
               context.push('/messages/$nprofile');

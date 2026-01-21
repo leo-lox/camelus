@@ -13,7 +13,6 @@ import '../../domain_layer/entities/invite_data.dart';
 import '../../domain_layer/entities/starter_pack_identifier.dart';
 import '../../domain_layer/usecases/app_auth.dart';
 import '../../helpers/helpers.dart';
-import '../../helpers/nprofile_helper.dart';
 import '../atoms/long_button.dart';
 import '../atoms/spinner_center.dart';
 import '../providers/nip05_provider.dart';
@@ -90,13 +89,10 @@ class _DeeplinkRecieverPageState extends ConsumerState<DeeplinkRecieverPage> {
     String myPubkeyHex = "";
 
     if (myMatch.contains("nprofile")) {
-      // remove the "nostr:" part
+      //TODO: remove the "nostr:" part
 
-      Map<String, dynamic> nProfileDecode = NprofileHelper().bech32toMap(
-        myMatch,
-      );
-
-      myPubkeyHex = nProfileDecode['pubkey'];
+      final nprofile = Nip19.decodeNprofile(myMatch);
+      myPubkeyHex = nprofile.pubkey;
 
       _pushProfile(pubkey: myPubkeyHex);
     } else if (myMatch.contains("npub")) {
@@ -223,7 +219,10 @@ class _DeeplinkRecieverPageState extends ConsumerState<DeeplinkRecieverPage> {
   }
 
   String _decodePubkey(String npubOrNprofile) {
-    return NprofileHelper().nprofileOrNpubToMap(npubOrNprofile)['pubkey'];
+    if (npubOrNprofile.startsWith('nprofile')) {
+      return Nip19.decodeNprofile(npubOrNprofile).pubkey;
+    }
+    return Nip19.decode(npubOrNprofile);
   }
 
   Future<void> _setupOnboarding(

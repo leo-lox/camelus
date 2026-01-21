@@ -5,7 +5,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../domain_layer/entities/nostr_list.dart';
 import '../../../helpers/helpers.dart';
-import '../../../helpers/nprofile_helper.dart';
 import '../../atoms/icon_patter.dart';
 import '../../atoms/overlapting_avatars.dart';
 import '../../providers/metadata_state_provider.dart';
@@ -100,7 +99,7 @@ class _StarterPackCardState extends ConsumerState<StarterPackCard> {
                           const SizedBox(width: 4),
                           Text(
                             creatorMetadata?.name ??
-                                _pubkeyToHrBech32Short(widget.pack.pubKey),
+                                Helpers().shortHr(widget.pack.pubKey),
                             style: TextStyle(
                               fontSize: 14,
                               color: Theme.of(
@@ -167,9 +166,3 @@ class _StarterPackCardState extends ConsumerState<StarterPackCard> {
   }
 }
 
-String _pubkeyToHrBech32Short(String pubkey) {
-  final bech = Helpers().encodeBech32(pubkey, "npub");
-  final bechShort = NprofileHelper().bech32toHr(bech, cutLength: 11);
-
-  return bechShort;
-}

@@ -5,8 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../domain_layer/entities/direct_message.dart';
-import '../../../helpers/helpers.dart';
-import '../../../helpers/nprofile_helper.dart';
+import 'package:ndk/shared/nips/nip19/nip19.dart';
 import '../../atoms/my_profile_picture.dart';
 import '../../components/dm/dm_message_bubble.dart';
 import '../../providers/dm_thread_provider.dart';
@@ -44,16 +43,15 @@ class _DmThreadPageState extends ConsumerState<DmThreadPage> {
       return identifier;
     }
 
-    // npub format
-    if (identifier.startsWith('npub')) {
-      final decoded = Helpers().decodeBech32(identifier);
-      return decoded[0];
-    }
-
     // nprofile format
     if (identifier.startsWith('nprofile')) {
-      final map = NprofileHelper().bech32toMap(identifier);
-      return map['pubkey'] as String;
+      final nprofile = Nip19.decodeNprofile(identifier);
+      return nprofile.pubkey;
+    }
+
+    // npub format (or other NIP-19)
+    if (identifier.startsWith('npub')) {
+      return Nip19.decode(identifier);
     }
 
     // Fallback: assume hex
@@ -87,7 +85,7 @@ class _DmThreadPageState extends ConsumerState<DmThreadPage> {
           onPressed: () => context.pop(),
         ),
         title: InkWell(
-          onTap: () => context.push('/nostr/${_peerPubkey}'),
+          onTap: () => context.push('/nostr/$_peerPubkey'),
           child: Row(
             children: [
               UserImage(

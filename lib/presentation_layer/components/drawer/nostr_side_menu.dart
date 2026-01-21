@@ -8,7 +8,7 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../../../helpers/nprofile_helper.dart';
+import 'package:ndk/shared/nips/nip19/nip19.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../providers/ndk_provider.dart';
 import '../../providers/theme_provider.dart';
@@ -37,9 +37,8 @@ class NostrSideMenu extends ConsumerWidget {
   }
 
   void openQrShareDialog(BuildContext context, String pubkey) async {
-    String nprofile = await NprofileHelper().getNprofile(
-      pubkey,
-      [],
+    String nprofile = Nip19.encodeNprofile(
+      pubkey: pubkey,
     ); //todo: get recommended relays
 
     if (!context.mounted) return;

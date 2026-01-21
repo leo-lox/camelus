@@ -11,7 +11,6 @@ import 'package:share_plus/share_plus.dart';
 import '../../../domain_layer/entities/feed_filter.dart';
 import '../../../domain_layer/entities/starter_pack_identifier.dart';
 import '../../../helpers/helpers.dart';
-import '../../../helpers/nprofile_helper.dart';
 import '../../atoms/long_button.dart';
 import '../../atoms/spinner_center.dart';
 import '../../providers/following_contact_state_provider.dart';
@@ -49,10 +48,10 @@ class _OpenStarterPackState extends ConsumerState<OpenStarterPack> {
         .map((e) => e.key)
         .toList();
 
-    final listNpub = NprofileHelper().mapToBech32({
-      "pubkey": widget.starterPackIdentifier.pubkey,
-      "relays": outboxRelays ?? [],
-    });
+    final listNpub = Nip19.encodeNprofile(
+      pubkey: widget.starterPackIdentifier.pubkey,
+      relays: outboxRelays ?? [],
+    );
 
     final ndk = ref.watch(ndkProvider);
 
