@@ -14,6 +14,7 @@ class DmRelaysSettings extends ConsumerStatefulWidget {
 
 class _DmRelaysSettingsState extends ConsumerState<DmRelaysSettings> {
   final TextEditingController _relayController = TextEditingController();
+  String? _errorText;
 
   @override
   void dispose() {
@@ -21,62 +22,47 @@ class _DmRelaysSettingsState extends ConsumerState<DmRelaysSettings> {
     super.dispose();
   }
 
-  Future<void> _addRelay() async {
+  void _addRelay() {
     final url = _relayController.text.trim();
     if (url.isEmpty) return;
 
-    final success = await ref.read(dmRelayListProvider.notifier).addRelay(url);
-
-    if (success) {
-      _relayController.clear();
-      if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('Relay added')));
-      }
-    } else {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Failed to add relay (may already exist)'),
-          ),
-        );
-      }
+    final result = ref.read(dmRelayListProvider.notifier).addRelay(url);
+    switch (result) {
+      case AddRelayResult.success:
+        _relayController.clear();
+        setState(() => _errorText = null);
+        break;
+      case AddRelayResult.invalidUrl:
+        setState(() => _errorText = 'Invalid URL');
+        break;
+      case AddRelayResult.alreadyExists:
+        setState(() => _errorText = 'Already exists');
+        break;
     }
   }
 
-  Future<void> _removeRelay(String relayUrl) async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Remove Relay'),
-        content: Text('Remove $relayUrl from your DM relays?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            child: Text(
-              'Remove',
-              style: TextStyle(color: Theme.of(context).colorScheme.error),
-            ),
-          ),
-        ],
-      ),
-    );
+  void _clearError() {
+    if (_errorText != null) {
+      setState(() => _errorText = null);
+    }
+  }
 
-    if (confirmed == true) {
-      final success = await ref
-          .read(dmRelayListProvider.notifier)
-          .removeRelay(relayUrl);
+  void _removeRelay(String relayUrl) {
+    ref.read(dmRelayListProvider.notifier).removeRelay(relayUrl);
+  }
 
-      if (success && mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('Relay removed')));
-      }
+  void _restoreRelay(String relayUrl) {
+    ref.read(dmRelayListProvider.notifier).restoreRelay(relayUrl);
+  }
+
+  Future<void> _saveChanges() async {
+    final success = await ref.read(dmRelayListProvider.notifier).saveChanges();
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(success ? 'Relays saved' : 'Failed to save relays'),
+        ),
+      );
     }
   }
 
@@ -86,6 +72,8 @@ class _DmRelaysSettingsState extends ConsumerState<DmRelaysSettings> {
 
     return Scaffold(
       appBar: AppBar(
+        scrolledUnderElevation: 0,
+        backgroundColor: Theme.of(context).colorScheme.surface,
         leading: IconButton(
           icon: Icon(PhosphorIcons.arrowLeft()),
           onPressed: () => Navigator.of(context).pop(),
@@ -101,9 +89,11 @@ class _DmRelaysSettingsState extends ConsumerState<DmRelaysSettings> {
                 child: CircularProgressIndicator(strokeWidth: 2),
               ),
             ),
+          if (state.hasChanges && !state.isSaving)
+            TextButton(onPressed: _saveChanges, child: const Text('Save')),
           IconButton(
             icon: Icon(PhosphorIcons.arrowClockwise()),
-            onPressed: state.isLoading
+            onPressed: state.isLoading || state.hasChanges
                 ? null
                 : () => ref.read(dmRelayListProvider.notifier).fetchRelays(),
             tooltip: 'Refresh',
@@ -150,6 +140,7 @@ class _DmRelaysSettingsState extends ConsumerState<DmRelaysSettings> {
                     controller: _relayController,
                     decoration: InputDecoration(
                       hintText: 'wss://relay.example.com',
+                      errorText: _errorText,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
@@ -158,6 +149,7 @@ class _DmRelaysSettingsState extends ConsumerState<DmRelaysSettings> {
                         vertical: 12,
                       ),
                     ),
+                    onChanged: (_) => _clearError(),
                     onSubmitted: (_) => _addRelay(),
                   ),
                 ),
@@ -174,18 +166,8 @@ class _DmRelaysSettingsState extends ConsumerState<DmRelaysSettings> {
           const SizedBox(height: 16),
           const Divider(),
 
-          // Relay list
-          Expanded(
-            child: state.relays.isEmpty
-                ? _buildEmptyState(context, state)
-                : ListView.builder(
-                    itemCount: state.relays.length,
-                    itemBuilder: (context, index) {
-                      final relay = state.relays[index];
-                      return _buildRelayTile(context, relay, state.isSaving);
-                    },
-                  ),
-          ),
+          // Relay list (active + pending deletion)
+          Expanded(child: _buildRelayList(context, state)),
         ],
       ),
     );
@@ -254,7 +236,39 @@ class _DmRelaysSettingsState extends ConsumerState<DmRelaysSettings> {
     );
   }
 
-  Widget _buildRelayTile(BuildContext context, String relay, bool isSaving) {
+  Widget _buildRelayList(BuildContext context, DmRelayListState state) {
+    // Keep original order: original relays + newly added relays
+    final newRelays = state.relays
+        .where((r) => !state.originalRelays.contains(r))
+        .toList();
+
+    final allRelays = [...state.originalRelays, ...newRelays];
+
+    if (allRelays.isEmpty) {
+      return _buildEmptyState(context, state);
+    }
+
+    return ListView.builder(
+      itemCount: allRelays.length,
+      itemBuilder: (context, index) {
+        final relay = allRelays[index];
+        final isPendingDeletion = !state.relays.contains(relay);
+        return _buildRelayTile(
+          context,
+          relay,
+          state.isSaving,
+          isPendingDeletion,
+        );
+      },
+    );
+  }
+
+  Widget _buildRelayTile(
+    BuildContext context,
+    String relay,
+    bool isSaving,
+    bool isPendingDeletion,
+  ) {
     // Extract domain for display
     final displayUrl = relay
         .replaceAll('wss://', '')
@@ -266,32 +280,51 @@ class _DmRelaysSettingsState extends ConsumerState<DmRelaysSettings> {
         width: 40,
         height: 40,
         decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.primaryContainer,
+          color: isPendingDeletion
+              ? Theme.of(context).colorScheme.surfaceContainerHighest
+              : Theme.of(context).colorScheme.primaryContainer,
           borderRadius: BorderRadius.circular(8),
         ),
         child: Icon(
           PhosphorIcons.globe(),
-          color: Theme.of(context).colorScheme.onPrimaryContainer,
+          color: isPendingDeletion
+              ? Theme.of(context).colorScheme.onSurfaceVariant
+              : Theme.of(context).colorScheme.onPrimaryContainer,
         ),
       ),
       title: Text(
         displayUrl,
-        style: const TextStyle(fontWeight: FontWeight.w500),
+        style: TextStyle(
+          fontWeight: FontWeight.w500,
+          decoration: isPendingDeletion ? TextDecoration.lineThrough : null,
+          color: isPendingDeletion
+              ? Theme.of(context).colorScheme.onSurfaceVariant
+              : null,
+        ),
       ),
       subtitle: Text(
         relay,
         style: TextStyle(
           fontSize: 12,
           color: Theme.of(context).colorScheme.onSurfaceVariant,
+          decoration: isPendingDeletion ? TextDecoration.lineThrough : null,
         ),
       ),
       trailing: IconButton(
         icon: Icon(
-          PhosphorIcons.trash(),
-          color: Theme.of(context).colorScheme.error,
+          isPendingDeletion
+              ? PhosphorIcons.arrowCounterClockwise()
+              : PhosphorIcons.trash(),
+          color: isPendingDeletion
+              ? Theme.of(context).colorScheme.primary
+              : Theme.of(context).colorScheme.error,
         ),
-        onPressed: isSaving ? null : () => _removeRelay(relay),
-        tooltip: 'Remove relay',
+        onPressed: isSaving
+            ? null
+            : () => isPendingDeletion
+                  ? _restoreRelay(relay)
+                  : _removeRelay(relay),
+        tooltip: isPendingDeletion ? 'Restore relay' : 'Remove relay',
       ),
     );
   }
