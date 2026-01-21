@@ -147,7 +147,11 @@ class NostrSideMenu extends ConsumerWidget {
     );
   }
 
-  Widget _textButton({text, onPressed, required BuildContext context}) {
+  Widget _textButton({
+    required String text,
+    required void Function()? onPressed,
+    required BuildContext context,
+  }) {
     return TextButton(
       onPressed: onPressed,
       child: Text(

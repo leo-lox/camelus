@@ -64,7 +64,7 @@ class _WritePostState extends ConsumerState<WritePost> {
     }
   }
 
-  Future<void> _searchMentions(search) async {
+  Future<void> _searchMentions(String search) async {
     final writePostState = ref.read(writePostStateProvider);
     final searchService = ref.read(searchProvider);
     List<Map<String, dynamic>> results = [];

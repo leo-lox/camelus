@@ -443,7 +443,7 @@ class _FollowButtonState extends ConsumerState<_FollowButton> {
   }
 }
 
-String _pubkeyToHrBech32Short(pubkey) {
+String _pubkeyToHrBech32Short(String pubkey) {
   final bech = Helpers().encodeBech32(pubkey, "npub");
   final bechShort = NprofileHelper().bech32toHr(bech, cutLength: 11);
 

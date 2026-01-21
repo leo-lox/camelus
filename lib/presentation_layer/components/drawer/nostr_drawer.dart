@@ -21,7 +21,11 @@ class NostrDrawer extends ConsumerWidget {
     context.push('/nostr/profile/$pubkey');
   }
 
-  Widget _drawerHeader(context, UserMetadata? metadata, WidgetRef ref) {
+  Widget _drawerHeader(
+    BuildContext context,
+    UserMetadata? metadata,
+    WidgetRef ref,
+  ) {
     final myContactList = ref.watch(contactListSelfStateProvider);
     return DrawerHeader(
       child: Column(
