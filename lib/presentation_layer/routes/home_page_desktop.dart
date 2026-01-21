@@ -18,14 +18,14 @@ class HomePageDesktop extends ConsumerWidget {
     if (myContactList.isLoading) {
       return Center(child: SpinnerCenter());
     }
-    
+
     // If no pubkey (read-only mode), show a default feed
-    final authors = currentUserPubkey != null 
+    final authors = currentUserPubkey != null
         ? (myContactList.contactList.contacts.isNotEmpty
-            ? [...myContactList.contactList.contacts, currentUserPubkey]
-            : [currentUserPubkey])
+              ? [...myContactList.contactList.contacts, currentUserPubkey]
+              : [currentUserPubkey])
         : myContactList.contactList.contacts;
-    
+
     return SafeArea(
       child: GenericFeed(
         key: PageStorageKey('homeFeed-${currentUserPubkey ?? "readonly"}'),

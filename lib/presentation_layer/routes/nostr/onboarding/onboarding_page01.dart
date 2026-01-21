@@ -7,7 +7,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-
 import '../../../components/responsive_center.dart';
 
 class OnboardingPage01 extends ConsumerStatefulWidget {

@@ -6,7 +6,6 @@ import 'package:http/http.dart' as http;
 import 'package:camelus/helpers/nprofile_helper.dart';
 import 'package:camelus/data_layer/data_sources/http_request_data_source.dart';
 
-
 import '../../../domain_layer/entities/nostr_note.dart';
 import '../../../domain_layer/entities/user_metadata.dart';
 import '../../../domain_layer/usecases/search.dart';
