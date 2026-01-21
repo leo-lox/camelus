@@ -1,3 +1,4 @@
+import 'package:camelus/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
@@ -33,10 +34,12 @@ class _DmRelaysSettingsState extends ConsumerState<DmRelaysSettings> {
         setState(() => _errorText = null);
         break;
       case AddRelayResult.invalidUrl:
-        setState(() => _errorText = 'Invalid URL');
+        setState(() => _errorText = AppLocalizations.of(context)!.invalidUrl);
         break;
       case AddRelayResult.alreadyExists:
-        setState(() => _errorText = 'Already exists');
+        setState(
+          () => _errorText = AppLocalizations.of(context)!.alreadyExists,
+        );
         break;
     }
   }
@@ -60,7 +63,11 @@ class _DmRelaysSettingsState extends ConsumerState<DmRelaysSettings> {
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(success ? 'Relays saved' : 'Failed to save relays'),
+          content: Text(
+            success
+                ? AppLocalizations.of(context)!.relaysSaved
+                : AppLocalizations.of(context)!.failedToSaveRelays,
+          ),
         ),
       );
     }
@@ -78,7 +85,7 @@ class _DmRelaysSettingsState extends ConsumerState<DmRelaysSettings> {
           icon: Icon(PhosphorIcons.arrowLeft()),
           onPressed: () => Navigator.of(context).pop(),
         ),
-        title: const Text('DM Relays'),
+        title: Text(AppLocalizations.of(context)!.dmRelays),
         actions: [
           if (state.isLoading || state.isSaving)
             const Padding(
@@ -90,13 +97,16 @@ class _DmRelaysSettingsState extends ConsumerState<DmRelaysSettings> {
               ),
             ),
           if (state.hasChanges && !state.isSaving)
-            TextButton(onPressed: _saveChanges, child: const Text('Save')),
+            TextButton(
+              onPressed: _saveChanges,
+              child: Text(AppLocalizations.of(context)!.save),
+            ),
           IconButton(
             icon: Icon(PhosphorIcons.arrowClockwise()),
             onPressed: state.isLoading || state.hasChanges
                 ? null
                 : () => ref.read(dmRelayListProvider.notifier).fetchRelays(),
-            tooltip: 'Refresh',
+            tooltip: AppLocalizations.of(context)!.refresh,
           ),
         ],
       ),
@@ -119,7 +129,7 @@ class _DmRelaysSettingsState extends ConsumerState<DmRelaysSettings> {
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
-                    'These relays are used specifically for sending and receiving private messages (NIP-17). Other users will send DMs to these relays.',
+                    AppLocalizations.of(context)!.dmRelaysInfo,
                     style: TextStyle(
                       color: Theme.of(context).colorScheme.onPrimaryContainer,
                       fontSize: 13,
@@ -157,7 +167,7 @@ class _DmRelaysSettingsState extends ConsumerState<DmRelaysSettings> {
                 IconButton.filled(
                   onPressed: state.isSaving ? null : _addRelay,
                   icon: Icon(PhosphorIcons.plus()),
-                  tooltip: 'Add relay',
+                  tooltip: AppLocalizations.of(context)!.addRelay,
                 ),
               ],
             ),
@@ -191,14 +201,14 @@ class _DmRelaysSettingsState extends ConsumerState<DmRelaysSettings> {
             ),
             const SizedBox(height: 16),
             Text(
-              'No DM relays configured',
+              AppLocalizations.of(context)!.noDmRelaysConfigured,
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
                 color: Theme.of(context).colorScheme.onSurface,
               ),
             ),
             const SizedBox(height: 8),
             Text(
-              'Add relays where you want to receive private messages. Without DM relays, your NIP-65 inbox relays will be used as fallback.',
+              AppLocalizations.of(context)!.dmRelaysEmptyDescription,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
@@ -207,7 +217,7 @@ class _DmRelaysSettingsState extends ConsumerState<DmRelaysSettings> {
             const SizedBox(height: 24),
             // Suggested relays
             Text(
-              'Suggested relays:',
+              AppLocalizations.of(context)!.suggestedRelays,
               style: Theme.of(context).textTheme.labelLarge,
             ),
             const SizedBox(height: 12),
@@ -324,7 +334,9 @@ class _DmRelaysSettingsState extends ConsumerState<DmRelaysSettings> {
             : () => isPendingDeletion
                   ? _restoreRelay(relay)
                   : _removeRelay(relay),
-        tooltip: isPendingDeletion ? 'Restore relay' : 'Remove relay',
+        tooltip: isPendingDeletion
+            ? AppLocalizations.of(context)!.restoreRelay
+            : AppLocalizations.of(context)!.removeRelay,
       ),
     );
   }

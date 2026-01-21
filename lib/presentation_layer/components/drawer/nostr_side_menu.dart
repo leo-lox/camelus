@@ -219,7 +219,7 @@ class NostrSideMenu extends ConsumerWidget {
                     if (!hideOnMobile && currentUserPubkey != null)
                       _drawerItem(
                         icon: PhosphorIcons.chatCircle(),
-                        label: 'Messages',
+                        label: AppLocalizations.of(context)!.messages,
                         routeName: '/messages',
                         onTap: () {
                           context.go('/messages');
@@ -267,7 +267,7 @@ class NostrSideMenu extends ConsumerWidget {
                     ] else ...[
                       // Show login option when not authenticated
                       _drawerItem(
-                        label: 'Login',
+                        label: AppLocalizations.of(context)!.login,
                         routeName: '/onboarding',
                         icon: PhosphorIcons.signIn(),
                         onTap: () {

@@ -1,3 +1,4 @@
+import 'package:camelus/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_list_view/flutter_list_view.dart';
@@ -171,7 +172,8 @@ class _DmThreadPageState extends ConsumerState<DmThreadPage> {
             ),
             const SizedBox(height: 16),
             Text(
-              state.errorMessage ?? 'Failed to load messages',
+              state.errorMessage ??
+                  AppLocalizations.of(context)!.failedToLoadMessages,
               style: Theme.of(context).textTheme.bodyLarge,
             ),
           ],
@@ -279,7 +281,7 @@ class _DmThreadPageState extends ConsumerState<DmThreadPage> {
                 .loadOlderMessages();
           },
           icon: Icon(PhosphorIcons.arrowUp()),
-          label: const Text('Load older messages'),
+          label: Text(AppLocalizations.of(context)!.loadOlderMessages),
         ),
       ),
     );
@@ -313,7 +315,7 @@ class _DmThreadPageState extends ConsumerState<DmThreadPage> {
               ),
               const SizedBox(width: 6),
               Text(
-                'End-to-end encrypted',
+                AppLocalizations.of(context)!.endToEndEncrypted,
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
                   color: Theme.of(context).colorScheme.primary,
                 ),
@@ -328,7 +330,7 @@ class _DmThreadPageState extends ConsumerState<DmThreadPage> {
               borderRadius: BorderRadius.circular(20),
             ),
             child: Text(
-              'This is the beginning of your conversation',
+              AppLocalizations.of(context)!.beginningOfConversation,
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
                 color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
@@ -365,7 +367,7 @@ class _DmThreadPageState extends ConsumerState<DmThreadPage> {
             ),
             const SizedBox(height: 8),
             Text(
-              'Start your encrypted conversation',
+              AppLocalizations.of(context)!.startYourEncryptedConversation,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
@@ -382,7 +384,7 @@ class _DmThreadPageState extends ConsumerState<DmThreadPage> {
                 ),
                 const SizedBox(width: 4),
                 Text(
-                  'End-to-end encrypted with NIP-17',
+                  AppLocalizations.of(context)!.endToEndEncryptedNip17,
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     color: Theme.of(context).colorScheme.primary,
                   ),
@@ -417,7 +419,7 @@ class _DmThreadPageState extends ConsumerState<DmThreadPage> {
               controller: _messageController,
               focusNode: _messageFocusNode,
               decoration: InputDecoration(
-                hintText: 'Message...',
+                hintText: AppLocalizations.of(context)!.messageHint,
                 hintStyle: TextStyle(
                   color: Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
@@ -473,8 +475,8 @@ class _DmThreadPageState extends ConsumerState<DmThreadPage> {
 
     if (!success && mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Failed to send message'),
+        SnackBar(
+          content: Text(AppLocalizations.of(context)!.failedToSendMessage),
           backgroundColor: Colors.red,
         ),
       );

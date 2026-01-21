@@ -1,3 +1,4 @@
+import 'package:camelus/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -38,7 +39,7 @@ class _DmListPageState extends ConsumerState<DmListPage> {
       return Scaffold(
         appBar: AppBar(
           title: Text(
-            'Messages',
+            AppLocalizations.of(context)!.messages,
             style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
           ),
         ),
@@ -53,13 +54,13 @@ class _DmListPageState extends ConsumerState<DmListPage> {
               ),
               const SizedBox(height: 16),
               Text(
-                'Please login to view messages',
+                AppLocalizations.of(context)!.pleaseLoginToViewMessages,
                 style: Theme.of(context).textTheme.titleMedium,
               ),
               const SizedBox(height: 16),
               ElevatedButton(
                 onPressed: () => context.push('/onboarding'),
-                child: const Text('Login'),
+                child: Text(AppLocalizations.of(context)!.login),
               ),
             ],
           ),
@@ -74,7 +75,7 @@ class _DmListPageState extends ConsumerState<DmListPage> {
         scrolledUnderElevation: 0,
         backgroundColor: Theme.of(context).colorScheme.surface,
         title: Text(
-          'Messages',
+          AppLocalizations.of(context)!.messages,
           style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
         ),
         actions: [
@@ -84,7 +85,7 @@ class _DmListPageState extends ConsumerState<DmListPage> {
               color: Theme.of(context).colorScheme.onSurface,
             ),
             onPressed: () => _showNewMessageDialog(context),
-            tooltip: 'New message',
+            tooltip: AppLocalizations.of(context)!.newMessage,
           ),
         ],
       ),
@@ -112,7 +113,8 @@ class _DmListPageState extends ConsumerState<DmListPage> {
             ),
             const SizedBox(height: 16),
             Text(
-              state.errorMessage ?? 'Failed to load messages',
+              state.errorMessage ??
+                  AppLocalizations.of(context)!.failedToLoadMessages,
               style: Theme.of(context).textTheme.bodyLarge,
               textAlign: TextAlign.center,
             ),
@@ -120,7 +122,7 @@ class _DmListPageState extends ConsumerState<DmListPage> {
             ElevatedButton(
               onPressed: () =>
                   ref.read(dmConversationsProvider.notifier).fetchMessages(),
-              child: const Text('Retry'),
+              child: Text(AppLocalizations.of(context)!.retry),
             ),
           ],
         ),
@@ -163,14 +165,14 @@ class _DmListPageState extends ConsumerState<DmListPage> {
             ),
             const SizedBox(height: 24),
             Text(
-              'No messages yet',
+              AppLocalizations.of(context)!.noMessagesYet,
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
                 color: Theme.of(context).colorScheme.onSurface,
               ),
             ),
             const SizedBox(height: 8),
             Text(
-              'Start a conversation by tapping the pencil icon',
+              AppLocalizations.of(context)!.startConversationHint,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
@@ -187,18 +189,18 @@ class _DmListPageState extends ConsumerState<DmListPage> {
 
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('New Message'),
+      builder: (dialogContext) => AlertDialog(
+        title: Text(AppLocalizations.of(context)!.newMessageDialogTitle),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text('Enter the pubkey (nprofile, npub, or hex):'),
+            Text(AppLocalizations.of(context)!.enterPubkeyPrompt),
             const SizedBox(height: 16),
             TextField(
               controller: textController,
-              decoration: const InputDecoration(
-                hintText: 'nprofile1..., npub1..., or hex',
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                hintText: AppLocalizations.of(context)!.pubkeyHint,
+                border: const OutlineInputBorder(),
               ),
               autofocus: true,
             ),
@@ -206,8 +208,8 @@ class _DmListPageState extends ConsumerState<DmListPage> {
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel'),
+            onPressed: () => Navigator.of(dialogContext).pop(),
+            child: Text(AppLocalizations.of(context)!.cancel),
           ),
           ElevatedButton(
             onPressed: () {
@@ -229,10 +231,10 @@ class _DmListPageState extends ConsumerState<DmListPage> {
               // Create nprofile for navigation
               final nprofile = Nip19.encodeNprofile(pubkey: hexPubkey);
 
-              Navigator.of(context).pop();
+              Navigator.of(dialogContext).pop();
               context.push('/messages/$nprofile');
             },
-            child: const Text('Start Chat'),
+            child: Text(AppLocalizations.of(context)!.startChat),
           ),
         ],
       ),

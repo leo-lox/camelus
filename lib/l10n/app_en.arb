@@ -1322,5 +1322,177 @@
   "byUsingCamelusYouAgree": "By using Camelus you agree to ",
   "@byUsingCamelusYouAgree": {
     "description": "Text before terms and conditions link on onboarding page"
+  },
+  "dmRelays": "DM Relays",
+  "@dmRelays": {
+    "description": "DM relays settings page title"
+  },
+  "dmRelaysInfo": "These relays are used specifically for sending and receiving private messages (NIP-17). Other users will send DMs to these relays.",
+  "@dmRelaysInfo": {
+    "description": "Info text explaining DM relays"
+  },
+  "invalidUrl": "Invalid URL",
+  "@invalidUrl": {
+    "description": "Error when URL format is invalid"
+  },
+  "alreadyExists": "Already exists",
+  "@alreadyExists": {
+    "description": "Error when item already exists"
+  },
+  "relaysSaved": "Relays saved",
+  "@relaysSaved": {
+    "description": "Success message when relays are saved"
+  },
+  "failedToSaveRelays": "Failed to save relays",
+  "@failedToSaveRelays": {
+    "description": "Error message when saving relays fails"
+  },
+  "noDmRelaysConfigured": "No DM relays configured",
+  "@noDmRelaysConfigured": {
+    "description": "Empty state title for DM relays"
+  },
+  "dmRelaysEmptyDescription": "Add relays where you want to receive private messages. Without DM relays, your NIP-65 inbox relays will be used as fallback.",
+  "@dmRelaysEmptyDescription": {
+    "description": "Empty state description for DM relays"
+  },
+  "suggestedRelays": "Suggested relays:",
+  "@suggestedRelays": {
+    "description": "Label for suggested relays section"
+  },
+  "restoreRelay": "Restore relay",
+  "@restoreRelay": {
+    "description": "Tooltip for restore relay button"
+  },
+  "removeRelay": "Remove relay",
+  "@removeRelay": {
+    "description": "Tooltip for remove relay button"
+  },
+  "addRelay": "Add relay",
+  "@addRelay": {
+    "description": "Tooltip for add relay button"
+  },
+  "refresh": "Refresh",
+  "@refresh": {
+    "description": "Refresh button tooltip"
+  },
+  "messages": "Messages",
+  "@messages": {
+    "description": "Messages page title"
+  },
+  "pleaseLoginToViewMessages": "Please login to view messages",
+  "@pleaseLoginToViewMessages": {
+    "description": "Message shown when user is not logged in"
+  },
+  "newMessage": "New message",
+  "@newMessage": {
+    "description": "Tooltip for new message button"
+  },
+  "failedToLoadMessages": "Failed to load messages",
+  "@failedToLoadMessages": {
+    "description": "Error message when messages fail to load"
+  },
+  "retry": "Retry",
+  "@retry": {
+    "description": "Retry button label"
+  },
+  "noMessagesYet": "No messages yet",
+  "@noMessagesYet": {
+    "description": "Empty state title for messages"
+  },
+  "startConversationHint": "Start a conversation by tapping the pencil icon",
+  "@startConversationHint": {
+    "description": "Empty state description for messages"
+  },
+  "newMessageDialogTitle": "New Message",
+  "@newMessageDialogTitle": {
+    "description": "Dialog title for new message"
+  },
+  "enterPubkeyPrompt": "Enter the pubkey (nprofile, npub, or hex):",
+  "@enterPubkeyPrompt": {
+    "description": "Prompt for entering pubkey"
+  },
+  "pubkeyHint": "nprofile1..., npub1..., or hex",
+  "@pubkeyHint": {
+    "description": "Hint text for pubkey input"
+  },
+  "startChat": "Start Chat",
+  "@startChat": {
+    "description": "Button to start a new chat"
+  },
+  "loadOlderMessages": "Load older messages",
+  "@loadOlderMessages": {
+    "description": "Button to load older messages"
+  },
+  "endToEndEncrypted": "End-to-end encrypted",
+  "@endToEndEncrypted": {
+    "description": "Label indicating encryption"
+  },
+  "beginningOfConversation": "This is the beginning of your conversation",
+  "@beginningOfConversation": {
+    "description": "Message shown at the start of conversation"
+  },
+  "startYourEncryptedConversation": "Start your encrypted conversation",
+  "@startYourEncryptedConversation": {
+    "description": "Empty thread state message"
+  },
+  "endToEndEncryptedNip17": "End-to-end encrypted with NIP-17",
+  "@endToEndEncryptedNip17": {
+    "description": "Label indicating NIP-17 encryption"
+  },
+  "messageHint": "Message...",
+  "@messageHint": {
+    "description": "Hint text for message input"
+  },
+  "failedToSendMessage": "Failed to send message",
+  "@failedToSendMessage": {
+    "description": "Error when message fails to send"
+  },
+  "deleteMessage": "Delete message",
+  "@deleteMessage": {
+    "description": "Menu item to delete a message"
+  },
+  "deleteMessageConfirmTitle": "Delete message?",
+  "@deleteMessageConfirmTitle": {
+    "description": "Confirmation dialog title"
+  },
+  "deleteMessageConfirmContent": "This will request the relay to delete this message and remove it from your device.",
+  "@deleteMessageConfirmContent": {
+    "description": "Confirmation dialog content"
+  },
+  "today": "Today",
+  "@today": {
+    "description": "Today date label"
+  },
+  "yesterday": "Yesterday",
+  "@yesterday": {
+    "description": "Yesterday date label"
+  },
+  "monday": "Monday",
+  "@monday": {
+    "description": "Monday weekday"
+  },
+  "tuesday": "Tuesday",
+  "@tuesday": {
+    "description": "Tuesday weekday"
+  },
+  "wednesday": "Wednesday",
+  "@wednesday": {
+    "description": "Wednesday weekday"
+  },
+  "thursday": "Thursday",
+  "@thursday": {
+    "description": "Thursday weekday"
+  },
+  "friday": "Friday",
+  "@friday": {
+    "description": "Friday weekday"
+  },
+  "saturday": "Saturday",
+  "@saturday": {
+    "description": "Saturday weekday"
+  },
+  "sunday": "Sunday",
+  "@sunday": {
+    "description": "Sunday weekday"
   }
 }

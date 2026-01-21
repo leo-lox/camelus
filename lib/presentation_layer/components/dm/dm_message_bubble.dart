@@ -1,3 +1,4 @@
+import 'package:camelus/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:timeago/timeago.dart' as timeago;
@@ -88,7 +89,7 @@ class _DmMessageBubbleState extends State<DmMessageBubble> {
                       if (widget.showTimestamp) ...[
                         const SizedBox(height: 4),
                         Text(
-                          _formatTime(widget.message.createdAt),
+                          _formatTime(context, widget.message.createdAt),
                           style: TextStyle(
                             color: isOutgoing
                                 ? Theme.of(
@@ -134,7 +135,7 @@ class _DmMessageBubbleState extends State<DmMessageBubble> {
     );
   }
 
-  String _formatTime(int timestamp) {
+  String _formatTime(BuildContext context, int timestamp) {
     final dateTime = DateTime.fromMillisecondsSinceEpoch(timestamp * 1000);
     final now = DateTime.now();
     final diff = now.difference(dateTime);
@@ -143,7 +144,7 @@ class _DmMessageBubbleState extends State<DmMessageBubble> {
       // Today - show time
       return '${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}';
     } else if (diff.inDays == 1) {
-      return 'Yesterday';
+      return AppLocalizations.of(context)!.yesterday;
     } else {
       return timeago.format(dateTime, locale: 'en_short');
     }
@@ -152,21 +153,23 @@ class _DmMessageBubbleState extends State<DmMessageBubble> {
   void _showMessageMenu(BuildContext context) {
     showModalBottomSheet(
       context: context,
-      builder: (context) => SafeArea(
+      builder: (sheetContext) => SafeArea(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
               leading: Icon(
                 Icons.delete_outline,
-                color: Theme.of(context).colorScheme.error,
+                color: Theme.of(sheetContext).colorScheme.error,
               ),
               title: Text(
-                'Delete message',
-                style: TextStyle(color: Theme.of(context).colorScheme.error),
+                AppLocalizations.of(context)!.deleteMessage,
+                style: TextStyle(
+                  color: Theme.of(sheetContext).colorScheme.error,
+                ),
               ),
               onTap: () {
-                Navigator.of(context).pop();
+                Navigator.of(sheetContext).pop();
                 _confirmDelete(context);
               },
             ),
@@ -179,26 +182,28 @@ class _DmMessageBubbleState extends State<DmMessageBubble> {
   void _confirmDelete(BuildContext context) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Delete message?'),
-        content: const Text(
-          'This will request the relay to delete this message and remove it from your device.',
+      builder: (dialogContext) => AlertDialog(
+        title: Text(AppLocalizations.of(context)!.deleteMessageConfirmTitle),
+        content: Text(
+          AppLocalizations.of(context)!.deleteMessageConfirmContent,
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel'),
+            onPressed: () => Navigator.of(dialogContext).pop(),
+            child: Text(AppLocalizations.of(context)!.cancel),
           ),
           TextButton(
             onPressed: () async {
-              Navigator.of(context).pop();
+              Navigator.of(dialogContext).pop();
               if (widget.onDelete != null) {
                 await widget.onDelete!(widget.message.id);
               }
             },
             child: Text(
-              'Delete',
-              style: TextStyle(color: Theme.of(context).colorScheme.error),
+              AppLocalizations.of(context)!.delete,
+              style: TextStyle(
+                color: Theme.of(dialogContext).colorScheme.error,
+              ),
             ),
           ),
         ],
@@ -225,7 +230,7 @@ class DmDateSeparator extends StatelessWidget {
             borderRadius: BorderRadius.circular(12),
           ),
           child: Text(
-            _formatDate(timestamp),
+            _formatDate(context, timestamp),
             style: TextStyle(
               color: Theme.of(context).colorScheme.onSurfaceVariant,
               fontSize: 12,
@@ -237,24 +242,25 @@ class DmDateSeparator extends StatelessWidget {
     );
   }
 
-  String _formatDate(int timestamp) {
+  String _formatDate(BuildContext context, int timestamp) {
     final dateTime = DateTime.fromMillisecondsSinceEpoch(timestamp * 1000);
     final now = DateTime.now();
     final diff = now.difference(dateTime);
 
     if (diff.inDays == 0) {
-      return 'Today';
+      return AppLocalizations.of(context)!.today;
     } else if (diff.inDays == 1) {
-      return 'Yesterday';
+      return AppLocalizations.of(context)!.yesterday;
     } else if (diff.inDays < 7) {
-      const weekdays = [
-        'Monday',
-        'Tuesday',
-        'Wednesday',
-        'Thursday',
-        'Friday',
-        'Saturday',
-        'Sunday',
+      final l10n = AppLocalizations.of(context)!;
+      final weekdays = [
+        l10n.monday,
+        l10n.tuesday,
+        l10n.wednesday,
+        l10n.thursday,
+        l10n.friday,
+        l10n.saturday,
+        l10n.sunday,
       ];
       return weekdays[dateTime.weekday - 1];
     } else {
