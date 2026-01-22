@@ -38,6 +38,11 @@ class _DmThreadPageState extends ConsumerState<DmThreadPage> {
     super.initState();
     _peerPubkey = _decodeIdentifier(widget.peerIdentifier);
     _messageFocusNode.onKeyEvent = _handleKeyEvent;
+
+    // Mark conversation as read when page is opened
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(dmThreadProvider(_peerPubkey).notifier).markAsRead();
+    });
   }
 
   KeyEventResult _handleKeyEvent(FocusNode node, KeyEvent event) {
