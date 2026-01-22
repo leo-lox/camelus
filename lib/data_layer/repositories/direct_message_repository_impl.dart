@@ -48,6 +48,9 @@ class DirectMessageRepositoryImpl implements DirectMessageRepository {
   /// Get DM inbox relays for a pubkey.
   /// First tries kind 10050 (DM-specific relays), then falls back to NIP-65 inbox relays.
   Future<List<String>> _getDmInboxRelays(String pubkey) async {
+    // Wait for seed relays to be connected before making requests
+    await ndk.relays.seedRelaysConnected;
+
     // First, try to get kind 10050 (DM relay list)
     final dmRelays = await _fetchKind10050Relays(pubkey);
     if (dmRelays.isNotEmpty) {
@@ -67,9 +70,26 @@ class DirectMessageRepositoryImpl implements DirectMessageRepository {
   }
 
   /// Fetch kind 10050 (DM relay list) for a pubkey.
+  /// Queries on the user's NIP-65 write relays.
   /// Returns empty list if not found.
   Future<List<String>> _fetchKind10050Relays(String pubkey) async {
     try {
+      // First get NIP-65 write relays to query kind 10050
+      final userRelayList = await ndk.userRelayLists.getSingleUserRelayList(
+        pubkey,
+      );
+
+      log('DM: userRelayList for $pubkey: ${userRelayList != null ? "found" : "null"}');
+
+      final writeRelays =
+          userRelayList?.relays.entries
+              .where((entry) => entry.value.isWrite)
+              .map((entry) => entry.key)
+              .toList() ??
+          [];
+
+      log('DM: writeRelays for kind 10050 query: $writeRelays');
+
       final filter = Filter(
         kinds: [kDmRelayListKind],
         authors: [pubkey],
@@ -79,6 +99,7 @@ class DirectMessageRepositoryImpl implements DirectMessageRepository {
       final response = ndk.requests.query(
         filter: filter,
         timeout: const Duration(seconds: 10),
+        explicitRelays: writeRelays.isNotEmpty ? writeRelays : null,
       );
 
       Nip01Event? latestEvent;
@@ -89,6 +110,7 @@ class DirectMessageRepositoryImpl implements DirectMessageRepository {
       }
 
       if (latestEvent == null) {
+        log('DM: No kind 10050 event found for $pubkey');
         return [];
       }
 
@@ -100,6 +122,7 @@ class DirectMessageRepositoryImpl implements DirectMessageRepository {
         }
       }
 
+      log('DM: Found kind 10050 relays: $relays');
       return relays;
     } catch (e) {
       log('DM: Error fetching kind 10050 for $pubkey: $e');
