@@ -40,13 +40,7 @@ class _DmMessageBubbleState extends State<DmMessageBubble> {
               : MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            // Delete button before message (for incoming)
-            if (!isOutgoing && _isHovered) ...[
-              _buildDeleteButton(context),
-              const SizedBox(width: 8),
-            ] else if (!isOutgoing)
-              const SizedBox(width: 40),
-            // Delete button before message (for outgoing)
+            // Delete button before message (for outgoing only)
             if (isOutgoing && _isHovered) ...[
               _buildDeleteButton(context),
               const SizedBox(width: 8),
@@ -108,6 +102,12 @@ class _DmMessageBubbleState extends State<DmMessageBubble> {
               ),
             ),
             if (isOutgoing) const SizedBox(width: 8),
+            // Delete button after message (for incoming)
+            if (!isOutgoing && _isHovered) ...[
+              const SizedBox(width: 8),
+              _buildDeleteButton(context),
+            ] else if (!isOutgoing)
+              const SizedBox(width: 40),
           ],
         ),
       ),
