@@ -371,5 +371,9 @@
   "byUsingCamelusYouAgree": "Camelusを使用することで、以下に同意したことになります ",
   "@byUsingCamelusYouAgree": {
     "description": "Text before terms and conditions link on onboarding page"
-  }
+  },
+  "searchUserHint": "名前、NIP-05、またはnpubで検索...",
+  "searchToStartConversation": "ユーザーを検索して会話を開始",
+  "enterAtLeast2Characters": "2文字以上入力してください",
+  "noUsersFound": "ユーザーが見つかりません"
 }

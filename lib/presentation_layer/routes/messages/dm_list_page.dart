@@ -84,7 +84,7 @@ class _DmListPageState extends ConsumerState<DmListPage> {
               PhosphorIcons.pencilSimpleLine(),
               color: Theme.of(context).colorScheme.onSurface,
             ),
-            onPressed: () => _showNewMessageDialog(context),
+            onPressed: () => context.push('/messages/new'),
             tooltip: AppLocalizations.of(context)!.newMessage,
           ),
         ],
@@ -180,63 +180,6 @@ class _DmListPageState extends ConsumerState<DmListPage> {
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  void _showNewMessageDialog(BuildContext context) {
-    final textController = TextEditingController();
-
-    showDialog(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: Text(AppLocalizations.of(context)!.newMessageDialogTitle),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(AppLocalizations.of(context)!.enterPubkeyPrompt),
-            const SizedBox(height: 16),
-            TextField(
-              controller: textController,
-              decoration: InputDecoration(
-                hintText: AppLocalizations.of(context)!.pubkeyHint,
-                border: const OutlineInputBorder(),
-              ),
-              autofocus: true,
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(),
-            child: Text(AppLocalizations.of(context)!.cancel),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              final input = textController.text.trim();
-              if (input.isEmpty) return;
-
-              String hexPubkey;
-
-              // Decode input to hex pubkey
-              if (input.startsWith('nprofile')) {
-                final decoded = Nip19.decodeNprofile(input);
-                hexPubkey = decoded.pubkey;
-              } else if (input.startsWith('npub')) {
-                hexPubkey = Nip19.decode(input);
-              } else {
-                hexPubkey = input; // Assume hex
-              }
-
-              // Create nprofile for navigation
-              final nprofile = Nip19.encodeNprofile(pubkey: hexPubkey);
-
-              Navigator.of(dialogContext).pop();
-              context.push('/messages/$nprofile');
-            },
-            child: Text(AppLocalizations.of(context)!.startChat),
-          ),
-        ],
       ),
     );
   }

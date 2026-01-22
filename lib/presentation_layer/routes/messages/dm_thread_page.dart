@@ -1,13 +1,14 @@
+import 'package:camelus/helpers/helpers.dart';
 import 'package:camelus/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_list_view/flutter_list_view.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:ndk/shared/nips/nip19/nip19.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../domain_layer/entities/direct_message.dart';
-import 'package:ndk/shared/nips/nip19/nip19.dart';
 import '../../atoms/my_profile_picture.dart';
 import '../../components/dm/dm_message_bubble.dart';
 import '../../providers/dm_thread_provider.dart';
@@ -90,8 +91,7 @@ class _DmThreadPageState extends ConsumerState<DmThreadPage> {
     final metadataState = ref.watch(metadataStateProvider(_peerPubkey));
     final metadata = metadataState.userMetadata;
 
-    final displayName =
-        metadata?.name ?? metadata?.name ?? '${_peerPubkey.substring(0, 8)}...';
+    final displayName = metadata?.name ?? Helpers().shortHr(_peerPubkey);
 
     return Scaffold(
       appBar: AppBar(
@@ -295,7 +295,7 @@ class _DmThreadPageState extends ConsumerState<DmThreadPage> {
   Widget _buildBeginningOfConversation(BuildContext context) {
     final metadataState = ref.watch(metadataStateProvider(_peerPubkey));
     final metadata = metadataState.userMetadata;
-    final displayName = metadata?.name ?? '${_peerPubkey.substring(0, 8)}...';
+    final displayName = metadata?.name ?? Helpers().shortHr(_peerPubkey);
 
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 24),
@@ -349,8 +349,7 @@ class _DmThreadPageState extends ConsumerState<DmThreadPage> {
   Widget _buildEmptyThreadState(BuildContext context) {
     final metadataState = ref.watch(metadataStateProvider(_peerPubkey));
     final metadata = metadataState.userMetadata;
-    final displayName =
-        metadata?.name ?? metadata?.name ?? '${_peerPubkey.substring(0, 8)}...';
+    final displayName = metadata?.name ?? Helpers().shortHr(_peerPubkey);
 
     return Center(
       child: Padding(

@@ -415,5 +415,9 @@
   "thursday": "Jueves",
   "friday": "Viernes",
   "saturday": "Sábado",
-  "sunday": "Domingo"
+  "sunday": "Domingo",
+  "searchUserHint": "Buscar por nombre, NIP-05 o npub...",
+  "searchToStartConversation": "Busca un usuario para iniciar una conversación",
+  "enterAtLeast2Characters": "Ingresa al menos 2 caracteres",
+  "noUsersFound": "No se encontraron usuarios"
 }

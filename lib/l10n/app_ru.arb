@@ -371,5 +371,9 @@
   "byUsingCamelusYouAgree": "Используя Camelus, вы соглашаетесь с ",
   "@byUsingCamelusYouAgree": {
     "description": "Text before terms and conditions link on onboarding page"
-  }
+  },
+  "searchUserHint": "Поиск по имени, NIP-05 или npub...",
+  "searchToStartConversation": "Найдите пользователя, чтобы начать разговор",
+  "enterAtLeast2Characters": "Введите минимум 2 символа",
+  "noUsersFound": "Пользователи не найдены"
 }

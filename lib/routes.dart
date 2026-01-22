@@ -36,6 +36,7 @@ import 'presentation_layer/routes/nostr/settings/settings_page.dart';
 import 'presentation_layer/routes/nostr/settings/dm_relays/dm_relays_settings.dart';
 import 'presentation_layer/routes/messages/dm_list_page.dart';
 import 'presentation_layer/routes/messages/dm_thread_page.dart';
+import 'presentation_layer/routes/messages/new_dm_page.dart';
 
 Null redirects(BuildContext context, GoRouterState state) {
   return null;
@@ -100,6 +101,10 @@ final routes = [
             path: '/messages',
             builder: (context, state) => const DmListPage(),
             routes: [
+              GoRoute(
+                path: 'new',
+                builder: (context, state) => const NewDmPage(),
+              ),
               GoRoute(
                 path: ':peerIdentifier',
                 builder: (context, state) => DmThreadPage(

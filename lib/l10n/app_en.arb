@@ -1494,5 +1494,21 @@
   "sunday": "Sunday",
   "@sunday": {
     "description": "Sunday weekday"
+  },
+  "searchUserHint": "Search by name, NIP-05 or npub...",
+  "@searchUserHint": {
+    "description": "Hint text for user search input"
+  },
+  "searchToStartConversation": "Search for a user to start a conversation",
+  "@searchToStartConversation": {
+    "description": "Empty state message for new DM page"
+  },
+  "enterAtLeast2Characters": "Enter at least 2 characters",
+  "@enterAtLeast2Characters": {
+    "description": "Message when search query is too short"
+  },
+  "noUsersFound": "No users found",
+  "@noUsersFound": {
+    "description": "Message when no users match the search"
   }
 }
