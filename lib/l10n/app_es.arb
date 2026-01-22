@@ -419,5 +419,41 @@
   "searchUserHint": "Buscar por nombre, NIP-05 o npub...",
   "searchToStartConversation": "Busca un usuario para iniciar una conversación",
   "enterAtLeast2Characters": "Ingresa al menos 2 caracteres",
-  "noUsersFound": "No se encontraron usuarios"
+  "noUsersFound": "No se encontraron usuarios",
+  "chatRelayStatus": "Estado de relays",
+  "chatRelayExcellent": "Excelente",
+  "chatRelayDegraded": "Degradado",
+  "chatRelayPoor": "Malo",
+  "yourDmRelays": "Tus relays DM",
+  "peerDmRelays": "Relays DM del contacto",
+  "noRelaysFound": "No se encontraron relays",
+  "debugTools": "Herramientas de debug",
+  "refreshRelayDiscovery": "Actualizar descubrimiento de relays",
+  "deletionNotSupportedByRelays": "Mensaje eliminado localmente, pero los relays pueden no soportar eliminación",
+  "testDeletionSupport": "Probar soporte de eliminación",
+  "deletionSupported": "Eliminación soportada",
+  "deletionNotSupported": "Eliminación no soportada",
+  "testing": "Probando...",
+  "testFailed": "Prueba fallida",
+  "relayRejectsGiftWrap": "Rechaza gift wraps",
+  "relayRejectsDeletion": "Rechaza eliminación",
+  "networkError": "Error de red",
+  "timeout": "Tiempo agotado",
+  "privacyPrivate": "Privado (seguro)",
+  "privacyLeaks": "Fuga de privacidad",
+  "testPrivacy": "Probar privacidad",
+  "testAllRelays": "Probar todos los relays",
+  "testAllRelaysDescription": "Prueba el soporte de eliminación y privacidad para todos los relays conectados",
+  "relayStatusExcellentDescription": "Conectado a {myCount} de tus relays y {peerCount} relays del contacto.",
+  "@relayStatusExcellentDescription": {
+    "placeholders": {
+      "myCount": {"type": "int"},
+      "peerCount": {"type": "int"}
+    }
+  },
+  "relayStatusDegradedMyOnly": "Conectado a tus relays, pero no a los relays DM del contacto. Los mensajes pueden retrasarse.",
+  "relayStatusDegradedPeerOnly": "Conectado a los relays del contacto, pero no a tus relays DM. Podrías perder mensajes.",
+  "relayStatusDegradedPartial": "Conectividad parcial. Algunos mensajes pueden retrasarse.",
+  "relayStatusPoorDescription": "Sin relays DM conectados. Los mensajes podrían no entregarse.",
+  "relayStatusLoadingDescription": "Cargando información de relays..."
 }

@@ -418,5 +418,41 @@
   "searchUserHint": "Pesquisar por nome, NIP-05 ou npub...",
   "searchToStartConversation": "Pesquise um usuário para iniciar uma conversa",
   "enterAtLeast2Characters": "Digite pelo menos 2 caracteres",
-  "noUsersFound": "Nenhum usuário encontrado"
+  "noUsersFound": "Nenhum usuário encontrado",
+  "chatRelayStatus": "Status dos relays",
+  "chatRelayExcellent": "Excelente",
+  "chatRelayDegraded": "Degradado",
+  "chatRelayPoor": "Ruim",
+  "yourDmRelays": "Seus relays DM",
+  "peerDmRelays": "Relays DM do contato",
+  "noRelaysFound": "Nenhum relay encontrado",
+  "debugTools": "Ferramentas de debug",
+  "refreshRelayDiscovery": "Atualizar descoberta de relays",
+  "deletionNotSupportedByRelays": "Mensagem excluída localmente, mas relays podem não suportar exclusão",
+  "testDeletionSupport": "Testar suporte à exclusão",
+  "deletionSupported": "Exclusão suportada",
+  "deletionNotSupported": "Exclusão não suportada",
+  "testing": "Testando...",
+  "testFailed": "Teste falhou",
+  "relayRejectsGiftWrap": "Rejeita gift wraps",
+  "relayRejectsDeletion": "Rejeita exclusão",
+  "networkError": "Erro de rede",
+  "timeout": "Tempo esgotado",
+  "privacyPrivate": "Privado (seguro)",
+  "privacyLeaks": "Vazamento de privacidade",
+  "testPrivacy": "Testar privacidade",
+  "testAllRelays": "Testar todos os relays",
+  "testAllRelaysDescription": "Testa suporte à exclusão e privacidade para todos os relays conectados",
+  "relayStatusExcellentDescription": "Conectado a {myCount} dos seus relays e {peerCount} relays do contato.",
+  "@relayStatusExcellentDescription": {
+    "placeholders": {
+      "myCount": {"type": "int"},
+      "peerCount": {"type": "int"}
+    }
+  },
+  "relayStatusDegradedMyOnly": "Conectado aos seus relays, mas não aos relays DM do contato. Mensagens podem atrasar.",
+  "relayStatusDegradedPeerOnly": "Conectado aos relays do contato, mas não aos seus relays DM. Você pode perder mensagens.",
+  "relayStatusDegradedPartial": "Conectividade parcial. Algumas mensagens podem atrasar.",
+  "relayStatusPoorDescription": "Sem relays DM conectados. Mensagens podem não ser entregues.",
+  "relayStatusLoadingDescription": "Carregando informações dos relays..."
 }

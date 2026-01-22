@@ -416,5 +416,41 @@
   "searchUserHint": "Suche nach Name, NIP-05 oder npub...",
   "searchToStartConversation": "Suchen Sie nach einem Benutzer, um eine Unterhaltung zu starten",
   "enterAtLeast2Characters": "Geben Sie mindestens 2 Zeichen ein",
-  "noUsersFound": "Keine Benutzer gefunden"
+  "noUsersFound": "Keine Benutzer gefunden",
+  "chatRelayStatus": "Relay-Status",
+  "chatRelayExcellent": "Ausgezeichnet",
+  "chatRelayDegraded": "Eingeschränkt",
+  "chatRelayPoor": "Schlecht",
+  "yourDmRelays": "Ihre DM-Relays",
+  "peerDmRelays": "DM-Relays des Kontakts",
+  "noRelaysFound": "Keine Relays gefunden",
+  "debugTools": "Debug-Tools",
+  "refreshRelayDiscovery": "Relay-Erkennung aktualisieren",
+  "deletionNotSupportedByRelays": "Nachricht lokal gelöscht, aber Relays unterstützen möglicherweise keine Löschung",
+  "testDeletionSupport": "Löschunterstützung testen",
+  "deletionSupported": "Löschung unterstützt",
+  "deletionNotSupported": "Löschung nicht unterstützt",
+  "testing": "Teste...",
+  "testFailed": "Test fehlgeschlagen",
+  "relayRejectsGiftWrap": "Lehnt Gift Wraps ab",
+  "relayRejectsDeletion": "Lehnt Löschung ab",
+  "networkError": "Netzwerkfehler",
+  "timeout": "Zeitüberschreitung",
+  "privacyPrivate": "Privat (sicher)",
+  "privacyLeaks": "Datenschutzleck",
+  "testPrivacy": "Datenschutz testen",
+  "testAllRelays": "Alle Relays testen",
+  "testAllRelaysDescription": "Testet Löschunterstützung und Datenschutz für alle verbundenen Relays",
+  "relayStatusExcellentDescription": "Verbunden mit {myCount} Ihrer Relays und {peerCount} Relays des Kontakts.",
+  "@relayStatusExcellentDescription": {
+    "placeholders": {
+      "myCount": {"type": "int"},
+      "peerCount": {"type": "int"}
+    }
+  },
+  "relayStatusDegradedMyOnly": "Mit Ihren Relays verbunden, aber nicht mit den DM-Relays des Kontakts. Nachrichten können verzögert werden.",
+  "relayStatusDegradedPeerOnly": "Mit den Relays des Kontakts verbunden, aber nicht mit Ihren DM-Relays. Sie könnten Nachrichten verpassen.",
+  "relayStatusDegradedPartial": "Teilweise Verbindung. Einige Nachrichten können verzögert werden.",
+  "relayStatusPoorDescription": "Keine DM-Relays verbunden. Nachrichten werden möglicherweise nicht zugestellt.",
+  "relayStatusLoadingDescription": "Lade Relay-Informationen..."
 }

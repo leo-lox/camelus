@@ -375,5 +375,41 @@
   "searchUserHint": "ค้นหาตามชื่อ, NIP-05 หรือ npub...",
   "searchToStartConversation": "ค้นหาผู้ใช้เพื่อเริ่มการสนทนา",
   "enterAtLeast2Characters": "กรุณาใส่อย่างน้อย 2 ตัวอักษร",
-  "noUsersFound": "ไม่พบผู้ใช้"
+  "noUsersFound": "ไม่พบผู้ใช้",
+  "chatRelayStatus": "สถานะรีเลย์",
+  "chatRelayExcellent": "ดีเยี่ยม",
+  "chatRelayDegraded": "ลดลง",
+  "chatRelayPoor": "แย่",
+  "yourDmRelays": "รีเลย์ DM ของคุณ",
+  "peerDmRelays": "รีเลย์ DM ของผู้ติดต่อ",
+  "noRelaysFound": "ไม่พบรีเลย์",
+  "debugTools": "เครื่องมือดีบัก",
+  "refreshRelayDiscovery": "รีเฟรชการค้นหารีเลย์",
+  "deletionNotSupportedByRelays": "ข้อความถูกลบในเครื่อง แต่รีเลย์อาจไม่รองรับการลบ",
+  "testDeletionSupport": "ทดสอบการรองรับการลบ",
+  "deletionSupported": "รองรับการลบ",
+  "deletionNotSupported": "ไม่รองรับการลบ",
+  "testing": "กำลังทดสอบ...",
+  "testFailed": "ทดสอบล้มเหลว",
+  "relayRejectsGiftWrap": "ปฏิเสธ gift wrap",
+  "relayRejectsDeletion": "ปฏิเสธการลบ",
+  "networkError": "ข้อผิดพลาดเครือข่าย",
+  "timeout": "หมดเวลา",
+  "privacyPrivate": "ส่วนตัว (ปลอดภัย)",
+  "privacyLeaks": "รั่วไหลความเป็นส่วนตัว",
+  "testPrivacy": "ทดสอบความเป็นส่วนตัว",
+  "testAllRelays": "ทดสอบรีเลย์ทั้งหมด",
+  "testAllRelaysDescription": "ทดสอบการรองรับการลบและความเป็นส่วนตัวสำหรับรีเลย์ที่เชื่อมต่อทั้งหมด",
+  "relayStatusExcellentDescription": "เชื่อมต่อกับ {myCount} รีเลย์ของคุณและ {peerCount} รีเลย์ของผู้ติดต่อ",
+  "@relayStatusExcellentDescription": {
+    "placeholders": {
+      "myCount": {"type": "int"},
+      "peerCount": {"type": "int"}
+    }
+  },
+  "relayStatusDegradedMyOnly": "เชื่อมต่อกับรีเลย์ของคุณ แต่ไม่ได้เชื่อมต่อกับรีเลย์ DM ของผู้ติดต่อ ข้อความอาจล่าช้า",
+  "relayStatusDegradedPeerOnly": "เชื่อมต่อกับรีเลย์ของผู้ติดต่อ แต่ไม่ได้เชื่อมต่อกับรีเลย์ DM ของคุณ คุณอาจพลาดข้อความ",
+  "relayStatusDegradedPartial": "การเชื่อมต่อบางส่วน ข้อความบางส่วนอาจล่าช้า",
+  "relayStatusPoorDescription": "ไม่มีรีเลย์ DM ที่เชื่อมต่อ ข้อความอาจไม่ถูกส่ง",
+  "relayStatusLoadingDescription": "กำลังโหลดข้อมูลรีเลย์..."
 }
