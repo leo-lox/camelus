@@ -561,26 +561,36 @@ class DirectMessageRepositoryImpl implements DirectMessageRepository {
 
       // 2. Create gift wraps for both recipient and ourselves
       // Per NIP-17: sender must send to both recipient's inbox AND their own inbox
+      // Special case: if sending to self ("Note to Self"), only create one gift wrap
+      final isSelfMessage = recipientPubkey == myPubkey;
+
       final recipientGiftWrap = await ndk.giftWrap.toGiftWrap(
         rumor: rumor,
         recipientPubkey: recipientPubkey,
       );
 
-      final selfGiftWrap = await ndk.giftWrap.toGiftWrap(
-        rumor: rumor,
-        recipientPubkey: myPubkey,
-      );
+      // Only create separate self gift wrap if not sending to self
+      final selfGiftWrap = isSelfMessage
+          ? recipientGiftWrap
+          : await ndk.giftWrap.toGiftWrap(
+              rumor: rumor,
+              recipientPubkey: myPubkey,
+            );
 
       // 3. Get DM relays for both recipient and ourselves
       final recipientRelays = await _getDmInboxRelays(recipientPubkey);
-      final myRelays = await _getDmInboxRelays(myPubkey);
+      final myRelays = isSelfMessage
+          ? recipientRelays
+          : await _getDmInboxRelays(myPubkey);
 
       log(
         'DM: Broadcasting to recipient relays: ${recipientRelays.isNotEmpty ? recipientRelays : "default"}',
       );
-      log(
-        'DM: Broadcasting to my relays: ${myRelays.isNotEmpty ? myRelays : "default"}',
-      );
+      if (!isSelfMessage) {
+        log(
+          'DM: Broadcasting to my relays: ${myRelays.isNotEmpty ? myRelays : "default"}',
+        );
+      }
 
       // 4. Broadcast gift wraps
       // Broadcast to recipient's relays
@@ -589,11 +599,13 @@ class DirectMessageRepositoryImpl implements DirectMessageRepository {
         specificRelays: recipientRelays.isNotEmpty ? recipientRelays : null,
       );
 
-      // Broadcast to our own relays
-      ndk.broadcast.broadcast(
-        nostrEvent: selfGiftWrap,
-        specificRelays: myRelays.isNotEmpty ? myRelays : null,
-      );
+      // Broadcast to our own relays (skip if self message - already sent above)
+      if (!isSelfMessage) {
+        ndk.broadcast.broadcast(
+          nostrEvent: selfGiftWrap,
+          specificRelays: myRelays.isNotEmpty ? myRelays : null,
+        );
+      }
 
       // 5. Cache locally so we see it immediately
       final localMessage = DirectMessageModel(

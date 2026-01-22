@@ -452,5 +452,7 @@
   "relayStatusDegradedPeerOnly": "Mit den Relays des Kontakts verbunden, aber nicht mit Ihren DM-Relays. Sie könnten Nachrichten verpassen.",
   "relayStatusDegradedPartial": "Teilweise Verbindung. Einige Nachrichten können verzögert werden.",
   "relayStatusPoorDescription": "Keine DM-Relays verbunden. Nachrichten werden möglicherweise nicht zugestellt.",
-  "relayStatusLoadingDescription": "Lade Relay-Informationen..."
+  "relayStatusLoadingDescription": "Lade Relay-Informationen...",
+  "noteToSelf": "Notiz an mich",
+  "noteToSelfHint": "Speichern Sie Nachrichten, Links und Notizen für sich selbst"
 }

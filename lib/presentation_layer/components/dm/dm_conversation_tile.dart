@@ -1,6 +1,6 @@
+import 'package:camelus/helpers/helpers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:timeago/timeago.dart' as timeago;
 
 import '../../../domain_layer/entities/dm_conversation.dart';
 import '../../atoms/my_profile_picture.dart';
@@ -49,7 +49,7 @@ class DmConversationTile extends ConsumerWidget {
             ),
           ),
           Text(
-            _formatTime(conversation.lastMessageAt),
+            Helpers.formatTimeAgo(conversation.lastMessageAt),
             style: TextStyle(
               fontSize: 12,
               color: conversation.unreadCount > 0
@@ -108,10 +108,5 @@ class DmConversationTile extends ConsumerWidget {
       ),
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
     );
-  }
-
-  String _formatTime(int timestamp) {
-    final dateTime = DateTime.fromMillisecondsSinceEpoch(timestamp * 1000);
-    return timeago.format(dateTime, locale: 'en_short');
   }
 }

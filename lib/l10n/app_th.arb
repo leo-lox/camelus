@@ -411,5 +411,7 @@
   "relayStatusDegradedPeerOnly": "เชื่อมต่อกับรีเลย์ของผู้ติดต่อ แต่ไม่ได้เชื่อมต่อกับรีเลย์ DM ของคุณ คุณอาจพลาดข้อความ",
   "relayStatusDegradedPartial": "การเชื่อมต่อบางส่วน ข้อความบางส่วนอาจล่าช้า",
   "relayStatusPoorDescription": "ไม่มีรีเลย์ DM ที่เชื่อมต่อ ข้อความอาจไม่ถูกส่ง",
-  "relayStatusLoadingDescription": "กำลังโหลดข้อมูลรีเลย์..."
+  "relayStatusLoadingDescription": "กำลังโหลดข้อมูลรีเลย์...",
+  "noteToSelf": "โน้ตถึงตัวเอง",
+  "noteToSelfHint": "บันทึกข้อความ ลิงก์ และโน้ตสำหรับตัวคุณเอง"
 }

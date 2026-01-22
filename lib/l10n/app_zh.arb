@@ -411,5 +411,7 @@
   "relayStatusDegradedPeerOnly": "已连接到对方的中继，但未连接到您的私信中继。您可能会错过消息。",
   "relayStatusDegradedPartial": "部分连接。某些消息可能会延迟。",
   "relayStatusPoorDescription": "没有已连接的私信中继。消息可能无法送达。",
-  "relayStatusLoadingDescription": "正在加载中继信息..."
+  "relayStatusLoadingDescription": "正在加载中继信息...",
+  "noteToSelf": "自己的笔记",
+  "noteToSelfHint": "为自己保存消息、链接和笔记"
 }

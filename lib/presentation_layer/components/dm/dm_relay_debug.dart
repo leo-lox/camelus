@@ -4,6 +4,7 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../l10n/app_localizations.dart';
 import '../../providers/dm_relay_health_provider.dart';
+import '../../providers/ndk_provider.dart';
 import '../../providers/relay_dm_test_provider.dart';
 
 /// Shows the DM relay debug UI adaptively:
@@ -133,6 +134,8 @@ class DmRelayDebugContent extends ConsumerWidget {
     final healthState = ref.watch(dmRelayHealthProvider(peerPubkey));
     final deletionTestState = ref.watch(relayDmTestProvider);
     final l10n = AppLocalizations.of(context)!;
+    final myPubkey = ref.read(ndkProvider).accounts.getPublicKey();
+    final isSelfConversation = peerPubkey == myPubkey;
 
     const horizontalPadding = EdgeInsets.symmetric(horizontal: 20);
 
@@ -160,20 +163,21 @@ class DmRelayDebugContent extends ConsumerWidget {
           ),
         ),
 
-        const SizedBox(height: 20),
-
-        // Peer's DM Relays section
-        Padding(
-          padding: horizontalPadding,
-          child: _buildRelaySection(
-            context,
-            ref,
-            title: l10n.peerDmRelays,
-            relays: healthState.peerRelays,
-            emptyMessage: l10n.noRelaysFound,
-            deletionTestState: deletionTestState,
+        // Peer's DM Relays section (hidden for self-conversation)
+        if (!isSelfConversation) ...[
+          const SizedBox(height: 20),
+          Padding(
+            padding: horizontalPadding,
+            child: _buildRelaySection(
+              context,
+              ref,
+              title: l10n.peerDmRelays,
+              relays: healthState.peerRelays,
+              emptyMessage: l10n.noRelaysFound,
+              deletionTestState: deletionTestState,
+            ),
           ),
-        ),
+        ],
 
         const SizedBox(height: 24),
 

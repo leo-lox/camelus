@@ -5,6 +5,7 @@ import 'dart:math';
 import 'package:bech32/bech32.dart';
 import 'package:flutter/foundation.dart';
 import 'package:hex/hex.dart';
+import 'package:timeago/timeago.dart' as timeago;
 import 'package:uuid/uuid.dart';
 
 class Helpers {
@@ -129,5 +130,11 @@ class Helpers {
     }
 
     return "${npubHr.substring(0, 8)}...${npubHr.substring(npubHr.length - 10)}";
+  }
+
+  /// Format a Unix timestamp to a short relative time string (e.g., "2h", "3d")
+  static String formatTimeAgo(int timestamp) {
+    final dateTime = DateTime.fromMillisecondsSinceEpoch(timestamp * 1000);
+    return timeago.format(dateTime, locale: 'en_short');
   }
 }

@@ -454,5 +454,7 @@
   "relayStatusDegradedPeerOnly": "Connecté aux relais du contact, mais pas à vos relais DM. Vous pourriez manquer des messages.",
   "relayStatusDegradedPartial": "Connectivité partielle. Certains messages peuvent être retardés.",
   "relayStatusPoorDescription": "Aucun relais DM connecté. Les messages pourraient ne pas être livrés.",
-  "relayStatusLoadingDescription": "Chargement des informations des relais..."
+  "relayStatusLoadingDescription": "Chargement des informations des relais...",
+  "noteToSelf": "Note personnelle",
+  "noteToSelfHint": "Sauvegardez des messages, liens et notes pour vous-même"
 }

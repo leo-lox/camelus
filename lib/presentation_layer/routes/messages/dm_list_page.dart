@@ -1,3 +1,4 @@
+import 'package:camelus/helpers/helpers.dart';
 import 'package:camelus/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -5,8 +6,11 @@ import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import 'package:ndk/shared/nips/nip19/nip19.dart';
+import '../../../domain_layer/entities/dm_conversation.dart';
+import '../../atoms/my_profile_picture.dart';
 import '../../components/dm/dm_conversation_tile.dart';
 import '../../providers/dm_conversations_provider.dart';
+import '../../providers/metadata_state_provider.dart';
 import '../../providers/ndk_provider.dart';
 
 /// Page displaying the list of DM conversations.
@@ -129,19 +133,37 @@ class _DmListPageState extends ConsumerState<DmListPage> {
       );
     }
 
-    if (state.conversations.isEmpty) {
+    final myPubkey = ref.read(ndkProvider).accounts.getPublicKey()!;
+
+    // Filter out self-conversation from regular list (will be shown as "Note to Self")
+    final otherConversations = state.conversations
+        .where((c) => c.peerPubkey != myPubkey)
+        .toList();
+    final selfConversation = state.conversations
+        .where((c) => c.peerPubkey == myPubkey)
+        .firstOrNull;
+
+    if (otherConversations.isEmpty && selfConversation == null) {
       return _buildEmptyState(context);
     }
 
     return ListView.separated(
-      itemCount: state.conversations.length,
+      itemCount: otherConversations.length + 1, // +1 for "Note to Self"
       separatorBuilder: (context, index) => Divider(
         height: 1,
         indent: 82,
         color: Theme.of(context).colorScheme.outlineVariant,
       ),
       itemBuilder: (context, index) {
-        final conversation = state.conversations[index];
+        // First item is "Note to Self"
+        if (index == 0) {
+          return _NoteToSelfTile(
+            conversation: selfConversation,
+            myPubkey: myPubkey,
+          );
+        }
+
+        final conversation = otherConversations[index - 1];
         final nprofile = Nip19.encodeNprofile(pubkey: conversation.peerPubkey);
         return DmConversationTile(
           conversation: conversation,
@@ -181,6 +203,131 @@ class _DmListPageState extends ConsumerState<DmListPage> {
           ],
         ),
       ),
+    );
+  }
+}
+
+/// Special tile for "Note to Self" conversation.
+class _NoteToSelfTile extends ConsumerWidget {
+  final DmConversation? conversation;
+  final String myPubkey;
+
+  const _NoteToSelfTile({required this.conversation, required this.myPubkey});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final hasMessages = conversation != null;
+    final metadataState = ref.watch(metadataStateProvider(myPubkey));
+    final metadata = metadataState.userMetadata;
+
+    return ListTile(
+      onTap: () {
+        final nprofile = Nip19.encodeNprofile(pubkey: myPubkey);
+        context.push('/messages/$nprofile');
+      },
+      leading: Stack(
+        children: [
+          UserImage(imageUrl: metadata?.picture, pubkey: myPubkey, size: 50),
+          Positioned(
+            right: 0,
+            bottom: 0,
+            child: Container(
+              width: 18,
+              height: 18,
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.primary,
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: Theme.of(context).colorScheme.surface,
+                  width: 2,
+                ),
+              ),
+              child: Icon(
+                PhosphorIcons.check(PhosphorIconsStyle.bold),
+                color: Theme.of(context).colorScheme.onPrimary,
+                size: 10,
+              ),
+            ),
+          ),
+        ],
+      ),
+      title: Row(
+        children: [
+          Expanded(
+            child: Text(
+              AppLocalizations.of(context)!.noteToSelf,
+              style: TextStyle(
+                fontWeight: hasMessages && conversation!.unreadCount > 0
+                    ? FontWeight.bold
+                    : FontWeight.normal,
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+          if (hasMessages)
+            Text(
+              Helpers.formatTimeAgo(conversation!.lastMessageAt),
+              style: TextStyle(
+                fontSize: 12,
+                color: conversation!.unreadCount > 0
+                    ? Theme.of(context).colorScheme.primary
+                    : Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
+            ),
+        ],
+      ),
+      subtitle: hasMessages
+          ? Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    conversation!.lastMessagePreview,
+                    style: TextStyle(
+                      color: conversation!.unreadCount > 0
+                          ? Theme.of(context).colorScheme.onSurface
+                          : Theme.of(context).colorScheme.onSurfaceVariant,
+                      fontWeight: conversation!.unreadCount > 0
+                          ? FontWeight.w500
+                          : FontWeight.normal,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                if (conversation!.unreadCount > 0)
+                  Container(
+                    margin: const EdgeInsets.only(left: 8),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 2,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.primary,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      conversation!.unreadCount > 99
+                          ? '99+'
+                          : conversation!.unreadCount.toString(),
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onPrimary,
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+              ],
+            )
+          : Text(
+              AppLocalizations.of(context)!.noteToSelfHint,
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
     );
   }
 }

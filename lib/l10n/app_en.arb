@@ -1646,5 +1646,13 @@
   "relayStatusLoadingDescription": "Loading relay information...",
   "@relayStatusLoadingDescription": {
     "description": "Status description when loading"
+  },
+  "noteToSelf": "Note to Self",
+  "@noteToSelf": {
+    "description": "Title for self-conversation feature"
+  },
+  "noteToSelfHint": "Save messages, links, and notes for yourself",
+  "@noteToSelfHint": {
+    "description": "Hint text for empty Note to Self conversation"
   }
 }

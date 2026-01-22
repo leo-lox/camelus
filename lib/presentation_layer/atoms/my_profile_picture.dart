@@ -129,7 +129,8 @@ class UserImage extends StatelessWidget {
                 ],
               );
             },
-            errorWidget: (context, url, error) => const Icon(Icons.error),
+            errorWidget: (context, url, error) =>
+                SvgPicture.network("${Dicebear.baseUrl}$pubkey"),
             cacheKey: pictureUrl,
             memCacheWidth: cacheHeight ?? 150,
             maxHeightDiskCache: cacheHeight ?? 150,

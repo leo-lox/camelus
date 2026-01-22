@@ -411,5 +411,7 @@
   "relayStatusDegradedPeerOnly": "Подключено к реле контакта, но не к вашим DM реле. Вы можете пропустить сообщения.",
   "relayStatusDegradedPartial": "Частичное подключение. Некоторые сообщения могут задерживаться.",
   "relayStatusPoorDescription": "Нет подключенных DM реле. Сообщения могут не доставляться.",
-  "relayStatusLoadingDescription": "Загрузка информации о реле..."
+  "relayStatusLoadingDescription": "Загрузка информации о реле...",
+  "noteToSelf": "Заметка себе",
+  "noteToSelfHint": "Сохраняйте сообщения, ссылки и заметки для себя"
 }
