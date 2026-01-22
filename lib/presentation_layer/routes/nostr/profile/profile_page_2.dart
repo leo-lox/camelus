@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../domain_layer/entities/contact_list.dart';
@@ -274,6 +275,8 @@ class _BuildProfileHeader extends ConsumerWidget {
                             ),
                           ),
                         if (!isOwnProfile)
+                          _DmButton(pubkey: userMetadata.pubkey),
+                        if (!isOwnProfile)
                           _FollowButton(pubkey: userMetadata.pubkey),
                         if (isOwnProfile)
                           longButton(
@@ -438,6 +441,46 @@ class _FollowButtonState extends ConsumerState<_FollowButton> {
         },
       );
     }
+  }
+}
+
+class _DmButton extends ConsumerWidget {
+  final String pubkey;
+
+  const _DmButton({required this.pubkey});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final ndk = ref.watch(ndkProvider);
+    final canSign = !ndk.accounts.cannotSign;
+
+    return Container(
+      margin: const EdgeInsets.only(right: 8),
+      child: ElevatedButton(
+        onPressed: () {
+          if (!canSign) {
+            AppAuth.showLoginPrompt(context);
+            return;
+          }
+          context.push('/messages/$pubkey');
+        },
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Theme.of(context).colorScheme.surface,
+          padding: const EdgeInsets.all(0),
+          shape: CircleBorder(
+            side: BorderSide(
+              color: Theme.of(context).colorScheme.onSurface,
+              width: 1,
+            ),
+          ),
+        ),
+        child: PhosphorIcon(
+          PhosphorIcons.chatCircle(PhosphorIconsStyle.regular),
+          size: 25,
+          color: Theme.of(context).colorScheme.onSurface,
+        ),
+      ),
+    );
   }
 }
 
