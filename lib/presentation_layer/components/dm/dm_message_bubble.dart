@@ -166,22 +166,11 @@ class _DmMessageBubbleState extends State<DmMessageBubble> {
   void _showMessageMenu(BuildContext context) {
     showModalBottomSheet(
       context: context,
+      showDragHandle: true,
       builder: (sheetContext) => SafeArea(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const SizedBox(height: 8),
-            Container(
-              width: 32,
-              height: 4,
-              decoration: BoxDecoration(
-                color: Theme.of(
-                  sheetContext,
-                ).colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-            const SizedBox(height: 16),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [

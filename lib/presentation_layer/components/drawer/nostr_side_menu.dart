@@ -135,7 +135,9 @@ class NostrSideMenu extends ConsumerWidget {
             onTap: onTap,
             leading: badgeCount > 0
                 ? Badge(
-                    label: Text(badgeCount > 99 ? '99+' : badgeCount.toString()),
+                    label: Text(
+                      badgeCount > 99 ? '99+' : badgeCount.toString(),
+                    ),
                     child: iconWidget,
                   )
                 : iconWidget,
