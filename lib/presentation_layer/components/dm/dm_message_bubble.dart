@@ -1,6 +1,7 @@
 import 'package:camelus/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 import '../../../domain_layer/entities/direct_message.dart';
@@ -82,17 +83,22 @@ class _DmMessageBubbleState extends State<DmMessageBubble> {
                       ),
                       if (widget.showTimestamp) ...[
                         const SizedBox(height: 4),
-                        Text(
-                          _formatTime(context, widget.message.createdAt),
-                          style: TextStyle(
-                            color: isOutgoing
-                                ? Theme.of(
-                                    context,
-                                  ).colorScheme.onPrimary.withValues(alpha: 0.7)
-                                : Theme.of(
-                                    context,
-                                  ).colorScheme.onSurfaceVariant,
-                            fontSize: 11,
+                        Tooltip(
+                          message: _formatExactTime(
+                            context,
+                            widget.message.createdAt,
+                          ),
+                          child: Text(
+                            _formatTime(context, widget.message.createdAt),
+                            style: TextStyle(
+                              color: isOutgoing
+                                  ? Theme.of(context).colorScheme.onPrimary
+                                        .withValues(alpha: 0.7)
+                                  : Theme.of(
+                                      context,
+                                    ).colorScheme.onSurfaceVariant,
+                              fontSize: 11,
+                            ),
                           ),
                         ),
                       ],
@@ -150,6 +156,13 @@ class _DmMessageBubbleState extends State<DmMessageBubble> {
     }
   }
 
+  String _formatExactTime(BuildContext context, int timestamp) {
+    final dateTime = DateTime.fromMillisecondsSinceEpoch(timestamp * 1000);
+    final locale = Localizations.localeOf(context).toString();
+    final dateFormat = DateFormat.yMd(locale).add_Hm();
+    return dateFormat.format(dateTime);
+  }
+
   void _showMessageMenu(BuildContext context) {
     showModalBottomSheet(
       context: context,
@@ -157,6 +170,46 @@ class _DmMessageBubbleState extends State<DmMessageBubble> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            const SizedBox(height: 8),
+            Container(
+              width: 32,
+              height: 4,
+              decoration: BoxDecoration(
+                color: Theme.of(
+                  sheetContext,
+                ).colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.access_time,
+                  size: 16,
+                  color: Theme.of(sheetContext).colorScheme.onSurfaceVariant,
+                ),
+                const SizedBox(width: 6),
+                Text(
+                  _formatExactTime(context, widget.message.createdAt),
+                  style: TextStyle(
+                    color: Theme.of(sheetContext).colorScheme.onSurfaceVariant,
+                    fontSize: 14,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            const Divider(height: 1),
+            ListTile(
+              leading: const Icon(Icons.copy),
+              title: Text(AppLocalizations.of(context)!.copy),
+              onTap: () {
+                Clipboard.setData(ClipboardData(text: widget.message.content));
+                Navigator.of(sheetContext).pop();
+              },
+            ),
             ListTile(
               leading: Icon(
                 Icons.delete_outline,
