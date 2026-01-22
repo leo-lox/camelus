@@ -10,6 +10,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import 'package:ndk/shared/nips/nip19/nip19.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../providers/dm_conversations_provider.dart';
 import '../../providers/ndk_provider.dart';
 import '../../providers/theme_provider.dart';
 
@@ -105,11 +106,20 @@ class NostrSideMenu extends ConsumerWidget {
     label,
     onTap,
     required String routeName,
+    int badgeCount = 0,
   }) {
     return Builder(
       builder: (context) {
         final currentRoute = GoRouterState.of(context).uri.toString();
         final isSelected = currentRoute.contains(routeName);
+
+        final iconWidget = Icon(
+          icon,
+          color: isSelected
+              ? Theme.of(context).colorScheme.primary
+              : Theme.of(context).colorScheme.onSurface,
+          size: 22,
+        );
 
         return Container(
           //width: 200,
@@ -123,13 +133,12 @@ class NostrSideMenu extends ConsumerWidget {
               : null,
           child: ListTile(
             onTap: onTap,
-            leading: Icon(
-              icon,
-              color: isSelected
-                  ? Theme.of(context).colorScheme.primary
-                  : Theme.of(context).colorScheme.onSurface,
-              size: 22,
-            ),
+            leading: badgeCount > 0
+                ? Badge(
+                    label: Text(badgeCount > 99 ? '99+' : badgeCount.toString()),
+                    child: iconWidget,
+                  )
+                : iconWidget,
             title: Text(
               label,
               style: TextStyle(
@@ -173,6 +182,7 @@ class NostrSideMenu extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final currentUserPubkey = ref.read(ndkProvider).accounts.getPublicKey();
+    final dmUnreadCount = ref.watch(dmUnreadCountProvider).value ?? 0;
 
     return Container(
       color: Theme.of(context).colorScheme.surface,
@@ -221,6 +231,7 @@ class NostrSideMenu extends ConsumerWidget {
                         icon: PhosphorIcons.chatCircle(),
                         label: AppLocalizations.of(context)!.messages,
                         routeName: '/messages',
+                        badgeCount: dmUnreadCount,
                         onTap: () {
                           context.go('/messages');
                         },
