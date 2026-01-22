@@ -79,7 +79,9 @@ class DirectMessageRepositoryImpl implements DirectMessageRepository {
         pubkey,
       );
 
-      log('DM: userRelayList for $pubkey: ${userRelayList != null ? "found" : "null"}');
+      log(
+        'DM: userRelayList for $pubkey: ${userRelayList != null ? "found" : "null"}',
+      );
 
       final writeRelays =
           userRelayList?.relays.entries
@@ -306,6 +308,20 @@ class DirectMessageRepositoryImpl implements DirectMessageRepository {
 
     // Base filter for gap detection
     final baseFilter = Filter(kinds: [1059], pTags: [myPubkey]);
+
+    // Check if we have any ranges recorded
+    final existingRanges = await ndk.fetchedRanges.getForFilter(baseFilter);
+
+    if (existingRanges.isEmpty) {
+      // First fetch - no ranges recorded yet, fetch directly
+      log('DM: First fetch - no existing ranges');
+      await _fetchRange(
+        since: effectiveSince,
+        until: effectiveUntil,
+        dmRelays: dmRelays,
+      );
+      return;
+    }
 
     // Find gaps in the requested range
     final gaps = await ndk.fetchedRanges.findGaps(
