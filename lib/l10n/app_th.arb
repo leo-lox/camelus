@@ -413,5 +413,11 @@
   "relayStatusPoorDescription": "ไม่มีรีเลย์ DM ที่เชื่อมต่อ ข้อความอาจไม่ถูกส่ง",
   "relayStatusLoadingDescription": "กำลังโหลดข้อมูลรีเลย์...",
   "noteToSelf": "โน้ตถึงตัวเอง",
-  "noteToSelfHint": "บันทึกข้อความ ลิงก์ และโน้ตสำหรับตัวคุณเอง"
+  "noteToSelfHint": "บันทึกข้อความ ลิงก์ และโน้ตสำหรับตัวคุณเอง",
+  "dmFollows": "ติดตาม",
+  "dmKnown": "รู้จัก",
+  "dmRequests": "คำขอ",
+  "noFollowsConversations": "ไม่มีการสนทนากับผู้ที่คุณติดตาม",
+  "noKnownConversations": "ไม่มีการสนทนากับผู้ติดต่อที่รู้จัก",
+  "noMessageRequests": "ไม่มีคำขอข้อความ"
 }

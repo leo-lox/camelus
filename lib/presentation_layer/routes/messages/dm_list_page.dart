@@ -9,11 +9,12 @@ import 'package:ndk/shared/nips/nip19/nip19.dart';
 import '../../../domain_layer/entities/dm_conversation.dart';
 import '../../atoms/my_profile_picture.dart';
 import '../../components/dm/dm_conversation_tile.dart';
+import '../../providers/dm_categories_provider.dart';
 import '../../providers/dm_conversations_provider.dart';
 import '../../providers/metadata_state_provider.dart';
 import '../../providers/ndk_provider.dart';
 
-/// Page displaying the list of DM conversations.
+/// Page displaying the list of DM conversations with category tabs.
 class DmListPage extends ConsumerStatefulWidget {
   const DmListPage({super.key});
 
@@ -21,10 +22,15 @@ class DmListPage extends ConsumerStatefulWidget {
   ConsumerState<DmListPage> createState() => _DmListPageState();
 }
 
-class _DmListPageState extends ConsumerState<DmListPage> {
+class _DmListPageState extends ConsumerState<DmListPage>
+    with SingleTickerProviderStateMixin {
+  late TabController _tabController;
+
   @override
   void initState() {
     super.initState();
+    _tabController = TabController(length: 3, vsync: this);
+
     // Trigger initial fetch when page loads
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final state = ref.read(dmConversationsProvider);
@@ -32,6 +38,12 @@ class _DmListPageState extends ConsumerState<DmListPage> {
         ref.read(dmConversationsProvider.notifier).fetchMessages();
       }
     });
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
   }
 
   @override
@@ -72,7 +84,8 @@ class _DmListPageState extends ConsumerState<DmListPage> {
       );
     }
 
-    final state = ref.watch(dmConversationsProvider);
+    final categorizedState = ref.watch(dmCategoriesProvider);
+    final conversationsState = ref.watch(dmConversationsProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -92,78 +105,116 @@ class _DmListPageState extends ConsumerState<DmListPage> {
             tooltip: AppLocalizations.of(context)!.newMessage,
           ),
         ],
+        bottom: TabBar(
+          controller: _tabController,
+          tabs: [
+            _buildTab(
+              context,
+              AppLocalizations.of(context)!.dmFollows,
+              categorizedState.getUnreadCount(DmCategory.follows),
+            ),
+            _buildTab(
+              context,
+              AppLocalizations.of(context)!.dmKnown,
+              categorizedState.getUnreadCount(DmCategory.known),
+            ),
+            _buildTab(
+              context,
+              AppLocalizations.of(context)!.dmRequests,
+              categorizedState.getUnreadCount(DmCategory.requests),
+            ),
+          ],
+        ),
       ),
       body: RefreshIndicator(
         onRefresh: () => ref.read(dmConversationsProvider.notifier).refresh(),
-        child: _buildBody(context, state),
+        child: TabBarView(
+          controller: _tabController,
+          children: [
+            _buildFollowsTab(context, categorizedState, conversationsState),
+            _buildKnownTab(context, categorizedState, conversationsState),
+            _buildRequestsTab(context, categorizedState, conversationsState),
+          ],
+        ),
       ),
     );
   }
 
-  Widget _buildBody(BuildContext context, DmConversationsState state) {
-    if (state.isLoading && state.conversations.isEmpty) {
+  Widget _buildTab(BuildContext context, String label, int unreadCount) {
+    return Tab(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(label),
+          if (unreadCount > 0) ...[
+            const SizedBox(width: 6),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.primary,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Text(
+                unreadCount > 99 ? '99+' : unreadCount.toString(),
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onPrimary,
+                  fontSize: 11,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFollowsTab(
+    BuildContext context,
+    CategorizedDmState categorizedState,
+    DmConversationsState conversationsState,
+  ) {
+    if (conversationsState.isLoading &&
+        categorizedState.follows.isEmpty &&
+        categorizedState.noteToSelf == null) {
       return const Center(child: CircularProgressIndicator());
     }
 
-    if (state.hasError && state.conversations.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              PhosphorIcons.warning(),
-              size: 48,
-              color: Theme.of(context).colorScheme.error,
-            ),
-            const SizedBox(height: 16),
-            Text(
-              state.errorMessage ??
-                  AppLocalizations.of(context)!.failedToLoadMessages,
-              style: Theme.of(context).textTheme.bodyLarge,
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: () =>
-                  ref.read(dmConversationsProvider.notifier).fetchMessages(),
-              child: Text(AppLocalizations.of(context)!.retry),
-            ),
-          ],
-        ),
-      );
+    if (conversationsState.hasError && categorizedState.follows.isEmpty) {
+      return _buildErrorState(context, conversationsState);
     }
 
     final myPubkey = ref.read(ndkProvider).accounts.getPublicKey()!;
+    final conversations = categorizedState.follows;
 
-    // Filter out self-conversation from regular list (will be shown as "Note to Self")
-    final otherConversations = state.conversations
-        .where((c) => c.peerPubkey != myPubkey)
-        .toList();
-    final selfConversation = state.conversations
-        .where((c) => c.peerPubkey == myPubkey)
-        .firstOrNull;
-
-    if (otherConversations.isEmpty && selfConversation == null) {
-      return _buildEmptyState(context);
+    if (conversations.isEmpty) {
+      return _buildEmptyState(
+        context,
+        AppLocalizations.of(context)!.noFollowsConversations,
+        showNoteToSelf: true,
+        myPubkey: myPubkey,
+        noteToSelf: categorizedState.noteToSelf,
+      );
     }
 
+    // Always show Note to Self tile at the top
     return ListView.separated(
-      itemCount: otherConversations.length + 1, // +1 for "Note to Self"
+      itemCount: conversations.length + 1,
       separatorBuilder: (context, index) => Divider(
         height: 1,
         indent: 82,
         color: Theme.of(context).colorScheme.outlineVariant,
       ),
       itemBuilder: (context, index) {
-        // First item is "Note to Self"
         if (index == 0) {
           return _NoteToSelfTile(
-            conversation: selfConversation,
+            conversation: categorizedState.noteToSelf,
             myPubkey: myPubkey,
           );
         }
 
-        final conversation = otherConversations[index - 1];
+        final conversation = conversations[index - 1];
         final nprofile = Nip19.encodeNprofile(pubkey: conversation.peerPubkey);
         return DmConversationTile(
           conversation: conversation,
@@ -173,7 +224,160 @@ class _DmListPageState extends ConsumerState<DmListPage> {
     );
   }
 
-  Widget _buildEmptyState(BuildContext context) {
+  Widget _buildKnownTab(
+    BuildContext context,
+    CategorizedDmState categorizedState,
+    DmConversationsState conversationsState,
+  ) {
+    if (conversationsState.isLoading && categorizedState.known.isEmpty) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    if (conversationsState.hasError && categorizedState.known.isEmpty) {
+      return _buildErrorState(context, conversationsState);
+    }
+
+    final conversations = categorizedState.known;
+
+    if (conversations.isEmpty) {
+      return _buildEmptyState(
+        context,
+        AppLocalizations.of(context)!.noKnownConversations,
+      );
+    }
+
+    return ListView.separated(
+      itemCount: conversations.length,
+      separatorBuilder: (context, index) => Divider(
+        height: 1,
+        indent: 82,
+        color: Theme.of(context).colorScheme.outlineVariant,
+      ),
+      itemBuilder: (context, index) {
+        final conversation = conversations[index];
+        final nprofile = Nip19.encodeNprofile(pubkey: conversation.peerPubkey);
+        return DmConversationTile(
+          conversation: conversation,
+          onTap: () => context.push('/messages/$nprofile'),
+        );
+      },
+    );
+  }
+
+  Widget _buildRequestsTab(
+    BuildContext context,
+    CategorizedDmState categorizedState,
+    DmConversationsState conversationsState,
+  ) {
+    if (conversationsState.isLoading && categorizedState.requests.isEmpty) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    if (conversationsState.hasError && categorizedState.requests.isEmpty) {
+      return _buildErrorState(context, conversationsState);
+    }
+
+    final conversations = categorizedState.requests;
+
+    if (conversations.isEmpty) {
+      return _buildEmptyState(
+        context,
+        AppLocalizations.of(context)!.noMessageRequests,
+      );
+    }
+
+    return ListView.separated(
+      itemCount: conversations.length,
+      separatorBuilder: (context, index) => Divider(
+        height: 1,
+        indent: 82,
+        color: Theme.of(context).colorScheme.outlineVariant,
+      ),
+      itemBuilder: (context, index) {
+        final conversation = conversations[index];
+        final nprofile = Nip19.encodeNprofile(pubkey: conversation.peerPubkey);
+        return DmConversationTile(
+          conversation: conversation,
+          onTap: () => context.push('/messages/$nprofile'),
+        );
+      },
+    );
+  }
+
+  Widget _buildErrorState(BuildContext context, DmConversationsState state) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            PhosphorIcons.warning(),
+            size: 48,
+            color: Theme.of(context).colorScheme.error,
+          ),
+          const SizedBox(height: 16),
+          Text(
+            state.errorMessage ??
+                AppLocalizations.of(context)!.failedToLoadMessages,
+            style: Theme.of(context).textTheme.bodyLarge,
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 16),
+          ElevatedButton(
+            onPressed: () =>
+                ref.read(dmConversationsProvider.notifier).fetchMessages(),
+            child: Text(AppLocalizations.of(context)!.retry),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEmptyState(
+    BuildContext context,
+    String message, {
+    bool showNoteToSelf = false,
+    String? myPubkey,
+    DmConversation? noteToSelf,
+  }) {
+    if (showNoteToSelf && myPubkey != null) {
+      // Show Note to Self tile at the top even when list is empty
+      return Column(
+        children: [
+          _NoteToSelfTile(conversation: noteToSelf, myPubkey: myPubkey),
+          Divider(
+            height: 1,
+            indent: 82,
+            color: Theme.of(context).colorScheme.outlineVariant,
+          ),
+          Expanded(
+            child: Center(
+              child: Padding(
+                padding: const EdgeInsets.all(32),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      PhosphorIcons.chatCircle(),
+                      size: 64,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
+                    const SizedBox(height: 24),
+                    Text(
+                      message,
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      );
+    }
+
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
@@ -187,15 +391,8 @@ class _DmListPageState extends ConsumerState<DmListPage> {
             ),
             const SizedBox(height: 24),
             Text(
-              AppLocalizations.of(context)!.noMessagesYet,
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                color: Theme.of(context).colorScheme.onSurface,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              AppLocalizations.of(context)!.startConversationHint,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              message,
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
                 color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
               textAlign: TextAlign.center,

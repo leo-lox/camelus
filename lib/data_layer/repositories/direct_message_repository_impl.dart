@@ -906,6 +906,39 @@ class DirectMessageRepositoryImpl implements DirectMessageRepository {
     }
   }
 
+  // ============ Categorization ============
+
+  @override
+  Future<Set<String>> getPeersWithOutgoingMessages(
+    List<String> peerPubkeys,
+  ) async {
+    if (peerPubkeys.isEmpty) return {};
+
+    final store = await getStore();
+    final box = store.box<DbNip17Message>();
+
+    final result = <String>{};
+
+    // Query for outgoing messages for the given peers
+    // We use a single query with OR conditions for efficiency
+    final query = box
+        .query(
+          DbNip17Message_.isOutgoing.equals(true) &
+              DbNip17Message_.peerPubkey.oneOf(peerPubkeys),
+        )
+        .build();
+
+    final messages = query.find();
+    query.close();
+
+    // Collect unique peer pubkeys
+    for (final msg in messages) {
+      result.add(msg.peerPubkey);
+    }
+
+    return result;
+  }
+
   // ============ Cleanup ============
 
   @override

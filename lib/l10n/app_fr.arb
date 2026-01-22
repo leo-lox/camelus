@@ -456,5 +456,11 @@
   "relayStatusPoorDescription": "Aucun relais DM connecté. Les messages pourraient ne pas être livrés.",
   "relayStatusLoadingDescription": "Chargement des informations des relais...",
   "noteToSelf": "Note personnelle",
-  "noteToSelfHint": "Sauvegardez des messages, liens et notes pour vous-même"
+  "noteToSelfHint": "Sauvegardez des messages, liens et notes pour vous-même",
+  "dmFollows": "Abonnements",
+  "dmKnown": "Connus",
+  "dmRequests": "Demandes",
+  "noFollowsConversations": "Aucune conversation avec les personnes que vous suivez",
+  "noKnownConversations": "Aucune conversation avec des contacts connus",
+  "noMessageRequests": "Aucune demande de message"
 }

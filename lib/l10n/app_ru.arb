@@ -413,5 +413,11 @@
   "relayStatusPoorDescription": "Нет подключенных DM реле. Сообщения могут не доставляться.",
   "relayStatusLoadingDescription": "Загрузка информации о реле...",
   "noteToSelf": "Заметка себе",
-  "noteToSelfHint": "Сохраняйте сообщения, ссылки и заметки для себя"
+  "noteToSelfHint": "Сохраняйте сообщения, ссылки и заметки для себя",
+  "dmFollows": "Подписки",
+  "dmKnown": "Известные",
+  "dmRequests": "Запросы",
+  "noFollowsConversations": "Нет разговоров с людьми, на которых вы подписаны",
+  "noKnownConversations": "Нет разговоров с известными контактами",
+  "noMessageRequests": "Нет запросов на сообщения"
 }

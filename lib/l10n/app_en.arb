@@ -1654,5 +1654,29 @@
   "noteToSelfHint": "Save messages, links, and notes for yourself",
   "@noteToSelfHint": {
     "description": "Hint text for empty Note to Self conversation"
+  },
+  "dmFollows": "Follows",
+  "@dmFollows": {
+    "description": "Tab label for DMs with people you follow"
+  },
+  "dmKnown": "Known",
+  "@dmKnown": {
+    "description": "Tab label for DMs with known contacts (not followed but messaged)"
+  },
+  "dmRequests": "Requests",
+  "@dmRequests": {
+    "description": "Tab label for DM requests from strangers"
+  },
+  "noFollowsConversations": "No conversations with people you follow",
+  "@noFollowsConversations": {
+    "description": "Empty state for follows DM tab"
+  },
+  "noKnownConversations": "No conversations with known contacts",
+  "@noKnownConversations": {
+    "description": "Empty state for known DM tab"
+  },
+  "noMessageRequests": "No message requests",
+  "@noMessageRequests": {
+    "description": "Empty state for requests DM tab"
   }
 }

@@ -454,5 +454,11 @@
   "relayStatusPoorDescription": "Keine DM-Relays verbunden. Nachrichten werden möglicherweise nicht zugestellt.",
   "relayStatusLoadingDescription": "Lade Relay-Informationen...",
   "noteToSelf": "Notiz an mich",
-  "noteToSelfHint": "Speichern Sie Nachrichten, Links und Notizen für sich selbst"
+  "noteToSelfHint": "Speichern Sie Nachrichten, Links und Notizen für sich selbst",
+  "dmFollows": "Gefolgt",
+  "dmKnown": "Bekannt",
+  "dmRequests": "Anfragen",
+  "noFollowsConversations": "Keine Unterhaltungen mit Personen, denen Sie folgen",
+  "noKnownConversations": "Keine Unterhaltungen mit bekannten Kontakten",
+  "noMessageRequests": "Keine Nachrichtenanfragen"
 }

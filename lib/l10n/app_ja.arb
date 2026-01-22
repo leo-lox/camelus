@@ -413,5 +413,11 @@
   "relayStatusPoorDescription": "DMリレーに接続されていません。メッセージが配信されない可能性があります。",
   "relayStatusLoadingDescription": "リレー情報を読み込み中...",
   "noteToSelf": "自分へのメモ",
-  "noteToSelfHint": "メッセージ、リンク、メモを自分用に保存"
+  "noteToSelfHint": "メッセージ、リンク、メモを自分用に保存",
+  "dmFollows": "フォロー中",
+  "dmKnown": "既知",
+  "dmRequests": "リクエスト",
+  "noFollowsConversations": "フォローしている人との会話はありません",
+  "noKnownConversations": "既知の連絡先との会話はありません",
+  "noMessageRequests": "メッセージリクエストはありません"
 }

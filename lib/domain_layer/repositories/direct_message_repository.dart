@@ -70,6 +70,12 @@ abstract class DirectMessageRepository {
   /// [messageId] is the gift wrap event ID.
   Future<bool> deleteMessage(String messageId);
 
+  // ============ Categorization ============
+
+  /// Check which peers the user has sent at least one message to.
+  /// Returns a Set of peerPubkeys for which we have outgoing messages.
+  Future<Set<String>> getPeersWithOutgoingMessages(List<String> peerPubkeys);
+
   // ============ Cleanup ============
 
   /// Close any active subscriptions

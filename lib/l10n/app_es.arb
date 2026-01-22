@@ -457,5 +457,11 @@
   "relayStatusPoorDescription": "Sin relays DM conectados. Los mensajes podrían no entregarse.",
   "relayStatusLoadingDescription": "Cargando información de relays...",
   "noteToSelf": "Nota personal",
-  "noteToSelfHint": "Guarda mensajes, enlaces y notas para ti mismo"
+  "noteToSelfHint": "Guarda mensajes, enlaces y notas para ti mismo",
+  "dmFollows": "Seguidos",
+  "dmKnown": "Conocidos",
+  "dmRequests": "Solicitudes",
+  "noFollowsConversations": "No hay conversaciones con personas que sigues",
+  "noKnownConversations": "No hay conversaciones con contactos conocidos",
+  "noMessageRequests": "No hay solicitudes de mensajes"
 }
