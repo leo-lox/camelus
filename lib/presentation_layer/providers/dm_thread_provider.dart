@@ -203,29 +203,33 @@ class DmThreadNotifier extends StateNotifier<DmThreadState> {
   }
 
   /// Delete a message (optimistic UI)
+  /// Returns true if deleted from relays, false if only deleted locally
+  /// (relays may not support deletion)
   Future<bool> deleteMessage(String messageId) async {
     final repository = ref.read(dmRepositoryProvider);
     if (repository == null) return false;
 
     // Optimistic update: remove from UI immediately
-    final originalMessages = state.messages;
     state = state.copyWith(
-      messages: originalMessages.where((m) => m.id != messageId).toList(),
+      messages: state.messages.where((m) => m.id != messageId).toList(),
     );
 
     try {
-      final success = await repository.deleteMessage(messageId);
-      if (success) {
-        log('DM Thread: Message deleted successfully');
+      final deletedFromRelays = await repository.deleteMessage(messageId);
+      if (deletedFromRelays) {
+        log('DM Thread: Message deleted from relays successfully');
       } else {
-        // Restore on failure
-        state = state.copyWith(messages: originalMessages);
+        // Message deleted locally but relays may not support deletion
+        // Don't restore - it's gone from local cache
+        log(
+          'DM Thread: Message deleted locally, but relays may not support deletion',
+        );
       }
-      return success;
+      return deletedFromRelays;
     } catch (e) {
       log('DM Thread: Error deleting message: $e');
-      // Restore on error
-      state = state.copyWith(messages: originalMessages);
+      // On error, message is still removed from local cache by repository
+      // Don't restore since it may cause inconsistency
       return false;
     }
   }

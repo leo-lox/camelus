@@ -11,9 +11,7 @@ import '../../objectbox.g.dart';
 import '../db/object_box_camelus/schema/db_nip17_conversation.dart';
 import '../db/object_box_camelus/schema/db_nip17_message.dart';
 import '../models/direct_message_model.dart';
-
-/// Kind 10050: DM relay list (NIP-17)
-const int kDmRelayListKind = 10050;
+import '../../config/nostr_kinds.dart';
 
 /// Implementation of [DirectMessageRepository] using NDK and ObjectBox.
 ///
@@ -729,12 +727,30 @@ class DirectMessageRepositoryImpl implements DirectMessageRepository {
 
       // Broadcast to DM relays
       final dmRelays = await _getDmInboxRelays(myPubkey);
-      ndk.broadcast.broadcast(
+      final broadcastResponse = ndk.broadcast.broadcast(
         nostrEvent: signedEvent,
         specificRelays: dmRelays.isNotEmpty ? dmRelays : null,
       );
 
+      // Wait for broadcast to complete
+      await broadcastResponse.broadcastDoneFuture;
       log('DM: Broadcasted delete request for message $messageId');
+
+      // Wait for relays to process the deletion
+      await Future.delayed(const Duration(milliseconds: 500));
+
+      // Verify deletion empirically by querying for the message
+      final stillExists = await _verifyMessageDeleted(
+        messageId,
+        dmRelays.isNotEmpty ? dmRelays : null,
+      );
+
+      if (stillExists) {
+        log(
+          'DM: Message $messageId still exists on some relays - deletion may not be supported',
+        );
+        // Still remove from local cache, but inform the user
+      }
 
       // Delete from local cache
       final store = await getStore();
@@ -758,9 +774,48 @@ class DirectMessageRepositoryImpl implements DirectMessageRepository {
       _notifyMessagesChanged(message.peerPubkey);
       _notifyConversationsChanged();
 
-      return true;
+      // Return true if message was deleted from at least some relays
+      return !stillExists;
     } catch (e) {
       log('DM: Error deleting message $messageId: $e');
+      return false;
+    }
+  }
+
+  /// Verify if a message was actually deleted from relays.
+  /// Returns true if the message still exists on any relay.
+  Future<bool> _verifyMessageDeleted(
+    String messageId,
+    List<String>? relays,
+  ) async {
+    try {
+      final filter = Filter(
+        ids: [messageId],
+        kinds: [1059], // Gift wrap
+        limit: 1,
+      );
+
+      final response = ndk.requests.query(
+        filter: filter,
+        cacheRead: false,
+        cacheWrite: false,
+        timeout: const Duration(seconds: 5),
+        explicitRelays: relays,
+      );
+
+      // Check if any event is returned
+      await for (final event in response.stream) {
+        if (event.id == messageId) {
+          log('DM: Message $messageId still found on relay');
+          return true; // Message still exists
+        }
+      }
+
+      log('DM: Message $messageId verified deleted from relays');
+      return false; // Message was deleted
+    } catch (e) {
+      log('DM: Error verifying deletion: $e');
+      // On error, assume deletion might have worked
       return false;
     }
   }

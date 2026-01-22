@@ -238,7 +238,21 @@ class _DmMessageBubbleState extends State<DmMessageBubble> {
             onPressed: () async {
               Navigator.of(dialogContext).pop();
               if (widget.onDelete != null) {
-                await widget.onDelete!(widget.message.id);
+                final deletedFromRelays = await widget.onDelete!(
+                  widget.message.id,
+                );
+                if (!deletedFromRelays && context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        AppLocalizations.of(
+                          context,
+                        )!.deletionNotSupportedByRelays,
+                      ),
+                      backgroundColor: Colors.orange,
+                    ),
+                  );
+                }
               }
             },
             child: Text(

@@ -1510,5 +1510,141 @@
   "noUsersFound": "No users found",
   "@noUsersFound": {
     "description": "Message when no users match the search"
+  },
+  "chatRelayStatus": "Chat Relay Status",
+  "@chatRelayStatus": {
+    "description": "Header for chat relay status in debug sheet"
+  },
+  "chatRelayExcellent": "Excellent",
+  "@chatRelayExcellent": {
+    "description": "Status when both parties have connected relays"
+  },
+  "chatRelayDegraded": "Degraded",
+  "@chatRelayDegraded": {
+    "description": "Status when only one party has connected relays"
+  },
+  "chatRelayPoor": "Poor",
+  "@chatRelayPoor": {
+    "description": "Status when no DM relays are connected"
+  },
+  "yourDmRelays": "Your DM Relays",
+  "@yourDmRelays": {
+    "description": "Section title for user's DM relays"
+  },
+  "peerDmRelays": "Peer's DM Relays",
+  "@peerDmRelays": {
+    "description": "Section title for peer's DM relays"
+  },
+  "noRelaysFound": "No relays found",
+  "@noRelaysFound": {
+    "description": "Message when no relays are configured"
+  },
+  "debugTools": "Debug Tools",
+  "@debugTools": {
+    "description": "Section title for debug tools"
+  },
+  "refreshRelayDiscovery": "Refresh relay discovery",
+  "@refreshRelayDiscovery": {
+    "description": "Button to re-fetch relay lists"
+  },
+  "viewAllRelays": "View all connected relays",
+  "@viewAllRelays": {
+    "description": "Button to navigate to relays page"
+  },
+  "deletionNotSupportedByRelays": "Message deleted locally, but relays may not support deletion",
+  "@deletionNotSupportedByRelays": {
+    "description": "Warning when message deletion is not confirmed by relays"
+  },
+  "testDeletionSupport": "Test deletion support",
+  "@testDeletionSupport": {
+    "description": "Tooltip for testing relay deletion support"
+  },
+  "deletionSupported": "Deletion supported",
+  "@deletionSupported": {
+    "description": "Badge text when relay supports deletion"
+  },
+  "deletionNotSupported": "Deletion not supported",
+  "@deletionNotSupported": {
+    "description": "Badge text when relay does not support deletion"
+  },
+  "testFailed": "Test failed",
+  "@testFailed": {
+    "description": "Badge text when deletion test failed"
+  },
+  "testing": "Testing...",
+  "@testing": {
+    "description": "Badge text when deletion test is in progress"
+  },
+  "testAllDeletionSupport": "Test all relays deletion support",
+  "@testAllDeletionSupport": {
+    "description": "Button to test deletion support on all relays"
+  },
+  "testAllDeletionSupportDescription": "Uses test keys to verify if relays actually delete messages",
+  "@testAllDeletionSupportDescription": {
+    "description": "Description for test all deletion support button"
+  },
+  "relayRejectsGiftWrap": "Rejects gift wraps",
+  "@relayRejectsGiftWrap": {
+    "description": "Badge text when relay rejects kind 1059 events"
+  },
+  "relayRejectsDeletion": "Rejects deletion",
+  "@relayRejectsDeletion": {
+    "description": "Badge text when relay rejects deletion requests"
+  },
+  "networkError": "Network error",
+  "@networkError": {
+    "description": "Badge text when there was a network error during test"
+  },
+  "timeout": "Timeout",
+  "@timeout": {
+    "description": "Badge text when test timed out"
+  },
+  "privacyPrivate": "Private (secure)",
+  "@privacyPrivate": {
+    "description": "Badge text when relay correctly restricts gift wrap access"
+  },
+  "privacyLeaks": "Privacy leak",
+  "@privacyLeaks": {
+    "description": "Badge text when relay leaks gift wraps to everyone"
+  },
+  "testPrivacy": "Test privacy",
+  "@testPrivacy": {
+    "description": "Tooltip for testing relay privacy"
+  },
+  "testAllRelays": "Test all relays",
+  "@testAllRelays": {
+    "description": "Button to test all relays for both deletion and privacy"
+  },
+  "testAllRelaysDescription": "Tests deletion support and privacy for all connected relays",
+  "@testAllRelaysDescription": {
+    "description": "Description for test all relays button"
+  },
+  "relayStatusExcellentDescription": "Connected to {myCount} of your relays and {peerCount} of peer's relays.",
+  "@relayStatusExcellentDescription": {
+    "description": "Status description when relay connection is excellent",
+    "placeholders": {
+      "myCount": {"type": "int"},
+      "peerCount": {"type": "int"}
+    }
+  },
+  "relayStatusDegradedMyOnly": "Connected to your relays, but not to peer's DM relays. Messages may be delayed.",
+  "@relayStatusDegradedMyOnly": {
+    "description": "Status description when only connected to own relays"
+  },
+  "relayStatusDegradedPeerOnly": "Connected to peer's relays, but not your DM relays. You may miss messages.",
+  "@relayStatusDegradedPeerOnly": {
+    "description": "Status description when only connected to peer relays"
+  },
+  "relayStatusDegradedPartial": "Partial connectivity. Some messages may be delayed.",
+  "@relayStatusDegradedPartial": {
+    "description": "Status description when partially connected"
+  },
+  "relayStatusPoorDescription": "No connected DM relays. Messages may not be delivered.",
+  "@relayStatusPoorDescription": {
+    "description": "Status description when no relays connected"
+  },
+  "relayStatusLoadingDescription": "Loading relay information...",
+  "@relayStatusLoadingDescription": {
+    "description": "Status description when loading"
   }
 }

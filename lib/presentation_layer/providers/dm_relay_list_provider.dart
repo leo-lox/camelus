@@ -3,10 +3,8 @@ import 'dart:developer';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:ndk/ndk.dart';
 
+import '../../config/nostr_kinds.dart';
 import 'ndk_provider.dart';
-
-/// Kind 10050: DM relay list (NIP-17)
-const int kDmRelayListKind = 10050;
 
 /// Result of adding a relay
 enum AddRelayResult { success, invalidUrl, alreadyExists }

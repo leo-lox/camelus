@@ -11,6 +11,7 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 import '../../../domain_layer/entities/direct_message.dart';
 import '../../atoms/my_profile_picture.dart';
 import '../../components/dm/dm_message_bubble.dart';
+import '../../components/dm/dm_relay_indicator.dart';
 import '../../providers/dm_thread_provider.dart';
 import '../../providers/metadata_state_provider.dart';
 
@@ -149,6 +150,7 @@ class _DmThreadPageState extends ConsumerState<DmThreadPage> {
             ),
           ),
         ),
+        actions: [DmRelayIndicator(peerPubkey: _peerPubkey)],
         elevation: 0,
       ),
       body: Column(
