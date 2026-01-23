@@ -3,7 +3,6 @@ import 'dart:developer';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
-import 'package:uuid/uuid.dart';
 
 import '../../domain_layer/entities/direct_message.dart';
 import 'dm_repository_provider.dart';
@@ -16,8 +15,8 @@ class DmThreadState {
   /// Messages from the cache (confirmed sent/received)
   final List<DirectMessage> _cachedMessages;
 
-  /// Messages that are pending (optimistic UI)
-  final List<DirectMessage> _pendingMessages;
+  /// Messages that failed to send (for retry functionality)
+  final List<DirectMessage> _failedMessages;
 
   final bool isLoading;
   final bool isLoadingOlder;
@@ -29,7 +28,7 @@ class DmThreadState {
   const DmThreadState({
     required this.peerPubkey,
     List<DirectMessage> cachedMessages = const [],
-    List<DirectMessage> pendingMessages = const [],
+    List<DirectMessage> failedMessages = const [],
     this.isLoading = false,
     this.isLoadingOlder = false,
     this.hasReachedBeginning = false,
@@ -37,22 +36,22 @@ class DmThreadState {
     this.hasError = false,
     this.errorMessage,
   }) : _cachedMessages = cachedMessages,
-       _pendingMessages = pendingMessages;
+       _failedMessages = failedMessages;
 
-  /// Combined messages: cached + pending, sorted by createdAt
+  /// Combined messages: cached + failed, sorted by createdAt
   List<DirectMessage> get messages {
-    final combined = [..._cachedMessages, ..._pendingMessages];
+    final combined = [..._cachedMessages, ..._failedMessages];
     combined.sort((a, b) => a.createdAt.compareTo(b.createdAt));
     return combined;
   }
 
-  /// Access to pending messages for internal use
-  List<DirectMessage> get pendingMessages => _pendingMessages;
+  /// Access to failed messages for retry functionality
+  List<DirectMessage> get failedMessages => _failedMessages;
 
   DmThreadState copyWith({
     String? peerPubkey,
     List<DirectMessage>? cachedMessages,
-    List<DirectMessage>? pendingMessages,
+    List<DirectMessage>? failedMessages,
     bool? isLoading,
     bool? isLoadingOlder,
     bool? hasReachedBeginning,
@@ -63,7 +62,7 @@ class DmThreadState {
     return DmThreadState(
       peerPubkey: peerPubkey ?? this.peerPubkey,
       cachedMessages: cachedMessages ?? _cachedMessages,
-      pendingMessages: pendingMessages ?? _pendingMessages,
+      failedMessages: failedMessages ?? _failedMessages,
       isLoading: isLoading ?? this.isLoading,
       isLoadingOlder: isLoadingOlder ?? this.isLoadingOlder,
       hasReachedBeginning: hasReachedBeginning ?? this.hasReachedBeginning,
@@ -123,23 +122,9 @@ class DmThreadNotifier extends StateNotifier<DmThreadState> {
         .watchMessages(peerPubkey)
         .listen(
           (messages) {
-            // Remove any pending messages that now appear in cached messages
-            // We match by content + approximate timestamp since IDs differ
-            // (pending uses UUID, cached uses Nostr event ID)
-            final remainingPending = state.pendingMessages.where((pending) {
-              // Keep pending if no cached message matches
-              return !messages.any(
-                (cached) =>
-                    cached.content == pending.content &&
-                    cached.isOutgoing == pending.isOutgoing &&
-                    (cached.createdAt - pending.createdAt).abs() <= 60,
-              );
-            }).toList();
-
-            // Update messages immediately (no loading delay)
+            // Update messages from cache
             state = state.copyWith(
               cachedMessages: messages,
-              pendingMessages: remainingPending,
               isLoading: false,
               hasError: false,
             );
@@ -180,7 +165,8 @@ class DmThreadNotifier extends StateNotifier<DmThreadState> {
     await repository.markConversationAsRead(peerPubkey);
   }
 
-  /// Send a message in this conversation (with optimistic UI update)
+  /// Send a message in this conversation
+  /// The message appears instantly via watchMessages (cached before broadcast)
   Future<bool> sendMessage(String content, {String? replyToEventId}) async {
     if (content.trim().isEmpty) return false;
 
@@ -191,56 +177,36 @@ class DmThreadNotifier extends StateNotifier<DmThreadState> {
     final myPubkey = ndk.accounts.getPublicKey();
     if (myPubkey == null) return false;
 
-    // Generate a temporary ID for the optimistic message
-    final tempId = const Uuid().v4();
-    final now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
-
-    // Create optimistic message
-    final optimisticMessage = DirectMessage(
-      id: tempId,
-      senderPubkey: myPubkey,
-      peerPubkey: peerPubkey,
-      content: content.trim(),
-      createdAt: now,
-      isOutgoing: true,
-      sendStatus: MessageSendStatus.pending,
-    );
-
-    // Add optimistic message immediately
-    state = state.copyWith(
-      pendingMessages: [...state.pendingMessages, optimisticMessage],
-      isSending: true,
-    );
+    state = state.copyWith(isSending: true);
 
     try {
+      // Send message - it's cached locally before broadcast,
+      // so it appears instantly via watchMessages
       await repository.sendMessage(
         recipientPubkey: peerPubkey,
         content: content.trim(),
         replyToEventId: replyToEventId,
       );
 
-      // Message sent successfully - remove the optimistic message
-      // (it will be replaced by the cached message from watchMessages)
-      state = state.copyWith(
-        pendingMessages: state.pendingMessages
-            .where((m) => m.id != tempId)
-            .toList(),
-        isSending: false,
-      );
+      state = state.copyWith(isSending: false);
       return true;
     } catch (e) {
       log('DM Thread: Error sending message: $e');
 
-      // Update the optimistic message to show failed status
-      final updatedPending = state.pendingMessages.map((m) {
-        if (m.id == tempId) {
-          return m.copyWith(sendStatus: MessageSendStatus.failed);
-        }
-        return m;
-      }).toList();
+      // Create a failed message for retry functionality
+      final now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
+      final failedMessage = DirectMessage(
+        id: 'failed-$now',
+        senderPubkey: myPubkey,
+        peerPubkey: peerPubkey,
+        content: content.trim(),
+        createdAt: now,
+        isOutgoing: true,
+        sendStatus: MessageSendStatus.failed,
+      );
 
       state = state.copyWith(
-        pendingMessages: updatedPending,
+        failedMessages: [...state.failedMessages, failedMessage],
         isSending: false,
         hasError: true,
         errorMessage: 'Failed to send message',
@@ -250,37 +216,32 @@ class DmThreadNotifier extends StateNotifier<DmThreadState> {
   }
 
   /// Retry sending a failed message
-  Future<bool> retrySendMessage(String tempMessageId) async {
-    final failedMessages = state.pendingMessages
-        .where(
-          (m) =>
-              m.id == tempMessageId && m.sendStatus == MessageSendStatus.failed,
-        )
-        .toList();
+  Future<bool> retrySendMessage(String messageId) async {
+    final message = state.failedMessages
+        .where((m) => m.id == messageId)
+        .firstOrNull;
 
-    if (failedMessages.isEmpty) {
-      log('DM Thread: Cannot retry - message not found or not failed');
+    if (message == null) {
+      log('DM Thread: Cannot retry - message not found');
       return false;
     }
 
-    final failedMessage = failedMessages.first;
-
-    // Remove the failed message from pending
+    // Remove the failed message
     state = state.copyWith(
-      pendingMessages: state.pendingMessages
-          .where((m) => m.id != tempMessageId)
+      failedMessages: state.failedMessages
+          .where((m) => m.id != messageId)
           .toList(),
     );
 
     // Resend the message
-    return sendMessage(failedMessage.content);
+    return sendMessage(message.content);
   }
 
-  /// Remove a failed message from the pending list
-  void removeFailedMessage(String tempMessageId) {
+  /// Remove a failed message from the list
+  void removeFailedMessage(String messageId) {
     state = state.copyWith(
-      pendingMessages: state.pendingMessages
-          .where((m) => m.id != tempMessageId)
+      failedMessages: state.failedMessages
+          .where((m) => m.id != messageId)
           .toList(),
     );
   }
@@ -321,22 +282,18 @@ class DmThreadNotifier extends StateNotifier<DmThreadState> {
     final repository = ref.read(dmRepositoryProvider);
     if (repository == null) return false;
 
-    // Optimistic update: remove from UI immediately
-    // Check if it's a pending message or a cached message
-    final isPendingMessage = state.pendingMessages.any(
-      (m) => m.id == messageId,
-    );
-    if (isPendingMessage) {
+    // Check if it's a failed message (not on relays)
+    final isFailedMessage = state.failedMessages.any((m) => m.id == messageId);
+    if (isFailedMessage) {
       state = state.copyWith(
-        pendingMessages: state.pendingMessages
+        failedMessages: state.failedMessages
             .where((m) => m.id != messageId)
             .toList(),
       );
-      return true; // Pending messages aren't on relays anyway
+      return true; // Failed messages aren't on relays
     }
 
-    // For cached messages, remove from the combined view via the cache stream
-    // The repository will handle the actual removal
+    // For cached messages, the repository will handle deletion
 
     try {
       final deletedFromRelays = await repository.deleteMessage(messageId);

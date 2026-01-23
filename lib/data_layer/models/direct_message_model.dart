@@ -17,6 +17,7 @@ class DirectMessageModel extends DirectMessage {
     required super.createdAt,
     required super.isOutgoing,
     super.tags,
+    super.sendStatus,
   });
 
   /// Create from ObjectBox database entity
@@ -41,6 +42,9 @@ class DirectMessageModel extends DirectMessage {
       createdAt: db.createdAt,
       isOutgoing: db.isOutgoing,
       tags: parsedTags,
+      sendStatus: db.sendStatus == 0
+          ? MessageSendStatus.pending
+          : MessageSendStatus.sent,
     );
   }
 
@@ -102,6 +106,7 @@ class DirectMessageModel extends DirectMessage {
       tags: tagsJson,
       replyToEventId: replyToEventId,
       isOutgoing: isOutgoing,
+      sendStatus: sendStatus == MessageSendStatus.pending ? 0 : 1,
     );
   }
 
@@ -115,6 +120,7 @@ class DirectMessageModel extends DirectMessage {
       createdAt: message.createdAt,
       isOutgoing: message.isOutgoing,
       tags: message.tags,
+      sendStatus: message.sendStatus,
     );
   }
 }

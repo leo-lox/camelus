@@ -126,8 +126,8 @@ class _DmMessageBubbleState extends State<DmMessageBubble> {
     final textColor = isFailed
         ? Theme.of(context).colorScheme.onErrorContainer.withValues(alpha: 0.7)
         : isOutgoing
-            ? Theme.of(context).colorScheme.onPrimary.withValues(alpha: 0.7)
-            : Theme.of(context).colorScheme.onSurfaceVariant;
+        ? Theme.of(context).colorScheme.onPrimary.withValues(alpha: 0.7)
+        : Theme.of(context).colorScheme.onSurfaceVariant;
 
     return Row(
       mainAxisSize: MainAxisSize.min,

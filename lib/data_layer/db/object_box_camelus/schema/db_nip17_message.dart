@@ -37,6 +37,10 @@ class DbNip17Message {
   /// Whether this message was sent by the current user
   bool isOutgoing = false;
 
+  /// Send status for outgoing messages (0 = pending, 1 = sent)
+  /// Only relevant for outgoing messages
+  int sendStatus = 1; // Default to sent
+
   DbNip17Message({
     this.eventId = '',
     this.senderPubkey = '',
@@ -46,5 +50,6 @@ class DbNip17Message {
     this.tags = '',
     this.replyToEventId,
     this.isOutgoing = false,
+    this.sendStatus = 1,
   });
 }

@@ -74,7 +74,7 @@
     },
     {
       "id": "9:5397343319776606099",
-      "lastPropertyId": "9:1722632928186673259",
+      "lastPropertyId": "10:7980053268206705210",
       "name": "DbNip17Message",
       "properties": [
         {
@@ -130,6 +130,11 @@
           "id": "9:1722632928186673259",
           "name": "isOutgoing",
           "type": 1
+        },
+        {
+          "id": "10:7980053268206705210",
+          "name": "sendStatus",
+          "type": 6
         }
       ],
       "relations": []

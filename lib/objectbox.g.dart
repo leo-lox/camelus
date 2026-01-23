@@ -101,7 +101,7 @@ final _entities = <obx_int.ModelEntity>[
   obx_int.ModelEntity(
     id: const obx_int.IdUid(9, 5397343319776606099),
     name: 'DbNip17Message',
-    lastPropertyId: const obx_int.IdUid(9, 1722632928186673259),
+    lastPropertyId: const obx_int.IdUid(10, 7980053268206705210),
     flags: 0,
     properties: <obx_int.ModelProperty>[
       obx_int.ModelProperty(
@@ -160,6 +160,12 @@ final _entities = <obx_int.ModelEntity>[
         id: const obx_int.IdUid(9, 1722632928186673259),
         name: 'isOutgoing',
         type: 1,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(10, 7980053268206705210),
+        name: 'sendStatus',
+        type: 6,
         flags: 0,
       ),
     ],
@@ -389,7 +395,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
         final replyToEventIdOffset = object.replyToEventId == null
             ? null
             : fbb.writeString(object.replyToEventId!);
-        fbb.startTable(10);
+        fbb.startTable(11);
         fbb.addInt64(0, object.dbId);
         fbb.addOffset(1, eventIdOffset);
         fbb.addOffset(2, senderPubkeyOffset);
@@ -399,6 +405,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
         fbb.addOffset(6, tagsOffset);
         fbb.addOffset(7, replyToEventIdOffset);
         fbb.addBool(8, object.isOutgoing);
+        fbb.addInt64(9, object.sendStatus);
         fbb.finish(fbb.endTable());
         return object.dbId;
       },
@@ -435,6 +442,12 @@ obx_int.ModelDefinition getObjectBoxModel() {
           20,
           false,
         );
+        final sendStatusParam = const fb.Int64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          22,
+          0,
+        );
         final object = DbNip17Message(
           eventId: eventIdParam,
           senderPubkey: senderPubkeyParam,
@@ -444,6 +457,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
           tags: tagsParam,
           replyToEventId: replyToEventIdParam,
           isOutgoing: isOutgoingParam,
+          sendStatus: sendStatusParam,
         )..dbId = const fb.Int64Reader().vTableGet(buffer, rootOffset, 4, 0);
 
         return object;
@@ -548,5 +562,10 @@ class DbNip17Message_ {
   /// See [DbNip17Message.isOutgoing].
   static final isOutgoing = obx.QueryBooleanProperty<DbNip17Message>(
     _entities[2].properties[8],
+  );
+
+  /// See [DbNip17Message.sendStatus].
+  static final sendStatus = obx.QueryIntegerProperty<DbNip17Message>(
+    _entities[2].properties[9],
   );
 }

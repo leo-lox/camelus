@@ -49,7 +49,8 @@ abstract class DirectMessageRepository {
   // ============ Sending ============
 
   /// Send a direct message to a recipient (1:1)
-  Future<void> sendMessage({
+  /// Returns the created message with its real Nostr event ID
+  Future<DirectMessage> sendMessage({
     required String recipientPubkey,
     required String content,
     String? replyToEventId,

@@ -572,7 +572,7 @@ class DirectMessageRepositoryImpl implements DirectMessageRepository {
   // ============ Sending ============
 
   @override
-  Future<void> sendMessage({
+  Future<DirectMessage> sendMessage({
     required String recipientPubkey,
     required String content,
     String? replyToEventId,
@@ -616,7 +616,30 @@ class DirectMessageRepositoryImpl implements DirectMessageRepository {
               recipientPubkey: myPubkey,
             );
 
-      // 3. Get DM relays for both recipient and ourselves
+      // 3. Cache locally IMMEDIATELY with pending status so it appears in UI
+      final localMessage = DirectMessageModel(
+        id: selfGiftWrap.id,
+        senderPubkey: myPubkey,
+        peerPubkey: recipientPubkey,
+        content: content,
+        createdAt: now,
+        isOutgoing: true,
+        tags: tags
+            .map(
+              (t) => NostrTagModel(type: t[0], value: t.length > 1 ? t[1] : ''),
+            )
+            .toList(),
+        sendStatus: MessageSendStatus.pending,
+      );
+
+      await cacheDecryptedMessage(localMessage);
+      await _updateConversation(localMessage, incrementUnread: false);
+      _notifyMessagesChanged(recipientPubkey);
+      _notifyConversationsChanged();
+
+      log('DM: Message cached as pending, now broadcasting...');
+
+      // 4. Get DM relays (network operation)
       final recipientRelays = await _getDmInboxRelays(recipientPubkey);
       final myRelays = isSelfMessage
           ? recipientRelays
@@ -631,14 +654,12 @@ class DirectMessageRepositoryImpl implements DirectMessageRepository {
         );
       }
 
-      // 4. Broadcast gift wraps
-      // Broadcast to recipient's relays
+      // 5. Broadcast gift wraps
       ndk.broadcast.broadcast(
         nostrEvent: recipientGiftWrap,
         specificRelays: recipientRelays.isNotEmpty ? recipientRelays : null,
       );
 
-      // Broadcast to our own relays (skip if self message - already sent above)
       if (!isSelfMessage) {
         ndk.broadcast.broadcast(
           nostrEvent: selfGiftWrap,
@@ -646,27 +667,17 @@ class DirectMessageRepositoryImpl implements DirectMessageRepository {
         );
       }
 
-      // 5. Cache locally so we see it immediately
-      final localMessage = DirectMessageModel(
-        id: selfGiftWrap.id,
-        senderPubkey: myPubkey,
-        peerPubkey: recipientPubkey,
-        content: content,
-        createdAt: now,
-        isOutgoing: true,
-        tags: tags
-            .map(
-              (t) => NostrTagModel(type: t[0], value: t.length > 1 ? t[1] : ''),
-            )
-            .toList(),
+      // 6. Update message status to sent
+      final sentMessage = localMessage.copyWith(
+        sendStatus: MessageSendStatus.sent,
       );
 
-      await cacheDecryptedMessage(localMessage);
-      await _updateConversation(localMessage, incrementUnread: false);
+      await cacheDecryptedMessage(sentMessage);
       _notifyMessagesChanged(recipientPubkey);
-      _notifyConversationsChanged();
 
       log('DM: Message sent successfully');
+
+      return sentMessage;
     } catch (e) {
       log('DM: Error sending message: $e');
       rethrow;
@@ -699,10 +710,15 @@ class DirectMessageRepositoryImpl implements DirectMessageRepository {
     final existing = query.findFirst();
     query.close();
 
-    if (existing != null) return;
-
     final model = DirectMessageModel.fromEntity(message);
-    box.put(model.toDb());
+    final dbMessage = model.toDb();
+
+    if (existing != null) {
+      // Update existing message (preserve dbId for ObjectBox)
+      dbMessage.dbId = existing.dbId;
+    }
+
+    box.put(dbMessage);
   }
 
   /// Update or create conversation record
