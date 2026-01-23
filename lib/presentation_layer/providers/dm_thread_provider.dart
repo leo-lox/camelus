@@ -6,17 +6,13 @@ import 'package:flutter_riverpod/legacy.dart';
 
 import '../../domain_layer/entities/direct_message.dart';
 import 'dm_repository_provider.dart';
-import 'ndk_provider.dart';
 
 /// State for a DM thread (conversation with one peer)
 class DmThreadState {
   final String peerPubkey;
 
-  /// Messages from the cache (confirmed sent/received)
+  /// Messages from the cache (includes pending, sent, and failed)
   final List<DirectMessage> _cachedMessages;
-
-  /// Messages that failed to send (for retry functionality)
-  final List<DirectMessage> _failedMessages;
 
   final bool isLoading;
   final bool isLoadingOlder;
@@ -28,30 +24,29 @@ class DmThreadState {
   const DmThreadState({
     required this.peerPubkey,
     List<DirectMessage> cachedMessages = const [],
-    List<DirectMessage> failedMessages = const [],
     this.isLoading = false,
     this.isLoadingOlder = false,
     this.hasReachedBeginning = false,
     this.isSending = false,
     this.hasError = false,
     this.errorMessage,
-  }) : _cachedMessages = cachedMessages,
-       _failedMessages = failedMessages;
+  }) : _cachedMessages = cachedMessages;
 
-  /// Combined messages: cached + failed, sorted by createdAt
+  /// All messages sorted by createdAt
   List<DirectMessage> get messages {
-    final combined = [..._cachedMessages, ..._failedMessages];
-    combined.sort((a, b) => a.createdAt.compareTo(b.createdAt));
-    return combined;
+    final sorted = [..._cachedMessages];
+    sorted.sort((a, b) => a.createdAt.compareTo(b.createdAt));
+    return sorted;
   }
 
-  /// Access to failed messages for retry functionality
-  List<DirectMessage> get failedMessages => _failedMessages;
+  /// Failed messages for retry functionality
+  List<DirectMessage> get failedMessages => _cachedMessages
+      .where((m) => m.sendStatus == MessageSendStatus.failed)
+      .toList();
 
   DmThreadState copyWith({
     String? peerPubkey,
     List<DirectMessage>? cachedMessages,
-    List<DirectMessage>? failedMessages,
     bool? isLoading,
     bool? isLoadingOlder,
     bool? hasReachedBeginning,
@@ -62,7 +57,6 @@ class DmThreadState {
     return DmThreadState(
       peerPubkey: peerPubkey ?? this.peerPubkey,
       cachedMessages: cachedMessages ?? _cachedMessages,
-      failedMessages: failedMessages ?? _failedMessages,
       isLoading: isLoading ?? this.isLoading,
       isLoadingOlder: isLoadingOlder ?? this.isLoadingOlder,
       hasReachedBeginning: hasReachedBeginning ?? this.hasReachedBeginning,
@@ -173,10 +167,6 @@ class DmThreadNotifier extends StateNotifier<DmThreadState> {
     final repository = ref.read(dmRepositoryProvider);
     if (repository == null) return false;
 
-    final ndk = ref.read(ndkProvider);
-    final myPubkey = ndk.accounts.getPublicKey();
-    if (myPubkey == null) return false;
-
     state = state.copyWith(isSending: true);
 
     try {
@@ -192,21 +182,9 @@ class DmThreadNotifier extends StateNotifier<DmThreadState> {
       return true;
     } catch (e) {
       log('DM Thread: Error sending message: $e');
-
-      // Create a failed message for retry functionality
-      final now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
-      final failedMessage = DirectMessage(
-        id: 'failed-$now',
-        senderPubkey: myPubkey,
-        peerPubkey: peerPubkey,
-        content: content.trim(),
-        createdAt: now,
-        isOutgoing: true,
-        sendStatus: MessageSendStatus.failed,
-      );
-
+      // Failed messages are saved to DB by repository with sendStatus: failed
+      // They will appear via watchMessages
       state = state.copyWith(
-        failedMessages: [...state.failedMessages, failedMessage],
         isSending: false,
         hasError: true,
         errorMessage: 'Failed to send message',
@@ -226,24 +204,26 @@ class DmThreadNotifier extends StateNotifier<DmThreadState> {
       return false;
     }
 
-    // Remove the failed message
-    state = state.copyWith(
-      failedMessages: state.failedMessages
-          .where((m) => m.id != messageId)
-          .toList(),
-    );
+    final repository = ref.read(dmRepositoryProvider);
+    if (repository == null) return false;
 
-    // Resend the message
-    return sendMessage(message.content);
+    // Resend the message first
+    final success = await sendMessage(message.content);
+
+    // Only delete the old failed message if retry succeeded
+    if (success) {
+      await repository.deleteMessage(messageId);
+    }
+
+    return success;
   }
 
-  /// Remove a failed message from the list
-  void removeFailedMessage(String messageId) {
-    state = state.copyWith(
-      failedMessages: state.failedMessages
-          .where((m) => m.id != messageId)
-          .toList(),
-    );
+  /// Remove a failed message
+  Future<void> removeFailedMessage(String messageId) async {
+    final repository = ref.read(dmRepositoryProvider);
+    if (repository == null) return;
+
+    await repository.deleteMessage(messageId);
   }
 
   /// Mark conversation as read (call when entering the thread)
@@ -275,42 +255,30 @@ class DmThreadNotifier extends StateNotifier<DmThreadState> {
     }
   }
 
-  /// Delete a message (optimistic UI)
+  /// Delete a message
   /// Returns true if deleted from relays, false if only deleted locally
-  /// (relays may not support deletion)
   Future<bool> deleteMessage(String messageId) async {
     final repository = ref.read(dmRepositoryProvider);
     if (repository == null) return false;
 
-    // Check if it's a failed message (not on relays)
+    // Check if it's a failed message (not on relays yet)
     final isFailedMessage = state.failedMessages.any((m) => m.id == messageId);
-    if (isFailedMessage) {
-      state = state.copyWith(
-        failedMessages: state.failedMessages
-            .where((m) => m.id != messageId)
-            .toList(),
-      );
-      return true; // Failed messages aren't on relays
-    }
-
-    // For cached messages, the repository will handle deletion
 
     try {
       final deletedFromRelays = await repository.deleteMessage(messageId);
+      if (isFailedMessage) {
+        return true; // Failed messages weren't on relays
+      }
       if (deletedFromRelays) {
         log('DM Thread: Message deleted from relays successfully');
       } else {
-        // Message deleted locally but relays may not support deletion
-        // Don't restore - it's gone from local cache
         log(
-          'DM Thread: Message deleted locally, but relays may not support deletion',
+          'DM Thread: Message deleted locally, relays may not support deletion',
         );
       }
       return deletedFromRelays;
     } catch (e) {
       log('DM Thread: Error deleting message: $e');
-      // On error, message is still removed from local cache by repository
-      // Don't restore since it may cause inconsistency
       return false;
     }
   }
