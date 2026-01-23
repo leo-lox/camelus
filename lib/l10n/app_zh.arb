@@ -419,5 +419,6 @@
   "dmRequests": "请求",
   "noFollowsConversations": "没有与关注用户的对话",
   "noKnownConversations": "没有与已知联系人的对话",
-  "noMessageRequests": "没有消息请求"
+  "noMessageRequests": "没有消息请求",
+  "failed": "失败"
 }

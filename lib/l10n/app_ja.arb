@@ -419,5 +419,6 @@
   "dmRequests": "リクエスト",
   "noFollowsConversations": "フォローしている人との会話はありません",
   "noKnownConversations": "既知の連絡先との会話はありません",
-  "noMessageRequests": "メッセージリクエストはありません"
+  "noMessageRequests": "メッセージリクエストはありません",
+  "failed": "失敗"
 }

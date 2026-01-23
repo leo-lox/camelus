@@ -390,6 +390,7 @@
   "newMessage": "Nouveau message",
   "failedToLoadMessages": "Échec du chargement des messages",
   "retry": "Réessayer",
+  "failed": "Échec",
   "noMessagesYet": "Aucun message",
   "startConversationHint": "Démarrez une conversation en appuyant sur l'icône crayon",
   "newMessageDialogTitle": "Nouveau message",

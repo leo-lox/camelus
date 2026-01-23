@@ -1,5 +1,17 @@
 import 'nostr_tag.dart';
 
+/// Status of message sending
+enum MessageSendStatus {
+  /// Message is being sent
+  pending,
+
+  /// Message was sent successfully
+  sent,
+
+  /// Message failed to send
+  failed,
+}
+
 /// Domain entity representing a NIP-17 direct message.
 ///
 /// This represents the decrypted content of a gift-wrapped message (kind 1059).
@@ -27,6 +39,9 @@ class DirectMessage {
   /// Tags from the rumor (for reply references, etc.)
   final List<NostrTag> tags;
 
+  /// Status of message sending (for optimistic UI updates)
+  final MessageSendStatus sendStatus;
+
   DirectMessage({
     required this.id,
     required this.senderPubkey,
@@ -35,7 +50,31 @@ class DirectMessage {
     required this.createdAt,
     required this.isOutgoing,
     this.tags = const [],
+    this.sendStatus = MessageSendStatus.sent,
   });
+
+  /// Create a copy of this message with updated fields
+  DirectMessage copyWith({
+    String? id,
+    String? senderPubkey,
+    String? peerPubkey,
+    String? content,
+    int? createdAt,
+    bool? isOutgoing,
+    List<NostrTag>? tags,
+    MessageSendStatus? sendStatus,
+  }) {
+    return DirectMessage(
+      id: id ?? this.id,
+      senderPubkey: senderPubkey ?? this.senderPubkey,
+      peerPubkey: peerPubkey ?? this.peerPubkey,
+      content: content ?? this.content,
+      createdAt: createdAt ?? this.createdAt,
+      isOutgoing: isOutgoing ?? this.isOutgoing,
+      tags: tags ?? this.tags,
+      sendStatus: sendStatus ?? this.sendStatus,
+    );
+  }
 
   /// Get the event ID this message is replying to, if any
   String? get replyToEventId {

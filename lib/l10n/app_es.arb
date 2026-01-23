@@ -391,6 +391,7 @@
   "newMessage": "Nuevo mensaje",
   "failedToLoadMessages": "Error al cargar los mensajes",
   "retry": "Reintentar",
+  "failed": "Error",
   "noMessagesYet": "Aún no hay mensajes",
   "startConversationHint": "Inicia una conversación tocando el ícono del lápiz",
   "newMessageDialogTitle": "Nuevo mensaje",

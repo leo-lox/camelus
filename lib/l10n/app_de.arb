@@ -388,6 +388,7 @@
   "newMessage": "Neue Nachricht",
   "failedToLoadMessages": "Nachrichten konnten nicht geladen werden",
   "retry": "Erneut versuchen",
+  "failed": "Fehlgeschlagen",
   "noMessagesYet": "Noch keine Nachrichten",
   "startConversationHint": "Starten Sie eine Unterhaltung, indem Sie auf das Stift-Symbol tippen",
   "newMessageDialogTitle": "Neue Nachricht",

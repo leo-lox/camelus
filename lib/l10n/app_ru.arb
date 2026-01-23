@@ -419,5 +419,6 @@
   "dmRequests": "Запросы",
   "noFollowsConversations": "Нет разговоров с людьми, на которых вы подписаны",
   "noKnownConversations": "Нет разговоров с известными контактами",
-  "noMessageRequests": "Нет запросов на сообщения"
+  "noMessageRequests": "Нет запросов на сообщения",
+  "failed": "Ошибка"
 }

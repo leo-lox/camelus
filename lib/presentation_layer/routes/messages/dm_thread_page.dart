@@ -214,11 +214,18 @@ class _DmThreadPageState extends ConsumerState<DmThreadPage> {
           return DmDateSeparator(timestamp: item);
         } else {
           // Message
+          final message = item as DirectMessage;
           return DmMessageBubble(
-            message: item as DirectMessage,
+            message: message,
             onDelete: (messageId) => ref
                 .read(dmThreadProvider(_peerPubkey).notifier)
                 .deleteMessage(messageId),
+            onRetry: (messageId) => ref
+                .read(dmThreadProvider(_peerPubkey).notifier)
+                .retrySendMessage(messageId),
+            onRemoveFailedMessage: (messageId) => ref
+                .read(dmThreadProvider(_peerPubkey).notifier)
+                .removeFailedMessage(messageId),
           );
         }
       }, childCount: totalCount),
@@ -449,20 +456,11 @@ class _DmThreadPageState extends ConsumerState<DmThreadPage> {
           ),
           const SizedBox(width: 8),
           IconButton(
-            onPressed: state.isSending ? null : _sendMessage,
-            icon: state.isSending
-                ? SizedBox(
-                    width: 24,
-                    height: 24,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
-                  )
-                : Icon(
-                    PhosphorIcons.paperPlaneTilt(PhosphorIconsStyle.fill),
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
+            onPressed: _sendMessage,
+            icon: Icon(
+              PhosphorIcons.paperPlaneTilt(PhosphorIconsStyle.fill),
+              color: Theme.of(context).colorScheme.primary,
+            ),
           ),
         ],
       ),
@@ -475,17 +473,8 @@ class _DmThreadPageState extends ConsumerState<DmThreadPage> {
 
     _messageController.clear();
 
-    final success = await ref
-        .read(dmThreadProvider(_peerPubkey).notifier)
-        .sendMessage(content);
-
-    if (!success && mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(AppLocalizations.of(context)!.failedToSendMessage),
-          backgroundColor: Colors.red,
-        ),
-      );
-    }
+    // Message is added optimistically, no need to wait for result
+    // or show error snackbar - error will be shown in the message bubble
+    ref.read(dmThreadProvider(_peerPubkey).notifier).sendMessage(content);
   }
 }

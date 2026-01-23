@@ -390,6 +390,7 @@
   "newMessage": "Nova mensagem",
   "failedToLoadMessages": "Falha ao carregar mensagens",
   "retry": "Tentar novamente",
+  "failed": "Falhou",
   "noMessagesYet": "Nenhuma mensagem ainda",
   "startConversationHint": "Inicie uma conversa tocando no ícone do lápis",
   "newMessageDialogTitle": "Nova mensagem",

@@ -1395,6 +1395,10 @@
   "@retry": {
     "description": "Retry button label"
   },
+  "failed": "Failed",
+  "@failed": {
+    "description": "Status text when message failed to send"
+  },
   "noMessagesYet": "No messages yet",
   "@noMessagesYet": {
     "description": "Empty state title for messages"

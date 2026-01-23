@@ -11,12 +11,16 @@ class DmMessageBubble extends StatefulWidget {
   final DirectMessage message;
   final bool showTimestamp;
   final Future<bool> Function(String messageId)? onDelete;
+  final Future<bool> Function(String messageId)? onRetry;
+  final void Function(String messageId)? onRemoveFailedMessage;
 
   const DmMessageBubble({
     super.key,
     required this.message,
     this.showTimestamp = true,
     this.onDelete,
+    this.onRetry,
+    this.onRemoveFailedMessage,
   });
 
   @override
@@ -29,6 +33,7 @@ class _DmMessageBubbleState extends State<DmMessageBubble> {
   @override
   Widget build(BuildContext context) {
     final isOutgoing = widget.message.isOutgoing;
+    final isFailed = widget.message.sendStatus == MessageSendStatus.failed;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
@@ -42,14 +47,19 @@ class _DmMessageBubbleState extends State<DmMessageBubble> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             // Delete button before message (for outgoing only)
-            if (isOutgoing && _isHovered) ...[
+            if (isOutgoing && _isHovered && !isFailed) ...[
               _buildDeleteButton(context),
               const SizedBox(width: 8),
-            ] else if (isOutgoing)
+            ] else if (isOutgoing && !isFailed)
               const SizedBox(width: 40),
+            // Failed message actions
+            if (isFailed && isOutgoing) ...[
+              _buildFailedMessageActions(context),
+              const SizedBox(width: 8),
+            ],
             Flexible(
               child: GestureDetector(
-                onLongPress: () => _showMessageMenu(context),
+                onLongPress: isFailed ? null : () => _showMessageMenu(context),
                 child: Container(
                   constraints: BoxConstraints(
                     maxWidth: MediaQuery.of(context).size.width * 0.75,
@@ -59,7 +69,9 @@ class _DmMessageBubbleState extends State<DmMessageBubble> {
                     vertical: 10,
                   ),
                   decoration: BoxDecoration(
-                    color: isOutgoing
+                    color: isFailed
+                        ? Theme.of(context).colorScheme.errorContainer
+                        : isOutgoing
                         ? Theme.of(context).colorScheme.primary
                         : Theme.of(context).colorScheme.surfaceContainerHighest,
                     borderRadius: BorderRadius.only(
@@ -75,7 +87,9 @@ class _DmMessageBubbleState extends State<DmMessageBubble> {
                       SelectableText(
                         widget.message.content,
                         style: TextStyle(
-                          color: isOutgoing
+                          color: isFailed
+                              ? Theme.of(context).colorScheme.onErrorContainer
+                              : isOutgoing
                               ? Theme.of(context).colorScheme.onPrimary
                               : Theme.of(context).colorScheme.onSurface,
                           fontSize: 15,
@@ -83,31 +97,14 @@ class _DmMessageBubbleState extends State<DmMessageBubble> {
                       ),
                       if (widget.showTimestamp) ...[
                         const SizedBox(height: 4),
-                        Tooltip(
-                          message: _formatExactTime(
-                            context,
-                            widget.message.createdAt,
-                          ),
-                          child: Text(
-                            _formatTime(context, widget.message.createdAt),
-                            style: TextStyle(
-                              color: isOutgoing
-                                  ? Theme.of(context).colorScheme.onPrimary
-                                        .withValues(alpha: 0.7)
-                                  : Theme.of(
-                                      context,
-                                    ).colorScheme.onSurfaceVariant,
-                              fontSize: 11,
-                            ),
-                          ),
-                        ),
+                        _buildStatusRow(context),
                       ],
                     ],
                   ),
                 ),
               ),
             ),
-            if (isOutgoing) const SizedBox(width: 8),
+            if (isOutgoing && !isFailed) const SizedBox(width: 8),
             // Delete button after message (for incoming)
             if (!isOutgoing && _isHovered) ...[
               const SizedBox(width: 8),
@@ -117,6 +114,87 @@ class _DmMessageBubbleState extends State<DmMessageBubble> {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildStatusRow(BuildContext context) {
+    final isOutgoing = widget.message.isOutgoing;
+    final sendStatus = widget.message.sendStatus;
+    final isFailed = sendStatus == MessageSendStatus.failed;
+    final isSent = sendStatus == MessageSendStatus.sent;
+
+    final textColor = isFailed
+        ? Theme.of(context).colorScheme.onErrorContainer.withValues(alpha: 0.7)
+        : isOutgoing
+            ? Theme.of(context).colorScheme.onPrimary.withValues(alpha: 0.7)
+            : Theme.of(context).colorScheme.onSurfaceVariant;
+
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        if (isFailed) ...[
+          Icon(
+            Icons.error_outline,
+            size: 12,
+            color: Theme.of(context).colorScheme.error,
+          ),
+          const SizedBox(width: 4),
+        ],
+        Tooltip(
+          message: _formatExactTime(context, widget.message.createdAt),
+          child: Text(
+            isFailed
+                ? AppLocalizations.of(context)!.failed
+                : _formatTime(context, widget.message.createdAt),
+            style: TextStyle(
+              color: isFailed ? Theme.of(context).colorScheme.error : textColor,
+              fontSize: 11,
+            ),
+          ),
+        ),
+        // Reserve space for check mark on outgoing messages
+        if (isOutgoing && !isFailed) ...[
+          const SizedBox(width: 4),
+          Icon(
+            Icons.check,
+            size: 12,
+            color: isSent ? textColor : Colors.transparent,
+          ),
+        ],
+      ],
+    );
+  }
+
+  Widget _buildFailedMessageActions(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        IconButton(
+          onPressed: () => widget.onRetry?.call(widget.message.id),
+          icon: Icon(
+            Icons.refresh,
+            size: 18,
+            color: Theme.of(context).colorScheme.primary,
+          ),
+          padding: EdgeInsets.zero,
+          constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+          splashRadius: 16,
+          tooltip: AppLocalizations.of(context)!.retry,
+        ),
+        IconButton(
+          onPressed: () =>
+              widget.onRemoveFailedMessage?.call(widget.message.id),
+          icon: Icon(
+            Icons.close,
+            size: 18,
+            color: Theme.of(context).colorScheme.error,
+          ),
+          padding: EdgeInsets.zero,
+          constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+          splashRadius: 16,
+          tooltip: AppLocalizations.of(context)!.delete,
+        ),
+      ],
     );
   }
 
