@@ -47,18 +47,27 @@ class DirectMessageRepositoryImpl implements DirectMessageRepository {
 
   /// Get DM inbox relays for a pubkey.
   /// First tries kind 10050 (DM-specific relays), then falls back to NIP-65 inbox relays.
+  /// Reads from cache first for speed, refreshes cache in background.
   Future<List<String>> _getDmInboxRelays(String pubkey) async {
-    // Wait for seed relays to be connected before making requests
+    // Try cache first (fast)
+    final cachedRelays = await _getDmInboxRelaysFromCache(pubkey);
+    if (cachedRelays.isNotEmpty) {
+      log('DM: Using cached relays for $pubkey: $cachedRelays');
+      // Refresh cache in background for next time
+      _refreshDmRelaysInBackground(pubkey);
+      return cachedRelays;
+    }
+
+    // Cache miss: fetch from network
+    log('DM: Cache miss, fetching relays for $pubkey');
     await ndk.relays.seedRelaysConnected;
 
-    // First, try to get kind 10050 (DM relay list)
     final dmRelays = await _fetchKind10050Relays(pubkey);
     if (dmRelays.isNotEmpty) {
       log('DM: Using kind 10050 relays for $pubkey: $dmRelays');
       return dmRelays;
     }
 
-    // Fall back to NIP-65 inbox relays
     final nip65Relays = await _getNip65InboxRelays(pubkey);
     if (nip65Relays.isNotEmpty) {
       log('DM: Using NIP-65 inbox relays for $pubkey: $nip65Relays');
@@ -67,6 +76,44 @@ class DirectMessageRepositoryImpl implements DirectMessageRepository {
 
     log('DM: No DM relays found for $pubkey, using default relays');
     return [];
+  }
+
+  /// Get DM relays from cache only (no network).
+  Future<List<String>> _getDmInboxRelaysFromCache(String pubkey) async {
+    // Try kind 10050 from cache
+    final events = await ndk.config.cache.loadEvents(
+      kinds: [kDmRelayListKind],
+      pubKeys: [pubkey],
+      limit: 1,
+    );
+    if (events.isNotEmpty) {
+      final relays = <String>[];
+      for (final tag in events.first.tags) {
+        if (tag.isNotEmpty && tag[0] == 'relay' && tag.length > 1) {
+          relays.add(tag[1]);
+        }
+      }
+      if (relays.isNotEmpty) return relays;
+    }
+
+    // Try NIP-65 from cache
+    final userRelayList = await ndk.config.cache.loadUserRelayList(pubkey);
+    if (userRelayList != null) {
+      return userRelayList.readUrls.toList();
+    }
+
+    return [];
+  }
+
+  /// Refresh DM relays cache in background (fire and forget).
+  void _refreshDmRelaysInBackground(String pubkey) {
+    Future(() async {
+      try {
+        await ndk.relays.seedRelaysConnected;
+        await _fetchKind10050Relays(pubkey);
+        await _getNip65InboxRelays(pubkey);
+      } catch (_) {}
+    });
   }
 
   /// Fetch kind 10050 (DM relay list) for a pubkey.
