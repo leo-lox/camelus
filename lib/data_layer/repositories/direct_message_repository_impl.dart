@@ -671,11 +671,7 @@ class DirectMessageRepositoryImpl implements DirectMessageRepository {
         content: content,
         createdAt: now,
         isOutgoing: true,
-        tags: tags
-            .map(
-              (t) => NostrTagModel(type: t[0], value: t.length > 1 ? t[1] : ''),
-            )
-            .toList(),
+        tags: tags.map((t) => NostrTagModel.fromJson(t)).toList(),
         sendStatus: MessageSendStatus.pending,
       );
 
