@@ -2,9 +2,9 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
-import '../../../config/palette.dart';
 import '../../../domain_layer/entities/nostr_list.dart';
 import '../../../domain_layer/entities/starter_pack_identifier.dart';
 import '../../../helpers/helpers.dart';
@@ -36,18 +36,20 @@ class _StarterPackSelectionBottomSheetState
 
   @override
   Widget build(BuildContext context) {
-    final followSetsList =
-        ref.watch(nostrListsFollowStateProvider(widget.currentUserPubkey));
+    final followSetsList = ref.watch(
+      nostrListsFollowStateProvider(widget.currentUserPubkey),
+    );
 
-    final userToAddMetadata =
-        ref.watch(metadataStateProvider(widget.userPubkey)).userMetadata;
+    final userToAddMetadata = ref
+        .watch(metadataStateProvider(widget.userPubkey))
+        .userMetadata;
 
     return BackdropFilter(
       filter: ImageFilter.blur(sigmaX: 2, sigmaY: 2),
       child: Container(
         padding: const EdgeInsets.all(20),
-        decoration: const BoxDecoration(
-          color: Palette.background,
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
         ),
         child: Column(
@@ -58,7 +60,7 @@ class _StarterPackSelectionBottomSheetState
             Text(
               'Add ${userToAddMetadata?.name ?? ""} to Starter Pack',
               style: TextStyle(
-                color: Palette.lightGray,
+                color: Theme.of(context).colorScheme.inverseSurface,
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
               ),
@@ -77,19 +79,19 @@ class _StarterPackSelectionBottomSheetState
       width: 40,
       height: 4,
       decoration: BoxDecoration(
-        color: Palette.gray,
+        color: Theme.of(context).colorScheme.inverseSurface,
         borderRadius: BorderRadius.circular(2),
       ),
     );
   }
 
-  Widget _buildContent(BuildContext context, WidgetRef ref,
-      NostrListsFollowState followSetsList) {
+  Widget _buildContent(
+    BuildContext context,
+    WidgetRef ref,
+    NostrListsFollowState followSetsList,
+  ) {
     if (followSetsList.isLoading) {
-      return const Padding(
-        padding: EdgeInsets.all(40),
-        child: SpinnerCenter(),
-      );
+      return const Padding(padding: EdgeInsets.all(40), child: SpinnerCenter());
     }
 
     if (followSetsList.publicNostrFollowSets.isEmpty) {
@@ -102,7 +104,8 @@ class _StarterPackSelectionBottomSheetState
       ),
       child: ListView.builder(
         shrinkWrap: true,
-        itemCount: followSetsList.publicNostrFollowSets.length +
+        itemCount:
+            followSetsList.publicNostrFollowSets.length +
             1, // +1 for create new option
         itemBuilder: (context, index) {
           if (index == followSetsList.publicNostrFollowSets.length) {
@@ -123,13 +126,13 @@ class _StarterPackSelectionBottomSheetState
         Icon(
           PhosphorIcons.listPlus(),
           size: 30,
-          color: Palette.gray,
+          color: Theme.of(context).colorScheme.inverseSurface,
         ),
         const SizedBox(height: 16),
         Text(
           'No starter packs found',
           style: TextStyle(
-            color: Palette.lightGray,
+            color: Theme.of(context).colorScheme.inverseSurface,
             fontSize: 16,
           ),
         ),
@@ -140,10 +143,14 @@ class _StarterPackSelectionBottomSheetState
   }
 
   Widget _buildPackOption(
-      BuildContext context, WidgetRef ref, NostrStarterPack pack) {
+    BuildContext context,
+    WidgetRef ref,
+    NostrStarterPack pack,
+  ) {
     final isLoading = _loadingPacks.contains(pack.name);
-    final isUserInPack =
-        pack.elements.any((element) => element.value == widget.userPubkey);
+    final isUserInPack = pack.elements.any(
+      (element) => element.value == widget.userPubkey,
+    );
     final wasJustAdded = _successPacks.contains(pack.name);
     final showCheck = isUserInPack || wasJustAdded;
 
@@ -162,7 +169,7 @@ class _StarterPackSelectionBottomSheetState
               children: [
                 Icon(
                   PhosphorIcons.users(),
-                  color: Palette.gray,
+                  color: Theme.of(context).colorScheme.inverseSurface,
                   size: 20,
                 ),
                 const SizedBox(width: 16),
@@ -173,7 +180,9 @@ class _StarterPackSelectionBottomSheetState
                       Text(
                         pack.title ?? pack.name,
                         style: TextStyle(
-                          color: showCheck ? Palette.gray : Palette.lightGray,
+                          color: showCheck
+                              ? Theme.of(context).colorScheme.inverseSurface
+                              : Theme.of(context).colorScheme.inverseSurface,
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
                         ),
@@ -182,7 +191,7 @@ class _StarterPackSelectionBottomSheetState
                         Text(
                           '${pack.elements.length} members',
                           style: TextStyle(
-                            color: Palette.gray,
+                            color: Theme.of(context).colorScheme.inverseSurface,
                             fontSize: 12,
                           ),
                         ),
@@ -203,24 +212,23 @@ class _StarterPackSelectionBottomSheetState
       return SizedBox(
         width: 16,
         height: 16,
-        child: CircularProgressIndicator(
-          strokeWidth: 2,
-          valueColor: AlwaysStoppedAnimation<Color>(Palette.gray),
-        ),
+        child: CircularProgressIndicator(strokeWidth: 2),
       );
     }
 
     if (showCheck) {
       return Icon(
         PhosphorIcons.check(),
-        color: wasJustAdded ? Palette.primary : Palette.gray,
+        color: wasJustAdded
+            ? Theme.of(context).colorScheme.primary
+            : Theme.of(context).colorScheme.inverseSurface,
         size: 16,
       );
     }
 
     return Icon(
       PhosphorIcons.plus(),
-      color: Palette.gray,
+      color: Theme.of(context).colorScheme.inverseSurface,
       size: 16,
     );
   }
@@ -236,14 +244,18 @@ class _StarterPackSelectionBottomSheetState
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: BoxDecoration(
-              border: Border.all(color: Palette.gray.withValues(alpha: 0.3)),
+              border: Border.all(
+                color: Theme.of(
+                  context,
+                ).colorScheme.inverseSurface.withValues(alpha: 0.3),
+              ),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Row(
               children: [
                 Icon(
                   PhosphorIcons.plus(),
-                  color: Palette.gray,
+                  color: Theme.of(context).colorScheme.inverseSurface,
                   size: 20,
                 ),
                 const SizedBox(width: 16),
@@ -251,7 +263,7 @@ class _StarterPackSelectionBottomSheetState
                   child: Text(
                     'Create new starter pack',
                     style: TextStyle(
-                      color: Palette.lightGray,
+                      color: Theme.of(context).colorScheme.inverseSurface,
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
                     ),
@@ -266,7 +278,10 @@ class _StarterPackSelectionBottomSheetState
   }
 
   void _addUserToPack(
-      BuildContext context, WidgetRef ref, NostrStarterPack pack) async {
+    BuildContext context,
+    WidgetRef ref,
+    NostrStarterPack pack,
+  ) async {
     // Set loading state
     setState(() {
       _loadingPacks.add(pack.name);
@@ -275,7 +290,9 @@ class _StarterPackSelectionBottomSheetState
     try {
       final listsP = ref.read(nostrListProvider);
       await listsP.addUserToStarterPack(
-          name: pack.name, pubkey: widget.userPubkey);
+        name: pack.name,
+        pubkey: widget.userPubkey,
+      );
 
       // Set success state
       setState(() {
@@ -288,16 +305,14 @@ class _StarterPackSelectionBottomSheetState
       Future.delayed(const Duration(milliseconds: 200)).then((_) {
         if (mounted) {
           ref.invalidate(nostrListProvider);
-          ref.invalidate(
-            nostrListsFollowStateProvider(myUserPubkey!),
-          );
+          ref.invalidate(nostrListsFollowStateProvider(myUserPubkey!));
         }
       });
 
       // Auto-close bottom sheet after success
       Future.delayed(const Duration(milliseconds: 1500)).then((_) {
         if (mounted) {
-          Navigator.pop(context);
+          context.pop();
         }
       });
     } catch (error) {
@@ -311,23 +326,16 @@ class _StarterPackSelectionBottomSheetState
           SnackBar(
             content: Row(
               children: [
-                Icon(
-                  PhosphorIcons.warning(),
-                  color: Colors.white,
-                  size: 20,
-                ),
+                Icon(PhosphorIcons.warning(), size: 20),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
                     'Failed to add user to ${pack.title ?? pack.name}',
-                    style: const TextStyle(
-                      fontWeight: FontWeight.w500,
-                    ),
+                    style: const TextStyle(fontWeight: FontWeight.w500),
                   ),
                 ),
               ],
             ),
-            backgroundColor: Palette.error,
             duration: const Duration(seconds: 3),
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
@@ -340,10 +348,9 @@ class _StarterPackSelectionBottomSheetState
   }
 
   void _createNewPack(BuildContext context) {
-    Navigator.pushNamed(
-      context,
+    context.push(
       '/edit-starter-pack',
-      arguments: StarterPackIdentifier(
+      extra: StarterPackIdentifier(
         name: "i-${Helpers().getRandomString(10)}",
         pubkey: widget.currentUserPubkey,
       ),

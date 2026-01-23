@@ -1,18 +1,23 @@
+import 'package:camelus/l10n/app_localizations.dart';
 import 'package:camelus/presentation_layer/atoms/long_button.dart';
-import 'package:camelus/config/palette.dart';
 import 'package:camelus/domain_layer/entities/onboarding_user_info.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
+
+import '../../../components/responsive_center.dart';
 
 class OnboardingName extends ConsumerStatefulWidget {
   final Function submitCallback;
+  final Function? onPressedBack;
 
-  OnboardingUserInfo userInfo;
+  final OnboardingUserInfo userInfo;
 
-  OnboardingName({
+  const OnboardingName({
     super.key,
     required this.submitCallback,
     required this.userInfo,
+    this.onPressedBack,
   });
   @override
   ConsumerState<OnboardingName> createState() => _OnboardingNameState();
@@ -21,18 +26,17 @@ class OnboardingName extends ConsumerStatefulWidget {
 class _OnboardingNameState extends ConsumerState<OnboardingName> {
   final TextEditingController _nameController = TextEditingController();
   final FocusNode _nameFocusNode = FocusNode();
-
-  bool nameSelected = false;
+  final ValueNotifier<bool> _nameNotEmpty = ValueNotifier(false);
 
   @override
   void initState() {
     super.initState();
     _nameController.text = widget.userInfo.name ?? '';
+    _nameNotEmpty.value = _nameController.text.isNotEmpty;
 
+    // Use ValueNotifier instead of setState
     _nameController.addListener(() {
-      setState(() {
-        nameSelected = _nameController.text.isNotEmpty;
-      });
+      _nameNotEmpty.value = _nameController.text.isNotEmpty;
     });
   }
 
@@ -40,26 +44,38 @@ class _OnboardingNameState extends ConsumerState<OnboardingName> {
   void dispose() {
     _nameController.dispose();
     _nameFocusNode.dispose();
+    _nameNotEmpty.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Palette.background,
-      body: Center(
+      body: ResponsiveCenter(
+        maxWidth: 800,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            const Spacer(
-              flex: 20,
-            ),
-            Container(
+            if (widget.onPressedBack != null)
+              Padding(
+                padding: const EdgeInsets.all(30),
+                child: Align(
+                  alignment: Alignment.topLeft,
+                  child: IconButton(
+                    icon: Icon(
+                      PhosphorIcons.arrowLeft(),
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
+                    onPressed: () => widget.onPressedBack!(),
+                  ),
+                ),
+              ),
+            const Spacer(flex: 20),
+            Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
-              width: MediaQuery.of(context).size.width * 0.95,
               child: TextField(
-                textAlign: TextAlign.justify,
+                textAlign: TextAlign.start,
                 cursorRadius: const Radius.circular(50),
                 maxLines: 2,
                 textAlignVertical: TextAlignVertical.center,
@@ -67,48 +83,47 @@ class _OnboardingNameState extends ConsumerState<OnboardingName> {
                 focusNode: _nameFocusNode,
                 controller: _nameController,
                 autofillHints: const [AutofillHints.name],
-                decoration: const InputDecoration(
-                  hintText: 'what should we call you?',
+                decoration: InputDecoration(
+                  hintText: AppLocalizations.of(context)!.whatShouldWeCallYou,
                   contentPadding: EdgeInsets.all(0),
-                  hintStyle: TextStyle(
-                    color: Palette.white,
-                    letterSpacing: 1.1,
-                  ),
+                  hintStyle: TextStyle(letterSpacing: 1.1),
                   alignLabelWithHint: true,
                   border: InputBorder.none,
                 ),
                 onChanged: (value) {
                   widget.userInfo.name = value;
                 },
-                style: const TextStyle(
-                  color: Palette.lightGray,
+                style: TextStyle(
                   letterSpacing: 1.1,
                   fontSize: 28, // Increase the font size
                 ),
               ),
             ),
-            const SizedBox(
-              height: 10,
-            ),
-            const Spacer(
-              flex: 1,
-            ),
-            Container(
+            const SizedBox(height: 10),
+            const Spacer(flex: 1),
+            Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
-              width: 400,
-              height: 40,
-              child: longButton(
-                name: nameSelected ? "next" : "skip",
-                onPressed: (() {
-                  _nameFocusNode.unfocus();
-                  widget.submitCallback(_nameController.text);
-                }),
-                inverted: nameSelected,
+              child: SizedBox(
+                width: double.infinity,
+                height: 40,
+                child: ValueListenableBuilder<bool>(
+                  valueListenable: _nameNotEmpty,
+                  builder: (context, nameSelected, _) {
+                    return longButton(
+                      name: nameSelected
+                          ? AppLocalizations.of(context)!.next
+                          : AppLocalizations.of(context)!.skip,
+                      onPressed: () {
+                        _nameFocusNode.unfocus();
+                        widget.submitCallback(_nameController.text);
+                      },
+                      inverted: nameSelected,
+                    );
+                  },
+                ),
               ),
             ),
-            const SizedBox(
-              height: 15,
-            ),
+            const SizedBox(height: 15),
           ],
         ),
       ),

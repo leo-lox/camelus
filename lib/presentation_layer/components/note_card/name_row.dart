@@ -4,7 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
-import '../../../config/palette.dart';
 import '../../../domain_layer/entities/user_metadata.dart';
 import '../../../helpers/helpers.dart';
 import '../../atoms/nip_05_text.dart';
@@ -35,13 +34,14 @@ class _NoteCardNameRowState extends ConsumerState<NoteCardNameRow> {
     _initSequence();
 
     final now = DateTime.now();
-    final postDateTime =
-        DateTime.fromMillisecondsSinceEpoch(widget.createdAt * 1000);
+    final postDateTime = DateTime.fromMillisecondsSinceEpoch(
+      widget.createdAt * 1000,
+    );
     final difference = now.difference(postDateTime);
 
     if (difference.inDays < 2) {
       // Use timeago for posts less than 2 days old
-      dateText = timeago.format(postDateTime);
+      dateText = timeago.format(postDateTime); // TODO translate
     } else {
       // Use a human-readable date format for posts 2 days or older
       dateText = DateFormat('MMM d, yyyy').format(postDateTime);
@@ -71,8 +71,8 @@ class _NoteCardNameRowState extends ConsumerState<NoteCardNameRow> {
                         children: [
                           TextSpan(
                             text: widget.myMetadata?.name ?? npubHrShort,
-                            style: const TextStyle(
-                              color: Colors.white,
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.onSurface,
                               fontWeight: FontWeight.bold,
                               fontSize: 15,
                             ),
@@ -95,7 +95,10 @@ class _NoteCardNameRowState extends ConsumerState<NoteCardNameRow> {
         ),
         Text(
           dateText,
-          style: const TextStyle(color: Palette.gray, fontSize: 14),
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.inverseSurface,
+            fontSize: 14,
+          ),
         ),
         const SizedBox(width: 10),
       ],

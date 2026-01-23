@@ -7,10 +7,8 @@ class UserReactions {
   final NoteRepository _noteRepository;
   final String? selfPubkey;
 
-  UserReactions({
-    required NoteRepository noteRepository,
-    this.selfPubkey,
-  }) : _noteRepository = noteRepository;
+  UserReactions({required NoteRepository noteRepository, this.selfPubkey})
+    : _noteRepository = noteRepository;
 
   Future<bool> isPostSelfLiked({required String postId}) async {
     if (selfPubkey == null) {
@@ -28,7 +26,10 @@ class UserReactions {
     bool useCache = false,
   }) async {
     final reactions = await _noteRepository.getReactions(
-        postId: postId, authors: [likedByPubkey], useCache: useCache);
+      postId: postId,
+      authors: [likedByPubkey],
+      useCache: useCache,
+    );
     if (reactions.isEmpty) {
       return null;
     }
@@ -54,16 +55,17 @@ class UserReactions {
 
     final now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
     final myReaction = NostrNote(
-        content: "+",
-        pubkey: selfPubkey!,
-        created_at: now,
-        kind: 7,
-        id: "",
-        sig: "",
-        tags: [
-          NostrTag(type: "e", value: postId),
-          NostrTag(type: "p", value: pubkeyOfEventAuthor),
-        ]);
+      content: "+",
+      pubkey: selfPubkey!,
+      createdAt: now,
+      kind: 7,
+      id: "",
+      sig: "",
+      tags: [
+        NostrTag(type: "e", value: postId),
+        NostrTag(type: "p", value: pubkeyOfEventAuthor),
+      ],
+    );
     return _noteRepository.broadcastNote(myReaction);
   }
 
@@ -82,8 +84,6 @@ class UserReactions {
       throw Exception("Reaction not found");
     }
 
-    return _noteRepository.deleteNote(
-      reaction.id,
-    );
+    return _noteRepository.deleteNote(reaction.id);
   }
 }

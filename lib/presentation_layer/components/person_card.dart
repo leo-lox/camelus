@@ -1,8 +1,6 @@
 import 'package:camelus/presentation_layer/atoms/follow_button.dart';
-import 'package:camelus/config/palette.dart';
 import 'package:camelus/presentation_layer/atoms/my_profile_picture.dart';
 import 'package:camelus/presentation_layer/atoms/nip_05_text.dart';
-import 'package:camelus/presentation_layer/providers/nip05_provider.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -53,8 +51,8 @@ class PersonCard extends ConsumerWidget {
                   if (name == '')
                     Text(
                       "${pubkey.substring(0, 7)}...${pubkey.substring(pubkey.length - 7, pubkey.length)}",
-                      style: const TextStyle(
-                        color: Palette.white,
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurface,
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
                       ),
@@ -64,20 +62,17 @@ class PersonCard extends ConsumerWidget {
                       children: [
                         Text(
                           name,
-                          style: const TextStyle(
-                            color: Palette.white,
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.onSurface,
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
                       ],
                     ),
-                  // nip 05
 
-                  Nip05Text(
-                    pubkey: pubkey,
-                    nip05verified: nip05,
-                  ),
+                  // nip 05
+                  Nip05Text(pubkey: pubkey, nip05verified: nip05),
 
                   const SizedBox(height: 4),
                   SizedBox(
@@ -87,8 +82,8 @@ class PersonCard extends ConsumerWidget {
                         : double.infinity,
                     child: Text(
                       about,
-                      style: const TextStyle(
-                        color: Palette.white,
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurface,
                         fontSize: 12,
                         fontWeight: FontWeight.w400,
                       ),
@@ -104,10 +99,11 @@ class PersonCard extends ConsumerWidget {
             //follow and unfollow button
             if (showFollowButton)
               followButton(
-                  isFollowing: isFollowing,
-                  onPressed: () {
-                    onFollowTab(!isFollowing);
-                  }),
+                isFollowing: isFollowing,
+                onPressed: () {
+                  onFollowTab(!isFollowing);
+                },
+              ),
           ],
         ),
       ),

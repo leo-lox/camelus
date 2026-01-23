@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../../config/palette.dart';
-
 class OverlappingAvatars extends StatelessWidget {
   final List<Widget> avatars;
   final double overlap;
@@ -24,9 +22,7 @@ class OverlappingAvatars extends StatelessWidget {
             Positioned(
               left: i * avatarSize * (1 - overlap),
               child: Container(
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                ),
+                decoration: BoxDecoration(shape: BoxShape.circle),
                 child: ClipOval(
                   clipBehavior: Clip.antiAlias,
                   child: SizedBox(

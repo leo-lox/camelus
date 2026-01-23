@@ -1,5 +1,6 @@
-import 'package:camelus/config/palette.dart';
+import 'package:camelus/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../../domain_layer/entities/feed_filter.dart';
@@ -60,15 +61,23 @@ class _SearchFeedPageState extends State<SearchFeedPage> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Search Help'),
-        content: const Text('Enter keywords to search for posts.'),
-        backgroundColor: Palette.darkGray,
-        titleTextStyle: const TextStyle(color: Palette.white, fontSize: 18),
-        contentTextStyle: const TextStyle(color: Palette.white),
+        title: Text(AppLocalizations.of(context)!.searchHelp),
+        content: Text(AppLocalizations.of(context)!.searchHelpMessage),
+        backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
+        titleTextStyle: TextStyle(
+          color: Theme.of(context).colorScheme.onSurface,
+          fontSize: 18,
+        ),
+        contentTextStyle: TextStyle(
+          color: Theme.of(context).colorScheme.onSurface,
+        ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('OK', style: TextStyle(color: Palette.primary)),
+            onPressed: () => context.pop(),
+            child: Text(
+              AppLocalizations.of(context)!.ok,
+              style: TextStyle(color: Theme.of(context).colorScheme.primary),
+            ),
           ),
         ],
       ),
@@ -94,7 +103,6 @@ class _SearchFeedPageState extends State<SearchFeedPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Palette.background,
       body: SafeArea(
         child: Column(
           children: [
@@ -107,7 +115,7 @@ class _SearchFeedPageState extends State<SearchFeedPage> {
               leading: IconButton(
                 icon: Icon(PhosphorIcons.arrowLeft()),
                 onPressed: () {
-                  Navigator.pop(context);
+                  context.pop();
                 },
               ),
             ),

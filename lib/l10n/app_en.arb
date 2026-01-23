@@ -1,0 +1,1326 @@
+{
+  "@@locale": "en",
+  "helloWorld": "Hello World!",
+  "@helloWorld": {
+    "description": "The conventional newborn programmer greeting"
+  },
+  "whatShouldWeCallYou": "what should we call you?",
+  "@whatShouldWeCallYou": {
+    "description": "Hint text for name input during onboarding"
+  },
+  "next": "next",
+  "@next": {
+    "description": "Next button label"
+  },
+  "skip": "skip",
+  "@skip": {
+    "description": "Skip button label"
+  },
+  "selectImage": "select image",
+  "@selectImage": {
+    "description": "Dialog title for image selection"
+  },
+  "unsupportedImageFormat": "unsupported image format",
+  "@unsupportedImageFormat": {
+    "description": "Error message for unsupported image format"
+  },
+  "invalidPrivateKeyOrSeedPhrase": "Invalid private key or seed phrase",
+  "@invalidPrivateKeyOrSeedPhrase": {
+    "description": "Error message for invalid credentials"
+  },
+  "pleaseReadAndAcceptTerms": "Please read and accept the terms and conditions first",
+  "@pleaseReadAndAcceptTerms": {
+    "description": "Error message when terms not accepted"
+  },
+  "pleaseImportPrivateKeyFirst": "Please import your private key first",
+  "@pleaseImportPrivateKeyFirst": {
+    "description": "Error message when private key not imported"
+  },
+  "publicKeyErrorMessage": "you entered a public key, please enter a private key, it starts with nsec1",
+  "@publicKeyErrorMessage": {
+    "description": "Error message when user enters public key instead of private key"
+  },
+  "wordNotValid": "word: {word} is not valid, check if it is spelled correctly",
+  "@wordNotValid": {
+    "description": "Error message when a seed phrase word is invalid",
+    "placeholders": {
+      "word": {
+        "type": "String"
+      }
+    }
+  },
+  "login": "login",
+  "@login": {
+    "description": "Login button and page title"
+  },
+  "yourPublicKeyIs": "your public key is:",
+  "@yourPublicKeyIs": {
+    "description": "Label for public key display"
+  },
+  "enterSeedPhraseOrNsec": "enter your seed phrase or nsec1",
+  "@enterSeedPhraseOrNsec": {
+    "description": "Hint text for login input field"
+  },
+  "paste": "paste",
+  "@paste": {
+    "description": "Paste button label"
+  },
+  "add": "add",
+  "@add": {
+    "description": "Add button label"
+  },
+  "iHaveReadAndAccept": "I have read and accept the ",
+  "@iHaveReadAndAccept": {
+    "description": "Checkbox label prefix for terms acceptance"
+  },
+  "termsAndConditions": "terms and conditions",
+  "@termsAndConditions": {
+    "description": "Terms and conditions link text"
+  },
+  "privacyPolicy": "privacy policy",
+  "@privacyPolicy": {
+    "description": "Privacy policy link text"
+  },
+  "settingUpYourAccount": "setting up your account",
+  "@settingUpYourAccount": {
+    "description": "Loading message during account setup"
+  },
+  "followingPeople": "following people",
+  "@followingPeople": {
+    "description": "Loading message while following users"
+  },
+  "movingData": "moving data",
+  "@movingData": {
+    "description": "Loading message during data migration"
+  },
+  "cleaningUp": "cleaning up",
+  "@cleaningUp": {
+    "description": "Loading message during cleanup process"
+  },
+  "uploadingProfilePicture": "uploading profile picture",
+  "@uploadingProfilePicture": {
+    "description": "Loading message while uploading profile picture"
+  },
+  "recoveryPhrase": "recovery phrase",
+  "@recoveryPhrase": {
+    "description": "Recovery phrase section title"
+  },
+  "newSeedPhraseGenerated": "a new seed phrase has been generated",
+  "@newSeedPhraseGenerated": {
+    "description": "Snackbar message when seed phrase is generated"
+  },
+  "regenerate": "regenerate",
+  "@regenerate": {
+    "description": "Regenerate button label"
+  },
+  "copiedSeedPhraseToClipboard": "copied seed phrase to clipboard",
+  "@copiedSeedPhraseToClipboard": {
+    "description": "Snackbar message when seed phrase is copied"
+  },
+  "copy": "copy",
+  "@copy": {
+    "description": "Copy button label"
+  },
+  "hideWords": "Hide words",
+  "@hideWords": {
+    "description": "Tooltip to hide seed phrase words"
+  },
+  "showWords": "Show words",
+  "@showWords": {
+    "description": "Tooltip to show seed phrase words"
+  },
+  "recoveryPhraseWarning": "You need the recovery phrase to login again. Make sure to keep it safe!",
+  "@recoveryPhraseWarning": {
+    "description": "Warning message about recovery phrase importance"
+  },
+  "publishAccount": "publish account",
+  "@publishAccount": {
+    "description": "Button to publish account after onboarding"
+  },
+  "starterPacks": "Starter Packs",
+  "@starterPacks": {
+    "description": "Main starter packs section title"
+  },
+  "additionalStarterPacks": "Additional Starter Packs",
+  "@additionalStarterPacks": {
+    "description": "Additional starter packs section title"
+  },
+  "continueWithAccounts": "continue with {count} accounts",
+  "@continueWithAccounts": {
+    "description": "Button text showing number of accounts selected",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "selectStarterPack": "select a starter pack",
+  "@selectStarterPack": {
+    "description": "Button text when no starter pack is selected"
+  },
+  "by": "by {name}",
+  "@by": {
+    "description": "Author attribution",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "unselectAll": "unselect all",
+  "@unselectAll": {
+    "description": "Button to unselect all accounts"
+  },
+  "followAll": "follow all",
+  "@followAll": {
+    "description": "Button to follow all accounts in a starter pack"
+  },
+  "followAccounts": "follow {count} accounts",
+  "@followAccounts": {
+    "description": "Follow specific number of accounts",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "invitedYouToJoin": " invited you to join",
+  "@invitedYouToJoin": {
+    "description": "Text showing who invited the user"
+  },
+  "youWillFollowThesePeople": "You'll follow these people right away",
+  "@youWillFollowThesePeople": {
+    "description": "Message about auto-following from starter pack"
+  },
+  "noStarterPackFound": "👀 no starter pack found ",
+  "@noStarterPackFound": {
+    "description": "Message when no starter pack is found"
+  },
+  "noWorriesYouCanStillJoin": "no worries, you can still join Camelus!",
+  "@noWorriesYouCanStillJoin": {
+    "description": "Reassurance message when no starter pack found"
+  },
+  "joinCamelus": "Join Camelus",
+  "@joinCamelus": {
+    "description": "Button to join Camelus with starter pack"
+  },
+  "signupWithoutStarterPack": "Signup without a starter pack",
+  "@signupWithoutStarterPack": {
+    "description": "Button to signup without using a starter pack"
+  },
+  "copiedToClipboard": "Copied to clipboard: {text}",
+  "@copiedToClipboard": {
+    "description": "Snackbar message when text is copied",
+    "placeholders": {
+      "text": {
+        "type": "String"
+      }
+    }
+  },
+  "shareYourProfile": "Share your Profile",
+  "@shareYourProfile": {
+    "description": "Dialog title for sharing profile"
+  },
+  "following": "Following",
+  "@following": {
+    "description": "Label for following count"
+  },
+  "followers": "Followers",
+  "@followers": {
+    "description": "Label for followers count"
+  },
+  "profile": "Profile",
+  "@profile": {
+    "description": "Profile menu item"
+  },
+  "bookmarks": "Bookmarks",
+  "@bookmarks": {
+    "description": "Bookmarks menu item"
+  },
+  "removeBookmark": "Remove this bookmark?",
+  "@removeBookmark": {
+    "description": "Confirmation dialog title for removing bookmark"
+  },
+  "bookmarkRemoved": "Bookmark removed",
+  "@bookmarkRemoved": {
+    "description": "Snackbar message when bookmark is removed"
+  },
+  "noPrivateBookmarks": "No private bookmarks yet",
+  "@noPrivateBookmarks": {
+    "description": "Empty state message for private bookmarks"
+  },
+  "noPublicBookmarks": "No public bookmarks yet",
+  "@noPublicBookmarks": {
+    "description": "Empty state message for public bookmarks"
+  },
+  "privateBookmarks": "Private",
+  "@privateBookmarks": {
+    "description": "Private bookmarks tab label"
+  },
+  "publicBookmarks": "Public",
+  "@publicBookmarks": {
+    "description": "Public bookmarks tab label"
+  },
+  "addToBookmarks": "Add to bookmarks",
+  "@addToBookmarks": {
+    "description": "Button label to add note to bookmarks"
+  },
+  "removeFromBookmarks": "Remove from bookmarks",
+  "@removeFromBookmarks": {
+    "description": "Button label to remove note from bookmarks"
+  },
+  "addingToBookmarks": "Adding to bookmarks...",
+  "@addingToBookmarks": {
+    "description": "Loading message when adding bookmark"
+  },
+  "removingFromBookmarks": "Removing from bookmarks...",
+  "@removingFromBookmarks": {
+    "description": "Loading message when removing bookmark"
+  },
+  "failedToAddBookmark": "Failed to add bookmark",
+  "@failedToAddBookmark": {
+    "description": "Error message when adding bookmark fails"
+  },
+  "failedToRemoveBookmark": "Failed to remove bookmark",
+  "@failedToRemoveBookmark": {
+    "description": "Error message when removing bookmark fails"
+  },
+  "notImplementedYet": "Not implemented yet",
+  "@notImplementedYet": {
+    "description": "Snackbar message for unimplemented features"
+  },
+  "payments": "Payments",
+  "@payments": {
+    "description": "Payments menu item"
+  },
+  "blocklist": "Blocklist",
+  "@blocklist": {
+    "description": "Blocklist menu item"
+  },
+  "settings": "Settings",
+  "@settings": {
+    "description": "Settings button and page title"
+  },
+  "termsOfService": "Terms of Service",
+  "@termsOfService": {
+    "description": "Terms of service button"
+  },
+  "languageSettings": "Language Settings",
+  "@languageSettings": {
+    "description": "Language settings menu item"
+  },
+  "initialRoute": "Initial route",
+  "@initialRoute": {
+    "description": "Initial route settings menu item"
+  },
+  "moderation": "Moderation",
+  "@moderation": {
+    "description": "Moderation settings menu item"
+  },
+  "fileServers": "File servers",
+  "@fileServers": {
+    "description": "File servers settings menu item and page title"
+  },
+  "logout": "Logout",
+  "@logout": {
+    "description": "Logout menu item"
+  },
+  "unsavedChanges": "Unsaved Changes",
+  "@unsavedChanges": {
+    "description": "Dialog title for unsaved changes warning"
+  },
+  "unsavedChangesMessage": "You have unsaved changes. Do you want to discard them?",
+  "@unsavedChangesMessage": {
+    "description": "Dialog message for unsaved changes warning"
+  },
+  "cancel": "Cancel",
+  "@cancel": {
+    "description": "Cancel button label"
+  },
+  "discard": "Discard",
+  "@discard": {
+    "description": "Discard button label"
+  },
+  "saveChanges": "save changes",
+  "@saveChanges": {
+    "description": "Save changes button label"
+  },
+  "saving": "Saving...",
+  "@saving": {
+    "description": "Saving status message"
+  },
+  "changesSavedSuccessfully": "Changes saved successfully",
+  "@changesSavedSuccessfully": {
+    "description": "Success message when changes are saved"
+  },
+  "failedToSaveChanges": "Failed to save changes",
+  "@failedToSaveChanges": {
+    "description": "Error message when save fails"
+  },
+  "setupDefaultServers": "setup default servers",
+  "@setupDefaultServers": {
+    "description": "Button to setup default file servers"
+  },
+  "defaultLabel": " (default)",
+  "@defaultLabel": {
+    "description": "Label suffix for default items"
+  },
+  "restoreDefaults": "Restore Defaults",
+  "@restoreDefaults": {
+    "description": "Button and dialog title to restore default servers"
+  },
+  "restoreDefaultsMessage": "Are you sure you want to restore default servers? This will remove all custom servers.",
+  "@restoreDefaultsMessage": {
+    "description": "Confirmation message for restoring default servers"
+  },
+  "restore": "Restore",
+  "@restore": {
+    "description": "Restore button label"
+  },
+  "enterBlossomUrl": "Enter blossom URL",
+  "@enterBlossomUrl": {
+    "description": "Hint text for blossom URL input"
+  },
+  "errorUpdatingFilter": "Error updating filter {error}",
+  "@errorUpdatingFilter": {
+    "description": "Error message when filter update fails",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "moderationSettings": "Moderation Settings",
+  "@moderationSettings": {
+    "description": "Moderation settings page title"
+  },
+  "camelusContentFiltering": "Camelus Content Filtering",
+  "@camelusContentFiltering": {
+    "description": "Content filtering section title"
+  },
+  "enableContentFilteringDescription": "Enable content filtering to hide potentially inappropriate content.",
+  "@enableContentFilteringDescription": {
+    "description": "Description for content filtering feature"
+  },
+  "enableContentFilter": "Enable Content Filter",
+  "@enableContentFilter": {
+    "description": "Switch label for content filter"
+  },
+  "contentFilterNote": "Note: Filters are applied locally (on device). When users report nostr content directly to camelus it gets added to the filter.",
+  "@contentFilterNote": {
+    "description": "Note about how content filtering works"
+  },
+  "errorUploadingImage": "err uploading image, upload servers configured?",
+  "@errorUploadingImage": {
+    "description": "Error message when image upload fails"
+  },
+  "editProfile": "Edit Profile",
+  "@editProfile": {
+    "description": "Edit profile page title"
+  },
+  "save": "save",
+  "@save": {
+    "description": "Save button label"
+  },
+  "loadingProfile": "Loading profile...",
+  "@loadingProfile": {
+    "description": "Loading message when fetching profile"
+  },
+  "uploading": "Uploading...",
+  "@uploading": {
+    "description": "Upload status message"
+  },
+  "uploadingCapitalized": "Uploading",
+  "@uploadingCapitalized": {
+    "description": "Upload status message capitalized"
+  },
+  "name": "Name",
+  "@name": {
+    "description": "Name field label"
+  },
+  "bio": "Bio",
+  "@bio": {
+    "description": "Bio field label"
+  },
+  "pronouns": "Pronouns",
+  "@pronouns": {
+    "description": "Pronouns field label"
+  },
+  "website": "Website",
+  "@website": {
+    "description": "Website field label"
+  },
+  "username": "Username (nip05)",
+  "@username": {
+    "description": "Username field label with NIP-05 specification"
+  },
+  "lightningAddress": "Lightning address",
+  "@lightningAddress": {
+    "description": "Lightning address field label"
+  },
+  "editRelays": "Edit Relays",
+  "@editRelays": {
+    "description": "Edit relays page title"
+  },
+  "error": "error:",
+  "@error": {
+    "description": "Error label prefix"
+  },
+  "whatsOnYourMind": "What's on your mind?",
+  "@whatsOnYourMind": {
+    "description": "Hint text for post composition"
+  },
+  "writePost": "write a post",
+  "@writePost": {
+    "description": "Title for post composition page"
+  },
+  "replyTo": "reply to {name}",
+  "@replyTo": {
+    "description": "Title for reply composition page",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "addToStarterPack": "add to starter pack",
+  "@addToStarterPack": {
+    "description": "Menu item to add user to starter pack"
+  },
+  "blockReport": "Block/Report",
+  "@blockReport": {
+    "description": "Menu item for blocking or reporting"
+  },
+  "blockedUsers": "Blocked Users",
+  "@blockedUsers": {
+    "description": "Blocked users page title"
+  },
+  "notImplemented": "not implemented",
+  "@notImplemented": {
+    "description": "Message for unimplemented features"
+  },
+  "impersonation": "impersonation",
+  "@impersonation": {
+    "description": "Report reason: impersonation"
+  },
+  "spam": "spam",
+  "@spam": {
+    "description": "Report reason: spam"
+  },
+  "illegal": "illegal",
+  "@illegal": {
+    "description": "Report reason: illegal content"
+  },
+  "profanity": "profanity",
+  "@profanity": {
+    "description": "Report reason: profanity"
+  },
+  "nudity": "nudity",
+  "@nudity": {
+    "description": "Report reason: nudity"
+  },
+  "malware": "malware",
+  "@malware": {
+    "description": "Report reason: malware"
+  },
+  "other": "other",
+  "@other": {
+    "description": "Report reason: other"
+  },
+  "reportSent": "report sent",
+  "@reportSent": {
+    "description": "Title shown after report is submitted"
+  },
+  "thankYouForReport": "thank you for your report",
+  "@thankYouForReport": {
+    "description": "Thank you message after report submission"
+  },
+  "goBack": "go back",
+  "@goBack": {
+    "description": "Button to go back after report submission"
+  },
+  "blockReportTitle": "block/report",
+  "@blockReportTitle": {
+    "description": "Block/report page title"
+  },
+  "user": "user",
+  "@user": {
+    "description": "User label"
+  },
+  "loading": "loading",
+  "@loading": {
+    "description": "Loading button state"
+  },
+  "unblock": "unblock",
+  "@unblock": {
+    "description": "Unblock button label"
+  },
+  "block": "block",
+  "@block": {
+    "description": "Block button label"
+  },
+  "whatIsWrongWithPost": "what is wrong with this post?",
+  "@whatIsWrongWithPost": {
+    "description": "Hint text for post report input"
+  },
+  "whatIsWrongWithUser": "what is wrong with this user?",
+  "@whatIsWrongWithUser": {
+    "description": "Hint text for user report input"
+  },
+  "reportsAreSentToRelays": "Reports are sent to the relays where you received the note from.",
+  "@reportsAreSentToRelays": {
+    "description": "Information about how reports are handled"
+  },
+  "additionallyReportToCamelus": "Additionally, report to camelus directly",
+  "@additionallyReportToCamelus": {
+    "description": "Checkbox label for direct reporting to Camelus"
+  },
+  "reportPost": "report post",
+  "@reportPost": {
+    "description": "Button to report a post"
+  },
+  "reportUser": "report user",
+  "@reportUser": {
+    "description": "Button to report a user"
+  },
+  "relays": "Relays",
+  "@relays": {
+    "description": "Relays page title"
+  },
+  "eventsRead": "Events Read",
+  "@eventsRead": {
+    "description": "Label for events read count"
+  },
+  "eventsWritten": "Events Written",
+  "@eventsWritten": {
+    "description": "Label for events written count"
+  },
+  "connectionSource": "Connection Source",
+  "@connectionSource": {
+    "description": "Label for connection source"
+  },
+  "noDataAvailable": "No data available",
+  "@noDataAvailable": {
+    "description": "Message when no data is available to display"
+  },
+  "notifications": "Notifications",
+  "@notifications": {
+    "description": "Notifications page title"
+  },
+  "searchHelp": "Search Help",
+  "@searchHelp": {
+    "description": "Search help dialog title"
+  },
+  "searchHelpMessage": "Enter keywords to search for posts.",
+  "@searchHelpMessage": {
+    "description": "Search help dialog message"
+  },
+  "ok": "OK",
+  "@ok": {
+    "description": "OK button label"
+  },
+  "thread": "thread",
+  "@thread": {
+    "description": "Thread page title"
+  },
+  "workInProgress": "work in progress",
+  "@workInProgress": {
+    "description": "Work in progress message"
+  },
+  "update": "Update",
+  "@update": {
+    "description": "Update button label"
+  },
+  "initialRouteSettings": "Initial Route Settings",
+  "@initialRouteSettings": {
+    "description": "Initial route settings page title"
+  },
+  "useSystemLanguage": "Use System Language",
+  "@useSystemLanguage": {
+    "description": "Option to use device's system language"
+  },
+  "edit": "edit",
+  "@edit": {
+    "description": "Edit button label"
+  },
+  "postSettings": "Post Settings",
+  "@postSettings": {
+    "description": "Post settings dialog title"
+  },
+  "enableContentWarning": "Enable Content Warning",
+  "@enableContentWarning": {
+    "description": "Switch to enable content warning"
+  },
+  "warningType": "Warning Type:",
+  "@warningType": {
+    "description": "Label for warning type dropdown"
+  },
+  "customWarning": "Custom Warning",
+  "@customWarning": {
+    "description": "Custom warning input label"
+  },
+  "specifyContentWarning": "Specify content warning",
+  "@specifyContentWarning": {
+    "description": "Hint text for custom warning input"
+  },
+  "enableClientTag": "Enable Client Tag",
+  "@enableClientTag": {
+    "description": "Switch to enable client tag"
+  },
+  "close": "Close",
+  "@close": {
+    "description": "Close button label"
+  },
+  "sensitiveContent": "Sensitive Content",
+  "@sensitiveContent": {
+    "description": "Content warning option"
+  },
+  "flashingLights": "Flashing Lights/Patterns",
+  "@flashingLights": {
+    "description": "Content warning option"
+  },
+  "loudNoises": "Loud Noises",
+  "@loudNoises": {
+    "description": "Content warning option"
+  },
+  "graphicContent": "Graphic Content",
+  "@graphicContent": {
+    "description": "Content warning option"
+  },
+  "discrimination": "Discrimination",
+  "@discrimination": {
+    "description": "Content warning option"
+  },
+  "health": "Health",
+  "@health": {
+    "description": "Content warning option"
+  },
+  "abuse": "Abuse",
+  "@abuse": {
+    "description": "Content warning option"
+  },
+  "routeHome": "Home",
+  "@routeHome": {
+    "description": "Home route label"
+  },
+  "routePostsAndReplies": "Posts and Replies",
+  "@routePostsAndReplies": {
+    "description": "Posts and replies route label"
+  },
+  "routeSearch": "Search",
+  "@routeSearch": {
+    "description": "Search route label"
+  },
+  "routeNotifications": "Notifications",
+  "@routeNotifications": {
+    "description": "Notifications route label"
+  },
+  "scrollToTop": "scroll to top",
+  "@scrollToTop": {
+    "description": "Tooltip for scrolling to top"
+  },
+  "home": "home",
+  "@home": {
+    "description": "Home tab label"
+  },
+  "search": "search",
+  "@search": {
+    "description": "Search tab label"
+  },
+  "explore": "Explore",
+  "@explore": {
+    "description": "Explore menu item"
+  },
+  "more": "More",
+  "@more": {
+    "description": "More options tooltip"
+  },
+  "posts": "Posts",
+  "@posts": {
+    "description": "Posts tab label"
+  },
+  "postsAndReplies": "Posts & Replies",
+  "@postsAndReplies": {
+    "description": "Posts and replies tab label"
+  },
+  "themeSettings": "Theme Settings",
+  "@themeSettings": {
+    "description": "Theme settings page title"
+  },
+  "themeMode": "Theme Mode",
+  "@themeMode": {
+    "description": "Theme mode section title"
+  },
+  "system": "System",
+  "@system": {
+    "description": "System option for theme mode and type"
+  },
+  "light": "Light",
+  "@light": {
+    "description": "Light theme mode option"
+  },
+  "dark": "Dark",
+  "@dark": {
+    "description": "Dark theme mode option"
+  },
+  "theme": "Theme",
+  "@theme": {
+    "description": "Theme selection section title"
+  },
+  "camelus": "Camelus",
+  "@camelus": {
+    "description": "Camelus theme option"
+  },
+  "nostr": "Nostr",
+  "@nostr": {
+    "description": "Nostr theme option"
+  },
+  "customColorTheme": "Custom Color Theme",
+  "@customColorTheme": {
+    "description": "Custom color theme section title"
+  },
+  "blue": "Blue",
+  "@blue": {
+    "description": "Blue color option"
+  },
+  "purple": "Purple",
+  "@purple": {
+    "description": "Purple color option"
+  },
+  "green": "Green",
+  "@green": {
+    "description": "Green color option"
+  },
+  "orange": "Orange",
+  "@orange": {
+    "description": "Orange color option"
+  },
+  "red": "Red",
+  "@red": {
+    "description": "Red color option"
+  },
+  "teal": "Teal",
+  "@teal": {
+    "description": "Teal color option"
+  },
+  "pink": "Pink",
+  "@pink": {
+    "description": "Pink color option"
+  },
+  "indigo": "Indigo",
+  "@indigo": {
+    "description": "Indigo color option"
+  },
+  "welcome": "Welcome",
+  "@welcome": {
+    "description": "Welcome greeting text"
+  },
+  "pleaseLoginToManageFileServers": "Please login to manage file servers",
+  "@pleaseLoginToManageFileServers": {
+    "description": "Message shown when user is not logged in on file servers page"
+  },
+  "welcomeTo": "welcome to",
+  "@welcomeTo": {
+    "description": "Welcome greeting prefix on onboarding page"
+  },
+  "joinTheConversation": "join the conversation",
+  "@joinTheConversation": {
+    "description": "Button text to register/join Camelus"
+  },
+  "browseWithoutLogin": "Browse without login",
+  "@browseWithoutLogin": {
+    "description": "Button text to browse app without logging in"
+  },
+  "loginRegistrationRequired": "Login/Registration Required",
+  "@loginRegistrationRequired": {
+    "description": "Dialog title prompting user to login or register"
+  },
+  "pleaseLoginToInteract": "Please login/register to interact with posts",
+  "@pleaseLoginToInteract": {
+    "description": "Message explaining user needs to login to interact with content"
+  },
+  "loginRegister": "Login/Register",
+  "@loginRegister": {
+    "description": "Button text for login or register action"
+  },
+  "all": "All",
+  "@all": {
+    "description": "All tab label for notifications and filters"
+  },
+  "mentions": "Mentions",
+  "@mentions": {
+    "description": "Mentions tab label for notifications"
+  },
+  "preview": "Preview",
+  "@preview": {
+    "description": "Preview tab label"
+  },
+  "relayAlreadyExists": "Relay already exists",
+  "@relayAlreadyExists": {
+    "description": "Error dialog title when relay already exists"
+  },
+  "relayAlreadyExistsMessage": "A relay with this name already exists.",
+  "@relayAlreadyExistsMessage": {
+    "description": "Error message when relay already exists"
+  },
+  "discardChanges": "Discard changes?",
+  "@discardChanges": {
+    "description": "Dialog title asking to discard changes"
+  },
+  "discardChangesMessage": "Do you want to discard your changes?",
+  "@discardChangesMessage": {
+    "description": "Dialog message asking to discard changes"
+  },
+  "deleteRelay": "Delete relay",
+  "@deleteRelay": {
+    "description": "Dialog title for relay deletion"
+  },
+  "delete": "Delete",
+  "@delete": {
+    "description": "Delete button label"
+  },
+  "noTextFoundInClipboard": "No text found in clipboard",
+  "@noTextFoundInClipboard": {
+    "description": "Error message when clipboard is empty"
+  },
+  "pleaseEnterValidBunkerUrl": "Please enter a valid bunker URL",
+  "@pleaseEnterValidBunkerUrl": {
+    "description": "Error message for invalid bunker URL"
+  },
+  "failedToConnectToBunker": "Failed to connect to bunker",
+  "@failedToConnectToBunker": {
+    "description": "Error message when bunker connection fails"
+  },
+  "reactedToYourPost": "reacted to your post",
+  "@reactedToYourPost": {
+    "description": "Notification message when someone reacted to a post"
+  },
+  "repliedToYourPost": "replied to your post",
+  "@repliedToYourPost": {
+    "description": "Notification message when someone replied to a post"
+  },
+  "mentionedYouInThread": "mentioned you in a thread",
+  "@mentionedYouInThread": {
+    "description": "Notification message when mentioned in a thread"
+  },
+  "repostedYourPost": "reposted your post",
+  "@repostedYourPost": {
+    "description": "Notification message when someone reposted"
+  },
+  "mentionedYou": "mentioned you",
+  "@mentionedYou": {
+    "description": "Notification message when mentioned"
+  },
+  "interactedWithYourPost": "interacted with your post",
+  "@interactedWithYourPost": {
+    "description": "Notification message for general interaction"
+  },
+  "whenSomeoneInteractsWithYourPosts": "When someone interacts with your posts,\nyou'll see it here",
+  "@whenSomeoneInteractsWithYourPosts": {
+    "description": "Empty state message for notifications"
+  },
+  "noNotifications": "no notifications",
+  "@noNotifications": {
+    "description": "Empty notifications message"
+  },
+  "endOfNotifications": "end of notifications",
+  "@endOfNotifications": {
+    "description": "Message at the end of notification list"
+  },
+  "trends": "trends",
+  "@trends": {
+    "description": "Trends section label"
+  },
+  "recentStarterPacks": "recent starter packs",
+  "@recentStarterPacks": {
+    "description": "Recent starter packs section label"
+  },
+  "noResultsFound": "No results found",
+  "@noResultsFound": {
+    "description": "Empty search results message"
+  },
+  "people": "People",
+  "@people": {
+    "description": "People section label"
+  },
+  "notes": "Notes",
+  "@notes": {
+    "description": "Notes section label"
+  },
+  "searchForHashtags": "search for hashtags",
+  "@searchForHashtags": {
+    "description": "Hint text for hashtag search"
+  },
+  "nip05Address": "nip05 address",
+  "@nip05Address": {
+    "description": "NIP-05 address label"
+  },
+  "repostHasNoInformation": "Repost has no information where to fetch the post",
+  "@repostHasNoInformation": {
+    "description": "Error message for invalid repost"
+  },
+  "invalidSignature": "Invalid signature!",
+  "@invalidSignature": {
+    "description": "Error message for invalid signature"
+  },
+  "deletionRequested": "deletion requested",
+  "@deletionRequested": {
+    "description": "Message when deletion is requested"
+  },
+  "unknownStarterPack": "unknown starter pack",
+  "@unknownStarterPack": {
+    "description": "Error message for unknown starter pack"
+  },
+  "noStarterPacksFound": "No starter packs found",
+  "@noStarterPacksFound": {
+    "description": "Empty state for starter packs"
+  },
+  "searchToAddUser": "search to add user",
+  "@searchToAddUser": {
+    "description": "Hint text for adding user to starter pack"
+  },
+  "noServersFound": "no servers found",
+  "@noServersFound": {
+    "description": "Empty state for file servers"
+  },
+  "noFilterFound": "no filter found",
+  "@noFilterFound": {
+    "description": "Empty state for moderation filters"
+  },
+  "replyToPrefix": "reply to",
+  "@replyToPrefix": {
+    "description": "Prefix text for reply context"
+  },
+  "andMoreCount": " and {count} more",
+  "@andMoreCount": {
+    "description": "Indicator for additional replies",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "noteNotFound": "Note not found",
+  "@noteNotFound": {
+    "description": "Error message when note cannot be found"
+  },
+  "shared": " shared",
+  "@shared": {
+    "description": "Repost indicator text"
+  },
+  "loadingMightFail": "loading might fail, the repost has no information where to fetch the post",
+  "@loadingMightFail": {
+    "description": "Error message for repost without reference"
+  },
+  "bugReportMessage": "This is a bug, please report it to the developers",
+  "@bugReportMessage": {
+    "description": "Bug report request message"
+  },
+  "noMoreNotesToShow": "No more notes to show",
+  "@noMoreNotesToShow": {
+    "description": "End of feed message"
+  },
+  "trendingPeople": "trending people",
+  "@trendingPeople": {
+    "description": "Trending people section heading"
+  },
+  "trendingHashtags": "trending hashtags",
+  "@trendingHashtags": {
+    "description": "Trending hashtags section heading"
+  },
+  "somethingWentWrong": "Something went wrong",
+  "@somethingWentWrong": {
+    "description": "Generic error message"
+  },
+  "noConnection": "No connection",
+  "@noConnection": {
+    "description": "No network connection error"
+  },
+  "reconnectingToRelays": "reconnecting to relays...",
+  "@reconnectingToRelays": {
+    "description": "Status message while reconnecting to relays"
+  },
+  "addRelay": " add relay",
+  "@addRelay": {
+    "description": "Input placeholder for adding relay"
+  },
+  "read": "read",
+  "@read": {
+    "description": "Relay read permission label"
+  },
+  "write": "write",
+  "@write": {
+    "description": "Relay write permission label"
+  },
+  "starterPack": "Starter Pack",
+  "@starterPack": {
+    "description": "Starter pack title"
+  },
+  "deleteStarterPack": "Delete Starter Pack",
+  "@deleteStarterPack": {
+    "description": "Delete starter pack dialog title"
+  },
+  "deleteStarterPackConfirm": "Are you sure you want to delete this starter pack? This action cannot be undone.",
+  "@deleteStarterPackConfirm": {
+    "description": "Delete starter pack confirmation message"
+  },
+  "share": "share",
+  "@share": {
+    "description": "Share button label"
+  },
+  "starterPackBy": "Starter pack by {author}",
+  "@starterPackBy": {
+    "description": "Starter pack attribution text",
+    "placeholders": {
+      "author": {
+        "type": "String"
+      }
+    }
+  },
+  "you": "you",
+  "@you": {
+    "description": "Pronoun for current user"
+  },
+  "addToStarterPackTitle": "Add {name} to Starter Pack",
+  "@addToStarterPackTitle": {
+    "description": "Dialog title for adding user to starter pack",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "createNewStarterPack": "Create new starter pack",
+  "@createNewStarterPack": {
+    "description": "Button to create new starter pack"
+  },
+  "upload": "upload",
+  "@upload": {
+    "description": "Upload button label"
+  },
+  "createYourStarterPack": "create your starter pack",
+  "@createYourStarterPack": {
+    "description": "Starter pack creation heading"
+  },
+  "inviteFriendsToFollow": "Invite your friends to follow your favorite people",
+  "@inviteFriendsToFollow": {
+    "description": "Starter pack creation subheading"
+  },
+  "title": "Title",
+  "@title": {
+    "description": "Title field label"
+  },
+  "description": "Description",
+  "@description": {
+    "description": "Description field label"
+  },
+  "yourStarterPack": "your starter pack",
+  "@yourStarterPack": {
+    "description": "Starter pack placeholder text"
+  },
+  "shareWithFriends": "Share it with your friends and help them discover amazing people!",
+  "@shareWithFriends": {
+    "description": "Share starter pack description"
+  },
+  "shareStarterPack": "share starter pack",
+  "@shareStarterPack": {
+    "description": "Share starter pack button"
+  },
+  "publishStarterPack": "publish starter pack",
+  "@publishStarterPack": {
+    "description": "Publish starter pack button"
+  },
+  "addUsersToContinue": "add users to continue",
+  "@addUsersToContinue": {
+    "description": "Instruction when no users added"
+  },
+  "addUserMenuHint": "you can also use the three dots menu on every post to add a user to a pack",
+  "@addUserMenuHint": {
+    "description": "Helper text for adding users"
+  },
+  "show": "show",
+  "@show": {
+    "description": "Button to reveal content"
+  },
+  "pushNotifications": "Push Notifications",
+  "@pushNotifications": {
+    "description": "Push notifications setting title"
+  },
+  "receiveNotificationsAboutReplies": "You will receive notifications about new replies.",
+  "@receiveNotificationsAboutReplies": {
+    "description": "Notifications enabled status"
+  },
+  "enableNotificationsForReplies": "Enable notifications to get notified about new replies",
+  "@enableNotificationsForReplies": {
+    "description": "Notifications disabled status"
+  },
+  "notificationsDeniedInSettings": "Note: You previously denied notifications. Please enable them in your device settings to receive notifications.",
+  "@notificationsDeniedInSettings": {
+    "description": "Notifications permission denied warning"
+  },
+  "welcomeTo": "welcome to",
+  "@welcomeTo": {
+    "description": "Welcome greeting prefix"
+  },
+  "joinTheConversation": "join the conversation",
+  "@joinTheConversation": {
+    "description": "Join button label"
+  },
+  "errorLoadingNote": "Error loading note",
+  "@errorLoadingNote": {
+    "description": "Error message when note fails to load"
+  },
+  "errorPrefix": "Error: {error}",
+  "@errorPrefix": {
+    "description": "Generic error message with error details",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "errorProcessingLink": "Error processing link: {error}",
+  "@errorProcessingLink": {
+    "description": "Error message when processing deeplink fails",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "processingLink": "processing link:",
+  "@processingLink": {
+    "description": "Status message when processing link"
+  },
+  "noMatchingActionFound": "no matching action found",
+  "@noMatchingActionFound": {
+    "description": "Error when no action matches the link"
+  },
+  "worksOnlyIfInCache": "works only if already in cache",
+  "@worksOnlyIfInCache": {
+    "description": "Description for username search limitation"
+  },
+  "mastodonAddress": "mastodon address (provided by mostr.pub)",
+  "@mastodonAddress": {
+    "description": "Description for mastodon address search"
+  },
+  "amberLogin": "amber login",
+  "@amberLogin": {
+    "description": "Amber login button label"
+  },
+  "seedPhraseLogin": "seed phrase login",
+  "@seedPhraseLogin": {
+    "description": "Seed phrase login button label"
+  },
+  "bunkerLogin": "bunker login",
+  "@bunkerLogin": {
+    "description": "Bunker login button label"
+  },
+  "iHaveReadAndAcceptThe": "I have read and accept the ",
+  "@iHaveReadAndAcceptThe": {
+    "description": "Terms acceptance checkbox prefix"
+  },
+  "installAmber": "install amber",
+  "@installAmber": {
+    "description": "Install Amber button label"
+  },
+  "authoriseAmber": "authorise amber",
+  "@authoriseAmber": {
+    "description": "Authorise Amber button label"
+  },
+  "connect": "connect",
+  "@connect": {
+    "description": "Connect button label"
+  },
+  "followCount": "follow {count}/{target}",
+  "@followCount": {
+    "description": "Follow progress counter",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "target": {
+        "type": "int"
+      }
+    }
+  },
+  "notAvailable": "n.a.",
+  "@notAvailable": {
+    "description": "Abbreviation for not available"
+  },
+  "post": "post",
+  "@post": {
+    "description": "Post button label"
+  },
+  "newPostsCount": "{count} new posts",
+  "@newPostsCount": {
+    "description": "New posts indicator",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "noteReference": "Note reference",
+  "@noteReference": {
+    "description": "Label for note reference link"
+  },
+  "createStarterPack": "create starter pack",
+  "@createStarterPack": {
+    "description": "Create starter pack button label"
+  },
+  "createAnother": "create another",
+  "@createAnother": {
+    "description": "Create another starter pack button"
+  },
+  "starterPackIsLive": "🎉 Your starter pack is live!",
+  "@starterPackIsLive": {
+    "description": "Success message when starter pack is published"
+  },
+  "searchHint": "Search",
+  "@searchHint": {
+    "description": "Search input hint text"
+  },
+  "bunkerUrlHint": "bunker://",
+  "@bunkerUrlHint": {
+    "description": "Bunker URL input hint"
+  },
+  "continueWithPeople": "continue with {count} people",
+  "@continueWithPeople": {
+    "description": "Button to continue with selected people",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "unknown": "Unknown",
+  "@unknown": {
+    "description": "Unknown label for missing data"
+  },
+  "follow": "follow",
+  "@follow": {
+    "description": "Follow button label"
+  },
+  "unfollow": "unfollow",
+  "@unfollow": {
+    "description": "Unfollow button label"
+  },
+  "invalidBunkerUrl": "Invalid bunker URL. Must start with bunker://",
+  "@invalidBunkerUrl": {
+    "description": "Error message for invalid bunker URL format"
+  },
+  "failedToConnectWithError": "Failed to connect: {error}",
+  "@failedToConnectWithError": {
+    "description": "Error message for failed connection with error details",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "byUsingCamelusYouAgree": "By using Camelus you agree to ",
+  "@byUsingCamelusYouAgree": {
+    "description": "Text before terms and conditions link on onboarding page"
+  }
+}

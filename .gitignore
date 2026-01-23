@@ -10,6 +10,8 @@
 .svn/
 .keys/
 migrate_working_dir/
+.env
+
 
 # IntelliJ related
 *.iml
@@ -71,3 +73,12 @@ isar.dll
 # firebase
 firebase_options.dart
 firebase.json
+dart_defines.json
+
+# Flatpak build artifacts
+.flatpak-builder/
+build-dir/
+*.flatpak
+
+/lib/l10n/*.dart
+/untranslated-messages.txt

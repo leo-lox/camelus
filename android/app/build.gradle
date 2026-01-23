@@ -39,8 +39,9 @@ if (flutterVersionName == null) {
 
 
 android {
-    compileSdk 35
-    ndkVersion flutter.ndkVersion
+    compileSdk 36
+    //flutter.ndkVersion
+    ndkVersion "29.0.14206865"
 
     compileOptions {
         coreLibraryDesugaringEnabled true
@@ -67,7 +68,7 @@ android {
         applicationId "de.lox.dev.camelus"
         // You can update the following values to match your application needs.
         // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-build-configuration.
-        minSdkVersion 23
+        minSdkVersion flutter.minSdkVersion
         targetSdkVersion flutter.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName

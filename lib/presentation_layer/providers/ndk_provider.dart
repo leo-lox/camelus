@@ -15,8 +15,8 @@ final ndkProvider = Provider<Ndk>((ref) {
     engine: NdkEngine.JIT,
     cache: db!,
     eventVerifier: eventVerifier,
-    bootstrapRelays: CAMELUS_BOOTSTRAP_RELAYS,
-    logLevel: Logger.logLevels.warning,
+    bootstrapRelays: camelusBootstrapRelays,
+    logLevel: Logger.logLevels.info,
     defaultBroadcastConsiderDonePercent: 0.2,
     eventOutFilters: [bloomFilterRef],
   );
@@ -31,12 +31,13 @@ final ndkProviderLight = Provider<Ndk>((ref) {
   final db = ref.read(dbNdkProvider);
 
   final NdkConfig ndkConfig = NdkConfig(
-      cache: db!,
-      eventVerifier: eventVerifier,
-      bootstrapRelays: [],
-      logLevel: Logger.logLevels.warning,
-      eventOutFilters: [],
-      defaultQueryTimeout: Duration(seconds: 5));
+    cache: db!,
+    eventVerifier: eventVerifier,
+    bootstrapRelays: [],
+    logLevel: Logger.logLevels.warning,
+    eventOutFilters: [],
+    defaultQueryTimeout: Duration(seconds: 5),
+  );
 
   final ndk = Ndk(ndkConfig);
   return ndk;

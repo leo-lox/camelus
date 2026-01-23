@@ -38,9 +38,10 @@ class Bip340 {
     final pubKeyHr = _helpers.encodeBech32(pubKey, 'npub');
 
     return KeyPair(
-        privateKey: privKey,
-        publicKey: pubKey,
-        privateKeyHr: privKeyHr,
-        publicKeyHr: pubKeyHr);
+      privateKey: privKey,
+      publicKey: pubKey,
+      privateKeyHr: privKeyHr,
+      publicKeyHr: pubKeyHr,
+    );
   }
 }

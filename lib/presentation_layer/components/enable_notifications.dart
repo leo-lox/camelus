@@ -2,12 +2,13 @@ import 'dart:async';
 import 'dart:developer';
 import 'dart:io';
 
+import 'package:camelus/l10n/app_localizations.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 
-import '../../config/palette.dart';
 import '../atoms/spinner_center.dart';
 import '../providers/db_app_provider.dart';
 import '../providers/notifications_provider.dart';
@@ -161,34 +162,27 @@ class PushNotificationToggleState
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                'Push Notifications',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
+              Text(
+                AppLocalizations.of(context)!.pushNotifications,
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
               if (isLoading)
-                const SizedBox(
-                  width: 24,
-                  height: 24,
-                  child: SpinnerCenter(),
-                )
+                const SizedBox(width: 24, height: 24, child: SpinnerCenter())
               else
                 Switch(
                   value: notificationsEnabled,
                   onChanged: toggleNotifications,
-                  activeColor: Palette.white,
+                  activeThumbColor: Theme.of(context).colorScheme.onSurface,
                 ),
             ],
           ),
           const SizedBox(height: 8),
           Text(
             notificationsEnabled
-                ? 'You will receive notifications about new replies.'
-                : 'Enable notifications to get notified about new replies',
+                ? AppLocalizations.of(context)!.receiveNotificationsAboutReplies
+                : AppLocalizations.of(context)!.enableNotificationsForReplies,
             style: TextStyle(
-              color: Palette.gray,
+              color: Theme.of(context).colorScheme.inverseSurface,
               fontSize: 14,
             ),
           ),
@@ -197,9 +191,9 @@ class PushNotificationToggleState
             Padding(
               padding: const EdgeInsets.only(top: 8.0),
               child: Text(
-                'Note: You previously denied notifications. Please enable them in your device settings to receive notifications.',
+                AppLocalizations.of(context)!.notificationsDeniedInSettings,
                 style: TextStyle(
-                  color: Palette.warn,
+                  color: Colors.orangeAccent, // hard coded color
                   fontSize: 12,
                   fontStyle: FontStyle.italic,
                 ),

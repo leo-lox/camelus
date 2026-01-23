@@ -1,4 +1,5 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter_riverpod/legacy.dart';
 import 'package:ndk/shared/nips/nip19/nip19.dart';
 
 import '../../../../data_layer/data_sources/serverpod_data_source.dart';
@@ -80,16 +81,16 @@ class EditStarterPackNotifier extends StateNotifier<StarterPackData> {
     this._serverpodProvider,
     StarterPackIdentifier identifier,
   ) : super(
-          StarterPackData(
-            name: identifier.name,
-            title: '',
-            description: '',
-            selectedUsers: [],
-            broadcasted: false,
-            broadcasting: false,
-            imageUploading: false,
-          ),
-        ) {
+        StarterPackData(
+          name: identifier.name,
+          title: '',
+          description: '',
+          selectedUsers: [],
+          broadcasted: false,
+          broadcasting: false,
+          imageUploading: false,
+        ),
+      ) {
     // Load initial data based on starterPackId
     _loadStarterPack(identifier);
   }
@@ -124,10 +125,7 @@ class EditStarterPackNotifier extends StateNotifier<StarterPackData> {
   }
 
   void updateData({String? title, String? description}) {
-    state = state.copyWith(
-      title: title,
-      description: description,
-    );
+    state = state.copyWith(title: title, description: description);
   }
 
   void addUser(String pubkeyey) {
@@ -180,7 +178,9 @@ class EditStarterPackNotifier extends StateNotifier<StarterPackData> {
       //server down
     }
 
-    print(result);
+    if (kDebugMode) {
+      print(result);
+    }
 
     state = state.copyWith(
       broadcasting: false,
@@ -193,25 +193,25 @@ class EditStarterPackNotifier extends StateNotifier<StarterPackData> {
 
   // resets the state
   void reset() {
-    state = state.copyWith(
-      broadcasted: false,
-      broadcasting: false,
-    );
+    state = state.copyWith(broadcasted: false, broadcasting: false);
   }
 }
 
-final editStarterPackProvider = StateNotifierProvider.family<
-    EditStarterPackNotifier, StarterPackData, StarterPackIdentifier>(
-  (ref, identifier) {
-    final listStateProvider =
-        ref.watch(nostrListsFollowStateProvider(identifier.pubkey));
-    final listProvider = ref.watch(nostrListProvider);
-    final serverpodProv = ref.watch(serverpodProvider);
-    return EditStarterPackNotifier(
-      listProvider,
-      listStateProvider,
-      serverpodProv,
-      identifier,
-    );
-  },
-);
+final editStarterPackProvider =
+    StateNotifierProvider.family<
+      EditStarterPackNotifier,
+      StarterPackData,
+      StarterPackIdentifier
+    >((ref, identifier) {
+      final listStateProvider = ref.watch(
+        nostrListsFollowStateProvider(identifier.pubkey),
+      );
+      final listProvider = ref.watch(nostrListProvider);
+      final serverpodProv = ref.watch(serverpodProvider);
+      return EditStarterPackNotifier(
+        listProvider,
+        listStateProvider,
+        serverpodProv,
+        identifier,
+      );
+    });

@@ -1,14 +1,15 @@
+import 'package:camelus/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../../config/onboard_conf.dart';
-import '../../../../config/palette.dart';
 import '../../../../domain_layer/entities/nostr_list.dart';
 import '../../../../domain_layer/entities/onboarding_user_info.dart';
 import '../../../atoms/long_button.dart';
 import '../../../atoms/my_profile_picture.dart';
 import '../../../atoms/spinner_center.dart';
+import '../../../components/responsive_center.dart';
 import '../../../components/starter_packs/starter_pack_card.dart';
 import '../../../providers/metadata_state_provider.dart';
 import '../../../providers/nostr_lists_follow_state_provider.dart';
@@ -100,42 +101,47 @@ class _OnboardingStarterPackState extends ConsumerState<OnboardingStarterPack> {
     final flattenedItems = _buildFlattenedItems();
 
     return Scaffold(
-      backgroundColor: Palette.background,
       appBar: AppBar(
-        backgroundColor: Palette.background,
         leading: Container(),
         leadingWidth: 0,
         title: widget.invitedByPubkey == null
-            ? const Text("Starter Packs")
-            : const Text("Additional Starter Packs"),
+            ? Text(AppLocalizations.of(context)!.starterPacks)
+            : Text(AppLocalizations.of(context)!.additionalStarterPacks),
       ),
-      body: Column(
-        children: [
-          Expanded(
-            child: ListView.builder(
-              itemCount: flattenedItems.length,
-              itemBuilder: (context, index) =>
-                  _buildItemWidget(flattenedItems[index]),
+      body: ResponsiveCenter(
+        maxWidth: 800,
+        child: Column(
+          children: [
+            Expanded(
+              child: ListView.builder(
+                itemCount: flattenedItems.length,
+                itemBuilder: (context, index) =>
+                    _buildItemWidget(flattenedItems[index]),
+              ),
             ),
-          ),
-          const SizedBox(height: 8),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            width: 400,
-            height: 40,
-            child: longButton(
-              name: selectedPubkeys.isNotEmpty
-                  ? "continue with ${selectedPubkeys.length} accounts"
-                  : "select a starter pack",
-              onPressed: (() {
-                widget.submitCallback(selectedPubkeys);
-              }),
-              disabled: selectedPubkeys.isEmpty,
-              inverted: true,
+            const SizedBox(height: 8),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: SizedBox(
+                width: double.infinity,
+                height: 40,
+                child: longButton(
+                  name: selectedPubkeys.isNotEmpty
+                      ? AppLocalizations.of(
+                          context,
+                        )!.continueWithAccounts(selectedPubkeys.length)
+                      : AppLocalizations.of(context)!.selectStarterPack,
+                  onPressed: (() {
+                    widget.submitCallback(selectedPubkeys);
+                  }),
+                  disabled: selectedPubkeys.isEmpty,
+                  inverted: true,
+                ),
+              ),
             ),
-          ),
-          const SizedBox(height: 15),
-        ],
+            const SizedBox(height: 15),
+          ],
+        ),
       ),
     );
   }
@@ -174,16 +180,19 @@ class _OnboardingOpenStarterPackState
   late final List<String> selectedPubkeys;
 
   // Check if nothing of the followSet is selected
-  bool get nothingOfOwnSelected => widget.followSet.elements
-      .every((element) => !selectedPubkeys.contains(element.value));
+  bool get nothingOfOwnSelected => widget.followSet.elements.every(
+    (element) => !selectedPubkeys.contains(element.value),
+  );
 
-  Iterable<NostrListElement> get ownSelected => widget.followSet.elements
-      .where((element) => selectedPubkeys.contains(element.value));
+  Iterable<NostrListElement> get ownSelected => widget.followSet.elements.where(
+    (element) => selectedPubkeys.contains(element.value),
+  );
 
   int get ownSelectedCount => ownSelected.length;
 
-  bool get allSelected => widget.followSet.elements
-      .every((element) => selectedPubkeys.contains(element.value));
+  bool get allSelected => widget.followSet.elements.every(
+    (element) => selectedPubkeys.contains(element.value),
+  );
 
   @override
   void initState() {
@@ -194,9 +203,7 @@ class _OnboardingOpenStarterPackState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Palette.background,
       appBar: AppBar(
-        backgroundColor: Palette.background,
         title: Row(
           crossAxisAlignment: CrossAxisAlignment.baseline,
           textBaseline: TextBaseline.alphabetic,
@@ -205,24 +212,35 @@ class _OnboardingOpenStarterPackState
             Flexible(
               flex: 20,
               child: Text.rich(
-                TextSpan(children: [
-                  TextSpan(
-                    text: widget.followSet.title ?? widget.followSet.name,
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w600,
+                TextSpan(
+                  children: [
+                    TextSpan(
+                      text: widget.followSet.title ?? widget.followSet.name,
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
-                  ),
-                  const TextSpan(text: " "),
-                  TextSpan(
-                    text:
-                        "by ${ref.watch(metadataStateProvider(widget.followSet.pubKey)).userMetadata?.name ?? "Unknown"}",
-                    style: TextStyle(
-                      color: Palette.gray,
-                      fontSize: 12,
+                    const TextSpan(text: " "),
+                    TextSpan(
+                      text: AppLocalizations.of(context)!.by(
+                        ref
+                                .watch(
+                                  metadataStateProvider(
+                                    widget.followSet.pubKey,
+                                  ),
+                                )
+                                .userMetadata
+                                ?.name ??
+                            AppLocalizations.of(context)!.unknown,
+                      ),
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.inverseSurface,
+                        fontSize: 12,
+                      ),
                     ),
-                  ),
-                ]),
+                  ],
+                ),
                 overflow: TextOverflow.ellipsis,
               ),
             ),
@@ -230,19 +248,19 @@ class _OnboardingOpenStarterPackState
             const Spacer(flex: 1),
             if (allSelected)
               longButton(
-                  name: "unselect all",
-                  onPressed: () {
-                    setState(() {
-                      selectedPubkeys.removeWhere((element) {
-                        return widget.followSet.elements
-                            .map((e) => e.value)
-                            .contains(element);
-                      });
+                name: AppLocalizations.of(context)!.unselectAll,
+                onPressed: () {
+                  setState(() {
+                    selectedPubkeys.removeWhere((element) {
+                      return widget.followSet.elements
+                          .map((e) => e.value)
+                          .contains(element);
                     });
-                  })
+                  });
+                },
+              ),
           ],
         ),
-        foregroundColor: Palette.white,
       ),
       body: Column(
         children: [
@@ -279,8 +297,8 @@ class _OnboardingOpenStarterPackState
                           children: [
                             Text(
                               displayMetadata?.name ?? "",
-                              style: const TextStyle(
-                                color: Palette.white,
+                              style: TextStyle(
+                                color: Theme.of(context).colorScheme.onSurface,
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600,
                               ),
@@ -289,8 +307,10 @@ class _OnboardingOpenStarterPackState
                             const SizedBox(height: 4),
                             Text(
                               displayMetadata?.about ?? "",
-                              style: const TextStyle(
-                                color: Palette.gray,
+                              style: TextStyle(
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.inverseSurface,
                                 fontSize: 12,
                               ),
                               maxLines: 3,
@@ -305,32 +325,37 @@ class _OnboardingOpenStarterPackState
                     selectedPubkeys.contains(displayPubkey)
                         ? PhosphorIcons.checkCircle()
                         : PhosphorIcons.circle(),
-                    color: Palette.white,
+                    color: Theme.of(context).colorScheme.onSurface,
                   ),
                 );
               },
             ),
           ),
           const SizedBox(height: 15),
-          Container(
+          Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
-            width: 400,
-            height: 40,
-            child: longButton(
-              name: nothingOfOwnSelected
-                  ? "follow all"
-                  : "follow ${ownSelectedCount} accounts",
-              onPressed: (() {
-                setState(() {
-                  if (nothingOfOwnSelected) {
-                    selectedPubkeys
-                        .addAll(widget.followSet.elements.map((e) => e.value));
-                  }
-                  Navigator.pop(context, selectedPubkeys);
-                });
-              }),
-              disabled: false,
-              inverted: true,
+            child: SizedBox(
+              width: double.infinity,
+              height: 40,
+              child: longButton(
+                name: nothingOfOwnSelected
+                    ? AppLocalizations.of(context)!.followAll
+                    : AppLocalizations.of(
+                        context,
+                      )!.followAccounts(ownSelectedCount),
+                onPressed: (() {
+                  setState(() {
+                    if (nothingOfOwnSelected) {
+                      selectedPubkeys.addAll(
+                        widget.followSet.elements.map((e) => e.value),
+                      );
+                    }
+                    Navigator.pop(context, selectedPubkeys);
+                  });
+                }),
+                disabled: false,
+                inverted: true,
+              ),
             ),
           ),
           const SizedBox(height: 15),

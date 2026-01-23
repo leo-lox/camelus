@@ -3,13 +3,11 @@ import 'package:camelus/domain_layer/entities/nostr_tag.dart';
 class NostrNote {
   final String id;
   final String pubkey;
-  // ignore: non_constant_identifier_names
-  final int created_at;
+  final int createdAt;
   final int kind;
   final String content;
   final String sig;
-  // ignore: non_constant_identifier_names
-  final bool? sig_valid;
+  final bool? sigValid;
   final List<NostrTag> tags;
 
   /// Relay that an event was received from
@@ -18,13 +16,12 @@ class NostrNote {
   NostrNote({
     required this.id,
     required this.pubkey,
-    // ignore: non_constant_identifier_names
-    required this.created_at,
+    required this.createdAt,
     required this.kind,
     required this.content,
     required this.sig,
     required this.tags,
-    this.sig_valid,
+    this.sigValid,
     this.sources = const [],
   });
 
@@ -33,8 +30,8 @@ class NostrNote {
   List<String> _extractRelayHints() {
     List<String> relayHints = [];
     for (NostrTag tag in tags) {
-      if (tag.recommended_relay != null) {
-        relayHints.add(tag.recommended_relay!);
+      if (tag.recommendedRelay != null) {
+        relayHints.add(tag.recommendedRelay!);
       }
     }
     return relayHints;
@@ -42,18 +39,19 @@ class NostrNote {
 
   factory NostrNote.empty({String? id, String? pubkey, int? kind}) {
     return NostrNote(
-        id: id ?? 'missing',
-        pubkey: pubkey ?? 'missing',
-        created_at: 0,
-        kind: kind ?? 1,
-        content: 'missing event',
-        sig: '',
-        tags: []);
+      id: id ?? 'missing',
+      pubkey: pubkey ?? 'missing',
+      createdAt: 0,
+      kind: kind ?? 1,
+      content: 'missing event',
+      sig: '',
+      tags: [],
+    );
   }
 
   @override
   String toString() {
-    return 'NostrNote{id: $id, pubkey: $pubkey, created_at: $created_at, kind: $kind, content: $content, sig: $sig, tags: $tags}';
+    return 'NostrNote{id: $id, pubkey: $pubkey, created_at: $createdAt, kind: $kind, content: $content, sig: $sig, tags: $tags}';
   }
 
   List<NostrTag> get getTagPubkeys {

@@ -19,9 +19,9 @@ class Moderation {
     required ModerationRepository moderationrepository,
     required GetNotes notes,
     required Ndk ndk,
-  })  : _moderationRepository = moderationrepository,
-        _notes = notes,
-        _ndk = ndk;
+  }) : _moderationRepository = moderationrepository,
+       _notes = notes,
+       _ndk = ndk;
 
   Future<void> muteUser(String npub) async {
     throw UnimplementedError();
@@ -59,7 +59,7 @@ class Moderation {
     final now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
     final report = NostrNote(
       content: userReport,
-      created_at: now,
+      createdAt: now,
       id: "",
       kind: _reportKind,
       pubkey: pubkeySubmittingReport,
@@ -68,23 +68,14 @@ class Moderation {
     );
     // profile report
     if (postId == null) {
-      report.tags.add(NostrTag(
-        type: "p",
-        value: reportedPubkey,
-        marker: reportReason,
-      ));
+      report.tags.add(
+        NostrTag(type: "p", value: reportedPubkey, marker: reportReason),
+      );
     } else {
       // event report
       report.tags.addAll([
-        NostrTag(
-          type: "e",
-          value: postId,
-          marker: reportReason,
-        ),
-        NostrTag(
-          type: "p",
-          value: reportedPubkey,
-        ),
+        NostrTag(type: "e", value: postId, marker: reportReason),
+        NostrTag(type: "p", value: reportedPubkey),
       ]);
     }
 
@@ -96,14 +87,10 @@ class Moderation {
 
     final signedReport = NostrNoteModel.fromNDKEvent(ndkEvent);
 
-    final List<Future> futures = [
-      _notes.broadcastNote(signedReport),
-    ];
+    final List<Future> futures = [_notes.broadcastNote(signedReport)];
 
     if (reportToCamelus) {
-      futures.add(
-        _moderationRepository.reportToCamelus(signedReport),
-      );
+      futures.add(_moderationRepository.reportToCamelus(signedReport));
     }
 
     // send report

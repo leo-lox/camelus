@@ -14,30 +14,23 @@ import 'get_notes_provider.dart';
 // Provider for managing notification state
 final notificationsStateProvider =
     NotifierProvider.family<NotificationsState, NotificationViewModel, String>(
-  NotificationsState.new,
-);
-
-class NotificationsState extends FamilyNotifier<NotificationViewModel, String> {
-  static const String SUBSCRIPTION_ID = "notifications-sub";
-  static const String NOTIFICATION_CUTOFF_KEY = "notifications-cutoff";
-
-  Future<void> _resetStateDispose() async {
-    final notesP = ref.watch(getNotesProvider);
-    await notesP.closeSubscription(SUBSCRIPTION_ID);
-    state = NotificationViewModel(
-      timelineNotifications: [],
-      newNotifications: [],
+      NotificationsState.new,
     );
-  }
+
+class NotificationsState extends Notifier<NotificationViewModel> {
+  final String userPubkey;
+  NotificationsState(this.userPubkey);
+
+  static const String subscriptionId = "notifications-sub";
+  static const String notificationCutoffKey = "notifications-cutoff";
 
   @override
-  NotificationViewModel build(String arg) {
+  NotificationViewModel build() {
+    final notesP = ref.read(getNotesProvider);
     // Clean up when provider is disposed
-    ref.onDispose(() {
-      _resetStateDispose();
+    ref.onDispose(() async {
+      await notesP.closeSubscription(subscriptionId);
     });
-
-    final userPubkey = arg;
 
     _setupSubscription(userPubkey);
 
@@ -51,9 +44,7 @@ class NotificationsState extends FamilyNotifier<NotificationViewModel, String> {
   void integrateNewNotifications() {
     _addTimelineNotifications(state.newNotifications);
 
-    state = state.copyWith(
-      newNotifications: [],
-    );
+    state = state.copyWith(newNotifications: []);
 
     ref
         .read(appBottomNavigationBarProvider.notifier)
@@ -67,7 +58,7 @@ class NotificationsState extends FamilyNotifier<NotificationViewModel, String> {
 
     final sub = notesP.genericNostrSubscription(
       since: cutoff,
-      subscriptionId: SUBSCRIPTION_ID,
+      subscriptionId: subscriptionId,
       kinds: [1, 7, 6], // Text notes, reactions, reposts
       pTags: [userPubkey], // Notes mentioning the user
     );
@@ -80,8 +71,6 @@ class NotificationsState extends FamilyNotifier<NotificationViewModel, String> {
 
   // Process incoming notifications
   Future<void> _processNewNotifications(List<NostrNote> notes) async {
-    final userPubkey = arg;
-
     // Filter notes that are interactions with the user's content
     // and convert them to notification objects
     final notifications = _convertToNotifications(notes, userPubkey);
@@ -93,7 +82,9 @@ class NotificationsState extends FamilyNotifier<NotificationViewModel, String> {
 
   // Helper to convert notes to notification objects
   List<NostrNotification> _convertToNotifications(
-      List<NostrNote> notes, String userPubkey) {
+    List<NostrNote> notes,
+    String userPubkey,
+  ) {
     return notes.map((note) {
       NotificationType type;
       String? targetNoteId;
@@ -103,8 +94,10 @@ class NotificationsState extends FamilyNotifier<NotificationViewModel, String> {
         r'nostr:(nprofile|npub)[a-zA-Z0-9]+',
         caseSensitive: false,
       );
-      final List<String> foundProfiles =
-          exp.allMatches(note.content).map((match) => match.group(0)!).toList();
+      final List<String> foundProfiles = exp
+          .allMatches(note.content)
+          .map((match) => match.group(0)!)
+          .toList();
 
       for (var profile in foundProfiles) {
         profile = profile.replaceFirst('nostr:', '');
@@ -115,25 +108,17 @@ class NotificationsState extends FamilyNotifier<NotificationViewModel, String> {
           foundPubkeysContent.add(pubkey);
         } else if (profile.startsWith('npub')) {
           final decoded = Helpers().decodeBech32(profile);
-          pubkey = decoded[0] ?? '';
+          pubkey = decoded[0];
           foundPubkeysContent.add(pubkey);
         }
       }
 
       if (note.kind == 7) {
         type = NotificationType.reaction;
-        targetNoteId = note.tags
-            .firstWhere(
-              (tag) => tag.type == 'e',
-            )
-            .value;
+        targetNoteId = note.tags.firstWhere((tag) => tag.type == 'e').value;
       } else if (note.kind == 6) {
         type = NotificationType.repost;
-        targetNoteId = note.tags
-            .firstWhere(
-              (tag) => tag.type == 'e',
-            )
-            .value;
+        targetNoteId = note.tags.firstWhere((tag) => tag.type == 'e').value;
       } else if (foundPubkeysContent.contains(userPubkey)) {
         type = NotificationType.mention;
       } else if (note.getTagPubkeys.last.value == userPubkey) {
@@ -156,7 +141,7 @@ class NotificationsState extends FamilyNotifier<NotificationViewModel, String> {
 
       return NostrNotification(
         id: note.id,
-        createdAt: note.created_at,
+        createdAt: note.createdAt,
         type: type,
         sourceNote: note,
         targetNoteId: targetNoteId,
@@ -167,7 +152,7 @@ class NotificationsState extends FamilyNotifier<NotificationViewModel, String> {
   // Get the cutoff time for notifications
   Future<int> _getCutoffTime() async {
     final appDbP = ref.read(dbAppProvider);
-    final lastFetch = await appDbP.read(NOTIFICATION_CUTOFF_KEY);
+    final lastFetch = await appDbP.read(notificationCutoffKey);
     return lastFetch != null
         ? int.parse(lastFetch)
         : DateTime.now().millisecondsSinceEpoch ~/ 1000;
@@ -177,7 +162,7 @@ class NotificationsState extends FamilyNotifier<NotificationViewModel, String> {
   Future<void> _saveCutoffTime() async {
     final appDbP = ref.read(dbAppProvider);
     final now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
-    await appDbP.save(key: NOTIFICATION_CUTOFF_KEY, value: now.toString());
+    await appDbP.save(key: notificationCutoffKey, value: now.toString());
   }
 
   // Load more older notifications
@@ -188,8 +173,6 @@ class NotificationsState extends FamilyNotifier<NotificationViewModel, String> {
     if (state.timelineNotifications.isNotEmpty) {
       cutoff = state.timelineNotifications.last.createdAt - 1;
     }
-
-    final userPubkey = arg;
 
     final notesP = ref.watch(getNotesProvider);
     final notesStream = notesP.genericNostrQuery(
@@ -205,9 +188,9 @@ class NotificationsState extends FamilyNotifier<NotificationViewModel, String> {
         .bufferTime(const Duration(milliseconds: 100))
         .where((events) => events.isNotEmpty)
         .listen((data) {
-      final notifications = _convertToNotifications(data, userPubkey);
-      _addTimelineNotifications(notifications);
-    });
+          final notifications = _convertToNotifications(data, userPubkey);
+          _addTimelineNotifications(notifications);
+        });
 
     final notes = await notesStream.toList();
     if (notes.isEmpty) {
@@ -219,22 +202,23 @@ class NotificationsState extends FamilyNotifier<NotificationViewModel, String> {
   // Add notifications to the timeline
   void _addTimelineNotifications(List<NostrNotification> notifications) {
     notifications = notifications.where((notification) {
-      return !state.timelineNotifications
-          .any((element) => element.id == notification.id);
+      return !state.timelineNotifications.any(
+        (element) => element.id == notification.id,
+      );
     }).toList();
 
     state = state.copyWith(
-        timelineNotifications: [
-      ...state.timelineNotifications,
-      ...notifications
-    ]..sort((a, b) => b.createdAt.compareTo(a.createdAt)));
+      timelineNotifications: [...state.timelineNotifications, ...notifications]
+        ..sort((a, b) => b.createdAt.compareTo(a.createdAt)),
+    );
   }
 
   // Add new notifications
   void _addNewNotifications(List<NostrNotification> notifications) {
     state = state.copyWith(
-        newNotifications: [...state.newNotifications, ...notifications]
-          ..sort((a, b) => b.createdAt.compareTo(a.createdAt)));
+      newNotifications: [...state.newNotifications, ...notifications]
+        ..sort((a, b) => b.createdAt.compareTo(a.createdAt)),
+    );
 
     ref
         .read(appBottomNavigationBarProvider.notifier)

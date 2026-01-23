@@ -1,22 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-
-import '../../config/palette.dart';
 
 class CameraUpload extends StatelessWidget {
   final double size;
-  const CameraUpload({
-    super.key,
-    this.size = 50,
-  });
+  const CameraUpload({super.key, this.size = 50});
 
   @override
   Widget build(BuildContext context) {
     return Container(
       width: size,
       height: size,
-      decoration: const BoxDecoration(
-        color: Palette.extraLightGray,
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.onSurface,
         shape: BoxShape.circle,
       ),
       child: Stack(
@@ -25,20 +19,20 @@ class CameraUpload extends StatelessWidget {
           Icon(
             Icons.camera_alt,
             size: size / 3,
-            color: Palette.darkGray,
+            color: Theme.of(context).colorScheme.surfaceContainerHighest,
           ),
           Positioned(
             bottom: 0,
             right: 0,
             child: Container(
               padding: const EdgeInsets.all(4),
-              decoration: const BoxDecoration(
-                color: Palette.darkGray,
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.surfaceContainerHighest,
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 Icons.add,
-                color: Colors.white,
+                color: Theme.of(context).colorScheme.onSurface,
                 size: size / 6,
               ),
             ),

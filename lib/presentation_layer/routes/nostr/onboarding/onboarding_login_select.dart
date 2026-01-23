@@ -1,20 +1,26 @@
 import 'dart:io';
 
+import 'package:camelus/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 
-import '../../../../config/palette.dart';
 import '../../../atoms/long_button.dart';
+import '../../../components/responsive_center.dart';
 
 class OnboardingLoginSelectPage extends ConsumerStatefulWidget {
   final Function onPressedSeedPhraseLogin;
   final Function onPressedAmberLogin;
+  final Function onPressedBunkerLogin;
+  final Function? onPressedBack;
 
   const OnboardingLoginSelectPage({
     super.key,
     required this.onPressedSeedPhraseLogin,
     required this.onPressedAmberLogin,
+    required this.onPressedBunkerLogin,
+    this.onPressedBack,
   });
   @override
   ConsumerState<OnboardingLoginSelectPage> createState() =>
@@ -27,30 +33,38 @@ class _OnboardingLoginSelectPageState
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: null,
-      backgroundColor: Palette.background,
       resizeToAvoidBottomInset: false,
       body: SafeArea(
-        // input for the user to enter their private key, should be visible on a dark background.
-        child: Container(
-          width: MediaQuery.of(context).size.width,
-          height: MediaQuery.of(context).size.height,
+        child: ResponsiveCenter(
+          maxWidth: 600,
           padding: const EdgeInsets.all(30),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              const SizedBox(height: 20),
+              if (widget.onPressedBack != null)
+                Row(
+                  children: [
+                    IconButton(
+                      icon: Icon(
+                        PhosphorIcons.arrowLeft(),
+                        color: Theme.of(context).colorScheme.onSurface,
+                      ),
+                      onPressed: () => widget.onPressedBack!(),
+                    ),
+                  ],
+                ),
+              if (widget.onPressedBack == null) const SizedBox(height: 20),
               SizedBox(
                 height: 200,
-                width: MediaQuery.of(context).size.width,
-                child: const Column(
+                child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      "login",
+                      AppLocalizations.of(context)!.login,
                       style: TextStyle(
-                        color: Palette.white,
+                        color: Theme.of(context).colorScheme.onSurface,
                         fontSize: 40,
                         fontFamily: "Poppins",
                       ),
@@ -58,29 +72,47 @@ class _OnboardingLoginSelectPageState
                   ],
                 ),
               ),
-              const Spacer(
-                flex: 1,
-              ),
+              const Spacer(flex: 1),
               if (Platform.isAndroid)
-                SizedBox(
-                  width: MediaQuery.of(context).size.width,
-                  height: 40,
-                  child: longButton(
-                    name: "amber login",
-                    inverted: false,
-                    onPressed: () => widget.onPressedAmberLogin(),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+
+                  child: SizedBox(
+                    width: double.infinity,
+                    height: 35,
+                    child: longButton(
+                      name: AppLocalizations.of(context)!.amberLogin,
+                      inverted: false,
+                      onPressed: () => widget.onPressedAmberLogin(),
+                    ),
                   ),
                 ),
-              const SizedBox(
-                height: 20,
+              const SizedBox(height: 20),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+
+                child: SizedBox(
+                  width: double.infinity,
+                  height: 35,
+                  child: longButton(
+                    name: AppLocalizations.of(context)!.seedPhraseLogin,
+                    inverted: false,
+                    onPressed: () => widget.onPressedSeedPhraseLogin(),
+                  ),
+                ),
               ),
-              SizedBox(
-                width: MediaQuery.of(context).size.width,
-                height: 40,
-                child: longButton(
-                  name: "seed phrase login",
-                  inverted: false,
-                  onPressed: () => widget.onPressedSeedPhraseLogin(),
+              const SizedBox(height: 20),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+
+                child: SizedBox(
+                  width: double.infinity,
+                  height: 35,
+                  child: longButton(
+                    name: AppLocalizations.of(context)!.bunkerLogin,
+                    inverted: false,
+                    onPressed: () => widget.onPressedBunkerLogin(),
+                  ),
                 ),
               ),
             ],

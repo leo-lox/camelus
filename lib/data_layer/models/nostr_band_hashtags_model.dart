@@ -1,17 +1,17 @@
 import '../../domain_layer/entities/nostr_band_hashtags.dart';
 
 class NostrBandHashtagsModel extends NostrBandHashtags {
-  NostrBandHashtagsModel({
-    required super.hashtags,
-  });
+  NostrBandHashtagsModel({required super.hashtags});
 
   Map<String, dynamic> toJson() {
     return {
       'hashtags': hashtags
-          .map((hashtag) => HashtagInfoModel(
-                hashtag: hashtag.hashtag,
-                posts: hashtag.posts,
-              ).toJson())
+          .map(
+            (hashtag) => HashtagInfoModel(
+              hashtag: hashtag.hashtag,
+              posts: hashtag.posts,
+            ).toJson(),
+          )
           .toList(),
     };
   }
@@ -26,16 +26,10 @@ class NostrBandHashtagsModel extends NostrBandHashtags {
 }
 
 class HashtagInfoModel extends HashtagInfo {
-  HashtagInfoModel({
-    required super.hashtag,
-    required super.posts,
-  });
+  HashtagInfoModel({required super.hashtag, required super.posts});
 
   Map<String, dynamic> toJson() {
-    return {
-      'hashtag': hashtag,
-      'posts': posts,
-    };
+    return {'hashtag': hashtag, 'posts': posts};
   }
 
   factory HashtagInfoModel.fromJson(Map<String, dynamic> json) {

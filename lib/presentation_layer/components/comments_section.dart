@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../../config/palette.dart';
 import '../../domain_layer/entities/parsed_post.dart';
 import 'note_card/note_card_container.dart';
 
@@ -37,10 +36,7 @@ class FlatCommentWidget extends StatelessWidget {
           left: 0,
           top: 0,
           bottom: 0,
-          child: DepthIndicator(
-            isHighlighted: false,
-            depth: comment.depth,
-          ),
+          child: DepthIndicator(isHighlighted: false, depth: comment.depth),
         ),
         Padding(
           padding: EdgeInsets.only(left: comment.depth * 16.0),
@@ -53,11 +49,15 @@ class FlatCommentWidget extends StatelessWidget {
                   child: Container(
                     decoration: BoxDecoration(
                       border: Border.all(
-                        color: Palette.primary.withValues(alpha: 0.65),
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.primary.withValues(alpha: 0.65),
                         width: 2.0,
                       ),
                       borderRadius: BorderRadius.circular(10.0),
-                      color: Palette.primary.withValues(alpha: 0.05),
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.primary.withValues(alpha: 0.05),
                     ),
                   ),
                 ),
@@ -97,15 +97,16 @@ class DepthIndicator extends StatelessWidget {
             margin: const EdgeInsets.only(left: 12),
             decoration: BoxDecoration(
               color: isHighlighted && i == depth - 1
-                  ? Palette.primary
-                  : Palette.lightGray
-                      .withValues(alpha: _calculateOpacity(i + 1)),
+                  ? Theme.of(context).colorScheme.primary
+                  : Theme.of(context).colorScheme.inverseSurface.withValues(
+                      alpha: _calculateOpacity(i + 1),
+                    ),
               // borderRadius: BorderRadius.vertical(
               //   top: Radius.circular(25),
               //   bottom: Radius.circular(25),
               // ),
             ),
-          )
+          ),
       ],
     );
   }

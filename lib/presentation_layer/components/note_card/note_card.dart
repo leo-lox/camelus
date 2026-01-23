@@ -1,14 +1,17 @@
 import 'dart:ui';
 
-import 'package:camelus/domain_layer/entities/parsed_post.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
-import '../../../config/palette.dart';
 import '../../../data_layer/models/post_context.dart';
 import '../../../domain_layer/entities/nostr_note.dart';
+import '../../../domain_layer/entities/parsed_post.dart';
 import '../../../domain_layer/entities/user_metadata.dart';
+import '../../../domain_layer/usecases/app_auth.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../atoms/my_profile_picture.dart';
+import '../../providers/ndk_provider.dart';
 import '../../providers/reactions_state_provider.dart';
 import '../../providers/reposts_state_provider.dart';
 import '../bottom_sheet_share.dart';
@@ -39,35 +42,38 @@ class NoteCard extends ConsumerWidget {
       return _buildMissingNote();
     }
 
+    final ndk = ref.watch(ndkProvider);
+    final canSign = !ndk.accounts.cannotSign;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        if (note.nostrNote.sig_valid != true) _buildInvalidSignature(),
+        if (note.nostrNote.sigValid != true) _buildInvalidSignature(),
         Padding(
           padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
-          child: Row(
+          child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildUserImage(context),
-              const SizedBox(width: 10),
-              Flexible(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    NoteCardNameRow(
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildUserImage(context),
+                  const SizedBox(width: 10),
+                  Flexible(
+                    child: NoteCardNameRow(
                       key: ValueKey("${note.id}name_row"),
                       createdAt: note.created_at,
                       myMetadata: myMetadata,
                       pubkey: note.pubkey,
                     ),
-                    const SizedBox(height: 10),
-                    PostContentWidget(
-                      key: ValueKey("${note.id}split_content"),
-                      post: note,
-                      fontSize: fontSize,
-                    )
-                  ],
-                ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
+              PostContentWidget(
+                key: ValueKey("${note.id}split_content"),
+                post: note,
+                fontSize: fontSize,
               ),
             ],
           ),
@@ -81,9 +87,17 @@ class NoteCard extends ConsumerWidget {
                 isLiked: ref.watch(postLikeProvider(note.nostrNote)).isLiked,
                 key: ValueKey("${note.id}bottom_action_row"),
                 onComment: () {
+                  if (!canSign) {
+                    AppAuth.showLoginPrompt(context);
+                    return;
+                  }
                   _writeReply(context, note.nostrNote);
                 },
                 onLike: () {
+                  if (!canSign) {
+                    AppAuth.showLoginPrompt(context);
+                    return;
+                  }
                   ref
                       .read(postLikeProvider(note.nostrNote).notifier)
                       .toggleLike();
@@ -91,24 +105,35 @@ class NoteCard extends ConsumerWidget {
                 retweetLoading: ref
                     .watch(postRepostProvider(note.nostrNote))
                     .toggleRepostLoading,
-                isRetweeted:
-                    ref.watch(postRepostProvider(note.nostrNote)).isReposted,
+                isRetweeted: ref
+                    .watch(postRepostProvider(note.nostrNote))
+                    .isReposted,
                 onRetweet: () {
+                  if (!canSign) {
+                    AppAuth.showLoginPrompt(context);
+                    return;
+                  }
                   ref
                       .read(postRepostProvider(note.nostrNote).notifier)
                       .toggleRepost();
                 },
                 onShare: () =>
                     openBottomSheetShare(context, ref, note.nostrNote),
-                onMore: () => openBottomSheetMore(context, note.nostrNote),
+                onMore: () {
+                  if (!canSign) {
+                    AppAuth.showLoginPrompt(context);
+                    return;
+                  }
+                  return openBottomSheetMore(context, note.nostrNote);
+                },
               ),
             ),
           ),
         ],
         if (!hideBottomBar)
-          const Divider(
+          Divider(
             thickness: 0.3,
-            color: Palette.darkGray,
+            color: Theme.of(context).colorScheme.surfaceContainerHighest,
           ),
       ],
     );
@@ -119,7 +144,7 @@ class NoteCard extends ConsumerWidget {
       height: 50,
       child: Center(
         child: Text(
-          "Missing note:  ${note.nostrNote.getDirectReply?.recommended_relay},  ${note.nostrNote.getRootReply?.recommended_relay}",
+          "Missing note:  ${note.nostrNote.getDirectReply?.recommendedRelay},  ${note.nostrNote.getRootReply?.recommendedRelay}",
           style: const TextStyle(color: Colors.purple, fontSize: 20),
         ),
       ),
@@ -128,14 +153,19 @@ class NoteCard extends ConsumerWidget {
 
   Widget _buildInvalidSignature() {
     return Center(
-      child: Container(
-        decoration: const BoxDecoration(
-          color: Colors.red,
-          borderRadius: BorderRadius.all(Radius.circular(25)),
-        ),
-        child: const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 25, vertical: 8),
-          child: Text("Invalid signature!", style: TextStyle(fontSize: 15)),
+      child: Builder(
+        builder: (context) => Container(
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.error,
+            borderRadius: BorderRadius.all(Radius.circular(25)),
+          ),
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 25, vertical: 8),
+            child: Text(
+              AppLocalizations.of(context)!.invalidSignature,
+              style: TextStyle(fontSize: 15),
+            ),
+          ),
         ),
       ),
     );
@@ -143,8 +173,7 @@ class NoteCard extends ConsumerWidget {
 
   Widget _buildUserImage(BuildContext context) {
     return GestureDetector(
-      onTap: () => Navigator.pushNamed(context, "/nostr/profile",
-          arguments: note.pubkey),
+      onTap: () => context.push('/nostr/profile/${note.pubkey}'),
       child: UserImage(
         imageUrl: myMetadata?.picture,
         pubkey: note.pubkey,
@@ -154,20 +183,20 @@ class NoteCard extends ConsumerWidget {
   }
 }
 
-void _writeReply(ctx, NostrNote note) {
+void _writeReply(context, NostrNote note) {
   showModalBottomSheet(
-      isScrollControlled: true,
-      elevation: 10,
-      backgroundColor: Palette.background,
-      isDismissible: false,
-      context: ctx,
-      builder: (ctx) => BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
-            child: Padding(
-                padding: EdgeInsets.only(
-                    bottom: MediaQuery.of(ctx).viewInsets.bottom),
-                child: WritePost(
-                  context: PostContext(replyToNote: note),
-                )),
-          ));
+    isScrollControlled: true,
+    elevation: 10,
+    isDismissible: false,
+    context: context,
+    builder: (context) => BackdropFilter(
+      filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+      child: Padding(
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom,
+        ),
+        child: WritePost(context: PostContext(replyToNote: note)),
+      ),
+    ),
+  );
 }

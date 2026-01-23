@@ -1,34 +1,35 @@
-import 'dart:math'; 
-import 'dart:ui'; 
-import 'package:flutter/material.dart'; 
+import 'dart:math';
+import 'dart:ui';
+import 'package:flutter/material.dart';
 
 // A widget that displays a full-screen loading animation with text and animated blobs.
 class FullScreenLoading extends StatefulWidget {
-  final List<String> loadingTexts; 
-  final int numberOfBlobs; 
-  final void Function(void Function()) updateState; 
+  final List<String> loadingTexts;
+  final int numberOfBlobs;
+  final void Function(void Function()) updateState;
 
   const FullScreenLoading({
-    Key? key,
+    super.key,
     required this.loadingTexts,
     this.numberOfBlobs = 5,
     required this.updateState,
-  }) : super(key: key);
+  });
 
   @override
-  _FullScreenLoadingState createState() => _FullScreenLoadingState();
+  State<FullScreenLoading> createState() => _FullScreenLoadingState();
 }
 
 class _FullScreenLoadingState extends State<FullScreenLoading>
     with TickerProviderStateMixin {
   late AnimationController _blobController; // Controls blob animation.
-  late AnimationController _textController; // Controls text fade-in/out animation.
-  late Animation<double> _textOpacity; 
-  int _currentTextIndex = 0; 
-  late List<Blob> blobs; 
+  late AnimationController
+  _textController; // Controls text fade-in/out animation.
+  late Animation<double> _textOpacity;
+  int _currentTextIndex = 0;
+  late List<Blob> blobs;
 
-  String? _successMessage; 
-  bool _showSuccessMessage = false; 
+  String? _successMessage;
+  bool _showSuccessMessage = false;
 
   /// Displays a success message and updates the state.
   void showSuccessMessage(String message) {
@@ -58,7 +59,7 @@ class _FullScreenLoadingState extends State<FullScreenLoading>
       CurvedAnimation(
         parent: _textController,
         curve: Interval(0, 0.5, curve: Curves.easeIn),
-        reverseCurve: Interval(0.5, 1, curve: Curves.easeOut), 
+        reverseCurve: Interval(0.5, 1, curve: Curves.easeOut),
       ),
     );
 
@@ -69,7 +70,8 @@ class _FullScreenLoadingState extends State<FullScreenLoading>
       } else if (status == AnimationStatus.dismissed) {
         setState(() {
           if (_showSuccessMessage && _successMessage != null) {
-            _currentTextIndex = widget.loadingTexts.length; // Show success message.
+            _currentTextIndex =
+                widget.loadingTexts.length; // Show success message.
           } else {
             _currentTextIndex =
                 (_currentTextIndex + 1) % widget.loadingTexts.length;
@@ -96,7 +98,7 @@ class _FullScreenLoadingState extends State<FullScreenLoading>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.transparent, 
+      backgroundColor: Colors.transparent,
       body: Stack(
         children: [
           // Animated blobs in the background.
@@ -115,22 +117,25 @@ class _FullScreenLoadingState extends State<FullScreenLoading>
               animation: _textController,
               builder: (context, child) {
                 return Opacity(
-                  opacity: _textOpacity.value, 
+                  opacity: _textOpacity.value,
                   child: Text(
                     _showSuccessMessage && _successMessage != null
                         ? _successMessage! // Display success message.
-                        : widget.loadingTexts[_currentTextIndex], // Display loading text.
+                        : widget
+                              .loadingTexts[_currentTextIndex], // Display loading text.
                     style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
                       fontFamily: 'Poppins',
-                      color: _showSuccessMessage ? Colors.green : Colors.white,
+                      color: _showSuccessMessage
+                          ? Colors.green
+                          : Theme.of(context).colorScheme.onSurface,
                     ),
                   ),
                 );
               },
             ),
-          )
+          ),
         ],
       ),
     );
@@ -148,7 +153,10 @@ class BlobPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     // Paint each blob on the canvas.
     for (var blob in blobs) {
-      blob.update(animationValue, size); // Update blob properties based on animation.
+      blob.update(
+        animationValue,
+        size,
+      ); // Update blob properties based on animation.
       _drawBlob(canvas, blob); // Draw the blob.
     }
   }
@@ -156,14 +164,16 @@ class BlobPainter extends CustomPainter {
   // Draws an individual blob on the canvas.
   void _drawBlob(Canvas canvas, Blob blob) {
     final paint = Paint()
-      ..shader = RadialGradient(
-        colors: [
-          blob.color.withOpacity(0.85), 
-          blob.color.withOpacity(0.0),
-        ],
-        stops: const [0.0, 1.0], 
-      ).createShader(
-          Rect.fromCircle(center: blob.position, radius: blob.radius))
+      ..shader =
+          RadialGradient(
+            colors: [
+              blob.color.withValues(alpha: 0.85),
+              blob.color.withValues(alpha: 0.0),
+            ],
+            stops: const [0.0, 1.0],
+          ).createShader(
+            Rect.fromCircle(center: blob.position, radius: blob.radius),
+          )
       ..blendMode = BlendMode.xor; // Blend mode for rendering blobs.
 
     canvas.drawCircle(blob.position, blob.radius, paint);
@@ -198,10 +208,10 @@ class Blob {
     endRadius = 60 + random.nextDouble() * 400; // Random end radius.
     radius = startRadius;
     color = Color.fromRGBO(
-      random.nextInt(100) + 100, 
-      random.nextInt(100) + 100, 
+      random.nextInt(100) + 100,
+      random.nextInt(100) + 100,
       255, // Blue component.
-      random.nextDouble(), 
+      random.nextDouble(),
     );
   }
 

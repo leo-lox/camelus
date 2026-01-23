@@ -19,9 +19,7 @@ import 'process_fcm_msg.dart';
 /// called when the app is in the background or terminated.
 /// runs in seperate bg thread
 @pragma('vm:entry-point')
-Future<void> firebaseMessagingBackgroundHandler(
-  RemoteMessage message,
-) async {
+Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   log("Handling a background message: ${message.messageId}");
 
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
@@ -59,15 +57,12 @@ Future<ProviderContainer> _setupProviderBackgroundThread() async {
   final CacheManager cacheManager = dbCacheManager;
 
   providerContainer.read(dbNdkProvider.notifier).setDB(cacheManager);
-  final mySigner = await AppAuth.getEventSigner();
-
-  if (mySigner != null) {
-    /// ndk login
-    providerContainer.read(ndkProviderLight).accounts.loginExternalSigner(
-          signer: mySigner,
-        );
-    providerContainer.read(signerProvider.notifier).setSigner(mySigner);
-  }
+  final startupAcc = await AppAuth.getStartupAccountData();
+  final _ = await AppAuth.loginWithStoredAccount(
+    startupAccountData: startupAcc,
+    signerNoti: providerContainer.read(signerProvider.notifier),
+    ndk: providerContainer.read(ndkProviderLight),
+  );
 
   return providerContainer;
 }

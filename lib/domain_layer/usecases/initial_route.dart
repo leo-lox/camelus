@@ -1,13 +1,11 @@
 import '../repositories/app_db.dart';
 
 class InitialRoute {
-  static const defaultRoute = '/';
+  static const defaultRoute = '/home';
 
   final AppDb _appDb;
 
-  InitialRoute({
-    required AppDb appDb,
-  }) : _appDb = appDb;
+  InitialRoute({required AppDb appDb}) : _appDb = appDb;
 
   Future<String> getInitialRoute() async {
     final savedRoute = await _appDb.read('initalRoute');

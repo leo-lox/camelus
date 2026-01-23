@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:rxdart/rxdart.dart';
 
@@ -13,32 +12,21 @@ import 'inbox_outbox_provider.dart';
 
 // Provider for managing state related to generic feed
 final genericFeedStateProvider = NotifierProvider.autoDispose
-    .family<GenericFeedState, FeedViewModel, FeedFilter>(
-  GenericFeedState.new,
-);
+    .family<GenericFeedState, FeedViewModel, FeedFilter>(GenericFeedState.new);
 
 // State management for a generic feed
-class GenericFeedState
-    extends AutoDisposeFamilyNotifier<FeedViewModel, FeedFilter> {
-  // Resets the state and disposes of active subscriptions
-  Future<void> _resetStateDispose() async {
-    final notesP = ref.watch(getNotesProvider);
-    await notesP.closeSubscription("sub-${arg.feedId}");
-    state = FeedViewModel(
-      timelineRootNotes: [],
-      newRootNotes: [],
-      timelineRootAndReplyNotes: [],
-      newRootAndReplyNotes: [],
-    );
-  }
+class GenericFeedState extends Notifier<FeedViewModel> {
+  final FeedFilter feedFilter;
+  GenericFeedState(this.feedFilter);
 
   @override
-  FeedViewModel build(FeedFilter arg) {
+  FeedViewModel build() {
+    final notesP = ref.read(getNotesProvider);
     // Ensures resources are cleaned up when provider is disposed
-    ref.onDispose(() {
-      _resetStateDispose();
+    ref.onDispose(() async {
+      await notesP.closeSubscription("sub-${feedFilter.feedId}");
     });
-    _setupSubscription(arg); // Initialize data subscription
+    _setupSubscription(feedFilter); // Initialize data subscription
     return FeedViewModel(
       timelineRootNotes: [],
       newRootNotes: [],
@@ -52,10 +40,7 @@ class GenericFeedState
     _addRootTimelineEvents(state.newRootNotes);
     _addRootAndReplyTimelineEvents(state.newRootAndReplyNotes);
 
-    state = state.copyWith(
-      newRootNotes: [],
-      newRootAndReplyNotes: [],
-    );
+    state = state.copyWith(newRootNotes: [], newRootAndReplyNotes: []);
   }
 
   // Sets up a subscription to listen for feed updates
@@ -91,8 +76,9 @@ class GenericFeedState
     final rootAndReplyNotes = networkNotes;
 
     final parsedRootNotes = await NostrParser.parseEvents(rootNotes);
-    final parsedRootAndReplyNotes =
-        await NostrParser.parseEvents(rootAndReplyNotes);
+    final parsedRootAndReplyNotes = await NostrParser.parseEvents(
+      rootAndReplyNotes,
+    );
 
     _addNewRootEvents(parsedRootNotes); // Add new root events
     _addNewRootAndReplyEvents(
@@ -117,8 +103,11 @@ class GenericFeedState
   }
 
   // Fetches network notes based on the filter and cutoff time
-  Stream<NostrNote> _fetchNetworkNotes(FeedFilter filter, int cutoff,
-      {int? limit}) {
+  Stream<NostrNote> _fetchNetworkNotes(
+    FeedFilter filter,
+    int cutoff, {
+    int? limit,
+  }) {
     final notesP = ref.watch(getNotesProvider);
     return notesP.genericNostrQuery(
       requestId: "q-${filter.feedId}",
@@ -138,18 +127,20 @@ class GenericFeedState
     final rootAndReplyNotes = networkNotes;
 
     final parsedRootNotes = await NostrParser.parseEvents(rootNotes);
-    final parsedRootAndReplyNotes =
-        await NostrParser.parseEvents(rootAndReplyNotes);
+    final parsedRootAndReplyNotes = await NostrParser.parseEvents(
+      rootAndReplyNotes,
+    );
 
     _addRootTimelineEvents(parsedRootNotes); // Add root notes to the timeline
     _addRootAndReplyTimelineEvents(
-        parsedRootAndReplyNotes); // Add root and reply notes
+      parsedRootAndReplyNotes,
+    ); // Add root and reply notes
   }
 
   // Loads more notes for infinite scrolling
   Future<void> loadMore() async {
-    int cutoff = await _getCutoffTime(arg.feedId);
-    await _saveCutoffTime(arg.feedId);
+    int cutoff = await _getCutoffTime(feedFilter.feedId);
+    await _saveCutoffTime(feedFilter.feedId);
 
     if (state.timelineRootAndReplyNotes.isNotEmpty) {
       cutoff = state.timelineRootAndReplyNotes.last.created_at - 1;
@@ -157,7 +148,11 @@ class GenericFeedState
 
     final rootNotesBeforeCount = state.timelineRootNotes.length;
 
-    final networkNotesStream = _fetchNetworkNotes(arg, cutoff, limit: 20);
+    final networkNotesStream = _fetchNetworkNotes(
+      feedFilter,
+      cutoff,
+      limit: 20,
+    );
 
     networkNotesStream
         .bufferTime(const Duration(milliseconds: 100))
@@ -185,35 +180,38 @@ class GenericFeedState
     }).toList();
 
     state = state.copyWith(
-        timelineRootNotes: [...state.timelineRootNotes, ...events]
-          ..sort((a, b) => b.created_at.compareTo(a.created_at)));
+      timelineRootNotes: [...state.timelineRootNotes, ...events]
+        ..sort((a, b) => b.created_at.compareTo(a.created_at)),
+    );
   }
 
   // Helper to add new root events
   void _addNewRootEvents(List<ParsedPost> events) {
     state = state.copyWith(
-        newRootNotes: [...state.newRootNotes, ...events]
-          ..sort((a, b) => b.created_at.compareTo(a.created_at)));
+      newRootNotes: [...state.newRootNotes, ...events]
+        ..sort((a, b) => b.created_at.compareTo(a.created_at)),
+    );
   }
 
   // Helper to add root and reply timeline events
   void _addRootAndReplyTimelineEvents(List<ParsedPost> events) {
     events = events.where((event) {
-      return !state.timelineRootAndReplyNotes
-          .any((element) => element.id == event.id);
+      return !state.timelineRootAndReplyNotes.any(
+        (element) => element.id == event.id,
+      );
     }).toList();
 
     state = state.copyWith(
-        timelineRootAndReplyNotes: [
-      ...state.timelineRootAndReplyNotes,
-      ...events
-    ]..sort((a, b) => b.created_at.compareTo(a.created_at)));
+      timelineRootAndReplyNotes: [...state.timelineRootAndReplyNotes, ...events]
+        ..sort((a, b) => b.created_at.compareTo(a.created_at)),
+    );
   }
 
   // Helper to add new root and reply events
   void _addNewRootAndReplyEvents(List<ParsedPost> events) {
     state = state.copyWith(
-        newRootAndReplyNotes: [...state.newRootAndReplyNotes, ...events]
-          ..sort((a, b) => b.created_at.compareTo(a.created_at)));
+      newRootAndReplyNotes: [...state.newRootAndReplyNotes, ...events]
+        ..sort((a, b) => b.created_at.compareTo(a.created_at)),
+    );
   }
 }

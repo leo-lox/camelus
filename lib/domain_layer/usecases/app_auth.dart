@@ -1,17 +1,31 @@
+import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
+import 'dart:ui';
 
 import 'package:amberflutter/amberflutter.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:go_router/go_router.dart';
+import 'package:ndk/data_layer/repositories/signers/nip46_event_signer.dart';
 import 'package:ndk/ndk.dart';
 import 'package:ndk/shared/nips/nip19/nip19.dart';
 import 'package:ndk_amber/ndk_amber.dart';
-
-import '../entities/key_pair.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
+import '../../l10n/app_localizations.dart';
+import '../../presentation_layer/providers/signer_provider.dart';
+import '../entities/stored_account.dart';
 
 /// This class is used to store and retrive user information from secure storage. \
 /// the storage keys [nostrKeys] and [amber] are used to store the user's keypair and amber public key respectively.
 class AppAuth {
+  static const accountStorageKey = kDebugMode
+      ? "DEV_storedAccounts"
+      : "storedAccounts";
+  static const activeAccountPubkeyStorageKey = kDebugMode
+      ? "DEV_activeAccountPubkey"
+      : "activeAccountPubkey";
+
   static FlutterSecureStorage secureStorage = const FlutterSecureStorage();
   static final amber = Amberflutter();
 
@@ -30,18 +44,10 @@ class AppAuth {
     }
     final amberValue = await amber.getPublicKey(
       permissions: [
-        const Permission(
-          type: "nip04_encrypt",
-        ),
-        const Permission(
-          type: "nip04_decrypt",
-        ),
-        const Permission(
-          type: "nip44_encrypt",
-        ),
-        const Permission(
-          type: "nip44_decrypt",
-        ),
+        const Permission(type: "nip04_encrypt"),
+        const Permission(type: "nip04_decrypt"),
+        const Permission(type: "nip44_encrypt"),
+        const Permission(type: "nip44_decrypt"),
         const Permission(type: "sign_event", kind: 0),
         const Permission(type: "sign_event", kind: 1),
         const Permission(type: "sign_event", kind: 2),
@@ -59,8 +65,10 @@ class AppAuth {
     final pubkeyHex = Nip19.decode(npub);
 
     final amberFlutterDS = AmberFlutterDS(amber);
-    final amberSigner =
-        AmberEventSigner(publicKey: pubkeyHex, amberFlutterDS: amberFlutterDS);
+    final amberSigner = AmberEventSigner(
+      publicKey: pubkeyHex,
+      amberFlutterDS: amberFlutterDS,
+    );
     return amberSigner;
   }
 
@@ -71,59 +79,182 @@ class AppAuth {
     }
     final amberFlutterDS = AmberFlutterDS(amber);
     final amberSigner = AmberEventSigner(
-        publicKey: amberPubkey, amberFlutterDS: amberFlutterDS);
+      publicKey: amberPubkey,
+      amberFlutterDS: amberFlutterDS,
+    );
     return amberSigner;
   }
 
-  static Future<KeyPair?> _setupKeys() async {
-    var nostrKeysString = await secureStorage.read(key: "nostrKeys");
-    if (nostrKeysString == null) {
-      return null;
+  /// tries to login with stored account data
+  /// returns the event signer if successful, null otherwise
+  static Future<EventSigner?> loginWithStoredAccount({
+    required StartupAccountData startupAccountData,
+    required SingerNotifier signerNoti,
+    required Ndk ndk,
+  }) async {
+    switch (startupAccountData.loginType) {
+      case LoginType.privateKey:
+        final keyPair = startupAccountData.account!.keyPair!;
+        final signer = Bip340EventSigner(
+          privateKey: keyPair.privateKey,
+          publicKey: keyPair.publicKey,
+        );
+        ndk.accounts.loginExternalSigner(signer: signer);
+        signerNoti.setSigner(signer);
+
+        return signer;
+      case LoginType.amber:
+        final amberPubkey = startupAccountData.account!.pubkey!;
+        final amberSigner = await _amberLogin(amberPubkey);
+
+        ndk.accounts.loginExternalSigner(signer: amberSigner);
+        signerNoti.setSigner(amberSigner);
+
+        return amberSigner;
+
+      case LoginType.bunkerConnection:
+        if (startupAccountData.account!.bunkerConnection == null) {
+          return null;
+        }
+
+        try {
+          final signer = Nip46EventSigner(
+            connection: startupAccountData.account!.bunkerConnection!,
+            requests: ndk.requests,
+            broadcast: ndk.broadcast,
+            cachedPublicKey: startupAccountData.account?.pubkey!,
+          );
+          ndk.accounts.loginExternalSigner(signer: signer);
+
+          signerNoti.setSigner(signer);
+          return signer;
+        } catch (_) {
+          return null;
+        }
+
+      case LoginType.readOnly:
+        // For read-only accounts, use NDK's loginReadOnlyPubkey
+        if (startupAccountData.account?.pubkey != null) {
+          ndk.accounts.loginPublicKey(
+            pubkey: startupAccountData.account!.pubkey!,
+          );
+        }
+        return null;
+
+      case LoginType.anon:
+        return null;
+
+      case LoginType.register:
+        return null;
     }
-    final myKeyPair = KeyPair.fromJson(json.decode(nostrKeysString));
-    return myKeyPair;
   }
 
-  /// gets the current used event signer based on storage
-  /// null if no valid event signer is found => user needs to register
-  static Future<EventSigner?> getEventSigner() async {
-    final myKeyPair = await _setupKeys();
+  static Future<StartupAccountData> getStartupAccountData() async {
+    final activeAccountPubkey = await secureStorage.read(
+      key: AppAuth.activeAccountPubkeyStorageKey,
+    );
+    final storedAccountsString = await secureStorage.read(
+      key: AppAuth.accountStorageKey,
+    );
 
-    if (myKeyPair != null) {
-      final signer = Bip340EventSigner(
-        privateKey: myKeyPair.privateKey,
-        publicKey: myKeyPair.publicKey,
+    if (activeAccountPubkey == null || storedAccountsString == null) {
+      return StartupAccountData(loginType: LoginType.anon);
+    }
+
+    final storedAccounts = jsonDecode(storedAccountsString) as List;
+    final storedAccountsList = storedAccounts
+        .map((e) => LocalStorageAccount.fromJson(e))
+        .toList();
+
+    // check if pubkey matches
+
+    LocalStorageAccount matchedAccount;
+    try {
+      matchedAccount = storedAccountsList.firstWhere(
+        (account) => account.pubkey == activeAccountPubkey,
       );
-      return signer;
+    } catch (e) {
+      // if no match found, use last account or register if list is empty
+      matchedAccount = storedAccountsList.isNotEmpty
+          ? storedAccountsList.last
+          : LocalStorageAccount(loginType: LoginType.anon);
     }
 
-    // no amber on other platforms
-    if (!Platform.isAndroid) {
-      return null;
-    }
-    // check if amber is used
-    final amberInstalled = await amber.isAppInstalled();
+    return StartupAccountData(
+      loginType: matchedAccount.loginType,
+      account: matchedAccount,
+    );
+  }
 
-    if (!amberInstalled) {
-      return null;
+  static Future<void> addStoredAccount({
+    required LocalStorageAccount account,
+    bool setActive = true,
+  }) async {
+    final storedAccountsString = await secureStorage.read(
+      key: AppAuth.accountStorageKey,
+    );
+    List<LocalStorageAccount> storedAccounts = [];
+    if (storedAccountsString != null) {
+      final storedAccountsJson = jsonDecode(storedAccountsString) as List;
+      storedAccounts = storedAccountsJson
+          .map((e) => LocalStorageAccount.fromJson(e))
+          .toList();
     }
-    final amberPubkey = await secureStorage.read(key: "amber");
-
-    // not registered with amber
-    if (amberPubkey == null) {
-      return null;
+    storedAccounts.add(account);
+    await secureStorage.write(
+      key: AppAuth.accountStorageKey,
+      value: jsonEncode(storedAccounts.map((e) => e.toJson()).toList()),
+    );
+    if (setActive && account.pubkey != null) {
+      await secureStorage.write(
+        key: AppAuth.activeAccountPubkeyStorageKey,
+        value: account.pubkey!,
+      );
     }
-
-    // ok to login with amber
-    return await _amberLogin(amberPubkey);
   }
 
   /// deltes the keys from storage.
   /// This is used to log out the user
-  static Future<void> clearKeys() async {
-    secureStorage.delete(
-      key: "nostrKeys",
+  static Future<void> clearAllAccounts() async {
+    await secureStorage.delete(key: AppAuth.activeAccountPubkeyStorageKey);
+    await secureStorage.delete(key: AppAuth.accountStorageKey);
+  }
+
+  static void showLoginPrompt(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+        child: AlertDialog(
+          icon: Icon(
+            PhosphorIcons.lockKey(),
+            size: 48,
+            color: Theme.of(context).colorScheme.primary,
+          ),
+          title: Text(
+            AppLocalizations.of(context)!.loginRegistrationRequired,
+            textAlign: TextAlign.center,
+          ),
+          content: Text(
+            AppLocalizations.of(context)!.pleaseLoginToInteract,
+            textAlign: TextAlign.center,
+          ),
+          actionsAlignment: MainAxisAlignment.center,
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(AppLocalizations.of(context)!.cancel),
+            ),
+            FilledButton(
+              onPressed: () {
+                Navigator.pop(context);
+                context.push('/onboarding');
+              },
+              child: Text(AppLocalizations.of(context)!.loginRegister),
+            ),
+          ],
+        ),
+      ),
     );
-    secureStorage.delete(key: "amber");
   }
 }

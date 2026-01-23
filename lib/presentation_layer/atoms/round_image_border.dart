@@ -1,18 +1,12 @@
 import 'dart:typed_data';
 
-import 'package:flutter/widgets.dart';
-
-import '../../config/palette.dart';
+import 'package:flutter/material.dart';
 
 class RoundImageWithBorder extends StatelessWidget {
   final Uint8List image;
   final double size;
 
-  const RoundImageWithBorder({
-    super.key,
-    required this.image,
-    this.size = 100,
-  });
+  const RoundImageWithBorder({super.key, required this.image, this.size = 100});
 
   @override
   Widget build(BuildContext context) {
@@ -21,14 +15,12 @@ class RoundImageWithBorder extends StatelessWidget {
       height: size,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        border: Border.all(color: Palette.black, width: 2),
-      ),
-      child: ClipOval(
-        child: Image.memory(
-          image,
-          fit: BoxFit.cover,
+        border: Border.all(
+          color: Theme.of(context).colorScheme.surface,
+          width: 2,
         ),
       ),
+      child: ClipOval(child: Image.memory(image, fit: BoxFit.cover)),
     );
   }
 }

@@ -1,8 +1,8 @@
+import 'package:camelus/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
-import '../../../../../config/palette.dart';
 import '../../../../providers/language_provider.dart';
 
 class LocaleSettingsPage extends ConsumerStatefulWidget {
@@ -22,6 +22,7 @@ class LocaleSettingsPageState extends ConsumerState<LocaleSettingsPage> {
     {'name': 'Português', 'locale': const Locale('pt', 'BR')},
     {'name': 'Español', 'locale': const Locale('es', 'ES')},
     {'name': 'Français', 'locale': const Locale('fr', 'FR')},
+    {'name': 'Русский', 'locale': const Locale('ru', 'RU')},
   ];
 
   bool _isSystemLanguage = false;
@@ -43,9 +44,9 @@ class LocaleSettingsPageState extends ConsumerState<LocaleSettingsPage> {
     setState(() {
       _isSystemLanguage =
           currentLocale.languageCode == systemLocale.languageCode &&
-              (currentLocale.countryCode == systemLocale.countryCode ||
-                  (currentLocale.countryCode == null &&
-                      systemLocale.countryCode == null));
+          (currentLocale.countryCode == systemLocale.countryCode ||
+              (currentLocale.countryCode == null &&
+                  systemLocale.countryCode == null));
     });
   }
 
@@ -55,28 +56,25 @@ class LocaleSettingsPageState extends ConsumerState<LocaleSettingsPage> {
     final languageNotifier = ref.watch(languageProvider.notifier);
 
     return Scaffold(
-      backgroundColor: Palette.background,
       appBar: AppBar(
-        title: const Text('Language Settings'),
-        backgroundColor: Palette.background,
+        title: Text(AppLocalizations.of(context)!.languageSettings),
       ),
       body: Column(
         children: [
           const SizedBox(height: 10),
-          Text("notice: language is still in development!",
-              style: TextStyle(
-                color: Palette.error,
-                fontSize: 16,
-              )),
-          const SizedBox(height: 10),
 
           ListTile(
             title: Text(
-              'Use System Language',
-              style: TextStyle(color: Palette.lightGray),
+              AppLocalizations.of(context)!.useSystemLanguage,
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.inverseSurface,
+              ),
             ),
             trailing: _isSystemLanguage
-                ? Icon(PhosphorIcons.check(), color: Palette.white)
+                ? Icon(
+                    PhosphorIcons.check(),
+                    color: Theme.of(context).colorScheme.onSurface,
+                  )
                 : null,
             onTap: () async {
               await languageNotifier.resetToSystemLanguage(context);
@@ -84,10 +82,13 @@ class LocaleSettingsPageState extends ConsumerState<LocaleSettingsPage> {
                 _isSystemLanguage = true;
               });
             },
-            tileColor: Palette.background,
+            tileColor: Theme.of(context).colorScheme.surface,
           ),
 
-          const Divider(color: Palette.darkGray, height: 1),
+          Divider(
+            color: Theme.of(context).colorScheme.surfaceContainerHighest,
+            height: 1,
+          ),
 
           // Available languages list
           Expanded(
@@ -96,17 +97,23 @@ class LocaleSettingsPageState extends ConsumerState<LocaleSettingsPage> {
               itemBuilder: (context, index) {
                 final localeInfo = availableLocales[index];
                 final locale = localeInfo['locale'] as Locale;
-                final isSelected = !_isSystemLanguage &&
+                final isSelected =
+                    !_isSystemLanguage &&
                     currentLocale.languageCode == locale.languageCode &&
                     currentLocale.countryCode == locale.countryCode;
 
                 return ListTile(
                   title: Text(
                     localeInfo['name'],
-                    style: TextStyle(color: Palette.lightGray),
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.inverseSurface,
+                    ),
                   ),
                   trailing: isSelected
-                      ? Icon(PhosphorIcons.check(), color: Palette.white)
+                      ? Icon(
+                          PhosphorIcons.check(),
+                          color: Theme.of(context).colorScheme.onSurface,
+                        )
                       : null,
                   onTap: () async {
                     await languageNotifier.changeLanguage(locale);
@@ -114,7 +121,7 @@ class LocaleSettingsPageState extends ConsumerState<LocaleSettingsPage> {
                       _isSystemLanguage = false;
                     });
                   },
-                  tileColor: Palette.background,
+                  tileColor: Theme.of(context).colorScheme.surface,
                 );
               },
             ),

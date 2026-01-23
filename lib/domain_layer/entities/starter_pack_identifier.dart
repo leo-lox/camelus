@@ -2,10 +2,7 @@ class StarterPackIdentifier {
   final String pubkey;
   final String name;
 
-  StarterPackIdentifier({
-    required this.pubkey,
-    required this.name,
-  });
+  StarterPackIdentifier({required this.pubkey, required this.name});
 
   @override
   bool operator ==(Object other) {

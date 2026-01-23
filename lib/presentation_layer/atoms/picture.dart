@@ -5,7 +5,8 @@ import 'package:flutter_svg/svg.dart';
 Widget simplePicture(String? pictureUrl, String? pubkey) {
   if (pictureUrl == null) {
     return SvgPicture.network(
-        "https://api.dicebear.com/7.x/personas/svg?seed=$pubkey");
+      "https://api.dicebear.com/7.x/personas/svg?seed=$pubkey",
+    );
   }
 
   if (pictureUrl.contains(".svg")) {
@@ -27,5 +28,6 @@ Widget simplePicture(String? pictureUrl, String? pubkey) {
   }
 
   return SvgPicture.network(
-      "https://api.dicebear.com/7.x/personas/svg?seed=$pubkey");
+    "https://api.dicebear.com/7.x/personas/svg?seed=$pubkey",
+  );
 }

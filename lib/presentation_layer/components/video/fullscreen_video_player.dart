@@ -5,7 +5,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:video_player/video_player.dart';
 
-import '../../../config/palette.dart';
 import 'video_player_state_provider.dart';
 
 class FullScreenVideoPlayer extends ConsumerStatefulWidget {
@@ -49,9 +48,7 @@ class _FullScreenVideoPlayerState extends ConsumerState<FullScreenVideoPlayer> {
       ]);
     } else {
       // Portrait or square video - keep portrait
-      SystemChrome.setPreferredOrientations([
-        DeviceOrientation.portraitUp,
-      ]);
+      SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
     }
   }
 
@@ -67,8 +64,9 @@ class _FullScreenVideoPlayerState extends ConsumerState<FullScreenVideoPlayer> {
   @override
   Widget build(BuildContext context) {
     final videoState = ref.watch(videoPlayerProvider(widget.videoId));
-    final videoStateNoti =
-        ref.watch(videoPlayerProvider(widget.videoId).notifier);
+    final videoStateNoti = ref.watch(
+      videoPlayerProvider(widget.videoId).notifier,
+    );
     final controller = widget.controller;
 
     return Scaffold(
@@ -122,9 +120,13 @@ class _FullScreenVideoPlayerState extends ConsumerState<FullScreenVideoPlayer> {
                       controller,
                       allowScrubbing: true,
                       colors: VideoProgressColors(
-                        backgroundColor: Palette.darkGray,
-                        bufferedColor: Palette.gray,
-                        playedColor: Palette.extraLightGray,
+                        backgroundColor: Theme.of(
+                          context,
+                        ).colorScheme.surfaceContainerHighest,
+                        bufferedColor: Theme.of(
+                          context,
+                        ).colorScheme.inverseSurface,
+                        playedColor: Theme.of(context).colorScheme.onSurface,
                       ),
                     ),
                     SizedBox(height: 10),
@@ -141,11 +143,15 @@ class _FullScreenVideoPlayerState extends ConsumerState<FullScreenVideoPlayer> {
                           ),
                           onPressed: () {
                             if (videoState.volume == 0.0) {
-                              videoStateNoti.setVolume(1.0,
-                                  userInteraction: true);
+                              videoStateNoti.setVolume(
+                                1.0,
+                                userInteraction: true,
+                              );
                             } else {
-                              videoStateNoti.setVolume(0.0,
-                                  userInteraction: true);
+                              videoStateNoti.setVolume(
+                                0.0,
+                                userInteraction: true,
+                              );
                             }
                           },
                         ),
@@ -169,11 +175,7 @@ class _FullScreenVideoPlayerState extends ConsumerState<FullScreenVideoPlayer> {
                 top: MediaQuery.of(context).padding.top + 10,
                 left: 10,
                 child: IconButton(
-                  icon: Icon(
-                    Icons.arrow_back,
-                    color: Colors.white,
-                    size: 32,
-                  ),
+                  icon: Icon(Icons.arrow_back, color: Colors.white, size: 32),
                   onPressed: () {
                     Navigator.of(context).pop();
                   },

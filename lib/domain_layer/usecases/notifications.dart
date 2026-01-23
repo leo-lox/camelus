@@ -16,22 +16,20 @@ class Notifications {
   final ndk.EventSigner? _eventSigner;
   final InboxOutbox _inboxOutbox;
 
-  Notifications(
-      {required NotificationsRepository notificationsRepository,
-      required ndk.EventSigner? eventSigner,
-      required InboxOutbox inboxOutbox})
-      : _notificationsRepo = notificationsRepository,
-        _eventSigner = eventSigner,
-        _inboxOutbox = inboxOutbox;
+  Notifications({
+    required NotificationsRepository notificationsRepository,
+    required ndk.EventSigner? eventSigner,
+    required InboxOutbox inboxOutbox,
+  }) : _notificationsRepo = notificationsRepository,
+       _eventSigner = eventSigner,
+       _inboxOutbox = inboxOutbox;
 
-  Future<bool> registerDevice({
-    required String token,
-  }) async {
+  Future<bool> registerDevice({required String token}) async {
     if (_eventSigner == null) {
       throw Exception("cannot register device without signer");
     }
 
-    final myPubkey = _eventSigner!.getPublicKey();
+    final myPubkey = _eventSigner.getPublicKey();
 
     final nip65data = await _inboxOutbox.getNip65data(myPubkey);
 
@@ -43,7 +41,7 @@ class Notifications {
           .map((e) => e.key)
           .toList();
     } else {
-      readRelays = DEFAULT_ACCOUNT_CREATION_RELAYS.entries
+      readRelays = defaultAccountCreationRelays.entries
           .where((e) => e.value.isRead)
           .map((e) => e.key)
           .toList();
@@ -52,23 +50,15 @@ class Notifications {
     final registrationNote = NostrNote(
       id: "",
       pubkey: myPubkey,
-      created_at: DateTime.now().millisecondsSinceEpoch ~/ 1000,
+      createdAt: DateTime.now().millisecondsSinceEpoch ~/ 1000,
       kind: 0,
       content: "",
       sig: "",
       tags: [
-        NostrTag(
-          type: "challenge",
-          value: token,
-        ),
-        ...readRelays.map(
-          (relayUrl) {
-            return NostrTag(
-              type: "relay",
-              value: relayUrl,
-            );
-          },
-        ),
+        NostrTag(type: "challenge", value: token),
+        ...readRelays.map((relayUrl) {
+          return NostrTag(type: "relay", value: relayUrl);
+        }),
 
         //NostrTag(type: "relay", value: "ws://localhost:10547")
       ],
@@ -121,7 +111,7 @@ class Notifications {
   /// gets called on lauch if payload is found
   static processNotificationPayload(String? payload) {
     if (payload != null) {
-      final payloadJson = jsonDecode(payload!);
+      final payloadJson = jsonDecode(payload);
       final nostrNoteJson = jsonDecode(payloadJson['note']);
       final bool likleyDirectReply = payloadJson['likleyDirectReply'];
       final nostrNote = NostrNoteModel.fromJson(nostrNoteJson);
@@ -130,11 +120,13 @@ class Notifications {
         final replyId = nostrNote.getDirectReply?.value;
         final rootId = nostrNote.getRootReply?.value;
 
-        navigatorKey.currentState
-            ?.pushNamed("/nostr/event", arguments: <String, String?>{
-          "root": rootId ?? replyId ?? nostrNote.id,
-          "scrollIntoView": replyId,
-        });
+        navigatorKey.currentState?.pushNamed(
+          "/nostr/event",
+          arguments: <String, String?>{
+            "root": rootId ?? replyId ?? nostrNote.id,
+            "scrollIntoView": replyId,
+          },
+        );
       }
     }
   }

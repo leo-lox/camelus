@@ -11,10 +11,8 @@ class UserReposts {
   final NoteRepository _noteRepository;
   final String? selfPubkey;
 
-  UserReposts({
-    required NoteRepository noteRepository,
-    this.selfPubkey,
-  }) : _noteRepository = noteRepository;
+  UserReposts({required NoteRepository noteRepository, this.selfPubkey})
+    : _noteRepository = noteRepository;
 
   Future<bool> isPostSelfReposted({required String postId}) async {
     if (selfPubkey == null) {
@@ -54,9 +52,7 @@ class UserReposts {
   /// repost a post \
   /// [postToRepost] the post to repost \
   ///
-  Future<void> repostPost({
-    required NostrNote postToRepost,
-  }) {
+  Future<void> repostPost({required NostrNote postToRepost}) {
     if (selfPubkey == null) {
       throw Exception("selfPubkey is null");
     }
@@ -65,12 +61,12 @@ class UserReposts {
 
     final selectedSource = recivedOnRelays.isNotEmpty
         ? recivedOnRelays.first
-        : DEFAULT_ACCOUNT_CREATION_RELAYS.keys.last;
+        : defaultAccountCreationRelays.keys.last;
 
     final postToRepostModel = NostrNoteModel(
       id: postToRepost.id,
       pubkey: postToRepost.pubkey,
-      created_at: postToRepost.created_at,
+      createdAt: postToRepost.createdAt,
       kind: postToRepost.kind,
       content: postToRepost.content,
       sig: postToRepost.sig,
@@ -81,7 +77,7 @@ class UserReposts {
     final myRepost = NostrNote(
       content: jsonEncode(postToRepostModel.toJson()),
       pubkey: selfPubkey!,
-      created_at: now,
+      createdAt: now,
       kind: 6,
       id: "",
       sig: "",
@@ -89,7 +85,7 @@ class UserReposts {
         NostrTag(
           type: "e",
           value: postToRepost.id,
-          recommended_relay: selectedSource,
+          recommendedRelay: selectedSource,
         ),
         NostrTag(type: "p", value: postToRepost.pubkey),
       ],
@@ -116,8 +112,6 @@ class UserReposts {
       throw Exception("Repost event not found");
     }
 
-    return _noteRepository.deleteNote(
-      myRepostEvent.id,
-    );
+    return _noteRepository.deleteNote(myRepostEvent.id);
   }
 }

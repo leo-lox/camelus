@@ -1,59 +1,59 @@
 class NostrList {
-  static const int MUTE = 10000;
-  static const int PIN = 10001;
-  static const int BOOKMARKS = 10003;
-  static const int COMMUNITIES = 10004;
-  static const int PUBLIC_CHATS = 10005;
-  static const int BLOCKED_RELAYS = 10006;
-  static const int SEARCH_RELAYS = 10007;
-  static const int INTERESTS = 10015;
-  static const int EMOJIS = 10030;
+  static const int mute = 10000;
+  static const int pin = 10001;
+  static const int bookmarks = 10003;
+  static const int communities = 10004;
+  static const int publicChats = 10005;
+  static const int blockedRelays = 10006;
+  static const int searchRelays = 10007;
+  static const int interests = 10015;
+  static const int emojis = 10030;
 
-  static const int FOLLOW_SET = 30000;
-  static const int STARTER_PACK = 39089;
-  static const int RELAY_SET = 30002;
-  static const int BOOKMARKS_SET = 30003;
-  static const int CURATION_SET = 30004;
-  static const int INTERESTS_SET = 30015;
-  static const int EMOJIS_SET = 30030;
+  static const int followSet = 30000;
+  static const int starterPack = 39089;
+  static const int relaySet = 30002;
+  static const int bookmarksSet = 30003;
+  static const int curationSet = 30004;
+  static const int interestsSet = 30015;
+  static const int emojisSet = 30030;
 
-  static const String RELAY = "relay";
-  static const String PUB_KEY = "p";
-  static const String HASHTAG = "t";
-  static const String WORD = "word";
-  static const String THREAD = "e";
-  static const String RESOURCE = "r";
-  static const String EMOJI = "emoji";
+  static const String relay = "relay";
+  static const String pubkeyTagKey = "p";
+  static const String hashtag = "t";
+  static const String word = "word";
+  static const String thread = "e";
+  static const String ressource = "r";
+  static const String emoji = "emoji";
   static const String A = "a";
 
-  static const List<int> POSSIBLE_KINDS = [
-    MUTE,
-    PIN,
-    BOOKMARKS,
-    COMMUNITIES,
-    PUBLIC_CHATS,
-    BLOCKED_RELAYS,
-    SEARCH_RELAYS,
-    INTERESTS,
-    EMOJIS,
-    FOLLOW_SET,
-    STARTER_PACK,
-    RELAY_SET,
-    BOOKMARKS_SET,
-    CURATION_SET,
-    INTERESTS_SET,
-    EMOJIS_SET
+  static const List<int> possibleKinds = [
+    mute,
+    pin,
+    bookmarks,
+    communities,
+    publicChats,
+    blockedRelays,
+    searchRelays,
+    interests,
+    emojis,
+    followSet,
+    starterPack,
+    relaySet,
+    bookmarksSet,
+    curationSet,
+    interestsSet,
+    emojisSet,
   ];
 
-  static const List<String> POSSIBLE_TAGS = [
-    RELAY,
-    PUB_KEY,
-    HASHTAG,
-    WORD,
-    THREAD,
-    RESOURCE,
-    EMOJI,
-    A
+  static const List<String> possibleTags = [
+    relay,
+    pubkeyTagKey,
+    hashtag,
+    word,
+    thread,
+    ressource,
+    emoji,
+    A,
   ];
 
   String? id;
@@ -65,11 +65,11 @@ class NostrList {
   List<NostrListElement> byTag(String tag) =>
       elements.where((element) => element.tag == tag).toList();
 
-  List<NostrListElement> get relays => byTag(RELAY);
-  List<NostrListElement> get pubKeys => byTag(PUB_KEY);
-  List<NostrListElement> get hashtags => byTag(HASHTAG);
-  List<NostrListElement> get words => byTag(WORD);
-  List<NostrListElement> get threads => byTag(THREAD);
+  List<NostrListElement> get relays => byTag(relay);
+  List<NostrListElement> get pubKeys => byTag(pubkeyTagKey);
+  List<NostrListElement> get hashtags => byTag(hashtag);
+  List<NostrListElement> get words => byTag(word);
+  List<NostrListElement> get threads => byTag(thread);
 
   List<String> get publicRelays =>
       relays.where((element) => !element.private).map((e) => e.value).toList();
@@ -77,15 +77,21 @@ class NostrList {
       relays.where((element) => !element.private).map((e) => e.value).toList();
 
   set privateRelays(List<String> list) {
-    elements.removeWhere((element) => element.tag == RELAY && element.private);
-    elements.addAll(list
-        .map((url) => NostrListElement(tag: RELAY, value: url, private: true)));
+    elements.removeWhere((element) => element.tag == relay && element.private);
+    elements.addAll(
+      list.map(
+        (url) => NostrListElement(tag: relay, value: url, private: true),
+      ),
+    );
   }
 
   set publicRelays(List<String> list) {
-    elements.removeWhere((element) => element.tag == RELAY && !element.private);
-    elements.addAll(list.map(
-        (url) => NostrListElement(tag: RELAY, value: url, private: false)));
+    elements.removeWhere((element) => element.tag == relay && !element.private);
+    elements.addAll(
+      list.map(
+        (url) => NostrListElement(tag: relay, value: url, private: false),
+      ),
+    );
   }
 
   late int createdAt;
@@ -98,13 +104,13 @@ class NostrList {
   // coverage:ignore-end
 
   String get displayTitle {
-    if (kind == NostrList.SEARCH_RELAYS) {
+    if (kind == NostrList.searchRelays) {
       return "Search";
     }
-    if (kind == NostrList.BLOCKED_RELAYS) {
+    if (kind == NostrList.blockedRelays) {
       return "Blocked";
     }
-    if (kind == NostrList.MUTE) {
+    if (kind == NostrList.mute) {
       return "Mute";
     }
     return "kind $kind";
@@ -127,16 +133,18 @@ class NostrList {
       if (length <= 1) continue;
       final tagName = tag[0];
       final value = tag[1];
-      if (POSSIBLE_TAGS.contains(tagName)) {
+      if (possibleTags.contains(tagName)) {
         elements.add(
-            NostrListElement(tag: tagName, value: value, private: private));
+          NostrListElement(tag: tagName, value: value, private: private),
+        );
       }
     }
   }
 
   void addRelay(String relayUrl, bool private) {
-    elements
-        .add(NostrListElement(tag: RELAY, value: relayUrl, private: private));
+    elements.add(
+      NostrListElement(tag: relay, value: relayUrl, private: private),
+    );
   }
 
   void addElement(String tag, String value, bool private) {
@@ -145,12 +153,14 @@ class NostrList {
 
   void removeRelay(String relayUrl) {
     elements.removeWhere(
-        (element) => element.tag == RELAY && element.value == relayUrl);
+      (element) => element.tag == relay && element.value == relayUrl,
+    );
   }
 
   void removeElement(String tag, String value) {
-    elements
-        .removeWhere((element) => element.tag == tag && element.value == value);
+    elements.removeWhere(
+      (element) => element.tag == tag && element.value == value,
+    );
   }
 }
 
@@ -187,7 +197,7 @@ class NostrStarterPack extends NostrList {
     this.description,
     required super.createdAt,
     required super.elements,
-    super.kind = NostrList.STARTER_PACK,
+    super.kind = NostrList.starterPack,
   });
 
   void parseSetTags(List tags) {

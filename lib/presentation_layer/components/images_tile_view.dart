@@ -1,5 +1,4 @@
 import 'package:camelus/presentation_layer/components/images_gallery.dart';
-import 'package:camelus/config/palette.dart';
 import 'package:camelus/helpers/helpers.dart';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -26,8 +25,10 @@ class ImagesTileView extends StatelessWidget {
         if (imageCount == 1) {
           return ClipRRect(
             borderRadius: BorderRadius.circular(10),
-            child:
-                _buildSingleImageWithAspectRatio(context, constraints.maxWidth),
+            child: _buildSingleImageWithAspectRatio(
+              context,
+              constraints.maxWidth,
+            ),
           );
         }
 
@@ -48,7 +49,9 @@ class ImagesTileView extends StatelessWidget {
   }
 
   Widget _buildSingleImageWithAspectRatio(
-      BuildContext context, double maxWidth) {
+    BuildContext context,
+    double maxWidth,
+  ) {
     return CachedNetworkImage(
       imageUrl: images[0],
       imageBuilder: (context, imageProvider) {
@@ -65,11 +68,8 @@ class ImagesTileView extends StatelessWidget {
           ),
         );
       },
-      placeholder: (context, url) => SizedBox(
-        width: maxWidth,
-        height: maxHeight,
-        child: _imageLoading(),
-      ),
+      placeholder: (context, url) =>
+          SizedBox(width: maxWidth, height: maxHeight, child: _imageLoading()),
       errorWidget: (context, url, error) => SizedBox(
         width: maxWidth,
         height: maxHeight,
@@ -79,7 +79,10 @@ class ImagesTileView extends StatelessWidget {
   }
 
   Widget _buildImageGrid(
-      int imageCount, double maxWidth, BuildContext context) {
+    int imageCount,
+    double maxWidth,
+    BuildContext context,
+  ) {
     return Column(
       children: [
         Expanded(
@@ -109,7 +112,10 @@ class ImagesTileView extends StatelessWidget {
   }
 
   Widget _buildImageTile(
-      int index, int additionalImages, BuildContext context) {
+    int index,
+    int additionalImages,
+    BuildContext context,
+  ) {
     return GestureDetector(
       onTap: () => _openGallery(context, index),
       child: Hero(
@@ -132,22 +138,29 @@ class ImagesTileView extends StatelessWidget {
   }
 
   Widget _buildAdditionalImagesOverlay(int additionalImages) {
-    return Container(
-      decoration: BoxDecoration(
-        gradient: RadialGradient(
-          colors: [
-            Palette.black.withOpacity(0.8),
-            Palette.extraDarkGray.withOpacity(0.5),
-          ],
-          stops: const [0.0, 1.0],
-        ),
-      ),
-      child: Center(
-        child: Text(
-          '+$additionalImages',
-          style: const TextStyle(color: Colors.white, fontSize: 38),
-        ),
-      ),
+    return Builder(
+      builder: (context) {
+        return Container(
+          decoration: BoxDecoration(
+            gradient: RadialGradient(
+              colors: [
+                Theme.of(context).colorScheme.surface.withValues(alpha: 0.8),
+                Theme.of(context).colorScheme.surface.withValues(alpha: 0.5),
+              ],
+              stops: const [0.0, 1.0],
+            ),
+          ),
+          child: Center(
+            child: Text(
+              '+$additionalImages',
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onSurface,
+                fontSize: 38,
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -168,15 +181,15 @@ class ImagesTileView extends StatelessWidget {
 }
 
 Widget _imageLoading() {
-  return Container(
-    decoration: BoxDecoration(
-      borderRadius: BorderRadius.circular(8),
-      color: Palette.extraDarkGray.withOpacity(0.5),
-    ),
-    child: Center(
-      child: CircularProgressIndicator(
-        color: Palette.extraLightGray,
-      ),
-    ),
+  return Builder(
+    builder: (context) {
+      return Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(8),
+          color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.5),
+        ),
+        child: Center(child: CircularProgressIndicator()),
+      );
+    },
   );
 }

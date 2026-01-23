@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 import 'package:ndk/ndk.dart';
 import 'package:video_player/video_player.dart';
 
@@ -71,29 +71,17 @@ class VideoState {
 }
 
 final videoPlayerProvider = StateNotifierProvider.family
-    .autoDispose<VideoPlayerNotifier, VideoState, String>(
-  (ref, videoId) {
-    final ndkP = ref.read(ndkProvider);
-    return VideoPlayerNotifier(
-      videoId: videoId,
-      ndkProvider: ndkP,
-    );
-  },
-);
+    .autoDispose<VideoPlayerNotifier, VideoState, String>((ref, videoId) {
+      final ndkP = ref.read(ndkProvider);
+      return VideoPlayerNotifier(videoId: videoId, ndkProvider: ndkP);
+    });
 
 class VideoPlayerNotifier extends StateNotifier<VideoState> {
   final String videoId;
   final Ndk ndkProvider;
 
-  VideoPlayerNotifier({
-    required this.videoId,
-    required this.ndkProvider,
-  }) : super(
-          VideoState(
-            videoLink: videoId,
-            controller: null,
-          ),
-        ) {
+  VideoPlayerNotifier({required this.videoId, required this.ndkProvider})
+    : super(VideoState(videoLink: videoId, controller: null)) {
     loadVideo(videoId);
   }
 
@@ -116,15 +104,13 @@ class VideoPlayerNotifier extends StateNotifier<VideoState> {
       final processedLink = await _processVideoLink(videoLink);
 
       if (processedLink == null) {
-        state = state.copyWith(
-          isLoading: false,
-          isError: true,
-        );
+        state = state.copyWith(isLoading: false, isError: true);
         return;
       }
 
-      final myController =
-          VideoPlayerController.networkUrl(Uri.parse(processedLink));
+      final myController = VideoPlayerController.networkUrl(
+        Uri.parse(processedLink),
+      );
       await myController.setLooping(true);
       await myController.setVolume(0);
       await myController.initialize();
@@ -193,12 +179,10 @@ class VideoPlayerNotifier extends StateNotifier<VideoState> {
     state.showControlsTimer?.cancel();
 
     state = state.copyWith(
-        showControlsTimer: Timer(
-      Duration(milliseconds: 1200),
-      () {
+      showControlsTimer: Timer(Duration(milliseconds: 1200), () {
         state = state.copyWith(showControls: false);
-      },
-    ));
+      }),
+    );
   }
 
   Future<String?> _processVideoLink(String initialLink) async {

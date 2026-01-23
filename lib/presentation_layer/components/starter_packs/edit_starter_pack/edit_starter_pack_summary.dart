@@ -1,8 +1,9 @@
+import 'package:camelus/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:share_plus/share_plus.dart';
 
-import '../../../../config/palette.dart';
 import '../../../../domain_layer/entities/nostr_list.dart';
 import '../../../../domain_layer/entities/starter_pack_identifier.dart';
 import '../../../atoms/long_button.dart';
@@ -46,29 +47,27 @@ class _EditStarterPackSummaryState extends ConsumerState<EditStarterPackSummary>
       vsync: this,
     );
 
-    _slideAnimation = Tween<Offset>(
-      begin: Offset.zero,
-      end: const Offset(0, -0.5), // move up value
-    ).animate(CurvedAnimation(
-      parent: _slideController,
-      curve: Curves.easeInOut,
-    ));
+    _slideAnimation =
+        Tween<Offset>(
+          begin: Offset.zero,
+          end: const Offset(0, -0.5), // move up value
+        ).animate(
+          CurvedAnimation(parent: _slideController, curve: Curves.easeInOut),
+        );
 
-    _titleFadeAnimation = Tween<double>(
-      begin: 1.0,
-      end: 0.0,
-    ).animate(CurvedAnimation(
-      parent: _fadeController,
-      curve: const Interval(0.0, 0.5, curve: Curves.easeOut),
-    ));
+    _titleFadeAnimation = Tween<double>(begin: 1.0, end: 0.0).animate(
+      CurvedAnimation(
+        parent: _fadeController,
+        curve: const Interval(0.0, 0.5, curve: Curves.easeOut),
+      ),
+    );
 
-    _shareContentFadeAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _fadeController,
-      curve: const Interval(0.5, 1.0, curve: Curves.easeIn),
-    ));
+    _shareContentFadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _fadeController,
+        curve: const Interval(0.5, 1.0, curve: Curves.easeIn),
+      ),
+    );
   }
 
   @override
@@ -80,16 +79,20 @@ class _EditStarterPackSummaryState extends ConsumerState<EditStarterPackSummary>
 
   @override
   Widget build(BuildContext context) {
-    final starterPackData =
-        ref.watch(editStarterPackProvider(widget.starterPackIdentifier));
-    final starterPackNotifier = ref
-        .watch(editStarterPackProvider(widget.starterPackIdentifier).notifier);
+    final starterPackData = ref.watch(
+      editStarterPackProvider(widget.starterPackIdentifier),
+    );
+    final starterPackNotifier = ref.watch(
+      editStarterPackProvider(widget.starterPackIdentifier).notifier,
+    );
 
     final ndk = ref.watch(ndkProvider);
 
     // trigger animations when broadcasted becomes true
-    ref.listen(editStarterPackProvider(widget.starterPackIdentifier),
-        (previous, next) {
+    ref.listen(editStarterPackProvider(widget.starterPackIdentifier), (
+      previous,
+      next,
+    ) {
       if (previous?.broadcasted == false && next.broadcasted == true) {
         _slideController.forward();
         _fadeController.forward();
@@ -111,18 +114,13 @@ class _EditStarterPackSummaryState extends ConsumerState<EditStarterPackSummary>
     );
 
     return Scaffold(
-      backgroundColor: Palette.background,
       body: Column(
         children: [
-          Column(
-            children: [],
-          ),
+          Column(children: []),
           Expanded(
             child: ListView(
               children: [
-                SizedBox(
-                  height: MediaQuery.of(context).size.height / 7,
-                ),
+                SizedBox(height: MediaQuery.of(context).size.height / 7),
                 AnimatedBuilder(
                   animation: _titleFadeAnimation,
                   builder: (context, child) {
@@ -133,10 +131,8 @@ class _EditStarterPackSummaryState extends ConsumerState<EditStarterPackSummary>
                         child: Column(
                           children: [
                             Text(
-                              "your starter pack",
-                              style: const TextStyle(
-                                fontSize: 30,
-                              ),
+                              AppLocalizations.of(context)!.yourStarterPack,
+                              style: const TextStyle(fontSize: 30),
                               textAlign: TextAlign.center,
                             ),
                           ],
@@ -150,9 +146,7 @@ class _EditStarterPackSummaryState extends ConsumerState<EditStarterPackSummary>
                   position: _slideAnimation,
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 8),
-                    child: StarterPackCard(
-                      pack: myNostrPack,
-                    ),
+                    child: StarterPackCard(pack: myNostrPack),
                   ),
                 ),
                 AnimatedBuilder(
@@ -164,8 +158,8 @@ class _EditStarterPackSummaryState extends ConsumerState<EditStarterPackSummary>
                         padding: const EdgeInsets.symmetric(horizontal: 24),
                         child: Column(
                           children: [
-                            const Text(
-                              "🎉 Your starter pack is live!",
+                            Text(
+                              AppLocalizations.of(context)!.starterPackIsLive,
                               style: TextStyle(
                                 fontSize: 24,
                                 fontWeight: FontWeight.bold,
@@ -173,11 +167,13 @@ class _EditStarterPackSummaryState extends ConsumerState<EditStarterPackSummary>
                               textAlign: TextAlign.center,
                             ),
                             const SizedBox(height: 8),
-                            const Text(
-                              "Share it with your friends and help them discover amazing people!",
+                            Text(
+                              AppLocalizations.of(context)!.shareWithFriends,
                               style: TextStyle(
                                 fontSize: 16,
-                                color: Colors.grey,
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.onSurfaceVariant,
                               ),
                               textAlign: TextAlign.center,
                             ),
@@ -185,11 +181,17 @@ class _EditStarterPackSummaryState extends ConsumerState<EditStarterPackSummary>
                             if (starterPackData.shortLinkPart != null)
                               Container(
                                 padding: EdgeInsets.symmetric(
-                                    horizontal: 16, vertical: 12),
+                                  horizontal: 16,
+                                  vertical: 12,
+                                ),
                                 decoration: BoxDecoration(
-                                  color: Palette.extraDarkGray,
+                                  color: Theme.of(context).colorScheme.surface,
                                   borderRadius: BorderRadius.circular(8),
-                                  border: Border.all(color: Palette.gray),
+                                  border: Border.all(
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.inverseSurface,
+                                  ),
                                 ),
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
@@ -210,7 +212,9 @@ class _EditStarterPackSummaryState extends ConsumerState<EditStarterPackSummary>
                               width: double.infinity,
                               height: 40,
                               child: longButton(
-                                name: "share starter pack",
+                                name: AppLocalizations.of(
+                                  context,
+                                )!.shareStarterPack,
                                 inverted: true,
                                 disabled: false,
                                 onPressed: () {
@@ -245,7 +249,7 @@ class _EditStarterPackSummaryState extends ConsumerState<EditStarterPackSummary>
                   width: double.infinity,
                   height: 40,
                   child: longButton(
-                    name: "publish starter pack",
+                    name: AppLocalizations.of(context)!.publishStarterPack,
                     inverted: true,
                     disabled: starterPackData.selectedUsers.isEmpty,
                     loading: starterPackData.broadcasting,
@@ -267,19 +271,22 @@ class _EditStarterPackSummaryState extends ConsumerState<EditStarterPackSummary>
                   width: double.infinity,
                   height: 40,
                   child: longButton(
-                    name: "close",
+                    name: AppLocalizations.of(context)!.close,
                     inverted: false,
                     onPressed: () {
                       starterPackNotifier.reset();
-                      Navigator.pop(context);
+                      context.pop();
 
                       ref.invalidate(
                         editStarterPackProvider(widget.starterPackIdentifier),
                       );
 
                       /// invalidate user starter pack lists so refresh is triggered
-                      ref.invalidate(nostrListsFollowStateProvider(
-                          widget.starterPackIdentifier.pubkey));
+                      ref.invalidate(
+                        nostrListsFollowStateProvider(
+                          widget.starterPackIdentifier.pubkey,
+                        ),
+                      );
                     },
                   ),
                 ),

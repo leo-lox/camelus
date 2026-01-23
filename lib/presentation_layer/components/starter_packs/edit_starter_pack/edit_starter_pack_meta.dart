@@ -1,10 +1,10 @@
+import 'package:camelus/l10n/app_localizations.dart';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 
-import '../../../../config/palette.dart';
 import '../../../../domain_layer/entities/mem_file.dart';
 import '../../../../domain_layer/entities/starter_pack_identifier.dart';
 import '../../../atoms/crop_avatar.dart';
@@ -38,8 +38,9 @@ class _EditStarterPackMetaState extends ConsumerState<EditStarterPackMeta> {
 
     // Listen to provider changes and update controllers
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final data =
-          ref.read(editStarterPackProvider(widget.starterPackIdentifier));
+      final data = ref.read(
+        editStarterPackProvider(widget.starterPackIdentifier),
+      );
       _titleController.text = data.title;
       _descriptionController.text = data.description ?? "";
     });
@@ -71,14 +72,15 @@ class _EditStarterPackMetaState extends ConsumerState<EditStarterPackMeta> {
           targetWidth: 400,
           roundUi: false,
           aspectRatio: 16 / 6,
-          buttonText: "upload",
+          buttonText: AppLocalizations.of(context)!.upload,
           imageData: uneditedImage,
         ),
       ),
     ).then((value) async {
       if (value != null) {
         final stateNoti = ref.read(
-            editStarterPackProvider(widget.starterPackIdentifier).notifier);
+          editStarterPackProvider(widget.starterPackIdentifier).notifier,
+        );
         stateNoti.updateImage(imageUploading: true);
 
         final editedFile = MemFile(
@@ -96,8 +98,9 @@ class _EditStarterPackMetaState extends ConsumerState<EditStarterPackMeta> {
   }
 
   Future<String?> _uploadImage(MemFile imageData) async {
-    final uploadResult =
-        await ref.read(fileUploadProvider).uploadImage(imageData);
+    final uploadResult = await ref
+        .read(fileUploadProvider)
+        .uploadImage(imageData);
     final hostedImageUrl = uploadResult
         .firstWhere((e) => e.descriptor?.url.isNotEmpty == true)
         .descriptor
@@ -107,24 +110,27 @@ class _EditStarterPackMetaState extends ConsumerState<EditStarterPackMeta> {
 
   @override
   Widget build(BuildContext context) {
-    final starterPackData =
-        ref.watch(editStarterPackProvider(widget.starterPackIdentifier));
-    final starterPackNotifier = ref
-        .watch(editStarterPackProvider(widget.starterPackIdentifier).notifier);
+    final starterPackData = ref.watch(
+      editStarterPackProvider(widget.starterPackIdentifier),
+    );
+    final starterPackNotifier = ref.watch(
+      editStarterPackProvider(widget.starterPackIdentifier).notifier,
+    );
 
     return Scaffold(
-      backgroundColor: Palette.background,
       appBar: AppBar(
-        backgroundColor: Palette.background,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          icon: Icon(
+            Icons.arrow_back,
+            color: Theme.of(context).colorScheme.onSurface,
+          ),
           onPressed: () => Navigator.of(context).pop(),
         ),
-        title: const Text(
+        title: Text(
           'Starter Pack',
           style: TextStyle(
-            color: Colors.white,
+            color: Theme.of(context).colorScheme.onSurface,
             fontSize: 20,
             fontWeight: FontWeight.w600,
           ),
@@ -140,20 +146,22 @@ class _EditStarterPackMetaState extends ConsumerState<EditStarterPackMeta> {
                 children: [
                   const SizedBox(height: 40),
                   // Title
-                  const Text(
-                    'create your starter pack',
+                  Text(
+                    AppLocalizations.of(context)!.createYourStarterPack,
                     style: TextStyle(
-                      color: Colors.white,
+                      color: Theme.of(context).colorScheme.onSurface,
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
                     ),
                     textAlign: TextAlign.center,
                   ),
                   // Subtitle
-                  const Text(
-                    'Invite your friends to follow your favorite people',
+                  Text(
+                    AppLocalizations.of(context)!.inviteFriendsToFollow,
                     style: TextStyle(
-                      color: Colors.white70,
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.onSurface.withValues(alpha: 0.7),
                       fontSize: 16,
                     ),
                     textAlign: TextAlign.center,
@@ -184,21 +192,22 @@ class _EditStarterPackMetaState extends ConsumerState<EditStarterPackMeta> {
                               Container(
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(10),
-                                  color: Palette.black.withValues(alpha: 0.6),
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.surface.withValues(alpha: 0.6),
                                 ),
                                 child: Center(
                                   child: Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
-                                      CircularProgressIndicator(
-                                        color: Colors.white,
-                                        strokeWidth: 2,
-                                      ),
+                                      CircularProgressIndicator(strokeWidth: 2),
                                       SizedBox(height: 8),
                                       Text(
-                                        'Uploading...',
+                                        AppLocalizations.of(context)!.uploading,
                                         style: TextStyle(
-                                          color: Colors.white,
+                                          color: Theme.of(
+                                            context,
+                                          ).colorScheme.onSurface,
                                           fontSize: 12,
                                           fontWeight: FontWeight.w500,
                                         ),
@@ -219,12 +228,14 @@ class _EditStarterPackMetaState extends ConsumerState<EditStarterPackMeta> {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Align(
+                      Align(
                         alignment: Alignment.centerLeft,
                         child: Text(
-                          'Title',
+                          AppLocalizations.of(context)!.title,
                           style: TextStyle(
-                            color: Colors.white70,
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onSurface.withValues(alpha: 0.7),
                             fontSize: 16,
                           ),
                         ),
@@ -235,24 +246,24 @@ class _EditStarterPackMetaState extends ConsumerState<EditStarterPackMeta> {
                       // Title input
                       Container(
                         decoration: BoxDecoration(
-                          color: Palette.extraDarkGray,
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: TextField(
                           controller: _titleController,
-                          onChanged: (value) {
-                            starterPackNotifier.updateTitle(value);
-                          },
-                          style: const TextStyle(
-                              color: Colors.white, fontSize: 18),
+                          onChanged: starterPackNotifier.updateTitle,
+                          style: TextStyle(fontSize: 18),
                           decoration: InputDecoration(
-                            border: InputBorder.none,
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+
                             contentPadding: const EdgeInsets.all(16),
                             suffixText: '${starterPackData.title.length}/40',
                             suffixStyle: TextStyle(
                               color: starterPackData.title.length > 40
-                                  ? Palette.warn
-                                  : Palette.gray,
+                                  ? Colors
+                                        .orangeAccent //! hard coded color
+                                  : null,
                               fontSize: 14,
                             ),
                           ),
@@ -261,12 +272,14 @@ class _EditStarterPackMetaState extends ConsumerState<EditStarterPackMeta> {
 
                       const SizedBox(height: 32),
 
-                      const Align(
+                      Align(
                         alignment: Alignment.centerLeft,
                         child: Text(
-                          'Description',
+                          AppLocalizations.of(context)!.description,
                           style: TextStyle(
-                            color: Colors.white70,
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onSurface.withValues(alpha: 0.7),
                             fontSize: 16,
                           ),
                         ),
@@ -278,21 +291,19 @@ class _EditStarterPackMetaState extends ConsumerState<EditStarterPackMeta> {
                       Container(
                         height: 200,
                         decoration: BoxDecoration(
-                          color: Palette.extraDarkGray,
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: TextField(
                           controller: _descriptionController,
-                          onChanged: (value) {
-                            starterPackNotifier.updateDescription(value);
-                          },
-                          style: const TextStyle(
-                              color: Colors.white, fontSize: 16),
+                          onChanged: starterPackNotifier.updateDescription,
+                          style: TextStyle(fontSize: 16),
                           maxLines: null,
                           expands: true,
                           textAlignVertical: TextAlignVertical.top,
-                          decoration: const InputDecoration(
-                            border: InputBorder.none,
+                          decoration: InputDecoration(
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
                             contentPadding: EdgeInsets.all(16),
                           ),
                         ),
@@ -310,14 +321,16 @@ class _EditStarterPackMetaState extends ConsumerState<EditStarterPackMeta> {
             child: SafeArea(
               top: false,
               child: SizedBox(
-                  width: double.infinity,
-                  height: 40,
-                  child: longButton(
-                      name: "next",
-                      inverted: true,
-                      onPressed: () {
-                        widget.onNext();
-                      })),
+                width: double.infinity,
+                height: 40,
+                child: longButton(
+                  name: AppLocalizations.of(context)!.next,
+                  inverted: true,
+                  onPressed: () {
+                    widget.onNext();
+                  },
+                ),
+              ),
             ),
           ),
         ],

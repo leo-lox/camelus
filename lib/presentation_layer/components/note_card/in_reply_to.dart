@@ -1,18 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
-import '../../../config/palette.dart';
 import '../../../domain_layer/entities/nostr_note.dart';
 import '../../../domain_layer/entities/nostr_tag.dart';
 import '../../../helpers/helpers.dart';
-import '../../providers/metadata_provider.dart';
 import '../../providers/metadata_state_provider.dart';
 
 class InReplyTo extends ConsumerWidget {
-  const InReplyTo({
-    super.key,
-    required this.myNote,
-  });
+  const InReplyTo({super.key, required this.myNote});
 
   final NostrNote myNote;
 
@@ -46,13 +42,15 @@ class InReplyTo extends ConsumerWidget {
 
       if (i == 0) {
         pubkeyFirst = tag.value;
-        final myMetadata =
-            ref.watch(metadataStateProvider(pubkeyFirst)).userMetadata;
+        final myMetadata = ref
+            .watch(metadataStateProvider(pubkeyFirst))
+            .userMetadata;
         valueFirst = myMetadata?.name ?? _formatPubkey(pubkeyFirst);
       } else if (i == 1) {
         pubkeySecond = tag.value;
-        final myMetadata =
-            ref.watch(metadataStateProvider(pubkeySecond)).userMetadata;
+        final myMetadata = ref
+            .watch(metadataStateProvider(pubkeySecond))
+            .userMetadata;
         valueSecond = myMetadata?.name ?? _formatPubkey(pubkeySecond);
       } else {
         othersCount++;
@@ -62,33 +60,49 @@ class InReplyTo extends ConsumerWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           "reply to ",
-          style: TextStyle(fontSize: 14, color: Palette.gray),
+          style: TextStyle(
+            fontSize: 14,
+            color: Theme.of(context).colorScheme.inverseSurface,
+          ),
         ),
         GestureDetector(
           onTap: () {
-            Navigator.pushNamed(context, "/nostr/profile",
-                arguments: pubkeyFirst);
+            context.push('/nostr/profile/$pubkeyFirst');
           },
-          child: Text('@$valueFirst ',
-              style: const TextStyle(
-                  color: Palette.primary, fontSize: 14, height: 1.3)),
+          child: Text(
+            '@$valueFirst ',
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.primary,
+              fontSize: 14,
+              height: 1.3,
+            ),
+          ),
         ),
         if (valueSecond.isNotEmpty)
           GestureDetector(
             onTap: () {
-              Navigator.pushNamed(context, "/nostr/profile",
-                  arguments: pubkeySecond);
+              context.push('/nostr/profile/$pubkeySecond');
             },
-            child: Text('@$valueSecond ',
-                style: const TextStyle(
-                    color: Palette.primary, fontSize: 14, height: 1.3)),
+            child: Text(
+              '@$valueSecond ',
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.primary,
+                fontSize: 14,
+                height: 1.3,
+              ),
+            ),
           ),
         if (othersCount != 0)
-          Text(' and $othersCount more',
-              style: const TextStyle(
-                  color: Palette.darkGray, fontSize: 14, height: 1.3))
+          Text(
+            ' and $othersCount more',
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.surfaceContainerHighest,
+              fontSize: 14,
+              height: 1.3,
+            ),
+          ),
       ],
     );
   }

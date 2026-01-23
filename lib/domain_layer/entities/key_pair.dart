@@ -19,16 +19,16 @@ class KeyPair {
   });
 
   Map<String, dynamic> toJson() => {
-        'privateKey': privateKey,
-        'publicKey': publicKey,
-        'privateKeyHr': privateKeyHr,
-        'publicKeyHr': publicKeyHr,
-      };
+    'privateKey': privateKey,
+    'publicKey': publicKey,
+    'privateKeyHr': privateKeyHr,
+    'publicKeyHr': publicKeyHr,
+  };
 
   factory KeyPair.fromJson(Map<String, dynamic> json) => KeyPair(
-        privateKey: json['privateKey'],
-        publicKey: json['publicKey'],
-        privateKeyHr: json['privateKeyHr'],
-        publicKeyHr: json['publicKeyHr'],
-      );
+    privateKey: json['privateKey'],
+    publicKey: json['publicKey'],
+    privateKeyHr: json['privateKeyHr'],
+    publicKeyHr: json['publicKeyHr'],
+  );
 }

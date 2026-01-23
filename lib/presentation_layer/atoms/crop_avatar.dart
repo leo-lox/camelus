@@ -3,7 +3,6 @@ import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:camelus/presentation_layer/atoms/long_button.dart';
-import 'package:camelus/config/palette.dart';
 import 'package:flutter/material.dart';
 import 'package:crop_your_image/crop_your_image.dart';
 
@@ -36,8 +35,10 @@ class _CropAvatarState extends State<CropAvatar> {
   final _controller = CropController();
   bool _loading = false;
 
-  Future<Uint8List> _resizeImage(Uint8List imageData,
-      {required int targetWidth}) async {
+  Future<Uint8List> _resizeImage(
+    Uint8List imageData, {
+    required int targetWidth,
+  }) async {
     if (!widget.resize) {
       return imageData;
     }
@@ -49,8 +50,9 @@ class _CropAvatarState extends State<CropAvatar> {
     final frameInfo = await codec.getNextFrame();
     final ui.Image resizedImage = frameInfo.image;
 
-    final byteData =
-        await resizedImage.toByteData(format: ui.ImageByteFormat.png);
+    final byteData = await resizedImage.toByteData(
+      format: ui.ImageByteFormat.png,
+    );
     return byteData!.buffer.asUint8List();
   }
 
@@ -59,10 +61,10 @@ class _CropAvatarState extends State<CropAvatar> {
     return Stack(
       children: [
         Crop(
-          baseColor: Palette.background,
+          baseColor: Theme.of(context).colorScheme.surface,
           aspectRatio: widget.aspectRatio,
-          //radius: 150,
 
+          //radius: 150,
           interactive: true,
 
           withCircleUi: widget.roundUi,
@@ -72,8 +74,10 @@ class _CropAvatarState extends State<CropAvatar> {
           onCropped: (result) async {
             switch (result) {
               case CropSuccess(:final croppedImage):
-                final resizedImage = await _resizeImage(croppedImage,
-                    targetWidth: widget.targetWidth);
+                final resizedImage = await _resizeImage(
+                  croppedImage,
+                  targetWidth: widget.targetWidth,
+                );
                 setState(() {
                   _loading = false;
                 });

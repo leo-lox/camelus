@@ -1,8 +1,9 @@
+import 'package:camelus/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:go_router/go_router.dart';
 
-import '../../../config/palette.dart';
 import '../../../domain_layer/entities/nostr_note.dart';
 import '../../../domain_layer/entities/nostr_tag.dart';
 import '../../../helpers/helpers.dart';
@@ -15,29 +16,25 @@ import 'skeleton_note.dart';
 class NoteCardRepost extends ConsumerWidget {
   final NostrNote repostEvent;
 
-  const NoteCardRepost({
-    super.key,
-    required this.repostEvent,
-  });
+  const NoteCardRepost({super.key, required this.repostEvent});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final notesP = ref.read(getNotesProvider);
-    final repostedByMetadata =
-        ref.watch(metadataStateProvider(repostEvent.pubkey)).userMetadata;
+    final repostedByMetadata = ref
+        .watch(metadataStateProvider(repostEvent.pubkey))
+        .userMetadata;
 
     final noteEtag = repostEvent.tags.cast<NostrTag?>().firstWhere(
-          (element) => element?.type == 'e',
-          orElse: () => null,
-        );
+      (element) => element?.type == 'e',
+      orElse: () => null,
+    );
 
     if (noteEtag == null) {
-      return Text("Repost has no information where to fetch the post");
+      return Text(AppLocalizations.of(context)!.repostHasNoInformation);
     }
 
-    final displayNoteStream = notesP.getNote(
-      noteEtag.value,
-    );
+    final displayNoteStream = notesP.getNote(noteEtag.value);
 
     return Column(
       children: [
@@ -49,7 +46,7 @@ class NoteCardRepost extends ConsumerWidget {
                 'assets/icons/retweet.svg',
                 height: 18,
                 colorFilter: ColorFilter.mode(
-                  Palette.repostActive,
+                  Color.fromARGB(255, 22, 163, 74),
                   BlendMode.srcATop,
                 ),
               ),
@@ -58,17 +55,19 @@ class NoteCardRepost extends ConsumerWidget {
                 onTap: () {
                   // navigate to the profile of the user who reposted
 
-                  Navigator.pushNamed(context, "/nostr/profile",
-                      arguments: repostEvent.pubkey);
+                  context.push('/nostr/profile/${repostEvent.pubkey}');
                 },
                 child: RichText(
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   text: TextSpan(
-                    style: TextStyle(color: Palette.gray),
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.inverseSurface,
+                    ),
                     children: [
                       TextSpan(
-                        text: repostedByMetadata?.name ??
+                        text:
+                            repostedByMetadata?.name ??
                             Helpers().shortHr(repostEvent.pubkey),
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
@@ -76,10 +75,8 @@ class NoteCardRepost extends ConsumerWidget {
                         ),
                       ),
                       TextSpan(
-                        text: ' shared',
-                        style: TextStyle(
-                          fontSize: 14,
-                        ),
+                        text: AppLocalizations.of(context)!.shared,
+                        style: TextStyle(fontSize: 14),
                       ),
                     ],
                   ),
@@ -94,22 +91,26 @@ class NoteCardRepost extends ConsumerWidget {
             if (!snapshot.hasData) {
               return Column(
                 children: [
-                  if (noteEtag.recommended_relay == null)
+                  if (noteEtag.recommendedRelay == null)
                     Padding(
                       padding: const EdgeInsets.all(16),
                       child: Column(
                         children: [
                           Text(
-                              "loading might fail, the repost has no information where to fetch the post"),
+                            "loading might fail, the repost has no information where to fetch the post",
+                          ),
                           SizedBox(height: 10),
                           Text(
-                              "This is a bug, please report it to the developers"),
+                            "This is a bug, please report it to the developers",
+                          ),
                           SizedBox(height: 10),
                           Text(
                             "repostId: ${repostEvent.id} ${repostEvent.sources}",
                             style: TextStyle(
                               fontSize: 10,
-                              color: Palette.darkGray,
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.surfaceContainerHighest,
                             ),
                           ),
                         ],

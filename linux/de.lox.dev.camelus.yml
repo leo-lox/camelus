@@ -1,0 +1,53 @@
+app-id: de.lox.dev.camelus
+runtime: org.freedesktop.Platform
+runtime-version: '25.08'
+sdk: org.freedesktop.Sdk
+command: camelus
+finish-args:
+  - --share=ipc
+  - --share=network
+  - --socket=wayland
+  - --socket=fallback-x11
+  - --socket=pulseaudio
+  - --device=dri
+  - --filesystem=xdg-download
+  - --talk-name=org.freedesktop.Notifications
+  - --talk-name=org.kde.StatusNotifierWatcher
+  - --talk-name=org.freedesktop.secrets
+  - --own-name=org.mpris.MediaPlayer2.camelus
+
+modules:
+  - name: libsecret
+    buildsystem: meson
+    config-opts:
+      - -Dmanpage=false
+      - -Dvapi=false
+      - -Dgtk_doc=false
+    sources:
+      - type: archive
+        url: https://download.gnome.org/sources/libsecret/0.21/libsecret-0.21.4.tar.xz
+        sha256: 163d08d783be6d4ab9a979ceb5a4fecbc1d9660d3c34168c581301cd53912b20
+
+  - name: camelus
+    buildsystem: simple
+    build-commands:
+      # Install the pre-built app
+      - mkdir -p /app/bin
+      - cp -r build/linux/x64/release/bundle/* /app/
+      - ln -s /app/camelus /app/bin/camelus
+
+      # Create symlink for lib64 libraries
+      - ln -sf /app/lib64/libsecret-1.so.0 /app/lib/libsecret-1.so.0
+
+      # Install icon
+      - install -Dm644 linux/de.lox.dev.camelus.png /app/share/icons/hicolor/512x512/apps/de.lox.dev.camelus.png
+
+      # Install desktop file
+      - install -Dm644 linux/de.lox.dev.camelus.desktop /app/share/applications/de.lox.dev.camelus.desktop
+
+      # Install appdata
+      - install -Dm644 linux/de.lox.dev.camelus.metainfo.xml /app/share/metainfo/de.lox.dev.camelus.metainfo.xml
+
+    sources:
+      - type: dir
+        path: ../.

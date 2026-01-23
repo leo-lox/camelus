@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:ndk/entities.dart' as ndk_entities;
 import 'package:ndk/ndk.dart' as ndk;
 import 'package:rxdart/rxdart.dart';
@@ -25,12 +23,12 @@ class NoteRepositoryImpl implements NoteRepository {
       kinds: [ndk_entities.Nip01Event.kTextNodeKind],
     );
 
-    final response = dartNdkSource.dartNdk.requests
-        .query(filters: [filter], name: 'getAllNotes-');
-
-    return response.stream.map(
-      (event) => NostrNoteModel.fromNDKEvent(event),
+    final response = dartNdkSource.dartNdk.requests.query(
+      filters: [filter],
+      name: 'getAllNotes-',
     );
+
+    return response.stream.map((event) => NostrNoteModel.fromNDKEvent(event));
   }
 
   @override
@@ -52,9 +50,7 @@ class NoteRepositoryImpl implements NoteRepository {
       cacheWrite: true,
     );
 
-    return response.stream.map(
-      (event) => NostrNoteModel.fromNDKEvent(event),
-    );
+    return response.stream.map((event) => NostrNoteModel.fromNDKEvent(event));
   }
 
   /// Get all notes by a list of authors using a query
@@ -86,14 +82,13 @@ class NoteRepositoryImpl implements NoteRepository {
     ReplaySubject<NostrNote> subject = ReplaySubject<NostrNote>();
 
     response.stream
-        .map(
-      (event) => NostrNoteModel.fromNDKEvent(event),
-    )
+        .map((event) => NostrNoteModel.fromNDKEvent(event))
         .listen((event) {
-      subject.add(event);
-    }).onDone(() {
-      subject.close();
-    });
+          subject.add(event);
+        })
+        .onDone(() {
+          subject.close();
+        });
     return subject;
   }
 
@@ -130,9 +125,7 @@ class NoteRepositoryImpl implements NoteRepository {
       timeout: Duration(seconds: 15),
     );
 
-    return response.stream.map(
-      (event) => NostrNoteModel.fromNDKEvent(event),
-    );
+    return response.stream.map((event) => NostrNoteModel.fromNDKEvent(event));
   }
 
   @override
@@ -168,9 +161,7 @@ class NoteRepositoryImpl implements NoteRepository {
       cacheWrite: true,
     );
 
-    return response.stream.map(
-      (event) => NostrNoteModel.fromNDKEvent(event),
-    );
+    return response.stream.map((event) => NostrNoteModel.fromNDKEvent(event));
   }
 
   /// Get all notes by a list of authors using a subscription
@@ -200,9 +191,7 @@ class NoteRepositoryImpl implements NoteRepository {
       cacheWrite: true,
     );
 
-    return response.stream.map(
-      (event) => NostrNoteModel.fromNDKEvent(event),
-    );
+    return response.stream.map((event) => NostrNoteModel.fromNDKEvent(event));
   }
 
   @override
@@ -229,17 +218,16 @@ class NoteRepositoryImpl implements NoteRepository {
       // cacheWrite: true,
     );
 
-    return response.stream.map(
-      (event) => NostrNoteModel.fromNDKEvent(event),
-    );
+    return response.stream.map((event) => NostrNoteModel.fromNDKEvent(event));
   }
 
   @override
   Future<void> broadcastNote(NostrNote noteToPublish) async {
     try {
       NostrNoteModel noteModel = NostrNoteModel.fromEntity(noteToPublish);
-      final response = dartNdkSource.dartNdk.broadcast
-          .broadcast(nostrEvent: noteModel.toNDKEvent());
+      final response = dartNdkSource.dartNdk.broadcast.broadcast(
+        nostrEvent: noteModel.toNDKEvent(),
+      );
 
       await response.broadcastDoneFuture;
     } catch (e) {
@@ -269,17 +257,14 @@ class NoteRepositoryImpl implements NoteRepository {
 
     final events = await response.future;
 
-    return events
-        .map(
-          (event) => NostrNoteModel.fromNDKEvent(event),
-        )
-        .toList();
+    return events.map((event) => NostrNoteModel.fromNDKEvent(event)).toList();
   }
 
   @override
   Future<void> deleteNote(String eventId) async {
-    final res =
-        dartNdkSource.dartNdk.broadcast.broadcastDeletion(eventId: eventId);
+    final res = dartNdkSource.dartNdk.broadcast.broadcastDeletion(
+      eventId: eventId,
+    );
     await res.broadcastDoneFuture;
   }
 
@@ -305,10 +290,6 @@ class NoteRepositoryImpl implements NoteRepository {
 
     final events = await response.future;
 
-    return events
-        .map(
-          (event) => NostrNoteModel.fromNDKEvent(event),
-        )
-        .toList();
+    return events.map((event) => NostrNoteModel.fromNDKEvent(event)).toList();
   }
 }

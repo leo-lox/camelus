@@ -18,14 +18,14 @@ final followingProvider = Provider<Follow>((ref) {
   final DartNdkSource dartNdkSource = DartNdkSource(ndk);
 
   // Creates an instance of FollowRepository, passing the data source, event verifier and event signer.
-  final FollowRepository _followRepository = FollowRepositoryImpl(
+  final FollowRepository followRepository = FollowRepositoryImpl(
     dartNdkSource: dartNdkSource,
     eventVerifier: eventVerifier,
   );
 
   // Creates an instance of the Follow use case, passing the follow repository and user's public key.
   final follow = Follow(
-    followRepository: _followRepository,
+    followRepository: followRepository,
     selfPubkey: ndk.accounts.getPublicKey,
   );
 

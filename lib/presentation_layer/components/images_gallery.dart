@@ -1,5 +1,4 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:camelus/config/palette.dart';
 import 'package:flutter/material.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:flutter/services.dart';
@@ -53,8 +52,10 @@ class ImageGalleryState extends State<ImageGallery> {
   /// Resets the status bar visibility to default when the widget is disposed.
   void _resetStatusBar() {
     if (!_hideStatusBarWhileViewing) return;
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
-        overlays: SystemUiOverlay.values);
+    SystemChrome.setEnabledSystemUIMode(
+      SystemUiMode.manual,
+      overlays: SystemUiOverlay.values,
+    );
   }
 
   @override
@@ -110,7 +111,9 @@ class ImageGalleryState extends State<ImageGallery> {
                     Center(
                       child: Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 5),
+                          horizontal: 10,
+                          vertical: 5,
+                        ),
                         child: widget.bottomBarWidget,
                       ),
                     ),
@@ -128,7 +131,7 @@ class ImageGalleryState extends State<ImageGallery> {
   Container _topBar(BuildContext context) {
     return Container(
       width: MediaQuery.of(context).size.width,
-      color: Palette.background.withValues(alpha: 0.25),
+      color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.25),
       child: Row(
         children: [
           // Close button to exit the gallery.
@@ -178,7 +181,8 @@ class ImageGalleryState extends State<ImageGallery> {
           heroAttributes: widget.heroTag != null
               ? PhotoViewHeroAttributes(
                   tag:
-                      'image-${widget.imageUrls[widget.defaultImageIndex]}-${widget.heroTag}')
+                      'image-${widget.imageUrls[widget.defaultImageIndex]}-${widget.heroTag}',
+                )
               : null,
           minScale: PhotoViewComputedScale.contained * 1,
           maxScale: PhotoViewComputedScale.covered * 2,

@@ -1,13 +1,17 @@
 import 'dart:ui';
 
+import 'package:camelus/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
-import '../../../config/palette.dart';
+import '../../../domain_layer/entities/nostr_list.dart';
 import '../../../domain_layer/entities/nostr_note.dart';
 import '../../providers/ndk_provider.dart';
 import '../../routes/nostr/blockedUsers/block_page.dart';
+import '../../routes/nostr/bookmarks/bookmarks_provider.dart';
+import '../../routes/nostr/bookmarks/bookmarks_state_provider.dart';
 import '../starter_packs/starter_pack_bottom_sheet_add.dart';
 
 class BottomSheetOption {
@@ -25,24 +29,31 @@ class BottomSheetOption {
   });
 }
 
-class MoreOptionsBottomSheet extends ConsumerWidget {
+class MoreOptionsBottomSheet extends ConsumerStatefulWidget {
   final NostrNote note;
 
-  const MoreOptionsBottomSheet({
-    super.key,
-    required this.note,
-  });
+  const MoreOptionsBottomSheet({super.key, required this.note});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<MoreOptionsBottomSheet> createState() =>
+      _MoreOptionsBottomSheetState();
+}
+
+class _MoreOptionsBottomSheetState
+    extends ConsumerState<MoreOptionsBottomSheet> {
+  bool _isAddingBookmark = false;
+  String? _errorMessage;
+
+  @override
+  Widget build(BuildContext context) {
     final options = _buildOptions(context, ref);
 
     return BackdropFilter(
       filter: ImageFilter.blur(sigmaX: 2, sigmaY: 2),
       child: Container(
         padding: const EdgeInsets.all(20),
-        decoration: const BoxDecoration(
-          color: Palette.background,
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
         ),
         child: Column(
@@ -50,7 +61,7 @@ class MoreOptionsBottomSheet extends ConsumerWidget {
           children: [
             _buildHandle(),
             const SizedBox(height: 20),
-            ...options.map((option) => _buildOptionTile(option)),
+            ...options,
             const SizedBox(height: 20),
           ],
         ),
@@ -59,13 +70,17 @@ class MoreOptionsBottomSheet extends ConsumerWidget {
   }
 
   Widget _buildHandle() {
-    return Container(
-      width: 40,
-      height: 4,
-      decoration: BoxDecoration(
-        color: Palette.gray,
-        borderRadius: BorderRadius.circular(2),
-      ),
+    return Builder(
+      builder: (context) {
+        return Container(
+          width: 40,
+          height: 4,
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.inverseSurface,
+            borderRadius: BorderRadius.circular(2),
+          ),
+        );
+      },
     );
   }
 
@@ -84,13 +99,19 @@ class MoreOptionsBottomSheet extends ConsumerWidget {
                 option.leading,
                 const SizedBox(width: 16),
                 Expanded(
-                  child: Text(
-                    option.label,
-                    style: TextStyle(
-                      color: option.textColor ?? Palette.lightGray,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                    ),
+                  child: Builder(
+                    builder: (context) {
+                      return Text(
+                        option.label,
+                        style: TextStyle(
+                          color:
+                              option.textColor ??
+                              Theme.of(context).colorScheme.inverseSurface,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      );
+                    },
                   ),
                 ),
               ],
@@ -101,29 +122,142 @@ class MoreOptionsBottomSheet extends ConsumerWidget {
     );
   }
 
-  List<BottomSheetOption> _buildOptions(BuildContext context, WidgetRef ref) {
-    return [
+  Widget _buildBookmarkOption(BuildContext context) {
+    final bookmarksState = ref.watch(bookmarksStateProvider);
+
+    // Check if note is already bookmarked (in either public or private)
+    final isBookmarked =
+        bookmarksState.publicBookmarks.any((n) => n.id == widget.note.id) ||
+        bookmarksState.privateBookmarks.any((n) => n.id == widget.note.id);
+    final isPrivateBookmark = bookmarksState.privateBookmarks.any(
+      (n) => n.id == widget.note.id,
+    );
+
+    if (_isAddingBookmark) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 4),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          decoration: BoxDecoration(borderRadius: BorderRadius.circular(8)),
+          child: Row(
+            children: [
+              SizedBox(
+                width: 24,
+                height: 24,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                    Theme.of(context).colorScheme.inverseSurface,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Text(
+                  isBookmarked
+                      ? AppLocalizations.of(context)!.removingFromBookmarks
+                      : AppLocalizations.of(context)!.addingToBookmarks,
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.inverseSurface,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    if (_errorMessage != null) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 4),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(8),
+            color: Theme.of(context).colorScheme.error.withValues(alpha: 0.1),
+          ),
+          child: Row(
+            children: [
+              Icon(
+                PhosphorIcons.warningCircle(),
+                color: Theme.of(context).colorScheme.error,
+                size: 24,
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Text(
+                  _errorMessage!,
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.error,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    if (isBookmarked) {
+      return _buildOptionTile(
+        BottomSheetOption(
+          leading: Icon(
+            PhosphorIcons.bookmarkSimple(PhosphorIconsStyle.fill),
+            color: Theme.of(context).colorScheme.primary,
+          ),
+          label: AppLocalizations.of(context)!.removeFromBookmarks,
+          onTap: () => _removeFromBookmarks(context, ref, isPrivateBookmark),
+          textColor: Theme.of(context).colorScheme.primary,
+        ),
+      );
+    }
+
+    return _buildOptionTile(
       BottomSheetOption(
         leading: Icon(
-          PhosphorIcons.userCirclePlus(),
-          color: Palette.gray,
+          PhosphorIcons.bookmarkSimple(),
+          color: Theme.of(context).colorScheme.inverseSurface,
         ),
-        label: 'add to starter pack',
-        onTap: () => _showFollowPackSelection(context, ref),
+        label: AppLocalizations.of(context)!.addToBookmarks,
+        onTap: () => _addToBookmarks(context, ref),
       ),
-      BottomSheetOption(
-        leading: Icon(
-          PhosphorIcons.speakerSimpleSlash(),
-          color: Palette.gray,
+    );
+  }
+
+  List<Widget> _buildOptions(BuildContext context, WidgetRef ref) {
+    return [
+      _buildOptionTile(
+        BottomSheetOption(
+          leading: Icon(
+            PhosphorIcons.userCirclePlus(),
+            color: Theme.of(context).colorScheme.inverseSurface,
+          ),
+          label: AppLocalizations.of(context)!.addToStarterPack,
+          onTap: () => _showFollowPackSelection(context, ref),
         ),
-        label: 'Block/Report',
-        onTap: () => _navigateToBlockPage(context),
+      ),
+      _buildBookmarkOption(context),
+      _buildOptionTile(
+        BottomSheetOption(
+          leading: Icon(
+            PhosphorIcons.speakerSimpleSlash(),
+            color: Theme.of(context).colorScheme.inverseSurface,
+          ),
+          label: AppLocalizations.of(context)!.blockReport,
+          onTap: () => _navigateToBlockPage(context),
+        ),
       ),
     ];
   }
 
   void _showFollowPackSelection(BuildContext context, WidgetRef ref) {
-    Navigator.pop(context); // Close current bottom sheet
+    context.pop();
+    // Close current bottom sheet
 
     // You'll need to get the current user's pubkey - adjust this based on your app structure
     final currentUserPubkey = ref.read(ndkProvider).accounts.getPublicKey();
@@ -135,23 +269,110 @@ class MoreOptionsBottomSheet extends ConsumerWidget {
       isDismissible: true,
       enableDrag: true,
       builder: (context) => StarterPackSelectionBottomSheet(
-        userPubkey: note.pubkey,
+        userPubkey: widget.note.pubkey,
         currentUserPubkey: currentUserPubkey!,
       ),
     );
   }
 
   void _navigateToBlockPage(BuildContext context) {
-    Navigator.pop(context); // Close bottom sheet first
+    context.pop(); // Close bottom sheet first
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => BlockPage(
-          postId: note.id,
-          userPubkey: note.pubkey,
-        ),
+        builder: (context) =>
+            BlockPage(postId: widget.note.id, userPubkey: widget.note.pubkey),
       ),
     );
+  }
+
+  Future<void> _addToBookmarks(BuildContext context, WidgetRef ref) async {
+    setState(() {
+      _isAddingBookmark = true;
+      _errorMessage = null;
+    });
+
+    try {
+      final bookmarksUseCase = ref.read(bookmarksProvider);
+
+      // Add to private bookmarks by default
+      await bookmarksUseCase.addElementToList(
+        tag: 'e',
+        value: widget.note.id,
+        kind: NostrList.bookmarks,
+        private: true,
+      );
+
+      if (mounted) {
+        // Refresh bookmarks state
+        ref.invalidate(bookmarksStateProvider);
+        setState(() {
+          _isAddingBookmark = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isAddingBookmark = false;
+          _errorMessage = AppLocalizations.of(context)!.failedToAddBookmark;
+        });
+
+        // Clear error after 3 seconds
+        Future.delayed(const Duration(seconds: 3), () {
+          if (mounted) {
+            setState(() {
+              _errorMessage = null;
+            });
+          }
+        });
+      }
+    }
+  }
+
+  Future<void> _removeFromBookmarks(
+    BuildContext context,
+    WidgetRef ref,
+    bool isPrivate,
+  ) async {
+    setState(() {
+      _isAddingBookmark = true;
+      _errorMessage = null;
+    });
+
+    try {
+      final bookmarksUseCase = ref.read(bookmarksProvider);
+
+      // Remove from bookmarks
+      await bookmarksUseCase.removeElementFromList(
+        tag: 'e',
+        value: widget.note.id,
+        kind: NostrList.bookmarks,
+      );
+
+      if (mounted) {
+        // Refresh bookmarks state
+        ref.invalidate(bookmarksStateProvider);
+        setState(() {
+          _isAddingBookmark = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isAddingBookmark = false;
+          _errorMessage = AppLocalizations.of(context)!.failedToRemoveBookmark;
+        });
+
+        // Clear error after 3 seconds
+        Future.delayed(const Duration(seconds: 3), () {
+          if (mounted) {
+            setState(() {
+              _errorMessage = null;
+            });
+          }
+        });
+      }
+    }
   }
 }
 

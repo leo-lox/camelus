@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:developer';
 
 import 'package:riverpod/riverpod.dart';
 
@@ -60,7 +59,8 @@ class InitModeration {
   }
 
   static BloomFilterPrehash? _createFilterFromData(
-      BloomFilterData? filterData) {
+    BloomFilterData? filterData,
+  ) {
     if (filterData == null) return null;
 
     return BloomFilterPrehash.fromNumHashFunctionsAndByteArray(

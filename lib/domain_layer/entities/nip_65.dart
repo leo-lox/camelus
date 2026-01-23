@@ -9,9 +9,5 @@ class Nip65 {
 
   // Nip65(this.relays);
 
-  Nip65({
-    required this.pubKey,
-    required this.relays,
-    required this.createdAt,
-  });
+  Nip65({required this.pubKey, required this.relays, required this.createdAt});
 }

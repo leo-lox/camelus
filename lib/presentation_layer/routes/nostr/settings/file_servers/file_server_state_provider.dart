@@ -1,3 +1,4 @@
+import 'package:flutter_riverpod/legacy.dart';
 import 'package:riverpod/riverpod.dart';
 
 import '../../../../../config/default_blossom.dart';
@@ -46,16 +47,21 @@ class FileServersNotifier extends StateNotifier<AsyncValue<List<FileServer>>> {
     final myPubkey = ndk.accounts.getPublicKey();
 
     try {
-      final fetchedServers =
-          await ref.read(fileUploadProvider).getFileUploadServers([myPubkey!]);
+      final fetchedServers = await ref
+          .read(fileUploadProvider)
+          .getFileUploadServers([myPubkey!]);
 
       if (fetchedServers == null || fetchedServers.isEmpty) {
-        state = AsyncValue.error("no servers found", StackTrace.current);
+        state = AsyncValue.error(
+          "no servers found",
+          StackTrace.current,
+        ); // TODO add translation
         return;
       }
 
       state = AsyncValue.data(
-          fetchedServers.map((url) => FileServer(url: url)).toList());
+        fetchedServers.map((url) => FileServer(url: url)).toList(),
+      );
 
       for (final server in state.value!) {
         _checkOnlineStatus(server);
@@ -93,7 +99,8 @@ class FileServersNotifier extends StateNotifier<AsyncValue<List<FileServer>>> {
 
   void restoreDefaults() {
     state = AsyncValue.data(
-        DEFAULT_BLOSSOM_SERVERS.map((url) => FileServer(url: url)).toList());
+      defaultBlossomServers.map((url) => FileServer(url: url)).toList(),
+    );
 
     for (final server in state.value!) {
       _checkOnlineStatus(server);
@@ -103,15 +110,16 @@ class FileServersNotifier extends StateNotifier<AsyncValue<List<FileServer>>> {
 
   /// checks if the server responds with a 200 status code
   void _checkOnlineStatus(FileServer server) async {
-    final isOnline =
-        await ref.read(fileUploadProvider).isFileUploadServerOnline(
-              server.url,
-            );
+    final isOnline = await ref
+        .read(fileUploadProvider)
+        .isFileUploadServerOnline(server.url);
 
     final currentServers = state.value ?? [];
     final serverIndex = currentServers.indexWhere((s) => s.url == server.url);
-    currentServers[serverIndex] =
-        FileServer(url: server.url, isOnline: isOnline);
+    currentServers[serverIndex] = FileServer(
+      url: server.url,
+      isOnline: isOnline,
+    );
 
     state = AsyncValue.data([...currentServers]);
   }
@@ -119,4 +127,5 @@ class FileServersNotifier extends StateNotifier<AsyncValue<List<FileServer>>> {
 
 final fileServersProvider =
     StateNotifierProvider<FileServersNotifier, AsyncValue<List<FileServer>>>(
-        (ref) => FileServersNotifier(ref));
+      (ref) => FileServersNotifier(ref),
+    );

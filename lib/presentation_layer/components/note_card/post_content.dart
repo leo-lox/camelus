@@ -1,14 +1,16 @@
 import 'dart:ui';
 
+import 'package:camelus/l10n/app_localizations.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_link_previewer/flutter_link_previewer.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
+import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
-import 'package:url_launcher/url_launcher_string.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 
-import '../../../config/palette.dart';
+import 'package:url_launcher/url_launcher_string.dart';
+
 import '../../../domain_layer/entities/parsed_post.dart';
 import '../../atoms/long_button.dart';
 import '../../providers/link_preview_state_provider.dart';
@@ -17,8 +19,9 @@ import '../images_tile_view.dart';
 import '../video/inline_video_player.dart';
 import 'note_card_reference.dart';
 
-final isContentRevealedProvider =
-    StateProvider.family<bool, String>((ref, postId) => false);
+final isContentRevealedProvider = StateProvider.family<bool, String>(
+  (ref, postId) => false,
+);
 
 class PostContentWidget extends ConsumerWidget {
   final ParsedPost post;
@@ -47,12 +50,14 @@ class PostContentWidget extends ConsumerWidget {
               padding: const EdgeInsets.only(bottom: 8.0),
               child: RichText(
                 text: TextSpan(
-                    style: TextStyle(
-                      fontSize: _fontSize,
-                      height: 1.2,
-                      wordSpacing: 1.05,
-                    ),
-                    children: [...currentTextSpans]),
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface,
+                    fontSize: _fontSize,
+                    height: 1.2,
+                    wordSpacing: 1.05,
+                  ),
+                  children: [...currentTextSpans],
+                ),
               ),
             ),
           );
@@ -74,28 +79,37 @@ class PostContentWidget extends ConsumerWidget {
               onTap: () => _openLink(segment.metadata!),
               child: Container(
                 decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(
-                      color: Palette.darkGray,
-                    )),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.surfaceContainerHighest,
+                  ),
+                ),
                 child: LinkPreview(
                   linkStyle: TextStyle(
-                    color: Palette.primary,
+                    color: Theme.of(context).colorScheme.primary,
                     fontSize: _fontSize - 2,
                     decoration: TextDecoration.none,
                   ),
                   enableAnimation: true,
                   onPreviewDataFetched: (data) {
                     ref
-                        .read(linkPreviewProvider(segment.metadata!).notifier)
-                        .state = data;
+                            .read(
+                              linkPreviewProvider(segment.metadata!).notifier,
+                            )
+                            .state =
+                        data;
                   },
-                  previewData:
-                      ref.watch(linkPreviewProvider(segment.metadata!)),
+                  previewData: ref.watch(
+                    linkPreviewProvider(segment.metadata!),
+                  ),
                   text: segment.metadata!,
                   textWidget: Text(
                     segment.content,
-                    style: TextStyle(color: Palette.primary),
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
                   ),
                   width: MediaQuery.of(context).size.width,
                 ),
@@ -106,13 +120,15 @@ class PostContentWidget extends ConsumerWidget {
       }
 
       if (segment.type == ContentType.noteReference) {
-        widgets.add(Padding(
-          padding: EdgeInsetsGeometry.only(bottom: 8),
-          child: NoteCardReference(
-            key: ValueKey(segment.metadata),
-            word: segment.metadata!,
+        widgets.add(
+          Padding(
+            padding: EdgeInsetsGeometry.only(bottom: 8),
+            child: NoteCardReference(
+              key: ValueKey(segment.metadata),
+              word: segment.metadata!,
+            ),
           ),
-        ));
+        );
       }
     }
 
@@ -122,6 +138,7 @@ class PostContentWidget extends ConsumerWidget {
         RichText(
           text: TextSpan(
             style: TextStyle(
+              color: Theme.of(context).colorScheme.onSurface,
               fontSize: _fontSize,
               height: 1.2,
               wordSpacing: 1.05,
@@ -136,54 +153,59 @@ class PostContentWidget extends ConsumerWidget {
       widgets.add(ImagesTileView(images: post.imageUrls));
     }
 
-    return Stack(children: [
-      ImageFiltered(
+    return Stack(
+      children: [
+        ImageFiltered(
           imageFilter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
           enabled: hasContentWarning && !isContentRevealed,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: widgets,
-          )),
-      if (hasContentWarning && !isContentRevealed)
-        Center(
-          child: Container(
-            alignment: Alignment.center,
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      PhosphorIcons.warningOctagon(),
-                      color: Palette.error,
-                      size: 32,
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      post.nostrNote.contentWarning!,
-                      style: const TextStyle(
-                        color: Palette.error,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 18,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                longButton(
-                    name: "show",
-                    onPressed: () {
-                      ref
-                          .read(isContentRevealedProvider(post.id).notifier)
-                          .state = true;
-                    }),
-              ],
-            ),
           ),
         ),
-    ]);
+        if (hasContentWarning && !isContentRevealed)
+          Center(
+            child: Container(
+              alignment: Alignment.center,
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        PhosphorIcons.warningOctagon(),
+                        color: Theme.of(context).colorScheme.error,
+                        size: 32,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        post.nostrNote.contentWarning!,
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.error,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  longButton(
+                    name: AppLocalizations.of(context)!.show,
+                    onPressed: () {
+                      ref
+                              .read(isContentRevealedProvider(post.id).notifier)
+                              .state =
+                          true;
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ),
+      ],
+    );
   }
 
   bool _isMediaType(ContentType type) {
@@ -194,28 +216,6 @@ class PostContentWidget extends ConsumerWidget {
     switch (segment.type) {
       case ContentType.image:
         return Container();
-
-        /// inline image could be here
-        return Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8.0),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(8.0),
-            child: CachedNetworkImage(
-              imageUrl: segment.metadata!,
-              placeholder: (context, url) => Container(
-                height: 200,
-                color: Colors.grey[300],
-                child: const Center(child: CircularProgressIndicator()),
-              ),
-              errorWidget: (context, url, error) => Container(
-                height: 200,
-                color: Colors.grey[300],
-                child: const Icon(Icons.error),
-              ),
-              fit: BoxFit.cover,
-            ),
-          ),
-        );
 
       case ContentType.video:
         return InlineVideoPlayer(
@@ -230,21 +230,28 @@ class PostContentWidget extends ConsumerWidget {
   }
 
   TextSpan _buildTextSpan(
-      ContentSegment segment, WidgetRef ref, BuildContext context) {
+    ContentSegment segment,
+    WidgetRef ref,
+    BuildContext context,
+  ) {
     switch (segment.type) {
       case ContentType.text:
         return TextSpan(
           text: segment.content,
-          style: TextStyle(fontSize: _fontSize),
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.onSurface,
+            fontSize: _fontSize,
+          ),
         );
 
       case ContentType.mention:
-        final user =
-            ref.watch(metadataStateProvider(segment.metadata!)).userMetadata;
+        final user = ref
+            .watch(metadataStateProvider(segment.metadata!))
+            .userMetadata;
         return TextSpan(
           text: user?.name != null ? "@${user?.name}" : segment.content,
           style: TextStyle(
-            color: Palette.primary,
+            color: Theme.of(context).colorScheme.primary,
             fontWeight: FontWeight.normal,
             fontSize: _fontSize,
           ),
@@ -256,7 +263,7 @@ class PostContentWidget extends ConsumerWidget {
         return TextSpan(
           text: segment.content,
           style: TextStyle(
-            color: Colors.blue,
+            color: Theme.of(context).colorScheme.primary,
             decoration: TextDecoration.none,
           ),
           recognizer: TapGestureRecognizer()
@@ -272,21 +279,20 @@ class PostContentWidget extends ConsumerWidget {
       default:
         return TextSpan(
           text: segment.content,
-          style: TextStyle(fontSize: _fontSize),
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.onSurface,
+            fontSize: _fontSize,
+          ),
         );
     }
   }
 
   void _openUserProfile(BuildContext context, String pubkey) {
-    Navigator.pushNamed(
-      context,
-      "/nostr/profile",
-      arguments: pubkey,
-    );
+    context.push('/nostr/profile/$pubkey');
   }
 
   void _openHashtag(BuildContext context, String hashtag) {
-    Navigator.pushNamed(context, "/nostr/search", arguments: "#$hashtag");
+    context.push('/nostr/search', extra: "#$hashtag");
   }
 
   void _openLink(String url) {

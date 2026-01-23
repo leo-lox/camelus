@@ -32,7 +32,7 @@ class NostrPushEndpoint extends Endpoint {
   late final FirebaseAdminApp _firebaseAdminApp;
   late final Messaging _firebaseMessaging;
 
-  List<StreamSubscription> _subscriptions = [];
+  final List<StreamSubscription> _subscriptions = [];
 
   Timer? relayPoolRestartTimer;
 
@@ -409,7 +409,7 @@ class NostrPushEndpoint extends Endpoint {
                   ".onError.listen, relay: ${relay.url} error: $error");
               s.log(
                 level: LogLevel.error,
-                "${message}",
+                "$message",
                 exception: message,
               );
               if (message is WebSocketException) {

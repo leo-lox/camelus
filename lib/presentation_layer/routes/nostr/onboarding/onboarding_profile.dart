@@ -1,17 +1,18 @@
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:camelus/l10n/app_localizations.dart';
 import 'package:camelus/presentation_layer/components/edit_profile.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mime/mime.dart';
 
 import '../../../../domain_layer/entities/mem_file.dart';
 import '../../../../domain_layer/entities/onboarding_user_info.dart';
 import '../../../../domain_layer/usecases/remove_image_metadata.dart';
 import '../../../atoms/crop_avatar.dart';
 import '../../../atoms/long_button.dart';
+import '../../../components/responsive_center.dart';
 
 class OnboardingProfile extends ConsumerStatefulWidget {
   final OnboardingUserInfo signUpInfo;
@@ -32,7 +33,7 @@ class _OnboardingProfileState extends ConsumerState<OnboardingProfile> {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
       allowMultiple: false,
       type: FileType.image,
-      dialogTitle: "select image",
+      dialogTitle: AppLocalizations.of(context)!.selectImage,
     );
 
     if (result != null) {
@@ -45,8 +46,8 @@ class _OnboardingProfileState extends ConsumerState<OnboardingProfile> {
         if (!mounted) return null;
 
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('unspoorted image format'),
+          SnackBar(
+            content: Text(AppLocalizations.of(context)!.unsupportedImageFormat),
           ),
         );
       }
@@ -115,7 +116,7 @@ class _OnboardingProfileState extends ConsumerState<OnboardingProfile> {
             mimeType: file.mimeType,
             name: file.name,
           );
-        })
+        }),
       },
     );
   }
@@ -123,80 +124,84 @@ class _OnboardingProfileState extends ConsumerState<OnboardingProfile> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
       body: SafeArea(
-        child: Stack(
-          children: [
-            SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.only(bottom: 80),
-                child: EditProfile(
-                  initialName: widget.signUpInfo.name ?? '',
-                  onNameChanged: (value) {
-                    widget.signUpInfo.name = value;
-                  },
-                  initialPicture: widget.signUpInfo.picture?.bytes,
-                  pictureCallback: () => _onClickPicture(),
-                  initialBanner: widget.signUpInfo.banner?.bytes,
-                  bannerCallback: () => _onClickBanner(),
-                  initialAbout: widget.signUpInfo.about ?? '',
-                  onAboutChanged: (value) {
-                    widget.signUpInfo.about = value;
-                  },
-                  initialPronouns: widget.signUpInfo.pronouns ?? '',
-                  onPronounsChanged: (value) {
-                    widget.signUpInfo.pronouns = value;
-                  },
-                  initialNip05: widget.signUpInfo.nip05 ?? '',
-                  onNip05Changed: (value) {
-                    widget.signUpInfo.nip05 = value;
-                  },
-                  initialWebsite: widget.signUpInfo.website ?? '',
-                  onWebsiteChanged: (value) {
-                    widget.signUpInfo.website = value;
-                  },
-                  initialLud06: widget.signUpInfo.lud06,
-                  onLud06Changed: (value) {
-                    widget.signUpInfo.lud06 = value;
-                  },
-                  initialLud16: widget.signUpInfo.lud16,
-                  onLud16Changed: (value) {
-                    widget.signUpInfo.lud16 = value;
-                  },
-                ),
-              ),
-            ),
-            Positioned(
-              left: 0,
-              right: 0,
-              bottom: 0,
-              child: Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: Colors.black,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
-                      blurRadius: 10,
-                      offset: Offset(0, -5),
-                    ),
-                  ],
-                ),
-                child: SizedBox(
-                  width: 400,
-                  height: 40,
-                  child: longButton(
-                    name: "next",
-                    onPressed: (() {
-                      FocusScope.of(context).unfocus();
-                      widget.profileCallback();
-                    }),
-                    inverted: true,
+        child: ResponsiveCenter(
+          maxWidth: 800,
+          child: Stack(
+            children: [
+              SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.only(bottom: 80),
+                  child: EditProfile(
+                    initialName: widget.signUpInfo.name ?? '',
+                    onNameChanged: (value) {
+                      widget.signUpInfo.name = value;
+                    },
+                    initialPicture: widget.signUpInfo.picture?.bytes,
+                    pictureCallback: () => _onClickPicture(),
+                    initialBanner: widget.signUpInfo.banner?.bytes,
+                    bannerCallback: () => _onClickBanner(),
+                    initialAbout: widget.signUpInfo.about ?? '',
+                    onAboutChanged: (value) {
+                      widget.signUpInfo.about = value;
+                    },
+                    initialPronouns: widget.signUpInfo.pronouns ?? '',
+                    onPronounsChanged: (value) {
+                      widget.signUpInfo.pronouns = value;
+                    },
+                    initialNip05: widget.signUpInfo.nip05 ?? '',
+                    onNip05Changed: (value) {
+                      widget.signUpInfo.nip05 = value;
+                    },
+                    initialWebsite: widget.signUpInfo.website ?? '',
+                    onWebsiteChanged: (value) {
+                      widget.signUpInfo.website = value;
+                    },
+                    initialLud06: widget.signUpInfo.lud06,
+                    onLud06Changed: (value) {
+                      widget.signUpInfo.lud06 = value;
+                    },
+                    initialLud16: widget.signUpInfo.lud16,
+                    onLud16Changed: (value) {
+                      widget.signUpInfo.lud16 = value;
+                    },
                   ),
                 ),
               ),
-            ),
-          ],
+              Positioned(
+                left: 0,
+                right: 0,
+                bottom: 0,
+                child: Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.surface,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.surface.withValues(alpha: 0.1),
+                        blurRadius: 10,
+                        offset: Offset(0, -5),
+                      ),
+                    ],
+                  ),
+                  child: SizedBox(
+                    width: double.infinity,
+                    height: 40,
+                    child: longButton(
+                      name: AppLocalizations.of(context)!.next,
+                      onPressed: (() {
+                        FocusScope.of(context).unfocus();
+                        widget.profileCallback();
+                      }),
+                      inverted: true,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

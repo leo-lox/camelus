@@ -1,7 +1,3 @@
-import 'dart:developer';
-
-import 'package:ndk/ndk.dart' as ndk;
-
 import '../../domain_layer/entities/nostr_list.dart';
 import '../../domain_layer/repositories/nostr_list_repository.dart';
 import '../data_sources/dart_ndk_source.dart';
@@ -10,9 +6,7 @@ import '../models/nostr_lists_model.dart';
 class NostrListRepositoryImpl implements NostrListRepository {
   final DartNdkSource dartNdkSource;
 
-  NostrListRepositoryImpl({
-    required this.dartNdkSource,
-  });
+  NostrListRepositoryImpl({required this.dartNdkSource});
 
   @override
   Stream<List<NostrStarterPack>?> getPublicNostrStarterPacks({
@@ -42,11 +36,12 @@ class NostrListRepositoryImpl implements NostrListRepository {
   Future<NostrStarterPack> broadcastStarterPack({
     required NostrStarterPack starterPack,
   }) async {
-    final ndkStarterPack =
-        NostrStarterPackModel.fromEntity(starterPack).toNDK();
+    final ndkStarterPack = NostrStarterPackModel.fromEntity(
+      starterPack,
+    ).toNDK();
     final result = await dartNdkSource.dartNdk.lists.setCompleteSet(
       set: ndkStarterPack,
-      kind: NostrList.STARTER_PACK,
+      kind: NostrList.starterPack,
     );
     return NostrStarterPackModel.fromNDK(result);
   }
@@ -55,7 +50,7 @@ class NostrListRepositoryImpl implements NostrListRepository {
   Future deleteStarterPack({required String name}) {
     return dartNdkSource.dartNdk.lists.deleteSet(
       name: name,
-      kind: NostrList.STARTER_PACK,
+      kind: NostrList.starterPack,
     );
   }
 
@@ -68,11 +63,54 @@ class NostrListRepositoryImpl implements NostrListRepository {
       tag: 'p',
       value: pubkey,
       name: name,
-      kind: NostrList.STARTER_PACK,
+      kind: NostrList.starterPack,
     );
     if (ndkSet == null) {
       return null;
     }
     return NostrStarterPackModel.fromNDK(ndkSet);
+  }
+
+  @override
+  Future<NostrList?> getSingleList({required int kind}) async {
+    final ndkList = await dartNdkSource.dartNdk.lists.getSingleNip51List(
+      kind,
+
+      forceRefresh: false,
+    );
+
+    if (ndkList == null) return null;
+    return NostrListModel.fromNDK(ndkList);
+  }
+
+  @override
+  Future<NostrList> addElementToList({
+    required String tag,
+    required String value,
+    required int kind,
+    bool private = false,
+  }) async {
+    final ndkList = await dartNdkSource.dartNdk.lists.addElementToList(
+      tag: tag,
+      value: value,
+      kind: kind,
+      private: private,
+    );
+    return NostrListModel.fromNDK(ndkList);
+  }
+
+  @override
+  Future<NostrList?> removeElementFromList({
+    required String tag,
+    required String value,
+    required int kind,
+  }) async {
+    final ndkList = await dartNdkSource.dartNdk.lists.removeElementFromList(
+      tag: tag,
+      value: value,
+      kind: kind,
+    );
+    if (ndkList == null) return null;
+    return NostrListModel.fromNDK(ndkList);
   }
 }

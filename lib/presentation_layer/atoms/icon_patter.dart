@@ -1,14 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
-import '../../config/palette.dart';
-
 class IconPattern extends StatelessWidget {
   final BorderRadiusGeometry? borderRadius;
-  const IconPattern({
-    super.key,
-    this.borderRadius,
-  });
+  const IconPattern({super.key, this.borderRadius});
 
   @override
   Widget build(BuildContext context) {
@@ -20,9 +15,9 @@ class IconPattern extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            Palette.extraDarkGray,
-            Palette.extraDarkGray.withValues(alpha: 1),
-            Palette.extraDarkGray,
+            Theme.of(context).colorScheme.surface,
+            Theme.of(context).colorScheme.surface,
+            Theme.of(context).colorScheme.surface,
           ],
         ),
       ),
@@ -45,8 +40,9 @@ class IconPattern extends StatelessWidget {
               top: row * 30.0 - 10,
               child: Icon(
                 icons[index % icons.length],
-                color: Colors.white.withValues(
-                    alpha: 0.09 + (index % 3) * 0.02), // varying opacity
+                color: Theme.of(context).colorScheme.onSurface.withValues(
+                  alpha: 0.09 + (index % 3) * 0.02,
+                ), // varying opacity
                 size: 20 + (index % 3) * 4, // varying sizes
               ),
             );

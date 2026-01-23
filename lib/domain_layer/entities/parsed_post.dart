@@ -12,7 +12,7 @@ class ParsedPost {
   final NostrNote nostrNote;
 
   // ignore: non_constant_identifier_names
-  int get created_at => nostrNote.created_at;
+  int get created_at => nostrNote.createdAt;
 
   int get kind => nostrNote.kind;
 
@@ -52,12 +52,4 @@ class ContentSegment {
   });
 }
 
-enum ContentType {
-  text,
-  mention,
-  hashtag,
-  link,
-  image,
-  video,
-  noteReference,
-}
+enum ContentType { text, mention, hashtag, link, image, video, noteReference }

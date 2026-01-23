@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+import 'package:flutter_riverpod/legacy.dart';
 import 'package:riverpod/riverpod.dart';
 
 import '../../domain_layer/entities/nostr_note.dart';
@@ -16,8 +18,11 @@ class PostRepostState {
     required this.toggleRepostLoading,
   });
 
-  PostRepostState copyWith(
-      {bool? isReposted, bool? isLoading, bool? toggleRepostLoading}) {
+  PostRepostState copyWith({
+    bool? isReposted,
+    bool? isLoading,
+    bool? toggleRepostLoading,
+  }) {
     return PostRepostState(
       isReposted: isReposted ?? this.isReposted,
       isLoading: isLoading ?? this.isLoading,
@@ -26,32 +31,35 @@ class PostRepostState {
   }
 }
 
-final postRepostProvider = StateNotifierProvider.family<PostRepostNotifier,
-    PostRepostState, NostrNote>(
-  (ref, arg) {
-    final userReactions = ref.watch(repostsProvider);
-    return PostRepostNotifier(userReactions, arg);
-  },
-);
+final postRepostProvider =
+    StateNotifierProvider.family<
+      PostRepostNotifier,
+      PostRepostState,
+      NostrNote
+    >((ref, arg) {
+      final userReactions = ref.watch(repostsProvider);
+      return PostRepostNotifier(userReactions, arg);
+    });
 
 class PostRepostNotifier extends StateNotifier<PostRepostState> {
   final UserReposts _userReposts;
   final NostrNote _displayNote;
 
-  PostRepostNotifier(
-    this._userReposts,
-    this._displayNote,
-  ) : super(PostRepostState(
+  PostRepostNotifier(this._userReposts, this._displayNote)
+    : super(
+        PostRepostState(
           isReposted: false,
           isLoading: true,
           toggleRepostLoading: false,
-        )) {
+        ),
+      ) {
     _initializeRepostState();
   }
 
   Future<void> _initializeRepostState() async {
-    final isReposted =
-        await _userReposts.isPostSelfReposted(postId: _displayNote.id);
+    final isReposted = await _userReposts.isPostSelfReposted(
+      postId: _displayNote.id,
+    );
 
     state = state.copyWith(isReposted: isReposted, isLoading: false);
   }
@@ -73,7 +81,9 @@ class PostRepostNotifier extends StateNotifier<PostRepostState> {
         toggleRepostLoading: false,
       );
     } catch (e) {
-      print(e);
+      if (kDebugMode) {
+        print(e);
+      }
       // Handle error
       state = state.copyWith(isLoading: false, toggleRepostLoading: false);
     }

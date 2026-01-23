@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 import 'package:flutter/material.dart';
-import '../../../config/palette.dart';
+import 'package:camelus/l10n/app_localizations.dart';
 
 class PostSettingsState {
   final bool enableContentWarning;
@@ -59,13 +60,11 @@ class PostSettingsNotifier extends StateNotifier<PostSettingsState> {
 
 final postSettingsProvider =
     StateNotifierProvider<PostSettingsNotifier, PostSettingsState>((ref) {
-  return PostSettingsNotifier();
-});
+      return PostSettingsNotifier();
+    });
 
 class PostSettings extends ConsumerStatefulWidget {
-  const PostSettings({
-    super.key,
-  });
+  const PostSettings({super.key});
 
   @override
   ConsumerState<PostSettings> createState() => _PostSettingsState();
@@ -74,7 +73,8 @@ class PostSettings extends ConsumerStatefulWidget {
 class _PostSettingsState extends ConsumerState<PostSettings> {
   late TextEditingController _customWarningController;
 
-  static const List<String> warningOptions = [
+  // English keys for internal storage
+  static const List<String> _warningKeys = [
     'Sensitive Content',
     'Flashing Lights/Patterns',
     'Loud Noises',
@@ -82,8 +82,37 @@ class _PostSettingsState extends ConsumerState<PostSettings> {
     'Discrimination',
     'Health',
     'Abuse',
-    'Other'
+    'Other',
   ];
+
+  // Get localized display values
+  List<String> _getWarningOptions(BuildContext context) {
+    return [
+      AppLocalizations.of(context)!.sensitiveContent,
+      AppLocalizations.of(context)!.flashingLights,
+      AppLocalizations.of(context)!.loudNoises,
+      AppLocalizations.of(context)!.graphicContent,
+      AppLocalizations.of(context)!.discrimination,
+      AppLocalizations.of(context)!.health,
+      AppLocalizations.of(context)!.abuse,
+      AppLocalizations.of(context)!.other,
+    ];
+  }
+
+  // Convert key to localized display value
+  String _keyToDisplay(BuildContext context, String key) {
+    final index = _warningKeys.indexOf(key);
+    if (index == -1) return key;
+    return _getWarningOptions(context)[index];
+  }
+
+  // Convert localized display value to key
+  String _displayToKey(BuildContext context, String display) {
+    final options = _getWarningOptions(context);
+    final index = options.indexOf(display);
+    if (index == -1) return display;
+    return _warningKeys[index];
+  }
 
   @override
   void initState() {
@@ -110,12 +139,10 @@ class _PostSettingsState extends ConsumerState<PostSettings> {
     }
 
     return AlertDialog(
-      backgroundColor: Palette.extraDarkGray,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       elevation: 24,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
-      title: const Text('Post Settings'),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      title: Text(AppLocalizations.of(context)!.postSettings),
       content: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -123,7 +150,7 @@ class _PostSettingsState extends ConsumerState<PostSettings> {
           children: [
             // Content Warning Switch
             _buildSwitchRow(
-              title: 'Enable Content Warning',
+              title: AppLocalizations.of(context)!.enableContentWarning,
               value: state.enableContentWarning,
               onChanged: (value) {
                 notifier.toggleContentWarning(value);
@@ -133,16 +160,12 @@ class _PostSettingsState extends ConsumerState<PostSettings> {
             // Only show dropdown if content warning is enabled
             if (state.enableContentWarning) ...[
               const SizedBox(height: 16),
-              const Text(
-                'Warning Type:',
-                style: TextStyle(fontSize: 16),
+              Text(
+                AppLocalizations.of(context)!.warningType,
+                style: const TextStyle(fontSize: 16),
               ),
               const SizedBox(height: 8),
-              _buildDropdown(
-                context,
-                state,
-                notifier,
-              ),
+              _buildDropdown(context, state, notifier),
 
               // Add custom warning text field if "Other" is selected
               if (state.selectedWarning == 'Other') ...[
@@ -150,8 +173,10 @@ class _PostSettingsState extends ConsumerState<PostSettings> {
                 TextField(
                   controller: _customWarningController,
                   decoration: InputDecoration(
-                    labelText: 'Custom Warning',
-                    hintText: 'Specify content warning',
+                    labelText: AppLocalizations.of(context)!.customWarning,
+                    hintText: AppLocalizations.of(
+                      context,
+                    )!.specifyContentWarning,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
@@ -164,14 +189,14 @@ class _PostSettingsState extends ConsumerState<PostSettings> {
             ],
 
             const SizedBox(height: 16),
-            const Divider(
-              color: Palette.darkGray,
+            Divider(
+              color: Theme.of(context).colorScheme.surfaceContainerHighest,
             ),
             const SizedBox(height: 16),
 
             // Client Tag Switch
             _buildSwitchRow(
-              title: 'Enable Client Tag',
+              title: AppLocalizations.of(context)!.enableClientTag,
               value: state.enableClientTag,
               onChanged: (value) {
                 notifier.toggleClientTag(value);
@@ -185,7 +210,7 @@ class _PostSettingsState extends ConsumerState<PostSettings> {
           onPressed: () {
             Navigator.of(context).pop();
           },
-          child: const Text('Close'),
+          child: Text(AppLocalizations.of(context)!.close),
         ),
       ],
     );
@@ -199,14 +224,11 @@ class _PostSettingsState extends ConsumerState<PostSettings> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
-          title,
-          style: const TextStyle(fontSize: 16),
-        ),
+        Text(title, style: const TextStyle(fontSize: 16)),
         Switch(
           value: value,
           onChanged: onChanged,
-          activeColor: Palette.white,
+          activeThumbColor: Theme.of(context).colorScheme.onSurface,
         ),
       ],
     );
@@ -222,29 +244,34 @@ class _PostSettingsState extends ConsumerState<PostSettings> {
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Palette.gray),
+        border: Border.all(color: Theme.of(context).colorScheme.inverseSurface),
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<String>(
-          dropdownColor: Palette.extraDarkGray,
-          value: state.selectedWarning,
+          dropdownColor: Theme.of(context).colorScheme.surface,
+          value: _keyToDisplay(context, state.selectedWarning),
           isExpanded: true,
           icon: const Icon(Icons.arrow_drop_down),
           elevation: 16,
-          style: const TextStyle(color: Colors.black87, fontSize: 16),
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.onSurface,
+            fontSize: 16,
+          ),
           onChanged: (String? newValue) {
             if (newValue != null) {
-              notifier.setSelectedWarning(newValue);
+              notifier.setSelectedWarning(_displayToKey(context, newValue));
             }
           },
-          items: warningOptions.map<DropdownMenuItem<String>>((String value) {
+          items: _getWarningOptions(context).map<DropdownMenuItem<String>>((
+            String value,
+          ) {
             return DropdownMenuItem<String>(
               value: value,
               child: Text(
                 value,
                 overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  color: Palette.white,
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface,
                 ),
               ),
             );
