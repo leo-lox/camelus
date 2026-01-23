@@ -655,29 +655,47 @@ class DirectMessageRepositoryImpl implements DirectMessageRepository {
       }
 
       // 5. Broadcast gift wraps
-      ndk.broadcast.broadcast(
+      final recipientBroadcast = ndk.broadcast.broadcast(
         nostrEvent: recipientGiftWrap,
         specificRelays: recipientRelays.isNotEmpty ? recipientRelays : null,
       );
 
-      if (!isSelfMessage) {
-        ndk.broadcast.broadcast(
-          nostrEvent: selfGiftWrap,
-          specificRelays: myRelays.isNotEmpty ? myRelays : null,
-        );
-      }
+      final selfBroadcast = isSelfMessage
+          ? null
+          : ndk.broadcast.broadcast(
+              nostrEvent: selfGiftWrap,
+              specificRelays: myRelays.isNotEmpty ? myRelays : null,
+            );
 
-      // 6. Update message status to sent
-      final sentMessage = localMessage.copyWith(
-        sendStatus: MessageSendStatus.sent,
+      // 6. Wait for relay confirmations
+      final recipientResponses = await recipientBroadcast.broadcastDoneFuture;
+      final recipientConfirmed = recipientResponses.any(
+        (r) => r.broadcastSuccessful,
       );
 
-      await cacheDecryptedMessage(sentMessage);
+      final selfConfirmed =
+          selfBroadcast == null ||
+          (await selfBroadcast.broadcastDoneFuture).any(
+            (r) => r.broadcastSuccessful,
+          );
+
+      final relayConfirmed = recipientConfirmed && selfConfirmed;
+
+      // 7. Update message status based on relay confirmation
+      final finalMessage = localMessage.copyWith(
+        sendStatus: relayConfirmed
+            ? MessageSendStatus.sent
+            : MessageSendStatus.failed,
+      );
+
+      await cacheDecryptedMessage(finalMessage);
       _notifyMessagesChanged(recipientPubkey);
 
-      log('DM: Message sent successfully');
+      log(
+        'DM: Message ${relayConfirmed ? 'sent successfully' : 'failed - no relay confirmation'}',
+      );
 
-      return sentMessage;
+      return finalMessage;
     } catch (e) {
       log('DM: Error sending message: $e');
       rethrow;
