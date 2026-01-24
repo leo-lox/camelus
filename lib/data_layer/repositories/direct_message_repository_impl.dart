@@ -705,9 +705,11 @@ class DirectMessageRepositoryImpl implements DirectMessageRepository {
       }
 
       // 6. Broadcast gift wraps
+      const dmTimeout = Duration(minutes: 1);
       final recipientBroadcast = ndk.broadcast.broadcast(
         nostrEvent: recipientGiftWrap,
         specificRelays: recipientRelays.isNotEmpty ? recipientRelays : null,
+        timeout: dmTimeout,
       );
 
       final selfBroadcast = isSelfMessage
@@ -715,6 +717,7 @@ class DirectMessageRepositoryImpl implements DirectMessageRepository {
           : ndk.broadcast.broadcast(
               nostrEvent: selfGiftWrap,
               specificRelays: myRelays.isNotEmpty ? myRelays : null,
+              timeout: dmTimeout,
             );
 
       // 7. Wait for relay confirmations
@@ -804,11 +807,13 @@ class DirectMessageRepositoryImpl implements DirectMessageRepository {
 
       // 5. Broadcast gift wraps
       // For self-messages or when we only have recipient gift wrap, use selfGiftWrap
+      const dmTimeout = Duration(minutes: 1);
       final giftWrapForRecipient = recipientGiftWrap ?? selfGiftWrap;
 
       final recipientBroadcast = ndk.broadcast.broadcast(
         nostrEvent: giftWrapForRecipient,
         specificRelays: recipientRelays.isNotEmpty ? recipientRelays : null,
+        timeout: dmTimeout,
       );
 
       final selfBroadcast = isSelfMessage
@@ -816,6 +821,7 @@ class DirectMessageRepositoryImpl implements DirectMessageRepository {
           : ndk.broadcast.broadcast(
               nostrEvent: selfGiftWrap,
               specificRelays: myRelays.isNotEmpty ? myRelays : null,
+              timeout: dmTimeout,
             );
 
       // 6. Wait for relay confirmations
