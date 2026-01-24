@@ -74,7 +74,7 @@
     },
     {
       "id": "9:5397343319776606099",
-      "lastPropertyId": "10:7980053268206705210",
+      "lastPropertyId": "12:6366347105473552422",
       "name": "DbNip17Message",
       "properties": [
         {
@@ -135,6 +135,16 @@
           "id": "10:7980053268206705210",
           "name": "sendStatus",
           "type": 6
+        },
+        {
+          "id": "11:4667629587475202421",
+          "name": "giftWrapJson",
+          "type": 9
+        },
+        {
+          "id": "12:6366347105473552422",
+          "name": "recipientGiftWrapJson",
+          "type": 9
         }
       ],
       "relations": []

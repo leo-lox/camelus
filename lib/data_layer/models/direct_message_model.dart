@@ -18,6 +18,8 @@ class DirectMessageModel extends DirectMessage {
     required super.isOutgoing,
     super.tags,
     super.sendStatus,
+    super.giftWrapJson,
+    super.recipientGiftWrapJson,
   });
 
   /// Create from ObjectBox database entity
@@ -34,6 +36,19 @@ class DirectMessageModel extends DirectMessage {
       }
     }
 
+    // Parse sendStatus: 0=pending, 1=sent, 2=failed
+    MessageSendStatus status;
+    switch (db.sendStatus) {
+      case 0:
+        status = MessageSendStatus.pending;
+        break;
+      case 2:
+        status = MessageSendStatus.failed;
+        break;
+      default:
+        status = MessageSendStatus.sent;
+    }
+
     return DirectMessageModel(
       id: db.eventId,
       senderPubkey: db.senderPubkey,
@@ -42,9 +57,9 @@ class DirectMessageModel extends DirectMessage {
       createdAt: db.createdAt,
       isOutgoing: db.isOutgoing,
       tags: parsedTags,
-      sendStatus: db.sendStatus == 0
-          ? MessageSendStatus.pending
-          : MessageSendStatus.sent,
+      sendStatus: status,
+      giftWrapJson: db.giftWrapJson,
+      recipientGiftWrapJson: db.recipientGiftWrapJson,
     );
   }
 
@@ -97,6 +112,20 @@ class DirectMessageModel extends DirectMessage {
       tagsJson = jsonEncode(tagsList);
     }
 
+    // Convert sendStatus: pending=0, sent=1, failed=2
+    int statusInt;
+    switch (sendStatus) {
+      case MessageSendStatus.pending:
+        statusInt = 0;
+        break;
+      case MessageSendStatus.failed:
+        statusInt = 2;
+        break;
+      case MessageSendStatus.sent:
+        statusInt = 1;
+        break;
+    }
+
     return DbNip17Message(
       eventId: id,
       senderPubkey: senderPubkey,
@@ -106,7 +135,9 @@ class DirectMessageModel extends DirectMessage {
       tags: tagsJson,
       replyToEventId: replyToEventId,
       isOutgoing: isOutgoing,
-      sendStatus: sendStatus == MessageSendStatus.pending ? 0 : 1,
+      sendStatus: statusInt,
+      giftWrapJson: giftWrapJson,
+      recipientGiftWrapJson: recipientGiftWrapJson,
     );
   }
 
@@ -121,6 +152,8 @@ class DirectMessageModel extends DirectMessage {
       isOutgoing: message.isOutgoing,
       tags: message.tags,
       sendStatus: message.sendStatus,
+      giftWrapJson: message.giftWrapJson,
+      recipientGiftWrapJson: message.recipientGiftWrapJson,
     );
   }
 }

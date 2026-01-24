@@ -56,6 +56,11 @@ abstract class DirectMessageRepository {
     String? replyToEventId,
   });
 
+  /// Resend a failed message using its cached gift wrap events.
+  /// Returns true if the message was successfully resent.
+  /// [messageId] is the gift wrap event ID of the failed message.
+  Future<bool> resendMessage(String messageId);
+
   // ============ Cache ============
 
   /// Get a cached (already decrypted) message by gift wrap event ID

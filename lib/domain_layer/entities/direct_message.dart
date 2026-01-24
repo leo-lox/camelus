@@ -42,6 +42,14 @@ class DirectMessage {
   /// Status of message sending (for optimistic UI updates)
   final MessageSendStatus sendStatus;
 
+  /// JSON-encoded gift wrap event for resending failed messages
+  /// Only stored for outgoing messages
+  final String? giftWrapJson;
+
+  /// JSON-encoded recipient gift wrap event (if different from giftWrapJson)
+  /// Only stored for outgoing messages to non-self recipients
+  final String? recipientGiftWrapJson;
+
   DirectMessage({
     required this.id,
     required this.senderPubkey,
@@ -51,6 +59,8 @@ class DirectMessage {
     required this.isOutgoing,
     this.tags = const [],
     this.sendStatus = MessageSendStatus.sent,
+    this.giftWrapJson,
+    this.recipientGiftWrapJson,
   });
 
   /// Create a copy of this message with updated fields
@@ -63,6 +73,8 @@ class DirectMessage {
     bool? isOutgoing,
     List<NostrTag>? tags,
     MessageSendStatus? sendStatus,
+    String? giftWrapJson,
+    String? recipientGiftWrapJson,
   }) {
     return DirectMessage(
       id: id ?? this.id,
@@ -73,6 +85,9 @@ class DirectMessage {
       isOutgoing: isOutgoing ?? this.isOutgoing,
       tags: tags ?? this.tags,
       sendStatus: sendStatus ?? this.sendStatus,
+      giftWrapJson: giftWrapJson ?? this.giftWrapJson,
+      recipientGiftWrapJson:
+          recipientGiftWrapJson ?? this.recipientGiftWrapJson,
     );
   }
 

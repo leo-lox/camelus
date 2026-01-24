@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:developer';
 
 import 'package:ndk/ndk.dart';
@@ -663,7 +664,15 @@ class DirectMessageRepositoryImpl implements DirectMessageRepository {
               recipientPubkey: myPubkey,
             );
 
-      // 3. Cache locally IMMEDIATELY with pending status so it appears in UI
+      // 3. Serialize gift wraps for potential resend
+      final selfGiftWrapJson = jsonEncode(
+        Nip01EventModel.fromEntity(selfGiftWrap).toJson(),
+      );
+      final recipientGiftWrapJson = isSelfMessage
+          ? null
+          : jsonEncode(Nip01EventModel.fromEntity(recipientGiftWrap).toJson());
+
+      // 4. Cache locally IMMEDIATELY with pending status so it appears in UI
       final localMessage = DirectMessageModel(
         id: selfGiftWrap.id,
         senderPubkey: myPubkey,
@@ -673,6 +682,8 @@ class DirectMessageRepositoryImpl implements DirectMessageRepository {
         isOutgoing: true,
         tags: tags.map((t) => NostrTagModel.fromJson(t)).toList(),
         sendStatus: MessageSendStatus.pending,
+        giftWrapJson: selfGiftWrapJson,
+        recipientGiftWrapJson: recipientGiftWrapJson,
       );
 
       await cacheDecryptedMessage(localMessage);
@@ -682,7 +693,7 @@ class DirectMessageRepositoryImpl implements DirectMessageRepository {
 
       log('DM: Message cached as pending, now broadcasting...');
 
-      // 4. Get DM relays (network operation)
+      // 5. Get DM relays (network operation)
       final recipientRelays = await _getDmInboxRelays(recipientPubkey);
       final myRelays = isSelfMessage
           ? recipientRelays
@@ -697,9 +708,110 @@ class DirectMessageRepositoryImpl implements DirectMessageRepository {
         );
       }
 
-      // 5. Broadcast gift wraps
+      // 6. Broadcast gift wraps
       final recipientBroadcast = ndk.broadcast.broadcast(
         nostrEvent: recipientGiftWrap,
+        specificRelays: recipientRelays.isNotEmpty ? recipientRelays : null,
+      );
+
+      final selfBroadcast = isSelfMessage
+          ? null
+          : ndk.broadcast.broadcast(
+              nostrEvent: selfGiftWrap,
+              specificRelays: myRelays.isNotEmpty ? myRelays : null,
+            );
+
+      // 7. Wait for relay confirmations
+      final recipientResponses = await recipientBroadcast.broadcastDoneFuture;
+      final recipientConfirmed = recipientResponses.any(
+        (r) => r.broadcastSuccessful,
+      );
+
+      final selfConfirmed =
+          selfBroadcast == null ||
+          (await selfBroadcast.broadcastDoneFuture).any(
+            (r) => r.broadcastSuccessful,
+          );
+
+      final relayConfirmed = recipientConfirmed && selfConfirmed;
+
+      // 8. Update message status based on relay confirmation
+      final finalMessage = localMessage.copyWith(
+        sendStatus: relayConfirmed
+            ? MessageSendStatus.sent
+            : MessageSendStatus.failed,
+      );
+
+      await cacheDecryptedMessage(finalMessage);
+      _notifyMessagesChanged(recipientPubkey);
+
+      log(
+        'DM: Message ${relayConfirmed ? 'sent successfully' : 'failed - no relay confirmation'}',
+      );
+
+      return finalMessage;
+    } catch (e) {
+      log('DM: Error sending message: $e');
+      rethrow;
+    }
+  }
+
+  @override
+  Future<bool> resendMessage(String messageId) async {
+    // 1. Get the cached message with stored gift wraps
+    final message = await getCachedMessage(messageId);
+    if (message == null) {
+      log('DM: Cannot resend - message $messageId not found');
+      return false;
+    }
+
+    if (!message.isOutgoing) {
+      log('DM: Cannot resend - message is not outgoing');
+      return false;
+    }
+
+    if (message.giftWrapJson == null) {
+      log('DM: Cannot resend - no gift wrap stored for message $messageId');
+      return false;
+    }
+
+    try {
+      // 2. Update status to pending
+      final pendingMessage = message.copyWith(
+        sendStatus: MessageSendStatus.pending,
+      );
+      await cacheDecryptedMessage(pendingMessage);
+      _notifyMessagesChanged(message.peerPubkey);
+
+      log('DM: Resending message $messageId...');
+
+      // 3. Reconstruct gift wrap events from JSON
+      final selfGiftWrap = Nip01EventModel.fromJson(
+        jsonDecode(message.giftWrapJson!),
+      );
+
+      final isSelfMessage = message.peerPubkey == myPubkey;
+      final recipientGiftWrap =
+          (!isSelfMessage && message.recipientGiftWrapJson != null)
+          ? Nip01EventModel.fromJson(jsonDecode(message.recipientGiftWrapJson!))
+          : null;
+
+      // 4. Get DM relays
+      final recipientRelays = await _getDmInboxRelays(message.peerPubkey);
+      final myRelays = isSelfMessage
+          ? recipientRelays
+          : await _getDmInboxRelays(myPubkey);
+
+      log(
+        'DM: Resending to recipient relays: ${recipientRelays.isNotEmpty ? recipientRelays : "default"}',
+      );
+
+      // 5. Broadcast gift wraps
+      // For self-messages or when we only have self gift wrap, use it for recipient too
+      final giftWrapForRecipient = recipientGiftWrap ?? selfGiftWrap;
+
+      final recipientBroadcast = ndk.broadcast.broadcast(
+        nostrEvent: giftWrapForRecipient,
         specificRelays: recipientRelays.isNotEmpty ? recipientRelays : null,
       );
 
@@ -725,23 +837,31 @@ class DirectMessageRepositoryImpl implements DirectMessageRepository {
       final relayConfirmed = recipientConfirmed && selfConfirmed;
 
       // 7. Update message status based on relay confirmation
-      final finalMessage = localMessage.copyWith(
+      final finalMessage = message.copyWith(
         sendStatus: relayConfirmed
             ? MessageSendStatus.sent
             : MessageSendStatus.failed,
       );
 
       await cacheDecryptedMessage(finalMessage);
-      _notifyMessagesChanged(recipientPubkey);
+      _notifyMessagesChanged(message.peerPubkey);
 
       log(
-        'DM: Message ${relayConfirmed ? 'sent successfully' : 'failed - no relay confirmation'}',
+        'DM: Resend ${relayConfirmed ? 'successful' : 'failed - no relay confirmation'}',
       );
 
-      return finalMessage;
+      return relayConfirmed;
     } catch (e) {
-      log('DM: Error sending message: $e');
-      rethrow;
+      log('DM: Error resending message $messageId: $e');
+
+      // Update status to failed
+      final failedMessage = message.copyWith(
+        sendStatus: MessageSendStatus.failed,
+      );
+      await cacheDecryptedMessage(failedMessage);
+      _notifyMessagesChanged(message.peerPubkey);
+
+      return false;
     }
   }
 

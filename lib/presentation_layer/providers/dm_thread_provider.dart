@@ -193,7 +193,7 @@ class DmThreadNotifier extends StateNotifier<DmThreadState> {
     }
   }
 
-  /// Retry sending a failed message
+  /// Retry sending a failed message by resending the cached gift wrap
   Future<bool> retrySendMessage(String messageId) async {
     final message = state.failedMessages
         .where((m) => m.id == messageId)
@@ -207,13 +207,10 @@ class DmThreadNotifier extends StateNotifier<DmThreadState> {
     final repository = ref.read(dmRepositoryProvider);
     if (repository == null) return false;
 
-    // Resend the message first
-    final success = await sendMessage(message.content);
+    // Resend the existing cached gift wrap event
+    final success = await repository.resendMessage(messageId);
 
-    // Only delete the old failed message if retry succeeded
-    if (success) {
-      await repository.deleteMessage(messageId);
-    }
+    log('DM Thread: Retry ${success ? 'successful' : 'failed'} for $messageId');
 
     return success;
   }
