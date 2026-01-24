@@ -101,7 +101,7 @@ final _entities = <obx_int.ModelEntity>[
   obx_int.ModelEntity(
     id: const obx_int.IdUid(9, 5397343319776606099),
     name: 'DbNip17Message',
-    lastPropertyId: const obx_int.IdUid(12, 6366347105473552422),
+    lastPropertyId: const obx_int.IdUid(13, 2871858570347088755),
     flags: 0,
     properties: <obx_int.ModelProperty>[
       obx_int.ModelProperty(
@@ -169,14 +169,8 @@ final _entities = <obx_int.ModelEntity>[
         flags: 0,
       ),
       obx_int.ModelProperty(
-        id: const obx_int.IdUid(11, 4667629587475202421),
-        name: 'giftWrapJson',
-        type: 9,
-        flags: 0,
-      ),
-      obx_int.ModelProperty(
-        id: const obx_int.IdUid(12, 6366347105473552422),
-        name: 'recipientGiftWrapJson',
+        id: const obx_int.IdUid(13, 2871858570347088755),
+        name: 'recipientGiftWrapId',
         type: 9,
         flags: 0,
       ),
@@ -288,6 +282,8 @@ obx_int.ModelDefinition getObjectBoxModel() {
       7429007344040003737,
       1857705759697671386,
       3769539562209329664,
+      4667629587475202421,
+      6366347105473552422,
     ],
     retiredRelationUids: const [],
     modelVersion: 5,
@@ -407,13 +403,10 @@ obx_int.ModelDefinition getObjectBoxModel() {
         final replyToEventIdOffset = object.replyToEventId == null
             ? null
             : fbb.writeString(object.replyToEventId!);
-        final giftWrapJsonOffset = object.giftWrapJson == null
+        final recipientGiftWrapIdOffset = object.recipientGiftWrapId == null
             ? null
-            : fbb.writeString(object.giftWrapJson!);
-        final recipientGiftWrapJsonOffset = object.recipientGiftWrapJson == null
-            ? null
-            : fbb.writeString(object.recipientGiftWrapJson!);
-        fbb.startTable(13);
+            : fbb.writeString(object.recipientGiftWrapId!);
+        fbb.startTable(14);
         fbb.addInt64(0, object.dbId);
         fbb.addOffset(1, eventIdOffset);
         fbb.addOffset(2, senderPubkeyOffset);
@@ -424,8 +417,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
         fbb.addOffset(7, replyToEventIdOffset);
         fbb.addBool(8, object.isOutgoing);
         fbb.addInt64(9, object.sendStatus);
-        fbb.addOffset(10, giftWrapJsonOffset);
-        fbb.addOffset(11, recipientGiftWrapJsonOffset);
+        fbb.addOffset(12, recipientGiftWrapIdOffset);
         fbb.finish(fbb.endTable());
         return object.dbId;
       },
@@ -468,12 +460,9 @@ obx_int.ModelDefinition getObjectBoxModel() {
           22,
           0,
         );
-        final giftWrapJsonParam = const fb.StringReader(
+        final recipientGiftWrapIdParam = const fb.StringReader(
           asciiOptimization: true,
-        ).vTableGetNullable(buffer, rootOffset, 24);
-        final recipientGiftWrapJsonParam = const fb.StringReader(
-          asciiOptimization: true,
-        ).vTableGetNullable(buffer, rootOffset, 26);
+        ).vTableGetNullable(buffer, rootOffset, 28);
         final object = DbNip17Message(
           eventId: eventIdParam,
           senderPubkey: senderPubkeyParam,
@@ -484,8 +473,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
           replyToEventId: replyToEventIdParam,
           isOutgoing: isOutgoingParam,
           sendStatus: sendStatusParam,
-          giftWrapJson: giftWrapJsonParam,
-          recipientGiftWrapJson: recipientGiftWrapJsonParam,
+          recipientGiftWrapId: recipientGiftWrapIdParam,
         )..dbId = const fb.Int64Reader().vTableGet(buffer, rootOffset, 4, 0);
 
         return object;
@@ -597,13 +585,8 @@ class DbNip17Message_ {
     _entities[2].properties[9],
   );
 
-  /// See [DbNip17Message.giftWrapJson].
-  static final giftWrapJson = obx.QueryStringProperty<DbNip17Message>(
+  /// See [DbNip17Message.recipientGiftWrapId].
+  static final recipientGiftWrapId = obx.QueryStringProperty<DbNip17Message>(
     _entities[2].properties[10],
-  );
-
-  /// See [DbNip17Message.recipientGiftWrapJson].
-  static final recipientGiftWrapJson = obx.QueryStringProperty<DbNip17Message>(
-    _entities[2].properties[11],
   );
 }

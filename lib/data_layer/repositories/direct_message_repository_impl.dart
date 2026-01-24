@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:developer';
 
 import 'package:ndk/ndk.dart';
@@ -664,13 +663,11 @@ class DirectMessageRepositoryImpl implements DirectMessageRepository {
               recipientPubkey: myPubkey,
             );
 
-      // 3. Serialize gift wraps for potential resend
-      final selfGiftWrapJson = jsonEncode(
-        Nip01EventModel.fromEntity(selfGiftWrap).toJson(),
-      );
-      final recipientGiftWrapJson = isSelfMessage
-          ? null
-          : jsonEncode(Nip01EventModel.fromEntity(recipientGiftWrap).toJson());
+      // 3. Save gift wraps to NDK cache for potential resend
+      await ndk.config.cache.saveEvent(selfGiftWrap);
+      if (!isSelfMessage) {
+        await ndk.config.cache.saveEvent(recipientGiftWrap);
+      }
 
       // 4. Cache locally IMMEDIATELY with pending status so it appears in UI
       final localMessage = DirectMessageModel(
@@ -682,8 +679,7 @@ class DirectMessageRepositoryImpl implements DirectMessageRepository {
         isOutgoing: true,
         tags: tags.map((t) => NostrTagModel.fromJson(t)).toList(),
         sendStatus: MessageSendStatus.pending,
-        giftWrapJson: selfGiftWrapJson,
-        recipientGiftWrapJson: recipientGiftWrapJson,
+        recipientGiftWrapId: isSelfMessage ? null : recipientGiftWrap.id,
       );
 
       await cacheDecryptedMessage(localMessage);
@@ -758,7 +754,7 @@ class DirectMessageRepositoryImpl implements DirectMessageRepository {
 
   @override
   Future<bool> resendMessage(String messageId) async {
-    // 1. Get the cached message with stored gift wraps
+    // 1. Get the cached message
     final message = await getCachedMessage(messageId);
     if (message == null) {
       log('DM: Cannot resend - message $messageId not found');
@@ -770,13 +766,24 @@ class DirectMessageRepositoryImpl implements DirectMessageRepository {
       return false;
     }
 
-    if (message.giftWrapJson == null) {
-      log('DM: Cannot resend - no gift wrap stored for message $messageId');
+    // 2. Load gift wraps from NDK cache
+    // The self gift wrap ID is the same as the message ID
+    final selfGiftWrap = await ndk.config.cache.loadEvent(messageId);
+    if (selfGiftWrap == null) {
+      log('DM: Cannot resend - gift wrap not found in cache for $messageId');
       return false;
     }
 
+    final isSelfMessage = message.peerPubkey == myPubkey;
+    Nip01Event? recipientGiftWrap;
+    if (!isSelfMessage && message.recipientGiftWrapId != null) {
+      recipientGiftWrap = await ndk.config.cache.loadEvent(
+        message.recipientGiftWrapId!,
+      );
+    }
+
     try {
-      // 2. Update status to pending
+      // 3. Update status to pending
       final pendingMessage = message.copyWith(
         sendStatus: MessageSendStatus.pending,
       );
@@ -784,17 +791,6 @@ class DirectMessageRepositoryImpl implements DirectMessageRepository {
       _notifyMessagesChanged(message.peerPubkey);
 
       log('DM: Resending message $messageId...');
-
-      // 3. Reconstruct gift wrap events from JSON
-      final selfGiftWrap = Nip01EventModel.fromJson(
-        jsonDecode(message.giftWrapJson!),
-      );
-
-      final isSelfMessage = message.peerPubkey == myPubkey;
-      final recipientGiftWrap =
-          (!isSelfMessage && message.recipientGiftWrapJson != null)
-          ? Nip01EventModel.fromJson(jsonDecode(message.recipientGiftWrapJson!))
-          : null;
 
       // 4. Get DM relays
       final recipientRelays = await _getDmInboxRelays(message.peerPubkey);
@@ -807,7 +803,7 @@ class DirectMessageRepositoryImpl implements DirectMessageRepository {
       );
 
       // 5. Broadcast gift wraps
-      // For self-messages or when we only have self gift wrap, use it for recipient too
+      // For self-messages or when we only have recipient gift wrap, use selfGiftWrap
       final giftWrapForRecipient = recipientGiftWrap ?? selfGiftWrap;
 
       final recipientBroadcast = ndk.broadcast.broadcast(

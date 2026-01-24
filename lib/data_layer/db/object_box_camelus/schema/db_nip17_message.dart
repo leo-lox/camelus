@@ -41,13 +41,11 @@ class DbNip17Message {
   /// Only relevant for outgoing messages
   int sendStatus = 1; // Default to sent
 
-  /// JSON-encoded gift wrap event for resending failed messages
-  /// Only stored for outgoing messages
-  String? giftWrapJson;
-
-  /// JSON-encoded recipient gift wrap event (if different from giftWrapJson)
-  /// Only stored for outgoing messages to non-self recipients
-  String? recipientGiftWrapJson;
+  /// Event ID of the recipient's gift wrap (for resending failed messages)
+  /// Only stored for outgoing messages to non-self recipients.
+  /// The self gift wrap ID is the same as eventId.
+  /// Gift wrap events are stored in NDK cache.
+  String? recipientGiftWrapId;
 
   DbNip17Message({
     this.eventId = '',
@@ -59,7 +57,6 @@ class DbNip17Message {
     this.replyToEventId,
     this.isOutgoing = false,
     this.sendStatus = 1,
-    this.giftWrapJson,
-    this.recipientGiftWrapJson,
+    this.recipientGiftWrapId,
   });
 }

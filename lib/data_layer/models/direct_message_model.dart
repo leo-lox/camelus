@@ -18,8 +18,7 @@ class DirectMessageModel extends DirectMessage {
     required super.isOutgoing,
     super.tags,
     super.sendStatus,
-    super.giftWrapJson,
-    super.recipientGiftWrapJson,
+    super.recipientGiftWrapId,
   });
 
   /// Create from ObjectBox database entity
@@ -58,8 +57,7 @@ class DirectMessageModel extends DirectMessage {
       isOutgoing: db.isOutgoing,
       tags: parsedTags,
       sendStatus: status,
-      giftWrapJson: db.giftWrapJson,
-      recipientGiftWrapJson: db.recipientGiftWrapJson,
+      recipientGiftWrapId: db.recipientGiftWrapId,
     );
   }
 
@@ -136,8 +134,7 @@ class DirectMessageModel extends DirectMessage {
       replyToEventId: replyToEventId,
       isOutgoing: isOutgoing,
       sendStatus: statusInt,
-      giftWrapJson: giftWrapJson,
-      recipientGiftWrapJson: recipientGiftWrapJson,
+      recipientGiftWrapId: recipientGiftWrapId,
     );
   }
 
@@ -152,8 +149,7 @@ class DirectMessageModel extends DirectMessage {
       isOutgoing: message.isOutgoing,
       tags: message.tags,
       sendStatus: message.sendStatus,
-      giftWrapJson: message.giftWrapJson,
-      recipientGiftWrapJson: message.recipientGiftWrapJson,
+      recipientGiftWrapId: message.recipientGiftWrapId,
     );
   }
 }

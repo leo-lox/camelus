@@ -42,13 +42,11 @@ class DirectMessage {
   /// Status of message sending (for optimistic UI updates)
   final MessageSendStatus sendStatus;
 
-  /// JSON-encoded gift wrap event for resending failed messages
-  /// Only stored for outgoing messages
-  final String? giftWrapJson;
-
-  /// JSON-encoded recipient gift wrap event (if different from giftWrapJson)
-  /// Only stored for outgoing messages to non-self recipients
-  final String? recipientGiftWrapJson;
+  /// Event ID of the recipient's gift wrap (for resending failed messages)
+  /// Only stored for outgoing messages to non-self recipients.
+  /// The self gift wrap ID is the same as [id].
+  /// Gift wrap events are stored in NDK cache.
+  final String? recipientGiftWrapId;
 
   DirectMessage({
     required this.id,
@@ -59,8 +57,7 @@ class DirectMessage {
     required this.isOutgoing,
     this.tags = const [],
     this.sendStatus = MessageSendStatus.sent,
-    this.giftWrapJson,
-    this.recipientGiftWrapJson,
+    this.recipientGiftWrapId,
   });
 
   /// Create a copy of this message with updated fields
@@ -73,8 +70,7 @@ class DirectMessage {
     bool? isOutgoing,
     List<NostrTag>? tags,
     MessageSendStatus? sendStatus,
-    String? giftWrapJson,
-    String? recipientGiftWrapJson,
+    String? recipientGiftWrapId,
   }) {
     return DirectMessage(
       id: id ?? this.id,
@@ -85,9 +81,7 @@ class DirectMessage {
       isOutgoing: isOutgoing ?? this.isOutgoing,
       tags: tags ?? this.tags,
       sendStatus: sendStatus ?? this.sendStatus,
-      giftWrapJson: giftWrapJson ?? this.giftWrapJson,
-      recipientGiftWrapJson:
-          recipientGiftWrapJson ?? this.recipientGiftWrapJson,
+      recipientGiftWrapId: recipientGiftWrapId ?? this.recipientGiftWrapId,
     );
   }
 
