@@ -78,10 +78,10 @@ dependencies:
   phosphor_flutter: ^2.1.0
 
   # ndk imports
-  ndk: ^0.6.1-dev.9
-  ndk_rust_verifier: 0.4.2-dev.10
-  ndk_amber: 0.3.3-dev.10
-  ndk_objectbox: 0.2.7-dev.10
+  ndk: ^0.7.1-dev.1
+  ndk_rust_verifier: ^0.5.0
+  ndk_amber: ^0.4.0
+  ndk_objectbox: ^0.2.7
   
   image: ^4.3.0
   flutter_list_view: ^1.1.29
