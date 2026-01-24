@@ -210,9 +210,10 @@ class DirectMessageRepositoryImpl implements DirectMessageRepository {
 
   Future<List<DmConversation>> _getConversationsFromDb() async {
     final store = await getStore();
-    final box = store.box<DbNip17Conversation>();
+    final convBox = store.box<DbNip17Conversation>();
+    final messageBox = store.box<DbNip17Message>();
 
-    final query = box
+    final query = convBox
         .query()
         .order(DbNip17Conversation_.lastMessageAt, flags: Order.descending)
         .build();
@@ -220,15 +221,32 @@ class DirectMessageRepositoryImpl implements DirectMessageRepository {
     final conversations = query.find();
     query.close();
 
-    return conversations.map((db) {
-      return DmConversation(
-        peerPubkey: db.peerPubkey,
-        lastMessageAt: db.lastMessageAt,
-        unreadCount: db.unreadCount,
-        lastMessagePreview: db.lastMessagePreview,
-        lastMessageIsOutgoing: db.lastMessageIsOutgoing,
-      );
-    }).toList();
+    return conversations
+        .map((db) => _dbConversationToEntity(db, messageBox))
+        .toList();
+  }
+
+  DmConversation _dbConversationToEntity(
+    DbNip17Conversation db,
+    Box<DbNip17Message> messageBox,
+  ) {
+    final msgQuery = messageBox
+        .query(DbNip17Message_.peerPubkey.equals(db.peerPubkey))
+        .order(DbNip17Message_.createdAt, flags: Order.descending)
+        .build();
+    final lastMessageDb = msgQuery.findFirst();
+    msgQuery.close();
+
+    return DmConversation(
+      peerPubkey: db.peerPubkey,
+      lastMessageAt: db.lastMessageAt,
+      unreadCount: db.unreadCount,
+      lastMessagePreview: db.lastMessagePreview,
+      lastMessageIsOutgoing: db.lastMessageIsOutgoing,
+      lastMessage: lastMessageDb != null
+          ? DirectMessageModel.fromDb(lastMessageDb)
+          : null,
+    );
   }
 
   void _notifyConversationsChanged() async {
@@ -240,9 +258,10 @@ class DirectMessageRepositoryImpl implements DirectMessageRepository {
   @override
   Future<DmConversation?> getConversation(String peerPubkey) async {
     final store = await getStore();
-    final box = store.box<DbNip17Conversation>();
+    final convBox = store.box<DbNip17Conversation>();
+    final messageBox = store.box<DbNip17Message>();
 
-    final query = box
+    final query = convBox
         .query(DbNip17Conversation_.peerPubkey.equals(peerPubkey))
         .build();
     final db = query.findFirst();
@@ -250,13 +269,7 @@ class DirectMessageRepositoryImpl implements DirectMessageRepository {
 
     if (db == null) return null;
 
-    return DmConversation(
-      peerPubkey: db.peerPubkey,
-      lastMessageAt: db.lastMessageAt,
-      unreadCount: db.unreadCount,
-      lastMessagePreview: db.lastMessagePreview,
-      lastMessageIsOutgoing: db.lastMessageIsOutgoing,
-    );
+    return _dbConversationToEntity(db, messageBox);
   }
 
   @override
@@ -743,6 +756,7 @@ class DirectMessageRepositoryImpl implements DirectMessageRepository {
 
       await cacheDecryptedMessage(finalMessage);
       _notifyMessagesChanged(recipientPubkey);
+      _notifyConversationsChanged();
 
       log(
         'DM: Message ${relayConfirmed ? 'sent successfully' : 'failed - no relay confirmation'}',
@@ -847,6 +861,7 @@ class DirectMessageRepositoryImpl implements DirectMessageRepository {
 
       await cacheDecryptedMessage(finalMessage);
       _notifyMessagesChanged(message.peerPubkey);
+      _notifyConversationsChanged();
 
       log(
         'DM: Resend ${relayConfirmed ? 'successful' : 'failed - no relay confirmation'}',
@@ -862,6 +877,7 @@ class DirectMessageRepositoryImpl implements DirectMessageRepository {
       );
       await cacheDecryptedMessage(failedMessage);
       _notifyMessagesChanged(message.peerPubkey);
+      _notifyConversationsChanged();
 
       return false;
     }

@@ -2,6 +2,7 @@ import 'package:camelus/helpers/helpers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../domain_layer/entities/direct_message.dart';
 import '../../../domain_layer/entities/dm_conversation.dart';
 import '../../atoms/my_profile_picture.dart';
 import '../../providers/metadata_state_provider.dart';
@@ -64,11 +65,7 @@ class DmConversationTile extends ConsumerWidget {
           if (conversation.lastMessageIsOutgoing)
             Padding(
               padding: const EdgeInsets.only(right: 4),
-              child: Icon(
-                Icons.check,
-                size: 14,
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-              ),
+              child: _buildSendStatusIcon(context),
             ),
           Expanded(
             child: Text(
@@ -108,5 +105,31 @@ class DmConversationTile extends ConsumerWidget {
       ),
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
     );
+  }
+
+  Widget _buildSendStatusIcon(BuildContext context) {
+    final lastMessage = conversation.lastMessage;
+    final sendStatus = lastMessage?.sendStatus ?? MessageSendStatus.sent;
+
+    switch (sendStatus) {
+      case MessageSendStatus.pending:
+        return Icon(
+          Icons.schedule,
+          size: 14,
+          color: Theme.of(context).colorScheme.onSurfaceVariant,
+        );
+      case MessageSendStatus.failed:
+        return Icon(
+          Icons.error_outline,
+          size: 14,
+          color: Theme.of(context).colorScheme.error,
+        );
+      case MessageSendStatus.sent:
+        return Icon(
+          Icons.check,
+          size: 14,
+          color: Theme.of(context).colorScheme.onSurfaceVariant,
+        );
+    }
   }
 }
