@@ -12,6 +12,7 @@ import '../../../../config/amber_url.dart';
 import '../../../../domain_layer/entities/stored_account.dart';
 import '../../../../domain_layer/usecases/app_auth.dart';
 import '../../../atoms/long_button.dart';
+import '../../../providers/dm_conversations_provider.dart';
 import '../../../providers/ndk_provider.dart';
 import '../../../providers/signer_provider.dart';
 
@@ -78,6 +79,9 @@ class _OnboardingLoginAmberPageState
       signerNoti: ref.read(signerProvider.notifier),
       ndk: ref.read(ndkProvider),
     );
+
+    // Start DM subscription
+    ref.read(dmConversationsProvider);
 
     setState(() {});
 
