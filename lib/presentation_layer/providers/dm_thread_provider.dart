@@ -261,6 +261,20 @@ class DmThreadNotifier extends StateNotifier<DmThreadState> {
     // Check if it's a failed message (not on relays yet)
     final isFailedMessage = state.failedMessages.any((m) => m.id == messageId);
 
+    // Optimistic update: remove message from UI immediately
+    final originalMessages = state._cachedMessages;
+    final messageToDelete = originalMessages
+        .where((m) => m.id == messageId)
+        .firstOrNull;
+
+    if (messageToDelete != null) {
+      state = state.copyWith(
+        cachedMessages: originalMessages
+            .where((m) => m.id != messageId)
+            .toList(),
+      );
+    }
+
     try {
       final deletedFromRelays = await repository.deleteMessage(messageId);
       if (isFailedMessage) {
@@ -276,6 +290,10 @@ class DmThreadNotifier extends StateNotifier<DmThreadState> {
       return deletedFromRelays;
     } catch (e) {
       log('DM Thread: Error deleting message: $e');
+      // Rollback: restore message on failure
+      if (messageToDelete != null) {
+        state = state.copyWith(cachedMessages: originalMessages);
+      }
       return false;
     }
   }
