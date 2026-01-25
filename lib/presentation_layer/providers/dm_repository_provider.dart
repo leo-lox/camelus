@@ -5,6 +5,7 @@ import '../../data_layer/repositories/direct_message_repository_impl.dart';
 import '../../domain_layer/repositories/direct_message_repository.dart';
 import 'db_app_provider.dart';
 import 'ndk_provider.dart';
+import 'signer_provider.dart';
 
 /// Provider for the DirectMessageRepository.
 ///
@@ -12,10 +13,9 @@ import 'ndk_provider.dart';
 final dmRepositoryProvider = Provider<DirectMessageRepository?>((ref) {
   final ndk = ref.watch(ndkProvider);
   final dbApp = ref.watch(dbAppProvider);
-
-  // Get the current user's pubkey
-  final myPubkey = ndk.accounts.getPublicKey();
-  if (myPubkey == null) {
+  // Watch signer to rebuild when user logs in/out
+  final signer = ref.watch(signerProvider);
+  if (signer == null) {
     return null; // User not logged in
   }
 
@@ -25,7 +25,7 @@ final dmRepositoryProvider = Provider<DirectMessageRepository?>((ref) {
   final repository = DirectMessageRepositoryImpl(
     ndk: ndk,
     getStore: () => dbImpl.store,
-    myPubkey: myPubkey,
+    myPubkey: signer.getPublicKey(),
   );
 
   // Clean up on dispose

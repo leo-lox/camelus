@@ -4,6 +4,7 @@ import 'dart:developer';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../domain_layer/entities/dm_conversation.dart';
+import '../../domain_layer/repositories/direct_message_repository.dart';
 import 'dm_repository_provider.dart';
 
 /// State for the DM conversations list
@@ -57,23 +58,23 @@ class DmConversationsNotifier extends Notifier<DmConversationsState> {
       _newMessageSubscription?.cancel();
     });
 
-    // Start watching conversations
-    _setupConversationsWatch();
-
-    return const DmConversationsState(isLoading: true);
-  }
-
-  void _setupConversationsWatch() {
+    // Check if user is logged in before starting
     final repository = ref.read(dmRepositoryProvider);
     if (repository == null) {
-      state = state.copyWith(
+      return const DmConversationsState(
         isLoading: false,
         hasError: true,
         errorMessage: 'Not logged in',
       );
-      return;
     }
 
+    // Start watching conversations
+    _setupConversationsWatch(repository);
+
+    return const DmConversationsState(isLoading: true);
+  }
+
+  void _setupConversationsWatch(DirectMessageRepository repository) {
     // Watch conversations from local cache
     _conversationsSubscription = repository.watchConversations().listen(
       (conversations) {
