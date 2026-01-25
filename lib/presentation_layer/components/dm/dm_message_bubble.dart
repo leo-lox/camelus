@@ -2,6 +2,7 @@ import 'package:camelus/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 import '../../../domain_layer/entities/direct_message.dart';
@@ -134,7 +135,7 @@ class _DmMessageBubbleState extends State<DmMessageBubble> {
       children: [
         if (isFailed) ...[
           Icon(
-            Icons.error_outline,
+            PhosphorIcons.xCircle(),
             size: 12,
             color: Theme.of(context).colorScheme.error,
           ),
@@ -156,7 +157,7 @@ class _DmMessageBubbleState extends State<DmMessageBubble> {
         if (isOutgoing && !isFailed) ...[
           const SizedBox(width: 4),
           Icon(
-            Icons.check,
+            PhosphorIcons.checkCircle(),
             size: 12,
             color: isSent ? textColor : Colors.transparent,
           ),
@@ -172,7 +173,7 @@ class _DmMessageBubbleState extends State<DmMessageBubble> {
         IconButton(
           onPressed: () => widget.onRetry?.call(widget.message.id),
           icon: Icon(
-            Icons.refresh,
+            PhosphorIcons.arrowClockwise(),
             size: 18,
             color: Theme.of(context).colorScheme.primary,
           ),
@@ -185,7 +186,7 @@ class _DmMessageBubbleState extends State<DmMessageBubble> {
           onPressed: () =>
               widget.onRemoveFailedMessage?.call(widget.message.id),
           icon: Icon(
-            Icons.close,
+            PhosphorIcons.x(),
             size: 18,
             color: Theme.of(context).colorScheme.error,
           ),
@@ -209,7 +210,7 @@ class _DmMessageBubbleState extends State<DmMessageBubble> {
         }
       },
       icon: Icon(
-        Icons.delete_outline,
+        PhosphorIcons.trash(),
         size: 18,
         color: Theme.of(context).colorScheme.error,
       ),
@@ -253,7 +254,7 @@ class _DmMessageBubbleState extends State<DmMessageBubble> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Icon(
-                  Icons.access_time,
+                  PhosphorIcons.clock(),
                   size: 16,
                   color: Theme.of(sheetContext).colorScheme.onSurfaceVariant,
                 ),
@@ -270,7 +271,7 @@ class _DmMessageBubbleState extends State<DmMessageBubble> {
             const SizedBox(height: 12),
             const Divider(height: 1),
             ListTile(
-              leading: const Icon(Icons.copy),
+              leading: Icon(PhosphorIcons.copySimple()),
               title: Text(AppLocalizations.of(context)!.copy),
               onTap: () {
                 Clipboard.setData(ClipboardData(text: widget.message.content));
@@ -279,7 +280,7 @@ class _DmMessageBubbleState extends State<DmMessageBubble> {
             ),
             ListTile(
               leading: Icon(
-                Icons.delete_outline,
+                PhosphorIcons.trash(),
                 color: Theme.of(sheetContext).colorScheme.error,
               ),
               title: Text(
