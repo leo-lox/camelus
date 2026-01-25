@@ -1020,53 +1020,12 @@ class DirectMessageRepositoryImpl implements DirectMessageRepository {
         return false;
       }
 
-      // NIP-59: "relays SHOULD delete kind 1059 events whose p-tag matches
-      // the signer of NIP-09 deletions". Since the gift wrap's p-tag is our
-      // pubkey (we're the recipient), we can request deletion.
-      final deleteEvent = Nip01Event(
-        pubKey: myPubkey,
-        kind: 5,
-        tags: [
-          ['e', messageId],
-        ],
-        content: '',
-        createdAt: DateTime.now().millisecondsSinceEpoch ~/ 1000,
-      );
+      final peerPubkey = message.peerPubkey;
 
-      final signedEvent = await ndk.accounts.sign(deleteEvent);
-
-      // Broadcast to DM relays
-      final dmRelays = await _getDmInboxRelays(myPubkey);
-      final broadcastResponse = ndk.broadcast.broadcast(
-        nostrEvent: signedEvent,
-        specificRelays: dmRelays.isNotEmpty ? dmRelays : null,
-      );
-
-      // Wait for broadcast to complete
-      await broadcastResponse.broadcastDoneFuture;
-      log('DM: Broadcasted delete request for message $messageId');
-
-      // Wait for relays to process the deletion
-      await Future.delayed(const Duration(milliseconds: 500));
-
-      // Verify deletion empirically by querying for the message
-      final stillExists = await _verifyMessageDeleted(
-        messageId,
-        dmRelays.isNotEmpty ? dmRelays : null,
-      );
-
-      if (stillExists) {
-        log(
-          'DM: Message $messageId still exists on some relays - deletion may not be supported',
-        );
-        // Still remove from local cache, but inform the user
-      }
-
-      // Delete from local cache
+      // 1. Delete from local cache FIRST (immediate, no flicker)
       final store = await getStore();
       final box = store.box<DbNip17Message>();
 
-      // Filter by ownerPubkey to only delete message for the current user
       final query = box
           .query(
             DbNip17Message_.ownerPubkey.equals(myPubkey) &
@@ -1081,56 +1040,45 @@ class DirectMessageRepositoryImpl implements DirectMessageRepository {
         log('DM: Removed message from local cache');
       }
 
-      // Update conversation (recalculate last message)
-      await _recalculateConversation(message.peerPubkey);
-
-      // Notify listeners
-      _notifyMessagesChanged(message.peerPubkey);
+      // 2. Update conversation and notify listeners immediately
+      await _recalculateConversation(peerPubkey);
+      _notifyMessagesChanged(peerPubkey);
       _notifyConversationsChanged();
 
-      // Return true if message was deleted from at least some relays
-      return !stillExists;
+      // 3. Broadcast kind 5 deletion to relays (fire and forget)
+      _broadcastDeletion(messageId);
+
+      return true;
     } catch (e) {
       log('DM: Error deleting message $messageId: $e');
       return false;
     }
   }
 
-  /// Verify if a message was actually deleted from relays.
-  /// Returns true if the message still exists on any relay.
-  Future<bool> _verifyMessageDeleted(
-    String messageId,
-    List<String>? relays,
-  ) async {
+  /// Broadcast kind 5 deletion event to relays (fire and forget)
+  void _broadcastDeletion(String messageId) async {
     try {
-      final filter = Filter(
-        ids: [messageId],
-        kinds: [1059], // Gift wrap
-        limit: 1,
+      final deleteEvent = Nip01Event(
+        pubKey: myPubkey,
+        kind: 5,
+        tags: [
+          ['e', messageId],
+        ],
+        content: '',
+        createdAt: DateTime.now().millisecondsSinceEpoch ~/ 1000,
       );
 
-      final response = ndk.requests.query(
-        filter: filter,
-        cacheRead: false,
-        cacheWrite: false,
-        timeout: const Duration(seconds: 5),
-        explicitRelays: relays,
+      final signedEvent = await ndk.accounts.sign(deleteEvent);
+
+      final dmRelays = await _getDmInboxRelays(myPubkey);
+      ndk.broadcast.broadcast(
+        nostrEvent: signedEvent,
+        specificRelays: dmRelays.isNotEmpty ? dmRelays : null,
       );
 
-      // Check if any event is returned
-      await for (final event in response.stream) {
-        if (event.id == messageId) {
-          log('DM: Message $messageId still found on relay');
-          return true; // Message still exists
-        }
-      }
-
-      log('DM: Message $messageId verified deleted from relays');
-      return false; // Message was deleted
+      log('DM: Broadcasted delete request for message $messageId');
     } catch (e) {
-      log('DM: Error verifying deletion: $e');
-      // On error, assume deletion might have worked
-      return false;
+      log('DM: Error broadcasting deletion for $messageId: $e');
     }
   }
 

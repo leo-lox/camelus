@@ -253,47 +253,17 @@ class DmThreadNotifier extends StateNotifier<DmThreadState> {
   }
 
   /// Delete a message
-  /// Returns true if deleted from relays, false if only deleted locally
   Future<bool> deleteMessage(String messageId) async {
     final repository = ref.read(dmRepositoryProvider);
     if (repository == null) return false;
 
-    // Check if it's a failed message (not on relays yet)
-    final isFailedMessage = state.failedMessages.any((m) => m.id == messageId);
-
-    // Optimistic update: remove message from UI immediately
-    final originalMessages = state._cachedMessages;
-    final messageToDelete = originalMessages
-        .where((m) => m.id == messageId)
-        .firstOrNull;
-
-    if (messageToDelete != null) {
-      state = state.copyWith(
-        cachedMessages: originalMessages
-            .where((m) => m.id != messageId)
-            .toList(),
-      );
-    }
-
     try {
-      final deletedFromRelays = await repository.deleteMessage(messageId);
-      if (isFailedMessage) {
-        return true; // Failed messages weren't on relays
-      }
-      if (deletedFromRelays) {
-        log('DM Thread: Message deleted from relays successfully');
-      } else {
-        log(
-          'DM Thread: Message deleted locally, relays may not support deletion',
-        );
-      }
-      return deletedFromRelays;
+      // Repository deletes locally first, then broadcasts to relays
+      // UI updates automatically via watchMessages stream
+      await repository.deleteMessage(messageId);
+      return true;
     } catch (e) {
       log('DM Thread: Error deleting message: $e');
-      // Rollback: restore message on failure
-      if (messageToDelete != null) {
-        state = state.copyWith(cachedMessages: originalMessages);
-      }
       return false;
     }
   }
