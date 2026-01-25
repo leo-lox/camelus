@@ -31,7 +31,7 @@
     },
     {
       "id": "8:3975513628429198363",
-      "lastPropertyId": "6:2742432485449068091",
+      "lastPropertyId": "7:1856797908576341898",
       "name": "DbNip17Conversation",
       "properties": [
         {
@@ -45,7 +45,7 @@
           "name": "peerPubkey",
           "indexId": "2:260264514658655485",
           "type": 9,
-          "flags": 2080
+          "flags": 2048
         },
         {
           "id": "3:5607779732579424544",
@@ -68,13 +68,20 @@
           "id": "6:2742432485449068091",
           "name": "lastMessageIsOutgoing",
           "type": 1
+        },
+        {
+          "id": "7:1856797908576341898",
+          "name": "ownerPubkey",
+          "indexId": "8:7106475925155755278",
+          "type": 9,
+          "flags": 2048
         }
       ],
       "relations": []
     },
     {
       "id": "9:5397343319776606099",
-      "lastPropertyId": "13:2871858570347088755",
+      "lastPropertyId": "14:4147261140443002825",
       "name": "DbNip17Message",
       "properties": [
         {
@@ -140,13 +147,20 @@
           "id": "13:2871858570347088755",
           "name": "recipientGiftWrapId",
           "type": 9
+        },
+        {
+          "id": "14:4147261140443002825",
+          "name": "ownerPubkey",
+          "indexId": "9:6864549305007800035",
+          "type": 9,
+          "flags": 2048
         }
       ],
       "relations": []
     }
   ],
   "lastEntityId": "9:5397343319776606099",
-  "lastIndexId": "7:5085530051442188719",
+  "lastIndexId": "9:6864549305007800035",
   "lastRelationId": "0:0",
   "lastSequenceId": "0:0",
   "modelVersion": 5,
