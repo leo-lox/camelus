@@ -5,8 +5,7 @@ import 'package:rxdart/rxdart.dart';
 
 import '../../domain_layer/entities/nostr_note.dart';
 
-import '../../helpers/helpers.dart';
-import '../../helpers/nprofile_helper.dart';
+import 'package:ndk/shared/nips/nip19/nip19.dart';
 import 'app_bar_provider/app_bottom_bar_provider.dart';
 import 'db_app_provider.dart';
 import 'get_notes_provider.dart';
@@ -103,12 +102,10 @@ class NotificationsState extends Notifier<NotificationViewModel> {
         profile = profile.replaceFirst('nostr:', '');
         final String pubkey;
         if (profile.startsWith('nprofile')) {
-          final decoded = NprofileHelper().bech32toMap(profile);
-          pubkey = decoded['pubkey'] ?? '';
+          pubkey = Nip19.decodeNprofile(profile).pubkey;
           foundPubkeysContent.add(pubkey);
         } else if (profile.startsWith('npub')) {
-          final decoded = Helpers().decodeBech32(profile);
-          pubkey = decoded[0];
+          pubkey = Nip19.decode(profile);
           foundPubkeysContent.add(pubkey);
         }
       }

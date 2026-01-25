@@ -30,7 +30,7 @@ class OnboardingPicture extends ConsumerStatefulWidget {
 class _OnboardingPictureState extends ConsumerState<OnboardingPicture> {
   bool pictureSelected = false;
 
-  _pickFile() async {
+  Future<void> _pickFile() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
       allowMultiple: false,
       type: FileType.image,
@@ -59,7 +59,7 @@ class _OnboardingPictureState extends ConsumerState<OnboardingPicture> {
     }
   }
 
-  _openCropImagePopup(Uint8List imageData) {
+  void _openCropImagePopup(Uint8List imageData) {
     // push fullscreen widget
     Navigator.push(
       context,

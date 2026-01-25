@@ -183,7 +183,7 @@ class NoteCard extends ConsumerWidget {
   }
 }
 
-void _writeReply(context, NostrNote note) {
+void _writeReply(BuildContext context, NostrNote note) {
   showModalBottomSheet(
     isScrollControlled: true,
     elevation: 10,

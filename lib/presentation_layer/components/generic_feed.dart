@@ -55,7 +55,7 @@ class _GenericFeedState extends ConsumerState<GenericFeed>
   final newPostsController = SwipeableFadeOutController();
 
   // Scroll to the top of the feed
-  _scrollToTop() {
+  void _scrollToTop() {
     _scrollController.animateTo(
       0,
       duration: const Duration(milliseconds: 500),
@@ -63,7 +63,7 @@ class _GenericFeedState extends ConsumerState<GenericFeed>
     );
   }
 
-  _newPostControllerDismissed() {
+  void _newPostControllerDismissed() {
     // don't bother the user for x minutes
     Future.delayed(NEW_POSTS_DISMISS_SLEEP, () {
       newPostsController.reset();

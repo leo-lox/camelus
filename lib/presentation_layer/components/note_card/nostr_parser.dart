@@ -5,8 +5,6 @@ import 'package:ndk/shared/nips/nip19/nip19.dart';
 
 import '../../../domain_layer/entities/nostr_note.dart';
 import '../../../domain_layer/entities/parsed_post.dart';
-import '../../../helpers/helpers.dart';
-import '../../../helpers/nprofile_helper.dart';
 
 class NostrParser {
   static const bool useThread = false;
@@ -193,11 +191,9 @@ class NostrParser {
     final encoded = nostrRef.replaceFirst('nostr:', '');
 
     if (encoded.startsWith('nprofile')) {
-      final decoded = NprofileHelper().bech32toMap(encoded);
-      return decoded['pubkey'] ?? '';
+      return Nip19.decodeNprofile(encoded).pubkey;
     } else if (encoded.startsWith('npub')) {
-      final decoded = Helpers().decodeBech32(encoded);
-      return decoded[0];
+      return Nip19.decode(encoded);
     }
     return nostrRef;
   }

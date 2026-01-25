@@ -75,6 +75,12 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
             },
           ),
           ListTile(
+            title: Text(AppLocalizations.of(context)!.dmRelays),
+            onTap: () {
+              context.push('/settings/dm-relays');
+            },
+          ),
+          ListTile(
             title: Text(AppLocalizations.of(context)!.logout),
             onTap: () {
               _logout();

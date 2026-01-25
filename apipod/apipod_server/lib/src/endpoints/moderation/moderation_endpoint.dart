@@ -1,4 +1,4 @@
-import 'package:ndk/ndk.dart';
+import 'package:ndk/ndk.dart' hide LogLevel;
 import 'package:serverpod/serverpod.dart';
 
 import '../../config/service_config.dart';
@@ -84,9 +84,9 @@ class ModerationEndpoint extends Endpoint {
   ) async {
     final event = reportEvent;
 
-    event.validSig = await Bip340EventVerifier().verify(event);
+    final isValidSig = await Bip340EventVerifier().verify(event);
 
-    if (event.validSig != null && !event.validSig!) {
+    if (!isValidSig) {
       session.log("invalid sig", level: LogLevel.info);
       return "invalid sig";
     }

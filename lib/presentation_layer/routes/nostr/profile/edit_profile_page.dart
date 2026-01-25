@@ -491,7 +491,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
 
       final completer = Completer<MemFile?>();
 
-      await _openCropImagePopup(
+      _openCropImagePopup(
         resize: resize,
         targetWidth: targetWidth,
         aspectRatio: aspectRatio,
@@ -513,7 +513,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
     return null;
   }
 
-  _openCropImagePopup({
+  void _openCropImagePopup({
     required Uint8List imageData,
     required Function(Uint8List) callback,
     double aspectRatio = 1,

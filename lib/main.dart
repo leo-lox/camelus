@@ -9,7 +9,6 @@ import 'package:window_manager/window_manager.dart';
 import 'package:flutter_mentions/flutter_mentions.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ndk/ndk.dart';
-import 'config/default_relays.dart';
 import 'domain_layer/entities/stored_account.dart';
 import 'l10n/app_localizations.dart';
 //import 'package:device_preview/device_preview.dart';
@@ -29,6 +28,7 @@ import 'presentation_layer/providers/language_provider.dart';
 import 'presentation_layer/providers/ndk_provider.dart';
 import 'presentation_layer/providers/signer_provider.dart';
 import 'presentation_layer/providers/theme_provider.dart';
+import 'presentation_layer/providers/dm_conversations_provider.dart';
 import 'routes.dart';
 import 'theme.dart' show getThemeVariants;
 
@@ -102,6 +102,9 @@ Future<void> main() async {
     final myPubkey = mySigner.getPublicKey();
     final inboxOutboxP = providerContainer.read(inboxOutboxProvider);
     inboxOutboxP.getNip65data(myPubkey, forceRefresh: false);
+
+    // Start DM subscription immediately (listen for new messages)
+    providerContainer.read(dmConversationsProvider);
   }
 
   final String initalRoute;

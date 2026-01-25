@@ -102,14 +102,14 @@ class Notifications {
   }
 
   /// called on foreground or paused
-  onNotificationTap(NotificationResponse notiResponse) {
+  void onNotificationTap(NotificationResponse notiResponse) {
     developer.log("onNotificationTapUsecase ${notiResponse.payload}");
 
     processNotificationPayload(notiResponse.payload);
   }
 
   /// gets called on lauch if payload is found
-  static processNotificationPayload(String? payload) {
+  static void processNotificationPayload(String? payload) {
     if (payload != null) {
       final payloadJson = jsonDecode(payload);
       final nostrNoteJson = jsonDecode(payloadJson['note']);

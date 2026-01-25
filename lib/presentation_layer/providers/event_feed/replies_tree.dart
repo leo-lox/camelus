@@ -34,7 +34,7 @@ class RepliesTree {
 
   /// recursive function to build the tree
   ///
-  static _buildSubtree({
+  static void _buildSubtree({
     required List<ParsedPost> workingList,
     required TreeNode<ParsedPost> parent,
   }) {

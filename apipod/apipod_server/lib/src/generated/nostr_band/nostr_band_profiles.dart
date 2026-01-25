@@ -11,6 +11,7 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
 import 'package:ndk/domain_layer/entities/nip_01_event.dart' as _i2;
+import 'package:ndk/data_layer/models/nip_01_event_model.dart' as _i3;
 
 abstract class NostrBandProfiles
     implements _i1.SerializableModel, _i1.ProtocolSerialization {
@@ -35,7 +36,7 @@ abstract class NostrBandProfiles
       relays: (jsonSerialization['relays'] as List)
           .map((e) => e as String)
           .toList(),
-      profile: _i2.Nip01Event.fromJson(jsonSerialization['profile']),
+      profile: _i3.Nip01EventModel.fromJson(jsonSerialization['profile']),
     );
   }
 
@@ -62,7 +63,7 @@ abstract class NostrBandProfiles
       'pubkey': pubkey,
       'newFollowersCount': newFollowersCount,
       'relays': relays.toJson(),
-      'profile': profile.toJson(),
+      'profile': _i3.Nip01EventModel.fromEntity(profile).toJson(),
     };
   }
 
@@ -76,7 +77,7 @@ abstract class NostrBandProfiles
 // ignore: unnecessary_type_check
           profile is _i1.ProtocolSerialization
               ? (profile as _i1.ProtocolSerialization).toJsonForProtocol()
-              : profile.toJson(),
+              : _i3.Nip01EventModel.fromEntity(profile).toJson(),
     };
   }
 

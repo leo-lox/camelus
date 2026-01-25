@@ -1128,34 +1128,34 @@ packages:
     dependency: "direct main"
     description:
       name: ndk
-      sha256: "555db0766c0731ab62297309d8b26d7c64594a7960609a0831ae777385eb27be"
+      sha256: "48373f964eb0a1c69c4daa4c80422465df6985af4738b4b3a268b806a2a43932"
       url: "https://pub.dev"
     source: hosted
-    version: "0.6.0"
+    version: "0.7.1-dev.1"
   ndk_amber:
     dependency: "direct main"
     description:
       name: ndk_amber
-      sha256: d5222d79eb7526021df1289cc59894e045ae80748714bd56e35f24b4d13b99a6
+      sha256: "9789a67d5b839c459b027ac7636a4021e126199c7d3b3361863ddba7ed55fe2e"
       url: "https://pub.dev"
     source: hosted
-    version: "0.3.3"
+    version: "0.4.0"
   ndk_objectbox:
     dependency: "direct main"
     description:
       name: ndk_objectbox
-      sha256: "2df6d27e31c787fa53e766d54bf5fa3831f8a82b475b0416e096bb1abcdee80a"
+      sha256: "5008b189c2e54cd352d741c6f7e0a6596023b077486e6ff84693cf7710b00a68"
       url: "https://pub.dev"
     source: hosted
-    version: "0.2.7"
+    version: "0.2.8-dev.1"
   ndk_rust_verifier:
     dependency: "direct main"
     description:
       name: ndk_rust_verifier
-      sha256: "177933f601d2afe3217734ea759c618ee624f79a1959ee5214ec184d06516728"
+      sha256: d45eff27d79dbd37104bf8c5a197f4bed0a4d50698355fb2e6c9c0aaf59407f8
       url: "https://pub.dev"
     source: hosted
-    version: "0.4.2"
+    version: "0.5.0"
   nm:
     dependency: transitive
     description:
@@ -1440,10 +1440,10 @@ packages:
     dependency: transitive
     description:
       name: rust_lib_ndk
-      sha256: f06a1a47c6fbadf25250eac796b65b91ea99797b6377304abb152f06205c28ff
+      sha256: "26df8806fe09800a7430549d2372c6a89c290962900029afca9b2db1fdb19aea"
       url: "https://pub.dev"
     source: hosted
-    version: "0.1.7"
+    version: "0.1.7+1"
   rxdart:
     dependency: "direct main"
     description:

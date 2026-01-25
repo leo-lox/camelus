@@ -6,7 +6,7 @@ import '../../config/camelus_config.dart';
 import '../../domain_layer/entities/mem_file.dart';
 import '../../domain_layer/entities/nostr_note.dart';
 import '../../domain_layer/entities/nostr_tag.dart';
-import '../../helpers/nprofile_helper.dart';
+import 'package:ndk/shared/nips/nip19/nip19.dart';
 import '../components/write_post/post_settings_dialog.dart';
 import 'file_upload_provider.dart';
 import 'get_notes_provider.dart';
@@ -40,7 +40,7 @@ class WritePostState {
     this.hashtagsInPost = const [],
   });
 
-  copyWith({
+  WritePostState copyWith({
     List<MemFile>? images,
     NostrNote? replyToNote,
     bool clearReplyToNote = false,
@@ -67,17 +67,17 @@ class WritePostState {
 }
 
 class WritePostNotifier extends Notifier<WritePostState> {
-  addImage(MemFile image) {
+  void addImage(MemFile image) {
     state = state.copyWith(images: [...state.images, image]);
   }
 
-  updateMarkup(String markupText) {
+  void updateMarkup(String markupText) {
     state = state.copyWith(markupText: markupText);
     extractMentions();
     extractHashtags();
   }
 
-  extractMentions() {
+  void extractMentions() {
     final mentionKeys = <String>[];
     final keyRegex = RegExp(r'@\[__(.*?)__\]');
 
@@ -89,7 +89,7 @@ class WritePostNotifier extends Notifier<WritePostState> {
     state.mentionedInPost = mentionKeys;
   }
 
-  extractHashtags() {
+  void extractHashtags() {
     final hashtagKeys = <String>[];
     final keyRegex = RegExp(r'#\w+');
 
@@ -118,10 +118,7 @@ class WritePostNotifier extends Notifier<WritePostState> {
       mentionKeys.add(match.group(1)!);
       var userHex = match.group(1)!;
 
-      var nprofile = NprofileHelper().mapToBech32({
-        'pubkey': userHex,
-        'relays': [],
-      });
+      var nprofile = Nip19.encodeNprofile(pubkey: userHex);
       return 'nostr:$nprofile ';
     });
 

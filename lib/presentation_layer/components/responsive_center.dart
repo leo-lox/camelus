@@ -20,7 +20,7 @@ class ResponsiveCenter extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         final isWideScreen = constraints.maxWidth > maxWidth;
-        
+
         return Center(
           child: Container(
             constraints: BoxConstraints(

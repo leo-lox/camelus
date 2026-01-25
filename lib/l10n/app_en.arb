@@ -1322,5 +1322,365 @@
   "byUsingCamelusYouAgree": "By using Camelus you agree to ",
   "@byUsingCamelusYouAgree": {
     "description": "Text before terms and conditions link on onboarding page"
+  },
+  "dmRelays": "DM Relays",
+  "@dmRelays": {
+    "description": "DM relays settings page title"
+  },
+  "dmRelaysInfo": "These relays are used specifically for sending and receiving private messages (NIP-17). Other users will send DMs to these relays.",
+  "@dmRelaysInfo": {
+    "description": "Info text explaining DM relays"
+  },
+  "invalidUrl": "Invalid URL",
+  "@invalidUrl": {
+    "description": "Error when URL format is invalid"
+  },
+  "alreadyExists": "Already exists",
+  "@alreadyExists": {
+    "description": "Error when item already exists"
+  },
+  "relaysSaved": "Relays saved",
+  "@relaysSaved": {
+    "description": "Success message when relays are saved"
+  },
+  "failedToSaveRelays": "Failed to save relays",
+  "@failedToSaveRelays": {
+    "description": "Error message when saving relays fails"
+  },
+  "noDmRelaysConfigured": "No DM relays configured",
+  "@noDmRelaysConfigured": {
+    "description": "Empty state title for DM relays"
+  },
+  "dmRelaysEmptyDescription": "Add relays where you want to receive private messages. Without DM relays, your NIP-65 inbox relays will be used as fallback.",
+  "@dmRelaysEmptyDescription": {
+    "description": "Empty state description for DM relays"
+  },
+  "suggestedRelays": "Suggested relays:",
+  "@suggestedRelays": {
+    "description": "Label for suggested relays section"
+  },
+  "restoreRelay": "Restore relay",
+  "@restoreRelay": {
+    "description": "Tooltip for restore relay button"
+  },
+  "removeRelay": "Remove relay",
+  "@removeRelay": {
+    "description": "Tooltip for remove relay button"
+  },
+  "addRelay": "Add relay",
+  "@addRelay": {
+    "description": "Tooltip for add relay button"
+  },
+  "refresh": "Refresh",
+  "@refresh": {
+    "description": "Refresh button tooltip"
+  },
+  "messages": "Messages",
+  "@messages": {
+    "description": "Messages page title"
+  },
+  "pleaseLoginToViewMessages": "Please login to view messages",
+  "@pleaseLoginToViewMessages": {
+    "description": "Message shown when user is not logged in"
+  },
+  "newMessage": "New message",
+  "@newMessage": {
+    "description": "Tooltip for new message button"
+  },
+  "failedToLoadMessages": "Failed to load messages",
+  "@failedToLoadMessages": {
+    "description": "Error message when messages fail to load"
+  },
+  "retry": "Retry",
+  "@retry": {
+    "description": "Retry button label"
+  },
+  "failed": "Failed",
+  "@failed": {
+    "description": "Status text when message failed to send"
+  },
+  "noMessagesYet": "No messages yet",
+  "@noMessagesYet": {
+    "description": "Empty state title for messages"
+  },
+  "startConversationHint": "Start a conversation by tapping the pencil icon",
+  "@startConversationHint": {
+    "description": "Empty state description for messages"
+  },
+  "newMessageDialogTitle": "New Message",
+  "@newMessageDialogTitle": {
+    "description": "Dialog title for new message"
+  },
+  "enterPubkeyPrompt": "Enter the pubkey (nprofile, npub, or hex):",
+  "@enterPubkeyPrompt": {
+    "description": "Prompt for entering pubkey"
+  },
+  "pubkeyHint": "nprofile1..., npub1..., or hex",
+  "@pubkeyHint": {
+    "description": "Hint text for pubkey input"
+  },
+  "startChat": "Start Chat",
+  "@startChat": {
+    "description": "Button to start a new chat"
+  },
+  "loadOlderMessages": "Load older messages",
+  "@loadOlderMessages": {
+    "description": "Button to load older messages"
+  },
+  "endToEndEncrypted": "End-to-end encrypted",
+  "@endToEndEncrypted": {
+    "description": "Label indicating encryption"
+  },
+  "beginningOfConversation": "This is the beginning of your conversation",
+  "@beginningOfConversation": {
+    "description": "Message shown at the start of conversation"
+  },
+  "startYourEncryptedConversation": "Start your encrypted conversation",
+  "@startYourEncryptedConversation": {
+    "description": "Empty thread state message"
+  },
+  "endToEndEncryptedNip17": "End-to-end encrypted with NIP-17",
+  "@endToEndEncryptedNip17": {
+    "description": "Label indicating NIP-17 encryption"
+  },
+  "messageHint": "Message...",
+  "@messageHint": {
+    "description": "Hint text for message input"
+  },
+  "failedToSendMessage": "Failed to send message",
+  "@failedToSendMessage": {
+    "description": "Error when message fails to send"
+  },
+  "deleteMessage": "Delete message",
+  "@deleteMessage": {
+    "description": "Menu item to delete a message"
+  },
+  "deleteMessageConfirmTitle": "Delete message?",
+  "@deleteMessageConfirmTitle": {
+    "description": "Confirmation dialog title"
+  },
+  "deleteMessageConfirmContent": "This will request the relay to delete this message and remove it from your device.",
+  "@deleteMessageConfirmContent": {
+    "description": "Confirmation dialog content"
+  },
+  "today": "Today",
+  "@today": {
+    "description": "Today date label"
+  },
+  "yesterday": "Yesterday",
+  "@yesterday": {
+    "description": "Yesterday date label"
+  },
+  "monday": "Monday",
+  "@monday": {
+    "description": "Monday weekday"
+  },
+  "tuesday": "Tuesday",
+  "@tuesday": {
+    "description": "Tuesday weekday"
+  },
+  "wednesday": "Wednesday",
+  "@wednesday": {
+    "description": "Wednesday weekday"
+  },
+  "thursday": "Thursday",
+  "@thursday": {
+    "description": "Thursday weekday"
+  },
+  "friday": "Friday",
+  "@friday": {
+    "description": "Friday weekday"
+  },
+  "saturday": "Saturday",
+  "@saturday": {
+    "description": "Saturday weekday"
+  },
+  "sunday": "Sunday",
+  "@sunday": {
+    "description": "Sunday weekday"
+  },
+  "searchUserHint": "Search by name, NIP-05 or npub...",
+  "@searchUserHint": {
+    "description": "Hint text for user search input"
+  },
+  "searchToStartConversation": "Search for a user to start a conversation",
+  "@searchToStartConversation": {
+    "description": "Empty state message for new DM page"
+  },
+  "enterAtLeast2Characters": "Enter at least 2 characters",
+  "@enterAtLeast2Characters": {
+    "description": "Message when search query is too short"
+  },
+  "noUsersFound": "No users found",
+  "@noUsersFound": {
+    "description": "Message when no users match the search"
+  },
+  "chatRelayStatus": "Chat Relay Status",
+  "@chatRelayStatus": {
+    "description": "Header for chat relay status in debug sheet"
+  },
+  "chatRelayExcellent": "Excellent",
+  "@chatRelayExcellent": {
+    "description": "Status when both parties have connected relays"
+  },
+  "chatRelayDegraded": "Degraded",
+  "@chatRelayDegraded": {
+    "description": "Status when only one party has connected relays"
+  },
+  "chatRelayPoor": "Poor",
+  "@chatRelayPoor": {
+    "description": "Status when no DM relays are connected"
+  },
+  "yourDmRelays": "Your DM Relays",
+  "@yourDmRelays": {
+    "description": "Section title for user's DM relays"
+  },
+  "peerDmRelays": "Peer's DM Relays",
+  "@peerDmRelays": {
+    "description": "Section title for peer's DM relays"
+  },
+  "noRelaysFound": "No relays found",
+  "@noRelaysFound": {
+    "description": "Message when no relays are configured"
+  },
+  "debugTools": "Debug Tools",
+  "@debugTools": {
+    "description": "Section title for debug tools"
+  },
+  "refreshRelayDiscovery": "Refresh relay discovery",
+  "@refreshRelayDiscovery": {
+    "description": "Button to re-fetch relay lists"
+  },
+  "viewAllRelays": "View all connected relays",
+  "@viewAllRelays": {
+    "description": "Button to navigate to relays page"
+  },
+  "deletionNotSupportedByRelays": "Message deleted locally, but relays may not support deletion",
+  "@deletionNotSupportedByRelays": {
+    "description": "Warning when message deletion is not confirmed by relays"
+  },
+  "testDeletionSupport": "Test deletion support",
+  "@testDeletionSupport": {
+    "description": "Tooltip for testing relay deletion support"
+  },
+  "deletionSupported": "Deletion supported",
+  "@deletionSupported": {
+    "description": "Badge text when relay supports deletion"
+  },
+  "deletionNotSupported": "Deletion not supported",
+  "@deletionNotSupported": {
+    "description": "Badge text when relay does not support deletion"
+  },
+  "testFailed": "Test failed",
+  "@testFailed": {
+    "description": "Badge text when deletion test failed"
+  },
+  "testing": "Testing...",
+  "@testing": {
+    "description": "Badge text when deletion test is in progress"
+  },
+  "testAllDeletionSupport": "Test all relays deletion support",
+  "@testAllDeletionSupport": {
+    "description": "Button to test deletion support on all relays"
+  },
+  "testAllDeletionSupportDescription": "Uses test keys to verify if relays actually delete messages",
+  "@testAllDeletionSupportDescription": {
+    "description": "Description for test all deletion support button"
+  },
+  "relayRejectsGiftWrap": "Rejects gift wraps",
+  "@relayRejectsGiftWrap": {
+    "description": "Badge text when relay rejects kind 1059 events"
+  },
+  "relayRejectsDeletion": "Rejects deletion",
+  "@relayRejectsDeletion": {
+    "description": "Badge text when relay rejects deletion requests"
+  },
+  "networkError": "Network error",
+  "@networkError": {
+    "description": "Badge text when there was a network error during test"
+  },
+  "timeout": "Timeout",
+  "@timeout": {
+    "description": "Badge text when test timed out"
+  },
+  "privacyPrivate": "Private (secure)",
+  "@privacyPrivate": {
+    "description": "Badge text when relay correctly restricts gift wrap access"
+  },
+  "privacyLeaks": "Privacy leak",
+  "@privacyLeaks": {
+    "description": "Badge text when relay leaks gift wraps to everyone"
+  },
+  "testPrivacy": "Test privacy",
+  "@testPrivacy": {
+    "description": "Tooltip for testing relay privacy"
+  },
+  "testAllRelays": "Test all relays",
+  "@testAllRelays": {
+    "description": "Button to test all relays for both deletion and privacy"
+  },
+  "testAllRelaysDescription": "Tests deletion support and privacy for all connected relays",
+  "@testAllRelaysDescription": {
+    "description": "Description for test all relays button"
+  },
+  "relayStatusExcellentDescription": "Connected to {myCount} of your relays and {peerCount} of peer's relays.",
+  "@relayStatusExcellentDescription": {
+    "description": "Status description when relay connection is excellent",
+    "placeholders": {
+      "myCount": {"type": "int"},
+      "peerCount": {"type": "int"}
+    }
+  },
+  "relayStatusDegradedMyOnly": "Connected to your relays, but not to peer's DM relays. Messages may be delayed.",
+  "@relayStatusDegradedMyOnly": {
+    "description": "Status description when only connected to own relays"
+  },
+  "relayStatusDegradedPeerOnly": "Connected to peer's relays, but not your DM relays. You may miss messages.",
+  "@relayStatusDegradedPeerOnly": {
+    "description": "Status description when only connected to peer relays"
+  },
+  "relayStatusDegradedPartial": "Partial connectivity. Some messages may be delayed.",
+  "@relayStatusDegradedPartial": {
+    "description": "Status description when partially connected"
+  },
+  "relayStatusPoorDescription": "No connected DM relays. Messages may not be delivered.",
+  "@relayStatusPoorDescription": {
+    "description": "Status description when no relays connected"
+  },
+  "relayStatusLoadingDescription": "Loading relay information...",
+  "@relayStatusLoadingDescription": {
+    "description": "Status description when loading"
+  },
+  "noteToSelf": "Note to Self",
+  "@noteToSelf": {
+    "description": "Title for self-conversation feature"
+  },
+  "noteToSelfHint": "Save messages, links, and notes for yourself",
+  "@noteToSelfHint": {
+    "description": "Hint text for empty Note to Self conversation"
+  },
+  "dmFollows": "Follows",
+  "@dmFollows": {
+    "description": "Tab label for DMs with people you follow"
+  },
+  "dmKnown": "Known",
+  "@dmKnown": {
+    "description": "Tab label for DMs with known contacts (not followed but messaged)"
+  },
+  "dmRequests": "Requests",
+  "@dmRequests": {
+    "description": "Tab label for DM requests from strangers"
+  },
+  "noFollowsConversations": "No conversations with people you follow",
+  "@noFollowsConversations": {
+    "description": "Empty state for follows DM tab"
+  },
+  "noKnownConversations": "No conversations with known contacts",
+  "@noKnownConversations": {
+    "description": "Empty state for known DM tab"
+  },
+  "noMessageRequests": "No message requests",
+  "@noMessageRequests": {
+    "description": "Empty state for requests DM tab"
   }
 }

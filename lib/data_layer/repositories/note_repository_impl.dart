@@ -24,7 +24,7 @@ class NoteRepositoryImpl implements NoteRepository {
     );
 
     final response = dartNdkSource.dartNdk.requests.query(
-      filters: [filter],
+      filter: filter,
       name: 'getAllNotes-',
     );
 
@@ -42,7 +42,7 @@ class NoteRepositoryImpl implements NoteRepository {
     );
 
     final response = dartNdkSource.dartNdk.requests.query(
-      filters: [filter],
+      filter: filter,
       name: 'getTextNote-',
       explicitRelays: explicitRelays,
       timeout: Duration(seconds: 15),
@@ -73,7 +73,7 @@ class NoteRepositoryImpl implements NoteRepository {
     );
 
     final response = dartNdkSource.dartNdk.requests.query(
-      filters: [filter],
+      filter: filter,
       name: requestId,
       cacheRead: true,
       cacheWrite: true,
@@ -118,7 +118,7 @@ class NoteRepositoryImpl implements NoteRepository {
     );
 
     final response = dartNdkSource.dartNdk.requests.query(
-      filters: [filter],
+      filter: filter,
       name: requestId,
       cacheRead: true,
       cacheWrite: true,
@@ -154,7 +154,7 @@ class NoteRepositoryImpl implements NoteRepository {
     );
 
     final response = dartNdkSource.dartNdk.requests.subscription(
-      filters: [filter],
+      filter: filter,
       name: subscriptionId,
       id: subscriptionId,
       cacheRead: false,
@@ -184,7 +184,7 @@ class NoteRepositoryImpl implements NoteRepository {
     );
 
     final response = dartNdkSource.dartNdk.requests.subscription(
-      filters: [filter],
+      filter: filter,
       name: requestId,
       id: requestId,
       cacheRead: true,
@@ -210,7 +210,7 @@ class NoteRepositoryImpl implements NoteRepository {
     );
 
     final response = dartNdkSource.dartNdk.requests.subscription(
-      filters: [filter],
+      filter: filter,
       name: requestId,
       id: requestId,
       //todo: bug in the NDK when using cacheRead and subscription
@@ -249,7 +249,7 @@ class NoteRepositoryImpl implements NoteRepository {
 
     final response = dartNdkSource.dartNdk.requests.query(
       timeout: Duration(seconds: 15),
-      filters: [filter],
+      filter: filter,
       name: 'getReactions-${postId.substring(5, 10)}-',
       cacheRead: useCache,
       cacheWrite: useCache,
@@ -282,7 +282,7 @@ class NoteRepositoryImpl implements NoteRepository {
 
     final response = dartNdkSource.dartNdk.requests.query(
       timeout: Duration(seconds: 15),
-      filters: [filter],
+      filter: filter,
       name: 'getReposts',
       cacheRead: cacheEnabled,
       cacheWrite: cacheEnabled,
