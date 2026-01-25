@@ -103,7 +103,8 @@ class DirectMessageModel extends DirectMessage {
   }
 
   /// Convert to ObjectBox database entity
-  DbNip17Message toDb() {
+  /// [ownerPubkey] - The pubkey of the logged-in user who owns this message
+  DbNip17Message toDb({required String ownerPubkey}) {
     String tagsJson = '';
     if (tags.isNotEmpty) {
       final tagsList = tags.map((tag) => tag.toList()).toList();
@@ -125,6 +126,7 @@ class DirectMessageModel extends DirectMessage {
     }
 
     return DbNip17Message(
+      ownerPubkey: ownerPubkey,
       eventId: id,
       senderPubkey: senderPubkey,
       peerPubkey: peerPubkey,

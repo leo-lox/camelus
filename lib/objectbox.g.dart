@@ -53,7 +53,7 @@ final _entities = <obx_int.ModelEntity>[
   obx_int.ModelEntity(
     id: const obx_int.IdUid(8, 3975513628429198363),
     name: 'DbNip17Conversation',
-    lastPropertyId: const obx_int.IdUid(6, 2742432485449068091),
+    lastPropertyId: const obx_int.IdUid(7, 1856797908576341898),
     flags: 0,
     properties: <obx_int.ModelProperty>[
       obx_int.ModelProperty(
@@ -66,7 +66,7 @@ final _entities = <obx_int.ModelEntity>[
         id: const obx_int.IdUid(2, 7897634050693751168),
         name: 'peerPubkey',
         type: 9,
-        flags: 2080,
+        flags: 2048,
         indexId: const obx_int.IdUid(2, 260264514658655485),
       ),
       obx_int.ModelProperty(
@@ -94,6 +94,13 @@ final _entities = <obx_int.ModelEntity>[
         type: 1,
         flags: 0,
       ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(7, 1856797908576341898),
+        name: 'ownerPubkey',
+        type: 9,
+        flags: 2048,
+        indexId: const obx_int.IdUid(8, 7106475925155755278),
+      ),
     ],
     relations: <obx_int.ModelRelation>[],
     backlinks: <obx_int.ModelBacklink>[],
@@ -101,7 +108,7 @@ final _entities = <obx_int.ModelEntity>[
   obx_int.ModelEntity(
     id: const obx_int.IdUid(9, 5397343319776606099),
     name: 'DbNip17Message',
-    lastPropertyId: const obx_int.IdUid(13, 2871858570347088755),
+    lastPropertyId: const obx_int.IdUid(14, 4147261140443002825),
     flags: 0,
     properties: <obx_int.ModelProperty>[
       obx_int.ModelProperty(
@@ -174,6 +181,13 @@ final _entities = <obx_int.ModelEntity>[
         type: 9,
         flags: 0,
       ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(14, 4147261140443002825),
+        name: 'ownerPubkey',
+        type: 9,
+        flags: 2048,
+        indexId: const obx_int.IdUid(9, 6864549305007800035),
+      ),
     ],
     relations: <obx_int.ModelRelation>[],
     backlinks: <obx_int.ModelBacklink>[],
@@ -219,7 +233,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
   final model = obx_int.ModelInfo(
     entities: _entities,
     lastEntityId: const obx_int.IdUid(9, 5397343319776606099),
-    lastIndexId: const obx_int.IdUid(7, 5085530051442188719),
+    lastIndexId: const obx_int.IdUid(9, 6864549305007800035),
     lastRelationId: const obx_int.IdUid(0, 0),
     lastSequenceId: const obx_int.IdUid(0, 0),
     retiredEntityUids: const [
@@ -338,19 +352,24 @@ obx_int.ModelDefinition getObjectBoxModel() {
         final lastMessagePreviewOffset = fbb.writeString(
           object.lastMessagePreview,
         );
-        fbb.startTable(7);
+        final ownerPubkeyOffset = fbb.writeString(object.ownerPubkey);
+        fbb.startTable(8);
         fbb.addInt64(0, object.dbId);
         fbb.addOffset(1, peerPubkeyOffset);
         fbb.addInt64(2, object.lastMessageAt);
         fbb.addInt64(3, object.unreadCount);
         fbb.addOffset(4, lastMessagePreviewOffset);
         fbb.addBool(5, object.lastMessageIsOutgoing);
+        fbb.addOffset(6, ownerPubkeyOffset);
         fbb.finish(fbb.endTable());
         return object.dbId;
       },
       objectFromFB: (obx.Store store, ByteData fbData) {
         final buffer = fb.BufferContext(fbData);
         final rootOffset = buffer.derefObject(0);
+        final ownerPubkeyParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGet(buffer, rootOffset, 16, '');
         final peerPubkeyParam = const fb.StringReader(
           asciiOptimization: true,
         ).vTableGet(buffer, rootOffset, 6, '');
@@ -376,6 +395,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
           false,
         );
         final object = DbNip17Conversation(
+          ownerPubkey: ownerPubkeyParam,
           peerPubkey: peerPubkeyParam,
           lastMessageAt: lastMessageAtParam,
           unreadCount: unreadCountParam,
@@ -406,7 +426,8 @@ obx_int.ModelDefinition getObjectBoxModel() {
         final recipientGiftWrapIdOffset = object.recipientGiftWrapId == null
             ? null
             : fbb.writeString(object.recipientGiftWrapId!);
-        fbb.startTable(14);
+        final ownerPubkeyOffset = fbb.writeString(object.ownerPubkey);
+        fbb.startTable(15);
         fbb.addInt64(0, object.dbId);
         fbb.addOffset(1, eventIdOffset);
         fbb.addOffset(2, senderPubkeyOffset);
@@ -418,12 +439,16 @@ obx_int.ModelDefinition getObjectBoxModel() {
         fbb.addBool(8, object.isOutgoing);
         fbb.addInt64(9, object.sendStatus);
         fbb.addOffset(12, recipientGiftWrapIdOffset);
+        fbb.addOffset(13, ownerPubkeyOffset);
         fbb.finish(fbb.endTable());
         return object.dbId;
       },
       objectFromFB: (obx.Store store, ByteData fbData) {
         final buffer = fb.BufferContext(fbData);
         final rootOffset = buffer.derefObject(0);
+        final ownerPubkeyParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGet(buffer, rootOffset, 30, '');
         final eventIdParam = const fb.StringReader(
           asciiOptimization: true,
         ).vTableGet(buffer, rootOffset, 6, '');
@@ -464,6 +489,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
           asciiOptimization: true,
         ).vTableGetNullable(buffer, rootOffset, 28);
         final object = DbNip17Message(
+          ownerPubkey: ownerPubkeyParam,
           eventId: eventIdParam,
           senderPubkey: senderPubkeyParam,
           peerPubkey: peerPubkeyParam,
@@ -531,6 +557,11 @@ class DbNip17Conversation_ {
   /// See [DbNip17Conversation.lastMessageIsOutgoing].
   static final lastMessageIsOutgoing =
       obx.QueryBooleanProperty<DbNip17Conversation>(_entities[1].properties[5]);
+
+  /// See [DbNip17Conversation.ownerPubkey].
+  static final ownerPubkey = obx.QueryStringProperty<DbNip17Conversation>(
+    _entities[1].properties[6],
+  );
 }
 
 /// [DbNip17Message] entity fields to define ObjectBox queries.
@@ -588,5 +619,10 @@ class DbNip17Message_ {
   /// See [DbNip17Message.recipientGiftWrapId].
   static final recipientGiftWrapId = obx.QueryStringProperty<DbNip17Message>(
     _entities[2].properties[10],
+  );
+
+  /// See [DbNip17Message.ownerPubkey].
+  static final ownerPubkey = obx.QueryStringProperty<DbNip17Message>(
+    _entities[2].properties[11],
   );
 }

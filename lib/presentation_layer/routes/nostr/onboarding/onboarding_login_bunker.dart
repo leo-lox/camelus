@@ -11,6 +11,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../../../domain_layer/entities/stored_account.dart';
 import '../../../atoms/long_button.dart';
 import '../../../components/responsive_center.dart';
+import '../../../providers/dm_conversations_provider.dart';
 import '../../../providers/ndk_provider.dart';
 import '../../../providers/signer_provider.dart';
 
@@ -121,6 +122,9 @@ class _OnboardingLoginBunkerPageState
         bunkerConnection: connection,
       );
       await AppAuth.addStoredAccount(account: storedAccount, setActive: true);
+
+      // Start DM subscription
+      ref.read(dmConversationsProvider);
 
       setState(() {
         _bunkerLoading = false;

@@ -9,6 +9,10 @@ class DbNip17Message {
   @Id()
   int dbId = 0;
 
+  /// Pubkey of the user who owns this message (the logged-in user)
+  @Index()
+  String ownerPubkey = '';
+
   /// Event ID of the gift wrap (kind 1059) - unique identifier
   @Unique()
   String eventId = '';
@@ -48,6 +52,7 @@ class DbNip17Message {
   String? recipientGiftWrapId;
 
   DbNip17Message({
+    this.ownerPubkey = '',
     this.eventId = '',
     this.senderPubkey = '',
     this.peerPubkey = '',

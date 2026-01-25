@@ -9,8 +9,13 @@ class DbNip17Conversation {
   @Id()
   int dbId = 0;
 
+  /// Pubkey of the user who owns this conversation (the logged-in user)
+  @Index()
+  String ownerPubkey = '';
+
   /// Pubkey of the other participant in the conversation
-  @Unique()
+  /// Combined with ownerPubkey forms a unique conversation identifier
+  @Index()
   String peerPubkey = '';
 
   /// Timestamp of the last message (for sorting conversations)
@@ -27,6 +32,7 @@ class DbNip17Conversation {
   bool lastMessageIsOutgoing = false;
 
   DbNip17Conversation({
+    this.ownerPubkey = '',
     this.peerPubkey = '',
     this.lastMessageAt = 0,
     this.unreadCount = 0,

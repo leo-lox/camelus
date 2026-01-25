@@ -213,8 +213,9 @@ class DirectMessageRepositoryImpl implements DirectMessageRepository {
     final convBox = store.box<DbNip17Conversation>();
     final messageBox = store.box<DbNip17Message>();
 
+    // Filter by ownerPubkey to only show conversations for the current user
     final query = convBox
-        .query()
+        .query(DbNip17Conversation_.ownerPubkey.equals(myPubkey))
         .order(DbNip17Conversation_.lastMessageAt, flags: Order.descending)
         .build();
 
@@ -230,8 +231,12 @@ class DirectMessageRepositoryImpl implements DirectMessageRepository {
     DbNip17Conversation db,
     Box<DbNip17Message> messageBox,
   ) {
+    // Filter by both ownerPubkey and peerPubkey
     final msgQuery = messageBox
-        .query(DbNip17Message_.peerPubkey.equals(db.peerPubkey))
+        .query(
+          DbNip17Message_.ownerPubkey.equals(myPubkey) &
+              DbNip17Message_.peerPubkey.equals(db.peerPubkey),
+        )
         .order(DbNip17Message_.createdAt, flags: Order.descending)
         .build();
     final lastMessageDb = msgQuery.findFirst();
@@ -261,8 +266,12 @@ class DirectMessageRepositoryImpl implements DirectMessageRepository {
     final convBox = store.box<DbNip17Conversation>();
     final messageBox = store.box<DbNip17Message>();
 
+    // Filter by ownerPubkey to only get conversation for the current user
     final query = convBox
-        .query(DbNip17Conversation_.peerPubkey.equals(peerPubkey))
+        .query(
+          DbNip17Conversation_.ownerPubkey.equals(myPubkey) &
+              DbNip17Conversation_.peerPubkey.equals(peerPubkey),
+        )
         .build();
     final db = query.findFirst();
     query.close();
@@ -278,8 +287,12 @@ class DirectMessageRepositoryImpl implements DirectMessageRepository {
     final box = store.box<DbNip17Conversation>();
 
     store.runInTransaction(TxMode.write, () {
+      // Filter by ownerPubkey to only update conversation for the current user
       final query = box
-          .query(DbNip17Conversation_.peerPubkey.equals(peerPubkey))
+          .query(
+            DbNip17Conversation_.ownerPubkey.equals(myPubkey) &
+                DbNip17Conversation_.peerPubkey.equals(peerPubkey),
+          )
           .build();
       final db = query.findFirst();
       query.close();
@@ -306,7 +319,10 @@ class DirectMessageRepositoryImpl implements DirectMessageRepository {
     final store = await getStore();
     final box = store.box<DbNip17Conversation>();
 
-    final query = box.query().build();
+    // Filter by ownerPubkey to only count unread for the current user
+    final query = box
+        .query(DbNip17Conversation_.ownerPubkey.equals(myPubkey))
+        .build();
     final conversations = query.find();
     query.close();
 
@@ -337,8 +353,12 @@ class DirectMessageRepositoryImpl implements DirectMessageRepository {
     final store = await getStore();
     final box = store.box<DbNip17Message>();
 
+    // Filter by ownerPubkey to only get messages for the current user
     final query = box
-        .query(DbNip17Message_.peerPubkey.equals(peerPubkey))
+        .query(
+          DbNip17Message_.ownerPubkey.equals(myPubkey) &
+              DbNip17Message_.peerPubkey.equals(peerPubkey),
+        )
         .order(DbNip17Message_.createdAt)
         .build();
 
@@ -454,11 +474,15 @@ class DirectMessageRepositoryImpl implements DirectMessageRepository {
 
   @override
   Future<bool> loadOlderMessages() async {
-    // Get the oldest message timestamp from local DB
+    // Get the oldest message timestamp from local DB for the current user
     final store = await getStore();
     final box = store.box<DbNip17Message>();
 
-    final query = box.query().order(DbNip17Message_.createdAt).build();
+    // Filter by ownerPubkey to only get messages for the current user
+    final query = box
+        .query(DbNip17Message_.ownerPubkey.equals(myPubkey))
+        .order(DbNip17Message_.createdAt)
+        .build();
     final oldestMessage = query.findFirst();
     query.close();
 
@@ -512,8 +536,12 @@ class DirectMessageRepositoryImpl implements DirectMessageRepository {
     final store = await getStore();
     final box = store.box<DbNip17Message>();
 
+    // Filter by ownerPubkey to only get messages for the current user
     final query = box
-        .query(DbNip17Message_.peerPubkey.equals(peerPubkey))
+        .query(
+          DbNip17Message_.ownerPubkey.equals(myPubkey) &
+              DbNip17Message_.peerPubkey.equals(peerPubkey),
+        )
         .order(DbNip17Message_.createdAt)
         .build();
     final oldestMessage = query.findFirst();
@@ -890,7 +918,13 @@ class DirectMessageRepositoryImpl implements DirectMessageRepository {
     final store = await getStore();
     final box = store.box<DbNip17Message>();
 
-    final query = box.query(DbNip17Message_.eventId.equals(giftWrapId)).build();
+    // Filter by ownerPubkey to only get messages for the current user
+    final query = box
+        .query(
+          DbNip17Message_.ownerPubkey.equals(myPubkey) &
+              DbNip17Message_.eventId.equals(giftWrapId),
+        )
+        .build();
     final db = query.findFirst();
     query.close();
 
@@ -904,13 +938,18 @@ class DirectMessageRepositoryImpl implements DirectMessageRepository {
     final store = await getStore();
     final box = store.box<DbNip17Message>();
 
-    // Check if already exists
-    final query = box.query(DbNip17Message_.eventId.equals(message.id)).build();
+    // Check if already exists for this user
+    final query = box
+        .query(
+          DbNip17Message_.ownerPubkey.equals(myPubkey) &
+              DbNip17Message_.eventId.equals(message.id),
+        )
+        .build();
     final existing = query.findFirst();
     query.close();
 
     final model = DirectMessageModel.fromEntity(message);
-    final dbMessage = model.toDb();
+    final dbMessage = model.toDb(ownerPubkey: myPubkey);
 
     if (existing != null) {
       // Update existing message (preserve dbId for ObjectBox)
@@ -929,14 +968,19 @@ class DirectMessageRepositoryImpl implements DirectMessageRepository {
     final box = store.box<DbNip17Conversation>();
 
     store.runInTransaction(TxMode.write, () {
+      // Filter by ownerPubkey to only update conversation for the current user
       final query = box
-          .query(DbNip17Conversation_.peerPubkey.equals(message.peerPubkey))
+          .query(
+            DbNip17Conversation_.ownerPubkey.equals(myPubkey) &
+                DbNip17Conversation_.peerPubkey.equals(message.peerPubkey),
+          )
           .build();
       var conversation = query.findFirst();
       query.close();
 
       if (conversation == null) {
         conversation = DbNip17Conversation(
+          ownerPubkey: myPubkey,
           peerPubkey: message.peerPubkey,
           lastMessageAt: message.createdAt,
           unreadCount: incrementUnread ? 1 : 0,
@@ -1022,8 +1066,12 @@ class DirectMessageRepositoryImpl implements DirectMessageRepository {
       final store = await getStore();
       final box = store.box<DbNip17Message>();
 
+      // Filter by ownerPubkey to only delete message for the current user
       final query = box
-          .query(DbNip17Message_.eventId.equals(messageId))
+          .query(
+            DbNip17Message_.ownerPubkey.equals(myPubkey) &
+                DbNip17Message_.eventId.equals(messageId),
+          )
           .build();
       final dbMessage = query.findFirst();
       query.close();
@@ -1092,17 +1140,23 @@ class DirectMessageRepositoryImpl implements DirectMessageRepository {
     final messageBox = store.box<DbNip17Message>();
     final conversationBox = store.box<DbNip17Conversation>();
 
-    // Get the latest message for this peer
+    // Get the latest message for this peer (filtered by ownerPubkey)
     final query = messageBox
-        .query(DbNip17Message_.peerPubkey.equals(peerPubkey))
+        .query(
+          DbNip17Message_.ownerPubkey.equals(myPubkey) &
+              DbNip17Message_.peerPubkey.equals(peerPubkey),
+        )
         .order(DbNip17Message_.createdAt, flags: Order.descending)
         .build();
     final latestMessage = query.findFirst();
     query.close();
 
-    // Get the conversation
+    // Get the conversation (filtered by ownerPubkey)
     final convQuery = conversationBox
-        .query(DbNip17Conversation_.peerPubkey.equals(peerPubkey))
+        .query(
+          DbNip17Conversation_.ownerPubkey.equals(myPubkey) &
+              DbNip17Conversation_.peerPubkey.equals(peerPubkey),
+        )
         .build();
     final conversation = convQuery.findFirst();
     convQuery.close();
@@ -1134,11 +1188,12 @@ class DirectMessageRepositoryImpl implements DirectMessageRepository {
 
     final result = <String>{};
 
-    // Query for outgoing messages for the given peers
+    // Query for outgoing messages for the given peers (filtered by ownerPubkey)
     // We use a single query with OR conditions for efficiency
     final query = box
         .query(
-          DbNip17Message_.isOutgoing.equals(true) &
+          DbNip17Message_.ownerPubkey.equals(myPubkey) &
+              DbNip17Message_.isOutgoing.equals(true) &
               DbNip17Message_.peerPubkey.oneOf(peerPubkeys),
         )
         .build();
