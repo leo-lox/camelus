@@ -76,15 +76,16 @@ dependencies:
   intl: any
   app_links: ^7.0.0
   phosphor_flutter: ^2.1.0
-  ## ndk imnports
-  ndk: ^0.6.0
-  ndk_rust_verifier: ^0.4.2
-  ndk_amber: ^0.3.3
+
+  # ndk imports
+  ndk: ^0.7.1-dev.1
+  ndk_rust_verifier: ^0.5.0
+  ndk_amber: ^0.4.0
   ndk_objectbox: ^0.2.7
   image: ^4.3.0
   flutter_list_view: ^1.1.29
   xxh3: ^1.2.0
-  serverpod_flutter: 2.9.1
+  serverpod_flutter: 3.2.3
   apipod_client:
     path: ./apipod/apipod_client
   firebase_messaging: ^16.0.2
