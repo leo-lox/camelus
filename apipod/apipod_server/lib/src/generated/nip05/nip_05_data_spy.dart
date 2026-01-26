@@ -7,9 +7,11 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
+import 'package:apipod_server/src/generated/protocol.dart' as _i2;
 
 abstract class Nip05Data
     implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
@@ -37,11 +39,12 @@ abstract class Nip05Data
       name: jsonSerialization['name'] as String,
       domain: jsonSerialization['domain'] as String,
       pubkey: jsonSerialization['pubkey'] as String,
-      relays: (jsonSerialization['relays'] as List)
-          .map((e) => e as String)
-          .toList(),
-      createdAt:
-          _i1.DateTimeJsonExtension.fromJson(jsonSerialization['createdAt']),
+      relays: _i2.Protocol().deserialize<List<String>>(
+        jsonSerialization['relays'],
+      ),
+      createdAt: _i1.DateTimeJsonExtension.fromJson(
+        jsonSerialization['createdAt'],
+      ),
     );
   }
 
@@ -79,6 +82,7 @@ abstract class Nip05Data
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'Nip05Data',
       if (id != null) 'id': id,
       'name': name,
       'domain': domain,
@@ -91,6 +95,7 @@ abstract class Nip05Data
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
+      '__className__': 'Nip05Data',
       if (id != null) 'id': id,
       'name': name,
       'domain': domain,
@@ -141,13 +146,13 @@ class _Nip05DataImpl extends Nip05Data {
     required List<String> relays,
     required DateTime createdAt,
   }) : super._(
-          id: id,
-          name: name,
-          domain: domain,
-          pubkey: pubkey,
-          relays: relays,
-          createdAt: createdAt,
-        );
+         id: id,
+         name: name,
+         domain: domain,
+         pubkey: pubkey,
+         relays: relays,
+         createdAt: createdAt,
+       );
 
   /// Returns a shallow copy of this [Nip05Data]
   /// with some or all fields replaced by the given arguments.
@@ -172,8 +177,40 @@ class _Nip05DataImpl extends Nip05Data {
   }
 }
 
+class Nip05DataUpdateTable extends _i1.UpdateTable<Nip05DataTable> {
+  Nip05DataUpdateTable(super.table);
+
+  _i1.ColumnValue<String, String> name(String value) => _i1.ColumnValue(
+    table.name,
+    value,
+  );
+
+  _i1.ColumnValue<String, String> domain(String value) => _i1.ColumnValue(
+    table.domain,
+    value,
+  );
+
+  _i1.ColumnValue<String, String> pubkey(String value) => _i1.ColumnValue(
+    table.pubkey,
+    value,
+  );
+
+  _i1.ColumnValue<List<String>, List<String>> relays(List<String> value) =>
+      _i1.ColumnValue(
+        table.relays,
+        value,
+      );
+
+  _i1.ColumnValue<DateTime, DateTime> createdAt(DateTime value) =>
+      _i1.ColumnValue(
+        table.createdAt,
+        value,
+      );
+}
+
 class Nip05DataTable extends _i1.Table<int?> {
   Nip05DataTable({super.tableRelation}) : super(tableName: 'nip_05_data') {
+    updateTable = Nip05DataUpdateTable(this);
     name = _i1.ColumnString(
       'name',
       this,
@@ -186,7 +223,7 @@ class Nip05DataTable extends _i1.Table<int?> {
       'pubkey',
       this,
     );
-    relays = _i1.ColumnSerializable(
+    relays = _i1.ColumnSerializable<List<String>>(
       'relays',
       this,
     );
@@ -196,25 +233,27 @@ class Nip05DataTable extends _i1.Table<int?> {
     );
   }
 
+  late final Nip05DataUpdateTable updateTable;
+
   late final _i1.ColumnString name;
 
   late final _i1.ColumnString domain;
 
   late final _i1.ColumnString pubkey;
 
-  late final _i1.ColumnSerializable relays;
+  late final _i1.ColumnSerializable<List<String>> relays;
 
   late final _i1.ColumnDateTime createdAt;
 
   @override
   List<_i1.Column> get columns => [
-        id,
-        name,
-        domain,
-        pubkey,
-        relays,
-        createdAt,
-      ];
+    id,
+    name,
+    domain,
+    pubkey,
+    relays,
+    createdAt,
+  ];
 }
 
 class Nip05DataInclude extends _i1.IncludeObject {
@@ -402,6 +441,46 @@ class Nip05DataRepository {
     return session.db.updateRow<Nip05Data>(
       row,
       columns: columns?.call(Nip05Data.t),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates a single [Nip05Data] by its [id] with the specified [columnValues].
+  /// Returns the updated row or null if no row with the given id exists.
+  Future<Nip05Data?> updateById(
+    _i1.Session session,
+    int id, {
+    required _i1.ColumnValueListBuilder<Nip05DataUpdateTable> columnValues,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateById<Nip05Data>(
+      id,
+      columnValues: columnValues(Nip05Data.t.updateTable),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates all [Nip05Data]s matching the [where] expression with the specified [columnValues].
+  /// Returns the list of updated rows.
+  Future<List<Nip05Data>> updateWhere(
+    _i1.Session session, {
+    required _i1.ColumnValueListBuilder<Nip05DataUpdateTable> columnValues,
+    required _i1.WhereExpressionBuilder<Nip05DataTable> where,
+    int? limit,
+    int? offset,
+    _i1.OrderByBuilder<Nip05DataTable>? orderBy,
+    _i1.OrderByListBuilder<Nip05DataTable>? orderByList,
+    bool orderDescending = false,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateWhere<Nip05Data>(
+      columnValues: columnValues(Nip05Data.t.updateTable),
+      where: where(Nip05Data.t),
+      limit: limit,
+      offset: offset,
+      orderBy: orderBy?.call(Nip05Data.t),
+      orderByList: orderByList?.call(Nip05Data.t),
+      orderDescending: orderDescending,
       transaction: transaction,
     );
   }

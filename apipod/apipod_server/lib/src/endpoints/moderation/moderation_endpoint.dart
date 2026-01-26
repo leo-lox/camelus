@@ -111,7 +111,7 @@ class ModerationEndpoint extends Endpoint {
       session,
       ReportsIncoming(
         createdAt: now,
-        report: event,
+        report: Nip01EventModel.fromEntity(event),
         author: event.pubKey,
         type: isEventReport ? "event" : "profile",
         processed: false,

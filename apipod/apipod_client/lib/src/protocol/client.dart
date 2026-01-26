@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
@@ -52,25 +53,24 @@ class EndpointLinkShorter extends _i1.EndpointRef {
     required String invitedByNpub,
     required String listName,
     required String listNpub,
-  }) =>
-      caller.callServerEndpoint<String>(
-        'linkShorter',
-        'shortInvite',
-        {
-          'invitedByNpub': invitedByNpub,
-          'listName': listName,
-          'listNpub': listNpub,
-        },
-      );
+  }) => caller.callServerEndpoint<String>(
+    'linkShorter',
+    'shortInvite',
+    {
+      'invitedByNpub': invitedByNpub,
+      'listName': listName,
+      'listNpub': listNpub,
+    },
+  );
 
   /// get short link and track usage
-  _i2.Future<_i4.ShortLinkInviteData?> getInviteByShortLink(
-          {required String shortLink}) =>
-      caller.callServerEndpoint<_i4.ShortLinkInviteData?>(
-        'linkShorter',
-        'getInviteByShortLink',
-        {'shortLink': shortLink},
-      );
+  _i2.Future<_i4.ShortLinkInviteData?> getInviteByShortLink({
+    required String shortLink,
+  }) => caller.callServerEndpoint<_i4.ShortLinkInviteData?>(
+    'linkShorter',
+    'getInviteByShortLink',
+    {'shortLink': shortLink},
+  );
 }
 
 ///    'size': <int>,
@@ -117,28 +117,26 @@ class EndpointNip05 extends _i1.EndpointRef {
   _i2.Future<_i7.Nip05Response?> getNip05(
     String? name,
     String domain,
-  ) =>
-      caller.callServerEndpoint<_i7.Nip05Response?>(
-        'nip05',
-        'getNip05',
-        {
-          'name': name,
-          'domain': domain,
-        },
-      );
+  ) => caller.callServerEndpoint<_i7.Nip05Response?>(
+    'nip05',
+    'getNip05',
+    {
+      'name': name,
+      'domain': domain,
+    },
+  );
 
   _i2.Future<_i8.NameCheckResult> checkName(
     String name,
     String domain,
-  ) =>
-      caller.callServerEndpoint<_i8.NameCheckResult>(
-        'nip05',
-        'checkName',
-        {
-          'name': name,
-          'domain': domain,
-        },
-      );
+  ) => caller.callServerEndpoint<_i8.NameCheckResult>(
+    'nip05',
+    'checkName',
+    {
+      'name': name,
+      'domain': domain,
+    },
+  );
 }
 
 /// {@category Endpoint}
@@ -151,15 +149,14 @@ class EndpointNostrBand extends _i1.EndpointRef {
   _i2.Future<_i9.NostrBandHashtags> hashtags({
     String? lang,
     String? limit,
-  }) =>
-      caller.callServerEndpoint<_i9.NostrBandHashtags>(
-        'nostrBand',
-        'hashtags',
-        {
-          'lang': lang,
-          'limit': limit,
-        },
-      );
+  }) => caller.callServerEndpoint<_i9.NostrBandHashtags>(
+    'nostrBand',
+    'hashtags',
+    {
+      'lang': lang,
+      'limit': limit,
+    },
+  );
 
   _i2.Future<_i10.NostrBandPeople> profiles({String? limit}) =>
       caller.callServerEndpoint<_i10.NostrBandPeople>(
@@ -179,43 +176,45 @@ class EndpointNostrPush extends _i1.EndpointRef {
   _i2.Future<bool> register(
     String token,
     List<_i6.Nip01Event> events,
-  ) =>
-      caller.callServerEndpoint<bool>(
-        'nostrPush',
-        'register',
-        {
-          'token': token,
-          'events': events,
-        },
-      );
+  ) => caller.callServerEndpoint<bool>(
+    'nostrPush',
+    'register',
+    {
+      'token': token,
+      'events': events,
+    },
+  );
 }
 
 class Client extends _i1.ServerpodClientShared {
   Client(
     String host, {
     dynamic securityContext,
-    _i1.AuthenticationKeyManager? authenticationKeyManager,
+    @Deprecated(
+      'Use authKeyProvider instead. This will be removed in future releases.',
+    )
+    super.authenticationKeyManager,
     Duration? streamingConnectionTimeout,
     Duration? connectionTimeout,
     Function(
       _i1.MethodCallContext,
       Object,
       StackTrace,
-    )? onFailedCall,
+    )?
+    onFailedCall,
     Function(_i1.MethodCallContext)? onSucceededCall,
     bool? disconnectStreamsOnLostInternetConnection,
   }) : super(
-          host,
-          _i11.Protocol(),
-          securityContext: securityContext,
-          authenticationKeyManager: authenticationKeyManager,
-          streamingConnectionTimeout: streamingConnectionTimeout,
-          connectionTimeout: connectionTimeout,
-          onFailedCall: onFailedCall,
-          onSucceededCall: onSucceededCall,
-          disconnectStreamsOnLostInternetConnection:
-              disconnectStreamsOnLostInternetConnection,
-        ) {
+         host,
+         _i11.Protocol(),
+         securityContext: securityContext,
+         streamingConnectionTimeout: streamingConnectionTimeout,
+         connectionTimeout: connectionTimeout,
+         onFailedCall: onFailedCall,
+         onSucceededCall: onSucceededCall,
+         disconnectStreamsOnLostInternetConnection:
+             disconnectStreamsOnLostInternetConnection,
+       ) {
     appUpdate = EndpointAppUpdate(this);
     linkShorter = EndpointLinkShorter(this);
     moderation = EndpointModeration(this);
@@ -238,13 +237,13 @@ class Client extends _i1.ServerpodClientShared {
 
   @override
   Map<String, _i1.EndpointRef> get endpointRefLookup => {
-        'appUpdate': appUpdate,
-        'linkShorter': linkShorter,
-        'moderation': moderation,
-        'nip05': nip05,
-        'nostrBand': nostrBand,
-        'nostrPush': nostrPush,
-      };
+    'appUpdate': appUpdate,
+    'linkShorter': linkShorter,
+    'moderation': moderation,
+    'nip05': nip05,
+    'nostrBand': nostrBand,
+    'nostrPush': nostrPush,
+  };
 
   @override
   Map<String, _i1.ModuleEndpointCaller> get moduleLookup => {};
