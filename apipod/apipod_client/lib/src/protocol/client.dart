@@ -53,26 +53,24 @@ class EndpointLinkShorter extends _i1.EndpointRef {
     required String invitedByNpub,
     required String listName,
     required String listNpub,
-  }) =>
-      caller.callServerEndpoint<String>(
-        'linkShorter',
-        'shortInvite',
-        {
-          'invitedByNpub': invitedByNpub,
-          'listName': listName,
-          'listNpub': listNpub,
-        },
-      );
+  }) => caller.callServerEndpoint<String>(
+    'linkShorter',
+    'shortInvite',
+    {
+      'invitedByNpub': invitedByNpub,
+      'listName': listName,
+      'listNpub': listNpub,
+    },
+  );
 
   /// get short link and track usage
   _i2.Future<_i4.ShortLinkInviteData?> getInviteByShortLink({
     required String shortLink,
-  }) =>
-      caller.callServerEndpoint<_i4.ShortLinkInviteData?>(
-        'linkShorter',
-        'getInviteByShortLink',
-        {'shortLink': shortLink},
-      );
+  }) => caller.callServerEndpoint<_i4.ShortLinkInviteData?>(
+    'linkShorter',
+    'getInviteByShortLink',
+    {'shortLink': shortLink},
+  );
 }
 
 ///    'size': <int>,
@@ -119,28 +117,26 @@ class EndpointNip05 extends _i1.EndpointRef {
   _i2.Future<_i7.Nip05Response?> getNip05(
     String? name,
     String domain,
-  ) =>
-      caller.callServerEndpoint<_i7.Nip05Response?>(
-        'nip05',
-        'getNip05',
-        {
-          'name': name,
-          'domain': domain,
-        },
-      );
+  ) => caller.callServerEndpoint<_i7.Nip05Response?>(
+    'nip05',
+    'getNip05',
+    {
+      'name': name,
+      'domain': domain,
+    },
+  );
 
   _i2.Future<_i8.NameCheckResult> checkName(
     String name,
     String domain,
-  ) =>
-      caller.callServerEndpoint<_i8.NameCheckResult>(
-        'nip05',
-        'checkName',
-        {
-          'name': name,
-          'domain': domain,
-        },
-      );
+  ) => caller.callServerEndpoint<_i8.NameCheckResult>(
+    'nip05',
+    'checkName',
+    {
+      'name': name,
+      'domain': domain,
+    },
+  );
 }
 
 /// {@category Endpoint}
@@ -153,15 +149,14 @@ class EndpointNostrBand extends _i1.EndpointRef {
   _i2.Future<_i9.NostrBandHashtags> hashtags({
     String? lang,
     String? limit,
-  }) =>
-      caller.callServerEndpoint<_i9.NostrBandHashtags>(
-        'nostrBand',
-        'hashtags',
-        {
-          'lang': lang,
-          'limit': limit,
-        },
-      );
+  }) => caller.callServerEndpoint<_i9.NostrBandHashtags>(
+    'nostrBand',
+    'hashtags',
+    {
+      'lang': lang,
+      'limit': limit,
+    },
+  );
 
   _i2.Future<_i10.NostrBandPeople> profiles({String? limit}) =>
       caller.callServerEndpoint<_i10.NostrBandPeople>(
@@ -189,15 +184,14 @@ class EndpointNostrPush extends _i1.EndpointRef {
   _i2.Future<bool> register(
     String token,
     List<_i6.Nip01Event> events,
-  ) =>
-      caller.callServerEndpoint<bool>(
-        'nostrPush',
-        'register',
-        {
-          'token': token,
-          'events': events,
-        },
-      );
+  ) => caller.callServerEndpoint<bool>(
+    'nostrPush',
+    'register',
+    {
+      'token': token,
+      'events': events,
+    },
+  );
 }
 
 /// {@category Endpoint}
@@ -229,20 +223,21 @@ class Client extends _i1.ServerpodClientShared {
       _i1.MethodCallContext,
       Object,
       StackTrace,
-    )? onFailedCall,
+    )?
+    onFailedCall,
     Function(_i1.MethodCallContext)? onSucceededCall,
     bool? disconnectStreamsOnLostInternetConnection,
   }) : super(
-          host,
-          _i11.Protocol(),
-          securityContext: securityContext,
-          streamingConnectionTimeout: streamingConnectionTimeout,
-          connectionTimeout: connectionTimeout,
-          onFailedCall: onFailedCall,
-          onSucceededCall: onSucceededCall,
-          disconnectStreamsOnLostInternetConnection:
-              disconnectStreamsOnLostInternetConnection,
-        ) {
+         host,
+         _i11.Protocol(),
+         securityContext: securityContext,
+         streamingConnectionTimeout: streamingConnectionTimeout,
+         connectionTimeout: connectionTimeout,
+         onFailedCall: onFailedCall,
+         onSucceededCall: onSucceededCall,
+         disconnectStreamsOnLostInternetConnection:
+             disconnectStreamsOnLostInternetConnection,
+       ) {
     appUpdate = EndpointAppUpdate(this);
     linkShorter = EndpointLinkShorter(this);
     moderation = EndpointModeration(this);
@@ -271,13 +266,15 @@ class Client extends _i1.ServerpodClientShared {
 
   @override
   Map<String, _i1.EndpointRef> get endpointRefLookup => {
-        'appUpdate': appUpdate,
-        'linkShorter': linkShorter,
-        'moderation': moderation,
-        'nip05': nip05,
-        'nostrBand': nostrBand,
-        'nostrPush': nostrPush,
-      };
+    'appUpdate': appUpdate,
+    'linkShorter': linkShorter,
+    'moderation': moderation,
+    'nip05': nip05,
+    'nostrBand': nostrBand,
+    'otsoExternalSync': otsoExternalSync,
+    'nostrPush': nostrPush,
+    'otsoPush': otsoPush,
+  };
 
   @override
   Map<String, _i1.ModuleEndpointCaller> get moduleLookup => {};

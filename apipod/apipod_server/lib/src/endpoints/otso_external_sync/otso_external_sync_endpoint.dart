@@ -3,7 +3,7 @@ import 'dart:io';
 
 import 'package:dart_geohash/dart_geohash.dart';
 import 'package:http/http.dart' as http;
-import 'package:ndk/ndk.dart';
+import 'package:ndk/ndk.dart' hide LogLevel;
 import 'package:serverpod/serverpod.dart';
 
 import '../../generated/protocol.dart';

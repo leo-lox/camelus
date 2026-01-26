@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
@@ -27,7 +28,8 @@ abstract class OtsoPushSubscription implements _i1.SerializableModel {
   }) = _OtsoPushSubscriptionImpl;
 
   factory OtsoPushSubscription.fromJson(
-      Map<String, dynamic> jsonSerialization) {
+    Map<String, dynamic> jsonSerialization,
+  ) {
     return OtsoPushSubscription(
       id: jsonSerialization['id'] as int?,
       pubkey: jsonSerialization['pubkey'] as String,
@@ -59,6 +61,7 @@ abstract class OtsoPushSubscription implements _i1.SerializableModel {
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'OtsoPushSubscription',
       if (id != null) 'id': id,
       'pubkey': pubkey,
       'relay': relay,
@@ -81,11 +84,11 @@ class _OtsoPushSubscriptionImpl extends OtsoPushSubscription {
     required String relay,
     required String token,
   }) : super._(
-          id: id,
-          pubkey: pubkey,
-          relay: relay,
-          token: token,
-        );
+         id: id,
+         pubkey: pubkey,
+         relay: relay,
+         token: token,
+       );
 
   /// Returns a shallow copy of this [OtsoPushSubscription]
   /// with some or all fields replaced by the given arguments.

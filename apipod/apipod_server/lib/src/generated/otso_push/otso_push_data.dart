@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
@@ -28,7 +29,8 @@ abstract class OtsoPushSubscription
   }) = _OtsoPushSubscriptionImpl;
 
   factory OtsoPushSubscription.fromJson(
-      Map<String, dynamic> jsonSerialization) {
+    Map<String, dynamic> jsonSerialization,
+  ) {
     return OtsoPushSubscription(
       id: jsonSerialization['id'] as int?,
       pubkey: jsonSerialization['pubkey'] as String,
@@ -65,6 +67,7 @@ abstract class OtsoPushSubscription
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'OtsoPushSubscription',
       if (id != null) 'id': id,
       'pubkey': pubkey,
       'relay': relay,
@@ -75,6 +78,7 @@ abstract class OtsoPushSubscription
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
+      '__className__': 'OtsoPushSubscription',
       if (id != null) 'id': id,
       'pubkey': pubkey,
       'relay': relay,
@@ -121,11 +125,11 @@ class _OtsoPushSubscriptionImpl extends OtsoPushSubscription {
     required String relay,
     required String token,
   }) : super._(
-          id: id,
-          pubkey: pubkey,
-          relay: relay,
-          token: token,
-        );
+         id: id,
+         pubkey: pubkey,
+         relay: relay,
+         token: token,
+       );
 
   /// Returns a shallow copy of this [OtsoPushSubscription]
   /// with some or all fields replaced by the given arguments.
@@ -146,9 +150,30 @@ class _OtsoPushSubscriptionImpl extends OtsoPushSubscription {
   }
 }
 
+class OtsoPushSubscriptionUpdateTable
+    extends _i1.UpdateTable<OtsoPushSubscriptionTable> {
+  OtsoPushSubscriptionUpdateTable(super.table);
+
+  _i1.ColumnValue<String, String> pubkey(String value) => _i1.ColumnValue(
+    table.pubkey,
+    value,
+  );
+
+  _i1.ColumnValue<String, String> relay(String value) => _i1.ColumnValue(
+    table.relay,
+    value,
+  );
+
+  _i1.ColumnValue<String, String> token(String value) => _i1.ColumnValue(
+    table.token,
+    value,
+  );
+}
+
 class OtsoPushSubscriptionTable extends _i1.Table<int?> {
   OtsoPushSubscriptionTable({super.tableRelation})
-      : super(tableName: 'otso_push_subscriptions') {
+    : super(tableName: 'otso_push_subscriptions') {
+    updateTable = OtsoPushSubscriptionUpdateTable(this);
     pubkey = _i1.ColumnString(
       'pubkey',
       this,
@@ -163,6 +188,8 @@ class OtsoPushSubscriptionTable extends _i1.Table<int?> {
     );
   }
 
+  late final OtsoPushSubscriptionUpdateTable updateTable;
+
   late final _i1.ColumnString pubkey;
 
   late final _i1.ColumnString relay;
@@ -171,11 +198,11 @@ class OtsoPushSubscriptionTable extends _i1.Table<int?> {
 
   @override
   List<_i1.Column> get columns => [
-        id,
-        pubkey,
-        relay,
-        token,
-      ];
+    id,
+    pubkey,
+    relay,
+    token,
+  ];
 }
 
 class OtsoPushSubscriptionInclude extends _i1.IncludeObject {
@@ -363,6 +390,48 @@ class OtsoPushSubscriptionRepository {
     return session.db.updateRow<OtsoPushSubscription>(
       row,
       columns: columns?.call(OtsoPushSubscription.t),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates a single [OtsoPushSubscription] by its [id] with the specified [columnValues].
+  /// Returns the updated row or null if no row with the given id exists.
+  Future<OtsoPushSubscription?> updateById(
+    _i1.Session session,
+    int id, {
+    required _i1.ColumnValueListBuilder<OtsoPushSubscriptionUpdateTable>
+    columnValues,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateById<OtsoPushSubscription>(
+      id,
+      columnValues: columnValues(OtsoPushSubscription.t.updateTable),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates all [OtsoPushSubscription]s matching the [where] expression with the specified [columnValues].
+  /// Returns the list of updated rows.
+  Future<List<OtsoPushSubscription>> updateWhere(
+    _i1.Session session, {
+    required _i1.ColumnValueListBuilder<OtsoPushSubscriptionUpdateTable>
+    columnValues,
+    required _i1.WhereExpressionBuilder<OtsoPushSubscriptionTable> where,
+    int? limit,
+    int? offset,
+    _i1.OrderByBuilder<OtsoPushSubscriptionTable>? orderBy,
+    _i1.OrderByListBuilder<OtsoPushSubscriptionTable>? orderByList,
+    bool orderDescending = false,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateWhere<OtsoPushSubscription>(
+      columnValues: columnValues(OtsoPushSubscription.t.updateTable),
+      where: where(OtsoPushSubscription.t),
+      limit: limit,
+      offset: offset,
+      orderBy: orderBy?.call(OtsoPushSubscription.t),
+      orderByList: orderByList?.call(OtsoPushSubscription.t),
+      orderDescending: orderDescending,
       transaction: transaction,
     );
   }

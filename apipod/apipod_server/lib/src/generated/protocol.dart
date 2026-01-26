@@ -24,11 +24,14 @@ import 'nostr_band/nostr_band_hashtags.dart' as _i11;
 import 'nostr_band/nostr_band_hastag_info.dart' as _i12;
 import 'nostr_band/nostr_band_people.dart' as _i13;
 import 'nostr_band/nostr_band_profiles.dart' as _i14;
-import 'reports_incoming.dart' as _i15;
-import 'short_links/short_link_invite_data.dart' as _i16;
-import 'subscription.dart' as _i17;
-import 'package:ndk/data_layer/models/nip_01_event_model.dart' as _i18;
-import 'package:ndk/domain_layer/entities/nip_01_event.dart' as _i19;
+import 'otso_push/otso_geo_subscriptions.dart' as _i15;
+import 'otso_push/otso_push_data.dart' as _i16;
+import 'otso_sync/otos_external_sync.dart' as _i17;
+import 'reports_incoming.dart' as _i18;
+import 'short_links/short_link_invite_data.dart' as _i19;
+import 'subscription.dart' as _i20;
+import 'package:ndk/data_layer/models/nip_01_event_model.dart' as _i21;
+import 'package:ndk/domain_layer/entities/nip_01_event.dart' as _i22;
 export 'app_update_data.dart';
 export 'bloom_filter_data.dart';
 export 'bloom_filter_events.dart';
@@ -364,7 +367,7 @@ class Protocol extends _i1.SerializationManagerServer {
             _i2.IndexElementDefinition(
               type: _i2.IndexElementDefinitionType.column,
               definition: 'id',
-            )
+            ),
           ],
           type: 'btree',
           isUnique: true,
@@ -425,7 +428,7 @@ class Protocol extends _i1.SerializationManagerServer {
             _i2.IndexElementDefinition(
               type: _i2.IndexElementDefinitionType.column,
               definition: 'id',
-            )
+            ),
           ],
           type: 'btree',
           isUnique: true,
@@ -493,7 +496,7 @@ class Protocol extends _i1.SerializationManagerServer {
             _i2.IndexElementDefinition(
               type: _i2.IndexElementDefinitionType.column,
               definition: 'id',
-            )
+            ),
           ],
           type: 'btree',
           isUnique: true,
@@ -892,34 +895,38 @@ class Protocol extends _i1.SerializationManagerServer {
     }
     if (t == Map<String, String>) {
       return (data as Map).map(
-        (k, v) => MapEntry(deserialize<String>(k), deserialize<String>(v)),
-      ) as T;
+            (k, v) => MapEntry(deserialize<String>(k), deserialize<String>(v)),
+          )
+          as T;
     }
     if (t == Map<String, List<String>>) {
       return (data as Map).map(
-        (k, v) =>
-            MapEntry(deserialize<String>(k), deserialize<List<String>>(v)),
-      ) as T;
+            (k, v) =>
+                MapEntry(deserialize<String>(k), deserialize<List<String>>(v)),
+          )
+          as T;
     }
     if (t == List<_i12.NostrBandHashtagInfo>) {
       return (data as List)
-          .map((e) => deserialize<_i12.NostrBandHashtagInfo>(e))
-          .toList() as T;
+              .map((e) => deserialize<_i12.NostrBandHashtagInfo>(e))
+              .toList()
+          as T;
     }
     if (t == List<_i14.NostrBandProfiles>) {
       return (data as List)
-          .map((e) => deserialize<_i14.NostrBandProfiles>(e))
-          .toList() as T;
-    }
-    if (t == _i18.Nip01EventModel) {
-      return _i18.Nip01EventModel.fromJson(data) as T;
-    }
-    if (t == List<_i19.Nip01Event>) {
-      return (data as List).map((e) => deserialize<_i19.Nip01Event>(e)).toList()
+              .map((e) => deserialize<_i14.NostrBandProfiles>(e))
+              .toList()
           as T;
     }
-    if (t == _i1.getType<_i18.Nip01EventModel?>()) {
-      return (data != null ? _i18.Nip01EventModel.fromJson(data) : null) as T;
+    if (t == _i21.Nip01EventModel) {
+      return _i21.Nip01EventModel.fromJson(data) as T;
+    }
+    if (t == List<_i22.Nip01Event>) {
+      return (data as List).map((e) => deserialize<_i22.Nip01Event>(e)).toList()
+          as T;
+    }
+    if (t == _i1.getType<_i21.Nip01EventModel?>()) {
+      return (data != null ? _i21.Nip01EventModel.fromJson(data) : null) as T;
     }
     try {
       return _i2.Protocol().deserialize<T>(data, t);
@@ -929,7 +936,7 @@ class Protocol extends _i1.SerializationManagerServer {
 
   static String? getClassNameForType(Type type) {
     return switch (type) {
-      _i18.Nip01EventModel => 'Nip01EventModel',
+      _i21.Nip01EventModel => 'Nip01EventModel',
       _i3.AppUpdateData => 'AppUpdateData',
       _i4.BloomFilterData => 'BloomFilterData',
       _i5.BloomFilterEvent => 'BloomFilterEvent',
@@ -942,9 +949,12 @@ class Protocol extends _i1.SerializationManagerServer {
       _i12.NostrBandHashtagInfo => 'NostrBandHashtagInfo',
       _i13.NostrBandPeople => 'NostrBandPeople',
       _i14.NostrBandProfiles => 'NostrBandProfiles',
-      _i15.ReportsIncoming => 'ReportsIncoming',
-      _i16.ShortLinkInviteData => 'ShortLinkInviteData',
-      _i17.PushSubscription => 'PushSubscription',
+      _i15.OtsoGeoSubscription => 'OtsoGeoSubscription',
+      _i16.OtsoPushSubscription => 'OtsoPushSubscription',
+      _i17.OtsoExternalSync => 'OtsoExternalSync',
+      _i18.ReportsIncoming => 'ReportsIncoming',
+      _i19.ShortLinkInviteData => 'ShortLinkInviteData',
+      _i20.PushSubscription => 'PushSubscription',
       _ => null,
     };
   }
@@ -959,7 +969,7 @@ class Protocol extends _i1.SerializationManagerServer {
     }
 
     switch (data) {
-      case _i18.Nip01EventModel():
+      case _i21.Nip01EventModel():
         return 'Nip01EventModel';
       case _i3.AppUpdateData():
         return 'AppUpdateData';
@@ -985,11 +995,17 @@ class Protocol extends _i1.SerializationManagerServer {
         return 'NostrBandPeople';
       case _i14.NostrBandProfiles():
         return 'NostrBandProfiles';
-      case _i15.ReportsIncoming():
+      case _i15.OtsoGeoSubscription():
+        return 'OtsoGeoSubscription';
+      case _i16.OtsoPushSubscription():
+        return 'OtsoPushSubscription';
+      case _i17.OtsoExternalSync():
+        return 'OtsoExternalSync';
+      case _i18.ReportsIncoming():
         return 'ReportsIncoming';
-      case _i16.ShortLinkInviteData():
+      case _i19.ShortLinkInviteData():
         return 'ShortLinkInviteData';
-      case _i17.PushSubscription():
+      case _i20.PushSubscription():
         return 'PushSubscription';
     }
     className = _i2.Protocol().getClassNameForObject(data);
@@ -1006,7 +1022,7 @@ class Protocol extends _i1.SerializationManagerServer {
       return super.deserializeByClassName(data);
     }
     if (dataClassName == 'Nip01EventModel') {
-      return deserialize<_i18.Nip01EventModel>(data['data']);
+      return deserialize<_i21.Nip01EventModel>(data['data']);
     }
     if (dataClassName == 'AppUpdateData') {
       return deserialize<_i3.AppUpdateData>(data['data']);

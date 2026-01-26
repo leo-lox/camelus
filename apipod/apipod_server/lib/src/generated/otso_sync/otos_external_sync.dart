@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
@@ -32,8 +33,9 @@ abstract class OtsoExternalSync
       id: jsonSerialization['id'] as int?,
       itemId: jsonSerialization['itemId'] as int,
       source: jsonSerialization['source'] as String,
-      syncedAt:
-          _i1.DateTimeJsonExtension.fromJson(jsonSerialization['syncedAt']),
+      syncedAt: _i1.DateTimeJsonExtension.fromJson(
+        jsonSerialization['syncedAt'],
+      ),
     );
   }
 
@@ -65,6 +67,7 @@ abstract class OtsoExternalSync
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'OtsoExternalSync',
       if (id != null) 'id': id,
       'itemId': itemId,
       'source': source,
@@ -75,6 +78,7 @@ abstract class OtsoExternalSync
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
+      '__className__': 'OtsoExternalSync',
       if (id != null) 'id': id,
       'itemId': itemId,
       'source': source,
@@ -121,11 +125,11 @@ class _OtsoExternalSyncImpl extends OtsoExternalSync {
     required String source,
     required DateTime syncedAt,
   }) : super._(
-          id: id,
-          itemId: itemId,
-          source: source,
-          syncedAt: syncedAt,
-        );
+         id: id,
+         itemId: itemId,
+         source: source,
+         syncedAt: syncedAt,
+       );
 
   /// Returns a shallow copy of this [OtsoExternalSync]
   /// with some or all fields replaced by the given arguments.
@@ -146,9 +150,31 @@ class _OtsoExternalSyncImpl extends OtsoExternalSync {
   }
 }
 
+class OtsoExternalSyncUpdateTable
+    extends _i1.UpdateTable<OtsoExternalSyncTable> {
+  OtsoExternalSyncUpdateTable(super.table);
+
+  _i1.ColumnValue<int, int> itemId(int value) => _i1.ColumnValue(
+    table.itemId,
+    value,
+  );
+
+  _i1.ColumnValue<String, String> source(String value) => _i1.ColumnValue(
+    table.source,
+    value,
+  );
+
+  _i1.ColumnValue<DateTime, DateTime> syncedAt(DateTime value) =>
+      _i1.ColumnValue(
+        table.syncedAt,
+        value,
+      );
+}
+
 class OtsoExternalSyncTable extends _i1.Table<int?> {
   OtsoExternalSyncTable({super.tableRelation})
-      : super(tableName: 'otso_external_sync') {
+    : super(tableName: 'otso_external_sync') {
+    updateTable = OtsoExternalSyncUpdateTable(this);
     itemId = _i1.ColumnInt(
       'itemId',
       this,
@@ -163,6 +189,8 @@ class OtsoExternalSyncTable extends _i1.Table<int?> {
     );
   }
 
+  late final OtsoExternalSyncUpdateTable updateTable;
+
   late final _i1.ColumnInt itemId;
 
   late final _i1.ColumnString source;
@@ -171,11 +199,11 @@ class OtsoExternalSyncTable extends _i1.Table<int?> {
 
   @override
   List<_i1.Column> get columns => [
-        id,
-        itemId,
-        source,
-        syncedAt,
-      ];
+    id,
+    itemId,
+    source,
+    syncedAt,
+  ];
 }
 
 class OtsoExternalSyncInclude extends _i1.IncludeObject {
@@ -363,6 +391,48 @@ class OtsoExternalSyncRepository {
     return session.db.updateRow<OtsoExternalSync>(
       row,
       columns: columns?.call(OtsoExternalSync.t),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates a single [OtsoExternalSync] by its [id] with the specified [columnValues].
+  /// Returns the updated row or null if no row with the given id exists.
+  Future<OtsoExternalSync?> updateById(
+    _i1.Session session,
+    int id, {
+    required _i1.ColumnValueListBuilder<OtsoExternalSyncUpdateTable>
+    columnValues,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateById<OtsoExternalSync>(
+      id,
+      columnValues: columnValues(OtsoExternalSync.t.updateTable),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates all [OtsoExternalSync]s matching the [where] expression with the specified [columnValues].
+  /// Returns the list of updated rows.
+  Future<List<OtsoExternalSync>> updateWhere(
+    _i1.Session session, {
+    required _i1.ColumnValueListBuilder<OtsoExternalSyncUpdateTable>
+    columnValues,
+    required _i1.WhereExpressionBuilder<OtsoExternalSyncTable> where,
+    int? limit,
+    int? offset,
+    _i1.OrderByBuilder<OtsoExternalSyncTable>? orderBy,
+    _i1.OrderByListBuilder<OtsoExternalSyncTable>? orderByList,
+    bool orderDescending = false,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateWhere<OtsoExternalSync>(
+      columnValues: columnValues(OtsoExternalSync.t.updateTable),
+      where: where(OtsoExternalSync.t),
+      limit: limit,
+      offset: offset,
+      orderBy: orderBy?.call(OtsoExternalSync.t),
+      orderByList: orderByList?.call(OtsoExternalSync.t),
+      orderDescending: orderDescending,
       transaction: transaction,
     );
   }

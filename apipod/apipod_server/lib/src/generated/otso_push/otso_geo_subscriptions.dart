@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
@@ -58,6 +59,7 @@ abstract class OtsoGeoSubscription
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'OtsoGeoSubscription',
       if (id != null) 'id': id,
       'pubkey': pubkey,
       'geohash': geohash,
@@ -67,6 +69,7 @@ abstract class OtsoGeoSubscription
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
+      '__className__': 'OtsoGeoSubscription',
       if (id != null) 'id': id,
       'pubkey': pubkey,
       'geohash': geohash,
@@ -111,10 +114,10 @@ class _OtsoGeoSubscriptionImpl extends OtsoGeoSubscription {
     required String pubkey,
     required String geohash,
   }) : super._(
-          id: id,
-          pubkey: pubkey,
-          geohash: geohash,
-        );
+         id: id,
+         pubkey: pubkey,
+         geohash: geohash,
+       );
 
   /// Returns a shallow copy of this [OtsoGeoSubscription]
   /// with some or all fields replaced by the given arguments.
@@ -133,9 +136,25 @@ class _OtsoGeoSubscriptionImpl extends OtsoGeoSubscription {
   }
 }
 
+class OtsoGeoSubscriptionUpdateTable
+    extends _i1.UpdateTable<OtsoGeoSubscriptionTable> {
+  OtsoGeoSubscriptionUpdateTable(super.table);
+
+  _i1.ColumnValue<String, String> pubkey(String value) => _i1.ColumnValue(
+    table.pubkey,
+    value,
+  );
+
+  _i1.ColumnValue<String, String> geohash(String value) => _i1.ColumnValue(
+    table.geohash,
+    value,
+  );
+}
+
 class OtsoGeoSubscriptionTable extends _i1.Table<int?> {
   OtsoGeoSubscriptionTable({super.tableRelation})
-      : super(tableName: 'otso_geo_subscriptions') {
+    : super(tableName: 'otso_geo_subscriptions') {
+    updateTable = OtsoGeoSubscriptionUpdateTable(this);
     pubkey = _i1.ColumnString(
       'pubkey',
       this,
@@ -146,16 +165,18 @@ class OtsoGeoSubscriptionTable extends _i1.Table<int?> {
     );
   }
 
+  late final OtsoGeoSubscriptionUpdateTable updateTable;
+
   late final _i1.ColumnString pubkey;
 
   late final _i1.ColumnString geohash;
 
   @override
   List<_i1.Column> get columns => [
-        id,
-        pubkey,
-        geohash,
-      ];
+    id,
+    pubkey,
+    geohash,
+  ];
 }
 
 class OtsoGeoSubscriptionInclude extends _i1.IncludeObject {
@@ -343,6 +364,48 @@ class OtsoGeoSubscriptionRepository {
     return session.db.updateRow<OtsoGeoSubscription>(
       row,
       columns: columns?.call(OtsoGeoSubscription.t),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates a single [OtsoGeoSubscription] by its [id] with the specified [columnValues].
+  /// Returns the updated row or null if no row with the given id exists.
+  Future<OtsoGeoSubscription?> updateById(
+    _i1.Session session,
+    int id, {
+    required _i1.ColumnValueListBuilder<OtsoGeoSubscriptionUpdateTable>
+    columnValues,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateById<OtsoGeoSubscription>(
+      id,
+      columnValues: columnValues(OtsoGeoSubscription.t.updateTable),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates all [OtsoGeoSubscription]s matching the [where] expression with the specified [columnValues].
+  /// Returns the list of updated rows.
+  Future<List<OtsoGeoSubscription>> updateWhere(
+    _i1.Session session, {
+    required _i1.ColumnValueListBuilder<OtsoGeoSubscriptionUpdateTable>
+    columnValues,
+    required _i1.WhereExpressionBuilder<OtsoGeoSubscriptionTable> where,
+    int? limit,
+    int? offset,
+    _i1.OrderByBuilder<OtsoGeoSubscriptionTable>? orderBy,
+    _i1.OrderByListBuilder<OtsoGeoSubscriptionTable>? orderByList,
+    bool orderDescending = false,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateWhere<OtsoGeoSubscription>(
+      columnValues: columnValues(OtsoGeoSubscription.t.updateTable),
+      where: where(OtsoGeoSubscription.t),
+      limit: limit,
+      offset: offset,
+      orderBy: orderBy?.call(OtsoGeoSubscription.t),
+      orderByList: orderByList?.call(OtsoGeoSubscription.t),
+      orderDescending: orderDescending,
       transaction: transaction,
     );
   }
