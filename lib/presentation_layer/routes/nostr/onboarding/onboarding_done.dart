@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:camelus/l10n/app_localizations.dart';
 import 'package:camelus/presentation_layer/components/full_screen_loading.dart';
 import 'package:camelus/presentation_layer/components/responsive_center.dart';
+import 'package:camelus/presentation_layer/providers/dm_conversations_provider.dart';
 import 'package:camelus/presentation_layer/providers/ndk_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -174,7 +175,7 @@ ${_privateKey.mnemonicSentence}
     super.dispose();
   }
 
-  _onSubmit() async {
+  Future<void> _onSubmit() async {
     if (!_termsAndConditions) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -209,6 +210,9 @@ ${_privateKey.mnemonicSentence}
       signerNoti: ref.read(signerProvider.notifier),
       ndk: ref.read(ndkProvider),
     );
+
+    // Start DM subscription
+    ref.read(dmConversationsProvider);
 
     await _broadcastAcc();
 

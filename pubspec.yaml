@@ -82,6 +82,7 @@ dependencies:
   ndk_rust_verifier: ^0.5.0
   ndk_amber: ^0.4.0
   ndk_objectbox: ^0.2.7
+  
   image: ^4.3.0
   flutter_list_view: ^1.1.29
   xxh3: ^1.2.0

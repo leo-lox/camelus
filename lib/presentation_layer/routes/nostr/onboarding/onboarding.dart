@@ -76,7 +76,7 @@ class _NostrOnboardingState extends ConsumerState<NostrOnboarding>
     });
   }
 
-  _navigateToLogin() {
+  void _navigateToLogin() {
     _horizontalPageController.animateToPage(
       0,
       duration: const Duration(milliseconds: 500),
@@ -98,7 +98,7 @@ class _NostrOnboardingState extends ConsumerState<NostrOnboarding>
     _setupTabLiseners();
   }
 
-  _nextTab() {
+  void _nextTab() {
     _tabController.animateTo(
       _tabController.index + 1,
       curve: Curves.easeInOut,

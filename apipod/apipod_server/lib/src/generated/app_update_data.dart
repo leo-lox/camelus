@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
@@ -56,6 +57,7 @@ abstract class AppUpdateData
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'AppUpdateData',
       'version': version,
       'title': title,
       'body': body,
@@ -66,6 +68,7 @@ abstract class AppUpdateData
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
+      '__className__': 'AppUpdateData',
       'version': version,
       'title': title,
       'body': body,
@@ -86,11 +89,11 @@ class _AppUpdateDataImpl extends AppUpdateData {
     required String body,
     required String url,
   }) : super._(
-          version: version,
-          title: title,
-          body: body,
-          url: url,
-        );
+         version: version,
+         title: title,
+         body: body,
+         url: url,
+       );
 
   /// Returns a shallow copy of this [AppUpdateData]
   /// with some or all fields replaced by the given arguments.

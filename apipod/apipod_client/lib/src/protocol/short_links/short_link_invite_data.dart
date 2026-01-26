@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
@@ -38,12 +39,13 @@ abstract class ShortLinkInviteData implements _i1.SerializableModel {
     return ShortLinkInviteData(
       id: jsonSerialization['id'] as int?,
       shortLink: jsonSerialization['shortLink'] as String,
-      createdAt:
-          _i1.DateTimeJsonExtension.fromJson(jsonSerialization['createdAt']),
+      createdAt: _i1.DateTimeJsonExtension.fromJson(
+        jsonSerialization['createdAt'],
+      ),
       invitedByNpub: jsonSerialization['invitedByNpub'] as String,
       listName: jsonSerialization['listName'] as String,
       listNpub: jsonSerialization['listNpub'] as String,
-      usageCount: jsonSerialization['usageCount'] as int,
+      usageCount: jsonSerialization['usageCount'] as int?,
       lastUsed: jsonSerialization['lastUsed'] == null
           ? null
           : _i1.DateTimeJsonExtension.fromJson(jsonSerialization['lastUsed']),
@@ -85,6 +87,7 @@ abstract class ShortLinkInviteData implements _i1.SerializableModel {
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'ShortLinkInviteData',
       if (id != null) 'id': id,
       'shortLink': shortLink,
       'createdAt': createdAt.toJson(),
@@ -115,15 +118,15 @@ class _ShortLinkInviteDataImpl extends ShortLinkInviteData {
     int? usageCount,
     DateTime? lastUsed,
   }) : super._(
-          id: id,
-          shortLink: shortLink,
-          createdAt: createdAt,
-          invitedByNpub: invitedByNpub,
-          listName: listName,
-          listNpub: listNpub,
-          usageCount: usageCount,
-          lastUsed: lastUsed,
-        );
+         id: id,
+         shortLink: shortLink,
+         createdAt: createdAt,
+         invitedByNpub: invitedByNpub,
+         listName: listName,
+         listNpub: listNpub,
+         usageCount: usageCount,
+         lastUsed: lastUsed,
+       );
 
   /// Returns a shallow copy of this [ShortLinkInviteData]
   /// with some or all fields replaced by the given arguments.

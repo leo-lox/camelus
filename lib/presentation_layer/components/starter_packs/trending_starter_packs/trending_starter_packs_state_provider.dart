@@ -37,9 +37,7 @@ class TrendingStarterPackNotifier
 
   void _loadData() async {
     final ndkResp = ndk.requests.query(
-      filters: [
-        Filter(limit: 3, kinds: [NostrList.starterPack]),
-      ],
+      filter: Filter(limit: 3, kinds: [NostrList.starterPack]),
     );
 
     List<NostrStarterPack> myPacks = [];

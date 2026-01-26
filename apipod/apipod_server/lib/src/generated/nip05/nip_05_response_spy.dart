@@ -7,9 +7,11 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
+import 'package:apipod_server/src/generated/protocol.dart' as _i2;
 
 abstract class Nip05Response
     implements _i1.SerializableModel, _i1.ProtocolSerialization {
@@ -27,14 +29,12 @@ abstract class Nip05Response
 
   factory Nip05Response.fromJson(Map<String, dynamic> jsonSerialization) {
     return Nip05Response(
-      names: (jsonSerialization['names'] as Map).map((k, v) => MapEntry(
-            k as String,
-            v as String,
-          )),
-      relays: (jsonSerialization['relays'] as Map).map((k, v) => MapEntry(
-            k as String,
-            (v as List).map((e) => e as String).toList(),
-          )),
+      names: _i2.Protocol().deserialize<Map<String, String>>(
+        jsonSerialization['names'],
+      ),
+      relays: _i2.Protocol().deserialize<Map<String, List<String>>>(
+        jsonSerialization['relays'],
+      ),
       domain: jsonSerialization['domain'] as String,
     );
   }
@@ -56,6 +56,7 @@ abstract class Nip05Response
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'Nip05Response',
       'names': names.toJson(),
       'relays': relays.toJson(valueToJson: (v) => v.toJson()),
       'domain': domain,
@@ -65,6 +66,7 @@ abstract class Nip05Response
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
+      '__className__': 'Nip05Response',
       'names': names.toJson(),
       'relays': relays.toJson(valueToJson: (v) => v.toJson()),
       'domain': domain,
@@ -83,10 +85,10 @@ class _Nip05ResponseImpl extends Nip05Response {
     required Map<String, List<String>> relays,
     required String domain,
   }) : super._(
-          names: names,
-          relays: relays,
-          domain: domain,
-        );
+         names: names,
+         relays: relays,
+         domain: domain,
+       );
 
   /// Returns a shallow copy of this [Nip05Response]
   /// with some or all fields replaced by the given arguments.
@@ -98,24 +100,28 @@ class _Nip05ResponseImpl extends Nip05Response {
     String? domain,
   }) {
     return Nip05Response(
-      names: names ??
-          this.names.map((
-                key0,
-                value0,
-              ) =>
-                  MapEntry(
-                    key0,
-                    value0,
-                  )),
-      relays: relays ??
-          this.relays.map((
-                key0,
-                value0,
-              ) =>
-                  MapEntry(
-                    key0,
-                    value0.map((e1) => e1).toList(),
-                  )),
+      names:
+          names ??
+          this.names.map(
+            (
+              key0,
+              value0,
+            ) => MapEntry(
+              key0,
+              value0,
+            ),
+          ),
+      relays:
+          relays ??
+          this.relays.map(
+            (
+              key0,
+              value0,
+            ) => MapEntry(
+              key0,
+              value0.map((e1) => e1).toList(),
+            ),
+          ),
       domain: domain ?? this.domain,
     );
   }

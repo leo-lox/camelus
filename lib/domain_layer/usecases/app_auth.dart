@@ -9,7 +9,6 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ndk/data_layer/repositories/signers/nip46_event_signer.dart';
 import 'package:ndk/ndk.dart';
-import 'package:ndk/shared/nips/nip19/nip19.dart';
 import 'package:ndk_amber/ndk_amber.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import '../../l10n/app_localizations.dart';

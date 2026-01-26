@@ -11,7 +11,6 @@ import 'package:share_plus/share_plus.dart';
 import '../../../domain_layer/entities/feed_filter.dart';
 import '../../../domain_layer/entities/starter_pack_identifier.dart';
 import '../../../helpers/helpers.dart';
-import '../../../helpers/nprofile_helper.dart';
 import '../../atoms/long_button.dart';
 import '../../atoms/spinner_center.dart';
 import '../../providers/following_contact_state_provider.dart';
@@ -38,7 +37,7 @@ class _OpenStarterPackState extends ConsumerState<OpenStarterPack> {
   bool _isDeleting = false;
   bool _deleteSuccess = false;
 
-  _onShare(WidgetRef ref) async {
+  Future<void> _onShare(WidgetRef ref) async {
     final inboxOutboxP = ref.read(inboxOutboxProvider);
     final nip65data = await inboxOutboxP.getNip65data(
       widget.starterPackIdentifier.pubkey,
@@ -49,10 +48,10 @@ class _OpenStarterPackState extends ConsumerState<OpenStarterPack> {
         .map((e) => e.key)
         .toList();
 
-    final listNpub = NprofileHelper().mapToBech32({
-      "pubkey": widget.starterPackIdentifier.pubkey,
-      "relays": outboxRelays ?? [],
-    });
+    final listNpub = Nip19.encodeNprofile(
+      pubkey: widget.starterPackIdentifier.pubkey,
+      relays: outboxRelays ?? [],
+    );
 
     final ndk = ref.watch(ndkProvider);
 
@@ -86,7 +85,7 @@ class _OpenStarterPackState extends ConsumerState<OpenStarterPack> {
     );
   }
 
-  _onEdit(BuildContext context) {
+  void _onEdit(BuildContext context) {
     context.push(
       '/edit-starter-pack',
       extra: StarterPackIdentifier(
@@ -96,7 +95,7 @@ class _OpenStarterPackState extends ConsumerState<OpenStarterPack> {
     );
   }
 
-  _showDeleteConfirmationDialog(BuildContext context) {
+  void _showDeleteConfirmationDialog(BuildContext context) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -140,7 +139,7 @@ class _OpenStarterPackState extends ConsumerState<OpenStarterPack> {
     );
   }
 
-  _onDelete(WidgetRef ref, BuildContext context) async {
+  Future<void> _onDelete(WidgetRef ref, BuildContext context) async {
     setState(() {
       _isDeleting = true;
     });
@@ -160,7 +159,7 @@ class _OpenStarterPackState extends ConsumerState<OpenStarterPack> {
     );
   }
 
-  _navigateToProfile(BuildContext context, String pubkey) {
+  void _navigateToProfile(BuildContext context, String pubkey) {
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => ProfilePage2(pubkey: pubkey)),

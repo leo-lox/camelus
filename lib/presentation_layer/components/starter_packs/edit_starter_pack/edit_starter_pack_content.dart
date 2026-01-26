@@ -31,7 +31,7 @@ class _EditStarterPackContentState
     extends ConsumerState<EditStarterPackContent> {
   bool _isReorderMode = false;
 
-  _addToSelection(String userPubkey) {
+  void _addToSelection(String userPubkey) {
     final starterPackNotifier = ref.read(
       editStarterPackProvider(widget.starterPackIdentifier).notifier,
     );
@@ -39,7 +39,7 @@ class _EditStarterPackContentState
     starterPackNotifier.addUser(userPubkey);
   }
 
-  _removeFromSelection(String userPubkey) {
+  void _removeFromSelection(String userPubkey) {
     final starterPackNotifier = ref.read(
       editStarterPackProvider(widget.starterPackIdentifier).notifier,
     );
@@ -47,7 +47,7 @@ class _EditStarterPackContentState
     starterPackNotifier.removeUser(userPubkey);
   }
 
-  _reorderUser(int oldIndex, int newIndex) {
+  void _reorderUser(int oldIndex, int newIndex) {
     final starterPackNotifier = ref.read(
       editStarterPackProvider(widget.starterPackIdentifier).notifier,
     );

@@ -7,9 +7,11 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
+import 'package:apipod_client/src/protocol/protocol.dart' as _i2;
 
 abstract class NameCheckResult implements _i1.SerializableModel {
   NameCheckResult._({
@@ -28,9 +30,9 @@ abstract class NameCheckResult implements _i1.SerializableModel {
     return NameCheckResult(
       isAvailable: jsonSerialization['isAvailable'] as bool,
       reason: jsonSerialization['reason'] as String?,
-      suggestions: (jsonSerialization['suggestions'] as List)
-          .map((e) => e as String)
-          .toList(),
+      suggestions: _i2.Protocol().deserialize<List<String>>(
+        jsonSerialization['suggestions'],
+      ),
     );
   }
 
@@ -51,6 +53,7 @@ abstract class NameCheckResult implements _i1.SerializableModel {
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'NameCheckResult',
       'isAvailable': isAvailable,
       if (reason != null) 'reason': reason,
       'suggestions': suggestions.toJson(),
@@ -71,10 +74,10 @@ class _NameCheckResultImpl extends NameCheckResult {
     String? reason,
     required List<String> suggestions,
   }) : super._(
-          isAvailable: isAvailable,
-          reason: reason,
-          suggestions: suggestions,
-        );
+         isAvailable: isAvailable,
+         reason: reason,
+         suggestions: suggestions,
+       );
 
   /// Returns a shallow copy of this [NameCheckResult]
   /// with some or all fields replaced by the given arguments.

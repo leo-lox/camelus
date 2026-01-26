@@ -2,7 +2,7 @@ class: ReportsIncoming
 table: reports_incoming
 fields:
   createdAt: DateTime
-  report: Nip01Event
+  report: Nip01EventModel
   author: String
   type: String # event or profile report
   processed: bool

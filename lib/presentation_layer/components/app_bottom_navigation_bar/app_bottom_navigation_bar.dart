@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../providers/app_bar_provider/app_bottom_bar_provider.dart';
+import '../../providers/dm_conversations_provider.dart';
 
 class AppBottomNavigationBar extends ConsumerWidget {
   const AppBottomNavigationBar({super.key});
@@ -40,13 +41,18 @@ class AppBottomNavigationBar extends ConsumerWidget {
               context.go('/notifications');
               break;
             }
+          case 3:
+            {
+              context.go('/messages');
+              break;
+            }
         }
       },
       destinations: <NavigationDestination>[
         _buildHomeItem(context, navigationState, ref),
         _buildSearchItem(context, navigationState),
         _buildNotificationsItem(context, navigationState),
-        //_buildChatItem(navigationState),
+        _buildMessagesItem(context, navigationState, ref),
       ],
     );
   }
@@ -126,6 +132,39 @@ class AppBottomNavigationBar extends ConsumerWidget {
       ),
       label: AppLocalizations.of(context)!.notifications,
       tooltip: AppLocalizations.of(context)!.notifications,
+    );
+  }
+
+  NavigationDestination _buildMessagesItem(
+    BuildContext context,
+    NavigationState state,
+    WidgetRef ref,
+  ) {
+    final isSelected = state.selectedTab == NavigationTab.chat;
+    final unreadCount = ref.watch(dmUnreadCountProvider);
+
+    return NavigationDestination(
+      icon: Builder(
+        builder: (context) {
+          final child = Icon(
+            PhosphorIcons.chatCircle(),
+            color: isSelected ? Theme.of(context).colorScheme.primary : null,
+            size: 23,
+          );
+
+          final count = unreadCount.value ?? 0;
+          if (count > 0) {
+            return Badge(
+              label: Text(count > 99 ? '99+' : count.toString()),
+              child: child,
+            );
+          }
+
+          return child;
+        },
+      ),
+      label: 'Messages',
+      tooltip: 'Messages',
     );
   }
 }

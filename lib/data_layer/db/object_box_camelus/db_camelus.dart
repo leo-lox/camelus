@@ -20,6 +20,12 @@ class DbAppImpl implements AppDb {
     _initCompleter.complete();
   }
 
+  /// Get the ObjectBox store for specialized operations (e.g., DMs)
+  Future<Store> get store async {
+    await _dbRdy;
+    return _objectBox.store;
+  }
+
   @override
   Future<void> clear() async {
     await _dbRdy;

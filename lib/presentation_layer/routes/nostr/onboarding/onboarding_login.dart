@@ -18,6 +18,7 @@ import '../../../../domain_layer/entities/key_pair.dart';
 
 import '../../../../domain_layer/entities/stored_account.dart';
 import '../../../../domain_layer/usecases/app_auth.dart';
+import '../../../providers/dm_conversations_provider.dart';
 import '../../../providers/ndk_provider.dart';
 import '../../../providers/signer_provider.dart';
 
@@ -118,7 +119,7 @@ class _OnboardingLoginPageState extends ConsumerState<OnboardingLoginPage> {
     }
   }
 
-  _onSubmit() async {
+  Future<void> _onSubmit() async {
     if (!_termsAndConditions) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -157,6 +158,9 @@ class _OnboardingLoginPageState extends ConsumerState<OnboardingLoginPage> {
       signerNoti: ref.read(signerProvider.notifier),
       ndk: ref.read(ndkProvider),
     );
+
+    // Start DM subscription
+    ref.read(dmConversationsProvider);
 
     setState(() {});
 

@@ -11,6 +11,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../../../domain_layer/entities/stored_account.dart';
 import '../../../atoms/long_button.dart';
 import '../../../components/responsive_center.dart';
+import '../../../providers/dm_conversations_provider.dart';
 import '../../../providers/ndk_provider.dart';
 import '../../../providers/signer_provider.dart';
 
@@ -107,20 +108,23 @@ class _OnboardingLoginBunkerPageState
         return;
       }
 
-      // create stored account
+      // loginWithBunkerUrl already called loginWithBunkerConnection internally,
+      // which calls getPublicKeyAsync() to get the actual user pubkey
+      // (not connection.remotePubkey which is the bunker's communication pubkey)
+      final userPubkey = ndk.accounts.getPublicKey()!;
+      final signer = ndk.accounts.getLoggedAccount()!.signer;
+      ref.read(signerProvider.notifier).setSigner(signer);
+
+      // Store account with the correct user pubkey
       final storedAccount = LocalStorageAccount(
         loginType: LoginType.bunkerConnection,
-        pubkey: connection.remotePubkey,
+        pubkey: userPubkey,
         bunkerConnection: connection,
       );
-
       await AppAuth.addStoredAccount(account: storedAccount, setActive: true);
-      final startupData = await AppAuth.getStartupAccountData();
-      await AppAuth.loginWithStoredAccount(
-        startupAccountData: startupData,
-        signerNoti: ref.read(signerProvider.notifier),
-        ndk: ndk,
-      );
+
+      // Start DM subscription
+      ref.read(dmConversationsProvider);
 
       setState(() {
         _bunkerLoading = false;

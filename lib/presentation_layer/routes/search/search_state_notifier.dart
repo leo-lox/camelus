@@ -3,10 +3,8 @@ import 'dart:convert';
 import 'dart:developer';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:http/http.dart' as http;
-import 'package:camelus/helpers/nprofile_helper.dart';
+import 'package:ndk/shared/nips/nip19/nip19.dart';
 import 'package:camelus/data_layer/data_sources/http_request_data_source.dart';
-
-import 'package:riverpod/riverpod.dart';
 
 import '../../../domain_layer/entities/nostr_note.dart';
 import '../../../domain_layer/entities/user_metadata.dart';
@@ -221,9 +219,12 @@ class SearchStateNotifier extends StateNotifier<SearchState> {
 
                 if (npub != null) {
                   try {
-                    final pubkey = NprofileHelper().nprofileOrNpubToMap(
-                      npub,
-                    )['pubkey'];
+                    final String pubkey;
+                    if (npub.startsWith('nprofile')) {
+                      pubkey = Nip19.decodeNprofile(npub).pubkey;
+                    } else {
+                      pubkey = Nip19.decode(npub);
+                    }
                     users.add(
                       UserMetadata(
                         eventId: '',

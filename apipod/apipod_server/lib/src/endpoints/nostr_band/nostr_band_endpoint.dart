@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:ndk/ndk.dart';
+import 'package:ndk/data_layer/models/nip_01_event_model.dart';
 import 'package:serverpod/server.dart';
 import 'package:serverpod/serverpod.dart';
 import 'package:http/http.dart' as http;
@@ -213,7 +214,7 @@ class NostrBandEndpoint extends Endpoint {
             relays: (p['relays'] as List<dynamic>)
                 .map((item) => item as String)
                 .toList(),
-            profile: Nip01Event.fromJson(p['profile']),
+            profile: Nip01EventModel.fromJson(p['profile']),
           ),
         );
       }

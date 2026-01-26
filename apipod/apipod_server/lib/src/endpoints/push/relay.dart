@@ -91,7 +91,7 @@ class Relay {
         switch (data[0]) {
           case 'EVENT':
             if (data.length < 3) return;
-            final event = Nip01Event.fromJson(data[2]);
+            final event = Nip01EventModel.fromJson(data[2]);
             _eventController.add(event);
             break;
           case 'EOSE':

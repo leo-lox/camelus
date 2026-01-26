@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../domain_layer/entities/contact_list.dart';
@@ -13,7 +14,6 @@ import '../../../../domain_layer/entities/feed_filter.dart';
 import '../../../../domain_layer/entities/user_metadata.dart';
 import '../../../../domain_layer/usecases/app_auth.dart';
 import '../../../../helpers/helpers.dart';
-import '../../../../helpers/nprofile_helper.dart';
 import '../../../atoms/back_button_round.dart';
 import '../../../atoms/follow_button.dart';
 import '../../../atoms/long_button.dart';
@@ -275,6 +275,8 @@ class _BuildProfileHeader extends ConsumerWidget {
                             ),
                           ),
                         if (!isOwnProfile)
+                          _DmButton(pubkey: userMetadata.pubkey),
+                        if (!isOwnProfile)
                           _FollowButton(pubkey: userMetadata.pubkey),
                         if (isOwnProfile)
                           longButton(
@@ -291,8 +293,7 @@ class _BuildProfileHeader extends ConsumerWidget {
                 ),
                 SizedBox(height: 10),
                 Text(
-                  userMetadata.name ??
-                      _pubkeyToHrBech32Short(userMetadata.pubkey),
+                  userMetadata.name ?? Helpers().shortHr(userMetadata.pubkey),
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
@@ -443,14 +444,47 @@ class _FollowButtonState extends ConsumerState<_FollowButton> {
   }
 }
 
-_pubkeyToHrBech32Short(pubkey) {
-  final bech = Helpers().encodeBech32(pubkey, "npub");
-  final bechShort = NprofileHelper().bech32toHr(bech, cutLength: 11);
+class _DmButton extends ConsumerWidget {
+  final String pubkey;
 
-  return bechShort;
+  const _DmButton({required this.pubkey});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final ndk = ref.watch(ndkProvider);
+    final canSign = !ndk.accounts.cannotSign;
+
+    return Container(
+      margin: const EdgeInsets.only(right: 8),
+      child: ElevatedButton(
+        onPressed: () {
+          if (!canSign) {
+            AppAuth.showLoginPrompt(context);
+            return;
+          }
+          context.push('/messages/$pubkey');
+        },
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Theme.of(context).colorScheme.surface,
+          padding: const EdgeInsets.all(0),
+          shape: CircleBorder(
+            side: BorderSide(
+              color: Theme.of(context).colorScheme.onSurface,
+              width: 1,
+            ),
+          ),
+        ),
+        child: PhosphorIcon(
+          PhosphorIcons.chatCircle(PhosphorIconsStyle.regular),
+          size: 25,
+          color: Theme.of(context).colorScheme.onSurface,
+        ),
+      ),
+    );
+  }
 }
 
-_openLightningAddress(String lu06) async {
+Future<void> _openLightningAddress(String lu06) async {
   final Uri lightningLaunchUri = Uri(
     scheme: 'lightning',
     path: lu06.toString(),

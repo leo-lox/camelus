@@ -54,7 +54,7 @@ class NostrNoteModel extends NostrNote {
       createdAt: nip01event.createdAt,
       kind: nip01event.kind,
       content: nip01event.content,
-      sig: nip01event.sig,
+      sig: nip01event.sig ?? '',
       tags: myTags,
       sigValid: nip01event.validSig,
       sources: nip01event.sources,
@@ -62,21 +62,15 @@ class NostrNoteModel extends NostrNote {
   }
 
   Nip01Event toNDKEvent() {
-    final mynip01 = Nip01Event(
+    return Nip01Event(
+      id: id.isNotEmpty ? id : null,
       content: content,
       createdAt: createdAt,
       kind: kind,
       pubKey: pubkey,
       tags: tags.map((tag) => tag.toList()).toList(),
+      sig: sig.isNotEmpty ? sig : null,
     );
-
-    if (sig.isNotEmpty) {
-      mynip01.sig = sig;
-    }
-    if (id.isNotEmpty) {
-      mynip01.id = id;
-    }
-    return mynip01;
   }
 
   factory NostrNoteModel.fromEntity(NostrNote nostrNote) {

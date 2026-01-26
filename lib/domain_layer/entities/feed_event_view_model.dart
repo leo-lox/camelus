@@ -12,7 +12,7 @@ class FeedEventViewModel {
     required this.unprocessedCommentsSet,
   });
 
-  copyWith({
+  FeedEventViewModel copyWith({
     ParsedPost? rootNote,
     List<TreeNode<ParsedPost>>? comments,
     Set<ParsedPost>? unprocessedCommentsSet,

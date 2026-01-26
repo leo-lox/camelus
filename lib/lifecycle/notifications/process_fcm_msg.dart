@@ -19,7 +19,7 @@ Future<void> processFcmData({
     data['encryptedEvent'],
   );
 
-  final encryptedWrapEvent = Nip01Event.fromJson(encryptedEventJson);
+  final encryptedWrapEvent = Nip01EventModel.fromJson(encryptedEventJson);
 
   final ndk = isBackground
       ? provider.read(ndkProviderLight)
@@ -49,7 +49,7 @@ Future<void> processFcmData({
         .firstOrNull;
 
     final payload = {
-      "note": jsonEncode(unwrappedEvent.toJson()),
+      "note": jsonEncode(Nip01EventModel.fromEntity(unwrappedEvent).toJson()),
       "likleyDirectReply": likleyDirectReply,
     };
 

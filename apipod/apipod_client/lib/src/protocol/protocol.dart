@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
@@ -22,13 +23,11 @@ import 'nostr_band/nostr_band_hashtags.dart' as _i10;
 import 'nostr_band/nostr_band_hastag_info.dart' as _i11;
 import 'nostr_band/nostr_band_people.dart' as _i12;
 import 'nostr_band/nostr_band_profiles.dart' as _i13;
-import 'otso_push/otso_geo_subscriptions.dart' as _i14;
-import 'otso_push/otso_push_data.dart' as _i15;
-import 'otso_sync/otos_external_sync.dart' as _i16;
-import 'reports_incoming.dart' as _i17;
-import 'short_links/short_link_invite_data.dart' as _i18;
-import 'subscription.dart' as _i19;
-import 'package:ndk/domain_layer/entities/nip_01_event.dart' as _i20;
+import 'reports_incoming.dart' as _i14;
+import 'short_links/short_link_invite_data.dart' as _i15;
+import 'subscription.dart' as _i16;
+import 'package:ndk/data_layer/models/nip_01_event_model.dart' as _i17;
+import 'package:ndk/domain_layer/entities/nip_01_event.dart' as _i18;
 export 'app_update_data.dart';
 export 'bloom_filter_data.dart';
 export 'bloom_filter_events.dart';
@@ -56,12 +55,33 @@ class Protocol extends _i1.SerializationManager {
 
   static final Protocol _instance = Protocol._();
 
+  static String? getClassNameFromObjectJson(dynamic data) {
+    if (data is! Map) return null;
+    final className = data['__className__'] as String?;
+    return className;
+  }
+
   @override
   T deserialize<T>(
     dynamic data, [
     Type? t,
   ]) {
     t ??= T;
+
+    final dataClassName = getClassNameFromObjectJson(data);
+    if (dataClassName != null && dataClassName != getClassNameForType(t)) {
+      try {
+        return deserializeByClassName({
+          'className': dataClassName,
+          'data': data,
+        });
+      } on FormatException catch (_) {
+        // If the className is not recognized (e.g., older client receiving
+        // data with a new subtype), fall back to deserializing without the
+        // className, using the expected type T.
+      }
+    }
+
     if (t == _i2.AppUpdateData) {
       return _i2.AppUpdateData.fromJson(data) as T;
     }
@@ -178,12 +198,15 @@ class Protocol extends _i1.SerializationManager {
       return (data as List).map((e) => deserialize<String>(e)).toList() as T;
     }
     if (t == Map<String, String>) {
-      return (data as Map).map((k, v) =>
-          MapEntry(deserialize<String>(k), deserialize<String>(v))) as T;
+      return (data as Map).map(
+        (k, v) => MapEntry(deserialize<String>(k), deserialize<String>(v)),
+      ) as T;
     }
     if (t == Map<String, List<String>>) {
-      return (data as Map).map((k, v) =>
-          MapEntry(deserialize<String>(k), deserialize<List<String>>(v))) as T;
+      return (data as Map).map(
+        (k, v) =>
+            MapEntry(deserialize<String>(k), deserialize<List<String>>(v)),
+      ) as T;
     }
     if (t == List<_i11.NostrBandHashtagInfo>) {
       return (data as List)
@@ -195,79 +218,83 @@ class Protocol extends _i1.SerializationManager {
           .map((e) => deserialize<_i13.NostrBandProfiles>(e))
           .toList() as T;
     }
-    if (t == _i20.Nip01Event) {
-      return _i20.Nip01Event.fromJson(data) as T;
+    if (t == _i17.Nip01EventModel) {
+      return _i17.Nip01EventModel.fromJson(data) as T;
     }
-    if (t == List<_i20.Nip01Event>) {
-      return (data as List).map((e) => deserialize<_i20.Nip01Event>(e)).toList()
+    if (t == List<_i18.Nip01Event>) {
+      return (data as List).map((e) => deserialize<_i18.Nip01Event>(e)).toList()
           as T;
     }
-    if (t == _i1.getType<_i20.Nip01Event?>()) {
-      return (data != null ? _i20.Nip01Event.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i17.Nip01EventModel?>()) {
+      return (data != null ? _i17.Nip01EventModel.fromJson(data) : null) as T;
     }
     return super.deserialize<T>(data, t);
+  }
+
+  static String? getClassNameForType(Type type) {
+    return switch (type) {
+      _i17.Nip01EventModel => 'Nip01EventModel',
+      _i2.AppUpdateData => 'AppUpdateData',
+      _i3.BloomFilterData => 'BloomFilterData',
+      _i4.BloomFilterEvent => 'BloomFilterEvent',
+      _i5.BloomFilterProfile => 'BloomFilterProfile',
+      _i6.Example => 'Example',
+      _i7.NameCheckResult => 'NameCheckResult',
+      _i8.Nip05Data => 'Nip05Data',
+      _i9.Nip05Response => 'Nip05Response',
+      _i10.NostrBandHashtags => 'NostrBandHashtags',
+      _i11.NostrBandHashtagInfo => 'NostrBandHashtagInfo',
+      _i12.NostrBandPeople => 'NostrBandPeople',
+      _i13.NostrBandProfiles => 'NostrBandProfiles',
+      _i14.ReportsIncoming => 'ReportsIncoming',
+      _i15.ShortLinkInviteData => 'ShortLinkInviteData',
+      _i16.PushSubscription => 'PushSubscription',
+      _ => null,
+    };
   }
 
   @override
   String? getClassNameForObject(Object? data) {
     String? className = super.getClassNameForObject(data);
     if (className != null) return className;
-    if (data is _i20.Nip01Event) {
-      return 'Nip01Event';
+
+    if (data is Map<String, dynamic> && data['__className__'] is String) {
+      return (data['__className__'] as String).replaceFirst('apipod.', '');
     }
-    if (data is _i2.AppUpdateData) {
-      return 'AppUpdateData';
-    }
-    if (data is _i3.BloomFilterData) {
-      return 'BloomFilterData';
-    }
-    if (data is _i4.BloomFilterEvent) {
-      return 'BloomFilterEvent';
-    }
-    if (data is _i5.BloomFilterProfile) {
-      return 'BloomFilterProfile';
-    }
-    if (data is _i6.Example) {
-      return 'Example';
-    }
-    if (data is _i7.NameCheckResult) {
-      return 'NameCheckResult';
-    }
-    if (data is _i8.Nip05Data) {
-      return 'Nip05Data';
-    }
-    if (data is _i9.Nip05Response) {
-      return 'Nip05Response';
-    }
-    if (data is _i10.NostrBandHashtags) {
-      return 'NostrBandHashtags';
-    }
-    if (data is _i11.NostrBandHashtagInfo) {
-      return 'NostrBandHashtagInfo';
-    }
-    if (data is _i12.NostrBandPeople) {
-      return 'NostrBandPeople';
-    }
-    if (data is _i13.NostrBandProfiles) {
-      return 'NostrBandProfiles';
-    }
-    if (data is _i14.OtsoGeoSubscription) {
-      return 'OtsoGeoSubscription';
-    }
-    if (data is _i15.OtsoPushSubscription) {
-      return 'OtsoPushSubscription';
-    }
-    if (data is _i16.OtsoExternalSync) {
-      return 'OtsoExternalSync';
-    }
-    if (data is _i17.ReportsIncoming) {
-      return 'ReportsIncoming';
-    }
-    if (data is _i18.ShortLinkInviteData) {
-      return 'ShortLinkInviteData';
-    }
-    if (data is _i19.PushSubscription) {
-      return 'PushSubscription';
+
+    switch (data) {
+      case _i17.Nip01EventModel():
+        return 'Nip01EventModel';
+      case _i2.AppUpdateData():
+        return 'AppUpdateData';
+      case _i3.BloomFilterData():
+        return 'BloomFilterData';
+      case _i4.BloomFilterEvent():
+        return 'BloomFilterEvent';
+      case _i5.BloomFilterProfile():
+        return 'BloomFilterProfile';
+      case _i6.Example():
+        return 'Example';
+      case _i7.NameCheckResult():
+        return 'NameCheckResult';
+      case _i8.Nip05Data():
+        return 'Nip05Data';
+      case _i9.Nip05Response():
+        return 'Nip05Response';
+      case _i10.NostrBandHashtags():
+        return 'NostrBandHashtags';
+      case _i11.NostrBandHashtagInfo():
+        return 'NostrBandHashtagInfo';
+      case _i12.NostrBandPeople():
+        return 'NostrBandPeople';
+      case _i13.NostrBandProfiles():
+        return 'NostrBandProfiles';
+      case _i14.ReportsIncoming():
+        return 'ReportsIncoming';
+      case _i15.ShortLinkInviteData():
+        return 'ShortLinkInviteData';
+      case _i16.PushSubscription():
+        return 'PushSubscription';
     }
     return null;
   }
@@ -278,8 +305,8 @@ class Protocol extends _i1.SerializationManager {
     if (dataClassName is! String) {
       return super.deserializeByClassName(data);
     }
-    if (dataClassName == 'Nip01Event') {
-      return deserialize<_i20.Nip01Event>(data['data']);
+    if (dataClassName == 'Nip01EventModel') {
+      return deserialize<_i17.Nip01EventModel>(data['data']);
     }
     if (dataClassName == 'AppUpdateData') {
       return deserialize<_i2.AppUpdateData>(data['data']);
@@ -336,5 +363,17 @@ class Protocol extends _i1.SerializationManager {
       return deserialize<_i19.PushSubscription>(data['data']);
     }
     return super.deserializeByClassName(data);
+  }
+
+  /// Maps any `Record`s known to this [Protocol] to their JSON representation
+  ///
+  /// Throws in case the record type is not known.
+  ///
+  /// This method will return `null` (only) for `null` inputs.
+  Map<String, dynamic>? mapRecordToJson(Record? record) {
+    if (record == null) {
+      return null;
+    }
+    throw Exception('Unsupported record type ${record.runtimeType}');
   }
 }

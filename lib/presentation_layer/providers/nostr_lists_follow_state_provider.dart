@@ -1,5 +1,4 @@
 import 'package:flutter_riverpod/legacy.dart';
-import 'package:riverpod/riverpod.dart';
 import 'dart:async';
 
 import '../../domain_layer/entities/nostr_list.dart';

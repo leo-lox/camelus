@@ -33,7 +33,10 @@ class UserImage extends StatelessWidget {
             color: Theme.of(context).colorScheme.primary,
             shape: BoxShape.circle,
           ),
-          child: SvgPicture.network("${Dicebear.baseUrl}$pubkey"),
+          child: SvgPicture.network(
+            "${Dicebear.baseUrl}$pubkey",
+            fit: BoxFit.cover,
+          ),
         ),
       );
     }
@@ -104,7 +107,10 @@ class UserImage extends StatelessWidget {
                       color: Theme.of(context).colorScheme.primary,
                       shape: BoxShape.circle,
                     ),
-                    child: SvgPicture.network("${Dicebear.baseUrl}$pubkey"),
+                    child: SvgPicture.network(
+                      "${Dicebear.baseUrl}$pubkey",
+                      fit: BoxFit.cover,
+                    ),
                   ),
                   // Transparency overlay that slides up as progress increases
                   Positioned.fill(
@@ -129,7 +135,10 @@ class UserImage extends StatelessWidget {
                 ],
               );
             },
-            errorWidget: (context, url, error) => const Icon(Icons.error),
+            errorWidget: (context, url, error) => SvgPicture.network(
+              "${Dicebear.baseUrl}$pubkey",
+              fit: BoxFit.cover,
+            ),
             cacheKey: pictureUrl,
             memCacheWidth: cacheHeight ?? 150,
             maxHeightDiskCache: cacheHeight ?? 150,
