@@ -7,10 +7,12 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
 import '../nostr_band/nostr_band_profiles.dart' as _i2;
+import 'package:apipod_client/src/protocol/protocol.dart' as _i3;
 
 abstract class NostrBandPeople implements _i1.SerializableModel {
   NostrBandPeople._({required this.profiles});
@@ -20,10 +22,10 @@ abstract class NostrBandPeople implements _i1.SerializableModel {
 
   factory NostrBandPeople.fromJson(Map<String, dynamic> jsonSerialization) {
     return NostrBandPeople(
-        profiles: (jsonSerialization['profiles'] as List)
-            .map((e) =>
-                _i2.NostrBandProfiles.fromJson((e as Map<String, dynamic>)))
-            .toList());
+      profiles: _i3.Protocol().deserialize<List<_i2.NostrBandProfiles>>(
+        jsonSerialization['profiles'],
+      ),
+    );
   }
 
   List<_i2.NostrBandProfiles> profiles;
@@ -34,7 +36,10 @@ abstract class NostrBandPeople implements _i1.SerializableModel {
   NostrBandPeople copyWith({List<_i2.NostrBandProfiles>? profiles});
   @override
   Map<String, dynamic> toJson() {
-    return {'profiles': profiles.toJson(valueToJson: (v) => v.toJson())};
+    return {
+      '__className__': 'NostrBandPeople',
+      'profiles': profiles.toJson(valueToJson: (v) => v.toJson()),
+    };
   }
 
   @override
@@ -45,7 +50,7 @@ abstract class NostrBandPeople implements _i1.SerializableModel {
 
 class _NostrBandPeopleImpl extends NostrBandPeople {
   _NostrBandPeopleImpl({required List<_i2.NostrBandProfiles> profiles})
-      : super._(profiles: profiles);
+    : super._(profiles: profiles);
 
   /// Returns a shallow copy of this [NostrBandPeople]
   /// with some or all fields replaced by the given arguments.
@@ -53,7 +58,7 @@ class _NostrBandPeopleImpl extends NostrBandPeople {
   @override
   NostrBandPeople copyWith({List<_i2.NostrBandProfiles>? profiles}) {
     return NostrBandPeople(
-        profiles:
-            profiles ?? this.profiles.map((e0) => e0.copyWith()).toList());
+      profiles: profiles ?? this.profiles.map((e0) => e0.copyWith()).toList(),
+    );
   }
 }

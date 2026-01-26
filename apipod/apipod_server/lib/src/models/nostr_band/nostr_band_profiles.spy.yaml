@@ -3,4 +3,4 @@ fields:
   pubkey: String
   newFollowersCount: int
   relays: List<String>
-  profile: Nip01Event
+  profile: Nip01EventModel

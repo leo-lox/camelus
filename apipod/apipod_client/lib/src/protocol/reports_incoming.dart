@@ -7,11 +7,11 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
-import 'package:ndk/domain_layer/entities/nip_01_event.dart' as _i2;
-import 'package:ndk/data_layer/models/nip_01_event_model.dart' as _i3;
+import 'package:ndk/data_layer/models/nip_01_event_model.dart' as _i2;
 
 abstract class ReportsIncoming implements _i1.SerializableModel {
   ReportsIncoming._({
@@ -26,7 +26,7 @@ abstract class ReportsIncoming implements _i1.SerializableModel {
   factory ReportsIncoming({
     int? id,
     required DateTime createdAt,
-    required _i2.Nip01Event report,
+    required _i2.Nip01EventModel report,
     required String author,
     required String type,
     required bool processed,
@@ -35,9 +35,10 @@ abstract class ReportsIncoming implements _i1.SerializableModel {
   factory ReportsIncoming.fromJson(Map<String, dynamic> jsonSerialization) {
     return ReportsIncoming(
       id: jsonSerialization['id'] as int?,
-      createdAt:
-          _i1.DateTimeJsonExtension.fromJson(jsonSerialization['createdAt']),
-      report: _i3.Nip01EventModel.fromJson(jsonSerialization['report']),
+      createdAt: _i1.DateTimeJsonExtension.fromJson(
+        jsonSerialization['createdAt'],
+      ),
+      report: _i2.Nip01EventModel.fromJson(jsonSerialization['report']),
       author: jsonSerialization['author'] as String,
       type: jsonSerialization['type'] as String,
       processed: jsonSerialization['processed'] as bool,
@@ -51,7 +52,7 @@ abstract class ReportsIncoming implements _i1.SerializableModel {
 
   DateTime createdAt;
 
-  _i2.Nip01Event report;
+  _i2.Nip01EventModel report;
 
   String author;
 
@@ -65,7 +66,7 @@ abstract class ReportsIncoming implements _i1.SerializableModel {
   ReportsIncoming copyWith({
     int? id,
     DateTime? createdAt,
-    _i2.Nip01Event? report,
+    _i2.Nip01EventModel? report,
     String? author,
     String? type,
     bool? processed,
@@ -73,9 +74,10 @@ abstract class ReportsIncoming implements _i1.SerializableModel {
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'ReportsIncoming',
       if (id != null) 'id': id,
       'createdAt': createdAt.toJson(),
-      'report': _i3.Nip01EventModel.fromEntity(report).toJson(),
+      'report': report.toJson(),
       'author': author,
       'type': type,
       'processed': processed,
@@ -94,18 +96,18 @@ class _ReportsIncomingImpl extends ReportsIncoming {
   _ReportsIncomingImpl({
     int? id,
     required DateTime createdAt,
-    required _i2.Nip01Event report,
+    required _i2.Nip01EventModel report,
     required String author,
     required String type,
     required bool processed,
   }) : super._(
-          id: id,
-          createdAt: createdAt,
-          report: report,
-          author: author,
-          type: type,
-          processed: processed,
-        );
+         id: id,
+         createdAt: createdAt,
+         report: report,
+         author: author,
+         type: type,
+         processed: processed,
+       );
 
   /// Returns a shallow copy of this [ReportsIncoming]
   /// with some or all fields replaced by the given arguments.
@@ -114,7 +116,7 @@ class _ReportsIncomingImpl extends ReportsIncoming {
   ReportsIncoming copyWith({
     Object? id = _Undefined,
     DateTime? createdAt,
-    _i2.Nip01Event? report,
+    _i2.Nip01EventModel? report,
     String? author,
     String? type,
     bool? processed,

@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
@@ -39,8 +40,9 @@ abstract class BloomFilterEvent
       size: jsonSerialization['size'] as int,
       numHashFunctions: jsonSerialization['numHashFunctions'] as int,
       bitArray: jsonSerialization['bitArray'] as String,
-      createdAt:
-          _i1.DateTimeJsonExtension.fromJson(jsonSerialization['createdAt']),
+      createdAt: _i1.DateTimeJsonExtension.fromJson(
+        jsonSerialization['createdAt'],
+      ),
       name: jsonSerialization['name'] as String?,
       description: jsonSerialization['description'] as String?,
     );
@@ -83,6 +85,7 @@ abstract class BloomFilterEvent
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'BloomFilterEvent',
       if (id != null) 'id': id,
       'size': size,
       'numHashFunctions': numHashFunctions,
@@ -96,6 +99,7 @@ abstract class BloomFilterEvent
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
+      '__className__': 'BloomFilterEvent',
       if (id != null) 'id': id,
       'size': size,
       'numHashFunctions': numHashFunctions,
@@ -148,14 +152,14 @@ class _BloomFilterEventImpl extends BloomFilterEvent {
     String? name,
     String? description,
   }) : super._(
-          id: id,
-          size: size,
-          numHashFunctions: numHashFunctions,
-          bitArray: bitArray,
-          createdAt: createdAt,
-          name: name,
-          description: description,
-        );
+         id: id,
+         size: size,
+         numHashFunctions: numHashFunctions,
+         bitArray: bitArray,
+         createdAt: createdAt,
+         name: name,
+         description: description,
+       );
 
   /// Returns a shallow copy of this [BloomFilterEvent]
   /// with some or all fields replaced by the given arguments.
@@ -182,9 +186,46 @@ class _BloomFilterEventImpl extends BloomFilterEvent {
   }
 }
 
+class BloomFilterEventUpdateTable
+    extends _i1.UpdateTable<BloomFilterEventTable> {
+  BloomFilterEventUpdateTable(super.table);
+
+  _i1.ColumnValue<int, int> size(int value) => _i1.ColumnValue(
+    table.size,
+    value,
+  );
+
+  _i1.ColumnValue<int, int> numHashFunctions(int value) => _i1.ColumnValue(
+    table.numHashFunctions,
+    value,
+  );
+
+  _i1.ColumnValue<String, String> bitArray(String value) => _i1.ColumnValue(
+    table.bitArray,
+    value,
+  );
+
+  _i1.ColumnValue<DateTime, DateTime> createdAt(DateTime value) =>
+      _i1.ColumnValue(
+        table.createdAt,
+        value,
+      );
+
+  _i1.ColumnValue<String, String> name(String? value) => _i1.ColumnValue(
+    table.name,
+    value,
+  );
+
+  _i1.ColumnValue<String, String> description(String? value) => _i1.ColumnValue(
+    table.description,
+    value,
+  );
+}
+
 class BloomFilterEventTable extends _i1.Table<int?> {
   BloomFilterEventTable({super.tableRelation})
-      : super(tableName: 'bloom_filter_events') {
+    : super(tableName: 'bloom_filter_events') {
+    updateTable = BloomFilterEventUpdateTable(this);
     size = _i1.ColumnInt(
       'size',
       this,
@@ -211,6 +252,8 @@ class BloomFilterEventTable extends _i1.Table<int?> {
     );
   }
 
+  late final BloomFilterEventUpdateTable updateTable;
+
   late final _i1.ColumnInt size;
 
   late final _i1.ColumnInt numHashFunctions;
@@ -225,14 +268,14 @@ class BloomFilterEventTable extends _i1.Table<int?> {
 
   @override
   List<_i1.Column> get columns => [
-        id,
-        size,
-        numHashFunctions,
-        bitArray,
-        createdAt,
-        name,
-        description,
-      ];
+    id,
+    size,
+    numHashFunctions,
+    bitArray,
+    createdAt,
+    name,
+    description,
+  ];
 }
 
 class BloomFilterEventInclude extends _i1.IncludeObject {
@@ -420,6 +463,48 @@ class BloomFilterEventRepository {
     return session.db.updateRow<BloomFilterEvent>(
       row,
       columns: columns?.call(BloomFilterEvent.t),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates a single [BloomFilterEvent] by its [id] with the specified [columnValues].
+  /// Returns the updated row or null if no row with the given id exists.
+  Future<BloomFilterEvent?> updateById(
+    _i1.Session session,
+    int id, {
+    required _i1.ColumnValueListBuilder<BloomFilterEventUpdateTable>
+    columnValues,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateById<BloomFilterEvent>(
+      id,
+      columnValues: columnValues(BloomFilterEvent.t.updateTable),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates all [BloomFilterEvent]s matching the [where] expression with the specified [columnValues].
+  /// Returns the list of updated rows.
+  Future<List<BloomFilterEvent>> updateWhere(
+    _i1.Session session, {
+    required _i1.ColumnValueListBuilder<BloomFilterEventUpdateTable>
+    columnValues,
+    required _i1.WhereExpressionBuilder<BloomFilterEventTable> where,
+    int? limit,
+    int? offset,
+    _i1.OrderByBuilder<BloomFilterEventTable>? orderBy,
+    _i1.OrderByListBuilder<BloomFilterEventTable>? orderByList,
+    bool orderDescending = false,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateWhere<BloomFilterEvent>(
+      columnValues: columnValues(BloomFilterEvent.t.updateTable),
+      where: where(BloomFilterEvent.t),
+      limit: limit,
+      offset: offset,
+      orderBy: orderBy?.call(BloomFilterEvent.t),
+      orderByList: orderByList?.call(BloomFilterEvent.t),
+      orderDescending: orderDescending,
       transaction: transaction,
     );
   }

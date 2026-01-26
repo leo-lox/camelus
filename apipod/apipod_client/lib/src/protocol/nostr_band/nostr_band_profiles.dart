@@ -7,11 +7,12 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
-import 'package:ndk/domain_layer/entities/nip_01_event.dart' as _i2;
-import 'package:ndk/data_layer/models/nip_01_event_model.dart' as _i3;
+import 'package:ndk/data_layer/models/nip_01_event_model.dart' as _i2;
+import 'package:apipod_client/src/protocol/protocol.dart' as _i3;
 
 abstract class NostrBandProfiles implements _i1.SerializableModel {
   NostrBandProfiles._({
@@ -25,17 +26,17 @@ abstract class NostrBandProfiles implements _i1.SerializableModel {
     required String pubkey,
     required int newFollowersCount,
     required List<String> relays,
-    required _i2.Nip01Event profile,
+    required _i2.Nip01EventModel profile,
   }) = _NostrBandProfilesImpl;
 
   factory NostrBandProfiles.fromJson(Map<String, dynamic> jsonSerialization) {
     return NostrBandProfiles(
       pubkey: jsonSerialization['pubkey'] as String,
       newFollowersCount: jsonSerialization['newFollowersCount'] as int,
-      relays: (jsonSerialization['relays'] as List)
-          .map((e) => e as String)
-          .toList(),
-      profile: _i3.Nip01EventModel.fromJson(jsonSerialization['profile']),
+      relays: _i3.Protocol().deserialize<List<String>>(
+        jsonSerialization['relays'],
+      ),
+      profile: _i2.Nip01EventModel.fromJson(jsonSerialization['profile']),
     );
   }
 
@@ -45,7 +46,7 @@ abstract class NostrBandProfiles implements _i1.SerializableModel {
 
   List<String> relays;
 
-  _i2.Nip01Event profile;
+  _i2.Nip01EventModel profile;
 
   /// Returns a shallow copy of this [NostrBandProfiles]
   /// with some or all fields replaced by the given arguments.
@@ -54,15 +55,16 @@ abstract class NostrBandProfiles implements _i1.SerializableModel {
     String? pubkey,
     int? newFollowersCount,
     List<String>? relays,
-    _i2.Nip01Event? profile,
+    _i2.Nip01EventModel? profile,
   });
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'NostrBandProfiles',
       'pubkey': pubkey,
       'newFollowersCount': newFollowersCount,
       'relays': relays.toJson(),
-      'profile': _i3.Nip01EventModel.fromEntity(profile).toJson(),
+      'profile': profile.toJson(),
     };
   }
 
@@ -77,13 +79,13 @@ class _NostrBandProfilesImpl extends NostrBandProfiles {
     required String pubkey,
     required int newFollowersCount,
     required List<String> relays,
-    required _i2.Nip01Event profile,
+    required _i2.Nip01EventModel profile,
   }) : super._(
-          pubkey: pubkey,
-          newFollowersCount: newFollowersCount,
-          relays: relays,
-          profile: profile,
-        );
+         pubkey: pubkey,
+         newFollowersCount: newFollowersCount,
+         relays: relays,
+         profile: profile,
+       );
 
   /// Returns a shallow copy of this [NostrBandProfiles]
   /// with some or all fields replaced by the given arguments.
@@ -93,7 +95,7 @@ class _NostrBandProfilesImpl extends NostrBandProfiles {
     String? pubkey,
     int? newFollowersCount,
     List<String>? relays,
-    _i2.Nip01Event? profile,
+    _i2.Nip01EventModel? profile,
   }) {
     return NostrBandProfiles(
       pubkey: pubkey ?? this.pubkey,

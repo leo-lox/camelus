@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
@@ -26,8 +27,8 @@ import 'nostr_band/nostr_band_profiles.dart' as _i14;
 import 'reports_incoming.dart' as _i15;
 import 'short_links/short_link_invite_data.dart' as _i16;
 import 'subscription.dart' as _i17;
-import 'package:ndk/domain_layer/entities/nip_01_event.dart' as _i18;
-import 'package:ndk/data_layer/models/nip_01_event_model.dart' as _i19;
+import 'package:ndk/data_layer/models/nip_01_event_model.dart' as _i18;
+import 'package:ndk/domain_layer/entities/nip_01_event.dart' as _i19;
 export 'app_update_data.dart';
 export 'bloom_filter_data.dart';
 export 'bloom_filter_events.dart';
@@ -111,7 +112,7 @@ class Protocol extends _i1.SerializationManagerServer {
             _i2.IndexElementDefinition(
               type: _i2.IndexElementDefinitionType.column,
               definition: 'id',
-            )
+            ),
           ],
           type: 'btree',
           isUnique: true,
@@ -124,7 +125,7 @@ class Protocol extends _i1.SerializationManagerServer {
             _i2.IndexElementDefinition(
               type: _i2.IndexElementDefinitionType.column,
               definition: 'createdAt',
-            )
+            ),
           ],
           type: 'btree',
           isUnique: false,
@@ -192,7 +193,7 @@ class Protocol extends _i1.SerializationManagerServer {
             _i2.IndexElementDefinition(
               type: _i2.IndexElementDefinitionType.column,
               definition: 'id',
-            )
+            ),
           ],
           type: 'btree',
           isUnique: true,
@@ -205,7 +206,7 @@ class Protocol extends _i1.SerializationManagerServer {
             _i2.IndexElementDefinition(
               type: _i2.IndexElementDefinitionType.column,
               definition: 'createdAt',
-            )
+            ),
           ],
           type: 'btree',
           isUnique: false,
@@ -267,7 +268,7 @@ class Protocol extends _i1.SerializationManagerServer {
             _i2.IndexElementDefinition(
               type: _i2.IndexElementDefinitionType.column,
               definition: 'id',
-            )
+            ),
           ],
           type: 'btree',
           isUnique: true,
@@ -280,7 +281,7 @@ class Protocol extends _i1.SerializationManagerServer {
             _i2.IndexElementDefinition(
               type: _i2.IndexElementDefinitionType.column,
               definition: 'domain',
-            )
+            ),
           ],
           type: 'btree',
           isUnique: false,
@@ -293,7 +294,7 @@ class Protocol extends _i1.SerializationManagerServer {
             _i2.IndexElementDefinition(
               type: _i2.IndexElementDefinitionType.column,
               definition: 'createdAt',
-            )
+            ),
           ],
           type: 'btree',
           isUnique: false,
@@ -360,7 +361,7 @@ class Protocol extends _i1.SerializationManagerServer {
             _i2.IndexElementDefinition(
               type: _i2.IndexElementDefinitionType.column,
               definition: 'id',
-            )
+            ),
           ],
           type: 'btree',
           isUnique: true,
@@ -414,7 +415,7 @@ class Protocol extends _i1.SerializationManagerServer {
           columnType: _i2.ColumnType.json,
           isNullable: false,
           dartType:
-              'package:ndk/domain_layer/entities/nip_01_event.dart:Nip01Event',
+              'package:ndk/data_layer/models/nip_01_event_model.dart:Nip01EventModel',
         ),
         _i2.ColumnDefinition(
           name: 'author',
@@ -444,12 +445,12 @@ class Protocol extends _i1.SerializationManagerServer {
             _i2.IndexElementDefinition(
               type: _i2.IndexElementDefinitionType.column,
               definition: 'id',
-            )
+            ),
           ],
           type: 'btree',
           isUnique: true,
           isPrimary: true,
-        )
+        ),
       ],
       managed: true,
     ),
@@ -519,7 +520,7 @@ class Protocol extends _i1.SerializationManagerServer {
             _i2.IndexElementDefinition(
               type: _i2.IndexElementDefinitionType.column,
               definition: 'id',
-            )
+            ),
           ],
           type: 'btree',
           isUnique: true,
@@ -532,7 +533,7 @@ class Protocol extends _i1.SerializationManagerServer {
             _i2.IndexElementDefinition(
               type: _i2.IndexElementDefinitionType.column,
               definition: 'shortLink',
-            )
+            ),
           ],
           type: 'btree',
           isUnique: true,
@@ -544,12 +545,33 @@ class Protocol extends _i1.SerializationManagerServer {
     ..._i2.Protocol.targetTableDefinitions,
   ];
 
+  static String? getClassNameFromObjectJson(dynamic data) {
+    if (data is! Map) return null;
+    final className = data['__className__'] as String?;
+    return className;
+  }
+
   @override
   T deserialize<T>(
     dynamic data, [
     Type? t,
   ]) {
     t ??= T;
+
+    final dataClassName = getClassNameFromObjectJson(data);
+    if (dataClassName != null && dataClassName != getClassNameForType(t)) {
+      try {
+        return deserializeByClassName({
+          'className': dataClassName,
+          'data': data,
+        });
+      } on FormatException catch (_) {
+        // If the className is not recognized (e.g., older client receiving
+        // data with a new subtype), fall back to deserializing without the
+        // className, using the expected type T.
+      }
+    }
+
     if (t == _i3.AppUpdateData) {
       return _i3.AppUpdateData.fromJson(data) as T;
     }
@@ -646,32 +668,39 @@ class Protocol extends _i1.SerializationManagerServer {
       return (data as List).map((e) => deserialize<String>(e)).toList() as T;
     }
     if (t == Map<String, String>) {
-      return (data as Map).map((k, v) =>
-          MapEntry(deserialize<String>(k), deserialize<String>(v))) as T;
+      return (data as Map).map(
+            (k, v) => MapEntry(deserialize<String>(k), deserialize<String>(v)),
+          )
+          as T;
     }
     if (t == Map<String, List<String>>) {
-      return (data as Map).map((k, v) =>
-          MapEntry(deserialize<String>(k), deserialize<List<String>>(v))) as T;
+      return (data as Map).map(
+            (k, v) =>
+                MapEntry(deserialize<String>(k), deserialize<List<String>>(v)),
+          )
+          as T;
     }
     if (t == List<_i12.NostrBandHashtagInfo>) {
       return (data as List)
-          .map((e) => deserialize<_i12.NostrBandHashtagInfo>(e))
-          .toList() as T;
+              .map((e) => deserialize<_i12.NostrBandHashtagInfo>(e))
+              .toList()
+          as T;
     }
     if (t == List<_i14.NostrBandProfiles>) {
       return (data as List)
-          .map((e) => deserialize<_i14.NostrBandProfiles>(e))
-          .toList() as T;
-    }
-    if (t == _i18.Nip01Event) {
-      return _i19.Nip01EventModel.fromJson(data) as T;
-    }
-    if (t == List<_i18.Nip01Event>) {
-      return (data as List).map((e) => deserialize<_i18.Nip01Event>(e)).toList()
+              .map((e) => deserialize<_i14.NostrBandProfiles>(e))
+              .toList()
           as T;
     }
-    if (t == _i1.getType<_i18.Nip01Event?>()) {
-      return (data != null ? _i19.Nip01EventModel.fromJson(data) : null) as T;
+    if (t == _i18.Nip01EventModel) {
+      return _i18.Nip01EventModel.fromJson(data) as T;
+    }
+    if (t == List<_i19.Nip01Event>) {
+      return (data as List).map((e) => deserialize<_i19.Nip01Event>(e)).toList()
+          as T;
+    }
+    if (t == _i1.getType<_i18.Nip01EventModel?>()) {
+      return (data != null ? _i18.Nip01EventModel.fromJson(data) : null) as T;
     }
     try {
       return _i2.Protocol().deserialize<T>(data, t);
@@ -679,57 +708,70 @@ class Protocol extends _i1.SerializationManagerServer {
     return super.deserialize<T>(data, t);
   }
 
+  static String? getClassNameForType(Type type) {
+    return switch (type) {
+      _i18.Nip01EventModel => 'Nip01EventModel',
+      _i3.AppUpdateData => 'AppUpdateData',
+      _i4.BloomFilterData => 'BloomFilterData',
+      _i5.BloomFilterEvent => 'BloomFilterEvent',
+      _i6.BloomFilterProfile => 'BloomFilterProfile',
+      _i7.Example => 'Example',
+      _i8.NameCheckResult => 'NameCheckResult',
+      _i9.Nip05Data => 'Nip05Data',
+      _i10.Nip05Response => 'Nip05Response',
+      _i11.NostrBandHashtags => 'NostrBandHashtags',
+      _i12.NostrBandHashtagInfo => 'NostrBandHashtagInfo',
+      _i13.NostrBandPeople => 'NostrBandPeople',
+      _i14.NostrBandProfiles => 'NostrBandProfiles',
+      _i15.ReportsIncoming => 'ReportsIncoming',
+      _i16.ShortLinkInviteData => 'ShortLinkInviteData',
+      _i17.PushSubscription => 'PushSubscription',
+      _ => null,
+    };
+  }
+
   @override
   String? getClassNameForObject(Object? data) {
     String? className = super.getClassNameForObject(data);
     if (className != null) return className;
-    if (data is _i18.Nip01Event) {
-      return 'Nip01Event';
+
+    if (data is Map<String, dynamic> && data['__className__'] is String) {
+      return (data['__className__'] as String).replaceFirst('apipod.', '');
     }
-    if (data is _i3.AppUpdateData) {
-      return 'AppUpdateData';
-    }
-    if (data is _i4.BloomFilterData) {
-      return 'BloomFilterData';
-    }
-    if (data is _i5.BloomFilterEvent) {
-      return 'BloomFilterEvent';
-    }
-    if (data is _i6.BloomFilterProfile) {
-      return 'BloomFilterProfile';
-    }
-    if (data is _i7.Example) {
-      return 'Example';
-    }
-    if (data is _i8.NameCheckResult) {
-      return 'NameCheckResult';
-    }
-    if (data is _i9.Nip05Data) {
-      return 'Nip05Data';
-    }
-    if (data is _i10.Nip05Response) {
-      return 'Nip05Response';
-    }
-    if (data is _i11.NostrBandHashtags) {
-      return 'NostrBandHashtags';
-    }
-    if (data is _i12.NostrBandHashtagInfo) {
-      return 'NostrBandHashtagInfo';
-    }
-    if (data is _i13.NostrBandPeople) {
-      return 'NostrBandPeople';
-    }
-    if (data is _i14.NostrBandProfiles) {
-      return 'NostrBandProfiles';
-    }
-    if (data is _i15.ReportsIncoming) {
-      return 'ReportsIncoming';
-    }
-    if (data is _i16.ShortLinkInviteData) {
-      return 'ShortLinkInviteData';
-    }
-    if (data is _i17.PushSubscription) {
-      return 'PushSubscription';
+
+    switch (data) {
+      case _i18.Nip01EventModel():
+        return 'Nip01EventModel';
+      case _i3.AppUpdateData():
+        return 'AppUpdateData';
+      case _i4.BloomFilterData():
+        return 'BloomFilterData';
+      case _i5.BloomFilterEvent():
+        return 'BloomFilterEvent';
+      case _i6.BloomFilterProfile():
+        return 'BloomFilterProfile';
+      case _i7.Example():
+        return 'Example';
+      case _i8.NameCheckResult():
+        return 'NameCheckResult';
+      case _i9.Nip05Data():
+        return 'Nip05Data';
+      case _i10.Nip05Response():
+        return 'Nip05Response';
+      case _i11.NostrBandHashtags():
+        return 'NostrBandHashtags';
+      case _i12.NostrBandHashtagInfo():
+        return 'NostrBandHashtagInfo';
+      case _i13.NostrBandPeople():
+        return 'NostrBandPeople';
+      case _i14.NostrBandProfiles():
+        return 'NostrBandProfiles';
+      case _i15.ReportsIncoming():
+        return 'ReportsIncoming';
+      case _i16.ShortLinkInviteData():
+        return 'ShortLinkInviteData';
+      case _i17.PushSubscription():
+        return 'PushSubscription';
     }
     className = _i2.Protocol().getClassNameForObject(data);
     if (className != null) {
@@ -744,8 +786,8 @@ class Protocol extends _i1.SerializationManagerServer {
     if (dataClassName is! String) {
       return super.deserializeByClassName(data);
     }
-    if (dataClassName == 'Nip01Event') {
-      return deserialize<_i18.Nip01Event>(data['data']);
+    if (dataClassName == 'Nip01EventModel') {
+      return deserialize<_i18.Nip01EventModel>(data['data']);
     }
     if (dataClassName == 'AppUpdateData') {
       return deserialize<_i3.AppUpdateData>(data['data']);
@@ -830,4 +872,19 @@ class Protocol extends _i1.SerializationManagerServer {
 
   @override
   String getModuleName() => 'apipod';
+
+  /// Maps any `Record`s known to this [Protocol] to their JSON representation
+  ///
+  /// Throws in case the record type is not known.
+  ///
+  /// This method will return `null` (only) for `null` inputs.
+  Map<String, dynamic>? mapRecordToJson(Record? record) {
+    if (record == null) {
+      return null;
+    }
+    try {
+      return _i2.Protocol().mapRecordToJson(record);
+    } catch (_) {}
+    throw Exception('Unsupported record type ${record.runtimeType}');
+  }
 }

@@ -7,9 +7,11 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
+import 'package:apipod_client/src/protocol/protocol.dart' as _i2;
 
 abstract class Nip05Data implements _i1.SerializableModel {
   Nip05Data._({
@@ -36,11 +38,12 @@ abstract class Nip05Data implements _i1.SerializableModel {
       name: jsonSerialization['name'] as String,
       domain: jsonSerialization['domain'] as String,
       pubkey: jsonSerialization['pubkey'] as String,
-      relays: (jsonSerialization['relays'] as List)
-          .map((e) => e as String)
-          .toList(),
-      createdAt:
-          _i1.DateTimeJsonExtension.fromJson(jsonSerialization['createdAt']),
+      relays: _i2.Protocol().deserialize<List<String>>(
+        jsonSerialization['relays'],
+      ),
+      createdAt: _i1.DateTimeJsonExtension.fromJson(
+        jsonSerialization['createdAt'],
+      ),
     );
   }
 
@@ -73,6 +76,7 @@ abstract class Nip05Data implements _i1.SerializableModel {
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'Nip05Data',
       if (id != null) 'id': id,
       'name': name,
       'domain': domain,
@@ -99,13 +103,13 @@ class _Nip05DataImpl extends Nip05Data {
     required List<String> relays,
     required DateTime createdAt,
   }) : super._(
-          id: id,
-          name: name,
-          domain: domain,
-          pubkey: pubkey,
-          relays: relays,
-          createdAt: createdAt,
-        );
+         id: id,
+         name: name,
+         domain: domain,
+         pubkey: pubkey,
+         relays: relays,
+         createdAt: createdAt,
+       );
 
   /// Returns a shallow copy of this [Nip05Data]
   /// with some or all fields replaced by the given arguments.
