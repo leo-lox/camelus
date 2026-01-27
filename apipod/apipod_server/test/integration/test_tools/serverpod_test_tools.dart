@@ -27,6 +27,7 @@ import 'package:apipod_server/src/generated/nostr_band/nostr_band_hashtags.dart'
     as _i10;
 import 'package:apipod_server/src/generated/nostr_band/nostr_band_people.dart'
     as _i11;
+import 'package:ndk/data_layer/models/nip_01_event_model.dart' as _i12;
 import 'package:apipod_server/src/generated/protocol.dart';
 import 'package:apipod_server/src/generated/endpoints.dart';
 export 'package:serverpod_test/serverpod_test_public_exports.dart';
@@ -638,7 +639,7 @@ class _OtsoPushEndpoint {
 
   _i3.Future<bool> register(
     _i1.TestSessionBuilder sessionBuilder,
-    List<_i7.Nip01Event> events,
+    List<_i12.Nip01EventModel> events,
   ) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =

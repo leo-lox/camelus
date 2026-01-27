@@ -25,7 +25,8 @@ import 'package:apipod_client/src/protocol/nostr_band/nostr_band_hashtags.dart'
     as _i9;
 import 'package:apipod_client/src/protocol/nostr_band/nostr_band_people.dart'
     as _i10;
-import 'protocol.dart' as _i11;
+import 'package:ndk/data_layer/models/nip_01_event_model.dart' as _i11;
+import 'protocol.dart' as _i12;
 
 /// {@category Endpoint}
 class EndpointAppUpdate extends _i1.EndpointRef {
@@ -201,7 +202,7 @@ class EndpointOtsoPush extends _i1.EndpointRef {
   @override
   String get name => 'otsoPush';
 
-  _i2.Future<bool> register(List<_i6.Nip01Event> events) =>
+  _i2.Future<bool> register(List<_i11.Nip01EventModel> events) =>
       caller.callServerEndpoint<bool>(
         'otsoPush',
         'register',
@@ -229,7 +230,7 @@ class Client extends _i1.ServerpodClientShared {
     bool? disconnectStreamsOnLostInternetConnection,
   }) : super(
          host,
-         _i11.Protocol(),
+         _i12.Protocol(),
          securityContext: securityContext,
          streamingConnectionTimeout: streamingConnectionTimeout,
          connectionTimeout: connectionTimeout,

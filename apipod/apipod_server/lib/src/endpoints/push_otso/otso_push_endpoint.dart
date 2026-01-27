@@ -112,7 +112,7 @@ class OtsoPushEndpoint extends Endpoint {
 
   Future<bool> register(
     Session session,
-    List<ndk.Nip01Event> events,
+    List<ndk.Nip01EventModel> events,
   ) async {
     List<Map<String, dynamic>> processed = [];
     bool newRelays = false;

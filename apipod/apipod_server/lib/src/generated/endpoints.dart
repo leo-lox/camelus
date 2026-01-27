@@ -21,6 +21,7 @@ import '../endpoints/otso_external_sync/otso_external_sync_endpoint.dart'
 import '../endpoints/push/nostr_push_endpoint.dart' as _i8;
 import '../endpoints/push_otso/otso_push_endpoint.dart' as _i9;
 import 'package:ndk/domain_layer/entities/nip_01_event.dart' as _i10;
+import 'package:ndk/data_layer/models/nip_01_event_model.dart' as _i11;
 
 class Endpoints extends _i1.EndpointDispatch {
   @override
@@ -341,7 +342,7 @@ class Endpoints extends _i1.EndpointDispatch {
           params: {
             'events': _i1.ParameterDescription(
               name: 'events',
-              type: _i1.getType<List<_i10.Nip01Event>>(),
+              type: _i1.getType<List<_i11.Nip01EventModel>>(),
               nullable: false,
             ),
           },

@@ -232,6 +232,12 @@ class Protocol extends _i1.SerializationManager {
       return (data as List).map((e) => deserialize<_i21.Nip01Event>(e)).toList()
           as T;
     }
+    if (t == List<_i20.Nip01EventModel>) {
+      return (data as List)
+              .map((e) => deserialize<_i20.Nip01EventModel>(e))
+              .toList()
+          as T;
+    }
     if (t == _i1.getType<_i20.Nip01EventModel?>()) {
       return (data != null ? _i20.Nip01EventModel.fromJson(data) : null) as T;
     }
