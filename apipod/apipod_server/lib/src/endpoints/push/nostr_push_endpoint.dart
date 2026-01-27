@@ -244,7 +244,9 @@ class NostrPushEndpoint extends Endpoint {
         sealEvent: event,
       );
 
-      final stringifiedWrappedEventToPush = jsonEncode(wrappedEvent);
+      final wrappedEventModel = ndk.Nip01EventModel.fromEntity(wrappedEvent);
+
+      final stringifiedWrappedEventToPush = wrappedEventModel.toJsonString();
 
       // Send to HTTP URLs
       if (tokensAsUrls.isNotEmpty) {
