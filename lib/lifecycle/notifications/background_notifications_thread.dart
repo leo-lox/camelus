@@ -39,7 +39,7 @@ Future<ProviderContainer> _setupProviderBackgroundThread() async {
   // db could already be open by main thread
   final DbObjectBox dbCacheManager;
 
-  final docsDir = await getApplicationDocumentsDirectory();
+  final docsDir = await getApplicationSupportDirectory();
   final dbPath = p.join(docsDir.path, "ndk-obx-default");
   final isDbOpen = Store.isOpen(dbPath);
 
