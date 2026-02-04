@@ -3,10 +3,9 @@ import 'dart:developer';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:ndk/ndk.dart';
 import 'package:ndk_objectbox/ndk_objectbox.dart';
-import 'package:path/path.dart' as p;
-import 'package:path_provider/path_provider.dart';
 import 'package:riverpod/riverpod.dart';
 
+import '../../config/db_paths.dart';
 import '../../domain_layer/usecases/app_auth.dart';
 import '../../objectbox.g.dart';
 import '../../presentation_layer/providers/db_ndk_provider.dart';
@@ -39,14 +38,13 @@ Future<ProviderContainer> _setupProviderBackgroundThread() async {
   // db could already be open by main thread
   final DbObjectBox dbCacheManager;
 
-  final docsDir = await getApplicationDocumentsDirectory();
-  final dbPath = p.join(docsDir.path, "ndk-obx-default");
+  final dbPath = await DbPaths.getNdkDbPath();
   final isDbOpen = Store.isOpen(dbPath);
 
   if (isDbOpen) {
-    dbCacheManager = DbObjectBox(attach: true);
+    dbCacheManager = DbObjectBox(attach: true, directory: dbPath);
   } else {
-    dbCacheManager = DbObjectBox(attach: false);
+    dbCacheManager = DbObjectBox(attach: false, directory: dbPath);
   }
 
   await dbCacheManager.dbRdy;
