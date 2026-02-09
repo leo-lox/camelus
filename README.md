@@ -32,6 +32,7 @@ Welcome to our social network app! This mobile application connects users across
     <li><strong>Clean Architecture:</strong> Uses Dart and Flutter</li>
     <li><strong>Dart_NDK Integration:</strong> Optimized for mobile battery</li>
     <li><strong>In-Box and Out-Box Messaging:</strong> Optimized for gossip and database performance</li>
+    <li><strong>Voice Communication (NEW):</strong> TeamSpeak/Discord-like voice chat with low latency and Nostr discovery</li>
     <li><strong>Open-Source Development:</strong> Community-driven project</li>
     <li><strong>Riverpod for State Management:</strong> Efficient and testable state management</li>
   </ul>
@@ -83,12 +84,34 @@ flutter pub get
 ```
 
 run ```flutter build apk --release``` or ```flutter run``` to run directly on your device in debug mode
-## 5 Download
+
+## 5 Voice Communication (Beta)
+
+Camelus now includes voice communication features! Host your own voice server or join community servers.
+
+### For Users
+- Access voice servers via the sidebar menu (microphone icon)
+- Browse and search available servers
+- Join rooms and chat with others
+- See [Quick Start Guide](docs/VOICE_QUICKSTART.md)
+
+### For Server Operators
+- Self-host your own voice server
+- Built with Go and WebRTC for low latency
+- Nostr integration for automatic discovery
+- See [Voice Server Documentation](voice-server/README.md)
+
+**Documentation:**
+- [Voice Feature Overview](docs/VOICE_FEATURE.md)
+- [Quick Start Guide](docs/VOICE_QUICKSTART.md)
+- [Server Setup](voice-server/README.md)
+
+## 6 Download
 
 Android
 You can join the test and download it from google play link
 
 or use the apk, it is signed with my key so you will need to enable "install from unknown sources" in your phone settings.
 
-## 6 Conclusion
+## 7 Conclusion
 Camelus is designed to offer secure social networking experience. Users are in control of their data through the Nostr protocol. This application is built with a focus on privacy. Contributions, feedback and ideas from the community are welcome to help shape and improve the app’s future.
