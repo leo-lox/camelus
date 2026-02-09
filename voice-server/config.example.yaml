@@ -1,0 +1,35 @@
+server:
+  name: "My Camelus Voice Server"
+  description: "A self-hosted voice communication server for Camelus"
+  host: "0.0.0.0"
+  port: 7880
+  max_users: 100
+  region: "us-west"
+  country: "US"
+  rtc_min_port: 50000
+  rtc_max_port: 60000
+
+nostr:
+  relay_url: "wss://relay.damus.io"
+  private_key: "nsec1..." # Your Nostr private key for server identity
+  admin_pubkeys:
+    - "npub1..." # Admin user public keys
+
+rooms:
+  - id: "general"
+    name: "General"
+    description: "General voice chat"
+    max_users: 50
+    is_public: true
+  
+  - id: "gaming"
+    name: "Gaming"
+    description: "For gaming discussions"
+    max_users: 25
+    is_public: true
+  
+  - id: "private"
+    name: "Private Room"
+    description: "Private voice channel"
+    max_users: 10
+    is_public: false
