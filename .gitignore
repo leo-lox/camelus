@@ -82,3 +82,8 @@ build-dir/
 
 /lib/l10n/*.dart
 /untranslated-messages.txt
+
+# Voice server
+/voice-server/voice-server
+/voice-server/voice-server.exe
+/voice-server/config.yaml
