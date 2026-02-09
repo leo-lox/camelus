@@ -1682,5 +1682,17 @@
   "noMessageRequests": "No message requests",
   "@noMessageRequests": {
     "description": "Empty state for requests DM tab"
+  },
+  "voice": "Voice",
+  "@voice": {
+    "description": "Voice communication label"
+  },
+  "voiceServers": "Voice Servers",
+  "@voiceServers": {
+    "description": "Voice servers page title"
+  },
+  "voiceRooms": "Voice Rooms",
+  "@voiceRooms": {
+    "description": "Voice rooms list"
   }
 }

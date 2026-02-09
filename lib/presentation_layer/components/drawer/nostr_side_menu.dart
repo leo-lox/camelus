@@ -248,6 +248,14 @@ class NostrSideMenu extends ConsumerWidget {
                         },
                       ),
                       _drawerItem(
+                        label: AppLocalizations.of(context)!.voice,
+                        routeName: '/voice',
+                        icon: PhosphorIcons.microphone(),
+                        onTap: () {
+                          context.push('/voice');
+                        },
+                      ),
+                      _drawerItem(
                         label: AppLocalizations.of(context)!.profile,
                         routeName: '/nostr/profile',
                         icon: PhosphorIcons.user(),

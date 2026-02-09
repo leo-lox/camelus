@@ -105,6 +105,9 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   system_theme: ^3.1.2
+  
+  # Voice communication
+  flutter_webrtc: ^0.12.3
 
   
 

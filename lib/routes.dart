@@ -37,6 +37,9 @@ import 'presentation_layer/routes/nostr/settings/dm_relays/dm_relays_settings.da
 import 'presentation_layer/routes/messages/dm_list_page.dart';
 import 'presentation_layer/routes/messages/dm_thread_page.dart';
 import 'presentation_layer/routes/messages/new_dm_page.dart';
+import 'presentation_layer/routes/voice/voice_servers_page.dart';
+import 'presentation_layer/routes/voice/voice_server_page.dart';
+import 'domain_layer/entities/voice/voice_server.dart';
 
 Null redirects(BuildContext context, GoRouterState state) {
   return null;
@@ -189,6 +192,17 @@ final routes = [
           GoRoute(
             path: '/nostr/blockedUsers',
             builder: (context, state) => const BlockedUsers(),
+          ),
+          GoRoute(
+            path: '/voice',
+            builder: (context, state) => const VoiceServersPage(),
+          ),
+          GoRoute(
+            path: '/voice/server',
+            builder: (context, state) {
+              final server = state.extra as VoiceServer;
+              return VoiceServerPage(server: server);
+            },
           ),
           GoRoute(
             path: '/edit-starter-pack',
