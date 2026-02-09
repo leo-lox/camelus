@@ -123,7 +123,15 @@ class VoiceDiscovery {
   }) async {
     final servers = <String, VoiceServer>{};
     
-    await for (final server in discoverServers(region: region, country: country)) {
+    // Add timeout to prevent hanging and limit results
+    final subscription = discoverServers(region: region, country: country)
+        .timeout(
+          const Duration(seconds: 10),
+          onTimeout: (sink) => sink.close(),
+        )
+        .take(100); // Limit to 100 servers max
+    
+    await for (final server in subscription) {
       servers[server.id] = server;
     }
     

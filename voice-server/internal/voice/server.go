@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"sync"
+	"time"
 
 	"github.com/camelus-hq/camelus/voice-server/internal/config"
 	"github.com/pion/webrtc/v3"
@@ -62,7 +63,10 @@ func (s *Server) Start(ctx context.Context) error {
 
 	go func() {
 		<-ctx.Done()
-		server.Shutdown(context.Background())
+		// Use a timeout context for graceful shutdown
+		shutdownCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+		server.Shutdown(shutdownCtx)
 	}()
 
 	return server.ListenAndServe()
