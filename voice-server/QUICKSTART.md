@@ -2,15 +2,32 @@
 
 The Camelus voice server handles **token generation** and **room management** while using **LiveKit** for WebRTC voice infrastructure.
 
-## Quick Start (Two Terminals)
+## Easiest: Docker Compose (Recommended)
+
+```bash
+cd voice-server
+docker-compose up
+```
+
+That's it! Both servers start automatically with proper networking.
+
+**What it starts:**
+- LiveKit server on port 7881 (WebRTC voice)
+- Voice server on port 7880 (API & token generation)
+
+Stop with: `docker-compose down`
+
+---
+
+## Alternative: Manual Setup (Two Terminals)
 
 ### Terminal 1: Start LiveKit Server
 
 ```bash
 docker run -d \
   --name livekit \
-  -p 7881:7881 \
-  -p 7882:7882/udp \
+  -p 7881:7880 \
+  -p 50000:7882/udp \
   livekit/livekit-server:latest
 ```
 
@@ -19,8 +36,10 @@ docker run -d \
 ```bash
 cd voice-server
 go build -o voice-server ./cmd/server
-./voice-server -config config.example.yaml
+./voice-server -config config.yaml
 ```
+
+Copy the docker command from the voice server output if you need specific API keys.
 
 **Done!** Your complete voice infrastructure is running.
 
