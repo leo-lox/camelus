@@ -1,15 +1,18 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 import '../../../domain_layer/usecases/voice/livekit_voice_service.dart';
 
 /// Provider for LiveKit voice service
-final liveKitVoiceServiceProvider = Provider.autoDispose<LiveKitVoiceService>((ref) {
+final liveKitVoiceServiceProvider = Provider.autoDispose<LiveKitVoiceService>((
+  ref,
+) {
   final service = LiveKitVoiceService();
-  
+
   // Cleanup when disposed
   ref.onDispose(() {
     service.dispose();
   });
-  
+
   return service;
 });
 
@@ -55,9 +58,10 @@ class VoiceConnectionState {
 }
 
 /// Provider for voice connection state
-final voiceConnectionProvider = StateNotifierProvider<VoiceConnectionNotifier, VoiceConnectionState>((ref) {
-  return VoiceConnectionNotifier();
-});
+final voiceConnectionProvider =
+    StateNotifierProvider<VoiceConnectionNotifier, VoiceConnectionState>((ref) {
+      return VoiceConnectionNotifier();
+    });
 
 class VoiceConnectionNotifier extends StateNotifier<VoiceConnectionState> {
   VoiceConnectionNotifier() : super(VoiceConnectionState());
