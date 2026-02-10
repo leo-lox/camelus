@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
@@ -54,19 +55,21 @@ class VoiceServersNotifier extends StateNotifier<VoiceServersState> {
 
   Future<void> loadServers() async {
     state = state.copyWith(isLoading: true, error: null);
-    
+
     try {
-      final servers = await _discovery.getAvailableServers(
-        region: state.regionFilter,
-        country: state.countryFilter,
-      ).timeout(
-        const Duration(seconds: 20),
-        onTimeout: () {
-          // Return empty list on timeout instead of throwing
-          return <VoiceServer>[];
-        },
-      );
-      
+      final servers = await _discovery
+          .getAvailableServers(
+            region: state.regionFilter,
+            country: state.countryFilter,
+          )
+          .timeout(
+            const Duration(seconds: 20),
+            onTimeout: () {
+              // Return empty list on timeout instead of throwing
+              return <VoiceServer>[];
+            },
+          );
+
       state = state.copyWith(servers: servers, isLoading: false);
     } catch (e) {
       state = state.copyWith(
@@ -90,9 +93,9 @@ class VoiceServersNotifier extends StateNotifier<VoiceServersState> {
 
 final voiceServersProvider =
     StateNotifierProvider<VoiceServersNotifier, VoiceServersState>((ref) {
-  final discovery = ref.watch(voiceDiscoveryProvider);
-  return VoiceServersNotifier(discovery);
-});
+      final discovery = ref.watch(voiceDiscoveryProvider);
+      return VoiceServersNotifier(discovery);
+    });
 
 /// State for voice rooms of a selected server
 class VoiceRoomsState {
@@ -100,11 +103,7 @@ class VoiceRoomsState {
   final bool isLoading;
   final String? error;
 
-  VoiceRoomsState({
-    this.rooms = const [],
-    this.isLoading = false,
-    this.error,
-  });
+  VoiceRoomsState({this.rooms = const [], this.isLoading = false, this.error});
 
   VoiceRoomsState copyWith({
     List<VoiceRoom>? rooms,
@@ -125,7 +124,7 @@ class VoiceRoomsNotifier extends StateNotifier<VoiceRoomsState> {
   final http.Client _httpClient;
 
   VoiceRoomsNotifier(this.serverAddress, this._httpClient)
-      : super(VoiceRoomsState());
+    : super(VoiceRoomsState());
 
   Future<void> loadRooms() async {
     state = state.copyWith(isLoading: true, error: null);
@@ -157,7 +156,10 @@ class VoiceRoomsNotifier extends StateNotifier<VoiceRoomsState> {
   }
 }
 
-final voiceRoomsProvider = StateNotifierProvider.family<VoiceRoomsNotifier,
-    VoiceRoomsState, String>((ref, serverAddress) {
-  return VoiceRoomsNotifier(serverAddress, http.Client());
-});
+final voiceRoomsProvider =
+    StateNotifierProvider.family<VoiceRoomsNotifier, VoiceRoomsState, String>((
+      ref,
+      serverAddress,
+    ) {
+      return VoiceRoomsNotifier(serverAddress, http.Client());
+    });

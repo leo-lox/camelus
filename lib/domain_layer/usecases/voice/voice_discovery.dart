@@ -9,7 +9,7 @@ import '../../entities/voice/voice_room.dart';
 /// Use case for discovering voice servers via Nostr
 class VoiceDiscovery {
   final Ndk _ndk;
-  
+
   // Nostr event kinds for voice communication
   static const int voiceServerKind = 38001;
   static const int voiceRoomKind = 38002;
@@ -21,10 +21,7 @@ class VoiceDiscovery {
     String? region,
     String? country,
   }) async* {
-    final filter = Nip01Filter(
-      kinds: [voiceServerKind],
-      limit: 100,
-    );
+    final filter = Filter(kinds: [voiceServerKind], limit: 100);
 
     final subscription = _ndk.requests.subscription(
       filters: [filter],
@@ -35,7 +32,7 @@ class VoiceDiscovery {
     await for (final event in subscription.stream) {
       try {
         final server = _parseServerFromEvent(event);
-        
+
         // Apply filters if specified
         if (region != null && server.region != region) continue;
         if (country != null && server.country != country) continue;
@@ -50,10 +47,7 @@ class VoiceDiscovery {
 
   /// Gets rooms for a specific server
   Stream<VoiceRoom> getServerRooms(String serverName) async* {
-    final filter = Nip01Filter(
-      kinds: [voiceRoomKind],
-      limit: 100,
-    );
+    final filter = Filter(kinds: [voiceRoomKind], limit: 100);
 
     final subscription = _ndk.requests.subscription(
       filters: [filter],
@@ -68,7 +62,7 @@ class VoiceDiscovery {
           (tag) => tag.length >= 2 && tag[0] == 'server',
           orElse: () => [],
         );
-        
+
         if (serverTag.isNotEmpty && serverTag[1] == serverName) {
           yield _parseRoomFromEvent(event);
         }
@@ -81,9 +75,9 @@ class VoiceDiscovery {
 
   VoiceServer _parseServerFromEvent(Nip01Event event) {
     final content = jsonDecode(event.content) as Map<String, dynamic>;
-    
+
     return VoiceServer(
-      id: event.pubkey,
+      id: event.pubKey,
       name: content['name'] ?? '',
       description: content['description'] ?? '',
       host: content['host'] ?? '',
@@ -97,14 +91,14 @@ class VoiceDiscovery {
 
   VoiceRoom _parseRoomFromEvent(Nip01Event event) {
     final content = jsonDecode(event.content) as Map<String, dynamic>;
-    
+
     List<VoiceUser> users = [];
     if (content['users'] != null) {
       users = (content['users'] as List)
           .map((u) => VoiceUser.fromJson(u))
           .toList();
     }
-    
+
     return VoiceRoom(
       id: content['id'] ?? '',
       name: content['name'] ?? '',
@@ -122,31 +116,21 @@ class VoiceDiscovery {
     String? country,
   }) async {
     final servers = <String, VoiceServer>{};
-    
+
     try {
       // Use query instead of subscription for more reliable one-time fetch
-      final filter = Nip01Filter(
-        kinds: [voiceServerKind],
-        limit: 100,
-      );
+      final filter = Filter(kinds: [voiceServerKind], limit: 100);
 
       // Fetch with timeout
-      final events = await _ndk.requests
-          .query(filters: [filter])
-          .timeout(
-            const Duration(seconds: 15),
-            onTimeout: (sink) {
-              sink.close();
-            },
-          )
-          .take(100)
-          .toList();
+      final myQuery = _ndk.requests.query(filter: filter);
+
+      final events = myQuery.stream;
 
       // Parse events
-      for (final event in events) {
+      await for (final event in events) {
         try {
           final server = _parseServerFromEvent(event);
-          
+
           // Apply filters if specified
           if (region != null && server.region != region) continue;
           if (country != null && server.country != country) continue;
@@ -161,7 +145,7 @@ class VoiceDiscovery {
       // Log error but return what we have
       print('Error fetching servers: $e');
     }
-    
+
     return servers.values.toList()
       ..sort((a, b) => b.lastSeen.compareTo(a.lastSeen));
   }

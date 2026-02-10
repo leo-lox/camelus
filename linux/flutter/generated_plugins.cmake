@@ -5,7 +5,9 @@
 list(APPEND FLUTTER_PLUGIN_LIST
   file_selector_linux
   flutter_secure_storage_linux
+  flutter_webrtc
   gtk
+  livekit_client
   objectbox_flutter_libs
   screen_retriever_linux
   system_theme
