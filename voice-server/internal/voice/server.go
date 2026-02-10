@@ -37,11 +37,13 @@ func NewServer(cfg *config.ServerConfig) (*Server, error) {
 	apiKey, apiSecret := mediaServer.GetCredentials()
 	livekitURL := mediaServer.GetURL(cfg.Server.Host)
 
-	// Create room service client (for compatibility, though not strictly needed)
+	// Create room service client (will connect to external LiveKit if you run one)
 	roomClient := lksdk.NewRoomServiceClient(livekitURL, apiKey, apiSecret)
 	
-	log.Printf("Server initialized with embedded media server")
-	log.Printf("Single executable - no external dependencies needed!")
+	log.Printf("Voice server initialized")
+	log.Printf("IMPORTANT: You must start LiveKit server for voice to work!")
+	log.Printf("Run: docker run -p %d:%d -p %d:%d/udp livekit/livekit-server",
+		livekitPort, livekitPort, cfg.Server.RTCPortStart, cfg.Server.RTCPortStart)
 	
 	return &Server{
 		config:        cfg,

@@ -39,14 +39,18 @@ type Participant struct {
 	Peer     *webrtc.PeerConnection
 }
 
-// NewEmbeddedMediaServer creates a new embedded media server with generated credentials
+// NewEmbeddedMediaServer creates credentials and config for LiveKit
+// Note: This doesn't start an actual LiveKit server - it just generates
+// credentials and provides HTTP endpoints. You need to run LiveKit separately.
 func NewEmbeddedMediaServer(port, rtcPortStart, rtcPortEnd int) (*EmbeddedMediaServer, error) {
 	// Generate random API credentials
 	apiKey := generateRandomKey("API")
 	apiSecret := generateRandomKey("SECRET")
 
-	log.Printf("Embedded media server initializing on port %d", port)
+	log.Printf("LiveKit credentials generated for port %d", port)
 	log.Printf("Generated API Key: %s", apiKey)
+	log.Printf("NOTE: Start LiveKit server separately:")
+	log.Printf("  docker run -p %d:%d -p %d:%d/udp livekit/livekit-server", port, port, rtcPortStart, rtcPortStart)
 
 	return &EmbeddedMediaServer{
 		apiKey:      apiKey,
@@ -58,9 +62,11 @@ func NewEmbeddedMediaServer(port, rtcPortStart, rtcPortEnd int) (*EmbeddedMediaS
 	}, nil
 }
 
-// Start starts the embedded media server
+// Start starts HTTP endpoints (not a full LiveKit server)
+// This provides utility endpoints but LiveKit must run separately for WebRTC
 func (e *EmbeddedMediaServer) Start() error {
-	log.Printf("Starting embedded media server on port %d (RTC ports: %d+)", e.port, e.rtcPort)
+	log.Printf("Starting HTTP utility endpoints on port %d", e.port)
+	log.Printf("Reminder: LiveKit server must be running on port %d for voice to work", e.port)
 	
 	mux := http.NewServeMux()
 	mux.HandleFunc("/rtc/validate", e.handleValidate)
@@ -74,11 +80,11 @@ func (e *EmbeddedMediaServer) Start() error {
 			Handler: e.corsMiddleware(mux),
 		}
 		if err := server.ListenAndServe(); err != nil {
-			log.Printf("Media server error: %v", err)
+			log.Printf("HTTP endpoints error: %v", err)
 		}
 	}()
 	
-	log.Printf("Embedded media server listening on %s", addr)
+	log.Printf("HTTP utility endpoints listening on %s", addr)
 	return nil
 }
 
@@ -100,11 +106,13 @@ func (e *EmbeddedMediaServer) GetCredentials() (string, string) {
 	return e.apiKey, e.apiSecret
 }
 
-// GetURL returns the WebSocket URL for clients
+// GetURL returns the WebSocket URL for clients (points to LiveKit server)
 func (e *EmbeddedMediaServer) GetURL(host string) string {
 	if host == "0.0.0.0" {
 		host = "localhost"
 	}
+	// Note: This URL points to where LiveKit should be running
+	// The embedded server provides HTTP endpoints, not WebSocket
 	return fmt.Sprintf("ws://%s:%d", host, e.port)
 }
 

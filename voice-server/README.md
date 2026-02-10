@@ -1,24 +1,37 @@
-# Camelus Voice Server - Single Binary Edition
+# Camelus Voice Server
 
-A self-hosted voice communication server for the Camelus Nostr client. **Everything is embedded in a single Go executable** - no Docker, no external dependencies!
+A self-hosted voice communication server for the Camelus Nostr client. The server handles **token generation** and **room management**, while using **LiveKit** for the actual WebRTC voice infrastructure.
 
-## Features
+## Architecture
 
-- **Single Binary**: Complete voice server in one executable
-- **Zero Dependencies**: No Docker, no external services needed
-- **Auto-Generated Credentials**: Server creates secure keys on startup
-- **Low Latency**: WebRTC with Opus codec for real-time voice
-- **High Quality Audio**: Opus codec for excellent quality
-- **End-to-End Encryption**: Built on WebRTC with encryption
-- **Nostr Integration**: Server discovery via Nostr protocol
-- **Role Management**: Admin, member, and anonymous roles
-- **Self-Hostable**: Run your own voice infrastructure
-- **TeamSpeak-style UI**: Familiar room-based interface
-- **Cross-Platform**: Works on Linux, macOS, Windows
+```
+┌────────────────────────────────┐         ┌──────────────────────┐
+│  Voice Server (Port 7880)      │         │  LiveKit Server      │
+│  - Token generation            │◄────────│  (Port 7881)         │
+│  - Room management             │ Tokens  │  - WebRTC signaling  │
+│  - Nostr announcements         │         │  - Audio streaming   │
+└────────────────────────────────┘         └──────────────────────┘
+         │                                           │
+         ▼                                           ▼
+   Clients discover                          Clients connect
+   via Nostr (HTTP)                          for voice (WebSocket)
+```
 
 ## Quick Start
 
-### Build and Run (One Command!)
+### Step 1: Start LiveKit Server
+
+```bash
+docker run -d \
+  --name livekit \
+  -p 7881:7881 \
+  -p 7882:7882/udp \
+  -e LIVEKIT_PORT=7881 \
+  -e LIVEKIT_LOG_LEVEL=info \
+  livekit/livekit-server:latest
+```
+
+### Step 2: Build and Run Voice Server
 
 ```bash
 cd voice-server
@@ -26,54 +39,25 @@ go build -o voice-server ./cmd/server
 ./voice-server -config config.yaml
 ```
 
-That's it! Your voice server is now running with everything embedded.
+The voice server will:
+1. Generate API credentials automatically
+2. Connect to LiveKit on port 7881
+3. Start HTTP API on port 7880
+4. Announce server via Nostr
 
 ### Example Output
 
 ```
 Embedded media server initializing on port 7881
 Generated API Key: APIxxxxxxxxxxxxxxxxxxx
-Starting embedded media server on port 7881 (RTC ports: 50000+)
 Server initialized with embedded media server
-Single executable - no external dependencies needed!
 Created room: General
 Created room: Gaming
 Starting voice API server on 0.0.0.0:7880
 LiveKit WebSocket URL: ws://localhost:7881
-Server started successfully
-```
-
-## Architecture
-
-```
-┌────────────────────────────────────────┐
-│    Single Go Binary (voice-server)     │
-│                                        │
-│  ┌──────────────────────────────────┐ │
-│  │   HTTP API Server (Port 7880)    │ │
-│  │   - Room listing                 │ │
-│  │   - Token generation             │ │
-│  │   - Nostr announcements          │ │
-│  └──────────────────────────────────┘ │
-│                                        │
-│  ┌──────────────────────────────────┐ │
-│  │ Embedded Media Server (Port 7881)│ │
-│  │   - WebRTC connections           │ │
-│  │   - Audio track handling         │ │
-│  │   - Peer management              │ │
-│  │   - Signaling                    │ │
-│  └──────────────────────────────────┘ │
-│                                        │
-└────────────────────────────────────────┘
-         │                       │
-         ▼                       ▼
-   Clients discover      Clients connect
-   via Nostr (HTTP)      for voice (WebRTC)
 ```
 
 ## Configuration
-
-Minimal configuration required - **NO API KEYS**!
 
 ### config.yaml
 
@@ -82,12 +66,12 @@ server:
   name: "My Voice Server"
   description: "Community voice chat"
   host: "0.0.0.0"
-  port: 7880
+  port: 7880           # HTTP API port
   max_users: 100
   region: "us-west"
   country: "US"
   
-  # Optional WebRTC settings (has defaults)
+  # LiveKit connection (connects to port 7881)
   rtc_port_start: 50000
   rtc_port_end: 50100
 
@@ -107,27 +91,21 @@ rooms:
 
 ## How It Works
 
-1. **Single Binary**: Build once, run anywhere
-2. **Auto-Start**: Media server starts automatically
-3. **Auto-Configure**: API keys generated on startup
-4. **Clients Connect**: 
-   - Discover via Nostr announcements
-   - Request token from HTTP API
-   - Connect to embedded WebRTC server
+1. **LiveKit Server**: Handles WebRTC connections and audio streaming
+2. **Voice Server**: Generates tokens and manages rooms
+3. **Clients**: 
+   - Discover server via Nostr
+   - Request token from voice server (HTTP)
+   - Connect to LiveKit with token (WebSocket)
    - Voice communication begins!
 
 ## API Endpoints
 
 **HTTP API (Port 7880)**:
 - `GET /rooms` - List available rooms and users
-- `POST /token` - Generate access token for joining
+- `POST /token` - Generate LiveKit access token
 - `POST /join` - Mark user as joined (tracking)
 - `POST /leave` - Mark user as left (tracking)
-
-**Media Server (Port 7881)**:
-- `/rtc/validate` - Validate access tokens
-- `/rtc/offer` - WebRTC offer exchange
-- `/rtc/answer` - WebRTC answer exchange
 
 ## Nostr Integration
 
@@ -144,29 +122,63 @@ Clients discover servers by subscribing to these events.
 - ✅ Nostr-based identity verification
 - ✅ Role-based access control
 - ✅ JWT tokens with expiration
-- ✅ No credentials stored in config
 
 ## Deployment
 
 ### Development (Local)
 
 ```bash
+# Terminal 1: Start LiveKit
+docker run -p 7881:7881 -p 7882:7882/udp livekit/livekit-server
+
+# Terminal 2: Start Voice Server
 ./voice-server -config config.yaml
 ```
 
-### Production (systemd service)
+### Production (Docker Compose)
+
+Create `docker-compose.yml`:
+
+```yaml
+version: '3.8'
+services:
+  livekit:
+    image: livekit/livekit-server:latest
+    ports:
+      - "7881:7881"
+      - "7882:7882/udp"
+    environment:
+      - LIVEKIT_PORT=7881
+    restart: always
+  
+  voice-server:
+    build: .
+    ports:
+      - "7880:7880"
+    volumes:
+      - ./config.yaml:/app/config.yaml
+    depends_on:
+      - livekit
+    restart: always
+```
+
+Run: `docker-compose up -d`
+
+### Production (systemd)
 
 Create `/etc/systemd/system/camelus-voice.service`:
 
 ```ini
 [Unit]
 Description=Camelus Voice Server
-After=network.target
+After=network.target docker.service
+Requires=docker.service
 
 [Service]
 Type=simple
 User=camelus
 WorkingDirectory=/opt/camelus-voice
+ExecStartPre=/usr/bin/docker start livekit || /usr/bin/docker run -d --name livekit -p 7881:7881 -p 7882:7882/udp livekit/livekit-server
 ExecStart=/opt/camelus-voice/voice-server -config /etc/camelus-voice/config.yaml
 Restart=on-failure
 
@@ -174,51 +186,13 @@ Restart=on-failure
 WantedBy=multi-user.target
 ```
 
-Then:
-```bash
-sudo systemctl enable camelus-voice
-sudo systemctl start camelus-voice
-```
-
-### Production (Docker - optional)
-
-Even though Docker isn't required, you can still containerize if needed:
-
-```dockerfile
-FROM golang:1.23-alpine AS builder
-WORKDIR /app
-COPY . .
-RUN go build -o voice-server ./cmd/server
-
-FROM alpine:latest
-RUN apk --no-cache add ca-certificates
-WORKDIR /app
-COPY --from=builder /app/voice-server .
-COPY config.yaml .
-CMD ["./voice-server", "-config", "config.yaml"]
-```
-
-## Advantages Over External Solutions
-
-**Previous Approach (External LiveKit)**:
-- ❌ Need separate LiveKit server
-- ❌ Docker dependency
-- ❌ Complex deployment
-- ❌ Multiple processes
-- ❌ External credentials
-
-**Current Approach (Embedded)**:
-- ✅ Single binary
-- ✅ No Docker required
-- ✅ Simple deployment
-- ✅ One process
-- ✅ Auto-generated credentials
-
 ## Troubleshooting
 
-**Port already in use**:
-- Change `port` in config.yaml
-- Media server will use port+1
+**"Failed to connect to LiveKit: WebSocketException"**:
+- Ensure LiveKit server is running on port 7881
+- Check `docker ps` to verify LiveKit container is up
+- Verify firewall allows port 7881 and UDP port 7882
+- Check LiveKit logs: `docker logs livekit`
 
 **Clients can't connect**:
 - Check firewall allows ports 7880, 7881
@@ -235,21 +209,26 @@ CMD ["./voice-server", "-config", "config.yaml"]
 - Check Nostr relay is reachable
 - Verify server has valid Nostr private key
 
-## Binary Size
+## Testing
 
-The compiled binary is approximately 20-25MB and includes:
-- Complete HTTP server
-- WebRTC media server
-- Nostr client
-- All dependencies
+Run integration tests:
 
-No runtime dependencies needed!
+```bash
+cd voice-server
+go test -v ./test/...
+```
+
+Tests verify:
+- Token generation
+- Room listing
+- API endpoints
+- Integration with LiveKit
 
 ## Performance
 
 - **Latency**: <100ms typical (WebRTC peer-to-peer)
-- **CPU**: Minimal (mostly routing audio)
-- **Memory**: ~50MB base + ~1MB per connection
+- **CPU**: Minimal (LiveKit handles heavy lifting)
+- **Memory**: Voice server ~50MB, LiveKit ~100MB
 - **Bandwidth**: ~30-50 Kbps per audio stream
 - **Scalability**: Tested up to 50 concurrent users per room
 
@@ -259,4 +238,4 @@ Same as the main Camelus project.
 
 ---
 
-**One binary. Zero dependencies. Full voice server.** 🎙️
+**Token generation + LiveKit = Complete voice solution** 🎙️
