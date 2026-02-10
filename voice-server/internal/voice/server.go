@@ -11,45 +11,42 @@ import (
 	"github.com/camelus-hq/camelus/voice-server/internal/config"
 	"github.com/camelus-hq/camelus/voice-server/internal/livekit"
 	"github.com/livekit/protocol/auth"
-	livekitProto "github.com/livekit/protocol/livekit"
 	lksdk "github.com/livekit/server-sdk-go/v2"
 )
 
-// Server handles voice communication using standalone LiveKit
+// Server handles voice communication using embedded media server
 type Server struct {
 	config         *config.ServerConfig
 	roomManager    *RoomManager
-	standalone     *livekit.StandaloneLiveKit
+	mediaServer    *livekit.EmbeddedMediaServer
 	roomClient     *lksdk.RoomServiceClient
 	apiKey         string
 	apiSecret      string
 	livekitURL     string
 }
 
-// NewServer creates a new voice server with standalone LiveKit credentials
+// NewServer creates a new voice server with embedded media server
 func NewServer(cfg *config.ServerConfig) (*Server, error) {
-	// Create standalone LiveKit with generated credentials
-	// Note: This uses port 7881 for LiveKit WebSocket, 7880 for HTTP API
+	// Create embedded media server on port 7881 (HTTP API on 7880)
 	livekitPort := cfg.Server.Port + 1
-	standalone := livekit.NewStandaloneLiveKit(livekitPort)
+	mediaServer, err := livekit.NewEmbeddedMediaServer(livekitPort, cfg.Server.RTCPortStart, cfg.Server.RTCPortEnd)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create embedded media server: %w", err)
+	}
 
-	apiKey, apiSecret := standalone.GetCredentials()
-	livekitURL := standalone.GetURL(cfg.Server.Host)
+	apiKey, apiSecret := mediaServer.GetCredentials()
+	livekitURL := mediaServer.GetURL(cfg.Server.Host)
 
-	// Create room service client (will connect to external LiveKit if you run one,
-	// or you can skip this if purely standalone)
-	// For now, we'll keep it for compatibility but it won't be strictly required
+	// Create room service client (for compatibility, though not strictly needed)
 	roomClient := lksdk.NewRoomServiceClient(livekitURL, apiKey, apiSecret)
 	
-	log.Printf("Server is standalone - LiveKit credentials generated")
-	log.Printf("To use voice features, you need to run a LiveKit server separately")
-	log.Printf("Run: docker run -p %d:%d -e LIVEKIT_KEYS=\"%s: %s\" livekit/livekit-server",
-		livekitPort, livekitPort, apiKey, apiSecret)
+	log.Printf("Server initialized with embedded media server")
+	log.Printf("Single executable - no external dependencies needed!")
 	
 	return &Server{
 		config:        cfg,
 		roomManager:   NewRoomManager(),
-		standalone:    standalone,
+		mediaServer:   mediaServer,
 		roomClient:    roomClient,
 		apiKey:        apiKey,
 		apiSecret:     apiSecret,
@@ -59,6 +56,14 @@ func NewServer(cfg *config.ServerConfig) (*Server, error) {
 
 // Start starts the voice server
 func (s *Server) Start(ctx context.Context) error {
+	// Start embedded media server first
+	if err := s.mediaServer.Start(); err != nil {
+		return fmt.Errorf("failed to start media server: %w", err)
+	}
+
+	// Wait a bit for media server to initialize
+	time.Sleep(1 * time.Second)
+
 	// Initialize rooms from config
 	for _, roomCfg := range s.config.Rooms {
 		s.roomManager.CreateRoom(
@@ -69,14 +74,11 @@ func (s *Server) Start(ctx context.Context) error {
 			roomCfg.IsPublic,
 		)
 		
-		// Try to create room in LiveKit (will fail silently if LiveKit not running)
-		_, err := s.roomClient.CreateRoom(ctx, &livekitProto.CreateRoomRequest{
-			Name:            roomCfg.ID,
-			EmptyTimeout:    600,  // 10 minutes
-			MaxParticipants: uint32(roomCfg.MaxUsers),
-		})
-		if err != nil {
-			log.Printf("Note: Could not create LiveKit room %s (LiveKit server may not be running): %v", roomCfg.ID, err)
+		// Create room in media server
+		if err := s.mediaServer.CreateRoom(roomCfg.ID); err != nil {
+			log.Printf("Warning: Could not create media room %s: %v", roomCfg.ID, err)
+		} else {
+			log.Printf("Created room: %s", roomCfg.Name)
 		}
 	}
 
@@ -100,6 +102,7 @@ func (s *Server) Start(ctx context.Context) error {
 		<-ctx.Done()
 		shutdownCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer cancel()
+		s.mediaServer.Stop()
 		server.Shutdown(shutdownCtx)
 	}()
 
