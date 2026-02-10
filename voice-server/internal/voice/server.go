@@ -65,22 +65,7 @@ func (s *Server) Start(ctx context.Context) error {
 	time.Sleep(1 * time.Second)
 
 	// Initialize rooms from config
-	for _, roomCfg := range s.config.Rooms {
-		s.roomManager.CreateRoom(
-			roomCfg.ID,
-			roomCfg.Name,
-			roomCfg.Description,
-			roomCfg.MaxUsers,
-			roomCfg.IsPublic,
-		)
-		
-		// Create room in media server
-		if err := s.mediaServer.CreateRoom(roomCfg.ID); err != nil {
-			log.Printf("Warning: Could not create media room %s: %v", roomCfg.ID, err)
-		} else {
-			log.Printf("Created room: %s", roomCfg.Name)
-		}
-	}
+	s.InitializeRooms()
 
 	// Set up HTTP handlers
 	mux := http.NewServeMux()
@@ -107,6 +92,34 @@ func (s *Server) Start(ctx context.Context) error {
 	}()
 
 	return server.ListenAndServe()
+}
+
+// RegisterHandlers registers HTTP handlers on the given mux (used for testing)
+func (s *Server) RegisterHandlers(mux *http.ServeMux) {
+	mux.HandleFunc("/rooms", s.handleGetRooms)
+	mux.HandleFunc("/token", s.handleGetToken)
+	mux.HandleFunc("/join", s.handleJoinRoom)
+	mux.HandleFunc("/leave", s.handleLeaveRoom)
+}
+
+// InitializeRooms initializes rooms from config (exposed for testing)
+func (s *Server) InitializeRooms() {
+	for _, roomCfg := range s.config.Rooms {
+		s.roomManager.CreateRoom(
+			roomCfg.ID,
+			roomCfg.Name,
+			roomCfg.Description,
+			roomCfg.MaxUsers,
+			roomCfg.IsPublic,
+		)
+		
+		// Create room in media server
+		if err := s.mediaServer.CreateRoom(roomCfg.ID); err != nil {
+			log.Printf("Warning: Could not create media room %s: %v", roomCfg.ID, err)
+		} else {
+			log.Printf("Created room: %s", roomCfg.Name)
+		}
+	}
 }
 
 // corsMiddleware adds CORS headers
