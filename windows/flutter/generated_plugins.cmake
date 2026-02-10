@@ -8,6 +8,7 @@ list(APPEND FLUTTER_PLUGIN_LIST
   file_selector_windows
   firebase_core
   flutter_secure_storage_windows
+  flutter_webrtc
   objectbox_flutter_libs
   screen_retriever_windows
   share_plus

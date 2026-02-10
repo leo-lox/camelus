@@ -228,6 +228,15 @@ class NostrSideMenu extends ConsumerWidget {
                           context.go('/notifications');
                         },
                       ),
+                    _drawerItem(
+                      icon: PhosphorIcons.microphone(),
+                      label: AppLocalizations.of(context)!.messages,
+                      routeName: '/voice',
+
+                      onTap: () {
+                        context.go('/voice');
+                      },
+                    ),
                     if (!hideOnMobile && currentUserPubkey != null)
                       _drawerItem(
                         icon: PhosphorIcons.chatCircle(),

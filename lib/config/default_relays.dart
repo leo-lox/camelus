@@ -1,13 +1,8 @@
 import 'package:ndk/entities.dart' as ndk_entities;
 
 List<String> camelusBootstrapRelays = [
-  "wss://nos.lol",
+  "ws://localhost:10547",
   "wss://relay.damus.io",
-  "wss://relay.nostr.band",
-  "wss://relay.snort.social",
-  "wss://relay.nostr.band",
-  "wss://relay.mostr.pub",
-  "wss://relay.camelus.app",
 ];
 
 final Map<String, ndk_entities.ReadWriteMarker> defaultAccountCreationRelays = {

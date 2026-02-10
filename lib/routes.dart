@@ -37,6 +37,7 @@ import 'presentation_layer/routes/nostr/settings/dm_relays/dm_relays_settings.da
 import 'presentation_layer/routes/messages/dm_list_page.dart';
 import 'presentation_layer/routes/messages/dm_thread_page.dart';
 import 'presentation_layer/routes/messages/new_dm_page.dart';
+import 'presentation_layer/routes/voice/voice_servers_page.dart';
 
 Null redirects(BuildContext context, GoRouterState state) {
   return null;
@@ -92,6 +93,10 @@ final routes = [
           GoRoute(
             path: '/search',
             builder: (context, state) => const SearchPage(),
+          ),
+          GoRoute(
+            path: '/voice',
+            builder: (context, state) => const VoiceServersPage(),
           ),
           GoRoute(
             path: '/notifications',

@@ -1,0 +1,46 @@
+server:
+  host: "127.0.0.1"
+  port: 8443
+  region: "eu-west"
+  max_users: 100
+  tls_cert: ""  # Optional: Path to TLS certificate
+  tls_key: ""   # Optional: Path to TLS key
+
+webrtc:
+  stun_servers:
+    - "stun:stun.l.google.com:19302"
+    - "stun:stun1.l.google.com:19302"
+  turn_servers: []  # Optional TURN servers
+  turn_username: ""
+  turn_password: ""
+  udp_port_min: 10000
+  udp_port_max: 20000
+  audio_codec: "opus"
+  audio_bitrate: 64000
+
+nostr:
+  relays:
+    - "ws://localhost:10547"
+
+  private_key: "${NOSTR_PRIVATE_KEY}"  # Set via environment variable
+  public_key: "${NOSTR_PUBLIC_KEY}"    # Set via environment variable
+
+channels:
+  default_tree:
+    - id: "lobby"
+      name: "Lobby"
+      max_users: 100
+      children:
+        - id: "general"
+          name: "General Chat"
+          max_users: 50
+        - id: "tech"
+          name: "Tech Talk"
+          max_users: 30
+          children:
+            - id: "development"
+              name: "Development"
+              max_users: 20
+            - id: "design"
+              name: "Design"
+              max_users: 20
