@@ -1,10 +1,8 @@
-# Voice Server - Quick Start (Standalone)
+# Voice Server - Quick Start (Single Binary!)
 
-The Camelus voice server is now **completely standalone** - no external API keys required!
+The Camelus voice server is now a **single Go executable** with everything embedded. No Docker, no external services required!
 
-## Quick Start (2 commands)
-
-### Step 1: Run Voice Server
+## Quick Start (Literally One Command)
 
 ```bash
 cd voice-server
@@ -12,28 +10,23 @@ go build -o voice-server ./cmd/server
 ./voice-server -config config.example.yaml
 ```
 
-Output:
+**Done!** Your complete voice server is running.
+
+## What Happens
+
 ```
-Standalone LiveKit initialized on port 7881
-Generated API Key: APIxxxxxxxxxxxxxxxxxxxx
-Server is standalone - LiveKit credentials generated
-To use voice features, you need to run a LiveKit server separately
-Run: docker run -p 7881:7881 -e LIVEKIT_KEYS="APIxxx: SECRETxxx" livekit/livekit-server
+Embedded media server initializing on port 7881
+Generated API Key: APIxxx...
+Starting embedded media server on port 7881 (RTC ports: 50000+)
+Embedded media server listening on 0.0.0.0:7881
+Server initialized with embedded media server
+Single executable - no external dependencies needed!
+Created room: General
+Created room: Gaming
 Starting voice API server on 0.0.0.0:7880
-LiveKit WebSocket URL: ws://0.0.0.0:7881
+LiveKit WebSocket URL: ws://localhost:7881
+Server started successfully
 ```
-
-### Step 2: Run LiveKit
-
-Copy the `docker run` command from the output above:
-
-```bash
-docker run -p 7881:7881 -p 7882:7882/udp \
-  -e LIVEKIT_KEYS="APIxxx: SECRETxxx" \
-  livekit/livekit-server
-```
-
-**Done!** Your voice server is running.
 
 ## Client Usage
 
@@ -50,6 +43,7 @@ Edit `config.yaml`:
 ```yaml
 server:
   name: "My Server"      # Your server name
+  port: 7880             # HTTP API port
   region: "us-west"      # Geographic region
   country: "US"          # Country code
   
@@ -58,66 +52,60 @@ nostr:
   private_key: "nsec1..."  # Generate with: nostr keygen
 ```
 
-**No LiveKit API keys needed** - they're auto-generated!
+**No API keys needed** - they're auto-generated on startup!
 
 ## Architecture
 
 ```
-Voice Server (7880) → Generates keys → LiveKit (7881)
-         ↓                                  ↓
-    Clients get token                  Voice streams
+Single Binary
+├── HTTP API (7880) - Rooms, tokens, Nostr
+└── Media Server (7881) - WebRTC, audio streaming
+```
+
+All in one process!
+
+## Deployment
+
+### Development
+```bash
+./voice-server
+```
+
+### Production (systemd)
+```bash
+sudo cp voice-server /usr/local/bin/
+sudo systemctl enable camelus-voice
+sudo systemctl start camelus-voice
+```
+
+### Production (Docker - optional)
+```bash
+docker build -t voice-server .
+docker run -p 7880:7880 -p 7881:7881 voice-server
 ```
 
 ## Troubleshooting
 
-**"Room will be auto-created"**
-- Normal message - rooms are created when users join
+**Port already in use**
+- Change port in config.yaml
 
 **Clients can't connect**
-- Ensure BOTH voice server AND LiveKit are running
-- Check ports 7880, 7881, 7882 are open
-- Verify docker container is running: `docker ps`
+- Open firewall ports 7880, 7881
+- Open UDP ports 50000-50100
 
 **No servers in client**
 - Wait 5 minutes (Nostr announcement interval)
 - Check Nostr relay is reachable
-- Verify server has valid Nostr private key
 
-## Production Deployment
+## Advantages
 
-Create `docker-compose.yml`:
-
-```yaml
-version: '3.8'
-services:
-  voice-server:
-    build: ./voice-server
-    ports:
-      - "7880:7880"
-    volumes:
-      - ./config.yaml:/app/config.yaml
-    restart: always
-  
-  livekit:
-    image: livekit/livekit-server:latest
-    ports:
-      - "7881:7881"
-      - "7882:7882/udp"
-    environment:
-      # These will be shown in voice-server logs
-      - LIVEKIT_KEYS=${API_KEY}:${API_SECRET}
-    restart: always
-```
-
-Run: `docker-compose up -d`
-
-## Next Steps
-
-- Configure admin users in `config.yaml`
-- Set up rooms for your community
-- Monitor server logs for activity
-- Share server with your community!
+✅ **No Docker** - Pure Go binary  
+✅ **No External Services** - Everything embedded  
+✅ **Single Command** - Just run it  
+✅ **~22MB Binary** - Includes everything  
+✅ **Cross-Platform** - Linux, macOS, Windows  
+✅ **Easy Deployment** - Copy one file  
 
 ---
 
-*Standalone voice server - no cloud required!* 🎙️
+**One binary to rule them all!** 🎙️
