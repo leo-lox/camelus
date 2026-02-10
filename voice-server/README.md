@@ -1,154 +1,204 @@
-# Camelus Voice Server
+# Camelus Voice Server - Standalone Edition
 
-A self-hosted voice communication server for the Camelus Nostr client. Built with Go and LiveKit for low-latency, high-quality voice chat with end-to-end encryption.
+A self-hosted voice communication server for the Camelus Nostr client. The server is now **completely standalone** - it generates its own API credentials and doesn't require external LiveKit cloud services.
 
 ## Features
 
-- **Low Latency**: Powered by LiveKit for real-time voice communication
-- **High Quality Audio**: Uses Opus codec for excellent audio quality
-- **End-to-End Encryption**: Built on WebRTC with encryption support
-- **Nostr Integration**: Server and room discovery via Nostr protocol
-- **Role Management**: Support for admin, member, and anonymous roles
-- **Self-Hostable**: Run your own voice server
-- **TeamSpeak-style UI**: Familiar room-based voice chat interface
+- **Standalone Operation**: No external API keys needed
+- **Auto-Generated Credentials**: Server creates secure random keys on startup
+- **Low Latency**: Powered by LiveKit for real-time voice
+- **High Quality Audio**: Opus codec for excellent quality
+- **End-to-End Encryption**: Built on WebRTC with encryption
+- **Nostr Integration**: Server discovery via Nostr protocol
+- **Role Management**: Admin, member, and anonymous roles
+- **Self-Hostable**: Run your own voice infrastructure
+- **TeamSpeak-style UI**: Familiar room-based interface
 
-## Architecture
+## Quick Start
 
-The voice server is built using:
-- **LiveKit** for scalable, production-ready voice infrastructure
-- **Go** for high-performance server implementation
-- **Nostr** for decentralized server discovery and announcements
-- **Clean Architecture** with separation of concerns
-
-## Prerequisites
-
-- Go 1.22 or higher
-- A running LiveKit server instance
-- A Nostr private key for server identity
-
-## LiveKit Setup
-
-You need a LiveKit server running. You have two options:
-
-### Option 1: LiveKit Cloud (Easiest)
-1. Sign up at https://cloud.livekit.io
-2. Create a project and get your API credentials
-3. Use the provided WebSocket URL
-
-### Option 2: Self-Hosted LiveKit
-1. Follow the LiveKit server installation guide: https://docs.livekit.io/deploy/
-2. Run LiveKit server locally or on your server
-3. Note your LiveKit server URL (e.g., `ws://localhost:7880`)
-
-## Installation
-
-### Building
+### 1. Build and Run the Voice Server
 
 ```bash
 cd voice-server
-go mod download
 go build -o voice-server ./cmd/server
-```
-
-### Running
-
-1. Copy the example configuration:
-```bash
 cp config.example.yaml config.yaml
+# Edit config.yaml (no API keys needed!)
+./voice-server
 ```
 
-2. Edit `config.yaml` with your settings:
-   - Set your server name and description
-   - Configure your LiveKit credentials (API key, secret, URL)
-   - Configure your Nostr relay and private key
-   - Define rooms/channels
-   - Set admin public keys
+The server will output something like:
+```
+Generated API Key: APIxxxxxxxxxxx
+To use voice features, run a LiveKit server:
+docker run -p 7881:7881 -e LIVEKIT_KEYS="APIxxx: SECRETxxx" livekit/livekit-server
+```
 
-3. Run the server:
+### 2. Run the LiveKit Server
+
+Copy the docker command from the server output and run it:
+
 ```bash
-./voice-server -config config.yaml
+docker run -p 7881:7881 -p 7882:7882/udp \
+  -e LIVEKIT_KEYS="APIxxx: SECRETxxx" \
+  livekit/livekit-server
+```
+
+That's it! Your voice server is now running standalone.
+
+## Architecture
+
+```
+┌─────────────────────┐         ┌──────────────────────┐
+│  Voice Server       │         │  LiveKit Server      │
+│  (Port 7880)        │         │  (Port 7881)         │
+│                     │         │                      │
+│  - HTTP API         │◄────────┤  - WebRTC/Voice      │
+│  - Token Generation │  Uses   │  - Audio Streaming   │
+│  - Room Management  │  Keys   │  - Real-time Comms   │
+│  - Nostr Announce   │         │                      │
+└─────────────────────┘         └──────────────────────┘
+         │                               │
+         │                               │
+         ▼                               ▼
+    Clients discover            Clients connect for
+    via Nostr & HTTP            actual voice chat
 ```
 
 ## Configuration
 
-The server is configured via a YAML file. See `config.example.yaml` for a complete example.
+The server requires minimal configuration - **NO API KEYS**!
 
-### Server Settings
+### config.yaml
 
-- `name`: Server display name
-- `description`: Server description
-- `host`: Bind address (use 0.0.0.0 for all interfaces)
-- `port`: HTTP API port (default: 7880)
-- `max_users`: Maximum concurrent users
-- `region`: Geographic region for filtering
-- `country`: Country code for filtering
-- `livekit_url`: LiveKit server WebSocket URL
-- `api_key`: LiveKit API key
-- `api_secret`: LiveKit API secret
+```yaml
+server:
+  name: "My Voice Server"
+  description: "Community voice chat"
+  host: "0.0.0.0"
+  port: 7880
+  max_users: 100
+  region: "us-west"
+  country: "US"
+  
+  # Optional WebRTC settings (has defaults)
+  rtc_port_start: 50000
+  rtc_port_end: 50100
 
-### Nostr Settings
+nostr:
+  relay_url: "wss://relay.damus.io"
+  private_key: "nsec1..."  # Your server identity
+  admin_pubkeys:
+    - "npub1..."  # Admin users
 
-- `relay_url`: Nostr relay for server announcements
-- `private_key`: Server's Nostr private key (nsec format)
-- `admin_pubkeys`: List of admin user public keys
+rooms:
+  - id: "general"
+    name: "General"
+    description: "General voice chat"
+    max_users: 50
+    is_public: true
+```
 
-### Rooms
+## How It Works
 
-Define voice channels with:
-- `id`: Unique room identifier
-- `name`: Display name
-- `description`: Room description
-- `max_users`: Room capacity
-- `is_public`: Whether room appears in public listings
+1. **Server Starts**: Generates random API credentials
+2. **Credentials Logged**: Shows docker command with keys
+3. **LiveKit Runs**: Docker container starts with those keys
+4. **Clients Connect**: 
+   - Request token from voice server (HTTP API)
+   - Server generates JWT with auto-generated keys
+   - Client connects to LiveKit with token
+   - Voice communication begins!
 
 ## API Endpoints
 
-The server exposes the following HTTP endpoints:
-
 - `GET /rooms` - List available rooms and users
-- `POST /token` - Generate LiveKit access token for joining
-- `POST /join` - Mark user as joined (for tracking)
-- `POST /leave` - Mark user as left
+- `POST /token` - Generate LiveKit access token
+- `POST /join` - Mark user as joined (tracking)
+- `POST /leave` - Mark user as left (tracking)
 
 ## Nostr Integration
 
-The server publishes two types of events:
+The server publishes:
+- **Kind 38001**: Server announcements (every 5 min)
+- **Kind 38002**: Room status updates (every 5 min)
 
-- **Kind 38001**: Server announcements with metadata
-- **Kind 38002**: Room status updates with user lists
-
-Clients can discover servers by subscribing to these event kinds.
+Clients discover servers by subscribing to these events.
 
 ## Security
 
-- LiveKit provides encryption for voice streams
-- Nostr integration for decentralized identity
-- Role-based access control (admin, member, anon)
-- Configurable admin permissions via public keys
-- Access tokens with expiration for room access
+- ✅ Automatically generated secure random keys
+- ✅ WebRTC encryption for voice streams
+- ✅ Nostr-based identity verification
+- ✅ Role-based access control
+- ✅ JWT tokens with expiration
 
-## Development
+## Deployment
 
-### Project Structure
-
-```
-voice-server/
-├── cmd/
-│   └── server/          # Server entry point
-├── internal/
-│   ├── config/          # Configuration handling
-│   ├── voice/           # Voice server and room management
-│   └── nostr/           # Nostr integration
-├── config.example.yaml  # Example configuration
-└── go.mod
-```
-
-### Testing
+### Development (Local)
 
 ```bash
-go test ./...
+# Terminal 1: Voice Server
+./voice-server -config config.yaml
+
+# Terminal 2: LiveKit (copy command from server output)
+docker run -p 7881:7881 -e LIVEKIT_KEYS="..." livekit/livekit-server
 ```
+
+### Production
+
+Use Docker Compose:
+
+```yaml
+version: '3.8'
+services:
+  voice-server:
+    build: .
+    ports:
+      - "7880:7880"
+    volumes:
+      - ./config.yaml:/app/config.yaml
+    depends_on:
+      - livekit
+  
+  livekit:
+    image: livekit/livekit-server
+    ports:
+      - "7881:7881"
+      - "7882:7882/udp"
+    environment:
+      - LIVEKIT_KEYS=${API_KEY}:${API_SECRET}
+```
+
+## Advantages Over External LiveKit
+
+**Before (External LiveKit Cloud):**
+- ❌ Need to sign up for cloud service
+- ❌ Configure API keys manually
+- ❌ Potential privacy concerns
+- ❌ Dependency on external service
+
+**Now (Standalone):**
+- ✅ No external accounts needed
+- ✅ Auto-generated credentials
+- ✅ Complete control and privacy
+- ✅ Self-contained deployment
+
+## Troubleshooting
+
+**"Could not create LiveKit room"**
+- This is normal - just means LiveKit isn't running yet
+- Start LiveKit with the docker command from logs
+
+**"Failed to connect to LiveKit"**
+- Ensure LiveKit container is running
+- Check port 7881 is accessible
+- Verify credentials match between server and LiveKit
+
+**Clients can't join**
+- Check both voice server AND LiveKit are running
+- Verify firewall allows ports 7880, 7881, 7882
+- Check server logs for token generation
 
 ## License
 
-Same as the main Camelus project.
+Same as main Camelus project.
