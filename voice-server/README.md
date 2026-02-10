@@ -1,10 +1,10 @@
 # Camelus Voice Server
 
-A self-hosted voice communication server for the Camelus Nostr client. Built with Go and WebRTC for low-latency, high-quality voice chat with end-to-end encryption.
+A self-hosted voice communication server for the Camelus Nostr client. Built with Go and LiveKit for low-latency, high-quality voice chat with end-to-end encryption.
 
 ## Features
 
-- **Low Latency**: Optimized for real-time voice communication
+- **Low Latency**: Powered by LiveKit for real-time voice communication
 - **High Quality Audio**: Uses Opus codec for excellent audio quality
 - **End-to-End Encryption**: Built on WebRTC with encryption support
 - **Nostr Integration**: Server and room discovery via Nostr protocol
@@ -15,17 +15,32 @@ A self-hosted voice communication server for the Camelus Nostr client. Built wit
 ## Architecture
 
 The voice server is built using:
-- **WebRTC** for peer-to-peer voice communication with Opus codec
+- **LiveKit** for scalable, production-ready voice infrastructure
 - **Go** for high-performance server implementation
 - **Nostr** for decentralized server discovery and announcements
 - **Clean Architecture** with separation of concerns
 
-## Installation
-
-### Prerequisites
+## Prerequisites
 
 - Go 1.22 or higher
+- A running LiveKit server instance
 - A Nostr private key for server identity
+
+## LiveKit Setup
+
+You need a LiveKit server running. You have two options:
+
+### Option 1: LiveKit Cloud (Easiest)
+1. Sign up at https://cloud.livekit.io
+2. Create a project and get your API credentials
+3. Use the provided WebSocket URL
+
+### Option 2: Self-Hosted LiveKit
+1. Follow the LiveKit server installation guide: https://docs.livekit.io/deploy/
+2. Run LiveKit server locally or on your server
+3. Note your LiveKit server URL (e.g., `ws://localhost:7880`)
+
+## Installation
 
 ### Building
 
@@ -44,6 +59,7 @@ cp config.example.yaml config.yaml
 
 2. Edit `config.yaml` with your settings:
    - Set your server name and description
+   - Configure your LiveKit credentials (API key, secret, URL)
    - Configure your Nostr relay and private key
    - Define rooms/channels
    - Set admin public keys
@@ -66,7 +82,9 @@ The server is configured via a YAML file. See `config.example.yaml` for a comple
 - `max_users`: Maximum concurrent users
 - `region`: Geographic region for filtering
 - `country`: Country code for filtering
-- `rtc_min_port`, `rtc_max_port`: WebRTC port range
+- `livekit_url`: LiveKit server WebSocket URL
+- `api_key`: LiveKit API key
+- `api_secret`: LiveKit API secret
 
 ### Nostr Settings
 
@@ -88,11 +106,9 @@ Define voice channels with:
 The server exposes the following HTTP endpoints:
 
 - `GET /rooms` - List available rooms and users
-- `POST /join` - Join a room
-- `POST /leave` - Leave a room
-- `POST /offer` - WebRTC offer
-- `POST /answer` - WebRTC answer
-- `POST /ice-candidate` - ICE candidate exchange
+- `POST /token` - Generate LiveKit access token for joining
+- `POST /join` - Mark user as joined (for tracking)
+- `POST /leave` - Mark user as left
 
 ## Nostr Integration
 
@@ -105,10 +121,11 @@ Clients can discover servers by subscribing to these event kinds.
 
 ## Security
 
-- WebRTC provides encryption for voice streams
+- LiveKit provides encryption for voice streams
 - Nostr integration for decentralized identity
 - Role-based access control (admin, member, anon)
 - Configurable admin permissions via public keys
+- Access tokens with expiration for room access
 
 ## Development
 
