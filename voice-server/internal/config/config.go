@@ -20,6 +20,9 @@ type ServerSettings struct {
 	// LiveKit server URL (can be overridden by LIVEKIT_URL env var)
 	LiveKitURL string `yaml:"livekit_url"`
 	
+	// LiveKit server port for embedded instance
+	LiveKitPort int `yaml:"livekit_port"`
+	
 	// WebRTC port range for embedded LiveKit
 	RTCPortStart int `yaml:"rtc_port_start"`
 	RTCPortEnd   int `yaml:"rtc_port_end"`

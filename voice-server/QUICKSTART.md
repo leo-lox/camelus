@@ -1,157 +1,301 @@
-# Voice Server - Quick Start
+# Quick Start Guide
 
-The Camelus voice server handles **token generation** and **room management** while using **LiveKit** for WebRTC voice infrastructure.
+## Single Binary Setup - No Docker!
 
-## Easiest: Docker Compose (Recommended)
+This guide will get you running the Camelus Voice Server in under 5 minutes with **one executable**.
 
-```bash
-cd voice-server
-docker-compose up
-```
+## Prerequisites
 
-That's it! Both servers start automatically with proper networking.
+- Go 1.21+ (for building)
+- Linux, macOS, or Windows
+- Internet connection (for downloading LiveKit binary)
+- Ports 7880, 7881, and 50000-50100 available
 
-**What it starts:**
-- LiveKit server on port 7881 (WebRTC voice)
-- Voice server on port 7880 (API & token generation)
-
-Stop with: `docker-compose down`
-
----
-
-## Alternative: Manual Setup (Two Terminals)
-
-### Terminal 1: Start LiveKit Server
+## Step 1: Build the Server
 
 ```bash
-docker run -d \
-  --name livekit \
-  -p 7881:7880 \
-  -p 50000:7882/udp \
-  livekit/livekit-server:latest
-```
+# Clone repository (if not already)
+git clone https://github.com/camelus-hq/camelus
+cd camelus/voice-server
 
-### Terminal 2: Start Voice Server
-
-```bash
-cd voice-server
+# Build single executable
 go build -o voice-server ./cmd/server
-./voice-server -config config.yaml
+
+# Check binary
+ls -lh voice-server
+# Should show ~19MB
 ```
 
-Copy the docker command from the voice server output if you need specific API keys.
+## Step 2: Create Configuration
 
-**Done!** Your complete voice infrastructure is running.
+```bash
+# Copy example config
+cp config.example.yaml config.yaml
 
-## What Happens
-
-### LiveKit Server Output:
-```
-Starting LiveKit server...
-Listening on port 7881
-Ready for WebRTC connections
+# Edit configuration
+nano config.yaml  # or vim, emacs, etc.
 ```
 
-### Voice Server Output:
-```
-Embedded media server initializing on port 7881
-Generated API Key: APIxxx...
-Server initialized with embedded media server
-Created room: General
-Created room: Gaming
-Starting voice API server on 0.0.0.0:7880
-LiveKit WebSocket URL: ws://localhost:7881
-Server started successfully
-```
-
-## Client Usage
-
-1. Open Camelus app → Voice (🎤)
-2. Wait for server to appear (discovered via Nostr)
-3. Join a room
-4. Grant microphone permission
-5. Start talking!
-
-## Configuration (Optional)
-
-Edit `config.yaml`:
+### Minimal Configuration
 
 ```yaml
 server:
-  name: "My Server"      # Your server name
-  port: 7880             # HTTP API port
-  region: "us-west"      # Geographic region
-  country: "US"          # Country code
-  
+  name: "My Voice Server"
+  description: "Camelus voice chat"
+  host: "0.0.0.0"
+  port: 7880
+  livekit_port: 7881
+  region: "us-west"
+  country: "US"
+
 nostr:
   relay_url: "wss://relay.damus.io"
-  private_key: "nsec1..."  # Generate with: nostr keygen
+  private_key: "nsec1..."  # Generate with: nostr-tools or any Nostr client
+  admin_pubkeys:
+    - "npub1..."  # Your Nostr public key
 
 rooms:
   - id: "general"
     name: "General"
+    description: "Main voice chat"
     max_users: 50
+    is_public: true
 ```
 
-**API keys are auto-generated** on server startup!
+## Step 3: Run the Server
 
-## Architecture
-
-```
-LiveKit (7881) ←── Tokens ──── Voice Server (7880)
-     │                                │
-     ▼                                ▼
-Voice streams                   Discovery (Nostr)
-```
-
-## Deployment Options
-
-### Development
 ```bash
-# Terminal 1
-docker run -p 7881:7881 -p 7882:7882/udp livekit/livekit-server
-
-# Terminal 2
-./voice-server
+./voice-server -config config.yaml
 ```
 
-### Production (Docker Compose)
-```bash
-docker-compose up -d
+### Expected Output
+
+```
+============================================================
+Voice Server with Embedded LiveKit
+============================================================
+Generated API Key: APIxxxxxxxxxx
+Generated API Secret: SECRETxxxxxxxxxx
+LiveKit URL: ws://localhost:7881
+============================================================
+Downloading LiveKit server v1.7.2 for linux/amd64...
+✓ LiveKit binary downloaded to ./livekit-server
+Starting embedded LiveKit server on port 7881...
+✓ LiveKit server started successfully
+Created room: General
+Starting HTTP API server on 0.0.0.0:7880
+LiveKit WebSocket URL: ws://localhost:7881
+✓ Single executable ready - everything running in one process!
 ```
 
-### Production (systemd)
+## Step 4: Verify It's Working
+
+### Check Health
+
 ```bash
-sudo systemctl start livekit
+curl http://localhost:7880/health
+```
+
+Expected response:
+```json
+{
+  "status": "healthy",
+  "livekit_url": "ws://localhost:7881"
+}
+```
+
+### List Rooms
+
+```bash
+curl http://localhost:7880/rooms
+```
+
+Expected response:
+```json
+{
+  "rooms": [
+    {
+      "id": "general",
+      "name": "General",
+      "description": "Main voice chat",
+      "users": [],
+      "max_users": 50,
+      "is_public": true
+    }
+  ]
+}
+```
+
+### Check LiveKit
+
+```bash
+# LiveKit should be running
+ps aux | grep livekit-server
+
+# Test LiveKit health (if exposed)
+curl http://localhost:7881/
+```
+
+## Step 5: Connect from Client
+
+### Flutter Client
+
+1. Open Camelus app
+2. Go to Voice section (sidebar)
+3. Wait up to 5 minutes for Nostr discovery
+4. Server should appear in list
+5. Tap to see rooms
+6. Join a room and start talking!
+
+### Troubleshooting Client Connection
+
+If server doesn't appear:
+1. Check Nostr relay is accessible
+2. Verify server is announcing (check logs)
+3. Try manual discovery with server IP
+4. Wait longer (Nostr can be slow)
+
+## Production Deployment
+
+### Systemd Service
+
+Create `/etc/systemd/system/camelus-voice.service`:
+
+```ini
+[Unit]
+Description=Camelus Voice Server
+After=network.target
+
+[Service]
+Type=simple
+User=camelus
+Group=camelus
+WorkingDirectory=/opt/camelus/voice-server
+ExecStart=/opt/camelus/voice-server/voice-server -config /opt/camelus/voice-server/config.yaml
+Restart=always
+RestartSec=5
+
+# Security
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/camelus/voice-server
+
+[Install]
+WantedBy=multi-user.target
+```
+
+Enable and start:
+
+```bash
+sudo systemctl daemon-reload
+sudo systemctl enable camelus-voice
 sudo systemctl start camelus-voice
+sudo systemctl status camelus-voice
 ```
 
-## Troubleshooting
+### Firewall Configuration
 
-**"Failed to connect to LiveKit: WebSocketException"**
-- Check LiveKit is running: `docker ps | grep livekit`
-- Restart LiveKit: `docker restart livekit`
-- Check port 7881 is open
+```bash
+# UFW (Ubuntu/Debian)
+sudo ufw allow 7880/tcp comment "Camelus Voice API"
+sudo ufw allow 7881/tcp comment "Camelus LiveKit"
+sudo ufw allow 50000:50100/udp comment "Camelus RTC"
 
-**Clients can't connect**
-- Open firewall ports 7880, 7881
-- Open UDP port 7882
+# firewalld (RHEL/CentOS)
+sudo firewall-cmd --permanent --add-port=7880/tcp
+sudo firewall-cmd --permanent --add-port=7881/tcp
+sudo firewall-cmd --permanent --add-port=50000-50100/udp
+sudo firewall-cmd --reload
+```
 
-**No servers in client**
-- Wait 5 minutes (Nostr announcement interval)
-- Check Nostr relay is reachable
+### Reverse Proxy (Optional)
 
-## Why Two Components?
+If you want to use a domain name:
 
-- **LiveKit**: Battle-tested WebRTC media server (used by companies worldwide)
-- **Voice Server**: Token generation, room management, Nostr integration
+#### Nginx
 
-This separation provides:
-✅ **Reliability** - LiveKit is production-grade  
-✅ **Simplicity** - We focus on tokens and rooms  
-✅ **Scalability** - Can run LiveKit and voice server on different machines  
-✅ **Security** - Automatic credential generation  
+```nginx
+server {
+    listen 80;
+    server_name voice.example.com;
+
+    location / {
+        proxy_pass http://localhost:7880;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+    }
+}
+
+server {
+    listen 80;
+    server_name livekit.example.com;
+
+    location / {
+        proxy_pass http://localhost:7881;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $host;
+    }
+}
+```
+
+## Common Issues
+
+### Port Already in Use
+
+```bash
+# Find what's using the port
+sudo lsof -i :7880
+sudo lsof -i :7881
+
+# Change ports in config.yaml
+```
+
+### LiveKit Download Fails
+
+```bash
+# Download manually
+wget https://github.com/livekit/livekit/releases/download/v1.7.2/livekit-server-linux-amd64
+mv livekit-server-linux-amd64 livekit-server
+chmod +x livekit-server
+
+# Place in same directory as voice-server
+```
+
+### Permission Denied
+
+```bash
+# Make binary executable
+chmod +x voice-server
+chmod +x livekit-server  # if manually downloaded
+```
+
+### Connection Refused from Clients
+
+1. Check server is running: `ps aux | grep voice-server`
+2. Check firewall: `sudo ufw status`
+3. Check ports are listening: `sudo netstat -tulpn | grep -E '7880|7881'`
+4. Test locally first: `curl http://localhost:7880/health`
+
+## Next Steps
+
+- Configure additional rooms in `config.yaml`
+- Set up admin users with Nostr pubkeys
+- Monitor with systemd: `journalctl -u camelus-voice -f`
+- Scale by running multiple servers in different regions
+
+## Support
+
+- Documentation: README.md
+- Issues: https://github.com/camelus-hq/camelus/issues
+- Tests: `cd voice-server && go test -v ./test/...`
 
 ---
 
-**LiveKit + Voice Server = Complete solution!** 🎙️
+**You're now running a complete, self-hosted voice server in a single Go binary!** 🎉

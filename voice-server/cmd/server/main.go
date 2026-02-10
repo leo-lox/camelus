@@ -63,4 +63,9 @@ func main() {
 	<-sigChan
 	log.Println("Shutting down...")
 	cancel()
+	
+	// Stop voice server (which stops embedded LiveKit)
+	if err := voiceServer.Stop(); err != nil {
+		log.Printf("Error stopping voice server: %v", err)
+	}
 }

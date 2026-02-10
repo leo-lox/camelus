@@ -14,50 +14,43 @@ import (
 	lksdk "github.com/livekit/server-sdk-go/v2"
 )
 
-// Server handles voice communication using embedded media server
+// Server handles voice communication with embedded LiveKit subprocess
 type Server struct {
 	config         *config.ServerConfig
 	roomManager    *RoomManager
-	mediaServer    *livekit.EmbeddedMediaServer
+	livekitMgr     *livekit.SubprocessManager
 	roomClient     *lksdk.RoomServiceClient
 	apiKey         string
 	apiSecret      string
 	livekitURL     string
 }
 
-// NewServer creates a new voice server with credential generation
+// NewServer creates a new voice server with embedded LiveKit
 func NewServer(cfg *config.ServerConfig) (*Server, error) {
-	// Generate credentials for LiveKit
-	livekitPort := cfg.Server.Port + 1
-	mediaServer, err := livekit.NewEmbeddedMediaServer(livekitPort, cfg.Server.RTCPortStart, cfg.Server.RTCPortEnd)
+	// Create LiveKit subprocess manager
+	livekitMgr, err := livekit.NewSubprocessManager(cfg)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create credential generator: %w", err)
+		return nil, fmt.Errorf("failed to create livekit manager: %w", err)
 	}
 
-	apiKey, apiSecret := mediaServer.GetCredentials()
-	
-	// Use configured LiveKit URL
-	livekitURL := cfg.Server.LiveKitURL
+	apiKey, apiSecret := livekitMgr.GetCredentials()
+	livekitURL := livekitMgr.GetURL()
 	
 	// Create room service client (connects to LiveKit server)
 	roomClient := lksdk.NewRoomServiceClient(livekitURL, apiKey, apiSecret)
 	
-	log.Printf("Voice server initialized")
+	log.Println("============================================================")
+	log.Println("Voice Server with Embedded LiveKit")
+	log.Println("============================================================")
 	log.Printf("Generated API Key: %s", apiKey)
 	log.Printf("Generated API Secret: %s", apiSecret)
 	log.Printf("LiveKit URL: %s", livekitURL)
-	log.Printf("")
-	log.Printf("⚠️  IMPORTANT: You must start LiveKit server for voice to work!")
-	log.Printf("Run in another terminal:")
-	log.Printf("  docker run -p %d:7880 -p %d:7882/udp \\", livekitPort, cfg.Server.RTCPortStart)
-	log.Printf("    -e \"LIVEKIT_KEYS=%s: %s\" \\", apiKey, apiSecret)
-	log.Printf("    livekit/livekit-server")
-	log.Printf("")
+	log.Println("============================================================")
 	
 	return &Server{
 		config:        cfg,
 		roomManager:   NewRoomManager(),
-		mediaServer:   mediaServer,
+		livekitMgr:    livekitMgr,
 		roomClient:    roomClient,
 		apiKey:        apiKey,
 		apiSecret:     apiSecret,
@@ -65,15 +58,13 @@ func NewServer(cfg *config.ServerConfig) (*Server, error) {
 	}, nil
 }
 
-// Start starts the voice server
+// Start starts the voice server and embedded LiveKit
 func (s *Server) Start(ctx context.Context) error {
-	// Start embedded media server first
-	if err := s.mediaServer.Start(); err != nil {
-		return fmt.Errorf("failed to start media server: %w", err)
+	// Start embedded LiveKit server first
+	log.Println("Starting embedded LiveKit server...")
+	if err := s.livekitMgr.Start(ctx); err != nil {
+		return fmt.Errorf("failed to start livekit: %w", err)
 	}
-
-	// Wait a bit for media server to initialize
-	time.Sleep(1 * time.Second)
 
 	// Initialize rooms from config
 	s.InitializeRooms()
@@ -87,8 +78,9 @@ func (s *Server) Start(ctx context.Context) error {
 	mux.HandleFunc("/leave", s.handleLeaveRoom)
 
 	addr := fmt.Sprintf("%s:%d", s.config.Server.Host, s.config.Server.Port)
-	log.Printf("Starting voice API server on %s", addr)
+	log.Printf("Starting HTTP API server on %s", addr)
 	log.Printf("LiveKit WebSocket URL: %s", s.livekitURL)
+	log.Printf("✓ Single executable ready - everything running in one process!")
 
 	server := &http.Server{
 		Addr:    addr,
@@ -99,11 +91,16 @@ func (s *Server) Start(ctx context.Context) error {
 		<-ctx.Done()
 		shutdownCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer cancel()
-		s.mediaServer.Stop()
 		server.Shutdown(shutdownCtx)
 	}()
 
 	return server.ListenAndServe()
+}
+
+// Stop stops the voice server and embedded LiveKit
+func (s *Server) Stop() error {
+	log.Println("Stopping embedded LiveKit server...")
+	return s.livekitMgr.Stop()
 }
 
 // RegisterHandlers registers HTTP handlers on the given mux (used for testing)
@@ -125,13 +122,7 @@ func (s *Server) InitializeRooms() {
 			roomCfg.MaxUsers,
 			roomCfg.IsPublic,
 		)
-		
-		// Create room in media server
-		if err := s.mediaServer.CreateRoom(roomCfg.ID); err != nil {
-			log.Printf("Warning: Could not create media room %s: %v", roomCfg.ID, err)
-		} else {
-			log.Printf("Created room: %s", roomCfg.Name)
-		}
+		log.Printf("Created room: %s", roomCfg.Name)
 	}
 }
 

@@ -3,16 +3,12 @@ server:
   description: "A self-hosted voice communication server for Camelus"
   host: "0.0.0.0"
   port: 7880
+  livekit_port: 7881  # Port for embedded LiveKit server
   max_users: 100
   region: "us-west"
   country: "US"
   
-  # LiveKit server URL (default: ws://localhost:7881)
-  # Override with LIVEKIT_URL environment variable for docker-compose
-  livekit_url: "ws://localhost:7881"
-  
-  # WebRTC port range for LiveKit server
-  # These are used in the docker command output
+  # WebRTC port range for embedded LiveKit server
   rtc_port_start: 50000
   rtc_port_end: 50100
 

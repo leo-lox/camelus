@@ -13,6 +13,20 @@ import (
 	"github.com/pion/webrtc/v3"
 )
 
+// Standalone represents generated credentials for LiveKit
+type Standalone struct {
+	APIKey    string
+	APISecret string
+}
+
+// NewStandalone generates random API credentials
+func NewStandalone() *Standalone {
+	return &Standalone{
+		APIKey:    generateRandomKey("API"),
+		APISecret: generateRandomKey("SECRET"),
+	}
+}
+
 // EmbeddedMediaServer manages an embedded WebRTC media server
 type EmbeddedMediaServer struct {
 	apiKey    string
