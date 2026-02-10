@@ -7,8 +7,12 @@ server:
   region: "us-west"
   country: "US"
   
-  # WebRTC port range for embedded LiveKit server
-  # No need for api_key or api_secret - generated automatically!
+  # LiveKit server URL (default: ws://localhost:7881)
+  # Override with LIVEKIT_URL environment variable for docker-compose
+  livekit_url: "ws://localhost:7881"
+  
+  # WebRTC port range for LiveKit server
+  # These are used in the docker command output
   rtc_port_start: 50000
   rtc_port_end: 50100
 
@@ -36,3 +40,4 @@ rooms:
     description: "Private voice channel"
     max_users: 10
     is_public: false
+

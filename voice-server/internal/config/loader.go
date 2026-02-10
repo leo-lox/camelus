@@ -31,6 +31,15 @@ func LoadConfig(path string) (*ServerConfig, error) {
 	if cfg.Server.RTCPortEnd == 0 {
 		cfg.Server.RTCPortEnd = 50100
 	}
+	
+	// Allow environment variable to override LiveKit URL
+	if livekitURL := os.Getenv("LIVEKIT_URL"); livekitURL != "" {
+		cfg.Server.LiveKitURL = livekitURL
+	}
+	// Default LiveKit URL if not specified
+	if cfg.Server.LiveKitURL == "" {
+		cfg.Server.LiveKitURL = "ws://localhost:7881"
+	}
 
 	return &cfg, nil
 }

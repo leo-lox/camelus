@@ -23,6 +23,7 @@ func createTestServer(t *testing.T) (*voice.Server, *config.ServerConfig) {
 			MaxUsers:     10,
 			Region:       "test",
 			Country:      "TS",
+			LiveKitURL:   "ws://localhost:17881", // Add LiveKit URL for tests
 			RTCPortStart: 60000,
 			RTCPortEnd:   60100,
 		},

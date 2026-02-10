@@ -25,25 +25,34 @@ type Server struct {
 	livekitURL     string
 }
 
-// NewServer creates a new voice server with embedded media server
+// NewServer creates a new voice server with credential generation
 func NewServer(cfg *config.ServerConfig) (*Server, error) {
-	// Create embedded media server on port 7881 (HTTP API on 7880)
+	// Generate credentials for LiveKit
 	livekitPort := cfg.Server.Port + 1
 	mediaServer, err := livekit.NewEmbeddedMediaServer(livekitPort, cfg.Server.RTCPortStart, cfg.Server.RTCPortEnd)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create embedded media server: %w", err)
+		return nil, fmt.Errorf("failed to create credential generator: %w", err)
 	}
 
 	apiKey, apiSecret := mediaServer.GetCredentials()
-	livekitURL := mediaServer.GetURL(cfg.Server.Host)
-
-	// Create room service client (will connect to external LiveKit if you run one)
+	
+	// Use configured LiveKit URL
+	livekitURL := cfg.Server.LiveKitURL
+	
+	// Create room service client (connects to LiveKit server)
 	roomClient := lksdk.NewRoomServiceClient(livekitURL, apiKey, apiSecret)
 	
 	log.Printf("Voice server initialized")
-	log.Printf("IMPORTANT: You must start LiveKit server for voice to work!")
-	log.Printf("Run: docker run -p %d:%d -p %d:%d/udp livekit/livekit-server",
-		livekitPort, livekitPort, cfg.Server.RTCPortStart, cfg.Server.RTCPortStart)
+	log.Printf("Generated API Key: %s", apiKey)
+	log.Printf("Generated API Secret: %s", apiSecret)
+	log.Printf("LiveKit URL: %s", livekitURL)
+	log.Printf("")
+	log.Printf("⚠️  IMPORTANT: You must start LiveKit server for voice to work!")
+	log.Printf("Run in another terminal:")
+	log.Printf("  docker run -p %d:7880 -p %d:7882/udp \\", livekitPort, cfg.Server.RTCPortStart)
+	log.Printf("    -e \"LIVEKIT_KEYS=%s: %s\" \\", apiKey, apiSecret)
+	log.Printf("    livekit/livekit-server")
+	log.Printf("")
 	
 	return &Server{
 		config:        cfg,
@@ -71,6 +80,7 @@ func (s *Server) Start(ctx context.Context) error {
 
 	// Set up HTTP handlers
 	mux := http.NewServeMux()
+	mux.HandleFunc("/health", s.handleHealth)
 	mux.HandleFunc("/rooms", s.handleGetRooms)
 	mux.HandleFunc("/token", s.handleGetToken)
 	mux.HandleFunc("/join", s.handleJoinRoom)
@@ -98,6 +108,7 @@ func (s *Server) Start(ctx context.Context) error {
 
 // RegisterHandlers registers HTTP handlers on the given mux (used for testing)
 func (s *Server) RegisterHandlers(mux *http.ServeMux) {
+	mux.HandleFunc("/health", s.handleHealth)
 	mux.HandleFunc("/rooms", s.handleGetRooms)
 	mux.HandleFunc("/token", s.handleGetToken)
 	mux.HandleFunc("/join", s.handleJoinRoom)
@@ -138,6 +149,18 @@ func (s *Server) corsMiddleware(next http.Handler) http.Handler {
 
 		next.ServeHTTP(w, r)
 	})
+}
+
+// handleHealth returns server health status
+func (s *Server) handleHealth(w http.ResponseWriter, r *http.Request) {
+	status := map[string]interface{}{
+		"status":      "healthy",
+		"livekit_url": s.livekitURL,
+		"api_port":    s.config.Server.Port,
+	}
+	
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(status)
 }
 
 // handleGetRooms returns list of available rooms

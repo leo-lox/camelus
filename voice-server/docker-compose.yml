@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  livekit:
+    image: livekit/livekit-server:latest
+    command: --dev --node-ip=127.0.0.1
+    ports:
+      - "7881:7880"      # WebSocket/HTTP port
+      - "7882:7882/udp"  # WebRTC/UDP port
+      - "7883:7881"      # WebRTC/TCP port
+    environment:
+      - LIVEKIT_KEYS=${LIVEKIT_KEYS:-APIxxxxxxxxxxxxx: SECRETxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx}
+    networks:
+      - voice-network
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:7880"]
+      interval: 5s
+      timeout: 3s
+      retries: 3
+
+  voice-server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "7880:7880"  # HTTP API port
+    volumes:
+      - ./config.yaml:/app/config.yaml:ro
+    depends_on:
+      livekit:
+        condition: service_healthy
+    networks:
+      - voice-network
+    environment:
+      - LIVEKIT_URL=ws://livekit:7880
+
+networks:
+  voice-network:
+    driver: bridge

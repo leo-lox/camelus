@@ -17,6 +17,9 @@ type ServerSettings struct {
 	Region      string `yaml:"region"`
 	Country     string `yaml:"country"`
 	
+	// LiveKit server URL (can be overridden by LIVEKIT_URL env var)
+	LiveKitURL string `yaml:"livekit_url"`
+	
 	// WebRTC port range for embedded LiveKit
 	RTCPortStart int `yaml:"rtc_port_start"`
 	RTCPortEnd   int `yaml:"rtc_port_end"`
