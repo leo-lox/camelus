@@ -123,16 +123,43 @@ class VoiceDiscovery {
   }) async {
     final servers = <String, VoiceServer>{};
     
-    // Add timeout to prevent hanging and limit results
-    final subscription = discoverServers(region: region, country: country)
-        .timeout(
-          const Duration(seconds: 10),
-          onTimeout: (sink) => sink.close(),
-        )
-        .take(100); // Limit to 100 servers max
-    
-    await for (final server in subscription) {
-      servers[server.id] = server;
+    try {
+      // Use query instead of subscription for more reliable one-time fetch
+      final filter = Nip01Filter(
+        kinds: [voiceServerKind],
+        limit: 100,
+      );
+
+      // Fetch with timeout
+      final events = await _ndk.requests
+          .query(filters: [filter])
+          .timeout(
+            const Duration(seconds: 15),
+            onTimeout: (sink) {
+              sink.close();
+            },
+          )
+          .take(100)
+          .toList();
+
+      // Parse events
+      for (final event in events) {
+        try {
+          final server = _parseServerFromEvent(event);
+          
+          // Apply filters if specified
+          if (region != null && server.region != region) continue;
+          if (country != null && server.country != country) continue;
+
+          servers[server.id] = server;
+        } catch (e) {
+          // Skip invalid events
+          continue;
+        }
+      }
+    } catch (e) {
+      // Log error but return what we have
+      print('Error fetching servers: $e');
     }
     
     return servers.values.toList()

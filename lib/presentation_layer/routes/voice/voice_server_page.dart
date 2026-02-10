@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 import '../../../domain_layer/entities/voice/voice_server.dart';
 import '../../../domain_layer/entities/voice/voice_room.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../providers/voice/voice_provider.dart';
+import '../../providers/voice/livekit_provider.dart';
+import '../../providers/ndk_provider.dart';
 
 class VoiceServerPage extends ConsumerStatefulWidget {
   final VoiceServer server;
@@ -212,6 +216,8 @@ class _VoiceServerPageState extends ConsumerState<VoiceServerPage> {
   }
 
   void _showJoinRoomDialog(BuildContext context, VoiceRoom room) {
+    final voiceConnection = ref.read(voiceConnectionProvider);
+    
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -220,9 +226,20 @@ class _VoiceServerPageState extends ConsumerState<VoiceServerPage> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Voice communication is currently in beta.'),
+            if (voiceConnection.isConnected)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: Text(
+                  'You are currently connected to another room. Joining will disconnect you.',
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.error,
+                    fontSize: 12,
+                  ),
+                ),
+              ),
+            const Text('Voice communication will start immediately.'),
             const SizedBox(height: 8),
-            Text('Make sure you have granted microphone permissions.'),
+            const Text('Make sure you have granted microphone permissions.'),
             const SizedBox(height: 8),
             Text(
               'Server: ${widget.server.name}',
@@ -242,16 +259,165 @@ class _VoiceServerPageState extends ConsumerState<VoiceServerPage> {
           ElevatedButton(
             onPressed: () {
               Navigator.pop(context);
-              // TODO: Implement actual voice connection
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Voice connection coming soon!'),
-                ),
-              );
+              _joinRoom(context, room);
             },
             child: const Text('Join'),
           ),
         ],
+      ),
+    );
+  }
+
+  Future<void> _joinRoom(BuildContext context, VoiceRoom room) async {
+    final voiceConnectionNotifier = ref.read(voiceConnectionProvider.notifier);
+    final liveKitService = ref.read(liveKitVoiceServiceProvider);
+    final ndk = ref.read(ndkProvider);
+    
+    try {
+      voiceConnectionNotifier.setConnecting(true);
+      
+      // Show loading
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Connecting to voice room...'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+
+      // Get user info
+      final userPubkey = ndk.accounts.getPublicKey();
+      final userId = userPubkey ?? 'anon-${DateTime.now().millisecondsSinceEpoch}';
+      final displayName = 'User'; // TODO: Get from user profile
+
+      // Request token from server
+      final tokenResponse = await http.post(
+        Uri.parse('http://${widget.server.address}/token'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'roomId': room.id,
+          'userId': userId,
+          'displayName': displayName,
+        }),
+      );
+
+      if (tokenResponse.statusCode != 200) {
+        throw Exception('Failed to get access token: ${tokenResponse.statusCode}');
+      }
+
+      final tokenData = jsonDecode(tokenResponse.body);
+      final token = tokenData['token'] as String;
+      final livekitUrl = tokenData['url'] as String;
+
+      // Connect to LiveKit
+      await liveKitService.connect(
+        url: livekitUrl,
+        token: token,
+        roomName: room.id,
+      );
+
+      voiceConnectionNotifier.setConnected(
+        true,
+        roomId: room.id,
+        serverUrl: widget.server.address,
+      );
+
+      if (!context.mounted) return;
+      
+      // Show voice controls dialog
+      _showVoiceControlsDialog(context, room, liveKitService);
+      
+    } catch (e) {
+      voiceConnectionNotifier.setError(e.toString());
+      
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to join room: $e'),
+          backgroundColor: Theme.of(context).colorScheme.error,
+        ),
+      );
+    }
+  }
+
+  void _showVoiceControlsDialog(BuildContext context, VoiceRoom room, dynamic service) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => WillPopScope(
+        onWillPop: () async => false,
+        child: Consumer(
+          builder: (context, ref, _) {
+            final voiceConnection = ref.watch(voiceConnectionProvider);
+            
+            return AlertDialog(
+              title: Row(
+                children: [
+                  Icon(PhosphorIcons.microphone(), color: Theme.of(context).colorScheme.primary),
+                  const SizedBox(width: 8),
+                  Expanded(child: Text(room.name)),
+                ],
+              ),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    voiceConnection.isConnected ? 'Connected' : 'Connecting...',
+                    style: TextStyle(
+                      color: voiceConnection.isConnected 
+                          ? Colors.green 
+                          : Colors.orange,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      IconButton(
+                        iconSize: 48,
+                        onPressed: () async {
+                          await service.toggleMute();
+                          ref.read(voiceConnectionProvider.notifier).setMuted(service.isMuted);
+                        },
+                        icon: Icon(
+                          voiceConnection.isMuted 
+                              ? PhosphorIcons.microphoneSlash() 
+                              : PhosphorIcons.microphone(),
+                          color: voiceConnection.isMuted 
+                              ? Theme.of(context).colorScheme.error 
+                              : Theme.of(context).colorScheme.primary,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    voiceConnection.isMuted ? 'Muted' : 'Unmuted',
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                ],
+              ),
+              actions: [
+                ElevatedButton.icon(
+                  onPressed: () async {
+                    await service.disconnect();
+                    ref.read(voiceConnectionProvider.notifier).disconnect();
+                    if (context.mounted) {
+                      Navigator.pop(context);
+                    }
+                  },
+                  icon: Icon(PhosphorIcons.phoneDisconnect()),
+                  label: const Text('Leave Room'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Theme.of(context).colorScheme.error,
+                    foregroundColor: Theme.of(context).colorScheme.onError,
+                  ),
+                ),
+              ],
+            );
+          },
+        ),
       ),
     );
   }

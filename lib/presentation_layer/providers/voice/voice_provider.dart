@@ -59,10 +59,21 @@ class VoiceServersNotifier extends StateNotifier<VoiceServersState> {
       final servers = await _discovery.getAvailableServers(
         region: state.regionFilter,
         country: state.countryFilter,
+      ).timeout(
+        const Duration(seconds: 20),
+        onTimeout: () {
+          // Return empty list on timeout instead of throwing
+          return <VoiceServer>[];
+        },
       );
+      
       state = state.copyWith(servers: servers, isLoading: false);
     } catch (e) {
-      state = state.copyWith(error: e.toString(), isLoading: false);
+      state = state.copyWith(
+        error: 'Failed to load servers: ${e.toString()}',
+        isLoading: false,
+        servers: [], // Set empty list on error
+      );
     }
   }
 

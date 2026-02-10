@@ -6,8 +6,11 @@ server:
   max_users: 100
   region: "us-west"
   country: "US"
-  rtc_min_port: 50000
-  rtc_max_port: 60000
+  
+  # LiveKit settings
+  livekit_url: "ws://localhost:7880"  # Your LiveKit server URL
+  api_key: "your-api-key"             # LiveKit API key
+  api_secret: "your-api-secret"       # LiveKit API secret
 
 nostr:
   relay_url: "wss://relay.damus.io"

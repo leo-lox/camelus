@@ -17,9 +17,10 @@ type ServerSettings struct {
 	Region      string `yaml:"region"`
 	Country     string `yaml:"country"`
 	
-	// WebRTC settings
-	RTCMinPort int `yaml:"rtc_min_port"`
-	RTCMaxPort int `yaml:"rtc_max_port"`
+	// LiveKit settings
+	LiveKitURL string `yaml:"livekit_url"`
+	APIKey     string `yaml:"api_key"`
+	APISecret  string `yaml:"api_secret"`
 }
 
 // NostrSettings contains Nostr relay configuration

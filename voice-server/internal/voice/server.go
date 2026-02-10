@@ -6,28 +6,29 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"sync"
 	"time"
 
 	"github.com/camelus-hq/camelus/voice-server/internal/config"
-	"github.com/pion/webrtc/v3"
+	"github.com/livekit/protocol/auth"
+	"github.com/livekit/protocol/livekit"
+	lksdk "github.com/livekit/server-sdk-go/v2"
 )
 
-// Server handles voice communication
+// Server handles voice communication using LiveKit
 type Server struct {
 	config      *config.ServerConfig
 	roomManager *RoomManager
-	
-	mu          sync.RWMutex
-	connections map[string]*webrtc.PeerConnection
+	roomClient  *lksdk.RoomServiceClient
 }
 
-// NewServer creates a new voice server
+// NewServer creates a new voice server with LiveKit
 func NewServer(cfg *config.ServerConfig) *Server {
+	roomClient := lksdk.NewRoomServiceClient(cfg.Server.LiveKitURL, cfg.Server.APIKey, cfg.Server.APISecret)
+	
 	return &Server{
 		config:      cfg,
 		roomManager: NewRoomManager(),
-		connections: make(map[string]*webrtc.PeerConnection),
+		roomClient:  roomClient,
 	}
 }
 
@@ -42,16 +43,24 @@ func (s *Server) Start(ctx context.Context) error {
 			roomCfg.MaxUsers,
 			roomCfg.IsPublic,
 		)
+		
+		// Create LiveKit room
+		_, err := s.roomClient.CreateRoom(ctx, &livekit.CreateRoomRequest{
+			Name:            roomCfg.ID,
+			EmptyTimeout:    600,  // 10 minutes
+			MaxParticipants: uint32(roomCfg.MaxUsers),
+		})
+		if err != nil {
+			log.Printf("Warning: Could not create LiveKit room %s: %v", roomCfg.ID, err)
+		}
 	}
 
 	// Set up HTTP handlers
 	mux := http.NewServeMux()
 	mux.HandleFunc("/rooms", s.handleGetRooms)
+	mux.HandleFunc("/token", s.handleGetToken)
 	mux.HandleFunc("/join", s.handleJoinRoom)
 	mux.HandleFunc("/leave", s.handleLeaveRoom)
-	mux.HandleFunc("/offer", s.handleOffer)
-	mux.HandleFunc("/answer", s.handleAnswer)
-	mux.HandleFunc("/ice-candidate", s.handleICECandidate)
 
 	addr := fmt.Sprintf("%s:%d", s.config.Server.Host, s.config.Server.Port)
 	log.Printf("Starting voice server on %s", addr)
@@ -63,7 +72,6 @@ func (s *Server) Start(ctx context.Context) error {
 
 	go func() {
 		<-ctx.Done()
-		// Use a timeout context for graceful shutdown
 		shutdownCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer cancel()
 		server.Shutdown(shutdownCtx)
@@ -122,6 +130,52 @@ func (s *Server) getRoomUserList(room *Room) []map[string]string {
 	return result
 }
 
+// handleGetToken generates a LiveKit access token
+func (s *Server) handleGetToken(w http.ResponseWriter, r *http.Request) {
+	var req struct {
+		RoomID      string `json:"roomId"`
+		UserID      string `json:"userId"`
+		DisplayName string `json:"displayName"`
+	}
+
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	room := s.roomManager.GetRoom(req.RoomID)
+	if room == nil {
+		http.Error(w, "room not found", http.StatusNotFound)
+		return
+	}
+
+	// Create access token
+	at := auth.NewAccessToken(s.config.Server.APIKey, s.config.Server.APISecret)
+	grant := &auth.VideoGrant{
+		RoomJoin: true,
+		Room:     req.RoomID,
+	}
+	at.AddGrant(grant).
+		SetIdentity(req.UserID).
+		SetName(req.DisplayName).
+		SetValidFor(24 * time.Hour)
+
+	token, err := at.ToJWT()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"token":       token,
+		"url":         s.config.Server.LiveKitURL,
+		"roomId":      req.RoomID,
+		"identity":    req.UserID,
+		"displayName": req.DisplayName,
+	})
+}
+
 // handleJoinRoom handles user joining a room
 func (s *Server) handleJoinRoom(w http.ResponseWriter, r *http.Request) {
 	var req struct {
@@ -177,120 +231,6 @@ func (s *Server) handleLeaveRoom(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]string{"status": "left"})
-}
-
-// handleOffer handles WebRTC offer from client
-func (s *Server) handleOffer(w http.ResponseWriter, r *http.Request) {
-	var req struct {
-		UserID string                     `json:"userId"`
-		Offer  webrtc.SessionDescription  `json:"offer"`
-	}
-
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	// Create WebRTC config with Opus codec for high-quality, low-latency audio
-	config := webrtc.Configuration{
-		ICEServers: []webrtc.ICEServer{
-			{
-				URLs: []string{"stun:stun.l.google.com:19302"},
-			},
-		},
-	}
-
-	peerConnection, err := webrtc.NewPeerConnection(config)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	// Set remote description (offer)
-	if err := peerConnection.SetRemoteDescription(req.Offer); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	// Create answer
-	answer, err := peerConnection.CreateAnswer(nil)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	// Set local description (answer)
-	if err := peerConnection.SetLocalDescription(answer); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	s.mu.Lock()
-	s.connections[req.UserID] = peerConnection
-	s.mu.Unlock()
-
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]interface{}{
-		"answer": answer,
-	})
-}
-
-// handleAnswer handles WebRTC answer from client
-func (s *Server) handleAnswer(w http.ResponseWriter, r *http.Request) {
-	var req struct {
-		UserID string                     `json:"userId"`
-		Answer webrtc.SessionDescription  `json:"answer"`
-	}
-
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	s.mu.RLock()
-	pc := s.connections[req.UserID]
-	s.mu.RUnlock()
-
-	if pc == nil {
-		http.Error(w, "connection not found", http.StatusNotFound)
-		return
-	}
-
-	if err := pc.SetRemoteDescription(req.Answer); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	w.WriteHeader(http.StatusOK)
-}
-
-// handleICECandidate handles ICE candidate exchange
-func (s *Server) handleICECandidate(w http.ResponseWriter, r *http.Request) {
-	var req struct {
-		UserID    string                  `json:"userId"`
-		Candidate webrtc.ICECandidateInit `json:"candidate"`
-	}
-
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	s.mu.RLock()
-	pc := s.connections[req.UserID]
-	s.mu.RUnlock()
-
-	if pc == nil {
-		http.Error(w, "connection not found", http.StatusNotFound)
-		return
-	}
-
-	if err := pc.AddICECandidate(req.Candidate); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	w.WriteHeader(http.StatusOK)
 }
 
 // GetRoomManager returns the room manager
