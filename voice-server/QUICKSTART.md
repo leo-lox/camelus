@@ -8,22 +8,30 @@ This guide will get you running the Camelus Voice Server in under 5 minutes with
 
 - Go 1.21+ (for building)
 - Linux, macOS, or Windows
-- Internet connection (for downloading LiveKit binary)
 - Ports 7880, 7881, and 50000-50100 available
 
-## Step 1: Build the Server
+## Step 1: Build Everything
+
+The LiveKit source code is included in `voice-server/livekit/`. Build both components:
 
 ```bash
 # Clone repository (if not already)
 git clone https://github.com/camelus-hq/camelus
 cd camelus/voice-server
 
-# Build single executable
-go build -o voice-server ./cmd/server
+# Build LiveKit from source
+make build-livekit
 
-# Check binary
-ls -lh voice-server
-# Should show ~19MB
+# Build voice server
+make build-server
+
+# Or build everything at once
+make build
+
+# Check binaries
+ls -lh livekit-server voice-server
+# livekit-server: ~66MB
+# voice-server: ~19MB
 ```
 
 ## Step 2: Create Configuration
@@ -78,8 +86,7 @@ Generated API Key: APIxxxxxxxxxx
 Generated API Secret: SECRETxxxxxxxxxx
 LiveKit URL: ws://localhost:7881
 ============================================================
-Downloading LiveKit server v1.7.2 for linux/amd64...
-✓ LiveKit binary downloaded to ./livekit-server
+Using LiveKit binary: /path/to/livekit-server
 Starting embedded LiveKit server on port 7881...
 ✓ LiveKit server started successfully
 Created room: General
@@ -257,15 +264,15 @@ sudo lsof -i :7881
 # Change ports in config.yaml
 ```
 
-### LiveKit Download Fails
+### LiveKit Binary Not Found
 
 ```bash
-# Download manually
-wget https://github.com/livekit/livekit/releases/download/v1.7.2/livekit-server-linux-amd64
-mv livekit-server-linux-amd64 livekit-server
-chmod +x livekit-server
+# Build LiveKit from source
+cd voice-server
+make build-livekit
 
-# Place in same directory as voice-server
+# Verify binary exists
+ls -lh livekit-server
 ```
 
 ### Permission Denied

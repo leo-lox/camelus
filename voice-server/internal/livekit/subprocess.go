@@ -3,19 +3,13 @@ package livekit
 import (
 	"context"
 	"fmt"
-	"io"
 	"net/http"
 	"os"
 	"os/exec"
 	"path/filepath"
-	"runtime"
 	"time"
 
 	"github.com/camelus-hq/camelus/voice-server/internal/config"
-)
-
-const (
-	livekitVersion = "v1.7.2"
 )
 
 // SubprocessManager manages the LiveKit server as a subprocess
@@ -93,78 +87,43 @@ func (sm *SubprocessManager) Stop() error {
 	return nil
 }
 
-// ensureLiveKitBinary ensures the LiveKit binary exists, downloading if necessary
+// ensureLiveKitBinary ensures the LiveKit binary exists (built from local source)
 func (sm *SubprocessManager) ensureLiveKitBinary() error {
-	// Determine binary name and download URL
-	osName := runtime.GOOS
-	arch := runtime.GOARCH
+	// Look for LiveKit binary built from local source
+	// The Makefile builds it to the voice-server directory
 	
-	binaryName := "livekit-server"
-	if osName == "windows" {
-		binaryName += ".exe"
+	// Try multiple locations
+	possiblePaths := []string{
+		"./livekit-server",           // Built by Makefile
+		"../livekit-server",          // If running from subdirectory
+		"./voice-server/livekit-server", // If running from repo root
 	}
-
-	// Store binary in the same directory as our executable or a cache dir
-	execPath, _ := os.Executable()
-	execDir := filepath.Dir(execPath)
-	sm.binaryPath = filepath.Join(execDir, binaryName)
-
-	// Check if binary already exists
-	if _, err := os.Stat(sm.binaryPath); err == nil {
-		fmt.Printf("Using existing LiveKit binary: %s\n", sm.binaryPath)
-		return nil
-	}
-
-	// Download binary
-	fmt.Printf("Downloading LiveKit server %s for %s/%s...\n", livekitVersion, osName, arch)
 	
-	downloadURL := fmt.Sprintf(
-		"https://github.com/livekit/livekit/releases/download/%s/livekit-server-%s-%s",
-		livekitVersion, osName, arch,
-	)
-	if osName == "windows" {
-		downloadURL += ".exe"
+	// Also check same directory as our executable
+	if execPath, err := os.Executable(); err == nil {
+		execDir := filepath.Dir(execPath)
+		possiblePaths = append(possiblePaths, filepath.Join(execDir, "livekit-server"))
 	}
-
-	resp, err := http.Get(downloadURL)
-	if err != nil {
-		return fmt.Errorf("failed to download livekit: %w", err)
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("failed to download livekit: status %d", resp.StatusCode)
-	}
-
-	// Create temporary file
-	tmpFile, err := os.CreateTemp("", "livekit-*")
-	if err != nil {
-		return fmt.Errorf("failed to create temp file: %w", err)
-	}
-	tmpPath := tmpFile.Name()
-	defer os.Remove(tmpPath)
-
-	// Download to temp file
-	if _, err := io.Copy(tmpFile, resp.Body); err != nil {
-		tmpFile.Close()
-		return fmt.Errorf("failed to write livekit binary: %w", err)
-	}
-	tmpFile.Close()
-
-	// Make executable (Unix)
-	if osName != "windows" {
-		if err := os.Chmod(tmpPath, 0755); err != nil {
-			return fmt.Errorf("failed to chmod livekit binary: %w", err)
+	
+	for _, path := range possiblePaths {
+		absPath, _ := filepath.Abs(path)
+		if _, err := os.Stat(absPath); err == nil {
+			sm.binaryPath = absPath
+			fmt.Printf("Using LiveKit binary: %s\n", sm.binaryPath)
+			return nil
 		}
 	}
-
-	// Move to final location
-	if err := os.Rename(tmpPath, sm.binaryPath); err != nil {
-		return fmt.Errorf("failed to move livekit binary: %w", err)
-	}
-
-	fmt.Printf("✓ LiveKit binary downloaded to %s\n", sm.binaryPath)
-	return nil
+	
+	return fmt.Errorf(`livekit-server binary not found. Please build it first:
+	
+	cd voice-server
+	make build-livekit
+	
+Or build everything:
+	
+	make build
+	
+This will compile LiveKit from the local source code in voice-server/livekit/`)
 }
 
 // createLiveKitConfig creates a configuration file for LiveKit

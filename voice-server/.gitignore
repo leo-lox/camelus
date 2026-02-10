@@ -1,5 +1,6 @@
 # Binaries
 voice-server
+livekit-server
 *.exe
 *.exe~
 *.dll
@@ -20,6 +21,7 @@ go.work
 
 # Configuration files with secrets
 config.yaml
+livekit-config-*.yaml
 
 # IDE
 .vscode/
