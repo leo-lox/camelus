@@ -27,7 +27,10 @@ func main() {
 	log.Printf("Region: %s, Country: %s", cfg.Server.Region, cfg.Server.Country)
 
 	// Create voice server
-	voiceServer := voice.NewServer(cfg)
+	voiceServer, err := voice.NewServer(cfg)
+	if err != nil {
+		log.Fatalf("Failed to create voice server: %v", err)
+	}
 
 	// Create Nostr advertiser
 	advertiser := nostr.NewAdvertiser(cfg, voiceServer.GetRoomManager())

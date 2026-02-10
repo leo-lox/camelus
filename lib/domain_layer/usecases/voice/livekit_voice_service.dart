@@ -143,9 +143,9 @@ class LiveKitVoiceService {
     }
   }
 
-  void dispose() {
-    disconnect();
-    _connectionStateController.close();
-    _participantsController.close();
+  Future<void> dispose() async {
+    await disconnect();
+    await _connectionStateController.close();
+    await _participantsController.close();
   }
 }

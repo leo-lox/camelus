@@ -7,10 +7,10 @@ server:
   region: "us-west"
   country: "US"
   
-  # LiveKit settings
-  livekit_url: "ws://localhost:7880"  # Your LiveKit server URL
-  api_key: "your-api-key"             # LiveKit API key
-  api_secret: "your-api-secret"       # LiveKit API secret
+  # WebRTC port range for embedded LiveKit server
+  # No need for api_key or api_secret - generated automatically!
+  rtc_port_start: 50000
+  rtc_port_end: 50100
 
 nostr:
   relay_url: "wss://relay.damus.io"

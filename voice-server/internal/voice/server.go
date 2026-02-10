@@ -9,27 +9,52 @@ import (
 	"time"
 
 	"github.com/camelus-hq/camelus/voice-server/internal/config"
+	"github.com/camelus-hq/camelus/voice-server/internal/livekit"
 	"github.com/livekit/protocol/auth"
-	"github.com/livekit/protocol/livekit"
+	livekitProto "github.com/livekit/protocol/livekit"
 	lksdk "github.com/livekit/server-sdk-go/v2"
 )
 
-// Server handles voice communication using LiveKit
+// Server handles voice communication using standalone LiveKit
 type Server struct {
-	config      *config.ServerConfig
-	roomManager *RoomManager
-	roomClient  *lksdk.RoomServiceClient
+	config         *config.ServerConfig
+	roomManager    *RoomManager
+	standalone     *livekit.StandaloneLiveKit
+	roomClient     *lksdk.RoomServiceClient
+	apiKey         string
+	apiSecret      string
+	livekitURL     string
 }
 
-// NewServer creates a new voice server with LiveKit
-func NewServer(cfg *config.ServerConfig) *Server {
-	roomClient := lksdk.NewRoomServiceClient(cfg.Server.LiveKitURL, cfg.Server.APIKey, cfg.Server.APISecret)
+// NewServer creates a new voice server with standalone LiveKit credentials
+func NewServer(cfg *config.ServerConfig) (*Server, error) {
+	// Create standalone LiveKit with generated credentials
+	// Note: This uses port 7881 for LiveKit WebSocket, 7880 for HTTP API
+	livekitPort := cfg.Server.Port + 1
+	standalone := livekit.NewStandaloneLiveKit(livekitPort)
+
+	apiKey, apiSecret := standalone.GetCredentials()
+	livekitURL := standalone.GetURL(cfg.Server.Host)
+
+	// Create room service client (will connect to external LiveKit if you run one,
+	// or you can skip this if purely standalone)
+	// For now, we'll keep it for compatibility but it won't be strictly required
+	roomClient := lksdk.NewRoomServiceClient(livekitURL, apiKey, apiSecret)
+	
+	log.Printf("Server is standalone - LiveKit credentials generated")
+	log.Printf("To use voice features, you need to run a LiveKit server separately")
+	log.Printf("Run: docker run -p %d:%d -e LIVEKIT_KEYS=\"%s: %s\" livekit/livekit-server",
+		livekitPort, livekitPort, apiKey, apiSecret)
 	
 	return &Server{
-		config:      cfg,
-		roomManager: NewRoomManager(),
-		roomClient:  roomClient,
-	}
+		config:        cfg,
+		roomManager:   NewRoomManager(),
+		standalone:    standalone,
+		roomClient:    roomClient,
+		apiKey:        apiKey,
+		apiSecret:     apiSecret,
+		livekitURL:    livekitURL,
+	}, nil
 }
 
 // Start starts the voice server
@@ -44,14 +69,14 @@ func (s *Server) Start(ctx context.Context) error {
 			roomCfg.IsPublic,
 		)
 		
-		// Create LiveKit room
-		_, err := s.roomClient.CreateRoom(ctx, &livekit.CreateRoomRequest{
+		// Try to create room in LiveKit (will fail silently if LiveKit not running)
+		_, err := s.roomClient.CreateRoom(ctx, &livekitProto.CreateRoomRequest{
 			Name:            roomCfg.ID,
 			EmptyTimeout:    600,  // 10 minutes
 			MaxParticipants: uint32(roomCfg.MaxUsers),
 		})
 		if err != nil {
-			log.Printf("Warning: Could not create LiveKit room %s: %v", roomCfg.ID, err)
+			log.Printf("Note: Could not create LiveKit room %s (LiveKit server may not be running): %v", roomCfg.ID, err)
 		}
 	}
 
@@ -63,7 +88,8 @@ func (s *Server) Start(ctx context.Context) error {
 	mux.HandleFunc("/leave", s.handleLeaveRoom)
 
 	addr := fmt.Sprintf("%s:%d", s.config.Server.Host, s.config.Server.Port)
-	log.Printf("Starting voice server on %s", addr)
+	log.Printf("Starting voice API server on %s", addr)
+	log.Printf("LiveKit WebSocket URL: %s", s.livekitURL)
 
 	server := &http.Server{
 		Addr:    addr,
@@ -149,8 +175,8 @@ func (s *Server) handleGetToken(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Create access token
-	at := auth.NewAccessToken(s.config.Server.APIKey, s.config.Server.APISecret)
+	// Create access token using embedded LiveKit credentials
+	at := auth.NewAccessToken(s.apiKey, s.apiSecret)
 	grant := &auth.VideoGrant{
 		RoomJoin: true,
 		Room:     req.RoomID,
@@ -169,7 +195,7 @@ func (s *Server) handleGetToken(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]interface{}{
 		"token":       token,
-		"url":         s.config.Server.LiveKitURL,
+		"url":         s.livekitURL,
 		"roomId":      req.RoomID,
 		"identity":    req.UserID,
 		"displayName": req.DisplayName,

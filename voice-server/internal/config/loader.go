@@ -25,8 +25,11 @@ func LoadConfig(path string) (*ServerConfig, error) {
 	if cfg.Server.MaxUsers == 0 {
 		cfg.Server.MaxUsers = 100
 	}
-	if cfg.Server.LiveKitURL == "" {
-		cfg.Server.LiveKitURL = "ws://localhost:7880"
+	if cfg.Server.RTCPortStart == 0 {
+		cfg.Server.RTCPortStart = 50000
+	}
+	if cfg.Server.RTCPortEnd == 0 {
+		cfg.Server.RTCPortEnd = 50100
 	}
 
 	return &cfg, nil
