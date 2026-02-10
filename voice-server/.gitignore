@@ -1,6 +1,5 @@
 # Binaries
 voice-server
-livekit-server
 *.exe
 *.exe~
 *.dll

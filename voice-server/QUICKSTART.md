@@ -1,308 +1,120 @@
 # Quick Start Guide
 
-## Single Binary Setup - No Docker!
-
-This guide will get you running the Camelus Voice Server in under 5 minutes with **one executable**.
+Get your Camelus voice server running in 3 simple steps!
 
 ## Prerequisites
 
-- Go 1.21+ (for building)
-- Linux, macOS, or Windows
-- Ports 7880, 7881, and 50000-50100 available
+- Go 1.21 or later
+- Git
 
-## Step 1: Build Everything
-
-The LiveKit source code is included in `voice-server/livekit/`. Build both components:
+## Step 1: Build
 
 ```bash
-# Clone repository (if not already)
-git clone https://github.com/camelus-hq/camelus
-cd camelus/voice-server
-
-# Build LiveKit from source
-make build-livekit
-
-# Build voice server
-make build-server
-
-# Or build everything at once
+cd voice-server
 make build
-
-# Check binaries
-ls -lh livekit-server voice-server
-# livekit-server: ~66MB
-# voice-server: ~19MB
 ```
 
-## Step 2: Create Configuration
-
-```bash
-# Copy example config
-cp config.example.yaml config.yaml
-
-# Edit configuration
-nano config.yaml  # or vim, emacs, etc.
+Output:
+```
+Building voice server with embedded LiveKit...
+✓ Voice server built successfully (67MB with embedded LiveKit)
 ```
 
-### Minimal Configuration
+## Step 2: Configure
+
+Create `config.yaml`:
 
 ```yaml
 server:
-  name: "My Voice Server"
-  description: "Camelus voice chat"
   host: "0.0.0.0"
   port: 7880
   livekit_port: 7881
-  region: "us-west"
+  rtc_port_start: 50000
+  rtc_port_end: 50100
+  name: "My Voice Server"
+  description: "Community voice server"
   country: "US"
+  region: "North America"
 
 nostr:
-  relay_url: "wss://relay.damus.io"
-  private_key: "nsec1..."  # Generate with: nostr-tools or any Nostr client
-  admin_pubkeys:
-    - "npub1..."  # Your Nostr public key
+  relays:
+    - "wss://relay.damus.io"
+    - "wss://nos.lol"
+  private_key: ""  # Auto-generated if empty
 
 rooms:
-  - id: "general"
-    name: "General"
-    description: "Main voice chat"
-    max_users: 50
-    is_public: true
+  - name: "General"
+    description: "General discussion"
+    max_participants: 50
 ```
 
-## Step 3: Run the Server
+## Step 3: Run
 
 ```bash
 ./voice-server -config config.yaml
 ```
 
-### Expected Output
-
+Output:
 ```
 ============================================================
 Voice Server with Embedded LiveKit
 ============================================================
-Generated API Key: APIxxxxxxxxxx
-Generated API Secret: SECRETxxxxxxxxxx
+Generated API Key: APIxxx...
+Generated API Secret: SECRETxxx...
 LiveKit URL: ws://localhost:7881
 ============================================================
-Using LiveKit binary: /path/to/livekit-server
-Starting embedded LiveKit server on port 7881...
-✓ LiveKit server started successfully
-Created room: General
+✓ Embedded LiveKit server started successfully
 Starting HTTP API server on 0.0.0.0:7880
-LiveKit WebSocket URL: ws://localhost:7881
 ✓ Single executable ready - everything running in one process!
 ```
 
-## Step 4: Verify It's Working
+That's it! Your voice server is now running.
 
-### Check Health
+## Test It
+
+Open another terminal:
 
 ```bash
+# Check server health
 curl http://localhost:7880/health
-```
 
-Expected response:
-```json
-{
-  "status": "healthy",
-  "livekit_url": "ws://localhost:7881"
-}
-```
-
-### List Rooms
-
-```bash
+# List rooms
 curl http://localhost:7880/rooms
+
+# Get a token to join
+curl "http://localhost:7880/token?room=General&identity=testuser"
 ```
 
-Expected response:
-```json
-{
-  "rooms": [
-    {
-      "id": "general",
-      "name": "General",
-      "description": "Main voice chat",
-      "users": [],
-      "max_users": 50,
-      "is_public": true
-    }
-  ]
-}
-```
+## What Just Happened?
 
-### Check LiveKit
-
-```bash
-# LiveKit should be running
-ps aux | grep livekit-server
-
-# Test LiveKit health (if exposed)
-curl http://localhost:7881/
-```
-
-## Step 5: Connect from Client
-
-### Flutter Client
-
-1. Open Camelus app
-2. Go to Voice section (sidebar)
-3. Wait up to 5 minutes for Nostr discovery
-4. Server should appear in list
-5. Tap to see rooms
-6. Join a room and start talking!
-
-### Troubleshooting Client Connection
-
-If server doesn't appear:
-1. Check Nostr relay is accessible
-2. Verify server is announcing (check logs)
-3. Try manual discovery with server IP
-4. Wait longer (Nostr can be slow)
-
-## Production Deployment
-
-### Systemd Service
-
-Create `/etc/systemd/system/camelus-voice.service`:
-
-```ini
-[Unit]
-Description=Camelus Voice Server
-After=network.target
-
-[Service]
-Type=simple
-User=camelus
-Group=camelus
-WorkingDirectory=/opt/camelus/voice-server
-ExecStart=/opt/camelus/voice-server/voice-server -config /opt/camelus/voice-server/config.yaml
-Restart=always
-RestartSec=5
-
-# Security
-NoNewPrivileges=true
-PrivateTmp=true
-ProtectSystem=strict
-ProtectHome=true
-ReadWritePaths=/opt/camelus/voice-server
-
-[Install]
-WantedBy=multi-user.target
-```
-
-Enable and start:
-
-```bash
-sudo systemctl daemon-reload
-sudo systemctl enable camelus-voice
-sudo systemctl start camelus-voice
-sudo systemctl status camelus-voice
-```
-
-### Firewall Configuration
-
-```bash
-# UFW (Ubuntu/Debian)
-sudo ufw allow 7880/tcp comment "Camelus Voice API"
-sudo ufw allow 7881/tcp comment "Camelus LiveKit"
-sudo ufw allow 50000:50100/udp comment "Camelus RTC"
-
-# firewalld (RHEL/CentOS)
-sudo firewall-cmd --permanent --add-port=7880/tcp
-sudo firewall-cmd --permanent --add-port=7881/tcp
-sudo firewall-cmd --permanent --add-port=50000-50100/udp
-sudo firewall-cmd --reload
-```
-
-### Reverse Proxy (Optional)
-
-If you want to use a domain name:
-
-#### Nginx
-
-```nginx
-server {
-    listen 80;
-    server_name voice.example.com;
-
-    location / {
-        proxy_pass http://localhost:7880;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection "upgrade";
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-    }
-}
-
-server {
-    listen 80;
-    server_name livekit.example.com;
-
-    location / {
-        proxy_pass http://localhost:7881;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection "upgrade";
-        proxy_set_header Host $host;
-    }
-}
-```
-
-## Common Issues
-
-### Port Already in Use
-
-```bash
-# Find what's using the port
-sudo lsof -i :7880
-sudo lsof -i :7881
-
-# Change ports in config.yaml
-```
-
-### LiveKit Binary Not Found
-
-```bash
-# Build LiveKit from source
-cd voice-server
-make build-livekit
-
-# Verify binary exists
-ls -lh livekit-server
-```
-
-### Permission Denied
-
-```bash
-# Make binary executable
-chmod +x voice-server
-chmod +x livekit-server  # if manually downloaded
-```
-
-### Connection Refused from Clients
-
-1. Check server is running: `ps aux | grep voice-server`
-2. Check firewall: `sudo ufw status`
-3. Check ports are listening: `sudo netstat -tulpn | grep -E '7880|7881'`
-4. Test locally first: `curl http://localhost:7880/health`
+1. **Built single binary** - One 67MB executable with LiveKit embedded
+2. **Generated credentials** - Secure API key/secret created automatically
+3. **Started servers** - Both LiveKit (7881) and HTTP API (7880) in one process
+4. **Announced on Nostr** - Server discoverable via Nostr relays
 
 ## Next Steps
 
-- Configure additional rooms in `config.yaml`
-- Set up admin users with Nostr pubkeys
-- Monitor with systemd: `journalctl -u camelus-voice -f`
-- Scale by running multiple servers in different regions
+- Configure firewall to allow ports 7880, 7881, and 50000-50100
+- Set up systemd service for production
+- Connect Flutter client to test voice
 
-## Support
+## Troubleshooting
 
-- Documentation: README.md
-- Issues: https://github.com/camelus-hq/camelus/issues
-- Tests: `cd voice-server && go test -v ./test/...`
+**Port already in use?**
+```yaml
+# Change ports in config.yaml
+server:
+  port: 8880
+  livekit_port: 8881
+```
 
----
+**Build fails?**
+```bash
+go mod tidy
+make build
+```
 
-**You're now running a complete, self-hosted voice server in a single Go binary!** 🎉
+**Can't connect?**
+- Check firewall allows the ports
+- Verify server is running: `curl http://localhost:7880/health`
+- Check logs for errors

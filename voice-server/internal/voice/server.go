@@ -14,11 +14,11 @@ import (
 	lksdk "github.com/livekit/server-sdk-go/v2"
 )
 
-// Server handles voice communication with embedded LiveKit subprocess
+// Server handles voice communication with embedded LiveKit server
 type Server struct {
 	config         *config.ServerConfig
 	roomManager    *RoomManager
-	livekitMgr     *livekit.SubprocessManager
+	livekitMgr     *livekit.EmbeddedServer
 	roomClient     *lksdk.RoomServiceClient
 	apiKey         string
 	apiSecret      string
@@ -27,10 +27,10 @@ type Server struct {
 
 // NewServer creates a new voice server with embedded LiveKit
 func NewServer(cfg *config.ServerConfig) (*Server, error) {
-	// Create LiveKit subprocess manager
-	livekitMgr, err := livekit.NewSubprocessManager(cfg)
+	// Create embedded LiveKit server
+	livekitMgr, err := livekit.NewEmbeddedServer(cfg)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create livekit manager: %w", err)
+		return nil, fmt.Errorf("failed to create livekit server: %w", err)
 	}
 
 	apiKey, apiSecret := livekitMgr.GetCredentials()

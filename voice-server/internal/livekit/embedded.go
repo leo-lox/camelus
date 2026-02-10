@@ -137,7 +137,7 @@ func (e *EmbeddedMediaServer) ValidateToken(token string) (*auth.ClaimGrants, er
 		return nil, fmt.Errorf("failed to parse token: %w", err)
 	}
 
-	claims, err := verifier.Verify(e.apiSecret)
+	_, claims, err := verifier.Verify(e.apiSecret)
 	if err != nil {
 		return nil, fmt.Errorf("failed to verify token: %w", err)
 	}
