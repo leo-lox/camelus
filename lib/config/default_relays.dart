@@ -8,6 +8,7 @@ List<String> camelusBootstrapRelays = [
   "wss://relay.nostr.band",
   "wss://relay.mostr.pub",
   "wss://relay.camelus.app",
+  "ws://localhost:10547",
 ];
 
 final Map<String, ndk_entities.ReadWriteMarker> defaultAccountCreationRelays = {

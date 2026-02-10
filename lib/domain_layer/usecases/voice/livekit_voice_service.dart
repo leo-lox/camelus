@@ -7,19 +7,24 @@ import 'package:permission_handler/permission_handler.dart';
 class LiveKitVoiceService {
   Room? _room;
   LocalAudioTrack? _localAudioTrack;
-  
-  final _connectionStateController = StreamController<ConnectionState>.broadcast();
-  final _participantsController = StreamController<List<Participant>>.broadcast();
-  
+
+  final _connectionStateController =
+      StreamController<ConnectionState>.broadcast();
+  final _participantsController =
+      StreamController<List<Participant>>.broadcast();
+
   bool _isMuted = false;
   bool _isConnected = false;
-  
-  Stream<ConnectionState> get connectionStateStream => _connectionStateController.stream;
-  Stream<List<Participant>> get participantsStream => _participantsController.stream;
-  
+
+  Stream<ConnectionState> get connectionStateStream =>
+      _connectionStateController.stream;
+  Stream<List<Participant>> get participantsStream =>
+      _participantsController.stream;
+
   bool get isMuted => _isMuted;
   bool get isConnected => _isConnected;
-  List<Participant> get participants => _room?.remoteParticipants.values.toList() ?? [];
+  List<Participant> get participants =>
+      _room?.remoteParticipants.values.toList() ?? [];
 
   /// Request microphone permission
   Future<bool> requestMicrophonePermission() async {
@@ -45,24 +50,21 @@ class LiveKitVoiceService {
 
       // Set up event listeners
       _room!.addListener(_onRoomUpdate);
-      
+
       // Connect to room
       await _room!.connect(
         url,
         token,
-        roomOptions: const RoomOptions(
-          adaptiveStream: true,
-          dynacast: true,
-        ),
+        roomOptions: const RoomOptions(adaptiveStream: true, dynacast: true),
       );
 
       // Publish local audio track
       await _publishAudio();
-      
+
       _isConnected = true;
       _connectionStateController.add(_room!.connectionState);
       _updateParticipants();
-      
+
       debugPrint('Connected to LiveKit room: $roomName');
     } catch (e) {
       debugPrint('Failed to connect to LiveKit: $e');
@@ -73,15 +75,17 @@ class LiveKitVoiceService {
   Future<void> _publishAudio() async {
     try {
       // Create audio track
-      _localAudioTrack = await LocalAudioTrack.create(AudioCaptureOptions(
-        echoCancellation: true,
-        noiseSuppression: true,
-        autoGainControl: true,
-      ));
+      _localAudioTrack = await LocalAudioTrack.create(
+        AudioCaptureOptions(
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true,
+        ),
+      );
 
       // Publish track
       await _room!.localParticipant?.publishAudioTrack(_localAudioTrack!);
-      
+
       debugPrint('Published local audio track');
     } catch (e) {
       debugPrint('Failed to publish audio: $e');
@@ -91,29 +95,30 @@ class LiveKitVoiceService {
 
   void _onRoomUpdate() {
     if (_room == null) return;
-    
+
     _connectionStateController.add(_room!.connectionState);
     _updateParticipants();
   }
 
   void _updateParticipants() {
     if (_room == null) return;
-    
+
     final participants = [
       if (_room!.localParticipant != null) _room!.localParticipant!,
       ..._room!.remoteParticipants.values,
     ];
-    
-    _participantsController.add(participants);
+    print('Participants updated: ');
+
+    // _participantsController.add(participants);
   }
 
   /// Toggle mute/unmute
   Future<void> toggleMute() async {
     if (_localAudioTrack == null) return;
-    
+
     _isMuted = !_isMuted;
-    await _localAudioTrack!.mute(_isMuted);
-    
+    //await _localAudioTrack!.mute(_isMuted);
+
     debugPrint('Audio ${_isMuted ? 'muted' : 'unmuted'}');
   }
 
@@ -136,7 +141,7 @@ class LiveKitVoiceService {
 
       _isConnected = false;
       _isMuted = false;
-      
+
       debugPrint('Disconnected from LiveKit room');
     } catch (e) {
       debugPrint('Error disconnecting: $e');
