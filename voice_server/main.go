@@ -103,6 +103,8 @@ func NewServer(config Config) *Server {
 		channels: channels,
 		upgrader: websocket.Upgrader{
 			CheckOrigin: func(r *http.Request) bool {
+				// TODO: In production, restrict to specific origins
+				// Example: return r.Header.Get("Origin") == "https://yourdomain.com"
 				return true // Allow all origins for development
 			},
 		},
@@ -332,7 +334,9 @@ func (s *Server) sendStateUpdate(user *User) {
 		return
 	}
 
-	user.Conn.WriteMessage(websocket.TextMessage, data)
+	if err := user.Conn.WriteMessage(websocket.TextMessage, data); err != nil {
+		log.Printf("Failed to send state to user %s: %v", user.ID, err)
+	}
 }
 
 func (s *Server) broadcastUserJoined(user *User) {
@@ -430,7 +434,9 @@ func (s *Server) sendError(user *User, message string) {
 		return
 	}
 
-	user.Conn.WriteMessage(websocket.TextMessage, data)
+	if err := user.Conn.WriteMessage(websocket.TextMessage, data); err != nil {
+		log.Printf("Failed to send error to user %s: %v", user.ID, err)
+	}
 }
 
 func generateUserID() string {

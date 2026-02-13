@@ -127,9 +127,10 @@ class _VoiceChatPageState extends ConsumerState<VoiceChatPage> {
                 const Divider(height: 1),
                 Expanded(
                   child: ListView(
-                    children: rootChannels.map((channel) {
-                      return _buildChannelTree(channel, voiceChatState);
-                    }).toList(),
+                    children: [
+                      for (var channel in rootChannels)
+                        _buildChannelTree(channel, voiceChatState)
+                    ],
                   ),
                 ),
               ],
@@ -178,9 +179,10 @@ class _VoiceChatPageState extends ConsumerState<VoiceChatPage> {
           Padding(
             padding: const EdgeInsets.only(left: 24.0),
             child: Column(
-              children: childChannels.map((child) {
-                return _buildChannelTree(child, voiceChatState);
-              }).toList(),
+              children: [
+                for (var child in childChannels)
+                  _buildChannelTree(child, voiceChatState)
+              ],
             ),
           ),
       ],
@@ -250,13 +252,15 @@ class _VoiceChatPageState extends ConsumerState<VoiceChatPage> {
   }
 
   Widget _buildUserTile(VoiceUser user) {
+    final displayNameInitial = user.displayName != null && user.displayName!.isNotEmpty
+        ? user.displayName!.substring(0, 1).toUpperCase()
+        : 'U';
+
     return ListTile(
       leading: Stack(
         children: [
           CircleAvatar(
-            child: Text(
-              user.displayName?.substring(0, 1).toUpperCase() ?? 'U',
-            ),
+            child: Text(displayNameInitial),
           ),
           if (user.isSpeaking)
             Positioned(

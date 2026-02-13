@@ -136,7 +136,7 @@ class WebRTCNotifier extends StateNotifier<WebRTCState> {
 
     final audioTracks = state.localStream!.getAudioTracks();
     for (var track in audioTracks) {
-      track.enabled = state.isMuted;
+      track.enabled = !state.isMuted;
     }
 
     state = state.copyWith(isMuted: !state.isMuted);

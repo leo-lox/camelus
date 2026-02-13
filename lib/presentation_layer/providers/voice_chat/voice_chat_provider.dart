@@ -130,42 +130,52 @@ class VoiceChatNotifier extends StateNotifier<VoiceChatState> {
   }
 
   void _handleStateUpdate(Map<String, dynamic> data) {
-    final channelsData = data['channels'] as List<dynamic>?;
-    final usersData = data['users'] as List<dynamic>?;
+    try {
+      final stateData = data['data'] as Map<String, dynamic>?;
+      if (stateData == null) {
+        state = state.copyWith(error: 'Invalid state update: missing data field');
+        return;
+      }
 
-    final channels = channelsData?.map((c) {
-          return VoiceChannel(
-            id: c['id'] as String,
-            name: c['name'] as String,
-            parentId: c['parent_id'] as String?,
-            position: c['position'] as int,
-            userIds: (c['user_ids'] as List<dynamic>?)
-                    ?.map((id) => id as String)
-                    .toList() ??
-                [],
-          );
-        }).toList() ??
-        [];
+      final channelsData = stateData['channels'] as List<dynamic>?;
+      final usersData = stateData['users'] as List<dynamic>?;
 
-    final users = usersData?.map((u) {
-          return VoiceUser(
-            id: u['id'] as String,
-            npub: u['npub'] as String?,
-            displayName: u['display_name'] as String?,
-            group: UserGroup.fromString(u['group'] as String? ?? 'anon'),
-            channelId: u['channel_id'] as String?,
-            isSpeaking: u['is_speaking'] as bool? ?? false,
-            isMuted: u['is_muted'] as bool? ?? false,
-          );
-        }).toList() ??
-        [];
+      final channels = channelsData?.map((c) {
+            return VoiceChannel(
+              id: c['id'] as String,
+              name: c['name'] as String,
+              parentId: c['parent_id'] as String?,
+              position: c['position'] as int,
+              userIds: (c['user_ids'] as List<dynamic>?)
+                      ?.map((id) => id as String)
+                      .toList() ??
+                  [],
+            );
+          }).toList() ??
+          [];
 
-    state = state.copyWith(
-      channelState: state.channelState.copyWith(
-        channels: channels,
-        users: users,
-      ),
-    );
+      final users = usersData?.map((u) {
+            return VoiceUser(
+              id: u['id'] as String,
+              npub: u['npub'] as String?,
+              displayName: u['display_name'] as String?,
+              group: UserGroup.fromString(u['group'] as String? ?? 'anon'),
+              channelId: u['channel_id'] as String?,
+              isSpeaking: u['is_speaking'] as bool? ?? false,
+              isMuted: u['is_muted'] as bool? ?? false,
+            );
+          }).toList() ??
+          [];
+
+      state = state.copyWith(
+        channelState: state.channelState.copyWith(
+          channels: channels,
+          users: users,
+        ),
+      );
+    } catch (e) {
+      state = state.copyWith(error: 'Failed to parse state update: $e');
+    }
   }
 
   void _handleUserJoined(Map<String, dynamic> data) {
