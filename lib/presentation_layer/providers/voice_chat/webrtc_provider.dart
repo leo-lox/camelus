@@ -51,7 +51,7 @@ class WebRTCNotifier extends StateNotifier<WebRTCState> {
     }
   }
 
-  Future<void> createPeerConnection(
+  Future<void> initializePeerConnection(
     Map<String, dynamic> configuration,
   ) async {
     try {
