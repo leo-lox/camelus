@@ -41,123 +41,122 @@ class ProfilePage2 extends ConsumerWidget {
 
     final bool isOwnProfile = myPubkey == pubkey;
 
-    return Scaffold(
-      body: GenericFeed(
-        feedPadding: EdgeInsets.only(
-          top: MediaQuery.of(context).padding.top + 48,
-        ),
-        additionalTabViews: [StarterPacksList(pubkey: pubkey)],
-        feedFilter: FeedFilter(
-          authors: [pubkey],
-          kinds: [1, 6],
-          feedId: 'profile-${pubkey.substring(10, 20)}',
-        ),
-        customHeaderSliverBuilder:
-            (
-              BuildContext context,
-              bool innerBoxIsScrolled,
-              TabController tabController,
-            ) {
-              return <Widget>[
-                SliverOverlapAbsorber(
-                  handle: NestedScrollView.sliverOverlapAbsorberHandleFor(
-                    context,
+    return DefaultTabController(
+      length: 3,
+      child: Scaffold(
+        body: NestedScrollView(
+          headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
+            return <Widget>[
+              SliverAppBar(
+                surfaceTintColor: Theme.of(context).colorScheme.surface,
+                leading: BackButtonRound(),
+                actions: [
+                  PopupMenuButton<String>(
+                    color: Theme.of(context).colorScheme.surface,
+                    tooltip: AppLocalizations.of(context)!.more,
+                    onSelected: (e) => {
+                      if (e == "block")
+                        {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  BlockPage(userPubkey: pubkey),
+                            ),
+                          ).then((value) => {context.pop()}),
+                        },
+                    },
+                    itemBuilder: (BuildContext context) {
+                      return {'block'}.map((String choice) {
+                        return PopupMenuItem<String>(
+                          value: choice,
+                          child: Text(AppLocalizations.of(context)!.block),
+                        );
+                      }).toList();
+                    },
                   ),
-                  sliver: SliverAppBar(
-                    surfaceTintColor: Theme.of(context).colorScheme.surface,
-                    leading: BackButtonRound(),
-                    actions: [
-                      PopupMenuButton<String>(
-                        color: Theme.of(context).colorScheme.surface,
-                        tooltip: AppLocalizations.of(context)!.more,
-                        onSelected: (e) => {
-                          //log(e),
-                          // toast
-                          if (e == "block")
-                            {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      BlockPage(userPubkey: pubkey),
-                                ),
-                              ).then((value) => {context.pop()}),
-                            },
-                        },
-                        itemBuilder: (BuildContext context) {
-                          return {'block'}.map((String choice) {
-                            return PopupMenuItem<String>(
-                              value: choice,
-                              child: Text(AppLocalizations.of(context)!.block),
-                            );
-                          }).toList();
-                        },
-                      ),
-                      if (Platform.isWindows ||
-                          Platform.isLinux ||
-                          Platform.isMacOS)
-                        const SizedBox(width: 154),
-                    ],
-                    expandedHeight: 400,
-                    pinned: true,
-                    floating: true,
-                    forceElevated: innerBoxIsScrolled,
-                    backgroundColor: Theme.of(
-                      context,
-                    ).colorScheme.surface, // Add a background color
-                    flexibleSpace: FlexibleSpaceBar(
-                      background: _BuildProfileHeader(
-                        isOwnProfile: isOwnProfile,
-                        userMetadata: UserMetadata(
-                          pubkey: pubkey,
-                          eventId: '',
-                          lastFetch: myMetadata?.lastFetch ?? 0,
-                          name: myMetadata?.name,
-                          picture: myMetadata?.picture,
-                          banner: myMetadata?.banner,
-                          nip05: myMetadata?.nip05,
-                          about: myMetadata?.about,
-                          website: myMetadata?.website,
-                          lud06: myMetadata?.lud06,
-                          lud16: myMetadata?.lud16,
-                        ),
-                      ),
-                    ),
-                    bottom: PreferredSize(
-                      preferredSize: Size.fromHeight(48),
-                      child: Container(
-                        color: Theme.of(context)
-                            .colorScheme
-                            .surface, // Add a background color to the tab bar
-                        child: TabBar(
-                          controller: tabController,
-                          tabs: [
-                            Tab(text: AppLocalizations.of(context)!.posts),
-                            Tab(
-                              text: AppLocalizations.of(
-                                context,
-                              )!.postsAndReplies,
-                            ),
-                            Tab(
-                              text: AppLocalizations.of(context)!.starterPacks,
-                            ),
-                          ],
-                          labelColor: Theme.of(context)
-                              .colorScheme
-                              .onSurface, // Set the color of the selected tab
-                          unselectedLabelColor: Theme.of(context)
-                              .colorScheme
-                              .onSurfaceVariant, // Set the color of unselected tabs
-                          indicatorColor: Theme.of(context)
-                              .colorScheme
-                              .primary, // Set the color of the indicator
-                        ),
-                      ),
+                  if (Platform.isWindows ||
+                      Platform.isLinux ||
+                      Platform.isMacOS)
+                    const SizedBox(width: 154),
+                ],
+                expandedHeight: 400,
+                pinned: true,
+                floating: true,
+                forceElevated: innerBoxIsScrolled,
+                backgroundColor: Theme.of(context).colorScheme.surface,
+                flexibleSpace: FlexibleSpaceBar(
+                  background: _BuildProfileHeader(
+                    isOwnProfile: isOwnProfile,
+                    userMetadata: UserMetadata(
+                      pubkey: pubkey,
+                      eventId: '',
+                      lastFetch: myMetadata?.lastFetch ?? 0,
+                      name: myMetadata?.name,
+                      picture: myMetadata?.picture,
+                      banner: myMetadata?.banner,
+                      nip05: myMetadata?.nip05,
+                      about: myMetadata?.about,
+                      website: myMetadata?.website,
+                      lud06: myMetadata?.lud06,
+                      lud16: myMetadata?.lud16,
                     ),
                   ),
                 ),
-              ];
-            },
+                bottom: PreferredSize(
+                  preferredSize: Size.fromHeight(48),
+                  child: Container(
+                    color: Theme.of(context).colorScheme.surface,
+                    child: TabBar(
+                      tabs: [
+                        Tab(text: AppLocalizations.of(context)!.posts),
+                        Tab(
+                          text: AppLocalizations.of(context)!.postsAndReplies,
+                        ),
+                        Tab(text: AppLocalizations.of(context)!.starterPacks),
+                      ],
+                      labelColor: Theme.of(context).colorScheme.onSurface,
+                      unselectedLabelColor: Theme.of(
+                        context,
+                      ).colorScheme.onSurfaceVariant,
+                      indicatorColor: Theme.of(context).colorScheme.primary,
+                    ),
+                  ),
+                ),
+              ),
+            ];
+          },
+          body: TabBarView(
+            children: [
+              // Posts tab - root notes only
+              GenericFeed(
+                feedPadding: EdgeInsets.only(
+                  top: MediaQuery.of(context).padding.top,
+                ),
+                feedFilter: FeedFilter(
+                  authors: [pubkey],
+                  kinds: [1, 6],
+                  feedId: 'profile-${pubkey.substring(10, 20)}',
+                  showRootNotesOnly: true,
+                ),
+              ),
+              // Posts and Replies tab - all posts
+              GenericFeed(
+                feedPadding: EdgeInsets.only(
+                  top: MediaQuery.of(context).padding.top,
+                ),
+                feedFilter: FeedFilter(
+                  authors: [pubkey],
+                  kinds: [1, 6],
+                  feedId: 'profile-${pubkey.substring(10, 20)}',
+                  showRootNotesOnly: false,
+                ),
+              ),
+              // Starter Packs tab
+              StarterPacksList(pubkey: pubkey),
+            ],
+          ),
+        ),
       ),
     );
   }
