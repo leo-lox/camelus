@@ -25,22 +25,27 @@ class ModerationNotifier extends Notifier<ModerationState> {
   ModerationState build() {
     final myUserPubkey = ref.read(ndkProvider).accounts.getPublicKey();
 
-    // Skip setup if no pubkey (read-only mode)
-    if (myUserPubkey != null) {
-      // Listen to contact changes
-      ref.listen<ContactListState>(contactListStateProvider(myUserPubkey), (
-        previous,
-        next,
-      ) {
-        _updateTrustedPubkeys(next);
-      });
+    // Initialize with empty set first
+    final initialState = ModerationState(trustedPubkeys: {});
 
-      // Load initial state
-      final contacts = ref.read(contactListStateProvider(myUserPubkey));
-      _updateTrustedPubkeys(contacts);
+    // Skip setup if no pubkey (read-only mode)
+    if (myUserPubkey == null) {
+      return initialState;
     }
 
-    return ModerationState(trustedPubkeys: {});
+    // Listen to contact changes
+    ref.listen<ContactListState>(contactListStateProvider(myUserPubkey), (
+      previous,
+      next,
+    ) {
+      _updateTrustedPubkeys(next);
+    });
+
+    // Load initial contacts and return state with them
+    final contacts = ref.read(contactListStateProvider(myUserPubkey));
+    final myContacts = contacts.contactList.contacts.toSet();
+
+    return ModerationState(trustedPubkeys: myContacts);
   }
 
   void _updateTrustedPubkeys(ContactListState contactsState) {
