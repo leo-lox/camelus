@@ -135,11 +135,15 @@ class WebRTCNotifier extends StateNotifier<WebRTCState> {
     if (state.localStream == null) return;
 
     final audioTracks = state.localStream!.getAudioTracks();
+    final newMutedState = !state.isMuted;
+    
     for (var track in audioTracks) {
-      track.enabled = !state.isMuted;
+      // When muted (true), tracks should be disabled (false)
+      // When unmuted (false), tracks should be enabled (true)
+      track.enabled = !newMutedState;
     }
 
-    state = state.copyWith(isMuted: !state.isMuted);
+    state = state.copyWith(isMuted: newMutedState);
   }
 
   Future<void> dispose() async {
