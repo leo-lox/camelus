@@ -65,21 +65,22 @@ cp config.example.yaml config.yaml
 
 2. Edit `config.yaml` with your channels and user npubs
 
-3. Install dependencies:
+3. Build the server:
 ```bash
-cd voice_server
-go mod download
+go build
 ```
 
 4. Run the server:
 ```bash
-go run main.go -config config.yaml
+./voice_server -config config.yaml
 ```
 
-Or build and run:
-```bash
-go build -o voice_server main.go
-./voice_server -config config.yaml
+You should see:
+```
+2026/02/13 11:19:47 Voice server listening on 0.0.0.0:8080
+2026/02/13 11:19:47 WebSocket endpoint: ws://0.0.0.0:8080/
+2026/02/13 11:19:47 WebRTC SFU enabled for audio forwarding
+2026/02/13 11:19:47 Ping/Pong enabled for connection keepalive
 ```
 
 ## API Protocol

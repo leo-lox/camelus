@@ -5,12 +5,15 @@
 The voice chat feature adds TeamSpeak/Discord-like voice communication to Camelus. It includes:
 
 - Voice-only communication (for now)
-- Low-latency WebRTC connections
+- Low-latency WebRTC connections with SFU
 - Multiple channels per server
 - Tree-like channel structure
 - Overview of users in channels
 - Speaking indicators
 - Mute functionality
+- **Connection state monitoring with ping/latency tracking**
+- **Automatic reconnection with backoff**
+- **Debug info panel for troubleshooting**
 
 ## Architecture
 
@@ -32,17 +35,23 @@ The implementation follows clean architecture principles:
 #### Presentation Layer
 
 **Providers** (`lib/presentation_layer/providers/voice_chat/`):
-- **VoiceChatProvider**: Manages WebSocket connection to signaling server
+- **VoiceChatProvider** (Modern Riverpod `Notifier`): Manages WebSocket connection
   - Handles authentication, channel joining, state updates
   - Real-time synchronization with server
-- **WebRTCProvider**: Manages WebRTC peer connections
+  - Connection status tracking (disconnected, connecting, connected, error)
+  - Ping/pong with latency measurement
+  - Automatic reconnection with exponential backoff
+- **WebRTCProvider** (Modern Riverpod `Notifier`): Manages WebRTC peer connections
   - Local media stream initialization
   - Peer connection management
   - ICE candidate handling
+  - Proper cleanup with `ref.onDispose()`
 
 **UI** (`lib/presentation_layer/routes/voice_chat/`):
 - **VoiceChatPage**: Main interface
   - Connection screen with server URL input
+  - **Color-coded connection status indicator in app bar**
+  - **Expandable debug info panel** (ping, latency, reconnects, errors)
   - Channel tree view (left panel)
   - Current channel user list (right panel)
   - Speaking indicators (green dot on avatar)
@@ -50,20 +59,36 @@ The implementation follows clean architecture principles:
 
 ### Server (Go)
 
-Located in `voice_server/`:
+Located in `voice_server/` - **Now organized into packages**:
+
+#### Package Structure
+```
+pkg/
+├── models/      - Data structures (Config, User, Channel, Message)
+├── websocket/   - WebSocket utilities & ping/pong handlers
+└── server/      - Main server logic
+    ├── server.go    - Server struct & WebSocket handler
+    ├── handlers.go  - Message routing & handlers
+    ├── broadcast.go - State updates & broadcasting
+    └── webrtc.go    - WebRTC SFU implementation
+```
 
 #### Components
 - **WebSocket Handler**: Manages persistent connections for API/signaling
+  - Proper upgrade headers and CORS
+  - Ping/pong keepalive (54s interval)
+  - Connection timeouts (60s read, 10s write)
 - **WebRTC SFU**: Forwards audio tracks between users in same channel
 - **Channel Manager**: Handles channel state and user assignments
 - **User Manager**: Manages user states and permissions
 - **Broadcaster**: Distributes state changes efficiently
 
 #### Technology
-- **gorilla/websocket**: For API/signaling communication
+- **gorilla/websocket**: For WebSocket connections with compression
 - **pion/webrtc**: Pure Go implementation of WebRTC for SFU
 - Hybrid architecture: WebSocket for state, WebRTC for media
 - ICE/STUN for NAT traversal
+- Application-level ping/pong for latency tracking
 
 #### Configuration
 Server is configured via `config.yaml`:
