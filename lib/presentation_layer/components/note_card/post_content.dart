@@ -5,7 +5,6 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_link_previewer/flutter_link_previewer.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_riverpod/legacy.dart';
 import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
@@ -19,9 +18,22 @@ import '../images_tile_view.dart';
 import '../video/inline_video_player.dart';
 import 'note_card_reference.dart';
 
-final isContentRevealedProvider = StateProvider.family<bool, String>(
-  (ref, postId) => false,
-);
+class ContentRevealedNotifier extends Notifier<bool> {
+  final String postId;
+  ContentRevealedNotifier(this.postId);
+
+  @override
+  bool build() => false;
+
+  void reveal() {
+    state = true;
+  }
+}
+
+final isContentRevealedProvider =
+    NotifierProvider.family<ContentRevealedNotifier, bool, String>(
+      ContentRevealedNotifier.new,
+    );
 
 class PostContentWidget extends ConsumerWidget {
   final ParsedPost post;
@@ -95,11 +107,8 @@ class PostContentWidget extends ConsumerWidget {
                   enableAnimation: true,
                   onPreviewDataFetched: (data) {
                     ref
-                            .read(
-                              linkPreviewProvider(segment.metadata!).notifier,
-                            )
-                            .state =
-                        data;
+                        .read(linkPreviewProvider(segment.metadata!).notifier)
+                        .setPreview(data);
                   },
                   previewData: ref.watch(
                     linkPreviewProvider(segment.metadata!),
@@ -195,9 +204,8 @@ class PostContentWidget extends ConsumerWidget {
                     name: AppLocalizations.of(context)!.show,
                     onPressed: () {
                       ref
-                              .read(isContentRevealedProvider(post.id).notifier)
-                              .state =
-                          true;
+                          .read(isContentRevealedProvider(post.id).notifier)
+                          .reveal();
                     },
                   ),
                 ],

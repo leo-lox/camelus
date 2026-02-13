@@ -1,6 +1,6 @@
 import 'dart:developer';
 
-import 'package:flutter_riverpod/legacy.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ndk/entities.dart';
 import 'package:ndk/ndk.dart';
 
@@ -130,11 +130,15 @@ class RelayDmTestState {
 }
 
 /// Notifier for testing relay DM support (deletion and privacy)
-class RelayDmTestNotifier extends StateNotifier<RelayDmTestState> {
-  final Ndk ndk;
-  final _bip340 = Bip340();
+class RelayDmTestNotifier extends Notifier<RelayDmTestState> {
+  @override
+  RelayDmTestState build() {
+    ndk = ref.watch(ndkProvider);
+    return const RelayDmTestState();
+  }
 
-  RelayDmTestNotifier(this.ndk) : super(const RelayDmTestState());
+  late final Ndk ndk;
+  final _bip340 = Bip340();
 
   // ============ RELAY TEST ============
 
@@ -505,7 +509,6 @@ class RelayDmTestNotifier extends StateNotifier<RelayDmTestState> {
 
 /// Provider for relay DM testing
 final relayDmTestProvider =
-    StateNotifierProvider<RelayDmTestNotifier, RelayDmTestState>((ref) {
-      final ndk = ref.watch(ndkProvider);
-      return RelayDmTestNotifier(ndk);
-    });
+    NotifierProvider<RelayDmTestNotifier, RelayDmTestState>(
+      RelayDmTestNotifier.new,
+    );

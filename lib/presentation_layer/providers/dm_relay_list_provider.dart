@@ -1,6 +1,6 @@
 import 'dart:developer';
 
-import 'package:flutter_riverpod/legacy.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ndk/ndk.dart';
 
 import '../../config/nostr_kinds.dart';
@@ -58,16 +58,24 @@ class DmRelayListState {
 }
 
 /// Provider for managing DM relay list (kind 10050)
-class DmRelayListNotifier extends StateNotifier<DmRelayListState> {
-  final Ndk ndk;
-  final String? myPubkey;
+class DmRelayListNotifier extends Notifier<DmRelayListState> {
+  @override
+  DmRelayListState build() {
+    final ndkInstance = ref.watch(ndkProvider);
+    final myPubkeyValue = ndkInstance.accounts.getPublicKey();
 
-  DmRelayListNotifier(this.ndk, this.myPubkey)
-    : super(const DmRelayListState()) {
+    ndk = ndkInstance;
+    myPubkey = myPubkeyValue;
+
     if (myPubkey != null) {
       _loadFromCacheThenFetch();
     }
+
+    return const DmRelayListState();
   }
+
+  late final Ndk ndk;
+  late final String? myPubkey;
 
   /// Load from cache first (instant), then fetch from network
   Future<void> _loadFromCacheThenFetch() async {
@@ -235,8 +243,6 @@ class DmRelayListNotifier extends StateNotifier<DmRelayListState> {
 
 /// Provider for DM relay list
 final dmRelayListProvider =
-    StateNotifierProvider<DmRelayListNotifier, DmRelayListState>((ref) {
-      final ndk = ref.watch(ndkProvider);
-      final myPubkey = ndk.accounts.getPublicKey();
-      return DmRelayListNotifier(ndk, myPubkey);
-    });
+    NotifierProvider<DmRelayListNotifier, DmRelayListState>(
+      DmRelayListNotifier.new,
+    );

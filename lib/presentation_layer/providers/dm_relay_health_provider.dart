@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:developer';
 
-import 'package:flutter_riverpod/legacy.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ndk/entities.dart';
 import 'package:ndk/ndk.dart';
 
@@ -83,28 +83,39 @@ class DmRelayHealthState {
 }
 
 /// Notifier for DM relay health per conversation
-class DmRelayHealthNotifier extends StateNotifier<DmRelayHealthState> {
-  final Ndk ndk;
-  final String? myPubkey;
-  final String peerPubkey;
+class DmRelayHealthNotifier extends Notifier<DmRelayHealthState> {
+  late final Ndk ndk;
+  late final String? myPubkey;
+  late final String peerPubkey;
 
   StreamSubscription? _connectivitySubscription;
   Map<String, RelayConnectivity>? _currentConnectivity;
 
-  DmRelayHealthNotifier({
-    required this.ndk,
-    required this.myPubkey,
-    required this.peerPubkey,
-  }) : super(const DmRelayHealthState()) {
+  DmRelayHealthNotifier(String peerPubkey) : peerPubkey = peerPubkey;
+
+  @override
+  DmRelayHealthState build() {
+    final ndkInstance = ref.watch(ndkProvider);
+    final myPubkeyValue = ndkInstance.accounts.getPublicKey();
+
+    ndk = ndkInstance;
+    myPubkey = myPubkeyValue;
+
+    ref.onDispose(() {
+      _connectivitySubscription?.cancel();
+    });
+
     if (myPubkey != null) {
       _initialize();
     } else {
-      state = state.copyWith(
+      return const DmRelayHealthState().copyWith(
         isLoading: false,
         status: DmRelayHealthStatus.unknown,
         error: 'Not logged in',
       );
     }
+
+    return const DmRelayHealthState();
   }
 
   Future<void> _initialize() async {
@@ -296,26 +307,10 @@ class DmRelayHealthNotifier extends StateNotifier<DmRelayHealthState> {
   Future<void> refreshRelayDiscovery() async {
     await _fetchRelays();
   }
-
-  @override
-  void dispose() {
-    _connectivitySubscription?.cancel();
-    super.dispose();
-  }
 }
 
 /// Provider for DM relay health (keyed by peer pubkey)
 final dmRelayHealthProvider =
-    StateNotifierProvider.family<
-      DmRelayHealthNotifier,
-      DmRelayHealthState,
-      String
-    >((ref, peerPubkey) {
-      final ndk = ref.watch(ndkProvider);
-      final myPubkey = ndk.accounts.getPublicKey();
-      return DmRelayHealthNotifier(
-        ndk: ndk,
-        myPubkey: myPubkey,
-        peerPubkey: peerPubkey,
-      );
-    });
+    NotifierProvider.family<DmRelayHealthNotifier, DmRelayHealthState, String>(
+      DmRelayHealthNotifier.new,
+    );

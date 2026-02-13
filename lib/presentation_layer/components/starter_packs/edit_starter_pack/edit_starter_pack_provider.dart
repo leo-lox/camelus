@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import 'package:flutter_riverpod/legacy.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ndk/shared/nips/nip19/nip19.dart';
 
 import '../../../../data_layer/data_sources/serverpod_data_source.dart';
@@ -70,29 +70,39 @@ class StarterPackData {
 }
 
 // State notifier for managing starter pack data
-class EditStarterPackNotifier extends StateNotifier<StarterPackData> {
-  final GetNostrLists _listsProvider;
-  final NostrListsFollowState _listsState;
-  final ServerpodDataSource _serverpodProvider;
+class EditStarterPackNotifier extends Notifier<StarterPackData> {
+  late final GetNostrLists _listsProvider;
+  late final NostrListsFollowState _listsState;
+  late final ServerpodDataSource _serverpodProvider;
+  late final StarterPackIdentifier identifier;
 
-  EditStarterPackNotifier(
-    this._listsProvider,
-    this._listsState,
-    this._serverpodProvider,
-    StarterPackIdentifier identifier,
-  ) : super(
-        StarterPackData(
-          name: identifier.name,
-          title: '',
-          description: '',
-          selectedUsers: [],
-          broadcasted: false,
-          broadcasting: false,
-          imageUploading: false,
-        ),
-      ) {
+  EditStarterPackNotifier(StarterPackIdentifier identifier)
+    : identifier = identifier;
+
+  @override
+  StarterPackData build() {
+    final listStateProvider = ref.watch(
+      nostrListsFollowStateProvider(identifier.pubkey),
+    );
+    final listProvider = ref.watch(nostrListProvider);
+    final serverpodProv = ref.watch(serverpodProvider);
+
+    _listsProvider = listProvider;
+    _listsState = listStateProvider;
+    _serverpodProvider = serverpodProv;
+
     // Load initial data based on starterPackId
     _loadStarterPack(identifier);
+
+    return StarterPackData(
+      name: identifier.name,
+      title: '',
+      description: '',
+      selectedUsers: [],
+      broadcasted: false,
+      broadcasting: false,
+      imageUploading: false,
+    );
   }
 
   void _loadStarterPack(StarterPackIdentifier identifier) {
@@ -198,20 +208,8 @@ class EditStarterPackNotifier extends StateNotifier<StarterPackData> {
 }
 
 final editStarterPackProvider =
-    StateNotifierProvider.family<
+    NotifierProvider.family<
       EditStarterPackNotifier,
       StarterPackData,
       StarterPackIdentifier
-    >((ref, identifier) {
-      final listStateProvider = ref.watch(
-        nostrListsFollowStateProvider(identifier.pubkey),
-      );
-      final listProvider = ref.watch(nostrListProvider);
-      final serverpodProv = ref.watch(serverpodProvider);
-      return EditStarterPackNotifier(
-        listProvider,
-        listStateProvider,
-        serverpodProv,
-        identifier,
-      );
-    });
+    >(EditStarterPackNotifier.new);

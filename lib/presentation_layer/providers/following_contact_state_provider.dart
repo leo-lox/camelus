@@ -1,6 +1,5 @@
 import 'package:flutter/foundation.dart';
-import 'package:flutter_riverpod/legacy.dart';
-import 'package:riverpod/riverpod.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'dart:async';
 
 import '../../domain_layer/entities/contact_list.dart';
@@ -23,11 +22,8 @@ class ContactListState {
 }
 
 final contactListStateProvider =
-    StateNotifierProvider.family<ContactListNotifier, ContactListState, String>(
-      (ref, pubkey) {
-        final follow = ref.watch(followingProvider);
-        return ContactListNotifier(pubkey, follow);
-      },
+    NotifierProvider.family<ContactListNotifier, ContactListState, String>(
+      ContactListNotifier.new,
     );
 
 /// convenience provider
@@ -56,31 +52,40 @@ final contactListSelfStateProvider = Provider<ContactListState>((ref) {
   return ref.watch(contactListStateProvider(selfPubkey));
 });
 
-class ContactListNotifier extends StateNotifier<ContactListState> {
-  final Follow _followUseCase;
-  final String _pubkey;
+class ContactListNotifier extends Notifier<ContactListState> {
+  late final Follow _followUseCase;
+  late final String _pubkey;
 
   StreamSubscription<ContactList?>? _subscription;
 
-  ContactListNotifier(this._pubkey, this._followUseCase)
-    : super(
-        ContactListState(
-          isLoading: true,
-          contactList: ContactList(
-            pubKey: _pubkey,
-            contacts: [],
-            contactRelays: [],
-            petnames: [],
-            followedTags: [],
-            followedCommunities: [],
-            followedEvents: [],
-            sources: [],
-            createdAt: 0,
-            loadedTimestamp: null,
-          ),
-        ),
-      ) {
+  ContactListNotifier(String pubkey) : _pubkey = pubkey;
+
+  @override
+  ContactListState build() {
+    final follow = ref.watch(followingProvider);
+    _followUseCase = follow;
+
+    ref.onDispose(() {
+      _subscription?.cancel();
+    });
+
     _initializeState();
+
+    return ContactListState(
+      isLoading: true,
+      contactList: ContactList(
+        pubKey: _pubkey,
+        contacts: [],
+        contactRelays: [],
+        petnames: [],
+        followedTags: [],
+        followedCommunities: [],
+        followedEvents: [],
+        sources: [],
+        createdAt: 0,
+        loadedTimestamp: null,
+      ),
+    );
   }
 
   void _initializeState() {
@@ -123,11 +128,5 @@ class ContactListNotifier extends StateNotifier<ContactListState> {
 
   Future<void> setContacts(List<String> pubkeys) async {
     return _followUseCase.setContacts(pubkeys);
-  }
-
-  @override
-  void dispose() {
-    _subscription?.cancel();
-    super.dispose();
   }
 }

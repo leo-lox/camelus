@@ -1,13 +1,25 @@
 import 'package:camelus/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_riverpod/legacy.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../../providers/inital_route_provider.dart';
 
 // Provider to store the selected route
-final selectedRouteProvider = StateProvider<String>((ref) => '/home');
+final selectedRouteProvider = NotifierProvider<SelectedRouteNotifier, String>(
+  SelectedRouteNotifier.new,
+);
+
+class SelectedRouteNotifier extends Notifier<String> {
+  @override
+  String build() {
+    return '/home';
+  }
+
+  void setRoute(String route) {
+    state = route;
+  }
+}
 
 class InitalRouteSettings extends ConsumerStatefulWidget {
   const InitalRouteSettings({super.key});
@@ -43,7 +55,7 @@ class InitalRouteSettingsState extends ConsumerState<InitalRouteSettings> {
 
   Future<void> _laodInitialRoute() async {
     final loadedRoute = await ref.read(initalRouteProvider).getInitialRoute();
-    ref.read(selectedRouteProvider.notifier).state = loadedRoute;
+    ref.read(selectedRouteProvider.notifier).setRoute(loadedRoute);
   }
 
   @override
@@ -79,7 +91,7 @@ class InitalRouteSettingsState extends ConsumerState<InitalRouteSettings> {
                   )
                 : null,
             onTap: () {
-              ref.read(selectedRouteProvider.notifier).state = route;
+              ref.read(selectedRouteProvider.notifier).setRoute(route);
               ref.read(initalRouteProvider).saveInitialRoute(route);
             },
             tileColor: Theme.of(context).colorScheme.surface,

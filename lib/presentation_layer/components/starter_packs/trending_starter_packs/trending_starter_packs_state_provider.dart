@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:camelus/presentation_layer/providers/ndk_provider.dart';
-import 'package:flutter_riverpod/legacy.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ndk/ndk.dart';
 
 import '../../../../data_layer/models/nostr_lists_model.dart';
@@ -27,13 +27,15 @@ class TrendingStarterPackState {
   }
 }
 
-class TrendingStarterPackNotifier
-    extends StateNotifier<TrendingStarterPackState> {
-  final Ndk ndk;
-  TrendingStarterPackNotifier({required this.ndk})
-    : super(TrendingStarterPackState(isLoading: true, starterPacks: [])) {
+class TrendingStarterPackNotifier extends Notifier<TrendingStarterPackState> {
+  @override
+  TrendingStarterPackState build() {
+    ndk = ref.watch(ndkProvider);
     _loadData();
+    return TrendingStarterPackState(isLoading: true, starterPacks: []);
   }
+
+  late final Ndk ndk;
 
   void _loadData() async {
     final ndkResp = ndk.requests.query(
@@ -57,10 +59,6 @@ class TrendingStarterPackNotifier
 }
 
 final trendingStarterPacksStateProvider =
-    StateNotifierProvider<
-      TrendingStarterPackNotifier,
-      TrendingStarterPackState
-    >((ref) {
-      final ndkP = ref.watch(ndkProvider);
-      return TrendingStarterPackNotifier(ndk: ndkP);
-    });
+    NotifierProvider<TrendingStarterPackNotifier, TrendingStarterPackState>(
+      TrendingStarterPackNotifier.new,
+    );

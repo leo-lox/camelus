@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:flutter_riverpod/legacy.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ndk/ndk.dart';
 import 'package:video_player/video_player.dart';
 
@@ -70,19 +70,29 @@ class VideoState {
   }
 }
 
-final videoPlayerProvider = StateNotifierProvider.family
-    .autoDispose<VideoPlayerNotifier, VideoState, String>((ref, videoId) {
-      final ndkP = ref.read(ndkProvider);
-      return VideoPlayerNotifier(videoId: videoId, ndkProvider: ndkP);
+final videoPlayerProvider = NotifierProvider.family
+    .autoDispose<VideoPlayerNotifier, VideoState, String>(
+      VideoPlayerNotifier.new,
+    );
+
+class VideoPlayerNotifier extends Notifier<VideoState> {
+  final String videoId;
+  late final Ndk ndk;
+
+  VideoPlayerNotifier(this.videoId);
+
+  @override
+  VideoState build() {
+    final ndkP = ref.read(ndkProvider);
+    ndk = ndkP;
+
+    ref.onDispose(() {
+      state.controller?.dispose();
     });
 
-class VideoPlayerNotifier extends StateNotifier<VideoState> {
-  final String videoId;
-  final Ndk ndkProvider;
-
-  VideoPlayerNotifier({required this.videoId, required this.ndkProvider})
-    : super(VideoState(videoLink: videoId, controller: null)) {
     loadVideo(videoId);
+
+    return VideoState(videoLink: videoId, controller: null);
   }
 
   Future<void> loadVideo(String videoLink) async {
@@ -187,16 +197,10 @@ class VideoPlayerNotifier extends StateNotifier<VideoState> {
 
   Future<String?> _processVideoLink(String initialLink) async {
     try {
-      final checkedLink = await ndkProvider.files.checkUrl(url: initialLink);
+      final checkedLink = await ndk.files.checkUrl(url: initialLink);
       return checkedLink;
     } catch (_) {
       return null;
     }
-  }
-
-  @override
-  void dispose() {
-    state.controller?.dispose();
-    super.dispose();
   }
 }

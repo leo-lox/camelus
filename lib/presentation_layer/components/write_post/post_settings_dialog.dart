@@ -1,5 +1,4 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_riverpod/legacy.dart';
 import 'package:flutter/material.dart';
 import 'package:camelus/l10n/app_localizations.dart';
 
@@ -34,8 +33,11 @@ class PostSettingsState {
   }
 }
 
-class PostSettingsNotifier extends StateNotifier<PostSettingsState> {
-  PostSettingsNotifier() : super(PostSettingsState());
+class PostSettingsNotifier extends Notifier<PostSettingsState> {
+  @override
+  PostSettingsState build() {
+    return PostSettingsState();
+  }
 
   void toggleContentWarning(bool value) {
     state = state.copyWith(enableContentWarning: value);
@@ -59,9 +61,9 @@ class PostSettingsNotifier extends StateNotifier<PostSettingsState> {
 }
 
 final postSettingsProvider =
-    StateNotifierProvider<PostSettingsNotifier, PostSettingsState>((ref) {
-      return PostSettingsNotifier();
-    });
+    NotifierProvider<PostSettingsNotifier, PostSettingsState>(
+      PostSettingsNotifier.new,
+    );
 
 class PostSettings extends ConsumerStatefulWidget {
   const PostSettings({super.key});
