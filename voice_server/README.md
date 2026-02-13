@@ -14,8 +14,9 @@ A WebSocket-based voice chat server for Camelus, providing low-latency voice com
 
 ## Configuration
 
-The server is configured via `config.yaml`. Example configuration:
+The server is configured via `config.yaml`. See `config.example.yaml` for a detailed example with comments.
 
+Basic example:
 ```yaml
 server:
   host: 0.0.0.0
@@ -26,18 +27,13 @@ channels:
     name: Lobby
     position: 0
     parent_id: null
-  
-  - id: general
-    name: General
-    position: 1
-    parent_id: lobby
 
 user_groups:
   admin:
     - npub1example1xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
   member:
     - npub1example2xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-  anon: []  # Anonymous users
+  anon: []
 ```
 
 ## Running the Server
@@ -48,13 +44,20 @@ user_groups:
 
 ### Installation
 
-1. Install dependencies:
+1. Copy the example config:
+```bash
+cp config.example.yaml config.yaml
+```
+
+2. Edit `config.yaml` with your channels and user npubs
+
+3. Install dependencies:
 ```bash
 cd voice_server
 go mod download
 ```
 
-2. Run the server:
+4. Run the server:
 ```bash
 go run main.go -config config.yaml
 ```
