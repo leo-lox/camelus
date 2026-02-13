@@ -1,16 +1,18 @@
 # Voice Chat Server
 
-A WebSocket-based voice chat server for Camelus, providing low-latency voice communication with channel management.
+A WebRTC-based voice chat server for Camelus, providing low-latency voice communication with channel management.
 
 ## Features
 
-- WebSocket-based signaling server
+- WebRTC data channels for signaling and messaging
+- Native WebRTC support (using pion/webrtc)
 - Tree-like channel structure
 - User groups (admin, member, anon) based on Nostr npubs
 - Efficient state change broadcasting
 - Channel state management
 - Speaking indicators
 - User mute states
+- Ready for WebRTC audio/video streams
 
 ## Configuration
 
@@ -70,11 +72,47 @@ go build -o voice_server main.go
 
 ## API Protocol
 
-The server uses WebSocket with JSON messages.
+The server uses WebRTC data channels with JSON messages.
 
-### Client -> Server Messages
+### Connection Flow
 
-#### Authentication
+1. Client creates WebRTC peer connection with offer
+2. Client sends offer to `/signaling` endpoint via HTTP POST
+3. Server creates peer connection and returns answer
+4. WebRTC connection established with data channel
+5. Client sends messages via data channel
+
+### Signaling (HTTP POST to `/signaling`)
+
+#### Offer from Client
+```json
+{
+  "type": "offer",
+  "sdp": {
+    "type": "offer",
+    "sdp": "..."
+  }
+}
+```
+
+#### Answer from Server
+```json
+{
+  "type": "answer",
+  "sdp": {
+    "type": "answer",
+    "sdp": "..."
+  }
+}
+```
+
+### Data Channel Messages
+
+Once the WebRTC connection is established, all messages are sent via data channel.
+
+### Client -> Server Messages (via Data Channel)
+
+#### Authentication (sent after data channel opens)
 ```json
 {
   "type": "auth",
@@ -106,7 +144,7 @@ The server uses WebSocket with JSON messages.
 }
 ```
 
-### Server -> Client Messages
+### Server -> Client Messages (via Data Channel)
 
 #### Initial State
 ```json
@@ -173,17 +211,29 @@ The server uses WebSocket with JSON messages.
 
 The server follows clean architecture principles:
 
-- **WebSocket Handler**: Manages connections and message routing
+- **WebRTC Handler**: Manages peer connections and signaling
+- **Data Channel Handler**: Routes messages through WebRTC data channels
 - **Channel Manager**: Handles channel state and user assignments
 - **User Manager**: Manages user states and permissions
 - **Broadcaster**: Efficiently distributes state changes to connected clients
+
+### Why WebRTC?
+
+Using pion/webrtc instead of WebSocket provides:
+- Native WebRTC support for audio/video streams
+- More efficient data transfer with data channels
+- Better integration with browser WebRTC APIs
+- Future support for peer-to-peer connections
+- Reduced latency for real-time communication
 
 ## Security Considerations
 
 - Authentication is based on Nostr npub
 - CORS is currently open for development (should be restricted in production)
 - User groups determine permissions (future: implement permission-based actions)
-- WebSocket connections should be secured with TLS in production
+- Uses STUN server for ICE candidates (Google's public STUN server)
+- WebRTC connections are automatically encrypted (DTLS)
+- For production, consider using TURN servers for NAT traversal
 
 ## Development
 
@@ -196,8 +246,8 @@ go run main.go
 
 2. Connect from the Camelus app:
    - Navigate to Voice Chat in the drawer
-   - Enter server URL: `ws://localhost:8080`
-   - Click Connect
+   - Enter server URL: `http://localhost:8080` (for signaling endpoint)
+   - Client will use WebRTC to establish connection
 
 ### Customizing Channels
 
@@ -208,7 +258,8 @@ Edit `config.yaml` to add/modify channels. Channels support:
 
 ## Future Enhancements
 
-- [ ] WebRTC peer-to-peer connections for actual audio
+- [ ] Audio streams via WebRTC media tracks (foundation is ready)
+- [ ] Video support
 - [ ] Channel permissions based on user groups
 - [ ] Persistent channel state
 - [ ] Audio quality settings
@@ -216,3 +267,4 @@ Edit `config.yaml` to add/modify channels. Channels support:
 - [ ] Text chat per channel
 - [ ] Channel creation/deletion API
 - [ ] User kick/ban functionality
+- [ ] TURN server configuration for better NAT traversal

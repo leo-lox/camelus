@@ -17,7 +17,8 @@ go run main.go
 
 You should see:
 ```
-2026/02/13 10:07:30 Voice server listening on 0.0.0.0:8080
+2026/02/13 10:28:09 Voice server listening on 0.0.0.0:8080
+2026/02/13 10:28:09 WebRTC signaling endpoint: http://0.0.0.0:8080/signaling
 ```
 
 ## 2. Connect from Camelus
@@ -30,8 +31,8 @@ You should see:
    - Click "Voice Chat" (🎤 icon)
 
 3. **Connect to Server**
-   - Enter server URL: `ws://localhost:8080`
-   - Click "Connect"
+   - Enter server URL: `http://localhost:8080`
+   - Click "Connect" (WebRTC connection will be established)
 
 ## 3. Join a Channel
 
@@ -86,11 +87,13 @@ Restart the server after config changes.
 
 **Can't connect?**
 - Server running? Check the terminal
-- Correct URL? Should be `ws://localhost:8080`
+- Correct URL? Should be `http://localhost:8080`
 - Firewall? May need to allow port 8080
+- Check browser console for WebRTC errors
 
 **No audio?**
-- WebRTC is basic structure only (full implementation pending)
+- WebRTC foundation is ready (pion/webrtc implemented)
+- Audio streams need to be added to client
 - Check microphone permissions
 - Platform WebRTC support required
 
@@ -127,12 +130,13 @@ To connect from other devices:
    ```
 
 3. **Connect from app**
-   - Use `ws://YOUR_IP:8080`
-   - Example: `ws://192.168.1.100:8080`
+   - Use `http://YOUR_IP:8080`
+   - Example: `http://192.168.1.100:8080`
 
 4. **Production deployment**
    - Use reverse proxy (nginx)
-   - Enable TLS: `wss://your-domain.com`
+   - Enable HTTPS for secure signaling
+   - Configure TURN servers for NAT traversal
    - Configure firewall rules
 
 ## Tips
@@ -140,7 +144,9 @@ To connect from other devices:
 - **Multiple servers**: Each server can have different channels
 - **Tree structure**: Nest channels up to any depth
 - **User groups**: Plan your permission structure
-- **Low latency**: Server focuses on minimal overhead
+- **Low latency**: WebRTC provides minimal overhead
 - **Clean architecture**: Easy to extend and customize
+- **Native WebRTC**: Using pion/webrtc for Go implementation
+- **Encrypted**: DTLS encryption built into WebRTC
 
 Happy chatting! 🎉

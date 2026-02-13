@@ -4,13 +4,14 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"os"
 	"sync"
 	"time"
 
-	"github.com/gorilla/websocket"
+	"github.com/pion/webrtc/v4"
 	"gopkg.in/yaml.v3"
 )
 
@@ -21,10 +22,10 @@ type ServerConfig struct {
 }
 
 type Channel struct {
-	ID       string  `yaml:"id" json:"id"`
-	Name     string  `yaml:"name" json:"name"`
-	ParentID *string `yaml:"parent_id" json:"parent_id"`
-	Position int     `yaml:"position" json:"position"`
+	ID       string   `yaml:"id" json:"id"`
+	Name     string   `yaml:"name" json:"name"`
+	ParentID *string  `yaml:"parent_id" json:"parent_id"`
+	Position int      `yaml:"position" json:"position"`
 	UserIDs  []string `json:"user_ids"`
 }
 
@@ -42,33 +43,41 @@ type Config struct {
 
 // Runtime structures
 type User struct {
-	ID          string          `json:"id"`
-	Npub        *string         `json:"npub"`
-	DisplayName *string         `json:"display_name"`
-	Group       string          `json:"group"`
-	ChannelID   *string         `json:"channel_id"`
-	IsSpeaking  bool            `json:"is_speaking"`
-	IsMuted     bool            `json:"is_muted"`
-	Conn        *websocket.Conn `json:"-"`
+	ID          string                    `json:"id"`
+	Npub        *string                   `json:"npub"`
+	DisplayName *string                   `json:"display_name"`
+	Group       string                    `json:"group"`
+	ChannelID   *string                   `json:"channel_id"`
+	IsSpeaking  bool                      `json:"is_speaking"`
+	IsMuted     bool                      `json:"is_muted"`
+	PC          *webrtc.PeerConnection    `json:"-"`
+	DataChannel *webrtc.DataChannel       `json:"-"`
 }
 
 type Message struct {
-	Type      string                 `json:"type"`
-	Data      map[string]interface{} `json:"data,omitempty"`
-	ChannelID *string                `json:"channel_id,omitempty"`
-	UserID    *string                `json:"user_id,omitempty"`
-	IsSpeaking *bool                 `json:"is_speaking,omitempty"`
-	Muted     *bool                  `json:"muted,omitempty"`
-	Npub      *string                `json:"npub,omitempty"`
-	Message   string                 `json:"message,omitempty"`
+	Type       string                 `json:"type"`
+	Data       map[string]interface{} `json:"data,omitempty"`
+	ChannelID  *string                `json:"channel_id,omitempty"`
+	UserID     *string                `json:"user_id,omitempty"`
+	IsSpeaking *bool                  `json:"is_speaking,omitempty"`
+	Muted      *bool                  `json:"muted,omitempty"`
+	Npub       *string                `json:"npub,omitempty"`
+	Message    string                 `json:"message,omitempty"`
+}
+
+// Signaling messages for WebRTC
+type SignalingMessage struct {
+	Type      string                     `json:"type"` // "offer", "answer", "ice-candidate"
+	SDP       *webrtc.SessionDescription `json:"sdp,omitempty"`
+	Candidate *webrtc.ICECandidateInit   `json:"candidate,omitempty"`
 }
 
 type Server struct {
-	config    Config
-	users     map[string]*User
-	channels  map[string]*Channel
-	mu        sync.RWMutex
-	upgrader  websocket.Upgrader
+	config   Config
+	users    map[string]*User
+	channels map[string]*Channel
+	mu       sync.RWMutex
+	api      *webrtc.API
 }
 
 var (
@@ -97,17 +106,15 @@ func NewServer(config Config) *Server {
 		channels[ch.ID] = ch
 	}
 
+	// Create WebRTC API with media engine
+	mediaEngine := &webrtc.MediaEngine{}
+	api := webrtc.NewAPI(webrtc.WithMediaEngine(mediaEngine))
+
 	return &Server{
 		config:   config,
 		users:    make(map[string]*User),
 		channels: channels,
-		upgrader: websocket.Upgrader{
-			CheckOrigin: func(r *http.Request) bool {
-				// TODO: In production, restrict to specific origins
-				// Example: return r.Header.Get("Origin") == "https://yourdomain.com"
-				return true // Allow all origins for development
-			},
-		},
+		api:      api,
 	}
 }
 
@@ -131,82 +138,166 @@ func (s *Server) getUserGroup(npub *string) string {
 	return "anon"
 }
 
-func (s *Server) handleWebSocket(w http.ResponseWriter, r *http.Request) {
-	conn, err := s.upgrader.Upgrade(w, r, nil)
-	if err != nil {
-		log.Printf("Failed to upgrade connection: %v", err)
+// HTTP handler for WebRTC signaling
+func (s *Server) handleSignaling(w http.ResponseWriter, r *http.Request) {
+	// Enable CORS for development
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS")
+	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+
+	if r.Method == "OPTIONS" {
+		w.WriteHeader(http.StatusOK)
 		return
 	}
-	defer conn.Close()
+
+	if r.Method != "POST" {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	// Read the offer from client
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
+		http.Error(w, "Failed to read body", http.StatusBadRequest)
+		return
+	}
+
+	var sigMsg SignalingMessage
+	if err := json.Unmarshal(body, &sigMsg); err != nil {
+		http.Error(w, "Failed to parse signaling message", http.StatusBadRequest)
+		return
+	}
+
+	if sigMsg.Type != "offer" || sigMsg.SDP == nil {
+		http.Error(w, "Expected offer with SDP", http.StatusBadRequest)
+		return
+	}
+
+	// Create peer connection
+	config := webrtc.Configuration{
+		ICEServers: []webrtc.ICEServer{
+			{
+				URLs: []string{"stun:stun.l.google.com:19302"},
+			},
+		},
+	}
+
+	pc, err := s.api.NewPeerConnection(config)
+	if err != nil {
+		log.Printf("Failed to create peer connection: %v", err)
+		http.Error(w, "Failed to create peer connection", http.StatusInternalServerError)
+		return
+	}
 
 	user := &User{
-		ID:   generateUserID(),
-		Conn: conn,
+		ID: generateUserID(),
+		PC: pc,
 	}
 
-	log.Printf("New connection from %s", r.RemoteAddr)
+	log.Printf("New WebRTC connection from %s", r.RemoteAddr)
 
-	// Read authentication message
-	_, msg, err := conn.ReadMessage()
+	// Handle data channel from client
+	pc.OnDataChannel(func(dc *webrtc.DataChannel) {
+		log.Printf("Data channel '%s' opened for user %s", dc.Label(), user.ID)
+		user.DataChannel = dc
+
+		dc.OnOpen(func() {
+			log.Printf("Data channel opened for user %s", user.ID)
+			// Send initial state when data channel opens
+			s.sendStateUpdate(user)
+			s.broadcastUserJoined(user)
+		})
+
+		dc.OnMessage(func(msg webrtc.DataChannelMessage) {
+			s.handleDataChannelMessage(user, msg.Data)
+		})
+
+		dc.OnClose(func() {
+			log.Printf("Data channel closed for user %s", user.ID)
+		})
+	})
+
+	// Handle ICE connection state changes
+	pc.OnICEConnectionStateChange(func(state webrtc.ICEConnectionState) {
+		log.Printf("ICE Connection State for user %s: %s", user.ID, state.String())
+		
+		if state == webrtc.ICEConnectionStateDisconnected ||
+			state == webrtc.ICEConnectionStateFailed ||
+			state == webrtc.ICEConnectionStateClosed {
+			s.handleUserDisconnect(user)
+		}
+	})
+
+	// Set remote description (offer from client)
+	if err := pc.SetRemoteDescription(*sigMsg.SDP); err != nil {
+		log.Printf("Failed to set remote description: %v", err)
+		http.Error(w, "Failed to set remote description", http.StatusInternalServerError)
+		return
+	}
+
+	// Create answer
+	answer, err := pc.CreateAnswer(nil)
 	if err != nil {
-		log.Printf("Failed to read auth message: %v", err)
+		log.Printf("Failed to create answer: %v", err)
+		http.Error(w, "Failed to create answer", http.StatusInternalServerError)
 		return
 	}
 
-	var authMsg Message
-	if err := json.Unmarshal(msg, &authMsg); err != nil {
-		log.Printf("Failed to parse auth message: %v", err)
+	// Set local description
+	if err := pc.SetLocalDescription(answer); err != nil {
+		log.Printf("Failed to set local description: %v", err)
+		http.Error(w, "Failed to set local description", http.StatusInternalServerError)
 		return
 	}
 
-	if authMsg.Type != "auth" {
-		log.Printf("Expected auth message, got %s", authMsg.Type)
-		return
-	}
-
-	user.Npub = authMsg.Npub
-	user.Group = s.getUserGroup(user.Npub)
-	user.DisplayName = authMsg.Npub // Could be enhanced to fetch display name
-
+	// Add user to server
 	s.mu.Lock()
 	s.users[user.ID] = user
 	s.mu.Unlock()
 
-	defer func() {
-		s.mu.Lock()
-		if user.ChannelID != nil {
-			s.removeUserFromChannel(user.ID, *user.ChannelID)
-		}
-		delete(s.users, user.ID)
-		s.mu.Unlock()
+	// Send answer back to client
+	response := SignalingMessage{
+		Type: "answer",
+		SDP:  pc.LocalDescription(),
+	}
 
-		s.broadcastUserLeft(user.ID)
-		log.Printf("User %s disconnected", user.ID)
-	}()
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(response)
+}
 
-	// Send initial state
-	s.sendStateUpdate(user)
+func (s *Server) handleDataChannelMessage(user *User, data []byte) {
+	var message Message
+	if err := json.Unmarshal(data, &message); err != nil {
+		log.Printf("Failed to parse message from user %s: %v", user.ID, err)
+		return
+	}
 
-	// Broadcast user joined
-	s.broadcastUserJoined(user)
+	// Handle authentication
+	if message.Type == "auth" {
+		user.Npub = message.Npub
+		user.Group = s.getUserGroup(user.Npub)
+		user.DisplayName = message.Npub // Could be enhanced to fetch display name
+		log.Printf("User %s authenticated as %s", user.ID, user.Group)
+		return
+	}
 
-	// Handle messages
-	for {
-		_, msg, err := conn.ReadMessage()
-		if err != nil {
-			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
-				log.Printf("WebSocket error: %v", err)
-			}
-			break
-		}
+	s.handleMessage(user, &message)
+}
 
-		var message Message
-		if err := json.Unmarshal(msg, &message); err != nil {
-			log.Printf("Failed to parse message: %v", err)
-			continue
-		}
+func (s *Server) handleUserDisconnect(user *User) {
+	s.mu.Lock()
+	if user.ChannelID != nil {
+		s.removeUserFromChannel(user.ID, *user.ChannelID)
+	}
+	delete(s.users, user.ID)
+	s.mu.Unlock()
 
-		s.handleMessage(user, &message)
+	s.broadcastUserLeft(user.ID)
+	log.Printf("User %s disconnected", user.ID)
+
+	// Close peer connection
+	if user.PC != nil {
+		user.PC.Close()
 	}
 }
 
@@ -334,9 +425,7 @@ func (s *Server) sendStateUpdate(user *User) {
 		return
 	}
 
-	if err := user.Conn.WriteMessage(websocket.TextMessage, data); err != nil {
-		log.Printf("Failed to send state to user %s: %v", user.ID, err)
-	}
+	s.sendToUser(user, data)
 }
 
 func (s *Server) broadcastUserJoined(user *User) {
@@ -414,11 +503,18 @@ func (s *Server) broadcast(msg Message, excludeUserID string) {
 
 	for _, user := range s.users {
 		if user.ID != excludeUserID {
-			user.Conn.SetWriteDeadline(time.Now().Add(10 * time.Second))
-			if err := user.Conn.WriteMessage(websocket.TextMessage, data); err != nil {
-				log.Printf("Failed to send message to user %s: %v", user.ID, err)
-			}
+			s.sendToUser(user, data)
 		}
+	}
+}
+
+func (s *Server) sendToUser(user *User, data []byte) {
+	if user.DataChannel == nil || user.DataChannel.ReadyState() != webrtc.DataChannelStateOpen {
+		return
+	}
+
+	if err := user.DataChannel.Send(data); err != nil {
+		log.Printf("Failed to send message to user %s: %v", user.ID, err)
 	}
 }
 
@@ -434,9 +530,7 @@ func (s *Server) sendError(user *User, message string) {
 		return
 	}
 
-	if err := user.Conn.WriteMessage(websocket.TextMessage, data); err != nil {
-		log.Printf("Failed to send error to user %s: %v", user.ID, err)
-	}
+	s.sendToUser(user, data)
 }
 
 func generateUserID() string {
@@ -453,10 +547,11 @@ func main() {
 
 	server := NewServer(*config)
 
-	http.HandleFunc("/", server.handleWebSocket)
+	http.HandleFunc("/signaling", server.handleSignaling)
 
 	addr := fmt.Sprintf("%s:%d", config.Server.Host, config.Server.Port)
 	log.Printf("Voice server listening on %s", addr)
+	log.Printf("WebRTC signaling endpoint: http://%s/signaling", addr)
 
 	if err := http.ListenAndServe(addr, nil); err != nil {
 		log.Fatalf("Failed to start server: %v", err)

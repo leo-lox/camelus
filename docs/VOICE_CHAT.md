@@ -53,10 +53,17 @@ The implementation follows clean architecture principles:
 Located in `voice_server/`:
 
 #### Components
-- **WebSocket Handler**: Manages client connections
+- **WebRTC Handler**: Manages peer connections and signaling
+- **Data Channel Handler**: Routes messages through WebRTC data channels
 - **Channel Manager**: Handles channel state and user assignments
 - **User Manager**: Manages user states and permissions
 - **Broadcaster**: Distributes state changes efficiently
+
+#### Technology
+- **pion/webrtc**: Pure Go implementation of WebRTC
+- Data channels for signaling and messaging
+- Native support for audio/video streams
+- ICE/STUN for NAT traversal
 
 #### Configuration
 Server is configured via `config.yaml`:
@@ -88,7 +95,7 @@ cd voice_server
 go run main.go -config config.yaml
 ```
 
-The server will start on `ws://localhost:8080` by default.
+The server will start on `http://localhost:8080` by default (WebRTC signaling endpoint).
 
 ### 2. Configure Channels
 
@@ -103,8 +110,8 @@ Edit `voice_server/config.yaml` to customize your channel structure:
 
 1. Open Camelus app
 2. Navigate to "Voice Chat" in the drawer menu
-3. Enter your server URL (e.g., `ws://localhost:8080`)
-4. Click "Connect"
+3. Enter your server URL (e.g., `http://localhost:8080`)
+4. Click "Connect" (client will establish WebRTC connection)
 5. Select a channel from the tree view
 6. Start talking!
 
@@ -127,7 +134,33 @@ Edit `voice_server/config.yaml` to customize your channel structure:
 
 ## Protocol
 
-### WebSocket Messages
+### WebRTC Connection Flow
+
+1. **Client creates WebRTC offer**
+   - Creates peer connection
+   - Creates data channel
+   - Generates SDP offer
+
+2. **Client sends offer to server**
+   - HTTP POST to `/signaling` endpoint
+   - Sends offer SDP
+
+3. **Server processes offer**
+   - Creates peer connection
+   - Sets up data channel handlers
+   - Generates SDP answer
+
+4. **Server returns answer**
+   - Returns answer SDP to client
+
+5. **WebRTC connection established**
+   - ICE candidates exchanged
+   - Data channel opens
+   - Messages flow via data channel
+
+### Data Channel Messages
+
+Once connected, all messages use JSON over data channel.
 
 #### Client → Server
 
@@ -198,6 +231,13 @@ Current implementation identifies users by npub, with room for future permission
 - Users authenticate with their Nostr npub
 - Server validates npub against configured user groups
 - Anonymous access allowed (as "anon" group)
+- WebRTC connections are encrypted by default (DTLS)
+
+### Network Security
+- WebRTC uses DTLS for encryption
+- ICE/STUN for NAT traversal
+- CORS configured (restrict in production)
+- Consider TURN servers for production
 
 ## Development
 
@@ -226,12 +266,12 @@ go run main.go
 flutter run
 ```
 
-Connect to `ws://localhost:8080` from the app.
+Connect to `http://localhost:8080` from the app.
 
 ## Future Enhancements
 
 Planned features:
-- [ ] Complete WebRTC peer-to-peer audio
+- [ ] Audio streams via WebRTC (foundation ready with pion/webrtc)
 - [ ] Channel permissions based on user groups
 - [ ] Push-to-talk mode
 - [ ] Audio quality settings
@@ -246,8 +286,9 @@ Planned features:
 
 ### Connection Issues
 - Verify server is running: check terminal output
-- Check server URL format: should start with `ws://` or `wss://`
+- Check server URL format: should start with `http://` for WebRTC signaling
 - Ensure port is accessible (firewall, network)
+- Check browser console for WebRTC errors
 
 ### No Audio
 - Grant microphone permissions to the app
@@ -260,9 +301,10 @@ Planned features:
 - Verify channel IDs are unique
 
 ### User Not Showing
-- Ensure WebSocket connection is established
-- Check authentication message sent
+- Ensure WebRTC connection is established (check data channel state)
+- Check authentication message sent via data channel
 - Look for errors in server logs
+- Verify ICE candidates are exchanged
 
 ## Technical Details
 
@@ -271,10 +313,11 @@ Planned features:
 - Immutable state objects with copyWith
 - Efficient updates through targeted broadcasts
 
-### WebSocket Protocol
-- JSON-based messaging
-- Persistent connections
-- Automatic reconnection handling (client-side)
+### WebRTC Protocol
+- JSON-based messaging over data channels
+- Encrypted by default (DTLS)
+- ICE/STUN for NAT traversal
+- Signaling via HTTP REST endpoint
 
 ### Channel Hierarchy
 - Implemented as parent-child relationships
@@ -284,7 +327,8 @@ Planned features:
 ### Broadcasting Strategy
 - Delta updates (only what changed)
 - User-specific filtering where needed
-- Efficient serialization with Go's json package
+- Efficient serialization with JSON
+- Data channels provide ordered, reliable delivery
 
 ## API Reference
 
