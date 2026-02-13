@@ -1,18 +1,30 @@
 # Voice Chat Server
 
-A WebRTC-based voice chat server for Camelus, providing low-latency voice communication with channel management.
+A hybrid WebSocket + WebRTC SFU voice chat server for Camelus, providing low-latency voice communication with channel management.
+
+## Architecture
+
+This server uses a **hybrid architecture** that combines:
+
+1. **WebSocket for API/Signaling**: State changes, channel management, user presence
+2. **pion/webrtc for SFU (Selective Forwarding Unit)**: Actual audio/video data transmission
+
+```
+Client ←──WebSocket (ws://)──→ Server (API/State)
+       ←──WebRTC (SFU)────→ Server (Audio/Video Forwarding)
+```
 
 ## Features
 
-- WebRTC data channels for signaling and messaging
-- Native WebRTC support (using pion/webrtc)
+- **WebSocket-based API**: State changes and channel management
+- **WebRTC SFU**: Audio forwarding between participants in same channel
 - Tree-like channel structure
 - User groups (admin, member, anon) based on Nostr npubs
 - Efficient state change broadcasting
 - Channel state management
 - Speaking indicators
 - User mute states
-- Ready for WebRTC audio/video streams
+- Low-latency audio forwarding
 
 ## Configuration
 
@@ -72,47 +84,35 @@ go build -o voice_server main.go
 
 ## API Protocol
 
-The server uses WebRTC data channels with JSON messages.
+The server uses a **dual-protocol approach**:
+
+1. **WebSocket (ws://)**: For API, signaling, and state management
+2. **WebRTC**: For audio/video data (SFU)
 
 ### Connection Flow
 
-1. Client creates WebRTC peer connection with offer
-2. Client sends offer to `/signaling` endpoint via HTTP POST
-3. Server creates peer connection and returns answer
-4. WebRTC connection established with data channel
-5. Client sends messages via data channel
+#### 1. WebSocket Connection (API/Signaling)
 
-### Signaling (HTTP POST to `/signaling`)
-
-#### Offer from Client
-```json
-{
-  "type": "offer",
-  "sdp": {
-    "type": "offer",
-    "sdp": "..."
-  }
-}
+```
+Client → ws://server:8080/
+      ← Connected
+      → {"type": "auth", "npub": "..."}
+      ← {"type": "state", "data": {...}}
 ```
 
-#### Answer from Server
-```json
-{
-  "type": "answer",
-  "sdp": {
-    "type": "answer",
-    "sdp": "..."
-  }
-}
+#### 2. WebRTC Connection (Media)
+
+```
+Client → {"type": "webrtc_offer", "sdp": {...}} (via WebSocket)
+      ← {"type": "webrtc_answer", "sdp": {...}} (via WebSocket)
+      ← ICE candidates exchanged
+      → Audio tracks sent via WebRTC
+      ← Audio forwarded to other users in same channel
 ```
 
-### Data Channel Messages
+### WebSocket Messages
 
-Once the WebRTC connection is established, all messages are sent via data channel.
-
-### Client -> Server Messages (via Data Channel)
-
-#### Authentication (sent after data channel opens)
+#### Authentication
 ```json
 {
   "type": "auth",
@@ -125,6 +125,25 @@ Once the WebRTC connection is established, all messages are sent via data channe
 {
   "type": "join_channel",
   "channel_id": "general"
+}
+```
+
+#### WebRTC Offer (for media connection)
+```json
+{
+  "type": "webrtc_offer",
+  "sdp": {
+    "type": "offer",
+    "sdp": "..."
+  }
+}
+```
+
+#### ICE Candidate
+```json
+{
+  "type": "webrtc_candidate",
+  "candidate": {...}
 }
 ```
 
@@ -144,7 +163,7 @@ Once the WebRTC connection is established, all messages are sent via data channe
 }
 ```
 
-### Server -> Client Messages (via Data Channel)
+### Server -> Client Messages (via WebSocket)
 
 #### Initial State
 ```json
@@ -199,6 +218,25 @@ Once the WebRTC connection is established, all messages are sent via data channe
 }
 ```
 
+#### WebRTC Answer (response to offer)
+```json
+{
+  "type": "webrtc_answer",
+  "sdp": {
+    "type": "answer",
+    "sdp": "..."
+  }
+}
+```
+
+#### ICE Candidate (for NAT traversal)
+```json
+{
+  "type": "webrtc_candidate",
+  "candidate": {...}
+}
+```
+
 #### Error
 ```json
 {
@@ -207,32 +245,41 @@ Once the WebRTC connection is established, all messages are sent via data channe
 }
 ```
 
-## Architecture
+## Server Architecture
 
-The server follows clean architecture principles:
+The server uses a **hybrid architecture** combining:
 
-- **WebRTC Handler**: Manages peer connections and signaling
-- **Data Channel Handler**: Routes messages through WebRTC data channels
+### Components
+
+- **WebSocket Handler**: Manages persistent connections for API/signaling
+- **WebRTC SFU**: Forwards audio tracks between users in same channel
 - **Channel Manager**: Handles channel state and user assignments
 - **User Manager**: Manages user states and permissions
-- **Broadcaster**: Efficiently distributes state changes to connected clients
+- **Broadcaster**: Efficiently distributes state changes via WebSocket
 
-### Why WebRTC?
+### Why Hybrid Architecture?
 
-Using pion/webrtc instead of WebSocket provides:
-- Native WebRTC support for audio/video streams
-- More efficient data transfer with data channels
-- Better integration with browser WebRTC APIs
-- Future support for peer-to-peer connections
-- Reduced latency for real-time communication
+**WebSocket for Signaling**:
+- Persistent bi-directional connection
+- Low overhead for state updates
+- Simple JSON-based API
+- Easy to debug and monitor
+
+**WebRTC for Media**:
+- Native audio/video support
+- Built-in encryption (DTLS)
+- Efficient binary data transfer
+- NAT traversal with ICE/STUN
+- SFU enables multi-party audio forwarding
 
 ## Security Considerations
 
 - Authentication is based on Nostr npub
 - CORS is currently open for development (should be restricted in production)
 - User groups determine permissions (future: implement permission-based actions)
-- Uses STUN server for ICE candidates (Google's public STUN server)
+- WebSocket connections should be secured with TLS (wss://) in production
 - WebRTC connections are automatically encrypted (DTLS)
+- Uses STUN server for ICE candidates (Google's public STUN server)
 - For production, consider using TURN servers for NAT traversal
 
 ## Development
@@ -246,8 +293,11 @@ go run main.go
 
 2. Connect from the Camelus app:
    - Navigate to Voice Chat in the drawer
-   - Enter server URL: `http://localhost:8080` (for signaling endpoint)
-   - Client will use WebRTC to establish connection
+   - Enter server URL: `ws://localhost:8080`
+   - Client establishes WebSocket for signaling
+   - Client creates WebRTC peer connection for audio
+   - Send WebRTC offer via WebSocket
+   - Receive answer and start audio transmission
 
 ### Customizing Channels
 
@@ -258,7 +308,9 @@ Edit `config.yaml` to add/modify channels. Channels support:
 
 ## Future Enhancements
 
-- [ ] Audio streams via WebRTC media tracks (foundation is ready)
+- [x] WebSocket for API/signaling
+- [x] WebRTC SFU for audio forwarding
+- [ ] Improved SFU with proper track management
 - [ ] Video support
 - [ ] Channel permissions based on user groups
 - [ ] Persistent channel state

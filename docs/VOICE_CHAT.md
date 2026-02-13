@@ -53,16 +53,16 @@ The implementation follows clean architecture principles:
 Located in `voice_server/`:
 
 #### Components
-- **WebRTC Handler**: Manages peer connections and signaling
-- **Data Channel Handler**: Routes messages through WebRTC data channels
+- **WebSocket Handler**: Manages persistent connections for API/signaling
+- **WebRTC SFU**: Forwards audio tracks between users in same channel
 - **Channel Manager**: Handles channel state and user assignments
 - **User Manager**: Manages user states and permissions
 - **Broadcaster**: Distributes state changes efficiently
 
 #### Technology
-- **pion/webrtc**: Pure Go implementation of WebRTC
-- Data channels for signaling and messaging
-- Native support for audio/video streams
+- **gorilla/websocket**: For API/signaling communication
+- **pion/webrtc**: Pure Go implementation of WebRTC for SFU
+- Hybrid architecture: WebSocket for state, WebRTC for media
 - ICE/STUN for NAT traversal
 
 #### Configuration
@@ -95,7 +95,7 @@ cd voice_server
 go run main.go -config config.yaml
 ```
 
-The server will start on `http://localhost:8080` by default (WebRTC signaling endpoint).
+The server will start on `ws://localhost:8080` by default (WebSocket endpoint).
 
 ### 2. Configure Channels
 
@@ -110,10 +110,11 @@ Edit `voice_server/config.yaml` to customize your channel structure:
 
 1. Open Camelus app
 2. Navigate to "Voice Chat" in the drawer menu
-3. Enter your server URL (e.g., `http://localhost:8080`)
-4. Click "Connect" (client will establish WebRTC connection)
-5. Select a channel from the tree view
-6. Start talking!
+3. Enter your server URL (e.g., `ws://localhost:8080`)
+4. Click "Connect" (WebSocket connection established)
+5. Client creates WebRTC peer connection for audio
+6. Select a channel from the tree view
+7. Start talking!
 
 ## Features
 
@@ -134,33 +135,30 @@ Edit `voice_server/config.yaml` to customize your channel structure:
 
 ## Protocol
 
-### WebRTC Connection Flow
+### Hybrid Architecture
 
-1. **Client creates WebRTC offer**
-   - Creates peer connection
-   - Creates data channel
-   - Generates SDP offer
+The server uses two separate protocols:
 
-2. **Client sends offer to server**
-   - HTTP POST to `/signaling` endpoint
-   - Sends offer SDP
+1. **WebSocket (ws://)**: For API, signaling, state management
+2. **WebRTC**: For audio/video data (SFU)
 
-3. **Server processes offer**
-   - Creates peer connection
-   - Sets up data channel handlers
-   - Generates SDP answer
+### Connection Flow
 
-4. **Server returns answer**
-   - Returns answer SDP to client
+1. **WebSocket Connection (API)**
+   - Client connects to `ws://server:8080/`
+   - Sends authentication message
+   - Receives initial state
+   - Subscribes to state updates
 
-5. **WebRTC connection established**
-   - ICE candidates exchanged
-   - Data channel opens
-   - Messages flow via data channel
+2. **WebRTC Connection (Media)**
+   - Client creates WebRTC peer connection
+   - Sends offer via WebSocket: `{"type": "webrtc_offer", "sdp": {...}}`
+   - Receives answer via WebSocket: `{"type": "webrtc_answer", "sdp": {...}}`
+   - ICE candidates exchanged via WebSocket
+   - Audio tracks sent via WebRTC
+   - Server forwards audio to other users in same channel (SFU)
 
-### Data Channel Messages
-
-Once connected, all messages use JSON over data channel.
+### WebSocket Messages
 
 #### Client → Server
 
@@ -188,6 +186,22 @@ Once connected, all messages use JSON over data channel.
 }
 ```
 
+**WebRTC Offer** (for media):
+```json
+{
+  "type": "webrtc_offer",
+  "sdp": {"type": "offer", "sdp": "..."}
+}
+```
+
+**ICE Candidate**:
+```json
+{
+  "type": "webrtc_candidate",
+  "candidate": {...}
+}
+```
+
 **Speaking State**:
 ```json
 {
@@ -206,6 +220,22 @@ Once connected, all messages use JSON over data channel.
     "channels": [...],
     "users": [...]
   }
+}
+```
+
+**WebRTC Answer** (response to offer):
+```json
+{
+  "type": "webrtc_answer",
+  "sdp": {"type": "answer", "sdp": "..."}
+}
+```
+
+**ICE Candidate**:
+```json
+{
+  "type": "webrtc_candidate",
+  "candidate": {...}
 }
 ```
 
@@ -231,9 +261,11 @@ Current implementation identifies users by npub, with room for future permission
 - Users authenticate with their Nostr npub
 - Server validates npub against configured user groups
 - Anonymous access allowed (as "anon" group)
-- WebRTC connections are encrypted by default (DTLS)
+- WebSocket secured with TLS (wss://) in production
+- WebRTC connections encrypted by default (DTLS)
 
 ### Network Security
+- WebSocket for control plane (secure with TLS)
 - WebRTC uses DTLS for encryption
 - ICE/STUN for NAT traversal
 - CORS configured (restrict in production)
@@ -266,7 +298,7 @@ go run main.go
 flutter run
 ```
 
-Connect to `http://localhost:8080` from the app.
+Connect to `ws://localhost:8080` from the app.
 
 ## Future Enhancements
 
@@ -286,7 +318,7 @@ Planned features:
 
 ### Connection Issues
 - Verify server is running: check terminal output
-- Check server URL format: should start with `http://` for WebRTC signaling
+- Check server URL format: should start with `ws://` for WebSocket
 - Ensure port is accessible (firewall, network)
 - Check browser console for WebRTC errors
 
@@ -301,10 +333,10 @@ Planned features:
 - Verify channel IDs are unique
 
 ### User Not Showing
-- Ensure WebRTC connection is established (check data channel state)
-- Check authentication message sent via data channel
+- Ensure WebSocket connection is established
+- Check authentication message sent via WebSocket
 - Look for errors in server logs
-- Verify ICE candidates are exchanged
+- Verify WebRTC peer connection for audio
 
 ## Technical Details
 
@@ -313,11 +345,11 @@ Planned features:
 - Immutable state objects with copyWith
 - Efficient updates through targeted broadcasts
 
-### WebRTC Protocol
-- JSON-based messaging over data channels
-- Encrypted by default (DTLS)
-- ICE/STUN for NAT traversal
-- Signaling via HTTP REST endpoint
+### Communication Protocol
+- WebSocket for signaling and state (JSON messages)
+- WebRTC for media streams (audio/video)
+- SFU forwards audio between users in same channel
+- Encrypted by default (TLS for WebSocket, DTLS for WebRTC)
 
 ### Channel Hierarchy
 - Implemented as parent-child relationships

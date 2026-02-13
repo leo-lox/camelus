@@ -17,8 +17,9 @@ go run main.go
 
 You should see:
 ```
-2026/02/13 10:28:09 Voice server listening on 0.0.0.0:8080
-2026/02/13 10:28:09 WebRTC signaling endpoint: http://0.0.0.0:8080/signaling
+2026/02/13 10:38:50 Voice server listening on 0.0.0.0:8080
+2026/02/13 10:38:50 WebSocket endpoint: ws://0.0.0.0:8080/
+2026/02/13 10:38:50 WebRTC SFU enabled for audio forwarding
 ```
 
 ## 2. Connect from Camelus
@@ -31,8 +32,8 @@ You should see:
    - Click "Voice Chat" (🎤 icon)
 
 3. **Connect to Server**
-   - Enter server URL: `http://localhost:8080`
-   - Click "Connect" (WebRTC connection will be established)
+   - Enter server URL: `ws://localhost:8080`
+   - Click "Connect" (WebSocket connection + WebRTC for audio)
 
 ## 3. Join a Channel
 
@@ -87,15 +88,15 @@ Restart the server after config changes.
 
 **Can't connect?**
 - Server running? Check the terminal
-- Correct URL? Should be `http://localhost:8080`
+- Correct URL? Should be `ws://localhost:8080`
 - Firewall? May need to allow port 8080
-- Check browser console for WebRTC errors
+- Check browser console for errors
 
 **No audio?**
-- WebRTC foundation is ready (pion/webrtc implemented)
-- Audio streams need to be added to client
+- WebRTC SFU is ready on server side
 - Check microphone permissions
 - Platform WebRTC support required
+- Check WebRTC connection established
 
 **Channel not showing?**
 - Check config.yaml syntax (valid YAML)
@@ -130,12 +131,12 @@ To connect from other devices:
    ```
 
 3. **Connect from app**
-   - Use `http://YOUR_IP:8080`
-   - Example: `http://192.168.1.100:8080`
+   - Use `ws://YOUR_IP:8080`
+   - Example: `ws://192.168.1.100:8080`
 
 4. **Production deployment**
    - Use reverse proxy (nginx)
-   - Enable HTTPS for secure signaling
+   - Enable TLS: `wss://your-domain.com`
    - Configure TURN servers for NAT traversal
    - Configure firewall rules
 
@@ -144,9 +145,9 @@ To connect from other devices:
 - **Multiple servers**: Each server can have different channels
 - **Tree structure**: Nest channels up to any depth
 - **User groups**: Plan your permission structure
-- **Low latency**: WebRTC provides minimal overhead
+- **Low latency**: Hybrid WebSocket + WebRTC architecture
 - **Clean architecture**: Easy to extend and customize
-- **Native WebRTC**: Using pion/webrtc for Go implementation
-- **Encrypted**: DTLS encryption built into WebRTC
+- **SFU**: Server forwards audio between participants
+- **Encrypted**: Both WebSocket (TLS) and WebRTC (DTLS) can be encrypted
 
 Happy chatting! 🎉

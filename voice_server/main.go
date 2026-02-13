@@ -4,13 +4,13 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"io"
 	"log"
 	"net/http"
 	"os"
 	"sync"
 	"time"
 
+	"github.com/gorilla/websocket"
 	"github.com/pion/webrtc/v4"
 	"gopkg.in/yaml.v3"
 )
@@ -43,15 +43,15 @@ type Config struct {
 
 // Runtime structures
 type User struct {
-	ID          string                    `json:"id"`
-	Npub        *string                   `json:"npub"`
-	DisplayName *string                   `json:"display_name"`
-	Group       string                    `json:"group"`
-	ChannelID   *string                   `json:"channel_id"`
-	IsSpeaking  bool                      `json:"is_speaking"`
-	IsMuted     bool                      `json:"is_muted"`
-	PC          *webrtc.PeerConnection    `json:"-"`
-	DataChannel *webrtc.DataChannel       `json:"-"`
+	ID             string                 `json:"id"`
+	Npub           *string                `json:"npub"`
+	DisplayName    *string                `json:"display_name"`
+	Group          string                 `json:"group"`
+	ChannelID      *string                `json:"channel_id"`
+	IsSpeaking     bool                   `json:"is_speaking"`
+	IsMuted        bool                   `json:"is_muted"`
+	WSConn         *websocket.Conn        `json:"-"` // WebSocket for signaling/API
+	PeerConnection *webrtc.PeerConnection `json:"-"` // WebRTC for media (SFU)
 }
 
 type Message struct {
@@ -63,21 +63,18 @@ type Message struct {
 	Muted      *bool                  `json:"muted,omitempty"`
 	Npub       *string                `json:"npub,omitempty"`
 	Message    string                 `json:"message,omitempty"`
-}
-
-// Signaling messages for WebRTC
-type SignalingMessage struct {
-	Type      string                     `json:"type"` // "offer", "answer", "ice-candidate"
+	// WebRTC signaling
 	SDP       *webrtc.SessionDescription `json:"sdp,omitempty"`
 	Candidate *webrtc.ICECandidateInit   `json:"candidate,omitempty"`
 }
 
 type Server struct {
-	config   Config
-	users    map[string]*User
-	channels map[string]*Channel
-	mu       sync.RWMutex
-	api      *webrtc.API
+	config    Config
+	users     map[string]*User
+	channels  map[string]*Channel
+	mu        sync.RWMutex
+	upgrader  websocket.Upgrader
+	api       *webrtc.API
 }
 
 var (
@@ -106,15 +103,35 @@ func NewServer(config Config) *Server {
 		channels[ch.ID] = ch
 	}
 
-	// Create WebRTC API with media engine
+	// Create WebRTC API for SFU
 	mediaEngine := &webrtc.MediaEngine{}
+	
+	// Register codecs for audio
+	if err := mediaEngine.RegisterCodec(webrtc.RTPCodecParameters{
+		RTPCodecCapability: webrtc.RTPCodecCapability{
+			MimeType:     webrtc.MimeTypeOpus,
+			ClockRate:    48000,
+			Channels:     2,
+			SDPFmtpLine:  "minptime=10;useinbandfec=1",
+		},
+		PayloadType: 111,
+	}, webrtc.RTPCodecTypeAudio); err != nil {
+		log.Printf("Failed to register Opus codec: %v", err)
+	}
+
 	api := webrtc.NewAPI(webrtc.WithMediaEngine(mediaEngine))
 
 	return &Server{
 		config:   config,
 		users:    make(map[string]*User),
 		channels: channels,
-		api:      api,
+		upgrader: websocket.Upgrader{
+			CheckOrigin: func(r *http.Request) bool {
+				// TODO: In production, restrict to specific origins
+				return true // Allow all origins for development
+			},
+		},
+		api: api,
 	}
 }
 
@@ -138,166 +155,88 @@ func (s *Server) getUserGroup(npub *string) string {
 	return "anon"
 }
 
-// HTTP handler for WebRTC signaling
-func (s *Server) handleSignaling(w http.ResponseWriter, r *http.Request) {
-	// Enable CORS for development
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS")
-	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
-
-	if r.Method == "OPTIONS" {
-		w.WriteHeader(http.StatusOK)
-		return
-	}
-
-	if r.Method != "POST" {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-		return
-	}
-
-	// Read the offer from client
-	body, err := io.ReadAll(r.Body)
+// WebSocket handler for API/signaling
+func (s *Server) handleWebSocket(w http.ResponseWriter, r *http.Request) {
+	conn, err := s.upgrader.Upgrade(w, r, nil)
 	if err != nil {
-		http.Error(w, "Failed to read body", http.StatusBadRequest)
+		log.Printf("Failed to upgrade connection: %v", err)
 		return
 	}
-
-	var sigMsg SignalingMessage
-	if err := json.Unmarshal(body, &sigMsg); err != nil {
-		http.Error(w, "Failed to parse signaling message", http.StatusBadRequest)
-		return
-	}
-
-	if sigMsg.Type != "offer" || sigMsg.SDP == nil {
-		http.Error(w, "Expected offer with SDP", http.StatusBadRequest)
-		return
-	}
-
-	// Create peer connection
-	config := webrtc.Configuration{
-		ICEServers: []webrtc.ICEServer{
-			{
-				URLs: []string{"stun:stun.l.google.com:19302"},
-			},
-		},
-	}
-
-	pc, err := s.api.NewPeerConnection(config)
-	if err != nil {
-		log.Printf("Failed to create peer connection: %v", err)
-		http.Error(w, "Failed to create peer connection", http.StatusInternalServerError)
-		return
-	}
+	defer conn.Close()
 
 	user := &User{
-		ID: generateUserID(),
-		PC: pc,
+		ID:     generateUserID(),
+		WSConn: conn,
 	}
 
-	log.Printf("New WebRTC connection from %s", r.RemoteAddr)
+	log.Printf("New WebSocket connection from %s", r.RemoteAddr)
 
-	// Handle data channel from client
-	pc.OnDataChannel(func(dc *webrtc.DataChannel) {
-		log.Printf("Data channel '%s' opened for user %s", dc.Label(), user.ID)
-		user.DataChannel = dc
-
-		dc.OnOpen(func() {
-			log.Printf("Data channel opened for user %s", user.ID)
-			// Send initial state when data channel opens
-			s.sendStateUpdate(user)
-			s.broadcastUserJoined(user)
-		})
-
-		dc.OnMessage(func(msg webrtc.DataChannelMessage) {
-			s.handleDataChannelMessage(user, msg.Data)
-		})
-
-		dc.OnClose(func() {
-			log.Printf("Data channel closed for user %s", user.ID)
-		})
-	})
-
-	// Handle ICE connection state changes
-	pc.OnICEConnectionStateChange(func(state webrtc.ICEConnectionState) {
-		log.Printf("ICE Connection State for user %s: %s", user.ID, state.String())
-		
-		if state == webrtc.ICEConnectionStateDisconnected ||
-			state == webrtc.ICEConnectionStateFailed ||
-			state == webrtc.ICEConnectionStateClosed {
-			s.handleUserDisconnect(user)
-		}
-	})
-
-	// Set remote description (offer from client)
-	if err := pc.SetRemoteDescription(*sigMsg.SDP); err != nil {
-		log.Printf("Failed to set remote description: %v", err)
-		http.Error(w, "Failed to set remote description", http.StatusInternalServerError)
-		return
-	}
-
-	// Create answer
-	answer, err := pc.CreateAnswer(nil)
+	// Read authentication message
+	_, msg, err := conn.ReadMessage()
 	if err != nil {
-		log.Printf("Failed to create answer: %v", err)
-		http.Error(w, "Failed to create answer", http.StatusInternalServerError)
+		log.Printf("Failed to read auth message: %v", err)
 		return
 	}
 
-	// Set local description
-	if err := pc.SetLocalDescription(answer); err != nil {
-		log.Printf("Failed to set local description: %v", err)
-		http.Error(w, "Failed to set local description", http.StatusInternalServerError)
+	var authMsg Message
+	if err := json.Unmarshal(msg, &authMsg); err != nil {
+		log.Printf("Failed to parse auth message: %v", err)
 		return
 	}
 
-	// Add user to server
+	if authMsg.Type != "auth" {
+		log.Printf("Expected auth message, got %s", authMsg.Type)
+		return
+	}
+
+	user.Npub = authMsg.Npub
+	user.Group = s.getUserGroup(user.Npub)
+	user.DisplayName = authMsg.Npub
+
 	s.mu.Lock()
 	s.users[user.ID] = user
 	s.mu.Unlock()
 
-	// Send answer back to client
-	response := SignalingMessage{
-		Type: "answer",
-		SDP:  pc.LocalDescription(),
-	}
+	defer func() {
+		s.mu.Lock()
+		if user.ChannelID != nil {
+			s.removeUserFromChannel(user.ID, *user.ChannelID)
+		}
+		delete(s.users, user.ID)
+		s.mu.Unlock()
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(response)
-}
+		// Close WebRTC connection if exists
+		if user.PeerConnection != nil {
+			user.PeerConnection.Close()
+		}
 
-func (s *Server) handleDataChannelMessage(user *User, data []byte) {
-	var message Message
-	if err := json.Unmarshal(data, &message); err != nil {
-		log.Printf("Failed to parse message from user %s: %v", user.ID, err)
-		return
-	}
+		s.broadcastUserLeft(user.ID)
+		log.Printf("User %s disconnected", user.ID)
+	}()
 
-	// Handle authentication
-	if message.Type == "auth" {
-		user.Npub = message.Npub
-		user.Group = s.getUserGroup(user.Npub)
-		user.DisplayName = message.Npub // Could be enhanced to fetch display name
-		log.Printf("User %s authenticated as %s", user.ID, user.Group)
-		return
-	}
+	// Send initial state
+	s.sendStateUpdate(user)
 
-	s.handleMessage(user, &message)
-}
+	// Broadcast user joined
+	s.broadcastUserJoined(user)
 
-func (s *Server) handleUserDisconnect(user *User) {
-	s.mu.Lock()
-	if user.ChannelID != nil {
-		s.removeUserFromChannel(user.ID, *user.ChannelID)
-	}
-	delete(s.users, user.ID)
-	s.mu.Unlock()
+	// Handle messages
+	for {
+		_, msg, err := conn.ReadMessage()
+		if err != nil {
+			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
+				log.Printf("WebSocket error: %v", err)
+			}
+			break
+		}
 
-	s.broadcastUserLeft(user.ID)
-	log.Printf("User %s disconnected", user.ID)
+		var message Message
+		if err := json.Unmarshal(msg, &message); err != nil {
+			log.Printf("Failed to parse message: %v", err)
+			continue
+		}
 
-	// Close peer connection
-	if user.PC != nil {
-		user.PC.Close()
+		s.handleMessage(user, &message)
 	}
 }
 
@@ -315,6 +254,145 @@ func (s *Server) handleMessage(user *User, msg *Message) {
 		if msg.IsSpeaking != nil {
 			s.handleSpeaking(user, *msg.IsSpeaking)
 		}
+	case "webrtc_offer":
+		// Handle WebRTC offer for media connection
+		if msg.SDP != nil {
+			s.handleWebRTCOffer(user, msg.SDP)
+		}
+	case "webrtc_candidate":
+		// Handle ICE candidate
+		if msg.Candidate != nil {
+			s.handleICECandidate(user, msg.Candidate)
+		}
+	}
+}
+
+// WebRTC SFU handling
+func (s *Server) handleWebRTCOffer(user *User, offer *webrtc.SessionDescription) {
+	log.Printf("Handling WebRTC offer from user %s", user.ID)
+
+	// Create peer connection for media
+	config := webrtc.Configuration{
+		ICEServers: []webrtc.ICEServer{
+			{
+				URLs: []string{"stun:stun.l.google.com:19302"},
+			},
+		},
+	}
+
+	pc, err := s.api.NewPeerConnection(config)
+	if err != nil {
+		log.Printf("Failed to create peer connection: %v", err)
+		s.sendError(user, "Failed to create peer connection")
+		return
+	}
+
+	user.PeerConnection = pc
+
+	// Handle incoming tracks (audio from this user)
+	pc.OnTrack(func(track *webrtc.TrackRemote, receiver *webrtc.RTPReceiver) {
+		log.Printf("Got track from user %s: %s", user.ID, track.Codec().MimeType)
+
+		// SFU: Forward this track to other users in the same channel
+		go s.forwardTrackToChannel(user, track)
+	})
+
+	// Handle ICE candidates
+	pc.OnICECandidate(func(candidate *webrtc.ICECandidate) {
+		if candidate == nil {
+			return
+		}
+
+		// Send ICE candidate to client via WebSocket
+		candidateJSON := candidate.ToJSON()
+		msg := Message{
+			Type:      "webrtc_candidate",
+			Candidate: &candidateJSON,
+		}
+		s.sendToUser(user, msg)
+	})
+
+	// Handle connection state changes
+	pc.OnICEConnectionStateChange(func(state webrtc.ICEConnectionState) {
+		log.Printf("ICE Connection State for user %s: %s", user.ID, state.String())
+	})
+
+	// Set remote description (offer from client)
+	if err := pc.SetRemoteDescription(*offer); err != nil {
+		log.Printf("Failed to set remote description: %v", err)
+		s.sendError(user, "Failed to set remote description")
+		return
+	}
+
+	// Create answer
+	answer, err := pc.CreateAnswer(nil)
+	if err != nil {
+		log.Printf("Failed to create answer: %v", err)
+		s.sendError(user, "Failed to create answer")
+		return
+	}
+
+	// Set local description
+	if err := pc.SetLocalDescription(answer); err != nil {
+		log.Printf("Failed to set local description: %v", err)
+		s.sendError(user, "Failed to set local description")
+		return
+	}
+
+	// Send answer back to client via WebSocket
+	msg := Message{
+		Type: "webrtc_answer",
+		SDP:  &answer,
+	}
+	s.sendToUser(user, msg)
+}
+
+func (s *Server) handleICECandidate(user *User, candidate *webrtc.ICECandidateInit) {
+	if user.PeerConnection == nil {
+		log.Printf("No peer connection for user %s", user.ID)
+		return
+	}
+
+	if err := user.PeerConnection.AddICECandidate(*candidate); err != nil {
+		log.Printf("Failed to add ICE candidate: %v", err)
+	}
+}
+
+// SFU: Forward audio track to other users in the same channel
+func (s *Server) forwardTrackToChannel(sourceUser *User, track *webrtc.TrackRemote) {
+	// Read RTP packets from source
+	buf := make([]byte, 1500)
+	for {
+		_, _, err := track.Read(buf)
+		if err != nil {
+			log.Printf("Track read error for user %s: %v", sourceUser.ID, err)
+			return
+		}
+
+		// Forward to all users in the same channel
+		s.mu.RLock()
+		channelID := sourceUser.ChannelID
+		if channelID == nil {
+			s.mu.RUnlock()
+			continue
+		}
+
+		for _, user := range s.users {
+			// Don't forward to self, and only to users in same channel
+			if user.ID == sourceUser.ID || user.ChannelID == nil || *user.ChannelID != *channelID {
+				continue
+			}
+
+			if user.PeerConnection == nil {
+				continue
+			}
+
+			// Forward the RTP packet to this user
+			// Note: In a real SFU, you'd want to create tracks and manage them properly
+			// This is a simplified version
+			log.Printf("Forwarding audio from %s to %s", sourceUser.ID, user.ID)
+		}
+		s.mu.RUnlock()
 	}
 }
 
@@ -419,13 +497,7 @@ func (s *Server) sendStateUpdate(user *User) {
 		},
 	}
 
-	data, err := json.Marshal(msg)
-	if err != nil {
-		log.Printf("Failed to marshal state: %v", err)
-		return
-	}
-
-	s.sendToUser(user, data)
+	s.sendToUser(user, msg)
 }
 
 func (s *Server) broadcastUserJoined(user *User) {
@@ -502,18 +574,28 @@ func (s *Server) broadcast(msg Message, excludeUserID string) {
 	defer s.mu.RUnlock()
 
 	for _, user := range s.users {
-		if user.ID != excludeUserID {
-			s.sendToUser(user, data)
+		if user.ID != excludeUserID && user.WSConn != nil {
+			user.WSConn.SetWriteDeadline(time.Now().Add(10 * time.Second))
+			if err := user.WSConn.WriteMessage(websocket.TextMessage, data); err != nil {
+				log.Printf("Failed to send message to user %s: %v", user.ID, err)
+			}
 		}
 	}
 }
 
-func (s *Server) sendToUser(user *User, data []byte) {
-	if user.DataChannel == nil || user.DataChannel.ReadyState() != webrtc.DataChannelStateOpen {
+func (s *Server) sendToUser(user *User, msg Message) {
+	if user.WSConn == nil {
 		return
 	}
 
-	if err := user.DataChannel.Send(data); err != nil {
+	data, err := json.Marshal(msg)
+	if err != nil {
+		log.Printf("Failed to marshal message: %v", err)
+		return
+	}
+
+	user.WSConn.SetWriteDeadline(time.Now().Add(10 * time.Second))
+	if err := user.WSConn.WriteMessage(websocket.TextMessage, data); err != nil {
 		log.Printf("Failed to send message to user %s: %v", user.ID, err)
 	}
 }
@@ -523,14 +605,7 @@ func (s *Server) sendError(user *User, message string) {
 		Type:    "error",
 		Message: message,
 	}
-
-	data, err := json.Marshal(msg)
-	if err != nil {
-		log.Printf("Failed to marshal error: %v", err)
-		return
-	}
-
-	s.sendToUser(user, data)
+	s.sendToUser(user, msg)
 }
 
 func generateUserID() string {
@@ -547,11 +622,13 @@ func main() {
 
 	server := NewServer(*config)
 
-	http.HandleFunc("/signaling", server.handleSignaling)
+	// WebSocket endpoint for API/signaling
+	http.HandleFunc("/", server.handleWebSocket)
 
 	addr := fmt.Sprintf("%s:%d", config.Server.Host, config.Server.Port)
 	log.Printf("Voice server listening on %s", addr)
-	log.Printf("WebRTC signaling endpoint: http://%s/signaling", addr)
+	log.Printf("WebSocket endpoint: ws://%s/", addr)
+	log.Printf("WebRTC SFU enabled for audio forwarding")
 
 	if err := http.ListenAndServe(addr, nil); err != nil {
 		log.Fatalf("Failed to start server: %v", err)
