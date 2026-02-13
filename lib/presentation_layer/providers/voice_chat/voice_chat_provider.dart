@@ -7,45 +7,79 @@ import '../../../domain_layer/entities/voice_chat/voice_channel.dart';
 import '../../../domain_layer/entities/voice_chat/voice_user.dart';
 import '../../../domain_layer/entities/voice_chat/user_group.dart';
 
+enum ConnectionStatus { disconnected, connecting, connected, error }
+
 class VoiceChatState {
   final ChannelState channelState;
-  final bool isConnected;
+  final ConnectionStatus connectionStatus;
   final String? serverUrl;
   final String? error;
+  final DateTime? lastPingTime;
+  final int? pingLatencyMs;
+  final int reconnectAttempts;
 
   VoiceChatState({
     required this.channelState,
-    this.isConnected = false,
+    this.connectionStatus = ConnectionStatus.disconnected,
     this.serverUrl,
     this.error,
+    this.lastPingTime,
+    this.pingLatencyMs,
+    this.reconnectAttempts = 0,
   });
+
+  bool get isConnected => connectionStatus == ConnectionStatus.connected;
 
   VoiceChatState copyWith({
     ChannelState? channelState,
-    bool? isConnected,
+    ConnectionStatus? connectionStatus,
     String? serverUrl,
     String? error,
+    DateTime? lastPingTime,
+    int? pingLatencyMs,
+    int? reconnectAttempts,
   }) {
     return VoiceChatState(
       channelState: channelState ?? this.channelState,
-      isConnected: isConnected ?? this.isConnected,
+      connectionStatus: connectionStatus ?? this.connectionStatus,
       serverUrl: serverUrl ?? this.serverUrl,
       error: error,
+      lastPingTime: lastPingTime ?? this.lastPingTime,
+      pingLatencyMs: pingLatencyMs ?? this.pingLatencyMs,
+      reconnectAttempts: reconnectAttempts ?? this.reconnectAttempts,
     );
   }
 }
 
-class VoiceChatNotifier extends StateNotifier<VoiceChatState> {
+class VoiceChatNotifier extends Notifier<VoiceChatState> {
   WebSocketChannel? _channel;
   StreamSubscription? _subscription;
+  Timer? _pingTimer;
 
-  VoiceChatNotifier()
-      : super(VoiceChatState(channelState: ChannelState()));
+  @override
+  VoiceChatState build() {
+    ref.onDispose(() {
+      _cleanup();
+    });
+    return VoiceChatState(channelState: ChannelState());
+  }
+
+  void _cleanup() {
+    _pingTimer?.cancel();
+    _subscription?.cancel();
+    _channel?.sink.close();
+  }
 
   Future<void> connect(String serverUrl, String? npub) async {
     try {
       // Disconnect if already connected
       await disconnect();
+
+      state = state.copyWith(
+        connectionStatus: ConnectionStatus.connecting,
+        serverUrl: serverUrl,
+        error: null,
+      );
 
       // Connect to WebSocket server
       final uri = Uri.parse(serverUrl);
@@ -66,36 +100,82 @@ class VoiceChatNotifier extends StateNotifier<VoiceChatState> {
         onError: (error) {
           state = state.copyWith(
             error: 'Connection error: $error',
-            isConnected: false,
+            connectionStatus: ConnectionStatus.error,
           );
+          _schedulereconnect(serverUrl, npub);
         },
         onDone: () {
-          state = state.copyWith(isConnected: false);
+          state = state.copyWith(connectionStatus: ConnectionStatus.disconnected);
+          _schedulereconnect(serverUrl, npub);
         },
       );
 
       state = state.copyWith(
-        isConnected: true,
-        serverUrl: serverUrl,
+        connectionStatus: ConnectionStatus.connected,
         error: null,
+        reconnectAttempts: 0,
       );
+
+      // Start ping timer
+      _startPingTimer();
     } catch (e) {
       state = state.copyWith(
         error: 'Failed to connect: $e',
-        isConnected: false,
+        connectionStatus: ConnectionStatus.error,
       );
     }
   }
 
+  void _startPingTimer() {
+    _pingTimer?.cancel();
+    _pingTimer = Timer.periodic(const Duration(seconds: 30), (timer) {
+      if (state.isConnected && _channel != null) {
+        final pingTime = DateTime.now();
+        final message = {
+          'type': 'ping',
+          'timestamp': pingTime.millisecondsSinceEpoch,
+        };
+        try {
+          _channel!.sink.add(jsonEncode(message));
+        } catch (e) {
+          // Connection might be dead
+          state = state.copyWith(connectionStatus: ConnectionStatus.error);
+        }
+      }
+    });
+  }
+
+  void _schedulereconnect(String serverUrl, String? npub) {
+    if (state.reconnectAttempts >= 5) {
+      state = state.copyWith(
+        error: 'Max reconnection attempts reached',
+        connectionStatus: ConnectionStatus.error,
+      );
+      return;
+    }
+
+    final delay = Duration(seconds: (state.reconnectAttempts + 1) * 2);
+    state = state.copyWith(reconnectAttempts: state.reconnectAttempts + 1);
+
+    Timer(delay, () {
+      if (state.connectionStatus != ConnectionStatus.connected) {
+        connect(serverUrl, npub);
+      }
+    });
+  }
+
   Future<void> disconnect() async {
+    _pingTimer?.cancel();
     await _subscription?.cancel();
     await _channel?.sink.close();
+    _pingTimer = null;
     _subscription = null;
     _channel = null;
 
     state = state.copyWith(
-      isConnected: false,
+      connectionStatus: ConnectionStatus.disconnected,
       serverUrl: null,
+      reconnectAttempts: 0,
     );
   }
 
@@ -120,12 +200,27 @@ class VoiceChatNotifier extends StateNotifier<VoiceChatState> {
         case 'user_moved':
           _handleUserMoved(data);
           break;
+        case 'pong':
+          _handlePong(data);
+          break;
         case 'error':
           state = state.copyWith(error: data['message'] as String?);
           break;
       }
     } catch (e) {
       state = state.copyWith(error: 'Failed to parse message: $e');
+    }
+  }
+
+  void _handlePong(Map<String, dynamic> data) {
+    final timestamp = data['timestamp'] as int?;
+    if (timestamp != null) {
+      final now = DateTime.now().millisecondsSinceEpoch;
+      final latency = now - timestamp;
+      state = state.copyWith(
+        lastPingTime: DateTime.now(),
+        pingLatencyMs: latency,
+      );
     }
   }
 
@@ -272,14 +367,7 @@ class VoiceChatNotifier extends StateNotifier<VoiceChatState> {
     _channel!.sink.add(jsonEncode(message));
   }
 
-  @override
-  void dispose() {
-    disconnect();
-    super.dispose();
-  }
 }
 
 final voiceChatProvider =
-    StateNotifierProvider<VoiceChatNotifier, VoiceChatState>((ref) {
-  return VoiceChatNotifier();
-});
+    NotifierProvider<VoiceChatNotifier, VoiceChatState>(VoiceChatNotifier.new);

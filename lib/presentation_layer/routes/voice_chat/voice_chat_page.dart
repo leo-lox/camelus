@@ -48,6 +48,7 @@ class _VoiceChatPageState extends ConsumerState<VoiceChatPage> {
       appBar: AppBar(
         title: const Text('Voice Chat'),
         actions: [
+          _buildConnectionStatusIndicator(voiceChatState),
           if (isConnected)
             IconButton(
               icon: Icon(PhosphorIcons.signOut()),
@@ -58,11 +59,55 @@ class _VoiceChatPageState extends ConsumerState<VoiceChatPage> {
       ),
       body: isConnected
           ? _buildConnectedView(voiceChatState)
-          : _buildConnectionView(),
+          : _buildConnectionView(voiceChatState),
     );
   }
 
-  Widget _buildConnectionView() {
+  Widget _buildConnectionStatusIndicator(VoiceChatState state) {
+    Color statusColor;
+    IconData statusIcon;
+    String tooltip;
+
+    switch (state.connectionStatus) {
+      case ConnectionStatus.connecting:
+        statusColor = Colors.orange;
+        statusIcon = PhosphorIcons.circleNotch();
+        tooltip = 'Connecting...';
+        break;
+      case ConnectionStatus.connected:
+        statusColor = Colors.green;
+        statusIcon = PhosphorIcons.wifiHigh();
+        tooltip = 'Connected';
+        if (state.pingLatencyMs != null) {
+          tooltip += ' (${state.pingLatencyMs}ms)';
+        }
+        break;
+      case ConnectionStatus.error:
+        statusColor = Colors.red;
+        statusIcon = PhosphorIcons.wifiSlash();
+        tooltip = state.error ?? 'Connection error';
+        break;
+      case ConnectionStatus.disconnected:
+      default:
+        statusColor = Colors.grey;
+        statusIcon = PhosphorIcons.wifiSlash();
+        tooltip = 'Disconnected';
+    }
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+      child: Tooltip(
+        message: tooltip,
+        child: Icon(
+          statusIcon,
+          color: statusColor,
+          size: 24,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildConnectionView(VoiceChatState voiceChatState) {
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Column(
@@ -92,8 +137,54 @@ class _VoiceChatPageState extends ConsumerState<VoiceChatPage> {
             onSubmitted: (_) => _connect(),
           ),
           const SizedBox(height: 16),
+          if (voiceChatState.error != null)
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.red.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.red),
+              ),
+              child: Row(
+                children: [
+                  Icon(PhosphorIcons.warning(), color: Colors.red),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      voiceChatState.error!,
+                      style: const TextStyle(color: Colors.red),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          if (voiceChatState.connectionStatus == ConnectionStatus.connecting)
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.orange.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.orange),
+              ),
+              child: Row(
+                children: [
+                  const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  ),
+                  const SizedBox(width: 12),
+                  const Text('Connecting...'),
+                  if (voiceChatState.reconnectAttempts > 0)
+                    Text(' (Attempt ${voiceChatState.reconnectAttempts})'),
+                ],
+              ),
+            ),
+          const SizedBox(height: 16),
           ElevatedButton.icon(
-            onPressed: _connect,
+            onPressed: voiceChatState.connectionStatus == ConnectionStatus.connecting
+                ? null
+                : _connect,
             icon: Icon(PhosphorIcons.plugsConnected()),
             label: const Text('Connect'),
             style: ElevatedButton.styleFrom(
@@ -108,41 +199,141 @@ class _VoiceChatPageState extends ConsumerState<VoiceChatPage> {
   Widget _buildConnectedView(VoiceChatState voiceChatState) {
     final rootChannels = voiceChatState.channelState.getChildChannels(null);
 
-    return Row(
+    return Column(
       children: [
         Expanded(
-          flex: 2,
-          child: Container(
-            color: Theme.of(context).colorScheme.surfaceContainerHighest,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Text(
-                    'Channels',
-                    style: Theme.of(context).textTheme.titleLarge,
-                  ),
-                ),
-                const Divider(height: 1),
-                Expanded(
-                  child: ListView(
+          child: Row(
+            children: [
+              Expanded(
+                flex: 2,
+                child: Container(
+                  color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      for (var channel in rootChannels)
-                        _buildChannelTree(channel, voiceChatState)
+                      Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Text(
+                          'Channels',
+                          style: Theme.of(context).textTheme.titleLarge,
+                        ),
+                      ),
+                      const Divider(height: 1),
+                      Expanded(
+                        child: ListView(
+                          children: [
+                            for (var channel in rootChannels)
+                              _buildChannelTree(channel, voiceChatState)
+                          ],
+                        ),
+                      ),
                     ],
                   ),
                 ),
-              ],
-            ),
+              ),
+              Expanded(
+                flex: 3,
+                child: _buildCurrentChannelView(voiceChatState),
+              ),
+            ],
           ),
         ),
-        Expanded(
-          flex: 3,
-          child: _buildCurrentChannelView(voiceChatState),
+        _buildDebugInfoPanel(voiceChatState),
+        _buildControlBar(voiceChatState),
+      ],
+    );
+  }
+
+  Widget _buildDebugInfoPanel(VoiceChatState voiceChatState) {
+    return ExpansionTile(
+      title: Row(
+        children: [
+          Icon(PhosphorIcons.info(), size: 16),
+          const SizedBox(width: 8),
+          const Text('Connection Debug Info', style: TextStyle(fontSize: 12)),
+        ],
+      ),
+      initiallyExpanded: false,
+      children: [
+        Container(
+          padding: const EdgeInsets.all(12),
+          color: Theme.of(context).colorScheme.surfaceContainerHighest,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildDebugRow('Status', voiceChatState.connectionStatus.name),
+              _buildDebugRow('Server', voiceChatState.serverUrl ?? 'N/A'),
+              _buildDebugRow(
+                'Ping Latency',
+                voiceChatState.pingLatencyMs != null
+                    ? '${voiceChatState.pingLatencyMs}ms'
+                    : 'N/A',
+              ),
+              _buildDebugRow(
+                'Last Ping',
+                voiceChatState.lastPingTime != null
+                    ? _formatTime(voiceChatState.lastPingTime!)
+                    : 'N/A',
+              ),
+              _buildDebugRow(
+                'Reconnect Attempts',
+                voiceChatState.reconnectAttempts.toString(),
+              ),
+              _buildDebugRow(
+                'Users Connected',
+                voiceChatState.channelState.users.length.toString(),
+              ),
+              if (voiceChatState.error != null)
+                _buildDebugRow('Error', voiceChatState.error!, isError: true),
+            ],
+          ),
         ),
       ],
     );
+  }
+
+  Widget _buildDebugRow(String label, String value, {bool isError = false}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 140,
+            child: Text(
+              '$label:',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 11,
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+              ),
+            ),
+          ),
+          Expanded(
+            child: Text(
+              value,
+              style: TextStyle(
+                fontSize: 11,
+                fontFamily: 'monospace',
+                color: isError ? Colors.red : null,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _formatTime(DateTime time) {
+    final now = DateTime.now();
+    final diff = now.difference(time);
+    if (diff.inSeconds < 60) {
+      return '${diff.inSeconds}s ago';
+    } else if (diff.inMinutes < 60) {
+      return '${diff.inMinutes}m ago';
+    } else {
+      return '${diff.inHours}h ago';
+    }
   }
 
   Widget _buildChannelTree(VoiceChannel channel, VoiceChatState voiceChatState) {

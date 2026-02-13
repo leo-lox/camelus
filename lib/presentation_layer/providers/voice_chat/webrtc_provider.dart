@@ -34,8 +34,19 @@ class WebRTCState {
   }
 }
 
-class WebRTCNotifier extends StateNotifier<WebRTCState> {
-  WebRTCNotifier() : super(WebRTCState());
+class WebRTCNotifier extends Notifier<WebRTCState> {
+  @override
+  WebRTCState build() {
+    ref.onDispose(() {
+      _cleanup();
+    });
+    return WebRTCState();
+  }
+
+  Future<void> _cleanup() async {
+    await state.localStream?.dispose();
+    await state.peerConnection?.close();
+  }
 
   Future<void> initializeLocalStream() async {
     try {
@@ -145,14 +156,8 @@ class WebRTCNotifier extends StateNotifier<WebRTCState> {
 
     state = state.copyWith(isMuted: newMutedState);
   }
-
-  Future<void> dispose() async {
-    await state.localStream?.dispose();
-    await state.peerConnection?.close();
-    state = WebRTCState();
-  }
 }
 
-final webRTCProvider = StateNotifierProvider<WebRTCNotifier, WebRTCState>((ref) {
-  return WebRTCNotifier();
-});
+final webRTCProvider = NotifierProvider<WebRTCNotifier, WebRTCState>(
+  WebRTCNotifier.new,
+);
