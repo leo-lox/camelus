@@ -37,6 +37,7 @@ import 'presentation_layer/routes/nostr/settings/dm_relays/dm_relays_settings.da
 import 'presentation_layer/routes/messages/dm_list_page.dart';
 import 'presentation_layer/routes/messages/dm_thread_page.dart';
 import 'presentation_layer/routes/messages/new_dm_page.dart';
+import 'presentation_layer/routes/voice_chat/voice_chat_page.dart';
 
 Null redirects(BuildContext context, GoRouterState state) {
   return null;
@@ -189,6 +190,10 @@ final routes = [
           GoRoute(
             path: '/nostr/blockedUsers',
             builder: (context, state) => const BlockedUsers(),
+          ),
+          GoRoute(
+            path: '/voice-chat',
+            builder: (context, state) => const VoiceChatPage(),
           ),
           GoRoute(
             path: '/edit-starter-pack',

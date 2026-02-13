@@ -82,3 +82,7 @@ build-dir/
 
 /lib/l10n/*.dart
 /untranslated-messages.txt
+
+# Voice server
+/voice_server/voice_server
+/voice_server/go.sum
