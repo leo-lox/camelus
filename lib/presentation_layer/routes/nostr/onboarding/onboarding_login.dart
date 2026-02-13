@@ -18,7 +18,7 @@ import '../../../../domain_layer/entities/key_pair.dart';
 
 import '../../../../domain_layer/entities/stored_account.dart';
 import '../../../../domain_layer/usecases/app_auth.dart';
-import '../../../providers/dm_conversations_provider.dart';
+import '../../../providers/messaging/dm_conversations_provider.dart';
 import '../../../providers/ndk_provider.dart';
 import '../../../providers/signer_provider.dart';
 

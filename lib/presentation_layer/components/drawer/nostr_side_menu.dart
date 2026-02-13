@@ -10,7 +10,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import 'package:ndk/shared/nips/nip19/nip19.dart';
 import '../../../l10n/app_localizations.dart';
-import '../../providers/dm_conversations_provider.dart';
+import '../../providers/messaging/dm_conversations_provider.dart';
 import '../../providers/ndk_provider.dart';
 import '../../providers/theme_provider.dart';
 

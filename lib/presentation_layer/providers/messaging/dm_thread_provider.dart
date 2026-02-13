@@ -3,7 +3,7 @@ import 'dart:developer';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../domain_layer/entities/direct_message.dart';
+import '../../../domain_layer/entities/direct_message.dart';
 import 'dm_repository_provider.dart';
 
 /// State for a DM thread (conversation with one peer)

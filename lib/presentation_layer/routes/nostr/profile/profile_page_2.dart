@@ -1,6 +1,5 @@
-import 'dart:io';
-
 import 'package:camelus/l10n/app_localizations.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
@@ -75,9 +74,10 @@ class ProfilePage2 extends ConsumerWidget {
                       }).toList();
                     },
                   ),
-                  if (Platform.isWindows ||
-                      Platform.isLinux ||
-                      Platform.isMacOS)
+                  if (!kIsWeb &&
+                      (defaultTargetPlatform == TargetPlatform.windows ||
+                          defaultTargetPlatform == TargetPlatform.linux ||
+                          defaultTargetPlatform == TargetPlatform.macOS))
                     const SizedBox(width: 154),
                 ],
                 expandedHeight: 400,

@@ -1,9 +1,9 @@
-import 'dart:io';
 import 'dart:ui';
 
 import 'package:camelus/l10n/app_localizations.dart';
 import 'package:camelus/presentation_layer/atoms/spinner_center.dart';
 import 'package:camelus/presentation_layer/providers/metadata_state_provider.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -123,9 +123,10 @@ class _HomePageMobileState extends ConsumerState<HomePageMobile>
                         RelaysConnectivityWidget(
                           onTap: () => context.push('/nostr/relays'),
                         ),
-                        if (Platform.isWindows ||
-                            Platform.isLinux ||
-                            Platform.isMacOS)
+                        if (!kIsWeb &&
+                            (defaultTargetPlatform == TargetPlatform.windows ||
+                                defaultTargetPlatform == TargetPlatform.linux ||
+                                defaultTargetPlatform == TargetPlatform.macOS))
                           const SizedBox(width: 154),
                       ],
                       bottom: PreferredSize(

@@ -1,10 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../domain_layer/entities/dm_conversation.dart';
+import '../../../domain_layer/entities/dm_conversation.dart';
 import 'dm_conversations_provider.dart';
 import 'dm_repository_provider.dart';
-import 'following_contact_state_provider.dart';
-import 'ndk_provider.dart';
+import '../following_contact_state_provider.dart';
+import '../ndk_provider.dart';
 
 /// Categories for DM conversations
 enum DmCategory { follows, known, requests }

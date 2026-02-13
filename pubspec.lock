@@ -919,6 +919,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.1.2"
+  idb_shim:
+    dependency: transitive
+    description:
+      name: idb_shim
+      sha256: cc994e1095d69f2bcdf929246112ed0772d59d75be8a58995667acc2df091602
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.8.2+3"
   image:
     dependency: "direct main"
     description:
@@ -1484,6 +1492,30 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.2.0"
+  sembast:
+    dependency: "direct main"
+    description:
+      name: sembast
+      sha256: "139cf71496105de32e7a08a4e3a1ead0f81c4a616ec9703ed07e8f0d10cdd505"
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.8.6"
+  sembast_cache_manager:
+    dependency: "direct main"
+    description:
+      name: sembast_cache_manager
+      sha256: "4de2c8129baff0265af2364212502042d6bfb69ff4c1484bb6698529258f23c5"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.6"
+  sembast_web:
+    dependency: "direct main"
+    description:
+      name: sembast_web
+      sha256: eaeb2f14613098fb8b363b01ae4e280031736b7ae1aa38653dbee0d47af6e3ea
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.4.4+1"
   serverpod_client:
     dependency: transitive
     description:

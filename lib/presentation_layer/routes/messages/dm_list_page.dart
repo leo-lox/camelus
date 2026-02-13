@@ -9,8 +9,8 @@ import 'package:ndk/shared/nips/nip19/nip19.dart';
 import '../../../domain_layer/entities/dm_conversation.dart';
 import '../../atoms/my_profile_picture.dart';
 import '../../components/dm/dm_conversation_tile.dart';
-import '../../providers/dm_categories_provider.dart';
-import '../../providers/dm_conversations_provider.dart';
+import '../../providers/messaging/dm_categories_provider.dart';
+import '../../providers/messaging/dm_conversations_provider.dart';
 import '../../providers/metadata_state_provider.dart';
 import '../../providers/ndk_provider.dart';
 

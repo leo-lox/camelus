@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:camelus/l10n/app_localizations.dart';
 import 'package:camelus/presentation_layer/atoms/my_profile_picture.dart';
 import 'package:camelus/presentation_layer/atoms/refresh_indicator_no_need.dart';
@@ -7,6 +5,7 @@ import 'package:camelus/presentation_layer/components/note_card/note_card.dart';
 import 'package:camelus/presentation_layer/components/note_card/skeleton_note.dart';
 import 'package:camelus/presentation_layer/providers/get_notes_provider.dart';
 import 'package:camelus/presentation_layer/providers/metadata_state_provider.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_list_view/flutter_list_view.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -120,7 +119,10 @@ class _NotificationPageState extends ConsumerState<NotificationPage>
                     .integrateNewNotifications();
               },
             ),
-          if (Platform.isWindows || Platform.isLinux || Platform.isMacOS)
+          if (!kIsWeb &&
+              (defaultTargetPlatform == TargetPlatform.windows ||
+                  defaultTargetPlatform == TargetPlatform.linux ||
+                  defaultTargetPlatform == TargetPlatform.macOS))
             const SizedBox(width: 154),
         ],
       ),
