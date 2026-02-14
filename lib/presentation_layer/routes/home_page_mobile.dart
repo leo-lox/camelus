@@ -73,63 +73,52 @@ class _HomePageMobileState extends ConsumerState<HomePageMobile>
               : [currentUserPubkey])
         : myContactList.contactList.contacts;
 
-    return Scaffold(
-      key: _scaffoldKey,
-      drawer: currentUserPubkey != null
-          ? NostrDrawer(pubkey: currentUserPubkey)
-          : null,
-      backgroundColor: Theme.of(context).colorScheme.surface,
-      floatingActionButton: currentUserPubkey != null
-          ? FloatingActionButton(
-              backgroundColor: Theme.of(context).colorScheme.onPrimary,
-              child: Icon(
-                PhosphorIcons.plus(),
-                color: Theme.of(context).colorScheme.onSurface,
-                size: 27,
+    return DefaultTabController(
+      length: 2,
+      initialIndex: initialTabIndex,
+      child: Scaffold(
+        key: _scaffoldKey,
+        drawer: currentUserPubkey != null
+            ? NostrDrawer(pubkey: currentUserPubkey)
+            : null,
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        floatingActionButton: currentUserPubkey != null
+            ? FloatingActionButton(
+                backgroundColor: Theme.of(context).colorScheme.onPrimary,
+                child: Icon(
+                  PhosphorIcons.plus(),
+                  color: Theme.of(context).colorScheme.onSurface,
+                  size: 27,
+                ),
+                onPressed: () => _show(context),
+              )
+            : FloatingActionButton(
+                backgroundColor: Theme.of(context).colorScheme.onPrimary,
+                child: Icon(
+                  PhosphorIcons.signIn(),
+                  color: Theme.of(context).colorScheme.onSurface,
+                  size: 27,
+                ),
+                onPressed: () => context.push('/onboarding'),
               ),
-              onPressed: () => _show(context),
-            )
-          : FloatingActionButton(
-              backgroundColor: Theme.of(context).colorScheme.onPrimary,
-              child: Icon(
-                PhosphorIcons.signIn(),
-                color: Theme.of(context).colorScheme.onSurface,
-                size: 27,
-              ),
-              onPressed: () => context.push('/onboarding'),
-            ),
-      body: SafeArea(
-        child: GenericFeed(
-          key: PageStorageKey('homeFeed-${currentUserPubkey ?? "readonly"}'),
-          floatHeaderSlivers: true,
-          initialTab: initialTabIndex,
-          customHeaderSliverBuilder:
-              (
-                BuildContext context,
-                bool innerBoxIsScrolled,
-                TabController tabController,
-              ) {
-                return <Widget>[
-                  SliverOverlapAbsorber(
-                    handle: NestedScrollView.sliverOverlapAbsorberHandleFor(
-                      context,
-                    ),
-                    sliver: SliverAppBar(
+        body: SafeArea(
+          child: NestedScrollView(
+            headerSliverBuilder:
+                (BuildContext context, bool innerBoxIsScrolled) {
+                  return <Widget>[
+                    SliverAppBar(
                       surfaceTintColor: Theme.of(context).colorScheme.surface,
                       shadowColor: Theme.of(context).colorScheme.surface,
                       backgroundColor: Theme.of(context).colorScheme.surface,
-
                       floating: true,
                       snap: false,
                       pinned: false,
-
                       leadingWidth: 48,
                       leading: MobileFeedHeader(
                         scaffoldKey: _scaffoldKey,
                         pubkey: currentUserPubkey,
                       ),
                       centerTitle: true,
-                      //title: const AppLogo(),
                       actions: [
                         RelaysConnectivityWidget(
                           onTap: () => context.push('/nostr/relays'),
@@ -142,18 +131,14 @@ class _HomePageMobileState extends ConsumerState<HomePageMobile>
                       bottom: PreferredSize(
                         preferredSize: const Size.fromHeight(40),
                         child: TabBar(
-                          controller: tabController,
                           indicatorColor: Theme.of(context).colorScheme.primary,
-                          // rounded underline indicator
                           indicator: UnderlineTabIndicator(
                             borderSide: BorderSide(
                               width: 2.5,
                               color: Theme.of(context).colorScheme.primary,
                             ),
-
                             borderRadius: BorderRadius.circular(20),
                           ),
-
                           dividerHeight: 0,
                           tabs: [
                             Tab(text: AppLocalizations.of(context)!.posts),
@@ -166,13 +151,36 @@ class _HomePageMobileState extends ConsumerState<HomePageMobile>
                         ),
                       ),
                     ),
+                  ];
+                },
+            body: TabBarView(
+              children: [
+                // Posts tab - root notes only
+                GenericFeed(
+                  key: PageStorageKey(
+                    'homeFeed-posts-${currentUserPubkey ?? "readonly"}',
                   ),
-                ];
-              },
-          feedFilter: FeedFilter(
-            feedId: "homeFeed",
-            kinds: [1, 6],
-            authors: authors.isNotEmpty ? authors : null,
+                  feedFilter: FeedFilter(
+                    feedId: "homeFeed",
+                    kinds: [1, 6],
+                    authors: authors.isNotEmpty ? authors : null,
+                    showRootNotesOnly: true,
+                  ),
+                ),
+                // Posts and Replies tab - all posts
+                GenericFeed(
+                  key: PageStorageKey(
+                    'homeFeed-all-${currentUserPubkey ?? "readonly"}',
+                  ),
+                  feedFilter: FeedFilter(
+                    feedId: "homeFeed",
+                    kinds: [1, 6],
+                    authors: authors.isNotEmpty ? authors : null,
+                    showRootNotesOnly: false,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
