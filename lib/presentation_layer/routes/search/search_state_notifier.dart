@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
-import 'package:flutter_riverpod/legacy.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:ndk/shared/nips/nip19/nip19.dart';
 import 'package:camelus/data_layer/data_sources/http_request_data_source.dart';
@@ -47,19 +47,27 @@ class SearchState {
   }
 }
 
-class SearchStateNotifier extends StateNotifier<SearchState> {
-  SearchStateNotifier(this._searchService, this._httpRequestDataSource)
-    : super(const SearchState());
-
-  final Search _searchService;
-  final HttpRequestDataSource _httpRequestDataSource;
-  Timer? _debounceTimer;
-
+class SearchStateNotifier extends Notifier<SearchState> {
   @override
-  void dispose() {
-    _debounceTimer?.cancel();
-    super.dispose();
+  SearchState build() {
+    final searchService = ref.read(searchProvider);
+    final client = http.Client();
+    final httpRequestDataSource = HttpRequestDataSource(client);
+
+    _searchService = searchService;
+    _httpRequestDataSource = httpRequestDataSource;
+
+    // Register dispose callback to cancel timer
+    ref.onDispose(() {
+      _debounceTimer?.cancel();
+    });
+
+    return const SearchState();
   }
+
+  late final Search _searchService;
+  late final HttpRequestDataSource _httpRequestDataSource;
+  Timer? _debounceTimer;
 
   void setSearching(bool isSearching) {
     if (state.isSearching != isSearching) {
@@ -263,10 +271,6 @@ class SearchStateNotifier extends StateNotifier<SearchState> {
   }
 }
 
-final searchStateProvider =
-    StateNotifierProvider<SearchStateNotifier, SearchState>((ref) {
-      final searchService = ref.read(searchProvider);
-      final client = http.Client();
-      final httpRequestDataSource = HttpRequestDataSource(client);
-      return SearchStateNotifier(searchService, httpRequestDataSource);
-    });
+final searchStateProvider = NotifierProvider<SearchStateNotifier, SearchState>(
+  SearchStateNotifier.new,
+);

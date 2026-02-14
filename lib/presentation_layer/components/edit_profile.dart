@@ -3,14 +3,42 @@ import 'dart:typed_data';
 import 'package:camelus/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_riverpod/legacy.dart';
 
 import '../atoms/camer_upload.dart';
 import '../atoms/round_image_border.dart';
 
 // to control upload state
-final editProfilePictureUploadingProvider = StateProvider<bool>((ref) => false);
-final editProfileBannerUploadingProvider = StateProvider<bool>((ref) => false);
+final editProfilePictureUploadingProvider =
+    NotifierProvider<EditProfilePictureUploadingNotifier, bool>(
+      EditProfilePictureUploadingNotifier.new,
+    );
+
+class EditProfilePictureUploadingNotifier extends Notifier<bool> {
+  @override
+  bool build() {
+    return false;
+  }
+
+  void setUploading(bool uploading) {
+    state = uploading;
+  }
+}
+
+final editProfileBannerUploadingProvider =
+    NotifierProvider<EditProfileBannerUploadingNotifier, bool>(
+      EditProfileBannerUploadingNotifier.new,
+    );
+
+class EditProfileBannerUploadingNotifier extends Notifier<bool> {
+  @override
+  bool build() {
+    return false;
+  }
+
+  void setUploading(bool uploading) {
+    state = uploading;
+  }
+}
 
 class EditProfile extends ConsumerStatefulWidget {
   // Fields to initialize and update the profile.

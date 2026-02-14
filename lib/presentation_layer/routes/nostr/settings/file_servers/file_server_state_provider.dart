@@ -1,5 +1,4 @@
-import 'package:flutter_riverpod/legacy.dart';
-import 'package:riverpod/riverpod.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../../config/default_blossom.dart';
 import '../../../../providers/file_upload_provider.dart';
@@ -12,16 +11,16 @@ class FileServer {
   FileServer({required this.url, this.isOnline = false});
 }
 
-class FileServersNotifier extends StateNotifier<AsyncValue<List<FileServer>>> {
-  final Ref ref;
+class FileServersNotifier extends Notifier<AsyncValue<List<FileServer>>> {
+  @override
+  AsyncValue<List<FileServer>> build() {
+    loadServers();
+    return const AsyncValue.loading();
+  }
 
   bool _hasUnsavedChanges = false;
 
   bool get hasUnsavedChanges => _hasUnsavedChanges;
-
-  FileServersNotifier(this.ref) : super(const AsyncValue.loading()) {
-    loadServers();
-  }
 
   Future<bool> save() async {
     final result = await ref
@@ -126,6 +125,6 @@ class FileServersNotifier extends StateNotifier<AsyncValue<List<FileServer>>> {
 }
 
 final fileServersProvider =
-    StateNotifierProvider<FileServersNotifier, AsyncValue<List<FileServer>>>(
-      (ref) => FileServersNotifier(ref),
+    NotifierProvider<FileServersNotifier, AsyncValue<List<FileServer>>>(
+      FileServersNotifier.new,
     );

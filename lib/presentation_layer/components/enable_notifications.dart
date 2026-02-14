@@ -7,17 +7,44 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_riverpod/legacy.dart';
 
 import '../atoms/spinner_center.dart';
 import '../providers/db_app_provider.dart';
 import '../providers/notifications_provider.dart';
 
 // Create a provider to track notification enabled status
-final notificationsEnabledProvider = StateProvider<bool>((ref) => false);
+final notificationsEnabledProvider =
+    NotifierProvider<NotificationsEnabledNotifier, bool>(
+      NotificationsEnabledNotifier.new,
+    );
+
+class NotificationsEnabledNotifier extends Notifier<bool> {
+  @override
+  bool build() {
+    return false;
+  }
+
+  void setEnabled(bool enabled) {
+    state = enabled;
+  }
+}
 
 // Create a provider to track if permissions were explicitly denied
-final notificationsDeniedProvider = StateProvider<bool>((ref) => false);
+final notificationsDeniedProvider =
+    NotifierProvider<NotificationsDeniedNotifier, bool>(
+      NotificationsDeniedNotifier.new,
+    );
+
+class NotificationsDeniedNotifier extends Notifier<bool> {
+  @override
+  bool build() {
+    return false;
+  }
+
+  void setDenied(bool denied) {
+    state = denied;
+  }
+}
 
 class PushNotificationToggle extends ConsumerStatefulWidget {
   const PushNotificationToggle({super.key});
@@ -58,11 +85,11 @@ class PushNotificationToggleState
     // If authorized, consider notifications as enabled
     final isEnabled =
         settings.authorizationStatus == AuthorizationStatus.authorized;
-    ref.read(notificationsEnabledProvider.notifier).state = isEnabled;
+    ref.read(notificationsEnabledProvider.notifier).setEnabled(isEnabled);
 
     // Check if permissions were explicitly denied
     final isDenied = settings.authorizationStatus == AuthorizationStatus.denied;
-    ref.read(notificationsDeniedProvider.notifier).state = isDenied;
+    ref.read(notificationsDeniedProvider.notifier).setDenied(isDenied);
 
     // If enabled, ensure we have the token stored
     if (isEnabled) {
@@ -78,7 +105,7 @@ class PushNotificationToggleState
     if (newValue) {
       await requestPermission();
     } else {
-      ref.read(notificationsEnabledProvider.notifier).state = false;
+      ref.read(notificationsEnabledProvider.notifier).setEnabled(false);
 
       // Clear the stored token
       final appDb = ref.read(dbAppProvider);
@@ -106,11 +133,11 @@ class PushNotificationToggleState
 
     final isAuthorized =
         settings.authorizationStatus == AuthorizationStatus.authorized;
-    ref.read(notificationsEnabledProvider.notifier).state = isAuthorized;
+    ref.read(notificationsEnabledProvider.notifier).setEnabled(isAuthorized);
 
     // Update denied status
     final isDenied = settings.authorizationStatus == AuthorizationStatus.denied;
-    ref.read(notificationsDeniedProvider.notifier).state = isDenied;
+    ref.read(notificationsDeniedProvider.notifier).setDenied(isDenied);
 
     if (isAuthorized) {
       final token = await getAndStoreToken();

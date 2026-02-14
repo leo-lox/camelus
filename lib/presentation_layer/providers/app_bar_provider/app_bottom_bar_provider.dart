@@ -1,5 +1,4 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_riverpod/legacy.dart';
 import 'dart:async';
 
 enum NavigationTab { home, search, notifications, chat }
@@ -68,11 +67,18 @@ class NavigationEvents {
   }
 }
 
-class NavigationNotifier extends StateNotifier<NavigationState> {
+class NavigationNotifier extends Notifier<NavigationState> {
   final NavigationEvents events = NavigationEvents();
 
-  NavigationNotifier()
-    : super(NavigationState(selectedTab: NavigationTab.home));
+  @override
+  NavigationState build() {
+    // Register dispose callback
+    ref.onDispose(() {
+      events.dispose();
+    });
+
+    return NavigationState(selectedTab: NavigationTab.home);
+  }
 
   void selectTab(NavigationTab tab) {
     final previousTab = state.selectedTab;
@@ -119,18 +125,12 @@ class NavigationNotifier extends StateNotifier<NavigationState> {
   void resetNewNotesCountNotifications() {
     state = state.copyWith(newNotesCountNotifications: 0);
   }
-
-  @override
-  void dispose() {
-    events.dispose();
-    super.dispose();
-  }
 }
 
 final appBottomNavigationBarProvider =
-    StateNotifierProvider<NavigationNotifier, NavigationState>((ref) {
-      return NavigationNotifier();
-    });
+    NotifierProvider<NavigationNotifier, NavigationState>(
+      NavigationNotifier.new,
+    );
 
 final appBottomNavigationBarEventsProvider = Provider<NavigationEvents>((ref) {
   final notifier = ref.watch(appBottomNavigationBarProvider.notifier);

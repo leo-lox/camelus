@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_riverpod/legacy.dart';
 
 import '../../domain_layer/repositories/app_db.dart';
 import 'db_app_provider.dart';
@@ -18,16 +17,17 @@ class LanguageState {
 }
 
 // Define a notifier class to handle language changes
-class LanguageNotifier extends StateNotifier<LanguageState> {
+class LanguageNotifier extends Notifier<LanguageState> {
   static const String _dbLangKey = 'app_language';
-  final AppDb _appDb;
 
-  // Initialize with a default locale first
-  LanguageNotifier(this._appDb)
-    : super(const LanguageState(locale: Locale('en'))) {
-    // Then load the saved locale asynchronously
+  @override
+  LanguageState build() {
+    // Initialize with default locale first
     _initializeLocale();
+    return const LanguageState(locale: Locale('en'));
   }
+
+  AppDb get _appDb => ref.read(dbAppProvider);
 
   Future<void> _initializeLocale() async {
     final savedLocale = await _getSavedLocale(_appDb);
@@ -98,11 +98,8 @@ class LanguageNotifier extends StateNotifier<LanguageState> {
 }
 
 // StateNotifierProvider for language
-final languageProvider = StateNotifierProvider<LanguageNotifier, LanguageState>(
-  (ref) {
-    final appDb = ref.watch(dbAppProvider);
-    return LanguageNotifier(appDb);
-  },
+final languageProvider = NotifierProvider<LanguageNotifier, LanguageState>(
+  LanguageNotifier.new,
 );
 
 // Provider to get current locale

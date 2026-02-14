@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:developer';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_riverpod/legacy.dart';
 
 import '../../domain_layer/entities/direct_message.dart';
 import 'dm_repository_provider.dart';
@@ -74,30 +73,28 @@ class DmThreadState {
 /// ref.watch(dmThreadProvider('peer-pubkey'))
 /// ```
 final dmThreadProvider =
-    StateNotifierProvider.family<DmThreadNotifier, DmThreadState, String>((
-      ref,
-      peerPubkey,
-    ) {
-      return DmThreadNotifier(ref, peerPubkey);
-    });
+    NotifierProvider.family<DmThreadNotifier, DmThreadState, String>(
+      DmThreadNotifier.new,
+    );
 
-class DmThreadNotifier extends StateNotifier<DmThreadState> {
-  final Ref ref;
-  final String peerPubkey;
+class DmThreadNotifier extends Notifier<DmThreadState> {
+  late final String peerPubkey;
 
   StreamSubscription? _messagesSubscription;
   StreamSubscription? _newMessageSubscription;
 
-  DmThreadNotifier(this.ref, this.peerPubkey)
-    : super(DmThreadState(peerPubkey: peerPubkey, isLoading: true)) {
-    _setupMessagesWatch();
-  }
+  DmThreadNotifier(this.peerPubkey);
 
   @override
-  void dispose() {
-    _messagesSubscription?.cancel();
-    _newMessageSubscription?.cancel();
-    super.dispose();
+  DmThreadState build() {
+    ref.onDispose(() {
+      _messagesSubscription?.cancel();
+      _newMessageSubscription?.cancel();
+    });
+
+    _setupMessagesWatch();
+
+    return DmThreadState(peerPubkey: peerPubkey, isLoading: true);
   }
 
   void _setupMessagesWatch() async {

@@ -1,4 +1,4 @@
-import 'package:flutter_riverpod/legacy.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'dart:async';
 
 import '../../domain_layer/entities/nostr_list.dart';
@@ -28,23 +28,29 @@ class NostrListsFollowState {
 
 /// hold all public follow lists for a given user
 final nostrListsFollowStateProvider =
-    StateNotifierProvider.family<
-      NostrListsNotifier,
-      NostrListsFollowState,
-      String
-    >((ref, arg) {
-      final nostrLists = ref.watch(nostrListProvider);
-      return NostrListsNotifier(nostrLists, arg);
-    });
+    NotifierProvider.family<NostrListsNotifier, NostrListsFollowState, String>(
+      NostrListsNotifier.new,
+    );
 
-class NostrListsNotifier extends StateNotifier<NostrListsFollowState> {
-  final GetNostrLists _getNostrLists;
-  final String _pubkey;
+class NostrListsNotifier extends Notifier<NostrListsFollowState> {
+  late final GetNostrLists _getNostrLists;
+  late final String _pubkey;
   StreamSubscription<List<NostrStarterPack>?>? _subscription;
 
-  NostrListsNotifier(this._getNostrLists, this._pubkey)
-    : super(NostrListsFollowState(isLoading: true, publicNostrFollowSets: [])) {
+  NostrListsNotifier(String pubkey) : _pubkey = pubkey;
+
+  @override
+  NostrListsFollowState build() {
+    final nostrLists = ref.watch(nostrListProvider);
+    _getNostrLists = nostrLists;
+
+    ref.onDispose(() {
+      _subscription?.cancel();
+    });
+
     _initializeState();
+
+    return NostrListsFollowState(isLoading: true, publicNostrFollowSets: []);
   }
 
   void _initializeState() {
@@ -61,11 +67,5 @@ class NostrListsNotifier extends StateNotifier<NostrListsFollowState> {
             state = state.copyWith(isLoading: false, publicNostrFollowSets: []);
           },
         );
-  }
-
-  @override
-  void dispose() {
-    _subscription?.cancel();
-    super.dispose();
   }
 }

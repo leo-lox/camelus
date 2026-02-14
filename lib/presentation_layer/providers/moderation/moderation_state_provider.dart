@@ -1,8 +1,6 @@
 import 'package:camelus/presentation_layer/providers/following_contact_state_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:flutter_riverpod/legacy.dart';
-
 import '../ndk_provider.dart';
 
 class ModerationState {
@@ -18,37 +16,36 @@ class ModerationState {
 }
 
 final moderationStateProvider =
-    StateNotifierProvider<ModerationNotifier, ModerationState>((ref) {
-      final myUserPubkey = ref.read(ndkProvider).accounts.getPublicKey();
+    NotifierProvider<ModerationNotifier, ModerationState>(
+      ModerationNotifier.new,
+    );
 
-      // If no pubkey (read-only mode), return empty moderation state
-      if (myUserPubkey == null) {
-        return ModerationNotifier(ref: ref, myUserPubkey: null);
-      }
+class ModerationNotifier extends Notifier<ModerationState> {
+  @override
+  ModerationState build() {
+    final myUserPubkey = ref.read(ndkProvider).accounts.getPublicKey();
 
-      return ModerationNotifier(ref: ref, myUserPubkey: myUserPubkey);
-    });
+    // Initialize with empty set first
+    final initialState = ModerationState(trustedPubkeys: {});
 
-class ModerationNotifier extends StateNotifier<ModerationState> {
-  final Ref ref;
-  final String? myUserPubkey;
-
-  ModerationNotifier({required this.ref, required this.myUserPubkey})
-    : super(ModerationState(trustedPubkeys: {})) {
     // Skip setup if no pubkey (read-only mode)
-    if (myUserPubkey == null) return;
+    if (myUserPubkey == null) {
+      return initialState;
+    }
 
     // Listen to contact changes
-    ref.listen<ContactListState>(contactListStateProvider(myUserPubkey!), (
+    ref.listen<ContactListState>(contactListStateProvider(myUserPubkey), (
       previous,
       next,
     ) {
       _updateTrustedPubkeys(next);
     });
 
-    // Load initial state
-    final contacts = ref.read(contactListStateProvider(myUserPubkey!));
-    _updateTrustedPubkeys(contacts);
+    // Load initial contacts and return state with them
+    final contacts = ref.read(contactListStateProvider(myUserPubkey));
+    final myContacts = contacts.contactList.contacts.toSet();
+
+    return ModerationState(trustedPubkeys: myContacts);
   }
 
   void _updateTrustedPubkeys(ContactListState contactsState) {
