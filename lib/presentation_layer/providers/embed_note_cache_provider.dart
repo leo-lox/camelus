@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:camelus/domain_layer/entities/nostr_note.dart';
 import 'package:camelus/domain_layer/entities/parsed_post.dart';
 
+import '../../config/feeds_config.dart';
 import 'get_notes_provider.dart';
 import '../components/note_card/nostr_parser.dart';
 
@@ -112,7 +113,7 @@ Future<NostrNote?> _fetchAndCacheNote(Ref ref, String noteId) async {
 
 /// Provider for the embed cache
 final embedCacheProvider = Provider<EmbedCache>((ref) {
-  return EmbedCache(maxSize: 1000);
+  return EmbedCache(maxSize: EMBEDDED_NOTE_CACHE_SIZE);
 });
 
 /// Provider to fetch a single embedded note (raw NostrNote)
