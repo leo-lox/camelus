@@ -4,7 +4,6 @@ import 'package:rxdart/rxdart.dart';
 
 import '../../domain_layer/entities/nostr_note.dart';
 import '../../domain_layer/repositories/note_repository.dart';
-import '../../helpers/helpers.dart';
 import '../data_sources/dart_ndk_source.dart';
 import '../models/nostr_note_model.dart';
 
