@@ -87,7 +87,7 @@ class TrendingHashtagsWidget extends ConsumerWidget {
           hashtag: hashtag.hashtag,
           postsCount: hashtag.posts,
           onTap: (hashtag) {
-            context.push('/nostr/search', extra: "#$hashtag");
+            context.push('/search/feed', extra: "#$hashtag");
           },
         );
       }),

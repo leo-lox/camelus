@@ -12,10 +12,14 @@ import '../models/user_metadata_model.dart';
 class MetadataRepositoryImpl implements MetadataRepository {
   final DartNdkSource dartNdkSource;
   final ndk.EventVerifier eventVerifier;
+  final Duration nip05CacheTtl;
+
+  final Map<String, _Nip05CacheEntry> _nip05CheckCache = {};
 
   MetadataRepositoryImpl({
     required this.dartNdkSource,
     required this.eventVerifier,
+    this.nip05CacheTtl = const Duration(minutes: 10),
   });
 
   /// nip05 is automatically verified if present and removed if invalid
@@ -41,14 +45,22 @@ class MetadataRepositoryImpl implements MetadataRepository {
 
         // If there was originally a NIP-05 identifier, perform verification
         if (originalNip05 != null && originalNip05.isNotEmpty) {
-          // Perform NIP-05 verification
-          final nip05Result = await dartNdkSource.dartNdk.nip05.check(
-            nip05: originalNip05,
-            pubkey: pubkey,
-          );
+          final cacheKey = '$pubkey::$originalNip05';
+          final cachedVerification = _getCachedNip05Verification(cacheKey);
+
+          final isValid =
+              cachedVerification ??
+              (await dartNdkSource.dartNdk.nip05.check(
+                nip05: originalNip05,
+                pubkey: pubkey,
+              )).valid;
+
+          if (cachedVerification == null) {
+            _setCachedNip05Verification(cacheKey, isValid);
+          }
 
           // If verification succeeds, set NIP-05 to the original value
-          if (nip05Result.valid) {
+          if (isValid) {
             metadata.nip05 = originalNip05;
             // Emit the second event with verified NIP-05
             yield metadata;
@@ -83,4 +95,33 @@ class MetadataRepositoryImpl implements MetadataRepository {
 
     return null;
   }
+
+  bool? _getCachedNip05Verification(String cacheKey) {
+    final entry = _nip05CheckCache[cacheKey];
+    if (entry == null) {
+      return null;
+    }
+
+    final isExpired = DateTime.now().difference(entry.cachedAt) > nip05CacheTtl;
+    if (isExpired) {
+      _nip05CheckCache.remove(cacheKey);
+      return null;
+    }
+
+    return entry.valid;
+  }
+
+  void _setCachedNip05Verification(String cacheKey, bool isValid) {
+    _nip05CheckCache[cacheKey] = _Nip05CacheEntry(
+      valid: isValid,
+      cachedAt: DateTime.now(),
+    );
+  }
+}
+
+class _Nip05CacheEntry {
+  final bool valid;
+  final DateTime cachedAt;
+
+  _Nip05CacheEntry({required this.valid, required this.cachedAt});
 }

@@ -121,7 +121,7 @@ class _HomePageMobileState extends ConsumerState<HomePageMobile>
                       centerTitle: true,
                       actions: [
                         RelaysConnectivityWidget(
-                          onTap: () => context.push('/nostr/relays'),
+                          onTap: () => context.push('/relays'),
                         ),
                         if (!kIsWeb &&
                             (defaultTargetPlatform == TargetPlatform.windows ||

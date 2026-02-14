@@ -109,7 +109,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
       context.push('/$code');
     } else {
       // 3. Fallback to standard text search
-      context.push('/nostr/search', extra: trimmedValue);
+      context.push('/search/feed', extra: trimmedValue);
     }
   }
 

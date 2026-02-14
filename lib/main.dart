@@ -29,7 +29,7 @@ import 'presentation_layer/providers/ndk_provider.dart';
 import 'presentation_layer/providers/signer_provider.dart';
 import 'presentation_layer/providers/theme_provider.dart';
 import 'presentation_layer/providers/messaging/dm_conversations_provider.dart';
-import 'routes.dart';
+import 'presentation_layer/routing/routes.dart';
 import 'theme.dart' show getThemeVariants;
 
 const devDeviceFrame = true;

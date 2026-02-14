@@ -2,6 +2,7 @@ import 'package:camelus/l10n/app_localizations.dart';
 import 'package:camelus/presentation_layer/components/note_card/note_card.dart';
 import 'package:camelus/helpers/helpers.dart';
 import 'package:camelus/helpers/nevent_helper.dart';
+import 'package:camelus/presentation_layer/routing/route_paths.dart';
 import 'package:camelus/domain_layer/entities/nostr_note.dart';
 import 'package:camelus/presentation_layer/components/note_card/skeleton_note.dart';
 import 'package:camelus/presentation_layer/providers/get_notes_provider.dart';
@@ -96,8 +97,11 @@ class NoteCardReference extends ConsumerWidget {
                 GestureDetector(
                   onTap: () {
                     context.push(
-                      '/nostr/event',
-                      extra: {'root': note.id, 'scrollIntoView': note.id},
+                      RoutePaths.status(
+                        pubkey: note.pubkey,
+                        eventId: note.id,
+                        scrollIntoView: note.id,
+                      ),
                     );
                   },
                   child: Container(

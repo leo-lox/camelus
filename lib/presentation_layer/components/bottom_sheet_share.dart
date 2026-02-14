@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:camelus/domain_layer/entities/nostr_note.dart';
+import 'package:camelus/presentation_layer/routing/route_paths.dart';
 import 'package:camelus/presentation_layer/providers/metadata_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -13,26 +14,26 @@ Future<void> openBottomSheetShare(
 ) async {
   final metadataP = ref.read(metadataProvider);
 
-  String userId;
+  String profilePath;
   try {
     // Add timeout of 1 second to the metadata fetch operation
     final userMetadata = await metadataP
         .getMetadataByPubkey(note.pubkey)
         .last
         .timeout(const Duration(milliseconds: 500));
-    userId = userMetadata.nip05 ?? note.pubkey;
+    profilePath = RoutePaths.status(
+      pubkey: note.pubkey,
+      eventId: note.id,
+      nip05: userMetadata.nip05,
+    );
   } on TimeoutException {
     // If timeout occurs, fall back to using just the pubkey
-    userId = note.pubkey;
+    profilePath = RoutePaths.status(pubkey: note.pubkey, eventId: note.id);
   }
 
   SharePlus.instance.share(
     ShareParams(
-      uri: Uri(
-        scheme: 'https',
-        host: 'camelus.app',
-        path: '/user/$userId/status/${note.id}',
-      ),
+      uri: Uri(scheme: 'https', host: 'camelus.app', path: profilePath),
     ),
   );
 }

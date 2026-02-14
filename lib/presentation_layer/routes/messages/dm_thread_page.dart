@@ -1,4 +1,5 @@
 import 'package:camelus/helpers/helpers.dart';
+import 'package:camelus/presentation_layer/routing/route_paths.dart';
 import 'package:camelus/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -108,7 +109,7 @@ class _DmThreadPageState extends ConsumerState<DmThreadPage> {
         title: MouseRegion(
           cursor: SystemMouseCursors.click,
           child: GestureDetector(
-            onTap: () => context.push('/nostr/profile/$_peerPubkey'),
+            onTap: () => context.push(RoutePaths.profile(pubkey: _peerPubkey)),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [

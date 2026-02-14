@@ -11,6 +11,7 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 import '../../../domain_layer/entities/parsed_post.dart';
+import '../../routing/route_paths.dart';
 import '../../atoms/long_button.dart';
 import '../../providers/link_preview_state_provider.dart';
 import '../../providers/metadata_state_provider.dart';
@@ -296,11 +297,11 @@ class PostContentWidget extends ConsumerWidget {
   }
 
   void _openUserProfile(BuildContext context, String pubkey) {
-    context.push('/nostr/profile/$pubkey');
+    context.push(RoutePaths.profile(pubkey: pubkey));
   }
 
   void _openHashtag(BuildContext context, String hashtag) {
-    context.push('/nostr/search', extra: "#$hashtag");
+    context.push('/search/feed', extra: "#$hashtag");
   }
 
   void _openLink(String url) {

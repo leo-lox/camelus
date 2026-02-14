@@ -1,4 +1,5 @@
 import 'package:camelus/l10n/app_localizations.dart';
+import 'package:camelus/presentation_layer/routing/route_paths.dart';
 import 'package:camelus/presentation_layer/atoms/my_profile_picture.dart';
 import 'package:camelus/presentation_layer/atoms/refresh_indicator_no_need.dart';
 import 'package:camelus/presentation_layer/components/note_card/note_card.dart';
@@ -467,15 +468,17 @@ class _NotificationPageState extends ConsumerState<NotificationPage>
   }
 
   void _navigateToPost(BuildContext context, NostrNotification notification) {
+    final rootId =
+        notification.sourceNote.getRootReply?.value ??
+        notification.targetNoteId ??
+        notification.sourceNote.id;
+
     context.push(
-      '/nostr/event',
-      extra: {
-        'root':
-            notification.sourceNote.getRootReply?.value ??
-            notification.targetNoteId ??
-            notification.sourceNote.id,
-        'scrollIntoView': notification.sourceNote.id,
-      },
+      RoutePaths.status(
+        pubkey: notification.sourceNote.pubkey,
+        eventId: rootId,
+        scrollIntoView: notification.sourceNote.id,
+      ),
     );
   }
 }

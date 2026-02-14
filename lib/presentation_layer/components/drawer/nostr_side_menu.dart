@@ -10,6 +10,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import 'package:ndk/shared/nips/nip19/nip19.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../routing/route_paths.dart';
 import '../../providers/messaging/dm_conversations_provider.dart';
 import '../../providers/ndk_provider.dart';
 import '../../providers/theme_provider.dart';
@@ -98,7 +99,7 @@ class NostrSideMenu extends ConsumerWidget {
   }
 
   void navigateToProfile(BuildContext context, String pubkey) {
-    context.push('/nostr/profile/$pubkey');
+    context.push(RoutePaths.profile(pubkey: pubkey));
   }
 
   Widget _drawerItem({
@@ -241,15 +242,15 @@ class NostrSideMenu extends ConsumerWidget {
                     if (currentUserPubkey != null) ...[
                       _drawerItem(
                         label: AppLocalizations.of(context)!.bookmarks,
-                        routeName: '/nostr/bookmarks',
+                        routeName: '/bookmarks',
                         icon: PhosphorIcons.bookmarkSimple(),
                         onTap: () {
-                          context.push('/nostr/bookmarks');
+                          context.push('/bookmarks');
                         },
                       ),
                       _drawerItem(
                         label: AppLocalizations.of(context)!.profile,
-                        routeName: '/nostr/profile',
+                        routeName: '/profile',
                         icon: PhosphorIcons.user(),
                         onTap: () {
                           navigateToProfile(context, currentUserPubkey);
@@ -271,10 +272,10 @@ class NostrSideMenu extends ConsumerWidget {
                       ),
                       _drawerItem(
                         label: AppLocalizations.of(context)!.blocklist,
-                        routeName: '/nostr/blockedUsers',
+                        routeName: '/blocked-users',
                         icon: PhosphorIcons.yinYang(),
                         onTap: () {
-                          context.push('/nostr/blockedUsers');
+                          context.push('/blocked-users');
                         },
                       ),
                     ] else ...[
