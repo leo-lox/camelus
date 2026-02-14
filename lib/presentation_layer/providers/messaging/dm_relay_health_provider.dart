@@ -91,7 +91,7 @@ class DmRelayHealthNotifier extends Notifier<DmRelayHealthState> {
   StreamSubscription? _connectivitySubscription;
   Map<String, RelayConnectivity>? _currentConnectivity;
 
-  DmRelayHealthNotifier(String peerPubkey) : peerPubkey = peerPubkey;
+  DmRelayHealthNotifier(this.peerPubkey);
 
   @override
   DmRelayHealthState build() {
