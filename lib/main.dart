@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:flutter/foundation.dart';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:go_router/go_router.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:flutter_mentions/flutter_mentions.dart';
@@ -58,6 +59,10 @@ Future<void> main() async {
       titleBarStyle: TitleBarStyle.hidden,
     );
     windowManager.waitUntilReadyToShow(windowOptions);
+  }
+
+  if (kIsWeb) {
+    usePathUrlStrategy();
   }
 
   final startupAccData = await AppAuth.getStartupAccountData();
