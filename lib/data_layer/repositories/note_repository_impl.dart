@@ -4,6 +4,7 @@ import 'package:rxdart/rxdart.dart';
 
 import '../../domain_layer/entities/nostr_note.dart';
 import '../../domain_layer/repositories/note_repository.dart';
+import '../../helpers/helpers.dart';
 import '../data_sources/dart_ndk_source.dart';
 import '../models/nostr_note_model.dart';
 
@@ -44,6 +45,29 @@ class NoteRepositoryImpl implements NoteRepository {
     final response = dartNdkSource.dartNdk.requests.query(
       filter: filter,
       name: 'getTextNote-',
+      explicitRelays: explicitRelays,
+      timeout: Duration(seconds: 15),
+      cacheRead: true,
+      cacheWrite: true,
+    );
+
+    return response.stream.map((event) => NostrNoteModel.fromNDKEvent(event));
+  }
+
+  @override
+  Stream<NostrNote> getTextNotes(
+    List<String> noteIds, {
+    Iterable<String>? explicitRelays,
+  }) {
+    ndk.Filter filter = ndk.Filter(
+      ids: noteIds,
+      kinds: [ndk_entities.Nip01Event.kTextNodeKind],
+    );
+
+    final response = dartNdkSource.dartNdk.requests.query(
+      filter: filter,
+      name: 'getTextNotes-${noteIds.length}',
+
       explicitRelays: explicitRelays,
       timeout: Duration(seconds: 15),
       cacheRead: true,

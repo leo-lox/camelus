@@ -7,6 +7,7 @@ import '../../domain_layer/entities/nostr_note.dart';
 import '../../domain_layer/entities/parsed_post.dart';
 import '../components/note_card/nostr_parser.dart';
 import 'db_app_provider.dart';
+import 'embed_note_cache_provider.dart';
 import 'get_notes_provider.dart';
 import 'inbox_outbox_provider.dart';
 
@@ -72,13 +73,15 @@ class GenericFeedState extends Notifier<FeedViewModel> {
 
   // Processes incoming fresh notes
   Future<void> _processFreshNotes(List<NostrNote> networkNotes) async {
-    final rootNotes = networkNotes.where((note) => note.isRoot).toList();
-    final rootAndReplyNotes = networkNotes;
+    final parsedRootAndReplyNotes = await NostrParser.parseEvents(networkNotes);
+    final parsedRootNotes = parsedRootAndReplyNotes
+        .where((post) => post.nostrNote.isRoot)
+        .toList();
 
-    final parsedRootNotes = await NostrParser.parseEvents(rootNotes);
-    final parsedRootAndReplyNotes = await NostrParser.parseEvents(
-      rootAndReplyNotes,
-    );
+    // Preload embedded notes
+    // not waiting for fetching everything
+    final embedService = ref.read(embedCacheServiceProvider);
+    embedService.preloadFromPosts(parsedRootAndReplyNotes);
 
     _addNewRootEvents(parsedRootNotes); // Add new root events
     _addNewRootAndReplyEvents(
