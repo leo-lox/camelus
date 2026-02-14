@@ -83,7 +83,7 @@ class DmThreadNotifier extends Notifier<DmThreadState> {
   StreamSubscription? _messagesSubscription;
   StreamSubscription? _newMessageSubscription;
 
-  DmThreadNotifier(String peerPubkey) : peerPubkey = peerPubkey;
+  DmThreadNotifier(this.peerPubkey);
 
   @override
   DmThreadState build() {

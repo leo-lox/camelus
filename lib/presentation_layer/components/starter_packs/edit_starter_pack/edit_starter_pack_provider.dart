@@ -76,8 +76,7 @@ class EditStarterPackNotifier extends Notifier<StarterPackData> {
   late final ServerpodDataSource _serverpodProvider;
   late final StarterPackIdentifier identifier;
 
-  EditStarterPackNotifier(StarterPackIdentifier identifier)
-    : identifier = identifier;
+  EditStarterPackNotifier(this.identifier);
 
   @override
   StarterPackData build() {

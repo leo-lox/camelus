@@ -147,6 +147,4 @@ class BookmarksNotifier extends Notifier<BookmarksState> {
 }
 
 final bookmarksStateProvider =
-    NotifierProvider<BookmarksNotifier, BookmarksState>(
-      () => BookmarksNotifier(),
-    );
+    NotifierProvider<BookmarksNotifier, BookmarksState>(BookmarksNotifier.new);
