@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:rxdart/rxdart.dart';
+import 'dart:async';
 
 import '../../domain_layer/entities/feed_filter.dart';
 import '../../domain_layer/entities/feed_view_model.dart';
@@ -19,12 +20,17 @@ class GenericFeedState extends Notifier<FeedViewModel> {
   final FeedFilter feedFilter;
   GenericFeedState(this.feedFilter);
 
+  StreamSubscription<List<NostrNote>>? _freshNotesSubscription;
+  StreamSubscription<List<NostrNote>>? _timelineSubscription;
+
   @override
   FeedViewModel build() {
     final notesP = ref.read(getNotesProvider);
     // Ensures resources are cleaned up when provider is disposed
-    ref.onDispose(() async {
-      await notesP.closeSubscription("sub-${feedFilter.feedId}");
+    ref.onDispose(() {
+      _freshNotesSubscription?.cancel();
+      _timelineSubscription?.cancel();
+      unawaited(notesP.closeSubscription("sub-${feedFilter.feedId}"));
     });
     _setupSubscription(feedFilter); // Initialize data subscription
     return FeedViewModel(
@@ -46,13 +52,15 @@ class GenericFeedState extends Notifier<FeedViewModel> {
   // Sets up a subscription to listen for feed updates
   Future<void> _setupSubscription(FeedFilter filter) async {
     int cutoff = await _getCutoffTime(filter.feedId); // Fetch the cutoff time
+    if (!ref.mounted) return;
 
     if (filter.authors != null && filter.authors!.isNotEmpty) {
-      final inboxOutboxP = ref.watch(inboxOutboxProvider);
+      final inboxOutboxP = ref.read(inboxOutboxProvider);
       await inboxOutboxP.updateCache(filter.authors!, forceRefresh: true);
+      if (!ref.mounted) return;
     }
 
-    final notesP = ref.watch(getNotesProvider);
+    final notesP = ref.read(getNotesProvider);
     final sub = notesP.genericNostrSubscription(
       since: cutoff,
       subscriptionId: "sub-${filter.feedId}",
@@ -64,7 +72,8 @@ class GenericFeedState extends Notifier<FeedViewModel> {
     );
 
     // Buffer notes for processing in batches
-    sub
+    _freshNotesSubscription?.cancel();
+    _freshNotesSubscription = sub
         .bufferTime(const Duration(seconds: 1))
         .where((events) => events.isNotEmpty)
         .listen(_processFreshNotes);
@@ -72,13 +81,17 @@ class GenericFeedState extends Notifier<FeedViewModel> {
 
   // Processes incoming fresh notes
   Future<void> _processFreshNotes(List<NostrNote> networkNotes) async {
+    if (!ref.mounted) return;
+
     final rootNotes = networkNotes.where((note) => note.isRoot).toList();
     final rootAndReplyNotes = networkNotes;
 
     final parsedRootNotes = await NostrParser.parseEvents(rootNotes);
+
     final parsedRootAndReplyNotes = await NostrParser.parseEvents(
       rootAndReplyNotes,
     );
+    if (!ref.mounted) return;
 
     _addNewRootEvents(parsedRootNotes); // Add new root events
     _addNewRootAndReplyEvents(
@@ -108,7 +121,7 @@ class GenericFeedState extends Notifier<FeedViewModel> {
     int cutoff, {
     int? limit,
   }) {
-    final notesP = ref.watch(getNotesProvider);
+    final notesP = ref.read(getNotesProvider);
     return notesP.genericNostrQuery(
       requestId: "q-${filter.feedId}",
       kinds: filter.kinds,
@@ -123,13 +136,17 @@ class GenericFeedState extends Notifier<FeedViewModel> {
 
   // Processes timeline notes and updates the state
   Future<void> _processTimelineNotes(List<NostrNote> networkNotes) async {
+    if (!ref.mounted) return;
+
     final rootNotes = networkNotes.where((note) => note.isRoot).toList();
     final rootAndReplyNotes = networkNotes;
 
     final parsedRootNotes = await NostrParser.parseEvents(rootNotes);
+
     final parsedRootAndReplyNotes = await NostrParser.parseEvents(
       rootAndReplyNotes,
     );
+    if (!ref.mounted) return;
 
     _addRootTimelineEvents(parsedRootNotes); // Add root notes to the timeline
     _addRootAndReplyTimelineEvents(
@@ -139,7 +156,10 @@ class GenericFeedState extends Notifier<FeedViewModel> {
 
   // Loads more notes for infinite scrolling
   Future<void> loadMore() async {
+    if (!ref.mounted) return;
+
     int cutoff = await _getCutoffTime(feedFilter.feedId);
+
     await _saveCutoffTime(feedFilter.feedId);
 
     if (state.timelineRootAndReplyNotes.isNotEmpty) {
@@ -154,7 +174,8 @@ class GenericFeedState extends Notifier<FeedViewModel> {
       limit: 20,
     );
 
-    networkNotesStream
+    await _timelineSubscription?.cancel();
+    _timelineSubscription = networkNotesStream
         .bufferTime(const Duration(milliseconds: 100))
         .where((events) => events.isNotEmpty)
         .listen(_processTimelineNotes);
