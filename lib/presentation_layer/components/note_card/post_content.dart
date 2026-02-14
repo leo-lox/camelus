@@ -301,7 +301,8 @@ class PostContentWidget extends ConsumerWidget {
   }
 
   void _openHashtag(BuildContext context, String hashtag) {
-    context.push('/search/feed', extra: "#$hashtag");
+    final encodedQuery = Uri.encodeQueryComponent("#$hashtag");
+    context.push('/search/feed?q=$encodedQuery');
   }
 
   void _openLink(String url) {

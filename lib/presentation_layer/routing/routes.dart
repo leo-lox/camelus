@@ -207,7 +207,9 @@ final routes = [
             path: '/search/feed',
             pageBuilder: (context, state) => CustomTransitionPage(
               key: state.pageKey,
-              child: SearchFeedPage(query: state.extra as String),
+              child: SearchFeedPage(
+                query: state.uri.queryParameters['q'] ?? '',
+              ),
               transitionDuration: Duration.zero,
               reverseTransitionDuration: Duration.zero,
               transitionsBuilder:

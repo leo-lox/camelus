@@ -109,7 +109,8 @@ class _SearchPageState extends ConsumerState<SearchPage> {
       context.push('/$code');
     } else {
       // 3. Fallback to standard text search
-      context.push('/search/feed', extra: trimmedValue);
+      final encodedQuery = Uri.encodeQueryComponent(trimmedValue);
+      context.push('/search/feed?q=$encodedQuery');
     }
   }
 
