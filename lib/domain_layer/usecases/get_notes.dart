@@ -20,6 +20,16 @@ class GetNotes {
     return _noteRepository.getTextNote(noteId, explicitRelays: explicitRelays);
   }
 
+  Stream<NostrNote> getNotes(
+    List<String> noteIds, {
+    Iterable<String>? explicitRelays,
+  }) {
+    return _noteRepository.getTextNotes(
+      noteIds,
+      explicitRelays: explicitRelays,
+    );
+  }
+
   Stream<NostrNote> genericNostrQuery({
     required String requestId,
     List<String>? authors,
