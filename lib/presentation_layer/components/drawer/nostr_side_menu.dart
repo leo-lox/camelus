@@ -111,8 +111,8 @@ class NostrSideMenu extends ConsumerWidget {
   }) {
     return Builder(
       builder: (context) {
-        final currentRoute = GoRouterState.of(context).uri.toString();
-        final isSelected = currentRoute.contains(routeName);
+        final currentRoute = GoRouterState.of(context).uri.path;
+        final isSelected = currentRoute == routeName;
 
         final iconWidget = Icon(
           icon,
@@ -122,34 +122,47 @@ class NostrSideMenu extends ConsumerWidget {
           size: 22,
         );
 
-        return Container(
-          //width: 200,
-          decoration: isSelected
-              ? BoxDecoration(
-                  color: Theme.of(
-                    context,
-                  ).colorScheme.primary.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(100),
-                )
-              : null,
-          child: ListTile(
-            onTap: onTap,
-            leading: badgeCount > 0
-                ? Badge(
-                    label: Text(
-                      badgeCount > 99 ? '99+' : badgeCount.toString(),
-                    ),
-                    child: iconWidget,
-                  )
-                : iconWidget,
-            title: Text(
-              label,
-              style: TextStyle(
-                color: isSelected
-                    ? Theme.of(context).colorScheme.primary
-                    : Theme.of(context).colorScheme.inverseSurface,
-                fontSize: 17,
-                fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+        return Material(
+          type: MaterialType.transparency,
+          child: Ink(
+            decoration: BoxDecoration(
+              color: isSelected
+                  ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.1)
+                  : Colors.transparent,
+              borderRadius: BorderRadius.circular(100),
+            ),
+            child: InkWell(
+              onTap: onTap,
+              borderRadius: BorderRadius.circular(100),
+              hoverColor: Theme.of(
+                context,
+              ).colorScheme.primary.withValues(alpha: 0.05),
+              splashColor: Theme.of(
+                context,
+              ).colorScheme.primary.withValues(alpha: 0.08),
+              highlightColor: Theme.of(
+                context,
+              ).colorScheme.primary.withValues(alpha: 0.04),
+              child: ListTile(
+                onTap: null,
+                leading: badgeCount > 0
+                    ? Badge(
+                        label: Text(
+                          badgeCount > 99 ? '99+' : badgeCount.toString(),
+                        ),
+                        child: iconWidget,
+                      )
+                    : iconWidget,
+                title: Text(
+                  label,
+                  style: TextStyle(
+                    color: isSelected
+                        ? Theme.of(context).colorScheme.primary
+                        : Theme.of(context).colorScheme.inverseSurface,
+                    fontSize: 17,
+                    fontWeight: FontWeight.normal,
+                  ),
+                ),
               ),
             ),
           ),
@@ -250,7 +263,8 @@ class NostrSideMenu extends ConsumerWidget {
                       ),
                       _drawerItem(
                         label: AppLocalizations.of(context)!.profile,
-                        routeName: '/profile',
+                        routeName:
+                            '/profile/${Nip19.encodePubKey(currentUserPubkey)}',
                         icon: PhosphorIcons.user(),
                         onTap: () {
                           navigateToProfile(context, currentUserPubkey);
