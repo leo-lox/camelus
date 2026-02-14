@@ -61,6 +61,11 @@ class NostrParser {
         .map((s) => s.metadata!)
         .toList();
 
+    final noteReferences = contentSegments
+        .where((s) => s.type == ContentType.noteReference)
+        .map((s) => s.metadata!)
+        .toList();
+
     return ParsedPost(
       id: event.id,
       authorId: event.pubkey,
@@ -70,6 +75,7 @@ class NostrParser {
       imageUrls: imageUrls,
       videoUrls: videoUrls,
       nostrNote: event,
+      noteReferences: noteReferences,
     );
   }
 
