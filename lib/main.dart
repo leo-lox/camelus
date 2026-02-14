@@ -155,6 +155,8 @@ Future<void> main() async {
 
   InitModeration.initBloomFilter(provider: providerContainer);
 
+  GoRouter.optionURLReflectsImperativeAPIs = true;
+
   final router = GoRouter(
     navigatorKey: navigatorKey,
     initialLocation: initalRoute,
