@@ -1,0 +1,91 @@
+server:
+  host: 0.0.0.0
+  port: 8080
+
+# Channel Configuration
+# Channels support a tree-like hierarchy through parent_id references
+# Set parent_id to null for root channels
+channels:
+  # Root channel - Lobby
+  - id: lobby
+    name: "🏠 Lobby"
+    position: 0
+    parent_id: null
+  
+  # Child of Lobby
+  - id: general
+    name: "💬 General"
+    position: 0
+    parent_id: lobby
+  
+  # Root channel - Gaming
+  - id: gaming
+    name: "🎮 Gaming"
+    position: 1
+    parent_id: null
+  
+  # Children of Gaming
+  - id: gaming-voice-1
+    name: "🎤 Voice 1"
+    position: 0
+    parent_id: gaming
+  
+  - id: gaming-voice-2
+    name: "🎤 Voice 2"
+    position: 1
+    parent_id: gaming
+  
+  # Root channel - Music
+  - id: music
+    name: "🎵 Music"
+    position: 2
+    parent_id: null
+  
+  # Children of Music
+  - id: music-listening
+    name: "🎧 Listening Room"
+    position: 0
+    parent_id: music
+  
+  - id: music-jam
+    name: "🎸 Jam Session"
+    position: 1
+    parent_id: music
+
+# User Groups Configuration
+# Users are identified by their Nostr npub
+# Groups determine permissions (future: implement permission-based actions)
+user_groups:
+  # Administrators - full control
+  admin:
+    - npub1admin1examplexxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+    - npub1admin2examplexxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+  
+  # Members - regular users
+  member:
+    - npub1member1examplexxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+    - npub1member2examplexxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+    - npub1member3examplexxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+  
+  # Anonymous users - no specific npubs required
+  # Any user not in admin or member list will be treated as anon
+  anon: []
+
+# Future Configuration Options (not yet implemented)
+# permissions:
+#   admin:
+#     - create_channel
+#     - delete_channel
+#     - kick_user
+#     - ban_user
+#   member:
+#     - join_channel
+#     - speak
+#   anon:
+#     - join_channel
+#     - speak
+# 
+# audio:
+#   codec: opus
+#   bitrate: 64000
+#   sample_rate: 48000

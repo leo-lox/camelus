@@ -1,0 +1,5 @@
+voice_server
+*.exe
+*.test
+*.prof
+go.sum

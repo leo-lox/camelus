@@ -1,0 +1,36 @@
+server:
+  host: 0.0.0.0
+  port: 8080
+
+channels:
+  - id: lobby
+    name: Lobby
+    position: 0
+    parent_id: null
+  
+  - id: general
+    name: General
+    position: 1
+    parent_id: lobby
+  
+  - id: gaming
+    name: Gaming
+    position: 0
+    parent_id: null
+  
+  - id: gaming-voice-1
+    name: Voice 1
+    position: 0
+    parent_id: gaming
+  
+  - id: gaming-voice-2
+    name: Voice 2
+    position: 1
+    parent_id: gaming
+
+user_groups:
+  admin:
+    - npub1example1xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+  member:
+    - npub1example2xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+  anon: []  # Anonymous users - no specific npubs

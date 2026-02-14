@@ -256,6 +256,14 @@ class NostrSideMenu extends ConsumerWidget {
                         },
                       ),
                       _drawerItem(
+                        label: 'Voice Chat',
+                        routeName: '/voice-chat',
+                        icon: PhosphorIcons.microphoneStage(),
+                        onTap: () {
+                          context.push('/voice-chat');
+                        },
+                      ),
+                      _drawerItem(
                         label: AppLocalizations.of(context)!.payments,
                         routeName: 'payments',
                         icon: PhosphorIcons.lightning(),
