@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:riverpod/legacy.dart';
 import '../../../../domain_layer/entities/nostr_list.dart';
 import '../../../../domain_layer/entities/nostr_note.dart';
 import '../../../providers/get_notes_provider.dart';
@@ -35,19 +34,22 @@ class BookmarksState {
   }
 }
 
-class BookmarksNotifier extends StateNotifier<BookmarksState> {
-  final Ref ref;
+class BookmarksNotifier extends Notifier<BookmarksState> {
   StreamSubscription? _subscription;
 
-  BookmarksNotifier(this.ref)
-    : super(
-        BookmarksState(
-          isLoading: true,
-          publicBookmarks: [],
-          privateBookmarks: [],
-        ),
-      ) {
+  @override
+  BookmarksState build() {
+    ref.onDispose(() {
+      _subscription?.cancel();
+    });
+
     _loadBookmarks();
+
+    return BookmarksState(
+      isLoading: true,
+      publicBookmarks: [],
+      privateBookmarks: [],
+    );
   }
 
   void _loadBookmarks() async {
@@ -142,15 +144,7 @@ class BookmarksNotifier extends StateNotifier<BookmarksState> {
       );
     }
   }
-
-  @override
-  void dispose() {
-    _subscription?.cancel();
-    super.dispose();
-  }
 }
 
 final bookmarksStateProvider =
-    StateNotifierProvider<BookmarksNotifier, BookmarksState>((ref) {
-      return BookmarksNotifier(ref);
-    });
+    NotifierProvider<BookmarksNotifier, BookmarksState>(BookmarksNotifier.new);

@@ -8,6 +8,7 @@ class ParsedPost {
   final List<String> mentionIds;
   final List<String> imageUrls;
   final List<String> videoUrls;
+  final List<String> noteReferences;
   // the original nostr note
   final NostrNote nostrNote;
 
@@ -27,6 +28,7 @@ class ParsedPost {
     required this.imageUrls,
     required this.videoUrls,
     required this.nostrNote,
+    this.noteReferences = const [],
   });
 
   @override

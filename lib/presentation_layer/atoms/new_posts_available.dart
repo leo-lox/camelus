@@ -138,58 +138,74 @@ class SwipeableFadeOutController {
   }
 }
 
-Widget newPostsAvailable({
-  required String name,
-  required Function onPressed,
-  Function? onDismissed,
-  double dismissThreshold = 0.2,
-  SwipeableFadeOutController? controller,
-}) {
-  return StatefulBuilder(
-    builder: (context, setState) {
-      final swipeableKey = GlobalKey<SwipeableFadeOutState>();
+class NewPostsAvailable extends StatefulWidget {
+  final String name;
+  final VoidCallback onPressed;
+  final VoidCallback? onDismissed;
+  final double dismissThreshold;
+  final SwipeableFadeOutController? controller;
 
-      // If a controller was provided, attach the state to it
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (controller != null && swipeableKey.currentState != null) {
-          controller.attach(swipeableKey.currentState!);
-        }
-      });
+  const NewPostsAvailable({
+    super.key,
+    required this.name,
+    required this.onPressed,
+    this.onDismissed,
+    this.dismissThreshold = 0.2,
+    this.controller,
+  });
 
-      return SwipeableFadeOut(
-        key: swipeableKey,
-        onDismissed: onDismissed,
-        dismissThreshold: dismissThreshold,
-        child: Padding(
-          padding: const EdgeInsets.only(top: 15),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              Container(
-                height: 40,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20),
-                  color: Theme.of(context).colorScheme.primary,
+  @override
+  State<NewPostsAvailable> createState() => _NewPostsAvailableState();
+}
+
+class _NewPostsAvailableState extends State<NewPostsAvailable> {
+  final GlobalKey<SwipeableFadeOutState> _swipeableKey =
+      GlobalKey<SwipeableFadeOutState>();
+
+  @override
+  void initState() {
+    super.initState();
+    // Attach the controller after the frame is built
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (widget.controller != null && _swipeableKey.currentState != null) {
+        widget.controller!.attach(_swipeableKey.currentState!);
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SwipeableFadeOut(
+      key: _swipeableKey,
+      onDismissed: widget.onDismissed,
+      dismissThreshold: widget.dismissThreshold,
+      child: Padding(
+        padding: const EdgeInsets.only(top: 15),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            Container(
+              height: 40,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20),
+                color: Theme.of(context).colorScheme.primary,
+              ),
+              child: TextButton(
+                onPressed: widget.onPressed,
+                style: TextButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
                 ),
-                child: TextButton(
-                  onPressed: () {
-                    onPressed();
-                  },
-                  style: TextButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                  ),
-                  child: Text(
-                    name,
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.onPrimary,
-                    ),
+                child: Text(
+                  widget.name,
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onPrimary,
                   ),
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
-      );
-    },
-  );
+      ),
+    );
+  }
 }

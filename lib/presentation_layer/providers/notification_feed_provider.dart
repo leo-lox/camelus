@@ -1,6 +1,6 @@
 import 'dart:developer';
 
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod/riverpod.dart';
 import 'package:rxdart/rxdart.dart';
 
 import '../../domain_layer/entities/nostr_note.dart';

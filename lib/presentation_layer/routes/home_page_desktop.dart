@@ -1,3 +1,4 @@
+import 'package:camelus/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -26,16 +27,57 @@ class HomePageDesktop extends ConsumerWidget {
               : [currentUserPubkey])
         : myContactList.contactList.contacts;
 
-    return SafeArea(
-      child: GenericFeed(
-        key: PageStorageKey('homeFeed-${currentUserPubkey ?? "readonly"}'),
-        feedPadding: EdgeInsets.only(top: 50),
-        floatHeaderSlivers: true,
-        initialTab: 0,
-        feedFilter: FeedFilter(
-          feedId: "homeFeed",
-          kinds: [1, 6],
-          authors: authors.isNotEmpty ? authors : null,
+    return DefaultTabController(
+      length: 2,
+      child: SafeArea(
+        child: Column(
+          children: [
+            TabBar(
+              indicatorColor: Theme.of(context).colorScheme.primary,
+              indicator: UnderlineTabIndicator(
+                borderSide: BorderSide(
+                  width: 2.5,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              dividerHeight: 0,
+              tabs: [
+                Tab(text: AppLocalizations.of(context)!.posts),
+                Tab(text: AppLocalizations.of(context)!.postsAndReplies),
+              ],
+            ),
+            Expanded(
+              child: TabBarView(
+                children: [
+                  // Posts tab - root notes only
+                  GenericFeed(
+                    key: PageStorageKey(
+                      'homeFeed-posts-${currentUserPubkey ?? "readonly"}',
+                    ),
+                    feedFilter: FeedFilter(
+                      feedId: "homeFeed",
+                      kinds: [1, 6],
+                      authors: authors.isNotEmpty ? authors : null,
+                      showRootNotesOnly: true,
+                    ),
+                  ),
+                  // Posts and Replies tab - all posts
+                  GenericFeed(
+                    key: PageStorageKey(
+                      'homeFeed-all-${currentUserPubkey ?? "readonly"}',
+                    ),
+                    feedFilter: FeedFilter(
+                      feedId: "homeFeed",
+                      kinds: [1, 6],
+                      authors: authors.isNotEmpty ? authors : null,
+                      showRootNotesOnly: false,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );

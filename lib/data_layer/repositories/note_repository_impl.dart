@@ -53,6 +53,29 @@ class NoteRepositoryImpl implements NoteRepository {
     return response.stream.map((event) => NostrNoteModel.fromNDKEvent(event));
   }
 
+  @override
+  Stream<NostrNote> getTextNotes(
+    List<String> noteIds, {
+    Iterable<String>? explicitRelays,
+  }) {
+    ndk.Filter filter = ndk.Filter(
+      ids: noteIds,
+      kinds: [ndk_entities.Nip01Event.kTextNodeKind],
+    );
+
+    final response = dartNdkSource.dartNdk.requests.query(
+      filter: filter,
+      name: 'getTextNotes-${noteIds.length}',
+
+      explicitRelays: explicitRelays,
+      timeout: Duration(seconds: 15),
+      cacheRead: true,
+      cacheWrite: true,
+    );
+
+    return response.stream.map((event) => NostrNoteModel.fromNDKEvent(event));
+  }
+
   /// Get all notes by a list of authors using a query
   @override
   ReplaySubject<NostrNote> getTextNotesByAuthors({
