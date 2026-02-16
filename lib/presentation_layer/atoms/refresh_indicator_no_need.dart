@@ -8,11 +8,13 @@ class RefreshIndicatorNoNeed extends StatelessWidget {
   final Widget child;
   final Future<void> Function()
   onRefresh; // The callback function to trigger the refresh.
+  final EdgeInsets? padding;
 
   const RefreshIndicatorNoNeed({
     super.key,
     required this.child,
     required this.onRefresh, // Function that handles the refresh logic.
+    this.padding,
   });
 
   @override
@@ -22,10 +24,13 @@ class RefreshIndicatorNoNeed extends StatelessWidget {
       builder: (BuildContext context, Widget child, IndicatorController controller) {
         return Stack(
           children: <Widget>[
-            _MyIndicator(
-              // Pass the indicator's progress value and loading state to custom indicator widget.
-              value: controller.value,
-              loading: controller.state.isLoading,
+            Padding(
+              padding: padding ?? EdgeInsets.zero,
+              child: _MyIndicator(
+                // Pass the indicator's progress value and loading state to custom indicator widget.
+                value: controller.value,
+                loading: controller.state.isLoading,
+              ),
             ),
             // Translate the child widget vertically based on the progress of the refresh indicator.
             Transform.translate(

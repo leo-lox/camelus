@@ -183,6 +183,8 @@ class GenericFeedState extends Notifier<FeedViewModel> {
 
     final networkNotes = await networkNotesStream.toList();
 
+    if (!ref.mounted) return;
+
     if (networkNotes.isEmpty) {
       state = state.copyWith(endOfRootNotes: true);
       return;

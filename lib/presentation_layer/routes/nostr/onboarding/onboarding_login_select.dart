@@ -1,6 +1,5 @@
-import 'dart:io';
-
 import 'package:camelus/l10n/app_localizations.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -73,7 +72,7 @@ class _OnboardingLoginSelectPageState
                 ),
               ),
               const Spacer(flex: 1),
-              if (Platform.isAndroid)
+              if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android)
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
 

@@ -3,8 +3,8 @@ import 'dart:developer';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../domain_layer/entities/dm_conversation.dart';
-import '../../domain_layer/repositories/direct_message_repository.dart';
+import '../../../domain_layer/entities/dm_conversation.dart';
+import '../../../domain_layer/repositories/direct_message_repository.dart';
 import 'dm_repository_provider.dart';
 
 /// State for the DM conversations list

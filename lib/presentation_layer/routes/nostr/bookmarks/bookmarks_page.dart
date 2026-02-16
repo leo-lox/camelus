@@ -187,6 +187,8 @@ class _BookmarksPageState extends ConsumerState<BookmarksPage>
         ),
         bottom: TabBar(
           controller: _tabController,
+          overlayColor: WidgetStateProperty.all(Colors.transparent),
+          splashFactory: NoSplash.splashFactory,
           tabs: [
             Tab(
               child: Row(

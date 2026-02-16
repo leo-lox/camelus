@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import '../../../domain_layer/entities/nostr_note.dart';
 import '../../../domain_layer/entities/nostr_tag.dart';
 import '../../../helpers/helpers.dart';
+import '../../routing/route_paths.dart';
 import '../../providers/get_notes_provider.dart';
 import '../../providers/metadata_state_provider.dart';
 import 'nostr_parser.dart';
@@ -55,7 +56,7 @@ class NoteCardRepost extends ConsumerWidget {
                 onTap: () {
                   // navigate to the profile of the user who reposted
 
-                  context.push('/nostr/profile/${repostEvent.pubkey}');
+                  context.push(RoutePaths.profile(pubkey: repostEvent.pubkey));
                 },
                 child: RichText(
                   maxLines: 1,

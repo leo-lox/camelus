@@ -1,5 +1,4 @@
 import 'dart:developer';
-import 'dart:io';
 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -11,7 +10,7 @@ import '../../presentation_layer/providers/notification_settings_provider.dart';
 import '../../presentation_layer/providers/notifications_provider.dart';
 import 'notifications_caller.dart';
 import '../../firebase_options.dart';
-import 'background_notifications_thread.dart';
+import 'background_notifications_handler.dart';
 
 Future<void> initializeFirebase({
   bool enable = true,
@@ -21,7 +20,10 @@ Future<void> initializeFirebase({
     return;
   }
   // Check if the current platform is supported by Firebase
-  if (kIsWeb || Platform.isAndroid || Platform.isIOS || Platform.isMacOS) {
+  if (kIsWeb ||
+      defaultTargetPlatform == TargetPlatform.android ||
+      defaultTargetPlatform == TargetPlatform.iOS ||
+      defaultTargetPlatform == TargetPlatform.macOS) {
     // Initialize Firebase only on supported platforms
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
@@ -30,7 +32,9 @@ Future<void> initializeFirebase({
     // Set up Firebase Messaging
     checkForInitialMessage();
 
-    FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+    if (firebaseBackgroundHandler != null) {
+      FirebaseMessaging.onBackgroundMessage(firebaseBackgroundHandler!);
+    }
     FirebaseMessaging.onMessageOpenedApp.listen(
       (data) => firebaseMessagingOpenedApp(data, provider),
     );

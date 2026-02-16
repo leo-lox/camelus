@@ -1,0 +1,54 @@
+import 'package:ndk/shared/nips/nip19/nip19.dart';
+
+class RoutePaths {
+  static String profileIdentifier({required String pubkey, String? nip05}) {
+    final normalizedNip05 = nip05?.trim();
+    if (normalizedNip05 != null &&
+        normalizedNip05.isNotEmpty &&
+        normalizedNip05.contains('@')) {
+      return Uri.encodeComponent(normalizedNip05);
+    }
+
+    return Nip19.encodePubKey(pubkey);
+  }
+
+  static String profile({required String pubkey, String? nip05}) {
+    final identifier = profileIdentifier(pubkey: pubkey, nip05: nip05);
+    return '/profile/$identifier';
+  }
+
+  static String profileEdit({required String pubkey, String? nip05}) {
+    return '${profile(pubkey: pubkey, nip05: nip05)}/edit';
+  }
+
+  static String status({
+    required String pubkey,
+    required String eventId,
+    String? nip05,
+    String? scrollIntoView,
+  }) {
+    return statusByIdentifier(
+      profileIdentifier: profileIdentifier(pubkey: pubkey, nip05: nip05),
+      eventId: eventId,
+      scrollIntoView: scrollIntoView,
+    );
+  }
+
+  static String statusByIdentifier({
+    required String profileIdentifier,
+    required String eventId,
+    String? scrollIntoView,
+  }) {
+    final identifier = Uri.encodeComponent(
+      Uri.decodeComponent(profileIdentifier),
+    );
+
+    final basePath = '/profile/$identifier/status/$eventId';
+    if (scrollIntoView == null || scrollIntoView.isEmpty) {
+      return basePath;
+    }
+
+    final encodedScrollIntoView = Uri.encodeQueryComponent(scrollIntoView);
+    return '$basePath?scrollIntoView=$encodedScrollIntoView';
+  }
+}

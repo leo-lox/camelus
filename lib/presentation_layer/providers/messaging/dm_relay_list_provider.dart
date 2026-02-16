@@ -3,8 +3,8 @@ import 'dart:developer';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ndk/ndk.dart';
 
-import '../../config/nostr_kinds.dart';
-import 'ndk_provider.dart';
+import '../../../config/nostr_kinds.dart';
+import '../ndk_provider.dart';
 
 /// Result of adding a relay
 enum AddRelayResult { success, invalidUrl, alreadyExists }

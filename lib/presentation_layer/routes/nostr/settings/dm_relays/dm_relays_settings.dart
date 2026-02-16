@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
-import '../../../../providers/dm_relay_list_provider.dart';
+import '../../../../providers/messaging/dm_relay_list_provider.dart';
 
 /// Settings page for managing DM relays (kind 10050)
 class DmRelaysSettings extends ConsumerStatefulWidget {

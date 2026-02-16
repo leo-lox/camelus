@@ -1,6 +1,5 @@
-import 'dart:io';
-
 import 'package:camelus/l10n/app_localizations.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -307,9 +306,10 @@ class _OpenStarterPackState extends ConsumerState<OpenStarterPack> {
                       ],
                     ),
                   const SizedBox(width: 16),
-                  if (Platform.isWindows ||
-                      Platform.isLinux ||
-                      Platform.isMacOS)
+                  if (!kIsWeb &&
+                      (defaultTargetPlatform == TargetPlatform.windows ||
+                          defaultTargetPlatform == TargetPlatform.linux ||
+                          defaultTargetPlatform == TargetPlatform.macOS))
                     const SizedBox(width: 154),
                 ],
                 flexibleSpace: FlexibleSpaceBar(
@@ -403,6 +403,8 @@ class _OpenStarterPackState extends ConsumerState<OpenStarterPack> {
                 pinned: true,
                 delegate: _SliverAppBarDelegate(
                   TabBar(
+                    overlayColor: WidgetStateProperty.all(Colors.transparent),
+                    splashFactory: NoSplash.splashFactory,
                     indicatorColor: Theme.of(context).colorScheme.primary,
                     indicatorWeight: 3,
                     labelColor: Theme.of(context).colorScheme.onSurface,

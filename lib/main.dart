@@ -1,9 +1,9 @@
-import 'dart:io';
 import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:go_router/go_router.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:flutter_mentions/flutter_mentions.dart';
@@ -18,7 +18,7 @@ import 'config/camelus_config.dart';
 import 'domain_layer/usecases/app_auth.dart';
 import 'lifecycle/notifications/init_firebase.dart';
 import 'lifecycle/notifications/notifications_caller.dart';
-import 'objectbox_isolate.dart';
+import 'data_layer/db/ndk_cache/ndk_cache_factory.dart';
 import 'presentation_layer/init/init_moderation.dart';
 
 import 'presentation_layer/providers/db_app_provider.dart';
@@ -28,25 +28,41 @@ import 'presentation_layer/providers/language_provider.dart';
 import 'presentation_layer/providers/ndk_provider.dart';
 import 'presentation_layer/providers/signer_provider.dart';
 import 'presentation_layer/providers/theme_provider.dart';
-import 'presentation_layer/providers/dm_conversations_provider.dart';
-import 'routes.dart';
+import 'presentation_layer/providers/messaging/dm_conversations_provider.dart';
+import 'presentation_layer/routing/routes.dart';
 import 'theme.dart' show getThemeVariants;
 
 const devDeviceFrame = true;
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
+bool get _isDesktopPlatform {
+  if (kIsWeb) return false;
+
+  return defaultTargetPlatform == TargetPlatform.windows ||
+      defaultTargetPlatform == TargetPlatform.linux ||
+      defaultTargetPlatform == TargetPlatform.macOS;
+}
+
+Future<CacheManager> _initNdkCacheManager() async {
+  return createNdkCacheManager();
+}
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   //await AppAuth.clearAllAccounts();
 
-  if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+  if (_isDesktopPlatform) {
     await windowManager.ensureInitialized();
     WindowOptions windowOptions = WindowOptions(
       titleBarStyle: TitleBarStyle.hidden,
     );
     windowManager.waitUntilReadyToShow(windowOptions);
+  }
+
+  if (kIsWeb) {
+    usePathUrlStrategy();
   }
 
   final startupAccData = await AppAuth.getStartupAccountData();
@@ -73,7 +89,7 @@ Future<void> main() async {
 
   final appDb = providerContainer.read(dbAppProvider);
 
-  final CacheManager cacheManager = await getDbMainThread();
+  final CacheManager cacheManager = await _initNdkCacheManager();
 
   providerContainer.read(dbNdkProvider.notifier).setDB(cacheManager);
 
@@ -110,7 +126,9 @@ Future<void> main() async {
   final String initalRoute;
 
   if (startupAccData.loginType == LoginType.anon) {
-    if ((Platform.isAndroid || Platform.isIOS)) {
+    if (!kIsWeb &&
+        (defaultTargetPlatform == TargetPlatform.android ||
+            defaultTargetPlatform == TargetPlatform.iOS)) {
       initalRoute = '/onboarding';
     } else {
       initalRoute = '/home';
@@ -136,6 +154,8 @@ Future<void> main() async {
   }
 
   InitModeration.initBloomFilter(provider: providerContainer);
+
+  GoRouter.optionURLReflectsImperativeAPIs = true;
 
   final router = GoRouter(
     navigatorKey: navigatorKey,
@@ -187,7 +207,7 @@ class MyApp extends ConsumerWidget {
       child: MaterialApp.router(
         routerConfig: router,
         scrollBehavior: const MaterialScrollBehavior().copyWith(
-          scrollbars: false,
+          scrollbars: _isDesktopPlatform ? true : false,
           dragDevices: {
             PointerDeviceKind.touch,
             PointerDeviceKind.mouse,
@@ -202,8 +222,10 @@ class MyApp extends ConsumerWidget {
         theme: themeVariants.lightTheme,
         darkTheme: themeVariants.darkTheme,
         themeMode: themeState.mode,
+        showPerformanceOverlay: false,
+
         builder: (context, child) {
-          if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+          if (_isDesktopPlatform) {
             return DragToResizeArea(
               child: Stack(
                 children: [

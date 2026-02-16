@@ -9,6 +9,7 @@ import '../../../domain_layer/entities/nostr_note.dart';
 import '../../../domain_layer/entities/parsed_post.dart';
 import '../../../domain_layer/entities/user_metadata.dart';
 import '../../../domain_layer/usecases/app_auth.dart';
+import '../../routing/route_paths.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../atoms/my_profile_picture.dart';
 import '../../providers/ndk_provider.dart';
@@ -173,7 +174,7 @@ class NoteCard extends ConsumerWidget {
 
   Widget _buildUserImage(BuildContext context) {
     return GestureDetector(
-      onTap: () => context.push('/nostr/profile/${note.pubkey}'),
+      onTap: () => context.push(RoutePaths.profile(pubkey: note.pubkey)),
       child: UserImage(
         imageUrl: myMetadata?.picture,
         pubkey: note.pubkey,

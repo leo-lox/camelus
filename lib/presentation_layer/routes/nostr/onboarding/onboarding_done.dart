@@ -3,7 +3,7 @@ import 'dart:math';
 import 'package:camelus/l10n/app_localizations.dart';
 import 'package:camelus/presentation_layer/components/full_screen_loading.dart';
 import 'package:camelus/presentation_layer/components/responsive_center.dart';
-import 'package:camelus/presentation_layer/providers/dm_conversations_provider.dart';
+import 'package:camelus/presentation_layer/providers/messaging/dm_conversations_provider.dart';
 import 'package:camelus/presentation_layer/providers/ndk_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';

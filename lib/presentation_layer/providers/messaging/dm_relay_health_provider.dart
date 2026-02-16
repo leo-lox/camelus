@@ -5,8 +5,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ndk/entities.dart';
 import 'package:ndk/ndk.dart';
 
-import '../../config/nostr_kinds.dart';
-import 'ndk_provider.dart';
+import '../../../config/nostr_kinds.dart';
+import '../ndk_provider.dart';
 
 /// Health status for DM relay connectivity
 enum DmRelayHealthStatus {

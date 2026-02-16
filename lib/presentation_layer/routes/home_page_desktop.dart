@@ -33,6 +33,8 @@ class HomePageDesktop extends ConsumerWidget {
         child: Column(
           children: [
             TabBar(
+              overlayColor: WidgetStateProperty.all(Colors.transparent),
+              splashFactory: NoSplash.splashFactory,
               indicatorColor: Theme.of(context).colorScheme.primary,
               indicator: UnderlineTabIndicator(
                 borderSide: BorderSide(

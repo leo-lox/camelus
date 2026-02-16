@@ -1,4 +1,5 @@
 import 'package:camelus/helpers/helpers.dart';
+import 'package:camelus/presentation_layer/routing/route_paths.dart';
 import 'package:camelus/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -12,7 +13,7 @@ import '../../../domain_layer/entities/direct_message.dart';
 import '../../atoms/my_profile_picture.dart';
 import '../../components/dm/dm_message_bubble.dart';
 import '../../components/dm/dm_relay_indicator.dart';
-import '../../providers/dm_thread_provider.dart';
+import '../../providers/messaging/dm_thread_provider.dart';
 import '../../providers/metadata_state_provider.dart';
 
 /// Page displaying a single DM conversation thread.
@@ -108,7 +109,7 @@ class _DmThreadPageState extends ConsumerState<DmThreadPage> {
         title: MouseRegion(
           cursor: SystemMouseCursors.click,
           child: GestureDetector(
-            onTap: () => context.push('/nostr/profile/$_peerPubkey'),
+            onTap: () => context.push(RoutePaths.profile(pubkey: _peerPubkey)),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [

@@ -13,6 +13,7 @@ import '../../domain_layer/entities/invite_data.dart';
 import '../../domain_layer/entities/starter_pack_identifier.dart';
 import '../../domain_layer/usecases/app_auth.dart';
 import '../../helpers/helpers.dart';
+import '../routing/route_paths.dart';
 import '../atoms/long_button.dart';
 import '../atoms/spinner_center.dart';
 import '../providers/nip05_provider.dart';
@@ -67,11 +68,16 @@ class _DeeplinkRecieverPageState extends ConsumerState<DeeplinkRecieverPage> {
   }
 
   void _pushProfile({required String pubkey}) {
-    context.go('/nostr/profile/$pubkey');
+    context.go(RoutePaths.profile(pubkey: pubkey));
   }
 
   void _pushNote({required String noteId}) {
-    context.go('/nostr/event', extra: {"root": noteId});
+    context.go(
+      RoutePaths.statusByIdentifier(
+        profileIdentifier: 'unknown',
+        eventId: noteId,
+      ),
+    );
   }
 
   void _navigateToStarterPack(String listName, String pubkey) {
@@ -128,7 +134,7 @@ class _DeeplinkRecieverPageState extends ConsumerState<DeeplinkRecieverPage> {
   }
 
   bool _isUserLink(String path) {
-    return path.startsWith("/user/");
+    return path.startsWith('/user/') || path.startsWith('/profile/');
   }
 
   Future<void> _camelusLinks({
@@ -251,7 +257,12 @@ class _DeeplinkRecieverPageState extends ConsumerState<DeeplinkRecieverPage> {
 
     if (pathSegments.length > 4 && pathSegments[3] == "status") {
       final statusId = pathSegments[4];
-      _pushNote(noteId: statusId);
+      context.go(
+        RoutePaths.statusByIdentifier(
+          profileIdentifier: username,
+          eventId: statusId,
+        ),
+      );
     } else {
       _nostrDecode(nostrCode: username, providerContainer: ref);
     }

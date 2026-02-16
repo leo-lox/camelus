@@ -5,7 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../providers/app_bar_provider/app_bottom_bar_provider.dart';
-import '../../providers/dm_conversations_provider.dart';
+import '../../providers/messaging/dm_conversations_provider.dart';
 
 class AppBottomNavigationBar extends ConsumerWidget {
   const AppBottomNavigationBar({super.key});

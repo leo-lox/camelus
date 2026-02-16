@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:developer' as developer;
+import 'package:camelus/presentation_layer/routing/route_paths.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:ndk/ndk.dart' as ndk;
 
@@ -139,11 +140,11 @@ class Notifications {
         final rootId = nostrNote.getRootReply?.value;
 
         navigatorKey.currentState?.pushNamed(
-          "/nostr/event",
-          arguments: <String, String?>{
-            "root": rootId ?? replyId ?? nostrNote.id,
-            "scrollIntoView": replyId,
-          },
+          RoutePaths.status(
+            pubkey: nostrNote.pubkey,
+            eventId: rootId ?? replyId ?? nostrNote.id,
+            scrollIntoView: replyId,
+          ),
         );
       }
     }

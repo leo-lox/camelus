@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../l10n/app_localizations.dart';
-import '../../providers/dm_relay_health_provider.dart';
+import '../../providers/messaging/dm_relay_health_provider.dart';
 import '../../providers/ndk_provider.dart';
 import '../../providers/relay_dm_test_provider.dart';
 

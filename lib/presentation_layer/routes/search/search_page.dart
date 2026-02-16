@@ -1,9 +1,9 @@
 import 'dart:async';
 
 import 'dart:developer';
-import 'dart:io';
 import 'package:camelus/l10n/app_localizations.dart';
 import 'package:camelus/presentation_layer/components/trends/trending_hashtags_widget.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -109,7 +109,8 @@ class _SearchPageState extends ConsumerState<SearchPage> {
       context.push('/$code');
     } else {
       // 3. Fallback to standard text search
-      context.push('/nostr/search', extra: trimmedValue);
+      final encodedQuery = Uri.encodeQueryComponent(trimmedValue);
+      context.push('/search/feed?q=$encodedQuery');
     }
   }
 
@@ -161,7 +162,10 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                 );
 
                 final isDesktop =
-                    Platform.isLinux || Platform.isMacOS || Platform.isWindows;
+                    !kIsWeb &&
+                    (defaultTargetPlatform == TargetPlatform.linux ||
+                        defaultTargetPlatform == TargetPlatform.macOS ||
+                        defaultTargetPlatform == TargetPlatform.windows);
                 if (!isDesktop) return child;
 
                 return Padding(

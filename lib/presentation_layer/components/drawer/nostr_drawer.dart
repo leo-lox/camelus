@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../domain_layer/entities/user_metadata.dart';
+import '../../routing/route_paths.dart';
 import '../../atoms/my_profile_picture.dart';
 import '../../providers/following_contact_state_provider.dart';
 import '../../providers/metadata_state_provider.dart';
@@ -18,7 +19,7 @@ class NostrDrawer extends ConsumerWidget {
   const NostrDrawer({super.key, required this.pubkey});
 
   void navigateToProfile(BuildContext context) {
-    context.push('/nostr/profile/$pubkey');
+    context.push(RoutePaths.profile(pubkey: pubkey));
   }
 
   Widget _drawerHeader(

@@ -11,7 +11,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../../../domain_layer/entities/stored_account.dart';
 import '../../../atoms/long_button.dart';
 import '../../../components/responsive_center.dart';
-import '../../../providers/dm_conversations_provider.dart';
+import '../../../providers/messaging/dm_conversations_provider.dart';
 import '../../../providers/ndk_provider.dart';
 import '../../../providers/signer_provider.dart';
 

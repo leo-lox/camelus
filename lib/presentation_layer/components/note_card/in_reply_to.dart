@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../domain_layer/entities/nostr_note.dart';
 import '../../../domain_layer/entities/nostr_tag.dart';
 import '../../../helpers/helpers.dart';
+import '../../routing/route_paths.dart';
 import '../../providers/metadata_state_provider.dart';
 
 class InReplyTo extends ConsumerWidget {
@@ -69,7 +70,7 @@ class InReplyTo extends ConsumerWidget {
         ),
         GestureDetector(
           onTap: () {
-            context.push('/nostr/profile/$pubkeyFirst');
+            context.push(RoutePaths.profile(pubkey: pubkeyFirst));
           },
           child: Text(
             '@$valueFirst ',
@@ -83,7 +84,7 @@ class InReplyTo extends ConsumerWidget {
         if (valueSecond.isNotEmpty)
           GestureDetector(
             onTap: () {
-              context.push('/nostr/profile/$pubkeySecond');
+              context.push(RoutePaths.profile(pubkey: pubkeySecond));
             },
             child: Text(
               '@$valueSecond ',
