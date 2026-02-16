@@ -1,0 +1,88 @@
+{
+  "actions": [
+    {
+      "type": "deleteTable",
+      "deleteTable": "otso_external_sync"
+    },
+    {
+      "type": "createTable",
+      "createTable": {
+        "name": "otso_external_sync",
+        "dartName": "OtsoExternalSync",
+        "module": "apipod",
+        "schema": "public",
+        "columns": [
+          {
+            "name": "id",
+            "columnType": 6,
+            "isNullable": false,
+            "columnDefault": "nextval('otso_external_sync_id_seq'::regclass)",
+            "dartType": "int?"
+          },
+          {
+            "name": "itemId",
+            "columnType": 6,
+            "isNullable": false,
+            "dartType": "int"
+          },
+          {
+            "name": "source",
+            "columnType": 0,
+            "isNullable": false,
+            "dartType": "String"
+          },
+          {
+            "name": "syncedAt",
+            "columnType": 4,
+            "isNullable": false,
+            "dartType": "DateTime"
+          }
+        ],
+        "foreignKeys": [],
+        "indexes": [
+          {
+            "indexName": "otso_external_sync_pkey",
+            "elements": [
+              {
+                "type": 0,
+                "definition": "id"
+              }
+            ],
+            "type": "btree",
+            "isUnique": true,
+            "isPrimary": true
+          },
+          {
+            "indexName": "otso_external_sync_unique_idx",
+            "elements": [
+              {
+                "type": 0,
+                "definition": "itemId"
+              },
+              {
+                "type": 0,
+                "definition": "source"
+              }
+            ],
+            "type": "btree",
+            "isUnique": true,
+            "isPrimary": false
+          }
+        ],
+        "managed": true
+      }
+    }
+  ],
+  "warnings": [
+    {
+      "type": "tableDropped",
+      "message": "One or more columns are added to table \"otso_external_sync\" which cannot be added in a table migration. The complete table will be deleted and recreated.",
+      "table": "otso_external_sync",
+      "columns": [
+        "source"
+      ],
+      "destrucive": true
+    }
+  ],
+  "migrationApiVersion": 1
+}

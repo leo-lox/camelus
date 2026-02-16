@@ -25,7 +25,8 @@ import 'package:apipod_client/src/protocol/nostr_band/nostr_band_hashtags.dart'
     as _i9;
 import 'package:apipod_client/src/protocol/nostr_band/nostr_band_people.dart'
     as _i10;
-import 'protocol.dart' as _i11;
+import 'package:ndk/data_layer/models/nip_01_event_model.dart' as _i11;
+import 'protocol.dart' as _i12;
 
 /// {@category Endpoint}
 class EndpointAppUpdate extends _i1.EndpointRef {
@@ -167,6 +168,14 @@ class EndpointNostrBand extends _i1.EndpointRef {
 }
 
 /// {@category Endpoint}
+class EndpointOtsoExternalSync extends _i1.EndpointRef {
+  EndpointOtsoExternalSync(_i1.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'otsoExternalSync';
+}
+
+/// {@category Endpoint}
 class EndpointNostrPush extends _i1.EndpointRef {
   EndpointNostrPush(_i1.EndpointCaller caller) : super(caller);
 
@@ -184,6 +193,21 @@ class EndpointNostrPush extends _i1.EndpointRef {
       'events': events,
     },
   );
+}
+
+/// {@category Endpoint}
+class EndpointOtsoPush extends _i1.EndpointRef {
+  EndpointOtsoPush(_i1.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'otsoPush';
+
+  _i2.Future<bool> register(List<_i11.Nip01EventModel> events) =>
+      caller.callServerEndpoint<bool>(
+        'otsoPush',
+        'register',
+        {'events': events},
+      );
 }
 
 class Client extends _i1.ServerpodClientShared {
@@ -206,7 +230,7 @@ class Client extends _i1.ServerpodClientShared {
     bool? disconnectStreamsOnLostInternetConnection,
   }) : super(
          host,
-         _i11.Protocol(),
+         _i12.Protocol(),
          securityContext: securityContext,
          streamingConnectionTimeout: streamingConnectionTimeout,
          connectionTimeout: connectionTimeout,
@@ -220,7 +244,9 @@ class Client extends _i1.ServerpodClientShared {
     moderation = EndpointModeration(this);
     nip05 = EndpointNip05(this);
     nostrBand = EndpointNostrBand(this);
+    otsoExternalSync = EndpointOtsoExternalSync(this);
     nostrPush = EndpointNostrPush(this);
+    otsoPush = EndpointOtsoPush(this);
   }
 
   late final EndpointAppUpdate appUpdate;
@@ -233,7 +259,11 @@ class Client extends _i1.ServerpodClientShared {
 
   late final EndpointNostrBand nostrBand;
 
+  late final EndpointOtsoExternalSync otsoExternalSync;
+
   late final EndpointNostrPush nostrPush;
+
+  late final EndpointOtsoPush otsoPush;
 
   @override
   Map<String, _i1.EndpointRef> get endpointRefLookup => {
@@ -242,7 +272,9 @@ class Client extends _i1.ServerpodClientShared {
     'moderation': moderation,
     'nip05': nip05,
     'nostrBand': nostrBand,
+    'otsoExternalSync': otsoExternalSync,
     'nostrPush': nostrPush,
+    'otsoPush': otsoPush,
   };
 
   @override

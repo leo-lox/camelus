@@ -27,6 +27,7 @@ import 'package:apipod_server/src/generated/nostr_band/nostr_band_hashtags.dart'
     as _i10;
 import 'package:apipod_server/src/generated/nostr_band/nostr_band_people.dart'
     as _i11;
+import 'package:ndk/data_layer/models/nip_01_event_model.dart' as _i12;
 import 'package:apipod_server/src/generated/protocol.dart';
 import 'package:apipod_server/src/generated/endpoints.dart';
 export 'package:serverpod_test/serverpod_test_public_exports.dart';
@@ -144,7 +145,11 @@ class TestEndpoints {
 
   late final _NostrBandEndpoint nostrBand;
 
+  late final _OtsoExternalSyncEndpoint otsoExternalSync;
+
   late final _NostrPushEndpoint nostrPush;
+
+  late final _OtsoPushEndpoint otsoPush;
 }
 
 class _InternalTestEndpoints extends TestEndpoints
@@ -174,7 +179,15 @@ class _InternalTestEndpoints extends TestEndpoints
       endpoints,
       serializationManager,
     );
+    otsoExternalSync = _OtsoExternalSyncEndpoint(
+      endpoints,
+      serializationManager,
+    );
     nostrPush = _NostrPushEndpoint(
+      endpoints,
+      serializationManager,
+    );
+    otsoPush = _OtsoPushEndpoint(
       endpoints,
       serializationManager,
     );
@@ -561,6 +574,13 @@ class _NostrBandEndpoint {
   }
 }
 
+class _OtsoExternalSyncEndpoint {
+  _OtsoExternalSyncEndpoint(
+    _endpointDispatch,
+    _serializationManager,
+  );
+}
+
 class _NostrPushEndpoint {
   _NostrPushEndpoint(
     this._endpointDispatch,
@@ -591,6 +611,48 @@ class _NostrPushEndpoint {
             'token': token,
             'events': events,
           }),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _i3.Future<bool>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+}
+
+class _OtsoPushEndpoint {
+  _OtsoPushEndpoint(
+    this._endpointDispatch,
+    this._serializationManager,
+  );
+
+  final _i2.EndpointDispatch _endpointDispatch;
+
+  final _i2.SerializationManager _serializationManager;
+
+  _i3.Future<bool> register(
+    _i1.TestSessionBuilder sessionBuilder,
+    List<_i12.Nip01EventModel> events,
+  ) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'otsoPush',
+            method: 'register',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'otsoPush',
+          methodName: 'register',
+          parameters: _i1.testObjectToJson({'events': events}),
           serializationManager: _serializationManager,
         );
         var _localReturnValue =

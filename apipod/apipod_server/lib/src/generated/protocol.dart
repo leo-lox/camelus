@@ -24,11 +24,14 @@ import 'nostr_band/nostr_band_hashtags.dart' as _i11;
 import 'nostr_band/nostr_band_hastag_info.dart' as _i12;
 import 'nostr_band/nostr_band_people.dart' as _i13;
 import 'nostr_band/nostr_band_profiles.dart' as _i14;
-import 'reports_incoming.dart' as _i15;
-import 'short_links/short_link_invite_data.dart' as _i16;
-import 'subscription.dart' as _i17;
-import 'package:ndk/data_layer/models/nip_01_event_model.dart' as _i18;
-import 'package:ndk/domain_layer/entities/nip_01_event.dart' as _i19;
+import 'otso_push/otso_geo_subscriptions.dart' as _i15;
+import 'otso_push/otso_push_data.dart' as _i16;
+import 'otso_sync/otos_external_sync.dart' as _i17;
+import 'reports_incoming.dart' as _i18;
+import 'short_links/short_link_invite_data.dart' as _i19;
+import 'subscription.dart' as _i20;
+import 'package:ndk/data_layer/models/nip_01_event_model.dart' as _i21;
+import 'package:ndk/domain_layer/entities/nip_01_event.dart' as _i22;
 export 'app_update_data.dart';
 export 'bloom_filter_data.dart';
 export 'bloom_filter_events.dart';
@@ -41,6 +44,9 @@ export 'nostr_band/nostr_band_hashtags.dart';
 export 'nostr_band/nostr_band_hastag_info.dart';
 export 'nostr_band/nostr_band_people.dart';
 export 'nostr_band/nostr_band_profiles.dart';
+export 'otso_push/otso_geo_subscriptions.dart';
+export 'otso_push/otso_push_data.dart';
+export 'otso_sync/otos_external_sync.dart';
 export 'reports_incoming.dart';
 export 'short_links/short_link_invite_data.dart';
 export 'subscription.dart';
@@ -311,6 +317,206 @@ class Protocol extends _i1.SerializationManagerServer {
             _i2.IndexElementDefinition(
               type: _i2.IndexElementDefinitionType.column,
               definition: 'domain',
+            ),
+          ],
+          type: 'btree',
+          isUnique: true,
+          isPrimary: false,
+        ),
+      ],
+      managed: true,
+    ),
+    _i2.TableDefinition(
+      name: 'otso_external_sync',
+      dartName: 'OtsoExternalSync',
+      schema: 'public',
+      module: 'apipod',
+      columns: [
+        _i2.ColumnDefinition(
+          name: 'id',
+          columnType: _i2.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int?',
+          columnDefault: 'nextval(\'otso_external_sync_id_seq\'::regclass)',
+        ),
+        _i2.ColumnDefinition(
+          name: 'itemId',
+          columnType: _i2.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int',
+        ),
+        _i2.ColumnDefinition(
+          name: 'source',
+          columnType: _i2.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+        ),
+        _i2.ColumnDefinition(
+          name: 'syncedAt',
+          columnType: _i2.ColumnType.timestampWithoutTimeZone,
+          isNullable: false,
+          dartType: 'DateTime',
+        ),
+      ],
+      foreignKeys: [],
+      indexes: [
+        _i2.IndexDefinition(
+          indexName: 'otso_external_sync_pkey',
+          tableSpace: null,
+          elements: [
+            _i2.IndexElementDefinition(
+              type: _i2.IndexElementDefinitionType.column,
+              definition: 'id',
+            ),
+          ],
+          type: 'btree',
+          isUnique: true,
+          isPrimary: true,
+        ),
+        _i2.IndexDefinition(
+          indexName: 'otso_external_sync_unique_idx',
+          tableSpace: null,
+          elements: [
+            _i2.IndexElementDefinition(
+              type: _i2.IndexElementDefinitionType.column,
+              definition: 'itemId',
+            ),
+            _i2.IndexElementDefinition(
+              type: _i2.IndexElementDefinitionType.column,
+              definition: 'source',
+            ),
+          ],
+          type: 'btree',
+          isUnique: true,
+          isPrimary: false,
+        ),
+      ],
+      managed: true,
+    ),
+    _i2.TableDefinition(
+      name: 'otso_geo_subscriptions',
+      dartName: 'OtsoGeoSubscription',
+      schema: 'public',
+      module: 'apipod',
+      columns: [
+        _i2.ColumnDefinition(
+          name: 'id',
+          columnType: _i2.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int?',
+          columnDefault: 'nextval(\'otso_geo_subscriptions_id_seq\'::regclass)',
+        ),
+        _i2.ColumnDefinition(
+          name: 'pubkey',
+          columnType: _i2.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+        ),
+        _i2.ColumnDefinition(
+          name: 'geohash',
+          columnType: _i2.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+        ),
+      ],
+      foreignKeys: [],
+      indexes: [
+        _i2.IndexDefinition(
+          indexName: 'otso_geo_subscriptions_pkey',
+          tableSpace: null,
+          elements: [
+            _i2.IndexElementDefinition(
+              type: _i2.IndexElementDefinitionType.column,
+              definition: 'id',
+            ),
+          ],
+          type: 'btree',
+          isUnique: true,
+          isPrimary: true,
+        ),
+        _i2.IndexDefinition(
+          indexName: 'otso_geo_subscription_unique_idx',
+          tableSpace: null,
+          elements: [
+            _i2.IndexElementDefinition(
+              type: _i2.IndexElementDefinitionType.column,
+              definition: 'pubkey',
+            ),
+            _i2.IndexElementDefinition(
+              type: _i2.IndexElementDefinitionType.column,
+              definition: 'geohash',
+            ),
+          ],
+          type: 'btree',
+          isUnique: true,
+          isPrimary: false,
+        ),
+      ],
+      managed: true,
+    ),
+    _i2.TableDefinition(
+      name: 'otso_push_subscriptions',
+      dartName: 'OtsoPushSubscription',
+      schema: 'public',
+      module: 'apipod',
+      columns: [
+        _i2.ColumnDefinition(
+          name: 'id',
+          columnType: _i2.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int?',
+          columnDefault:
+              'nextval(\'otso_push_subscriptions_id_seq\'::regclass)',
+        ),
+        _i2.ColumnDefinition(
+          name: 'pubkey',
+          columnType: _i2.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+        ),
+        _i2.ColumnDefinition(
+          name: 'relay',
+          columnType: _i2.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+        ),
+        _i2.ColumnDefinition(
+          name: 'token',
+          columnType: _i2.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+        ),
+      ],
+      foreignKeys: [],
+      indexes: [
+        _i2.IndexDefinition(
+          indexName: 'otso_push_subscriptions_pkey',
+          tableSpace: null,
+          elements: [
+            _i2.IndexElementDefinition(
+              type: _i2.IndexElementDefinitionType.column,
+              definition: 'id',
+            ),
+          ],
+          type: 'btree',
+          isUnique: true,
+          isPrimary: true,
+        ),
+        _i2.IndexDefinition(
+          indexName: 'otso_push_subscription_unique_idx',
+          tableSpace: null,
+          elements: [
+            _i2.IndexElementDefinition(
+              type: _i2.IndexElementDefinitionType.column,
+              definition: 'pubkey',
+            ),
+            _i2.IndexElementDefinition(
+              type: _i2.IndexElementDefinitionType.column,
+              definition: 'relay',
+            ),
+            _i2.IndexElementDefinition(
+              type: _i2.IndexElementDefinitionType.column,
+              definition: 'token',
             ),
           ],
           type: 'btree',
@@ -608,14 +814,23 @@ class Protocol extends _i1.SerializationManagerServer {
     if (t == _i14.NostrBandProfiles) {
       return _i14.NostrBandProfiles.fromJson(data) as T;
     }
-    if (t == _i15.ReportsIncoming) {
-      return _i15.ReportsIncoming.fromJson(data) as T;
+    if (t == _i15.OtsoGeoSubscription) {
+      return _i15.OtsoGeoSubscription.fromJson(data) as T;
     }
-    if (t == _i16.ShortLinkInviteData) {
-      return _i16.ShortLinkInviteData.fromJson(data) as T;
+    if (t == _i16.OtsoPushSubscription) {
+      return _i16.OtsoPushSubscription.fromJson(data) as T;
     }
-    if (t == _i17.PushSubscription) {
-      return _i17.PushSubscription.fromJson(data) as T;
+    if (t == _i17.OtsoExternalSync) {
+      return _i17.OtsoExternalSync.fromJson(data) as T;
+    }
+    if (t == _i18.ReportsIncoming) {
+      return _i18.ReportsIncoming.fromJson(data) as T;
+    }
+    if (t == _i19.ShortLinkInviteData) {
+      return _i19.ShortLinkInviteData.fromJson(data) as T;
+    }
+    if (t == _i20.PushSubscription) {
+      return _i20.PushSubscription.fromJson(data) as T;
     }
     if (t == _i1.getType<_i3.AppUpdateData?>()) {
       return (data != null ? _i3.AppUpdateData.fromJson(data) : null) as T;
@@ -654,15 +869,26 @@ class Protocol extends _i1.SerializationManagerServer {
     if (t == _i1.getType<_i14.NostrBandProfiles?>()) {
       return (data != null ? _i14.NostrBandProfiles.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i15.ReportsIncoming?>()) {
-      return (data != null ? _i15.ReportsIncoming.fromJson(data) : null) as T;
-    }
-    if (t == _i1.getType<_i16.ShortLinkInviteData?>()) {
-      return (data != null ? _i16.ShortLinkInviteData.fromJson(data) : null)
+    if (t == _i1.getType<_i15.OtsoGeoSubscription?>()) {
+      return (data != null ? _i15.OtsoGeoSubscription.fromJson(data) : null)
           as T;
     }
-    if (t == _i1.getType<_i17.PushSubscription?>()) {
-      return (data != null ? _i17.PushSubscription.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i16.OtsoPushSubscription?>()) {
+      return (data != null ? _i16.OtsoPushSubscription.fromJson(data) : null)
+          as T;
+    }
+    if (t == _i1.getType<_i17.OtsoExternalSync?>()) {
+      return (data != null ? _i17.OtsoExternalSync.fromJson(data) : null) as T;
+    }
+    if (t == _i1.getType<_i18.ReportsIncoming?>()) {
+      return (data != null ? _i18.ReportsIncoming.fromJson(data) : null) as T;
+    }
+    if (t == _i1.getType<_i19.ShortLinkInviteData?>()) {
+      return (data != null ? _i19.ShortLinkInviteData.fromJson(data) : null)
+          as T;
+    }
+    if (t == _i1.getType<_i20.PushSubscription?>()) {
+      return (data != null ? _i20.PushSubscription.fromJson(data) : null) as T;
     }
     if (t == List<String>) {
       return (data as List).map((e) => deserialize<String>(e)).toList() as T;
@@ -692,15 +918,21 @@ class Protocol extends _i1.SerializationManagerServer {
               .toList()
           as T;
     }
-    if (t == _i18.Nip01EventModel) {
-      return _i18.Nip01EventModel.fromJson(data) as T;
+    if (t == _i21.Nip01EventModel) {
+      return _i21.Nip01EventModel.fromJson(data) as T;
     }
-    if (t == List<_i19.Nip01Event>) {
-      return (data as List).map((e) => deserialize<_i19.Nip01Event>(e)).toList()
+    if (t == List<_i22.Nip01Event>) {
+      return (data as List).map((e) => deserialize<_i22.Nip01Event>(e)).toList()
           as T;
     }
-    if (t == _i1.getType<_i18.Nip01EventModel?>()) {
-      return (data != null ? _i18.Nip01EventModel.fromJson(data) : null) as T;
+    if (t == List<_i21.Nip01EventModel>) {
+      return (data as List)
+              .map((e) => deserialize<_i21.Nip01EventModel>(e))
+              .toList()
+          as T;
+    }
+    if (t == _i1.getType<_i21.Nip01EventModel?>()) {
+      return (data != null ? _i21.Nip01EventModel.fromJson(data) : null) as T;
     }
     try {
       return _i2.Protocol().deserialize<T>(data, t);
@@ -710,7 +942,7 @@ class Protocol extends _i1.SerializationManagerServer {
 
   static String? getClassNameForType(Type type) {
     return switch (type) {
-      _i18.Nip01EventModel => 'Nip01EventModel',
+      _i21.Nip01EventModel => 'Nip01EventModel',
       _i3.AppUpdateData => 'AppUpdateData',
       _i4.BloomFilterData => 'BloomFilterData',
       _i5.BloomFilterEvent => 'BloomFilterEvent',
@@ -723,9 +955,12 @@ class Protocol extends _i1.SerializationManagerServer {
       _i12.NostrBandHashtagInfo => 'NostrBandHashtagInfo',
       _i13.NostrBandPeople => 'NostrBandPeople',
       _i14.NostrBandProfiles => 'NostrBandProfiles',
-      _i15.ReportsIncoming => 'ReportsIncoming',
-      _i16.ShortLinkInviteData => 'ShortLinkInviteData',
-      _i17.PushSubscription => 'PushSubscription',
+      _i15.OtsoGeoSubscription => 'OtsoGeoSubscription',
+      _i16.OtsoPushSubscription => 'OtsoPushSubscription',
+      _i17.OtsoExternalSync => 'OtsoExternalSync',
+      _i18.ReportsIncoming => 'ReportsIncoming',
+      _i19.ShortLinkInviteData => 'ShortLinkInviteData',
+      _i20.PushSubscription => 'PushSubscription',
       _ => null,
     };
   }
@@ -740,7 +975,7 @@ class Protocol extends _i1.SerializationManagerServer {
     }
 
     switch (data) {
-      case _i18.Nip01EventModel():
+      case _i21.Nip01EventModel():
         return 'Nip01EventModel';
       case _i3.AppUpdateData():
         return 'AppUpdateData';
@@ -766,11 +1001,17 @@ class Protocol extends _i1.SerializationManagerServer {
         return 'NostrBandPeople';
       case _i14.NostrBandProfiles():
         return 'NostrBandProfiles';
-      case _i15.ReportsIncoming():
+      case _i15.OtsoGeoSubscription():
+        return 'OtsoGeoSubscription';
+      case _i16.OtsoPushSubscription():
+        return 'OtsoPushSubscription';
+      case _i17.OtsoExternalSync():
+        return 'OtsoExternalSync';
+      case _i18.ReportsIncoming():
         return 'ReportsIncoming';
-      case _i16.ShortLinkInviteData():
+      case _i19.ShortLinkInviteData():
         return 'ShortLinkInviteData';
-      case _i17.PushSubscription():
+      case _i20.PushSubscription():
         return 'PushSubscription';
     }
     className = _i2.Protocol().getClassNameForObject(data);
@@ -787,7 +1028,7 @@ class Protocol extends _i1.SerializationManagerServer {
       return super.deserializeByClassName(data);
     }
     if (dataClassName == 'Nip01EventModel') {
-      return deserialize<_i18.Nip01EventModel>(data['data']);
+      return deserialize<_i21.Nip01EventModel>(data['data']);
     }
     if (dataClassName == 'AppUpdateData') {
       return deserialize<_i3.AppUpdateData>(data['data']);
@@ -825,14 +1066,23 @@ class Protocol extends _i1.SerializationManagerServer {
     if (dataClassName == 'NostrBandProfiles') {
       return deserialize<_i14.NostrBandProfiles>(data['data']);
     }
+    if (dataClassName == 'OtsoGeoSubscription') {
+      return deserialize<_i15.OtsoGeoSubscription>(data['data']);
+    }
+    if (dataClassName == 'OtsoPushSubscription') {
+      return deserialize<_i16.OtsoPushSubscription>(data['data']);
+    }
+    if (dataClassName == 'OtsoExternalSync') {
+      return deserialize<_i17.OtsoExternalSync>(data['data']);
+    }
     if (dataClassName == 'ReportsIncoming') {
-      return deserialize<_i15.ReportsIncoming>(data['data']);
+      return deserialize<_i18.ReportsIncoming>(data['data']);
     }
     if (dataClassName == 'ShortLinkInviteData') {
-      return deserialize<_i16.ShortLinkInviteData>(data['data']);
+      return deserialize<_i19.ShortLinkInviteData>(data['data']);
     }
     if (dataClassName == 'PushSubscription') {
-      return deserialize<_i17.PushSubscription>(data['data']);
+      return deserialize<_i20.PushSubscription>(data['data']);
     }
     if (dataClassName.startsWith('serverpod.')) {
       data['className'] = dataClassName.substring(10);
@@ -856,12 +1106,18 @@ class Protocol extends _i1.SerializationManagerServer {
         return _i6.BloomFilterProfile.t;
       case _i9.Nip05Data:
         return _i9.Nip05Data.t;
-      case _i15.ReportsIncoming:
-        return _i15.ReportsIncoming.t;
-      case _i16.ShortLinkInviteData:
-        return _i16.ShortLinkInviteData.t;
-      case _i17.PushSubscription:
-        return _i17.PushSubscription.t;
+      case _i15.OtsoGeoSubscription:
+        return _i15.OtsoGeoSubscription.t;
+      case _i16.OtsoPushSubscription:
+        return _i16.OtsoPushSubscription.t;
+      case _i17.OtsoExternalSync:
+        return _i17.OtsoExternalSync.t;
+      case _i18.ReportsIncoming:
+        return _i18.ReportsIncoming.t;
+      case _i19.ShortLinkInviteData:
+        return _i19.ShortLinkInviteData.t;
+      case _i20.PushSubscription:
+        return _i20.PushSubscription.t;
     }
     return null;
   }

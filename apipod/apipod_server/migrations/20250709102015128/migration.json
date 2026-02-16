@@ -1,0 +1,159 @@
+{
+  "actions": [
+    {
+      "type": "createTable",
+      "createTable": {
+        "name": "otso_external_sync",
+        "dartName": "OtsoExternalSync",
+        "module": "apipod",
+        "schema": "public",
+        "columns": [
+          {
+            "name": "id",
+            "columnType": 6,
+            "isNullable": false,
+            "columnDefault": "nextval('otso_external_sync_id_seq'::regclass)",
+            "dartType": "int?"
+          },
+          {
+            "name": "itemId",
+            "columnType": 6,
+            "isNullable": false,
+            "dartType": "int"
+          },
+          {
+            "name": "syncedAt",
+            "columnType": 4,
+            "isNullable": false,
+            "dartType": "DateTime"
+          }
+        ],
+        "foreignKeys": [],
+        "indexes": [
+          {
+            "indexName": "otso_external_sync_pkey",
+            "elements": [
+              {
+                "type": 0,
+                "definition": "id"
+              }
+            ],
+            "type": "btree",
+            "isUnique": true,
+            "isPrimary": true
+          },
+          {
+            "indexName": "otso_external_sync_unique_idx",
+            "elements": [
+              {
+                "type": 0,
+                "definition": "itemId"
+              }
+            ],
+            "type": "btree",
+            "isUnique": true,
+            "isPrimary": false
+          }
+        ],
+        "managed": true
+      }
+    },
+    {
+      "type": "deleteTable",
+      "deleteTable": "push_subscriptions"
+    },
+    {
+      "type": "createTable",
+      "createTable": {
+        "name": "push_subscriptions",
+        "dartName": "PushSubscription",
+        "module": "apipod",
+        "schema": "public",
+        "columns": [
+          {
+            "name": "id",
+            "columnType": 6,
+            "isNullable": false,
+            "columnDefault": "nextval('push_subscriptions_id_seq'::regclass)",
+            "dartType": "int?"
+          },
+          {
+            "name": "pubKey",
+            "columnType": 0,
+            "isNullable": false,
+            "dartType": "String"
+          },
+          {
+            "name": "relay",
+            "columnType": 0,
+            "isNullable": false,
+            "dartType": "String"
+          },
+          {
+            "name": "token",
+            "columnType": 0,
+            "isNullable": false,
+            "dartType": "String"
+          }
+        ],
+        "foreignKeys": [],
+        "indexes": [
+          {
+            "indexName": "push_subscriptions_pkey",
+            "elements": [
+              {
+                "type": 0,
+                "definition": "id"
+              }
+            ],
+            "type": "btree",
+            "isUnique": true,
+            "isPrimary": true
+          },
+          {
+            "indexName": "subscription_unique_idx",
+            "elements": [
+              {
+                "type": 0,
+                "definition": "pubKey"
+              },
+              {
+                "type": 0,
+                "definition": "relay"
+              },
+              {
+                "type": 0,
+                "definition": "token"
+              }
+            ],
+            "type": "btree",
+            "isUnique": true,
+            "isPrimary": false
+          }
+        ],
+        "managed": true
+      }
+    }
+  ],
+  "warnings": [
+    {
+      "type": "columnDropped",
+      "message": "Column \"pubkey\" of table \"push_subscriptions\" will be dropped.",
+      "table": "push_subscriptions",
+      "columns": [
+        "pubkey"
+      ],
+      "destrucive": true
+    },
+    {
+      "type": "tableDropped",
+      "message": "One or more columns are added to table \"push_subscriptions\" which cannot be added in a table migration. The complete table will be deleted and recreated.",
+      "table": "push_subscriptions",
+      "columns": [
+        "pubKey"
+      ],
+      "destrucive": true
+    }
+  ],
+  "migrationApiVersion": 1
+}

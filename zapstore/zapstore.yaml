@@ -4,7 +4,7 @@ camelus:
     name: camelus
     summary: camelus is the truly decentralized social network build on the nostr protocol
     description: camelus the decentralized social network build on the nostr protocol. \nYour data your control!
-    repository: https://github.com/leo-lox/camelus
+    repository: https://github.com/camelus-hq/camelus.git
     license: GPL-3.0
     builder: npub1camelhq7t54m7hkata58sklug2vm83masprf2lx8n0zdykke6vcqxl9339
     artifacts:

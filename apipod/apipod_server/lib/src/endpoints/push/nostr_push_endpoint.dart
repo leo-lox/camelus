@@ -96,7 +96,7 @@ class NostrPushEndpoint extends Endpoint {
   /// creates a new session for the given operation
   Future<T> _withSession<T>(Future<T> Function(Session session) operation,
       {final bool enableLogging = false}) async {
-    if (_pod == null) throw Exception('Pod not initialized');
+    _pod ??= Serverpod.instance;
 
     final session = await _pod!.createSession(
       enableLogging: enableLogging,
@@ -117,7 +117,7 @@ class NostrPushEndpoint extends Endpoint {
     bool newRelays = false;
 
     for (final event in events) {
-      bool veryOk = verifyEvent(event);
+      bool veryOk = await verifyEvent(event);
 
       final tokenTag = event.tags.firstWhere(
         (tag) => tag[0] == 'challenge' && tag.length > 1,
@@ -244,7 +244,9 @@ class NostrPushEndpoint extends Endpoint {
         sealEvent: event,
       );
 
-      final stringifiedWrappedEventToPush = jsonEncode(wrappedEvent);
+      final wrappedEventModel = ndk.Nip01EventModel.fromEntity(wrappedEvent);
+
+      final stringifiedWrappedEventToPush = wrappedEventModel.toJsonString();
 
       // Send to HTTP URLs
       if (tokensAsUrls.isNotEmpty) {
@@ -354,7 +356,11 @@ class NostrPushEndpoint extends Endpoint {
         }
 
         // Create a new relay pool with the fetched relay URLs
-        _relayPool = RelayPool(relays);
+        _relayPool = RelayPool(relays,
+            options: RelayOptions(
+              reconnectFilter: PushConfig.subscriptionFilter,
+              reconnectSubId: PushConfig.subscriptionId,
+            ));
 
         // Set up event handlers using the new stream-based approach
         _relayPool!.onOpen.listen((relay) {
