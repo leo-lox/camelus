@@ -31,7 +31,6 @@ import 'reports_incoming.dart' as _i18;
 import 'short_links/short_link_invite_data.dart' as _i19;
 import 'subscription.dart' as _i20;
 import 'package:ndk/data_layer/models/nip_01_event_model.dart' as _i21;
-import 'package:ndk/domain_layer/entities/nip_01_event.dart' as _i22;
 export 'app_update_data.dart';
 export 'bloom_filter_data.dart';
 export 'bloom_filter_events.dart';
@@ -557,6 +556,12 @@ class Protocol extends _i1.SerializationManagerServer {
           isNullable: false,
           dartType: 'String',
         ),
+        _i2.ColumnDefinition(
+          name: 'kinds',
+          columnType: _i2.ColumnType.json,
+          isNullable: true,
+          dartType: 'List<int>?',
+        ),
       ],
       foreignKeys: [],
       indexes: [
@@ -921,14 +926,25 @@ class Protocol extends _i1.SerializationManagerServer {
     if (t == _i21.Nip01EventModel) {
       return _i21.Nip01EventModel.fromJson(data) as T;
     }
-    if (t == List<_i22.Nip01Event>) {
-      return (data as List).map((e) => deserialize<_i22.Nip01Event>(e)).toList()
+    if (t == List<int>) {
+      return (data as List).map((e) => deserialize<int>(e)).toList() as T;
+    }
+    if (t == _i1.getType<List<int>?>()) {
+      return (data != null
+              ? (data as List).map((e) => deserialize<int>(e)).toList()
+              : null)
           as T;
     }
     if (t == List<_i21.Nip01EventModel>) {
       return (data as List)
               .map((e) => deserialize<_i21.Nip01EventModel>(e))
               .toList()
+          as T;
+    }
+    if (t == Map<String, dynamic>) {
+      return (data as Map).map(
+            (k, v) => MapEntry(deserialize<String>(k), deserialize<dynamic>(v)),
+          )
           as T;
     }
     if (t == _i1.getType<_i21.Nip01EventModel?>()) {

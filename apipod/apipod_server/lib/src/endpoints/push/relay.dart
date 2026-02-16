@@ -3,8 +3,6 @@ import 'dart:convert';
 import 'package:ndk/ndk.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
-import '../../config/push_config.dart';
-
 /// Represents a Nostr relay connection
 class Relay {
   /// The WebSocket URL of the relay

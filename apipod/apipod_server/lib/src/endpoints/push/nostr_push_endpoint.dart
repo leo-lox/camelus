@@ -83,6 +83,8 @@ class NostrPushEndpoint extends Endpoint {
 
     final session = await pod.createSession();
     try {
+      // Migrate existing subscriptions to include kinds
+      await migrateExistingSubscriptions(session);
       await _restartRelayPool();
     } finally {
       await session.close(); // Always close sessions
@@ -111,12 +113,14 @@ class NostrPushEndpoint extends Endpoint {
   Future<bool> register(
     Session session,
     String token,
-    List<ndk.Nip01Event> events,
+    List<ndk.Nip01EventModel> events,
   ) async {
     List<Map<String, dynamic>> processed = [];
     bool newRelays = false;
 
-    for (final event in events) {
+    for (final eventModel in events) {
+      // Convert model to entity for signature verification
+      final event = eventModel;
       bool veryOk = await verifyEvent(event);
 
       final tokenTag = event.tags.firstWhere(
@@ -133,18 +137,60 @@ class NostrPushEndpoint extends Endpoint {
           .toSet() // Remove duplicates
           .toList();
 
+      // Extract kinds from event tags
+      final kindsTags = event.tags
+          .where((tag) => tag[0] == 'kind' && tag.length > 1)
+          .map((tag) => int.tryParse(tag[1]))
+          .whereType<int>()
+          .toList();
+
+      // Filter kinds to available ones
+      final validKinds = kindsTags
+          .where((kind) => PushConfig.availableKinds.contains(kind))
+          .toList();
+
+      // If no kinds specified, default to all available kinds
+      final kindsToRegister =
+          validKinds.isEmpty ? PushConfig.availableKinds : validKinds;
+
       final int endIndex = min(relayTags.length, maxRelaysRegistration);
       final relayTagsShort = relayTags.sublist(0, endIndex);
 
       if (veryOk && relayTags.isNotEmpty) {
         newRelays = await checkIfThereIsANewRelay(session, relayTagsShort);
 
-        // Register in database
+        // Register in database with kinds
         for (final relayUrl in relayTagsShort) {
-          await PushSubscription.db.insertRow(
+          try {
+            // Check if subscription already exists
+            final existing = await PushSubscription.db.find(
               session,
-              PushSubscription(
-                  pubKey: event.pubKey, relay: relayUrl, token: tokenTag[1]));
+              where: (t) =>
+                  t.pubKey.equals(event.pubKey) &
+                  t.relay.equals(relayUrl) &
+                  t.token.equals(tokenTag[1]),
+            );
+
+            if (existing.isEmpty) {
+              await PushSubscription.db.insertRow(
+                session,
+                PushSubscription(
+                  pubKey: event.pubKey,
+                  relay: relayUrl,
+                  token: tokenTag[1],
+                  kinds: kindsToRegister,
+                ),
+              );
+            } else {
+              // Update existing subscription with new kinds
+              await PushSubscription.db.updateRow(
+                session,
+                existing.first.copyWith(kinds: kindsToRegister),
+              );
+            }
+          } catch (e) {
+            session.log('Error registering subscription: $e');
+          }
         }
       } else {
         session
@@ -155,7 +201,8 @@ class NostrPushEndpoint extends Endpoint {
         'pubkey': event.pubKey,
         'added': veryOk && relayTagsShort.isNotEmpty
       });
-      session.log('pubkey added: ${event.pubKey}, $tokenTag, $relayTagsShort');
+      session.log(
+          'pubkey added: ${event.pubKey}, $tokenTag, $relayTagsShort, kinds: $kindsToRegister');
     }
 
     if (newRelays) {
@@ -195,6 +242,67 @@ class NostrPushEndpoint extends Endpoint {
         isValidUrl(url);
   }
 
+  /// Get the registration state for a public key with signature verification
+  /// The event must be signed by the pubKey and contain the pubKey to verify
+  Future<Map<String, dynamic>> getRegistrationState(
+    Session session,
+    String signedEventJson,
+  ) async {
+    try {
+      // Parse the signed event
+      final eventMap = jsonDecode(signedEventJson) as Map<String, dynamic>;
+      final eventModel = ndk.Nip01EventModel.fromJson(eventMap);
+
+      // Convert model to entity for signature verification
+      final event = eventModel;
+
+      // Verify the event signature
+      bool veryOk = await verifyEvent(event);
+      if (!veryOk) {
+        return {
+          'success': false,
+          'error': 'Invalid signature',
+        };
+      }
+
+      // Get subscription data for this pubKey
+      final subscriptions =
+          await getSubscriptionsByPubKey(session, event.pubKey);
+
+      if (subscriptions.isEmpty) {
+        return {
+          'success': true,
+          'pubKey': event.pubKey,
+          'subscriptions': [],
+        };
+      }
+
+      // Format response
+      final formattedSubscriptions = subscriptions.entries
+          .map((entry) => {
+                'relay': entry.key,
+                'kinds': entry.value,
+              })
+          .toList();
+
+      return {
+        'success': true,
+        'pubKey': event.pubKey,
+        'subscriptions': formattedSubscriptions,
+        'availableKinds': PushConfig.availableKinds,
+      };
+    } catch (e) {
+      session.log(
+        level: LogLevel.error,
+        'Error getting registration state: $e',
+      );
+      return {
+        'success': false,
+        'error': 'Invalid request: $e',
+      };
+    }
+  }
+
   bool isValidHttpUrl(String urlString) {
     try {
       final uri = Uri.parse(urlString);
@@ -221,6 +329,17 @@ class NostrPushEndpoint extends Endpoint {
 
       if (event.pTags.length > PushConfig.maxPubkeyPerEvent) {
         // hellthread prevention
+        return;
+      }
+
+      // Get the subscribed kinds for this user and relay
+      final subscribedKinds =
+          await getKindsByPubKeyAndRelay(session, pubkeyTag[1], relay.url);
+
+      // Check if the event kind is in the user's subscribed kinds
+      if (!subscribedKinds.contains(event.kind)) {
+        session.log(
+            'Event kind ${event.kind} not in subscribed kinds $subscribedKinds for ${pubkeyTag[1]}');
         return;
       }
 

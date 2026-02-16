@@ -594,7 +594,7 @@ class _NostrPushEndpoint {
   _i3.Future<bool> register(
     _i1.TestSessionBuilder sessionBuilder,
     String token,
-    List<_i7.Nip01Event> events,
+    List<_i12.Nip01EventModel> events,
   ) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
@@ -619,6 +619,39 @@ class _NostrPushEndpoint {
                   _localCallContext.arguments,
                 )
                 as _i3.Future<bool>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _i3.Future<Map<String, dynamic>> getRegistrationState(
+    _i1.TestSessionBuilder sessionBuilder,
+    String signedEventJson,
+  ) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'nostrPush',
+            method: 'getRegistrationState',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'nostrPush',
+          methodName: 'getRegistrationState',
+          parameters: _i1.testObjectToJson({
+            'signedEventJson': signedEventJson,
+          }),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _i3.Future<Map<String, dynamic>>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
