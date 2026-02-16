@@ -313,4 +313,10 @@ const List<_NotificationKindOption> _kindOptions = [
     label: 'File Message',
     description: 'Private Direct Messages',
   ),
+  _NotificationKindOption(
+    kind: 1059,
+    label: 'Gift Wrap',
+    description:
+        'Used for encrypted events that require unwrapping (e.g. group chats, sealed messages, etc.)',
+  ),
 ];

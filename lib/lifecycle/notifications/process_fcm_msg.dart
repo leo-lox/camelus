@@ -153,8 +153,10 @@ Future<void> processFcmData({
 
     /// is gift wrap
   } else if (unwrappedEvent.kind == 1059) {
+    final eventJson = jsonDecode(unwrappedEvent.content);
+    final wrappedEventLevel2 = Nip01EventModel.fromJson(eventJson);
     final unwrappedEventLevel2 = await ndk.giftWrap.unwrapEvent(
-      wrappedEvent: encryptedWrapEvent,
+      wrappedEvent: wrappedEventLevel2,
     );
 
     /// is Chat message (rumor, unsigned)
