@@ -106,6 +106,19 @@ class Notifications {
     );
   }
 
+  Future<void> displayGenericNotification({
+    required String title,
+    required String body,
+    String? payload,
+  }) {
+    return _notificationsRepo.displayGenericNotification(
+      id: _getNotificationId(),
+      title: title,
+      body: body,
+      payload: payload,
+    );
+  }
+
   /// called on foreground or paused
   void onNotificationTap(NotificationResponse notiResponse) {
     developer.log("onNotificationTapUsecase ${notiResponse.payload}");

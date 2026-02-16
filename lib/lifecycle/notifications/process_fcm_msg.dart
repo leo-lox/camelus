@@ -49,8 +49,9 @@ Future<void> processFcmData({
         .firstOrNull;
 
     final payload = {
-      "note": jsonEncode(Nip01EventModel.fromEntity(unwrappedEvent).toJson()),
+      "event": jsonEncode(Nip01EventModel.fromEntity(unwrappedEvent).toJson()),
       "likleyDirectReply": likleyDirectReply,
+      "route": "/profile/${unwrappedEvent.pubKey}/status/$threadId",
     };
 
     /// display notification
@@ -67,6 +68,139 @@ Future<void> processFcmData({
       payload: jsonEncode(payload),
       type: likleyDirectReply ? "new reply" : "new mention (thread)",
       threadIdentifier: threadId,
+    );
+
+    /// Repost => 6 or
+  } else if (unwrappedEvent.kind == 6) {
+    final metadata = await provider
+        .read(metadataProvider)
+        .getMetadataByPubkey(unwrappedEvent.pubKey)
+        .first;
+
+    final repostedNoteJson = jsonDecode(unwrappedEvent.content);
+
+    final Nip01EventModel repostedNote = Nip01EventModel.fromJson(
+      repostedNoteJson,
+    );
+
+    await notiProvider.displayLocalAvatarNotification(
+      title:
+          metadata.name ??
+          metadata.nip05 ??
+          "${metadata.pubkey.substring(0, 15)}...",
+      body:
+          "reposted your note: ${repostedNote.content.length < 280 ? repostedNote.content : "${repostedNote.content.substring(0, 280)}..."}",
+      avatarUrl: metadata.picture ?? "${Dicebear.baseUrlPng}${metadata.pubkey}",
+      pubkey: unwrappedEvent.pubKey,
+      payload: jsonEncode({
+        "event": jsonEncode(
+          Nip01EventModel.fromEntity(unwrappedEvent).toJson(),
+        ),
+        "route": "/notifications",
+      }),
+      type: "repost",
+    );
+
+    /// 7=> Reaction
+  } else if (unwrappedEvent.kind == 7) {
+    final metadata = await provider
+        .read(metadataProvider)
+        .getMetadataByPubkey(unwrappedEvent.pubKey)
+        .first;
+
+    /// convert + and - to like or dislike otherwise just show the content as is (e.g. for custom emojis)
+    final content = unwrappedEvent.content;
+
+    final idOfOriginEvent = unwrappedEvent.getEId();
+
+    if (idOfOriginEvent == null) {
+      return;
+    }
+    final query = ndk.requests.query(
+      filter: Filter(eTags: [idOfOriginEvent]),
+      timeout: Duration(seconds: 5),
+    );
+
+    final originEvent = (await query.future).first;
+
+    final reaction = content == "+"
+        ? "liked"
+        : content == "-"
+        ? "disliked"
+        : content;
+
+    await notiProvider.displayLocalAvatarNotification(
+      title:
+          " ${metadata.name ?? metadata.nip05 ?? "${metadata.pubkey.substring(0, 15)}..."} $reaction your note",
+      body: originEvent.content.length < 280
+          ? originEvent.content
+          : "${originEvent.content.substring(0, 280)}...",
+      avatarUrl: metadata.picture ?? "${Dicebear.baseUrlPng}${metadata.pubkey}",
+      pubkey: unwrappedEvent.pubKey,
+      payload: jsonEncode({
+        "event": jsonEncode(
+          Nip01EventModel.fromEntity(unwrappedEvent).toJson(),
+        ),
+        "route": "/notifications",
+      }),
+      type: "reaction",
+    );
+
+    /// is gift wrap
+  } else if (unwrappedEvent.kind == 1059) {
+    final unwrappedEventLevel2 = await ndk.giftWrap.unwrapEvent(
+      wrappedEvent: encryptedWrapEvent,
+    );
+
+    /// is Chat message (rumor, unsigned)
+    if (unwrappedEventLevel2.kind == 14) {
+      final metadata = await provider
+          .read(metadataProvider)
+          .getMetadataByPubkey(unwrappedEvent.pubKey)
+          .first;
+
+      await notiProvider.displayLocalAvatarNotification(
+        title:
+            metadata.name ??
+            metadata.nip05 ??
+            "${metadata.pubkey.substring(0, 15)}...",
+        body: unwrappedEvent.content.length < 280
+            ? unwrappedEvent.content
+            : "${unwrappedEvent.content.substring(0, 280)}...",
+        avatarUrl:
+            metadata.picture ?? "${Dicebear.baseUrlPng}${metadata.pubkey}",
+        pubkey: unwrappedEvent.pubKey,
+        payload: jsonEncode({
+          "event": jsonEncode(
+            Nip01EventModel.fromEntity(unwrappedEvent).toJson(),
+          ),
+          "route": "/messages/${unwrappedEvent.pubKey}",
+        }),
+        type: "chat_message",
+      );
+    } else {
+      await notiProvider.displayGenericNotification(
+        title:
+            "recieved a gift wrapped event of kind ${unwrappedEventLevel2.kind}",
+        body: unwrappedEventLevel2.content,
+        payload: jsonEncode({
+          "event": jsonEncode(
+            Nip01EventModel.fromEntity(unwrappedEvent).toJson(),
+          ),
+          "route": "/",
+        }),
+      );
+    }
+  } else {
+    await notiProvider.displayGenericNotification(
+      title: "New event of kind ${unwrappedEvent.kind}",
+      body: unwrappedEvent.content,
+      payload: jsonEncode({
+        "event": jsonEncode(
+          Nip01EventModel.fromEntity(unwrappedEvent).toJson(),
+        ),
+        "route": "/",
+      }),
     );
   }
 }
