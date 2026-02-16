@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_list_view/flutter_list_view.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../config/feeds_config.dart';
@@ -96,7 +95,10 @@ class _GenericFeedState extends ConsumerState<GenericFeed>
           onRefresh: () async {
             await Future.delayed(Duration.zero);
           },
-          child: ScrollablePostsList(feedFilter: widget.feedFilter),
+          child: ScrollablePostsList(
+            feedFilter: widget.feedFilter,
+            scrollController: _scrollController,
+          ),
         ),
 
         if (widget.feedFilter.showRootNotesOnly &&
@@ -136,8 +138,13 @@ class _GenericFeedState extends ConsumerState<GenericFeed>
 // Widget for rendering a scrollable list of posts
 class ScrollablePostsList extends ConsumerWidget {
   final FeedFilter feedFilter;
+  final ScrollController scrollController;
 
-  const ScrollablePostsList({super.key, required this.feedFilter});
+  const ScrollablePostsList({
+    super.key,
+    required this.feedFilter,
+    required this.scrollController,
+  });
 
   @override
   Widget build(BuildContext context, ref) {
@@ -151,8 +158,17 @@ class ScrollablePostsList extends ConsumerWidget {
         ? genericFeedStateP.timelineRootNotes
         : genericFeedStateP.timelineRootAndReplyNotes;
 
-    return FlutterListView(
-      delegate: FlutterListViewDelegate((BuildContext context, int index) {
+    return ListView.builder(
+      key: PageStorageKey<String>(
+        'feed_${feedFilter.hashCode}_${feedFilter.showRootNotesOnly}',
+      ),
+      controller: scrollController,
+      cacheExtent: 600,
+      physics: const AlwaysScrollableScrollPhysics(
+        parent: BouncingScrollPhysics(),
+      ),
+      itemCount: timelineNotes.length + 1,
+      itemBuilder: (BuildContext context, int index) {
         if (index == timelineNotes.length) {
           if (genericFeedStateP.endOfRootNotes) {
             return NoMoreNotes();
@@ -173,7 +189,7 @@ class ScrollablePostsList extends ConsumerWidget {
           );
         }
         return Container();
-      }, childCount: timelineNotes.length + 1),
+      },
     );
   }
 }

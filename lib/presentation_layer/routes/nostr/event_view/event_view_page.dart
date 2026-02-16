@@ -1,5 +1,7 @@
 import 'dart:async';
+import 'dart:ui';
 import 'package:camelus/l10n/app_localizations.dart';
+import 'package:camelus/presentation_layer/atoms/my_profile_picture.dart';
 import 'package:camelus/presentation_layer/components/note_card/note_card_container.dart';
 import 'package:camelus/presentation_layer/components/note_card/skeleton_note.dart';
 import 'package:flutter/material.dart';
@@ -182,9 +184,33 @@ class EventViewPageState extends ConsumerState<EventViewPage> {
     _flattenedComments = _flattenCommentTree(eventFeedState.comments);
 
     return Scaffold(
-      appBar: AppBar(title: Text(AppLocalizations.of(context)!.thread)),
+      appBar: AppBar(
+        title: Row(
+          children: [
+            Text(AppLocalizations.of(context)!.thread),
+            SizedBox(width: 6),
+          ],
+        ),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        scrolledUnderElevation: 0,
+        surfaceTintColor: Colors.transparent,
+        // flexibleSpace: ClipRect(
+        //   child: BackdropFilter(
+        //     filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+        //     child: Container(
+        //       color: Theme.of(context).colorScheme.surface.withOpacity(0.45),
+        //     ),
+        //   ),
+        // ),
+      ),
       body: FlutterListView(
+        key: PageStorageKey<String>('feed_events${eventFeedState.hashCode}'),
         controller: eventViewController,
+        cacheExtent: 600,
+        physics: const AlwaysScrollableScrollPhysics(
+          parent: BouncingScrollPhysics(),
+        ),
         delegate: FlutterListViewDelegate(
           childCount: _flattenedComments.length + 1, // +1 for root note
           keepPosition: true,
