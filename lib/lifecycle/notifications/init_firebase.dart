@@ -7,6 +7,7 @@ import 'package:flutter/foundation.dart';
 import 'package:riverpod/riverpod.dart';
 
 import '../../presentation_layer/providers/db_app_provider.dart';
+import '../../presentation_layer/providers/notification_settings_provider.dart';
 import '../../presentation_layer/providers/notifications_provider.dart';
 import 'notifications_caller.dart';
 import '../../firebase_options.dart';
@@ -43,7 +44,9 @@ Future<void> initializeFirebase({
       final notiProvider = await provider.read(notificationsProvider.future);
       final appDb = provider.read(dbAppProvider);
       await appDb.save(key: "fcm_token", value: newToken);
-      await notiProvider.registerDevice(token: newToken);
+      final storedKinds = await appDb.read('push_kinds');
+      final kinds = NotificationSettingsNotifier.parseKinds(storedKinds);
+      await notiProvider.registerDevice(token: newToken, kinds: kinds);
     });
   } else {
     log('Firebase not initialized: unsupported platform');

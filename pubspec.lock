@@ -1120,10 +1120,10 @@ packages:
     dependency: "direct main"
     description:
       name: ndk
-      sha256: "48373f964eb0a1c69c4daa4c80422465df6985af4738b4b3a268b806a2a43932"
+      sha256: c366e3906d23633024ac842c37dcf510f150e128e0514d8f9e333ef3f7fe8764
       url: "https://pub.dev"
     source: hosted
-    version: "0.7.1-dev.1"
+    version: "0.7.1-dev.12"
   ndk_amber:
     dependency: "direct main"
     description:
@@ -1136,10 +1136,10 @@ packages:
     dependency: "direct main"
     description:
       name: ndk_objectbox
-      sha256: "5008b189c2e54cd352d741c6f7e0a6596023b077486e6ff84693cf7710b00a68"
+      sha256: "2bfe79e8aaa10f1f51c556c147c9976a3366aae2c610c172fe924cae27dd7005"
       url: "https://pub.dev"
     source: hosted
-    version: "0.2.8-dev.1"
+    version: "0.2.8-dev.12"
   ndk_rust_verifier:
     dependency: "direct main"
     description:
@@ -1488,26 +1488,26 @@ packages:
     dependency: transitive
     description:
       name: serverpod_client
-      sha256: "4add5cba3fd6f13d05f12928bff09752efc9096e83d0a8c7d67b4f036634f2b1"
+      sha256: e936d6fa951f548cf2a16f75a526d645162c3b88437ff57550fb596835266a00
       url: "https://pub.dev"
     source: hosted
-    version: "3.2.3"
+    version: "3.3.1"
   serverpod_flutter:
     dependency: "direct main"
     description:
       name: serverpod_flutter
-      sha256: "7d63b5b2b648bb03d3a49687d2dbcc1713bb4245cb832dc334d984c7d7e54e02"
+      sha256: "563e5e7935c530456f27668b00bac04fc94f27786fd49f1a83372b8ebab77b6a"
       url: "https://pub.dev"
     source: hosted
-    version: "3.2.3"
+    version: "3.3.1"
   serverpod_serialization:
     dependency: transitive
     description:
       name: serverpod_serialization
-      sha256: "69d0b721c4b7d50b53861681e1c7d385a3def0be9a52e89fd3bd0c704fce0d37"
+      sha256: b1422d3e99a26e8c5fc9cf09785cb2f6c10713cb08d46b2b86dd7054e9e7decd
       url: "https://pub.dev"
     source: hosted
-    version: "3.2.3"
+    version: "3.3.1"
   share_plus:
     dependency: "direct main"
     description:

@@ -15,7 +15,7 @@ import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
-import '../components/enable_notifications.dart';
+import '../providers/notification_settings_provider.dart';
 import '../components/note_card/no_more_notes.dart';
 import '../components/note_card/nostr_parser.dart';
 import '../providers/ndk_provider.dart';
@@ -97,6 +97,8 @@ class _NotificationPageState extends ConsumerState<NotificationPage>
         .where((notification) => notification.type == NotificationType.mention)
         .toList();
 
+    final notificationSettings = ref.watch(notificationSettingsProvider);
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -127,7 +129,43 @@ class _NotificationPageState extends ConsumerState<NotificationPage>
       body: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          PushNotificationToggle(),
+          if (notificationSettings.platformSupported &&
+              !notificationSettings.notificationsEnabled)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  ElevatedButton(
+                    onPressed: notificationSettings.isLoading
+                        ? null
+                        : () => ref
+                              .read(notificationSettingsProvider.notifier)
+                              .requestPermission(),
+                    child: Text(
+                      AppLocalizations.of(
+                        context,
+                      )!.enableNotificationsForReplies,
+                    ),
+                  ),
+                  if (notificationSettings.permissionRequested &&
+                      notificationSettings.notificationsDenied)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 8),
+                      child: Text(
+                        AppLocalizations.of(
+                          context,
+                        )!.notificationsDeniedInSettings,
+                        style: TextStyle(
+                          color: Colors.orangeAccent,
+                          fontSize: 12,
+                          fontStyle: FontStyle.italic,
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            ),
           TabBar(
             controller: _tabController,
             labelColor: Theme.of(context).colorScheme.onSurface,

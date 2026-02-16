@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:ndk/entities.dart';
 import 'package:ndk/ndk.dart' as ndk;
 
 import '../../../domain_layer/entities/nostr_note.dart';
@@ -34,8 +35,9 @@ class NotificationsRepositoryImpl implements NotificationsRepository {
       throw Exception("cannot register device without signer");
     }
 
-    await eventSigner!.sign(ndkEvent);
-    return serverpodDs.client.nostrPush.register(token, [ndkEvent]);
+    final signedEvent = await eventSigner!.sign(ndkEvent);
+    final signedEventModel = Nip01EventModel.fromEntity(signedEvent);
+    return serverpodDs.client.nostrPush.register(token, [signedEventModel]);
   }
 
   @override

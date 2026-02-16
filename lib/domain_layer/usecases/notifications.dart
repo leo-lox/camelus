@@ -24,7 +24,7 @@ class Notifications {
        _eventSigner = eventSigner,
        _inboxOutbox = inboxOutbox;
 
-  Future<bool> registerDevice({required String token}) async {
+  Future<bool> registerDevice({required String token, List<int>? kinds}) async {
     if (_eventSigner == null) {
       throw Exception("cannot register device without signer");
     }
@@ -47,6 +47,10 @@ class Notifications {
           .toList();
     }
 
+    final kindTags = (kinds ?? [])
+        .map((kind) => NostrTag(type: "kind", value: kind.toString()))
+        .toList();
+
     final registrationNote = NostrNote(
       id: "",
       pubkey: myPubkey,
@@ -59,6 +63,7 @@ class Notifications {
         ...readRelays.map((relayUrl) {
           return NostrTag(type: "relay", value: relayUrl);
         }),
+        ...kindTags,
 
         //NostrTag(type: "relay", value: "ws://localhost:10547")
       ],

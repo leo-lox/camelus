@@ -81,6 +81,12 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
             },
           ),
           ListTile(
+            title: Text(AppLocalizations.of(context)!.pushNotifications),
+            onTap: () {
+              context.push('/settings/notifications');
+            },
+          ),
+          ListTile(
             title: Text(AppLocalizations.of(context)!.logout),
             onTap: () {
               _logout();

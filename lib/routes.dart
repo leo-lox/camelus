@@ -34,6 +34,7 @@ import 'presentation_layer/routes/nostr/settings/locale/locale_settings.dart';
 import 'presentation_layer/routes/nostr/settings/moderation/moderation_settings.dart';
 import 'presentation_layer/routes/nostr/settings/settings_page.dart';
 import 'presentation_layer/routes/nostr/settings/dm_relays/dm_relays_settings.dart';
+import 'presentation_layer/routes/nostr/settings/notifications/notifications_settings.dart';
 import 'presentation_layer/routes/messages/dm_list_page.dart';
 import 'presentation_layer/routes/messages/dm_thread_page.dart';
 import 'presentation_layer/routes/messages/new_dm_page.dart';
@@ -140,6 +141,10 @@ final routes = [
               GoRoute(
                 path: 'dm-relays',
                 builder: (context, state) => const DmRelaysSettings(),
+              ),
+              GoRoute(
+                path: 'notifications',
+                builder: (context, state) => const NotificationsSettingsPage(),
               ),
             ],
           ),
