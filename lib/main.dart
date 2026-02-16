@@ -207,7 +207,7 @@ class MyApp extends ConsumerWidget {
       child: MaterialApp.router(
         routerConfig: router,
         scrollBehavior: const MaterialScrollBehavior().copyWith(
-          scrollbars: false,
+          scrollbars: _isDesktopPlatform ? true : false,
           dragDevices: {
             PointerDeviceKind.touch,
             PointerDeviceKind.mouse,
@@ -222,6 +222,8 @@ class MyApp extends ConsumerWidget {
         theme: themeVariants.lightTheme,
         darkTheme: themeVariants.darkTheme,
         themeMode: themeState.mode,
+        showPerformanceOverlay: false,
+
         builder: (context, child) {
           if (_isDesktopPlatform) {
             return DragToResizeArea(

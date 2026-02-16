@@ -31,10 +31,64 @@ class HomePageMobile extends ConsumerStatefulWidget {
 
 class _HomePageMobileState extends ConsumerState<HomePageMobile>
     with AutomaticKeepAliveClientMixin {
+  static const double _tabBarHeight = 40;
+
+  // static const double _floatingHeaderHeight = kToolbarHeight + _tabBarHeight;
+
+  double _floatingHeaderHeight(BuildContext context) {
+    return MediaQuery.of(context).padding.top + kToolbarHeight + _tabBarHeight;
+  }
+
   @override
   bool get wantKeepAlive => true;
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
+  // Header animation state
+  double _headerTopOffset = 0.0;
+  double _lastScrollOffset = 0.0;
+
+  ScrollController? _postsScrollController;
+  ScrollController? _repliesScrollController;
+
+  void _onScrollUpdate(ScrollController scrollController) {
+    if (!scrollController.hasClients) return;
+
+    final offset = scrollController.offset;
+    final delta = offset - _lastScrollOffset;
+    _lastScrollOffset = offset;
+
+    // Calculate new header position
+    double newTop = _headerTopOffset - delta;
+
+    // Clamp between fully hidden and fully visible
+    newTop = newTop.clamp(-_floatingHeaderHeight(context), 0.0);
+
+    // If near top, snap to visible
+    if (offset < 50) {
+      newTop = 0.0;
+    }
+
+    if (_headerTopOffset != newTop) {
+      setState(() => _headerTopOffset = newTop);
+    }
+  }
+
+  void _setupScrollListener(ScrollController controller) {
+    controller.removeListener(_onScrollUpdateWrapper);
+    controller.addListener(_onScrollUpdateWrapper);
+  }
+
+  void _onScrollUpdateWrapper() {
+    // Find which controller is currently active
+    final controller = _postsScrollController?.hasClients == true
+        ? _postsScrollController
+        : _repliesScrollController;
+
+    if (controller != null) {
+      _onScrollUpdate(controller);
+    }
+  }
 
   void _show(BuildContext context) {
     showModalBottomSheet(
@@ -52,6 +106,13 @@ class _HomePageMobileState extends ConsumerState<HomePageMobile>
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _postsScrollController?.removeListener(_onScrollUpdateWrapper);
+    _repliesScrollController?.removeListener(_onScrollUpdateWrapper);
+    super.dispose();
   }
 
   @override
@@ -78,6 +139,7 @@ class _HomePageMobileState extends ConsumerState<HomePageMobile>
       initialIndex: initialTabIndex,
       child: Scaffold(
         key: _scaffoldKey,
+        extendBodyBehindAppBar: true,
         drawer: currentUserPubkey != null
             ? NostrDrawer(pubkey: currentUserPubkey)
             : null,
@@ -101,69 +163,16 @@ class _HomePageMobileState extends ConsumerState<HomePageMobile>
                 ),
                 onPressed: () => context.push('/onboarding'),
               ),
-        body: SafeArea(
-          child: NestedScrollView(
-            headerSliverBuilder:
-                (BuildContext context, bool innerBoxIsScrolled) {
-                  return <Widget>[
-                    SliverAppBar(
-                      surfaceTintColor: Theme.of(context).colorScheme.surface,
-                      shadowColor: Theme.of(context).colorScheme.surface,
-                      backgroundColor: Theme.of(context).colorScheme.surface,
-                      floating: true,
-                      snap: false,
-                      pinned: false,
-                      leadingWidth: 48,
-                      leading: MobileFeedHeader(
-                        scaffoldKey: _scaffoldKey,
-                        pubkey: currentUserPubkey,
-                      ),
-                      centerTitle: true,
-                      actions: [
-                        RelaysConnectivityWidget(
-                          onTap: () => context.push('/relays'),
-                        ),
-                        if (!kIsWeb &&
-                            (defaultTargetPlatform == TargetPlatform.windows ||
-                                defaultTargetPlatform == TargetPlatform.linux ||
-                                defaultTargetPlatform == TargetPlatform.macOS))
-                          const SizedBox(width: 154),
-                      ],
-                      bottom: PreferredSize(
-                        preferredSize: const Size.fromHeight(40),
-                        child: TabBar(
-                          overlayColor: WidgetStateProperty.all(
-                            Colors.transparent,
-                          ),
-                          splashFactory: NoSplash.splashFactory,
-                          indicatorColor: Theme.of(context).colorScheme.primary,
-                          indicator: UnderlineTabIndicator(
-                            borderSide: BorderSide(
-                              width: 2.5,
-                              color: Theme.of(context).colorScheme.primary,
-                            ),
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          dividerHeight: 0,
-                          tabs: [
-                            Tab(text: AppLocalizations.of(context)!.posts),
-                            Tab(
-                              text: AppLocalizations.of(
-                                context,
-                              )!.postsAndReplies,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ];
-                },
-            body: TabBarView(
+        body: Stack(
+          children: [
+            TabBarView(
               children: [
-                // Posts tab - root notes only
                 GenericFeed(
                   key: PageStorageKey(
                     'homeFeed-posts-${currentUserPubkey ?? "readonly"}',
+                  ),
+                  feedPadding: EdgeInsets.only(
+                    top: _floatingHeaderHeight(context),
                   ),
                   feedFilter: FeedFilter(
                     feedId: "homeFeed",
@@ -171,11 +180,17 @@ class _HomePageMobileState extends ConsumerState<HomePageMobile>
                     authors: authors.isNotEmpty ? authors : null,
                     showRootNotesOnly: true,
                   ),
+                  onScrollControllerReady: (controller) {
+                    _postsScrollController = controller;
+                    _setupScrollListener(controller);
+                  },
                 ),
-                // Posts and Replies tab - all posts
                 GenericFeed(
                   key: PageStorageKey(
                     'homeFeed-all-${currentUserPubkey ?? "readonly"}',
+                  ),
+                  feedPadding: EdgeInsets.only(
+                    top: _floatingHeaderHeight(context),
                   ),
                   feedFilter: FeedFilter(
                     feedId: "homeFeed",
@@ -183,10 +198,98 @@ class _HomePageMobileState extends ConsumerState<HomePageMobile>
                     authors: authors.isNotEmpty ? authors : null,
                     showRootNotesOnly: false,
                   ),
+                  onScrollControllerReady: (controller) {
+                    _repliesScrollController = controller;
+                    _setupScrollListener(controller);
+                  },
                 ),
               ],
             ),
-          ),
+            Positioned(
+              top: _headerTopOffset,
+              left: 0,
+              right: 0,
+              child: AnimatedOpacity(
+                opacity:
+                    _headerTopOffset > -_floatingHeaderHeight(context) * 0.5
+                    ? 1.0
+                    : 0.0,
+                duration: const Duration(milliseconds: 150),
+                child: ClipRect(
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+                    child: Material(
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.surface.withOpacity(0.95),
+                      elevation: 0,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          AppBar(
+                            toolbarHeight: kToolbarHeight,
+                            automaticallyImplyLeading: false,
+                            surfaceTintColor: Theme.of(
+                              context,
+                            ).colorScheme.surface,
+                            shadowColor: Theme.of(context).colorScheme.surface,
+                            backgroundColor: Colors.transparent,
+
+                            leading: MobileFeedHeader(
+                              scaffoldKey: _scaffoldKey,
+                              pubkey: currentUserPubkey,
+                            ),
+                            centerTitle: true,
+                            actions: [
+                              RelaysConnectivityWidget(
+                                onTap: () => context.push('/relays'),
+                              ),
+                              if (!kIsWeb &&
+                                  (defaultTargetPlatform ==
+                                          TargetPlatform.windows ||
+                                      defaultTargetPlatform ==
+                                          TargetPlatform.linux ||
+                                      defaultTargetPlatform ==
+                                          TargetPlatform.macOS))
+                                const SizedBox(width: 154),
+                            ],
+                          ),
+                          SizedBox(
+                            height: _tabBarHeight,
+                            child: TabBar(
+                              overlayColor: WidgetStateProperty.all(
+                                Colors.transparent,
+                              ),
+                              splashFactory: NoSplash.splashFactory,
+                              indicatorColor: Theme.of(
+                                context,
+                              ).colorScheme.primary,
+                              indicator: UnderlineTabIndicator(
+                                borderSide: BorderSide(
+                                  width: 2.5,
+                                  color: Theme.of(context).colorScheme.primary,
+                                ),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              dividerHeight: 0,
+                              tabs: [
+                                Tab(text: AppLocalizations.of(context)!.posts),
+                                Tab(
+                                  text: AppLocalizations.of(
+                                    context,
+                                  )!.postsAndReplies,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
