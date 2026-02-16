@@ -153,17 +153,15 @@ Future<void> processFcmData({
 
     /// is gift wrap
   } else if (unwrappedEvent.kind == 1059) {
-    final eventJson = jsonDecode(unwrappedEvent.content);
-    final wrappedEventLevel2 = Nip01EventModel.fromJson(eventJson);
-    final unwrappedEventLevel2 = await ndk.giftWrap.unwrapEvent(
-      wrappedEvent: wrappedEventLevel2,
+    final unwrappedEventLevel2 = await ndk.giftWrap.fromGiftWrap(
+      giftWrap: unwrappedEvent,
     );
 
     /// is Chat message (rumor, unsigned)
     if (unwrappedEventLevel2.kind == 14) {
       final metadata = await provider
           .read(metadataProvider)
-          .getMetadataByPubkey(unwrappedEvent.pubKey)
+          .getMetadataByPubkey(unwrappedEventLevel2.pubKey)
           .first;
 
       await notiProvider.displayLocalAvatarNotification(
@@ -171,18 +169,18 @@ Future<void> processFcmData({
             metadata.name ??
             metadata.nip05 ??
             "${metadata.pubkey.substring(0, 15)}...",
-        body: unwrappedEvent.content.length < 280
-            ? unwrappedEvent.content
-            : "${unwrappedEvent.content.substring(0, 280)}...",
+        body: unwrappedEventLevel2.content.length < 280
+            ? unwrappedEventLevel2.content
+            : "${unwrappedEventLevel2.content.substring(0, 280)}...",
         avatarUrl:
             metadata.picture ?? "${Dicebear.baseUrlPng}${metadata.pubkey}",
-        pubkey: unwrappedEvent.pubKey,
+        pubkey: unwrappedEventLevel2.pubKey,
         payload: jsonEncode({
           "kind": unwrappedEventLevel2.kind,
           "event": jsonEncode(
-            Nip01EventModel.fromEntity(unwrappedEvent).toJson(),
+            Nip01EventModel.fromEntity(unwrappedEventLevel2).toJson(),
           ),
-          "route": "/messages/${unwrappedEvent.pubKey}",
+          "route": "/messages/${unwrappedEventLevel2.pubKey}",
         }),
         type: "chat_message",
       );
@@ -194,7 +192,7 @@ Future<void> processFcmData({
         payload: jsonEncode({
           "kind": unwrappedEventLevel2.kind,
           "event": jsonEncode(
-            Nip01EventModel.fromEntity(unwrappedEvent).toJson(),
+            Nip01EventModel.fromEntity(unwrappedEventLevel2).toJson(),
           ),
           "route": "/",
         }),
