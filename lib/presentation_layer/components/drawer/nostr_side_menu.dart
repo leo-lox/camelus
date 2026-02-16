@@ -10,6 +10,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import 'package:ndk/shared/nips/nip19/nip19.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../providers/app_bar_provider/app_bottom_bar_provider.dart';
 import '../../routing/route_paths.dart';
 import '../../providers/messaging/dm_conversations_provider.dart';
 import '../../providers/ndk_provider.dart';
@@ -222,6 +223,9 @@ class NostrSideMenu extends ConsumerWidget {
                       routeName: '/home',
                       onTap: () {
                         context.go('/home');
+                        ref
+                            .read(appBottomNavigationBarProvider.notifier)
+                            .selectTab(NavigationTab.home);
                       },
                     ),
                     if (!hideOnMobile)
@@ -231,6 +235,9 @@ class NostrSideMenu extends ConsumerWidget {
                         routeName: '/search',
                         onTap: () {
                           context.go('/search');
+                          ref
+                              .read(appBottomNavigationBarProvider.notifier)
+                              .selectTab(NavigationTab.search);
                         },
                       ),
                     if (!hideOnMobile)
@@ -240,6 +247,9 @@ class NostrSideMenu extends ConsumerWidget {
                         routeName: '/notifications',
                         onTap: () {
                           context.go('/notifications');
+                          ref
+                              .read(appBottomNavigationBarProvider.notifier)
+                              .selectTab(NavigationTab.notifications);
                         },
                       ),
                     if (!hideOnMobile && currentUserPubkey != null)
@@ -250,6 +260,9 @@ class NostrSideMenu extends ConsumerWidget {
                         badgeCount: dmUnreadCount,
                         onTap: () {
                           context.go('/messages');
+                          ref
+                              .read(appBottomNavigationBarProvider.notifier)
+                              .selectTab(NavigationTab.chat);
                         },
                       ),
                     if (currentUserPubkey != null) ...[
