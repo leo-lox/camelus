@@ -119,7 +119,7 @@ Future<void> processFcmData({
       return;
     }
     final query = ndk.requests.query(
-      filter: Filter(eTags: [idOfOriginEvent]),
+      filter: Filter(ids: [idOfOriginEvent]),
       timeout: Duration(seconds: 5),
     );
 
