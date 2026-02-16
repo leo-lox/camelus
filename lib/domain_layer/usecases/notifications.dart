@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:developer' as developer;
 import 'package:camelus/presentation_layer/routing/route_paths.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:go_router/go_router.dart';
 import 'package:ndk/ndk.dart' as ndk;
 
 import '../../config/default_relays.dart';
@@ -129,24 +130,35 @@ class Notifications {
 
   /// gets called on lauch if payload is found
   static void processNotificationPayload(String? payload) {
-    if (payload != null) {
-      final payloadJson = jsonDecode(payload);
-      final nostrNoteJson = jsonDecode(payloadJson['note']);
+    if (payload == null) {
+      return;
+    }
+    final payloadJson = jsonDecode(payload);
+    final routeTo = payloadJson['route'] as String?;
+
+    if (payloadJson['kind'] == 1) {
+      final nostrEventJson = jsonDecode(payloadJson['event']);
       final bool likleyDirectReply = payloadJson['likleyDirectReply'];
-      final nostrNote = NostrNoteModel.fromJson(nostrNoteJson);
+      final nostrEvent = NostrNoteModel.fromJson(nostrEventJson);
 
       if (likleyDirectReply) {
-        final replyId = nostrNote.getDirectReply?.value;
-        final rootId = nostrNote.getRootReply?.value;
+        final replyId = nostrEvent.getDirectReply?.value;
+        final rootId = nostrEvent.getRootReply?.value;
 
-        navigatorKey.currentState?.pushNamed(
+        GoRouter.of(navigatorKey.currentContext!).push(
           RoutePaths.status(
-            pubkey: nostrNote.pubkey,
-            eventId: rootId ?? replyId ?? nostrNote.id,
+            pubkey: nostrEvent.pubkey,
+            eventId: rootId ?? replyId ?? nostrEvent.id,
             scrollIntoView: replyId,
           ),
         );
       }
+      return;
+    }
+    if (routeTo != null) {
+      GoRouter.of(navigatorKey.currentContext!).push(routeTo);
+    } else {
+      developer.log("no route found in payload");
     }
   }
 }

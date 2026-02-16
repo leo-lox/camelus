@@ -49,6 +49,7 @@ Future<void> processFcmData({
         .firstOrNull;
 
     final payload = {
+      "kind": unwrappedEvent.kind,
       "event": jsonEncode(Nip01EventModel.fromEntity(unwrappedEvent).toJson()),
       "likleyDirectReply": likleyDirectReply,
       "route": "/profile/${unwrappedEvent.pubKey}/status/$threadId",
@@ -93,6 +94,7 @@ Future<void> processFcmData({
       avatarUrl: metadata.picture ?? "${Dicebear.baseUrlPng}${metadata.pubkey}",
       pubkey: unwrappedEvent.pubKey,
       payload: jsonEncode({
+        "kind": unwrappedEvent.kind,
         "event": jsonEncode(
           Nip01EventModel.fromEntity(unwrappedEvent).toJson(),
         ),
@@ -121,7 +123,7 @@ Future<void> processFcmData({
       timeout: Duration(seconds: 5),
     );
 
-    final originEvent = (await query.future).first;
+    final originEvent = (await query.future).firstOrNull;
 
     final reaction = content == "+"
         ? "liked"
@@ -131,13 +133,16 @@ Future<void> processFcmData({
 
     await notiProvider.displayLocalAvatarNotification(
       title:
-          " ${metadata.name ?? metadata.nip05 ?? "${metadata.pubkey.substring(0, 15)}..."} $reaction your note",
-      body: originEvent.content.length < 280
-          ? originEvent.content
-          : "${originEvent.content.substring(0, 280)}...",
+          "$reaction from ${metadata.name ?? metadata.nip05 ?? "${metadata.pubkey.substring(0, 15)}..."}",
+      body: originEvent != null
+          ? originEvent.content.length < 280
+                ? originEvent.content
+                : "${originEvent.content.substring(0, 280)}..."
+          : "reacted with $content",
       avatarUrl: metadata.picture ?? "${Dicebear.baseUrlPng}${metadata.pubkey}",
       pubkey: unwrappedEvent.pubKey,
       payload: jsonEncode({
+        "kind": unwrappedEvent.kind,
         "event": jsonEncode(
           Nip01EventModel.fromEntity(unwrappedEvent).toJson(),
         ),
@@ -171,6 +176,7 @@ Future<void> processFcmData({
             metadata.picture ?? "${Dicebear.baseUrlPng}${metadata.pubkey}",
         pubkey: unwrappedEvent.pubKey,
         payload: jsonEncode({
+          "kind": unwrappedEventLevel2.kind,
           "event": jsonEncode(
             Nip01EventModel.fromEntity(unwrappedEvent).toJson(),
           ),
@@ -184,6 +190,7 @@ Future<void> processFcmData({
             "recieved a gift wrapped event of kind ${unwrappedEventLevel2.kind}",
         body: unwrappedEventLevel2.content,
         payload: jsonEncode({
+          "kind": unwrappedEventLevel2.kind,
           "event": jsonEncode(
             Nip01EventModel.fromEntity(unwrappedEvent).toJson(),
           ),
@@ -196,6 +203,7 @@ Future<void> processFcmData({
       title: "New event of kind ${unwrappedEvent.kind}",
       body: unwrappedEvent.content,
       payload: jsonEncode({
+        "kind": unwrappedEvent.kind,
         "event": jsonEncode(
           Nip01EventModel.fromEntity(unwrappedEvent).toJson(),
         ),
