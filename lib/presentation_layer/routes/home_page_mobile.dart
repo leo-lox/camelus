@@ -132,6 +132,10 @@ class _HomePageMobileState extends ConsumerState<HomePageMobile>
                       bottom: PreferredSize(
                         preferredSize: const Size.fromHeight(40),
                         child: TabBar(
+                          overlayColor: WidgetStateProperty.all(
+                            Colors.transparent,
+                          ),
+                          splashFactory: NoSplash.splashFactory,
                           indicatorColor: Theme.of(context).colorScheme.primary,
                           indicator: UnderlineTabIndicator(
                             borderSide: BorderSide(

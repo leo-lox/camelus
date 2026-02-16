@@ -109,6 +109,8 @@ class ProfilePage2 extends ConsumerWidget {
                   child: Container(
                     color: Theme.of(context).colorScheme.surface,
                     child: TabBar(
+                      overlayColor: WidgetStateProperty.all(Colors.transparent),
+                      splashFactory: NoSplash.splashFactory,
                       tabs: [
                         Tab(text: AppLocalizations.of(context)!.posts),
                         Tab(

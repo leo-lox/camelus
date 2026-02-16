@@ -403,6 +403,8 @@ class _OpenStarterPackState extends ConsumerState<OpenStarterPack> {
                 pinned: true,
                 delegate: _SliverAppBarDelegate(
                   TabBar(
+                    overlayColor: WidgetStateProperty.all(Colors.transparent),
+                    splashFactory: NoSplash.splashFactory,
                     indicatorColor: Theme.of(context).colorScheme.primary,
                     indicatorWeight: 3,
                     labelColor: Theme.of(context).colorScheme.onSurface,

@@ -107,6 +107,8 @@ class _DmListPageState extends ConsumerState<DmListPage>
         ],
         bottom: TabBar(
           controller: _tabController,
+          overlayColor: WidgetStateProperty.all(Colors.transparent),
+          splashFactory: NoSplash.splashFactory,
           tabs: [
             _buildTab(
               context,
