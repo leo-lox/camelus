@@ -444,10 +444,10 @@ class NostrPushEndpoint extends Endpoint {
     _isInRelayPoolFunction = true;
 
     /// restart pool in 4 hours
-    relayPoolRestartTimer?.cancel();
-    relayPoolRestartTimer = Timer(Duration(hours: 4), () {
-      _restartRelayPool();
-    });
+    // relayPoolRestartTimer?.cancel();
+    // relayPoolRestartTimer = Timer(Duration(hours: 4), () {
+    //   _restartRelayPool();
+    // });
 
     for (final sub in _subscriptions) {
       await sub.cancel();
