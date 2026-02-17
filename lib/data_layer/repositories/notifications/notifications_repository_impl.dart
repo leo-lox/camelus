@@ -41,6 +41,11 @@ class NotificationsRepositoryImpl implements NotificationsRepository {
   }
 
   @override
+  Future<void> deleteNotification(int id) async {
+    await notiDs.notificationsPlugin.cancel(id);
+  }
+
+  @override
   // 1. Generic notification method
   Future<void> displayGenericNotification({
     required int id,

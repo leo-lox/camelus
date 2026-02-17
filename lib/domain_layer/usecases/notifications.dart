@@ -81,6 +81,10 @@ class Notifications {
     );
   }
 
+  Future<void> deleteNotification(int id) async {
+    await _notificationsRepo.deleteNotification(id);
+  }
+
   // show multiple
   int _getNotificationId() =>
       DateTime.now().millisecondsSinceEpoch.remainder(100000);
@@ -95,9 +99,10 @@ class Notifications {
     required String type,
     String? threadIdentifier,
     String? payload,
+    int? notificationId,
   }) {
     return _notificationsRepo.displayAvatarNotification(
-      id: _getNotificationId(),
+      id: notificationId ?? _getNotificationId(),
       title: title,
       body: body,
       avatarUrl: avatarUrl,
@@ -112,9 +117,10 @@ class Notifications {
     required String title,
     required String body,
     String? payload,
+    int? notificationId,
   }) {
     return _notificationsRepo.displayGenericNotification(
-      id: _getNotificationId(),
+      id: notificationId ?? _getNotificationId(),
       title: title,
       body: body,
       payload: payload,

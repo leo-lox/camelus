@@ -24,4 +24,6 @@ abstract class NotificationsRepository {
     String? threadIdentifier,
     String? payload,
   });
+
+  Future<void> deleteNotification(int id);
 }
