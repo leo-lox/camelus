@@ -21,7 +21,12 @@ import 'process_fcm_msg.dart';
 Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   log("Handling a background message: ${message.messageId}");
 
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  // check if already initialized (can happen if main thread is still alive in background)
+  if (Firebase.apps.isEmpty) {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+  }
 
   final providerContainer = await _setupProviderBackgroundThread();
 
