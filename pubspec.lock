@@ -1504,10 +1504,10 @@ packages:
     dependency: "direct main"
     description:
       name: sembast_cache_manager
-      sha256: "4de2c8129baff0265af2364212502042d6bfb69ff4c1484bb6698529258f23c5"
+      sha256: b280580f3328489cff97420d746d70ba29537e001582a7ff2cf95c687fe021a9
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.6"
+    version: "1.0.7-dev.12"
   sembast_web:
     dependency: "direct main"
     description:

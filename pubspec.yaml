@@ -76,7 +76,7 @@ dependencies:
   objectbox_flutter_libs: any
   sembast: ^3.8.5+1
   sembast_web: ^2.4.1
-  sembast_cache_manager: ^1.0.6
+  sembast_cache_manager: ^1.0.7-dev.12
   amberflutter: ^0.0.9
   intl: any
   app_links: ^7.0.0
