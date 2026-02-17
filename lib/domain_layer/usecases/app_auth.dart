@@ -11,6 +11,7 @@ import 'package:ndk/data_layer/repositories/signers/nip46_event_signer.dart';
 import 'package:ndk/ndk.dart';
 import 'package:ndk_amber/ndk_amber.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
+import '../../config/camelus_config.dart';
 import '../../l10n/app_localizations.dart';
 import '../../presentation_layer/providers/signer_provider.dart';
 import '../entities/stored_account.dart';
@@ -141,6 +142,11 @@ class AppAuth {
         return null;
 
       case LoginType.anon:
+        if (startupAccountData.account?.pubkey != null) {
+          ndk.accounts.loginPublicKey(
+            pubkey: startupAccountData.account!.pubkey!,
+          );
+        }
         return null;
 
       case LoginType.register:
@@ -157,7 +163,13 @@ class AppAuth {
     );
 
     if (activeAccountPubkey == null || storedAccountsString == null) {
-      return StartupAccountData(loginType: LoginType.anon);
+      return StartupAccountData(
+        loginType: LoginType.anon,
+        account: LocalStorageAccount(
+          loginType: LoginType.anon,
+          pubkey: CamelusConfig.defaultAnonReadPubkey,
+        ),
+      );
     }
 
     final storedAccounts = jsonDecode(storedAccountsString) as List;
@@ -176,7 +188,10 @@ class AppAuth {
       // if no match found, use last account or register if list is empty
       matchedAccount = storedAccountsList.isNotEmpty
           ? storedAccountsList.last
-          : LocalStorageAccount(loginType: LoginType.anon);
+          : LocalStorageAccount(
+              loginType: LoginType.anon,
+              pubkey: CamelusConfig.defaultAnonReadPubkey,
+            );
     }
 
     return StartupAccountData(
