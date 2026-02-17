@@ -67,7 +67,7 @@ class NotificationSettingsState {
 }
 
 class NotificationSettingsNotifier extends Notifier<NotificationSettingsState> {
-  static const List<int> availableKinds = [1, 3, 6, 7, 9, 13, 14, 15];
+  static const List<int> availableKinds = [1, 3, 6, 7, 9, 13, 14, 15, 1059];
   Timer? _successTimer;
 
   @override
