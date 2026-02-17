@@ -136,6 +136,7 @@ class ProfilePage2 extends ConsumerWidget {
                 feedPadding: EdgeInsets.only(
                   top: MediaQuery.of(context).padding.top,
                 ),
+                usePrimaryScrollController: true,
                 feedFilter: FeedFilter(
                   authors: [pubkey],
                   kinds: [1, 6],
@@ -148,6 +149,7 @@ class ProfilePage2 extends ConsumerWidget {
                 feedPadding: EdgeInsets.only(
                   top: MediaQuery.of(context).padding.top,
                 ),
+                usePrimaryScrollController: true,
                 feedFilter: FeedFilter(
                   authors: [pubkey],
                   kinds: [1, 6],

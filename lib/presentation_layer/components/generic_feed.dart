@@ -24,11 +24,14 @@ class GenericFeed extends ConsumerStatefulWidget {
 
   final void Function(ScrollController)? onScrollControllerReady;
 
+  final bool usePrimaryScrollController;
+
   const GenericFeed({
     super.key,
     this.feedPadding,
     required this.feedFilter,
     this.onScrollControllerReady,
+    this.usePrimaryScrollController = false,
   });
 
   @override
@@ -38,16 +41,22 @@ class GenericFeed extends ConsumerStatefulWidget {
 // State class for GenericFeed, which manages its lifecycle and behavior
 class _GenericFeedState extends ConsumerState<GenericFeed>
     with TickerProviderStateMixin {
-  late ScrollController _scrollController; // Controller for scrolling behavior
+  ScrollController? _scrollController; // Controller for scrolling behavior
   late StreamSubscription<void> _homeBarSub; // Subscription to home tab events
 
   final newPostsController = SwipeableFadeOutController();
 
-  VoidCallback? _externalScrollListener;
-
   // Scroll to the top of the feed
-  void _scrollToTop() {
-    _scrollController.animateTo(
+  void _scrollToTop([BuildContext? context]) {
+    final controller = widget.usePrimaryScrollController
+        ? (context != null ? PrimaryScrollController.maybeOf(context) : null)
+        : _scrollController;
+
+    if (controller == null || !controller.hasClients) {
+      return;
+    }
+
+    controller.animateTo(
       0,
       duration: const Duration(milliseconds: 500),
       curve: Curves.easeOutCubic,
@@ -64,16 +73,17 @@ class _GenericFeedState extends ConsumerState<GenericFeed>
   @override
   void initState() {
     super.initState();
-    _scrollController = ScrollController();
+    if (!widget.usePrimaryScrollController) {
+      _scrollController = ScrollController();
+    }
 
     // Notify parent if callback provided
-    if (widget.onScrollControllerReady != null) {
+    if (!widget.usePrimaryScrollController &&
+        widget.onScrollControllerReady != null &&
+        _scrollController != null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        // Store the listener so we can remove it later
-        _externalScrollListener = () =>
-            widget.onScrollControllerReady!(_scrollController);
         // Don't call the callback here, just pass the controller
-        widget.onScrollControllerReady!(_scrollController);
+        widget.onScrollControllerReady!(_scrollController!);
       });
     }
 
@@ -92,12 +102,7 @@ class _GenericFeedState extends ConsumerState<GenericFeed>
 
   @override
   void dispose() {
-    // Remove external listener if it was added
-    if (_externalScrollListener != null) {
-      _scrollController.removeListener(_externalScrollListener!);
-    }
-
-    _scrollController.dispose();
+    _scrollController?.dispose();
     _homeBarSub.cancel();
 
     super.dispose();
@@ -124,6 +129,7 @@ class _GenericFeedState extends ConsumerState<GenericFeed>
             feedFilter: widget.feedFilter,
             scrollController: _scrollController,
             feedPadding: widget.feedPadding,
+            usePrimaryScrollController: widget.usePrimaryScrollController,
           ),
         ),
 
@@ -139,7 +145,7 @@ class _GenericFeedState extends ConsumerState<GenericFeed>
               )!.newPostsCount(genericFeedStateP.newRootNotes.length),
               onPressed: () {
                 genericFeedStateNotifier.integrateNewNotes();
-                _scrollToTop();
+                _scrollToTop(context);
               },
               onDismissed: _newPostControllerDismissed,
             ),
@@ -157,7 +163,7 @@ class _GenericFeedState extends ConsumerState<GenericFeed>
               )!.newPostsCount(genericFeedStateP.newRootAndReplyNotes.length),
               onPressed: () {
                 genericFeedStateNotifier.integrateNewNotes();
-                _scrollToTop();
+                _scrollToTop(context);
               },
               onDismissed: _newPostControllerDismissed,
             ),
@@ -170,14 +176,16 @@ class _GenericFeedState extends ConsumerState<GenericFeed>
 // Widget for rendering a scrollable list of posts
 class ScrollablePostsList extends ConsumerWidget {
   final FeedFilter feedFilter;
-  final ScrollController scrollController;
+  final ScrollController? scrollController;
   final EdgeInsets? feedPadding;
+  final bool usePrimaryScrollController;
 
   const ScrollablePostsList({
     super.key,
     required this.feedFilter,
     required this.scrollController,
     this.feedPadding,
+    this.usePrimaryScrollController = false,
   });
 
   @override
@@ -196,7 +204,8 @@ class ScrollablePostsList extends ConsumerWidget {
       key: PageStorageKey<String>(
         'feed_${feedFilter.hashCode}_${feedFilter.showRootNotesOnly}',
       ),
-      controller: scrollController,
+      controller: usePrimaryScrollController ? null : scrollController,
+      primary: usePrimaryScrollController,
       padding: feedPadding,
       cacheExtent: 2000,
       physics: const AlwaysScrollableScrollPhysics(
