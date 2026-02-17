@@ -25,9 +25,11 @@ Future<void> initializeFirebase({
       defaultTargetPlatform == TargetPlatform.iOS ||
       defaultTargetPlatform == TargetPlatform.macOS) {
     // Initialize Firebase only on supported platforms
-    await Firebase.initializeApp(
-      options: DefaultFirebaseOptions.currentPlatform,
-    );
+    if (Firebase.apps.isEmpty) {
+      await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform,
+      );
+    }
 
     // Set up Firebase Messaging
     checkForInitialMessage();
