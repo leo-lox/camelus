@@ -27,13 +27,28 @@ class GenericFeedState extends Notifier<FeedViewModel> {
   @override
   FeedViewModel build() {
     final notesP = ref.read(getNotesProvider);
+
+    // Auto dispose delay - 5 minutes
+    final link = ref.keepAlive();
+    Timer? timer;
+
+    ref.onCancel(() {
+      timer = Timer(Duration(minutes: 5), () => link.close());
+    });
+
+    ref.onResume(() {
+      timer?.cancel();
+    });
+
     // Ensures resources are cleaned up when provider is disposed
     ref.onDispose(() {
       _freshNotesSubscription?.cancel();
       _timelineSubscription?.cancel();
       unawaited(notesP.closeSubscription("sub-${feedFilter.feedId}"));
+      timer?.cancel();
     });
     _setupSubscription(feedFilter); // Initialize data subscription
+
     return FeedViewModel(
       timelineRootNotes: [],
       newRootNotes: [],
@@ -91,8 +106,8 @@ class GenericFeedState extends Notifier<FeedViewModel> {
 
     // Preload embedded notes
     // not waiting for fetching everything
-    final embedService = ref.read(embedCacheServiceProvider);
-    embedService.preloadFromPosts(parsedRootAndReplyNotes);
+    // final embedService = ref.read(embedCacheServiceProvider);
+    //embedService.preloadFromPosts(parsedRootAndReplyNotes);
 
     _addNewRootEvents(parsedRootNotes); // Add new root events
     _addNewRootAndReplyEvents(
@@ -172,7 +187,7 @@ class GenericFeedState extends Notifier<FeedViewModel> {
     final networkNotesStream = _fetchNetworkNotes(
       feedFilter,
       cutoff,
-      limit: 20,
+      limit: 10,
     );
 
     await _timelineSubscription?.cancel();
