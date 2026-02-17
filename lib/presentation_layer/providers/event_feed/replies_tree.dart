@@ -1,24 +1,24 @@
-import '../../../domain_layer/entities/parsed_post.dart';
+import '../../../domain_layer/entities/nostr_note.dart';
 import '../../../domain_layer/entities/tree_node.dart';
 
 class RepliesTree {
   /// build a tree from the replies \
   /// [returns] a list of first level replies \
   /// the cildren are replies of replies
-  static List<TreeNode<ParsedPost>> buildRepliesTree({
+  static List<TreeNode<NostrNote>> buildRepliesTree({
     required String rootNoteId,
-    required List<ParsedPost> replies,
+    required List<NostrNote> replies,
   }) {
-    final List<ParsedPost> workingList = List.from(replies, growable: true);
-    workingList.sort((a, b) => a.created_at.compareTo(b.created_at));
-    final List<TreeNode<ParsedPost>> tree = [];
+    final List<NostrNote> workingList = List.from(replies, growable: true);
+    workingList.sort((a, b) => a.createdAt.compareTo(b.createdAt));
+    final List<TreeNode<NostrNote>> tree = [];
 
     // find top level replies
     for (var i = 0; i < workingList.length; i++) {
       final reply = workingList[i];
 
-      if (reply.nostrNote.getDirectReply?.value == rootNoteId) {
-        tree.add(TreeNode<ParsedPost>(reply));
+      if (reply.getDirectReply?.value == rootNoteId) {
+        tree.add(TreeNode<NostrNote>(reply));
         workingList.remove(reply);
         i--; // Adjust index after removal
       }
@@ -35,14 +35,14 @@ class RepliesTree {
   /// recursive function to build the tree
   ///
   static void _buildSubtree({
-    required List<ParsedPost> workingList,
-    required TreeNode<ParsedPost> parent,
+    required List<NostrNote> workingList,
+    required TreeNode<NostrNote> parent,
   }) {
     for (var i = 0; i < workingList.length; i++) {
       final reply = workingList[i];
 
-      if (reply.nostrNote.getDirectReply?.value == parent.value.id) {
-        final child = TreeNode<ParsedPost>(reply);
+      if (reply.getDirectReply?.value == parent.value.id) {
+        final child = TreeNode<NostrNote>(reply);
         parent.addChild(child);
         workingList.remove(reply);
         i--; // Adjust index after removal

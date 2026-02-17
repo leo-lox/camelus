@@ -1,17 +1,18 @@
 import 'dart:async';
-import 'dart:ui';
+
 import 'package:camelus/l10n/app_localizations.dart';
-import 'package:camelus/presentation_layer/atoms/my_profile_picture.dart';
+
 import 'package:camelus/presentation_layer/components/note_card/note_card_container.dart';
 import 'package:camelus/presentation_layer/components/note_card/skeleton_note.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_list_view/flutter_list_view.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../domain_layer/entities/parsed_post.dart';
+import '../../../../domain_layer/entities/nostr_note.dart';
 import '../../../../domain_layer/entities/tree_node.dart';
 import '../../../components/comments_section.dart';
 import '../../../providers/event_feed/event_feed_provider.dart';
+import '../../../providers/parsed_note_cache_provider.dart';
 
 class EventViewPage extends ConsumerStatefulWidget {
   final String? _openNoteId;
@@ -97,13 +98,13 @@ class EventViewPageState extends ConsumerState<EventViewPage> {
 
   // Flatten the comment tree into a list with depth information
   List<FlattenedComment> _flattenCommentTree(
-    List<TreeNode<ParsedPost>> comments,
+    List<TreeNode<NostrNote>> comments,
   ) {
     List<FlattenedComment> result = [];
 
     // Sort direct replies to root by creation time (oldest first)
-    final sortedComments = List<TreeNode<ParsedPost>>.from(comments)
-      ..sort((a, b) => a.value.created_at.compareTo(b.value.created_at));
+    final sortedComments = List<TreeNode<NostrNote>>.from(comments)
+      ..sort((a, b) => a.value.createdAt.compareTo(b.value.createdAt));
 
     // Process each top-level comment
     for (final comment in sortedComments) {
@@ -131,15 +132,15 @@ class EventViewPageState extends ConsumerState<EventViewPage> {
 
   // Helper method to recursively flatten child comments
   List<FlattenedComment> _flattenChildComments(
-    List<TreeNode<ParsedPost>> children,
+    List<TreeNode<NostrNote>> children,
     int depth,
     List<bool> ancestorHasSibling,
   ) {
     List<FlattenedComment> result = [];
 
     // Sort child comments by creation time (older first)
-    final sortedChildren = List<TreeNode<ParsedPost>>.from(children)
-      ..sort((a, b) => a.value.created_at.compareTo(b.value.created_at));
+    final sortedChildren = List<TreeNode<NostrNote>>.from(children)
+      ..sort((a, b) => a.value.createdAt.compareTo(b.value.createdAt));
 
     for (var i = 0; i < sortedChildren.length; i++) {
       final child = sortedChildren[i];
@@ -223,14 +224,26 @@ class EventViewPageState extends ConsumerState<EventViewPage> {
           },
           (BuildContext context, int index) {
             if (index == 0) {
-              // Root note
-              return eventFeedState.rootNote != null
-                  ? NoteCardContainer(
-                      note: eventFeedState.rootNote!,
-                      key: ValueKey(widget._rootNoteId),
-                      fontSize: 17.5,
-                    )
-                  : const SkeletonNote();
+              final parsedPostAsync = ref.watch(
+                parsedNoteCacheProvider(eventFeedState.rootNote!),
+              );
+              return parsedPostAsync.when(
+                data: (parsedNote) {
+                  if (parsedNote == null) {
+                    return const SizedBox.shrink();
+                  }
+                  // Root note
+                  return eventFeedState.rootNote != null
+                      ? NoteCardContainer(
+                          note: parsedNote,
+                          key: ValueKey(widget._rootNoteId),
+                          fontSize: 17.5,
+                        )
+                      : const SkeletonNote();
+                },
+                loading: () => const SkeletonNote(hideBottomAction: true),
+                error: (_, _) => const SizedBox.shrink(),
+              );
             }
 
             // Comment

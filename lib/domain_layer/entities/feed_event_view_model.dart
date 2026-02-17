@@ -1,10 +1,10 @@
-import 'parsed_post.dart';
+import 'nostr_note.dart';
 import 'tree_node.dart';
 
 class FeedEventViewModel {
-  ParsedPost? rootNote;
-  List<TreeNode<ParsedPost>> comments;
-  Set<ParsedPost> unprocessedCommentsSet = {};
+  NostrNote? rootNote;
+  List<TreeNode<NostrNote>> comments;
+  Set<NostrNote> unprocessedCommentsSet = {};
 
   FeedEventViewModel({
     required this.rootNote,
@@ -13,9 +13,9 @@ class FeedEventViewModel {
   });
 
   FeedEventViewModel copyWith({
-    ParsedPost? rootNote,
-    List<TreeNode<ParsedPost>>? comments,
-    Set<ParsedPost>? unprocessedCommentsSet,
+    NostrNote? rootNote,
+    List<TreeNode<NostrNote>>? comments,
+    Set<NostrNote>? unprocessedCommentsSet,
   }) {
     return FeedEventViewModel(
       rootNote: rootNote ?? this.rootNote,

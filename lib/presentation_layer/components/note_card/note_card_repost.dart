@@ -7,10 +7,10 @@ import 'package:go_router/go_router.dart';
 import '../../../domain_layer/entities/nostr_note.dart';
 import '../../../domain_layer/entities/nostr_tag.dart';
 import '../../../helpers/helpers.dart';
+import '../../providers/parsed_note_cache_provider.dart';
 import '../../routing/route_paths.dart';
 import '../../providers/get_notes_provider.dart';
 import '../../providers/metadata_state_provider.dart';
-import 'nostr_parser.dart';
 import 'note_card_container.dart';
 import 'skeleton_note.dart';
 
@@ -122,9 +122,22 @@ class NoteCardRepost extends ConsumerWidget {
               );
             }
 
-            return NoteCardContainer(
-              key: PageStorageKey(repostEvent.id),
-              note: NostrParser.parseEventSync(snapshot.data!),
+            final parsedRepostAsync = ref.watch(
+              parsedNoteCacheProvider(snapshot.data!),
+            );
+            return parsedRepostAsync.when(
+              data: (parsedNote) {
+                if (parsedNote == null) {
+                  return const SizedBox.shrink();
+                }
+
+                return NoteCardContainer(
+                  key: PageStorageKey(parsedNote.id),
+                  note: parsedNote,
+                );
+              },
+              loading: () => const SkeletonNote(hideBottomAction: true),
+              error: (_, _) => const SizedBox.shrink(),
             );
           },
         ),

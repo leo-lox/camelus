@@ -10,6 +10,7 @@ import '../atoms/new_posts_available.dart';
 import '../atoms/refresh_indicator_no_need.dart';
 import '../providers/app_bar_provider/app_bottom_bar_provider.dart';
 import '../providers/generic_feed_provider.dart';
+import '../providers/parsed_note_cache_provider.dart';
 import 'note_card/no_more_notes.dart';
 import 'note_card/note_card_container.dart';
 import 'note_card/note_card_repost.dart';
@@ -224,15 +225,32 @@ class ScrollablePostsList extends ConsumerWidget {
           );
         }
         final note = timelineNotes[index];
-        if (note.kind == 1) {
-          return NoteCardContainer(key: PageStorageKey(note.id), note: note);
-        } else if (note.kind == 6) {
+
+        if (note.kind == 6) {
           return NoteCardRepost(
             key: PageStorageKey(note.id),
-            repostEvent: note.nostrNote,
+            repostEvent: note,
           );
         }
-        return Container();
+
+        final parsedPostAsync = ref.watch(parsedNoteCacheProvider(note));
+        return parsedPostAsync.when(
+          data: (parsedNote) {
+            if (parsedNote == null) {
+              return const SizedBox.shrink();
+            }
+
+            if (note.kind == 1) {
+              return NoteCardContainer(
+                key: PageStorageKey(note.id),
+                note: parsedNote,
+              );
+            }
+            return Container();
+          },
+          loading: () => const SkeletonNote(hideBottomAction: true),
+          error: (_, _) => const SizedBox.shrink(),
+        );
       },
     );
   }
