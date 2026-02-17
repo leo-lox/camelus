@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'dart:async';
 
+import '../../config/camelus_config.dart';
 import '../../domain_layer/entities/contact_list.dart';
 import '../../domain_layer/usecases/follow.dart';
 import 'following_provider.dart';
@@ -30,22 +31,10 @@ final contactListStateProvider =
 final contactListSelfStateProvider = Provider<ContactListState>((ref) {
   final selfPubkey = ref.watch(ndkProvider).accounts.getPublicKey();
 
-  // If no pubkey (read-only mode), return empty contact list
+  // If no pubkey (anon mode), return empty contact list
   if (selfPubkey == null) {
-    return ContactListState(
-      isLoading: false,
-      contactList: ContactList(
-        pubKey: '',
-        contacts: [],
-        contactRelays: [],
-        petnames: [],
-        followedTags: [],
-        followedCommunities: [],
-        followedEvents: [],
-        sources: [],
-        createdAt: 0,
-        loadedTimestamp: null,
-      ),
+    return ref.watch(
+      contactListStateProvider(CamelusConfig.defaultAnonReadPubkey),
     );
   }
 

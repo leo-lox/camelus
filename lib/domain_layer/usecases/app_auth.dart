@@ -142,11 +142,6 @@ class AppAuth {
         return null;
 
       case LoginType.anon:
-        if (startupAccountData.account?.pubkey != null) {
-          ndk.accounts.loginPublicKey(
-            pubkey: startupAccountData.account!.pubkey!,
-          );
-        }
         return null;
 
       case LoginType.register:
