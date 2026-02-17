@@ -163,13 +163,7 @@ class AppAuth {
     );
 
     if (activeAccountPubkey == null || storedAccountsString == null) {
-      return StartupAccountData(
-        loginType: LoginType.anon,
-        account: LocalStorageAccount(
-          loginType: LoginType.anon,
-          pubkey: CamelusConfig.defaultAnonReadPubkey,
-        ),
-      );
+      return StartupAccountData(loginType: LoginType.anon);
     }
 
     final storedAccounts = jsonDecode(storedAccountsString) as List;
@@ -188,10 +182,7 @@ class AppAuth {
       // if no match found, use last account or register if list is empty
       matchedAccount = storedAccountsList.isNotEmpty
           ? storedAccountsList.last
-          : LocalStorageAccount(
-              loginType: LoginType.anon,
-              pubkey: CamelusConfig.defaultAnonReadPubkey,
-            );
+          : LocalStorageAccount(loginType: LoginType.anon);
     }
 
     return StartupAccountData(
