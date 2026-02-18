@@ -94,8 +94,8 @@ dependencies:
   serverpod_flutter: 3.3.1
   apipod_client:
     path: ./apipod/apipod_client
-  firebase_messaging: ^16.0.2
-  firebase_core: ^4.1.1
+  firebase_messaging: ^16.1.1
+  firebase_core: ^4.4.0
   flutter_local_notifications: ^19.4.2
   path: ^1.9.1
   share_plus: ^12.0.1
