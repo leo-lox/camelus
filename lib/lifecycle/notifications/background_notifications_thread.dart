@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 import 'package:ndk/ndk.dart';
 import 'package:ndk_objectbox/ndk_objectbox.dart';
 import 'package:riverpod/riverpod.dart';
@@ -22,7 +23,8 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   log("Handling a background message: ${message.messageId}");
 
   // check if already initialized (can happen if main thread is still alive in background)
-  if (Firebase.apps.isEmpty) {
+  // doulbe init on iOS causes issues
+  if (Firebase.apps.isEmpty && defaultTargetPlatform != TargetPlatform.iOS) {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
