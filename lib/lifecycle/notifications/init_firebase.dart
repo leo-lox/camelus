@@ -22,7 +22,7 @@ Future<void> initializeFirebase({
   // Check if the current platform is supported by Firebase
   if (kIsWeb ||
       defaultTargetPlatform == TargetPlatform.android ||
-      defaultTargetPlatform == TargetPlatform.iOS ||
+      // defaultTargetPlatform == TargetPlatform.iOS ||
       defaultTargetPlatform == TargetPlatform.macOS) {
     // Initialize Firebase only on supported platforms
     if (Firebase.apps.isEmpty) {
