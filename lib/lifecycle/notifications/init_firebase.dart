@@ -24,13 +24,14 @@ Future<void> initializeFirebase({
       defaultTargetPlatform == TargetPlatform.android ||
       defaultTargetPlatform == TargetPlatform.iOS ||
       defaultTargetPlatform == TargetPlatform.macOS) {
-    try {
-      // attach if it exists, otherwise initialize
-      Firebase.app();
-    } catch (_) {
-      await Firebase.initializeApp(
-        options: DefaultFirebaseOptions.currentPlatform,
-      );
+    if (Firebase.apps.isEmpty) {
+      try {
+        await Firebase.initializeApp(
+          options: DefaultFirebaseOptions.currentPlatform,
+        );
+      } catch (_) {
+        // Already initialized at native level — safe to continue
+      }
     }
 
     // Set up Firebase Messaging

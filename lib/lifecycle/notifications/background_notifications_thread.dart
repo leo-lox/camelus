@@ -23,13 +23,14 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 
   // check if already initialized (can happen if main thread is still alive in background)
   // doulbe init on iOS causes issues
-  try {
-    // attach if it exists, otherwise initialize
-    Firebase.app();
-  } catch (_) {
-    await Firebase.initializeApp(
-      options: DefaultFirebaseOptions.currentPlatform,
-    );
+  if (Firebase.apps.isEmpty) {
+    try {
+      await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform,
+      );
+    } catch (_) {
+      // Already initialized at native level — safe to continue
+    }
   }
 
   final providerContainer = await _setupProviderBackgroundThread();
