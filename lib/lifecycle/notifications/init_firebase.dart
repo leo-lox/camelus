@@ -24,8 +24,10 @@ Future<void> initializeFirebase({
       defaultTargetPlatform == TargetPlatform.android ||
       defaultTargetPlatform == TargetPlatform.iOS ||
       defaultTargetPlatform == TargetPlatform.macOS) {
-    // Initialize Firebase only on supported platforms
-    if (Firebase.apps.isEmpty) {
+    try {
+      // attach if it exists, otherwise initialize
+      Firebase.app();
+    } catch (_) {
       await Firebase.initializeApp(
         options: DefaultFirebaseOptions.currentPlatform,
       );
