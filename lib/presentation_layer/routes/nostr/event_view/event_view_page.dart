@@ -224,6 +224,9 @@ class EventViewPageState extends ConsumerState<EventViewPage> {
           },
           (BuildContext context, int index) {
             if (index == 0) {
+              if (eventFeedState.rootNote == null) {
+                return const SkeletonNote();
+              }
               final parsedPostAsync = ref.watch(
                 parsedNoteCacheProvider(eventFeedState.rootNote!),
               );
@@ -233,13 +236,11 @@ class EventViewPageState extends ConsumerState<EventViewPage> {
                     return const SizedBox.shrink();
                   }
                   // Root note
-                  return eventFeedState.rootNote != null
-                      ? NoteCardContainer(
-                          note: parsedNote,
-                          key: ValueKey(widget._rootNoteId),
-                          fontSize: 17.5,
-                        )
-                      : const SkeletonNote();
+                  return NoteCardContainer(
+                    note: parsedNote,
+                    key: ValueKey(widget._rootNoteId),
+                    fontSize: 17.5,
+                  );
                 },
                 loading: () => const SkeletonNote(hideBottomAction: true),
                 error: (_, _) => const SizedBox.shrink(),
