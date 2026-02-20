@@ -111,11 +111,17 @@ class _GenericFeedState extends ConsumerState<GenericFeed>
 
   @override
   Widget build(BuildContext context) {
-    // Watch the state of the generic feed and its notifier
-    final genericFeedStateP = ref.watch(
-      genericFeedStateProvider(widget.feedFilter),
+    final newRootNotesCount = ref.watch(
+      genericFeedStateProvider(
+        widget.feedFilter,
+      ).select((state) => state.newRootNotes.length),
     );
-    final genericFeedStateNotifier = ref.watch(
+    final newRootAndReplyNotesCount = ref.watch(
+      genericFeedStateProvider(
+        widget.feedFilter,
+      ).select((state) => state.newRootAndReplyNotes.length),
+    );
+    final genericFeedStateNotifier = ref.read(
       genericFeedStateProvider(widget.feedFilter).notifier,
     );
 
@@ -134,8 +140,7 @@ class _GenericFeedState extends ConsumerState<GenericFeed>
           ),
         ),
 
-        if (widget.feedFilter.showRootNotesOnly &&
-            genericFeedStateP.newRootNotes.isNotEmpty)
+        if (widget.feedFilter.showRootNotesOnly && newRootNotesCount > 0)
           Padding(
             padding: widget.feedPadding ?? EdgeInsets.zero,
             child: NewPostsAvailable(
@@ -143,7 +148,7 @@ class _GenericFeedState extends ConsumerState<GenericFeed>
               dismissThreshold: NEW_POSTS_DISMISS_THRESHOLD,
               name: AppLocalizations.of(
                 context,
-              )!.newPostsCount(genericFeedStateP.newRootNotes.length),
+              )!.newPostsCount(newRootNotesCount),
               onPressed: () {
                 genericFeedStateNotifier.integrateNewNotes();
                 _scrollToTop(context);
@@ -153,7 +158,7 @@ class _GenericFeedState extends ConsumerState<GenericFeed>
           ),
 
         if (!widget.feedFilter.showRootNotesOnly &&
-            genericFeedStateP.newRootNotes.isNotEmpty)
+            newRootAndReplyNotesCount > 0)
           Padding(
             padding: widget.feedPadding ?? EdgeInsets.zero,
             child: NewPostsAvailable(
@@ -161,7 +166,7 @@ class _GenericFeedState extends ConsumerState<GenericFeed>
               dismissThreshold: NEW_POSTS_DISMISS_THRESHOLD,
               name: AppLocalizations.of(
                 context,
-              )!.newPostsCount(genericFeedStateP.newRootAndReplyNotes.length),
+              )!.newPostsCount(newRootAndReplyNotesCount),
               onPressed: () {
                 genericFeedStateNotifier.integrateNewNotes();
                 _scrollToTop(context);
@@ -191,15 +196,21 @@ class ScrollablePostsList extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, ref) {
-    final genericFeedStateP = ref.watch(genericFeedStateProvider(feedFilter));
+    final timelineNotes = ref.watch(
+      genericFeedStateProvider(feedFilter).select(
+        (state) => feedFilter.showRootNotesOnly
+            ? state.timelineRootNotes
+            : state.timelineRootAndReplyNotes,
+      ),
+    );
+    final endOfRootNotes = ref.watch(
+      genericFeedStateProvider(
+        feedFilter,
+      ).select((state) => state.endOfRootNotes),
+    );
     final genericFeedStateNoti = ref.read(
       genericFeedStateProvider(feedFilter).notifier,
     );
-
-    /// Depending on the feed filter, determine which notes to display in the timeline
-    final timelineNotes = feedFilter.showRootNotesOnly
-        ? genericFeedStateP.timelineRootNotes
-        : genericFeedStateP.timelineRootAndReplyNotes;
 
     return ListView.builder(
       key: PageStorageKey<String>(
@@ -215,7 +226,7 @@ class ScrollablePostsList extends ConsumerWidget {
       itemCount: timelineNotes.length + 1,
       itemBuilder: (BuildContext context, int index) {
         if (index == timelineNotes.length) {
-          if (genericFeedStateP.endOfRootNotes) {
+          if (endOfRootNotes) {
             return NoMoreNotes();
           }
           return SkeletonNote(
