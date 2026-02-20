@@ -1,6 +1,6 @@
 import Flutter
 import UIKit
-//import FirebaseCore
+import FirebaseCore
 
 @main
 @objc class AppDelegate: FlutterAppDelegate, FlutterImplicitEngineDelegate {
