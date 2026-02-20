@@ -919,6 +919,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.1.2"
+  iconsax_flutter:
+    dependency: transitive
+    description:
+      name: iconsax_flutter
+      sha256: d14b4cec8586025ac15276bdd40f6eea308cb85748135965bb6255f14beb2564
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.1"
   image:
     dependency: "direct main"
     description:
@@ -1120,26 +1128,34 @@ packages:
     dependency: "direct main"
     description:
       name: ndk
-      sha256: "48373f964eb0a1c69c4daa4c80422465df6985af4738b4b3a268b806a2a43932"
+      sha256: "7a118aa8aac16ad1a8bcc8fd68314a2cbccd6b31cdab12b08499aa7f9d0833b7"
       url: "https://pub.dev"
     source: hosted
-    version: "0.7.1-dev.1"
+    version: "0.7.1-dev.14"
   ndk_amber:
     dependency: "direct main"
     description:
       name: ndk_amber
-      sha256: "9789a67d5b839c459b027ac7636a4021e126199c7d3b3361863ddba7ed55fe2e"
+      sha256: c8a2741b2d87811ad670764071954829bff019e0e73c3bb4eb4cbb520cf40f2b
       url: "https://pub.dev"
     source: hosted
-    version: "0.4.0"
+    version: "0.4.0-dev.15"
+  ndk_flutter:
+    dependency: "direct main"
+    description:
+      name: ndk_flutter
+      sha256: "64fde6317984207da9db20fc1b1bd1b03086c5b7554ca2300760e35b159f8e70"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.2-dev.8"
   ndk_objectbox:
     dependency: "direct main"
     description:
       name: ndk_objectbox
-      sha256: "5008b189c2e54cd352d741c6f7e0a6596023b077486e6ff84693cf7710b00a68"
+      sha256: "3d324498f11097975c5f74e188ada02c4c1f4de92f51423c0196c6386022ebc8"
       url: "https://pub.dev"
     source: hosted
-    version: "0.2.8-dev.1"
+    version: "0.2.8-dev.14"
   ndk_rust_verifier:
     dependency: "direct main"
     description:
@@ -1148,6 +1164,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.5.0"
+  nip07_event_signer:
+    dependency: transitive
+    description:
+      name: nip07_event_signer
+      sha256: e49d1750617909f0349de9d5125203f398f2c6ecdb9eda8dba4bc52630b39664
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.6-dev.15"
   nm:
     dependency: transitive
     description:
@@ -1292,6 +1316,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.3.0"
+  pausable_timer:
+    dependency: transitive
+    description:
+      name: pausable_timer
+      sha256: "6ef1a95441ec3439de6fb63f39a011b67e693198e7dae14e20675c3c00e86074"
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.1.0+3"
   petitparser:
     dependency: transitive
     description:
@@ -1356,6 +1388,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "6.0.3"
+  pretty_qr_code:
+    dependency: transitive
+    description:
+      name: pretty_qr_code
+      sha256: "474f8a4512113fba06f14a6ec9bbf42353b4e651d7a520e3096f2a9b6bbe7a8a"
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.6.0"
   process:
     dependency: transitive
     description:
@@ -1781,26 +1821,26 @@ packages:
     dependency: "direct dev"
     description:
       name: test
-      sha256: "77cc98ea27006c84e71a7356cf3daf9ddbde2d91d84f77dbfe64cf0e4d9611ae"
+      sha256: "54c516bbb7cee2754d327ad4fca637f78abfc3cbcc5ace83b3eda117e42cd71a"
       url: "https://pub.dev"
     source: hosted
-    version: "1.28.0"
+    version: "1.29.0"
   test_api:
     dependency: transitive
     description:
       name: test_api
-      sha256: "19a78f63e83d3a61f00826d09bc2f60e191bf3504183c001262be6ac75589fb8"
+      sha256: "93167629bfc610f71560ab9312acdda4959de4df6fac7492c89ff0d3886f6636"
       url: "https://pub.dev"
     source: hosted
-    version: "0.7.8"
+    version: "0.7.9"
   test_core:
     dependency: transitive
     description:
       name: test_core
-      sha256: f1072617a6657e5fc09662e721307f7fb009b4ed89b19f47175d11d5254a62d4
+      sha256: "394f07d21f0f2255ec9e3989f21e54d3c7dc0e6e9dbce160e5a9c1a6be0e2943"
       url: "https://pub.dev"
     source: hosted
-    version: "0.6.14"
+    version: "0.6.15"
   timeago:
     dependency: "direct main"
     description:
@@ -1825,6 +1865,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.10.1"
+  toastification:
+    dependency: transitive
+    description:
+      name: toastification
+      sha256: "69db2bff425b484007409650d8bcd5ed1ce2e9666293ece74dcd917dacf23112"
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.0.3"
   typed_data:
     dependency: transitive
     description:
