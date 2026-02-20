@@ -9,7 +9,6 @@ import 'package:window_manager/window_manager.dart';
 import 'package:flutter_mentions/flutter_mentions.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ndk/ndk.dart';
-import 'package:ndk_flutter/ndk_flutter.dart';
 import 'domain_layer/entities/stored_account.dart';
 import 'l10n/app_localizations.dart';
 //import 'package:device_preview/device_preview.dart';
@@ -204,20 +203,11 @@ class MyApp extends ConsumerWidget {
         darkTheme: themeVariants.darkTheme,
         themeMode: themeState.mode,
         builder: (context, child) {
-          final ndkFlutter = ref.read(ndkFlutterProvider);
-
-          Widget content = Stack(
-            children: [
-              child!,
-              NPendingRequests(ndkFlutter: ndkFlutter),
-            ],
-          );
-
           if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
             return DragToResizeArea(
               child: Stack(
                 children: [
-                  content,
+                  child!,
                   Positioned(
                     top: 0,
                     left: 0,
@@ -242,7 +232,7 @@ class MyApp extends ConsumerWidget {
               ),
             );
           }
-          return content;
+          return child!;
         },
       ),
     );
