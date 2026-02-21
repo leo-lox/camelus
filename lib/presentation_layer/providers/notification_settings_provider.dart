@@ -121,32 +121,40 @@ class NotificationSettingsNotifier extends Notifier<NotificationSettingsState> {
   }
 
   Future<void> _loadState() async {
-    final appDb = ref.read(dbAppProvider);
+    try {
+      final appDb = ref.read(dbAppProvider);
 
-    final settings = await FirebaseMessaging.instance.getNotificationSettings();
-    final isEnabled =
-        settings.authorizationStatus == AuthorizationStatus.authorized ||
-        settings.authorizationStatus == AuthorizationStatus.provisional;
-    final isDenied = settings.authorizationStatus == AuthorizationStatus.denied;
+      final settings = await FirebaseMessaging.instance
+          .getNotificationSettings();
+      final isEnabled =
+          settings.authorizationStatus == AuthorizationStatus.authorized ||
+          settings.authorizationStatus == AuthorizationStatus.provisional;
+      final isDenied =
+          settings.authorizationStatus == AuthorizationStatus.denied;
 
-    final storedKinds = await appDb.read(_dbKindsKey);
-    final storedPermissionRequested = await appDb.read(
-      _dbPermissionRequestedKey,
-    );
-    final permissionRequested = storedPermissionRequested == 'true';
-    final selectedKinds = parseKinds(storedKinds);
+      final storedKinds = await appDb.read(_dbKindsKey);
+      final storedPermissionRequested = await appDb.read(
+        _dbPermissionRequestedKey,
+      );
+      final permissionRequested = storedPermissionRequested == 'true';
+      final selectedKinds = parseKinds(storedKinds);
 
-    if (isEnabled) {
-      await _ensureTokenStored();
+      if (isEnabled) {
+        await _ensureTokenStored();
+      }
+
+      state = state.copyWith(
+        notificationsEnabled: isEnabled,
+        notificationsDenied: isDenied,
+        permissionRequested: permissionRequested,
+        selectedKinds: selectedKinds,
+        syncError: null,
+      );
+    } catch (e) {
+      state = state.copyWith(syncError: e.toString());
+    } finally {
+      state = state.copyWith(isLoading: false);
     }
-
-    state = state.copyWith(
-      isLoading: false,
-      notificationsEnabled: isEnabled,
-      notificationsDenied: isDenied,
-      permissionRequested: permissionRequested,
-      selectedKinds: selectedKinds,
-    );
   }
 
   Future<void> requestPermission() async {
@@ -154,34 +162,46 @@ class NotificationSettingsNotifier extends Notifier<NotificationSettingsState> {
 
     state = state.copyWith(isLoading: true);
 
-    final appDb = ref.read(dbAppProvider);
-    await appDb.save(key: _dbPermissionRequestedKey, value: 'true');
+    try {
+      final appDb = ref.read(dbAppProvider);
+      await appDb.save(key: _dbPermissionRequestedKey, value: 'true');
 
-    final settings = await FirebaseMessaging.instance.requestPermission(
-      alert: true,
-      badge: true,
-      sound: true,
-      provisional: false,
-    );
+      final settings = await FirebaseMessaging.instance.requestPermission(
+        alert: true,
+        badge: true,
+        sound: true,
+        provisional: false,
+      );
 
-    final isAuthorized =
-        settings.authorizationStatus == AuthorizationStatus.authorized ||
-        settings.authorizationStatus == AuthorizationStatus.provisional;
-    final isDenied = settings.authorizationStatus == AuthorizationStatus.denied;
+      final isAuthorized =
+          settings.authorizationStatus == AuthorizationStatus.authorized ||
+          settings.authorizationStatus == AuthorizationStatus.provisional;
+      final isDenied =
+          settings.authorizationStatus == AuthorizationStatus.denied;
 
-    if (isAuthorized) {
-      final token = await _getAndStoreToken();
-      if (token != null) {
-        await _registerToken(token, state.selectedKinds);
+      if (isAuthorized) {
+        final token = await _getAndStoreToken();
+        if (token != null) {
+          await _registerToken(token, state.selectedKinds);
+        }
       }
-    }
 
-    state = state.copyWith(
-      isLoading: false,
-      notificationsEnabled: isAuthorized,
-      notificationsDenied: isDenied,
-      permissionRequested: true,
-    );
+      state = state.copyWith(
+        notificationsEnabled: isAuthorized,
+        notificationsDenied: isDenied,
+        permissionRequested: true,
+        syncError: null,
+      );
+    } catch (e) {
+      state = state.copyWith(
+        notificationsEnabled: false,
+        notificationsDenied: false,
+        permissionRequested: true,
+        syncError: e.toString(),
+      );
+    } finally {
+      state = state.copyWith(isLoading: false);
+    }
   }
 
   Future<void> disableNotifications() async {
