@@ -22,6 +22,7 @@ import 'data_layer/db/ndk_cache/ndk_cache_factory.dart';
 import 'presentation_layer/init/init_moderation.dart';
 
 import 'presentation_layer/providers/db_app_provider.dart';
+import 'presentation_layer/providers/developer_settings_provider.dart';
 import 'presentation_layer/providers/db_ndk_provider.dart';
 import 'presentation_layer/providers/inbox_outbox_provider.dart';
 import 'presentation_layer/providers/language_provider.dart';
@@ -197,6 +198,7 @@ class MyApp extends ConsumerWidget {
     final currentLocale = ref.watch(currentLocaleProvider);
 
     final themeState = ref.watch(themeProvider);
+    final developerSettings = ref.watch(developerSettingsProvider);
 
     final themeVariants = getThemeVariants(
       themeType: themeState.type,
@@ -222,7 +224,7 @@ class MyApp extends ConsumerWidget {
         theme: themeVariants.lightTheme,
         darkTheme: themeVariants.darkTheme,
         themeMode: themeState.mode,
-        showPerformanceOverlay: false,
+        showPerformanceOverlay: developerSettings.showPerformanceOverlay,
 
         builder: (context, child) {
           if (_isDesktopPlatform) {

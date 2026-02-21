@@ -87,6 +87,12 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
               context.push('/settings/dm-relays');
             },
           ),
+          ListTile(
+            title: const Text('Developer settings'),
+            onTap: () {
+              context.push('/settings/developer');
+            },
+          ),
           Divider(),
           ListTile(
             title: Text(AppLocalizations.of(context)!.logout),
