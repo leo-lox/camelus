@@ -19,7 +19,10 @@ final notificationSettingsProvider =
     );
 
 class NotificationSettingsState {
+  static const Object _noChange = Object();
+
   final bool isLoading;
+  final bool isEnablingNotifications;
   final bool platformSupported;
   final bool notificationsEnabled;
   final bool notificationsDenied;
@@ -31,6 +34,7 @@ class NotificationSettingsState {
 
   const NotificationSettingsState({
     required this.isLoading,
+    required this.isEnablingNotifications,
     required this.platformSupported,
     required this.notificationsEnabled,
     required this.notificationsDenied,
@@ -43,25 +47,32 @@ class NotificationSettingsState {
 
   NotificationSettingsState copyWith({
     bool? isLoading,
+    bool? isEnablingNotifications,
     bool? platformSupported,
     bool? notificationsEnabled,
     bool? notificationsDenied,
     bool? permissionRequested,
     List<int>? selectedKinds,
-    DateTime? lastSyncAt,
+    Object? lastSyncAt = _noChange,
     bool? syncSuccessVisible,
-    String? syncError,
+    Object? syncError = _noChange,
   }) {
     return NotificationSettingsState(
       isLoading: isLoading ?? this.isLoading,
+      isEnablingNotifications:
+          isEnablingNotifications ?? this.isEnablingNotifications,
       platformSupported: platformSupported ?? this.platformSupported,
       notificationsEnabled: notificationsEnabled ?? this.notificationsEnabled,
       notificationsDenied: notificationsDenied ?? this.notificationsDenied,
       permissionRequested: permissionRequested ?? this.permissionRequested,
       selectedKinds: selectedKinds ?? this.selectedKinds,
-      lastSyncAt: lastSyncAt ?? this.lastSyncAt,
+      lastSyncAt: identical(lastSyncAt, _noChange)
+          ? this.lastSyncAt
+          : lastSyncAt as DateTime?,
       syncSuccessVisible: syncSuccessVisible ?? this.syncSuccessVisible,
-      syncError: syncError,
+      syncError: identical(syncError, _noChange)
+          ? this.syncError
+          : syncError as String?,
     );
   }
 }
@@ -75,6 +86,7 @@ class NotificationSettingsNotifier extends Notifier<NotificationSettingsState> {
     final supported = _isPlatformSupported();
     final initial = NotificationSettingsState(
       isLoading: supported,
+      isEnablingNotifications: false,
       platformSupported: supported,
       notificationsEnabled: false,
       notificationsDenied: false,
@@ -160,7 +172,11 @@ class NotificationSettingsNotifier extends Notifier<NotificationSettingsState> {
   Future<void> requestPermission() async {
     if (!state.platformSupported) return;
 
-    state = state.copyWith(isLoading: true);
+    state = state.copyWith(
+      isLoading: true,
+      isEnablingNotifications: true,
+      syncError: null,
+    );
 
     try {
       final appDb = ref.read(dbAppProvider);
@@ -190,7 +206,6 @@ class NotificationSettingsNotifier extends Notifier<NotificationSettingsState> {
         notificationsEnabled: isAuthorized,
         notificationsDenied: isDenied,
         permissionRequested: true,
-        syncError: null,
       );
     } catch (e) {
       state = state.copyWith(
@@ -200,7 +215,7 @@ class NotificationSettingsNotifier extends Notifier<NotificationSettingsState> {
         syncError: e.toString(),
       );
     } finally {
-      state = state.copyWith(isLoading: false);
+      state = state.copyWith(isLoading: false, isEnablingNotifications: false);
     }
   }
 

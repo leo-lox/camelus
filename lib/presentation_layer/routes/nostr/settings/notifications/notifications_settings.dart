@@ -66,17 +66,31 @@ class NotificationsSettingsPage extends ConsumerWidget {
                           ],
                         ),
                       ),
-                      Switch(
-                        value: state.notificationsEnabled,
-                        onChanged: state.isLoading
-                            ? null
-                            : (enabled) async {
-                                if (enabled) {
-                                  await notifier.requestPermission();
-                                } else {
-                                  await notifier.disableNotifications();
-                                }
-                              },
+                      AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 200),
+                        child: state.isEnablingNotifications
+                            ? SizedBox(
+                                key: const ValueKey('enable-loading'),
+                                width: 24,
+                                height: 24,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2.5,
+                                  color: Theme.of(context).colorScheme.primary,
+                                ),
+                              )
+                            : Switch(
+                                key: const ValueKey('enable-switch'),
+                                value: state.notificationsEnabled,
+                                onChanged: state.isLoading
+                                    ? null
+                                    : (enabled) async {
+                                        if (enabled) {
+                                          await notifier.requestPermission();
+                                        } else {
+                                          await notifier.disableNotifications();
+                                        }
+                                      },
+                              ),
                       ),
                     ],
                   ),
@@ -113,6 +127,7 @@ class NotificationsSettingsPage extends ConsumerWidget {
                         ),
                       ),
                     ),
+
                   // Last sync info
                   const SizedBox(height: 16),
                   Container(
