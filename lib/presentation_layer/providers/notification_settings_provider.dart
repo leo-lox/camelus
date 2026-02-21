@@ -258,6 +258,9 @@ class NotificationSettingsNotifier extends Notifier<NotificationSettingsState> {
   }
 
   Future<String?> _getAndStoreToken() async {
+    /// needed for iOS to ensure the APNs token is generated and linked to FCM before getting the FCM token
+    await FirebaseMessaging.instance.getAPNSToken();
+
     final token = await FirebaseMessaging.instance.getToken();
     if (token != null) {
       final appDb = ref.read(dbAppProvider);
