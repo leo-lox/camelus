@@ -7,6 +7,7 @@ import 'package:ndk/ndk.dart' as ndk;
 
 import '../../config/default_relays.dart';
 import '../../data_layer/models/nostr_note_model.dart';
+import '../../lifecycle/notifications/notification_types.dart';
 import '../../main.dart';
 import '../entities/nostr_note.dart';
 import '../entities/nostr_tag.dart';
@@ -96,7 +97,7 @@ class Notifications {
     required String pubkey,
 
     /// e.g. new reply
-    required String type,
+    required NotificationTypeLocal type,
     String? threadIdentifier,
     String? payload,
     int? notificationId,

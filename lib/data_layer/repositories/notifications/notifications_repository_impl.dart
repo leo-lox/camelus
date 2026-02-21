@@ -5,6 +5,7 @@ import 'package:ndk/ndk.dart' as ndk;
 
 import '../../../domain_layer/entities/nostr_note.dart';
 import '../../../domain_layer/repositories/notifications_repository.dart';
+import '../../../lifecycle/notifications/notification_types.dart';
 import '../../data_sources/http_request_data_source.dart';
 import '../../data_sources/notification_data_source.dart';
 import '../../data_sources/serverpod_data_source.dart';
@@ -95,7 +96,7 @@ class NotificationsRepositoryImpl implements NotificationsRepository {
     required int id,
     required String title,
     required String body,
-    required String type,
+    required NotificationTypeLocal type,
     required String avatarUrl,
     required String pubkey,
     String? threadIdentifier,
@@ -111,13 +112,12 @@ class NotificationsRepositoryImpl implements NotificationsRepository {
 
       // Create Android notification with avatar
       androidNotificationDetails = AndroidNotificationDetails(
-        'nostr_notifications',
-        'Nostr Notifications',
-        channelDescription:
-            'This channel is used to receive nostr notifications',
+        type.channelId,
+        type.channelName,
+        channelDescription: type.channelDescription,
 
-        importance: Importance.defaultImportance,
-        priority: Priority.defaultPriority,
+        importance: type.importance,
+        priority: type.priority,
         showWhen: true,
         icon: 'ic_notification',
 
@@ -125,20 +125,15 @@ class NotificationsRepositoryImpl implements NotificationsRepository {
 
         // Use person-to-person messaging style
         styleInformation: MessagingStyleInformation(
-          Person(name: title, key: pubkey),
-          conversationTitle: type,
+          Person(
+            name: title,
+            key: pubkey,
+            icon: ByteArrayAndroidIcon(imageBytes),
+          ),
+          conversationTitle: title,
+
           groupConversation: threadIdentifier != null,
-          messages: [
-            Message(
-              body,
-              DateTime.now(),
-              Person(
-                name: title,
-                key: pubkey,
-                icon: ByteArrayAndroidIcon(imageBytes),
-              ),
-            ),
-          ],
+          messages: [Message(body, DateTime.now(), null)],
         ),
 
         category: AndroidNotificationCategory.message,
@@ -151,7 +146,7 @@ class NotificationsRepositoryImpl implements NotificationsRepository {
         presentBadge: true,
         presentSound: true,
         threadIdentifier: threadIdentifier, // Group related notifications
-        subtitle: type,
+        categoryIdentifier: type.channelId,
       );
     } catch (e) {
       // If there's an error, we'll fall back to default notification

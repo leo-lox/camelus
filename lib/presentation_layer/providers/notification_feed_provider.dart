@@ -85,7 +85,7 @@ class NotificationsState extends Notifier<NotificationViewModel> {
     String userPubkey,
   ) {
     return notes.map((note) {
-      NotificationType type;
+      NotificationTypeFeed type;
       String? targetNoteId;
 
       final List<String> foundPubkeysContent = [];
@@ -111,13 +111,13 @@ class NotificationsState extends Notifier<NotificationViewModel> {
       }
 
       if (note.kind == 7) {
-        type = NotificationType.reaction;
+        type = NotificationTypeFeed.reaction;
         targetNoteId = note.tags.firstWhere((tag) => tag.type == 'e').value;
       } else if (note.kind == 6) {
-        type = NotificationType.repost;
+        type = NotificationTypeFeed.repost;
         targetNoteId = note.tags.firstWhere((tag) => tag.type == 'e').value;
       } else if (foundPubkeysContent.contains(userPubkey)) {
-        type = NotificationType.mention;
+        type = NotificationTypeFeed.mention;
       } else if (note.getTagPubkeys.last.value == userPubkey) {
         /// find note id of reply
         for (final tag in note.tags) {
@@ -126,14 +126,14 @@ class NotificationsState extends Notifier<NotificationViewModel> {
             break;
           }
         }
-        type = NotificationType.reply;
+        type = NotificationTypeFeed.reply;
       } else if (note.getTagPubkeys
           .where((t) => t.value == userPubkey)
           .isNotEmpty) {
-        type = NotificationType.threadReply;
+        type = NotificationTypeFeed.threadReply;
       } else {
         log(note.toString());
-        type = NotificationType.unknown;
+        type = NotificationTypeFeed.unknown;
       }
 
       return NostrNotification(
@@ -249,12 +249,19 @@ class NotificationViewModel {
   }
 }
 
-enum NotificationType { reaction, reply, threadReply, repost, mention, unknown }
+enum NotificationTypeFeed {
+  reaction,
+  reply,
+  threadReply,
+  repost,
+  mention,
+  unknown,
+}
 
 class NostrNotification {
   final String id;
   final int createdAt;
-  final NotificationType type;
+  final NotificationTypeFeed type;
   final NostrNote sourceNote;
   final String? targetNoteId; // ID of user's note that was interacted with
 

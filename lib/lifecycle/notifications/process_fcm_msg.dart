@@ -8,6 +8,7 @@ import '../../presentation_layer/providers/metadata_provider.dart';
 import '../../presentation_layer/providers/ndk_provider.dart';
 import '../../presentation_layer/providers/notifications_provider.dart';
 import '../../presentation_layer/providers/signer_provider.dart';
+import 'notification_types.dart';
 
 /// processes a FCM message
 Future<void> processFcmData({
@@ -67,7 +68,9 @@ Future<void> processFcmData({
       avatarUrl: metadata.picture ?? "${Dicebear.baseUrlPng}${metadata.pubkey}",
       pubkey: unwrappedEvent.pubKey,
       payload: jsonEncode(payload),
-      type: likleyDirectReply ? "new reply" : "new mention (thread)",
+      type: likleyDirectReply
+          ? NotificationTypeLocal.reply
+          : NotificationTypeLocal.mention,
       threadIdentifier: threadId,
     );
 
@@ -100,7 +103,7 @@ Future<void> processFcmData({
         ),
         "route": "/notifications",
       }),
-      type: "repost",
+      type: NotificationTypeLocal.repost,
     );
 
     /// 7=> Reaction
@@ -148,7 +151,7 @@ Future<void> processFcmData({
         ),
         "route": "/notifications",
       }),
-      type: "reaction",
+      type: NotificationTypeLocal.reaction,
     );
 
     /// is gift wrap
@@ -165,6 +168,7 @@ Future<void> processFcmData({
           .first;
 
       await notiProvider.displayLocalAvatarNotification(
+        notificationId: metadata.pubkey.hashCode,
         title:
             metadata.name ??
             metadata.nip05 ??
@@ -182,7 +186,7 @@ Future<void> processFcmData({
           ),
           "route": "/messages/${unwrappedEventLevel2.pubKey}",
         }),
-        type: "chat_message",
+        type: NotificationTypeLocal.chatMessage,
       );
     } else {
       await notiProvider.displayGenericNotification(

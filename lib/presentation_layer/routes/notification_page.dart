@@ -94,7 +94,9 @@ class _NotificationPageState extends ConsumerState<NotificationPage>
 
     // Filter mentions-only notifications
     final mentionNotifications = allNotifications
-        .where((notification) => notification.type == NotificationType.mention)
+        .where(
+          (notification) => notification.type == NotificationTypeFeed.mention,
+        )
         .toList();
 
     final notificationSettings = ref.watch(notificationSettingsProvider);
@@ -319,7 +321,7 @@ class _NotificationPageState extends ConsumerState<NotificationPage>
         leading: _getNotificationIcon(notification),
         title: Row(
           children: [
-            if (notification.type == NotificationType.reaction)
+            if (notification.type == NotificationTypeFeed.reaction)
               UserImage(
                 size: 23,
                 imageUrl: reactingUser.userMetadata?.picture,
@@ -375,15 +377,15 @@ class _NotificationPageState extends ConsumerState<NotificationPage>
   String _getNotificationText(NostrNotification notification) {
     final l10n = AppLocalizations.of(context)!;
     switch (notification.type) {
-      case NotificationType.reaction:
+      case NotificationTypeFeed.reaction:
         return l10n.reactedToYourPost;
-      case NotificationType.reply:
+      case NotificationTypeFeed.reply:
         return l10n.repliedToYourPost;
-      case NotificationType.threadReply:
+      case NotificationTypeFeed.threadReply:
         return l10n.mentionedYouInThread;
-      case NotificationType.repost:
+      case NotificationTypeFeed.repost:
         return l10n.repostedYourPost;
-      case NotificationType.mention:
+      case NotificationTypeFeed.mention:
         return l10n.mentionedYou;
       default:
         return l10n.interactedWithYourPost;
@@ -395,7 +397,7 @@ class _NotificationPageState extends ConsumerState<NotificationPage>
     Color iconColor;
 
     switch (notification.type) {
-      case NotificationType.reaction:
+      case NotificationTypeFeed.reaction:
         if (notification.sourceNote.content == '+') {
           icon = PhosphorIcons.heart(PhosphorIconsStyle.bold);
           iconColor = Theme.of(context).colorScheme.error;
@@ -406,12 +408,12 @@ class _NotificationPageState extends ConsumerState<NotificationPage>
           );
         }
 
-      case NotificationType.reply:
+      case NotificationTypeFeed.reply:
         icon = PhosphorIcons.arrowBendUpLeft();
         iconColor = Theme.of(context).colorScheme.primary;
         break;
 
-      case NotificationType.repost:
+      case NotificationTypeFeed.repost:
         return SvgPicture.asset(
           'assets/icons/retweet.svg',
           height: 18,
@@ -420,7 +422,7 @@ class _NotificationPageState extends ConsumerState<NotificationPage>
             BlendMode.srcATop,
           ),
         );
-      case NotificationType.mention:
+      case NotificationTypeFeed.mention:
         icon = PhosphorIcons.at();
         iconColor = Colors.orange;
         break;
@@ -443,10 +445,10 @@ class _NotificationPageState extends ConsumerState<NotificationPage>
     );
 
     switch (notification.type) {
-      case NotificationType.reaction:
+      case NotificationTypeFeed.reaction:
         //return Container();
         break;
-      case NotificationType.reply:
+      case NotificationTypeFeed.reply:
         final mentionUser = ref.watch(
           metadataStateProvider(notification.sourceNote.pubkey),
         );
@@ -456,7 +458,7 @@ class _NotificationPageState extends ConsumerState<NotificationPage>
           hideBottomBar: true,
         );
 
-      case NotificationType.threadReply:
+      case NotificationTypeFeed.threadReply:
         final mentionUser = ref.watch(
           metadataStateProvider(notification.sourceNote.pubkey),
         );
@@ -466,9 +468,9 @@ class _NotificationPageState extends ConsumerState<NotificationPage>
           hideBottomBar: true,
         );
 
-      case NotificationType.repost:
+      case NotificationTypeFeed.repost:
         break;
-      case NotificationType.mention:
+      case NotificationTypeFeed.mention:
         final mentionUser = ref.watch(
           metadataStateProvider(notification.sourceNote.pubkey),
         );
