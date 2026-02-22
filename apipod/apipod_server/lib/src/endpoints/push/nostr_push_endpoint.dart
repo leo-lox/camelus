@@ -404,11 +404,24 @@ class NostrPushEndpoint extends Endpoint {
         };
 
         try {
-          final response =
-              await _firebaseMessaging.sendEachForMulticast(MulticastMessage(
-            tokens: firebaseTokens,
-            data: message,
-          ));
+          final response = await _firebaseMessaging.sendEachForMulticast(
+            MulticastMessage(
+              tokens: firebaseTokens,
+              data: message,
+              apns: ApnsConfig(
+                headers: {
+                  'apns-priority':
+                      '5', // 5 = background, 10 = immediate (use 5 for silent)
+                  'apns-push-type': 'background',
+                },
+                payload: ApnsPayload(
+                  aps: Aps(
+                    contentAvailable: true,
+                  ),
+                ),
+              ),
+            ),
+          );
 
           if (response.failureCount > 0) {
             response.responses.asMap().forEach((idx, resp) async {

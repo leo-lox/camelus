@@ -51,15 +51,32 @@ Future<ProviderContainer> _setupProviderBackgroundThread() async {
 
   // init ndk db
   // db could already be open by main thread
-  final DbObjectBox dbCacheManager;
+  DbObjectBox dbCacheManager;
 
   final dbPath = await DbPaths.getNdkDbPath();
-  final isDbOpen = Store.isOpen(dbPath);
 
-  if (isDbOpen) {
+  //final isDbOpen = Store.isOpen(dbPath);
+
+  // if (isDbOpen) {
+  //   dbCacheManager = DbObjectBox(attach: true, directory: dbPath);
+  // } else {
+  //   dbCacheManager = DbObjectBox(attach: false, directory: dbPath);
+  // }
+
+  try {
     dbCacheManager = DbObjectBox(attach: true, directory: dbPath);
-  } else {
-    dbCacheManager = DbObjectBox(attach: false, directory: dbPath);
+    await dbCacheManager.dbRdy;
+  } catch (e) {
+    // Attach failed → main thread doesn't have store open
+    log("Store attach failed, opening fresh: $e");
+    try {
+      dbCacheManager = DbObjectBox(attach: false, directory: dbPath);
+      await dbCacheManager.dbRdy;
+    } catch (e2) {
+      log("ERROR: Could not open/attach ObjectBox: $e2");
+      // Fall back to no-DB or throw
+      rethrow;
+    }
   }
 
   await dbCacheManager.dbRdy;
