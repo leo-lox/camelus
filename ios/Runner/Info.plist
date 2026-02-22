@@ -105,7 +105,7 @@
     
     <!-- Firebase Configuration -->
     <key>FirebaseAppDelegateProxyEnabled</key>
-    <false/>
+    <true/>
     <key>FirebaseAutomaticScreenReportingEnabled</key>
     <false/>
 </dict>
