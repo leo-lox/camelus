@@ -200,6 +200,129 @@ class NotificationsSettingsPage extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: 24),
+          // Relay selection section
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(
+                      PhosphorIcons.broadcast(),
+                      size: 20,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'Relays (${state.selectedRelays.length}/${NotificationSettingsNotifier.maxRelaySelection})',
+                        style: Theme.of(context).textTheme.titleMedium
+                            ?.copyWith(fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ],
+                ),
+                if (state.relaySelectionError != null &&
+                    state.relaySelectionError!.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 6),
+                    child: Text(
+                      state.relaySelectionError!,
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.error,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 8),
+          Card(
+            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: state.availableRelays.isEmpty
+                ? Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Text(
+                      'No relays available',
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  )
+                : Column(
+                    children: state.availableRelays.asMap().entries.map((
+                      entry,
+                    ) {
+                      final index = entry.key;
+                      final relay = entry.value;
+                      final enabled = state.selectedRelays.contains(relay.url);
+                      final isLast = index == state.availableRelays.length - 1;
+
+                      return Column(
+                        children: [
+                          CheckboxListTile(
+                            title: Text(
+                              relay.url,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            subtitle: Padding(
+                              padding: const EdgeInsets.only(top: 4),
+                              child: Wrap(
+                                spacing: 6,
+                                runSpacing: 6,
+                                children: [
+                                  if (relay.isDmRelay)
+                                    _RelayTagChip(
+                                      label: 'DM',
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.primaryContainer,
+                                      textColor: Theme.of(
+                                        context,
+                                      ).colorScheme.onPrimaryContainer,
+                                    ),
+                                  if (relay.isInboxRelay)
+                                    _RelayTagChip(
+                                      label: 'Inbox',
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.secondaryContainer,
+                                      textColor: Theme.of(
+                                        context,
+                                      ).colorScheme.onSecondaryContainer,
+                                    ),
+                                  if (relay.isOutboxRelay)
+                                    _RelayTagChip(
+                                      label: 'Outbox',
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.tertiaryContainer,
+                                      textColor: Theme.of(
+                                        context,
+                                      ).colorScheme.onTertiaryContainer,
+                                    ),
+                                ],
+                              ),
+                            ),
+                            value: enabled,
+                            onChanged: state.isLoading
+                                ? null
+                                : (value) => notifier.setRelayEnabled(
+                                    relay.url,
+                                    value ?? false,
+                                  ),
+                          ),
+                          if (!isLast)
+                            Divider(height: 1, indent: 16, endIndent: 16),
+                        ],
+                      );
+                    }).toList(),
+                  ),
+          ),
+          const SizedBox(height: 16),
           // Event kinds section
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -255,6 +378,37 @@ class NotificationsSettingsPage extends ConsumerWidget {
           ),
           const SizedBox(height: 16),
         ],
+      ),
+    );
+  }
+}
+
+class _RelayTagChip extends StatelessWidget {
+  final String label;
+  final Color color;
+  final Color textColor;
+
+  const _RelayTagChip({
+    required this.label,
+    required this.color,
+    required this.textColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+      decoration: BoxDecoration(
+        color: color,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(
+          fontSize: 11,
+          color: textColor,
+          fontWeight: FontWeight.w600,
+        ),
       ),
     );
   }

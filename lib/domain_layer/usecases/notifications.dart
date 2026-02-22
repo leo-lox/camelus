@@ -15,6 +15,8 @@ import '../repositories/notifications_repository.dart';
 import 'inbox_outbox.dart';
 
 class Notifications {
+  static const int maxRelaySelection = 4;
+
   final NotificationsRepository _notificationsRepo;
   final ndk.EventSigner? _eventSigner;
   final InboxOutbox _inboxOutbox;
@@ -27,28 +29,23 @@ class Notifications {
        _eventSigner = eventSigner,
        _inboxOutbox = inboxOutbox;
 
-  Future<bool> registerDevice({required String token, List<int>? kinds}) async {
+  Future<bool> registerDevice({
+    required String token,
+    List<int>? kinds,
+    List<String>? relays,
+  }) async {
     if (_eventSigner == null) {
       throw Exception("cannot register device without signer");
     }
 
+    final availableRelays = await getAvailableReadRelays();
+    final chosenRelays = (relays != null && relays.isNotEmpty)
+        ? relays
+        : availableRelays;
+    final readRelays = _dedupeRelays(
+      chosenRelays,
+    ).take(maxRelaySelection).toList();
     final myPubkey = _eventSigner.getPublicKey();
-
-    final nip65data = await _inboxOutbox.getNip65data(myPubkey);
-
-    List<String> readRelays;
-
-    if (nip65data != null) {
-      readRelays = nip65data.relays.entries
-          .where((e) => e.value.isRead)
-          .map((e) => e.key)
-          .toList();
-    } else {
-      readRelays = defaultAccountCreationRelays.entries
-          .where((e) => e.value.isRead)
-          .map((e) => e.key)
-          .toList();
-    }
 
     final kindTags = (kinds ?? [])
         .map((kind) => NostrTag(type: "kind", value: kind.toString()))
@@ -80,6 +77,55 @@ class Notifications {
       token: token,
       registrationNote: registrationNote,
     );
+  }
+
+  Future<List<String>> getAvailableReadRelays() async {
+    final fallbackRelays = _defaultReadRelays();
+
+    if (_eventSigner == null) {
+      return fallbackRelays;
+    }
+
+    try {
+      final myPubkey = _eventSigner.getPublicKey();
+      final nip65data = await _inboxOutbox.getNip65data(myPubkey);
+
+      if (nip65data == null) {
+        return fallbackRelays;
+      }
+
+      final readRelays = nip65data.relays.entries
+          .where((e) => e.value.isRead)
+          .map((e) => e.key)
+          .toList();
+
+      return readRelays.isEmpty ? fallbackRelays : _dedupeRelays(readRelays);
+    } catch (_) {
+      return fallbackRelays;
+    }
+  }
+
+  List<String> _defaultReadRelays() {
+    return defaultAccountCreationRelays.entries
+        .where((e) => e.value.isRead)
+        .map((e) => e.key)
+        .toList();
+  }
+
+  List<String> _dedupeRelays(List<String> relays) {
+    final unique = <String>{};
+    final result = <String>[];
+
+    for (final relay in relays) {
+      final normalized = relay.trim();
+      if (normalized.isEmpty || unique.contains(normalized)) {
+        continue;
+      }
+      unique.add(normalized);
+      result.add(normalized);
+    }
+
+    return result;
   }
 
   Future<void> deleteNotification(int id) async {

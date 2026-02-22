@@ -54,8 +54,16 @@ Future<void> initializeFirebase({
       final appDb = provider.read(dbAppProvider);
       await appDb.save(key: "fcm_token", value: newToken);
       final storedKinds = await appDb.read('push_kinds');
+      final storedRelays = await appDb.read('push_relays');
       final kinds = NotificationSettingsNotifier.parseKinds(storedKinds);
-      await notiProvider.registerDevice(token: newToken, kinds: kinds);
+      final relays = NotificationSettingsNotifier.parseSelectedRelays(
+        storedRelays,
+      );
+      await notiProvider.registerDevice(
+        token: newToken,
+        kinds: kinds,
+        relays: relays,
+      );
     });
   } else {
     log('Firebase not initialized: unsupported platform');

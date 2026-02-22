@@ -151,6 +151,25 @@ class DmRelayListNotifier extends Notifier<DmRelayListState> {
     }
   }
 
+  /// Returns current DM relays and lazily loads them when needed.
+  /// Set [refresh] to true to force a network refresh.
+  Future<List<String>> getRelays({bool refresh = false}) async {
+    if (myPubkey == null) {
+      return const [];
+    }
+
+    if (state.relays.isEmpty) {
+      await _loadFromCacheThenFetch();
+      return state.relays;
+    }
+
+    if (refresh) {
+      await fetchRelays();
+    }
+
+    return state.relays;
+  }
+
   /// Add a relay to the list (local change only)
   AddRelayResult addRelay(String relayUrl) {
     if (myPubkey == null) return AddRelayResult.invalidUrl;
