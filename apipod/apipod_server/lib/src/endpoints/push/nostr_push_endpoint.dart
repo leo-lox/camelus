@@ -394,15 +394,25 @@ class NostrPushEndpoint extends Endpoint {
             MulticastMessage(
               tokens: firebaseTokens,
               data: message,
+              notification: event.kind == 1059
+                  ? Notification(
+                      title: 'New notification',
+                      body: 'You have a new notification',
+                    )
+                  : null,
               apns: ApnsConfig(
                 headers: {
-                  'apns-priority':
-                      '5', // 5 = background, 10 = immediate (use 5 for silent)
-                  'apns-push-type': 'background',
+                  'apns-priority': event.kind == 1059
+                      ? '10'
+                      : '5', // 5 = background, 10 = immediate (use 5 for silent)
+                  'apns-push-type': event.kind == 1059 ? 'alert' : 'background',
                 },
                 payload: ApnsPayload(
                   aps: Aps(
                     contentAvailable: true,
+                    threadId: event.kind == 1059
+                        ? 'notification-${pubkeyTag[1]}'
+                        : null,
                   ),
                 ),
               ),
