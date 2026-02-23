@@ -1,17 +1,14 @@
-import 'package:flutter/foundation.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:ndk/ndk.dart';
 import 'package:ndk_rust_verifier/ndk_rust_verifier.dart';
+import 'package:ndk_flutter/ndk_flutter.dart' show WebEventVerifier;
 import 'package:ndk/entities.dart' as ndk_entities;
 import 'package:riverpod/riverpod.dart';
 
 // Provider for the EventVerifier, which provides an instance of a specific event verifier.
-// Currently set to use the RustEventVerifier.
+// Uses WebEventVerifier on web, RustEventVerifier on native platforms.
 final eventVerifierProvider = Provider<EventVerifier>((ref) {
-  /// use MockVerifer for now
-  if (kIsWeb) {
-    return MockEventVerifier();
-  }
-
+  if (kIsWeb) return WebEventVerifier();
   return RustEventVerifier();
 });
 

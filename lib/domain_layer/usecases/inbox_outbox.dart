@@ -20,6 +20,14 @@ class InboxOutbox {
     );
   }
 
+  Future<List<String>> getDmRelays({bool forceRefresh = false}) {
+    return _inboxOutboxRepository.getDmRelays(forceRefresh: forceRefresh);
+  }
+
+  Future<List<String>> setDmRelays(List<String> relays) {
+    return _inboxOutboxRepository.setDmRelays(relays);
+  }
+
   Future<void> updateCache(List<String> pubkeys, {bool forceRefresh = false}) {
     return _inboxOutboxRepository.updateCache(
       pubkeys,

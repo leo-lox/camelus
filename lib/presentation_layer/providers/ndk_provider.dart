@@ -1,4 +1,5 @@
 import 'package:ndk/ndk.dart';
+import 'package:ndk_flutter/ndk_flutter.dart';
 import 'package:riverpod/riverpod.dart';
 
 import '../../config/default_relays.dart';
@@ -41,4 +42,10 @@ final ndkProviderLight = Provider<Ndk>((ref) {
 
   final ndk = Ndk(ndkConfig);
   return ndk;
+});
+
+/// NdkFlutter wrapper for Flutter widgets
+final ndkFlutterProvider = Provider<NdkFlutter>((ref) {
+  final ndk = ref.watch(ndkProvider);
+  return NdkFlutter(ndk: ndk);
 });

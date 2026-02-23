@@ -1,10 +1,11 @@
 import 'dart:developer';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:ndk/ndk.dart';
 
-import '../../../config/nostr_kinds.dart';
-import '../ndk_provider.dart';
+import '../../config/nostr_kinds.dart';
+import '../../domain_layer/usecases/inbox_outbox.dart';
+import 'inbox_outbox_provider.dart';
+import 'ndk_provider.dart';
 
 /// Result of adding a relay
 enum AddRelayResult { success, invalidUrl, alreadyExists }
@@ -61,10 +62,10 @@ class DmRelayListState {
 class DmRelayListNotifier extends Notifier<DmRelayListState> {
   @override
   DmRelayListState build() {
-    final ndkInstance = ref.watch(ndkProvider);
-    final myPubkeyValue = ndkInstance.accounts.getPublicKey();
+    final inboxOutboxInstance = ref.watch(inboxOutboxProvider);
+    final myPubkeyValue = ref.watch(ndkProvider).accounts.getPublicKey();
 
-    ndk = ndkInstance;
+    inboxOutbox = inboxOutboxInstance;
     myPubkey = myPubkeyValue;
 
     if (myPubkey != null) {
@@ -74,36 +75,21 @@ class DmRelayListNotifier extends Notifier<DmRelayListState> {
     return const DmRelayListState();
   }
 
-  late final Ndk ndk;
+  late final InboxOutbox inboxOutbox;
   late final String? myPubkey;
 
   /// Load from cache first (instant), then fetch from network
   Future<void> _loadFromCacheThenFetch() async {
-    // 1. Load from cache (instant)
-    final cached = await ndk.config.cache.loadEvents(
-      pubKeys: [myPubkey!],
-      kinds: [kDmRelayListKind],
-      limit: 1,
-    );
+    // 1. Load from cache via NDK lists usecase (instant if available)
+    final relays = await inboxOutbox.getDmRelays();
 
-    if (cached.isNotEmpty) {
-      final relays = _parseRelaysFromEvent(cached.first);
+    if (relays.isNotEmpty) {
       log('DM Relays: Loaded ${relays.length} relays from cache');
       state = state.copyWith(originalRelays: relays, relays: relays);
     }
 
     // 2. Fetch from network in background
     await fetchRelays();
-  }
-
-  List<String> _parseRelaysFromEvent(Nip01Event event) {
-    final relays = <String>[];
-    for (final tag in event.tags) {
-      if (tag.isNotEmpty && tag[0] == 'relay' && tag.length > 1) {
-        relays.add(tag[1]);
-      }
-    }
-    return relays;
   }
 
   /// Fetch the current DM relay list from the network
@@ -116,28 +102,7 @@ class DmRelayListNotifier extends Notifier<DmRelayListState> {
     }
 
     try {
-      final filter = Filter(
-        kinds: [kDmRelayListKind],
-        authors: [myPubkey!],
-        limit: 1,
-      );
-
-      final response = ndk.requests.query(
-        filter: filter,
-        name: 'dm-relay-list-fetch',
-        timeout: const Duration(seconds: 15),
-      );
-
-      Nip01Event? latestEvent;
-      await for (final event in response.stream) {
-        if (latestEvent == null || event.createdAt > latestEvent.createdAt) {
-          latestEvent = event;
-        }
-      }
-
-      final relays = latestEvent != null
-          ? _parseRelaysFromEvent(latestEvent)
-          : <String>[];
+      final relays = await inboxOutbox.getDmRelays(forceRefresh: true);
 
       log('DM Relays: Fetched ${relays.length} relays from network');
       state = state.copyWith(
@@ -178,9 +143,6 @@ class DmRelayListNotifier extends Notifier<DmRelayListState> {
     String url = relayUrl.trim();
     if (!url.startsWith('wss://') && !url.startsWith('ws://')) {
       url = 'wss://$url';
-    }
-    if (!url.endsWith('/')) {
-      url = '$url/';
     }
 
     // Validate URL
@@ -227,30 +189,14 @@ class DmRelayListNotifier extends Notifier<DmRelayListState> {
     state = state.copyWith(isSaving: true, error: null);
 
     try {
-      // Build tags for kind 10050
-      final tags = state.relays.map((url) => ['relay', url]).toList();
-
-      // Create and sign the event
-      final event = Nip01Event(
-        pubKey: myPubkey!,
-        kind: kDmRelayListKind,
-        tags: tags,
-        content: '',
-      );
-      final signedEvent = await ndk.accounts.sign(event);
-
-      // Save to cache first (optimistic)
-      await ndk.config.cache.saveEvent(signedEvent);
-
-      // Broadcast to user's write relays
-      final broadcastResponse = ndk.broadcast.broadcast(
-        nostrEvent: signedEvent,
-      );
-
-      await broadcastResponse.broadcastDoneFuture;
+      final savedRelays = await inboxOutbox.setDmRelays(state.relays);
 
       log('DM Relays: Saved ${state.relays.length} relays');
-      state = state.copyWith(originalRelays: state.relays, isSaving: false);
+      state = state.copyWith(
+        originalRelays: savedRelays,
+        relays: savedRelays,
+        isSaving: false,
+      );
       return true;
     } catch (e) {
       log('DM Relays: Error saving: $e');
