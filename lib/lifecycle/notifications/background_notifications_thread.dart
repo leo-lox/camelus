@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:ndk/ndk.dart';
 import 'package:ndk_objectbox/ndk_objectbox.dart';
@@ -7,6 +8,7 @@ import 'package:riverpod/riverpod.dart';
 
 import '../../config/db_paths.dart';
 import '../../domain_layer/usecases/app_auth.dart';
+import '../../firebase_options.dart';
 import '../../objectbox.g.dart';
 import '../../presentation_layer/providers/db_ndk_provider.dart';
 import '../../presentation_layer/providers/ndk_provider.dart';
@@ -18,6 +20,8 @@ import 'process_fcm_msg.dart';
 @pragma('vm:entry-point')
 Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   log("Handling a background message: ${message.messageId}");
+
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   final providerContainer = await _setupProviderBackgroundThread();
 

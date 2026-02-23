@@ -19,7 +19,7 @@ env:
   # organization. Maybe this part "../../../../../../templates/serverpod_templates/github/workflows"could be included in the make file and asked
   # the user what they want to use.
 
-  GHCR_ORG: "leo-lox"
+  GHCR_ORG: "camelus-hq"
 
 jobs:
   build-and-push-image:
@@ -170,6 +170,10 @@ jobs:
 
           # GOOGLE_APPLICATION_CREDENTIALS path
           GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS}}
+
+          # nostr keys
+          OTSO_NOSTR_PRIV_KEY: ${{ secrets.OTSO_NOSTR_PRIV_KEY }}
+          OTSO_NOSTR_PUB_KEY:  ${{ secrets.OTSO_NOSTR_PUB_KEY }}
 
 
       - name: cleanup

@@ -1,5 +1,6 @@
 import '../../domain_layer/entities/nip_65.dart';
 import '../../domain_layer/repositories/inbox_outbox_repository.dart';
+import '../../config/nostr_kinds.dart';
 import '../data_sources/dart_ndk_source.dart';
 import '../models/nip_65_model.dart';
 
@@ -31,6 +32,59 @@ class InboxOutboxRepositoryImpl implements InboxOutboxRepository {
 
     final data = Nip65Model.fromNdkUserRelayList(ndkData);
     return data;
+  }
+
+  @override
+  Future<List<String>> getDmRelays({bool forceRefresh = false}) async {
+    final list = await dartNdkSource.dartNdk.lists.getSingleNip51List(
+      kDmRelayListKind,
+      forceRefresh: forceRefresh,
+    );
+    return list?.allRelays.toList() ?? const [];
+  }
+
+  @override
+  Future<List<String>> setDmRelays(List<String> relays) async {
+    final normalized = <String>[];
+    final seen = <String>{};
+
+    for (final relay in relays) {
+      final value = relay.trim();
+      if (value.isEmpty || seen.contains(value)) {
+        continue;
+      }
+      seen.add(value);
+      normalized.add(value);
+    }
+
+    final current = await getDmRelays(forceRefresh: true);
+    final currentSet = current.toSet();
+    final targetSet = normalized.toSet();
+
+    final toRemove = current.where((relay) => !targetSet.contains(relay));
+    final toAdd = normalized.where((relay) => !currentSet.contains(relay));
+
+    for (final relay in toRemove) {
+      await dartNdkSource.dartNdk.lists.removeElementFromList(
+        kind: kDmRelayListKind,
+        tag: 'relay',
+        value: relay,
+      );
+    }
+
+    for (final relay in toAdd) {
+      await dartNdkSource.dartNdk.lists.addElementToList(
+        kind: kDmRelayListKind,
+        tag: 'relay',
+        value: relay,
+      );
+    }
+
+    if (toRemove.isEmpty && toAdd.isEmpty) {
+      return normalized;
+    }
+
+    return getDmRelays(forceRefresh: true);
   }
 
   @override

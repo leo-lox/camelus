@@ -8,7 +8,7 @@ assignees: ''
 ---
 
 ** check the public issue tracker **
-- [ ] I checked the public bug tracker https://github.com/users/leo-lox/projects/3/views/1
+- [ ] I checked the public bug tracker https://github.com/orgs/camelus-hq/projects/2
 
 **Describe the bug**
 A clear and concise description of what the bug is.
