@@ -4,6 +4,7 @@ import 'dart:developer';
 import 'package:ndk/ndk.dart';
 
 import '../../domain_layer/entities/direct_message.dart';
+import '../../domain_layer/usecases/inbox_outbox.dart';
 import '../models/nostr_tag_model.dart';
 import '../../domain_layer/entities/dm_conversation.dart';
 import '../../domain_layer/repositories/direct_message_repository.dart';
@@ -11,7 +12,6 @@ import '../../objectbox.g.dart';
 import '../db/object_box_camelus/schema/db_nip17_conversation.dart';
 import '../db/object_box_camelus/schema/db_nip17_message.dart';
 import '../models/direct_message_model.dart';
-import '../../config/nostr_kinds.dart';
 
 /// Implementation of [DirectMessageRepository] using NDK and ObjectBox.
 ///
@@ -23,6 +23,7 @@ class DirectMessageRepositoryImpl implements DirectMessageRepository {
   final Ndk ndk;
   final Future<Store> Function() getStore;
   final String myPubkey;
+  final InboxOutbox inboxOutbox;
 
   // Subscription for real-time messages
   NdkResponse? _dmSubscription;
@@ -41,6 +42,7 @@ class DirectMessageRepositoryImpl implements DirectMessageRepository {
     required this.ndk,
     required this.getStore,
     required this.myPubkey,
+    required this.inboxOutbox,
   });
 
   // ============ DM Relay Discovery ============
@@ -50,25 +52,14 @@ class DirectMessageRepositoryImpl implements DirectMessageRepository {
   /// Reads from cache first for speed, refreshes cache in background.
   Future<List<String>> _getDmInboxRelays(String pubkey) async {
     // Try cache first (fast)
-    final cachedRelays = await _getDmInboxRelaysFromCache(pubkey);
+    final cachedRelays = await _getDmRelays(pubkey);
     if (cachedRelays.isNotEmpty) {
       log('DM: Using cached relays for $pubkey: $cachedRelays');
-      // Refresh cache in background for next time
-      _refreshDmRelaysInBackground(pubkey);
+
       return cachedRelays;
     }
 
-    // Cache miss: fetch from network
-    log('DM: Cache miss, fetching relays for $pubkey');
-    await ndk.relays.seedRelaysConnected;
-
-    final dmRelays = await _fetchKind10050Relays(pubkey);
-    if (dmRelays.isNotEmpty) {
-      log('DM: Using kind 10050 relays for $pubkey: $dmRelays');
-      return dmRelays;
-    }
-
-    final nip65Relays = await _getNip65InboxRelays(pubkey);
+    final nip65Relays = await _getNip65InboxRelays(pubkey, forceRefresh: true);
     if (nip65Relays.isNotEmpty) {
       log('DM: Using NIP-65 inbox relays for $pubkey: $nip65Relays');
       return nip65Relays;
@@ -78,119 +69,45 @@ class DirectMessageRepositoryImpl implements DirectMessageRepository {
     return [];
   }
 
-  /// Get DM relays from cache only (no network).
-  Future<List<String>> _getDmInboxRelaysFromCache(String pubkey) async {
-    // Try kind 10050 from cache
-    final events = await ndk.config.cache.loadEvents(
-      kinds: [kDmRelayListKind],
-      pubKeys: [pubkey],
-      limit: 1,
-    );
-    if (events.isNotEmpty) {
-      final relays = <String>[];
-      for (final tag in events.first.tags) {
-        if (tag.isNotEmpty && tag[0] == 'relay' && tag.length > 1) {
-          relays.add(tag[1]);
-        }
-      }
-      if (relays.isNotEmpty) return relays;
-    }
-
-    // Try NIP-65 from cache
-    final userRelayList = await ndk.config.cache.loadUserRelayList(pubkey);
-    if (userRelayList != null) {
-      return userRelayList.readUrls.toList();
-    }
-
-    return [];
-  }
-
-  /// Refresh DM relays cache in background (fire and forget).
-  void _refreshDmRelaysInBackground(String pubkey) {
-    Future(() async {
-      try {
-        await ndk.relays.seedRelaysConnected;
-        await _fetchKind10050Relays(pubkey);
-        await _getNip65InboxRelays(pubkey);
-      } catch (_) {}
-    });
-  }
-
-  /// Fetch kind 10050 (DM relay list) for a pubkey.
-  /// Queries on the user's NIP-65 write relays.
-  /// Returns empty list if not found.
-  Future<List<String>> _fetchKind10050Relays(String pubkey) async {
+  /// Get DM relays via InboxOutbox (kind 10050).
+  Future<List<String>> _getDmRelays(
+    String pubkey, {
+    bool forceRefresh = false,
+  }) async {
     try {
-      // First get NIP-65 write relays to query kind 10050
-      final userRelayList = await ndk.userRelayLists.getSingleUserRelayList(
-        pubkey,
-      );
-
-      log(
-        'DM: userRelayList for $pubkey: ${userRelayList != null ? "found" : "null"}',
-      );
-
-      final writeRelays =
-          userRelayList?.relays.entries
-              .where((entry) => entry.value.isWrite)
-              .map((entry) => entry.key)
-              .toList() ??
-          [];
-
-      log('DM: writeRelays for kind 10050 query: $writeRelays');
-
-      final filter = Filter(
-        kinds: [kDmRelayListKind],
-        authors: [pubkey],
-        limit: 1,
-      );
-
-      final response = ndk.requests.query(
-        filter: filter,
-        timeout: const Duration(seconds: 10),
-        explicitRelays: writeRelays.isNotEmpty ? writeRelays : null,
-      );
-
-      Nip01Event? latestEvent;
-      await for (final event in response.stream) {
-        if (latestEvent == null || event.createdAt > latestEvent.createdAt) {
-          latestEvent = event;
-        }
+      if (pubkey == myPubkey) {
+        return await inboxOutbox.getDmRelaysSelf(forceRefresh: forceRefresh);
       }
 
-      if (latestEvent == null) {
-        log('DM: No kind 10050 event found for $pubkey');
-        return [];
-      }
-
-      // Parse relay URLs from tags: [["relay", "wss://relay.example.com"], ...]
-      final relays = <String>[];
-      for (final tag in latestEvent.tags) {
-        if (tag.isNotEmpty && tag[0] == 'relay' && tag.length > 1) {
-          relays.add(tag[1]);
-        }
-      }
-
-      log('DM: Found kind 10050 relays: $relays');
-      return relays;
+      return await inboxOutbox.getDmRelays(
+        pubkey: pubkey,
+        forceRefresh: forceRefresh,
+      );
     } catch (e) {
-      log('DM: Error fetching kind 10050 for $pubkey: $e');
+      log('DM: Error getting DM relays via InboxOutbox for $pubkey: $e');
       return [];
     }
   }
 
   /// Get NIP-65 inbox relays (read-capable relays) for a pubkey.
-  Future<List<String>> _getNip65InboxRelays(String pubkey) async {
+  Future<List<String>> _getNip65InboxRelays(
+    String pubkey, {
+    bool forceRefresh = false,
+  }) async {
     try {
-      final userRelayList = await ndk.userRelayLists.getSingleUserRelayList(
+      final nip65 = await inboxOutbox.getNip65data(
         pubkey,
+        forceRefresh: forceRefresh,
       );
-      if (userRelayList == null) {
+      if (nip65 == null) {
         return [];
       }
 
       // Get relays marked for reading (inbox)
-      return userRelayList.readUrls.toList();
+      return nip65.relays.entries
+          .where((entry) => entry.value.isRead)
+          .map((entry) => entry.key)
+          .toList();
     } catch (e) {
       log('DM: Error fetching NIP-65 for $pubkey: $e');
       return [];
