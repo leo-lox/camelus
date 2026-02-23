@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ndk/shared/nips/nip19/nip19.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:toastification/toastification.dart';
 
 import '../../../domain_layer/entities/direct_message.dart';
 import '../../atoms/my_profile_picture.dart';
@@ -220,9 +221,13 @@ class _DmThreadPageState extends ConsumerState<DmThreadPage> {
             onDelete: (messageId) => ref
                 .read(dmThreadProvider(_peerPubkey).notifier)
                 .deleteMessage(messageId),
-            onRetry: (messageId) => ref
-                .read(dmThreadProvider(_peerPubkey).notifier)
-                .retrySendMessage(messageId),
+            onRetry: (messageId) async {
+              final success = await ref
+                  .read(dmThreadProvider(_peerPubkey).notifier)
+                  .retrySendMessage(messageId);
+              if (!success && mounted) _showSendErrorToast();
+              return success;
+            },
             onRemoveFailedMessage: (messageId) => ref
                 .read(dmThreadProvider(_peerPubkey).notifier)
                 .removeFailedMessage(messageId),
@@ -467,14 +472,26 @@ class _DmThreadPageState extends ConsumerState<DmThreadPage> {
     );
   }
 
+  void _showSendErrorToast() {
+    toastification.show(
+      context: context,
+      type: ToastificationType.error,
+      title: Text(AppLocalizations.of(context)!.failedToSendMessage),
+      autoCloseDuration: const Duration(seconds: 10),
+      showProgressBar: true,
+    );
+  }
+
   Future<void> _sendMessage() async {
     final content = _messageController.text.trim();
     if (content.isEmpty) return;
 
     _messageController.clear();
 
-    // Message is added optimistically, no need to wait for result
-    // or show error snackbar - error will be shown in the message bubble
-    ref.read(dmThreadProvider(_peerPubkey).notifier).sendMessage(content);
+    final success = await ref
+        .read(dmThreadProvider(_peerPubkey).notifier)
+        .sendMessage(content);
+
+    if (!success && mounted) _showSendErrorToast();
   }
 }

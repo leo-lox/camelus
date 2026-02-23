@@ -1128,10 +1128,10 @@ packages:
     dependency: "direct main"
     description:
       name: ndk
-      sha256: "7a118aa8aac16ad1a8bcc8fd68314a2cbccd6b31cdab12b08499aa7f9d0833b7"
+      sha256: "3fef9d35e2aad334eaef13aec5448f2284aad9ce3ab946e1648ac67b4b08795c"
       url: "https://pub.dev"
     source: hosted
-    version: "0.7.1-dev.14"
+    version: "0.7.1-dev.17"
   ndk_amber:
     dependency: "direct main"
     description:
@@ -1866,7 +1866,7 @@ packages:
     source: hosted
     version: "0.10.1"
   toastification:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: toastification
       sha256: "69db2bff425b484007409650d8bcd5ed1ce2e9666293ece74dcd917dacf23112"

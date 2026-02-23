@@ -786,10 +786,12 @@ class DirectMessageRepositoryImpl implements DirectMessageRepository {
       _notifyMessagesChanged(recipientPubkey);
       _notifyConversationsChanged();
 
-      log(
-        'DM: Message ${relayConfirmed ? 'sent successfully' : 'failed - no relay confirmation'}',
-      );
+      if (!relayConfirmed) {
+        log('DM: Message failed - no relay confirmation');
+        throw Exception('No relay confirmation');
+      }
 
+      log('DM: Message sent successfully');
       return finalMessage;
     } catch (e) {
       log('DM: Error sending message: $e');

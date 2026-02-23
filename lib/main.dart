@@ -9,6 +9,7 @@ import 'package:window_manager/window_manager.dart';
 import 'package:flutter_mentions/flutter_mentions.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ndk/ndk.dart';
+import 'package:toastification/toastification.dart';
 import 'domain_layer/entities/stored_account.dart';
 import 'l10n/app_localizations.dart';
 //import 'package:device_preview/device_preview.dart';
@@ -183,57 +184,59 @@ class MyApp extends ConsumerWidget {
       themeColor: themeState.color,
     );
 
-    return Portal(
-      child: MaterialApp.router(
-        routerConfig: router,
-        scrollBehavior: const MaterialScrollBehavior().copyWith(
-          scrollbars: false,
-          dragDevices: {
-            PointerDeviceKind.touch,
-            PointerDeviceKind.mouse,
-            PointerDeviceKind.trackpad,
-          },
-        ),
-        debugShowCheckedModeBanner: false,
-        title: 'camelus',
-        locale: currentLocale,
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
-        supportedLocales: AppLocalizations.supportedLocales,
-        theme: themeVariants.lightTheme,
-        darkTheme: themeVariants.darkTheme,
-        themeMode: themeState.mode,
-        builder: (context, child) {
-          if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
-            return DragToResizeArea(
-              child: Stack(
-                children: [
-                  child!,
-                  Positioned(
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    child: SizedBox(
-                      height: 32,
-                      child: Row(
-                        children: [
-                          Expanded(child: DragToMoveArea(child: Container())),
-                          SizedBox(
-                            width: 154,
-                            child: WindowCaption(
-                              brightness: Theme.of(context).brightness,
-                              backgroundColor: Colors.transparent,
+    return ToastificationWrapper(
+      child: Portal(
+        child: MaterialApp.router(
+          routerConfig: router,
+          scrollBehavior: const MaterialScrollBehavior().copyWith(
+            scrollbars: false,
+            dragDevices: {
+              PointerDeviceKind.touch,
+              PointerDeviceKind.mouse,
+              PointerDeviceKind.trackpad,
+            },
+          ),
+          debugShowCheckedModeBanner: false,
+          title: 'camelus',
+          locale: currentLocale,
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          theme: themeVariants.lightTheme,
+          darkTheme: themeVariants.darkTheme,
+          themeMode: themeState.mode,
+          builder: (context, child) {
+            if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+              return DragToResizeArea(
+                child: Stack(
+                  children: [
+                    child!,
+                    Positioned(
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      child: SizedBox(
+                        height: 32,
+                        child: Row(
+                          children: [
+                            Expanded(child: DragToMoveArea(child: Container())),
+                            SizedBox(
+                              width: 154,
+                              child: WindowCaption(
+                                brightness: Theme.of(context).brightness,
+                                backgroundColor: Colors.transparent,
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                ],
-              ),
-            );
-          }
-          return child!;
-        },
+                  ],
+                ),
+              );
+            }
+            return child!;
+          },
+        ),
       ),
     );
   }

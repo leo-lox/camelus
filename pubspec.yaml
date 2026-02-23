@@ -78,7 +78,7 @@ dependencies:
   phosphor_flutter: ^2.1.0
 
   # ndk imports
-  ndk: ^0.7.1-dev.14
+  ndk: ^0.7.1-dev.17
   ndk_rust_verifier: ^0.5.0
   ndk_amber: ^0.4.0-dev.15
   ndk_objectbox: ^0.2.8-dev.14
@@ -106,6 +106,7 @@ dependencies:
     sdk: flutter
   system_theme: ^3.1.2
   ndk_flutter: ^0.0.2-dev.8
+  toastification: ^3.0.3
 
   
 
