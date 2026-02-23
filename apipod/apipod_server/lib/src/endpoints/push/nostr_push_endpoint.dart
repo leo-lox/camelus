@@ -395,25 +395,19 @@ class NostrPushEndpoint extends Endpoint {
             MulticastMessage(
               tokens: firebaseTokens,
               data: message,
-              notification: event.kind == 1059
-                  ? Notification(
-                      title: 'New notification',
-                      body: 'You have a new notification',
-                    )
-                  : null,
+
+              // Keep iOS data-only so the app can parse encryptedEvent
+              // and create its own local notification in background.
+              notification: null,
               apns: ApnsConfig(
                 headers: {
-                  'apns-priority': event.kind == 1059
-                      ? '10'
-                      : '5', // 5 = background, 10 = immediate (use 5 for silent)
-                  'apns-push-type': event.kind == 1059 ? 'alert' : 'background',
+                  'apns-priority':
+                      '10', // 10 is for immediate, 5 is for background
+                  'apns-push-type': 'alert', // background
                 },
                 payload: ApnsPayload(
                   aps: Aps(
                     contentAvailable: true,
-                    threadId: event.kind == 1059
-                        ? 'notification-${pubkeyTag[1]}'
-                        : null,
                   ),
                 ),
               ),
