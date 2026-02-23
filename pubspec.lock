@@ -1856,7 +1856,7 @@ packages:
     source: hosted
     version: "0.10.1"
   toastification:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: toastification
       sha256: "69db2bff425b484007409650d8bcd5ed1ce2e9666293ece74dcd917dacf23112"
