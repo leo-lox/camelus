@@ -321,13 +321,13 @@ class NostrPushEndpoint extends Endpoint {
       }
 
       // Get the subscribed kinds for this user and relay
-      final subscribedKinds =
-          await getKindsByPubKeyAndRelay(session, pubkeyTag[1], relay.url);
+      final subscribedKinds = await getKindsByPubKey(session, pubkeyTag[1]);
 
       // Check if the event kind is in the user's subscribed kinds
       if (!subscribedKinds.contains(event.kind)) {
         session.log(
-            'Event kind ${event.kind} not in subscribed kinds $subscribedKinds for ${pubkeyTag[1]}');
+            'Event kind ${event.kind} not in subscribed kinds $subscribedKinds for ${pubkeyTag[1]}',
+            level: LogLevel.debug);
         return;
       }
 
@@ -343,7 +343,8 @@ class NostrPushEndpoint extends Endpoint {
 
       await _withSession(enableLogging: true, (s) async {
         s.log(
-            "fcm msg, all_tokens: ${tokens.toString()}, fcm_tokens: ${firebaseTokens.toString()}");
+            "fcm msg, all_tokens: ${tokens.toString()}, pubkey: ${pubkeyTag[1]}, relay: ${relay.url}, event kind: ${event.kind}, event id: ${event.id}",
+            level: LogLevel.debug);
       });
 
       final wrappedEvent = await ndk.GiftWrap.wrapEvent(

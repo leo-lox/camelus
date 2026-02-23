@@ -62,11 +62,10 @@ Future<List<String>> getTokensByPubKey(Session session, String pubKey) async {
 }
 
 // Get subscription kinds for a pubKey and relay
-Future<List<int>> getKindsByPubKeyAndRelay(
-    Session session, String pubKey, String relay) async {
+Future<List<int>> getKindsByPubKey(Session session, String pubKey) async {
   final subscriptions = await PushSubscription.db.find(
     session,
-    where: (t) => t.pubKey.equals(pubKey) & t.relay.equals(relay),
+    where: (t) => t.pubKey.equals(pubKey),
   );
 
   if (subscriptions.isEmpty) {
