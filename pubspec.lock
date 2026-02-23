@@ -1128,34 +1128,24 @@ packages:
     dependency: "direct main"
     description:
       name: ndk
-      sha256: "3fef9d35e2aad334eaef13aec5448f2284aad9ce3ab946e1648ac67b4b08795c"
+      sha256: "6162f1421ae3f5c7e43ae0c7b702ea4f3c5507fb0fd491847eed71208c7137af"
       url: "https://pub.dev"
     source: hosted
-    version: "0.7.1-dev.17"
+    version: "0.7.1-dev.15"
   ndk_amber:
     dependency: "direct main"
     description:
-      name: ndk_amber
-      sha256: c8a2741b2d87811ad670764071954829bff019e0e73c3bb4eb4cbb520cf40f2b
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.4.0-dev.15"
-  ndk_flutter:
-    dependency: "direct main"
-    description:
-      name: ndk_flutter
-      sha256: "64fde6317984207da9db20fc1b1bd1b03086c5b7554ca2300760e35b159f8e70"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.0.2-dev.8"
+      path: "../ndk/packages/amber"
+      relative: true
+    source: path
+    version: "0.4.0-dev.16"
   ndk_objectbox:
     dependency: "direct main"
     description:
-      name: ndk_objectbox
-      sha256: "3d324498f11097975c5f74e188ada02c4c1f4de92f51423c0196c6386022ebc8"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.2.8-dev.14"
+      path: "../ndk/packages/objectbox"
+      relative: true
+    source: path
+    version: "0.2.8-dev.16"
   ndk_rust_verifier:
     dependency: "direct main"
     description:
