@@ -22,7 +22,7 @@ class _BlockedUsersState extends ConsumerState<BlocklistPage> {
     final localCreatedAt = createdAt.toLocal();
     final diff = DateTime.now().difference(localCreatedAt);
     if (diff <= const Duration(hours: 24)) {
-      return "${timeago.format(localCreatedAt, locale: 'en_short')} ago";
+      return timeago.format(localCreatedAt, locale: 'en_short');
     }
 
     final locale = Localizations.localeOf(context).toLanguageTag();
@@ -108,7 +108,7 @@ class _BlockedUsersState extends ConsumerState<BlocklistPage> {
           const SizedBox(height: 12),
           if (blocklistState.blockedPubkeys.isEmpty)
             Text(
-              'No blocked users',
+              AppLocalizations.of(context)!.noBlockedUsers,
               style: TextStyle(color: Theme.of(context).colorScheme.outline),
             )
           else
@@ -150,9 +150,9 @@ class _BlockedUsersState extends ConsumerState<BlocklistPage> {
                   enabled: !blocklistState.isLoading,
                   textInputAction: TextInputAction.done,
                   onSubmitted: (_) => _addWord(),
-                  decoration: const InputDecoration(
-                    hintText: 'Add blocked word',
-                    border: OutlineInputBorder(),
+                  decoration: InputDecoration(
+                    hintText: AppLocalizations.of(context)!.addBlockedWord,
+                    border: const OutlineInputBorder(),
                     isDense: true,
                   ),
                 ),
@@ -167,7 +167,7 @@ class _BlockedUsersState extends ConsumerState<BlocklistPage> {
           const SizedBox(height: 12),
           if (blocklistState.blockedWords.isEmpty)
             Text(
-              'No blocked words',
+              AppLocalizations.of(context)!.noBlockedWords,
               style: TextStyle(color: Theme.of(context).colorScheme.outline),
             )
           else
