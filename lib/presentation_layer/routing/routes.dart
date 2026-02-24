@@ -27,6 +27,7 @@ import '../routes/nostr/profile/profile_resolver_page.dart';
 import '../routes/nostr/relays_page.dart';
 import '../routes/nostr/search_feed_page/search_feed_page.dart';
 import '../routes/nostr/settings/developer/developer_settings.dart';
+import '../routes/nostr/settings/nip65_relays/nip65_relays_settings.dart';
 import '../routes/nostr/settings/notifications/notifications_settings.dart';
 import '../routes/nostr/settings/theme/theme_settings.dart';
 import '../routes/notification_page.dart';
@@ -166,6 +167,10 @@ final routes = [
               GoRoute(
                 path: 'dm-relays',
                 builder: (context, state) => const DmRelaysSettings(),
+              ),
+              GoRoute(
+                path: 'nip65-relays',
+                builder: (context, state) => const Nip65RelaysSettings(),
               ),
               GoRoute(
                 path: 'notifications',
