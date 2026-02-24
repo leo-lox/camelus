@@ -4,14 +4,14 @@ import 'package:camelus/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class BlockedUsers extends ConsumerStatefulWidget {
-  const BlockedUsers({super.key});
+class BlocklistPage extends ConsumerStatefulWidget {
+  const BlocklistPage({super.key});
 
   @override
-  ConsumerState<BlockedUsers> createState() => _BlockedUsersState();
+  ConsumerState<BlocklistPage> createState() => _BlockedUsersState();
 }
 
-class _BlockedUsersState extends ConsumerState<BlockedUsers> {
+class _BlockedUsersState extends ConsumerState<BlocklistPage> {
   Completer initDone = Completer();
 
   List<NostrTag> contentTags = [];
