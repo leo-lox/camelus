@@ -8,7 +8,7 @@ class TrendsEndpoint extends Endpoint {
 
   Future<TrendsResponse> trends(
     Session session, {
-    String interval = '24h',
+    String interval = '12h',
     int limit = trendsDefaultTopK,
   }) async {
     return _service.getTrends(

@@ -1,15 +1,16 @@
-import 'dart:convert';
 import 'dart:developer';
 
 import 'package:camelus/l10n/app_localizations.dart';
+import 'package:apipod_client/apipod_client.dart' as api_pod;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../domain_layer/entities/contact_list.dart';
-import '../../../domain_layer/entities/nostr_band_people.dart';
+
 import '../../providers/following_contact_state_provider.dart';
-import '../../providers/nostr_band_provider.dart';
-import '../../routes/nostr/profile/profile_page_2.dart';
+import '../../providers/metadata_state_provider.dart';
+import '../../providers/trends_provider.dart';
 import '../person_card.dart';
 
 class TrendingPeopleWidget extends ConsumerWidget {
@@ -60,15 +61,12 @@ class _TrendingPeopleList extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final contactList = ref.watch(contactListSelfStateProvider).contactList;
-    final nostrBandAsync = ref.watch(
-      nostrBandProvider.select((provider) => provider.getTrendingPeople()),
-    );
+    final trendsPeopleAsync = ref.watch(trendsPeopleProvider);
 
-    return FutureBuilder<NostrBandPeople?>(
-      future: nostrBandAsync,
-      builder: (context, snapshot) {
-        if (snapshot.hasError) {
-          log(snapshot.error.toString());
+    return trendsPeopleAsync.when(
+      data: (data) {
+        if (!data.success) {
+          log(data.error ?? 'trendingPeople endpoint returned success=false');
           return Text(
             AppLocalizations.of(context)!.somethingWentWrong,
             style: TextStyle(
@@ -77,17 +75,7 @@ class _TrendingPeopleList extends ConsumerWidget {
           );
         }
 
-        if (snapshot.hasData && snapshot.data != null) {
-          return _buildPeopleList(
-            context,
-            snapshot.data!,
-            10,
-            contactList,
-            showFollowButton,
-          );
-        }
-
-        if (snapshot.connectionState == ConnectionState.done) {
+        if (data.people.isEmpty) {
           return Text(
             AppLocalizations.of(context)!.noConnection,
             style: TextStyle(
@@ -96,48 +84,87 @@ class _TrendingPeopleList extends ConsumerWidget {
           );
         }
 
-        return const Center(child: CircularProgressIndicator());
+        return _TrendingPeopleListContent(
+          response: data,
+          limit: 10,
+          contactList: contactList,
+          showFollowButton: showFollowButton,
+          onFollowChange: onFollowChange,
+        );
       },
+      error: (error, stackTrace) {
+        log(error.toString());
+        return Text(
+          AppLocalizations.of(context)!.somethingWentWrong,
+          style: TextStyle(color: Theme.of(context).colorScheme.inverseSurface),
+        );
+      },
+      loading: () => const Center(child: CircularProgressIndicator()),
     );
   }
+}
 
-  Widget _buildPeopleList(
-    BuildContext context,
-    NostrBandPeople api,
-    int limit,
-    ContactList contactList,
-    bool showFollowButton,
-  ) {
-    final profiles = api.profiles.take(limit).toList();
+class _TrendingPeopleListContent extends StatelessWidget {
+  final api_pod.TrendsResponse response;
+  final int limit;
+  final ContactList contactList;
+  final bool showFollowButton;
+  final Function(bool, String) onFollowChange;
+
+  const _TrendingPeopleListContent({
+    required this.response,
+    required this.limit,
+    required this.contactList,
+    required this.showFollowButton,
+    required this.onFollowChange,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final people = response.people.take(limit).toList();
 
     return Column(
-      children: profiles.map((profile) {
-        try {
-          final metadata = jsonDecode(profile.profile.content);
-          return PersonCard(
-            pubkey: profile.pubkey,
-            name: metadata['name'] ?? '',
-            pictureUrl: metadata['picture'] ?? '',
-            about: metadata['about'] ?? '',
-            nip05: metadata['nip05'],
-            showFollowButton: showFollowButton,
-            isFollowing: contactList.contacts.contains(profile.pubkey),
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => ProfilePage2(pubkey: profile.pubkey),
-                ),
-              );
-            },
-            onFollowTab: (followState) =>
-                onFollowChange(followState, profile.pubkey),
-          );
-        } catch (e) {
-          log('Error parsing profile metadata: $e');
-          return const SizedBox.shrink();
-        }
+      children: people.map((person) {
+        return _TrendingPersonListItem(
+          pubkey: person.tag,
+          showFollowButton: showFollowButton,
+          isFollowing: contactList.contacts.contains(person.tag),
+          onFollowChange: onFollowChange,
+        );
       }).toList(),
+    );
+  }
+}
+
+class _TrendingPersonListItem extends ConsumerWidget {
+  final String pubkey;
+  final bool showFollowButton;
+  final bool isFollowing;
+  final Function(bool, String) onFollowChange;
+
+  const _TrendingPersonListItem({
+    required this.pubkey,
+    required this.showFollowButton,
+    required this.isFollowing,
+    required this.onFollowChange,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final metadata = ref.watch(metadataStateProvider(pubkey)).userMetadata;
+
+    return PersonCard(
+      pubkey: pubkey,
+      name: metadata?.name ?? '',
+      pictureUrl: metadata?.picture ?? '',
+      about: metadata?.about ?? '',
+      nip05: metadata?.nip05,
+      showFollowButton: showFollowButton,
+      isFollowing: isFollowing,
+      onTap: () {
+        context.push('/profile/$pubkey');
+      },
+      onFollowTab: (followState) => onFollowChange(followState, pubkey),
     );
   }
 }
