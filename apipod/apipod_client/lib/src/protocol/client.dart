@@ -195,7 +195,6 @@ class EndpointNostrPush extends _i1.EndpointRef {
   );
 
   /// Get the registration state for a public key with signature verification
-  /// The event must be signed by the pubKey and contain the pubKey to verify
   _i2.Future<Map<String, dynamic>> getRegistrationState(
     String signedEventJson,
   ) => caller.callServerEndpoint<Map<String, dynamic>>(
@@ -218,6 +217,26 @@ class EndpointOtsoPush extends _i1.EndpointRef {
         'register',
         {'events': events},
       );
+}
+
+/// {@category Endpoint}
+class EndpointTrends extends _i1.EndpointRef {
+  EndpointTrends(_i1.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'trends';
+
+  _i2.Future<Map<String, dynamic>> trends({
+    required String interval,
+    required int limit,
+  }) => caller.callServerEndpoint<Map<String, dynamic>>(
+    'trends',
+    'trends',
+    {
+      'interval': interval,
+      'limit': limit,
+    },
+  );
 }
 
 class Client extends _i1.ServerpodClientShared {
@@ -257,6 +276,7 @@ class Client extends _i1.ServerpodClientShared {
     otsoExternalSync = EndpointOtsoExternalSync(this);
     nostrPush = EndpointNostrPush(this);
     otsoPush = EndpointOtsoPush(this);
+    trends = EndpointTrends(this);
   }
 
   late final EndpointAppUpdate appUpdate;
@@ -275,6 +295,8 @@ class Client extends _i1.ServerpodClientShared {
 
   late final EndpointOtsoPush otsoPush;
 
+  late final EndpointTrends trends;
+
   @override
   Map<String, _i1.EndpointRef> get endpointRefLookup => {
     'appUpdate': appUpdate,
@@ -285,6 +307,7 @@ class Client extends _i1.ServerpodClientShared {
     'otsoExternalSync': otsoExternalSync,
     'nostrPush': nostrPush,
     'otsoPush': otsoPush,
+    'trends': trends,
   };
 
   @override

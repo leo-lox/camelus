@@ -20,8 +20,9 @@ import '../endpoints/otso_external_sync/otso_external_sync_endpoint.dart'
     as _i7;
 import '../endpoints/push/nostr_push_endpoint.dart' as _i8;
 import '../endpoints/push_otso/otso_push_endpoint.dart' as _i9;
-import 'package:ndk/domain_layer/entities/nip_01_event.dart' as _i10;
-import 'package:ndk/data_layer/models/nip_01_event_model.dart' as _i11;
+import '../endpoints/trends/trends_endpoint.dart' as _i10;
+import 'package:ndk/domain_layer/entities/nip_01_event.dart' as _i11;
+import 'package:ndk/data_layer/models/nip_01_event_model.dart' as _i12;
 
 class Endpoints extends _i1.EndpointDispatch {
   @override
@@ -73,6 +74,12 @@ class Endpoints extends _i1.EndpointDispatch {
         ..initialize(
           server,
           'otsoPush',
+          null,
+        ),
+      'trends': _i10.TrendsEndpoint()
+        ..initialize(
+          server,
+          'trends',
           null,
         ),
     };
@@ -177,7 +184,7 @@ class Endpoints extends _i1.EndpointDispatch {
           params: {
             'reportEvent': _i1.ParameterDescription(
               name: 'reportEvent',
-              type: _i1.getType<_i10.Nip01Event>(),
+              type: _i1.getType<_i11.Nip01Event>(),
               nullable: false,
             ),
           },
@@ -316,7 +323,7 @@ class Endpoints extends _i1.EndpointDispatch {
             ),
             'events': _i1.ParameterDescription(
               name: 'events',
-              type: _i1.getType<List<_i11.Nip01EventModel>>(),
+              type: _i1.getType<List<_i12.Nip01EventModel>>(),
               nullable: false,
             ),
           },
@@ -361,7 +368,7 @@ class Endpoints extends _i1.EndpointDispatch {
           params: {
             'events': _i1.ParameterDescription(
               name: 'events',
-              type: _i1.getType<List<_i11.Nip01EventModel>>(),
+              type: _i1.getType<List<_i12.Nip01EventModel>>(),
               nullable: false,
             ),
           },
@@ -374,6 +381,36 @@ class Endpoints extends _i1.EndpointDispatch {
                     session,
                     params['events'],
                   ),
+        ),
+      },
+    );
+    connectors['trends'] = _i1.EndpointConnector(
+      name: 'trends',
+      endpoint: endpoints['trends']!,
+      methodConnectors: {
+        'trends': _i1.MethodConnector(
+          name: 'trends',
+          params: {
+            'interval': _i1.ParameterDescription(
+              name: 'interval',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+            'limit': _i1.ParameterDescription(
+              name: 'limit',
+              type: _i1.getType<int>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['trends'] as _i10.TrendsEndpoint).trends(
+                session,
+                interval: params['interval'],
+                limit: params['limit'],
+              ),
         ),
       },
     );

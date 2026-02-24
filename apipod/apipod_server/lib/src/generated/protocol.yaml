@@ -19,3 +19,5 @@ nostrPush:
   - getRegistrationState:
 otsoPush:
   - register:
+trends:
+  - trends:

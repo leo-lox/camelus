@@ -30,7 +30,8 @@ import 'otso_sync/otos_external_sync.dart' as _i17;
 import 'reports_incoming.dart' as _i18;
 import 'short_links/short_link_invite_data.dart' as _i19;
 import 'subscription.dart' as _i20;
-import 'package:ndk/data_layer/models/nip_01_event_model.dart' as _i21;
+import 'trends/trends_snapshot.dart' as _i21;
+import 'package:ndk/data_layer/models/nip_01_event_model.dart' as _i22;
 export 'app_update_data.dart';
 export 'bloom_filter_data.dart';
 export 'bloom_filter_events.dart';
@@ -49,6 +50,7 @@ export 'otso_sync/otos_external_sync.dart';
 export 'reports_incoming.dart';
 export 'short_links/short_link_invite_data.dart';
 export 'subscription.dart';
+export 'trends/trends_snapshot.dart';
 
 class Protocol extends _i1.SerializationManagerServer {
   Protocol._();
@@ -753,6 +755,56 @@ class Protocol extends _i1.SerializationManagerServer {
       ],
       managed: true,
     ),
+    _i2.TableDefinition(
+      name: 'trends_snapshot',
+      dartName: 'TrendsSnapshot',
+      schema: 'public',
+      module: 'apipod',
+      columns: [
+        _i2.ColumnDefinition(
+          name: 'id',
+          columnType: _i2.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int?',
+          columnDefault: 'nextval(\'trends_snapshot_id_seq\'::regclass)',
+        ),
+        _i2.ColumnDefinition(
+          name: 'createdAt',
+          columnType: _i2.ColumnType.timestampWithoutTimeZone,
+          isNullable: false,
+          dartType: 'DateTime',
+        ),
+        _i2.ColumnDefinition(
+          name: 'interval',
+          columnType: _i2.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+        ),
+        _i2.ColumnDefinition(
+          name: 'payloadJson',
+          columnType: _i2.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+        ),
+      ],
+      foreignKeys: [],
+      indexes: [
+        _i2.IndexDefinition(
+          indexName: 'trends_snapshot_pkey',
+          tableSpace: null,
+          elements: [
+            _i2.IndexElementDefinition(
+              type: _i2.IndexElementDefinitionType.column,
+              definition: 'id',
+            ),
+          ],
+          type: 'btree',
+          isUnique: true,
+          isPrimary: true,
+        ),
+      ],
+      managed: true,
+    ),
     ..._i2.Protocol.targetTableDefinitions,
   ];
 
@@ -837,6 +889,9 @@ class Protocol extends _i1.SerializationManagerServer {
     if (t == _i20.PushSubscription) {
       return _i20.PushSubscription.fromJson(data) as T;
     }
+    if (t == _i21.TrendsSnapshot) {
+      return _i21.TrendsSnapshot.fromJson(data) as T;
+    }
     if (t == _i1.getType<_i3.AppUpdateData?>()) {
       return (data != null ? _i3.AppUpdateData.fromJson(data) : null) as T;
     }
@@ -895,6 +950,9 @@ class Protocol extends _i1.SerializationManagerServer {
     if (t == _i1.getType<_i20.PushSubscription?>()) {
       return (data != null ? _i20.PushSubscription.fromJson(data) : null) as T;
     }
+    if (t == _i1.getType<_i21.TrendsSnapshot?>()) {
+      return (data != null ? _i21.TrendsSnapshot.fromJson(data) : null) as T;
+    }
     if (t == List<String>) {
       return (data as List).map((e) => deserialize<String>(e)).toList() as T;
     }
@@ -923,8 +981,8 @@ class Protocol extends _i1.SerializationManagerServer {
               .toList()
           as T;
     }
-    if (t == _i21.Nip01EventModel) {
-      return _i21.Nip01EventModel.fromJson(data) as T;
+    if (t == _i22.Nip01EventModel) {
+      return _i22.Nip01EventModel.fromJson(data) as T;
     }
     if (t == List<int>) {
       return (data as List).map((e) => deserialize<int>(e)).toList() as T;
@@ -935,9 +993,9 @@ class Protocol extends _i1.SerializationManagerServer {
               : null)
           as T;
     }
-    if (t == List<_i21.Nip01EventModel>) {
+    if (t == List<_i22.Nip01EventModel>) {
       return (data as List)
-              .map((e) => deserialize<_i21.Nip01EventModel>(e))
+              .map((e) => deserialize<_i22.Nip01EventModel>(e))
               .toList()
           as T;
     }
@@ -947,8 +1005,8 @@ class Protocol extends _i1.SerializationManagerServer {
           )
           as T;
     }
-    if (t == _i1.getType<_i21.Nip01EventModel?>()) {
-      return (data != null ? _i21.Nip01EventModel.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i22.Nip01EventModel?>()) {
+      return (data != null ? _i22.Nip01EventModel.fromJson(data) : null) as T;
     }
     try {
       return _i2.Protocol().deserialize<T>(data, t);
@@ -958,7 +1016,7 @@ class Protocol extends _i1.SerializationManagerServer {
 
   static String? getClassNameForType(Type type) {
     return switch (type) {
-      _i21.Nip01EventModel => 'Nip01EventModel',
+      _i22.Nip01EventModel => 'Nip01EventModel',
       _i3.AppUpdateData => 'AppUpdateData',
       _i4.BloomFilterData => 'BloomFilterData',
       _i5.BloomFilterEvent => 'BloomFilterEvent',
@@ -977,6 +1035,7 @@ class Protocol extends _i1.SerializationManagerServer {
       _i18.ReportsIncoming => 'ReportsIncoming',
       _i19.ShortLinkInviteData => 'ShortLinkInviteData',
       _i20.PushSubscription => 'PushSubscription',
+      _i21.TrendsSnapshot => 'TrendsSnapshot',
       _ => null,
     };
   }
@@ -991,7 +1050,7 @@ class Protocol extends _i1.SerializationManagerServer {
     }
 
     switch (data) {
-      case _i21.Nip01EventModel():
+      case _i22.Nip01EventModel():
         return 'Nip01EventModel';
       case _i3.AppUpdateData():
         return 'AppUpdateData';
@@ -1029,6 +1088,8 @@ class Protocol extends _i1.SerializationManagerServer {
         return 'ShortLinkInviteData';
       case _i20.PushSubscription():
         return 'PushSubscription';
+      case _i21.TrendsSnapshot():
+        return 'TrendsSnapshot';
     }
     className = _i2.Protocol().getClassNameForObject(data);
     if (className != null) {
@@ -1044,7 +1105,7 @@ class Protocol extends _i1.SerializationManagerServer {
       return super.deserializeByClassName(data);
     }
     if (dataClassName == 'Nip01EventModel') {
-      return deserialize<_i21.Nip01EventModel>(data['data']);
+      return deserialize<_i22.Nip01EventModel>(data['data']);
     }
     if (dataClassName == 'AppUpdateData') {
       return deserialize<_i3.AppUpdateData>(data['data']);
@@ -1100,6 +1161,9 @@ class Protocol extends _i1.SerializationManagerServer {
     if (dataClassName == 'PushSubscription') {
       return deserialize<_i20.PushSubscription>(data['data']);
     }
+    if (dataClassName == 'TrendsSnapshot') {
+      return deserialize<_i21.TrendsSnapshot>(data['data']);
+    }
     if (dataClassName.startsWith('serverpod.')) {
       data['className'] = dataClassName.substring(10);
       return _i2.Protocol().deserializeByClassName(data);
@@ -1134,6 +1198,8 @@ class Protocol extends _i1.SerializationManagerServer {
         return _i19.ShortLinkInviteData.t;
       case _i20.PushSubscription:
         return _i20.PushSubscription.t;
+      case _i21.TrendsSnapshot:
+        return _i21.TrendsSnapshot.t;
     }
     return null;
   }
