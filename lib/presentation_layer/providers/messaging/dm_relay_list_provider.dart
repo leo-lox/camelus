@@ -2,10 +2,9 @@ import 'dart:developer';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../config/nostr_kinds.dart';
-import '../../domain_layer/usecases/inbox_outbox.dart';
-import 'inbox_outbox_provider.dart';
-import 'ndk_provider.dart';
+import '../../../domain_layer/usecases/inbox_outbox.dart';
+import '../inbox_outbox_provider.dart';
+import '../ndk_provider.dart';
 
 /// Result of adding a relay
 enum AddRelayResult { success, invalidUrl, alreadyExists }
