@@ -10,9 +10,6 @@ moderation:
 nip05:
   - getNip05:
   - checkName:
-nostrBand:
-  - hashtags:
-  - profiles:
 otsoExternalSync:
 nostrPush:
   - register:

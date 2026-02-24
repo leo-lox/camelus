@@ -20,20 +20,16 @@ import 'example.dart' as _i7;
 import 'nip05/check_name_result_spy.dart' as _i8;
 import 'nip05/nip_05_data_spy.dart' as _i9;
 import 'nip05/nip_05_response_spy.dart' as _i10;
-import 'nostr_band/nostr_band_hashtags.dart' as _i11;
-import 'nostr_band/nostr_band_hastag_info.dart' as _i12;
-import 'nostr_band/nostr_band_people.dart' as _i13;
-import 'nostr_band/nostr_band_profiles.dart' as _i14;
-import 'otso_push/otso_geo_subscriptions.dart' as _i15;
-import 'otso_push/otso_push_data.dart' as _i16;
-import 'otso_sync/otos_external_sync.dart' as _i17;
-import 'reports_incoming.dart' as _i18;
-import 'short_links/short_link_invite_data.dart' as _i19;
-import 'subscription.dart' as _i20;
-import 'trends/trends_response.dart' as _i21;
-import 'trends/trends_snapshot.dart' as _i22;
-import 'trends/trends_top_item.dart' as _i23;
-import 'package:ndk/data_layer/models/nip_01_event_model.dart' as _i24;
+import 'otso_push/otso_geo_subscriptions.dart' as _i11;
+import 'otso_push/otso_push_data.dart' as _i12;
+import 'otso_sync/otos_external_sync.dart' as _i13;
+import 'reports_incoming.dart' as _i14;
+import 'short_links/short_link_invite_data.dart' as _i15;
+import 'subscription.dart' as _i16;
+import 'trends/trends_response.dart' as _i17;
+import 'trends/trends_snapshot.dart' as _i18;
+import 'trends/trends_top_item.dart' as _i19;
+import 'package:ndk/data_layer/models/nip_01_event_model.dart' as _i20;
 export 'app_update_data.dart';
 export 'bloom_filter_data.dart';
 export 'bloom_filter_events.dart';
@@ -42,10 +38,6 @@ export 'example.dart';
 export 'nip05/check_name_result_spy.dart';
 export 'nip05/nip_05_data_spy.dart';
 export 'nip05/nip_05_response_spy.dart';
-export 'nostr_band/nostr_band_hashtags.dart';
-export 'nostr_band/nostr_band_hastag_info.dart';
-export 'nostr_band/nostr_band_people.dart';
-export 'nostr_band/nostr_band_profiles.dart';
 export 'otso_push/otso_geo_subscriptions.dart';
 export 'otso_push/otso_push_data.dart';
 export 'otso_sync/otos_external_sync.dart';
@@ -863,44 +855,32 @@ class Protocol extends _i1.SerializationManagerServer {
     if (t == _i10.Nip05Response) {
       return _i10.Nip05Response.fromJson(data) as T;
     }
-    if (t == _i11.NostrBandHashtags) {
-      return _i11.NostrBandHashtags.fromJson(data) as T;
+    if (t == _i11.OtsoGeoSubscription) {
+      return _i11.OtsoGeoSubscription.fromJson(data) as T;
     }
-    if (t == _i12.NostrBandHashtagInfo) {
-      return _i12.NostrBandHashtagInfo.fromJson(data) as T;
+    if (t == _i12.OtsoPushSubscription) {
+      return _i12.OtsoPushSubscription.fromJson(data) as T;
     }
-    if (t == _i13.NostrBandPeople) {
-      return _i13.NostrBandPeople.fromJson(data) as T;
+    if (t == _i13.OtsoExternalSync) {
+      return _i13.OtsoExternalSync.fromJson(data) as T;
     }
-    if (t == _i14.NostrBandProfiles) {
-      return _i14.NostrBandProfiles.fromJson(data) as T;
+    if (t == _i14.ReportsIncoming) {
+      return _i14.ReportsIncoming.fromJson(data) as T;
     }
-    if (t == _i15.OtsoGeoSubscription) {
-      return _i15.OtsoGeoSubscription.fromJson(data) as T;
+    if (t == _i15.ShortLinkInviteData) {
+      return _i15.ShortLinkInviteData.fromJson(data) as T;
     }
-    if (t == _i16.OtsoPushSubscription) {
-      return _i16.OtsoPushSubscription.fromJson(data) as T;
+    if (t == _i16.PushSubscription) {
+      return _i16.PushSubscription.fromJson(data) as T;
     }
-    if (t == _i17.OtsoExternalSync) {
-      return _i17.OtsoExternalSync.fromJson(data) as T;
+    if (t == _i17.TrendsResponse) {
+      return _i17.TrendsResponse.fromJson(data) as T;
     }
-    if (t == _i18.ReportsIncoming) {
-      return _i18.ReportsIncoming.fromJson(data) as T;
+    if (t == _i18.TrendsSnapshot) {
+      return _i18.TrendsSnapshot.fromJson(data) as T;
     }
-    if (t == _i19.ShortLinkInviteData) {
-      return _i19.ShortLinkInviteData.fromJson(data) as T;
-    }
-    if (t == _i20.PushSubscription) {
-      return _i20.PushSubscription.fromJson(data) as T;
-    }
-    if (t == _i21.TrendsResponse) {
-      return _i21.TrendsResponse.fromJson(data) as T;
-    }
-    if (t == _i22.TrendsSnapshot) {
-      return _i22.TrendsSnapshot.fromJson(data) as T;
-    }
-    if (t == _i23.TrendsTopItem) {
-      return _i23.TrendsTopItem.fromJson(data) as T;
+    if (t == _i19.TrendsTopItem) {
+      return _i19.TrendsTopItem.fromJson(data) as T;
     }
     if (t == _i1.getType<_i3.AppUpdateData?>()) {
       return (data != null ? _i3.AppUpdateData.fromJson(data) : null) as T;
@@ -926,48 +906,35 @@ class Protocol extends _i1.SerializationManagerServer {
     if (t == _i1.getType<_i10.Nip05Response?>()) {
       return (data != null ? _i10.Nip05Response.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i11.NostrBandHashtags?>()) {
-      return (data != null ? _i11.NostrBandHashtags.fromJson(data) : null) as T;
-    }
-    if (t == _i1.getType<_i12.NostrBandHashtagInfo?>()) {
-      return (data != null ? _i12.NostrBandHashtagInfo.fromJson(data) : null)
+    if (t == _i1.getType<_i11.OtsoGeoSubscription?>()) {
+      return (data != null ? _i11.OtsoGeoSubscription.fromJson(data) : null)
           as T;
     }
-    if (t == _i1.getType<_i13.NostrBandPeople?>()) {
-      return (data != null ? _i13.NostrBandPeople.fromJson(data) : null) as T;
-    }
-    if (t == _i1.getType<_i14.NostrBandProfiles?>()) {
-      return (data != null ? _i14.NostrBandProfiles.fromJson(data) : null) as T;
-    }
-    if (t == _i1.getType<_i15.OtsoGeoSubscription?>()) {
-      return (data != null ? _i15.OtsoGeoSubscription.fromJson(data) : null)
+    if (t == _i1.getType<_i12.OtsoPushSubscription?>()) {
+      return (data != null ? _i12.OtsoPushSubscription.fromJson(data) : null)
           as T;
     }
-    if (t == _i1.getType<_i16.OtsoPushSubscription?>()) {
-      return (data != null ? _i16.OtsoPushSubscription.fromJson(data) : null)
+    if (t == _i1.getType<_i13.OtsoExternalSync?>()) {
+      return (data != null ? _i13.OtsoExternalSync.fromJson(data) : null) as T;
+    }
+    if (t == _i1.getType<_i14.ReportsIncoming?>()) {
+      return (data != null ? _i14.ReportsIncoming.fromJson(data) : null) as T;
+    }
+    if (t == _i1.getType<_i15.ShortLinkInviteData?>()) {
+      return (data != null ? _i15.ShortLinkInviteData.fromJson(data) : null)
           as T;
     }
-    if (t == _i1.getType<_i17.OtsoExternalSync?>()) {
-      return (data != null ? _i17.OtsoExternalSync.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i16.PushSubscription?>()) {
+      return (data != null ? _i16.PushSubscription.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i18.ReportsIncoming?>()) {
-      return (data != null ? _i18.ReportsIncoming.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i17.TrendsResponse?>()) {
+      return (data != null ? _i17.TrendsResponse.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i19.ShortLinkInviteData?>()) {
-      return (data != null ? _i19.ShortLinkInviteData.fromJson(data) : null)
-          as T;
+    if (t == _i1.getType<_i18.TrendsSnapshot?>()) {
+      return (data != null ? _i18.TrendsSnapshot.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i20.PushSubscription?>()) {
-      return (data != null ? _i20.PushSubscription.fromJson(data) : null) as T;
-    }
-    if (t == _i1.getType<_i21.TrendsResponse?>()) {
-      return (data != null ? _i21.TrendsResponse.fromJson(data) : null) as T;
-    }
-    if (t == _i1.getType<_i22.TrendsSnapshot?>()) {
-      return (data != null ? _i22.TrendsSnapshot.fromJson(data) : null) as T;
-    }
-    if (t == _i1.getType<_i23.TrendsTopItem?>()) {
-      return (data != null ? _i23.TrendsTopItem.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i19.TrendsTopItem?>()) {
+      return (data != null ? _i19.TrendsTopItem.fromJson(data) : null) as T;
     }
     if (t == List<String>) {
       return (data as List).map((e) => deserialize<String>(e)).toList() as T;
@@ -985,20 +952,8 @@ class Protocol extends _i1.SerializationManagerServer {
           )
           as T;
     }
-    if (t == List<_i12.NostrBandHashtagInfo>) {
-      return (data as List)
-              .map((e) => deserialize<_i12.NostrBandHashtagInfo>(e))
-              .toList()
-          as T;
-    }
-    if (t == List<_i14.NostrBandProfiles>) {
-      return (data as List)
-              .map((e) => deserialize<_i14.NostrBandProfiles>(e))
-              .toList()
-          as T;
-    }
-    if (t == _i24.Nip01EventModel) {
-      return _i24.Nip01EventModel.fromJson(data) as T;
+    if (t == _i20.Nip01EventModel) {
+      return _i20.Nip01EventModel.fromJson(data) as T;
     }
     if (t == List<int>) {
       return (data as List).map((e) => deserialize<int>(e)).toList() as T;
@@ -1009,15 +964,15 @@ class Protocol extends _i1.SerializationManagerServer {
               : null)
           as T;
     }
-    if (t == List<_i23.TrendsTopItem>) {
+    if (t == List<_i19.TrendsTopItem>) {
       return (data as List)
-              .map((e) => deserialize<_i23.TrendsTopItem>(e))
+              .map((e) => deserialize<_i19.TrendsTopItem>(e))
               .toList()
           as T;
     }
-    if (t == List<_i24.Nip01EventModel>) {
+    if (t == List<_i20.Nip01EventModel>) {
       return (data as List)
-              .map((e) => deserialize<_i24.Nip01EventModel>(e))
+              .map((e) => deserialize<_i20.Nip01EventModel>(e))
               .toList()
           as T;
     }
@@ -1027,8 +982,8 @@ class Protocol extends _i1.SerializationManagerServer {
           )
           as T;
     }
-    if (t == _i1.getType<_i24.Nip01EventModel?>()) {
-      return (data != null ? _i24.Nip01EventModel.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i20.Nip01EventModel?>()) {
+      return (data != null ? _i20.Nip01EventModel.fromJson(data) : null) as T;
     }
     try {
       return _i2.Protocol().deserialize<T>(data, t);
@@ -1038,7 +993,7 @@ class Protocol extends _i1.SerializationManagerServer {
 
   static String? getClassNameForType(Type type) {
     return switch (type) {
-      _i24.Nip01EventModel => 'Nip01EventModel',
+      _i20.Nip01EventModel => 'Nip01EventModel',
       _i3.AppUpdateData => 'AppUpdateData',
       _i4.BloomFilterData => 'BloomFilterData',
       _i5.BloomFilterEvent => 'BloomFilterEvent',
@@ -1047,19 +1002,15 @@ class Protocol extends _i1.SerializationManagerServer {
       _i8.NameCheckResult => 'NameCheckResult',
       _i9.Nip05Data => 'Nip05Data',
       _i10.Nip05Response => 'Nip05Response',
-      _i11.NostrBandHashtags => 'NostrBandHashtags',
-      _i12.NostrBandHashtagInfo => 'NostrBandHashtagInfo',
-      _i13.NostrBandPeople => 'NostrBandPeople',
-      _i14.NostrBandProfiles => 'NostrBandProfiles',
-      _i15.OtsoGeoSubscription => 'OtsoGeoSubscription',
-      _i16.OtsoPushSubscription => 'OtsoPushSubscription',
-      _i17.OtsoExternalSync => 'OtsoExternalSync',
-      _i18.ReportsIncoming => 'ReportsIncoming',
-      _i19.ShortLinkInviteData => 'ShortLinkInviteData',
-      _i20.PushSubscription => 'PushSubscription',
-      _i21.TrendsResponse => 'TrendsResponse',
-      _i22.TrendsSnapshot => 'TrendsSnapshot',
-      _i23.TrendsTopItem => 'TrendsTopItem',
+      _i11.OtsoGeoSubscription => 'OtsoGeoSubscription',
+      _i12.OtsoPushSubscription => 'OtsoPushSubscription',
+      _i13.OtsoExternalSync => 'OtsoExternalSync',
+      _i14.ReportsIncoming => 'ReportsIncoming',
+      _i15.ShortLinkInviteData => 'ShortLinkInviteData',
+      _i16.PushSubscription => 'PushSubscription',
+      _i17.TrendsResponse => 'TrendsResponse',
+      _i18.TrendsSnapshot => 'TrendsSnapshot',
+      _i19.TrendsTopItem => 'TrendsTopItem',
       _ => null,
     };
   }
@@ -1074,7 +1025,7 @@ class Protocol extends _i1.SerializationManagerServer {
     }
 
     switch (data) {
-      case _i24.Nip01EventModel():
+      case _i20.Nip01EventModel():
         return 'Nip01EventModel';
       case _i3.AppUpdateData():
         return 'AppUpdateData';
@@ -1092,31 +1043,23 @@ class Protocol extends _i1.SerializationManagerServer {
         return 'Nip05Data';
       case _i10.Nip05Response():
         return 'Nip05Response';
-      case _i11.NostrBandHashtags():
-        return 'NostrBandHashtags';
-      case _i12.NostrBandHashtagInfo():
-        return 'NostrBandHashtagInfo';
-      case _i13.NostrBandPeople():
-        return 'NostrBandPeople';
-      case _i14.NostrBandProfiles():
-        return 'NostrBandProfiles';
-      case _i15.OtsoGeoSubscription():
+      case _i11.OtsoGeoSubscription():
         return 'OtsoGeoSubscription';
-      case _i16.OtsoPushSubscription():
+      case _i12.OtsoPushSubscription():
         return 'OtsoPushSubscription';
-      case _i17.OtsoExternalSync():
+      case _i13.OtsoExternalSync():
         return 'OtsoExternalSync';
-      case _i18.ReportsIncoming():
+      case _i14.ReportsIncoming():
         return 'ReportsIncoming';
-      case _i19.ShortLinkInviteData():
+      case _i15.ShortLinkInviteData():
         return 'ShortLinkInviteData';
-      case _i20.PushSubscription():
+      case _i16.PushSubscription():
         return 'PushSubscription';
-      case _i21.TrendsResponse():
+      case _i17.TrendsResponse():
         return 'TrendsResponse';
-      case _i22.TrendsSnapshot():
+      case _i18.TrendsSnapshot():
         return 'TrendsSnapshot';
-      case _i23.TrendsTopItem():
+      case _i19.TrendsTopItem():
         return 'TrendsTopItem';
     }
     className = _i2.Protocol().getClassNameForObject(data);
@@ -1133,7 +1076,7 @@ class Protocol extends _i1.SerializationManagerServer {
       return super.deserializeByClassName(data);
     }
     if (dataClassName == 'Nip01EventModel') {
-      return deserialize<_i24.Nip01EventModel>(data['data']);
+      return deserialize<_i20.Nip01EventModel>(data['data']);
     }
     if (dataClassName == 'AppUpdateData') {
       return deserialize<_i3.AppUpdateData>(data['data']);
@@ -1159,44 +1102,32 @@ class Protocol extends _i1.SerializationManagerServer {
     if (dataClassName == 'Nip05Response') {
       return deserialize<_i10.Nip05Response>(data['data']);
     }
-    if (dataClassName == 'NostrBandHashtags') {
-      return deserialize<_i11.NostrBandHashtags>(data['data']);
-    }
-    if (dataClassName == 'NostrBandHashtagInfo') {
-      return deserialize<_i12.NostrBandHashtagInfo>(data['data']);
-    }
-    if (dataClassName == 'NostrBandPeople') {
-      return deserialize<_i13.NostrBandPeople>(data['data']);
-    }
-    if (dataClassName == 'NostrBandProfiles') {
-      return deserialize<_i14.NostrBandProfiles>(data['data']);
-    }
     if (dataClassName == 'OtsoGeoSubscription') {
-      return deserialize<_i15.OtsoGeoSubscription>(data['data']);
+      return deserialize<_i11.OtsoGeoSubscription>(data['data']);
     }
     if (dataClassName == 'OtsoPushSubscription') {
-      return deserialize<_i16.OtsoPushSubscription>(data['data']);
+      return deserialize<_i12.OtsoPushSubscription>(data['data']);
     }
     if (dataClassName == 'OtsoExternalSync') {
-      return deserialize<_i17.OtsoExternalSync>(data['data']);
+      return deserialize<_i13.OtsoExternalSync>(data['data']);
     }
     if (dataClassName == 'ReportsIncoming') {
-      return deserialize<_i18.ReportsIncoming>(data['data']);
+      return deserialize<_i14.ReportsIncoming>(data['data']);
     }
     if (dataClassName == 'ShortLinkInviteData') {
-      return deserialize<_i19.ShortLinkInviteData>(data['data']);
+      return deserialize<_i15.ShortLinkInviteData>(data['data']);
     }
     if (dataClassName == 'PushSubscription') {
-      return deserialize<_i20.PushSubscription>(data['data']);
+      return deserialize<_i16.PushSubscription>(data['data']);
     }
     if (dataClassName == 'TrendsResponse') {
-      return deserialize<_i21.TrendsResponse>(data['data']);
+      return deserialize<_i17.TrendsResponse>(data['data']);
     }
     if (dataClassName == 'TrendsSnapshot') {
-      return deserialize<_i22.TrendsSnapshot>(data['data']);
+      return deserialize<_i18.TrendsSnapshot>(data['data']);
     }
     if (dataClassName == 'TrendsTopItem') {
-      return deserialize<_i23.TrendsTopItem>(data['data']);
+      return deserialize<_i19.TrendsTopItem>(data['data']);
     }
     if (dataClassName.startsWith('serverpod.')) {
       data['className'] = dataClassName.substring(10);
@@ -1220,20 +1151,20 @@ class Protocol extends _i1.SerializationManagerServer {
         return _i6.BloomFilterProfile.t;
       case _i9.Nip05Data:
         return _i9.Nip05Data.t;
-      case _i15.OtsoGeoSubscription:
-        return _i15.OtsoGeoSubscription.t;
-      case _i16.OtsoPushSubscription:
-        return _i16.OtsoPushSubscription.t;
-      case _i17.OtsoExternalSync:
-        return _i17.OtsoExternalSync.t;
-      case _i18.ReportsIncoming:
-        return _i18.ReportsIncoming.t;
-      case _i19.ShortLinkInviteData:
-        return _i19.ShortLinkInviteData.t;
-      case _i20.PushSubscription:
-        return _i20.PushSubscription.t;
-      case _i22.TrendsSnapshot:
-        return _i22.TrendsSnapshot.t;
+      case _i11.OtsoGeoSubscription:
+        return _i11.OtsoGeoSubscription.t;
+      case _i12.OtsoPushSubscription:
+        return _i12.OtsoPushSubscription.t;
+      case _i13.OtsoExternalSync:
+        return _i13.OtsoExternalSync.t;
+      case _i14.ReportsIncoming:
+        return _i14.ReportsIncoming.t;
+      case _i15.ShortLinkInviteData:
+        return _i15.ShortLinkInviteData.t;
+      case _i16.PushSubscription:
+        return _i16.PushSubscription.t;
+      case _i18.TrendsSnapshot:
+        return _i18.TrendsSnapshot.t;
     }
     return null;
   }
