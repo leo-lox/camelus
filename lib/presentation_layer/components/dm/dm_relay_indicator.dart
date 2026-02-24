@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
-import '../../providers/dm_relay_health_provider.dart';
+import '../../providers/messaging/dm_relay_health_provider.dart';
 import 'dm_relay_debug.dart';
 
 /// Shield icon indicator showing DM relay health status.

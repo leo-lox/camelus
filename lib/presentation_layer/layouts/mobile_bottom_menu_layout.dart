@@ -19,6 +19,8 @@ class MobileBottomMenuLayout extends StatelessWidget {
     final shouldShow = showOnRoutes.contains(currentRoute);
 
     return SafeArea(
+      top: false,
+      bottom: true,
       child: Scaffold(
         body: mainContent,
         bottomNavigationBar: AnimatedSwitcher(

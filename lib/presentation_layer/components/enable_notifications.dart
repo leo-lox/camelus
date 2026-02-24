@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:developer';
-import 'dart:io';
 
 import 'package:camelus/l10n/app_localizations.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -63,7 +62,10 @@ class PushNotificationToggleState
     super.initState();
 
     // platform supported?
-    if ((kIsWeb || Platform.isAndroid || Platform.isIOS || Platform.isMacOS)) {
+    if (kIsWeb ||
+        defaultTargetPlatform == TargetPlatform.android ||
+        defaultTargetPlatform == TargetPlatform.iOS ||
+        defaultTargetPlatform == TargetPlatform.macOS) {
       // Check if notifications are already enabled
       checkNotificationStatus();
     } else {

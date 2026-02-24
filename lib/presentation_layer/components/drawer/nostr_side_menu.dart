@@ -10,7 +10,9 @@ import 'package:url_launcher/url_launcher.dart';
 
 import 'package:ndk/shared/nips/nip19/nip19.dart';
 import '../../../l10n/app_localizations.dart';
-import '../../providers/dm_conversations_provider.dart';
+import '../../providers/app_bar_provider/app_bottom_bar_provider.dart';
+import '../../routing/route_paths.dart';
+import '../../providers/messaging/dm_conversations_provider.dart';
 import '../../providers/ndk_provider.dart';
 import '../../providers/theme_provider.dart';
 
@@ -98,7 +100,7 @@ class NostrSideMenu extends ConsumerWidget {
   }
 
   void navigateToProfile(BuildContext context, String pubkey) {
-    context.push('/nostr/profile/$pubkey');
+    context.push(RoutePaths.profile(pubkey: pubkey));
   }
 
   Widget _drawerItem({
@@ -110,8 +112,8 @@ class NostrSideMenu extends ConsumerWidget {
   }) {
     return Builder(
       builder: (context) {
-        final currentRoute = GoRouterState.of(context).uri.toString();
-        final isSelected = currentRoute.contains(routeName);
+        final currentRoute = GoRouterState.of(context).uri.path;
+        final isSelected = currentRoute == routeName;
 
         final iconWidget = Icon(
           icon,
@@ -121,34 +123,47 @@ class NostrSideMenu extends ConsumerWidget {
           size: 22,
         );
 
-        return Container(
-          //width: 200,
-          decoration: isSelected
-              ? BoxDecoration(
-                  color: Theme.of(
-                    context,
-                  ).colorScheme.primary.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(100),
-                )
-              : null,
-          child: ListTile(
-            onTap: onTap,
-            leading: badgeCount > 0
-                ? Badge(
-                    label: Text(
-                      badgeCount > 99 ? '99+' : badgeCount.toString(),
-                    ),
-                    child: iconWidget,
-                  )
-                : iconWidget,
-            title: Text(
-              label,
-              style: TextStyle(
-                color: isSelected
-                    ? Theme.of(context).colorScheme.primary
-                    : Theme.of(context).colorScheme.inverseSurface,
-                fontSize: 17,
-                fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+        return Material(
+          type: MaterialType.transparency,
+          child: Ink(
+            decoration: BoxDecoration(
+              color: isSelected
+                  ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.1)
+                  : Colors.transparent,
+              borderRadius: BorderRadius.circular(100),
+            ),
+            child: InkWell(
+              onTap: onTap,
+              borderRadius: BorderRadius.circular(100),
+              hoverColor: Theme.of(
+                context,
+              ).colorScheme.primary.withValues(alpha: 0.05),
+              splashColor: Theme.of(
+                context,
+              ).colorScheme.primary.withValues(alpha: 0.08),
+              highlightColor: Theme.of(
+                context,
+              ).colorScheme.primary.withValues(alpha: 0.04),
+              child: ListTile(
+                onTap: null,
+                leading: badgeCount > 0
+                    ? Badge(
+                        label: Text(
+                          badgeCount > 99 ? '99+' : badgeCount.toString(),
+                        ),
+                        child: iconWidget,
+                      )
+                    : iconWidget,
+                title: Text(
+                  label,
+                  style: TextStyle(
+                    color: isSelected
+                        ? Theme.of(context).colorScheme.primary
+                        : Theme.of(context).colorScheme.inverseSurface,
+                    fontSize: 17,
+                    fontWeight: FontWeight.normal,
+                  ),
+                ),
               ),
             ),
           ),
@@ -208,6 +223,9 @@ class NostrSideMenu extends ConsumerWidget {
                       routeName: '/home',
                       onTap: () {
                         context.go('/home');
+                        ref
+                            .read(appBottomNavigationBarProvider.notifier)
+                            .selectTab(NavigationTab.home);
                       },
                     ),
                     if (!hideOnMobile)
@@ -217,6 +235,9 @@ class NostrSideMenu extends ConsumerWidget {
                         routeName: '/search',
                         onTap: () {
                           context.go('/search');
+                          ref
+                              .read(appBottomNavigationBarProvider.notifier)
+                              .selectTab(NavigationTab.search);
                         },
                       ),
                     if (!hideOnMobile)
@@ -226,6 +247,9 @@ class NostrSideMenu extends ConsumerWidget {
                         routeName: '/notifications',
                         onTap: () {
                           context.go('/notifications');
+                          ref
+                              .read(appBottomNavigationBarProvider.notifier)
+                              .selectTab(NavigationTab.notifications);
                         },
                       ),
                     if (!hideOnMobile && currentUserPubkey != null)
@@ -236,20 +260,24 @@ class NostrSideMenu extends ConsumerWidget {
                         badgeCount: dmUnreadCount,
                         onTap: () {
                           context.go('/messages');
+                          ref
+                              .read(appBottomNavigationBarProvider.notifier)
+                              .selectTab(NavigationTab.chat);
                         },
                       ),
                     if (currentUserPubkey != null) ...[
                       _drawerItem(
                         label: AppLocalizations.of(context)!.bookmarks,
-                        routeName: '/nostr/bookmarks',
+                        routeName: '/bookmarks',
                         icon: PhosphorIcons.bookmarkSimple(),
                         onTap: () {
-                          context.push('/nostr/bookmarks');
+                          context.push('/bookmarks');
                         },
                       ),
                       _drawerItem(
                         label: AppLocalizations.of(context)!.profile,
-                        routeName: '/nostr/profile',
+                        routeName:
+                            '/profile/${Nip19.encodePubKey(currentUserPubkey)}',
                         icon: PhosphorIcons.user(),
                         onTap: () {
                           navigateToProfile(context, currentUserPubkey);
@@ -271,10 +299,10 @@ class NostrSideMenu extends ConsumerWidget {
                       ),
                       _drawerItem(
                         label: AppLocalizations.of(context)!.blocklist,
-                        routeName: '/nostr/blockedUsers',
+                        routeName: '/blocked-users',
                         icon: PhosphorIcons.yinYang(),
                         onTap: () {
-                          context.push('/nostr/blockedUsers');
+                          context.push('/blocked-users');
                         },
                       ),
                     ] else ...[

@@ -1,42 +1,66 @@
 import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
+import 'package:ndk/shared/nips/nip19/nip19.dart';
 
-import 'domain_layer/entities/starter_pack_identifier.dart';
-import 'lifecycle/app_init_shell.dart';
-import 'presentation_layer/components/app_bottom_navigation_bar/app_bottom_navigation_bar.dart';
-import 'presentation_layer/components/drawer/nostr_side_menu.dart';
-import 'presentation_layer/components/drawer/nostr_side_menu_post_button.dart';
-import 'presentation_layer/components/drawer/side_menu_logo.dart';
-import 'presentation_layer/components/relays_connectivity_widget.dart';
-import 'presentation_layer/components/right_sidebar/right_siedbar.dart';
-import 'presentation_layer/components/starter_packs/edit_starter_pack/edit_starter_pack.dart';
-import 'presentation_layer/components/starter_packs/open_starter_pack.dart';
-import 'presentation_layer/layouts/mobile_bottom_menu_layout.dart';
-import 'presentation_layer/layouts/responsive_layout.dart';
-import 'presentation_layer/layouts/three_colum_layout.dart';
-import 'presentation_layer/routes/deeplink_reciever_page.dart';
-import 'presentation_layer/routes/home_page_desktop.dart';
-import 'presentation_layer/routes/home_page_mobile.dart';
-import 'presentation_layer/routes/nostr/blockedUsers/blocked_users.dart';
-import 'presentation_layer/routes/nostr/bookmarks/bookmarks_page.dart';
-import 'presentation_layer/routes/nostr/event_view/event_view_page.dart';
-import 'presentation_layer/routes/nostr/onboarding/onboarding.dart';
-import 'presentation_layer/routes/nostr/profile/edit_profile_page.dart';
-import 'presentation_layer/routes/nostr/profile/profile_page_2.dart';
-import 'presentation_layer/routes/nostr/relays_page.dart';
-import 'presentation_layer/routes/nostr/search_feed_page/search_feed_page.dart';
-import 'presentation_layer/routes/nostr/settings/theme/theme_settings.dart';
-import 'presentation_layer/routes/notification_page.dart';
-import 'presentation_layer/routes/search/search_page.dart';
-import 'presentation_layer/routes/nostr/settings/file_servers/settings_file_servers.dart';
-import 'presentation_layer/routes/nostr/settings/inital_route/inital_route_settings.dart';
-import 'presentation_layer/routes/nostr/settings/locale/locale_settings.dart';
-import 'presentation_layer/routes/nostr/settings/moderation/moderation_settings.dart';
-import 'presentation_layer/routes/nostr/settings/settings_page.dart';
-import 'presentation_layer/routes/nostr/settings/dm_relays/dm_relays_settings.dart';
-import 'presentation_layer/routes/messages/dm_list_page.dart';
-import 'presentation_layer/routes/messages/dm_thread_page.dart';
-import 'presentation_layer/routes/messages/new_dm_page.dart';
+import '../../domain_layer/entities/starter_pack_identifier.dart';
+import '../../lifecycle/app_init_shell.dart';
+import '../components/app_bottom_navigation_bar/app_bottom_navigation_bar.dart';
+import '../components/drawer/nostr_side_menu.dart';
+import '../components/drawer/nostr_side_menu_post_button.dart';
+import '../components/drawer/side_menu_logo.dart';
+import '../components/relays_connectivity_widget.dart';
+import '../components/right_sidebar/right_siedbar.dart';
+import '../components/starter_packs/edit_starter_pack/edit_starter_pack.dart';
+import '../components/starter_packs/open_starter_pack.dart';
+import '../layouts/mobile_bottom_menu_layout.dart';
+import '../layouts/responsive_layout.dart';
+import '../layouts/three_colum_layout.dart';
+import '../routes/deeplink_reciever_page.dart';
+import '../routes/home_page_desktop.dart';
+import '../routes/home_page_mobile.dart';
+import '../routes/nostr/blockedUsers/blocked_users.dart';
+import '../routes/nostr/bookmarks/bookmarks_page.dart';
+import '../routes/nostr/event_view/event_view_page.dart';
+import '../routes/nostr/onboarding/onboarding.dart';
+import '../routes/nostr/profile/edit_profile_page.dart';
+import '../routes/nostr/profile/profile_resolver_page.dart';
+import '../routes/nostr/relays_page.dart';
+import '../routes/nostr/search_feed_page/search_feed_page.dart';
+import '../routes/nostr/settings/theme/theme_settings.dart';
+import '../routes/notification_page.dart';
+import '../routes/search/search_page.dart';
+import '../routes/nostr/settings/file_servers/settings_file_servers.dart';
+import '../routes/nostr/settings/inital_route/inital_route_settings.dart';
+import '../routes/nostr/settings/locale/locale_settings.dart';
+import '../routes/nostr/settings/moderation/moderation_settings.dart';
+import '../routes/nostr/settings/settings_page.dart';
+import '../routes/nostr/settings/dm_relays/dm_relays_settings.dart';
+import '../routes/messages/dm_list_page.dart';
+import '../routes/messages/dm_thread_page.dart';
+import '../routes/messages/new_dm_page.dart';
+
+String? decodeProfileIdentifierToPubkey(String rawIdentifier) {
+  final identifier = Uri.decodeComponent(rawIdentifier).trim();
+
+  try {
+    if (identifier.startsWith('nprofile')) {
+      return Nip19.decodeNprofile(identifier).pubkey;
+    }
+
+    if (identifier.startsWith('npub')) {
+      return Nip19.decode(identifier);
+    }
+  } catch (_) {
+    return null;
+  }
+
+  final isHexPubkey = RegExp(r'^[0-9a-fA-F]{64}$').hasMatch(identifier);
+  if (isHexPubkey) {
+    return identifier.toLowerCase();
+  }
+
+  return null;
+}
 
 Null redirects(BuildContext context, GoRouterState state) {
   return null;
@@ -62,7 +86,7 @@ final routes = [
                 leadingWidget: SideMenuLogo(
                   trailingWidget: RelaysConnectivityWidget(
                     onTap: () {
-                      context.push('/nostr/relays');
+                      context.push('/relays');
                     },
                   ),
                 ),
@@ -144,38 +168,48 @@ final routes = [
             ],
           ),
           GoRoute(
-            path: '/nostr/event',
-            builder: (context, state) {
-              final args = state.extra as Map<String, dynamic>;
-              return EventViewPage(
-                rootNoteId: args['root'] as String,
-                openNoteId: args['scrollIntoView'] as String?,
-              );
-            },
-          ),
-          GoRoute(
-            path: '/nostr/relays',
+            path: '/relays',
             builder: (context, state) {
               return RelaysPage();
             },
           ),
           GoRoute(
-            path: '/nostr/profile/:pubkey',
-            builder: (context, state) =>
-                ProfilePage2(pubkey: state.pathParameters['pubkey']!),
+            path: '/profile/:profileIdentifier',
+            //redirect: _redirectProfileToCanonicalNip05,
+            builder: (context, state) => ProfileResolverPage(
+              identifier: state.pathParameters['profileIdentifier']!,
+            ),
             routes: [
               GoRoute(
                 path: 'edit',
-                builder: (context, state) =>
-                    EditProfilePage(pubkey: state.pathParameters['pubkey']!),
+                //redirect: _redirectProfileToCanonicalNip05,
+                builder: (context, state) {
+                  final profileIdentifier =
+                      state.pathParameters['profileIdentifier']!;
+                  final pubkey =
+                      decodeProfileIdentifierToPubkey(profileIdentifier) ??
+                      Uri.decodeComponent(profileIdentifier);
+
+                  return EditProfilePage(pubkey: pubkey);
+                },
+              ),
+              GoRoute(
+                path: 'status/:eventId',
+                //redirect: _redirectProfileToCanonicalNip05,
+                builder: (context, state) => EventViewPage(
+                  rootNoteId: state.pathParameters['eventId']!,
+                  openNoteId: state.uri.queryParameters['scrollIntoView'],
+                ),
               ),
             ],
           ),
           GoRoute(
-            path: '/nostr/search',
+            path: '/search/feed',
             pageBuilder: (context, state) => CustomTransitionPage(
               key: state.pageKey,
-              child: SearchFeedPage(query: state.extra as String),
+              child: SearchFeedPage(
+                query: state.uri.queryParameters['q'] ?? '',
+              ),
               transitionDuration: Duration.zero,
               reverseTransitionDuration: Duration.zero,
               transitionsBuilder:
@@ -183,11 +217,11 @@ final routes = [
             ),
           ),
           GoRoute(
-            path: '/nostr/bookmarks',
+            path: '/bookmarks',
             builder: (context, state) => const BookmarksPage(),
           ),
           GoRoute(
-            path: '/nostr/blockedUsers',
+            path: '/blocked-users',
             builder: (context, state) => const BlockedUsers(),
           ),
           GoRoute(

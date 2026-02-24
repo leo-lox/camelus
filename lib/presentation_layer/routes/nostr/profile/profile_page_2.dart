@@ -1,6 +1,5 @@
-import 'dart:io';
-
 import 'package:camelus/l10n/app_localizations.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
@@ -14,6 +13,7 @@ import '../../../../domain_layer/entities/feed_filter.dart';
 import '../../../../domain_layer/entities/user_metadata.dart';
 import '../../../../domain_layer/usecases/app_auth.dart';
 import '../../../../helpers/helpers.dart';
+import '../../../routing/route_paths.dart';
 import '../../../atoms/back_button_round.dart';
 import '../../../atoms/follow_button.dart';
 import '../../../atoms/long_button.dart';
@@ -75,9 +75,10 @@ class ProfilePage2 extends ConsumerWidget {
                       }).toList();
                     },
                   ),
-                  if (Platform.isWindows ||
-                      Platform.isLinux ||
-                      Platform.isMacOS)
+                  if (!kIsWeb &&
+                      (defaultTargetPlatform == TargetPlatform.windows ||
+                          defaultTargetPlatform == TargetPlatform.linux ||
+                          defaultTargetPlatform == TargetPlatform.macOS))
                     const SizedBox(width: 154),
                 ],
                 expandedHeight: 400,
@@ -108,6 +109,8 @@ class ProfilePage2 extends ConsumerWidget {
                   child: Container(
                     color: Theme.of(context).colorScheme.surface,
                     child: TabBar(
+                      overlayColor: WidgetStateProperty.all(Colors.transparent),
+                      splashFactory: NoSplash.splashFactory,
                       tabs: [
                         Tab(text: AppLocalizations.of(context)!.posts),
                         Tab(
@@ -282,7 +285,9 @@ class _BuildProfileHeader extends ConsumerWidget {
                             name: AppLocalizations.of(context)!.edit,
                             onPressed: () {
                               context.push(
-                                '/nostr/profile/${userMetadata.pubkey}/edit',
+                                RoutePaths.profileEdit(
+                                  pubkey: userMetadata.pubkey,
+                                ),
                               );
                             },
                           ),
