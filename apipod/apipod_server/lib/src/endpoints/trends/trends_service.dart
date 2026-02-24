@@ -6,16 +6,22 @@ import '../../generated/protocol.dart';
 import 'trends_constants.dart';
 
 class TrendsService {
-  Future<Map<String, dynamic>> get({
+  Future<TrendsResponse> get({
     required Session session,
     required String interval,
     required int limit,
   }) async {
     if (!trendsIntervals.containsKey(interval)) {
-      return {
-        'success': false,
-        'error': 'Unsupported interval.',
-      };
+      return TrendsResponse(
+        success: false,
+        error: 'Unsupported interval.',
+        interval: interval,
+        windowHours: null,
+        bucketMinutes: null,
+        generatedAt: null,
+        top: const [],
+        limit: null,
+      );
     }
 
     final safeLimit = limit.clamp(1, trendsDefaultTopK).toInt();
@@ -34,15 +40,16 @@ class TrendsService {
     );
 
     if (snapshot == null) {
-      return {
-        'success': true,
-        'interval': interval,
-        'windowHours': trendsIntervals[interval]!.inHours,
-        'bucketMinutes': trendsBucketDuration.inMinutes,
-        'generatedAt': null,
-        'top': <Map<String, dynamic>>[],
-        'limit': safeLimit,
-      };
+      return TrendsResponse(
+        success: true,
+        error: null,
+        interval: interval,
+        windowHours: trendsIntervals[interval]!.inHours,
+        bucketMinutes: trendsBucketDuration.inMinutes,
+        generatedAt: null,
+        top: const [],
+        limit: safeLimit,
+      );
     }
 
     await session.caches.local.put(
@@ -54,12 +61,33 @@ class TrendsService {
     return _limitPayload(snapshot.payloadJson, safeLimit);
   }
 
-  Map<String, dynamic> _limitPayload(String payloadJson, int limit) {
+  TrendsResponse _limitPayload(String payloadJson, int limit) {
     final decoded = jsonDecode(payloadJson);
     final payload = Map<String, dynamic>.from(decoded as Map);
-    final top = List<dynamic>.from(payload['top'] as List? ?? const []);
-    payload['top'] = top.take(limit).toList();
-    payload['limit'] = limit;
-    return payload;
+    final topRaw = List<dynamic>.from(payload['top'] as List? ?? const []);
+    final top = topRaw.take(limit).map((entry) {
+      final item = Map<String, dynamic>.from(entry as Map);
+      return TrendsTopItem(
+        tag: item['tag'] as String? ?? '',
+        count: (item['count'] as num?)?.toInt() ?? 0,
+      );
+    }).toList(growable: false);
+
+    final generatedAtRaw = payload['generatedAt'];
+    DateTime? generatedAt;
+    if (generatedAtRaw is String && generatedAtRaw.isNotEmpty) {
+      generatedAt = DateTime.tryParse(generatedAtRaw)?.toUtc();
+    }
+
+    return TrendsResponse(
+      success: payload['success'] as bool? ?? true,
+      error: payload['error'] as String?,
+      interval: payload['interval'] as String?,
+      windowHours: (payload['windowHours'] as num?)?.toInt(),
+      bucketMinutes: (payload['bucketMinutes'] as num?)?.toInt(),
+      generatedAt: generatedAt,
+      top: top,
+      limit: limit,
+    );
   }
 }

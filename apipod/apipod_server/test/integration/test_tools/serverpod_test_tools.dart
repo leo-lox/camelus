@@ -28,6 +28,8 @@ import 'package:apipod_server/src/generated/nostr_band/nostr_band_hashtags.dart'
 import 'package:apipod_server/src/generated/nostr_band/nostr_band_people.dart'
     as _i11;
 import 'package:ndk/data_layer/models/nip_01_event_model.dart' as _i12;
+import 'package:apipod_server/src/generated/trends/trends_response.dart'
+    as _i13;
 import 'package:apipod_server/src/generated/protocol.dart';
 import 'package:apipod_server/src/generated/endpoints.dart';
 export 'package:serverpod_test/serverpod_test_public_exports.dart';
@@ -718,7 +720,7 @@ class _TrendsEndpoint {
 
   final _i2.SerializationManager _serializationManager;
 
-  _i3.Future<Map<String, dynamic>> trends(
+  _i3.Future<_i13.TrendsResponse> trends(
     _i1.TestSessionBuilder sessionBuilder, {
     required String interval,
     required int limit,
@@ -745,7 +747,7 @@ class _TrendsEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<Map<String, dynamic>>);
+                as _i3.Future<_i13.TrendsResponse>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();

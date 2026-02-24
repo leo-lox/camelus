@@ -1,0 +1,10 @@
+class: TrendsResponse
+fields:
+  success: bool
+  error: String?
+  interval: String?
+  windowHours: int?
+  bucketMinutes: int?
+  generatedAt: DateTime?
+  top: List<TrendsTopItem>
+  limit: int?

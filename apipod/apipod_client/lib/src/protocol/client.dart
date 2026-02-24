@@ -26,7 +26,8 @@ import 'package:apipod_client/src/protocol/nostr_band/nostr_band_hashtags.dart'
 import 'package:apipod_client/src/protocol/nostr_band/nostr_band_people.dart'
     as _i10;
 import 'package:ndk/data_layer/models/nip_01_event_model.dart' as _i11;
-import 'protocol.dart' as _i12;
+import 'package:apipod_client/src/protocol/trends/trends_response.dart' as _i12;
+import 'protocol.dart' as _i13;
 
 /// {@category Endpoint}
 class EndpointAppUpdate extends _i1.EndpointRef {
@@ -226,10 +227,10 @@ class EndpointTrends extends _i1.EndpointRef {
   @override
   String get name => 'trends';
 
-  _i2.Future<Map<String, dynamic>> trends({
+  _i2.Future<_i12.TrendsResponse> trends({
     required String interval,
     required int limit,
-  }) => caller.callServerEndpoint<Map<String, dynamic>>(
+  }) => caller.callServerEndpoint<_i12.TrendsResponse>(
     'trends',
     'trends',
     {
@@ -259,7 +260,7 @@ class Client extends _i1.ServerpodClientShared {
     bool? disconnectStreamsOnLostInternetConnection,
   }) : super(
          host,
-         _i12.Protocol(),
+         _i13.Protocol(),
          securityContext: securityContext,
          streamingConnectionTimeout: streamingConnectionTimeout,
          connectionTimeout: connectionTimeout,
