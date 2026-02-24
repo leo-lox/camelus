@@ -63,7 +63,7 @@ class HashtagCard extends StatelessWidget {
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  "posts",
+                  "people",
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w400,
