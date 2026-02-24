@@ -1135,17 +1135,20 @@ packages:
   ndk:
     dependency: "direct main"
     description:
-      path: "../ndk/packages/ndk"
-      relative: true
-    source: path
+      path: "packages/ndk"
+      ref: "feat/lists-getPublicList"
+      resolved-ref: ab4d779df0a9376b398eadabb2ca5b512db97f5b
+      url: "https://github.com/relaystr/ndk.git"
+    source: git
     version: "0.7.1-dev.17"
   ndk_amber:
     dependency: "direct main"
     description:
-      path: "../ndk/packages/amber"
-      relative: true
-    source: path
-    version: "0.4.0-dev.18"
+      name: ndk_amber
+      sha256: d1abd1bfe207db4aaad292e3d7bb2c5756ed8e733664988dfd4fc80b209bc404
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.4.1-dev.17"
   ndk_flutter:
     dependency: "direct main"
     description:
@@ -1157,9 +1160,10 @@ packages:
   ndk_objectbox:
     dependency: "direct main"
     description:
-      path: "../ndk/packages/objectbox"
-      relative: true
-    source: path
+      name: ndk_objectbox
+      sha256: "30d563c7882a5d1a5aca8c1633ccaf52326e69e7f0a5e08e5c7665596379309f"
+      url: "https://pub.dev"
+    source: hosted
     version: "0.2.8-dev.18"
   ndk_rust_verifier:
     dependency: "direct main"
