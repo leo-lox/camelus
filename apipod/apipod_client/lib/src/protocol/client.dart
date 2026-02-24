@@ -207,6 +207,18 @@ class EndpointTrends extends _i1.EndpointRef {
       'limit': limit,
     },
   );
+
+  _i2.Future<_i10.TrendsResponse> trendingPeople({
+    required String interval,
+    required int limit,
+  }) => caller.callServerEndpoint<_i10.TrendsResponse>(
+    'trends',
+    'trendingPeople',
+    {
+      'interval': interval,
+      'limit': limit,
+    },
+  );
 }
 
 class Client extends _i1.ServerpodClientShared {

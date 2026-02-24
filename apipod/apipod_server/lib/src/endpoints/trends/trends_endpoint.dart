@@ -11,6 +11,22 @@ class TrendsEndpoint extends Endpoint {
     String interval = '24h',
     int limit = trendsDefaultTopK,
   }) async {
-    return _service.get(session: session, interval: interval, limit: limit);
+    return _service.getTrends(
+      session: session,
+      interval: interval,
+      limit: limit,
+    );
+  }
+
+  Future<TrendsResponse> trendingPeople(
+    Session session, {
+    String interval = '24h',
+    int limit = trendsDefaultTopK,
+  }) async {
+    return _service.getTrendingPeople(
+      session: session,
+      interval: interval,
+      limit: limit,
+    );
   }
 }

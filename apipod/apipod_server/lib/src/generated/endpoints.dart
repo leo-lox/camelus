@@ -355,6 +355,31 @@ class Endpoints extends _i1.EndpointDispatch {
                 limit: params['limit'],
               ),
         ),
+        'trendingPeople': _i1.MethodConnector(
+          name: 'trendingPeople',
+          params: {
+            'interval': _i1.ParameterDescription(
+              name: 'interval',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+            'limit': _i1.ParameterDescription(
+              name: 'limit',
+              type: _i1.getType<int>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['trends'] as _i9.TrendsEndpoint).trendingPeople(
+                    session,
+                    interval: params['interval'],
+                    limit: params['limit'],
+                  ),
+        ),
       },
     );
   }

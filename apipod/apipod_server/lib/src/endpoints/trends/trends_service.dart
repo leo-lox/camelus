@@ -6,10 +6,40 @@ import '../../generated/protocol.dart';
 import 'trends_constants.dart';
 
 class TrendsService {
-  Future<TrendsResponse> get({
+  Future<TrendsResponse> getTrends({
     required Session session,
     required String interval,
     required int limit,
+  }) {
+    return _get(
+      session: session,
+      interval: interval,
+      limit: limit,
+      includeTop: true,
+      includePeople: false,
+    );
+  }
+
+  Future<TrendsResponse> getTrendingPeople({
+    required Session session,
+    required String interval,
+    required int limit,
+  }) {
+    return _get(
+      session: session,
+      interval: interval,
+      limit: limit,
+      includeTop: false,
+      includePeople: true,
+    );
+  }
+
+  Future<TrendsResponse> _get({
+    required Session session,
+    required String interval,
+    required int limit,
+    required bool includeTop,
+    required bool includePeople,
   }) async {
     if (!trendsIntervals.containsKey(interval)) {
       return TrendsResponse(
@@ -19,7 +49,8 @@ class TrendsService {
         windowHours: null,
         bucketMinutes: null,
         generatedAt: null,
-        top: const [],
+        top: const <TrendsTopItem>[],
+        people: const <TrendsTopItem>[],
         limit: null,
       );
     }
@@ -29,7 +60,12 @@ class TrendsService {
 
     final cached = await session.caches.local.get<TrendsSnapshot>(cacheKey);
     if (cached != null) {
-      return _limitPayload(cached.payloadJson, safeLimit);
+      return _limitPayload(
+        cached.payloadJson,
+        safeLimit,
+        includeTop: includeTop,
+        includePeople: includePeople,
+      );
     }
 
     final snapshot = await TrendsSnapshot.db.findFirstRow(
@@ -47,7 +83,8 @@ class TrendsService {
         windowHours: trendsIntervals[interval]!.inHours,
         bucketMinutes: trendsBucketDuration.inMinutes,
         generatedAt: null,
-        top: const [],
+        top: const <TrendsTopItem>[],
+        people: const <TrendsTopItem>[],
         limit: safeLimit,
       );
     }
@@ -58,20 +95,28 @@ class TrendsService {
       lifetime: const Duration(seconds: 30),
     );
 
-    return _limitPayload(snapshot.payloadJson, safeLimit);
+    return _limitPayload(
+      snapshot.payloadJson,
+      safeLimit,
+      includeTop: includeTop,
+      includePeople: includePeople,
+    );
   }
 
-  TrendsResponse _limitPayload(String payloadJson, int limit) {
+  TrendsResponse _limitPayload(
+    String payloadJson,
+    int limit, {
+    required bool includeTop,
+    required bool includePeople,
+  }) {
     final decoded = jsonDecode(payloadJson);
     final payload = Map<String, dynamic>.from(decoded as Map);
-    final topRaw = List<dynamic>.from(payload['top'] as List? ?? const []);
-    final top = topRaw.take(limit).map((entry) {
-      final item = Map<String, dynamic>.from(entry as Map);
-      return TrendsTopItem(
-        tag: item['tag'] as String? ?? '',
-        count: (item['count'] as num?)?.toInt() ?? 0,
-      );
-    }).toList(growable: false);
+    final List<TrendsTopItem> top = includeTop
+        ? _parseTopItems(payload['top'], limit)
+        : const <TrendsTopItem>[];
+    final List<TrendsTopItem> people = includePeople
+        ? _parseTopItems(payload['people'], limit)
+        : const <TrendsTopItem>[];
 
     final generatedAtRaw = payload['generatedAt'];
     DateTime? generatedAt;
@@ -87,7 +132,19 @@ class TrendsService {
       bucketMinutes: (payload['bucketMinutes'] as num?)?.toInt(),
       generatedAt: generatedAt,
       top: top,
+      people: people,
       limit: limit,
     );
+  }
+
+  List<TrendsTopItem> _parseTopItems(dynamic source, int limit) {
+    final raw = List<dynamic>.from(source as List? ?? const []);
+    return raw.take(limit).map((entry) {
+      final item = Map<String, dynamic>.from(entry as Map);
+      return TrendsTopItem(
+        tag: item['tag'] as String? ?? '',
+        count: (item['count'] as num?)?.toInt() ?? 0,
+      );
+    }).toList(growable: false);
   }
 }

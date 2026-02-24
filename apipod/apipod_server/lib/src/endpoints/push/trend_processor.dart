@@ -15,7 +15,20 @@ class TrendProcessor {
   static const double _bloomFalsePositiveProbability = 0.01;
   static const int _maxCandidatesPerInterval = 5000;
 
-  final Map<String, _TrendWindowState> _states = {
+  final Map<String, _TrendWindowState> _hashtagStates = {
+    for (final entry in trendsIntervals.entries)
+      entry.key: _TrendWindowState(
+        window: entry.value,
+        bucketDuration: trendsBucketDuration,
+        cmsWidth: _cmsWidth,
+        cmsDepth: _cmsDepth,
+        bloomItemsPerBucket: _bloomItemsPerBucket,
+        bloomFalsePositiveProbability: _bloomFalsePositiveProbability,
+        maxCandidatesPerInterval: _maxCandidatesPerInterval,
+      ),
+  };
+
+  final Map<String, _TrendWindowState> _peopleStates = {
     for (final entry in trendsIntervals.entries)
       entry.key: _TrendWindowState(
         window: entry.value,
@@ -44,24 +57,42 @@ class TrendProcessor {
     }
 
     final hashtags = _extractHashtags(event);
-    if (hashtags.isEmpty) {
+    final people = _extractPeople(event);
+
+    if (hashtags.isEmpty && people.isEmpty) {
       return;
     }
 
     final now = DateTime.now().toUtc();
 
-    for (final state in _states.values) {
-      final bucket = state.rotateAndGetBucket(now);
-      if (bucket.pubkeyBloom.contains(event.pubKey)) {
-        continue;
+    for (final intervalKey in trendsIntervals.keys) {
+      final hashtagState = _hashtagStates[intervalKey]!;
+      final peopleState = _peopleStates[intervalKey]!;
+
+      if (hashtags.isNotEmpty) {
+        final bucket = hashtagState.rotateAndGetBucket(now);
+        if (!bucket.pubkeyBloom.contains(event.pubKey)) {
+          bucket.pubkeyBloom.add(event.pubKey);
+
+          for (final hashtag in hashtags) {
+            bucket.sketch.increment(hashtag);
+            hashtagState.totalSketch.increment(hashtag);
+            hashtagState.rememberCandidate(hashtag);
+          }
+        }
       }
 
-      bucket.pubkeyBloom.add(event.pubKey);
+      if (people.isNotEmpty) {
+        final bucket = peopleState.rotateAndGetBucket(now);
+        if (!bucket.pubkeyBloom.contains(event.pubKey)) {
+          bucket.pubkeyBloom.add(event.pubKey);
 
-      for (final hashtag in hashtags) {
-        bucket.sketch.increment(hashtag);
-        state.totalSketch.increment(hashtag);
-        state.rememberCandidate(hashtag);
+          for (final person in people) {
+            bucket.sketch.increment(person);
+            peopleState.totalSketch.increment(person);
+            peopleState.rememberCandidate(person);
+          }
+        }
       }
     }
 
@@ -81,18 +112,26 @@ class TrendProcessor {
   }
 
   Future<void> _persistSnapshots(Session session, DateTime now) async {
-    for (final entry in _states.entries) {
-      final intervalKey = entry.key;
-      final state = entry.value;
-      final top = _computeTopK(state, trendsDefaultTopK);
+    for (final intervalKey in trendsIntervals.keys) {
+      final hashtagState = _hashtagStates[intervalKey]!;
+      final peopleState = _peopleStates[intervalKey]!;
+
+      final top = _computeTopK(hashtagState, trendsDefaultTopK);
+      final topPeople = _computeTopK(peopleState, trendsDefaultTopK);
 
       final payload = {
         'success': true,
         'interval': intervalKey,
-        'windowHours': state.window.inHours,
-        'bucketMinutes': state.bucketDuration.inMinutes,
+        'windowHours': hashtagState.window.inHours,
+        'bucketMinutes': hashtagState.bucketDuration.inMinutes,
         'generatedAt': now.toIso8601String(),
         'top': top
+            .map((e) => {
+                  'tag': e.tag,
+                  'count': e.count,
+                })
+            .toList(),
+        'people': topPeople
             .map((e) => {
                   'tag': e.tag,
                   'count': e.count,
@@ -111,6 +150,23 @@ class TrendProcessor {
 
       await session.caches.local.invalidateKey(trendsCacheKey(intervalKey));
     }
+  }
+
+  List<String> _extractPeople(ndk.Nip01Event event) {
+    final result = <String>{};
+
+    for (final tag in event.tags) {
+      if (tag.length < 2 || tag[0] != 'p') {
+        continue;
+      }
+
+      final normalized = _normalizePubkey(tag[1]);
+      if (normalized != null) {
+        result.add(normalized);
+      }
+    }
+
+    return result.toList(growable: false);
   }
 
   List<String> _extractHashtags(ndk.Nip01Event event) {
@@ -153,6 +209,20 @@ class TrendProcessor {
     }
 
     return withoutHash;
+  }
+
+  String? _normalizePubkey(String value) {
+    final trimmed = value.trim().toLowerCase();
+    if (trimmed.length != 64) {
+      return null;
+    }
+
+    final hexRegex = RegExp(r'^[0-9a-f]{64}$');
+    if (!hexRegex.hasMatch(trimmed)) {
+      return null;
+    }
+
+    return trimmed;
   }
 
   List<_TrendCount> _computeTopK(_TrendWindowState state, int k) {

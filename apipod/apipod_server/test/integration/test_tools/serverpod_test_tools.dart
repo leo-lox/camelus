@@ -667,4 +667,39 @@ class _TrendsEndpoint {
       }
     });
   }
+
+  _i3.Future<_i11.TrendsResponse> trendingPeople(
+    _i1.TestSessionBuilder sessionBuilder, {
+    required String interval,
+    required int limit,
+  }) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'trends',
+            method: 'trendingPeople',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'trends',
+          methodName: 'trendingPeople',
+          parameters: _i1.testObjectToJson({
+            'interval': interval,
+            'limit': limit,
+          }),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _i3.Future<_i11.TrendsResponse>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
 }

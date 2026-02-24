@@ -7,4 +7,5 @@ fields:
   bucketMinutes: int?
   generatedAt: DateTime?
   top: List<TrendsTopItem>
+  people: List<TrendsTopItem>
   limit: int?

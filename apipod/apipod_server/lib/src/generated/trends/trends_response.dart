@@ -24,6 +24,7 @@ abstract class TrendsResponse
     this.bucketMinutes,
     this.generatedAt,
     required this.top,
+    required this.people,
     this.limit,
   });
 
@@ -35,6 +36,7 @@ abstract class TrendsResponse
     int? bucketMinutes,
     DateTime? generatedAt,
     required List<_i2.TrendsTopItem> top,
+    required List<_i2.TrendsTopItem> people,
     int? limit,
   }) = _TrendsResponseImpl;
 
@@ -52,6 +54,9 @@ abstract class TrendsResponse
             ),
       top: _i3.Protocol().deserialize<List<_i2.TrendsTopItem>>(
         jsonSerialization['top'],
+      ),
+      people: _i3.Protocol().deserialize<List<_i2.TrendsTopItem>>(
+        jsonSerialization['people'],
       ),
       limit: jsonSerialization['limit'] as int?,
     );
@@ -71,6 +76,8 @@ abstract class TrendsResponse
 
   List<_i2.TrendsTopItem> top;
 
+  List<_i2.TrendsTopItem> people;
+
   int? limit;
 
   /// Returns a shallow copy of this [TrendsResponse]
@@ -84,6 +91,7 @@ abstract class TrendsResponse
     int? bucketMinutes,
     DateTime? generatedAt,
     List<_i2.TrendsTopItem>? top,
+    List<_i2.TrendsTopItem>? people,
     int? limit,
   });
   @override
@@ -97,6 +105,7 @@ abstract class TrendsResponse
       if (bucketMinutes != null) 'bucketMinutes': bucketMinutes,
       if (generatedAt != null) 'generatedAt': generatedAt?.toJson(),
       'top': top.toJson(valueToJson: (v) => v.toJson()),
+      'people': people.toJson(valueToJson: (v) => v.toJson()),
       if (limit != null) 'limit': limit,
     };
   }
@@ -112,6 +121,7 @@ abstract class TrendsResponse
       if (bucketMinutes != null) 'bucketMinutes': bucketMinutes,
       if (generatedAt != null) 'generatedAt': generatedAt?.toJson(),
       'top': top.toJson(valueToJson: (v) => v.toJsonForProtocol()),
+      'people': people.toJson(valueToJson: (v) => v.toJsonForProtocol()),
       if (limit != null) 'limit': limit,
     };
   }
@@ -133,6 +143,7 @@ class _TrendsResponseImpl extends TrendsResponse {
     int? bucketMinutes,
     DateTime? generatedAt,
     required List<_i2.TrendsTopItem> top,
+    required List<_i2.TrendsTopItem> people,
     int? limit,
   }) : super._(
          success: success,
@@ -142,6 +153,7 @@ class _TrendsResponseImpl extends TrendsResponse {
          bucketMinutes: bucketMinutes,
          generatedAt: generatedAt,
          top: top,
+         people: people,
          limit: limit,
        );
 
@@ -157,6 +169,7 @@ class _TrendsResponseImpl extends TrendsResponse {
     Object? bucketMinutes = _Undefined,
     Object? generatedAt = _Undefined,
     List<_i2.TrendsTopItem>? top,
+    List<_i2.TrendsTopItem>? people,
     Object? limit = _Undefined,
   }) {
     return TrendsResponse(
@@ -167,6 +180,7 @@ class _TrendsResponseImpl extends TrendsResponse {
       bucketMinutes: bucketMinutes is int? ? bucketMinutes : this.bucketMinutes,
       generatedAt: generatedAt is DateTime? ? generatedAt : this.generatedAt,
       top: top ?? this.top.map((e0) => e0.copyWith()).toList(),
+      people: people ?? this.people.map((e0) => e0.copyWith()).toList(),
       limit: limit is int? ? limit : this.limit,
     );
   }
