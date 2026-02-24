@@ -15,7 +15,7 @@ import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
-import '../components/enable_notifications.dart';
+import '../providers/notification_settings_provider.dart';
 import '../components/note_card/no_more_notes.dart';
 import '../components/note_card/nostr_parser.dart';
 import '../providers/ndk_provider.dart';
@@ -94,8 +94,12 @@ class _NotificationPageState extends ConsumerState<NotificationPage>
 
     // Filter mentions-only notifications
     final mentionNotifications = allNotifications
-        .where((notification) => notification.type == NotificationType.mention)
+        .where(
+          (notification) => notification.type == NotificationTypeFeed.mention,
+        )
         .toList();
+
+    final notificationSettings = ref.watch(notificationSettingsProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -130,7 +134,43 @@ class _NotificationPageState extends ConsumerState<NotificationPage>
       body: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          PushNotificationToggle(),
+          if (notificationSettings.platformSupported &&
+              !notificationSettings.notificationsEnabled)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  ElevatedButton(
+                    onPressed: notificationSettings.isLoading
+                        ? null
+                        : () => ref
+                              .read(notificationSettingsProvider.notifier)
+                              .requestPermission(),
+                    child: Text(
+                      AppLocalizations.of(
+                        context,
+                      )!.enableNotificationsForReplies,
+                    ),
+                  ),
+                  if (notificationSettings.permissionRequested &&
+                      notificationSettings.notificationsDenied)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 8),
+                      child: Text(
+                        AppLocalizations.of(
+                          context,
+                        )!.notificationsDeniedInSettings,
+                        style: TextStyle(
+                          color: Colors.orangeAccent,
+                          fontSize: 12,
+                          fontStyle: FontStyle.italic,
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            ),
           TabBar(
             controller: _tabController,
             overlayColor: WidgetStateProperty.all(Colors.transparent),
@@ -281,7 +321,7 @@ class _NotificationPageState extends ConsumerState<NotificationPage>
         leading: _getNotificationIcon(notification),
         title: Row(
           children: [
-            if (notification.type == NotificationType.reaction)
+            if (notification.type == NotificationTypeFeed.reaction)
               UserImage(
                 size: 23,
                 imageUrl: reactingUser.userMetadata?.picture,
@@ -337,15 +377,15 @@ class _NotificationPageState extends ConsumerState<NotificationPage>
   String _getNotificationText(NostrNotification notification) {
     final l10n = AppLocalizations.of(context)!;
     switch (notification.type) {
-      case NotificationType.reaction:
+      case NotificationTypeFeed.reaction:
         return l10n.reactedToYourPost;
-      case NotificationType.reply:
+      case NotificationTypeFeed.reply:
         return l10n.repliedToYourPost;
-      case NotificationType.threadReply:
+      case NotificationTypeFeed.threadReply:
         return l10n.mentionedYouInThread;
-      case NotificationType.repost:
+      case NotificationTypeFeed.repost:
         return l10n.repostedYourPost;
-      case NotificationType.mention:
+      case NotificationTypeFeed.mention:
         return l10n.mentionedYou;
       default:
         return l10n.interactedWithYourPost;
@@ -357,7 +397,7 @@ class _NotificationPageState extends ConsumerState<NotificationPage>
     Color iconColor;
 
     switch (notification.type) {
-      case NotificationType.reaction:
+      case NotificationTypeFeed.reaction:
         if (notification.sourceNote.content == '+') {
           icon = PhosphorIcons.heart(PhosphorIconsStyle.bold);
           iconColor = Theme.of(context).colorScheme.error;
@@ -368,12 +408,12 @@ class _NotificationPageState extends ConsumerState<NotificationPage>
           );
         }
 
-      case NotificationType.reply:
+      case NotificationTypeFeed.reply:
         icon = PhosphorIcons.arrowBendUpLeft();
         iconColor = Theme.of(context).colorScheme.primary;
         break;
 
-      case NotificationType.repost:
+      case NotificationTypeFeed.repost:
         return SvgPicture.asset(
           'assets/icons/retweet.svg',
           height: 18,
@@ -382,7 +422,7 @@ class _NotificationPageState extends ConsumerState<NotificationPage>
             BlendMode.srcATop,
           ),
         );
-      case NotificationType.mention:
+      case NotificationTypeFeed.mention:
         icon = PhosphorIcons.at();
         iconColor = Colors.orange;
         break;
@@ -405,10 +445,10 @@ class _NotificationPageState extends ConsumerState<NotificationPage>
     );
 
     switch (notification.type) {
-      case NotificationType.reaction:
+      case NotificationTypeFeed.reaction:
         //return Container();
         break;
-      case NotificationType.reply:
+      case NotificationTypeFeed.reply:
         final mentionUser = ref.watch(
           metadataStateProvider(notification.sourceNote.pubkey),
         );
@@ -418,7 +458,7 @@ class _NotificationPageState extends ConsumerState<NotificationPage>
           hideBottomBar: true,
         );
 
-      case NotificationType.threadReply:
+      case NotificationTypeFeed.threadReply:
         final mentionUser = ref.watch(
           metadataStateProvider(notification.sourceNote.pubkey),
         );
@@ -428,9 +468,9 @@ class _NotificationPageState extends ConsumerState<NotificationPage>
           hideBottomBar: true,
         );
 
-      case NotificationType.repost:
+      case NotificationTypeFeed.repost:
         break;
-      case NotificationType.mention:
+      case NotificationTypeFeed.mention:
         final mentionUser = ref.watch(
           metadataStateProvider(notification.sourceNote.pubkey),
         );

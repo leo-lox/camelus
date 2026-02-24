@@ -35,11 +35,26 @@ class InboxOutboxRepositoryImpl implements InboxOutboxRepository {
   }
 
   @override
-  Future<List<String>> getDmRelays({bool forceRefresh = false}) async {
+  Future<List<String>> getDmRelays({
+    required String pubkey,
+    bool forceRefresh = false,
+  }) async {
+    final list = await dartNdkSource.dartNdk.lists.getPublicList(
+      kind: kDmRelayListKind,
+      forceRefresh: forceRefresh,
+      publicKey: pubkey,
+    );
+
+    return list?.allRelays.toList() ?? const [];
+  }
+
+  @override
+  Future<List<String>> getDmRelaysSelf({bool forceRefresh = false}) async {
     final list = await dartNdkSource.dartNdk.lists.getSingleNip51List(
       kDmRelayListKind,
       forceRefresh: forceRefresh,
     );
+
     return list?.allRelays.toList() ?? const [];
   }
 
@@ -57,7 +72,7 @@ class InboxOutboxRepositoryImpl implements InboxOutboxRepository {
       normalized.add(value);
     }
 
-    final current = await getDmRelays(forceRefresh: true);
+    final current = await getDmRelaysSelf(forceRefresh: true);
     final currentSet = current.toSet();
     final targetSet = normalized.toSet();
 
@@ -84,7 +99,7 @@ class InboxOutboxRepositoryImpl implements InboxOutboxRepository {
       return normalized;
     }
 
-    return getDmRelays(forceRefresh: true);
+    return getDmRelaysSelf(forceRefresh: true);
   }
 
   @override

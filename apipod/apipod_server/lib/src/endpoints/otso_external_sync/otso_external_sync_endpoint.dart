@@ -11,8 +11,6 @@ import 'models/otso_sync_model.dart';
 import 'models/otso_sync_wish_model.dart';
 import 'models/otso_sync_xml_model.dart';
 
-const padletUrl =
-    "https://padlet.com/api/10/wishes?wall_hashid=board_YjMXnWQK1VbayND5";
 const stopIceUrl =
     "https://stopice.net/login/?recentmapdata=1&duration=since_yesterday";
 
@@ -38,14 +36,6 @@ class OtsoExternalSyncEndpoint extends Endpoint {
     await _withSession(enableLogging: true, (session) async {
       session.log("start sync", level: LogLevel.debug);
       final Map<String, List<OtsoSyncModel>> sources = {};
-
-      final padletData = await _getData(
-        url: padletUrl,
-        parseMethod: Wish.parse,
-      );
-      if (padletData != null) {
-        sources["padlet"] = padletData;
-      }
 
       final stopiceData = await _getData(
         url: stopIceUrl,

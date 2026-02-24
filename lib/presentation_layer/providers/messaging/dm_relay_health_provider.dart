@@ -106,7 +106,8 @@ class DmRelayHealthNotifier extends Notifier<DmRelayHealthState> {
     });
 
     if (myPubkey != null) {
-      _initialize();
+      // Schedule initialization for after build completes
+      Future.microtask(() => _initialize());
     } else {
       return const DmRelayHealthState().copyWith(
         isLoading: false,

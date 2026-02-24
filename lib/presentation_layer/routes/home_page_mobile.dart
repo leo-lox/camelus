@@ -45,49 +45,71 @@ class _HomePageMobileState extends ConsumerState<HomePageMobile>
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   // Header animation state
-  double _headerTopOffset = 0.0;
-  double _lastScrollOffset = 0.0;
+  final ValueNotifier<double> _headerTopOffset = ValueNotifier<double>(0.0);
+  double _lastPostsScrollOffset = 0.0;
+  double _lastRepliesScrollOffset = 0.0;
+  double _headerHeight = 0.0;
 
   ScrollController? _postsScrollController;
   ScrollController? _repliesScrollController;
 
-  void _onScrollUpdate(ScrollController scrollController) {
+  void _onScrollUpdate(
+    ScrollController scrollController, {
+    required bool isPostsFeed,
+  }) {
     if (!scrollController.hasClients) return;
 
     final offset = scrollController.offset;
-    final delta = offset - _lastScrollOffset;
-    _lastScrollOffset = offset;
+    final previousOffset = isPostsFeed
+        ? _lastPostsScrollOffset
+        : _lastRepliesScrollOffset;
+    final delta = offset - previousOffset;
+
+    if (isPostsFeed) {
+      _lastPostsScrollOffset = offset;
+    } else {
+      _lastRepliesScrollOffset = offset;
+    }
 
     // Calculate new header position
-    double newTop = _headerTopOffset - delta;
+    double newTop = _headerTopOffset.value - delta;
 
     // Clamp between fully hidden and fully visible
-    newTop = newTop.clamp(-_floatingHeaderHeight(context), 0.0);
+    newTop = newTop.clamp(-_headerHeight, 0.0);
 
     // If near top, snap to visible
     if (offset < 50) {
       newTop = 0.0;
     }
 
-    if (_headerTopOffset != newTop) {
-      setState(() => _headerTopOffset = newTop);
+    if (_headerTopOffset.value != newTop) {
+      _headerTopOffset.value = newTop;
     }
   }
 
   void _setupScrollListener(ScrollController controller) {
-    controller.removeListener(_onScrollUpdateWrapper);
-    controller.addListener(_onScrollUpdateWrapper);
+    if (identical(controller, _postsScrollController)) {
+      controller.removeListener(_onPostsScrollUpdate);
+      controller.addListener(_onPostsScrollUpdate);
+      return;
+    }
+
+    if (identical(controller, _repliesScrollController)) {
+      controller.removeListener(_onRepliesScrollUpdate);
+      controller.addListener(_onRepliesScrollUpdate);
+    }
   }
 
-  void _onScrollUpdateWrapper() {
-    // Find which controller is currently active
-    final controller = _postsScrollController?.hasClients == true
-        ? _postsScrollController
-        : _repliesScrollController;
+  void _onPostsScrollUpdate() {
+    final controller = _postsScrollController;
+    if (controller == null) return;
+    _onScrollUpdate(controller, isPostsFeed: true);
+  }
 
-    if (controller != null) {
-      _onScrollUpdate(controller);
-    }
+  void _onRepliesScrollUpdate() {
+    final controller = _repliesScrollController;
+    if (controller == null) return;
+    _onScrollUpdate(controller, isPostsFeed: false);
   }
 
   void _show(BuildContext context) {
@@ -110,14 +132,17 @@ class _HomePageMobileState extends ConsumerState<HomePageMobile>
 
   @override
   void dispose() {
-    _postsScrollController?.removeListener(_onScrollUpdateWrapper);
-    _repliesScrollController?.removeListener(_onScrollUpdateWrapper);
+    _postsScrollController?.removeListener(_onPostsScrollUpdate);
+    _repliesScrollController?.removeListener(_onRepliesScrollUpdate);
+    _headerTopOffset.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     super.build(context);
+
+    _headerHeight = _floatingHeaderHeight(context);
 
     final currentUserPubkey = ref.read(ndkProvider).accounts.getPublicKey();
     final initialTabIndex = widget.initialTab == "/posts-and-replies" ? 1 : 0;
@@ -171,9 +196,7 @@ class _HomePageMobileState extends ConsumerState<HomePageMobile>
                   key: PageStorageKey(
                     'homeFeed-posts-${currentUserPubkey ?? "readonly"}',
                   ),
-                  feedPadding: EdgeInsets.only(
-                    top: _floatingHeaderHeight(context),
-                  ),
+                  feedPadding: EdgeInsets.only(top: _headerHeight),
                   feedFilter: FeedFilter(
                     feedId: "homeFeed",
                     kinds: [1, 6],
@@ -189,9 +212,7 @@ class _HomePageMobileState extends ConsumerState<HomePageMobile>
                   key: PageStorageKey(
                     'homeFeed-all-${currentUserPubkey ?? "readonly"}',
                   ),
-                  feedPadding: EdgeInsets.only(
-                    top: _floatingHeaderHeight(context),
-                  ),
+                  feedPadding: EdgeInsets.only(top: _headerHeight),
                   feedFilter: FeedFilter(
                     feedId: "homeFeed",
                     kinds: [1, 6],
@@ -205,85 +226,88 @@ class _HomePageMobileState extends ConsumerState<HomePageMobile>
                 ),
               ],
             ),
-            Positioned(
-              top: _headerTopOffset,
-              left: 0,
-              right: 0,
-              child: AnimatedOpacity(
-                opacity:
-                    _headerTopOffset > -_floatingHeaderHeight(context) * 0.5
-                    ? 1.0
-                    : 0.0,
-                duration: const Duration(milliseconds: 150),
-                child: ClipRect(
-                  child: BackdropFilter(
-                    filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
-                    child: Material(
-                      color: Theme.of(
-                        context,
-                      ).colorScheme.surface.withOpacity(0.95),
-                      elevation: 0,
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          AppBar(
-                            toolbarHeight: kToolbarHeight,
-                            automaticallyImplyLeading: false,
-                            surfaceTintColor: Theme.of(
-                              context,
-                            ).colorScheme.surface,
-                            shadowColor: Theme.of(context).colorScheme.surface,
-                            backgroundColor: Colors.transparent,
+            ValueListenableBuilder<double>(
+              valueListenable: _headerTopOffset,
+              builder: (context, headerTopOffset, child) {
+                return Positioned(
+                  top: headerTopOffset,
+                  left: 0,
+                  right: 0,
+                  child: AnimatedOpacity(
+                    opacity: headerTopOffset > -_headerHeight * 0.5 ? 1.0 : 0.0,
+                    duration: const Duration(milliseconds: 150),
+                    child: child,
+                  ),
+                );
+              },
+              child: ClipRect(
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+                  child: Material(
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.surface.withOpacity(0.95),
+                    elevation: 0,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        AppBar(
+                          toolbarHeight: kToolbarHeight,
+                          automaticallyImplyLeading: false,
+                          surfaceTintColor: Theme.of(
+                            context,
+                          ).colorScheme.surface,
+                          shadowColor: Theme.of(context).colorScheme.surface,
+                          backgroundColor: Colors.transparent,
 
-                            leading: MobileFeedHeader(
-                              scaffoldKey: _scaffoldKey,
-                              pubkey: currentUserPubkey,
+                          leading: MobileFeedHeader(
+                            scaffoldKey: _scaffoldKey,
+                            pubkey: currentUserPubkey,
+                          ),
+                          centerTitle: true,
+                          actions: [
+                            RelaysConnectivityWidget(
+                              onTap: () => context.push('/relays'),
                             ),
-                            centerTitle: true,
-                            actions: [
-                              RelaysConnectivityWidget(
-                                onTap: () => context.push('/relays'),
+                            if (!kIsWeb &&
+                                (defaultTargetPlatform ==
+                                        TargetPlatform.windows ||
+                                    defaultTargetPlatform ==
+                                        TargetPlatform.linux ||
+                                    defaultTargetPlatform ==
+                                        TargetPlatform.macOS))
+                              const SizedBox(width: 154),
+                          ],
+                        ),
+                        SizedBox(
+                          height: _tabBarHeight,
+                          child: TabBar(
+                            overlayColor: WidgetStateProperty.all(
+                              Colors.transparent,
+                            ),
+                            splashFactory: NoSplash.splashFactory,
+                            indicatorColor: Theme.of(
+                              context,
+                            ).colorScheme.primary,
+                            indicator: UnderlineTabIndicator(
+                              borderSide: BorderSide(
+                                width: 2.5,
+                                color: Theme.of(context).colorScheme.primary,
                               ),
-                              if (!kIsWeb &&
-                                  (defaultTargetPlatform ==
-                                          TargetPlatform.windows ||
-                                      defaultTargetPlatform ==
-                                          TargetPlatform.linux ||
-                                      defaultTargetPlatform ==
-                                          TargetPlatform.macOS))
-                                const SizedBox(width: 154),
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            dividerHeight: 0,
+                            tabs: [
+                              Tab(text: AppLocalizations.of(context)!.posts),
+                              Tab(
+                                text: AppLocalizations.of(
+                                  context,
+                                )!.postsAndReplies,
+                              ),
                             ],
                           ),
-                          SizedBox(
-                            height: _tabBarHeight,
-                            child: TabBar(
-                              overlayColor: WidgetStateProperty.all(
-                                Colors.transparent,
-                              ),
-                              splashFactory: NoSplash.splashFactory,
-                              indicatorColor: Theme.of(
-                                context,
-                              ).colorScheme.primary,
-                              indicator: UnderlineTabIndicator(
-                                borderSide: BorderSide(
-                                  width: 2.5,
-                                  color: Theme.of(context).colorScheme.primary,
-                                ),
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              dividerHeight: 0,
-                              tabs: [
-                                Tab(text: AppLocalizations.of(context)!.posts),
-                                Tab(
-                                  text: AppLocalizations.of(
-                                    context,
-                                  )!.postsAndReplies,
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
@@ -316,7 +340,9 @@ class MobileFeedHeader extends ConsumerWidget {
       );
     }
 
-    final myMetadata = ref.watch(metadataStateProvider(pubkey!)).userMetadata;
+    final myMetadata = ref.watch(
+      metadataStateProvider(pubkey!).select((state) => state.userMetadata),
+    );
 
     return InkWell(
       borderRadius: BorderRadius.circular(100),

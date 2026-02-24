@@ -7,7 +7,7 @@ environment:
   sdk: '>=3.3.0 <4.0.0'
 
 dependencies:
-  serverpod: 3.2.3
+  serverpod: 3.3.1
   ndk: ^0.7.1-dev.2
   dart_firebase_admin: ^0.4.1
   web_socket_channel: ^3.0.2
@@ -18,7 +18,7 @@ dependencies:
 dev_dependencies:
   lints: '>=3.0.0 <6.0.0'
   test: '^1.24.2'
-  serverpod_test: 3.2.3
+  serverpod_test: 3.3.1
 
 dependency_overrides:
   #ndk:

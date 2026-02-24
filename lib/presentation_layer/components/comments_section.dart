@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../domain_layer/entities/parsed_post.dart';
+import '../../domain_layer/entities/nostr_note.dart';
+
+import '../providers/parsed_note_cache_provider.dart';
 import 'note_card/note_card_container.dart';
+import 'note_card/skeleton_note.dart';
 
 class FlattenedComment {
-  final ParsedPost note;
+  final NostrNote note;
   final int depth;
   final List<bool> ancestorHasSibling;
 
@@ -16,7 +20,7 @@ class FlattenedComment {
 }
 
 // Widget to display a flattened comment
-class FlatCommentWidget extends StatelessWidget {
+class FlatCommentWidget extends ConsumerWidget {
   final FlattenedComment comment;
   final bool isHighlighted;
 
@@ -27,50 +31,63 @@ class FlatCommentWidget extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    return Stack(
-      clipBehavior: Clip.none,
-      children: [
-        // Depth indicator bars
-        Positioned(
-          left: 0,
-          top: 0,
-          bottom: 0,
-          child: DepthIndicator(isHighlighted: false, depth: comment.depth),
-        ),
-        Padding(
-          padding: EdgeInsets.only(left: comment.depth * 16.0),
-          child: Stack(
-            clipBehavior: Clip.none,
-            children: [
-              // Highlight container if this is the openNoteId
-              if (isHighlighted)
-                Positioned.fill(
-                  child: Container(
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                        color: Theme.of(
-                          context,
-                        ).colorScheme.primary.withValues(alpha: 0.65),
-                        width: 2.0,
+  Widget build(BuildContext context, WidgetRef ref) {
+    final parsedPostAsync = ref.watch(parsedNoteCacheProvider(comment.note));
+
+    return parsedPostAsync.when(
+      data: (parsedNote) {
+        if (parsedNote == null) {
+          return const SizedBox.shrink();
+        }
+
+        return Stack(
+          clipBehavior: Clip.none,
+          children: [
+            // Depth indicator bars
+            Positioned(
+              left: 0,
+              top: 0,
+              bottom: 0,
+              child: DepthIndicator(isHighlighted: false, depth: comment.depth),
+            ),
+            Padding(
+              padding: EdgeInsets.only(left: comment.depth * 16.0),
+              child: Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  // Highlight container if this is the openNoteId
+                  if (isHighlighted)
+                    Positioned.fill(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.primary.withValues(alpha: 0.65),
+                            width: 2.0,
+                          ),
+                          borderRadius: BorderRadius.circular(10.0),
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.primary.withValues(alpha: 0.05),
+                        ),
                       ),
-                      borderRadius: BorderRadius.circular(10.0),
-                      color: Theme.of(
-                        context,
-                      ).colorScheme.primary.withValues(alpha: 0.05),
                     ),
+
+                  // Render the main comment content
+                  NoteCardContainer(
+                    key: ValueKey(comment.note.id),
+                    note: parsedNote,
+                    fontSize: isHighlighted ? 17.5 : 16,
                   ),
-                ),
-              // Render the main comment content
-              NoteCardContainer(
-                key: ValueKey(comment.note.id),
-                note: comment.note,
-                fontSize: isHighlighted ? 17.5 : 16,
+                ],
               ),
-            ],
-          ),
-        ),
-      ],
+            ),
+          ],
+        );
+      },
+      loading: () => const SkeletonNote(hideBottomAction: true),
+      error: (_, _) => const SizedBox.shrink(),
     );
   }
 }

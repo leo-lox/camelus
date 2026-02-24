@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:riverpod/riverpod.dart';
 
 import '../../presentation_layer/providers/db_app_provider.dart';
+import '../../presentation_layer/providers/notification_settings_provider.dart';
 import '../../presentation_layer/providers/notifications_provider.dart';
 import 'notifications_caller.dart';
 import '../../firebase_options.dart';
@@ -23,10 +24,15 @@ Future<void> initializeFirebase({
       defaultTargetPlatform == TargetPlatform.android ||
       defaultTargetPlatform == TargetPlatform.iOS ||
       defaultTargetPlatform == TargetPlatform.macOS) {
-    // Initialize Firebase only on supported platforms
-    await Firebase.initializeApp(
-      options: DefaultFirebaseOptions.currentPlatform,
-    );
+    if (Firebase.apps.isEmpty) {
+      try {
+        await Firebase.initializeApp(
+          options: DefaultFirebaseOptions.currentPlatform,
+        );
+      } catch (_) {
+        // Already initialized at native level — safe to continue
+      }
+    }
 
     // Set up Firebase Messaging
     checkForInitialMessage();
@@ -47,7 +53,17 @@ Future<void> initializeFirebase({
       final notiProvider = await provider.read(notificationsProvider.future);
       final appDb = provider.read(dbAppProvider);
       await appDb.save(key: "fcm_token", value: newToken);
-      await notiProvider.registerDevice(token: newToken);
+      final storedKinds = await appDb.read('push_kinds');
+      final storedRelays = await appDb.read('push_relays');
+      final kinds = NotificationSettingsNotifier.parseKinds(storedKinds);
+      final relays = NotificationSettingsNotifier.parseSelectedRelays(
+        storedRelays,
+      );
+      await notiProvider.registerDevice(
+        token: newToken,
+        kinds: kinds,
+        relays: relays,
+      );
     });
   } else {
     log('Firebase not initialized: unsupported platform');

@@ -10,6 +10,7 @@ import '../atoms/new_posts_available.dart';
 import '../atoms/refresh_indicator_no_need.dart';
 import '../providers/app_bar_provider/app_bottom_bar_provider.dart';
 import '../providers/generic_feed_provider.dart';
+import '../providers/parsed_note_cache_provider.dart';
 import 'note_card/no_more_notes.dart';
 import 'note_card/note_card_container.dart';
 import 'note_card/note_card_repost.dart';
@@ -24,11 +25,14 @@ class GenericFeed extends ConsumerStatefulWidget {
 
   final void Function(ScrollController)? onScrollControllerReady;
 
+  final bool usePrimaryScrollController;
+
   const GenericFeed({
     super.key,
     this.feedPadding,
     required this.feedFilter,
     this.onScrollControllerReady,
+    this.usePrimaryScrollController = false,
   });
 
   @override
@@ -38,16 +42,22 @@ class GenericFeed extends ConsumerStatefulWidget {
 // State class for GenericFeed, which manages its lifecycle and behavior
 class _GenericFeedState extends ConsumerState<GenericFeed>
     with TickerProviderStateMixin {
-  late ScrollController _scrollController; // Controller for scrolling behavior
+  ScrollController? _scrollController; // Controller for scrolling behavior
   late StreamSubscription<void> _homeBarSub; // Subscription to home tab events
 
   final newPostsController = SwipeableFadeOutController();
 
-  VoidCallback? _externalScrollListener;
-
   // Scroll to the top of the feed
-  void _scrollToTop() {
-    _scrollController.animateTo(
+  void _scrollToTop([BuildContext? context]) {
+    final controller = widget.usePrimaryScrollController
+        ? (context != null ? PrimaryScrollController.maybeOf(context) : null)
+        : _scrollController;
+
+    if (controller == null || !controller.hasClients) {
+      return;
+    }
+
+    controller.animateTo(
       0,
       duration: const Duration(milliseconds: 500),
       curve: Curves.easeOutCubic,
@@ -64,16 +74,17 @@ class _GenericFeedState extends ConsumerState<GenericFeed>
   @override
   void initState() {
     super.initState();
-    _scrollController = ScrollController();
+    if (!widget.usePrimaryScrollController) {
+      _scrollController = ScrollController();
+    }
 
     // Notify parent if callback provided
-    if (widget.onScrollControllerReady != null) {
+    if (!widget.usePrimaryScrollController &&
+        widget.onScrollControllerReady != null &&
+        _scrollController != null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        // Store the listener so we can remove it later
-        _externalScrollListener = () =>
-            widget.onScrollControllerReady!(_scrollController);
         // Don't call the callback here, just pass the controller
-        widget.onScrollControllerReady!(_scrollController);
+        widget.onScrollControllerReady!(_scrollController!);
       });
     }
 
@@ -92,12 +103,7 @@ class _GenericFeedState extends ConsumerState<GenericFeed>
 
   @override
   void dispose() {
-    // Remove external listener if it was added
-    if (_externalScrollListener != null) {
-      _scrollController.removeListener(_externalScrollListener!);
-    }
-
-    _scrollController.dispose();
+    _scrollController?.dispose();
     _homeBarSub.cancel();
 
     super.dispose();
@@ -105,11 +111,17 @@ class _GenericFeedState extends ConsumerState<GenericFeed>
 
   @override
   Widget build(BuildContext context) {
-    // Watch the state of the generic feed and its notifier
-    final genericFeedStateP = ref.watch(
-      genericFeedStateProvider(widget.feedFilter),
+    final newRootNotesCount = ref.watch(
+      genericFeedStateProvider(
+        widget.feedFilter,
+      ).select((state) => state.newRootNotes.length),
     );
-    final genericFeedStateNotifier = ref.watch(
+    final newRootAndReplyNotesCount = ref.watch(
+      genericFeedStateProvider(
+        widget.feedFilter,
+      ).select((state) => state.newRootAndReplyNotes.length),
+    );
+    final genericFeedStateNotifier = ref.read(
       genericFeedStateProvider(widget.feedFilter).notifier,
     );
 
@@ -124,11 +136,11 @@ class _GenericFeedState extends ConsumerState<GenericFeed>
             feedFilter: widget.feedFilter,
             scrollController: _scrollController,
             feedPadding: widget.feedPadding,
+            usePrimaryScrollController: widget.usePrimaryScrollController,
           ),
         ),
 
-        if (widget.feedFilter.showRootNotesOnly &&
-            genericFeedStateP.newRootNotes.isNotEmpty)
+        if (widget.feedFilter.showRootNotesOnly && newRootNotesCount > 0)
           Padding(
             padding: widget.feedPadding ?? EdgeInsets.zero,
             child: NewPostsAvailable(
@@ -136,17 +148,17 @@ class _GenericFeedState extends ConsumerState<GenericFeed>
               dismissThreshold: NEW_POSTS_DISMISS_THRESHOLD,
               name: AppLocalizations.of(
                 context,
-              )!.newPostsCount(genericFeedStateP.newRootNotes.length),
+              )!.newPostsCount(newRootNotesCount),
               onPressed: () {
                 genericFeedStateNotifier.integrateNewNotes();
-                _scrollToTop();
+                _scrollToTop(context);
               },
               onDismissed: _newPostControllerDismissed,
             ),
           ),
 
         if (!widget.feedFilter.showRootNotesOnly &&
-            genericFeedStateP.newRootNotes.isNotEmpty)
+            newRootAndReplyNotesCount > 0)
           Padding(
             padding: widget.feedPadding ?? EdgeInsets.zero,
             child: NewPostsAvailable(
@@ -154,10 +166,10 @@ class _GenericFeedState extends ConsumerState<GenericFeed>
               dismissThreshold: NEW_POSTS_DISMISS_THRESHOLD,
               name: AppLocalizations.of(
                 context,
-              )!.newPostsCount(genericFeedStateP.newRootAndReplyNotes.length),
+              )!.newPostsCount(newRootAndReplyNotesCount),
               onPressed: () {
                 genericFeedStateNotifier.integrateNewNotes();
-                _scrollToTop();
+                _scrollToTop(context);
               },
               onDismissed: _newPostControllerDismissed,
             ),
@@ -170,33 +182,42 @@ class _GenericFeedState extends ConsumerState<GenericFeed>
 // Widget for rendering a scrollable list of posts
 class ScrollablePostsList extends ConsumerWidget {
   final FeedFilter feedFilter;
-  final ScrollController scrollController;
+  final ScrollController? scrollController;
   final EdgeInsets? feedPadding;
+  final bool usePrimaryScrollController;
 
   const ScrollablePostsList({
     super.key,
     required this.feedFilter,
     required this.scrollController,
     this.feedPadding,
+    this.usePrimaryScrollController = false,
   });
 
   @override
   Widget build(BuildContext context, ref) {
-    final genericFeedStateP = ref.watch(genericFeedStateProvider(feedFilter));
+    final timelineNotes = ref.watch(
+      genericFeedStateProvider(feedFilter).select(
+        (state) => feedFilter.showRootNotesOnly
+            ? state.timelineRootNotes
+            : state.timelineRootAndReplyNotes,
+      ),
+    );
+    final endOfRootNotes = ref.watch(
+      genericFeedStateProvider(
+        feedFilter,
+      ).select((state) => state.endOfRootNotes),
+    );
     final genericFeedStateNoti = ref.read(
       genericFeedStateProvider(feedFilter).notifier,
     );
-
-    /// Depending on the feed filter, determine which notes to display in the timeline
-    final timelineNotes = feedFilter.showRootNotesOnly
-        ? genericFeedStateP.timelineRootNotes
-        : genericFeedStateP.timelineRootAndReplyNotes;
 
     return ListView.builder(
       key: PageStorageKey<String>(
         'feed_${feedFilter.hashCode}_${feedFilter.showRootNotesOnly}',
       ),
-      controller: scrollController,
+      controller: usePrimaryScrollController ? null : scrollController,
+      primary: usePrimaryScrollController,
       padding: feedPadding,
       cacheExtent: 2000,
       physics: const AlwaysScrollableScrollPhysics(
@@ -205,7 +226,7 @@ class ScrollablePostsList extends ConsumerWidget {
       itemCount: timelineNotes.length + 1,
       itemBuilder: (BuildContext context, int index) {
         if (index == timelineNotes.length) {
-          if (genericFeedStateP.endOfRootNotes) {
+          if (endOfRootNotes) {
             return NoMoreNotes();
           }
           return SkeletonNote(
@@ -215,15 +236,32 @@ class ScrollablePostsList extends ConsumerWidget {
           );
         }
         final note = timelineNotes[index];
-        if (note.kind == 1) {
-          return NoteCardContainer(key: PageStorageKey(note.id), note: note);
-        } else if (note.kind == 6) {
+
+        if (note.kind == 6) {
           return NoteCardRepost(
             key: PageStorageKey(note.id),
-            repostEvent: note.nostrNote,
+            repostEvent: note,
           );
         }
-        return Container();
+
+        final parsedPostAsync = ref.watch(parsedNoteCacheProvider(note));
+        return parsedPostAsync.when(
+          data: (parsedNote) {
+            if (parsedNote == null) {
+              return const SizedBox.shrink();
+            }
+
+            if (note.kind == 1) {
+              return NoteCardContainer(
+                key: PageStorageKey(note.id),
+                note: parsedNote,
+              );
+            }
+            return Container();
+          },
+          loading: () => const SkeletonNote(hideBottomAction: true),
+          error: (_, _) => const SizedBox.shrink(),
+        );
       },
     );
   }

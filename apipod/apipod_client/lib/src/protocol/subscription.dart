@@ -11,6 +11,7 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
+import 'package:apipod_client/src/protocol/protocol.dart' as _i2;
 
 abstract class PushSubscription implements _i1.SerializableModel {
   PushSubscription._({
@@ -18,6 +19,7 @@ abstract class PushSubscription implements _i1.SerializableModel {
     required this.pubKey,
     required this.relay,
     required this.token,
+    this.kinds,
   });
 
   factory PushSubscription({
@@ -25,6 +27,7 @@ abstract class PushSubscription implements _i1.SerializableModel {
     required String pubKey,
     required String relay,
     required String token,
+    List<int>? kinds,
   }) = _PushSubscriptionImpl;
 
   factory PushSubscription.fromJson(Map<String, dynamic> jsonSerialization) {
@@ -33,6 +36,9 @@ abstract class PushSubscription implements _i1.SerializableModel {
       pubKey: jsonSerialization['pubKey'] as String,
       relay: jsonSerialization['relay'] as String,
       token: jsonSerialization['token'] as String,
+      kinds: jsonSerialization['kinds'] == null
+          ? null
+          : _i2.Protocol().deserialize<List<int>>(jsonSerialization['kinds']),
     );
   }
 
@@ -47,6 +53,8 @@ abstract class PushSubscription implements _i1.SerializableModel {
 
   String token;
 
+  List<int>? kinds;
+
   /// Returns a shallow copy of this [PushSubscription]
   /// with some or all fields replaced by the given arguments.
   @_i1.useResult
@@ -55,6 +63,7 @@ abstract class PushSubscription implements _i1.SerializableModel {
     String? pubKey,
     String? relay,
     String? token,
+    List<int>? kinds,
   });
   @override
   Map<String, dynamic> toJson() {
@@ -64,6 +73,7 @@ abstract class PushSubscription implements _i1.SerializableModel {
       'pubKey': pubKey,
       'relay': relay,
       'token': token,
+      if (kinds != null) 'kinds': kinds?.toJson(),
     };
   }
 
@@ -81,11 +91,13 @@ class _PushSubscriptionImpl extends PushSubscription {
     required String pubKey,
     required String relay,
     required String token,
+    List<int>? kinds,
   }) : super._(
          id: id,
          pubKey: pubKey,
          relay: relay,
          token: token,
+         kinds: kinds,
        );
 
   /// Returns a shallow copy of this [PushSubscription]
@@ -97,12 +109,14 @@ class _PushSubscriptionImpl extends PushSubscription {
     String? pubKey,
     String? relay,
     String? token,
+    Object? kinds = _Undefined,
   }) {
     return PushSubscription(
       id: id is int? ? id : this.id,
       pubKey: pubKey ?? this.pubKey,
       relay: relay ?? this.relay,
       token: token ?? this.token,
+      kinds: kinds is List<int>? ? kinds : this.kinds?.map((e0) => e0).toList(),
     );
   }
 }

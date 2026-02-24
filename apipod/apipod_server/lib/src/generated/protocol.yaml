@@ -16,5 +16,6 @@ nostrBand:
 otsoExternalSync:
 nostrPush:
   - register:
+  - getRegistrationState:
 otsoPush:
   - register:

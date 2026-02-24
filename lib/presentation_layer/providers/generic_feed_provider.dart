@@ -5,10 +5,7 @@ import 'dart:async';
 import '../../domain_layer/entities/feed_filter.dart';
 import '../../domain_layer/entities/feed_view_model.dart';
 import '../../domain_layer/entities/nostr_note.dart';
-import '../../domain_layer/entities/parsed_post.dart';
-import '../components/note_card/nostr_parser.dart';
 import 'db_app_provider.dart';
-import 'embed_note_cache_provider.dart';
 import 'get_notes_provider.dart';
 import 'inbox_outbox_provider.dart';
 
@@ -27,13 +24,28 @@ class GenericFeedState extends Notifier<FeedViewModel> {
   @override
   FeedViewModel build() {
     final notesP = ref.read(getNotesProvider);
+
+    // Auto dispose delay - 5 minutes
+    final link = ref.keepAlive();
+    Timer? timer;
+
+    ref.onCancel(() {
+      timer = Timer(Duration(minutes: 5), () => link.close());
+    });
+
+    ref.onResume(() {
+      timer?.cancel();
+    });
+
     // Ensures resources are cleaned up when provider is disposed
     ref.onDispose(() {
       _freshNotesSubscription?.cancel();
       _timelineSubscription?.cancel();
       unawaited(notesP.closeSubscription("sub-${feedFilter.feedId}"));
+      timer?.cancel();
     });
     _setupSubscription(feedFilter); // Initialize data subscription
+
     return FeedViewModel(
       timelineRootNotes: [],
       newRootNotes: [],
@@ -82,22 +94,22 @@ class GenericFeedState extends Notifier<FeedViewModel> {
 
   // Processes incoming fresh notes
   Future<void> _processFreshNotes(List<NostrNote> networkNotes) async {
-    final parsedRootAndReplyNotes = await NostrParser.parseEvents(networkNotes);
-    final parsedRootNotes = parsedRootAndReplyNotes
-        .where((post) => post.nostrNote.isRoot)
-        .toList();
+    // final parsedRootAndReplyNotes = await NostrParser.parseEvents(networkNotes);
+    // final parsedRootNotes = parsedRootAndReplyNotes
+    //     .where((post) => post.nostrNote.isRoot)
+    //     .toList();
 
-    if (!ref.mounted) return;
+    // if (!ref.mounted) return;
 
     // Preload embedded notes
     // not waiting for fetching everything
-    final embedService = ref.read(embedCacheServiceProvider);
-    embedService.preloadFromPosts(parsedRootAndReplyNotes);
+    // final embedService = ref.read(embedCacheServiceProvider);
+    //embedService.preloadFromPosts(parsedRootAndReplyNotes);
 
-    _addNewRootEvents(parsedRootNotes); // Add new root events
-    _addNewRootAndReplyEvents(
-      parsedRootAndReplyNotes,
-    ); // Add new root and reply events
+    final rootNotes = networkNotes.where((note) => note.isRoot).toList();
+
+    _addNewRootEvents(rootNotes); // Add new root events
+    _addNewRootAndReplyEvents(networkNotes); // Add new root and reply events
   }
 
   // Fetches the cutoff time to separate old and new notes
@@ -137,22 +149,22 @@ class GenericFeedState extends Notifier<FeedViewModel> {
 
   // Processes timeline notes and updates the state
   Future<void> _processTimelineNotes(List<NostrNote> networkNotes) async {
-    if (!ref.mounted) return;
+    // if (!ref.mounted) return;
+
+    // final rootNotes = networkNotes.where((note) => note.isRoot).toList();
+    // final rootAndReplyNotes = networkNotes;
+
+    // final parsedRootNotes = await NostrParser.parseEvents(rootNotes);
+
+    // final parsedRootAndReplyNotes = await NostrParser.parseEvents(
+    //   rootAndReplyNotes,
+    // );
+    // if (!ref.mounted) return;
 
     final rootNotes = networkNotes.where((note) => note.isRoot).toList();
-    final rootAndReplyNotes = networkNotes;
 
-    final parsedRootNotes = await NostrParser.parseEvents(rootNotes);
-
-    final parsedRootAndReplyNotes = await NostrParser.parseEvents(
-      rootAndReplyNotes,
-    );
-    if (!ref.mounted) return;
-
-    _addRootTimelineEvents(parsedRootNotes); // Add root notes to the timeline
-    _addRootAndReplyTimelineEvents(
-      parsedRootAndReplyNotes,
-    ); // Add root and reply notes
+    _addRootTimelineEvents(rootNotes); // Add root notes to the timeline
+    _addRootAndReplyTimelineEvents(networkNotes); // Add root and reply notes
   }
 
   // Loads more notes for infinite scrolling
@@ -164,7 +176,7 @@ class GenericFeedState extends Notifier<FeedViewModel> {
     await _saveCutoffTime(feedFilter.feedId);
 
     if (state.timelineRootAndReplyNotes.isNotEmpty) {
-      cutoff = state.timelineRootAndReplyNotes.last.created_at - 1;
+      cutoff = state.timelineRootAndReplyNotes.last.createdAt - 1;
     }
 
     final rootNotesBeforeCount = state.timelineRootNotes.length;
@@ -172,7 +184,7 @@ class GenericFeedState extends Notifier<FeedViewModel> {
     final networkNotesStream = _fetchNetworkNotes(
       feedFilter,
       cutoff,
-      limit: 20,
+      limit: 10,
     );
 
     await _timelineSubscription?.cancel();
@@ -198,27 +210,27 @@ class GenericFeedState extends Notifier<FeedViewModel> {
   }
 
   // Helper to add root timeline events to the state
-  void _addRootTimelineEvents(List<ParsedPost> events) {
+  void _addRootTimelineEvents(List<NostrNote> events) {
     events = events.where((event) {
       return !state.timelineRootNotes.any((element) => element.id == event.id);
     }).toList();
 
     state = state.copyWith(
       timelineRootNotes: [...state.timelineRootNotes, ...events]
-        ..sort((a, b) => b.created_at.compareTo(a.created_at)),
+        ..sort((a, b) => b.createdAt.compareTo(a.createdAt)),
     );
   }
 
   // Helper to add new root events
-  void _addNewRootEvents(List<ParsedPost> events) {
+  void _addNewRootEvents(List<NostrNote> events) {
     state = state.copyWith(
       newRootNotes: [...state.newRootNotes, ...events]
-        ..sort((a, b) => b.created_at.compareTo(a.created_at)),
+        ..sort((a, b) => b.createdAt.compareTo(a.createdAt)),
     );
   }
 
   // Helper to add root and reply timeline events
-  void _addRootAndReplyTimelineEvents(List<ParsedPost> events) {
+  void _addRootAndReplyTimelineEvents(List<NostrNote> events) {
     events = events.where((event) {
       return !state.timelineRootAndReplyNotes.any(
         (element) => element.id == event.id,
@@ -227,15 +239,15 @@ class GenericFeedState extends Notifier<FeedViewModel> {
 
     state = state.copyWith(
       timelineRootAndReplyNotes: [...state.timelineRootAndReplyNotes, ...events]
-        ..sort((a, b) => b.created_at.compareTo(a.created_at)),
+        ..sort((a, b) => b.createdAt.compareTo(a.createdAt)),
     );
   }
 
   // Helper to add new root and reply events
-  void _addNewRootAndReplyEvents(List<ParsedPost> events) {
+  void _addNewRootAndReplyEvents(List<NostrNote> events) {
     state = state.copyWith(
       newRootAndReplyNotes: [...state.newRootAndReplyNotes, ...events]
-        ..sort((a, b) => b.created_at.compareTo(a.created_at)),
+        ..sort((a, b) => b.createdAt.compareTo(a.createdAt)),
     );
   }
 }

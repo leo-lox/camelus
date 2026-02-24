@@ -81,7 +81,7 @@ class DmRelayListNotifier extends Notifier<DmRelayListState> {
   /// Load from cache first (instant), then fetch from network
   Future<void> _loadFromCacheThenFetch() async {
     // 1. Load from cache via NDK lists usecase (instant if available)
-    final relays = await inboxOutbox.getDmRelays();
+    final relays = await inboxOutbox.getDmRelaysSelf();
 
     if (relays.isNotEmpty) {
       log('DM Relays: Loaded ${relays.length} relays from cache');
@@ -102,7 +102,7 @@ class DmRelayListNotifier extends Notifier<DmRelayListState> {
     }
 
     try {
-      final relays = await inboxOutbox.getDmRelays(forceRefresh: true);
+      final relays = await inboxOutbox.getDmRelaysSelf(forceRefresh: true);
 
       log('DM Relays: Fetched ${relays.length} relays from network');
       state = state.copyWith(
@@ -114,6 +114,25 @@ class DmRelayListNotifier extends Notifier<DmRelayListState> {
       log('DM Relays: Error fetching: $e');
       state = state.copyWith(isLoading: false, error: e.toString());
     }
+  }
+
+  /// Returns current DM relays and lazily loads them when needed.
+  /// Set [refresh] to true to force a network refresh.
+  Future<List<String>> getRelays({bool refresh = false}) async {
+    if (myPubkey == null) {
+      return const [];
+    }
+
+    if (state.relays.isEmpty) {
+      await _loadFromCacheThenFetch();
+      return state.relays;
+    }
+
+    if (refresh) {
+      await fetchRelays();
+    }
+
+    return state.relays;
   }
 
   /// Add a relay to the list (local change only)

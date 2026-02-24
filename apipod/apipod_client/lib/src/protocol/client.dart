@@ -184,7 +184,7 @@ class EndpointNostrPush extends _i1.EndpointRef {
 
   _i2.Future<bool> register(
     String token,
-    List<_i6.Nip01Event> events,
+    List<_i11.Nip01EventModel> events,
   ) => caller.callServerEndpoint<bool>(
     'nostrPush',
     'register',
@@ -192,6 +192,16 @@ class EndpointNostrPush extends _i1.EndpointRef {
       'token': token,
       'events': events,
     },
+  );
+
+  /// Get the registration state for a public key with signature verification
+  /// The event must be signed by the pubKey and contain the pubKey to verify
+  _i2.Future<Map<String, dynamic>> getRegistrationState(
+    String signedEventJson,
+  ) => caller.callServerEndpoint<Map<String, dynamic>>(
+    'nostrPush',
+    'getRegistrationState',
+    {'signedEventJson': signedEventJson},
   );
 }
 

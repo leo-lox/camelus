@@ -2,10 +2,12 @@ import 'dart:convert';
 import 'dart:developer' as developer;
 import 'package:camelus/presentation_layer/routing/route_paths.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:go_router/go_router.dart';
 import 'package:ndk/ndk.dart' as ndk;
 
 import '../../config/default_relays.dart';
 import '../../data_layer/models/nostr_note_model.dart';
+import '../../lifecycle/notifications/notification_types.dart';
 import '../../main.dart';
 import '../entities/nostr_note.dart';
 import '../entities/nostr_tag.dart';
@@ -13,6 +15,8 @@ import '../repositories/notifications_repository.dart';
 import 'inbox_outbox.dart';
 
 class Notifications {
+  static const int maxRelaySelection = 4;
+
   final NotificationsRepository _notificationsRepo;
   final ndk.EventSigner? _eventSigner;
   final InboxOutbox _inboxOutbox;
@@ -25,28 +29,27 @@ class Notifications {
        _eventSigner = eventSigner,
        _inboxOutbox = inboxOutbox;
 
-  Future<bool> registerDevice({required String token}) async {
+  Future<bool> registerDevice({
+    required String token,
+    List<int>? kinds,
+    List<String>? relays,
+  }) async {
     if (_eventSigner == null) {
       throw Exception("cannot register device without signer");
     }
 
+    final availableRelays = await getAvailableReadRelays();
+    final chosenRelays = (relays != null && relays.isNotEmpty)
+        ? relays
+        : availableRelays;
+    final readRelays = _dedupeRelays(
+      chosenRelays,
+    ).take(maxRelaySelection).toList();
     final myPubkey = _eventSigner.getPublicKey();
 
-    final nip65data = await _inboxOutbox.getNip65data(myPubkey);
-
-    List<String> readRelays;
-
-    if (nip65data != null) {
-      readRelays = nip65data.relays.entries
-          .where((e) => e.value.isRead)
-          .map((e) => e.key)
-          .toList();
-    } else {
-      readRelays = defaultAccountCreationRelays.entries
-          .where((e) => e.value.isRead)
-          .map((e) => e.key)
-          .toList();
-    }
+    final kindTags = (kinds ?? [])
+        .map((kind) => NostrTag(type: "kind", value: kind.toString()))
+        .toList();
 
     final registrationNote = NostrNote(
       id: "",
@@ -60,6 +63,7 @@ class Notifications {
         ...readRelays.map((relayUrl) {
           return NostrTag(type: "relay", value: relayUrl);
         }),
+        ...kindTags,
 
         //NostrTag(type: "relay", value: "ws://localhost:10547")
       ],
@@ -75,6 +79,59 @@ class Notifications {
     );
   }
 
+  Future<List<String>> getAvailableReadRelays() async {
+    final fallbackRelays = _defaultReadRelays();
+
+    if (_eventSigner == null) {
+      return fallbackRelays;
+    }
+
+    try {
+      final myPubkey = _eventSigner.getPublicKey();
+      final nip65data = await _inboxOutbox.getNip65data(myPubkey);
+
+      if (nip65data == null) {
+        return fallbackRelays;
+      }
+
+      final readRelays = nip65data.relays.entries
+          .where((e) => e.value.isRead)
+          .map((e) => e.key)
+          .toList();
+
+      return readRelays.isEmpty ? fallbackRelays : _dedupeRelays(readRelays);
+    } catch (_) {
+      return fallbackRelays;
+    }
+  }
+
+  List<String> _defaultReadRelays() {
+    return defaultAccountCreationRelays.entries
+        .where((e) => e.value.isRead)
+        .map((e) => e.key)
+        .toList();
+  }
+
+  List<String> _dedupeRelays(List<String> relays) {
+    final unique = <String>{};
+    final result = <String>[];
+
+    for (final relay in relays) {
+      final normalized = relay.trim();
+      if (normalized.isEmpty || unique.contains(normalized)) {
+        continue;
+      }
+      unique.add(normalized);
+      result.add(normalized);
+    }
+
+    return result;
+  }
+
+  Future<void> deleteNotification(int id) async {
+    await _notificationsRepo.deleteNotification(id);
+  }
+
   // show multiple
   int _getNotificationId() =>
       DateTime.now().millisecondsSinceEpoch.remainder(100000);
@@ -86,18 +143,33 @@ class Notifications {
     required String pubkey,
 
     /// e.g. new reply
-    required String type,
+    required NotificationTypeLocal type,
     String? threadIdentifier,
     String? payload,
+    int? notificationId,
   }) {
     return _notificationsRepo.displayAvatarNotification(
-      id: _getNotificationId(),
+      id: notificationId ?? _getNotificationId(),
       title: title,
       body: body,
       avatarUrl: avatarUrl,
       pubkey: pubkey,
       type: type,
       threadIdentifier: threadIdentifier,
+      payload: payload,
+    );
+  }
+
+  Future<void> displayGenericNotification({
+    required String title,
+    required String body,
+    String? payload,
+    int? notificationId,
+  }) {
+    return _notificationsRepo.displayGenericNotification(
+      id: notificationId ?? _getNotificationId(),
+      title: title,
+      body: body,
       payload: payload,
     );
   }
@@ -111,24 +183,35 @@ class Notifications {
 
   /// gets called on lauch if payload is found
   static void processNotificationPayload(String? payload) {
-    if (payload != null) {
-      final payloadJson = jsonDecode(payload);
-      final nostrNoteJson = jsonDecode(payloadJson['note']);
+    if (payload == null) {
+      return;
+    }
+    final payloadJson = jsonDecode(payload);
+    final routeTo = payloadJson['route'] as String?;
+
+    if (payloadJson['kind'] == 1) {
+      final nostrEventJson = jsonDecode(payloadJson['event']);
       final bool likleyDirectReply = payloadJson['likleyDirectReply'];
-      final nostrNote = NostrNoteModel.fromJson(nostrNoteJson);
+      final nostrEvent = NostrNoteModel.fromJson(nostrEventJson);
 
       if (likleyDirectReply) {
-        final replyId = nostrNote.getDirectReply?.value;
-        final rootId = nostrNote.getRootReply?.value;
+        final replyId = nostrEvent.getDirectReply?.value;
+        final rootId = nostrEvent.getRootReply?.value;
 
-        navigatorKey.currentState?.pushNamed(
+        GoRouter.of(navigatorKey.currentContext!).push(
           RoutePaths.status(
-            pubkey: nostrNote.pubkey,
-            eventId: rootId ?? replyId ?? nostrNote.id,
+            pubkey: nostrEvent.pubkey,
+            eventId: rootId ?? replyId ?? nostrEvent.id,
             scrollIntoView: replyId,
           ),
         );
       }
+      return;
+    }
+    if (routeTo != null) {
+      GoRouter.of(navigatorKey.currentContext!).push(routeTo);
+    } else {
+      developer.log("no route found in payload");
     }
   }
 }

@@ -19,7 +19,7 @@ import 'relay.dart';
 const int maxRelaysRegistration = 4;
 
 class NostrPushEndpoint extends Endpoint {
-  Serverpod? _pod; // pod reference
+  Serverpod? _pod;
 
   // Cache implementation
   final Map<String, DateTime> _sentCache = {};
@@ -28,6 +28,7 @@ class NostrPushEndpoint extends Endpoint {
 
   RelayPool? _relayPool;
   bool _isInRelayPoolFunction = false;
+  bool _pendingRestart = false; // Track if a restart was requested while busy
 
   late final FirebaseAdminApp _firebaseAdminApp;
   late final Messaging _firebaseMessaging;
@@ -35,6 +36,7 @@ class NostrPushEndpoint extends Endpoint {
   final List<StreamSubscription> _subscriptions = [];
 
   Timer? relayPoolRestartTimer;
+  Timer? _cacheCleanTimer;
 
   @override
   void initialize(Server server, String name, String? moduleName) {
@@ -46,11 +48,8 @@ class NostrPushEndpoint extends Endpoint {
       throw Exception("no FIREBASE_PROJECT_ID set");
     }
 
-    // long lived instance
     _firebaseAdminApp = FirebaseAdminApp.initializeApp(
         projectId, Credential.fromApplicationDefaultCredentials());
-
-    // admin.useEmulator();
 
     _firebaseMessaging = Messaging(_firebaseAdminApp);
   }
@@ -75,7 +74,6 @@ class NostrPushEndpoint extends Endpoint {
   Future<void> onServerStart(Serverpod pod) async {
     _pod = pod;
 
-    // bg session needs on init
     final projectId = Platform.environment['FIREBASE_PROJECT_ID'];
     _firebaseAdminApp = FirebaseAdminApp.initializeApp(
         projectId!, Credential.fromApplicationDefaultCredentials());
@@ -83,17 +81,19 @@ class NostrPushEndpoint extends Endpoint {
 
     final session = await pod.createSession();
     try {
+      await migrateExistingSubscriptions(session);
       await _restartRelayPool();
     } finally {
-      await session.close(); // Always close sessions
+      await session.close();
     }
 
     // Set up periodic cache cleaning
-    Timer.periodic(Duration(minutes: 1), (_) => _cleanCache());
+    _cacheCleanTimer?.cancel();
+    _cacheCleanTimer =
+        Timer.periodic(Duration(minutes: 1), (_) => _cleanCache());
   }
 
-  /// helper method to execute operations with fresh sessions
-  /// creates a new session for the given operation
+  /// Helper method to execute operations with fresh sessions
   Future<T> _withSession<T>(Future<T> Function(Session session) operation,
       {final bool enableLogging = false}) async {
     _pod ??= Serverpod.instance;
@@ -111,12 +111,13 @@ class NostrPushEndpoint extends Endpoint {
   Future<bool> register(
     Session session,
     String token,
-    List<ndk.Nip01Event> events,
+    List<ndk.Nip01EventModel> events,
   ) async {
     List<Map<String, dynamic>> processed = [];
     bool newRelays = false;
 
-    for (final event in events) {
+    for (final eventModel in events) {
+      final event = eventModel;
       bool veryOk = await verifyEvent(event);
 
       final tokenTag = event.tags.firstWhere(
@@ -130,8 +131,24 @@ class NostrPushEndpoint extends Endpoint {
               tag[1].length > 1 &&
               isSupportedUrl(tag[1]))
           .map((tag) => tag[1])
-          .toSet() // Remove duplicates
+          .toSet()
           .toList();
+
+      // Extract kinds from event tags
+      final kindsTags = event.tags
+          .where((tag) => tag[0] == 'kind' && tag.length > 1)
+          .map((tag) => int.tryParse(tag[1]))
+          .whereType<int>()
+          .toList();
+
+      // Filter kinds to available ones
+      final validKinds = kindsTags
+          .where((kind) => PushConfig.availableKinds.contains(kind))
+          .toList();
+
+      // If no kinds specified, default to all available kinds
+      final kindsToRegister =
+          validKinds.isEmpty ? PushConfig.availableKinds : validKinds;
 
       final int endIndex = min(relayTags.length, maxRelaysRegistration);
       final relayTagsShort = relayTags.sublist(0, endIndex);
@@ -139,12 +156,36 @@ class NostrPushEndpoint extends Endpoint {
       if (veryOk && relayTags.isNotEmpty) {
         newRelays = await checkIfThereIsANewRelay(session, relayTagsShort);
 
-        // Register in database
+        // Register in database with kinds
         for (final relayUrl in relayTagsShort) {
-          await PushSubscription.db.insertRow(
+          try {
+            final existing = await PushSubscription.db.find(
               session,
-              PushSubscription(
-                  pubKey: event.pubKey, relay: relayUrl, token: tokenTag[1]));
+              where: (t) =>
+                  t.pubKey.equals(event.pubKey) &
+                  t.relay.equals(relayUrl) &
+                  t.token.equals(tokenTag[1]),
+            );
+
+            if (existing.isEmpty) {
+              await PushSubscription.db.insertRow(
+                session,
+                PushSubscription(
+                  pubKey: event.pubKey,
+                  relay: relayUrl,
+                  token: tokenTag[1],
+                  kinds: kindsToRegister,
+                ),
+              );
+            } else {
+              await PushSubscription.db.updateRow(
+                session,
+                existing.first.copyWith(kinds: kindsToRegister),
+              );
+            }
+          } catch (e) {
+            session.log('Error registering subscription: $e');
+          }
         }
       } else {
         session
@@ -155,7 +196,8 @@ class NostrPushEndpoint extends Endpoint {
         'pubkey': event.pubKey,
         'added': veryOk && relayTagsShort.isNotEmpty
       });
-      session.log('pubkey added: ${event.pubKey}, $tokenTag, $relayTagsShort');
+      session.log(
+          'pubkey added: ${event.pubKey}, $tokenTag, $relayTagsShort, kinds: $kindsToRegister');
     }
 
     if (newRelays) {
@@ -175,24 +217,78 @@ class NostrPushEndpoint extends Endpoint {
   }
 
   bool isSupportedUrl(String url) {
-    return !url.contains("brb.io") && // no broken relays
-        !url.contains("echo.websocket.org") && // test relay
-        !url.contains("127.0") && // no local relays
-        !url.contains("umbrel.local") && // no local relays
-        !url.contains("192.168.") && // no local relays
-        !url.contains(".onion") && // we are not running on Tor
-        !url.contains("https://") && // not a websocket
-        !url.contains("http://") && // not a websocket
-        !url.contains("www://") && // not a websocket
-        !url.contains("https//") && // not a websocket
-        !url.contains("http//") && // not a websocket
-        !url.contains("www//") && // not a websocket
-        !url.contains("npub1") && // does not allow custom uris
-        !url.contains("was://") && // common misspellings
-        !url.contains("ws://umbrel:") && // local domain
-        !url.contains("\t") && // tab is not allowed
-        !url.contains(" ") && // space is not allowed
+    return !url.contains("brb.io") &&
+        !url.contains("echo.websocket.org") &&
+        !url.contains("127.0") &&
+        !url.contains("umbrel.local") &&
+        !url.contains("192.168.") &&
+        !url.contains(".onion") &&
+        !url.contains("https://") &&
+        !url.contains("http://") &&
+        !url.contains("www://") &&
+        !url.contains("https//") &&
+        !url.contains("http//") &&
+        !url.contains("www//") &&
+        !url.contains("npub1") &&
+        !url.contains("was://") &&
+        !url.contains("ws://umbrel:") &&
+        !url.contains("\t") &&
+        !url.contains(" ") &&
         isValidUrl(url);
+  }
+
+  /// Get the registration state for a public key with signature verification
+  Future<Map<String, dynamic>> getRegistrationState(
+    Session session,
+    String signedEventJson,
+  ) async {
+    try {
+      final eventMap = jsonDecode(signedEventJson) as Map<String, dynamic>;
+      final eventModel = ndk.Nip01EventModel.fromJson(eventMap);
+      final event = eventModel;
+
+      bool veryOk = await verifyEvent(event);
+      if (!veryOk) {
+        return {
+          'success': false,
+          'error': 'Invalid signature',
+        };
+      }
+
+      final subscriptions =
+          await getSubscriptionsByPubKey(session, event.pubKey);
+
+      if (subscriptions.isEmpty) {
+        return {
+          'success': true,
+          'pubKey': event.pubKey,
+          'subscriptions': [],
+        };
+      }
+
+      final formattedSubscriptions = subscriptions.entries
+          .map((entry) => {
+                'relay': entry.key,
+                'kinds': entry.value,
+              })
+          .toList();
+
+      return {
+        'success': true,
+        'pubKey': event.pubKey,
+        'subscriptions': formattedSubscriptions,
+        'availableKinds': PushConfig.availableKinds,
+      };
+    } catch (e) {
+      session.log(
+        level: LogLevel.error,
+        'Error getting registration state: $e',
+      );
+      return {
+        'success': false,
+        'error': 'Invalid request: $e',
+      };
+    }
   }
 
   bool isValidHttpUrl(String urlString) {
@@ -209,7 +305,7 @@ class NostrPushEndpoint extends Endpoint {
     Relay relay,
   ) async {
     await _withSession(enableLogging: false, (session) async {
-      /// get the last added pubkey (usually the direct reply)
+      // Get the last added pubkey (usually the direct reply)
       List<String> pubkeyTag;
       try {
         pubkeyTag = event.tags.lastWhere(
@@ -224,6 +320,17 @@ class NostrPushEndpoint extends Endpoint {
         return;
       }
 
+      // Get the subscribed kinds for this user and relay
+      final subscribedKinds = await getKindsByPubKey(session, pubkeyTag[1]);
+
+      // Check if the event kind is in the user's subscribed kinds
+      if (!subscribedKinds.contains(event.kind)) {
+        session.log(
+            'Event kind ${event.kind} not in subscribed kinds $subscribedKinds for ${pubkeyTag[1]}',
+            level: LogLevel.debug);
+        return;
+      }
+
       final tokens = await getTokensByPubKey(session, pubkeyTag[1]);
       final tokensAsUrls =
           tokens.where((token) => isValidHttpUrl(token)).toList();
@@ -234,9 +341,10 @@ class NostrPushEndpoint extends Endpoint {
         return;
       }
 
-      _withSession(enableLogging: true, (s) async {
+      await _withSession(enableLogging: true, (s) async {
         s.log(
-            "fcm msg, all_tokens: ${tokens.toString()}, fcm_tokens: ${firebaseTokens.toString()}");
+            "fcm msg, all_tokens: ${tokens.toString()}, pubkey: ${pubkeyTag[1]}, relay: ${relay.url}, event kind: ${event.kind}, event id: ${event.id}",
+            level: LogLevel.debug);
       });
 
       final wrappedEvent = await ndk.GiftWrap.wrapEvent(
@@ -245,7 +353,6 @@ class NostrPushEndpoint extends Endpoint {
       );
 
       final wrappedEventModel = ndk.Nip01EventModel.fromEntity(wrappedEvent);
-
       final stringifiedWrappedEventToPush = wrappedEventModel.toJsonString();
 
       // Send to HTTP URLs
@@ -269,7 +376,6 @@ class NostrPushEndpoint extends Endpoint {
             session.log(
                 level: LogLevel.error,
                 'Error posting to NTFY: ${stringifiedWrappedEventToPush.length} chars. $tokenUrl $err');
-            // delete tokens on error
             await deleteToken(session, tokenUrl);
           }
         }
@@ -285,29 +391,48 @@ class NostrPushEndpoint extends Endpoint {
         };
 
         try {
-          final response =
-              await _firebaseMessaging.sendEachForMulticast(MulticastMessage(
-            tokens: firebaseTokens,
-            data: message,
-          ));
+          final response = await _firebaseMessaging.sendEachForMulticast(
+            MulticastMessage(
+              tokens: firebaseTokens,
+              data: message,
+
+              // Keep iOS data-only so the app can parse encryptedEvent
+              // and create its own local notification in background.
+              notification: null,
+              apns: ApnsConfig(
+                headers: {
+                  'apns-priority':
+                      '10', // 10 is for immediate, 5 is for background
+                  'apns-push-type': 'alert', // background
+                },
+                payload: ApnsPayload(
+                  aps: Aps(
+                    contentAvailable: true,
+                  ),
+                ),
+              ),
+            ),
+          );
 
           if (response.failureCount > 0) {
-            response.responses.asMap().forEach((idx, resp) async {
-              _withSession(enableLogging: true, (s) async {
-                if (!resp.success) {
-                  s.log(
-                      level: LogLevel.error,
-                      'Failed: ${resp.error?.code} ${resp.error?.message} ${jsonEncode(message).length} chars');
-                  if (resp.error?.code ==
-                          'messaging/registration-token-not-registered' ||
-                      resp.error?.code == 'messaging/internal-error') {
-                    s.log(
-                        level: LogLevel.info, 'Deleting Token ${tokens[idx]}');
-                    await deleteToken(session, tokens[idx]);
-                  }
+            // Use indexed for loop and await each deletion
+            for (int idx = 0; idx < response.responses.length; idx++) {
+              final resp = response.responses[idx];
+              if (!resp.success) {
+                session.log(
+                    level: LogLevel.error,
+                    'Failed: ${resp.error?.code} ${resp.error?.message} ${jsonEncode(message).length} chars');
+                if (resp.error?.code ==
+                        'messaging/registration-token-not-registered' ||
+                    resp.error?.code == 'messaging/internal-error') {
+                  // Use the correct token from firebaseTokens and the current session
+                  session.log(
+                      level: LogLevel.info,
+                      'Deleting Token ${firebaseTokens[idx]}');
+                  await deleteToken(session, firebaseTokens[idx]);
                 }
-              });
-            });
+              }
+            }
           }
         } catch (e) {
           session.log(level: LogLevel.error, 'Firebase messaging error: $e');
@@ -321,14 +446,13 @@ class NostrPushEndpoint extends Endpoint {
   }
 
   Future<void> _restartRelayPool() async {
-    if (_isInRelayPoolFunction) return;
+    if (_isInRelayPoolFunction) {
+      // Mark that a restart is pending so we retry after the current one finishes
+      _pendingRestart = true;
+      return;
+    }
     _isInRelayPoolFunction = true;
-
-    /// restart pool in 4 hours
-    relayPoolRestartTimer?.cancel();
-    relayPoolRestartTimer = Timer(Duration(hours: 4), () {
-      _restartRelayPool();
-    });
+    _pendingRestart = false;
 
     for (final sub in _subscriptions) {
       await sub.cancel();
@@ -339,14 +463,12 @@ class NostrPushEndpoint extends Endpoint {
       await _withSession((session) async {
         final relays = await getAllRelays(session);
         if (!relays.contains(PushConfig.bootstrapRelay)) {
-          // add at least on relay to keep the session alive (first startup)
           relays.add(PushConfig.bootstrapRelay);
         }
 
         if (_relayPool != null) {
           final hasNewRelay = relays.any((relay) => !_relayPool!.has(relay));
           if (!hasNewRelay) {
-            _isInRelayPoolFunction = false;
             return;
           }
         }
@@ -355,14 +477,12 @@ class NostrPushEndpoint extends Endpoint {
           _relayPool!.close();
         }
 
-        // Create a new relay pool with the fetched relay URLs
         _relayPool = RelayPool(relays,
             options: RelayOptions(
               reconnectFilter: PushConfig.subscriptionFilter,
               reconnectSubId: PushConfig.subscriptionId,
             ));
 
-        // Set up event handlers using the new stream-based approach
         _relayPool!.onOpen.listen((relay) {
           _withSession(enableLogging: true, (s) async {
             s.log(level: LogLevel.info, "onOpen.listen ${relay.url}");
@@ -371,7 +491,6 @@ class NostrPushEndpoint extends Endpoint {
                 "relayPool relays: ${_relayPool!.myRelays.length}");
           });
 
-          // Subscribe to specific event kinds when a relay connects
           relay.subscribe(
             PushConfig.subscriptionId,
             PushConfig.subscriptionFilter,
@@ -379,9 +498,7 @@ class NostrPushEndpoint extends Endpoint {
         });
 
         _subscriptions.add(
-          _relayPool!.onEvent.listen((relayEvent) {
-            // session.log(
-            //     "onEvent.listen, relay: ${relayEvent.relay.url} eventId: ${relayEvent.event.id}");
+          _relayPool!.onEvent.listen((relayEvent) async {
             try {
               final event = relayEvent.event;
 
@@ -389,9 +506,10 @@ class NostrPushEndpoint extends Endpoint {
               if (_sentCache.containsKey(event.id)) return;
               _sentCache[event.id] = DateTime.now();
 
-              _notify(event, relayEvent.relay);
+              // Await _notify so errors are caught and backpressure is respected
+              await _notify(event, relayEvent.relay);
             } catch (e) {
-              _withSession(enableLogging: true, (s) async {
+              await _withSession(enableLogging: true, (s) async {
                 s.log(level: LogLevel.error, 'Error handling event: $e');
               });
             }
@@ -402,7 +520,6 @@ class NostrPushEndpoint extends Endpoint {
           _relayPool!.onError.listen((relayError) async {
             final relay = relayError.relay;
             final error = relayError.error;
-
             final message = error.message;
 
             await _withSession(enableLogging: true, (s) async {
@@ -498,6 +615,11 @@ class NostrPushEndpoint extends Endpoint {
       });
     } finally {
       _isInRelayPoolFunction = false;
+
+      // If a restart was requested while we were busy, do it now
+      if (_pendingRestart) {
+        await _restartRelayPool();
+      }
     }
   }
 }

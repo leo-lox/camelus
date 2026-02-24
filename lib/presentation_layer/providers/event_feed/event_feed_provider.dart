@@ -5,7 +5,6 @@ import 'package:ndk/entities.dart' as ndk_entities;
 import 'package:rxdart/rxdart.dart';
 
 import '../../../domain_layer/entities/feed_event_view_model.dart';
-import '../../components/note_card/nostr_parser.dart';
 import 'replies_tree.dart';
 import '../../../helpers/helpers.dart';
 import '../get_notes_provider.dart';
@@ -82,9 +81,8 @@ class EventFeedState extends Notifier<FeedEventViewModel> {
     // Subscribes to updates for the root note.
 
     _rootNoteSub = notesP.getNote(rootNoteId).listen((rootNote) {
-      final parsedRootNote = NostrParser.parseEventSync(rootNote);
       // Updates the root note in the state.
-      state = state.copyWith(rootNote: parsedRootNote);
+      state = state.copyWith(rootNote: rootNote);
     });
 
     // Subscribes to updates for the reply notes of the root note.
@@ -99,8 +97,7 @@ class EventFeedState extends Notifier<FeedEventViewModel> {
         .bufferTime(const Duration(milliseconds: 700))
         .where((events) => events.isNotEmpty)
         .listen((replies) {
-          final parsedReplies = NostrParser.parseEventsSync(replies);
-          final newSet = {...state.unprocessedCommentsSet, ...parsedReplies};
+          final newSet = {...state.unprocessedCommentsSet, ...replies};
 
           state = state.copyWith(
             unprocessedCommentsSet: newSet,
@@ -124,7 +121,7 @@ class EventFeedState extends Notifier<FeedEventViewModel> {
     // find oldest comment in unprocessedCommentsSet
     final oldestComment = state.unprocessedCommentsSet.isNotEmpty
         ? state.unprocessedCommentsSet.reduce(
-            (a, b) => a.created_at < b.created_at ? a : b,
+            (a, b) => a.createdAt < b.createdAt ? a : b,
           )
         : null;
 
@@ -133,7 +130,7 @@ class EventFeedState extends Notifier<FeedEventViewModel> {
       eTags: [rootNoteId],
       kinds: [ndk_entities.Nip01Event.kTextNodeKind],
       since: oldestComment != null
-          ? oldestComment.created_at +
+          ? oldestComment.createdAt +
                 1 // +1 to avoid duplicates
           : now,
     );
@@ -141,8 +138,7 @@ class EventFeedState extends Notifier<FeedEventViewModel> {
         .bufferTime(const Duration(seconds: 1))
         .where((events) => events.isNotEmpty)
         .listen((replies) {
-          final parsedReplies = NostrParser.parseEventsSync(replies);
-          final newSet = {...state.unprocessedCommentsSet, ...parsedReplies};
+          final newSet = {...state.unprocessedCommentsSet, ...replies};
           state = state.copyWith(
             unprocessedCommentsSet: newSet,
             comments: RepliesTree.buildRepliesTree(

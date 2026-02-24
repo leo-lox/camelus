@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 import 'package:ndk/ndk.dart';
 import 'package:ndk_objectbox/ndk_objectbox.dart';
 import 'package:riverpod/riverpod.dart';
@@ -21,7 +22,17 @@ import 'process_fcm_msg.dart';
 Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   log("Handling a background message: ${message.messageId}");
 
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  // check if already initialized (can happen if main thread is still alive in background)
+  // doulbe init on iOS causes issues
+  if (Firebase.apps.isEmpty) {
+    try {
+      await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform,
+      );
+    } catch (_) {
+      // Already initialized at native level — safe to continue
+    }
+  }
 
   final providerContainer = await _setupProviderBackgroundThread();
 
@@ -40,15 +51,32 @@ Future<ProviderContainer> _setupProviderBackgroundThread() async {
 
   // init ndk db
   // db could already be open by main thread
-  final DbObjectBox dbCacheManager;
+  DbObjectBox dbCacheManager;
 
   final dbPath = await DbPaths.getNdkDbPath();
-  final isDbOpen = Store.isOpen(dbPath);
 
-  if (isDbOpen) {
+  //final isDbOpen = Store.isOpen(dbPath);
+
+  // if (isDbOpen) {
+  //   dbCacheManager = DbObjectBox(attach: true, directory: dbPath);
+  // } else {
+  //   dbCacheManager = DbObjectBox(attach: false, directory: dbPath);
+  // }
+
+  try {
     dbCacheManager = DbObjectBox(attach: true, directory: dbPath);
-  } else {
-    dbCacheManager = DbObjectBox(attach: false, directory: dbPath);
+    await dbCacheManager.dbRdy;
+  } catch (e) {
+    // Attach failed → main thread doesn't have store open
+    log("Store attach failed, opening fresh: $e");
+    try {
+      dbCacheManager = DbObjectBox(attach: false, directory: dbPath);
+      await dbCacheManager.dbRdy;
+    } catch (e2) {
+      log("ERROR: Could not open/attach ObjectBox: $e2");
+      // Fall back to no-DB or throw
+      rethrow;
+    }
   }
 
   await dbCacheManager.dbRdy;

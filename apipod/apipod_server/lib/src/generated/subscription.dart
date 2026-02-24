@@ -11,6 +11,7 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
+import 'package:apipod_server/src/generated/protocol.dart' as _i2;
 
 abstract class PushSubscription
     implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
@@ -19,6 +20,7 @@ abstract class PushSubscription
     required this.pubKey,
     required this.relay,
     required this.token,
+    this.kinds,
   });
 
   factory PushSubscription({
@@ -26,6 +28,7 @@ abstract class PushSubscription
     required String pubKey,
     required String relay,
     required String token,
+    List<int>? kinds,
   }) = _PushSubscriptionImpl;
 
   factory PushSubscription.fromJson(Map<String, dynamic> jsonSerialization) {
@@ -34,6 +37,9 @@ abstract class PushSubscription
       pubKey: jsonSerialization['pubKey'] as String,
       relay: jsonSerialization['relay'] as String,
       token: jsonSerialization['token'] as String,
+      kinds: jsonSerialization['kinds'] == null
+          ? null
+          : _i2.Protocol().deserialize<List<int>>(jsonSerialization['kinds']),
     );
   }
 
@@ -50,6 +56,8 @@ abstract class PushSubscription
 
   String token;
 
+  List<int>? kinds;
+
   @override
   _i1.Table<int?> get table => t;
 
@@ -61,6 +69,7 @@ abstract class PushSubscription
     String? pubKey,
     String? relay,
     String? token,
+    List<int>? kinds,
   });
   @override
   Map<String, dynamic> toJson() {
@@ -70,6 +79,7 @@ abstract class PushSubscription
       'pubKey': pubKey,
       'relay': relay,
       'token': token,
+      if (kinds != null) 'kinds': kinds?.toJson(),
     };
   }
 
@@ -81,6 +91,7 @@ abstract class PushSubscription
       'pubKey': pubKey,
       'relay': relay,
       'token': token,
+      if (kinds != null) 'kinds': kinds?.toJson(),
     };
   }
 
@@ -122,11 +133,13 @@ class _PushSubscriptionImpl extends PushSubscription {
     required String pubKey,
     required String relay,
     required String token,
+    List<int>? kinds,
   }) : super._(
          id: id,
          pubKey: pubKey,
          relay: relay,
          token: token,
+         kinds: kinds,
        );
 
   /// Returns a shallow copy of this [PushSubscription]
@@ -138,12 +151,14 @@ class _PushSubscriptionImpl extends PushSubscription {
     String? pubKey,
     String? relay,
     String? token,
+    Object? kinds = _Undefined,
   }) {
     return PushSubscription(
       id: id is int? ? id : this.id,
       pubKey: pubKey ?? this.pubKey,
       relay: relay ?? this.relay,
       token: token ?? this.token,
+      kinds: kinds is List<int>? ? kinds : this.kinds?.map((e0) => e0).toList(),
     );
   }
 }
@@ -166,6 +181,12 @@ class PushSubscriptionUpdateTable
     table.token,
     value,
   );
+
+  _i1.ColumnValue<List<int>, List<int>> kinds(List<int>? value) =>
+      _i1.ColumnValue(
+        table.kinds,
+        value,
+      );
 }
 
 class PushSubscriptionTable extends _i1.Table<int?> {
@@ -184,6 +205,10 @@ class PushSubscriptionTable extends _i1.Table<int?> {
       'token',
       this,
     );
+    kinds = _i1.ColumnSerializable<List<int>>(
+      'kinds',
+      this,
+    );
   }
 
   late final PushSubscriptionUpdateTable updateTable;
@@ -194,12 +219,15 @@ class PushSubscriptionTable extends _i1.Table<int?> {
 
   late final _i1.ColumnString token;
 
+  late final _i1.ColumnSerializable<List<int>> kinds;
+
   @override
   List<_i1.Column> get columns => [
     id,
     pubKey,
     relay,
     token,
+    kinds,
   ];
 }
 

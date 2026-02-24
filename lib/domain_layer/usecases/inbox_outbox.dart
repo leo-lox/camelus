@@ -20,8 +20,18 @@ class InboxOutbox {
     );
   }
 
-  Future<List<String>> getDmRelays({bool forceRefresh = false}) {
-    return _inboxOutboxRepository.getDmRelays(forceRefresh: forceRefresh);
+  Future<List<String>> getDmRelaysSelf({bool forceRefresh = false}) {
+    return _inboxOutboxRepository.getDmRelaysSelf(forceRefresh: forceRefresh);
+  }
+
+  Future<List<String>> getDmRelays({
+    required String pubkey,
+    bool forceRefresh = false,
+  }) {
+    return _inboxOutboxRepository.getDmRelays(
+      forceRefresh: forceRefresh,
+      pubkey: pubkey,
+    );
   }
 
   Future<List<String>> setDmRelays(List<String> relays) {

@@ -15,7 +15,7 @@ publish_to: "none" # Remove this line if you wish to publish to pub.dev
 # In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 1.8.0+67
+version: 1.9.0+87
 
 environment:
   sdk: ">=3.9.2 <4.0.0"
@@ -76,7 +76,7 @@ dependencies:
   objectbox_flutter_libs: any
   sembast: ^3.8.5+1
   sembast_web: ^2.4.1
-  sembast_cache_manager: ^1.0.6
+  sembast_cache_manager: ^1.0.7-dev.12
   amberflutter: ^0.0.9
   intl: any
   app_links: ^7.0.0
@@ -91,11 +91,11 @@ dependencies:
   image: ^4.3.0
   flutter_list_view: ^1.1.29
   xxh3: ^1.2.0
-  serverpod_flutter: 3.2.3
+  serverpod_flutter: 3.3.1
   apipod_client:
     path: ./apipod/apipod_client
-  firebase_messaging: ^16.0.2
-  firebase_core: ^4.1.1
+  firebase_messaging: ^16.1.1
+  firebase_core: ^4.4.0
   flutter_local_notifications: ^19.4.2
   path: ^1.9.1
   share_plus: ^12.0.1
@@ -116,8 +116,8 @@ dependencies:
 
 
 dependency_overrides:
-  #ndk:
-    #path: ../ndk/packages/ndk
+  ndk:
+    path: ../ndk/packages/ndk
     #git:
     #  url: https://github.com/relaystr/ndk.git
     #  path: packages/ndk
@@ -127,15 +127,15 @@ dependency_overrides:
     #git:
     #  url: https://github.com/relaystr/ndk.git
     #  path: packages/rust_verifier
-  #ndk_objectbox:
-    #path: ../ndk/packages/objectbox
+  ndk_objectbox:
+    path: ../ndk/packages/objectbox
     #git:
     #   url: https://github.com/relaystr/ndk.git
     #   path: packages/objectbox
        #ref: search-usecase
 
-  #ndk_amber:
-    #path: ../ndk/packages/amber
+  ndk_amber:
+    path: ../ndk/packages/amber
     #git:
      # url: https://github.com/relaystr/ndk.git
       #path: packages/amber
