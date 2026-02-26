@@ -7,14 +7,23 @@ import 'package:ndk/ndk.dart' hide LogLevel;
 import 'package:serverpod/serverpod.dart';
 
 import '../../generated/protocol.dart';
+import 'models/otso_sync_iceout_model.dart';
 import 'models/otso_sync_model.dart';
-import 'models/otso_sync_wish_model.dart';
 import 'models/otso_sync_xml_model.dart';
+import 'services/altcha_cookie_service.dart';
 
 const stopIceUrl =
     "https://stopice.net/login/?recentmapdata=1&duration=since_yesterday";
 
-const prodRelays = ['wss://relay.damus.io', 'wss://nos.lol'];
+const iceoutUrl = "https://iceout.org/api/reports/";
+const iceoutAltcha = "https://iceout.org/auth/altcha/";
+
+const prodRelays = [
+  'wss://relay.damus.io',
+  'wss://nos.lol',
+  'wss://relay.camelus.app',
+  'wss://usw1.relay.camelus.app'
+];
 
 const isProd = true;
 
@@ -24,6 +33,9 @@ const syncIntervall = Duration(minutes: 5);
 
 class OtsoExternalSyncEndpoint extends Endpoint {
   Serverpod? _pod;
+
+  final service = AltchaCookieService();
+
   Future<void> onServerStart(Serverpod pod) async {
     _pod ??= Serverpod.instance;
 
@@ -36,6 +48,32 @@ class OtsoExternalSyncEndpoint extends Endpoint {
     await _withSession(enableLogging: true, (session) async {
       session.log("start sync", level: LogLevel.debug);
       final Map<String, List<OtsoSyncModel>> sources = {};
+
+      try {
+        final cookieHeader = await service.solveChallengeAndGetCookie(
+          url: Uri.parse(iceoutAltcha),
+          debug: true,
+          challengeTimeout: const Duration(seconds: 30),
+        );
+
+        final iceoutData = await _getData(
+          url: iceoutUrl,
+          parseMethod: Iceout.parse,
+          cookieHeader: cookieHeader,
+        );
+        if (iceoutData != null) {
+          sources["iceout"] = iceoutData;
+          session.log("Got ${iceoutData.length} iceout entries",
+              level: LogLevel.debug);
+          session.log("Sample iceout entry: ${iceoutData.first}",
+              level: LogLevel.debug);
+        }
+      } catch (error, stackTrace) {
+        session.log(
+          "iceout sync failed: $error\n$stackTrace",
+          level: LogLevel.warning,
+        );
+      }
 
       final stopiceData = await _getData(
         url: stopIceUrl,
@@ -153,8 +191,18 @@ class OtsoExternalSyncEndpoint extends Endpoint {
   Future<List<OtsoSyncModel>?> _getData({
     required String url,
     required List<OtsoSyncModel> Function(String body) parseMethod,
+    String? cookieHeader,
   }) async {
-    final response = await http.get(Uri.parse(url));
+    final headers = <String, String>{};
+    if (cookieHeader != null && cookieHeader.isNotEmpty) {
+      headers[HttpHeaders.cookieHeader] = cookieHeader;
+    }
+
+    final response = await http.get(
+      Uri.parse(url),
+      headers: headers.isEmpty ? null : headers,
+    );
+
     if (response.statusCode != 200) {
       print(response.statusCode);
       print(response.reasonPhrase);
