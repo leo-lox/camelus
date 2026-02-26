@@ -464,4 +464,9 @@
   "noFollowsConversations": "Nenhuma conversa com pessoas que você segue",
   "noKnownConversations": "Nenhuma conversa com contatos conhecidos",
   "noMessageRequests": "Nenhum pedido de mensagem"
+  ,
+  "imprint": "Impressão",
+  "@imprint": {
+    "description": "Imprint page title"
+  }
 }

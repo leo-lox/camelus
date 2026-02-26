@@ -421,4 +421,9 @@
   "noKnownConversations": "ไม่มีการสนทนากับผู้ติดต่อที่รู้จัก",
   "noMessageRequests": "ไม่มีคำขอข้อความ",
   "failed": "ล้มเหลว"
+  ,
+  "imprint": "ข้อมูลทางกฎหมาย",
+  "@imprint": {
+    "description": "Imprint page title"
+  }
 }

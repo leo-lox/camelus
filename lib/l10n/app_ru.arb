@@ -421,4 +421,9 @@
   "noKnownConversations": "Нет разговоров с известными контактами",
   "noMessageRequests": "Нет запросов на сообщения",
   "failed": "Ошибка"
+  ,
+  "imprint": "Выходные данные",
+  "@imprint": {
+    "description": "Imprint page title"
+  }
 }

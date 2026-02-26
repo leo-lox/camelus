@@ -1,10 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 import '../../../../providers/developer_settings_provider.dart';
 
 class DeveloperSettingsPage extends ConsumerWidget {
   const DeveloperSettingsPage({super.key});
+
+  Future<PackageInfo> _getPackageInfo() async {
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+
+    return packageInfo;
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -20,6 +27,38 @@ class DeveloperSettingsPage extends ConsumerWidget {
             subtitle: const Text('Show performance graphs'),
             value: state.showPerformanceOverlay,
             onChanged: notifier.setShowPerformanceOverlay,
+          ),
+          const Divider(),
+          FutureBuilder(
+            future: _getPackageInfo(),
+            builder: (context, snapshot) {
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'v${snapshot.data?.version}',
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurface,
+                      fontSize: 10,
+                    ),
+                  ),
+                  Text(
+                    'build ${snapshot.data?.buildNumber}',
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurface,
+                      fontSize: 10,
+                    ),
+                  ),
+                  Text(
+                    '${snapshot.data?.buildSignature}',
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurface,
+                      fontSize: 8,
+                    ),
+                  ),
+                ],
+              );
+            },
           ),
         ],
       ),
