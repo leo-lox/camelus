@@ -1,13 +1,13 @@
 import 'dart:developer';
 
 import 'package:camelus/l10n/app_localizations.dart';
+import 'package:apipod_client/apipod_client.dart' as api_pod;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../domain_layer/entities/nostr_band_hashtags.dart';
 import '../../atoms/hashtag_card.dart';
-import '../../providers/nostr_band_provider.dart';
+import '../../providers/trends_provider.dart';
 
 class TrendingHashtagsWidget extends ConsumerWidget {
   final bool showHeading;
@@ -15,9 +15,7 @@ class TrendingHashtagsWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final nostrBandAsync = ref.watch(
-      nostrBandProvider.select((provider) => provider.getTrendingHashtags()),
-    );
+    final trendsAsync = ref.watch(trendsProvider);
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -34,11 +32,10 @@ class TrendingHashtagsWidget extends ConsumerWidget {
               ),
             ),
           const SizedBox(height: 10),
-          FutureBuilder<NostrBandHashtags?>(
-            future: nostrBandAsync,
-            builder: (context, snapshot) {
-              if (snapshot.hasError) {
-                log(snapshot.error.toString());
+          trendsAsync.when(
+            data: (data) {
+              if (!data.success) {
+                log(data.error ?? 'trends endpoint returned success=false');
                 return Text(
                   AppLocalizations.of(context)!.somethingWentWrong,
                   style: TextStyle(
@@ -47,11 +44,7 @@ class TrendingHashtagsWidget extends ConsumerWidget {
                 );
               }
 
-              if (snapshot.hasData && snapshot.data != null) {
-                return _buildHashtagsList(context, snapshot.data!, 10);
-              }
-
-              if (snapshot.connectionState == ConnectionState.done) {
+              if (data.top.isEmpty) {
                 return Text(
                   AppLocalizations.of(context)!.noConnection,
                   style: TextStyle(
@@ -60,10 +53,20 @@ class TrendingHashtagsWidget extends ConsumerWidget {
                 );
               }
 
-              return Column(
-                children: List.generate(10, (i) => const HashtagCardSkeleton()),
+              return _buildHashtagsList(context, data, 10);
+            },
+            error: (error, stackTrace) {
+              log(error.toString());
+              return Text(
+                AppLocalizations.of(context)!.somethingWentWrong,
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.inverseSurface,
+                ),
               );
             },
+            loading: () => Column(
+              children: List.generate(10, (i) => const HashtagCardSkeleton()),
+            ),
           ),
         ],
       ),
@@ -72,10 +75,10 @@ class TrendingHashtagsWidget extends ConsumerWidget {
 
   Widget _buildHashtagsList(
     BuildContext context,
-    NostrBandHashtags api,
+    api_pod.TrendsResponse response,
     int limit,
   ) {
-    final hashtags = api.hashtags;
+    final hashtags = response.top;
     final displayLimit = limit > hashtags.length ? hashtags.length : limit;
 
     return Column(
@@ -84,8 +87,8 @@ class TrendingHashtagsWidget extends ConsumerWidget {
         final hashtag = hashtags[i];
         return HashtagCard(
           index: i,
-          hashtag: hashtag.hashtag,
-          postsCount: hashtag.posts,
+          hashtag: hashtag.tag,
+          postsCount: hashtag.count,
           onTap: (hashtag) {
             final encodedQuery = Uri.encodeQueryComponent("#$hashtag");
             context.push('/search/feed?q=$encodedQuery');

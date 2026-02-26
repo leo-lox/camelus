@@ -1,0 +1,6 @@
+class: TrendsSnapshot
+table: trends_snapshot
+fields:
+  createdAt: DateTime
+  interval: String
+  payloadJson: String

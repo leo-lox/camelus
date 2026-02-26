@@ -15,11 +15,13 @@ import '../../generated/protocol.dart';
 import 'database_operations.dart';
 import 'nostr_utils.dart';
 import 'relay.dart';
+import 'trend_processor.dart';
 
 const int maxRelaysRegistration = 4;
 
 class NostrPushEndpoint extends Endpoint {
   Serverpod? _pod;
+  final TrendProcessor _trendProcessor = TrendProcessor();
 
   // Cache implementation
   final Map<String, DateTime> _sentCache = {};
@@ -445,6 +447,19 @@ class NostrPushEndpoint extends Endpoint {
     });
   }
 
+  Future<void> _processTrendEvent(ndk.Nip01Event event, Relay relay) async {
+    if (event.kind != 1) {
+      return;
+    }
+
+    await _withSession(enableLogging: false, (session) async {
+      await _trendProcessor.processKind1Event(
+        session: session,
+        event: event,
+      );
+    });
+  }
+
   Future<void> _restartRelayPool() async {
     if (_isInRelayPoolFunction) {
       // Mark that a restart is pending so we retry after the current one finishes
@@ -508,6 +523,7 @@ class NostrPushEndpoint extends Endpoint {
 
               // Await _notify so errors are caught and backpressure is respected
               await _notify(event, relayEvent.relay);
+              await _processTrendEvent(event, relayEvent.relay);
             } catch (e) {
               await _withSession(enableLogging: true, (s) async {
                 s.log(level: LogLevel.error, 'Error handling event: $e');

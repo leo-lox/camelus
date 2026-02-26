@@ -200,36 +200,13 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Text(
-                          AppLocalizations.of(context)!.trends,
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.onSurface,
-                            fontSize: 27,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(width: 15),
-                        GestureDetector(
-                          onTap: () {
-                            launchUrl(
-                              Uri.parse("https://nostr.band"),
-                              mode: LaunchMode.externalApplication,
-                            );
-                          },
-                          child: Text(
-                            "by nostr.band",
-                            style: TextStyle(
-                              color: Theme.of(
-                                context,
-                              ).colorScheme.inverseSurface,
-                              fontSize: 14,
-                            ),
-                          ),
-                        ),
-                      ],
+                    Text(
+                      AppLocalizations.of(context)!.trends,
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurface,
+                        fontSize: 27,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     TrendingHashtagsWidget(showHeading: false),
                   ],
