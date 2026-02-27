@@ -83,7 +83,7 @@ dependencies:
   phosphor_flutter: ^2.1.0
 
   # ndk imports
-  ndk: ^0.7.1-dev.14
+  ndk: ^0.7.1-dev.19
   ndk_rust_verifier: ^0.5.0
   ndk_amber: 0.4.1-dev.17
   ndk_objectbox: ^0.2.8-dev.18
@@ -121,7 +121,7 @@ dependency_overrides:
     git:
       url: https://github.com/relaystr/ndk.git
       path: packages/ndk
-      ref: feat/lists-getPublicList
+      ref: master
   #ndk_rust_verifier:
   #  path: ../ndk/packages/rust_verifier
     #git:

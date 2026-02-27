@@ -1136,11 +1136,11 @@ packages:
     dependency: "direct main"
     description:
       path: "packages/ndk"
-      ref: "feat/lists-getPublicList"
-      resolved-ref: ab4d779df0a9376b398eadabb2ca5b512db97f5b
+      ref: master
+      resolved-ref: b8c870bd48f13fa18696759e17b6c4884083c927
       url: "https://github.com/relaystr/ndk.git"
     source: git
-    version: "0.7.1-dev.17"
+    version: "0.7.1-dev.19"
   ndk_amber:
     dependency: "direct main"
     description:
@@ -1153,18 +1153,18 @@ packages:
     dependency: "direct main"
     description:
       name: ndk_flutter
-      sha256: "117e44a97b87a4b15fb0444b94fdd1962a87e0918e1eb767dfa591e9ba983d74"
+      sha256: "48e31352e4e67a0411e39fcf3cc1ae648add158e0783e131029fafdec7cefd9d"
       url: "https://pub.dev"
     source: hosted
-    version: "0.0.2-dev.9"
+    version: "0.0.2-dev.11"
   ndk_objectbox:
     dependency: "direct main"
     description:
       name: ndk_objectbox
-      sha256: "30d563c7882a5d1a5aca8c1633ccaf52326e69e7f0a5e08e5c7665596379309f"
+      sha256: f7057f038233b8e79cb66ff8095307f9f3252ce1aa1a4bdee082c1fbf3c151df
       url: "https://pub.dev"
     source: hosted
-    version: "0.2.8-dev.18"
+    version: "0.2.8-dev.20"
   ndk_rust_verifier:
     dependency: "direct main"
     description:
@@ -1177,10 +1177,10 @@ packages:
     dependency: transitive
     description:
       name: nip07_event_signer
-      sha256: e154e26d53b0c3a2a0194af8d517c95a50166a8f8a7ad8c9dd2c39a445dced09
+      sha256: c471dc0799d8ddd80354c66f057701901ab268011a09968d518a93ff9259591d
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.6-dev.16"
+    version: "1.0.6-dev.20"
   nm:
     dependency: transitive
     description:
