@@ -400,19 +400,19 @@ class NostrPushEndpoint extends Endpoint {
 
               // Keep iOS data-only so the app can parse encryptedEvent
               // and create its own local notification in background.
-              notification: null,
-              apns: ApnsConfig(
-                headers: {
-                  'apns-priority':
-                      '10', // 10 is for immediate, 5 is for background
-                  'apns-push-type': 'alert', // background
-                },
-                payload: ApnsPayload(
-                  aps: Aps(
-                    contentAvailable: true,
-                  ),
-                ),
-              ),
+              // notification: null,
+              // apns: ApnsConfig(
+              //   headers: {
+              //     'apns-priority':
+              //         '10', // 10 is for immediate, 5 is for background
+              //     'apns-push-type': 'alert', // background
+              //   },
+              //   payload: ApnsPayload(
+              //     aps: Aps(
+              //       contentAvailable: true,
+              //     ),
+              //   ),
+              // ),
             ),
           );
 
