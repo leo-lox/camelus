@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'dart:math' as math;
 
@@ -106,35 +105,43 @@ class _BottomActionRowState extends State<BottomActionRow>
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        _buildActionButton(
-          onTap: widget.onComment,
-          icon: Icon(
-            PhosphorIcons.chatTeardropText(),
-            size: BottomActionRow.iconSize,
-            color: defaultColor,
-          ),
-          count: widget.commentCount,
-        ),
-        _buildRetweetButton(
-          color: widget.isRetweeted ? Color.fromARGB(255, 22, 163, 74) : null,
-          onTap: widget.onRetweet,
-          repostController: _repostController,
-        ),
-        _buildLikeButton(),
-        _buildActionButton(
-          onTap: widget.onShare,
-          icon: Icon(
-            PhosphorIcons.share(),
-            size: BottomActionRow.iconSize,
-            color: defaultColor,
+        Expanded(
+          child: _buildActionButton(
+            onTap: widget.onComment,
+            icon: Icon(
+              PhosphorIcons.chatTeardropText(),
+              size: BottomActionRow.iconSize,
+              color: defaultColor,
+            ),
+            count: widget.commentCount,
           ),
         ),
-        _buildActionButton(
-          onTap: widget.onMore,
-          icon: Icon(
-            PhosphorIcons.dotsThree(PhosphorIconsStyle.bold),
-            size: BottomActionRow.iconSize,
-            color: defaultColor,
+        Expanded(
+          child: _buildRetweetButton(
+            color: widget.isRetweeted ? Color.fromARGB(255, 22, 163, 74) : null,
+            onTap: widget.onRetweet,
+            repostController: _repostController,
+          ),
+        ),
+        Expanded(child: _buildLikeButton()),
+        Expanded(
+          child: _buildActionButton(
+            onTap: widget.onShare,
+            icon: Icon(
+              PhosphorIcons.share(),
+              size: BottomActionRow.iconSize,
+              color: defaultColor,
+            ),
+          ),
+        ),
+        Expanded(
+          child: _buildActionButton(
+            onTap: widget.onMore,
+            icon: Icon(
+              PhosphorIcons.dotsThree(PhosphorIconsStyle.bold),
+              size: BottomActionRow.iconSize,
+              color: defaultColor,
+            ),
           ),
         ),
       ],
@@ -145,7 +152,7 @@ class _BottomActionRowState extends State<BottomActionRow>
     final defaultColor = Theme.of(context).colorScheme.surfaceContainerHighest;
     return SizedBox(
       height: 35,
-      width: 65,
+      // width is removed so that parent Flex (Expanded) can control sizing
       child: InkWell(
         onTap: _triggerLike,
         borderRadius: BorderRadius.circular(50),
@@ -186,14 +193,12 @@ class _BottomActionRowState extends State<BottomActionRow>
   Widget _buildActionButton({
     required VoidCallback onTap,
     Icon? icon,
-    String? svgIcon,
+
     int? count,
-    Color? color,
   }) {
-    final defaultColor = Theme.of(context).colorScheme.surfaceContainerHighest;
     return SizedBox(
       height: 35,
-      width: 65,
+      // allow flexible horizontal sizing
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(50),
@@ -203,15 +208,7 @@ class _BottomActionRowState extends State<BottomActionRow>
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               if (icon != null) icon,
-              if (svgIcon != null)
-                SvgPicture.asset(
-                  svgIcon,
-                  height: 35,
-                  colorFilter: ColorFilter.mode(
-                    color ?? defaultColor,
-                    BlendMode.srcATop,
-                  ),
-                ),
+
               if (count != null) ...[
                 const SizedBox(width: 5),
                 Text(
@@ -243,7 +240,7 @@ Widget _buildRetweetButton({
       ).colorScheme.surfaceContainerHighest;
       return SizedBox(
         height: 35,
-        width: 65,
+        // width removed for flexibility
         child: InkWell(
           onTap: onTap,
           borderRadius: BorderRadius.circular(50),
@@ -254,13 +251,10 @@ Widget _buildRetweetButton({
               children: [
                 AnimatedBuilder(
                   animation: repostController,
-                  child: SvgPicture.asset(
-                    'assets/icons/retweet.svg',
-                    height: 35,
-                    colorFilter: ColorFilter.mode(
-                      color ?? defaultColor,
-                      BlendMode.srcATop,
-                    ),
+                  child: Icon(
+                    PhosphorIcons.repeat(),
+                    size: BottomActionRow.iconSize,
+                    color: color ?? defaultColor,
                   ),
                   builder: (context, Widget? child) {
                     return Transform.rotate(
