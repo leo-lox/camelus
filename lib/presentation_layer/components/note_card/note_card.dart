@@ -49,7 +49,7 @@ class NoteCard extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        if (note.nostrNote.sigValid != true) _buildInvalidSignature(),
+        if (note.nostrNote.sigValid == false) _buildInvalidSignature(),
         Padding(
           padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
           child: Column(
