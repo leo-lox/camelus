@@ -54,7 +54,7 @@ class EventFeedState extends Notifier<FeedEventViewModel> {
       timer = Timer(Duration(minutes: 2), () => link.close());
     });
     ref.onResume(() {
-      _subNewNotes(rootEventId);
+      Future.microtask(() => _subNewNotes(rootEventId));
       timer?.cancel();
     });
 
@@ -115,7 +115,7 @@ class EventFeedState extends Notifier<FeedEventViewModel> {
 
   /// Subcribes to new notes for the given root note ID.
   void _subNewNotes(String rootNoteId) {
-    final notesP = ref.watch(getNotesProvider);
+    final notesP = ref.read(getNotesProvider);
     final now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
 
     // find oldest comment in unprocessedCommentsSet

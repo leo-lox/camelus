@@ -122,7 +122,13 @@ class PostContentWidget extends ConsumerWidget {
     flushTextSpans();
 
     if (post.imageUrls.isNotEmpty) {
-      widgets.add(ImagesTileView(images: post.imageUrls));
+      widgets.add(
+        ImagesTileView(
+          images: post.imageUrls,
+          eventId: post.id,
+          profileIdentifier: post.authorId,
+        ),
+      );
     }
 
     return Stack(

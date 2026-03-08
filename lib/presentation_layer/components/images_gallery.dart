@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:flutter/services.dart';
 
@@ -139,7 +140,11 @@ class ImageGalleryState extends State<ImageGallery> {
             icon: const Icon(Icons.close, size: 30),
             color: Colors.white,
             onPressed: () {
-              Navigator.of(context).pop();
+              if (Navigator.of(context).canPop()) {
+                Navigator.of(context).pop();
+              } else {
+                context.go('/');
+              }
             },
           ),
           // Title of the gallery.
@@ -178,10 +183,11 @@ class ImageGalleryState extends State<ImageGallery> {
       itemBuilder: (context, index) {
         return PhotoView(
           imageProvider: CachedNetworkImageProvider(widget.imageUrls[index]),
-          heroAttributes: widget.heroTag != null
+          heroAttributes:
+              widget.heroTag != null && index == widget.defaultImageIndex
               ? PhotoViewHeroAttributes(
                   tag:
-                      'image-${widget.imageUrls[widget.defaultImageIndex]}-${widget.heroTag}',
+                      'image-${widget.imageUrls[index]}-${widget.heroTag}-$index',
                 )
               : null,
           minScale: PhotoViewComputedScale.contained * 1,

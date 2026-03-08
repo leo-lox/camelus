@@ -1,20 +1,23 @@
-import 'package:camelus/presentation_layer/components/images_gallery.dart';
-import 'package:camelus/helpers/helpers.dart';
 import 'package:camelus/presentation_layer/providers/image_aspect_ratio_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 class ImagesTileView extends ConsumerStatefulWidget {
   final List<String> images;
   final Widget? galleryBottomWidget;
   final double maxHeight;
+  final String eventId;
+  final String profileIdentifier;
 
   const ImagesTileView({
     super.key,
     required this.images,
     this.galleryBottomWidget,
     this.maxHeight = 200,
+    required this.eventId,
+    required this.profileIdentifier,
   });
 
   @override
@@ -22,8 +25,6 @@ class ImagesTileView extends ConsumerStatefulWidget {
 }
 
 class _ImagesTileViewState extends ConsumerState<ImagesTileView> {
-  final String _tileViewId = Helpers().getRandomString(4);
-
   @override
   Widget build(BuildContext context) {
     int imageCount = widget.images.length;
@@ -74,7 +75,7 @@ class _ImagesTileViewState extends ConsumerState<ImagesTileView> {
             return GestureDetector(
               onTap: () => _openGallery(context, 0),
               child: Hero(
-                tag: 'image-$url-$_tileViewId',
+                tag: 'image-$url-${widget.eventId}-0',
                 child: Image(
                   image: imageProvider,
                   fit: BoxFit.cover,
@@ -137,7 +138,7 @@ class _ImagesTileViewState extends ConsumerState<ImagesTileView> {
     return GestureDetector(
       onTap: () => _openGallery(context, index),
       child: Hero(
-        tag: 'image-${widget.images[index]}-$_tileViewId',
+        tag: 'image-${widget.images[index]}-${widget.eventId}-$index',
         child: Stack(
           fit: StackFit.expand,
           children: [
@@ -183,17 +184,8 @@ class _ImagesTileViewState extends ConsumerState<ImagesTileView> {
   }
 
   void _openGallery(BuildContext context, int index) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => ImageGallery(
-          imageUrls: widget.images,
-          defaultImageIndex: index,
-          topBarTitle: 'close',
-          bottomBarWidget: widget.galleryBottomWidget,
-          heroTag: _tileViewId,
-        ),
-      ),
+    context.push(
+      '/profile/${widget.profileIdentifier}/status/${widget.eventId}/gallery?start=$index',
     );
   }
 }
