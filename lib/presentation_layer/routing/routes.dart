@@ -98,7 +98,7 @@ final routes = [
             ),
             mobileContent: MobileBottomMenuLayout(
               mainContent: child,
-              bottomNavigationBar: AppBottomNavigationBar(),
+              bottomNavigationBar: const AppBottomNavigationBar(),
             ),
           );
         },

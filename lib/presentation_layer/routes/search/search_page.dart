@@ -5,10 +5,10 @@ import 'package:camelus/l10n/app_localizations.dart';
 import 'package:camelus/presentation_layer/components/trends/trending_hashtags_widget.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
-import 'package:url_launcher/url_launcher.dart';
 import '../../../domain_layer/entities/contact_list.dart';
 import '../../../domain_layer/entities/nostr_note.dart';
 import '../../../domain_layer/entities/user_metadata.dart';
@@ -137,49 +137,59 @@ class _SearchPageState extends ConsumerState<SearchPage> {
   Widget build(BuildContext context) {
     final searchState = ref.watch(searchStateProvider);
 
-    return PopScope(
-      canPop: true,
-      onPopInvokedWithResult: (didPop, result) {
-        if (didPop && _searchFocusNode.hasFocus) {
-          _searchFocusNode.unfocus();
-          _searchController.clear();
-          ref
-              .read(searchStateProvider.notifier)
-              .clearSearch(stillSearching: true);
-        }
-      },
-      child: Scaffold(
-        body: Column(
-          children: [
-            Builder(
-              builder: (context) {
-                final child = SearchBarWidget(
-                  onSearchChanged: _onSearchChanged,
-                  onSubmit: _onSubmit,
-                  helpSearch: _helpSearch,
-                  externalFocusNode: _searchFocusNode,
-                  externalController: _searchController,
-                );
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle(
+        statusBarColor: Theme.of(context).scaffoldBackgroundColor,
+        statusBarIconBrightness: Theme.of(context).brightness == Brightness.dark
+            ? Brightness.light
+            : Brightness.dark,
+      ),
+      child: PopScope(
+        canPop: true,
+        onPopInvokedWithResult: (didPop, result) {
+          if (didPop && _searchFocusNode.hasFocus) {
+            _searchFocusNode.unfocus();
+            _searchController.clear();
+            ref
+                .read(searchStateProvider.notifier)
+                .clearSearch(stillSearching: true);
+          }
+        },
+        child: Scaffold(
+          body: SafeArea(
+            child: Column(
+              children: [
+                Builder(
+                  builder: (context) {
+                    final child = SearchBarWidget(
+                      onSearchChanged: _onSearchChanged,
+                      onSubmit: _onSubmit,
+                      helpSearch: _helpSearch,
+                      externalFocusNode: _searchFocusNode,
+                      externalController: _searchController,
+                    );
 
-                final isDesktop =
-                    !kIsWeb &&
-                    (defaultTargetPlatform == TargetPlatform.linux ||
-                        defaultTargetPlatform == TargetPlatform.macOS ||
-                        defaultTargetPlatform == TargetPlatform.windows);
-                if (!isDesktop) return child;
+                    final isDesktop =
+                        !kIsWeb &&
+                        (defaultTargetPlatform == TargetPlatform.linux ||
+                            defaultTargetPlatform == TargetPlatform.macOS ||
+                            defaultTargetPlatform == TargetPlatform.windows);
+                    if (!isDesktop) return child;
 
-                return Padding(
-                  padding: const EdgeInsets.only(top: 16),
-                  child: child,
-                );
-              },
+                    return Padding(
+                      padding: const EdgeInsets.only(top: 16),
+                      child: child,
+                    );
+                  },
+                ),
+                Expanded(
+                  child: searchState.isSearching
+                      ? _buildSearchResults(searchState)
+                      : _buildDefaultView(),
+                ),
+              ],
             ),
-            Expanded(
-              child: searchState.isSearching
-                  ? _buildSearchResults(searchState)
-                  : _buildDefaultView(),
-            ),
-          ],
+          ),
         ),
       ),
     );

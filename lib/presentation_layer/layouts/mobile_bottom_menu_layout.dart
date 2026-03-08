@@ -20,7 +20,7 @@ class MobileBottomMenuLayout extends StatelessWidget {
 
     return SafeArea(
       top: false,
-      bottom: true,
+      bottom: false,
       child: Scaffold(
         body: mainContent,
         bottomNavigationBar: AnimatedSwitcher(
