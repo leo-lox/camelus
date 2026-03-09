@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 import 'package:phosphor_flutter/phosphor_flutter.dart';
-import 'package:shimmer/shimmer.dart';
 import 'package:video_player/video_player.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 
@@ -13,221 +11,303 @@ import 'video_player_state_provider.dart';
 class InlineVideoPlayer extends ConsumerWidget {
   final String videoId;
   final String initVideoLink;
-
-  /// if no author pubkey is provided video is untrusted by default \
-  /// => no auto play
   final String? authorPubkey;
+  final double maxHeight;
 
   const InlineVideoPlayer({
     super.key,
     required this.videoId,
     required this.initVideoLink,
     required this.authorPubkey,
+    this.maxHeight = 300,
   });
 
   VideoPlayerKey get _videoKey =>
       VideoPlayerKey(videoId: videoId, initialLink: initVideoLink);
 
-  void enterFullScreen(BuildContext context, WidgetRef ref) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => FullScreenVideoPlayer(videoKey: _videoKey),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final videoStateAsync = ref.watch(videoPlayerProvider(_videoKey));
     final videoStateNoti = ref.read(videoPlayerProvider(_videoKey).notifier);
+    final theme = Theme.of(context);
 
-    return Column(
-      children: [
-        Center(
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return ClipRRect(
+          borderRadius: BorderRadius.circular(10),
           child: videoStateAsync.when(
-            loading: () => _buildShimmerLoading(100, 100),
-            error: (error, stackTrace) => _buildRetryLoading(context, ref),
+            loading: () => _buildLoading(context, constraints.maxWidth),
+            error: (_, __) => _buildRetry(context, ref, constraints.maxWidth),
             data: (videoState) {
               final controller = videoState.controller;
               if (controller == null) {
-                return _buildShimmerLoading(100, 100);
+                return _buildLoading(context, constraints.maxWidth);
               }
 
-              return Stack(
-                children: [
-                  AspectRatio(
-                    aspectRatio: controller.value.aspectRatio,
-                    child: VisibilityDetector(
-                      key: Key('video-$videoId'),
-                      onVisibilityChanged: (visibilityInfo) {
-                        final visiblePercentage =
-                            visibilityInfo.visibleFraction * 100;
-                        final isAuthorTrusted = ref
-                            .read(moderationStateProvider.notifier)
-                            .isPubkeyTrusted(authorPubkey!);
-                        if (visiblePercentage >= 90) {
-                          if (authorPubkey == null) return;
+              final aspectRatio = controller.value.aspectRatio;
+              final naturalHeight = constraints.maxWidth / aspectRatio;
+              final clampedHeight = naturalHeight.clamp(0.0, maxHeight);
 
-                          if (!isAuthorTrusted) {
-                            videoStateNoti.showControls();
-                            return;
-                          }
-
-                          videoStateNoti.play();
-                        } else {
-                          videoStateNoti.pause(
-                            userInteraction: !isAuthorTrusted,
-                          );
-                        }
-                      },
-                      child: GestureDetector(
-                        onTap: () {
-                          videoStateNoti.showControls();
-                        },
-                        child: VideoPlayer(controller),
-                      ),
-                    ),
-                  ),
-                  Positioned.fill(
-                    child: GestureDetector(
-                      onTap: () {
-                        if (videoState.isPlaying) {
-                          videoStateNoti.pause(userInteraction: true);
-                        } else {
-                          videoStateNoti.play(userInteraction: true);
-                        }
-                      },
-                      child: videoState.showControls
-                          ? Container(
-                              color: Theme.of(
-                                context,
-                              ).colorScheme.surface.withValues(alpha: 0.54),
-                              child: Center(
-                                child: Icon(
-                                  videoState.isPlaying
-                                      ? PhosphorIcons.pause()
-                                      : PhosphorIcons.play(),
-                                  color: Theme.of(
-                                    context,
-                                  ).colorScheme.onSurface,
-                                  size: 64.0,
-                                ),
-                              ),
-                            )
-                          : Container(),
-                    ),
-                  ),
-                  if (videoState.showControls)
-                    Positioned(
-                      bottom: 10,
-                      left: 10,
-                      right: 10,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          IconButton(
-                            icon: Icon(
-                              videoState.volume == 0.0
-                                  ? PhosphorIcons.speakerSlash()
-                                  : PhosphorIcons.speakerHigh(),
-                              color: Theme.of(context).colorScheme.onSurface,
-                            ),
-                            onPressed: () {
-                              if (videoState.volume == 0.0) {
-                                videoStateNoti.setVolume(
-                                  1.0,
-                                  userInteraction: true,
-                                );
-                              } else {
-                                videoStateNoti.setVolume(
-                                  0.0,
-                                  userInteraction: true,
-                                );
-                              }
-                            },
-                          ),
-                          IconButton(
-                            icon: Icon(
-                              PhosphorIcons.cornersOut(),
-                              color: Theme.of(context).colorScheme.onSurface,
-                            ),
-                            onPressed: () {
-                              enterFullScreen(context, ref);
-                            },
-                          ),
-                        ],
-                      ),
-                    ),
-                  if (videoState.showControls)
-                    Positioned(
-                      bottom: 5,
-                      left: 10,
-                      right: 10,
-                      child: VideoProgressIndicator(
-                        controller,
-                        allowScrubbing: true,
-                        colors: VideoProgressColors(
-                          backgroundColor: Theme.of(
-                            context,
-                          ).colorScheme.surfaceContainerHighest,
-                          bufferedColor: Theme.of(
-                            context,
-                          ).colorScheme.inverseSurface,
-                          playedColor: Theme.of(context).colorScheme.onSurface,
+              return SizedBox(
+                width: constraints.maxWidth,
+                height: clampedHeight,
+                child: VisibilityDetector(
+                  key: Key('video-$videoId'),
+                  onVisibilityChanged: (info) =>
+                      _onVisibilityChanged(info, ref, videoStateNoti),
+                  child: Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      // Video
+                      FittedBox(
+                        fit: BoxFit.cover,
+                        clipBehavior: Clip.hardEdge,
+                        child: SizedBox(
+                          width: controller.value.size.width,
+                          height: controller.value.size.height,
+                          child: VideoPlayer(controller),
                         ),
                       ),
-                    ),
-                ],
+
+                      // Tap overlay
+                      GestureDetector(
+                        behavior: HitTestBehavior.opaque,
+                        onTap: () {
+                          if (videoState.showControls) {
+                            if (videoState.isPlaying) {
+                              videoStateNoti.pause(userInteraction: true);
+                            } else {
+                              videoStateNoti.play(userInteraction: true);
+                            }
+                          } else {
+                            videoStateNoti.showControls();
+                          }
+                        },
+                        child: AnimatedOpacity(
+                          opacity: videoState.showControls ? 1.0 : 0.0,
+                          duration: const Duration(milliseconds: 200),
+                          child: Container(
+                            color: theme.colorScheme.surface.withValues(
+                              alpha: 0.4,
+                            ),
+                            child: Center(
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: theme.colorScheme.surface.withValues(
+                                    alpha: 0.6,
+                                  ),
+                                  shape: BoxShape.circle,
+                                ),
+                                padding: const EdgeInsets.all(12),
+                                child: Icon(
+                                  videoState.isPlaying
+                                      ? PhosphorIcons.pause(
+                                          PhosphorIconsStyle.fill,
+                                        )
+                                      : PhosphorIcons.play(
+                                          PhosphorIconsStyle.fill,
+                                        ),
+                                  color: theme.colorScheme.onSurface,
+                                  size: 32,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+
+                      // Bottom controls
+                      if (videoState.showControls)
+                        Positioned(
+                          left: 0,
+                          right: 0,
+                          bottom: 0,
+                          child: _BottomControls(
+                            videoState: videoState,
+                            controller: controller,
+                            onMuteToggle: () {
+                              videoStateNoti.setVolume(
+                                videoState.volume == 0.0 ? 1.0 : 0.0,
+                                userInteraction: true,
+                              );
+                            },
+                            onFullScreen: () => _enterFullScreen(context),
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
               );
             },
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildShimmerLoading(double width, double height) {
-    return Builder(
-      builder: (context) {
-        return Shimmer.fromColors(
-          baseColor: Theme.of(
-            context,
-          ).colorScheme.surface.withValues(alpha: 0.1),
-          highlightColor: Theme.of(
-            context,
-          ).colorScheme.surface.withValues(alpha: 0.7),
-          child: Container(
-            width: width,
-            height: height,
-            color: Theme.of(context).colorScheme.surface,
           ),
         );
       },
     );
   }
 
-  Widget _buildRetryLoading(BuildContext context, WidgetRef ref) {
+  void _onVisibilityChanged(
+    VisibilityInfo info,
+    WidgetRef ref,
+    VideoPlayerNotifier videoStateNoti,
+  ) {
+    final visiblePercentage = info.visibleFraction * 100;
+    final isAuthorTrusted = ref
+        .read(moderationStateProvider.notifier)
+        .isPubkeyTrusted(authorPubkey ?? '');
+
+    if (visiblePercentage >= 90) {
+      if (authorPubkey == null || !isAuthorTrusted) {
+        videoStateNoti.showControls();
+        return;
+      }
+      videoStateNoti.play();
+    } else {
+      videoStateNoti.pause(
+        userInteraction: authorPubkey == null || !isAuthorTrusted,
+      );
+    }
+  }
+
+  void _enterFullScreen(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => FullScreenVideoPlayer(videoKey: _videoKey),
+      ),
+    );
+  }
+
+  Widget _buildLoading(BuildContext context, double width) {
+    final theme = Theme.of(context);
+    return Container(
+      width: width,
+      height: maxHeight * 0.5,
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surface.withValues(alpha: 0.5),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: const Center(child: CircularProgressIndicator()),
+    );
+  }
+
+  Widget _buildRetry(BuildContext context, WidgetRef ref, double width) {
+    final theme = Theme.of(context);
     final videoStateNoti = ref.read(videoPlayerProvider(_videoKey).notifier);
 
-    return SizedBox(
-      width: 100,
-      height: 100,
+    return Container(
+      width: width,
+      height: maxHeight * 0.5,
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surface.withValues(alpha: 0.5),
+        borderRadius: BorderRadius.circular(10),
+      ),
       child: Material(
-        color: Theme.of(context).colorScheme.surface,
+        color: Colors.transparent,
         child: InkWell(
+          borderRadius: BorderRadius.circular(10),
           onTap: videoStateNoti.retry,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Icon(
-                Icons.refresh,
-                color: Theme.of(context).colorScheme.onSurface,
+                PhosphorIcons.arrowClockwise(),
+                color: theme.colorScheme.onSurface,
+                size: 28,
               ),
-              const SizedBox(height: 4),
-              Text('Retry', style: Theme.of(context).textTheme.labelSmall),
+              const SizedBox(height: 8),
+              Text(
+                'Tap to retry',
+                style: theme.textTheme.labelMedium?.copyWith(
+                  color: theme.colorScheme.onSurface,
+                ),
+              ),
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _BottomControls extends StatelessWidget {
+  final VideoState videoState;
+  final VideoPlayerController controller;
+  final VoidCallback onMuteToggle;
+  final VoidCallback onFullScreen;
+
+  const _BottomControls({
+    required this.videoState,
+    required this.controller,
+    required this.onMuteToggle,
+    required this.onFullScreen,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.bottomCenter,
+          end: Alignment.topCenter,
+          colors: [
+            theme.colorScheme.surface.withValues(alpha: 0.7),
+            Colors.transparent,
+          ],
+        ),
+      ),
+      padding: const EdgeInsets.only(top: 24),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Progress bar
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            child: VideoProgressIndicator(
+              controller,
+              allowScrubbing: true,
+              padding: const EdgeInsets.only(bottom: 4),
+              colors: VideoProgressColors(
+                backgroundColor: theme.colorScheme.onSurface.withValues(
+                  alpha: 0.2,
+                ),
+                bufferedColor: theme.colorScheme.onSurface.withValues(
+                  alpha: 0.4,
+                ),
+                playedColor: theme.colorScheme.onSurface,
+              ),
+            ),
+          ),
+          // Buttons row
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                IconButton(
+                  iconSize: 20,
+                  visualDensity: VisualDensity.compact,
+                  icon: Icon(
+                    videoState.volume == 0.0
+                        ? PhosphorIcons.speakerSlash(PhosphorIconsStyle.fill)
+                        : PhosphorIcons.speakerHigh(PhosphorIconsStyle.fill),
+                    color: theme.colorScheme.onSurface,
+                  ),
+                  onPressed: onMuteToggle,
+                ),
+                IconButton(
+                  iconSize: 20,
+                  visualDensity: VisualDensity.compact,
+                  icon: Icon(
+                    PhosphorIcons.cornersOut(),
+                    color: theme.colorScheme.onSurface,
+                  ),
+                  onPressed: onFullScreen,
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

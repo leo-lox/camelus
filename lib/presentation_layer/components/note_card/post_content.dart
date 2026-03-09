@@ -3,19 +3,16 @@ import 'dart:ui';
 import 'package:camelus/l10n/app_localizations.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_link_previewer/flutter_link_previewer.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
-
 import 'package:url_launcher/url_launcher_string.dart';
-
 import '../../../domain_layer/entities/parsed_post.dart';
 import '../../routing/route_paths.dart';
 import '../../atoms/long_button.dart';
-import '../../providers/link_preview_state_provider.dart';
 import '../../providers/metadata_state_provider.dart';
 import '../images_tile_view.dart';
+import '../link_preview/link_preview_widget.dart';
 import '../video/inline_video_player.dart';
 import 'note_card_reference.dart';
 
@@ -54,113 +51,84 @@ class PostContentWidget extends ConsumerWidget {
 
     final isContentRevealed = ref.watch(isContentRevealedProvider(post.id));
 
+    void flushTextSpans() {
+      if (currentTextSpans.isNotEmpty) {
+        widgets.add(
+          Padding(
+            padding: const EdgeInsets.only(bottom: 8.0),
+            child: RichText(
+              text: TextSpan(
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface,
+                  fontSize: _fontSize,
+                  height: 1.2,
+                  wordSpacing: 1.05,
+                ),
+                children: [...currentTextSpans],
+              ),
+            ),
+          ),
+        );
+        currentTextSpans.clear();
+      }
+    }
+
     for (final segment in post.contentSegments) {
-      if (_isMediaType(segment.type)) {
-        // Flush accumulated text spans
-        if (currentTextSpans.isNotEmpty) {
+      if (_shouldSkipSegment(segment.type)) continue;
+
+      if (_isInlineWidgetType(segment.type)) {
+        flushTextSpans();
+
+        if (segment.type == ContentType.image ||
+            segment.type == ContentType.video) {
+          widgets.add(_buildMediaWidget(segment));
+        } else if (segment.type == ContentType.link) {
           widgets.add(
             Padding(
               padding: const EdgeInsets.only(bottom: 8.0),
-              child: RichText(
-                text: TextSpan(
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.onSurface,
-                    fontSize: _fontSize,
-                    height: 1.2,
-                    wordSpacing: 1.05,
+              child: InkWell(
+                onTap: () => _openLink(segment.metadata!),
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8),
+
+                    color: Theme.of(context).colorScheme.surfaceContainerHighest
+                        .withValues(alpha: 0.5),
                   ),
-                  children: [...currentTextSpans],
+                  child: LinkPreviewWidget(
+                    fontSize: _fontSize,
+                    url: segment.content,
+                  ),
                 ),
               ),
             ),
           );
-          currentTextSpans.clear();
-        }
-
-        // Add media widget
-        widgets.add(_buildMediaWidget(segment));
-      } else {
-        // Accumulate text spans
-        currentTextSpans.add(_buildTextSpan(segment, ref, context));
-      }
-
-      if (segment.type == ContentType.link) {
-        widgets.add(
-          Padding(
-            padding: const EdgeInsets.only(bottom: 8.0),
-            child: InkWell(
-              onTap: () => _openLink(segment.metadata!),
-              child: Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(
-                    color: Theme.of(
-                      context,
-                    ).colorScheme.surfaceContainerHighest,
-                  ),
-                ),
-                child: LinkPreview(
-                  linkStyle: TextStyle(
-                    color: Theme.of(context).colorScheme.primary,
-                    fontSize: _fontSize - 2,
-                    decoration: TextDecoration.none,
-                  ),
-                  enableAnimation: true,
-                  onPreviewDataFetched: (data) {
-                    ref
-                        .read(linkPreviewProvider(segment.metadata!).notifier)
-                        .setPreview(data);
-                  },
-                  previewData: ref.watch(
-                    linkPreviewProvider(segment.metadata!),
-                  ),
-                  text: segment.metadata!,
-                  textWidget: Text(
-                    segment.content,
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
-                  ),
-                  width: MediaQuery.of(context).size.width,
-                ),
+        } else if (segment.type == ContentType.noteReference) {
+          widgets.add(
+            Padding(
+              padding: const EdgeInsets.only(bottom: 8.0),
+              child: NoteCardReference(
+                key: ValueKey(segment.metadata),
+                word: segment.metadata!,
               ),
             ),
-          ),
-        );
-      }
-
-      if (segment.type == ContentType.noteReference) {
-        widgets.add(
-          Padding(
-            padding: EdgeInsetsGeometry.only(bottom: 8),
-            child: NoteCardReference(
-              key: ValueKey(segment.metadata),
-              word: segment.metadata!,
-            ),
-          ),
-        );
+          );
+        }
+      } else {
+        currentTextSpans.add(_buildTextSpan(segment, ref, context));
       }
     }
 
-    // Flush remaining text spans
-    if (currentTextSpans.isNotEmpty) {
+    flushTextSpans();
+
+    if (post.imageUrls.isNotEmpty) {
       widgets.add(
-        RichText(
-          text: TextSpan(
-            style: TextStyle(
-              color: Theme.of(context).colorScheme.onSurface,
-              fontSize: _fontSize,
-              height: 1.2,
-              wordSpacing: 1.05,
-            ),
-            children: currentTextSpans,
-          ),
+        ImagesTileView(
+          images: post.imageUrls,
+          eventId: post.id,
+          profileIdentifier: post.authorId,
         ),
       );
-    }
-    // add images
-    if (post.imageUrls.isNotEmpty) {
-      widgets.add(ImagesTileView(images: post.imageUrls));
     }
 
     return Stack(
@@ -217,14 +185,22 @@ class PostContentWidget extends ConsumerWidget {
     );
   }
 
-  bool _isMediaType(ContentType type) {
-    return type == ContentType.image || type == ContentType.video;
+  bool _isInlineWidgetType(ContentType type) {
+    return type == ContentType.image ||
+        type == ContentType.video ||
+        type == ContentType.link ||
+        type == ContentType.noteReference;
+  }
+
+  bool _shouldSkipSegment(ContentType type) {
+    // Images are rendered via post.imageUrls at the bottom, skip them in the loop
+    return type == ContentType.image;
   }
 
   Widget _buildMediaWidget(ContentSegment segment) {
     switch (segment.type) {
       case ContentType.image:
-        return Container();
+        return const SizedBox.shrink();
 
       case ContentType.video:
         return InlineVideoPlayer(
@@ -274,16 +250,11 @@ class PostContentWidget extends ConsumerWidget {
           style: TextStyle(
             color: Theme.of(context).colorScheme.primary,
             decoration: TextDecoration.none,
+            fontSize: _fontSize,
           ),
           recognizer: TapGestureRecognizer()
             ..onTap = () => _openHashtag(context, segment.metadata!),
         );
-
-      case ContentType.link:
-        return TextSpan();
-
-      case ContentType.noteReference:
-        return TextSpan();
 
       default:
         return TextSpan(

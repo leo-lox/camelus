@@ -198,7 +198,7 @@ class NostrParser {
         // Other links
         segments.add(
           ContentSegment(
-            content: _shortenUrl(linkUrl),
+            content: linkUrl,
             type: ContentType.link,
             metadata: linkUrl,
           ),
@@ -219,15 +219,5 @@ class NostrParser {
     }
 
     return segments;
-  }
-
-  static String _shortenUrl(String url) {
-    try {
-      final uri = Uri.parse(url);
-      return uri.host +
-          (uri.path.length > 20 ? '${uri.path.substring(0, 20)}...' : uri.path);
-    } catch (_) {
-      return url;
-    }
   }
 }
