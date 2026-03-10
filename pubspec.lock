@@ -373,10 +373,10 @@ packages:
     dependency: transitive
     description:
       name: cryptography
-      sha256: "696eca57317bb4cac33463299058fcb96c9e651634d0eadf5e7856f5e1b6cbc7"
+      sha256: "3eda3029d34ec9095a27a198ac9785630fe525c0eb6a49f3d575272f8e792ef0"
       url: "https://pub.dev"
     source: hosted
-    version: "2.8.1"
+    version: "2.9.0"
   csslib:
     dependency: transitive
     description:
@@ -461,10 +461,10 @@ packages:
     dependency: transitive
     description:
       name: equatable
-      sha256: "567c64b3cb4cf82397aac55f4f0cbd3ca20d77c6c03bedbc4ceaddc08904aef7"
+      sha256: "3e0141505477fd8ad55d6eb4e7776d3fe8430be8e497ccb1521370c3f21a3e2b"
       url: "https://pub.dev"
     source: hosted
-    version: "2.0.7"
+    version: "2.0.8"
   fake_async:
     dependency: transitive
     description:
@@ -589,10 +589,10 @@ packages:
     dependency: transitive
     description:
       name: flat_buffers
-      sha256: "380bdcba5664a718bfd4ea20a45d39e13684f5318fcd8883066a55e21f37f4c3"
+      sha256: "7c1de2d6eb5f3e61e5c50040841109f509deaaf2b12ec0d57b92456d9ea50345"
       url: "https://pub.dev"
     source: hosted
-    version: "23.5.26"
+    version: "25.9.23"
   flutter:
     dependency: "direct main"
     description: flutter
@@ -1135,36 +1135,35 @@ packages:
   ndk:
     dependency: "direct main"
     description:
-      path: "packages/ndk"
-      ref: master
-      resolved-ref: b8c870bd48f13fa18696759e17b6c4884083c927
-      url: "https://github.com/relaystr/ndk.git"
-    source: git
-    version: "0.7.1-dev.19"
+      name: ndk
+      sha256: "57e910f41973e57d0c52a802ce0b55415f8437599f4e98b4f4caa3420f3b3506"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.7.2-dev.0"
   ndk_amber:
     dependency: "direct main"
     description:
       name: ndk_amber
-      sha256: d1abd1bfe207db4aaad292e3d7bb2c5756ed8e733664988dfd4fc80b209bc404
+      sha256: "0335845c4390ee0d6a0efdd9c8ee23883f5d47e1f390a87d6da0819cf51d36f6"
       url: "https://pub.dev"
     source: hosted
-    version: "0.4.1-dev.17"
+    version: "0.4.1"
   ndk_flutter:
     dependency: "direct main"
     description:
       name: ndk_flutter
-      sha256: "48e31352e4e67a0411e39fcf3cc1ae648add158e0783e131029fafdec7cefd9d"
+      sha256: "1bfac53a54e07e30a5535b843652a7c153ab5e398763b5704c470296e2fdc790"
       url: "https://pub.dev"
     source: hosted
-    version: "0.0.2-dev.11"
+    version: "0.0.2"
   ndk_objectbox:
     dependency: "direct main"
     description:
       name: ndk_objectbox
-      sha256: f7057f038233b8e79cb66ff8095307f9f3252ce1aa1a4bdee082c1fbf3c151df
+      sha256: b8a217ac3827ec8f84cc9ce500219b5988e38ebea3b93d5ac31559e53a9b8973
       url: "https://pub.dev"
     source: hosted
-    version: "0.2.8-dev.20"
+    version: "0.2.8"
   ndk_rust_verifier:
     dependency: "direct main"
     description:
@@ -1177,10 +1176,10 @@ packages:
     dependency: transitive
     description:
       name: nip07_event_signer
-      sha256: c471dc0799d8ddd80354c66f057701901ab268011a09968d518a93ff9259591d
+      sha256: "6c58d993fc0fec27fb217c70215971dbb7f5b570114688a93bddb1d408f17103"
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.6-dev.20"
+    version: "1.0.7-dev.0"
   nm:
     dependency: transitive
     description:
@@ -1201,26 +1200,26 @@ packages:
     dependency: "direct main"
     description:
       name: objectbox
-      sha256: "9c7a37ef0b35fe64d67f58022809f0c82bd215b4e01d4cbf714d470b41237a25"
+      sha256: ac1e1ef852f60ea0af01fddb28811c8aa169f2b1ae9284e91e7b822abe5ed603
       url: "https://pub.dev"
     source: hosted
-    version: "5.0.2"
+    version: "5.2.0"
   objectbox_flutter_libs:
     dependency: "direct main"
     description:
       name: objectbox_flutter_libs
-      sha256: "461b4052533820c4e3ec0600ac2cc1597d8bb998640f1812b999c02a19901676"
+      sha256: "928aeabb2c246db225866cd931f2fea6c7684cc7046d54c02355a7b227ae5ba5"
       url: "https://pub.dev"
     source: hosted
-    version: "5.0.2"
+    version: "5.2.0"
   objectbox_generator:
     dependency: "direct dev"
     description:
       name: objectbox_generator
-      sha256: cb3d3bd9b73c9b5f6795092bf939938aaaa49c826eca5980968fdf383246405b
+      sha256: "28628fa65d4fe8ade868cd50aa323ecdfd6d435fcda2cc7484071b84031f8c5e"
       url: "https://pub.dev"
     source: hosted
-    version: "5.0.2"
+    version: "5.2.0"
   objective_c:
     dependency: transitive
     description:
