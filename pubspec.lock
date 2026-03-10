@@ -1135,10 +1135,9 @@ packages:
   ndk:
     dependency: "direct main"
     description:
-      name: ndk
-      sha256: "57e910f41973e57d0c52a802ce0b55415f8437599f4e98b4f4caa3420f3b3506"
-      url: "https://pub.dev"
-    source: hosted
+      path: "../ndk/packages/ndk"
+      relative: true
+    source: path
     version: "0.7.2-dev.0"
   ndk_amber:
     dependency: "direct main"
