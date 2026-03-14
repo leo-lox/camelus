@@ -64,6 +64,8 @@ class NoteCard extends ConsumerWidget {
 
     final metrics = metricsAsync.maybeWhen(
       data: (data) => data,
+      error: (error, stackTrace) => null,
+
       orElse: () => null,
     );
 

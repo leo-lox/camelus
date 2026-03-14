@@ -1,6 +1,7 @@
 import 'package:ndk/ndk.dart';
 import 'package:riverpod/riverpod.dart';
 
+import '../../config/app_trusted_assertions.dart';
 import 'ndk_provider.dart';
 
 /// Parameters for event metrics query
@@ -13,7 +14,7 @@ class EventMetricsParams {
   const EventMetricsParams({
     required this.eventId,
     this.metrics,
-    this.providers,
+    this.providers = APP_DEFAULT_NIP85_PROVIDERS,
   });
 
   @override
