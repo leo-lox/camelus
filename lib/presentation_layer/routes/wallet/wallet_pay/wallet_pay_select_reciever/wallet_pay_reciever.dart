@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ndk/entities.dart' as ndk_entities;
 
-import '../../../../../config/palette.dart';
 import '../../../../../domain_layer/entities/user_metadata.dart';
 
 import '../../../../../helpers/helpers.dart';
@@ -73,25 +72,30 @@ class WalletSelectReciever extends ConsumerWidget {
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(64),
           child: Padding(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 12.0,
+              vertical: 8.0,
+            ),
             child: TextField(
               onChanged: notifier.setSearchQuery,
               decoration: InputDecoration(
                 isDense: true,
                 hintText: ' Search by name',
-                hintStyle:
-                    const TextStyle(color: Colors.white, letterSpacing: 1.1),
+                hintStyle: const TextStyle(
+                  color: Colors.white,
+                  letterSpacing: 1.1,
+                ),
                 filled: true,
                 fillColor: Theme.of(context).colorScheme.surface,
                 enabledBorder: const OutlineInputBorder(
                   borderRadius: BorderRadius.all(Radius.circular(50.0)),
-                  borderSide: BorderSide(color: Paletter.extraDarkGray),
+                  borderSide: BorderSide(color: Colors.grey),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.all(Radius.circular(25.0)),
-                  borderSide:
-                      BorderSide(color: Theme.of(context).colorScheme.surface),
+                  borderSide: BorderSide(
+                    color: Theme.of(context).colorScheme.surface,
+                  ),
                 ),
               ),
             ),
@@ -194,11 +198,12 @@ class WalletSelectReciever extends ConsumerWidget {
             width: double.infinity,
             height: 45,
             child: longButton(
-                name: "next",
-                onPressed: () {
-                  _onTokenSelected(paymentStateNotifier);
-                },
-                inverted: true),
+              name: "next",
+              onPressed: () {
+                _onTokenSelected(paymentStateNotifier);
+              },
+              inverted: true,
+            ),
           ),
         ),
       ),
@@ -271,11 +276,8 @@ class _ContactsList extends StatelessWidget {
           ),
           title: Text(c.name ?? ''),
           subtitle: Text(
-            c.nip05 ??
-                Helpers.shortHr(
-                  c.pubkey,
-                ),
-            style: TextStyle(color: Paletter.gray),
+            c.nip05 ?? Helpers.shortHr(c.pubkey),
+            style: TextStyle(color: Colors.grey),
           ),
           onTap: () => onTap(c),
         );
@@ -325,15 +327,15 @@ class _WalletsList extends StatelessWidget {
           subtitle: Text(w.type.toString()),
 
           /// show all balances for the wallet
-          trailing: Column(children: [
-            for (final b in wBallances)
-              Text(
-                "${WalletNumberFormatting.formatAmount(amount: b.amount, unit: b.unit)} ${b.unit}",
-                style: TextStyle(
-                  color: Colors.white,
+          trailing: Column(
+            children: [
+              for (final b in wBallances)
+                Text(
+                  "${WalletNumberFormatting.formatAmount(amount: b.amount, unit: b.unit)} ${b.unit}",
+                  style: TextStyle(color: Colors.white),
                 ),
-              ),
-          ]),
+            ],
+          ),
 
           onTap: () => onTap(w),
         );

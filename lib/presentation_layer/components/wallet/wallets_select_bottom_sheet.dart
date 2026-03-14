@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:ndk/entities.dart' as ndk_entities;
-import '../../../config/palette.dart';
 import '../../atoms/wallet/wallet_card.dart';
 
 Future<String?> showWalletsSelectBottomSheet({
@@ -32,7 +31,9 @@ Future<String?> showWalletsSelectBottomSheet({
             borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
             boxShadow: [
               BoxShadow(
-                  blurRadius: 16, color: Theme.of(context).colorScheme.surface)
+                blurRadius: 16,
+                color: Theme.of(context).colorScheme.surface,
+              ),
             ],
           ),
           child: Material(
@@ -66,8 +67,10 @@ Future<String?> showWalletsSelectBottomSheet({
                   fit: FlexFit.loose,
                   child: ConstrainedBox(
                     constraints: BoxConstraints(
-                      maxHeight:
-                          maxScrollableHeight.clamp(120.0, double.infinity),
+                      maxHeight: maxScrollableHeight.clamp(
+                        120.0,
+                        double.infinity,
+                      ),
                     ),
                     child: SingleChildScrollView(
                       padding: const EdgeInsets.fromLTRB(12, 8, 12, 16),
@@ -85,8 +88,9 @@ Future<String?> showWalletsSelectBottomSheet({
                             isSelected: isSelected,
                             onTap: (id) => Navigator.of(ctx).pop(id),
                             tralling: Radio(
-                              activeColor:
-                                  Theme.of(context).colorScheme.primary,
+                              activeColor: Theme.of(
+                                context,
+                              ).colorScheme.primary,
                               value: wallet.id,
                               groupValue: isSelected ? wallet.id : null,
                               onChanged: (value) {

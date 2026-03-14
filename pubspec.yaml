@@ -72,7 +72,7 @@ dependencies:
   rxdart: ^0.28.0
   shimmer: ^3.0.0
   flutter_force_directed_graph: ^1.0.7
-  objectbox: ^5.0.0
+  objectbox: ^5.2.0 
   objectbox_flutter_libs: any
   sembast: ^3.8.5+1
   sembast_web: ^2.4.1

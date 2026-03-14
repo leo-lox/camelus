@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ndk/entities.dart' as ndk_entities;
 import 'package:ndk/ndk.dart';
+import 'package:riverpod/legacy.dart';
 
 import '../../../../../domain_layer/entities/user_metadata.dart';
 import '../../../../../domain_layer/usecases/get_user_metadata.dart';
@@ -53,9 +54,11 @@ class WalletPayRecieverState {
     if (q.isEmpty) return const [];
 
     return allContacts
-        .where((c) =>
-            (c.name != null && c.name!.toLowerCase().contains(q)) ||
-            (c.pubkey.toLowerCase().contains(q)))
+        .where(
+          (c) =>
+              (c.name != null && c.name!.toLowerCase().contains(q)) ||
+              (c.pubkey.toLowerCase().contains(q)),
+        )
         .toList();
   }
 
@@ -78,20 +81,20 @@ class WalletPayToNotifier extends StateNotifier<WalletPayRecieverState> {
     required Ndk ndk,
     required List<String> contactPubkeys,
     required GetUserMetadata getUserMetadata,
-  })  : _ndk = ndk,
-        _contactPubkeys = contactPubkeys,
-        _getUserMetadata = getUserMetadata,
-        super(
-          WalletPayRecieverState(
-            wallets: const [],
-            balances: const [],
-            allContacts: const [],
-            recentContacts: const [],
-            selectedWalletId: initialWalletId,
-            searchQuery: '',
-            isLoading: true,
-          ),
-        ) {
+  }) : _ndk = ndk,
+       _contactPubkeys = contactPubkeys,
+       _getUserMetadata = getUserMetadata,
+       super(
+         WalletPayRecieverState(
+           wallets: const [],
+           balances: const [],
+           allContacts: const [],
+           recentContacts: const [],
+           selectedWalletId: initialWalletId,
+           searchQuery: '',
+           isLoading: true,
+         ),
+       ) {
     _loadInitial();
   }
 
@@ -136,20 +139,22 @@ class WalletPayToNotifier extends StateNotifier<WalletPayRecieverState> {
   }
 }
 
-final walletPayRecieverProvider = StateNotifierProvider.family<
-    WalletPayToNotifier,
-    WalletPayRecieverState,
-    String?>((ref, initialWalletId) {
-  final ndk = ref.watch(ndkProvider);
+final walletPayRecieverProvider =
+    StateNotifierProvider.family<
+      WalletPayToNotifier,
+      WalletPayRecieverState,
+      String?
+    >((ref, initialWalletId) {
+      final ndk = ref.watch(ndkProvider);
 
-  final contacts = ref.watch(contactListSelfStateProvider);
+      final contacts = ref.watch(contactListSelfStateProvider);
 
-  final getUserMetadata = ref.watch(metadataProvider);
+      final getUserMetadata = ref.watch(metadataProvider);
 
-  return WalletPayToNotifier(
-    initialWalletId: initialWalletId,
-    ndk: ndk,
-    contactPubkeys: contacts.contactList.contacts,
-    getUserMetadata: getUserMetadata,
-  );
-});
+      return WalletPayToNotifier(
+        initialWalletId: initialWalletId,
+        ndk: ndk,
+        contactPubkeys: contacts.contactList.contacts,
+        getUserMetadata: getUserMetadata,
+      );
+    });

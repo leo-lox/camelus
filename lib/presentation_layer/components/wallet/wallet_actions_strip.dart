@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
-import '../../../config/palette.dart';
-
 class WalletActionsStrip extends StatelessWidget {
   final void Function() onScan;
   final void Function() onReceive;
@@ -34,6 +32,7 @@ class WalletActionsStrip extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(2),
               child: _actionButton(
+                context: context,
                 iconData: PhosphorIcons.barcode(),
                 onTab: () => onScan(),
                 text: "scan",
@@ -42,6 +41,7 @@ class WalletActionsStrip extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(2),
               child: _actionButton(
+                context: context,
                 iconData: PhosphorIcons.wallet(),
                 onTab: () => onPay(),
                 text: "pay",
@@ -50,17 +50,21 @@ class WalletActionsStrip extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(2),
               child: _actionButton(
-                  iconData: PhosphorIcons.piggyBank(),
-                  onTab: () => onReceive(),
-                  text: "receive"),
+                context: context,
+                iconData: PhosphorIcons.piggyBank(),
+                onTab: () => onReceive(),
+                text: "receive",
+              ),
             ),
             Container(
-                padding: const EdgeInsets.all(2),
-                child: _actionButton(
-                  iconData: PhosphorIcons.receipt(),
-                  text: "history",
-                  onTab: () => onHistory(),
-                )),
+              padding: const EdgeInsets.all(2),
+              child: _actionButton(
+                context: context,
+                iconData: PhosphorIcons.receipt(),
+                text: "history",
+                onTab: () => onHistory(),
+              ),
+            ),
           ],
         ),
       ),
@@ -72,6 +76,7 @@ Widget _actionButton({
   required Function onTab,
   required IconData iconData,
   required String text,
+  required BuildContext context,
   Color? iconColor,
   Color? textColor,
 }) {
@@ -87,14 +92,17 @@ Widget _actionButton({
         ),
         child: Icon(
           iconData,
-          color: iconColor ?? Paletter.gray,
+          color: iconColor ?? Theme.of(context).colorScheme.onSurfaceVariant,
           size: 23,
         ),
       ),
       Text(
         text,
-        style: TextStyle(color: textColor ?? Paletter.gray),
-      )
+        style: TextStyle(
+          color: textColor ?? Theme.of(context).colorScheme.onSurfaceVariant,
+          fontSize: 12,
+        ),
+      ),
     ],
   );
 }

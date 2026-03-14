@@ -1,12 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../../config/palette.dart';
-
 class WalletAccountCardPlaceholder extends StatelessWidget {
-  const WalletAccountCardPlaceholder({
-    super.key,
-    this.onTap,
-  });
+  const WalletAccountCardPlaceholder({super.key, this.onTap});
 
   final VoidCallback? onTap;
 
@@ -16,11 +11,11 @@ class WalletAccountCardPlaceholder extends StatelessWidget {
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
-          color: Paletter.extraDarkGray,
+          color: Theme.of(context).colorScheme.surfaceVariant,
           borderRadius: BorderRadius.circular(18.0),
           border: Border.all(
             width: 1,
-            color: Paletter.gray,
+            color: Theme.of(context).colorScheme.outline,
           ),
         ),
         child: Center(
@@ -28,7 +23,7 @@ class WalletAccountCardPlaceholder extends StatelessWidget {
             'add wallet +',
             style: TextStyle(
               fontSize: 16,
-              color: Colors.grey[700],
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
           ),
         ),

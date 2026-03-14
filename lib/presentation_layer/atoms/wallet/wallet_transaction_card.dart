@@ -5,7 +5,6 @@ import 'package:ndk/entities.dart' as ndk_entities;
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:timeago_flutter/timeago_flutter.dart' as timeago;
 
-import '../../../config/palette.dart';
 import '../../../helpers/wallet_number_formatting.dart';
 
 DateTime _fromUnixSeconds(int seconds) =>
@@ -41,10 +40,14 @@ class WalletTransactionCard extends StatelessWidget {
 
     return Card(
       elevation: 0,
-      color: Paletter.extraDarkGray.withValues(alpha: 0.75),
+      color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.75),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: Paletter.darkGray.withValues(alpha: 0.25)),
+        side: BorderSide(
+          color: Theme.of(
+            context,
+          ).colorScheme.onSurface.withValues(alpha: 0.25),
+        ),
       ),
       margin: const EdgeInsets.symmetric(vertical: 6),
       child: ListTile(
@@ -60,16 +63,17 @@ class WalletTransactionCard extends StatelessWidget {
           transactionStatus.label,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.w600,
-          ),
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
         ),
         subtitle: Text(
           "${cashuTx != null ? _removeHttpPrefix(cashuTx.mintUrl) : ""}  • ${cashuTx != null ? _txType(cashuTx) : ''}",
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
-          style: TextStyle(color: Paletter.extraLightGray),
+          style: TextStyle(
+            color: Theme.of(
+              context,
+            ).colorScheme.onSurface.withValues(alpha: 0.7),
+          ),
         ),
         trailing: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -89,7 +93,9 @@ class WalletTransactionCard extends StatelessWidget {
             Text(
               formattedDate,
               style: TextStyle(
-                color: Paletter.gray,
+                color: Theme.of(
+                  context,
+                ).colorScheme.onSurface.withValues(alpha: 0.6),
                 fontSize: 12,
               ),
             ),
@@ -102,8 +108,11 @@ class WalletTransactionCard extends StatelessWidget {
     );
   }
 
-  String _formatDate(DateTime dt,
-      {bool includeDate = true, int minAgeForDate = 24}) {
+  String _formatDate(
+    DateTime dt, {
+    bool includeDate = true,
+    int minAgeForDate = 24,
+  }) {
     if (DateTime.now().difference(dt).inHours < minAgeForDate) {
       return timeago.format(dt);
     }
@@ -142,6 +151,8 @@ class WalletTransactionCard extends StatelessWidget {
   }
 }
 
+mixin Paletter {}
+
 class TransactionStatus {
   final String label;
   final IconData icon;
@@ -157,7 +168,9 @@ class TransactionStatus {
 }
 
 TransactionStatus _getTransactionStatus(
-    ndk_entities.WalletTransaction tx, BuildContext context) {
+  ndk_entities.WalletTransaction tx,
+  BuildContext context,
+) {
   final isDraft = tx.state == ndk_entities.WalletTransactionState.draft;
   final isPending = tx.state == ndk_entities.WalletTransactionState.pending;
   final isFailed = tx.state == ndk_entities.WalletTransactionState.failed;
@@ -187,9 +200,12 @@ TransactionStatus _getTransactionStatus(
     );
   } else {
     // Successful transaction
-    final color = isIncoming ? Colors.green : Paletter.gray;
-    final icon =
-        isIncoming ? PhosphorIcons.arrowDown() : PhosphorIcons.arrowUp();
+    final color = isIncoming
+        ? Colors.green
+        : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.8);
+    final icon = isIncoming
+        ? PhosphorIcons.arrowDown()
+        : PhosphorIcons.arrowUp();
 
     return TransactionStatus(
       label: isIncoming ? 'Incoming' : 'Outgoing',

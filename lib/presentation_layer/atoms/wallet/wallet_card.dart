@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ndk/entities.dart' as ndk_entities;
 
-import '../../../config/palette.dart';
 import '../../../helpers/wallet_number_formatting.dart';
 
 class WalletCard extends StatelessWidget {
@@ -15,7 +14,7 @@ class WalletCard extends StatelessWidget {
 
   final bool showBalances;
 
-  final Color backgroundColor;
+  final Color? backgroundColor;
 
   const WalletCard({
     super.key,
@@ -24,7 +23,7 @@ class WalletCard extends StatelessWidget {
     required this.onTap,
     this.isSelected = false,
     this.isDisabled = false,
-    this.backgroundColor = Paletter.extraDarkGray,
+    this.backgroundColor,
     this.tralling,
     this.showBalances = true,
   });
@@ -35,7 +34,9 @@ class WalletCard extends StatelessWidget {
       onTap: isDisabled ? null : () => onTap(wallet.id),
       child: Container(
         decoration: BoxDecoration(
-          color: backgroundColor,
+          color:
+              backgroundColor ??
+              Theme.of(context).colorScheme.surfaceContainerHighest,
           borderRadius: BorderRadius.circular(12),
         ),
         child: Padding(
@@ -44,12 +45,13 @@ class WalletCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               CircleAvatar(
-                backgroundColor: Theme.of(context)
-                    .colorScheme
-                    .primary
-                    .withValues(alpha: 0.8),
-                child: Text(wallet.name.substring(0, 2).toUpperCase(),
-                    style: TextStyle(color: Colors.white, fontSize: 12)),
+                backgroundColor: Theme.of(
+                  context,
+                ).colorScheme.primary.withValues(alpha: 0.8),
+                child: Text(
+                  wallet.name.substring(0, 2).toUpperCase(),
+                  style: TextStyle(color: Colors.white, fontSize: 12),
+                ),
               ),
               const SizedBox(width: 12),
               Row(
@@ -63,15 +65,18 @@ class WalletCard extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
-                          color: isDisabled ? Paletter.gray : Colors.white,
+                          color: isDisabled
+                              ? Theme.of(context).colorScheme.onSurfaceVariant
+                              : Colors.white,
                         ),
                       ),
                       Text(
                         wallet.id,
                         style: TextStyle(
                           fontSize: 14,
-                          color:
-                              isDisabled ? Paletter.gray : Paletter.lightGray,
+                          color: isDisabled
+                              ? Theme.of(context).colorScheme.onSurfaceVariant
+                              : Theme.of(context).colorScheme.outline,
                         ),
                       ),
                     ],
@@ -81,19 +86,16 @@ class WalletCard extends StatelessWidget {
               const SizedBox(width: 12),
               Spacer(flex: 1),
               if (showBalances)
-                Column(children: [
-                  for (final b in balances)
-                    Text(
-                      "${WalletNumberFormatting.formatAmount(amount: b.amount, unit: b.unit)} ${b.unit}",
-                      style: TextStyle(
-                        color: Colors.white,
+                Column(
+                  children: [
+                    for (final b in balances)
+                      Text(
+                        "${WalletNumberFormatting.formatAmount(amount: b.amount, unit: b.unit)} ${b.unit}",
+                        style: TextStyle(color: Colors.white),
                       ),
-                    ),
-                ]),
-              if (tralling != null) ...[
-                Spacer(flex: 2),
-                tralling!,
-              ],
+                  ],
+                ),
+              if (tralling != null) ...[Spacer(flex: 2), tralling!],
             ],
           ),
         ),

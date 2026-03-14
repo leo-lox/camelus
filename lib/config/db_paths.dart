@@ -10,7 +10,8 @@ class DbPaths {
   static const String _camelusDbNameDev = 'camelus-obx-default-dev';
 
   static String get ndkDbName => kDebugMode ? _ndkDbNameDev : _ndkDbNameProd;
-  static String get camelusDbName => kDebugMode ? _camelusDbNameDev : _camelusDbNameProd;
+  static String get camelusDbName =>
+      kDebugMode ? _camelusDbNameDev : _camelusDbNameProd;
 
   static Future<String> getNdkDbPath() async {
     final docsDir = await getApplicationSupportDirectory();

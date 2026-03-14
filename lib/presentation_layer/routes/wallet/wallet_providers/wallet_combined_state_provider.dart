@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:ndk/entities.dart' as ndk_entities;
 import 'package:ndk/ndk.dart';
+import 'package:riverpod/legacy.dart';
 
 import 'package:riverpod/riverpod.dart';
 
@@ -37,15 +38,16 @@ class WalletCombinedState {
   }
 }
 
-final walletCombinedProvider = StateNotifierProvider.autoDispose<
-    WalletCombinedStateNotifier, WalletCombinedState>(
-  (ref) {
-    final ndk = ref.watch(ndkProvider);
-    final ndkDb = ref.watch(dbNdkProvider)!;
+final walletCombinedProvider =
+    StateNotifierProvider.autoDispose<
+      WalletCombinedStateNotifier,
+      WalletCombinedState
+    >((ref) {
+      final ndk = ref.watch(ndkProvider);
+      final ndkDb = ref.watch(dbNdkProvider)!;
 
-    return WalletCombinedStateNotifier(ndk, ndkDb);
-  },
-);
+      return WalletCombinedStateNotifier(ndk, ndkDb);
+    });
 
 class WalletCombinedStateNotifier extends StateNotifier<WalletCombinedState> {
   final Ndk _ndk;
@@ -53,16 +55,15 @@ class WalletCombinedStateNotifier extends StateNotifier<WalletCombinedState> {
 
   final _subscriptions = <StreamSubscription>[];
 
-  WalletCombinedStateNotifier(
-    this._ndk,
-    this.ndkDb,
-  ) : super(
-          WalletCombinedState(
-              balances: [],
-              recentTransactions: [],
-              pendingTransactions: [],
-              wallets: []),
-        ) {
+  WalletCombinedStateNotifier(this._ndk, this.ndkDb)
+    : super(
+        WalletCombinedState(
+          balances: [],
+          recentTransactions: [],
+          pendingTransactions: [],
+          wallets: [],
+        ),
+      ) {
     _initializeState();
   }
 

@@ -1,5 +1,6 @@
 import 'package:ndk/entities.dart' as ndk_entities;
 import 'package:ndk/ndk.dart';
+import 'package:riverpod/legacy.dart';
 import 'package:riverpod/riverpod.dart';
 
 import '../../../providers/ndk_provider.dart';
@@ -36,33 +37,29 @@ class WalletTransactionListNotifier
   final Ndk _ndk;
   final Ref ref;
   WalletTransactionListNotifier({required Ndk ndk, required this.ref})
-      : _ndk = ndk,
-        super(
-          WalletTransactionListState(
-            transactions: [],
-            pendingTransactions: [],
-          ),
-        ) {
+    : _ndk = ndk,
+      super(
+        WalletTransactionListState(transactions: [], pendingTransactions: []),
+      ) {
     ref.listen(walletCombinedProvider, (previous, next) {
       if (next.pendingTransactions != previous?.pendingTransactions ||
           next.recentTransactions != previous?.recentTransactions) {
-        state = state.copyWith(
-          pendingTransactions: next.pendingTransactions,
-        );
+        state = state.copyWith(pendingTransactions: next.pendingTransactions);
       }
     }, fireImmediately: true);
     _loadMore();
   }
 
   _loadMore() async {
-    final transactions = await _ndk.wallets.combinedTransactions(
-      limit: limit,
-      offset: state.offset,
-    );
-    state = state.copyWith(
-      transactions: [...state.transactions, ...transactions],
-      offset: state.offset + transactions.length,
-    );
+    throw UnimplementedError("Loading more transactions is currently disabled");
+    // final transactions = await _ndk.wallets.combinedTransactions(
+    //   limit: limit,
+    //   offset: state.offset,
+    // );
+    // state = state.copyWith(
+    //   transactions: [...state.transactions, ...transactions],
+    //   offset: state.offset + transactions.length,
+    // );
   }
 
   void reset() {
@@ -73,10 +70,11 @@ class WalletTransactionListNotifier
   }
 }
 
-final walletTransactionListProvider = StateNotifierProvider<
-    WalletTransactionListNotifier, WalletTransactionListState>(
-  (ref) {
-    final ndk = ref.watch(ndkProvider);
-    return WalletTransactionListNotifier(ndk: ndk, ref: ref);
-  },
-);
+final walletTransactionListProvider =
+    StateNotifierProvider<
+      WalletTransactionListNotifier,
+      WalletTransactionListState
+    >((ref) {
+      final ndk = ref.watch(ndkProvider);
+      return WalletTransactionListNotifier(ndk: ndk, ref: ref);
+    });

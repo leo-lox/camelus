@@ -5,7 +5,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ndk/entities.dart' as ndk_entities;
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
-import '../../../../../config/palette.dart';
 import '../../../../atoms/currency_picker_bar.dart';
 import '../../../../atoms/long_button.dart';
 import '../../../../components/wallet/wallets_select_bottom_sheet.dart';
@@ -106,10 +105,7 @@ class _WalletPaySelectAmountState extends ConsumerState<WalletPaySelectAmount> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         backgroundColor: Theme.of(context).colorScheme.onError,
-        content: Text(
-          message,
-          style: TextStyle(color: Colors.white),
-        ),
+        content: Text(message, style: TextStyle(color: Colors.white)),
       ),
     );
   }
@@ -159,10 +155,7 @@ class _WalletPaySelectAmountState extends ConsumerState<WalletPaySelectAmount> {
                       .toList(),
                   onTap: (_) {},
                   tralling: IconButton(
-                    icon: Icon(
-                      PhosphorIcons.notePencil(),
-                      size: 25,
-                    ),
+                    icon: Icon(PhosphorIcons.notePencil(), size: 25),
                     color: Theme.of(context).colorScheme.primary,
                     onPressed: () async {
                       final selectedId = await showWalletsSelectBottomSheet(
@@ -185,11 +178,10 @@ class _WalletPaySelectAmountState extends ConsumerState<WalletPaySelectAmount> {
                 focusNode: _amountFocus,
                 autofocus: true,
                 keyboardType: TextInputType.numberWithOptions(
-                    decimal: state.unit != 'sat'),
+                  decimal: state.unit != 'sat',
+                ),
                 inputFormatters: state.unit == 'sat'
-                    ? [
-                        FilteringTextInputFormatter.digitsOnly,
-                      ]
+                    ? [FilteringTextInputFormatter.digitsOnly]
                     : [
                         FilteringTextInputFormatter.allow(RegExp(r'[0-9\.,]')),
                         DecimalTextInputFormatter(decimalRange: 2),
@@ -218,21 +210,19 @@ class _WalletPaySelectAmountState extends ConsumerState<WalletPaySelectAmount> {
                         ? state.supportedUnitsByWallet!.toList()
                         : [],
                     initialIndex: state.unit != null
-                        ? state.supportedUnitsByWallet!
-                            .toList()
-                            .indexOf(state.unit!)
+                        ? state.supportedUnitsByWallet!.toList().indexOf(
+                            state.unit!,
+                          )
                         : 0,
                     onChanged: (r) => {
-                      payNotifier.updateUnit(
-                        r.currentUnit,
-                      ),
+                      payNotifier.updateUnit(r.currentUnit),
                       _onSwitchCurrency(
                         previousUnit: r.previousUnit,
                         currentUnit: r.currentUnit,
                       ),
                     },
                     showHaptics: true,
-                    trackColor: Paletter.extraDarkGray,
+                    trackColor: Theme.of(context).colorScheme.onSurface,
                     activeColor: Theme.of(context).colorScheme.primary,
                   ),
                 ),
@@ -266,21 +256,22 @@ class _WalletPaySelectAmountState extends ConsumerState<WalletPaySelectAmount> {
         child: Padding(
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
           child: longButton(
-              name: "next",
-              onPressed: () {
-                if (state.payFromWalletId == null ||
-                    state.payFromWalletId!.isEmpty) {
-                  showSnackBar(context, 'Please select a wallet to pay from.');
-                  return;
-                }
-                if (state.amount == null || state.amount! <= 0) {
-                  _amountFocus.requestFocus();
-                  showSnackBar(context, 'Please enter a valid amount.');
-                  return;
-                }
-                widget.doneCallback();
-              },
-              inverted: true),
+            name: "next",
+            onPressed: () {
+              if (state.payFromWalletId == null ||
+                  state.payFromWalletId!.isEmpty) {
+                showSnackBar(context, 'Please select a wallet to pay from.');
+                return;
+              }
+              if (state.amount == null || state.amount! <= 0) {
+                _amountFocus.requestFocus();
+                showSnackBar(context, 'Please enter a valid amount.');
+                return;
+              }
+              widget.doneCallback();
+            },
+            inverted: true,
+          ),
         ),
       ),
     );
@@ -289,7 +280,7 @@ class _WalletPaySelectAmountState extends ConsumerState<WalletPaySelectAmount> {
 
 class DecimalTextInputFormatter extends TextInputFormatter {
   DecimalTextInputFormatter({required this.decimalRange})
-      : assert(decimalRange > 0);
+    : assert(decimalRange > 0);
 
   final int decimalRange;
 

@@ -7,7 +7,6 @@ import 'package:ndk/entities.dart' as ndk_entities;
 import 'package:pretty_qr_code/pretty_qr_code.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../../../../../config/palette.dart';
 import '../../../../../helpers/wallet_number_formatting.dart';
 
 import '../../../../atoms/copy_to_clipboard.dart';
@@ -16,19 +15,13 @@ import '../wallet_receive_state_provider.dart';
 
 class WalletReceiveRequest extends ConsumerWidget {
   final Function backCallback;
-  const WalletReceiveRequest({
-    super.key,
-    required this.backCallback,
-  });
+  const WalletReceiveRequest({super.key, required this.backCallback});
 
   showSnackBar(BuildContext context, String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         backgroundColor: Theme.of(context).colorScheme.error,
-        content: Text(
-          message,
-          style: TextStyle(color: Colors.white),
-        ),
+        content: Text(message, style: TextStyle(color: Colors.white)),
       ),
     );
   }
@@ -56,8 +49,9 @@ class WalletReceiveRequest extends ConsumerWidget {
           Container(
             width: double.infinity,
             decoration: BoxDecoration(
-              color:
-                  Theme.of(context).colorScheme.primary.withValues(alpha: 0.9),
+              color: Theme.of(
+                context,
+              ).colorScheme.primary.withValues(alpha: 0.9),
               borderRadius: BorderRadius.only(
                 bottomLeft: Radius.circular(20),
                 bottomRight: Radius.circular(20),
@@ -91,7 +85,7 @@ class WalletReceiveRequest extends ConsumerWidget {
                         IconButton(
                           icon: Icon(
                             Icons.close,
-                            color: Paletter.lightGray,
+                            color: Theme.of(context).colorScheme.onSurface,
                             size: 24,
                           ),
                           onPressed: () {
@@ -111,9 +105,7 @@ class WalletReceiveRequest extends ConsumerWidget {
                           Stack(
                             children: [
                               Container(
-                                constraints: BoxConstraints(
-                                  maxHeight: 300,
-                                ),
+                                constraints: BoxConstraints(maxHeight: 300),
                                 padding: EdgeInsets.all(16),
                                 decoration: BoxDecoration(
                                   color: Colors.white,
@@ -139,8 +131,9 @@ class WalletReceiveRequest extends ConsumerWidget {
                                     aspectRatio: 1.0,
                                     child: Container(
                                       decoration: BoxDecoration(
-                                        color:
-                                            Colors.black.withValues(alpha: 0.7),
+                                        color: Colors.black.withValues(
+                                          alpha: 0.7,
+                                        ),
                                         borderRadius: BorderRadius.circular(12),
                                       ),
                                       child: Column(
@@ -169,13 +162,13 @@ class WalletReceiveRequest extends ConsumerWidget {
                           ),
                           SizedBox(height: 16),
                           Container(
-                            constraints: BoxConstraints(
-                              maxWidth: 300,
-                            ),
+                            constraints: BoxConstraints(maxWidth: 300),
                             child: CopyClipboardButton(
                               value: state.request!,
                               copyText: "Copy invoice",
-                              backgroundColor: Paletter.extraDarkGray,
+                              backgroundColor: Theme.of(
+                                context,
+                              ).colorScheme.primary.withValues(alpha: 0.8),
                             ),
                           ),
                         ],
@@ -205,17 +198,16 @@ class WalletReceiveRequest extends ConsumerWidget {
                     label: "Amount",
                     value: state.amount != null
                         ? WalletNumberFormatting.formatAmount(
-                            amount: state.amount!, unit: state.unit!)
+                            amount: state.amount!,
+                            unit: state.unit!,
+                          )
                         : "Not set",
                   ),
                   _buildDetailRow(
                     label: "Unit",
                     value: state.unit ?? "Not set",
                   ),
-                  _buildDetailRow(
-                    label: "Memo",
-                    value: state.memo ?? "",
-                  ),
+                  _buildDetailRow(label: "Memo", value: state.memo ?? ""),
                   Spacer(),
                 ],
               ),
@@ -228,18 +220,16 @@ class WalletReceiveRequest extends ConsumerWidget {
         child: Padding(
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
           child: longButton(
-              name: "close",
-              onPressed: () => {rcvNotifier.reset(), context.pop()},
-              inverted: true),
+            name: "close",
+            onPressed: () => {rcvNotifier.reset(), context.pop()},
+            inverted: true,
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildDetailRow({
-    required String label,
-    required String value,
-  }) {
+  Widget _buildDetailRow({required String label, required String value}) {
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 8),
       child: Row(
@@ -259,9 +249,7 @@ class WalletReceiveRequest extends ConsumerWidget {
 }
 
 class ContactReciever extends StatelessWidget {
-  const ContactReciever({
-    super.key,
-  });
+  const ContactReciever({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -270,22 +258,31 @@ class ContactReciever extends StatelessWidget {
       child: Row(
         children: [
           CircleAvatar(
-            backgroundColor:
-                Theme.of(context).colorScheme.primary.withValues(alpha: 0.8),
-            child:
-                Text('NA', style: TextStyle(color: Colors.white, fontSize: 12)),
+            backgroundColor: Theme.of(
+              context,
+            ).colorScheme.primary.withValues(alpha: 0.8),
+            child: Text(
+              'NA',
+              style: TextStyle(color: Colors.white, fontSize: 12),
+            ),
           ),
           SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('receiver',
-                    style: TextStyle(color: Colors.grey, fontSize: 12)),
-                Text('NOT IMPLEMENTED',
-                    style: TextStyle(color: Colors.white, fontSize: 16)),
-                Text('send to pubkey not implemented',
-                    style: TextStyle(color: Colors.grey, fontSize: 14)),
+                Text(
+                  'receiver',
+                  style: TextStyle(color: Colors.grey, fontSize: 12),
+                ),
+                Text(
+                  'NOT IMPLEMENTED',
+                  style: TextStyle(color: Colors.white, fontSize: 16),
+                ),
+                Text(
+                  'send to pubkey not implemented',
+                  style: TextStyle(color: Colors.grey, fontSize: 14),
+                ),
               ],
             ),
           ),
@@ -296,9 +293,7 @@ class ContactReciever extends StatelessWidget {
 }
 
 class TokenReciever extends StatelessWidget {
-  const TokenReciever({
-    super.key,
-  });
+  const TokenReciever({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -307,25 +302,41 @@ class TokenReciever extends StatelessWidget {
       child: Row(
         children: [
           CircleAvatar(
-            backgroundColor:
-                Theme.of(context).colorScheme.primary.withValues(alpha: 0.8),
-            child:
-                Text('TK', style: TextStyle(color: Colors.white, fontSize: 12)),
+            backgroundColor: Theme.of(
+              context,
+            ).colorScheme.primary.withValues(alpha: 0.8),
+            child: Text(
+              'TK',
+              style: TextStyle(color: Colors.white, fontSize: 12),
+            ),
           ),
           SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('receiver',
-                    style: TextStyle(color: Paletter.gray, fontSize: 12)),
-                Text('Token',
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold)),
-                Text('send as a <cashu> token or qr code',
-                    style: TextStyle(color: Paletter.lightGray, fontSize: 14)),
+                Text(
+                  'receiver',
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface,
+                    fontSize: 12,
+                  ),
+                ),
+                Text(
+                  'Token',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Text(
+                  'send as a <cashu> token or qr code',
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    fontSize: 14,
+                  ),
+                ),
               ],
             ),
           ),
@@ -336,9 +347,7 @@ class TokenReciever extends StatelessWidget {
 }
 
 class WalletReciever extends StatelessWidget {
-  const WalletReciever({
-    super.key,
-  });
+  const WalletReciever({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -347,22 +356,31 @@ class WalletReciever extends StatelessWidget {
       child: Row(
         children: [
           CircleAvatar(
-            backgroundColor:
-                Theme.of(context).colorScheme.primary.withValues(alpha: 0.8),
-            child:
-                Text('NA', style: TextStyle(color: Colors.white, fontSize: 12)),
+            backgroundColor: Theme.of(
+              context,
+            ).colorScheme.primary.withValues(alpha: 0.8),
+            child: Text(
+              'NA',
+              style: TextStyle(color: Colors.white, fontSize: 12),
+            ),
           ),
           SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('receiver',
-                    style: TextStyle(color: Colors.grey, fontSize: 12)),
-                Text('NOT IMPLEMENTED',
-                    style: TextStyle(color: Colors.white, fontSize: 16)),
-                Text('send to wallet not implemented',
-                    style: TextStyle(color: Colors.grey, fontSize: 14)),
+                Text(
+                  'receiver',
+                  style: TextStyle(color: Colors.grey, fontSize: 12),
+                ),
+                Text(
+                  'NOT IMPLEMENTED',
+                  style: TextStyle(color: Colors.white, fontSize: 16),
+                ),
+                Text(
+                  'send to wallet not implemented',
+                  style: TextStyle(color: Colors.grey, fontSize: 14),
+                ),
               ],
             ),
           ),

@@ -4,8 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ndk/entities.dart' as ndk_entities;
 
-import '../../../../../config/palette.dart';
-
 import '../../../../../helpers/wallet_number_formatting.dart';
 import '../../../../atoms/long_button.dart';
 
@@ -16,10 +14,7 @@ import '../wallet_receive_state_provider.dart';
 class WalletReceiveType extends ConsumerWidget {
   final Function doneCallback;
 
-  const WalletReceiveType({
-    super.key,
-    required this.doneCallback,
-  });
+  const WalletReceiveType({super.key, required this.doneCallback});
 
   _onPasteToken(BuildContext context, WidgetRef ref) async {
     final userClipboard = await _handleReadClipboard();
@@ -33,8 +28,9 @@ class WalletReceiveType extends ConsumerWidget {
       return;
     }
 
-    final ecashCompleter =
-        ref.read(walletReceiveEcashCompleterProvider.notifier);
+    final ecashCompleter = ref.read(
+      walletReceiveEcashCompleterProvider.notifier,
+    );
 
     ecashCompleter.receiveEcash(tokenString: userClipboard);
     if (!context.mounted) return;
@@ -102,18 +98,17 @@ class WalletReceiveType extends ConsumerWidget {
                     ),
                   ),
                   _Island(
-                      title: "Ecash",
-                      child: longButton(
-                        name: "paste token",
-                        onPressed: () => _onPasteToken(context, ref),
-                      )),
+                    title: "Ecash",
+                    child: longButton(
+                      name: "paste token",
+                      onPressed: () => _onPasteToken(context, ref),
+                    ),
+                  ),
                   _Island(
                     title: 'All wallets',
                     child: _WalletsList(
                       wallets: combinedWallets.wallets
-                          .where(
-                            (w) => w.id != state.recieveToWalletId,
-                          )
+                          .where((w) => w.id != state.recieveToWalletId)
                           .toList(),
                       balances: combinedWallets.balances,
                       selectedWalletId: state.recieveToWalletId,
@@ -227,15 +222,15 @@ class _WalletsList extends StatelessWidget {
           subtitle: Text(w.type.toString()),
 
           /// show all balances for the wallet
-          trailing: Column(children: [
-            for (final b in wBallances)
-              Text(
-                "${WalletNumberFormatting.formatAmount(amount: b.amount, unit: b.unit)} ${b.unit}",
-                style: TextStyle(
-                  color: Colors.white,
+          trailing: Column(
+            children: [
+              for (final b in wBallances)
+                Text(
+                  "${WalletNumberFormatting.formatAmount(amount: b.amount, unit: b.unit)} ${b.unit}",
+                  style: TextStyle(color: Colors.white),
                 ),
-              ),
-          ]),
+            ],
+          ),
 
           onTap: () => onTap(w),
         );

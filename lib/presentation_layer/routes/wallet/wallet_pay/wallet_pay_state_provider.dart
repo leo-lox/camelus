@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ndk/entities.dart' as ndk_entities;
 import 'package:ndk/ndk.dart';
+import 'package:riverpod/legacy.dart';
 
 import '../../../providers/ndk_provider.dart';
 import '../wallet_providers/wallet_combined_state_provider.dart';
@@ -120,20 +121,20 @@ class WalletPayNotifier extends StateNotifier<WalletPayState> {
   final Ref ref;
 
   WalletPayNotifier({required Ndk ndk, required this.ref})
-      : _ndk = ndk,
-        super(
-          WalletPayState(
-            availableWallets: [],
-            availableBalances: [],
-            payFromWalletId: null,
-            amount: null,
-            unit: null,
-            memo: null,
-            recieverType: null,
-            payToPubkey: null,
-            payToWalletId: null,
-          ),
-        ) {
+    : _ndk = ndk,
+      super(
+        WalletPayState(
+          availableWallets: [],
+          availableBalances: [],
+          payFromWalletId: null,
+          amount: null,
+          unit: null,
+          memo: null,
+          recieverType: null,
+          payToPubkey: null,
+          payToWalletId: null,
+        ),
+      ) {
     // listen to state changes
     ref.listen(walletCombinedProvider, (previous, next) {
       if (next.balances != previous?.balances ||
@@ -154,18 +155,17 @@ class WalletPayNotifier extends StateNotifier<WalletPayState> {
         (state.recieverType == PaymentRecieverType.contact
             ? state.payToPubkey != null
             : state.recieverType == PaymentRecieverType.wallet
-                ? state.payToWalletId != null
-                : true);
+            ? state.payToWalletId != null
+            : true);
   }
 
   void updatePayFromWalletId(String walletId) {
-    state = state.copyWith(
-      payFromWalletId: walletId,
-    );
+    state = state.copyWith(payFromWalletId: walletId);
     state = state.copyWith(
       supportedUnitsByWallet: state.payFromWallet?.supportedUnits,
-      unit:
-          state.unit == null ? state.payFromWallet?.supportedUnits.first : null,
+      unit: state.unit == null
+          ? state.payFromWallet?.supportedUnits.first
+          : null,
     );
   }
 
@@ -234,9 +234,7 @@ class WalletPayNotifier extends StateNotifier<WalletPayState> {
         transactionId: result.transaction.id,
       );
     } catch (e) {
-      setError(
-        errorMessage: e.toString(),
-      );
+      setError(errorMessage: e.toString());
 
       return;
     }
@@ -265,6 +263,6 @@ class WalletPayNotifier extends StateNotifier<WalletPayState> {
 
 final walletPayStateProvider =
     StateNotifierProvider<WalletPayNotifier, WalletPayState>((ref) {
-  final ndk = ref.watch(ndkProvider);
-  return WalletPayNotifier(ndk: ndk, ref: ref);
-});
+      final ndk = ref.watch(ndkProvider);
+      return WalletPayNotifier(ndk: ndk, ref: ref);
+    });

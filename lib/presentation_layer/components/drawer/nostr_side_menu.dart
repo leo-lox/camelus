@@ -280,13 +280,7 @@ class NostrSideMenu extends ConsumerWidget {
                         routeName: 'payments',
                         icon: PhosphorIcons.lightning(),
                         onTap: () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                AppLocalizations.of(context)!.notImplementedYet,
-                              ),
-                            ),
-                          );
+                          context.push('/wallet/dashboard');
                         },
                       ),
                       _drawerItem(

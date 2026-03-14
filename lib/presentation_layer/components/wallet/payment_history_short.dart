@@ -3,7 +3,6 @@ import 'package:intl/intl.dart';
 import 'package:ndk/entities.dart' as ndk_entities;
 import 'package:timeago/timeago.dart' as timeago;
 
-import '../../../config/palette.dart';
 import '../../../helpers/wallet_number_formatting.dart';
 import '../../atoms/wallet/wallet_transaction_card.dart';
 
@@ -33,22 +32,24 @@ class PaymentHistoryShort extends StatelessWidget {
   Widget build(BuildContext context) {
     if (transactions.isEmpty && pendingTransactions.isEmpty) {
       return Padding(
-        padding: const EdgeInsets.symmetric(
-          vertical: 24.0,
-        ),
+        padding: const EdgeInsets.symmetric(vertical: 24.0),
         child: Center(child: Text(emptyText)),
       );
     }
 
-    final sortedPending =
-        List<ndk_entities.WalletTransaction>.from(pendingTransactions);
-    sortedPending
-        .sort((a, b) => (_bestDate(b) ?? 0).compareTo(_bestDate(a) ?? 0));
+    final sortedPending = List<ndk_entities.WalletTransaction>.from(
+      pendingTransactions,
+    );
+    sortedPending.sort(
+      (a, b) => (_bestDate(b) ?? 0).compareTo(_bestDate(a) ?? 0),
+    );
 
-    final sortedTransactions =
-        List<ndk_entities.WalletTransaction>.from(transactions);
-    sortedTransactions
-        .sort((a, b) => (_bestDate(b) ?? 0).compareTo(_bestDate(a) ?? 0));
+    final sortedTransactions = List<ndk_entities.WalletTransaction>.from(
+      transactions,
+    );
+    sortedTransactions.sort(
+      (a, b) => (_bestDate(b) ?? 0).compareTo(_bestDate(a) ?? 0),
+    );
 
     final allTransactions = [...sortedPending, ...sortedTransactions];
 
@@ -61,14 +62,11 @@ class PaymentHistoryShort extends StatelessWidget {
       physics: physics,
       slivers: [
         SliverList(
-          delegate: SliverChildBuilderDelegate(
-            (context, index) {
-              final tx = visible[index];
+          delegate: SliverChildBuilderDelegate((context, index) {
+            final tx = visible[index];
 
-              return WalletTransactionCard(tx: tx);
-            },
-            childCount: visible.length,
-          ),
+            return WalletTransactionCard(tx: tx);
+          }, childCount: visible.length),
         ),
       ],
     );

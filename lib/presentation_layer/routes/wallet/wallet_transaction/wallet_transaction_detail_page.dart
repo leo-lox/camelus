@@ -2,15 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ndk/entities.dart' as ndk_entities;
 
-import '../../../../config/palette.dart';
-
 class WalletTransactionDetailPage extends ConsumerWidget {
   final ndk_entities.WalletTransaction transaction;
 
-  const WalletTransactionDetailPage({
-    super.key,
-    required this.transaction,
-  });
+  const WalletTransactionDetailPage({super.key, required this.transaction});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -45,10 +40,7 @@ class WalletTransactionDetailPage extends ConsumerWidget {
               style: TextStyle(fontSize: 16),
             ),
             SizedBox(height: 8),
-            Text(
-              'State: ${transaction.state}',
-              style: TextStyle(fontSize: 16),
-            ),
+            Text('State: ${transaction.state}', style: TextStyle(fontSize: 16)),
             if (transaction.completionMsg != null) ...[
               SizedBox(height: 8),
               Text(

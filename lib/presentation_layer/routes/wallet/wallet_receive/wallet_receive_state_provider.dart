@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ndk/entities.dart' as ndk_entities;
 import 'package:ndk/ndk.dart';
 import 'package:bolt11_decoder/bolt11_decoder.dart';
+import 'package:riverpod/legacy.dart';
 
 import '../../../providers/ndk_provider.dart';
 
@@ -84,15 +85,9 @@ class WalletPayRecieverState {
 class WalletPayToNotifier extends StateNotifier<WalletPayRecieverState> {
   final Ndk _ndk;
 
-  WalletPayToNotifier({
-    String? initialWalletId,
-    required Ndk ndk,
-  })  : _ndk = ndk,
-        super(
-          WalletPayRecieverState(
-            recieveToWalletId: initialWalletId,
-          ),
-        );
+  WalletPayToNotifier({String? initialWalletId, required Ndk ndk})
+    : _ndk = ndk,
+      super(WalletPayRecieverState(recieveToWalletId: initialWalletId));
 
   void updateRecieveToWalletId(String? walletId) {
     state = state.copyWith(
@@ -146,20 +141,19 @@ class WalletPayToNotifier extends StateNotifier<WalletPayRecieverState> {
 
       state = state.copyWith(
         request: initTransaction.qoute!.request,
-        decodedBolt11Request:
-            Bolt11PaymentRequest(initTransaction.qoute!.request),
+        decodedBolt11Request: Bolt11PaymentRequest(
+          initTransaction.qoute!.request,
+        ),
         isPending: true,
       );
 
-      final resultStream =
-          _ndk.cashu.retrieveFunds(draftTransaction: initTransaction);
+      final resultStream = _ndk.cashu.retrieveFunds(
+        draftTransaction: initTransaction,
+      );
 
       await for (final result in resultStream) {
         if (result.state == ndk_entities.WalletTransactionState.completed) {
-          state = state.copyWith(
-            isPending: false,
-            isSuccess: true,
-          );
+          state = state.copyWith(isPending: false, isSuccess: true);
         } else if (result.state == ndk_entities.WalletTransactionState.failed) {
           state = state.copyWith(
             requestErr: result.completionMsg,
@@ -181,9 +175,7 @@ class WalletPayToNotifier extends StateNotifier<WalletPayRecieverState> {
 
 final walletRecieverProvider =
     StateNotifierProvider<WalletPayToNotifier, WalletPayRecieverState>((ref) {
-  final ndk = ref.watch(ndkProvider);
+      final ndk = ref.watch(ndkProvider);
 
-  return WalletPayToNotifier(
-    ndk: ndk,
-  );
-});
+      return WalletPayToNotifier(ndk: ndk);
+    });

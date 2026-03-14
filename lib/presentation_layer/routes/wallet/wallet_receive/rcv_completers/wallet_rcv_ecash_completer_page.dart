@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
-import '../../../../../config/palette.dart';
 import '../../../../../helpers/wallet_number_formatting.dart';
 import '../../../../atoms/long_button.dart';
 import 'wallet_rcv_ecash_completer_state_provider.dart';
@@ -37,15 +36,17 @@ class WalletReceiveEcashCompleterPage extends ConsumerWidget {
                   children: [
                     Text(
                       '+',
-                      style: const TextStyle(
-                        color: Paletter.lightGray,
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurface,
                         fontSize: 28,
                       ),
                     ),
                     const SizedBox(width: 8),
                     Text(
                       WalletNumberFormatting.formatAmount(
-                          amount: walletState.amount!, unit: walletState.unit!),
+                        amount: walletState.amount!,
+                        unit: walletState.unit!,
+                      ),
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 48,
@@ -55,8 +56,10 @@ class WalletReceiveEcashCompleterPage extends ConsumerWidget {
                     const SizedBox(width: 8),
                     Text(
                       walletState.unit ?? '',
-                      style: const TextStyle(
-                          fontSize: 16, color: Paletter.lightGray),
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Theme.of(context).colorScheme.onSurface,
+                      ),
                     ),
                   ],
                 ),
@@ -73,10 +76,7 @@ class WalletReceiveEcashCompleterPage extends ConsumerWidget {
                   child: SingleChildScrollView(
                     child: Text(
                       walletState.memo!,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                      ),
+                      style: const TextStyle(color: Colors.white, fontSize: 16),
                       textAlign: TextAlign.center,
                     ),
                   ),
@@ -97,14 +97,19 @@ class WalletReceiveEcashCompleterPage extends ConsumerWidget {
         child: Padding(
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
           child: longButton(
-              name: "close", onPressed: () => {context.pop()}, inverted: true),
+            name: "close",
+            onPressed: () => {context.pop()},
+            inverted: true,
+          ),
         ),
       ),
     );
   }
 
   Widget _buildStatusCard(
-      WalletRcvEcashCompleterState state, BuildContext context) {
+    WalletRcvEcashCompleterState state,
+    BuildContext context,
+  ) {
     IconData icon;
     Color color;
     String title;
@@ -127,7 +132,7 @@ class WalletReceiveEcashCompleterPage extends ConsumerWidget {
       subtitle = 'received successfully';
     } else {
       icon = PhosphorIcons.info();
-      color = Paletter.gray;
+      color = Colors.grey;
       title = 'Ready';
       subtitle = 'waiting for transaction';
     }
@@ -144,11 +149,7 @@ class WalletReceiveEcashCompleterPage extends ConsumerWidget {
                 color: color.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(50),
               ),
-              child: Icon(
-                icon,
-                color: color,
-                size: 32,
-              ),
+              child: Icon(icon, color: color, size: 32),
             ),
             const SizedBox(width: 16),
             Expanded(
@@ -165,10 +166,7 @@ class WalletReceiveEcashCompleterPage extends ConsumerWidget {
                   const SizedBox(height: 4),
                   Text(
                     subtitle,
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey[600],
-                    ),
+                    style: TextStyle(fontSize: 14, color: Colors.grey[600]),
                   ),
                 ],
               ),
@@ -194,11 +192,7 @@ class WalletReceiveEcashCompleterPage extends ConsumerWidget {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Icon(
-              Icons.error_outline,
-              color: Colors.red[700],
-              size: 24,
-            ),
+            Icon(Icons.error_outline, color: Colors.red[700], size: 24),
             const SizedBox(width: 12),
             Expanded(
               child: Column(
@@ -215,10 +209,7 @@ class WalletReceiveEcashCompleterPage extends ConsumerWidget {
                   const SizedBox(height: 4),
                   Text(
                     errorMessage,
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.red[600],
-                    ),
+                    style: TextStyle(fontSize: 14, color: Colors.red[600]),
                   ),
                 ],
               ),

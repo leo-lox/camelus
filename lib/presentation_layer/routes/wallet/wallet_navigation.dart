@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod/legacy.dart';
 
 import '../../components/wallet/sheet_send_receive.dart';
 import 'wallet_dashboard.dart';
@@ -46,14 +47,16 @@ class WalletNavigationState {
 // StateNotifier for managing navigation
 class WalletNavigationNotifier extends StateNotifier<WalletNavigationState> {
   WalletNavigationNotifier()
-      : super(WalletNavigationState(
+    : super(
+        WalletNavigationState(
           selectedIndex: 0,
           dashboardIndex:
               1, // Start at dashboard (index 1 in vertical PageView)
           mainPageController: PageController(initialPage: 0),
           dashboardPageController: PageController(initialPage: 1),
           pageChangeController: StreamController<int>.broadcast(),
-        ));
+        ),
+      );
 
   // Route mappings
   final Map<String, int> _routeToIndex = {
@@ -70,8 +73,11 @@ class WalletNavigationNotifier extends StateNotifier<WalletNavigationState> {
   };
 
   // Change main page (horizontal navigation)
-  void changeMainPage(int index,
-      {bool animate = true, bool updateRoute = true}) {
+  void changeMainPage(
+    int index, {
+    bool animate = true,
+    bool updateRoute = true,
+  }) {
     if (index == state.selectedIndex) return;
 
     state = state.copyWith(selectedIndex: index);
@@ -154,10 +160,11 @@ class WalletNavigationNotifier extends StateNotifier<WalletNavigationState> {
 
 // Provider
 final walletNavigationProvider =
-    StateNotifierProvider<WalletNavigationNotifier, WalletNavigationState>(
-        (ref) {
-  return WalletNavigationNotifier();
-});
+    StateNotifierProvider<WalletNavigationNotifier, WalletNavigationState>((
+      ref,
+    ) {
+      return WalletNavigationNotifier();
+    });
 
 // Convenience providers for easy access
 final selectedIndexProvider = Provider<int>((ref) {
@@ -204,9 +211,7 @@ class _WalletNavigationState extends ConsumerState<WalletNavigation>
     showModalBottomSheet(
       backgroundColor: Colors.black,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(
-          top: Radius.circular(20),
-        ),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       context: myContext,
       builder: (context) => WalletSheetSendReceive(
@@ -239,7 +244,9 @@ class _WalletNavigationState extends ConsumerState<WalletNavigation>
   void initState() {
     super.initState();
     animationController = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 200));
+      vsync: this,
+      duration: const Duration(milliseconds: 200),
+    );
     animationController.forward();
 
     // current route from navigator
@@ -276,10 +283,7 @@ class _WalletNavigationState extends ConsumerState<WalletNavigation>
           scrollDirection: Axis.vertical,
           controller: dashboardPageController,
           onPageChanged: _onDashboardPageSwipe,
-          children: [
-            WalletQrScan(),
-            WalletDashboard(),
-          ],
+          children: [WalletQrScan(), WalletDashboard()],
         ),
         WalletTransactionListPage(),
       ],

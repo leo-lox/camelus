@@ -5,7 +5,6 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import 'package:ndk/entities.dart' as ndk_entities;
 
-import '../../../../config/palette.dart';
 import '../../../atoms/wallet/wallet_transaction_card.dart';
 import '../wallet_navigation.dart';
 import 'wallet_transaction_list_state_provider.dart';
@@ -22,16 +21,17 @@ class WalletTransactionListPage extends ConsumerWidget {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
-          elevation: 0,
-          backgroundColor: Theme.of(context).colorScheme.surface,
-          foregroundColor: Colors.white,
-          title: const Text('Transactions'),
-          leading: IconButton(
-            icon: Icon(PhosphorIcons.caretLeft(), size: 24),
-            onPressed: () {
-              ref.read(walletNavigationProvider.notifier).changeMainPage(0);
-            },
-          )),
+        elevation: 0,
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        foregroundColor: Colors.white,
+        title: const Text('Transactions'),
+        leading: IconButton(
+          icon: Icon(PhosphorIcons.caretLeft(), size: 24),
+          onPressed: () {
+            ref.read(walletNavigationProvider.notifier).changeMainPage(0);
+          },
+        ),
+      ),
       body: state.transactions.isEmpty
           ? const _EmptyTransactions()
           : ListView.builder(
@@ -45,10 +45,7 @@ class WalletTransactionListPage extends ConsumerWidget {
                     _DateHeader(label: section.label),
                     const SizedBox(height: 8),
                     ...section.items.map(
-                      (tx) => WalletTransactionCard(
-                        tx: tx,
-                        showDate: false,
-                      ),
+                      (tx) => WalletTransactionCard(tx: tx, showDate: false),
                     ),
                     const SizedBox(height: 16),
                   ],
@@ -97,10 +94,12 @@ List<_DaySection> _groupByDay(
     ..sort((a, b) => labelToDate[b]!.compareTo(labelToDate[a]!));
 
   return keys
-      .map((k) => _DaySection(
-            label: _formatDayLabel(labelToDate[k]!),
-            items: buckets[k]!,
-          ))
+      .map(
+        (k) => _DaySection(
+          label: _formatDayLabel(labelToDate[k]!),
+          items: buckets[k]!,
+        ),
+      )
       .toList();
 }
 
@@ -116,14 +115,21 @@ class _DateHeader extends StatelessWidget {
     return Row(
       children: [
         Expanded(
-            child: Divider(color: Paletter.darkGray.withValues(alpha: 0.4))),
+          child: Divider(
+            color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.4),
+          ),
+        ),
         Container(
           margin: const EdgeInsets.symmetric(horizontal: 12),
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
           decoration: BoxDecoration(
-            color: Paletter.extraDarkGray,
+            color: Theme.of(context).colorScheme.surfaceVariant,
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: Paletter.darkGray.withValues(alpha: 0.4)),
+            border: Border.all(
+              color: Theme.of(
+                context,
+              ).colorScheme.outline.withValues(alpha: 0.4),
+            ),
           ),
           child: Text(
             label,
@@ -136,7 +142,10 @@ class _DateHeader extends StatelessWidget {
           ),
         ),
         Expanded(
-            child: Divider(color: Paletter.darkGray.withValues(alpha: 0.4))),
+          child: Divider(
+            color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.4),
+          ),
+        ),
       ],
     );
   }
@@ -153,12 +162,16 @@ class _EmptyTransactions extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.receipt_long_outlined, size: 48, color: Paletter.gray),
+            Icon(
+              Icons.receipt_long_outlined,
+              size: 48,
+              color: Theme.of(context).colorScheme.outline,
+            ),
             const SizedBox(height: 12),
             Text(
               'No transactions available',
               style: TextStyle(
-                color: Colors.white,
+                color: Theme.of(context).colorScheme.onSurface,
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
               ),
@@ -168,7 +181,7 @@ class _EmptyTransactions extends StatelessWidget {
               'Your recent activity will show up here.',
               textAlign: TextAlign.center,
               style: TextStyle(
-                color: Paletter.lightGray,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
                 fontSize: 13.5,
               ),
             ),

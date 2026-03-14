@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
-import '../../../config/palette.dart';
 import '../../atoms/my_profile_picture.dart';
 import '../../components/drawer/nostr_drawer.dart';
 import '../../components/wallet/payment_history_short.dart';
@@ -59,8 +58,9 @@ class _WalletDashboardState extends ConsumerState<WalletDashboard>
         surfaceTintColor: Theme.of(context).colorScheme.surface,
         leading: Builder(
           builder: (context) {
-            final myMetadata =
-                ref.watch(metadataStateProvider(myUserPubkey)).userMetadata;
+            final myMetadata = ref
+                .watch(metadataStateProvider(myUserPubkey))
+                .userMetadata;
             return InkWell(
               borderRadius: BorderRadius.circular(100),
               onTap: () => Scaffold.of(context).openDrawer(),
@@ -76,10 +76,7 @@ class _WalletDashboardState extends ConsumerState<WalletDashboard>
         ),
         actions: [
           IconButton(
-            icon: Icon(
-              PhosphorIcons.plusCircle(),
-              size: 30,
-            ),
+            icon: Icon(PhosphorIcons.plusCircle(), size: 30),
             onPressed: () {
               context.push('/wallet/add_mint');
             },
@@ -106,8 +103,9 @@ class _WalletDashboardState extends ConsumerState<WalletDashboard>
             const SizedBox(height: 30),
             WalletActionsStrip(
               onScan: () {
-                final navigationNoti =
-                    ref.read(walletNavigationProvider.notifier);
+                final navigationNoti = ref.read(
+                  walletNavigationProvider.notifier,
+                );
                 navigationNoti.changeDashboardPage(0);
               },
               onReceive: () async {
@@ -143,8 +141,9 @@ class _WalletDashboardState extends ConsumerState<WalletDashboard>
                 }
               },
               onHistory: () {
-                final navigationNoti =
-                    ref.read(walletNavigationProvider.notifier);
+                final navigationNoti = ref.read(
+                  walletNavigationProvider.notifier,
+                );
                 navigationNoti.changeMainPage(1);
               },
             ),
@@ -156,7 +155,7 @@ class _WalletDashboardState extends ConsumerState<WalletDashboard>
                   context.push('/wallet/transactions/detail', extra: tx);
                 },
               ),
-            )
+            ),
           ],
         ),
       ),

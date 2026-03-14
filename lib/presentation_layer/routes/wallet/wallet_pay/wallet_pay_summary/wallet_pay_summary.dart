@@ -6,7 +6,6 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import 'package:ndk/entities.dart' as ndk_entities;
 
-import '../../../../../config/palette.dart';
 import '../../../../../helpers/wallet_number_formatting.dart';
 import '../../../../atoms/wallet/wallet_card.dart';
 import '../../../../components/wallet/wallets_select_bottom_sheet.dart';
@@ -15,19 +14,13 @@ import '../wallet_pay_state_provider.dart';
 
 class WalletPaySummary extends ConsumerWidget {
   final Function backCallback;
-  const WalletPaySummary({
-    super.key,
-    required this.backCallback,
-  });
+  const WalletPaySummary({super.key, required this.backCallback});
 
   showSnackBar(BuildContext context, String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         backgroundColor: Theme.of(context).colorScheme.error,
-        content: Text(
-          message,
-          style: TextStyle(color: Colors.white),
-        ),
+        content: Text(message, style: TextStyle(color: Colors.white)),
       ),
     );
   }
@@ -63,8 +56,10 @@ class WalletPaySummary extends ConsumerWidget {
       );
       if (availableBalanceForUnit.isEmpty ||
           availableBalanceForUnit.first.amount < state.amount!) {
-        showSnackBar(context,
-            'Insufficient balance in the selected wallet for the specified unit');
+        showSnackBar(
+          context,
+          'Insufficient balance in the selected wallet for the specified unit',
+        );
         return false;
       }
 
@@ -89,8 +84,9 @@ class WalletPaySummary extends ConsumerWidget {
           Container(
             width: double.infinity,
             decoration: BoxDecoration(
-              color:
-                  Theme.of(context).colorScheme.primary.withValues(alpha: 0.9),
+              color: Theme.of(
+                context,
+              ).colorScheme.primary.withValues(alpha: 0.9),
               borderRadius: BorderRadius.only(
                 bottomLeft: Radius.circular(20),
                 bottomRight: Radius.circular(20),
@@ -124,7 +120,7 @@ class WalletPaySummary extends ConsumerWidget {
                         IconButton(
                           icon: Icon(
                             Icons.close,
-                            color: Paletter.lightGray,
+                            color: Theme.of(context).colorScheme.onSurface,
                             size: 24,
                           ),
                           onPressed: () {
@@ -144,7 +140,9 @@ class WalletPaySummary extends ConsumerWidget {
                         Text(
                           state.amount != null && state.unit != null
                               ? WalletNumberFormatting.formatAmount(
-                                  amount: state.amount!, unit: state.unit!)
+                                  amount: state.amount!,
+                                  unit: state.unit!,
+                                )
                               : '0',
                           style: TextStyle(
                             color: Colors.white,
@@ -157,7 +155,7 @@ class WalletPaySummary extends ConsumerWidget {
                           icon: Icon(
                             PhosphorIcons.notePencil(),
                             size: 24,
-                            color: Paletter.extraLightGray,
+                            color: Theme.of(context).colorScheme.primary,
                           ),
                           onPressed: () => backCallback(),
                         ),
@@ -210,19 +208,16 @@ class WalletPaySummary extends ConsumerWidget {
                               .toList(),
                           onTap: (_) {},
                           tralling: IconButton(
-                            icon: Icon(
-                              PhosphorIcons.notePencil(),
-                              size: 25,
-                            ),
+                            icon: Icon(PhosphorIcons.notePencil(), size: 25),
                             color: Theme.of(context).colorScheme.primary,
                             onPressed: () async {
                               final selectedId =
                                   await showWalletsSelectBottomSheet(
-                                context: context,
-                                selectedId: state.payFromWalletId,
-                                wallets: state.availableWallets,
-                                balances: state.availableBalances,
-                              );
+                                    context: context,
+                                    selectedId: state.payFromWalletId,
+                                    wallets: state.availableWallets,
+                                    balances: state.availableBalances,
+                                  );
                               if (selectedId != null) {
                                 payNotifier.updatePayFromWalletId(selectedId);
                               }
@@ -230,7 +225,10 @@ class WalletPaySummary extends ConsumerWidget {
                           ),
                         ),
 
-                        Divider(color: Paletter.darkGray, height: 1),
+                        Divider(
+                          color: Theme.of(context).colorScheme.surface,
+                          height: 1,
+                        ),
 
                         /// receiver
                         if (state.recieverType ==
@@ -251,18 +249,20 @@ class WalletPaySummary extends ConsumerWidget {
 
                   /// details
                   _buildDetailRow(
-                      label: 'transaction type',
-                      value: state.recieverType.toString(),
-                      isEditable: false,
-                      context: context),
+                    label: 'transaction type',
+                    value: state.recieverType.toString(),
+                    isEditable: false,
+                    context: context,
+                  ),
 
                   _buildDetailRow(
-                      label: 'Memo',
-                      value: state.memo ?? '',
-                      onEdit: () {
-                        backCallback();
-                      },
-                      context: context),
+                    label: 'Memo',
+                    value: state.memo ?? '',
+                    onEdit: () {
+                      backCallback();
+                    },
+                    context: context,
+                  ),
 
                   SizedBox(height: 24),
 
@@ -278,7 +278,10 @@ class WalletPaySummary extends ConsumerWidget {
         child: Padding(
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
           child: longButton(
-              name: "send", onPressed: () => onSend(), inverted: true),
+            name: "send",
+            onPressed: () => onSend(),
+            inverted: true,
+          ),
         ),
       ),
     );
@@ -305,10 +308,7 @@ class WalletPaySummary extends ConsumerWidget {
           ),
           if (isEditable && onEdit != null)
             IconButton(
-              icon: Icon(
-                PhosphorIcons.notePencil(),
-                size: 25,
-              ),
+              icon: Icon(PhosphorIcons.notePencil(), size: 25),
               color: Theme.of(context).colorScheme.primary,
               onPressed: isEditable ? onEdit : null,
             ),
@@ -319,9 +319,7 @@ class WalletPaySummary extends ConsumerWidget {
 }
 
 class ContactReciever extends StatelessWidget {
-  const ContactReciever({
-    super.key,
-  });
+  const ContactReciever({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -330,22 +328,31 @@ class ContactReciever extends StatelessWidget {
       child: Row(
         children: [
           CircleAvatar(
-            backgroundColor:
-                Theme.of(context).colorScheme.primary.withValues(alpha: 0.8),
-            child:
-                Text('NA', style: TextStyle(color: Colors.white, fontSize: 12)),
+            backgroundColor: Theme.of(
+              context,
+            ).colorScheme.primary.withValues(alpha: 0.8),
+            child: Text(
+              'NA',
+              style: TextStyle(color: Colors.white, fontSize: 12),
+            ),
           ),
           SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('receiver',
-                    style: TextStyle(color: Colors.grey, fontSize: 12)),
-                Text('NOT IMPLEMENTED',
-                    style: TextStyle(color: Colors.white, fontSize: 16)),
-                Text('send to pubkey not implemented',
-                    style: TextStyle(color: Colors.grey, fontSize: 14)),
+                Text(
+                  'receiver',
+                  style: TextStyle(color: Colors.grey, fontSize: 12),
+                ),
+                Text(
+                  'NOT IMPLEMENTED',
+                  style: TextStyle(color: Colors.white, fontSize: 16),
+                ),
+                Text(
+                  'send to pubkey not implemented',
+                  style: TextStyle(color: Colors.grey, fontSize: 14),
+                ),
               ],
             ),
           ),
@@ -356,9 +363,7 @@ class ContactReciever extends StatelessWidget {
 }
 
 class TokenReciever extends StatelessWidget {
-  const TokenReciever({
-    super.key,
-  });
+  const TokenReciever({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -367,25 +372,41 @@ class TokenReciever extends StatelessWidget {
       child: Row(
         children: [
           CircleAvatar(
-            backgroundColor:
-                Theme.of(context).colorScheme.primary.withValues(alpha: 0.8),
-            child:
-                Text('TK', style: TextStyle(color: Colors.white, fontSize: 12)),
+            backgroundColor: Theme.of(
+              context,
+            ).colorScheme.primary.withValues(alpha: 0.8),
+            child: Text(
+              'TK',
+              style: TextStyle(color: Colors.white, fontSize: 12),
+            ),
           ),
           SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('receiver',
-                    style: TextStyle(color: Paletter.gray, fontSize: 12)),
-                Text('Token',
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold)),
-                Text('send as a <cashu> token or qr code',
-                    style: TextStyle(color: Paletter.lightGray, fontSize: 14)),
+                Text(
+                  'receiver',
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface,
+                    fontSize: 12,
+                  ),
+                ),
+                Text(
+                  'Token',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Text(
+                  'send as a <cashu> token or qr code',
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface,
+                    fontSize: 14,
+                  ),
+                ),
               ],
             ),
           ),
@@ -396,9 +417,7 @@ class TokenReciever extends StatelessWidget {
 }
 
 class WalletReciever extends StatelessWidget {
-  const WalletReciever({
-    super.key,
-  });
+  const WalletReciever({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -407,22 +426,31 @@ class WalletReciever extends StatelessWidget {
       child: Row(
         children: [
           CircleAvatar(
-            backgroundColor:
-                Theme.of(context).colorScheme.primary.withValues(alpha: 0.8),
-            child:
-                Text('NA', style: TextStyle(color: Colors.white, fontSize: 12)),
+            backgroundColor: Theme.of(
+              context,
+            ).colorScheme.primary.withValues(alpha: 0.8),
+            child: Text(
+              'NA',
+              style: TextStyle(color: Colors.white, fontSize: 12),
+            ),
           ),
           SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('receiver',
-                    style: TextStyle(color: Colors.grey, fontSize: 12)),
-                Text('NOT IMPLEMENTED',
-                    style: TextStyle(color: Colors.white, fontSize: 16)),
-                Text('send to wallet not implemented',
-                    style: TextStyle(color: Colors.grey, fontSize: 14)),
+                Text(
+                  'receiver',
+                  style: TextStyle(color: Colors.grey, fontSize: 12),
+                ),
+                Text(
+                  'NOT IMPLEMENTED',
+                  style: TextStyle(color: Colors.white, fontSize: 16),
+                ),
+                Text(
+                  'send to wallet not implemented',
+                  style: TextStyle(color: Colors.grey, fontSize: 14),
+                ),
               ],
             ),
           ),

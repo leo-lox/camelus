@@ -5,7 +5,6 @@ import 'package:go_router/go_router.dart';
 import 'package:ndk/entities.dart' as ndk_entities;
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
-import '../../../../../config/palette.dart';
 import '../../../../../helpers/wallet_number_formatting.dart';
 import '../../../../atoms/copy_to_clipboard.dart';
 import '../../../../atoms/long_button.dart';
@@ -26,22 +25,21 @@ class WalletPayDone extends ConsumerWidget {
       appBar: null,
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Center(
-          child: _buildCurrentStep(walletPayState),
-        ),
+        child: Center(child: _buildCurrentStep(walletPayState)),
       ),
       bottomNavigationBar: SafeArea(
         top: false,
         child: Padding(
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
           child: longButton(
-              name: "close",
-              onPressed: () {
-                payNotifier.reset();
+            name: "close",
+            onPressed: () {
+              payNotifier.reset();
 
-                context.pop();
-              },
-              inverted: true),
+              context.pop();
+            },
+            inverted: true,
+          ),
         ),
       ),
     );
@@ -77,16 +75,11 @@ class ProcessingStep extends StatelessWidget {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        CircularProgressIndicator(
-          strokeWidth: 3,
-        ),
+        CircularProgressIndicator(strokeWidth: 3),
         SizedBox(height: 24),
         Text(
           'Creating Token...',
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.w500,
-          ),
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
         ),
       ],
     );
@@ -162,10 +155,7 @@ class SuccessStep extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Text(
-              WalletNumberFormatting.formatAmount(
-                amount: amount,
-                unit: unit,
-              ),
+              WalletNumberFormatting.formatAmount(amount: amount, unit: unit),
               style: TextStyle(
                 fontSize: 48,
                 fontWeight: FontWeight.bold,
@@ -178,7 +168,7 @@ class SuccessStep extends StatelessWidget {
               style: TextStyle(
                 fontSize: 48,
                 fontWeight: FontWeight.bold,
-                color: Paletter.extraLightGray,
+                color: Theme.of(context).colorScheme.surfaceContainerHighest,
               ),
             ),
           ],
@@ -195,9 +185,7 @@ class SuccessStep extends StatelessWidget {
             color: Colors.white,
             borderRadius: BorderRadius.circular(8),
           ),
-          child: AnimatedQr(
-            qrCodeData: outputToken!.toV4TokenString(),
-          ),
+          child: AnimatedQr(qrCodeData: outputToken!.toV4TokenString()),
         ),
         const SizedBox(height: 32),
 
@@ -245,7 +233,7 @@ class TransactionState extends ConsumerWidget {
 
     if (myTransaction.state == ndk_entities.WalletTransactionState.pending) {
       icon = PhosphorIcons.hourglass();
-      color = Paletter.lightGray;
+      color = Theme.of(context).colorScheme.surface;
       title = 'pending ecash';
     } else if (myTransaction.state ==
         ndk_entities.WalletTransactionState.failed) {

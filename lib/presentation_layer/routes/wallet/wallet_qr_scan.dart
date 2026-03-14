@@ -5,7 +5,6 @@ import 'package:go_router/go_router.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
-import '../../../config/palette.dart';
 import '../../atoms/spinner_center.dart';
 import 'wallet_navigation.dart';
 import 'wallet_providers/qr_value_processing_state_provider.dart';
@@ -74,8 +73,9 @@ class _QrScan extends ConsumerState<WalletQrScan> {
           next.navigationData != null) {
         ref.read(qrScannerProvider.notifier).clearNavigation();
 
-        final rcvProvider =
-            ref.read(walletReceiveEcashCompleterProvider.notifier);
+        final rcvProvider = ref.read(
+          walletReceiveEcashCompleterProvider.notifier,
+        );
 
         switch (next.navigationTarget!) {
           case QRNavigationTarget.rcvPage:
@@ -88,7 +88,8 @@ class _QrScan extends ConsumerState<WalletQrScan> {
             break;
           case QRNavigationTarget.sendPage:
             throw UnimplementedError(
-                'Send page navigation is not implemented yet');
+              'Send page navigation is not implemented yet',
+            );
             break;
         }
       }
@@ -106,7 +107,9 @@ class _QrScan extends ConsumerState<WalletQrScan> {
                 child: Text(
                   'Error: $p1',
                   style: TextStyle(
-                      color: Theme.of(context).colorScheme.error, fontSize: 16),
+                    color: Theme.of(context).colorScheme.error,
+                    fontSize: 16,
+                  ),
                 ),
               );
             },
@@ -131,16 +134,14 @@ class _QrScan extends ConsumerState<WalletQrScan> {
           /// scanning indicator
           Center(
             child: Container(
-                width: 250,
-                height: 250,
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    color: Colors.white,
-                    width: 2,
-                  ),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: null),
+              width: 250,
+              height: 250,
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.white, width: 2),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: null,
+            ),
           ),
 
           /// bottom area
@@ -174,14 +175,12 @@ class _QrScan extends ConsumerState<WalletQrScan> {
                               }
                             });
                           },
-                          icon: Icon(
-                            PhosphorIcons.clipboardText(),
-                            size: 18,
-                          ),
+                          icon: Icon(PhosphorIcons.clipboardText(), size: 18),
                           label: const Text('paste from clipboard'),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor:
-                                Theme.of(context).colorScheme.primary,
+                            backgroundColor: Theme.of(
+                              context,
+                            ).colorScheme.primary,
                             foregroundColor: Colors.white,
                           ),
                         ),
@@ -199,7 +198,9 @@ class _QrScan extends ConsumerState<WalletQrScan> {
               right: 20,
               child: LinearProgressIndicator(
                 borderRadius: BorderRadius.circular(20),
-                backgroundColor: Paletter.extraDarkGray,
+                backgroundColor: Theme.of(
+                  context,
+                ).colorScheme.primary.withValues(alpha: 0.5),
                 color: Colors.white,
               ),
             ),
@@ -216,7 +217,9 @@ class _QrScan extends ConsumerState<WalletQrScan> {
                   qrScannerState.error != null
                       ? Container(
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 12, vertical: 6),
+                            horizontal: 12,
+                            vertical: 6,
+                          ),
                           decoration: BoxDecoration(
                             color: Colors.black54,
                             borderRadius: BorderRadius.circular(50),

@@ -2,16 +2,11 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '../../config/palette.dart';
-
 class ChangeResult {
   final String currentUnit;
   final String previousUnit;
 
-  ChangeResult({
-    required this.currentUnit,
-    required this.previousUnit,
-  });
+  ChangeResult({required this.currentUnit, required this.previousUnit});
 }
 
 class CurrencyPickerBar extends StatefulWidget {
@@ -64,11 +59,15 @@ class _CurrencyPickerBarState extends State<CurrencyPickerBar>
     super.initState();
     _selectedIndex = widget.currencies.isEmpty
         ? 0
-        : widget.initialIndex
-            .clamp(0, math.max(0, widget.currencies.length - 1));
+        : widget.initialIndex.clamp(
+            0,
+            math.max(0, widget.currencies.length - 1),
+          );
     _lensX = 0; // will be set on first layout
-    _snapController =
-        AnimationController(vsync: this, duration: widget.snapDuration);
+    _snapController = AnimationController(
+      vsync: this,
+      duration: widget.snapDuration,
+    );
   }
 
   @override
@@ -121,9 +120,10 @@ class _CurrencyPickerBarState extends State<CurrencyPickerBar>
     final targetX = _xForIndex(index, width);
     _snapController.stop();
     final start = _lensX;
-    _snapAnim = Tween<double>(begin: start, end: targetX)
-        .chain(CurveTween(curve: Curves.easeOutCubic))
-        .animate(_snapController);
+    _snapAnim = Tween<double>(
+      begin: start,
+      end: targetX,
+    ).chain(CurveTween(curve: Curves.easeOutCubic)).animate(_snapController);
     _snapAnim!.addListener(() {
       setState(() {
         _lensX = _snapAnim!.value;
@@ -146,10 +146,7 @@ class _CurrencyPickerBarState extends State<CurrencyPickerBar>
     final previousUnit = widget.currencies[previousIndex];
 
     widget.onChanged?.call(
-      ChangeResult(
-        currentUnit: currentUnit,
-        previousUnit: previousUnit,
-      ),
+      ChangeResult(currentUnit: currentUnit, previousUnit: previousUnit),
     );
   }
 
@@ -157,17 +154,20 @@ class _CurrencyPickerBarState extends State<CurrencyPickerBar>
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    final trackColor = widget.trackColor ??
+    final trackColor =
+        widget.trackColor ??
         (widget.isDark
-            ? Paletter.extraDarkGray.withValues(alpha: 0.22)
-            : Paletter.lightGray.withValues(alpha: 0.85));
+            ? Theme.of(context).colorScheme.surface.withValues(alpha: 0.22)
+            : Theme.of(context).colorScheme.surface.withValues(alpha: 0.85));
 
-    final inactiveColor = widget.inactiveColor ??
+    final inactiveColor =
+        widget.inactiveColor ??
         (widget.isDark
-            ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.88)
-            : Theme.of(context).colorScheme.primary.withValues(alpha: 0.9));
+            ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.88)
+            : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.9));
 
-    final activeColor = widget.activeColor ?? theme.colorScheme.primary;
+    final activeColor =
+        widget.activeColor ?? theme.colorScheme.primaryContainer;
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -180,8 +180,10 @@ class _CurrencyPickerBarState extends State<CurrencyPickerBar>
         }
 
         void handleTapOrPanTo(Offset localPos) {
-          final clamped =
-              localPos.dx.clamp(_leftBound(width), _rightBound(width));
+          final clamped = localPos.dx.clamp(
+            _leftBound(width),
+            _rightBound(width),
+          );
           setState(() => _lensX = clamped.toDouble());
           final nearest = _nearestIndexForX(_lensX, width);
           _setSelectedIndex(nearest);
@@ -231,7 +233,9 @@ class _CurrencyPickerBarState extends State<CurrencyPickerBar>
                     boxShadow: [
                       if (!widget.isDark)
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.06),
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.shadow.withOpacity(0.06),
                           blurRadius: 10,
                           offset: const Offset(0, 3),
                         ),
@@ -256,10 +260,12 @@ class _CurrencyPickerBarState extends State<CurrencyPickerBar>
         return Semantics(
           label: 'Currency picker',
           value: hasItems ? widget.currencies[_selectedIndex] : '',
-          increasedValue:
-              canIncrease ? widget.currencies[_selectedIndex + 1] : null,
-          decreasedValue:
-              canDecrease ? widget.currencies[_selectedIndex - 1] : null,
+          increasedValue: canIncrease
+              ? widget.currencies[_selectedIndex + 1]
+              : null,
+          decreasedValue: canDecrease
+              ? widget.currencies[_selectedIndex - 1]
+              : null,
           onIncrease: canIncrease
               ? () {
                   _setSelectedIndex(_selectedIndex + 1);
@@ -281,8 +287,10 @@ class _CurrencyPickerBarState extends State<CurrencyPickerBar>
                 _animateLensToIndex(_selectedIndex, width);
               },
               onHorizontalDragUpdate: (d) {
-                final moved = (_lensX + d.delta.dx)
-                    .clamp(_leftBound(width), _rightBound(width));
+                final moved = (_lensX + d.delta.dx).clamp(
+                  _leftBound(width),
+                  _rightBound(width),
+                );
                 setState(() => _lensX = moved.toDouble());
                 final nearest = _nearestIndexForX(_lensX, width);
                 _setSelectedIndex(nearest);
@@ -305,12 +313,14 @@ class _CurrencyPickerBarState extends State<CurrencyPickerBar>
                     child: _LensRing(
                       isDark: widget.isDark,
                       borderWidth: 3,
-                      shadowColor: widget.isDark
-                          ? Colors.black.withValues(alpha: 0.5)
-                          : Colors.black.withValues(alpha: 0.15),
+
                       highlightColor: widget.isDark
-                          ? Colors.white.withValues(alpha: 0.08)
-                          : Colors.white.withValues(alpha: 0.18),
+                          ? Theme.of(
+                              context,
+                            ).colorScheme.surface.withValues(alpha: 0.08)
+                          : Theme.of(
+                              context,
+                            ).colorScheme.surface.withValues(alpha: 0.18),
                     ),
                   ),
                 ],
@@ -327,14 +337,13 @@ class _LensRing extends StatelessWidget {
   const _LensRing({
     required this.isDark,
     this.borderWidth = 3,
-    this.shadowColor = Paletter.gray,
-    this.highlightColor = Paletter.gray,
+    this.highlightColor,
   });
 
   final bool isDark;
   final double borderWidth;
-  final Color shadowColor;
-  final Color highlightColor;
+
+  final Color? highlightColor;
 
   @override
   Widget build(BuildContext context) {
@@ -345,7 +354,7 @@ class _LensRing extends StatelessWidget {
           border: Border.all(
             width: borderWidth,
             color: isDark
-                ? Paletter.darkGray
+                ? Theme.of(context).colorScheme.onSurface
                 : Theme.of(context).colorScheme.surface,
           ),
           boxShadow: [
@@ -355,7 +364,9 @@ class _LensRing extends StatelessWidget {
               offset: const Offset(0, 4),
             ),
             BoxShadow(
-              color: highlightColor,
+              color:
+                  highlightColor ??
+                  Theme.of(context).colorScheme.onSurfaceVariant,
               blurRadius: 8,
               spreadRadius: -2,
               offset: const Offset(0, -1),

@@ -1,3 +1,4 @@
+import 'package:flutter_riverpod/legacy.dart';
 import 'package:riverpod/riverpod.dart';
 
 class QRScannerState {
@@ -28,37 +29,27 @@ class QRScannerState {
   }
 }
 
-enum QRNavigationTarget {
-  rcvPage,
-  sendPage,
-}
+enum QRNavigationTarget { rcvPage, sendPage }
 
 class QRScanTypeResult {
   final String value;
   final QRScanTypes type;
 
-  QRScanTypeResult({
-    required this.value,
-    required this.type,
-  });
+  QRScanTypeResult({required this.value, required this.type});
 }
 
-enum QRScanTypes {
-  cashuToken,
-  lightningInvoice,
-  unknown,
-}
+enum QRScanTypes { cashuToken, lightningInvoice, unknown }
 
 class QRScannerNotifier extends StateNotifier<QRScannerState> {
   QRScannerNotifier()
-      : super(
-          QRScannerState(
-            isProcessing: false,
-            error: null,
-            navigationTarget: null,
-            navigationData: null,
-          ),
-        );
+    : super(
+        QRScannerState(
+          isProcessing: false,
+          error: null,
+          navigationTarget: null,
+          navigationData: null,
+        ),
+      );
 
   void setError(String error) {
     state = state.copyWith(error: error);
@@ -105,24 +96,18 @@ class QRScannerNotifier extends StateNotifier<QRScannerState> {
   Future<QRScanTypeResult> _analyzeQRData(String qrData) async {
     // Analyze the QR data and return the appropriate type
     if (qrData.startsWith('cashuB')) {
-      return QRScanTypeResult(
-        value: qrData,
-        type: QRScanTypes.cashuToken,
-      );
+      return QRScanTypeResult(value: qrData, type: QRScanTypes.cashuToken);
     } else if (qrData.startsWith('lightning:')) {
       return QRScanTypeResult(
         value: qrData,
         type: QRScanTypes.lightningInvoice,
       );
     }
-    return QRScanTypeResult(
-      value: qrData,
-      type: QRScanTypes.unknown,
-    );
+    return QRScanTypeResult(value: qrData, type: QRScanTypes.unknown);
   }
 }
 
 final qrScannerProvider =
     StateNotifierProvider.autoDispose<QRScannerNotifier, QRScannerState>(
-  (ref) => QRScannerNotifier(),
-);
+      (ref) => QRScannerNotifier(),
+    );

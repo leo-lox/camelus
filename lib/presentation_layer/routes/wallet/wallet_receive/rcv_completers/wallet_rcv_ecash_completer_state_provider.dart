@@ -1,12 +1,11 @@
 import 'package:ndk/entities.dart' as ndk_entities;
 import 'package:ndk/ndk.dart';
+import 'package:riverpod/legacy.dart';
 import 'package:riverpod/riverpod.dart';
 
 import '../../../../providers/ndk_provider.dart';
 
-enum WalletRcvType {
-  eCash,
-}
+enum WalletRcvType { eCash }
 
 class WalletRcvEcashCompleterState {
   final bool isPending;
@@ -66,19 +65,17 @@ class WalletRcvEcashCompleterNotifier
     extends StateNotifier<WalletRcvEcashCompleterState> {
   final Ndk _ndk;
   WalletRcvEcashCompleterNotifier({required Ndk ndk})
-      : _ndk = ndk,
-        super(
-          WalletRcvEcashCompleterState(
-            isPending: false,
-            isCompleted: false,
-            isError: false,
-            isSuccess: false,
-          ),
-        );
+    : _ndk = ndk,
+      super(
+        WalletRcvEcashCompleterState(
+          isPending: false,
+          isCompleted: false,
+          isError: false,
+          isSuccess: false,
+        ),
+      );
 
-  void receiveEcash({
-    required String tokenString,
-  }) async {
+  void receiveEcash({required String tokenString}) async {
     reset();
 
     state = state.copyWith(isPending: true);
@@ -139,10 +136,11 @@ class WalletRcvEcashCompleterNotifier
   }
 }
 
-final walletReceiveEcashCompleterProvider = StateNotifierProvider<
-    WalletRcvEcashCompleterNotifier, WalletRcvEcashCompleterState>(
-  (ref) {
-    final ndk = ref.watch(ndkProvider);
-    return WalletRcvEcashCompleterNotifier(ndk: ndk);
-  },
-);
+final walletReceiveEcashCompleterProvider =
+    StateNotifierProvider<
+      WalletRcvEcashCompleterNotifier,
+      WalletRcvEcashCompleterState
+    >((ref) {
+      final ndk = ref.watch(ndkProvider);
+      return WalletRcvEcashCompleterNotifier(ndk: ndk);
+    });
