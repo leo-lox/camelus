@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import 'package:riverpod/riverpod.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../domain_layer/entities/nostr_note.dart';
 import '../../domain_layer/usecases/user_reposts.dart';
@@ -17,8 +17,11 @@ class PostRepostState {
     required this.toggleRepostLoading,
   });
 
-  PostRepostState copyWith(
-      {bool? isReposted, bool? isLoading, bool? toggleRepostLoading}) {
+  PostRepostState copyWith({
+    bool? isReposted,
+    bool? isLoading,
+    bool? toggleRepostLoading,
+  }) {
     return PostRepostState(
       isReposted: isReposted ?? this.isReposted,
       isLoading: isLoading ?? this.isLoading,
@@ -27,32 +30,35 @@ class PostRepostState {
   }
 }
 
-final postRepostProvider = StateNotifierProvider.family<PostRepostNotifier,
-    PostRepostState, NostrNote>(
-  (ref, arg) {
-    final userReactions = ref.watch(repostsProvider);
-    return PostRepostNotifier(userReactions, arg);
-  },
-);
+final postRepostProvider =
+    NotifierProvider.family<PostRepostNotifier, PostRepostState, NostrNote>(
+      PostRepostNotifier.new,
+    );
 
-class PostRepostNotifier extends StateNotifier<PostRepostState> {
-  final UserReposts _userReposts;
-  final NostrNote _displayNote;
+class PostRepostNotifier extends Notifier<PostRepostState> {
+  late final UserReposts _userReposts;
+  late final NostrNote _displayNote;
 
-  PostRepostNotifier(
-    this._userReposts,
-    this._displayNote,
-  ) : super(PostRepostState(
-          isReposted: false,
-          isLoading: true,
-          toggleRepostLoading: false,
-        )) {
+  PostRepostNotifier(NostrNote note) : _displayNote = note;
+
+  @override
+  PostRepostState build() {
+    final userReposts = ref.watch(repostsProvider);
+    _userReposts = userReposts;
+
     _initializeRepostState();
+
+    return PostRepostState(
+      isReposted: false,
+      isLoading: true,
+      toggleRepostLoading: false,
+    );
   }
 
   Future<void> _initializeRepostState() async {
-    final isReposted =
-        await _userReposts.isPostSelfReposted(postId: _displayNote.id);
+    final isReposted = await _userReposts.isPostSelfReposted(
+      postId: _displayNote.id,
+    );
 
     state = state.copyWith(isReposted: isReposted, isLoading: false);
   }

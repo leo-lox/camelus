@@ -1,13 +1,15 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ndk/ndk.dart';
-import 'package:riverpod/riverpod.dart';
 
-final dbNdkProvider =
-    StateNotifierProvider<DbProviderNotifier, CacheManager?>((ref) {
-  return DbProviderNotifier();
-});
+final dbNdkProvider = NotifierProvider<DbProviderNotifier, CacheManager?>(
+  DbProviderNotifier.new,
+);
 
-class DbProviderNotifier extends StateNotifier<CacheManager?> {
-  DbProviderNotifier() : super(null);
+class DbProviderNotifier extends Notifier<CacheManager?> {
+  @override
+  CacheManager? build() {
+    return null;
+  }
 
   void setDB(CacheManager newDb) {
     state = newDb;

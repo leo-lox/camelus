@@ -6,9 +6,7 @@ import '../models/nostr_lists_model.dart';
 class NostrListRepositoryImpl implements NostrListRepository {
   final DartNdkSource dartNdkSource;
 
-  NostrListRepositoryImpl({
-    required this.dartNdkSource,
-  });
+  NostrListRepositoryImpl({required this.dartNdkSource});
 
   @override
   Stream<List<NostrStarterPack>?> getPublicNostrStarterPacks({
@@ -38,8 +36,9 @@ class NostrListRepositoryImpl implements NostrListRepository {
   Future<NostrStarterPack> broadcastStarterPack({
     required NostrStarterPack starterPack,
   }) async {
-    final ndkStarterPack =
-        NostrStarterPackModel.fromEntity(starterPack).toNDK();
+    final ndkStarterPack = NostrStarterPackModel.fromEntity(
+      starterPack,
+    ).toNDK();
     final result = await dartNdkSource.dartNdk.lists.setCompleteSet(
       set: ndkStarterPack,
       kind: NostrList.starterPack,
@@ -70,5 +69,48 @@ class NostrListRepositoryImpl implements NostrListRepository {
       return null;
     }
     return NostrStarterPackModel.fromNDK(ndkSet);
+  }
+
+  @override
+  Future<NostrList?> getSingleList({required int kind}) async {
+    final ndkList = await dartNdkSource.dartNdk.lists.getSingleNip51List(
+      kind,
+
+      forceRefresh: false,
+    );
+
+    if (ndkList == null) return null;
+    return NostrListModel.fromNDK(ndkList);
+  }
+
+  @override
+  Future<NostrList> addElementToList({
+    required String tag,
+    required String value,
+    required int kind,
+    bool private = false,
+  }) async {
+    final ndkList = await dartNdkSource.dartNdk.lists.addElementToList(
+      tag: tag,
+      value: value,
+      kind: kind,
+      private: private,
+    );
+    return NostrListModel.fromNDK(ndkList);
+  }
+
+  @override
+  Future<NostrList?> removeElementFromList({
+    required String tag,
+    required String value,
+    required int kind,
+  }) async {
+    final ndkList = await dartNdkSource.dartNdk.lists.removeElementFromList(
+      tag: tag,
+      value: value,
+      kind: kind,
+    );
+    if (ndkList == null) return null;
+    return NostrListModel.fromNDK(ndkList);
   }
 }

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
-import '../../config/palette.dart';
 import '../providers/ndk_provider.dart';
 
 class RelaysConnectivityWidget extends ConsumerWidget {
@@ -19,7 +18,8 @@ class RelaysConnectivityWidget extends ConsumerWidget {
       child: StreamBuilder(
         stream: ndk.connectivity.relayConnectivityChanges,
         builder: (context, snapshot) {
-          final isConnected = snapshot.hasData &&
+          final isConnected =
+              snapshot.hasData &&
               snapshot.data!.isNotEmpty &&
               snapshot.data!.values.any((e) => e.isConnected);
 
@@ -40,7 +40,7 @@ class RelaysConnectivityWidget extends ConsumerWidget {
               Text(
                 connectedCount.toString(),
                 style: TextStyle(
-                  color: Paletter.getLightGray(context),
+                  color: Theme.of(context).colorScheme.inverseSurface,
                 ),
                 key: ValueKey(connectedCount),
               ),

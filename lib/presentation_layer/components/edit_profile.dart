@@ -4,13 +4,41 @@ import 'package:camelus/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../config/palette.dart';
 import '../atoms/camer_upload.dart';
 import '../atoms/round_image_border.dart';
 
 // to control upload state
-final editProfilePictureUploadingProvider = StateProvider<bool>((ref) => false);
-final editProfileBannerUploadingProvider = StateProvider<bool>((ref) => false);
+final editProfilePictureUploadingProvider =
+    NotifierProvider<EditProfilePictureUploadingNotifier, bool>(
+      EditProfilePictureUploadingNotifier.new,
+    );
+
+class EditProfilePictureUploadingNotifier extends Notifier<bool> {
+  @override
+  bool build() {
+    return false;
+  }
+
+  void setUploading(bool uploading) {
+    state = uploading;
+  }
+}
+
+final editProfileBannerUploadingProvider =
+    NotifierProvider<EditProfileBannerUploadingNotifier, bool>(
+      EditProfileBannerUploadingNotifier.new,
+    );
+
+class EditProfileBannerUploadingNotifier extends Notifier<bool> {
+  @override
+  bool build() {
+    return false;
+  }
+
+  void setUploading(bool uploading) {
+    state = uploading;
+  }
+}
 
 class EditProfile extends ConsumerStatefulWidget {
   // Fields to initialize and update the profile.
@@ -143,7 +171,9 @@ class _EditProfileState extends ConsumerState<EditProfile> {
                   width: MediaQuery.of(context).size.width,
                   height: MediaQuery.of(context).size.height / 6,
                   decoration: BoxDecoration(
-                    color: Paletter.getDarkGray(context),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.surfaceContainerHighest,
                     image: widget.initialBanner != null
                         ? DecorationImage(
                             image: MemoryImage(widget.initialBanner!),
@@ -158,10 +188,9 @@ class _EditProfileState extends ConsumerState<EditProfile> {
                   Container(
                     width: MediaQuery.of(context).size.width,
                     height: MediaQuery.of(context).size.height / 6,
-                    color: Theme.of(context)
-                        .colorScheme
-                        .surface
-                        .withValues(alpha: 0.5),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.surface.withValues(alpha: 0.8),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -179,9 +208,12 @@ class _EditProfileState extends ConsumerState<EditProfile> {
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(4),
                             child: LinearProgressIndicator(
-                              backgroundColor: Paletter.getGray(context),
+                              backgroundColor: Theme.of(
+                                context,
+                              ).colorScheme.inverseSurface,
                               valueColor: AlwaysStoppedAnimation<Color>(
-                                  Theme.of(context).colorScheme.onSurface),
+                                Theme.of(context).colorScheme.primary,
+                              ),
                               minHeight: 6,
                             ),
                           ),
@@ -203,7 +235,9 @@ class _EditProfileState extends ConsumerState<EditProfile> {
                   widget.initialPicture == null
                       ? const CameraUpload(size: 100)
                       : RoundImageWithBorder(
-                          image: widget.initialPicture!, size: 102),
+                          image: widget.initialPicture!,
+                          size: 102,
+                        ),
                   if (isUploadingPicture) _buildUploadingProfilePicture(),
                 ],
               ),
@@ -223,10 +257,10 @@ class _EditProfileState extends ConsumerState<EditProfile> {
           width: 102,
           height: 102,
           decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.5),
+            color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.9),
             shape: BoxShape.circle,
             border: Border.all(
-              color: Theme.of(context).colorScheme.onSurface,
+              color: Theme.of(context).colorScheme.primary,
               width: 3,
             ),
           ),
@@ -238,6 +272,7 @@ class _EditProfileState extends ConsumerState<EditProfile> {
           height: 60,
           child: CircularProgressIndicator(
             strokeWidth: 3,
+            color: Theme.of(context).colorScheme.primary,
           ),
         ),
 
@@ -260,56 +295,90 @@ class _EditProfileState extends ConsumerState<EditProfile> {
       child: Column(
         children: [
           _buildInputField(
-              AppLocalizations.of(context)!.name, _controllers['name']!),
+            AppLocalizations.of(context)!.name,
+            _controllers['name']!,
+          ),
           _buildInputField(
-              AppLocalizations.of(context)!.bio, _controllers['about']!,
-              isMultiline: true),
-          _buildInputField(AppLocalizations.of(context)!.pronouns,
-              _controllers['pronouns']!),
+            AppLocalizations.of(context)!.bio,
+            _controllers['about']!,
+            isMultiline: true,
+          ),
           _buildInputField(
-              AppLocalizations.of(context)!.website, _controllers['website']!),
+            AppLocalizations.of(context)!.pronouns,
+            _controllers['pronouns']!,
+          ),
           _buildInputField(
-              AppLocalizations.of(context)!.username, _controllers['nip05']!),
-          _buildInputField(AppLocalizations.of(context)!.lightningAddress,
-              _controllers['lud16']!),
+            AppLocalizations.of(context)!.website,
+            _controllers['website']!,
+          ),
+          _buildInputField(
+            AppLocalizations.of(context)!.username,
+            _controllers['nip05']!,
+          ),
+          _buildInputField(
+            AppLocalizations.of(context)!.lightningAddress,
+            _controllers['lud16']!,
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildInputField(String label, TextEditingController controller,
-      {bool isMultiline = false}) {
+  Widget _buildInputField(
+    String label,
+    TextEditingController controller, {
+    bool isMultiline = false,
+  }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
           padding: const EdgeInsets.only(top: 16.0, bottom: 8.0, left: 8.0),
           child: Text(
-            label, // Display the label of the input field.
+            label,
             style: TextStyle(
-              color: const Color.fromARGB(213, 245, 248, 250),
-              fontSize: MediaQuery.of(context).size.width / 28,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
             ),
           ),
         ),
         TextFormField(
-          controller: controller, // Bind the controller to the input field.
+          controller: controller,
+          style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
           decoration: InputDecoration(
             hintText: "",
-            contentPadding:
-                EdgeInsets.symmetric(vertical: 8.0, horizontal: 8.0),
-            enabledBorder: UnderlineInputBorder(
+            hintStyle: TextStyle(
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+              letterSpacing: 1.1,
+            ),
+            contentPadding: EdgeInsets.symmetric(
+              vertical: 8.0,
+              horizontal: 8.0,
+            ),
+            filled: true,
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.all(Radius.circular(10)),
+
+              borderSide: BorderSide(color: Colors.transparent),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.all(Radius.circular(10)),
               borderSide: BorderSide(
-                width: 1,
-                color: Paletter.getGray(
-                    context), // Border color for the text field.
+                color: Theme.of(context).colorScheme.primary,
+              ),
+            ),
+            errorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.all(Radius.circular(10)),
+              borderSide: BorderSide(
+                color: Theme.of(context).colorScheme.error,
               ),
             ),
           ),
-          maxLines: isMultiline ? null : 1,
+          maxLines: isMultiline ? 3 : 1,
           keyboardType: isMultiline
               ? TextInputType.multiline
-              : TextInputType.text, // Set keyboard type.
+              : TextInputType.text,
         ),
       ],
     );

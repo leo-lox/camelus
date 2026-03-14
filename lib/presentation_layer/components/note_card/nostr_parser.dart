@@ -1,19 +1,26 @@
 import 'dart:developer';
 
 import 'package:flutter/foundation.dart';
+import 'package:ndk/shared/nips/nip19/nip19.dart';
 
 import '../../../domain_layer/entities/nostr_note.dart';
 import '../../../domain_layer/entities/parsed_post.dart';
-import '../../../helpers/helpers.dart';
-import '../../../helpers/nprofile_helper.dart';
 
 class NostrParser {
   static const bool useThread = false;
+  static final RegExp _contentRegex = RegExp(
+    r'nostr:(nevent1\w+|npub1\w+|nprofile1\w+|note1\w+)|'
+    r'#(\w+)|'
+    r'(https?://\S+\.(?:jpg|jpeg|png|gif|webp))|'
+    r'(https?://\S+\.(?:mp4|webm|mov))|'
+    r'(https?://\S+)',
+    caseSensitive: false,
+  );
 
   /// parses the event in a seperate thread
   static Future<ParsedPost> parseEvent(NostrNote event) async {
     if (useThread) {
-      return compute((e) => _parse(e), event);
+      return compute(_parse, event);
     }
 
     return _parse(event);
@@ -31,7 +38,7 @@ class NostrParser {
   /// parses multiple event in seperate thread
   static Future<List<ParsedPost>> parseEvents(List<NostrNote> events) async {
     if (useThread) {
-      return compute((e) => _parseEvents(e), events);
+      return compute(_parseEvents, events);
     }
 
     return _parseEvents(events);
@@ -44,23 +51,36 @@ class NostrParser {
   static ParsedPost _parse(NostrNote event) {
     final content = event.content;
     final contentSegments = _parseContentToSegments(content);
+    final mentionIdsSet = <String>{};
+    final imageUrls = <String>[];
+    final videoUrls = <String>[];
+    final noteReferences = <String>[];
 
-    // Extract metadata IDs for async fetching
-    final mentionIds = contentSegments
-        .where((s) => s.type == ContentType.mention)
-        .map((s) => s.metadata!)
-        .toSet()
-        .toList();
+    for (final segment in contentSegments) {
+      final metadata = segment.metadata;
+      if (metadata == null) {
+        continue;
+      }
 
-    final imageUrls = contentSegments
-        .where((s) => s.type == ContentType.image)
-        .map((s) => s.metadata!)
-        .toList();
+      switch (segment.type) {
+        case ContentType.mention:
+          mentionIdsSet.add(metadata);
+          break;
+        case ContentType.image:
+          imageUrls.add(metadata);
+          break;
+        case ContentType.video:
+          videoUrls.add(metadata);
+          break;
+        case ContentType.noteReference:
+          noteReferences.add(metadata);
+          break;
+        default:
+          break;
+      }
+    }
 
-    final videoUrls = contentSegments
-        .where((s) => s.type == ContentType.video)
-        .map((s) => s.metadata!)
-        .toList();
+    final mentionIds = mentionIdsSet.toList();
 
     return ParsedPost(
       id: event.id,
@@ -71,82 +91,118 @@ class NostrParser {
       imageUrls: imageUrls,
       videoUrls: videoUrls,
       nostrNote: event,
+      noteReferences: noteReferences,
     );
   }
 
   static List<ContentSegment> _parseContentToSegments(String content) {
     final segments = <ContentSegment>[];
 
-    // Regex to match different content types
-    final regex = RegExp(
-      r'nostr:(nevent1\w+|npub1\w+|nprofile1\w+|note1\w+)|' // Nostr references
-      r'#(\w+)|' // Hashtags
-      r'(https?://\S+\.(?:jpg|jpeg|png|gif|webp))|' // Images
-      r'(https?://\S+\.(?:mp4|webm|mov))|' // Videos
-      r'(https?://\S+)', // Other links
-      caseSensitive: false,
-    );
-
     int lastEnd = 0;
 
-    for (final match in regex.allMatches(content)) {
+    for (final match in _contentRegex.allMatches(content)) {
       // Add text before match
       if (match.start > lastEnd) {
         final textContent = content.substring(lastEnd, match.start);
         if (textContent.isNotEmpty) {
-          segments.add(ContentSegment(
-            content: textContent,
-            type: ContentType.text,
-          ));
+          segments.add(
+            ContentSegment(content: textContent, type: ContentType.text),
+          );
         }
       }
 
       final matchText = match.group(0)!;
+      final nostrRef = match.group(1);
+      final hashtag = match.group(2);
+      final imageUrl = match.group(3);
+      final videoUrl = match.group(4);
+      final linkUrl = match.group(5);
 
       // Parse different types
-      if (matchText.startsWith(RegExp(r'nostr:(nprofile|npub)[a-zA-Z0-9]+'))) {
-        try {
-          segments.add(ContentSegment(
-            content: matchText,
-            type: ContentType.mention,
-            metadata: _extractUserIdFromNostr(matchText),
-          ));
-        } catch (e) {
-          log('Error parsing Nostr reference: $matchText', error: e);
+      if (nostrRef != null) {
+        if (nostrRef.startsWith('nprofile1')) {
+          try {
+            segments.add(
+              ContentSegment(
+                content: matchText,
+                type: ContentType.mention,
+                metadata: Nip19.decodeNprofile(nostrRef).pubkey,
+              ),
+            );
+          } catch (e) {
+            log('Error parsing Nostr reference: $matchText', error: e);
+          }
+        } else if (nostrRef.startsWith('npub1')) {
+          try {
+            segments.add(
+              ContentSegment(
+                content: matchText,
+                type: ContentType.mention,
+                metadata: Nip19.decode(nostrRef),
+              ),
+            );
+          } catch (e) {
+            log('Error parsing Nostr reference: $matchText', error: e);
+          }
+        } else if (nostrRef.startsWith('note1')) {
+          segments.add(
+            ContentSegment(
+              content: 'Note reference',
+              type: ContentType.noteReference,
+              metadata: nostrRef,
+            ),
+          );
+        } else if (nostrRef.startsWith('nevent1')) {
+          try {
+            final nevent = Nip19.decodeNevent(nostrRef);
+            if (nevent.kind == 1) {
+              segments.add(
+                ContentSegment(
+                  content: 'Note reference',
+                  type: ContentType.noteReference,
+                  metadata: matchText,
+                ),
+              );
+            }
+          } catch (e) {
+            log('Error parsing Nostr reference: $matchText', error: e);
+          }
         }
-      } else if (matchText.startsWith('nostr:note1')) {
-        segments.add(ContentSegment(
-          content: 'Note reference',
-          type: ContentType.noteReference,
-          metadata: _extractNoteIdFromNostr(matchText),
-        ));
-      } else if (matchText.startsWith('#')) {
-        segments.add(ContentSegment(
-          content: matchText,
-          type: ContentType.hashtag,
-          metadata: matchText.substring(1), // Remove #
-        ));
-      } else if (match.group(3) != null) {
+      } else if (hashtag != null) {
+        segments.add(
+          ContentSegment(
+            content: matchText,
+            type: ContentType.hashtag,
+            metadata: hashtag,
+          ),
+        );
+      } else if (imageUrl != null) {
         // Image URL
-        segments.add(ContentSegment(
-          content: '', // No text for images
-          type: ContentType.image,
-          metadata: matchText,
-        ));
-      } else if (match.group(4) != null) {
+        segments.add(
+          ContentSegment(
+            content: '', // No text for images
+            type: ContentType.image,
+            metadata: imageUrl,
+          ),
+        );
+      } else if (videoUrl != null) {
         // Video URL
-        segments.add(ContentSegment(
-          content: '', // No text for videos
-          type: ContentType.video,
-          metadata: matchText,
-        ));
-      } else if (match.group(5) != null) {
+        segments.add(
+          ContentSegment(
+            content: '', // No text for videos
+            type: ContentType.video,
+            metadata: videoUrl,
+          ),
+        );
+      } else if (linkUrl != null) {
         // Other links
-        segments.add(ContentSegment(
-          content: _shortenUrl(matchText),
-          type: ContentType.link,
-          metadata: matchText,
-        ));
+        segments.add(
+          ContentSegment(
+            content: linkUrl,
+            type: ContentType.link,
+            metadata: linkUrl,
+          ),
+        );
       }
 
       lastEnd = match.end;
@@ -156,40 +212,12 @@ class NostrParser {
     if (lastEnd < content.length) {
       final remainingText = content.substring(lastEnd);
       if (remainingText.isNotEmpty) {
-        segments.add(ContentSegment(
-          content: remainingText,
-          type: ContentType.text,
-        ));
+        segments.add(
+          ContentSegment(content: remainingText, type: ContentType.text),
+        );
       }
     }
 
     return segments;
-  }
-
-  static String _extractUserIdFromNostr(String nostrRef) {
-    final encoded = nostrRef.replaceFirst('nostr:', '');
-
-    if (encoded.startsWith('nprofile')) {
-      final decoded = NprofileHelper().bech32toMap(encoded);
-      return decoded['pubkey'] ?? '';
-    } else if (encoded.startsWith('npub')) {
-      final decoded = Helpers().decodeBech32(encoded);
-      return decoded[0] ?? '';
-    }
-    return nostrRef;
-  }
-
-  static String _extractNoteIdFromNostr(String nostrRef) {
-    return nostrRef.replaceFirst('nostr:', '');
-  }
-
-  static String _shortenUrl(String url) {
-    try {
-      final uri = Uri.parse(url);
-      return uri.host +
-          (uri.path.length > 20 ? '${uri.path.substring(0, 20)}...' : uri.path);
-    } catch (_) {
-      return url;
-    }
   }
 }

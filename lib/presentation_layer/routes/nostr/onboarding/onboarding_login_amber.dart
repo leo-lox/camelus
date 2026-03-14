@@ -1,5 +1,6 @@
 import 'package:amberflutter/amberflutter.dart';
 import 'package:camelus/l10n/app_localizations.dart';
+import 'package:camelus/presentation_layer/components/responsive_center.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -8,18 +9,17 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 import '../../../../config/amber_url.dart';
+import '../../../../domain_layer/entities/stored_account.dart';
 import '../../../../domain_layer/usecases/app_auth.dart';
 import '../../../atoms/long_button.dart';
+import '../../../providers/messaging/dm_conversations_provider.dart';
 import '../../../providers/ndk_provider.dart';
 import '../../../providers/signer_provider.dart';
 
 class OnboardingLoginAmberPage extends ConsumerStatefulWidget {
   final Function? onPressedBack;
 
-  const OnboardingLoginAmberPage({
-    super.key,
-    this.onPressedBack,
-  });
+  const OnboardingLoginAmberPage({super.key, this.onPressedBack});
   @override
   ConsumerState<OnboardingLoginAmberPage> createState() =>
       _OnboardingLoginAmberPageState();
@@ -55,8 +55,7 @@ class _OnboardingLoginAmberPageState
     if (!_termsAndConditions) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content:
-              Text(AppLocalizations.of(context)!.pleaseReadAndAcceptTerms),
+          content: Text(AppLocalizations.of(context)!.pleaseReadAndAcceptTerms),
         ),
       );
       return;
@@ -67,8 +66,22 @@ class _OnboardingLoginAmberPageState
 
     final amberSigner = await AppAuth.amberRegister();
 
-    ref.read(ndkProvider).accounts.loginExternalSigner(signer: amberSigner);
-    ref.read(signerProvider.notifier).setSigner(amberSigner);
+    // create stored account
+    final storedAccount = LocalStorageAccount(
+      loginType: LoginType.amber,
+      pubkey: amberSigner.publicKey,
+    );
+
+    await AppAuth.addStoredAccount(account: storedAccount, setActive: true);
+    final startupData = await AppAuth.getStartupAccountData();
+    await AppAuth.loginWithStoredAccount(
+      startupAccountData: startupData,
+      signerNoti: ref.read(signerProvider.notifier),
+      ndk: ref.read(ndkProvider),
+    );
+
+    // Start DM subscription
+    ref.read(dmConversationsProvider);
 
     setState(() {});
 
@@ -83,10 +96,8 @@ class _OnboardingLoginAmberPageState
       appBar: null,
       resizeToAvoidBottomInset: false,
       body: SafeArea(
-        // input for the user to enter their private key, should be visible on a dark background.
-        child: Container(
-          width: MediaQuery.of(context).size.width,
-          height: MediaQuery.of(context).size.height,
+        child: ResponsiveCenter(
+          maxWidth: 600,
           padding: const EdgeInsets.all(30),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -96,8 +107,10 @@ class _OnboardingLoginAmberPageState
                 Row(
                   children: [
                     IconButton(
-                      icon: Icon(PhosphorIcons.arrowLeft(),
-                          color: Theme.of(context).colorScheme.onSurface),
+                      icon: Icon(
+                        PhosphorIcons.arrowLeft(),
+                        color: Theme.of(context).colorScheme.onSurface,
+                      ),
                       onPressed: () => widget.onPressedBack!(),
                     ),
                   ],
@@ -105,13 +118,12 @@ class _OnboardingLoginAmberPageState
               if (widget.onPressedBack == null) const SizedBox(height: 20),
               SizedBox(
                 height: 200,
-                width: MediaQuery.of(context).size.width,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      "login",
+                      AppLocalizations.of(context)!.login,
                       style: TextStyle(
                         color: Theme.of(context).colorScheme.onSurface,
                         fontSize: 40,
@@ -121,9 +133,7 @@ class _OnboardingLoginAmberPageState
                   ],
                 ),
               ),
-              const Spacer(
-                flex: 1,
-              ),
+              const Spacer(flex: 1),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -136,7 +146,7 @@ class _OnboardingLoginAmberPageState
                     },
                   ),
                   Text(
-                    "I have read and accept the ",
+                    AppLocalizations.of(context)!.iHaveReadAndAcceptThe,
                     style: TextStyle(
                       color: Theme.of(context).colorScheme.onSurface,
                       fontSize: 12,
@@ -149,7 +159,7 @@ class _OnboardingLoginAmberPageState
                       launchUrl(url, mode: LaunchMode.externalApplication);
                     },
                     child: Text(
-                      "terms and conditions",
+                      AppLocalizations.of(context)!.termsAndConditions,
                       style: TextStyle(
                         color: Theme.of(context).colorScheme.onSurface,
                         fontSize: 12,
@@ -167,7 +177,7 @@ class _OnboardingLoginAmberPageState
                   launchUrl(url, mode: LaunchMode.externalApplication);
                 },
                 child: Text(
-                  "privacy policy",
+                  AppLocalizations.of(context)!.privacyPolicy,
                   style: TextStyle(
                     color: Theme.of(context).colorScheme.onSurface,
                     fontSize: 12,
@@ -178,26 +188,27 @@ class _OnboardingLoginAmberPageState
               ),
               const SizedBox(height: 20),
               if (!_amberInstalled)
-                Container(
+                Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
-                  width: 400,
-                  height: 40,
+
                   child: longButton(
-                    name: "install amber",
+                    name: AppLocalizations.of(context)!.installAmber,
                     inverted: true,
                     onPressed: () => _promtAmberInstall(),
                   ),
                 ),
               if (_amberInstalled)
-                Container(
+                Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
-                  width: 400,
-                  height: 40,
-                  child: longButton(
-                    name: "authorise amber",
-                    inverted: true,
-                    loading: _amberLoading,
-                    onPressed: () => _onAmberLogin(),
+
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: longButton(
+                      name: AppLocalizations.of(context)!.authoriseAmber,
+                      inverted: true,
+                      loading: _amberLoading,
+                      onPressed: () => _onAmberLogin(),
+                    ),
                   ),
                 ),
             ],

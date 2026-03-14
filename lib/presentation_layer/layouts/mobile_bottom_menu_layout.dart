@@ -1,11 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-const showOnRoutes = [
-  '/home',
-  '/search',
-  '/notifications',
-];
+const showOnRoutes = ['/home', '/search', '/notifications', '/messages'];
 
 class MobileBottomMenuLayout extends StatelessWidget {
   final Widget mainContent;
@@ -23,6 +19,8 @@ class MobileBottomMenuLayout extends StatelessWidget {
     final shouldShow = showOnRoutes.contains(currentRoute);
 
     return SafeArea(
+      top: false,
+      bottom: false,
       child: Scaffold(
         body: mainContent,
         bottomNavigationBar: AnimatedSwitcher(

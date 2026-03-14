@@ -23,12 +23,12 @@ class NoteRepositoryImpl implements NoteRepository {
       kinds: [ndk_entities.Nip01Event.kTextNodeKind],
     );
 
-    final response = dartNdkSource.dartNdk.requests
-        .query(filters: [filter], name: 'getAllNotes-');
-
-    return response.stream.map(
-      (event) => NostrNoteModel.fromNDKEvent(event),
+    final response = dartNdkSource.dartNdk.requests.query(
+      filter: filter,
+      name: 'getAllNotes-',
     );
+
+    return response.stream.map((event) => NostrNoteModel.fromNDKEvent(event));
   }
 
   @override
@@ -42,7 +42,7 @@ class NoteRepositoryImpl implements NoteRepository {
     );
 
     final response = dartNdkSource.dartNdk.requests.query(
-      filters: [filter],
+      filter: filter,
       name: 'getTextNote-',
       explicitRelays: explicitRelays,
       timeout: Duration(seconds: 15),
@@ -50,9 +50,30 @@ class NoteRepositoryImpl implements NoteRepository {
       cacheWrite: true,
     );
 
-    return response.stream.map(
-      (event) => NostrNoteModel.fromNDKEvent(event),
+    return response.stream.map((event) => NostrNoteModel.fromNDKEvent(event));
+  }
+
+  @override
+  Stream<NostrNote> getTextNotes(
+    List<String> noteIds, {
+    Iterable<String>? explicitRelays,
+  }) {
+    ndk.Filter filter = ndk.Filter(
+      ids: noteIds,
+      kinds: [ndk_entities.Nip01Event.kTextNodeKind],
     );
+
+    final response = dartNdkSource.dartNdk.requests.query(
+      filter: filter,
+      name: 'getTextNotes-${noteIds.length}',
+
+      explicitRelays: explicitRelays,
+      timeout: Duration(seconds: 15),
+      cacheRead: true,
+      cacheWrite: true,
+    );
+
+    return response.stream.map((event) => NostrNoteModel.fromNDKEvent(event));
   }
 
   /// Get all notes by a list of authors using a query
@@ -75,7 +96,7 @@ class NoteRepositoryImpl implements NoteRepository {
     );
 
     final response = dartNdkSource.dartNdk.requests.query(
-      filters: [filter],
+      filter: filter,
       name: requestId,
       cacheRead: true,
       cacheWrite: true,
@@ -84,14 +105,13 @@ class NoteRepositoryImpl implements NoteRepository {
     ReplaySubject<NostrNote> subject = ReplaySubject<NostrNote>();
 
     response.stream
-        .map(
-      (event) => NostrNoteModel.fromNDKEvent(event),
-    )
+        .map((event) => NostrNoteModel.fromNDKEvent(event))
         .listen((event) {
-      subject.add(event);
-    }).onDone(() {
-      subject.close();
-    });
+          subject.add(event);
+        })
+        .onDone(() {
+          subject.close();
+        });
     return subject;
   }
 
@@ -121,16 +141,14 @@ class NoteRepositoryImpl implements NoteRepository {
     );
 
     final response = dartNdkSource.dartNdk.requests.query(
-      filters: [filter],
+      filter: filter,
       name: requestId,
       cacheRead: true,
       cacheWrite: true,
       timeout: Duration(seconds: 15),
     );
 
-    return response.stream.map(
-      (event) => NostrNoteModel.fromNDKEvent(event),
-    );
+    return response.stream.map((event) => NostrNoteModel.fromNDKEvent(event));
   }
 
   @override
@@ -159,16 +177,14 @@ class NoteRepositoryImpl implements NoteRepository {
     );
 
     final response = dartNdkSource.dartNdk.requests.subscription(
-      filters: [filter],
+      filter: filter,
       name: subscriptionId,
       id: subscriptionId,
       cacheRead: false,
       cacheWrite: true,
     );
 
-    return response.stream.map(
-      (event) => NostrNoteModel.fromNDKEvent(event),
-    );
+    return response.stream.map((event) => NostrNoteModel.fromNDKEvent(event));
   }
 
   /// Get all notes by a list of authors using a subscription
@@ -191,16 +207,14 @@ class NoteRepositoryImpl implements NoteRepository {
     );
 
     final response = dartNdkSource.dartNdk.requests.subscription(
-      filters: [filter],
+      filter: filter,
       name: requestId,
       id: requestId,
       cacheRead: true,
       cacheWrite: true,
     );
 
-    return response.stream.map(
-      (event) => NostrNoteModel.fromNDKEvent(event),
-    );
+    return response.stream.map((event) => NostrNoteModel.fromNDKEvent(event));
   }
 
   @override
@@ -219,7 +233,7 @@ class NoteRepositoryImpl implements NoteRepository {
     );
 
     final response = dartNdkSource.dartNdk.requests.subscription(
-      filters: [filter],
+      filter: filter,
       name: requestId,
       id: requestId,
       //todo: bug in the NDK when using cacheRead and subscription
@@ -227,17 +241,16 @@ class NoteRepositoryImpl implements NoteRepository {
       // cacheWrite: true,
     );
 
-    return response.stream.map(
-      (event) => NostrNoteModel.fromNDKEvent(event),
-    );
+    return response.stream.map((event) => NostrNoteModel.fromNDKEvent(event));
   }
 
   @override
   Future<void> broadcastNote(NostrNote noteToPublish) async {
     try {
       NostrNoteModel noteModel = NostrNoteModel.fromEntity(noteToPublish);
-      final response = dartNdkSource.dartNdk.broadcast
-          .broadcast(nostrEvent: noteModel.toNDKEvent());
+      final response = dartNdkSource.dartNdk.broadcast.broadcast(
+        nostrEvent: noteModel.toNDKEvent(),
+      );
 
       await response.broadcastDoneFuture;
     } catch (e) {
@@ -259,7 +272,7 @@ class NoteRepositoryImpl implements NoteRepository {
 
     final response = dartNdkSource.dartNdk.requests.query(
       timeout: Duration(seconds: 15),
-      filters: [filter],
+      filter: filter,
       name: 'getReactions-${postId.substring(5, 10)}-',
       cacheRead: useCache,
       cacheWrite: useCache,
@@ -267,17 +280,14 @@ class NoteRepositoryImpl implements NoteRepository {
 
     final events = await response.future;
 
-    return events
-        .map(
-          (event) => NostrNoteModel.fromNDKEvent(event),
-        )
-        .toList();
+    return events.map((event) => NostrNoteModel.fromNDKEvent(event)).toList();
   }
 
   @override
   Future<void> deleteNote(String eventId) async {
-    final res =
-        dartNdkSource.dartNdk.broadcast.broadcastDeletion(eventId: eventId);
+    final res = dartNdkSource.dartNdk.broadcast.broadcastDeletion(
+      eventId: eventId,
+    );
     await res.broadcastDoneFuture;
   }
 
@@ -295,7 +305,7 @@ class NoteRepositoryImpl implements NoteRepository {
 
     final response = dartNdkSource.dartNdk.requests.query(
       timeout: Duration(seconds: 15),
-      filters: [filter],
+      filter: filter,
       name: 'getReposts',
       cacheRead: cacheEnabled,
       cacheWrite: cacheEnabled,
@@ -303,10 +313,6 @@ class NoteRepositoryImpl implements NoteRepository {
 
     final events = await response.future;
 
-    return events
-        .map(
-          (event) => NostrNoteModel.fromNDKEvent(event),
-        )
-        .toList();
+    return events.map((event) => NostrNoteModel.fromNDKEvent(event)).toList();
   }
 }

@@ -4,6 +4,7 @@ fields:
   pubKey: String
   relay: String
   token: String
+  kinds: List<int>?
 indexes:
   subscription_unique_idx:
     fields: pubKey, relay, token

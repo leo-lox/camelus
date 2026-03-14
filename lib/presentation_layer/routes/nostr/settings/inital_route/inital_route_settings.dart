@@ -3,11 +3,23 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
-import '../../../../../config/palette.dart';
 import '../../../../providers/inital_route_provider.dart';
 
 // Provider to store the selected route
-final selectedRouteProvider = StateProvider<String>((ref) => '/home');
+final selectedRouteProvider = NotifierProvider<SelectedRouteNotifier, String>(
+  SelectedRouteNotifier.new,
+);
+
+class SelectedRouteNotifier extends Notifier<String> {
+  @override
+  String build() {
+    return '/home';
+  }
+
+  void setRoute(String route) {
+    state = route;
+  }
+}
 
 class InitalRouteSettings extends ConsumerStatefulWidget {
   const InitalRouteSettings({super.key});
@@ -22,7 +34,7 @@ class InitalRouteSettingsState extends ConsumerState<InitalRouteSettings> {
     '/home',
     '/posts-and-replies',
     '/search',
-    '/notifications'
+    '/notifications',
   ];
 
   // Get localized route label
@@ -41,9 +53,9 @@ class InitalRouteSettingsState extends ConsumerState<InitalRouteSettings> {
     }
   }
 
-  _laodInitialRoute() async {
+  Future<void> _laodInitialRoute() async {
     final loadedRoute = await ref.read(initalRouteProvider).getInitialRoute();
-    ref.read(selectedRouteProvider.notifier).state = loadedRoute;
+    ref.read(selectedRouteProvider.notifier).setRoute(loadedRoute);
   }
 
   @override
@@ -68,14 +80,18 @@ class InitalRouteSettingsState extends ConsumerState<InitalRouteSettings> {
           return ListTile(
             title: Text(
               _getRouteLabel(context, route),
-              style: TextStyle(color: Paletter.getLightGray(context)),
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.inverseSurface,
+              ),
             ),
             trailing: selectedRoute == route
-                ? Icon(PhosphorIcons.check(),
-                    color: Theme.of(context).colorScheme.onSurface)
+                ? Icon(
+                    PhosphorIcons.check(),
+                    color: Theme.of(context).colorScheme.onSurface,
+                  )
                 : null,
             onTap: () {
-              ref.read(selectedRouteProvider.notifier).state = route;
+              ref.read(selectedRouteProvider.notifier).setRoute(route);
               ref.read(initalRouteProvider).saveInitialRoute(route);
             },
             tileColor: Theme.of(context).colorScheme.surface,

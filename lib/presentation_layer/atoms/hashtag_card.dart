@@ -1,6 +1,3 @@
-import 'dart:math';
-
-import 'package:camelus/config/palette.dart';
 import 'package:flutter/material.dart';
 
 class HashtagCard extends StatelessWidget {
@@ -40,13 +37,16 @@ class HashtagCard extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 5),
-                Text(
-                  hashtag,
-                  style: const TextStyle(
-                    height: BorderSide.strokeAlignCenter,
-                    letterSpacing: 1,
-                    fontSize: 22,
-                    fontWeight: FontWeight.w600,
+                Expanded(
+                  child: Text(
+                    hashtag,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      height: BorderSide.strokeAlignCenter,
+                      letterSpacing: 1,
+                      fontSize: 22,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
               ],
@@ -59,16 +59,16 @@ class HashtagCard extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w400,
-                    color: Paletter.getGray(context),
+                    color: Theme.of(context).colorScheme.inverseSurface,
                   ),
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  "posts",
+                  "people",
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w400,
-                    color: Paletter.getGray(context),
+                    color: Theme.of(context).colorScheme.inverseSurface,
                   ),
                 ),
               ],
@@ -97,18 +97,18 @@ class HashtagCardSkeleton extends StatelessWidget {
                 width: 20,
                 height: 20,
                 decoration: BoxDecoration(
-                  color: Paletter.getExtraDarkGray(context),
+                  color: Theme.of(context).colorScheme.surface,
                   borderRadius: BorderRadius.circular(5),
                 ),
               ),
               const SizedBox(width: 5),
-              Container(
-                // random between 100 and 200
-                width: 80 + (140 * (Random().nextDouble() * 1.0)),
-                height: 40,
-                decoration: BoxDecoration(
-                  color: Paletter.getExtraDarkGray(context),
-                  borderRadius: BorderRadius.circular(5),
+              Expanded(
+                child: Container(
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.surface,
+                    borderRadius: BorderRadius.circular(5),
+                  ),
                 ),
               ),
             ],
@@ -121,7 +121,7 @@ class HashtagCardSkeleton extends StatelessWidget {
                 width: 100,
                 height: 20,
                 decoration: BoxDecoration(
-                  color: Paletter.getExtraDarkGray(context),
+                  color: Theme.of(context).colorScheme.surface,
                   borderRadius: BorderRadius.circular(5),
                 ),
               ),

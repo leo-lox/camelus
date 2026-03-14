@@ -1,19 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ndk_flutter/ndk_flutter.dart';
 
 import '../presentation_layer/components/update_check/update_check.dart';
 import '../presentation_layer/providers/app_lifecycle_provider.dart';
 import '../presentation_layer/providers/language_provider.dart';
+import '../presentation_layer/providers/ndk_provider.dart';
 import 'connectivity/connectivity.dart';
 import 'deeplinks/deep_link_service.dart';
 
 class AppInitializationShell extends ConsumerStatefulWidget {
   final Widget child;
 
-  const AppInitializationShell({
-    super.key,
-    required this.child,
-  });
+  const AppInitializationShell({super.key, required this.child});
 
   @override
   ConsumerState<AppInitializationShell> createState() =>
@@ -53,6 +52,13 @@ class _AppInitializationShellState
 
   @override
   Widget build(BuildContext context) {
-    return UpdateCheck(child: widget.child);
+    final ndkFlutter = ref.read(ndkFlutterProvider);
+
+    return Stack(
+      children: [
+        UpdateCheck(child: widget.child),
+        NPendingRequests(ndkFlutter: ndkFlutter),
+      ],
+    );
   }
 }

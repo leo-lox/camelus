@@ -1,4 +1,4 @@
-import 'package:camelus/config/palette.dart';
+import 'package:camelus/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
@@ -70,17 +70,15 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              //color: Paletter.getExtraDarkGray(context),
+              //color: Theme.of(context).colorScheme.surface,
               borderRadius: BorderRadius.circular(200),
             ),
-            child: widget.leading ??
+            child:
+                widget.leading ??
                 IconButton(
                   icon: _searchFocusNode.hasFocus
                       ? Icon(PhosphorIcons.arrowLeft())
-                      : Icon(
-                          PhosphorIcons.magnifyingGlass(),
-                          size: 23,
-                        ),
+                      : Icon(PhosphorIcons.magnifyingGlass(), size: 23),
                   color: Theme.of(context).colorScheme.onSurface,
                   onPressed: () {
                     _searchController.clear();
@@ -101,26 +99,16 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
               focusNode: _searchFocusNode,
               decoration: InputDecoration(
                 isDense: true,
-                hintText: ' Search',
-                hintStyle: TextStyle(
-                    color: Theme.of(context).colorScheme.onSurface,
-                    letterSpacing: 1.1),
+                hintText: ' ${AppLocalizations.of(context)!.searchHint}',
+                hintStyle: TextStyle(letterSpacing: 1.1),
                 filled: true,
-                fillColor: _searchFocusNode.hasFocus
-                    ? Theme.of(context).colorScheme.surface
-                    : Paletter.getExtraDarkGray(context),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.all(Radius.circular(50.0)),
-                  borderSide:
-                      BorderSide(color: Paletter.getExtraDarkGray(context)),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.all(Radius.circular(25.0)),
-                  borderSide:
-                      BorderSide(color: Theme.of(context).colorScheme.surface),
                 ),
               ),
-              style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
               onChanged: (value) {
                 widget.onSearchChanged(value);
               },
@@ -139,10 +127,7 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
               width: 41,
               height: 41,
               child: IconButton(
-                icon: Icon(
-                  PhosphorIcons.question(),
-                  size: 23,
-                ),
+                icon: Icon(PhosphorIcons.question(), size: 23),
                 color: Theme.of(context).colorScheme.onSurface,
                 onPressed: () => widget.helpSearch(context),
               ),

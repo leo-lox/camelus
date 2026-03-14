@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:flutter/services.dart';
 
@@ -52,8 +53,10 @@ class ImageGalleryState extends State<ImageGallery> {
   /// Resets the status bar visibility to default when the widget is disposed.
   void _resetStatusBar() {
     if (!_hideStatusBarWhileViewing) return;
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
-        overlays: SystemUiOverlay.values);
+    SystemChrome.setEnabledSystemUIMode(
+      SystemUiMode.manual,
+      overlays: SystemUiOverlay.values,
+    );
   }
 
   @override
@@ -109,7 +112,9 @@ class ImageGalleryState extends State<ImageGallery> {
                     Center(
                       child: Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 5),
+                          horizontal: 10,
+                          vertical: 5,
+                        ),
                         child: widget.bottomBarWidget,
                       ),
                     ),
@@ -135,7 +140,11 @@ class ImageGalleryState extends State<ImageGallery> {
             icon: const Icon(Icons.close, size: 30),
             color: Colors.white,
             onPressed: () {
-              Navigator.of(context).pop();
+              if (Navigator.of(context).canPop()) {
+                Navigator.of(context).pop();
+              } else {
+                context.go('/');
+              }
             },
           ),
           // Title of the gallery.
@@ -174,10 +183,12 @@ class ImageGalleryState extends State<ImageGallery> {
       itemBuilder: (context, index) {
         return PhotoView(
           imageProvider: CachedNetworkImageProvider(widget.imageUrls[index]),
-          heroAttributes: widget.heroTag != null
+          heroAttributes:
+              widget.heroTag != null && index == widget.defaultImageIndex
               ? PhotoViewHeroAttributes(
                   tag:
-                      'image-${widget.imageUrls[widget.defaultImageIndex]}-${widget.heroTag}')
+                      'image-${widget.imageUrls[index]}-${widget.heroTag}-$index',
+                )
               : null,
           minScale: PhotoViewComputedScale.contained * 1,
           maxScale: PhotoViewComputedScale.covered * 2,

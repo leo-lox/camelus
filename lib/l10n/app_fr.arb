@@ -52,7 +52,6 @@
   "following": "Abonnements",
   "followers": "Abonnés",
   "profile": "Profil",
-  "bookmarks": "Favoris",
   "notImplementedYet": "Pas encore implémenté",
   "payments": "Paiements",
   "blocklist": "Liste de blocage",
@@ -182,5 +181,292 @@
   "teal": "Bleu Sarcelle",
   "pink": "Rose",
   "indigo": "Indigo",
-  "welcome": "Bienvenue"
+  "welcome": "Bienvenue",
+  "bookmarks": "Favoris",
+  "removeBookmark": "Supprimer ce favori?",
+  "bookmarkRemoved": "Favori supprimé",
+  "noPrivateBookmarks": "Pas encore de favoris privés",
+  "noPublicBookmarks": "Pas encore de favoris publics",
+  "privateBookmarks": "Privé",
+  "publicBookmarks": "Public",
+  "addToBookmarks": "Ajouter aux favoris",
+  "removeFromBookmarks": "Retirer des favoris",
+  "addingToBookmarks": "Ajout aux favoris...",
+  "removingFromBookmarks": "Suppression des favoris...",
+  "failedToAddBookmark": "Échec de l'ajout du favori",
+  "failedToRemoveBookmark": "Échec de la suppression du favori",
+  "pleaseLoginToManageFileServers": "Veuillez vous connecter pour gérer les serveurs de fichiers",
+  "welcomeTo": "bienvenue à",
+  "joinTheConversation": "rejoindre la conversation",
+  "browseWithoutLogin": "Parcourir sans se connecter",
+  "loginRegistrationRequired": "Connexion/Inscription requise",
+  "pleaseLoginToInteract": "Veuillez vous connecter/vous inscrire pour interagir avec les publications",
+  "loginRegister": "Se connecter/S'inscrire",
+  "all": "Tous",
+  "mentions": "Mentions",
+  "preview": "Aperçu",
+  "relayAlreadyExists": "Le relais existe déjà",
+  "relayAlreadyExistsMessage": "Ce relais a déjà été ajouté",
+  "discardChanges": "Annuler les modifications",
+  "discardChangesMessage": "Voulez-vous annuler les modifications?",
+  "deleteRelay": "Supprimer le relais",
+  "delete": "Supprimer",
+  "noTextFoundInClipboard": "Aucun texte trouvé dans le presse-papiers",
+  "pleaseEnterValidBunkerUrl": "Veuillez entrer une URL bunker valide",
+  "failedToConnectToBunker": "Échec de la connexion au bunker",
+  "reactedToYourPost": "a réagi à votre publication",
+  "repliedToYourPost": "a répondu à votre publication",
+  "mentionedYouInThread": "vous a mentionné dans un fil",
+  "repostedYourPost": "a partagé votre publication",
+  "mentionedYou": "vous a mentionné",
+  "interactedWithYourPost": "a interagi avec votre publication",
+  "whenSomeoneInteractsWithYourPosts": "Quand quelqu'un interagit avec vos publications",
+  "noNotifications": "Aucune notification",
+  "endOfNotifications": "Fin des notifications",
+  "trends": "Tendances",
+  "recentStarterPacks": "Packs de démarrage récents",
+  "noResultsFound": "Aucun résultat trouvé",
+  "people": "Personnes",
+  "notes": "Notes",
+  "searchForHashtags": "Rechercher des hashtags",
+  "nip05Address": "Adresse NIP-05",
+  "repostHasNoInformation": "Ce repost ne contient aucune information",
+  "invalidSignature": "Signature invalide",
+  "deletionRequested": "Suppression demandée",
+  "unknownStarterPack": "Pack de démarrage inconnu",
+  "noStarterPacksFound": "Aucun pack de démarrage trouvé",
+  "searchToAddUser": "Rechercher pour ajouter un utilisateur",
+  "noServersFound": "Aucun serveur trouvé",
+  "noFilterFound": "Aucun filtre trouvé",
+  "replyToPrefix": "répondre à",
+  "andMoreCount": "et {count} de plus",
+  "@andMoreCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "noteNotFound": "Note introuvable",
+  "shared": " a partagé",
+  "loadingMightFail": "Le chargement pourrait échouer",
+  "bugReportMessage": "Signaler un bug",
+  "noMoreNotesToShow": "Plus de notes à afficher",
+  "trendingPeople": "Personnes tendance",
+  "trendingHashtags": "Hashtags tendance",
+  "somethingWentWrong": "Quelque chose s'est mal passé",
+  "noConnection": "Aucune connexion",
+  "reconnectingToRelays": "Reconnexion aux relais",
+  "addRelay": "Ajouter un relais",
+  "read": "Lire",
+  "write": "Écrire",
+  "starterPack": "Pack de démarrage",
+  "deleteStarterPack": "Supprimer le pack de démarrage",
+  "deleteStarterPackConfirm": "Êtes-vous sûr de vouloir supprimer ce pack de démarrage? Cette action ne peut pas être annulée.",
+  "share": "Partager",
+  "starterPackBy": "Pack de démarrage par {author}",
+  "@starterPackBy": {
+    "placeholders": {
+      "author": {
+        "type": "String"
+      }
+    }
+  },
+  "you": "vous",
+  "addToStarterPackTitle": "Ajouter {name} au pack de démarrage",
+  "@addToStarterPackTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "createNewStarterPack": "Créer un nouveau pack de démarrage",
+  "upload": "Télécharger",
+  "createYourStarterPack": "Créez votre pack de démarrage",
+  "inviteFriendsToFollow": "Invitez vos amis à suivre vos personnes préférées",
+  "title": "Titre",
+  "description": "Description",
+  "yourStarterPack": "votre pack de démarrage",
+  "shareWithFriends": "Partagez-le avec vos amis et aidez-les à découvrir des personnes formidables!",
+  "shareStarterPack": "partager le pack de démarrage",
+  "publishStarterPack": "publier le pack de démarrage",
+  "addUsersToContinue": "ajouter des utilisateurs pour continuer",
+  "addUserMenuHint": "Ajouter un utilisateur à la liste",
+  "show": "Afficher",
+  "pushNotifications": "Notifications push",
+  "receiveNotificationsAboutReplies": "Recevoir des notifications concernant les réponses",
+  "enableNotificationsForReplies": "Activer les notifications pour les réponses",
+  "notificationsDeniedInSettings": "Notifications refusées dans les paramètres",
+  "welcomeTo": "Bienvenue à",
+  "joinTheConversation": "Rejoignez la conversation",
+  "errorLoadingNote": "Erreur lors du chargement de la note",
+  "errorPrefix": "Erreur: {error}",
+  "@errorPrefix": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "errorProcessingLink": "Erreur lors du traitement du lien",
+  "processingLink": "Traitement du lien",
+  "noMatchingActionFound": "Aucune action correspondante trouvée",
+  "worksOnlyIfInCache": "Fonctionne uniquement si en cache",
+  "mastodonAddress": "Adresse Mastodon",
+  "amberLogin": "Connexion Amber",
+  "seedPhraseLogin": "Connexion par phrase de récupération",
+  "bunkerLogin": "Connexion Bunker",
+  "iHaveReadAndAcceptThe": "J'ai lu et j'accepte les",
+  "installAmber": "Installer Amber",
+  "authoriseAmber": "Autoriser Amber",
+  "connect": "Connecter",
+  "followCount": "continuer avec {count}/{target} personnes",
+  "@followCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "target": {
+        "type": "int"
+      }
+    }
+  },
+  "notAvailable": "Non disponible",
+  "post": "Publier",
+  "newPostsCount": "{count} nouvelles publications",
+  "@newPostsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "noteReference": "Référence de note",
+  "createStarterPack": "Créer un pack de démarrage",
+  "createAnother": "Créer un autre",
+  "starterPackIsLive": "🎉 Votre pack de démarrage est en ligne!",
+  "searchHint": "Rechercher",
+  "bunkerUrlHint": "bunker://",
+  "continueWithPeople": "continuer avec {count} personnes",
+  "@continueWithPeople": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "unknown": "Inconnu",
+  "follow": "suivre",
+  "unfollow": "ne plus suivre",
+  "invalidBunkerUrl": "URL bunker invalide. Doit commencer par bunker://",
+  "failedToConnectWithError": "Échec de la connexion: {error}",
+  "@failedToConnectWithError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "byUsingCamelusYouAgree": "En utilisant Camelus, vous acceptez ",
+  "@byUsingCamelusYouAgree": {
+    "description": "Text before terms and conditions link on onboarding page"
+  },
+  "dmRelays": "Relais DM",
+  "dmRelaysInfo": "Ces relais sont utilisés spécifiquement pour envoyer et recevoir des messages privés (NIP-17). Les autres utilisateurs enverront leurs DMs à ces relais.",
+  "invalidUrl": "URL invalide",
+  "alreadyExists": "Existe déjà",
+  "relaysSaved": "Relais sauvegardés",
+  "failedToSaveRelays": "Échec de la sauvegarde des relais",
+  "noDmRelaysConfigured": "Aucun relais DM configuré",
+  "dmRelaysEmptyDescription": "Ajoutez des relais où vous souhaitez recevoir des messages privés. Sans relais DM, vos relais inbox NIP-65 seront utilisés par défaut.",
+  "suggestedRelays": "Relais suggérés:",
+  "restoreRelay": "Restaurer le relais",
+  "removeRelay": "Supprimer le relais",
+  "addRelay": "Ajouter un relais",
+  "refresh": "Actualiser",
+  "messages": "Messages",
+  "pleaseLoginToViewMessages": "Veuillez vous connecter pour voir les messages",
+  "newMessage": "Nouveau message",
+  "failedToLoadMessages": "Échec du chargement des messages",
+  "retry": "Réessayer",
+  "failed": "Échec",
+  "noMessagesYet": "Aucun message",
+  "startConversationHint": "Démarrez une conversation en appuyant sur l'icône crayon",
+  "newMessageDialogTitle": "Nouveau message",
+  "enterPubkeyPrompt": "Entrez la clé publique (nprofile, npub, ou hex):",
+  "pubkeyHint": "nprofile1..., npub1..., ou hex",
+  "startChat": "Démarrer",
+  "loadOlderMessages": "Charger les anciens messages",
+  "endToEndEncrypted": "Chiffré de bout en bout",
+  "beginningOfConversation": "C'est le début de votre conversation",
+  "startYourEncryptedConversation": "Démarrez votre conversation chiffrée",
+  "endToEndEncryptedNip17": "Chiffré de bout en bout avec NIP-17",
+  "messageHint": "Message...",
+  "failedToSendMessage": "Échec de l'envoi du message",
+  "deleteMessage": "Supprimer le message",
+  "deleteMessageConfirmTitle": "Supprimer le message ?",
+  "deleteMessageConfirmContent": "Cela demandera au relais de supprimer ce message et le retirera de votre appareil.",
+  "today": "Aujourd'hui",
+  "yesterday": "Hier",
+  "monday": "Lundi",
+  "tuesday": "Mardi",
+  "wednesday": "Mercredi",
+  "thursday": "Jeudi",
+  "friday": "Vendredi",
+  "saturday": "Samedi",
+  "sunday": "Dimanche",
+  "searchUserHint": "Rechercher par nom, NIP-05 ou npub...",
+  "searchToStartConversation": "Recherchez un utilisateur pour démarrer une conversation",
+  "enterAtLeast2Characters": "Entrez au moins 2 caractères",
+  "noUsersFound": "Aucun utilisateur trouvé",
+  "chatRelayStatus": "État des relais",
+  "chatRelayExcellent": "Excellent",
+  "chatRelayDegraded": "Dégradé",
+  "chatRelayPoor": "Mauvais",
+  "yourDmRelays": "Vos relais DM",
+  "peerDmRelays": "Relais DM du contact",
+  "noRelaysFound": "Aucun relais trouvé",
+  "debugTools": "Outils de debug",
+  "refreshRelayDiscovery": "Actualiser la découverte des relais",
+  "deletionNotSupportedByRelays": "Message supprimé localement, mais les relais peuvent ne pas supporter la suppression",
+  "testDeletionSupport": "Tester le support de suppression",
+  "deletionSupported": "Suppression supportée",
+  "deletionNotSupported": "Suppression non supportée",
+  "testing": "Test en cours...",
+  "testFailed": "Échec du test",
+  "relayRejectsGiftWrap": "Rejette les gift wraps",
+  "relayRejectsDeletion": "Rejette la suppression",
+  "networkError": "Erreur réseau",
+  "timeout": "Délai dépassé",
+  "privacyPrivate": "Privé (sécurisé)",
+  "privacyLeaks": "Fuite de confidentialité",
+  "testPrivacy": "Tester la confidentialité",
+  "testAllRelays": "Tester tous les relais",
+  "testAllRelaysDescription": "Teste le support de suppression et la confidentialité pour tous les relais connectés",
+  "relayStatusExcellentDescription": "Connecté à {myCount} de vos relais et {peerCount} relais du contact.",
+  "@relayStatusExcellentDescription": {
+    "placeholders": {
+      "myCount": {"type": "int"},
+      "peerCount": {"type": "int"}
+    }
+  },
+  "relayStatusDegradedMyOnly": "Connecté à vos relais, mais pas aux relais DM du contact. Les messages peuvent être retardés.",
+  "relayStatusDegradedPeerOnly": "Connecté aux relais du contact, mais pas à vos relais DM. Vous pourriez manquer des messages.",
+  "relayStatusDegradedPartial": "Connectivité partielle. Certains messages peuvent être retardés.",
+  "relayStatusPoorDescription": "Aucun relais DM connecté. Les messages pourraient ne pas être livrés.",
+  "relayStatusLoadingDescription": "Chargement des informations des relais...",
+  "noteToSelf": "Note personnelle",
+  "noteToSelfHint": "Sauvegardez des messages, liens et notes pour vous-même",
+  "dmFollows": "Abonnements",
+  "dmKnown": "Connus",
+  "dmRequests": "Demandes",
+  "noFollowsConversations": "Aucune conversation avec les personnes que vous suivez",
+  "noKnownConversations": "Aucune conversation avec des contacts connus",
+  "noMessageRequests": "Aucune demande de message"
+  ,
+  "imprint": "Mentions légales",
+  "@imprint": {
+    "description": "Imprint page title"
+  }
 }

@@ -1,10 +1,11 @@
+import 'package:camelus/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 
-import 'package:camelus/config/palette.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../domain_layer/entities/user_metadata.dart';
+import '../../routing/route_paths.dart';
 import '../../atoms/my_profile_picture.dart';
 import '../../providers/following_contact_state_provider.dart';
 import '../../providers/metadata_state_provider.dart';
@@ -18,10 +19,14 @@ class NostrDrawer extends ConsumerWidget {
   const NostrDrawer({super.key, required this.pubkey});
 
   void navigateToProfile(BuildContext context) {
-    context.push('/nostr/profile/$pubkey');
+    context.push(RoutePaths.profile(pubkey: pubkey));
   }
 
-  Widget _drawerHeader(context, UserMetadata? metadata, WidgetRef ref) {
+  Widget _drawerHeader(
+    BuildContext context,
+    UserMetadata? metadata,
+    WidgetRef ref,
+  ) {
     final myContactList = ref.watch(contactListSelfStateProvider);
     return DrawerHeader(
       child: Column(
@@ -37,15 +42,10 @@ class NostrDrawer extends ConsumerWidget {
                 color: Theme.of(context).colorScheme.surface,
                 shape: BoxShape.circle,
               ),
-              child: UserImage(
-                imageUrl: metadata?.picture,
-                pubkey: pubkey,
-              ),
+              child: UserImage(imageUrl: metadata?.picture, pubkey: pubkey),
             ),
           ),
-          const SizedBox(
-            height: 8,
-          ),
+          const SizedBox(height: 8),
           GestureDetector(
             onTap: () => navigateToProfile(context),
             child: Row(
@@ -61,18 +61,18 @@ class NostrDrawer extends ConsumerWidget {
                         Text(
                           metadata?.name ?? '',
                           style: TextStyle(
-                              color: Theme.of(context).colorScheme.onSurface,
-                              fontSize: 17,
-                              fontWeight: FontWeight.bold),
+                            color: Theme.of(context).colorScheme.onSurface,
+                            fontSize: 17,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
-                        const SizedBox(
-                          height: 3,
-                        ),
+                        const SizedBox(height: 3),
                         Text(
                           metadata?.nip05 ?? '',
                           style: TextStyle(
-                            color:
-                                Theme.of(context).colorScheme.onSurfaceVariant,
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onSurfaceVariant,
                             fontSize: 15,
                           ),
                         ),
@@ -88,9 +88,7 @@ class NostrDrawer extends ConsumerWidget {
               ],
             ),
           ),
-          const SizedBox(
-            height: 15,
-          ),
+          const SizedBox(height: 15),
           Row(
             children: [
               RichText(
@@ -100,38 +98,40 @@ class NostrDrawer extends ConsumerWidget {
                       : 'n.a.',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    color: Paletter.getExtraLightGray(context),
+                    color: Theme.of(context).colorScheme.onSurface,
                   ),
                   children: [
                     TextSpan(
-                      text: ' Following  ',
+                      text: ' ${AppLocalizations.of(context)!.following}  ',
                       style: TextStyle(
-                          color: Theme.of(context).colorScheme.onSurfaceVariant,
-                          fontSize: 13,
-                          fontWeight: FontWeight.normal),
-                    )
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        fontSize: 13,
+                        fontWeight: FontWeight.normal,
+                      ),
+                    ),
                   ],
                 ),
               ),
-              const SizedBox(
-                width: 6,
-              ),
+              const SizedBox(width: 6),
               RichText(
-                  text: TextSpan(
-                      text: 'n.a.',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Paletter.getExtraLightGray(context),
-                      ),
-                      children: [
+                text: TextSpan(
+                  text: AppLocalizations.of(context)!.notAvailable,
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
+                  children: [
                     TextSpan(
-                      text: 'Followers',
+                      text: AppLocalizations.of(context)!.followers,
                       style: TextStyle(
-                          color: Theme.of(context).colorScheme.onSurfaceVariant,
-                          fontSize: 13,
-                          fontWeight: FontWeight.normal),
-                    )
-                  ])),
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        fontSize: 13,
+                        fontWeight: FontWeight.normal,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ],
           ),
         ],
@@ -141,8 +141,9 @@ class NostrDrawer extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final myUserMetadata =
-        ref.watch(metadataStateProvider(pubkey)).userMetadata;
+    final myUserMetadata = ref
+        .watch(metadataStateProvider(pubkey))
+        .userMetadata;
     return Drawer(
       child: NostrSideMenu(
         hideOnMobile: true,

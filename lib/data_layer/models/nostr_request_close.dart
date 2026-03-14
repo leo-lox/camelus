@@ -7,9 +7,7 @@ class NostrRequestClose implements NostrRequest {
   @override
   final String subscriptionId;
 
-  NostrRequestClose({
-    required this.subscriptionId,
-  });
+  NostrRequestClose({required this.subscriptionId});
 
   @override
   String toRawList() {

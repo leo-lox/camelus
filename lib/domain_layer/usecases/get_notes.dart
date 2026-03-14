@@ -17,8 +17,15 @@ class GetNotes {
 
   // todo: check if possible to close the subscription when the stream closes
   Stream<NostrNote> getNote(String noteId, {Iterable<String>? explicitRelays}) {
-    return _noteRepository.getTextNote(
-      noteId,
+    return _noteRepository.getTextNote(noteId, explicitRelays: explicitRelays);
+  }
+
+  Stream<NostrNote> getNotes(
+    List<String> noteIds, {
+    Iterable<String>? explicitRelays,
+  }) {
+    return _noteRepository.getTextNotes(
+      noteIds,
       explicitRelays: explicitRelays,
     );
   }
@@ -117,11 +124,12 @@ class GetNotes {
   }
 
   Future<void> broadcastNote(NostrNote noteToPublish) async {
-    await _noteRepository.broadcastNote(noteToPublish).onError(
-      (error, stackTrace) {
-        log('Error broadcasting note: $error', stackTrace: stackTrace);
-        return Future.error(error ?? 'Error broadcasting note');
-      },
-    );
+    await _noteRepository.broadcastNote(noteToPublish).onError((
+      error,
+      stackTrace,
+    ) {
+      log('Error broadcasting note: $error', stackTrace: stackTrace);
+      return Future.error(error ?? 'Error broadcasting note');
+    });
   }
 }

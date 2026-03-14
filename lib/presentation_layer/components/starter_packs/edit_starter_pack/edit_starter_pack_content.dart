@@ -1,8 +1,8 @@
+import 'package:camelus/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
-import '../../../../config/palette.dart';
 import '../../../../domain_layer/entities/starter_pack_identifier.dart';
 
 import '../../../atoms/long_button.dart';
@@ -10,7 +10,7 @@ import '../../../atoms/my_profile_picture.dart';
 import '../../../atoms/nip_05_text.dart';
 import '../../../providers/metadata_state_provider.dart';
 import '../../../providers/search_provider.dart';
-import '../../../routes/search_page.dart';
+import '../../../routes/search/search_state_notifier.dart';
 import '../../search_bar.dart';
 import 'edit_starter_pack_provider.dart';
 
@@ -31,23 +31,26 @@ class _EditStarterPackContentState
     extends ConsumerState<EditStarterPackContent> {
   bool _isReorderMode = false;
 
-  _addToSelection(String userPubkey) {
-    final starterPackNotifier = ref
-        .read(editStarterPackProvider(widget.starterPackIdentifier).notifier);
+  void _addToSelection(String userPubkey) {
+    final starterPackNotifier = ref.read(
+      editStarterPackProvider(widget.starterPackIdentifier).notifier,
+    );
 
     starterPackNotifier.addUser(userPubkey);
   }
 
-  _removeFromSelection(String userPubkey) {
-    final starterPackNotifier = ref
-        .read(editStarterPackProvider(widget.starterPackIdentifier).notifier);
+  void _removeFromSelection(String userPubkey) {
+    final starterPackNotifier = ref.read(
+      editStarterPackProvider(widget.starterPackIdentifier).notifier,
+    );
 
     starterPackNotifier.removeUser(userPubkey);
   }
 
-  _reorderUser(int oldIndex, int newIndex) {
-    final starterPackNotifier = ref
-        .read(editStarterPackProvider(widget.starterPackIdentifier).notifier);
+  void _reorderUser(int oldIndex, int newIndex) {
+    final starterPackNotifier = ref.read(
+      editStarterPackProvider(widget.starterPackIdentifier).notifier,
+    );
 
     starterPackNotifier.reorderUser(oldIndex, newIndex);
   }
@@ -57,8 +60,9 @@ class _EditStarterPackContentState
     final searchService = ref.read(searchProvider);
     final searchState = ref.watch(searchStateProvider);
     final searchNotifier = ref.watch(searchStateProvider.notifier);
-    final starterPackData =
-        ref.watch(editStarterPackProvider(widget.starterPackIdentifier));
+    final starterPackData = ref.watch(
+      editStarterPackProvider(widget.starterPackIdentifier),
+    );
 
     return Scaffold(
       body: Column(
@@ -117,17 +121,21 @@ class _EditStarterPackContentState
               child: SafeArea(
                 top: false,
                 child: SizedBox(
-                    width: double.infinity,
-                    height: 40,
-                    child: longButton(
-                        name: starterPackData.selectedUsers.isEmpty
-                            ? "add users to continue"
-                            : "continue with ${starterPackData.selectedUsers.length} people",
-                        inverted: true,
-                        disabled: starterPackData.selectedUsers.isEmpty,
-                        onPressed: () {
-                          widget.onNext();
-                        })),
+                  width: double.infinity,
+                  height: 40,
+                  child: longButton(
+                    name: starterPackData.selectedUsers.isEmpty
+                        ? AppLocalizations.of(context)!.addUsersToContinue
+                        : AppLocalizations.of(context)!.continueWithPeople(
+                            starterPackData.selectedUsers.length,
+                          ),
+                    inverted: true,
+                    disabled: starterPackData.selectedUsers.isEmpty,
+                    onPressed: () {
+                      widget.onNext();
+                    },
+                  ),
+                ),
               ),
             ),
         ],
@@ -156,7 +164,9 @@ class _EditStarterPackContentState
   }
 
   Widget _buildNormalList(
-      SearchState searchState, StarterPackData starterPackData) {
+    SearchState searchState,
+    StarterPackData starterPackData,
+  ) {
     return ListView(
       physics: const BouncingScrollPhysics(),
       children: [
@@ -191,17 +201,19 @@ class _EditStarterPackContentState
             child: Column(
               children: [
                 Text(
-                  "search to add user",
+                  AppLocalizations.of(context)!.searchToAddUser,
                   style: TextStyle(fontSize: 18),
                 ),
                 Text(
-                  "you can also use the three dots menu on every post to add a user to a pack",
+                  AppLocalizations.of(context)!.addUserMenuHint,
                   style: TextStyle(
-                      fontSize: 12, color: Paletter.getLightGray(context)),
+                    fontSize: 12,
+                    color: Theme.of(context).colorScheme.inverseSurface,
+                  ),
                 ),
               ],
             ),
-          )
+          ),
       ],
     );
   }
@@ -227,15 +239,13 @@ class PersonSelect extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final metadata = ref.watch(metadataStateProvider(pubkey)).userMetadata;
     return ListTile(
-      onTap:
-          isReorderMode ? null : () => onTab(), // Disable tap in reorder mode
+      onTap: isReorderMode
+          ? null
+          : () => onTab(), // Disable tap in reorder mode
       title: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          UserImage(
-            imageUrl: metadata?.picture,
-            pubkey: pubkey,
-          ),
+          UserImage(imageUrl: metadata?.picture, pubkey: pubkey),
           const SizedBox(width: 16),
           Expanded(
             child: Column(
@@ -250,15 +260,12 @@ class PersonSelect extends ConsumerWidget {
                   ),
                   overflow: TextOverflow.ellipsis,
                 ),
-                Nip05Text(
-                  pubkey: pubkey,
-                  nip05verified: metadata?.nip05,
-                ),
+                Nip05Text(pubkey: pubkey, nip05verified: metadata?.nip05),
                 const SizedBox(height: 4),
                 Text(
                   metadata?.about ?? "",
                   style: TextStyle(
-                    color: Paletter.getGray(context),
+                    color: Theme.of(context).colorScheme.inverseSurface,
                     fontSize: 12,
                   ),
                   maxLines: 3,
@@ -286,7 +293,7 @@ class PersonSelect extends ConsumerWidget {
                 width: 50,
                 child: Icon(PhosphorIcons.dotsSixVertical()),
               ),
-            )
+            ),
         ],
       ),
     );

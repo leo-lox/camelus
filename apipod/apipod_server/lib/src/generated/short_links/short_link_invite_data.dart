@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
@@ -39,12 +40,13 @@ abstract class ShortLinkInviteData
     return ShortLinkInviteData(
       id: jsonSerialization['id'] as int?,
       shortLink: jsonSerialization['shortLink'] as String,
-      createdAt:
-          _i1.DateTimeJsonExtension.fromJson(jsonSerialization['createdAt']),
+      createdAt: _i1.DateTimeJsonExtension.fromJson(
+        jsonSerialization['createdAt'],
+      ),
       invitedByNpub: jsonSerialization['invitedByNpub'] as String,
       listName: jsonSerialization['listName'] as String,
       listNpub: jsonSerialization['listNpub'] as String,
-      usageCount: jsonSerialization['usageCount'] as int,
+      usageCount: jsonSerialization['usageCount'] as int?,
       lastUsed: jsonSerialization['lastUsed'] == null
           ? null
           : _i1.DateTimeJsonExtension.fromJson(jsonSerialization['lastUsed']),
@@ -91,6 +93,7 @@ abstract class ShortLinkInviteData
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'ShortLinkInviteData',
       if (id != null) 'id': id,
       'shortLink': shortLink,
       'createdAt': createdAt.toJson(),
@@ -105,6 +108,7 @@ abstract class ShortLinkInviteData
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
+      '__className__': 'ShortLinkInviteData',
       if (id != null) 'id': id,
       'shortLink': shortLink,
       'createdAt': createdAt.toJson(),
@@ -159,15 +163,15 @@ class _ShortLinkInviteDataImpl extends ShortLinkInviteData {
     int? usageCount,
     DateTime? lastUsed,
   }) : super._(
-          id: id,
-          shortLink: shortLink,
-          createdAt: createdAt,
-          invitedByNpub: invitedByNpub,
-          listName: listName,
-          listNpub: listNpub,
-          usageCount: usageCount,
-          lastUsed: lastUsed,
-        );
+         id: id,
+         shortLink: shortLink,
+         createdAt: createdAt,
+         invitedByNpub: invitedByNpub,
+         listName: listName,
+         listNpub: listNpub,
+         usageCount: usageCount,
+         lastUsed: lastUsed,
+       );
 
   /// Returns a shallow copy of this [ShortLinkInviteData]
   /// with some or all fields replaced by the given arguments.
@@ -196,9 +200,53 @@ class _ShortLinkInviteDataImpl extends ShortLinkInviteData {
   }
 }
 
+class ShortLinkInviteDataUpdateTable
+    extends _i1.UpdateTable<ShortLinkInviteDataTable> {
+  ShortLinkInviteDataUpdateTable(super.table);
+
+  _i1.ColumnValue<String, String> shortLink(String value) => _i1.ColumnValue(
+    table.shortLink,
+    value,
+  );
+
+  _i1.ColumnValue<DateTime, DateTime> createdAt(DateTime value) =>
+      _i1.ColumnValue(
+        table.createdAt,
+        value,
+      );
+
+  _i1.ColumnValue<String, String> invitedByNpub(String value) =>
+      _i1.ColumnValue(
+        table.invitedByNpub,
+        value,
+      );
+
+  _i1.ColumnValue<String, String> listName(String value) => _i1.ColumnValue(
+    table.listName,
+    value,
+  );
+
+  _i1.ColumnValue<String, String> listNpub(String value) => _i1.ColumnValue(
+    table.listNpub,
+    value,
+  );
+
+  _i1.ColumnValue<int, int> usageCount(int value) => _i1.ColumnValue(
+    table.usageCount,
+    value,
+  );
+
+  _i1.ColumnValue<DateTime, DateTime> lastUsed(DateTime? value) =>
+      _i1.ColumnValue(
+        table.lastUsed,
+        value,
+      );
+}
+
 class ShortLinkInviteDataTable extends _i1.Table<int?> {
   ShortLinkInviteDataTable({super.tableRelation})
-      : super(tableName: 'short_link_invite_data') {
+    : super(tableName: 'short_link_invite_data') {
+    updateTable = ShortLinkInviteDataUpdateTable(this);
     shortLink = _i1.ColumnString(
       'shortLink',
       this,
@@ -230,6 +278,8 @@ class ShortLinkInviteDataTable extends _i1.Table<int?> {
     );
   }
 
+  late final ShortLinkInviteDataUpdateTable updateTable;
+
   late final _i1.ColumnString shortLink;
 
   late final _i1.ColumnDateTime createdAt;
@@ -246,15 +296,15 @@ class ShortLinkInviteDataTable extends _i1.Table<int?> {
 
   @override
   List<_i1.Column> get columns => [
-        id,
-        shortLink,
-        createdAt,
-        invitedByNpub,
-        listName,
-        listNpub,
-        usageCount,
-        lastUsed,
-      ];
+    id,
+    shortLink,
+    createdAt,
+    invitedByNpub,
+    listName,
+    listNpub,
+    usageCount,
+    lastUsed,
+  ];
 }
 
 class ShortLinkInviteDataInclude extends _i1.IncludeObject {
@@ -442,6 +492,48 @@ class ShortLinkInviteDataRepository {
     return session.db.updateRow<ShortLinkInviteData>(
       row,
       columns: columns?.call(ShortLinkInviteData.t),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates a single [ShortLinkInviteData] by its [id] with the specified [columnValues].
+  /// Returns the updated row or null if no row with the given id exists.
+  Future<ShortLinkInviteData?> updateById(
+    _i1.Session session,
+    int id, {
+    required _i1.ColumnValueListBuilder<ShortLinkInviteDataUpdateTable>
+    columnValues,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateById<ShortLinkInviteData>(
+      id,
+      columnValues: columnValues(ShortLinkInviteData.t.updateTable),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates all [ShortLinkInviteData]s matching the [where] expression with the specified [columnValues].
+  /// Returns the list of updated rows.
+  Future<List<ShortLinkInviteData>> updateWhere(
+    _i1.Session session, {
+    required _i1.ColumnValueListBuilder<ShortLinkInviteDataUpdateTable>
+    columnValues,
+    required _i1.WhereExpressionBuilder<ShortLinkInviteDataTable> where,
+    int? limit,
+    int? offset,
+    _i1.OrderByBuilder<ShortLinkInviteDataTable>? orderBy,
+    _i1.OrderByListBuilder<ShortLinkInviteDataTable>? orderByList,
+    bool orderDescending = false,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateWhere<ShortLinkInviteData>(
+      columnValues: columnValues(ShortLinkInviteData.t.updateTable),
+      where: where(ShortLinkInviteData.t),
+      limit: limit,
+      offset: offset,
+      orderBy: orderBy?.call(ShortLinkInviteData.t),
+      orderByList: orderByList?.call(ShortLinkInviteData.t),
+      orderDescending: orderDescending,
       transaction: transaction,
     );
   }

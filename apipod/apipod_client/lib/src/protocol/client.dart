@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
@@ -20,10 +21,8 @@ import 'package:apipod_client/src/protocol/nip05/nip_05_response_spy.dart'
     as _i7;
 import 'package:apipod_client/src/protocol/nip05/check_name_result_spy.dart'
     as _i8;
-import 'package:apipod_client/src/protocol/nostr_band/nostr_band_hashtags.dart'
-    as _i9;
-import 'package:apipod_client/src/protocol/nostr_band/nostr_band_people.dart'
-    as _i10;
+import 'package:ndk/data_layer/models/nip_01_event_model.dart' as _i9;
+import 'package:apipod_client/src/protocol/trends/trends_response.dart' as _i10;
 import 'protocol.dart' as _i11;
 
 /// {@category Endpoint}
@@ -52,25 +51,24 @@ class EndpointLinkShorter extends _i1.EndpointRef {
     required String invitedByNpub,
     required String listName,
     required String listNpub,
-  }) =>
-      caller.callServerEndpoint<String>(
-        'linkShorter',
-        'shortInvite',
-        {
-          'invitedByNpub': invitedByNpub,
-          'listName': listName,
-          'listNpub': listNpub,
-        },
-      );
+  }) => caller.callServerEndpoint<String>(
+    'linkShorter',
+    'shortInvite',
+    {
+      'invitedByNpub': invitedByNpub,
+      'listName': listName,
+      'listNpub': listNpub,
+    },
+  );
 
   /// get short link and track usage
-  _i2.Future<_i4.ShortLinkInviteData?> getInviteByShortLink(
-          {required String shortLink}) =>
-      caller.callServerEndpoint<_i4.ShortLinkInviteData?>(
-        'linkShorter',
-        'getInviteByShortLink',
-        {'shortLink': shortLink},
-      );
+  _i2.Future<_i4.ShortLinkInviteData?> getInviteByShortLink({
+    required String shortLink,
+  }) => caller.callServerEndpoint<_i4.ShortLinkInviteData?>(
+    'linkShorter',
+    'getInviteByShortLink',
+    {'shortLink': shortLink},
+  );
 }
 
 ///    'size': <int>,
@@ -117,56 +115,34 @@ class EndpointNip05 extends _i1.EndpointRef {
   _i2.Future<_i7.Nip05Response?> getNip05(
     String? name,
     String domain,
-  ) =>
-      caller.callServerEndpoint<_i7.Nip05Response?>(
-        'nip05',
-        'getNip05',
-        {
-          'name': name,
-          'domain': domain,
-        },
-      );
+  ) => caller.callServerEndpoint<_i7.Nip05Response?>(
+    'nip05',
+    'getNip05',
+    {
+      'name': name,
+      'domain': domain,
+    },
+  );
 
   _i2.Future<_i8.NameCheckResult> checkName(
     String name,
     String domain,
-  ) =>
-      caller.callServerEndpoint<_i8.NameCheckResult>(
-        'nip05',
-        'checkName',
-        {
-          'name': name,
-          'domain': domain,
-        },
-      );
+  ) => caller.callServerEndpoint<_i8.NameCheckResult>(
+    'nip05',
+    'checkName',
+    {
+      'name': name,
+      'domain': domain,
+    },
+  );
 }
 
 /// {@category Endpoint}
-class EndpointNostrBand extends _i1.EndpointRef {
-  EndpointNostrBand(_i1.EndpointCaller caller) : super(caller);
+class EndpointOtsoExternalSync extends _i1.EndpointRef {
+  EndpointOtsoExternalSync(_i1.EndpointCaller caller) : super(caller);
 
   @override
-  String get name => 'nostrBand';
-
-  _i2.Future<_i9.NostrBandHashtags> hashtags({
-    String? lang,
-    String? limit,
-  }) =>
-      caller.callServerEndpoint<_i9.NostrBandHashtags>(
-        'nostrBand',
-        'hashtags',
-        {
-          'lang': lang,
-          'limit': limit,
-        },
-      );
-
-  _i2.Future<_i10.NostrBandPeople> profiles({String? limit}) =>
-      caller.callServerEndpoint<_i10.NostrBandPeople>(
-        'nostrBand',
-        'profiles',
-        {'limit': limit},
-      );
+  String get name => 'otsoExternalSync';
 }
 
 /// {@category Endpoint}
@@ -178,50 +154,110 @@ class EndpointNostrPush extends _i1.EndpointRef {
 
   _i2.Future<bool> register(
     String token,
-    List<_i6.Nip01Event> events,
-  ) =>
+    List<_i9.Nip01EventModel> events,
+  ) => caller.callServerEndpoint<bool>(
+    'nostrPush',
+    'register',
+    {
+      'token': token,
+      'events': events,
+    },
+  );
+
+  /// Get the registration state for a public key with signature verification
+  _i2.Future<Map<String, dynamic>> getRegistrationState(
+    String signedEventJson,
+  ) => caller.callServerEndpoint<Map<String, dynamic>>(
+    'nostrPush',
+    'getRegistrationState',
+    {'signedEventJson': signedEventJson},
+  );
+}
+
+/// {@category Endpoint}
+class EndpointOtsoPush extends _i1.EndpointRef {
+  EndpointOtsoPush(_i1.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'otsoPush';
+
+  _i2.Future<bool> register(List<_i9.Nip01EventModel> events) =>
       caller.callServerEndpoint<bool>(
-        'nostrPush',
+        'otsoPush',
         'register',
-        {
-          'token': token,
-          'events': events,
-        },
+        {'events': events},
       );
+}
+
+/// {@category Endpoint}
+class EndpointTrends extends _i1.EndpointRef {
+  EndpointTrends(_i1.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'trends';
+
+  _i2.Future<_i10.TrendsResponse> trends({
+    required String interval,
+    required int limit,
+  }) => caller.callServerEndpoint<_i10.TrendsResponse>(
+    'trends',
+    'trends',
+    {
+      'interval': interval,
+      'limit': limit,
+    },
+  );
+
+  _i2.Future<_i10.TrendsResponse> trendingPeople({
+    required String interval,
+    required int limit,
+  }) => caller.callServerEndpoint<_i10.TrendsResponse>(
+    'trends',
+    'trendingPeople',
+    {
+      'interval': interval,
+      'limit': limit,
+    },
+  );
 }
 
 class Client extends _i1.ServerpodClientShared {
   Client(
     String host, {
     dynamic securityContext,
-    _i1.AuthenticationKeyManager? authenticationKeyManager,
+    @Deprecated(
+      'Use authKeyProvider instead. This will be removed in future releases.',
+    )
+    super.authenticationKeyManager,
     Duration? streamingConnectionTimeout,
     Duration? connectionTimeout,
     Function(
       _i1.MethodCallContext,
       Object,
       StackTrace,
-    )? onFailedCall,
+    )?
+    onFailedCall,
     Function(_i1.MethodCallContext)? onSucceededCall,
     bool? disconnectStreamsOnLostInternetConnection,
   }) : super(
-          host,
-          _i11.Protocol(),
-          securityContext: securityContext,
-          authenticationKeyManager: authenticationKeyManager,
-          streamingConnectionTimeout: streamingConnectionTimeout,
-          connectionTimeout: connectionTimeout,
-          onFailedCall: onFailedCall,
-          onSucceededCall: onSucceededCall,
-          disconnectStreamsOnLostInternetConnection:
-              disconnectStreamsOnLostInternetConnection,
-        ) {
+         host,
+         _i11.Protocol(),
+         securityContext: securityContext,
+         streamingConnectionTimeout: streamingConnectionTimeout,
+         connectionTimeout: connectionTimeout,
+         onFailedCall: onFailedCall,
+         onSucceededCall: onSucceededCall,
+         disconnectStreamsOnLostInternetConnection:
+             disconnectStreamsOnLostInternetConnection,
+       ) {
     appUpdate = EndpointAppUpdate(this);
     linkShorter = EndpointLinkShorter(this);
     moderation = EndpointModeration(this);
     nip05 = EndpointNip05(this);
-    nostrBand = EndpointNostrBand(this);
+    otsoExternalSync = EndpointOtsoExternalSync(this);
     nostrPush = EndpointNostrPush(this);
+    otsoPush = EndpointOtsoPush(this);
+    trends = EndpointTrends(this);
   }
 
   late final EndpointAppUpdate appUpdate;
@@ -232,19 +268,25 @@ class Client extends _i1.ServerpodClientShared {
 
   late final EndpointNip05 nip05;
 
-  late final EndpointNostrBand nostrBand;
+  late final EndpointOtsoExternalSync otsoExternalSync;
 
   late final EndpointNostrPush nostrPush;
 
+  late final EndpointOtsoPush otsoPush;
+
+  late final EndpointTrends trends;
+
   @override
   Map<String, _i1.EndpointRef> get endpointRefLookup => {
-        'appUpdate': appUpdate,
-        'linkShorter': linkShorter,
-        'moderation': moderation,
-        'nip05': nip05,
-        'nostrBand': nostrBand,
-        'nostrPush': nostrPush,
-      };
+    'appUpdate': appUpdate,
+    'linkShorter': linkShorter,
+    'moderation': moderation,
+    'nip05': nip05,
+    'otsoExternalSync': otsoExternalSync,
+    'nostrPush': nostrPush,
+    'otsoPush': otsoPush,
+    'trends': trends,
+  };
 
   @override
   Map<String, _i1.ModuleEndpointCaller> get moduleLookup => {};

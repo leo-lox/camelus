@@ -6,16 +6,14 @@ import '../../config/camelus_config.dart';
 import '../../domain_layer/entities/mem_file.dart';
 import '../../domain_layer/entities/nostr_note.dart';
 import '../../domain_layer/entities/nostr_tag.dart';
-import '../../helpers/nprofile_helper.dart';
+import 'package:ndk/shared/nips/nip19/nip19.dart';
 import '../components/write_post/post_settings_dialog.dart';
 import 'file_upload_provider.dart';
 import 'get_notes_provider.dart';
 import 'ndk_provider.dart';
 
 final writePostStateProvider =
-    NotifierProvider<WritePostNotifier, WritePostState>(
-  WritePostNotifier.new,
-);
+    NotifierProvider<WritePostNotifier, WritePostState>(WritePostNotifier.new);
 
 class WritePostState {
   final List<MemFile> images;
@@ -42,7 +40,7 @@ class WritePostState {
     this.hashtagsInPost = const [],
   });
 
-  copyWith({
+  WritePostState copyWith({
     List<MemFile>? images,
     NostrNote? replyToNote,
     bool clearReplyToNote = false,
@@ -69,19 +67,17 @@ class WritePostState {
 }
 
 class WritePostNotifier extends Notifier<WritePostState> {
-  addImage(
-    MemFile image,
-  ) {
+  void addImage(MemFile image) {
     state = state.copyWith(images: [...state.images, image]);
   }
 
-  updateMarkup(String markupText) {
+  void updateMarkup(String markupText) {
     state = state.copyWith(markupText: markupText);
     extractMentions();
     extractHashtags();
   }
 
-  extractMentions() {
+  void extractMentions() {
     final mentionKeys = <String>[];
     final keyRegex = RegExp(r'@\[__(.*?)__\]');
 
@@ -93,7 +89,7 @@ class WritePostNotifier extends Notifier<WritePostState> {
     state.mentionedInPost = mentionKeys;
   }
 
-  extractHashtags() {
+  void extractHashtags() {
     final hashtagKeys = <String>[];
     final keyRegex = RegExp(r'#\w+');
 
@@ -122,8 +118,7 @@ class WritePostNotifier extends Notifier<WritePostState> {
       mentionKeys.add(match.group(1)!);
       var userHex = match.group(1)!;
 
-      var nprofile =
-          NprofileHelper().mapToBech32({'pubkey': userHex, 'relays': []});
+      var nprofile = Nip19.encodeNprofile(pubkey: userHex);
       return 'nostr:$nprofile ';
     });
 
@@ -200,13 +195,15 @@ class WritePostNotifier extends Notifier<WritePostState> {
       // Create "p" tags (without markers)
 
       for (final pubkey in pubkeysToTag) {
-        tags.add(NostrTag(
+        tags.add(
+          NostrTag(
             type: "p",
             value: pubkey,
             recommendedRelay:
-                "" // todo  await editRelayProvider.getRelayHintsInbox(pubkey);
+                "", // todo  await editRelayProvider.getRelayHintsInbox(pubkey);
             // No marker for p tags according to NIP-10
-            ));
+          ),
+        );
       }
     } else {
       // Not a reply, but still add mentions as "p" tags
@@ -214,24 +211,21 @@ class WritePostNotifier extends Notifier<WritePostState> {
         for (int i = 0; i < mentionKeys.length; i++) {
           final pubkey = mentionKeys[i];
 
-          tags.add(NostrTag(
+          tags.add(
+            NostrTag(
               type: "p",
               value: pubkey,
               recommendedRelay:
-                  "" //todo  await editRelayProvider.getRelayHintsInbox(pubkey);,
-              ));
+                  "", //todo  await editRelayProvider.getRelayHintsInbox(pubkey);,
+            ),
+          );
         }
       }
     }
 
     // add hashtags
     for (final hashtag in state.hashtagsInPost) {
-      tags.add(
-        NostrTag(
-          type: "t",
-          value: hashtag.toLowerCase().substring(1),
-        ),
-      );
+      tags.add(NostrTag(type: "t", value: hashtag.toLowerCase().substring(1)));
     }
 
     // upload images
@@ -240,10 +234,10 @@ class WritePostNotifier extends Notifier<WritePostState> {
       state = state.copyWith(
         uploadTasks: [
           ...state.uploadTasks,
-          ref
-              .watch(fileUploadProvider)
-              .uploadImage(image)
-              .onError((err, trace) {
+          ref.watch(fileUploadProvider).uploadImage(image).onError((
+            err,
+            trace,
+          ) {
             // display error
             state = state.copyWith(
               isSubmitting: false,
@@ -251,7 +245,7 @@ class WritePostNotifier extends Notifier<WritePostState> {
               isError: true,
             );
             return Future.error(err.toString());
-          })
+          }),
         ],
       );
     }
@@ -259,13 +253,17 @@ class WritePostNotifier extends Notifier<WritePostState> {
     await Future.wait(state.uploadTasks).then((resultList) {
       if (resultList.isEmpty) return;
       imageUrls = resultList
-          .where((e) =>
-              e.isNotEmpty &&
-              e.any((item) => item.descriptor?.url.isNotEmpty == true))
-          .map((e) => e
-              .firstWhere((item) => item.descriptor?.url.isNotEmpty == true)
-              .descriptor!
-              .url)
+          .where(
+            (e) =>
+                e.isNotEmpty &&
+                e.any((item) => item.descriptor?.url.isNotEmpty == true),
+          )
+          .map(
+            (e) => e
+                .firstWhere((item) => item.descriptor?.url.isNotEmpty == true)
+                .descriptor!
+                .url,
+          )
           .toList();
     });
 
@@ -290,19 +288,18 @@ class WritePostNotifier extends Notifier<WritePostState> {
     final postSettings = ref.watch(postSettingsProvider);
 
     if (postSettings.enableContentWarning) {
-      tags.add(NostrTag(
-        type: 'content-warning',
-        value: postSettings.warning,
-      ));
+      tags.add(NostrTag(type: 'content-warning', value: postSettings.warning));
     }
     if (postSettings.enableClientTag) {
       // ["client", "My Client", "31990:app1-pubkey:<d-identifier>", "wss://relay1"]
-      tags.add(NostrTag(
-        type: 'client',
-        value: CamelusConfig.name,
-        marker: CamelusConfig.identifierAddress,
-        recommendedRelay: CamelusConfig.homeRelay,
-      ));
+      tags.add(
+        NostrTag(
+          type: 'client',
+          value: CamelusConfig.name,
+          marker: CamelusConfig.identifierAddress,
+          recommendedRelay: CamelusConfig.homeRelay,
+        ),
+      );
     }
 
     try {
@@ -319,7 +316,10 @@ class WritePostNotifier extends Notifier<WritePostState> {
       );
     } catch (e) {
       state = state.copyWith(
-          isSubmitting: false, isError: true, errorText: e.toString());
+        isSubmitting: false,
+        isError: true,
+        errorText: e.toString(),
+      );
       return Future.error('Error broadcasting note: $e');
     }
 

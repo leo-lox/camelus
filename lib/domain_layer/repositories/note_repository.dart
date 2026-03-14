@@ -10,6 +10,11 @@ abstract class NoteRepository {
     Iterable<String>? explicitRelays,
   });
 
+  Stream<NostrNote> getTextNotes(
+    List<String> noteIds, {
+    Iterable<String>? explicitRelays,
+  });
+
   /// returns the replies to a root note, without the root note
   Stream<NostrNote> subscribeReplyNotes({
     required String rootNoteId,

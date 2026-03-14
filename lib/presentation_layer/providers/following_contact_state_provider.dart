@@ -1,7 +1,8 @@
 import 'package:flutter/foundation.dart';
-import 'package:riverpod/riverpod.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'dart:async';
 
+import '../../config/camelus_config.dart';
 import '../../domain_layer/entities/contact_list.dart';
 import '../../domain_layer/usecases/follow.dart';
 import 'following_provider.dart';
@@ -11,15 +12,9 @@ class ContactListState {
   final bool isLoading;
   final ContactList contactList;
 
-  ContactListState({
-    required this.isLoading,
-    required this.contactList,
-  });
+  ContactListState({required this.isLoading, required this.contactList});
 
-  ContactListState copyWith({
-    bool? isLoading,
-    ContactList? contactList,
-  }) {
+  ContactListState copyWith({bool? isLoading, ContactList? contactList}) {
     return ContactListState(
       isLoading: isLoading ?? this.isLoading,
       contactList: contactList ?? this.contactList,
@@ -28,65 +23,78 @@ class ContactListState {
 }
 
 final contactListStateProvider =
-    StateNotifierProvider.family<ContactListNotifier, ContactListState, String>(
-        (ref, pubkey) {
-  final follow = ref.watch(followingProvider);
-  return ContactListNotifier(pubkey, follow);
-});
+    NotifierProvider.family<ContactListNotifier, ContactListState, String>(
+      ContactListNotifier.new,
+    );
 
-/// convinience provider
+/// convenience provider
 final contactListSelfStateProvider = Provider<ContactListState>((ref) {
   final selfPubkey = ref.watch(ndkProvider).accounts.getPublicKey();
-  return ref.watch(contactListStateProvider(selfPubkey!));
+
+  // If no pubkey (anon mode), return empty contact list
+  if (selfPubkey == null) {
+    return ref.watch(
+      contactListStateProvider(CamelusConfig.defaultAnonReadPubkey),
+    );
+  }
+
+  return ref.watch(contactListStateProvider(selfPubkey));
 });
 
-class ContactListNotifier extends StateNotifier<ContactListState> {
-  final Follow _followUseCase;
-  final String _pubkey;
+class ContactListNotifier extends Notifier<ContactListState> {
+  late final Follow _followUseCase;
+  late final String _pubkey;
 
   StreamSubscription<ContactList?>? _subscription;
 
-  ContactListNotifier(
-    this._pubkey,
-    this._followUseCase,
-  ) : super(
-          ContactListState(
-            isLoading: true,
-            contactList: ContactList(
-                pubKey: _pubkey,
-                contacts: [],
-                contactRelays: [],
-                petnames: [],
-                followedTags: [],
-                followedCommunities: [],
-                followedEvents: [],
-                sources: [],
-                createdAt: 0,
-                loadedTimestamp: null),
-          ),
-        ) {
+  ContactListNotifier(String pubkey) : _pubkey = pubkey;
+
+  @override
+  ContactListState build() {
+    final follow = ref.watch(followingProvider);
+    _followUseCase = follow;
+
+    ref.onDispose(() {
+      _subscription?.cancel();
+    });
+
     _initializeState();
+
+    return ContactListState(
+      isLoading: true,
+      contactList: ContactList(
+        pubKey: _pubkey,
+        contacts: [],
+        contactRelays: [],
+        petnames: [],
+        followedTags: [],
+        followedCommunities: [],
+        followedEvents: [],
+        sources: [],
+        createdAt: 0,
+        loadedTimestamp: null,
+      ),
+    );
   }
 
   void _initializeState() {
-    _subscription = _followUseCase.getContactsStream(_pubkey).listen(
-      (contactList) {
-        state = state.copyWith(
-          isLoading: false,
-          contactList: contactList,
+    _subscription = _followUseCase
+        .getContactsStream(_pubkey)
+        .listen(
+          (contactList) {
+            state = state.copyWith(isLoading: false, contactList: contactList);
+          },
+          onError: (error) {
+            state = state.copyWith(
+              isLoading: false,
+              contactList: null, // Set to null on error
+            );
+            // Handle the error appropriately, e.g., log it
+            if (kDebugMode) {
+              print('Error fetching contact list: $error');
+            }
+          },
         );
-      },
-      onError: (error) {
-        state = state.copyWith(
-          isLoading: false,
-          contactList: null, // Set to null on error
-        );
-        // Handle the error appropriately, e.g., log it
-        if (kDebugMode) {
-          print('Error fetching contact list: $error');
-        }
-      },
-    );
   }
 
   Future followUser(String pubkey) async {
@@ -109,11 +117,5 @@ class ContactListNotifier extends StateNotifier<ContactListState> {
 
   Future<void> setContacts(List<String> pubkeys) async {
     return _followUseCase.setContacts(pubkeys);
-  }
-
-  @override
-  void dispose() {
-    _subscription?.cancel();
-    super.dispose();
   }
 }

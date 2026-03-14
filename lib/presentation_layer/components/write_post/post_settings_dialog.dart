@@ -1,7 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
 import 'package:camelus/l10n/app_localizations.dart';
-import '../../../config/palette.dart';
 
 class PostSettingsState {
   final bool enableContentWarning;
@@ -34,8 +33,11 @@ class PostSettingsState {
   }
 }
 
-class PostSettingsNotifier extends StateNotifier<PostSettingsState> {
-  PostSettingsNotifier() : super(PostSettingsState());
+class PostSettingsNotifier extends Notifier<PostSettingsState> {
+  @override
+  PostSettingsState build() {
+    return PostSettingsState();
+  }
 
   void toggleContentWarning(bool value) {
     state = state.copyWith(enableContentWarning: value);
@@ -59,14 +61,12 @@ class PostSettingsNotifier extends StateNotifier<PostSettingsState> {
 }
 
 final postSettingsProvider =
-    StateNotifierProvider<PostSettingsNotifier, PostSettingsState>((ref) {
-  return PostSettingsNotifier();
-});
+    NotifierProvider<PostSettingsNotifier, PostSettingsState>(
+      PostSettingsNotifier.new,
+    );
 
 class PostSettings extends ConsumerStatefulWidget {
-  const PostSettings({
-    super.key,
-  });
+  const PostSettings({super.key});
 
   @override
   ConsumerState<PostSettings> createState() => _PostSettingsState();
@@ -84,7 +84,7 @@ class _PostSettingsState extends ConsumerState<PostSettings> {
     'Discrimination',
     'Health',
     'Abuse',
-    'Other'
+    'Other',
   ];
 
   // Get localized display values
@@ -141,11 +141,9 @@ class _PostSettingsState extends ConsumerState<PostSettings> {
     }
 
     return AlertDialog(
-      backgroundColor: Paletter.getExtraDarkGray(context),
+      backgroundColor: Theme.of(context).colorScheme.surface,
       elevation: 24,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       title: Text(AppLocalizations.of(context)!.postSettings),
       content: SingleChildScrollView(
         child: Column(
@@ -169,11 +167,7 @@ class _PostSettingsState extends ConsumerState<PostSettings> {
                 style: const TextStyle(fontSize: 16),
               ),
               const SizedBox(height: 8),
-              _buildDropdown(
-                context,
-                state,
-                notifier,
-              ),
+              _buildDropdown(context, state, notifier),
 
               // Add custom warning text field if "Other" is selected
               if (state.selectedWarning == 'Other') ...[
@@ -182,8 +176,9 @@ class _PostSettingsState extends ConsumerState<PostSettings> {
                   controller: _customWarningController,
                   decoration: InputDecoration(
                     labelText: AppLocalizations.of(context)!.customWarning,
-                    hintText:
-                        AppLocalizations.of(context)!.specifyContentWarning,
+                    hintText: AppLocalizations.of(
+                      context,
+                    )!.specifyContentWarning,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
@@ -197,7 +192,7 @@ class _PostSettingsState extends ConsumerState<PostSettings> {
 
             const SizedBox(height: 16),
             Divider(
-              color: Paletter.getDarkGray(context),
+              color: Theme.of(context).colorScheme.surfaceContainerHighest,
             ),
             const SizedBox(height: 16),
 
@@ -231,10 +226,7 @@ class _PostSettingsState extends ConsumerState<PostSettings> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
-          title,
-          style: const TextStyle(fontSize: 16),
-        ),
+        Text(title, style: const TextStyle(fontSize: 16)),
         Switch(
           value: value,
           onChanged: onChanged,
@@ -254,24 +246,27 @@ class _PostSettingsState extends ConsumerState<PostSettings> {
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Paletter.getGray(context)),
+        border: Border.all(color: Theme.of(context).colorScheme.inverseSurface),
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<String>(
-          dropdownColor: Paletter.getExtraDarkGray(context),
+          dropdownColor: Theme.of(context).colorScheme.surface,
           value: _keyToDisplay(context, state.selectedWarning),
           isExpanded: true,
           icon: const Icon(Icons.arrow_drop_down),
           elevation: 16,
           style: TextStyle(
-              color: Theme.of(context).colorScheme.onSurface, fontSize: 16),
+            color: Theme.of(context).colorScheme.onSurface,
+            fontSize: 16,
+          ),
           onChanged: (String? newValue) {
             if (newValue != null) {
               notifier.setSelectedWarning(_displayToKey(context, newValue));
             }
           },
-          items: _getWarningOptions(context)
-              .map<DropdownMenuItem<String>>((String value) {
+          items: _getWarningOptions(context).map<DropdownMenuItem<String>>((
+            String value,
+          ) {
             return DropdownMenuItem<String>(
               value: value,
               child: Text(

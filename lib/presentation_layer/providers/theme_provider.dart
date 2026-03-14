@@ -2,12 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'db_app_provider.dart';
 
-enum ThemeType {
-  camelus,
-  nostr,
-  custom,
-  system,
-}
+enum ThemeType { camelus, nostr, custom, system }
 
 class ThemeState {
   final ThemeMode mode;
@@ -20,11 +15,7 @@ class ThemeState {
     required this.type,
   });
 
-  ThemeState copyWith({
-    ThemeMode? mode,
-    Color? color,
-    ThemeType? type,
-  }) {
+  ThemeState copyWith({ThemeMode? mode, Color? color, ThemeType? type}) {
     return ThemeState(
       mode: mode ?? this.mode,
       color: color ?? this.color,
@@ -45,16 +36,16 @@ class ThemeState {
   int get hashCode => mode.hashCode ^ color.hashCode ^ type.hashCode;
 }
 
-class ThemeNotifier extends StateNotifier<ThemeState> {
-  final Ref ref;
-
-  ThemeNotifier(this.ref)
-      : super(const ThemeState(
-          mode: ThemeMode.system,
-          color: Colors.blue,
-          type: ThemeType.custom,
-        )) {
+class ThemeNotifier extends Notifier<ThemeState> {
+  @override
+  ThemeState build() {
     _loadThemeSettings();
+
+    return const ThemeState(
+      mode: ThemeMode.system,
+      color: Colors.blue,
+      type: ThemeType.custom,
+    );
   }
 
   Future<void> _loadThemeSettings() async {
@@ -190,6 +181,6 @@ class ThemeNotifier extends StateNotifier<ThemeState> {
   }
 }
 
-final themeProvider = StateNotifierProvider<ThemeNotifier, ThemeState>((ref) {
-  return ThemeNotifier(ref);
-});
+final themeProvider = NotifierProvider<ThemeNotifier, ThemeState>(
+  ThemeNotifier.new,
+);

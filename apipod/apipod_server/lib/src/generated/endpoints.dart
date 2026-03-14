@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
@@ -14,9 +15,13 @@ import '../endpoints/app_update_endpoint.dart' as _i2;
 import '../endpoints/link_shorter/link_shorter_endpoint.dart' as _i3;
 import '../endpoints/moderation/moderation_endpoint.dart' as _i4;
 import '../endpoints/nip05/nip05_endpoint.dart' as _i5;
-import '../endpoints/nostr_band/nostr_band_endpoint.dart' as _i6;
+import '../endpoints/otso_external_sync/otso_external_sync_endpoint.dart'
+    as _i6;
 import '../endpoints/push/nostr_push_endpoint.dart' as _i7;
-import 'package:ndk/domain_layer/entities/nip_01_event.dart' as _i8;
+import '../endpoints/push_otso/otso_push_endpoint.dart' as _i8;
+import '../endpoints/trends/trends_endpoint.dart' as _i9;
+import 'package:ndk/domain_layer/entities/nip_01_event.dart' as _i10;
+import 'package:ndk/data_layer/models/nip_01_event_model.dart' as _i11;
 
 class Endpoints extends _i1.EndpointDispatch {
   @override
@@ -46,16 +51,28 @@ class Endpoints extends _i1.EndpointDispatch {
           'nip05',
           null,
         ),
-      'nostrBand': _i6.NostrBandEndpoint()
+      'otsoExternalSync': _i6.OtsoExternalSyncEndpoint()
         ..initialize(
           server,
-          'nostrBand',
+          'otsoExternalSync',
           null,
         ),
       'nostrPush': _i7.NostrPushEndpoint()
         ..initialize(
           server,
           'nostrPush',
+          null,
+        ),
+      'otsoPush': _i8.OtsoPushEndpoint()
+        ..initialize(
+          server,
+          'otsoPush',
+          null,
+        ),
+      'trends': _i9.TrendsEndpoint()
+        ..initialize(
+          server,
+          'trends',
           null,
         ),
     };
@@ -66,13 +83,13 @@ class Endpoints extends _i1.EndpointDispatch {
         'checkVersion': _i1.MethodConnector(
           name: 'checkVersion',
           params: {},
-          call: (
-            _i1.Session session,
-            Map<String, dynamic> params,
-          ) async =>
-              (endpoints['appUpdate'] as _i2.AppUpdateEndpoint)
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['appUpdate'] as _i2.AppUpdateEndpoint)
                   .checkVersion(session),
-        )
+        ),
       },
     );
     connectors['linkShorter'] = _i1.EndpointConnector(
@@ -98,16 +115,17 @@ class Endpoints extends _i1.EndpointDispatch {
               nullable: false,
             ),
           },
-          call: (
-            _i1.Session session,
-            Map<String, dynamic> params,
-          ) async =>
-              (endpoints['linkShorter'] as _i3.LinkShorterEndpoint).shortInvite(
-            session,
-            invitedByNpub: params['invitedByNpub'],
-            listName: params['listName'],
-            listNpub: params['listNpub'],
-          ),
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['linkShorter'] as _i3.LinkShorterEndpoint)
+                  .shortInvite(
+                    session,
+                    invitedByNpub: params['invitedByNpub'],
+                    listName: params['listName'],
+                    listNpub: params['listNpub'],
+                  ),
         ),
         'getInviteByShortLink': _i1.MethodConnector(
           name: 'getInviteByShortLink',
@@ -116,17 +134,17 @@ class Endpoints extends _i1.EndpointDispatch {
               name: 'shortLink',
               type: _i1.getType<String>(),
               nullable: false,
-            )
+            ),
           },
-          call: (
-            _i1.Session session,
-            Map<String, dynamic> params,
-          ) async =>
-              (endpoints['linkShorter'] as _i3.LinkShorterEndpoint)
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['linkShorter'] as _i3.LinkShorterEndpoint)
                   .getInviteByShortLink(
-            session,
-            shortLink: params['shortLink'],
-          ),
+                    session,
+                    shortLink: params['shortLink'],
+                  ),
         ),
       },
     );
@@ -137,21 +155,21 @@ class Endpoints extends _i1.EndpointDispatch {
         'getProfileBloomFilter': _i1.MethodConnector(
           name: 'getProfileBloomFilter',
           params: {},
-          call: (
-            _i1.Session session,
-            Map<String, dynamic> params,
-          ) async =>
-              (endpoints['moderation'] as _i4.ModerationEndpoint)
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['moderation'] as _i4.ModerationEndpoint)
                   .getProfileBloomFilter(session),
         ),
         'getEventBloomFilter': _i1.MethodConnector(
           name: 'getEventBloomFilter',
           params: {},
-          call: (
-            _i1.Session session,
-            Map<String, dynamic> params,
-          ) async =>
-              (endpoints['moderation'] as _i4.ModerationEndpoint)
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['moderation'] as _i4.ModerationEndpoint)
                   .getEventBloomFilter(session),
         ),
         'report': _i1.MethodConnector(
@@ -159,18 +177,19 @@ class Endpoints extends _i1.EndpointDispatch {
           params: {
             'reportEvent': _i1.ParameterDescription(
               name: 'reportEvent',
-              type: _i1.getType<_i8.Nip01Event>(),
+              type: _i1.getType<_i10.Nip01Event>(),
               nullable: false,
-            )
+            ),
           },
-          call: (
-            _i1.Session session,
-            Map<String, dynamic> params,
-          ) async =>
-              (endpoints['moderation'] as _i4.ModerationEndpoint).report(
-            session,
-            params['reportEvent'],
-          ),
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['moderation'] as _i4.ModerationEndpoint).report(
+                    session,
+                    params['reportEvent'],
+                  ),
         ),
       },
     );
@@ -192,15 +211,15 @@ class Endpoints extends _i1.EndpointDispatch {
               nullable: false,
             ),
           },
-          call: (
-            _i1.Session session,
-            Map<String, dynamic> params,
-          ) async =>
-              (endpoints['nip05'] as _i5.Nip05Endpoint).getNip05(
-            session,
-            params['name'],
-            params['domain'],
-          ),
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['nip05'] as _i5.Nip05Endpoint).getNip05(
+                session,
+                params['name'],
+                params['domain'],
+              ),
         ),
         'checkName': _i1.MethodConnector(
           name: 'checkName',
@@ -216,65 +235,22 @@ class Endpoints extends _i1.EndpointDispatch {
               nullable: false,
             ),
           },
-          call: (
-            _i1.Session session,
-            Map<String, dynamic> params,
-          ) async =>
-              (endpoints['nip05'] as _i5.Nip05Endpoint).checkName(
-            session,
-            params['name'],
-            params['domain'],
-          ),
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['nip05'] as _i5.Nip05Endpoint).checkName(
+                session,
+                params['name'],
+                params['domain'],
+              ),
         ),
       },
     );
-    connectors['nostrBand'] = _i1.EndpointConnector(
-      name: 'nostrBand',
-      endpoint: endpoints['nostrBand']!,
-      methodConnectors: {
-        'hashtags': _i1.MethodConnector(
-          name: 'hashtags',
-          params: {
-            'lang': _i1.ParameterDescription(
-              name: 'lang',
-              type: _i1.getType<String?>(),
-              nullable: true,
-            ),
-            'limit': _i1.ParameterDescription(
-              name: 'limit',
-              type: _i1.getType<String?>(),
-              nullable: true,
-            ),
-          },
-          call: (
-            _i1.Session session,
-            Map<String, dynamic> params,
-          ) async =>
-              (endpoints['nostrBand'] as _i6.NostrBandEndpoint).hashtags(
-            session,
-            lang: params['lang'],
-            limit: params['limit'],
-          ),
-        ),
-        'profiles': _i1.MethodConnector(
-          name: 'profiles',
-          params: {
-            'limit': _i1.ParameterDescription(
-              name: 'limit',
-              type: _i1.getType<String?>(),
-              nullable: true,
-            )
-          },
-          call: (
-            _i1.Session session,
-            Map<String, dynamic> params,
-          ) async =>
-              (endpoints['nostrBand'] as _i6.NostrBandEndpoint).profiles(
-            session,
-            limit: params['limit'],
-          ),
-        ),
-      },
+    connectors['otsoExternalSync'] = _i1.EndpointConnector(
+      name: 'otsoExternalSync',
+      endpoint: endpoints['otsoExternalSync']!,
+      methodConnectors: {},
     );
     connectors['nostrPush'] = _i1.EndpointConnector(
       name: 'nostrPush',
@@ -290,20 +266,120 @@ class Endpoints extends _i1.EndpointDispatch {
             ),
             'events': _i1.ParameterDescription(
               name: 'events',
-              type: _i1.getType<List<_i8.Nip01Event>>(),
+              type: _i1.getType<List<_i11.Nip01EventModel>>(),
               nullable: false,
             ),
           },
-          call: (
-            _i1.Session session,
-            Map<String, dynamic> params,
-          ) async =>
-              (endpoints['nostrPush'] as _i7.NostrPushEndpoint).register(
-            session,
-            params['token'],
-            params['events'],
-          ),
-        )
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['nostrPush'] as _i7.NostrPushEndpoint).register(
+                    session,
+                    params['token'],
+                    params['events'],
+                  ),
+        ),
+        'getRegistrationState': _i1.MethodConnector(
+          name: 'getRegistrationState',
+          params: {
+            'signedEventJson': _i1.ParameterDescription(
+              name: 'signedEventJson',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['nostrPush'] as _i7.NostrPushEndpoint)
+                  .getRegistrationState(
+                    session,
+                    params['signedEventJson'],
+                  ),
+        ),
+      },
+    );
+    connectors['otsoPush'] = _i1.EndpointConnector(
+      name: 'otsoPush',
+      endpoint: endpoints['otsoPush']!,
+      methodConnectors: {
+        'register': _i1.MethodConnector(
+          name: 'register',
+          params: {
+            'events': _i1.ParameterDescription(
+              name: 'events',
+              type: _i1.getType<List<_i11.Nip01EventModel>>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['otsoPush'] as _i8.OtsoPushEndpoint).register(
+                    session,
+                    params['events'],
+                  ),
+        ),
+      },
+    );
+    connectors['trends'] = _i1.EndpointConnector(
+      name: 'trends',
+      endpoint: endpoints['trends']!,
+      methodConnectors: {
+        'trends': _i1.MethodConnector(
+          name: 'trends',
+          params: {
+            'interval': _i1.ParameterDescription(
+              name: 'interval',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+            'limit': _i1.ParameterDescription(
+              name: 'limit',
+              type: _i1.getType<int>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['trends'] as _i9.TrendsEndpoint).trends(
+                session,
+                interval: params['interval'],
+                limit: params['limit'],
+              ),
+        ),
+        'trendingPeople': _i1.MethodConnector(
+          name: 'trendingPeople',
+          params: {
+            'interval': _i1.ParameterDescription(
+              name: 'interval',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+            'limit': _i1.ParameterDescription(
+              name: 'limit',
+              type: _i1.getType<int>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['trends'] as _i9.TrendsEndpoint).trendingPeople(
+                    session,
+                    interval: params['interval'],
+                    limit: params['limit'],
+                  ),
+        ),
       },
     );
   }

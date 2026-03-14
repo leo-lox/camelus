@@ -14,8 +14,9 @@ void main() {
     test('getUuid generates a valid UUID', () {
       final uuid = helpers.getUuid();
       final uuidRegEx = RegExp(
-          r'^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$',
-          caseSensitive: false);
+        r'^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$',
+        caseSensitive: false,
+      );
       expect(uuidRegEx.hasMatch(uuid), true);
     });
 

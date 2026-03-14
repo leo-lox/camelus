@@ -1,8 +1,8 @@
 import 'dart:async';
 
 import 'package:camelus/presentation_layer/providers/ndk_provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ndk/ndk.dart';
-import 'package:riverpod/riverpod.dart';
 
 import '../../../../data_layer/models/nostr_lists_model.dart';
 import '../../../../domain_layer/entities/nostr_list.dart';
@@ -27,27 +27,25 @@ class TrendingStarterPackState {
   }
 }
 
-class TrendingStarterPackNotifier
-    extends StateNotifier<TrendingStarterPackState> {
-  final Ndk ndk;
-  TrendingStarterPackNotifier({required this.ndk})
-      : super(
-          TrendingStarterPackState(
-            isLoading: true,
-            starterPacks: [],
-          ),
-        ) {
+class TrendingStarterPackNotifier extends Notifier<TrendingStarterPackState> {
+  @override
+  TrendingStarterPackState build() {
+    ndk = ref.watch(ndkProvider);
     _loadData();
+    return TrendingStarterPackState(isLoading: true, starterPacks: []);
   }
 
+  late final Ndk ndk;
+
   void _loadData() async {
-    final ndkResp = ndk.requests.query(filters: [
-      Filter(limit: 3, kinds: [NostrList.starterPack])
-    ]);
+    final ndkResp = ndk.requests.query(
+      filter: Filter(limit: 3, kinds: [NostrList.starterPack]),
+    );
 
     List<NostrStarterPack> myPacks = [];
-    final StreamSubscription<Nip01Event> subscription =
-        ndkResp.stream.listen((event) async {
+    final StreamSubscription<Nip01Event> subscription = ndkResp.stream.listen((
+      event,
+    ) async {
       final ndkSet = await Nip51Set.fromEvent(event, null);
       if (ndkSet == null) return;
       final rcvPack = NostrStarterPackModel.fromNDK(ndkSet);
@@ -60,8 +58,7 @@ class TrendingStarterPackNotifier
   }
 }
 
-final trendingStarterPacksStateProvider = StateNotifierProvider<
-    TrendingStarterPackNotifier, TrendingStarterPackState>((ref) {
-  final ndkP = ref.watch(ndkProvider);
-  return TrendingStarterPackNotifier(ndk: ndkP);
-});
+final trendingStarterPacksStateProvider =
+    NotifierProvider<TrendingStarterPackNotifier, TrendingStarterPackState>(
+      TrendingStarterPackNotifier.new,
+    );

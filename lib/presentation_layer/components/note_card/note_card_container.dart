@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../domain_layer/entities/nostr_tag.dart';
 import '../../../domain_layer/entities/parsed_post.dart';
+import '../../routing/route_paths.dart';
 import '../../providers/metadata_state_provider.dart';
 import 'in_reply_to.dart';
 import 'note_card.dart';
@@ -12,17 +13,13 @@ class NoteCardContainer extends ConsumerWidget {
   final ParsedPost note;
   final double? fontSize;
 
-  const NoteCardContainer({
-    super.key,
-    required this.note,
-    this.fontSize,
-  });
+  const NoteCardContainer({super.key, required this.note, this.fontSize});
 
   static void _onNoteTab(BuildContext context, ParsedPost myNote) {
     var refEvents = myNote.nostrNote.getTagEvents;
 
     if (myNote.nostrNote.isRoot) {
-      _navigateToEventViewPage(context, myNote.id, null);
+      _navigateToEventViewPage(context, myNote.pubkey, myNote.id, null);
       return;
     }
 
@@ -31,24 +28,29 @@ class NoteCardContainer extends ConsumerWidget {
     // off spec support, sometimes not marked as root
     root ??= refEvents.first;
 
-    _navigateToEventViewPage(context, root.value, myNote.id);
+    _navigateToEventViewPage(context, myNote.pubkey, root.value, myNote.id);
   }
 
   static void _navigateToEventViewPage(
     BuildContext context,
+    String pubkey,
     String root,
     String? scrollIntoView,
   ) {
-    context.push('/nostr/event', extra: {
-      'root': root,
-      'scrollIntoView': scrollIntoView,
-    });
+    context.push(
+      RoutePaths.status(
+        pubkey: pubkey,
+        eventId: root,
+        scrollIntoView: scrollIntoView,
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final myMetadata =
-        ref.watch(metadataStateProvider(note.pubkey)).userMetadata;
+    final myMetadata = ref
+        .watch(metadataStateProvider(note.pubkey))
+        .userMetadata;
 
     return GestureDetector(
       onTap: () => _onNoteTab(context, note),

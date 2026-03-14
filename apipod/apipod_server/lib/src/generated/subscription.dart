@@ -7,9 +7,11 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
+import 'package:apipod_server/src/generated/protocol.dart' as _i2;
 
 abstract class PushSubscription
     implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
@@ -18,6 +20,7 @@ abstract class PushSubscription
     required this.pubKey,
     required this.relay,
     required this.token,
+    this.kinds,
   });
 
   factory PushSubscription({
@@ -25,6 +28,7 @@ abstract class PushSubscription
     required String pubKey,
     required String relay,
     required String token,
+    List<int>? kinds,
   }) = _PushSubscriptionImpl;
 
   factory PushSubscription.fromJson(Map<String, dynamic> jsonSerialization) {
@@ -33,6 +37,9 @@ abstract class PushSubscription
       pubKey: jsonSerialization['pubKey'] as String,
       relay: jsonSerialization['relay'] as String,
       token: jsonSerialization['token'] as String,
+      kinds: jsonSerialization['kinds'] == null
+          ? null
+          : _i2.Protocol().deserialize<List<int>>(jsonSerialization['kinds']),
     );
   }
 
@@ -49,6 +56,8 @@ abstract class PushSubscription
 
   String token;
 
+  List<int>? kinds;
+
   @override
   _i1.Table<int?> get table => t;
 
@@ -60,24 +69,29 @@ abstract class PushSubscription
     String? pubKey,
     String? relay,
     String? token,
+    List<int>? kinds,
   });
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'PushSubscription',
       if (id != null) 'id': id,
       'pubKey': pubKey,
       'relay': relay,
       'token': token,
+      if (kinds != null) 'kinds': kinds?.toJson(),
     };
   }
 
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
+      '__className__': 'PushSubscription',
       if (id != null) 'id': id,
       'pubKey': pubKey,
       'relay': relay,
       'token': token,
+      if (kinds != null) 'kinds': kinds?.toJson(),
     };
   }
 
@@ -119,12 +133,14 @@ class _PushSubscriptionImpl extends PushSubscription {
     required String pubKey,
     required String relay,
     required String token,
+    List<int>? kinds,
   }) : super._(
-          id: id,
-          pubKey: pubKey,
-          relay: relay,
-          token: token,
-        );
+         id: id,
+         pubKey: pubKey,
+         relay: relay,
+         token: token,
+         kinds: kinds,
+       );
 
   /// Returns a shallow copy of this [PushSubscription]
   /// with some or all fields replaced by the given arguments.
@@ -135,19 +151,48 @@ class _PushSubscriptionImpl extends PushSubscription {
     String? pubKey,
     String? relay,
     String? token,
+    Object? kinds = _Undefined,
   }) {
     return PushSubscription(
       id: id is int? ? id : this.id,
       pubKey: pubKey ?? this.pubKey,
       relay: relay ?? this.relay,
       token: token ?? this.token,
+      kinds: kinds is List<int>? ? kinds : this.kinds?.map((e0) => e0).toList(),
     );
   }
 }
 
+class PushSubscriptionUpdateTable
+    extends _i1.UpdateTable<PushSubscriptionTable> {
+  PushSubscriptionUpdateTable(super.table);
+
+  _i1.ColumnValue<String, String> pubKey(String value) => _i1.ColumnValue(
+    table.pubKey,
+    value,
+  );
+
+  _i1.ColumnValue<String, String> relay(String value) => _i1.ColumnValue(
+    table.relay,
+    value,
+  );
+
+  _i1.ColumnValue<String, String> token(String value) => _i1.ColumnValue(
+    table.token,
+    value,
+  );
+
+  _i1.ColumnValue<List<int>, List<int>> kinds(List<int>? value) =>
+      _i1.ColumnValue(
+        table.kinds,
+        value,
+      );
+}
+
 class PushSubscriptionTable extends _i1.Table<int?> {
   PushSubscriptionTable({super.tableRelation})
-      : super(tableName: 'push_subscriptions') {
+    : super(tableName: 'push_subscriptions') {
+    updateTable = PushSubscriptionUpdateTable(this);
     pubKey = _i1.ColumnString(
       'pubKey',
       this,
@@ -160,7 +205,13 @@ class PushSubscriptionTable extends _i1.Table<int?> {
       'token',
       this,
     );
+    kinds = _i1.ColumnSerializable<List<int>>(
+      'kinds',
+      this,
+    );
   }
+
+  late final PushSubscriptionUpdateTable updateTable;
 
   late final _i1.ColumnString pubKey;
 
@@ -168,13 +219,16 @@ class PushSubscriptionTable extends _i1.Table<int?> {
 
   late final _i1.ColumnString token;
 
+  late final _i1.ColumnSerializable<List<int>> kinds;
+
   @override
   List<_i1.Column> get columns => [
-        id,
-        pubKey,
-        relay,
-        token,
-      ];
+    id,
+    pubKey,
+    relay,
+    token,
+    kinds,
+  ];
 }
 
 class PushSubscriptionInclude extends _i1.IncludeObject {
@@ -362,6 +416,48 @@ class PushSubscriptionRepository {
     return session.db.updateRow<PushSubscription>(
       row,
       columns: columns?.call(PushSubscription.t),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates a single [PushSubscription] by its [id] with the specified [columnValues].
+  /// Returns the updated row or null if no row with the given id exists.
+  Future<PushSubscription?> updateById(
+    _i1.Session session,
+    int id, {
+    required _i1.ColumnValueListBuilder<PushSubscriptionUpdateTable>
+    columnValues,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateById<PushSubscription>(
+      id,
+      columnValues: columnValues(PushSubscription.t.updateTable),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates all [PushSubscription]s matching the [where] expression with the specified [columnValues].
+  /// Returns the list of updated rows.
+  Future<List<PushSubscription>> updateWhere(
+    _i1.Session session, {
+    required _i1.ColumnValueListBuilder<PushSubscriptionUpdateTable>
+    columnValues,
+    required _i1.WhereExpressionBuilder<PushSubscriptionTable> where,
+    int? limit,
+    int? offset,
+    _i1.OrderByBuilder<PushSubscriptionTable>? orderBy,
+    _i1.OrderByListBuilder<PushSubscriptionTable>? orderByList,
+    bool orderDescending = false,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateWhere<PushSubscription>(
+      columnValues: columnValues(PushSubscription.t.updateTable),
+      where: where(PushSubscription.t),
+      limit: limit,
+      offset: offset,
+      orderBy: orderBy?.call(PushSubscription.t),
+      orderByList: orderByList?.call(PushSubscription.t),
+      orderDescending: orderDescending,
       transaction: transaction,
     );
   }

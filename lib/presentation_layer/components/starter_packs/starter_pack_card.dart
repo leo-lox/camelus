@@ -1,11 +1,10 @@
+import 'package:camelus/l10n/app_localizations.dart';
 import 'package:camelus/presentation_layer/atoms/my_profile_picture.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../config/palette.dart';
 import '../../../domain_layer/entities/nostr_list.dart';
 import '../../../helpers/helpers.dart';
-import '../../../helpers/nprofile_helper.dart';
 import '../../atoms/icon_patter.dart';
 import '../../atoms/overlapting_avatars.dart';
 import '../../providers/metadata_state_provider.dart';
@@ -13,11 +12,7 @@ import '../../providers/metadata_state_provider.dart';
 class StarterPackCard extends ConsumerStatefulWidget {
   final NostrStarterPack pack;
   final Function? onTab;
-  const StarterPackCard({
-    super.key,
-    required this.pack,
-    this.onTab,
-  });
+  const StarterPackCard({super.key, required this.pack, this.onTab});
 
   @override
   ConsumerState<StarterPackCard> createState() => _StarterPackCardState();
@@ -26,8 +21,9 @@ class StarterPackCard extends ConsumerStatefulWidget {
 class _StarterPackCardState extends ConsumerState<StarterPackCard> {
   @override
   Widget build(BuildContext context) {
-    final creatorMetadata =
-        ref.watch(metadataStateProvider(widget.pack.pubKey)).userMetadata;
+    final creatorMetadata = ref
+        .watch(metadataStateProvider(widget.pack.pubKey))
+        .userMetadata;
     return InkWell(
       borderRadius: BorderRadius.circular(12),
       onTap: widget.onTab != null ? () => widget.onTab!() : null,
@@ -38,9 +34,7 @@ class _StarterPackCardState extends ConsumerState<StarterPackCard> {
       child: Card(
         // margin: const EdgeInsets.all(16),
         clipBehavior: Clip.antiAlias,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         child: Stack(
           children: [
             Column(
@@ -68,7 +62,8 @@ class _StarterPackCardState extends ConsumerState<StarterPackCard> {
                     children: [
                       // Title
                       Text(
-                        widget.pack.title ?? "Starter Pack",
+                        widget.pack.title ??
+                            AppLocalizations.of(context)!.starterPack,
                         style: const TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
@@ -83,7 +78,7 @@ class _StarterPackCardState extends ConsumerState<StarterPackCard> {
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.normal,
-                          color: Paletter.getGray(context),
+                          color: Theme.of(context).colorScheme.inverseSurface,
                         ),
                       ),
 
@@ -96,16 +91,20 @@ class _StarterPackCardState extends ConsumerState<StarterPackCard> {
                             "by",
                             style: TextStyle(
                               fontSize: 14,
-                              color: Paletter.getGray(context),
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.inverseSurface,
                             ),
                           ),
                           const SizedBox(width: 4),
                           Text(
                             creatorMetadata?.name ??
-                                _pubkeyToHrBech32Short(widget.pack.pubKey),
+                                Helpers.shortHr(widget.pack.pubKey),
                             style: TextStyle(
                               fontSize: 14,
-                              color: Paletter.getGray(context),
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.inverseSurface,
                             ),
                           ),
                           const SizedBox(width: 8),
@@ -152,7 +151,7 @@ class _StarterPackCardState extends ConsumerState<StarterPackCard> {
                         "+${(widget.pack.pubKeys.length - 5)}",
                         style: TextStyle(
                           fontSize: 16,
-                          color: Paletter.getLightGray(context),
+                          color: Theme.of(context).colorScheme.inverseSurface,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -165,11 +164,4 @@ class _StarterPackCardState extends ConsumerState<StarterPackCard> {
       ),
     );
   }
-}
-
-_pubkeyToHrBech32Short(pubkey) {
-  final bech = Helpers.encodeBech32(pubkey, "npub");
-  final bechShort = NprofileHelper().bech32toHr(bech, cutLength: 11);
-
-  return bechShort;
 }

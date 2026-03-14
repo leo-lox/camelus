@@ -237,6 +237,54 @@
   "@bookmarks": {
     "description": "Bookmarks menu item"
   },
+  "removeBookmark": "Remove this bookmark?",
+  "@removeBookmark": {
+    "description": "Confirmation dialog title for removing bookmark"
+  },
+  "bookmarkRemoved": "Bookmark removed",
+  "@bookmarkRemoved": {
+    "description": "Snackbar message when bookmark is removed"
+  },
+  "noPrivateBookmarks": "No private bookmarks yet",
+  "@noPrivateBookmarks": {
+    "description": "Empty state message for private bookmarks"
+  },
+  "noPublicBookmarks": "No public bookmarks yet",
+  "@noPublicBookmarks": {
+    "description": "Empty state message for public bookmarks"
+  },
+  "privateBookmarks": "Private",
+  "@privateBookmarks": {
+    "description": "Private bookmarks tab label"
+  },
+  "publicBookmarks": "Public",
+  "@publicBookmarks": {
+    "description": "Public bookmarks tab label"
+  },
+  "addToBookmarks": "Add to bookmarks",
+  "@addToBookmarks": {
+    "description": "Button label to add note to bookmarks"
+  },
+  "removeFromBookmarks": "Remove from bookmarks",
+  "@removeFromBookmarks": {
+    "description": "Button label to remove note from bookmarks"
+  },
+  "addingToBookmarks": "Adding to bookmarks...",
+  "@addingToBookmarks": {
+    "description": "Loading message when adding bookmark"
+  },
+  "removingFromBookmarks": "Removing from bookmarks...",
+  "@removingFromBookmarks": {
+    "description": "Loading message when removing bookmark"
+  },
+  "failedToAddBookmark": "Failed to add bookmark",
+  "@failedToAddBookmark": {
+    "description": "Error message when adding bookmark fails"
+  },
+  "failedToRemoveBookmark": "Failed to remove bookmark",
+  "@failedToRemoveBookmark": {
+    "description": "Error message when removing bookmark fails"
+  },
   "notImplementedYet": "Not implemented yet",
   "@notImplementedYet": {
     "description": "Snackbar message for unimplemented features"
@@ -766,5 +814,881 @@
   "welcome": "Welcome",
   "@welcome": {
     "description": "Welcome greeting text"
+  },
+  "pleaseLoginToManageFileServers": "Please login to manage file servers",
+  "@pleaseLoginToManageFileServers": {
+    "description": "Message shown when user is not logged in on file servers page"
+  },
+  "welcomeTo": "welcome to",
+  "@welcomeTo": {
+    "description": "Welcome greeting prefix on onboarding page"
+  },
+  "joinTheConversation": "join the conversation",
+  "@joinTheConversation": {
+    "description": "Button text to register/join Camelus"
+  },
+  "browseWithoutLogin": "Browse without login",
+  "@browseWithoutLogin": {
+    "description": "Button text to browse app without logging in"
+  },
+  "loginRegistrationRequired": "Login/Registration Required",
+  "@loginRegistrationRequired": {
+    "description": "Dialog title prompting user to login or register"
+  },
+  "pleaseLoginToInteract": "Please login/register to interact with posts",
+  "@pleaseLoginToInteract": {
+    "description": "Message explaining user needs to login to interact with content"
+  },
+  "loginRegister": "Login/Register",
+  "@loginRegister": {
+    "description": "Button text for login or register action"
+  },
+  "all": "All",
+  "@all": {
+    "description": "All tab label for notifications and filters"
+  },
+  "mentions": "Mentions",
+  "@mentions": {
+    "description": "Mentions tab label for notifications"
+  },
+  "preview": "Preview",
+  "@preview": {
+    "description": "Preview tab label"
+  },
+  "relayAlreadyExists": "Relay already exists",
+  "@relayAlreadyExists": {
+    "description": "Error dialog title when relay already exists"
+  },
+  "relayAlreadyExistsMessage": "A relay with this name already exists.",
+  "@relayAlreadyExistsMessage": {
+    "description": "Error message when relay already exists"
+  },
+  "discardChanges": "Discard changes?",
+  "@discardChanges": {
+    "description": "Dialog title asking to discard changes"
+  },
+  "discardChangesMessage": "Do you want to discard your changes?",
+  "@discardChangesMessage": {
+    "description": "Dialog message asking to discard changes"
+  },
+  "deleteRelay": "Delete relay",
+  "@deleteRelay": {
+    "description": "Dialog title for relay deletion"
+  },
+  "delete": "Delete",
+  "@delete": {
+    "description": "Delete button label"
+  },
+  "noTextFoundInClipboard": "No text found in clipboard",
+  "@noTextFoundInClipboard": {
+    "description": "Error message when clipboard is empty"
+  },
+  "pleaseEnterValidBunkerUrl": "Please enter a valid bunker URL",
+  "@pleaseEnterValidBunkerUrl": {
+    "description": "Error message for invalid bunker URL"
+  },
+  "failedToConnectToBunker": "Failed to connect to bunker",
+  "@failedToConnectToBunker": {
+    "description": "Error message when bunker connection fails"
+  },
+  "reactedToYourPost": "reacted to your post",
+  "@reactedToYourPost": {
+    "description": "Notification message when someone reacted to a post"
+  },
+  "repliedToYourPost": "replied to your post",
+  "@repliedToYourPost": {
+    "description": "Notification message when someone replied to a post"
+  },
+  "mentionedYouInThread": "mentioned you in a thread",
+  "@mentionedYouInThread": {
+    "description": "Notification message when mentioned in a thread"
+  },
+  "repostedYourPost": "reposted your post",
+  "@repostedYourPost": {
+    "description": "Notification message when someone reposted"
+  },
+  "mentionedYou": "mentioned you",
+  "@mentionedYou": {
+    "description": "Notification message when mentioned"
+  },
+  "interactedWithYourPost": "interacted with your post",
+  "@interactedWithYourPost": {
+    "description": "Notification message for general interaction"
+  },
+  "whenSomeoneInteractsWithYourPosts": "When someone interacts with your posts,\nyou'll see it here",
+  "@whenSomeoneInteractsWithYourPosts": {
+    "description": "Empty state message for notifications"
+  },
+  "noNotifications": "no notifications",
+  "@noNotifications": {
+    "description": "Empty notifications message"
+  },
+  "endOfNotifications": "end of notifications",
+  "@endOfNotifications": {
+    "description": "Message at the end of notification list"
+  },
+  "trends": "trends",
+  "@trends": {
+    "description": "Trends section label"
+  },
+  "recentStarterPacks": "recent starter packs",
+  "@recentStarterPacks": {
+    "description": "Recent starter packs section label"
+  },
+  "noResultsFound": "No results found",
+  "@noResultsFound": {
+    "description": "Empty search results message"
+  },
+  "people": "People",
+  "@people": {
+    "description": "People section label"
+  },
+  "notes": "Notes",
+  "@notes": {
+    "description": "Notes section label"
+  },
+  "searchForHashtags": "search for hashtags",
+  "@searchForHashtags": {
+    "description": "Hint text for hashtag search"
+  },
+  "nip05Address": "nip05 address",
+  "@nip05Address": {
+    "description": "NIP-05 address label"
+  },
+  "repostHasNoInformation": "Repost has no information where to fetch the post",
+  "@repostHasNoInformation": {
+    "description": "Error message for invalid repost"
+  },
+  "invalidSignature": "Invalid signature!",
+  "@invalidSignature": {
+    "description": "Error message for invalid signature"
+  },
+  "deletionRequested": "deletion requested",
+  "@deletionRequested": {
+    "description": "Message when deletion is requested"
+  },
+  "unknownStarterPack": "unknown starter pack",
+  "@unknownStarterPack": {
+    "description": "Error message for unknown starter pack"
+  },
+  "noStarterPacksFound": "No starter packs found",
+  "@noStarterPacksFound": {
+    "description": "Empty state for starter packs"
+  },
+  "searchToAddUser": "search to add user",
+  "@searchToAddUser": {
+    "description": "Hint text for adding user to starter pack"
+  },
+  "noServersFound": "no servers found",
+  "@noServersFound": {
+    "description": "Empty state for file servers"
+  },
+  "noFilterFound": "no filter found",
+  "@noFilterFound": {
+    "description": "Empty state for moderation filters"
+  },
+  "replyToPrefix": "reply to",
+  "@replyToPrefix": {
+    "description": "Prefix text for reply context"
+  },
+  "andMoreCount": " and {count} more",
+  "@andMoreCount": {
+    "description": "Indicator for additional replies",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "noteNotFound": "Note not found",
+  "@noteNotFound": {
+    "description": "Error message when note cannot be found"
+  },
+  "shared": " shared",
+  "@shared": {
+    "description": "Repost indicator text"
+  },
+  "loadingMightFail": "loading might fail, the repost has no information where to fetch the post",
+  "@loadingMightFail": {
+    "description": "Error message for repost without reference"
+  },
+  "bugReportMessage": "This is a bug, please report it to the developers",
+  "@bugReportMessage": {
+    "description": "Bug report request message"
+  },
+  "noMoreNotesToShow": "No more notes to show",
+  "@noMoreNotesToShow": {
+    "description": "End of feed message"
+  },
+  "trendingPeople": "trending people",
+  "@trendingPeople": {
+    "description": "Trending people section heading"
+  },
+  "trendingHashtags": "trending hashtags",
+  "@trendingHashtags": {
+    "description": "Trending hashtags section heading"
+  },
+  "somethingWentWrong": "Something went wrong",
+  "@somethingWentWrong": {
+    "description": "Generic error message"
+  },
+  "noConnection": "No connection",
+  "@noConnection": {
+    "description": "No network connection error"
+  },
+  "reconnectingToRelays": "reconnecting to relays...",
+  "@reconnectingToRelays": {
+    "description": "Status message while reconnecting to relays"
+  },
+  "addRelay": " add relay",
+  "@addRelay": {
+    "description": "Input placeholder for adding relay"
+  },
+  "read": "read",
+  "@read": {
+    "description": "Relay read permission label"
+  },
+  "write": "write",
+  "@write": {
+    "description": "Relay write permission label"
+  },
+  "starterPack": "Starter Pack",
+  "@starterPack": {
+    "description": "Starter pack title"
+  },
+  "deleteStarterPack": "Delete Starter Pack",
+  "@deleteStarterPack": {
+    "description": "Delete starter pack dialog title"
+  },
+  "deleteStarterPackConfirm": "Are you sure you want to delete this starter pack? This action cannot be undone.",
+  "@deleteStarterPackConfirm": {
+    "description": "Delete starter pack confirmation message"
+  },
+  "share": "share",
+  "@share": {
+    "description": "Share button label"
+  },
+  "starterPackBy": "Starter pack by {author}",
+  "@starterPackBy": {
+    "description": "Starter pack attribution text",
+    "placeholders": {
+      "author": {
+        "type": "String"
+      }
+    }
+  },
+  "you": "you",
+  "@you": {
+    "description": "Pronoun for current user"
+  },
+  "addToStarterPackTitle": "Add {name} to Starter Pack",
+  "@addToStarterPackTitle": {
+    "description": "Dialog title for adding user to starter pack",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "createNewStarterPack": "Create new starter pack",
+  "@createNewStarterPack": {
+    "description": "Button to create new starter pack"
+  },
+  "upload": "upload",
+  "@upload": {
+    "description": "Upload button label"
+  },
+  "createYourStarterPack": "create your starter pack",
+  "@createYourStarterPack": {
+    "description": "Starter pack creation heading"
+  },
+  "inviteFriendsToFollow": "Invite your friends to follow your favorite people",
+  "@inviteFriendsToFollow": {
+    "description": "Starter pack creation subheading"
+  },
+  "title": "Title",
+  "@title": {
+    "description": "Title field label"
+  },
+  "description": "Description",
+  "@description": {
+    "description": "Description field label"
+  },
+  "yourStarterPack": "your starter pack",
+  "@yourStarterPack": {
+    "description": "Starter pack placeholder text"
+  },
+  "shareWithFriends": "Share it with your friends and help them discover amazing people!",
+  "@shareWithFriends": {
+    "description": "Share starter pack description"
+  },
+  "shareStarterPack": "share starter pack",
+  "@shareStarterPack": {
+    "description": "Share starter pack button"
+  },
+  "publishStarterPack": "publish starter pack",
+  "@publishStarterPack": {
+    "description": "Publish starter pack button"
+  },
+  "addUsersToContinue": "add users to continue",
+  "@addUsersToContinue": {
+    "description": "Instruction when no users added"
+  },
+  "addUserMenuHint": "you can also use the three dots menu on every post to add a user to a pack",
+  "@addUserMenuHint": {
+    "description": "Helper text for adding users"
+  },
+  "show": "show",
+  "@show": {
+    "description": "Button to reveal content"
+  },
+  "pushNotifications": "Push Notifications",
+  "@pushNotifications": {
+    "description": "Push notifications setting title"
+  },
+  "receiveNotificationsAboutReplies": "You will receive notifications about new replies.",
+  "@receiveNotificationsAboutReplies": {
+    "description": "Notifications enabled status"
+  },
+  "enableNotificationsForReplies": "Enable notifications to get notified about new replies",
+  "@enableNotificationsForReplies": {
+    "description": "Notifications disabled status"
+  },
+  "notificationsDeniedInSettings": "Note: You previously denied notifications. Please enable them in your device settings to receive notifications.",
+  "@notificationsDeniedInSettings": {
+    "description": "Notifications permission denied warning"
+  },
+  "welcomeTo": "welcome to",
+  "@welcomeTo": {
+    "description": "Welcome greeting prefix"
+  },
+  "joinTheConversation": "join the conversation",
+  "@joinTheConversation": {
+    "description": "Join button label"
+  },
+  "errorLoadingNote": "Error loading note",
+  "@errorLoadingNote": {
+    "description": "Error message when note fails to load"
+  },
+  "errorPrefix": "Error: {error}",
+  "@errorPrefix": {
+    "description": "Generic error message with error details",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "errorProcessingLink": "Error processing link: {error}",
+  "@errorProcessingLink": {
+    "description": "Error message when processing deeplink fails",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "processingLink": "processing link:",
+  "@processingLink": {
+    "description": "Status message when processing link"
+  },
+  "noMatchingActionFound": "no matching action found",
+  "@noMatchingActionFound": {
+    "description": "Error when no action matches the link"
+  },
+  "worksOnlyIfInCache": "works only if already in cache",
+  "@worksOnlyIfInCache": {
+    "description": "Description for username search limitation"
+  },
+  "mastodonAddress": "mastodon address (provided by mostr.pub)",
+  "@mastodonAddress": {
+    "description": "Description for mastodon address search"
+  },
+  "amberLogin": "amber login",
+  "@amberLogin": {
+    "description": "Amber login button label"
+  },
+  "seedPhraseLogin": "seed phrase login",
+  "@seedPhraseLogin": {
+    "description": "Seed phrase login button label"
+  },
+  "bunkerLogin": "bunker login",
+  "@bunkerLogin": {
+    "description": "Bunker login button label"
+  },
+  "iHaveReadAndAcceptThe": "I have read and accept the ",
+  "@iHaveReadAndAcceptThe": {
+    "description": "Terms acceptance checkbox prefix"
+  },
+  "installAmber": "install amber",
+  "@installAmber": {
+    "description": "Install Amber button label"
+  },
+  "authoriseAmber": "authorise amber",
+  "@authoriseAmber": {
+    "description": "Authorise Amber button label"
+  },
+  "connect": "connect",
+  "@connect": {
+    "description": "Connect button label"
+  },
+  "followCount": "follow {count}/{target}",
+  "@followCount": {
+    "description": "Follow progress counter",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "target": {
+        "type": "int"
+      }
+    }
+  },
+  "notAvailable": "n.a.",
+  "@notAvailable": {
+    "description": "Abbreviation for not available"
+  },
+  "post": "post",
+  "@post": {
+    "description": "Post button label"
+  },
+  "newPostsCount": "{count} new posts",
+  "@newPostsCount": {
+    "description": "New posts indicator",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "noteReference": "Note reference",
+  "@noteReference": {
+    "description": "Label for note reference link"
+  },
+  "createStarterPack": "create starter pack",
+  "@createStarterPack": {
+    "description": "Create starter pack button label"
+  },
+  "createAnother": "create another",
+  "@createAnother": {
+    "description": "Create another starter pack button"
+  },
+  "starterPackIsLive": "🎉 Your starter pack is live!",
+  "@starterPackIsLive": {
+    "description": "Success message when starter pack is published"
+  },
+  "searchHint": "Search",
+  "@searchHint": {
+    "description": "Search input hint text"
+  },
+  "bunkerUrlHint": "bunker://",
+  "@bunkerUrlHint": {
+    "description": "Bunker URL input hint"
+  },
+  "continueWithPeople": "continue with {count} people",
+  "@continueWithPeople": {
+    "description": "Button to continue with selected people",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "unknown": "Unknown",
+  "@unknown": {
+    "description": "Unknown label for missing data"
+  },
+  "follow": "follow",
+  "@follow": {
+    "description": "Follow button label"
+  },
+  "unfollow": "unfollow",
+  "@unfollow": {
+    "description": "Unfollow button label"
+  },
+  "invalidBunkerUrl": "Invalid bunker URL. Must start with bunker://",
+  "@invalidBunkerUrl": {
+    "description": "Error message for invalid bunker URL format"
+  },
+  "failedToConnectWithError": "Failed to connect: {error}",
+  "@failedToConnectWithError": {
+    "description": "Error message for failed connection with error details",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "byUsingCamelusYouAgree": "By using Camelus you agree to ",
+  "@byUsingCamelusYouAgree": {
+    "description": "Text before terms and conditions link on onboarding page"
+  },
+  "dmRelays": "DM Relays",
+  "@dmRelays": {
+    "description": "DM relays settings page title"
+  },
+  "dmRelaysInfo": "These relays are used specifically for sending and receiving private messages (NIP-17). Other users will send DMs to these relays.",
+  "@dmRelaysInfo": {
+    "description": "Info text explaining DM relays"
+  },
+  "invalidUrl": "Invalid URL",
+  "@invalidUrl": {
+    "description": "Error when URL format is invalid"
+  },
+  "alreadyExists": "Already exists",
+  "@alreadyExists": {
+    "description": "Error when item already exists"
+  },
+  "relaysSaved": "Relays saved",
+  "@relaysSaved": {
+    "description": "Success message when relays are saved"
+  },
+  "failedToSaveRelays": "Failed to save relays",
+  "@failedToSaveRelays": {
+    "description": "Error message when saving relays fails"
+  },
+  "noDmRelaysConfigured": "No DM relays configured",
+  "@noDmRelaysConfigured": {
+    "description": "Empty state title for DM relays"
+  },
+  "dmRelaysEmptyDescription": "Add relays where you want to receive private messages. Without DM relays, your NIP-65 inbox relays will be used as fallback.",
+  "@dmRelaysEmptyDescription": {
+    "description": "Empty state description for DM relays"
+  },
+  "suggestedRelays": "Suggested relays:",
+  "@suggestedRelays": {
+    "description": "Label for suggested relays section"
+  },
+  "restoreRelay": "Restore relay",
+  "@restoreRelay": {
+    "description": "Tooltip for restore relay button"
+  },
+  "removeRelay": "Remove relay",
+  "@removeRelay": {
+    "description": "Tooltip for remove relay button"
+  },
+  "addRelay": "Add relay",
+  "@addRelay": {
+    "description": "Tooltip for add relay button"
+  },
+  "refresh": "Refresh",
+  "@refresh": {
+    "description": "Refresh button tooltip"
+  },
+  "messages": "Messages",
+  "@messages": {
+    "description": "Messages page title"
+  },
+  "pleaseLoginToViewMessages": "Please login to view messages",
+  "@pleaseLoginToViewMessages": {
+    "description": "Message shown when user is not logged in"
+  },
+  "newMessage": "New message",
+  "@newMessage": {
+    "description": "Tooltip for new message button"
+  },
+  "failedToLoadMessages": "Failed to load messages",
+  "@failedToLoadMessages": {
+    "description": "Error message when messages fail to load"
+  },
+  "retry": "Retry",
+  "@retry": {
+    "description": "Retry button label"
+  },
+  "failed": "Failed",
+  "@failed": {
+    "description": "Status text when message failed to send"
+  },
+  "noMessagesYet": "No messages yet",
+  "@noMessagesYet": {
+    "description": "Empty state title for messages"
+  },
+  "startConversationHint": "Start a conversation by tapping the pencil icon",
+  "@startConversationHint": {
+    "description": "Empty state description for messages"
+  },
+  "newMessageDialogTitle": "New Message",
+  "@newMessageDialogTitle": {
+    "description": "Dialog title for new message"
+  },
+  "enterPubkeyPrompt": "Enter the pubkey (nprofile, npub, or hex):",
+  "@enterPubkeyPrompt": {
+    "description": "Prompt for entering pubkey"
+  },
+  "pubkeyHint": "nprofile1..., npub1..., or hex",
+  "@pubkeyHint": {
+    "description": "Hint text for pubkey input"
+  },
+  "startChat": "Start Chat",
+  "@startChat": {
+    "description": "Button to start a new chat"
+  },
+  "loadOlderMessages": "Load older messages",
+  "@loadOlderMessages": {
+    "description": "Button to load older messages"
+  },
+  "endToEndEncrypted": "End-to-end encrypted",
+  "@endToEndEncrypted": {
+    "description": "Label indicating encryption"
+  },
+  "beginningOfConversation": "This is the beginning of your conversation",
+  "@beginningOfConversation": {
+    "description": "Message shown at the start of conversation"
+  },
+  "startYourEncryptedConversation": "Start your encrypted conversation",
+  "@startYourEncryptedConversation": {
+    "description": "Empty thread state message"
+  },
+  "endToEndEncryptedNip17": "End-to-end encrypted with NIP-17",
+  "@endToEndEncryptedNip17": {
+    "description": "Label indicating NIP-17 encryption"
+  },
+  "messageHint": "Message...",
+  "@messageHint": {
+    "description": "Hint text for message input"
+  },
+  "failedToSendMessage": "Failed to send message",
+  "@failedToSendMessage": {
+    "description": "Error when message fails to send"
+  },
+  "deleteMessage": "Delete message",
+  "@deleteMessage": {
+    "description": "Menu item to delete a message"
+  },
+  "deleteMessageConfirmTitle": "Delete message?",
+  "@deleteMessageConfirmTitle": {
+    "description": "Confirmation dialog title"
+  },
+  "deleteMessageConfirmContent": "This will request the relay to delete this message and remove it from your device.",
+  "@deleteMessageConfirmContent": {
+    "description": "Confirmation dialog content"
+  },
+  "today": "Today",
+  "@today": {
+    "description": "Today date label"
+  },
+  "yesterday": "Yesterday",
+  "@yesterday": {
+    "description": "Yesterday date label"
+  },
+  "monday": "Monday",
+  "@monday": {
+    "description": "Monday weekday"
+  },
+  "tuesday": "Tuesday",
+  "@tuesday": {
+    "description": "Tuesday weekday"
+  },
+  "wednesday": "Wednesday",
+  "@wednesday": {
+    "description": "Wednesday weekday"
+  },
+  "thursday": "Thursday",
+  "@thursday": {
+    "description": "Thursday weekday"
+  },
+  "friday": "Friday",
+  "@friday": {
+    "description": "Friday weekday"
+  },
+  "saturday": "Saturday",
+  "@saturday": {
+    "description": "Saturday weekday"
+  },
+  "sunday": "Sunday",
+  "@sunday": {
+    "description": "Sunday weekday"
+  },
+  "searchUserHint": "Search by name, NIP-05 or npub...",
+  "@searchUserHint": {
+    "description": "Hint text for user search input"
+  },
+  "searchToStartConversation": "Search for a user to start a conversation",
+  "@searchToStartConversation": {
+    "description": "Empty state message for new DM page"
+  },
+  "enterAtLeast2Characters": "Enter at least 2 characters",
+  "@enterAtLeast2Characters": {
+    "description": "Message when search query is too short"
+  },
+  "noUsersFound": "No users found",
+  "@noUsersFound": {
+    "description": "Message when no users match the search"
+  },
+  "chatRelayStatus": "Chat Relay Status",
+  "@chatRelayStatus": {
+    "description": "Header for chat relay status in debug sheet"
+  },
+  "chatRelayExcellent": "Excellent",
+  "@chatRelayExcellent": {
+    "description": "Status when both parties have connected relays"
+  },
+  "chatRelayDegraded": "Degraded",
+  "@chatRelayDegraded": {
+    "description": "Status when only one party has connected relays"
+  },
+  "chatRelayPoor": "Poor",
+  "@chatRelayPoor": {
+    "description": "Status when no DM relays are connected"
+  },
+  "yourDmRelays": "Your DM Relays",
+  "@yourDmRelays": {
+    "description": "Section title for user's DM relays"
+  },
+  "peerDmRelays": "Peer's DM Relays",
+  "@peerDmRelays": {
+    "description": "Section title for peer's DM relays"
+  },
+  "noRelaysFound": "No relays found",
+  "@noRelaysFound": {
+    "description": "Message when no relays are configured"
+  },
+  "debugTools": "Debug Tools",
+  "@debugTools": {
+    "description": "Section title for debug tools"
+  },
+  "refreshRelayDiscovery": "Refresh relay discovery",
+  "@refreshRelayDiscovery": {
+    "description": "Button to re-fetch relay lists"
+  },
+  "viewAllRelays": "View all connected relays",
+  "@viewAllRelays": {
+    "description": "Button to navigate to relays page"
+  },
+  "deletionNotSupportedByRelays": "Message deleted locally, but relays may not support deletion",
+  "@deletionNotSupportedByRelays": {
+    "description": "Warning when message deletion is not confirmed by relays"
+  },
+  "testDeletionSupport": "Test deletion support",
+  "@testDeletionSupport": {
+    "description": "Tooltip for testing relay deletion support"
+  },
+  "deletionSupported": "Deletion supported",
+  "@deletionSupported": {
+    "description": "Badge text when relay supports deletion"
+  },
+  "deletionNotSupported": "Deletion not supported",
+  "@deletionNotSupported": {
+    "description": "Badge text when relay does not support deletion"
+  },
+  "testFailed": "Test failed",
+  "@testFailed": {
+    "description": "Badge text when deletion test failed"
+  },
+  "testing": "Testing...",
+  "@testing": {
+    "description": "Badge text when deletion test is in progress"
+  },
+  "testAllDeletionSupport": "Test all relays deletion support",
+  "@testAllDeletionSupport": {
+    "description": "Button to test deletion support on all relays"
+  },
+  "testAllDeletionSupportDescription": "Uses test keys to verify if relays actually delete messages",
+  "@testAllDeletionSupportDescription": {
+    "description": "Description for test all deletion support button"
+  },
+  "relayRejectsGiftWrap": "Rejects gift wraps",
+  "@relayRejectsGiftWrap": {
+    "description": "Badge text when relay rejects kind 1059 events"
+  },
+  "relayRejectsDeletion": "Rejects deletion",
+  "@relayRejectsDeletion": {
+    "description": "Badge text when relay rejects deletion requests"
+  },
+  "networkError": "Network error",
+  "@networkError": {
+    "description": "Badge text when there was a network error during test"
+  },
+  "timeout": "Timeout",
+  "@timeout": {
+    "description": "Badge text when test timed out"
+  },
+  "privacyPrivate": "Private (secure)",
+  "@privacyPrivate": {
+    "description": "Badge text when relay correctly restricts gift wrap access"
+  },
+  "privacyLeaks": "Privacy leak",
+  "@privacyLeaks": {
+    "description": "Badge text when relay leaks gift wraps to everyone"
+  },
+  "testPrivacy": "Test privacy",
+  "@testPrivacy": {
+    "description": "Tooltip for testing relay privacy"
+  },
+  "testAllRelays": "Test all relays",
+  "@testAllRelays": {
+    "description": "Button to test all relays for both deletion and privacy"
+  },
+  "testAllRelaysDescription": "Tests deletion support and privacy for all connected relays",
+  "@testAllRelaysDescription": {
+    "description": "Description for test all relays button"
+  },
+  "relayStatusExcellentDescription": "Connected to {myCount} of your relays and {peerCount} of peer's relays.",
+  "@relayStatusExcellentDescription": {
+    "description": "Status description when relay connection is excellent",
+    "placeholders": {
+      "myCount": {
+        "type": "int"
+      },
+      "peerCount": {
+        "type": "int"
+      }
+    }
+  },
+  "relayStatusDegradedMyOnly": "Connected to your relays, but not to peer's DM relays. Messages may be delayed.",
+  "@relayStatusDegradedMyOnly": {
+    "description": "Status description when only connected to own relays"
+  },
+  "relayStatusDegradedPeerOnly": "Connected to peer's relays, but not your DM relays. You may miss messages.",
+  "@relayStatusDegradedPeerOnly": {
+    "description": "Status description when only connected to peer relays"
+  },
+  "relayStatusDegradedPartial": "Partial connectivity. Some messages may be delayed.",
+  "@relayStatusDegradedPartial": {
+    "description": "Status description when partially connected"
+  },
+  "relayStatusPoorDescription": "No connected DM relays. Messages may not be delivered.",
+  "@relayStatusPoorDescription": {
+    "description": "Status description when no relays connected"
+  },
+  "relayStatusLoadingDescription": "Loading relay information...",
+  "@relayStatusLoadingDescription": {
+    "description": "Status description when loading"
+  },
+  "noteToSelf": "Note to Self",
+  "@noteToSelf": {
+    "description": "Title for self-conversation feature"
+  },
+  "noteToSelfHint": "Save messages, links, and notes for yourself",
+  "@noteToSelfHint": {
+    "description": "Hint text for empty Note to Self conversation"
+  },
+  "dmFollows": "Follows",
+  "@dmFollows": {
+    "description": "Tab label for DMs with people you follow"
+  },
+  "dmKnown": "Known",
+  "@dmKnown": {
+    "description": "Tab label for DMs with known contacts (not followed but messaged)"
+  },
+  "dmRequests": "Requests",
+  "@dmRequests": {
+    "description": "Tab label for DM requests from strangers"
+  },
+  "noFollowsConversations": "No conversations with people you follow",
+  "@noFollowsConversations": {
+    "description": "Empty state for follows DM tab"
+  },
+  "noKnownConversations": "No conversations with known contacts",
+  "@noKnownConversations": {
+    "description": "Empty state for known DM tab"
+  },
+  "noMessageRequests": "No message requests",
+  "@noMessageRequests": {
+    "description": "Empty state for requests DM tab"
+  },
+  "imprint": "Imprint",
+  "@imprint": {
+    "description": "Imprint page title"
   }
 }

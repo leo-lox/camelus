@@ -7,9 +7,7 @@ final onboardingProvider = Provider<Onboard>((ref) {
   OnboardingUserInfo signUpInfo = OnboardingUserInfo(
     keyPair: Bip340().generatePrivateKey(),
   );
-  final onboard = Onboard(
-    signUpInfo: signUpInfo,
-  );
+  final onboard = Onboard(signUpInfo: signUpInfo);
 
   return onboard;
 });

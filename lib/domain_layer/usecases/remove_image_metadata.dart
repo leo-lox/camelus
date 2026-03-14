@@ -30,8 +30,9 @@ class RemoveImageMetadata {
           break;
         case 'jpg':
         case 'jpeg':
-          cleanImageBytes =
-              Uint8List.fromList(img.encodeJpg(cleanImage, quality: 100));
+          cleanImageBytes = Uint8List.fromList(
+            img.encodeJpg(cleanImage, quality: 100),
+          );
           mimeType = 'image/jpeg';
           break;
 

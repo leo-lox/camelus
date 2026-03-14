@@ -62,7 +62,7 @@ Before you start, make sure that **Flutter** is installed on your machine. You c
 Start by cloning the repository to your local machine:
 
 ```bash
-git clone https://github.com/leo-lox/camelus.git
+git clone https://github.com/camelus-hq/camelus.git
 ```
 Clone `dart_ndk`
 

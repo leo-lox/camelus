@@ -1,7 +1,7 @@
 import 'dart:developer';
 import 'package:camelus/domain_layer/entities/relay.dart';
+import 'package:camelus/l10n/app_localizations.dart';
 import 'package:camelus/presentation_layer/atoms/long_button.dart';
-import 'package:camelus/config/palette.dart';
 import 'package:camelus/presentation_layer/providers/edit_relays_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -46,12 +46,13 @@ class _EditRelaysViewState extends ConsumerState<EditRelaysView> {
       showDialog(
         context: context,
         builder: (BuildContext context) {
+          final l10n = AppLocalizations.of(context)!;
           return AlertDialog(
-            title: const Text("Relay already exists"),
-            content: const Text("A relay with this name already exists."),
+            title: Text(l10n.relayAlreadyExists),
+            content: Text(l10n.relayAlreadyExistsMessage),
             actions: [
               TextButton(
-                child: const Text("OK"),
+                child: Text(l10n.ok),
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
@@ -70,7 +71,7 @@ class _EditRelaysViewState extends ConsumerState<EditRelaysView> {
     _relayNameController.clear();
   }
 
-  _saveRelays() async {
+  Future<void> _saveRelays() async {
     log("saving relays $myRelays");
     setState(() {
       loading = true;
@@ -106,7 +107,7 @@ class _EditRelaysViewState extends ConsumerState<EditRelaysView> {
     super.dispose();
   }
 
-  _checkClose() async {
+  Future<void> _checkClose() async {
     if (!touched) {
       Navigator.of(context).pop();
       return;
@@ -115,18 +116,19 @@ class _EditRelaysViewState extends ConsumerState<EditRelaysView> {
     showDialog(
       context: context,
       builder: (BuildContext context) {
+        final l10n = AppLocalizations.of(context)!;
         return AlertDialog(
-          title: const Text("Discard changes?"),
-          content: const Text("Do you want to discard your changes?"),
+          title: Text(l10n.discardChanges),
+          content: Text(l10n.discardChangesMessage),
           actions: [
             TextButton(
-              child: const Text("Cancel"),
+              child: Text(l10n.cancel),
               onPressed: () {
                 Navigator.of(context).pop();
               },
             ),
             TextButton(
-              child: const Text("Discard"),
+              child: Text(l10n.discard),
               onPressed: () {
                 Navigator.of(context).pop();
                 Navigator.of(context).pop();
@@ -149,17 +151,19 @@ class _EditRelaysViewState extends ConsumerState<EditRelaysView> {
       child: reconnecting
           ? Center(
               child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                CircularProgressIndicator(),
-                SizedBox(height: 20),
-                Text(
-                  "reconnecting to relays...",
-                  style:
-                      TextStyle(color: Theme.of(context).colorScheme.onSurface),
-                ),
-              ],
-            ))
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CircularProgressIndicator(),
+                  SizedBox(height: 20),
+                  Text(
+                    AppLocalizations.of(context)!.reconnectingToRelays,
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
+                  ),
+                ],
+              ),
+            )
           : ListView(
               children: [
                 Padding(
@@ -167,20 +171,14 @@ class _EditRelaysViewState extends ConsumerState<EditRelaysView> {
                   child: TextField(
                     controller: _relayNameController,
                     decoration: InputDecoration(
-                      hintText: " add relay",
+                      hintText: AppLocalizations.of(context)!.addRelay,
                       enabledBorder: OutlineInputBorder(
-                        borderSide:
-                            BorderSide(color: Paletter.getLightGray(context)),
                         borderRadius: BorderRadius.all(Radius.circular(30)),
                       ),
                       focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(
-                            color: Theme.of(context).colorScheme.onSurface),
                         borderRadius: BorderRadius.all(Radius.circular(30)),
                       ),
                     ),
-                    style: TextStyle(
-                        color: Theme.of(context).colorScheme.onSurface),
                     onSubmitted: (value) {
                       _addRelay();
                     },
@@ -189,17 +187,14 @@ class _EditRelaysViewState extends ConsumerState<EditRelaysView> {
                 const SizedBox(height: 20),
                 for (var relay in myRelays)
                   Padding(
-                    padding: const EdgeInsets.only(
-                      left: 10,
-                      right: 10,
-                    ),
+                    padding: const EdgeInsets.only(left: 10, right: 10),
                     child: Container(
                       margin: const EdgeInsets.only(bottom: 10),
                       //round corners
                       padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(20),
-                        color: Paletter.getExtraDarkGray(context),
+                        color: Theme.of(context).colorScheme.surface,
                       ),
                       height: 85,
                       width: double.infinity,
@@ -210,7 +205,8 @@ class _EditRelaysViewState extends ConsumerState<EditRelaysView> {
                           Text(
                             relay.url,
                             style: TextStyle(
-                                color: Theme.of(context).colorScheme.onSurface),
+                              color: Theme.of(context).colorScheme.onSurface,
+                            ),
                           ),
                           const Spacer(),
                           // switch button read
@@ -229,11 +225,12 @@ class _EditRelaysViewState extends ConsumerState<EditRelaysView> {
                                 //activeColor: Theme.of(context).colorScheme.primary,
                               ),
                               Text(
-                                'read',
+                                AppLocalizations.of(context)!.read,
                                 style: TextStyle(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onSurface),
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.onSurface,
+                                ),
                               ),
                             ],
                           ),
@@ -251,11 +248,12 @@ class _EditRelaysViewState extends ConsumerState<EditRelaysView> {
                                 },
                               ),
                               Text(
-                                'write',
+                                AppLocalizations.of(context)!.write,
                                 style: TextStyle(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onSurface),
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.onSurface,
+                                ),
                               ),
                             ],
                           ),
@@ -266,26 +264,32 @@ class _EditRelaysViewState extends ConsumerState<EditRelaysView> {
                               IconButton(
                                 icon: Icon(
                                   Icons.delete,
-                                  color: Paletter.getLightGray(context),
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.inverseSurface,
                                 ),
                                 onPressed: () {
                                   // confirm dialog
                                   showDialog(
                                     context: context,
                                     builder: (BuildContext context) {
+                                      final l10n = AppLocalizations.of(
+                                        context,
+                                      )!;
                                       return AlertDialog(
-                                        title: const Text("Delete relay"),
-                                        content: const Text(
-                                            "Are you sure you want to delete this relay?"),
+                                        title: Text(l10n.deleteRelay),
+                                        content: Text(
+                                          l10n.unsavedChangesMessage,
+                                        ),
                                         actions: [
                                           TextButton(
-                                            child: const Text("Cancel"),
+                                            child: Text(l10n.cancel),
                                             onPressed: () {
                                               Navigator.of(context).pop();
                                             },
                                           ),
                                           TextButton(
-                                            child: const Text("Delete"),
+                                            child: Text(l10n.delete),
                                             onPressed: () {
                                               setState(() {
                                                 touched = true;
@@ -301,11 +305,12 @@ class _EditRelaysViewState extends ConsumerState<EditRelaysView> {
                                 },
                               ),
                               Text(
-                                'delete',
+                                AppLocalizations.of(context)!.delete,
                                 style: TextStyle(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onSurface),
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.onSurface,
+                                ),
                               ),
                             ],
                           ),
@@ -315,10 +320,13 @@ class _EditRelaysViewState extends ConsumerState<EditRelaysView> {
                   ),
                 const SizedBox(height: 10),
                 Padding(
-                  padding:
-                      const EdgeInsets.only(left: 20, right: 20, bottom: 10),
+                  padding: const EdgeInsets.only(
+                    left: 20,
+                    right: 20,
+                    bottom: 10,
+                  ),
                   child: longButton(
-                    name: "save",
+                    name: AppLocalizations.of(context)!.save,
                     onPressed: _saveRelays,
                     inverted: true,
                     disabled: !touched,

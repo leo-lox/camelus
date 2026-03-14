@@ -1,4 +1,4 @@
-import 'package:riverpod/riverpod.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../../config/default_blossom.dart';
 import '../../../../providers/file_upload_provider.dart';
@@ -11,16 +11,16 @@ class FileServer {
   FileServer({required this.url, this.isOnline = false});
 }
 
-class FileServersNotifier extends StateNotifier<AsyncValue<List<FileServer>>> {
-  final Ref ref;
+class FileServersNotifier extends Notifier<AsyncValue<List<FileServer>>> {
+  @override
+  AsyncValue<List<FileServer>> build() {
+    loadServers();
+    return const AsyncValue.loading();
+  }
 
   bool _hasUnsavedChanges = false;
 
   bool get hasUnsavedChanges => _hasUnsavedChanges;
-
-  FileServersNotifier(this.ref) : super(const AsyncValue.loading()) {
-    loadServers();
-  }
 
   Future<bool> save() async {
     final result = await ref
@@ -46,17 +46,21 @@ class FileServersNotifier extends StateNotifier<AsyncValue<List<FileServer>>> {
     final myPubkey = ndk.accounts.getPublicKey();
 
     try {
-      final fetchedServers =
-          await ref.read(fileUploadProvider).getFileUploadServers([myPubkey!]);
+      final fetchedServers = await ref
+          .read(fileUploadProvider)
+          .getFileUploadServers([myPubkey!]);
 
       if (fetchedServers == null || fetchedServers.isEmpty) {
         state = AsyncValue.error(
-            "no servers found", StackTrace.current); // TODO add translation
+          "no servers found",
+          StackTrace.current,
+        ); // TODO add translation
         return;
       }
 
       state = AsyncValue.data(
-          fetchedServers.map((url) => FileServer(url: url)).toList());
+        fetchedServers.map((url) => FileServer(url: url)).toList(),
+      );
 
       for (final server in state.value!) {
         _checkOnlineStatus(server);
@@ -94,7 +98,8 @@ class FileServersNotifier extends StateNotifier<AsyncValue<List<FileServer>>> {
 
   void restoreDefaults() {
     state = AsyncValue.data(
-        defaultBlossomServers.map((url) => FileServer(url: url)).toList());
+      defaultBlossomServers.map((url) => FileServer(url: url)).toList(),
+    );
 
     for (final server in state.value!) {
       _checkOnlineStatus(server);
@@ -104,20 +109,22 @@ class FileServersNotifier extends StateNotifier<AsyncValue<List<FileServer>>> {
 
   /// checks if the server responds with a 200 status code
   void _checkOnlineStatus(FileServer server) async {
-    final isOnline =
-        await ref.read(fileUploadProvider).isFileUploadServerOnline(
-              server.url,
-            );
+    final isOnline = await ref
+        .read(fileUploadProvider)
+        .isFileUploadServerOnline(server.url);
 
     final currentServers = state.value ?? [];
     final serverIndex = currentServers.indexWhere((s) => s.url == server.url);
-    currentServers[serverIndex] =
-        FileServer(url: server.url, isOnline: isOnline);
+    currentServers[serverIndex] = FileServer(
+      url: server.url,
+      isOnline: isOnline,
+    );
 
     state = AsyncValue.data([...currentServers]);
   }
 }
 
 final fileServersProvider =
-    StateNotifierProvider<FileServersNotifier, AsyncValue<List<FileServer>>>(
-        (ref) => FileServersNotifier(ref));
+    NotifierProvider<FileServersNotifier, AsyncValue<List<FileServer>>>(
+      FileServersNotifier.new,
+    );

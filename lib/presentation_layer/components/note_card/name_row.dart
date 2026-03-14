@@ -4,7 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
-import '../../../config/palette.dart';
 import '../../../domain_layer/entities/user_metadata.dart';
 import '../../../helpers/helpers.dart';
 import '../../atoms/nip_05_text.dart';
@@ -35,8 +34,9 @@ class _NoteCardNameRowState extends ConsumerState<NoteCardNameRow> {
     _initSequence();
 
     final now = DateTime.now();
-    final postDateTime =
-        DateTime.fromMillisecondsSinceEpoch(widget.createdAt * 1000);
+    final postDateTime = DateTime.fromMillisecondsSinceEpoch(
+      widget.createdAt * 1000,
+    );
     final difference = now.difference(postDateTime);
 
     if (difference.inDays < 2) {
@@ -95,7 +95,10 @@ class _NoteCardNameRowState extends ConsumerState<NoteCardNameRow> {
         ),
         Text(
           dateText,
-          style: TextStyle(color: Paletter.getGray(context), fontSize: 14),
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.inverseSurface,
+            fontSize: 14,
+          ),
         ),
         const SizedBox(width: 10),
       ],

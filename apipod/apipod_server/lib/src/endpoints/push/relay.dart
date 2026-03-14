@@ -3,8 +3,6 @@ import 'dart:convert';
 import 'package:ndk/ndk.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
-import '../../config/push_config.dart';
-
 /// Represents a Nostr relay connection
 class Relay {
   /// The WebSocket URL of the relay
@@ -24,7 +22,7 @@ class Relay {
   /// Flag indicating if reconnection is in progress
   bool _reconnecting = false;
 
-  int reconnectDelay = 100;
+  int reconnectDelay = 4000;
   int reconnectAttempts = 0;
 
   /// Stream controllers for different event types
@@ -91,7 +89,7 @@ class Relay {
         switch (data[0]) {
           case 'EVENT':
             if (data.length < 3) return;
-            final event = Nip01Event.fromJson(data[2]);
+            final event = Nip01EventModel.fromJson(data[2]);
             _eventController.add(event);
             break;
           case 'EOSE':
@@ -156,11 +154,14 @@ class Relay {
   }
 
   /// Resubscribe after reconnect
-  void _handleOpen() {
-    subscribe(
-      PushConfig.subscriptionId,
-      PushConfig.subscriptionFilter,
-    );
+  Future<void> _handleOpen() async {
+    if (options.reconnectFilter != null && options.reconnectSubId != null) {
+      await subscribe(
+        options.reconnectSubId!,
+        options.reconnectFilter,
+      );
+    }
+
     print("Resubscribed to $url after reconnect");
   }
 
@@ -224,6 +225,13 @@ class RelayOptions {
   /// Whether to automatically reconnect on disconnection
   final bool reconnect;
 
+  final Map<String, Object>? reconnectFilter;
+  final String? reconnectSubId;
+
   /// Creates a new options object
-  const RelayOptions({this.reconnect = true});
+  const RelayOptions({
+    this.reconnect = true,
+    this.reconnectFilter,
+    this.reconnectSubId,
+  });
 }

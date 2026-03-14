@@ -2,17 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../config/palette.dart';
 import '../../../domain_layer/entities/nostr_note.dart';
 import '../../../domain_layer/entities/nostr_tag.dart';
 import '../../../helpers/helpers.dart';
+import '../../routing/route_paths.dart';
 import '../../providers/metadata_state_provider.dart';
 
 class InReplyTo extends ConsumerWidget {
-  const InReplyTo({
-    super.key,
-    required this.myNote,
-  });
+  const InReplyTo({super.key, required this.myNote});
 
   final NostrNote myNote;
 
@@ -46,13 +43,15 @@ class InReplyTo extends ConsumerWidget {
 
       if (i == 0) {
         pubkeyFirst = tag.value;
-        final myMetadata =
-            ref.watch(metadataStateProvider(pubkeyFirst)).userMetadata;
+        final myMetadata = ref
+            .watch(metadataStateProvider(pubkeyFirst))
+            .userMetadata;
         valueFirst = myMetadata?.name ?? _formatPubkey(pubkeyFirst);
       } else if (i == 1) {
         pubkeySecond = tag.value;
-        final myMetadata =
-            ref.watch(metadataStateProvider(pubkeySecond)).userMetadata;
+        final myMetadata = ref
+            .watch(metadataStateProvider(pubkeySecond))
+            .userMetadata;
         valueSecond = myMetadata?.name ?? _formatPubkey(pubkeySecond);
       } else {
         othersCount++;
@@ -64,35 +63,47 @@ class InReplyTo extends ConsumerWidget {
       children: [
         Text(
           "reply to ",
-          style: TextStyle(fontSize: 14, color: Paletter.getGray(context)),
+          style: TextStyle(
+            fontSize: 14,
+            color: Theme.of(context).colorScheme.inverseSurface,
+          ),
         ),
         GestureDetector(
           onTap: () {
-            context.push('/nostr/profile/$pubkeyFirst');
+            context.push(RoutePaths.profile(pubkey: pubkeyFirst));
           },
-          child: Text('@$valueFirst ',
-              style: TextStyle(
-                  color: Theme.of(context).colorScheme.primary,
-                  fontSize: 14,
-                  height: 1.3)),
+          child: Text(
+            '@$valueFirst ',
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.primary,
+              fontSize: 14,
+              height: 1.3,
+            ),
+          ),
         ),
         if (valueSecond.isNotEmpty)
           GestureDetector(
             onTap: () {
-              context.push('/nostr/profile/$pubkeySecond');
+              context.push(RoutePaths.profile(pubkey: pubkeySecond));
             },
-            child: Text('@$valueSecond ',
-                style: TextStyle(
-                    color: Theme.of(context).colorScheme.primary,
-                    fontSize: 14,
-                    height: 1.3)),
+            child: Text(
+              '@$valueSecond ',
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.primary,
+                fontSize: 14,
+                height: 1.3,
+              ),
+            ),
           ),
         if (othersCount != 0)
-          Text(' and $othersCount more',
-              style: TextStyle(
-                  color: Paletter.getDarkGray(context),
-                  fontSize: 14,
-                  height: 1.3))
+          Text(
+            ' and $othersCount more',
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.surfaceContainerHighest,
+              fontSize: 14,
+              height: 1.3,
+            ),
+          ),
       ],
     );
   }

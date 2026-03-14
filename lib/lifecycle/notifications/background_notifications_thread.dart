@@ -1,13 +1,15 @@
 import 'dart:developer';
 
+import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 import 'package:ndk/ndk.dart';
 import 'package:ndk_objectbox/ndk_objectbox.dart';
-import 'package:path/path.dart' as p;
-import 'package:path_provider/path_provider.dart';
 import 'package:riverpod/riverpod.dart';
 
+import '../../config/db_paths.dart';
 import '../../domain_layer/usecases/app_auth.dart';
+import '../../firebase_options.dart';
 import '../../objectbox.g.dart';
 import '../../presentation_layer/providers/db_ndk_provider.dart';
 import '../../presentation_layer/providers/ndk_provider.dart';
@@ -17,10 +19,20 @@ import 'process_fcm_msg.dart';
 /// called when the app is in the background or terminated.
 /// runs in seperate bg thread
 @pragma('vm:entry-point')
-Future<void> firebaseMessagingBackgroundHandler(
-  RemoteMessage message,
-) async {
+Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   log("Handling a background message: ${message.messageId}");
+
+  // check if already initialized (can happen if main thread is still alive in background)
+  // doulbe init on iOS causes issues
+  if (Firebase.apps.isEmpty) {
+    try {
+      await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform,
+      );
+    } catch (_) {
+      // Already initialized at native level — safe to continue
+    }
+  }
 
   final providerContainer = await _setupProviderBackgroundThread();
 
@@ -39,31 +51,44 @@ Future<ProviderContainer> _setupProviderBackgroundThread() async {
 
   // init ndk db
   // db could already be open by main thread
-  final DbObjectBox dbCacheManager;
+  DbObjectBox dbCacheManager;
 
-  final docsDir = await getApplicationDocumentsDirectory();
-  final dbPath = p.join(docsDir.path, "ndk-obx-default");
-  final isDbOpen = Store.isOpen(dbPath);
+  final dbPath = await DbPaths.getNdkDbPath();
 
-  if (isDbOpen) {
-    dbCacheManager = DbObjectBox(attach: true);
-  } else {
-    dbCacheManager = DbObjectBox(attach: false);
+  //final isDbOpen = Store.isOpen(dbPath);
+
+  // if (isDbOpen) {
+  //   dbCacheManager = DbObjectBox(attach: true, directory: dbPath);
+  // } else {
+  //   dbCacheManager = DbObjectBox(attach: false, directory: dbPath);
+  // }
+
+  try {
+    dbCacheManager = DbObjectBox(attach: true, directory: dbPath);
+    await dbCacheManager.dbRdy;
+  } catch (e) {
+    // Attach failed → main thread doesn't have store open
+    log("Store attach failed, opening fresh: $e");
+    try {
+      dbCacheManager = DbObjectBox(attach: false, directory: dbPath);
+      await dbCacheManager.dbRdy;
+    } catch (e2) {
+      log("ERROR: Could not open/attach ObjectBox: $e2");
+      // Fall back to no-DB or throw
+      rethrow;
+    }
   }
 
   await dbCacheManager.dbRdy;
   final CacheManager cacheManager = dbCacheManager;
 
   providerContainer.read(dbNdkProvider.notifier).setDB(cacheManager);
-  final mySigner = await AppAuth.getEventSigner();
-
-  if (mySigner != null) {
-    /// ndk login
-    providerContainer.read(ndkProviderLight).accounts.loginExternalSigner(
-          signer: mySigner,
-        );
-    providerContainer.read(signerProvider.notifier).setSigner(mySigner);
-  }
+  final startupAcc = await AppAuth.getStartupAccountData();
+  final _ = await AppAuth.loginWithStoredAccount(
+    startupAccountData: startupAcc,
+    signerNoti: providerContainer.read(signerProvider.notifier),
+    ndk: providerContainer.read(ndkProviderLight),
+  );
 
   return providerContainer;
 }

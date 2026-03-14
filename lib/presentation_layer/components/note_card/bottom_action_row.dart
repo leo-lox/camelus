@@ -1,6 +1,4 @@
-import 'package:camelus/config/palette.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'dart:math' as math;
 
@@ -66,9 +64,10 @@ class _BottomActionRowState extends State<BottomActionRow>
       duration: const Duration(milliseconds: 150),
       vsync: this,
     );
-    _animation = Tween<double>(begin: 1.0, end: 1.4).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.linear),
-    );
+    _animation = Tween<double>(
+      begin: 1.0,
+      end: 1.4,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.linear));
     _animation.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
         _controller.reverse();
@@ -101,51 +100,59 @@ class _BottomActionRowState extends State<BottomActionRow>
 
   @override
   Widget build(BuildContext context) {
-    final defaultColor = Paletter.getDarkGray(context);
+    final defaultColor = Theme.of(context).colorScheme.surfaceContainerHighest;
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        _buildActionButton(
-          onTap: widget.onComment,
-          icon: Icon(
-            PhosphorIcons.chatTeardropText(),
-            size: BottomActionRow.iconSize,
-            color: defaultColor,
-          ),
-          count: widget.commentCount,
-        ),
-        _buildRetweetButton(
-          color: widget.isRetweeted ? Color.fromARGB(255, 22, 163, 74) : null,
-          onTap: widget.onRetweet,
-          repostController: _repostController,
-        ),
-        _buildLikeButton(),
-        _buildActionButton(
-          onTap: widget.onShare,
-          icon: Icon(
-            PhosphorIcons.share(),
-            size: BottomActionRow.iconSize,
-            color: defaultColor,
+        Expanded(
+          child: _buildActionButton(
+            onTap: widget.onComment,
+            icon: Icon(
+              PhosphorIcons.chatTeardropText(),
+              size: BottomActionRow.iconSize,
+              color: defaultColor,
+            ),
+            count: widget.commentCount,
           ),
         ),
-        _buildActionButton(
-          onTap: widget.onMore,
-          icon: Icon(
-            PhosphorIcons.dotsThree(PhosphorIconsStyle.bold),
-            size: BottomActionRow.iconSize,
-            color: defaultColor,
+        Expanded(
+          child: _buildRetweetButton(
+            color: widget.isRetweeted ? Color.fromARGB(255, 22, 163, 74) : null,
+            onTap: widget.onRetweet,
+            repostController: _repostController,
           ),
-        )
+        ),
+        Expanded(child: _buildLikeButton()),
+        Expanded(
+          child: _buildActionButton(
+            onTap: widget.onShare,
+            icon: Icon(
+              PhosphorIcons.share(),
+              size: BottomActionRow.iconSize,
+              color: defaultColor,
+            ),
+          ),
+        ),
+        Expanded(
+          child: _buildActionButton(
+            onTap: widget.onMore,
+            icon: Icon(
+              PhosphorIcons.dotsThree(PhosphorIconsStyle.bold),
+              size: BottomActionRow.iconSize,
+              color: defaultColor,
+            ),
+          ),
+        ),
       ],
     );
   }
 
   Widget _buildLikeButton() {
-    final defaultColor = Paletter.getDarkGray(context);
+    final defaultColor = Theme.of(context).colorScheme.surfaceContainerHighest;
     return SizedBox(
       height: 35,
-      width: 65,
+      // width is removed so that parent Flex (Expanded) can control sizing
       child: InkWell(
         onTap: _triggerLike,
         borderRadius: BorderRadius.circular(50),
@@ -170,8 +177,10 @@ class _BottomActionRowState extends State<BottomActionRow>
                 const SizedBox(width: 5),
                 Text(
                   widget.likeCount.toString(),
-                  style:
-                      TextStyle(color: Paletter.getGray(context), fontSize: 16),
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.inverseSurface,
+                    fontSize: 16,
+                  ),
                 ),
               ],
             ],
@@ -184,14 +193,12 @@ class _BottomActionRowState extends State<BottomActionRow>
   Widget _buildActionButton({
     required VoidCallback onTap,
     Icon? icon,
-    String? svgIcon,
+
     int? count,
-    Color? color,
   }) {
-    final defaultColor = Paletter.getDarkGray(context);
     return SizedBox(
       height: 35,
-      width: 65,
+      // allow flexible horizontal sizing
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(50),
@@ -201,21 +208,15 @@ class _BottomActionRowState extends State<BottomActionRow>
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               if (icon != null) icon,
-              if (svgIcon != null)
-                SvgPicture.asset(
-                  svgIcon,
-                  height: 35,
-                  colorFilter: ColorFilter.mode(
-                    color ?? defaultColor,
-                    BlendMode.srcATop,
-                  ),
-                ),
+
               if (count != null) ...[
                 const SizedBox(width: 5),
                 Text(
                   count.toString(),
-                  style:
-                      TextStyle(color: Paletter.getGray(context), fontSize: 16),
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.inverseSurface,
+                    fontSize: 16,
+                  ),
                 ),
               ],
             ],
@@ -232,47 +233,51 @@ Widget _buildRetweetButton({
   int? count,
   Color? color,
 }) {
-  return Builder(builder: (context) {
-    final defaultColor = Paletter.getDarkGray(context);
-    return SizedBox(
-      height: 35,
-      width: 65,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(50),
-        child: Padding(
-          padding: const EdgeInsets.all(6.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              AnimatedBuilder(
+  return Builder(
+    builder: (context) {
+      final defaultColor = Theme.of(
+        context,
+      ).colorScheme.surfaceContainerHighest;
+      return SizedBox(
+        height: 35,
+        // width removed for flexibility
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(50),
+          child: Padding(
+            padding: const EdgeInsets.all(6.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                AnimatedBuilder(
                   animation: repostController,
-                  child: SvgPicture.asset(
-                    'assets/icons/retweet.svg',
-                    height: 35,
-                    colorFilter: ColorFilter.mode(
-                      color ?? defaultColor,
-                      BlendMode.srcATop,
-                    ),
+                  child: Icon(
+                    PhosphorIcons.repeat(),
+                    size: BottomActionRow.iconSize,
+                    color: color ?? defaultColor,
                   ),
                   builder: (context, Widget? child) {
                     return Transform.rotate(
                       angle: repostController.value * 2 * math.pi,
                       child: child,
                     );
-                  }),
-              if (count != null) ...[
-                const SizedBox(width: 5),
-                Text(
-                  count.toString(),
-                  style:
-                      TextStyle(color: Paletter.getGray(context), fontSize: 16),
+                  },
                 ),
+                if (count != null) ...[
+                  const SizedBox(width: 5),
+                  Text(
+                    count.toString(),
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.inverseSurface,
+                      fontSize: 16,
+                    ),
+                  ),
+                ],
               ],
-            ],
+            ),
           ),
         ),
-      ),
-    );
-  });
+      );
+    },
+  );
 }

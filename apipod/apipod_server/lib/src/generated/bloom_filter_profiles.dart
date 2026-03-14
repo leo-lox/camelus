@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
@@ -39,8 +40,9 @@ abstract class BloomFilterProfile
       size: jsonSerialization['size'] as int,
       numHashFunctions: jsonSerialization['numHashFunctions'] as int,
       bitArray: jsonSerialization['bitArray'] as String,
-      createdAt:
-          _i1.DateTimeJsonExtension.fromJson(jsonSerialization['createdAt']),
+      createdAt: _i1.DateTimeJsonExtension.fromJson(
+        jsonSerialization['createdAt'],
+      ),
       name: jsonSerialization['name'] as String?,
       description: jsonSerialization['description'] as String?,
     );
@@ -83,6 +85,7 @@ abstract class BloomFilterProfile
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'BloomFilterProfile',
       if (id != null) 'id': id,
       'size': size,
       'numHashFunctions': numHashFunctions,
@@ -96,6 +99,7 @@ abstract class BloomFilterProfile
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
+      '__className__': 'BloomFilterProfile',
       if (id != null) 'id': id,
       'size': size,
       'numHashFunctions': numHashFunctions,
@@ -148,14 +152,14 @@ class _BloomFilterProfileImpl extends BloomFilterProfile {
     String? name,
     String? description,
   }) : super._(
-          id: id,
-          size: size,
-          numHashFunctions: numHashFunctions,
-          bitArray: bitArray,
-          createdAt: createdAt,
-          name: name,
-          description: description,
-        );
+         id: id,
+         size: size,
+         numHashFunctions: numHashFunctions,
+         bitArray: bitArray,
+         createdAt: createdAt,
+         name: name,
+         description: description,
+       );
 
   /// Returns a shallow copy of this [BloomFilterProfile]
   /// with some or all fields replaced by the given arguments.
@@ -182,9 +186,46 @@ class _BloomFilterProfileImpl extends BloomFilterProfile {
   }
 }
 
+class BloomFilterProfileUpdateTable
+    extends _i1.UpdateTable<BloomFilterProfileTable> {
+  BloomFilterProfileUpdateTable(super.table);
+
+  _i1.ColumnValue<int, int> size(int value) => _i1.ColumnValue(
+    table.size,
+    value,
+  );
+
+  _i1.ColumnValue<int, int> numHashFunctions(int value) => _i1.ColumnValue(
+    table.numHashFunctions,
+    value,
+  );
+
+  _i1.ColumnValue<String, String> bitArray(String value) => _i1.ColumnValue(
+    table.bitArray,
+    value,
+  );
+
+  _i1.ColumnValue<DateTime, DateTime> createdAt(DateTime value) =>
+      _i1.ColumnValue(
+        table.createdAt,
+        value,
+      );
+
+  _i1.ColumnValue<String, String> name(String? value) => _i1.ColumnValue(
+    table.name,
+    value,
+  );
+
+  _i1.ColumnValue<String, String> description(String? value) => _i1.ColumnValue(
+    table.description,
+    value,
+  );
+}
+
 class BloomFilterProfileTable extends _i1.Table<int?> {
   BloomFilterProfileTable({super.tableRelation})
-      : super(tableName: 'bloom_filter_profiles') {
+    : super(tableName: 'bloom_filter_profiles') {
+    updateTable = BloomFilterProfileUpdateTable(this);
     size = _i1.ColumnInt(
       'size',
       this,
@@ -211,6 +252,8 @@ class BloomFilterProfileTable extends _i1.Table<int?> {
     );
   }
 
+  late final BloomFilterProfileUpdateTable updateTable;
+
   late final _i1.ColumnInt size;
 
   late final _i1.ColumnInt numHashFunctions;
@@ -225,14 +268,14 @@ class BloomFilterProfileTable extends _i1.Table<int?> {
 
   @override
   List<_i1.Column> get columns => [
-        id,
-        size,
-        numHashFunctions,
-        bitArray,
-        createdAt,
-        name,
-        description,
-      ];
+    id,
+    size,
+    numHashFunctions,
+    bitArray,
+    createdAt,
+    name,
+    description,
+  ];
 }
 
 class BloomFilterProfileInclude extends _i1.IncludeObject {
@@ -420,6 +463,48 @@ class BloomFilterProfileRepository {
     return session.db.updateRow<BloomFilterProfile>(
       row,
       columns: columns?.call(BloomFilterProfile.t),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates a single [BloomFilterProfile] by its [id] with the specified [columnValues].
+  /// Returns the updated row or null if no row with the given id exists.
+  Future<BloomFilterProfile?> updateById(
+    _i1.Session session,
+    int id, {
+    required _i1.ColumnValueListBuilder<BloomFilterProfileUpdateTable>
+    columnValues,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateById<BloomFilterProfile>(
+      id,
+      columnValues: columnValues(BloomFilterProfile.t.updateTable),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates all [BloomFilterProfile]s matching the [where] expression with the specified [columnValues].
+  /// Returns the list of updated rows.
+  Future<List<BloomFilterProfile>> updateWhere(
+    _i1.Session session, {
+    required _i1.ColumnValueListBuilder<BloomFilterProfileUpdateTable>
+    columnValues,
+    required _i1.WhereExpressionBuilder<BloomFilterProfileTable> where,
+    int? limit,
+    int? offset,
+    _i1.OrderByBuilder<BloomFilterProfileTable>? orderBy,
+    _i1.OrderByListBuilder<BloomFilterProfileTable>? orderByList,
+    bool orderDescending = false,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateWhere<BloomFilterProfile>(
+      columnValues: columnValues(BloomFilterProfile.t.updateTable),
+      where: where(BloomFilterProfile.t),
+      limit: limit,
+      offset: offset,
+      orderBy: orderBy?.call(BloomFilterProfile.t),
+      orderByList: orderByList?.call(BloomFilterProfile.t),
+      orderDescending: orderDescending,
       transaction: transaction,
     );
   }

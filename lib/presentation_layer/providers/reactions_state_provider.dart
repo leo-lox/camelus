@@ -9,10 +9,7 @@ class PostLikeState {
   final bool isLiked;
   final bool isLoading;
 
-  PostLikeState({
-    required this.isLiked,
-    required this.isLoading,
-  });
+  PostLikeState({required this.isLiked, required this.isLoading});
 
   PostLikeState copyWith({bool? isLiked, bool? isLoading}) {
     return PostLikeState(
@@ -22,15 +19,24 @@ class PostLikeState {
   }
 }
 
-// Create the StateNotifier
-class PostLikeNotifier extends StateNotifier<PostLikeState> {
-  final UserReactions _userReactions;
-  final String _postId;
-  final String _postAuthorPubkey;
+// Create the Notifier
+class PostLikeNotifier extends Notifier<PostLikeState> {
+  late final UserReactions _userReactions;
+  late final String _postId;
+  late final String _postAuthorPubkey;
 
-  PostLikeNotifier(this._userReactions, this._postId, this._postAuthorPubkey)
-      : super(PostLikeState(isLiked: false, isLoading: true)) {
+  PostLikeNotifier(NostrNote note)
+    : _postId = note.id,
+      _postAuthorPubkey = note.pubkey;
+
+  @override
+  PostLikeState build() {
+    final userReactions = ref.watch(reactionsProvider);
+    _userReactions = userReactions;
+
     _initializeLikeState();
+
+    return PostLikeState(isLiked: false, isLoading: true);
   }
 
   Future<void> _initializeLikeState() async {
@@ -62,12 +68,9 @@ class PostLikeNotifier extends StateNotifier<PostLikeState> {
   }
 }
 
-// Create the provider family \
-// first arg is the postId, second is the postAuthorPubkey
+// Create the provider family
+// arg is the NostrNote
 final postLikeProvider =
-    StateNotifierProvider.family<PostLikeNotifier, PostLikeState, NostrNote>(
-  (ref, arg) {
-    final userReactions = ref.watch(reactionsProvider);
-    return PostLikeNotifier(userReactions, arg.id, arg.pubkey);
-  },
-);
+    NotifierProvider.family<PostLikeNotifier, PostLikeState, NostrNote>(
+      PostLikeNotifier.new,
+    );

@@ -4,17 +4,21 @@ import 'package:flutter/services.dart';
 import 'package:ndk/ndk.dart';
 import 'package:ndk_objectbox/ndk_objectbox.dart';
 
+import 'config/db_paths.dart';
+
 /// inits the db in a isolate
 Future<CacheManager> getDbWithIsolate() async {
   final rootToken = RootIsolateToken.instance;
   if (rootToken == null) {
     throw StateError(
-        'Cannot get the root isolate token. This is required for plugins to work in background isolates.');
+      'Cannot get the root isolate token. This is required for plugins to work in background isolates.',
+    );
   }
   final dbIsolateManager = DbIsolateManager();
   await dbIsolateManager.start();
 
-  DbObjectBox dbCacheManager = DbObjectBox(attach: true);
+  final dbPath = await DbPaths.getNdkDbPath();
+  DbObjectBox dbCacheManager = DbObjectBox(attach: true, directory: dbPath);
   await dbCacheManager.dbRdy;
 
   return dbCacheManager;
@@ -22,7 +26,8 @@ Future<CacheManager> getDbWithIsolate() async {
 
 /// inits db on main thread
 Future<CacheManager> getDbMainThread() async {
-  DbObjectBox dbCacheManager = DbObjectBox(attach: false);
+  final dbPath = await DbPaths.getNdkDbPath();
+  DbObjectBox dbCacheManager = DbObjectBox(attach: false, directory: dbPath);
   await dbCacheManager.dbRdy;
   return dbCacheManager;
 }
@@ -30,8 +35,9 @@ Future<CacheManager> getDbMainThread() async {
 class DbIsolateData {
   final SendPort sendPort;
   final RootIsolateToken rootToken;
+  final String dbPath;
 
-  DbIsolateData(this.sendPort, this.rootToken);
+  DbIsolateData(this.sendPort, this.rootToken, this.dbPath);
 }
 
 // This will be the entry point for your database isolate
@@ -44,7 +50,7 @@ void dbIsolateEntry(DbIsolateData data) async {
   data.sendPort.send(receivePort.sendPort);
 
   // Initialize the database (not attaching since this is the primary instance)
-  final dbCacheManager = DbObjectBox(attach: false);
+  final dbCacheManager = DbObjectBox(attach: false, directory: data.dbPath);
   await dbCacheManager.dbRdy;
 
   // Listen for messages from the main isolate
@@ -84,11 +90,12 @@ class DbIsolateManager {
     if (_dbIsolate != null) return;
 
     final rootToken = RootIsolateToken.instance!;
+    final dbPath = await DbPaths.getNdkDbPath();
 
     // Start the database isolate
     _dbIsolate = await Isolate.spawn(
       dbIsolateEntry,
-      DbIsolateData(_receivePort.sendPort, rootToken),
+      DbIsolateData(_receivePort.sendPort, rootToken, dbPath),
     );
 
     // Set up communication with the isolate

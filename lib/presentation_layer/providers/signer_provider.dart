@@ -1,13 +1,15 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ndk/ndk.dart';
-import 'package:riverpod/riverpod.dart';
 
-final signerProvider =
-    StateNotifierProvider<SingerNotifier, EventSigner?>((ref) {
-  return SingerNotifier();
-});
+final signerProvider = NotifierProvider<SingerNotifier, EventSigner?>(
+  SingerNotifier.new,
+);
 
-class SingerNotifier extends StateNotifier<EventSigner?> {
-  SingerNotifier() : super(null);
+class SingerNotifier extends Notifier<EventSigner?> {
+  @override
+  EventSigner? build() {
+    return null;
+  }
 
   void setSigner(EventSigner newSigner) {
     state = newSigner;

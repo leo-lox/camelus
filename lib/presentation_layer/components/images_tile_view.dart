@@ -1,40 +1,52 @@
-import 'package:camelus/presentation_layer/components/images_gallery.dart';
-import 'package:camelus/config/palette.dart';
-import 'package:camelus/helpers/helpers.dart';
+import 'package:camelus/presentation_layer/providers/image_aspect_ratio_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
-class ImagesTileView extends StatelessWidget {
+class ImagesTileView extends ConsumerStatefulWidget {
   final List<String> images;
   final Widget? galleryBottomWidget;
-  final String _tileViewId = Helpers().getRandomString(4);
   final double maxHeight;
+  final String eventId;
+  final String profileIdentifier;
 
-  ImagesTileView({
+  const ImagesTileView({
     super.key,
     required this.images,
     this.galleryBottomWidget,
     this.maxHeight = 200,
+    required this.eventId,
+    required this.profileIdentifier,
   });
 
   @override
+  ConsumerState<ImagesTileView> createState() => _ImagesTileViewState();
+}
+
+class _ImagesTileViewState extends ConsumerState<ImagesTileView> {
+  @override
   Widget build(BuildContext context) {
-    int imageCount = images.length;
+    int imageCount = widget.images.length;
 
     return LayoutBuilder(
       builder: (context, constraints) {
         if (imageCount == 1) {
           return ClipRRect(
             borderRadius: BorderRadius.circular(10),
-            child:
-                _buildSingleImageWithAspectRatio(context, constraints.maxWidth),
+            child: _buildSingleImageWithAspectRatio(
+              context,
+              constraints.maxWidth,
+            ),
           );
         }
 
         // For multiple images, use the existing logic
         double aspectRatio = 1;
         double widgetHeight = constraints.maxWidth / aspectRatio;
-        widgetHeight = widgetHeight > maxHeight ? maxHeight : widgetHeight;
+        widgetHeight = widgetHeight > widget.maxHeight
+            ? widget.maxHeight
+            : widgetHeight;
 
         return ClipRRect(
           borderRadius: BorderRadius.circular(10),
@@ -48,38 +60,48 @@ class ImagesTileView extends StatelessWidget {
   }
 
   Widget _buildSingleImageWithAspectRatio(
-      BuildContext context, double maxWidth) {
-    return CachedNetworkImage(
-      imageUrl: images[0],
-      imageBuilder: (context, imageProvider) {
-        return GestureDetector(
-          onTap: () => _openGallery(context, 0),
-          child: Hero(
-            tag: 'image-${images[0]}-$_tileViewId',
-            child: Image(
-              image: imageProvider,
-              fit: BoxFit.cover,
-              width: maxWidth,
-              // height: maxHeight,
-            ),
-          ),
-        );
-      },
-      placeholder: (context, url) => SizedBox(
-        width: maxWidth,
-        height: maxHeight,
+    BuildContext context,
+    double maxWidth,
+  ) {
+    final url = widget.images[0];
+    final aspectAsync = ref.watch(imageAspectRatioProvider(url));
+
+    return aspectAsync.when(
+      data: (aspect) => AspectRatio(
+        aspectRatio: aspect,
+        child: CachedNetworkImage(
+          imageUrl: url,
+          imageBuilder: (context, imageProvider) {
+            return GestureDetector(
+              onTap: () => _openGallery(context, 0),
+              child: Hero(
+                tag: 'image-$url-${widget.eventId}-0',
+                child: Image(
+                  image: imageProvider,
+                  fit: BoxFit.cover,
+                  width: maxWidth,
+                ),
+              ),
+            );
+          },
+          placeholder: (context, url) => _imageLoading(),
+          errorWidget: (context, url, error) => const Icon(Icons.error),
+        ),
+      ),
+      loading: () => AspectRatio(
+        aspectRatio: widget.maxHeight > 0 ? maxWidth / widget.maxHeight : 1.0,
         child: _imageLoading(),
       ),
-      errorWidget: (context, url, error) => SizedBox(
-        width: maxWidth,
-        height: maxHeight,
-        child: const Icon(Icons.error),
-      ),
+      error: (_, __) =>
+          AspectRatio(aspectRatio: 1.0, child: const Icon(Icons.error)),
     );
   }
 
   Widget _buildImageGrid(
-      int imageCount, double maxWidth, BuildContext context) {
+    int imageCount,
+    double maxWidth,
+    BuildContext context,
+  ) {
     return Column(
       children: [
         Expanded(
@@ -109,16 +131,19 @@ class ImagesTileView extends StatelessWidget {
   }
 
   Widget _buildImageTile(
-      int index, int additionalImages, BuildContext context) {
+    int index,
+    int additionalImages,
+    BuildContext context,
+  ) {
     return GestureDetector(
       onTap: () => _openGallery(context, index),
       child: Hero(
-        tag: 'image-${images[index]}-$_tileViewId',
+        tag: 'image-${widget.images[index]}-${widget.eventId}-$index',
         child: Stack(
           fit: StackFit.expand,
           children: [
             CachedNetworkImage(
-              imageUrl: images[index],
+              imageUrl: widget.images[index],
               fit: BoxFit.cover,
               placeholder: (context, url) => _imageLoading(),
               errorWidget: (context, url, error) => const Icon(Icons.error),
@@ -132,54 +157,49 @@ class ImagesTileView extends StatelessWidget {
   }
 
   Widget _buildAdditionalImagesOverlay(int additionalImages) {
-    return Builder(builder: (context) {
-      return Container(
-        decoration: BoxDecoration(
-          gradient: RadialGradient(
-            colors: [
-              Theme.of(context).colorScheme.surface.withValues(alpha: 0.8),
-              Paletter.getExtraDarkGray(context).withValues(alpha: 0.5),
-            ],
-            stops: const [0.0, 1.0],
+    return Builder(
+      builder: (context) {
+        return Container(
+          decoration: BoxDecoration(
+            gradient: RadialGradient(
+              colors: [
+                Theme.of(context).colorScheme.surface.withValues(alpha: 0.8),
+                Theme.of(context).colorScheme.surface.withValues(alpha: 0.5),
+              ],
+              stops: const [0.0, 1.0],
+            ),
           ),
-        ),
-        child: Center(
-          child: Text(
-            '+$additionalImages',
-            style: TextStyle(
-                color: Theme.of(context).colorScheme.onSurface, fontSize: 38),
+          child: Center(
+            child: Text(
+              '+$additionalImages',
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onSurface,
+                fontSize: 38,
+              ),
+            ),
           ),
-        ),
-      );
-    });
+        );
+      },
+    );
   }
 
   void _openGallery(BuildContext context, int index) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => ImageGallery(
-          imageUrls: images,
-          defaultImageIndex: index,
-          topBarTitle: 'close',
-          bottomBarWidget: galleryBottomWidget,
-          heroTag: _tileViewId,
-        ),
-      ),
+    context.push(
+      '/profile/${widget.profileIdentifier}/status/${widget.eventId}/gallery?start=$index',
     );
   }
 }
 
 Widget _imageLoading() {
-  return Builder(builder: (context) {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8),
-        color: Paletter.getExtraDarkGray(context).withValues(alpha: 0.5),
-      ),
-      child: Center(
-        child: CircularProgressIndicator(),
-      ),
-    );
-  });
+  return Builder(
+    builder: (context) {
+      return Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(8),
+          color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.5),
+        ),
+        child: Center(child: CircularProgressIndicator()),
+      );
+    },
+  );
 }

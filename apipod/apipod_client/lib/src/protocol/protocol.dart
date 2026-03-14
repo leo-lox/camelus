@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
@@ -18,14 +19,16 @@ import 'example.dart' as _i6;
 import 'nip05/check_name_result_spy.dart' as _i7;
 import 'nip05/nip_05_data_spy.dart' as _i8;
 import 'nip05/nip_05_response_spy.dart' as _i9;
-import 'nostr_band/nostr_band_hashtags.dart' as _i10;
-import 'nostr_band/nostr_band_hastag_info.dart' as _i11;
-import 'nostr_band/nostr_band_people.dart' as _i12;
-import 'nostr_band/nostr_band_profiles.dart' as _i13;
-import 'reports_incoming.dart' as _i14;
-import 'short_links/short_link_invite_data.dart' as _i15;
-import 'subscription.dart' as _i16;
-import 'package:ndk/domain_layer/entities/nip_01_event.dart' as _i17;
+import 'otso_push/otso_geo_subscriptions.dart' as _i10;
+import 'otso_push/otso_push_data.dart' as _i11;
+import 'otso_sync/otos_external_sync.dart' as _i12;
+import 'reports_incoming.dart' as _i13;
+import 'short_links/short_link_invite_data.dart' as _i14;
+import 'subscription.dart' as _i15;
+import 'trends/trends_response.dart' as _i16;
+import 'trends/trends_snapshot.dart' as _i17;
+import 'trends/trends_top_item.dart' as _i18;
+import 'package:ndk/data_layer/models/nip_01_event_model.dart' as _i19;
 export 'app_update_data.dart';
 export 'bloom_filter_data.dart';
 export 'bloom_filter_events.dart';
@@ -34,13 +37,15 @@ export 'example.dart';
 export 'nip05/check_name_result_spy.dart';
 export 'nip05/nip_05_data_spy.dart';
 export 'nip05/nip_05_response_spy.dart';
-export 'nostr_band/nostr_band_hashtags.dart';
-export 'nostr_band/nostr_band_hastag_info.dart';
-export 'nostr_band/nostr_band_people.dart';
-export 'nostr_band/nostr_band_profiles.dart';
+export 'otso_push/otso_geo_subscriptions.dart';
+export 'otso_push/otso_push_data.dart';
+export 'otso_sync/otos_external_sync.dart';
 export 'reports_incoming.dart';
 export 'short_links/short_link_invite_data.dart';
 export 'subscription.dart';
+export 'trends/trends_response.dart';
+export 'trends/trends_snapshot.dart';
+export 'trends/trends_top_item.dart';
 export 'client.dart';
 
 class Protocol extends _i1.SerializationManager {
@@ -50,12 +55,33 @@ class Protocol extends _i1.SerializationManager {
 
   static final Protocol _instance = Protocol._();
 
+  static String? getClassNameFromObjectJson(dynamic data) {
+    if (data is! Map) return null;
+    final className = data['__className__'] as String?;
+    return className;
+  }
+
   @override
   T deserialize<T>(
     dynamic data, [
     Type? t,
   ]) {
     t ??= T;
+
+    final dataClassName = getClassNameFromObjectJson(data);
+    if (dataClassName != null && dataClassName != getClassNameForType(t)) {
+      try {
+        return deserializeByClassName({
+          'className': dataClassName,
+          'data': data,
+        });
+      } on FormatException catch (_) {
+        // If the className is not recognized (e.g., older client receiving
+        // data with a new subtype), fall back to deserializing without the
+        // className, using the expected type T.
+      }
+    }
+
     if (t == _i2.AppUpdateData) {
       return _i2.AppUpdateData.fromJson(data) as T;
     }
@@ -80,26 +106,32 @@ class Protocol extends _i1.SerializationManager {
     if (t == _i9.Nip05Response) {
       return _i9.Nip05Response.fromJson(data) as T;
     }
-    if (t == _i10.NostrBandHashtags) {
-      return _i10.NostrBandHashtags.fromJson(data) as T;
+    if (t == _i10.OtsoGeoSubscription) {
+      return _i10.OtsoGeoSubscription.fromJson(data) as T;
     }
-    if (t == _i11.NostrBandHashtagInfo) {
-      return _i11.NostrBandHashtagInfo.fromJson(data) as T;
+    if (t == _i11.OtsoPushSubscription) {
+      return _i11.OtsoPushSubscription.fromJson(data) as T;
     }
-    if (t == _i12.NostrBandPeople) {
-      return _i12.NostrBandPeople.fromJson(data) as T;
+    if (t == _i12.OtsoExternalSync) {
+      return _i12.OtsoExternalSync.fromJson(data) as T;
     }
-    if (t == _i13.NostrBandProfiles) {
-      return _i13.NostrBandProfiles.fromJson(data) as T;
+    if (t == _i13.ReportsIncoming) {
+      return _i13.ReportsIncoming.fromJson(data) as T;
     }
-    if (t == _i14.ReportsIncoming) {
-      return _i14.ReportsIncoming.fromJson(data) as T;
+    if (t == _i14.ShortLinkInviteData) {
+      return _i14.ShortLinkInviteData.fromJson(data) as T;
     }
-    if (t == _i15.ShortLinkInviteData) {
-      return _i15.ShortLinkInviteData.fromJson(data) as T;
+    if (t == _i15.PushSubscription) {
+      return _i15.PushSubscription.fromJson(data) as T;
     }
-    if (t == _i16.PushSubscription) {
-      return _i16.PushSubscription.fromJson(data) as T;
+    if (t == _i16.TrendsResponse) {
+      return _i16.TrendsResponse.fromJson(data) as T;
+    }
+    if (t == _i17.TrendsSnapshot) {
+      return _i17.TrendsSnapshot.fromJson(data) as T;
+    }
+    if (t == _i18.TrendsTopItem) {
+      return _i18.TrendsTopItem.fromJson(data) as T;
     }
     if (t == _i1.getType<_i2.AppUpdateData?>()) {
       return (data != null ? _i2.AppUpdateData.fromJson(data) : null) as T;
@@ -125,114 +157,158 @@ class Protocol extends _i1.SerializationManager {
     if (t == _i1.getType<_i9.Nip05Response?>()) {
       return (data != null ? _i9.Nip05Response.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i10.NostrBandHashtags?>()) {
-      return (data != null ? _i10.NostrBandHashtags.fromJson(data) : null) as T;
-    }
-    if (t == _i1.getType<_i11.NostrBandHashtagInfo?>()) {
-      return (data != null ? _i11.NostrBandHashtagInfo.fromJson(data) : null)
+    if (t == _i1.getType<_i10.OtsoGeoSubscription?>()) {
+      return (data != null ? _i10.OtsoGeoSubscription.fromJson(data) : null)
           as T;
     }
-    if (t == _i1.getType<_i12.NostrBandPeople?>()) {
-      return (data != null ? _i12.NostrBandPeople.fromJson(data) : null) as T;
-    }
-    if (t == _i1.getType<_i13.NostrBandProfiles?>()) {
-      return (data != null ? _i13.NostrBandProfiles.fromJson(data) : null) as T;
-    }
-    if (t == _i1.getType<_i14.ReportsIncoming?>()) {
-      return (data != null ? _i14.ReportsIncoming.fromJson(data) : null) as T;
-    }
-    if (t == _i1.getType<_i15.ShortLinkInviteData?>()) {
-      return (data != null ? _i15.ShortLinkInviteData.fromJson(data) : null)
+    if (t == _i1.getType<_i11.OtsoPushSubscription?>()) {
+      return (data != null ? _i11.OtsoPushSubscription.fromJson(data) : null)
           as T;
     }
-    if (t == _i1.getType<_i16.PushSubscription?>()) {
-      return (data != null ? _i16.PushSubscription.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i12.OtsoExternalSync?>()) {
+      return (data != null ? _i12.OtsoExternalSync.fromJson(data) : null) as T;
+    }
+    if (t == _i1.getType<_i13.ReportsIncoming?>()) {
+      return (data != null ? _i13.ReportsIncoming.fromJson(data) : null) as T;
+    }
+    if (t == _i1.getType<_i14.ShortLinkInviteData?>()) {
+      return (data != null ? _i14.ShortLinkInviteData.fromJson(data) : null)
+          as T;
+    }
+    if (t == _i1.getType<_i15.PushSubscription?>()) {
+      return (data != null ? _i15.PushSubscription.fromJson(data) : null) as T;
+    }
+    if (t == _i1.getType<_i16.TrendsResponse?>()) {
+      return (data != null ? _i16.TrendsResponse.fromJson(data) : null) as T;
+    }
+    if (t == _i1.getType<_i17.TrendsSnapshot?>()) {
+      return (data != null ? _i17.TrendsSnapshot.fromJson(data) : null) as T;
+    }
+    if (t == _i1.getType<_i18.TrendsTopItem?>()) {
+      return (data != null ? _i18.TrendsTopItem.fromJson(data) : null) as T;
     }
     if (t == List<String>) {
       return (data as List).map((e) => deserialize<String>(e)).toList() as T;
     }
     if (t == Map<String, String>) {
-      return (data as Map).map((k, v) =>
-          MapEntry(deserialize<String>(k), deserialize<String>(v))) as T;
-    }
-    if (t == Map<String, List<String>>) {
-      return (data as Map).map((k, v) =>
-          MapEntry(deserialize<String>(k), deserialize<List<String>>(v))) as T;
-    }
-    if (t == List<_i11.NostrBandHashtagInfo>) {
-      return (data as List)
-          .map((e) => deserialize<_i11.NostrBandHashtagInfo>(e))
-          .toList() as T;
-    }
-    if (t == List<_i13.NostrBandProfiles>) {
-      return (data as List)
-          .map((e) => deserialize<_i13.NostrBandProfiles>(e))
-          .toList() as T;
-    }
-    if (t == _i17.Nip01Event) {
-      return _i17.Nip01Event.fromJson(data) as T;
-    }
-    if (t == List<_i17.Nip01Event>) {
-      return (data as List).map((e) => deserialize<_i17.Nip01Event>(e)).toList()
+      return (data as Map).map(
+            (k, v) => MapEntry(deserialize<String>(k), deserialize<String>(v)),
+          )
           as T;
     }
-    if (t == _i1.getType<_i17.Nip01Event?>()) {
-      return (data != null ? _i17.Nip01Event.fromJson(data) : null) as T;
+    if (t == Map<String, List<String>>) {
+      return (data as Map).map(
+            (k, v) =>
+                MapEntry(deserialize<String>(k), deserialize<List<String>>(v)),
+          )
+          as T;
+    }
+    if (t == _i19.Nip01EventModel) {
+      return _i19.Nip01EventModel.fromJson(data) as T;
+    }
+    if (t == List<int>) {
+      return (data as List).map((e) => deserialize<int>(e)).toList() as T;
+    }
+    if (t == _i1.getType<List<int>?>()) {
+      return (data != null
+              ? (data as List).map((e) => deserialize<int>(e)).toList()
+              : null)
+          as T;
+    }
+    if (t == List<_i18.TrendsTopItem>) {
+      return (data as List)
+              .map((e) => deserialize<_i18.TrendsTopItem>(e))
+              .toList()
+          as T;
+    }
+    if (t == List<_i19.Nip01EventModel>) {
+      return (data as List)
+              .map((e) => deserialize<_i19.Nip01EventModel>(e))
+              .toList()
+          as T;
+    }
+    if (t == Map<String, dynamic>) {
+      return (data as Map).map(
+            (k, v) => MapEntry(deserialize<String>(k), deserialize<dynamic>(v)),
+          )
+          as T;
+    }
+    if (t == _i1.getType<_i19.Nip01EventModel?>()) {
+      return (data != null ? _i19.Nip01EventModel.fromJson(data) : null) as T;
     }
     return super.deserialize<T>(data, t);
+  }
+
+  static String? getClassNameForType(Type type) {
+    return switch (type) {
+      _i19.Nip01EventModel => 'Nip01EventModel',
+      _i2.AppUpdateData => 'AppUpdateData',
+      _i3.BloomFilterData => 'BloomFilterData',
+      _i4.BloomFilterEvent => 'BloomFilterEvent',
+      _i5.BloomFilterProfile => 'BloomFilterProfile',
+      _i6.Example => 'Example',
+      _i7.NameCheckResult => 'NameCheckResult',
+      _i8.Nip05Data => 'Nip05Data',
+      _i9.Nip05Response => 'Nip05Response',
+      _i10.OtsoGeoSubscription => 'OtsoGeoSubscription',
+      _i11.OtsoPushSubscription => 'OtsoPushSubscription',
+      _i12.OtsoExternalSync => 'OtsoExternalSync',
+      _i13.ReportsIncoming => 'ReportsIncoming',
+      _i14.ShortLinkInviteData => 'ShortLinkInviteData',
+      _i15.PushSubscription => 'PushSubscription',
+      _i16.TrendsResponse => 'TrendsResponse',
+      _i17.TrendsSnapshot => 'TrendsSnapshot',
+      _i18.TrendsTopItem => 'TrendsTopItem',
+      _ => null,
+    };
   }
 
   @override
   String? getClassNameForObject(Object? data) {
     String? className = super.getClassNameForObject(data);
     if (className != null) return className;
-    if (data is _i17.Nip01Event) {
-      return 'Nip01Event';
+
+    if (data is Map<String, dynamic> && data['__className__'] is String) {
+      return (data['__className__'] as String).replaceFirst('apipod.', '');
     }
-    if (data is _i2.AppUpdateData) {
-      return 'AppUpdateData';
-    }
-    if (data is _i3.BloomFilterData) {
-      return 'BloomFilterData';
-    }
-    if (data is _i4.BloomFilterEvent) {
-      return 'BloomFilterEvent';
-    }
-    if (data is _i5.BloomFilterProfile) {
-      return 'BloomFilterProfile';
-    }
-    if (data is _i6.Example) {
-      return 'Example';
-    }
-    if (data is _i7.NameCheckResult) {
-      return 'NameCheckResult';
-    }
-    if (data is _i8.Nip05Data) {
-      return 'Nip05Data';
-    }
-    if (data is _i9.Nip05Response) {
-      return 'Nip05Response';
-    }
-    if (data is _i10.NostrBandHashtags) {
-      return 'NostrBandHashtags';
-    }
-    if (data is _i11.NostrBandHashtagInfo) {
-      return 'NostrBandHashtagInfo';
-    }
-    if (data is _i12.NostrBandPeople) {
-      return 'NostrBandPeople';
-    }
-    if (data is _i13.NostrBandProfiles) {
-      return 'NostrBandProfiles';
-    }
-    if (data is _i14.ReportsIncoming) {
-      return 'ReportsIncoming';
-    }
-    if (data is _i15.ShortLinkInviteData) {
-      return 'ShortLinkInviteData';
-    }
-    if (data is _i16.PushSubscription) {
-      return 'PushSubscription';
+
+    switch (data) {
+      case _i19.Nip01EventModel():
+        return 'Nip01EventModel';
+      case _i2.AppUpdateData():
+        return 'AppUpdateData';
+      case _i3.BloomFilterData():
+        return 'BloomFilterData';
+      case _i4.BloomFilterEvent():
+        return 'BloomFilterEvent';
+      case _i5.BloomFilterProfile():
+        return 'BloomFilterProfile';
+      case _i6.Example():
+        return 'Example';
+      case _i7.NameCheckResult():
+        return 'NameCheckResult';
+      case _i8.Nip05Data():
+        return 'Nip05Data';
+      case _i9.Nip05Response():
+        return 'Nip05Response';
+      case _i10.OtsoGeoSubscription():
+        return 'OtsoGeoSubscription';
+      case _i11.OtsoPushSubscription():
+        return 'OtsoPushSubscription';
+      case _i12.OtsoExternalSync():
+        return 'OtsoExternalSync';
+      case _i13.ReportsIncoming():
+        return 'ReportsIncoming';
+      case _i14.ShortLinkInviteData():
+        return 'ShortLinkInviteData';
+      case _i15.PushSubscription():
+        return 'PushSubscription';
+      case _i16.TrendsResponse():
+        return 'TrendsResponse';
+      case _i17.TrendsSnapshot():
+        return 'TrendsSnapshot';
+      case _i18.TrendsTopItem():
+        return 'TrendsTopItem';
     }
     return null;
   }
@@ -243,8 +319,8 @@ class Protocol extends _i1.SerializationManager {
     if (dataClassName is! String) {
       return super.deserializeByClassName(data);
     }
-    if (dataClassName == 'Nip01Event') {
-      return deserialize<_i17.Nip01Event>(data['data']);
+    if (dataClassName == 'Nip01EventModel') {
+      return deserialize<_i19.Nip01EventModel>(data['data']);
     }
     if (dataClassName == 'AppUpdateData') {
       return deserialize<_i2.AppUpdateData>(data['data']);
@@ -270,27 +346,45 @@ class Protocol extends _i1.SerializationManager {
     if (dataClassName == 'Nip05Response') {
       return deserialize<_i9.Nip05Response>(data['data']);
     }
-    if (dataClassName == 'NostrBandHashtags') {
-      return deserialize<_i10.NostrBandHashtags>(data['data']);
+    if (dataClassName == 'OtsoGeoSubscription') {
+      return deserialize<_i10.OtsoGeoSubscription>(data['data']);
     }
-    if (dataClassName == 'NostrBandHashtagInfo') {
-      return deserialize<_i11.NostrBandHashtagInfo>(data['data']);
+    if (dataClassName == 'OtsoPushSubscription') {
+      return deserialize<_i11.OtsoPushSubscription>(data['data']);
     }
-    if (dataClassName == 'NostrBandPeople') {
-      return deserialize<_i12.NostrBandPeople>(data['data']);
-    }
-    if (dataClassName == 'NostrBandProfiles') {
-      return deserialize<_i13.NostrBandProfiles>(data['data']);
+    if (dataClassName == 'OtsoExternalSync') {
+      return deserialize<_i12.OtsoExternalSync>(data['data']);
     }
     if (dataClassName == 'ReportsIncoming') {
-      return deserialize<_i14.ReportsIncoming>(data['data']);
+      return deserialize<_i13.ReportsIncoming>(data['data']);
     }
     if (dataClassName == 'ShortLinkInviteData') {
-      return deserialize<_i15.ShortLinkInviteData>(data['data']);
+      return deserialize<_i14.ShortLinkInviteData>(data['data']);
     }
     if (dataClassName == 'PushSubscription') {
-      return deserialize<_i16.PushSubscription>(data['data']);
+      return deserialize<_i15.PushSubscription>(data['data']);
+    }
+    if (dataClassName == 'TrendsResponse') {
+      return deserialize<_i16.TrendsResponse>(data['data']);
+    }
+    if (dataClassName == 'TrendsSnapshot') {
+      return deserialize<_i17.TrendsSnapshot>(data['data']);
+    }
+    if (dataClassName == 'TrendsTopItem') {
+      return deserialize<_i18.TrendsTopItem>(data['data']);
     }
     return super.deserializeByClassName(data);
+  }
+
+  /// Maps any `Record`s known to this [Protocol] to their JSON representation
+  ///
+  /// Throws in case the record type is not known.
+  ///
+  /// This method will return `null` (only) for `null` inputs.
+  Map<String, dynamic>? mapRecordToJson(Record? record) {
+    if (record == null) {
+      return null;
+    }
+    throw Exception('Unsupported record type ${record.runtimeType}');
   }
 }

@@ -2,7 +2,9 @@ import 'package:serverpod/serverpod.dart';
 
 import 'package:apipod_server/src/web/routes/root.dart';
 
+import 'src/endpoints/otso_external_sync/otso_external_sync_endpoint.dart';
 import 'src/endpoints/push/nostr_push_endpoint.dart';
+import 'src/endpoints/push_otso/otso_push_endpoint.dart';
 import 'src/generated/protocol.dart';
 import 'src/generated/endpoints.dart';
 
@@ -24,11 +26,6 @@ void run(List<String> args) async {
   // Setup a default page at the web root.
   pod.webServer.addRoute(RouteRoot(), '/');
   pod.webServer.addRoute(RouteRoot(), '/index.html');
-  // Serve all files in the /static directory.
-  pod.webServer.addRoute(
-    RouteStaticDirectory(serverDirectory: 'static', basePath: '/'),
-    '/*',
-  );
 
   // Start the server.
   await pod.start();
@@ -36,4 +33,6 @@ void run(List<String> args) async {
   /// restore push server
 
   NostrPushEndpoint().onServerStart(pod);
+  OtsoPushEndpoint().onServerStart(pod);
+  OtsoExternalSyncEndpoint().onServerStart(pod);
 }

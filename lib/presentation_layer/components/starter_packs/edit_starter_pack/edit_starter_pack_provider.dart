@@ -70,29 +70,38 @@ class StarterPackData {
 }
 
 // State notifier for managing starter pack data
-class EditStarterPackNotifier extends StateNotifier<StarterPackData> {
-  final GetNostrLists _listsProvider;
-  final NostrListsFollowState _listsState;
-  final ServerpodDataSource _serverpodProvider;
+class EditStarterPackNotifier extends Notifier<StarterPackData> {
+  late final GetNostrLists _listsProvider;
+  late final NostrListsFollowState _listsState;
+  late final ServerpodDataSource _serverpodProvider;
+  late final StarterPackIdentifier identifier;
 
-  EditStarterPackNotifier(
-    this._listsProvider,
-    this._listsState,
-    this._serverpodProvider,
-    StarterPackIdentifier identifier,
-  ) : super(
-          StarterPackData(
-            name: identifier.name,
-            title: '',
-            description: '',
-            selectedUsers: [],
-            broadcasted: false,
-            broadcasting: false,
-            imageUploading: false,
-          ),
-        ) {
+  EditStarterPackNotifier(this.identifier);
+
+  @override
+  StarterPackData build() {
+    final listStateProvider = ref.watch(
+      nostrListsFollowStateProvider(identifier.pubkey),
+    );
+    final listProvider = ref.watch(nostrListProvider);
+    final serverpodProv = ref.watch(serverpodProvider);
+
+    _listsProvider = listProvider;
+    _listsState = listStateProvider;
+    _serverpodProvider = serverpodProv;
+
     // Load initial data based on starterPackId
     _loadStarterPack(identifier);
+
+    return StarterPackData(
+      name: identifier.name,
+      title: '',
+      description: '',
+      selectedUsers: [],
+      broadcasted: false,
+      broadcasting: false,
+      imageUploading: false,
+    );
   }
 
   void _loadStarterPack(StarterPackIdentifier identifier) {
@@ -125,10 +134,7 @@ class EditStarterPackNotifier extends StateNotifier<StarterPackData> {
   }
 
   void updateData({String? title, String? description}) {
-    state = state.copyWith(
-      title: title,
-      description: description,
-    );
+    state = state.copyWith(title: title, description: description);
   }
 
   void addUser(String pubkeyey) {
@@ -196,25 +202,13 @@ class EditStarterPackNotifier extends StateNotifier<StarterPackData> {
 
   // resets the state
   void reset() {
-    state = state.copyWith(
-      broadcasted: false,
-      broadcasting: false,
-    );
+    state = state.copyWith(broadcasted: false, broadcasting: false);
   }
 }
 
-final editStarterPackProvider = StateNotifierProvider.family<
-    EditStarterPackNotifier, StarterPackData, StarterPackIdentifier>(
-  (ref, identifier) {
-    final listStateProvider =
-        ref.watch(nostrListsFollowStateProvider(identifier.pubkey));
-    final listProvider = ref.watch(nostrListProvider);
-    final serverpodProv = ref.watch(serverpodProvider);
-    return EditStarterPackNotifier(
-      listProvider,
-      listStateProvider,
-      serverpodProv,
-      identifier,
-    );
-  },
-);
+final editStarterPackProvider =
+    NotifierProvider.family<
+      EditStarterPackNotifier,
+      StarterPackData,
+      StarterPackIdentifier
+    >(EditStarterPackNotifier.new);

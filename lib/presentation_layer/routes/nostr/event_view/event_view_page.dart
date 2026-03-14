@@ -1,15 +1,18 @@
 import 'dart:async';
+
 import 'package:camelus/l10n/app_localizations.dart';
+
 import 'package:camelus/presentation_layer/components/note_card/note_card_container.dart';
 import 'package:camelus/presentation_layer/components/note_card/skeleton_note.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_list_view/flutter_list_view.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../domain_layer/entities/parsed_post.dart';
+import '../../../../domain_layer/entities/nostr_note.dart';
 import '../../../../domain_layer/entities/tree_node.dart';
 import '../../../components/comments_section.dart';
 import '../../../providers/event_feed/event_feed_provider.dart';
+import '../../../providers/parsed_note_cache_provider.dart';
 
 class EventViewPage extends ConsumerStatefulWidget {
   final String? _openNoteId;
@@ -19,8 +22,8 @@ class EventViewPage extends ConsumerStatefulWidget {
     super.key,
     required String? openNoteId,
     required String rootNoteId,
-  })  : _openNoteId = openNoteId,
-        _rootNoteId = rootNoteId;
+  }) : _openNoteId = openNoteId,
+       _rootNoteId = rootNoteId;
 
   @override
   EventViewPageState createState() => EventViewPageState();
@@ -55,8 +58,11 @@ class EventViewPageState extends ConsumerState<EventViewPage> {
       return;
     }
     if (noteId == widget._rootNoteId) {
-      eventViewController.sliverController.animateToIndex(0,
-          duration: Duration(milliseconds: 200), curve: Curves.easeInOut);
+      eventViewController.sliverController.animateToIndex(
+        0,
+        duration: Duration(milliseconds: 200),
+        curve: Curves.easeInOut,
+      );
       return;
     }
 
@@ -64,8 +70,11 @@ class EventViewPageState extends ConsumerState<EventViewPage> {
     for (int i = 0; i < _flattenedComments.length; i++) {
       if (_flattenedComments[i].note.id == noteId) {
         // Add 1 to account for the root note at index 0
-        eventViewController.sliverController.animateToIndex(i + 1,
-            duration: Duration(milliseconds: 300), curve: Curves.easeInOutExpo);
+        eventViewController.sliverController.animateToIndex(
+          i + 1,
+          duration: Duration(milliseconds: 300),
+          curve: Curves.easeInOutExpo,
+        );
         return;
       }
     }
@@ -89,26 +98,32 @@ class EventViewPageState extends ConsumerState<EventViewPage> {
 
   // Flatten the comment tree into a list with depth information
   List<FlattenedComment> _flattenCommentTree(
-      List<TreeNode<ParsedPost>> comments) {
+    List<TreeNode<NostrNote>> comments,
+  ) {
     List<FlattenedComment> result = [];
 
     // Sort direct replies to root by creation time (oldest first)
-    final sortedComments = List<TreeNode<ParsedPost>>.from(comments)
-      ..sort((a, b) => a.value.created_at.compareTo(b.value.created_at));
+    final sortedComments = List<TreeNode<NostrNote>>.from(comments)
+      ..sort((a, b) => a.value.createdAt.compareTo(b.value.createdAt));
 
     // Process each top-level comment
     for (final comment in sortedComments) {
       // Add the comment itself
-      result.add(FlattenedComment(
-        note: comment.value,
-        depth: 0,
-        ancestorHasSibling: [false],
-      ));
+      result.add(
+        FlattenedComment(
+          note: comment.value,
+          depth: 0,
+          ancestorHasSibling: [false],
+        ),
+      );
 
       // Add all its children recursively (with child comments sorted by creation time)
       if (comment.children.isNotEmpty) {
-        result.addAll(_flattenChildComments(
-            comment.children, 1, [comment != sortedComments.last]));
+        result.addAll(
+          _flattenChildComments(comment.children, 1, [
+            comment != sortedComments.last,
+          ]),
+        );
       }
     }
 
@@ -117,30 +132,37 @@ class EventViewPageState extends ConsumerState<EventViewPage> {
 
   // Helper method to recursively flatten child comments
   List<FlattenedComment> _flattenChildComments(
-      List<TreeNode<ParsedPost>> children,
-      int depth,
-      List<bool> ancestorHasSibling) {
+    List<TreeNode<NostrNote>> children,
+    int depth,
+    List<bool> ancestorHasSibling,
+  ) {
     List<FlattenedComment> result = [];
 
     // Sort child comments by creation time (older first)
-    final sortedChildren = List<TreeNode<ParsedPost>>.from(children)
-      ..sort((a, b) => a.value.created_at.compareTo(b.value.created_at));
+    final sortedChildren = List<TreeNode<NostrNote>>.from(children)
+      ..sort((a, b) => a.value.createdAt.compareTo(b.value.createdAt));
 
     for (var i = 0; i < sortedChildren.length; i++) {
       final child = sortedChildren[i];
       final isLastChild = i == sortedChildren.length - 1;
 
       // Add the child comment
-      result.add(FlattenedComment(
-        note: child.value,
-        depth: depth,
-        ancestorHasSibling: [...ancestorHasSibling, !isLastChild],
-      ));
+      result.add(
+        FlattenedComment(
+          note: child.value,
+          depth: depth,
+          ancestorHasSibling: [...ancestorHasSibling, !isLastChild],
+        ),
+      );
 
       // Add all its children recursively
       if (child.children.isNotEmpty) {
-        result.addAll(_flattenChildComments(
-            child.children, depth + 1, [...ancestorHasSibling, !isLastChild]));
+        result.addAll(
+          _flattenChildComments(child.children, depth + 1, [
+            ...ancestorHasSibling,
+            !isLastChild,
+          ]),
+        );
       }
     }
 
@@ -155,18 +177,41 @@ class EventViewPageState extends ConsumerState<EventViewPage> {
       });
     }
 
-    final eventFeedState =
-        ref.watch(eventFeedStateProvider(widget._rootNoteId));
+    final eventFeedState = ref.watch(
+      eventFeedStateProvider(widget._rootNoteId),
+    );
 
     // Flatten the comment tree
     _flattenedComments = _flattenCommentTree(eventFeedState.comments);
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(AppLocalizations.of(context)!.thread),
+        title: Row(
+          children: [
+            Text(AppLocalizations.of(context)!.thread),
+            SizedBox(width: 6),
+          ],
+        ),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        scrolledUnderElevation: 0,
+        surfaceTintColor: Colors.transparent,
+        // flexibleSpace: ClipRect(
+        //   child: BackdropFilter(
+        //     filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+        //     child: Container(
+        //       color: Theme.of(context).colorScheme.surface.withOpacity(0.45),
+        //     ),
+        //   ),
+        // ),
       ),
       body: FlutterListView(
+        key: PageStorageKey<String>('feed_events${eventFeedState.hashCode}'),
         controller: eventViewController,
+        cacheExtent: 600,
+        physics: const AlwaysScrollableScrollPhysics(
+          parent: BouncingScrollPhysics(),
+        ),
         delegate: FlutterListViewDelegate(
           childCount: _flattenedComments.length + 1, // +1 for root note
           keepPosition: true,
@@ -179,14 +224,27 @@ class EventViewPageState extends ConsumerState<EventViewPage> {
           },
           (BuildContext context, int index) {
             if (index == 0) {
-              // Root note
-              return eventFeedState.rootNote != null
-                  ? NoteCardContainer(
-                      note: eventFeedState.rootNote!,
-                      key: ValueKey(widget._rootNoteId),
-                      fontSize: 17.5,
-                    )
-                  : const SkeletonNote();
+              if (eventFeedState.rootNote == null) {
+                return const SkeletonNote();
+              }
+              final parsedPostAsync = ref.watch(
+                parsedNoteCacheProvider(eventFeedState.rootNote!),
+              );
+              return parsedPostAsync.when(
+                data: (parsedNote) {
+                  if (parsedNote == null) {
+                    return const SizedBox.shrink();
+                  }
+                  // Root note
+                  return NoteCardContainer(
+                    note: parsedNote,
+                    key: ValueKey(widget._rootNoteId),
+                    fontSize: 17.5,
+                  );
+                },
+                loading: () => const SkeletonNote(hideBottomAction: true),
+                error: (_, _) => const SizedBox.shrink(),
+              );
             }
 
             // Comment

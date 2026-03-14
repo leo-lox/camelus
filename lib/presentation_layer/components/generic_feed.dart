@@ -1,14 +1,16 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
-import 'package:flutter_list_view/flutter_list_view.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../config/feeds_config.dart';
 import '../../domain_layer/entities/feed_filter.dart';
+import '../../l10n/app_localizations.dart';
 import '../atoms/new_posts_available.dart';
 import '../atoms/refresh_indicator_no_need.dart';
 import '../providers/app_bar_provider/app_bottom_bar_provider.dart';
 import '../providers/generic_feed_provider.dart';
+import '../providers/parsed_note_cache_provider.dart';
 import 'note_card/no_more_notes.dart';
 import 'note_card/note_card_container.dart';
 import 'note_card/note_card_repost.dart';
@@ -19,24 +21,18 @@ class GenericFeed extends ConsumerStatefulWidget {
   // The feed filter determines the scope of the feed
   final FeedFilter feedFilter;
 
-  // Optional custom header and configuration for floating headers
-  final List<Widget> Function(BuildContext, bool, TabController)?
-      customHeaderSliverBuilder;
-  final bool floatHeaderSlivers;
-
-  final List<Widget> additionalTabViews;
   final EdgeInsets? feedPadding;
 
-  final int? initialTab;
+  final void Function(ScrollController)? onScrollControllerReady;
+
+  final bool usePrimaryScrollController;
 
   const GenericFeed({
     super.key,
     this.feedPadding,
-    this.customHeaderSliverBuilder,
-    this.floatHeaderSlivers = false,
     required this.feedFilter,
-    this.additionalTabViews = const [],
-    this.initialTab,
+    this.onScrollControllerReady,
+    this.usePrimaryScrollController = false,
   });
 
   @override
@@ -46,23 +42,29 @@ class GenericFeed extends ConsumerStatefulWidget {
 // State class for GenericFeed, which manages its lifecycle and behavior
 class _GenericFeedState extends ConsumerState<GenericFeed>
     with TickerProviderStateMixin {
-  late ScrollController _scrollController; // Controller for scrolling behavior
+  ScrollController? _scrollController; // Controller for scrolling behavior
   late StreamSubscription<void> _homeBarSub; // Subscription to home tab events
-
-  TabController? _tabController;
 
   final newPostsController = SwipeableFadeOutController();
 
   // Scroll to the top of the feed
-  _scrollToTop() {
-    _scrollController.animateTo(
+  void _scrollToTop([BuildContext? context]) {
+    final controller = widget.usePrimaryScrollController
+        ? (context != null ? PrimaryScrollController.maybeOf(context) : null)
+        : _scrollController;
+
+    if (controller == null || !controller.hasClients) {
+      return;
+    }
+
+    controller.animateTo(
       0,
       duration: const Duration(milliseconds: 500),
       curve: Curves.easeOutCubic,
     );
   }
 
-  _newPostControllerDismissed() {
+  void _newPostControllerDismissed() {
     // don't bother the user for x minutes
     Future.delayed(NEW_POSTS_DISMISS_SLEEP, () {
       newPostsController.reset();
@@ -72,25 +74,25 @@ class _GenericFeedState extends ConsumerState<GenericFeed>
   @override
   void initState() {
     super.initState();
-    _scrollController = ScrollController();
+    if (!widget.usePrimaryScrollController) {
+      _scrollController = ScrollController();
+    }
 
-    _tabController = TabController(
-      initialIndex: 0,
-      length: 2 + widget.additionalTabViews.length,
-      vsync: this, // Requires TickerProviderStateMixin
-    );
-
-    // hotfix, does not work with direct initialIndex
-    if (widget.initialTab != null) {
-      Future.delayed(Duration(milliseconds: 100)).then((_) {
-        _tabController!.animateTo(widget.initialTab!);
+    // Notify parent if callback provided
+    if (!widget.usePrimaryScrollController &&
+        widget.onScrollControllerReady != null &&
+        _scrollController != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        // Don't call the callback here, just pass the controller
+        widget.onScrollControllerReady!(_scrollController!);
       });
     }
 
     // Initialize providers for navigation and feed state
     final navBarP = ref.read(appBottomNavigationBarEventsProvider);
-    final genericFeedStateNotifier =
-        ref.read(genericFeedStateProvider(widget.feedFilter).notifier);
+    final genericFeedStateNotifier = ref.read(
+      genericFeedStateProvider(widget.feedFilter).notifier,
+    );
 
     // Listen to home tab events and refresh the feed
     _homeBarSub = navBarP.onHomeTabSelected.listen((_) {
@@ -101,115 +103,78 @@ class _GenericFeedState extends ConsumerState<GenericFeed>
 
   @override
   void dispose() {
-    // Dispose of resources to prevent memory leaks
-    _scrollController.dispose();
+    _scrollController?.dispose();
     _homeBarSub.cancel();
-    _tabController?.dispose();
+
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    // Watch the state of the generic feed and its notifier
-    final genericFeedStateP =
-        ref.watch(genericFeedStateProvider(widget.feedFilter));
-    final genericFeedStateNotifier =
-        ref.watch(genericFeedStateProvider(widget.feedFilter).notifier);
+    final newRootNotesCount = ref.watch(
+      genericFeedStateProvider(
+        widget.feedFilter,
+      ).select((state) => state.newRootNotes.length),
+    );
+    final newRootAndReplyNotesCount = ref.watch(
+      genericFeedStateProvider(
+        widget.feedFilter,
+      ).select((state) => state.newRootAndReplyNotes.length),
+    );
+    final genericFeedStateNotifier = ref.read(
+      genericFeedStateProvider(widget.feedFilter).notifier,
+    );
 
-    return NestedScrollView(
-      floatHeaderSlivers: widget.floatHeaderSlivers,
-      controller: _scrollController,
-      headerSliverBuilder: widget.customHeaderSliverBuilder != null
-          ? (context, innerBoxIsScrolled) => widget.customHeaderSliverBuilder!(
-                context,
-                innerBoxIsScrolled,
-                _tabController!,
-              )
-          : (BuildContext context, bool innerBoxIsScrolled) {
-              // Default header builder
-              return <Widget>[
-                SliverOverlapAbsorber(
-                  handle:
-                      NestedScrollView.sliverOverlapAbsorberHandleFor(context),
-                  sliver: SliverAppBar(
-                    toolbarHeight: 0,
-                    floating: true,
-                    pinned: true,
-                    snap: widget.floatHeaderSlivers, // Snap if floating
-                    forceElevated: innerBoxIsScrolled,
-                    backgroundColor: Theme.of(context).colorScheme.surface,
-                    surfaceTintColor: Theme.of(context).colorScheme.surface,
-                    bottom: TabBar(
-                      controller: _tabController!,
-                      tabs: [
-                        const Tab(text: "Posts"),
-                        const Tab(text: "Posts and Replies"),
-                      ],
-                    ),
-                  ),
-                ),
-              ];
-            },
-      body: Padding(
-        padding: widget.feedPadding ?? EdgeInsets.zero,
-        child: TabBarView(
-          controller: _tabController!,
-          children: [
-            // Tab 1: Display posts
-            Stack(
-              children: [
-                RefreshIndicatorNoNeed(
-                  onRefresh: () async {
-                    await Future.delayed(Duration.zero);
-                  },
-                  child: ScrollablePostsList(feedFilter: widget.feedFilter),
-                ),
-                if (genericFeedStateP.newRootNotes.isNotEmpty)
-                  newPostsAvailable(
-                    controller: newPostsController,
-                    dismissThreshold: NEW_POSTS_DISMISS_THRESHOLD,
-                    name: "${genericFeedStateP.newRootNotes.length} new posts",
-                    onPressed: () {
-                      genericFeedStateNotifier.integrateNewNotes();
-                      _scrollToTop();
-                    },
-                    onDismissed: _newPostControllerDismissed,
-                  ),
-              ],
-            ),
-            // Tab 2: Display posts with replies
-            Stack(
-              children: [
-                RefreshIndicatorNoNeed(
-                  onRefresh: () async {
-                    await Future.delayed(Duration.zero);
-                  },
-                  child: ScrollablePostsAndRepliesList(
-                      feedFilter: widget.feedFilter),
-                ),
-                if (genericFeedStateP.newRootAndReplyNotes.isNotEmpty)
-                  Positioned(
-                    top: 20,
-                    left: 0,
-                    right: 0,
-                    child: newPostsAvailable(
-                      controller: newPostsController,
-                      onDismissed: _newPostControllerDismissed,
-                      dismissThreshold: NEW_POSTS_DISMISS_THRESHOLD,
-                      name:
-                          "${genericFeedStateP.newRootAndReplyNotes.length} new posts",
-                      onPressed: () {
-                        genericFeedStateNotifier.integrateNewNotes();
-                        _scrollToTop();
-                      },
-                    ),
-                  ),
-              ],
-            ),
-            ...widget.additionalTabViews,
-          ],
+    return Stack(
+      children: [
+        RefreshIndicatorNoNeed(
+          padding: widget.feedPadding,
+          onRefresh: () async {
+            await Future.delayed(Duration.zero);
+          },
+          child: ScrollablePostsList(
+            feedFilter: widget.feedFilter,
+            scrollController: _scrollController,
+            feedPadding: widget.feedPadding,
+            usePrimaryScrollController: widget.usePrimaryScrollController,
+          ),
         ),
-      ),
+
+        if (widget.feedFilter.showRootNotesOnly && newRootNotesCount > 0)
+          Padding(
+            padding: widget.feedPadding ?? EdgeInsets.zero,
+            child: NewPostsAvailable(
+              controller: newPostsController,
+              dismissThreshold: NEW_POSTS_DISMISS_THRESHOLD,
+              name: AppLocalizations.of(
+                context,
+              )!.newPostsCount(newRootNotesCount),
+              onPressed: () {
+                genericFeedStateNotifier.integrateNewNotes();
+                _scrollToTop(context);
+              },
+              onDismissed: _newPostControllerDismissed,
+            ),
+          ),
+
+        if (!widget.feedFilter.showRootNotesOnly &&
+            newRootAndReplyNotesCount > 0)
+          Padding(
+            padding: widget.feedPadding ?? EdgeInsets.zero,
+            child: NewPostsAvailable(
+              controller: newPostsController,
+              dismissThreshold: NEW_POSTS_DISMISS_THRESHOLD,
+              name: AppLocalizations.of(
+                context,
+              )!.newPostsCount(newRootAndReplyNotesCount),
+              onPressed: () {
+                genericFeedStateNotifier.integrateNewNotes();
+                _scrollToTop(context);
+              },
+              onDismissed: _newPostControllerDismissed,
+            ),
+          ),
+      ],
     );
   }
 }
@@ -217,23 +182,51 @@ class _GenericFeedState extends ConsumerState<GenericFeed>
 // Widget for rendering a scrollable list of posts
 class ScrollablePostsList extends ConsumerWidget {
   final FeedFilter feedFilter;
+  final ScrollController? scrollController;
+  final EdgeInsets? feedPadding;
+  final bool usePrimaryScrollController;
 
   const ScrollablePostsList({
     super.key,
     required this.feedFilter,
+    required this.scrollController,
+    this.feedPadding,
+    this.usePrimaryScrollController = false,
   });
 
   @override
   Widget build(BuildContext context, ref) {
-    final genericFeedStateP = ref.watch(genericFeedStateProvider(feedFilter));
-    final genericFeedStateNoti =
-        ref.read(genericFeedStateProvider(feedFilter).notifier);
+    final timelineNotes = ref.watch(
+      genericFeedStateProvider(feedFilter).select(
+        (state) => feedFilter.showRootNotesOnly
+            ? state.timelineRootNotes
+            : state.timelineRootAndReplyNotes,
+      ),
+    );
+    final endOfRootNotes = ref.watch(
+      genericFeedStateProvider(
+        feedFilter,
+      ).select((state) => state.endOfRootNotes),
+    );
+    final genericFeedStateNoti = ref.read(
+      genericFeedStateProvider(feedFilter).notifier,
+    );
 
-    return FlutterListView(
-        delegate: FlutterListViewDelegate(
-      (BuildContext context, int index) {
-        if (index == genericFeedStateP.timelineRootNotes.length) {
-          if (genericFeedStateP.endOfRootNotes) {
+    return ListView.builder(
+      key: PageStorageKey<String>(
+        'feed_${feedFilter.hashCode}_${feedFilter.showRootNotesOnly}',
+      ),
+      controller: usePrimaryScrollController ? null : scrollController,
+      primary: usePrimaryScrollController,
+      padding: feedPadding,
+      cacheExtent: 2000,
+      physics: const AlwaysScrollableScrollPhysics(
+        parent: BouncingScrollPhysics(),
+      ),
+      itemCount: timelineNotes.length + 1,
+      itemBuilder: (BuildContext context, int index) {
+        if (index == timelineNotes.length) {
+          if (endOfRootNotes) {
             return NoMoreNotes();
           }
           return SkeletonNote(
@@ -242,71 +235,34 @@ class ScrollablePostsList extends ConsumerWidget {
             },
           );
         }
-        final note = genericFeedStateP.timelineRootNotes[index];
-        if (note.kind == 1) {
-          return NoteCardContainer(
-            key: PageStorageKey(note.id),
-            note: note,
-          );
-        } else if (note.kind == 6) {
+        final note = timelineNotes[index];
+
+        if (note.kind == 6) {
           return NoteCardRepost(
             key: PageStorageKey(note.id),
-            repostEvent: note.nostrNote,
+            repostEvent: note,
           );
         }
-        return Container();
+
+        final parsedPostAsync = ref.watch(parsedNoteCacheProvider(note));
+        return parsedPostAsync.when(
+          data: (parsedNote) {
+            if (parsedNote == null) {
+              return const SizedBox.shrink();
+            }
+
+            if (note.kind == 1) {
+              return NoteCardContainer(
+                key: PageStorageKey(note.id),
+                note: parsedNote,
+              );
+            }
+            return Container();
+          },
+          loading: () => const SkeletonNote(hideBottomAction: true),
+          error: (_, _) => const SizedBox.shrink(),
+        );
       },
-      childCount: genericFeedStateP.timelineRootNotes.length + 1,
-    ));
-  }
-}
-
-// Widget for rendering a scrollable list of posts with replies
-class ScrollablePostsAndRepliesList extends ConsumerWidget {
-  final FeedFilter feedFilter;
-
-  const ScrollablePostsAndRepliesList({
-    super.key,
-    required this.feedFilter,
-  });
-
-  @override
-  Widget build(BuildContext context, ref) {
-    final genericFeedStateP = ref.watch(genericFeedStateProvider(feedFilter));
-    final genericFeedStateNoti =
-        ref.read(genericFeedStateProvider(feedFilter).notifier);
-
-    return FlutterListView(
-        delegate: FlutterListViewDelegate(
-      (BuildContext context, int index) {
-        if (index == genericFeedStateP.timelineRootAndReplyNotes.length) {
-          if (genericFeedStateP.endOfRootAndReplyNotes) {
-            return NoMoreNotes();
-          }
-          return SkeletonNote(
-            renderCallback: () {
-              genericFeedStateNoti.loadMore();
-            },
-          );
-        }
-        final note = genericFeedStateP.timelineRootAndReplyNotes[index];
-
-        if (note.kind == 1) {
-          return NoteCardContainer(
-            key: PageStorageKey(
-              note.id,
-            ),
-            note: note,
-          );
-        } else if (note.kind == 6) {
-          return NoteCardRepost(
-            key: PageStorageKey(note.id),
-            repostEvent: note.nostrNote,
-          );
-        }
-        return Container();
-      },
-      childCount: genericFeedStateP.timelineRootAndReplyNotes.length + 1,
-    ));
+    );
   }
 }

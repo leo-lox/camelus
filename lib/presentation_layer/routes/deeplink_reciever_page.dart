@@ -1,16 +1,19 @@
 import 'dart:developer';
 
+import 'package:camelus/l10n/app_localizations.dart';
+import 'package:camelus/presentation_layer/providers/ndk_provider.dart';
+import 'package:camelus/presentation_layer/providers/signer_provider.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:ndk/shared/nips/nip19/nip19.dart';
 
 import '../../domain_layer/entities/invite_data.dart';
 import '../../domain_layer/entities/starter_pack_identifier.dart';
 import '../../domain_layer/usecases/app_auth.dart';
 import '../../helpers/helpers.dart';
-import '../../helpers/nevent_helper.dart';
-import '../../helpers/nprofile_helper.dart';
+import '../routing/route_paths.dart';
 import '../atoms/long_button.dart';
 import '../atoms/spinner_center.dart';
 import '../providers/nip05_provider.dart';
@@ -20,10 +23,7 @@ import '../providers/serverpod_provider.dart';
 class DeeplinkRecieverPage extends ConsumerStatefulWidget {
   final String userParam;
 
-  const DeeplinkRecieverPage({
-    super.key,
-    required this.userParam,
-  });
+  const DeeplinkRecieverPage({super.key, required this.userParam});
 
   @override
   ConsumerState<DeeplinkRecieverPage> createState() =>
@@ -46,10 +46,7 @@ class _DeeplinkRecieverPageState extends ConsumerState<DeeplinkRecieverPage> {
         final reconstructedPath = segments.join("/");
 
         try {
-          _camelusLinks(
-            path: "/$reconstructedPath",
-            ref: ref,
-          );
+          _camelusLinks(path: "/$reconstructedPath", ref: ref);
         } catch (e) {
           setState(() {
             userErrorMsg = "Error processing link: $e";
@@ -59,10 +56,7 @@ class _DeeplinkRecieverPageState extends ConsumerState<DeeplinkRecieverPage> {
       } else if (!widget.userParam.contains("/")) {
         /// check if its nostr code
         try {
-          _nostrDecode(
-            nostrCode: widget.userParam,
-            providerContainer: ref,
-          );
+          _nostrDecode(nostrCode: widget.userParam, providerContainer: ref);
         } catch (e) {
           setState(() {
             userErrorMsg = "Error processing link: $e";
@@ -73,29 +67,27 @@ class _DeeplinkRecieverPageState extends ConsumerState<DeeplinkRecieverPage> {
     });
   }
 
-  _pushProfile({
-    required String pubkey,
-  }) {
-    context.go('/nostr/profile/$pubkey');
+  void _pushProfile({required String pubkey}) {
+    context.go(RoutePaths.profile(pubkey: pubkey));
   }
 
-  _pushNote({
-    required String noteId,
-  }) {
-    context.go('/nostr/event', extra: {"root": noteId});
+  void _pushNote({required String noteId}) {
+    context.go(
+      RoutePaths.statusByIdentifier(
+        profileIdentifier: 'unknown',
+        eventId: noteId,
+      ),
+    );
   }
 
   void _navigateToStarterPack(String listName, String pubkey) {
     context.go(
       '/open-starter-pack',
-      extra: StarterPackIdentifier(
-        name: listName,
-        pubkey: pubkey,
-      ),
+      extra: StarterPackIdentifier(name: listName, pubkey: pubkey),
     );
   }
 
-  _nostrDecode({
+  Future<void> _nostrDecode({
     required String nostrCode,
     required WidgetRef providerContainer,
   }) async {
@@ -103,44 +95,31 @@ class _DeeplinkRecieverPageState extends ConsumerState<DeeplinkRecieverPage> {
     String myPubkeyHex = "";
 
     if (myMatch.contains("nprofile")) {
-      // remove the "nostr:" part
+      //TODO: remove the "nostr:" part
 
-      Map<String, dynamic> nProfileDecode =
-          NprofileHelper().bech32toMap(myMatch);
+      final nprofile = Nip19.decodeNprofile(myMatch);
+      myPubkeyHex = nprofile.pubkey;
 
-      myPubkeyHex = nProfileDecode['pubkey'];
-
-      _pushProfile(
-        pubkey: myPubkeyHex,
-      );
+      _pushProfile(pubkey: myPubkeyHex);
     } else if (myMatch.contains("npub")) {
       final List decode = Helpers().decodeBech32(myMatch);
 
       myPubkeyHex = decode[0];
 
-      _pushProfile(
-        pubkey: myPubkeyHex,
-      );
+      _pushProfile(pubkey: myPubkeyHex);
     } else if (myMatch.contains("note1")) {
       final decode = Helpers().decodeBech32(myMatch);
       final String noteId = decode[1];
       if (noteId.isEmpty) {
         return;
       }
-      _pushNote(
-        noteId: noteId,
-      );
+      _pushNote(noteId: noteId);
     } else if (myMatch.contains("nevent")) {
-      final map = NeventHelper().bech32ToMap(myMatch);
-      final String eventId = map['eventId'];
+      final nevent = Nip19.decodeNevent(myMatch);
 
-      if (eventId.isEmpty) {
-        return;
+      if (nevent.kind == 1) {
+        _pushNote(noteId: nevent.eventId);
       }
-
-      _pushNote(
-        noteId: eventId,
-      );
     } else if (myMatch.contains("@")) {
       final nip05P = providerContainer.read(nip05provider);
       final nip05Data = await nip05P.get(myMatch);
@@ -155,7 +134,7 @@ class _DeeplinkRecieverPageState extends ConsumerState<DeeplinkRecieverPage> {
   }
 
   bool _isUserLink(String path) {
-    return path.startsWith("/user/");
+    return path.startsWith('/user/') || path.startsWith('/profile/');
   }
 
   Future<void> _camelusLinks({
@@ -173,10 +152,7 @@ class _DeeplinkRecieverPageState extends ConsumerState<DeeplinkRecieverPage> {
     }
   }
 
-  Future<void> _handleInviteLink(
-    String path,
-    WidgetRef ref,
-  ) async {
+  Future<void> _handleInviteLink(String path, WidgetRef ref) async {
     final pathSegments = path.split("/");
     if (pathSegments.length < 3) return;
 
@@ -199,7 +175,12 @@ class _DeeplinkRecieverPageState extends ConsumerState<DeeplinkRecieverPage> {
         ? _decodePubkey(inviteData.listNpub!)
         : null;
 
-    final mySigner = await AppAuth.getEventSigner();
+    final startupAcc = await AppAuth.getStartupAccountData();
+    final mySigner = await AppAuth.loginWithStoredAccount(
+      startupAccountData: startupAcc,
+      signerNoti: ref.read(signerProvider.notifier),
+      ndk: ref.read(ndkProvider),
+    );
 
     if (mySigner != null) {
       _navigateToStarterPack(
@@ -244,7 +225,10 @@ class _DeeplinkRecieverPageState extends ConsumerState<DeeplinkRecieverPage> {
   }
 
   String _decodePubkey(String npubOrNprofile) {
-    return NprofileHelper().nprofileOrNpubToMap(npubOrNprofile)['pubkey'];
+    if (npubOrNprofile.startsWith('nprofile')) {
+      return Nip19.decodeNprofile(npubOrNprofile).pubkey;
+    }
+    return Nip19.decode(npubOrNprofile);
   }
 
   Future<void> _setupOnboarding(
@@ -265,10 +249,7 @@ class _DeeplinkRecieverPageState extends ConsumerState<DeeplinkRecieverPage> {
     }
   }
 
-  Future<void> _handleUserLink(
-    String path,
-    WidgetRef ref,
-  ) async {
+  Future<void> _handleUserLink(String path, WidgetRef ref) async {
     final pathSegments = path.split("/");
     if (pathSegments.length < 3) return;
 
@@ -276,7 +257,12 @@ class _DeeplinkRecieverPageState extends ConsumerState<DeeplinkRecieverPage> {
 
     if (pathSegments.length > 4 && pathSegments[3] == "status") {
       final statusId = pathSegments[4];
-      _pushNote(noteId: statusId);
+      context.go(
+        RoutePaths.statusByIdentifier(
+          profileIdentifier: username,
+          eventId: statusId,
+        ),
+      );
     } else {
       _nostrDecode(nostrCode: username, providerContainer: ref);
     }
@@ -293,16 +279,19 @@ class _DeeplinkRecieverPageState extends ConsumerState<DeeplinkRecieverPage> {
             const SizedBox(height: 20),
             Center(
               child: Text(
-                'processing link:',
+                AppLocalizations.of(context)!.processingLink,
                 style: Theme.of(context).textTheme.titleLarge,
               ),
             ),
             const SizedBox(height: 4),
-            Text(widget.userParam,
-                style: const TextStyle(fontFamily: 'monospace')),
+            Text(
+              widget.userParam,
+              style: const TextStyle(fontFamily: 'monospace'),
+            ),
             const SizedBox(height: 20),
             if (loading) const SpinnerCenter(),
-            if (!loading) Text('no matching action found'),
+            if (!loading)
+              Text(AppLocalizations.of(context)!.noMatchingActionFound),
             if (!loading && userErrorMsg != "")
               Text(
                 userErrorMsg,
@@ -310,11 +299,11 @@ class _DeeplinkRecieverPageState extends ConsumerState<DeeplinkRecieverPage> {
               ),
             const SizedBox(height: 20),
             longButton(
-              name: "home",
+              name: AppLocalizations.of(context)!.home,
               onPressed: () {
                 context.go('/home');
               },
-            )
+            ),
           ],
         ),
       ),

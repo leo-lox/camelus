@@ -1,4 +1,3 @@
-import 'package:camelus/config/palette.dart';
 import 'package:camelus/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -64,16 +63,21 @@ class _SearchFeedPageState extends State<SearchFeedPage> {
       builder: (context) => AlertDialog(
         title: Text(AppLocalizations.of(context)!.searchHelp),
         content: Text(AppLocalizations.of(context)!.searchHelpMessage),
-        backgroundColor: Paletter.getDarkGray(context),
+        backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
         titleTextStyle: TextStyle(
-            color: Theme.of(context).colorScheme.onSurface, fontSize: 18),
-        contentTextStyle:
-            TextStyle(color: Theme.of(context).colorScheme.onSurface),
+          color: Theme.of(context).colorScheme.onSurface,
+          fontSize: 18,
+        ),
+        contentTextStyle: TextStyle(
+          color: Theme.of(context).colorScheme.onSurface,
+        ),
         actions: [
           TextButton(
             onPressed: () => context.pop(),
-            child: Text(AppLocalizations.of(context)!.ok,
-                style: TextStyle(color: Theme.of(context).colorScheme.primary)),
+            child: Text(
+              AppLocalizations.of(context)!.ok,
+              style: TextStyle(color: Theme.of(context).colorScheme.primary),
+            ),
           ),
         ],
       ),
@@ -112,7 +116,6 @@ class _SearchFeedPageState extends State<SearchFeedPage> {
                 icon: Icon(PhosphorIcons.arrowLeft()),
                 onPressed: () {
                   context.pop();
-                  ;
                 },
               ),
             ),

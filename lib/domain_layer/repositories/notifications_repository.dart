@@ -1,3 +1,4 @@
+import '../../lifecycle/notifications/notification_types.dart';
 import '../entities/nostr_note.dart';
 
 abstract class NotificationsRepository {
@@ -20,8 +21,10 @@ abstract class NotificationsRepository {
     required String pubkey,
 
     /// e.g. New Message
-    required String type,
+    required NotificationTypeLocal type,
     String? threadIdentifier,
     String? payload,
   });
+
+  Future<void> deleteNotification(int id);
 }

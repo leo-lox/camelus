@@ -51,7 +51,7 @@ In the app's architecture, components are organized into three primary categorie
 
    
 
-[Here](https://github.com/leo-lox/camelus) you can see code for a LongButton which is an atom
+
 
 ### Using Provider for State Management
 
@@ -203,7 +203,7 @@ Before you start, make sure that **Flutter** is installed on your machine. You c
 Start by cloning the repository to your local machine:
 
 ```bash
-git clone https://github.com/leo-lox/camelus.git
+git clone https://github.com/camelus-hq/camelus.git
 ```
 Clone `dart_ndk`
 

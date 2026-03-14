@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../../../config/palette.dart';
 import '../../../domain_layer/entities/app_update.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../providers/app_update_provider.dart';
@@ -10,10 +9,7 @@ import '../../providers/language_provider.dart';
 
 class UpdateCheck extends ConsumerStatefulWidget {
   final Widget child;
-  const UpdateCheck({
-    super.key,
-    required this.child,
-  });
+  const UpdateCheck({super.key, required this.child});
 
   @override
   ConsumerState<UpdateCheck> createState() => _UpdateCheckState();
@@ -68,7 +64,7 @@ class UpdateDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      backgroundColor: Paletter.getExtraDarkGray(context),
+      backgroundColor: Theme.of(context).colorScheme.surface,
       title: Text(updateInfo.title),
       content: Text(updateInfo.body),
       actions: <Widget>[
@@ -79,8 +75,10 @@ class UpdateDialog extends StatelessWidget {
         TextButton(
           child: Text(AppLocalizations.of(context)!.update),
           onPressed: () {
-            launchUrl(Uri.parse(updateInfo.url),
-                mode: LaunchMode.externalApplication);
+            launchUrl(
+              Uri.parse(updateInfo.url),
+              mode: LaunchMode.externalApplication,
+            );
             Navigator.of(context).pop();
           },
         ),

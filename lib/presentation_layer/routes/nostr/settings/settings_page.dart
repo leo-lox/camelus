@@ -19,7 +19,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
   }
 
   void _logout() async {
-    await AppAuth.clearKeys();
+    await AppAuth.clearAllAccounts();
 
     ref.read(ndkProvider).accounts.logout();
 
@@ -41,9 +41,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(AppLocalizations.of(context)!.settings),
-      ),
+      appBar: AppBar(title: Text(AppLocalizations.of(context)!.settings)),
       body: ListView(
         children: [
           ListTile(
@@ -58,6 +56,13 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
               context.push('/settings/theme');
             },
           ),
+          ListTile(
+            title: Text(AppLocalizations.of(context)!.pushNotifications),
+            onTap: () {
+              context.push('/settings/notifications');
+            },
+          ),
+
           ListTile(
             title: Text(AppLocalizations.of(context)!.initialRoute),
             onTap: () {
@@ -76,6 +81,19 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
               _navigateToFileServers();
             },
           ),
+          ListTile(
+            title: Text(AppLocalizations.of(context)!.dmRelays),
+            onTap: () {
+              context.push('/settings/dm-relays');
+            },
+          ),
+          ListTile(
+            title: const Text('Developer settings'),
+            onTap: () {
+              context.push('/settings/developer');
+            },
+          ),
+          Divider(),
           ListTile(
             title: Text(AppLocalizations.of(context)!.logout),
             onTap: () {

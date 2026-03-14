@@ -1,0 +1,110 @@
+/* AUTOMATICALLY GENERATED CODE DO NOT MODIFY */
+/*   To generate run: "serverpod generate"    */
+
+// ignore_for_file: implementation_imports
+// ignore_for_file: library_private_types_in_public_api
+// ignore_for_file: non_constant_identifier_names
+// ignore_for_file: public_member_api_docs
+// ignore_for_file: type_literal_in_constant_pattern
+// ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
+
+// ignore_for_file: no_leading_underscores_for_library_prefixes
+import 'package:serverpod_client/serverpod_client.dart' as _i1;
+
+abstract class OtsoPushSubscription implements _i1.SerializableModel {
+  OtsoPushSubscription._({
+    this.id,
+    required this.pubkey,
+    required this.relay,
+    required this.token,
+  });
+
+  factory OtsoPushSubscription({
+    int? id,
+    required String pubkey,
+    required String relay,
+    required String token,
+  }) = _OtsoPushSubscriptionImpl;
+
+  factory OtsoPushSubscription.fromJson(
+    Map<String, dynamic> jsonSerialization,
+  ) {
+    return OtsoPushSubscription(
+      id: jsonSerialization['id'] as int?,
+      pubkey: jsonSerialization['pubkey'] as String,
+      relay: jsonSerialization['relay'] as String,
+      token: jsonSerialization['token'] as String,
+    );
+  }
+
+  /// The database id, set if the object has been inserted into the
+  /// database or if it has been fetched from the database. Otherwise,
+  /// the id will be null.
+  int? id;
+
+  String pubkey;
+
+  String relay;
+
+  String token;
+
+  /// Returns a shallow copy of this [OtsoPushSubscription]
+  /// with some or all fields replaced by the given arguments.
+  @_i1.useResult
+  OtsoPushSubscription copyWith({
+    int? id,
+    String? pubkey,
+    String? relay,
+    String? token,
+  });
+  @override
+  Map<String, dynamic> toJson() {
+    return {
+      '__className__': 'OtsoPushSubscription',
+      if (id != null) 'id': id,
+      'pubkey': pubkey,
+      'relay': relay,
+      'token': token,
+    };
+  }
+
+  @override
+  String toString() {
+    return _i1.SerializationManager.encode(this);
+  }
+}
+
+class _Undefined {}
+
+class _OtsoPushSubscriptionImpl extends OtsoPushSubscription {
+  _OtsoPushSubscriptionImpl({
+    int? id,
+    required String pubkey,
+    required String relay,
+    required String token,
+  }) : super._(
+         id: id,
+         pubkey: pubkey,
+         relay: relay,
+         token: token,
+       );
+
+  /// Returns a shallow copy of this [OtsoPushSubscription]
+  /// with some or all fields replaced by the given arguments.
+  @_i1.useResult
+  @override
+  OtsoPushSubscription copyWith({
+    Object? id = _Undefined,
+    String? pubkey,
+    String? relay,
+    String? token,
+  }) {
+    return OtsoPushSubscription(
+      id: id is int? ? id : this.id,
+      pubkey: pubkey ?? this.pubkey,
+      relay: relay ?? this.relay,
+      token: token ?? this.token,
+    );
+  }
+}

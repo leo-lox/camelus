@@ -1,0 +1,4 @@
+class: TrendsTopItem
+fields:
+  tag: String
+  count: int

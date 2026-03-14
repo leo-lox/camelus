@@ -7,10 +7,11 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
-import 'package:ndk/domain_layer/entities/nip_01_event.dart' as _i2;
+import 'package:ndk/data_layer/models/nip_01_event_model.dart' as _i2;
 
 abstract class ReportsIncoming
     implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
@@ -26,7 +27,7 @@ abstract class ReportsIncoming
   factory ReportsIncoming({
     int? id,
     required DateTime createdAt,
-    required _i2.Nip01Event report,
+    required _i2.Nip01EventModel report,
     required String author,
     required String type,
     required bool processed,
@@ -35,9 +36,10 @@ abstract class ReportsIncoming
   factory ReportsIncoming.fromJson(Map<String, dynamic> jsonSerialization) {
     return ReportsIncoming(
       id: jsonSerialization['id'] as int?,
-      createdAt:
-          _i1.DateTimeJsonExtension.fromJson(jsonSerialization['createdAt']),
-      report: _i2.Nip01Event.fromJson(jsonSerialization['report']),
+      createdAt: _i1.DateTimeJsonExtension.fromJson(
+        jsonSerialization['createdAt'],
+      ),
+      report: _i2.Nip01EventModel.fromJson(jsonSerialization['report']),
       author: jsonSerialization['author'] as String,
       type: jsonSerialization['type'] as String,
       processed: jsonSerialization['processed'] as bool,
@@ -53,7 +55,7 @@ abstract class ReportsIncoming
 
   DateTime createdAt;
 
-  _i2.Nip01Event report;
+  _i2.Nip01EventModel report;
 
   String author;
 
@@ -70,7 +72,7 @@ abstract class ReportsIncoming
   ReportsIncoming copyWith({
     int? id,
     DateTime? createdAt,
-    _i2.Nip01Event? report,
+    _i2.Nip01EventModel? report,
     String? author,
     String? type,
     bool? processed,
@@ -78,6 +80,7 @@ abstract class ReportsIncoming
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'ReportsIncoming',
       if (id != null) 'id': id,
       'createdAt': createdAt.toJson(),
       'report': report.toJson(),
@@ -90,13 +93,14 @@ abstract class ReportsIncoming
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
+      '__className__': 'ReportsIncoming',
       if (id != null) 'id': id,
       'createdAt': createdAt.toJson(),
       'report':
-// ignore: unnecessary_type_check
+          // ignore: unnecessary_type_check
           report is _i1.ProtocolSerialization
-              ? (report as _i1.ProtocolSerialization).toJsonForProtocol()
-              : report.toJson(),
+          ? (report as _i1.ProtocolSerialization).toJsonForProtocol()
+          : report.toJson(),
       'author': author,
       'type': type,
       'processed': processed,
@@ -139,18 +143,18 @@ class _ReportsIncomingImpl extends ReportsIncoming {
   _ReportsIncomingImpl({
     int? id,
     required DateTime createdAt,
-    required _i2.Nip01Event report,
+    required _i2.Nip01EventModel report,
     required String author,
     required String type,
     required bool processed,
   }) : super._(
-          id: id,
-          createdAt: createdAt,
-          report: report,
-          author: author,
-          type: type,
-          processed: processed,
-        );
+         id: id,
+         createdAt: createdAt,
+         report: report,
+         author: author,
+         type: type,
+         processed: processed,
+       );
 
   /// Returns a shallow copy of this [ReportsIncoming]
   /// with some or all fields replaced by the given arguments.
@@ -159,7 +163,7 @@ class _ReportsIncomingImpl extends ReportsIncoming {
   ReportsIncoming copyWith({
     Object? id = _Undefined,
     DateTime? createdAt,
-    _i2.Nip01Event? report,
+    _i2.Nip01EventModel? report,
     String? author,
     String? type,
     bool? processed,
@@ -175,14 +179,47 @@ class _ReportsIncomingImpl extends ReportsIncoming {
   }
 }
 
+class ReportsIncomingUpdateTable extends _i1.UpdateTable<ReportsIncomingTable> {
+  ReportsIncomingUpdateTable(super.table);
+
+  _i1.ColumnValue<DateTime, DateTime> createdAt(DateTime value) =>
+      _i1.ColumnValue(
+        table.createdAt,
+        value,
+      );
+
+  _i1.ColumnValue<_i2.Nip01EventModel, _i2.Nip01EventModel> report(
+    _i2.Nip01EventModel value,
+  ) => _i1.ColumnValue(
+    table.report,
+    value,
+  );
+
+  _i1.ColumnValue<String, String> author(String value) => _i1.ColumnValue(
+    table.author,
+    value,
+  );
+
+  _i1.ColumnValue<String, String> type(String value) => _i1.ColumnValue(
+    table.type,
+    value,
+  );
+
+  _i1.ColumnValue<bool, bool> processed(bool value) => _i1.ColumnValue(
+    table.processed,
+    value,
+  );
+}
+
 class ReportsIncomingTable extends _i1.Table<int?> {
   ReportsIncomingTable({super.tableRelation})
-      : super(tableName: 'reports_incoming') {
+    : super(tableName: 'reports_incoming') {
+    updateTable = ReportsIncomingUpdateTable(this);
     createdAt = _i1.ColumnDateTime(
       'createdAt',
       this,
     );
-    report = _i1.ColumnSerializable(
+    report = _i1.ColumnSerializable<_i2.Nip01EventModel>(
       'report',
       this,
     );
@@ -200,9 +237,11 @@ class ReportsIncomingTable extends _i1.Table<int?> {
     );
   }
 
+  late final ReportsIncomingUpdateTable updateTable;
+
   late final _i1.ColumnDateTime createdAt;
 
-  late final _i1.ColumnSerializable report;
+  late final _i1.ColumnSerializable<_i2.Nip01EventModel> report;
 
   late final _i1.ColumnString author;
 
@@ -212,13 +251,13 @@ class ReportsIncomingTable extends _i1.Table<int?> {
 
   @override
   List<_i1.Column> get columns => [
-        id,
-        createdAt,
-        report,
-        author,
-        type,
-        processed,
-      ];
+    id,
+    createdAt,
+    report,
+    author,
+    type,
+    processed,
+  ];
 }
 
 class ReportsIncomingInclude extends _i1.IncludeObject {
@@ -406,6 +445,48 @@ class ReportsIncomingRepository {
     return session.db.updateRow<ReportsIncoming>(
       row,
       columns: columns?.call(ReportsIncoming.t),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates a single [ReportsIncoming] by its [id] with the specified [columnValues].
+  /// Returns the updated row or null if no row with the given id exists.
+  Future<ReportsIncoming?> updateById(
+    _i1.Session session,
+    int id, {
+    required _i1.ColumnValueListBuilder<ReportsIncomingUpdateTable>
+    columnValues,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateById<ReportsIncoming>(
+      id,
+      columnValues: columnValues(ReportsIncoming.t.updateTable),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates all [ReportsIncoming]s matching the [where] expression with the specified [columnValues].
+  /// Returns the list of updated rows.
+  Future<List<ReportsIncoming>> updateWhere(
+    _i1.Session session, {
+    required _i1.ColumnValueListBuilder<ReportsIncomingUpdateTable>
+    columnValues,
+    required _i1.WhereExpressionBuilder<ReportsIncomingTable> where,
+    int? limit,
+    int? offset,
+    _i1.OrderByBuilder<ReportsIncomingTable>? orderBy,
+    _i1.OrderByListBuilder<ReportsIncomingTable>? orderByList,
+    bool orderDescending = false,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateWhere<ReportsIncoming>(
+      columnValues: columnValues(ReportsIncoming.t.updateTable),
+      where: where(ReportsIncoming.t),
+      limit: limit,
+      offset: offset,
+      orderBy: orderBy?.call(ReportsIncoming.t),
+      orderByList: orderByList?.call(ReportsIncoming.t),
+      orderDescending: orderDescending,
       transaction: transaction,
     );
   }

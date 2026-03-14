@@ -1,4 +1,3 @@
-import 'package:camelus/config/palette.dart';
 import 'package:custom_refresh_indicator/custom_refresh_indicator.dart';
 import 'package:flutter/material.dart';
 
@@ -8,29 +7,30 @@ import 'package:flutter/material.dart';
 class RefreshIndicatorNoNeed extends StatelessWidget {
   final Widget child;
   final Future<void> Function()
-      onRefresh; // The callback function to trigger the refresh.
+  onRefresh; // The callback function to trigger the refresh.
+  final EdgeInsets? padding;
 
   const RefreshIndicatorNoNeed({
     super.key,
     required this.child,
     required this.onRefresh, // Function that handles the refresh logic.
+    this.padding,
   });
 
   @override
   Widget build(BuildContext context) {
     return CustomRefreshIndicator(
       // Custom builder for the refresh indicator.
-      builder: (
-        BuildContext context,
-        Widget child,
-        IndicatorController controller,
-      ) {
+      builder: (BuildContext context, Widget child, IndicatorController controller) {
         return Stack(
           children: <Widget>[
-            _MyIndicator(
-              // Pass the indicator's progress value and loading state to custom indicator widget.
-              value: controller.value,
-              loading: controller.state.isLoading,
+            Padding(
+              padding: padding ?? EdgeInsets.zero,
+              child: _MyIndicator(
+                // Pass the indicator's progress value and loading state to custom indicator widget.
+                value: controller.value,
+                loading: controller.state.isLoading,
+              ),
             ),
             // Translate the child widget vertically based on the progress of the refresh indicator.
             Transform.translate(
@@ -77,9 +77,8 @@ class _MyIndicator extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
               decoration: BoxDecoration(
                 //backgroundBlendMode: BlendMode.clear,
-
                 borderRadius: BorderRadius.circular(20),
-                color: Paletter.getExtraDarkGray(context),
+                color: Theme.of(context).colorScheme.surface,
               ),
               child: Text(
                 'no need 😉', // The custom message displayed when the refresh indicator is active.

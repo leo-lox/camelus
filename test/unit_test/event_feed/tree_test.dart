@@ -1,7 +1,5 @@
 import 'package:camelus/domain_layer/entities/nostr_note.dart';
 import 'package:camelus/domain_layer/entities/nostr_tag.dart';
-import 'package:camelus/domain_layer/entities/parsed_post.dart';
-import 'package:camelus/presentation_layer/components/note_card/nostr_parser.dart';
 import 'package:camelus/presentation_layer/providers/event_feed/replies_tree.dart';
 import 'package:test/test.dart';
 
@@ -100,22 +98,18 @@ void main() {
       kind: 1,
       content: 'A reply to a note that does not exist.',
       sig: 'sig8',
-      tags: [
-        NostrTag(type: 'e', value: 'notFound', marker: 'root'),
-      ],
+      tags: [NostrTag(type: 'e', value: 'notFound', marker: 'root')],
     );
 
     // Create a list of all notes
-    final List<ParsedPost> allValidReplies = [
-      ...NostrParser.parseEventsSync([
-        reply1,
-        reply2,
-        nestedReply1,
-        nestedReply2,
-        nestedNestedReply1,
-        nestedNestedReply2,
-        notFoundReply,
-      ])
+    final List<NostrNote> allValidReplies = [
+      reply1,
+      reply2,
+      nestedReply1,
+      nestedReply2,
+      nestedNestedReply1,
+      nestedNestedReply2,
+      notFoundReply,
     ];
 
     test('test building tree', () {
@@ -142,10 +136,14 @@ void main() {
       // third level replies
 
       expect(tree[0].children[0].children.length, 2);
-      expect(tree[0].children[0].children[0].value.id,
-          equals(nestedNestedReply1.id));
-      expect(tree[0].children[0].children[1].value.id,
-          equals(nestedNestedReply2.id));
+      expect(
+        tree[0].children[0].children[0].value.id,
+        equals(nestedNestedReply1.id),
+      );
+      expect(
+        tree[0].children[0].children[1].value.id,
+        equals(nestedNestedReply2.id),
+      );
 
       expect(tree[1].children[0].children.length, 0);
     });

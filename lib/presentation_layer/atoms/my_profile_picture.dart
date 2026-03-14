@@ -1,6 +1,6 @@
+import 'dart:convert';
 import 'package:camelus/config/dicebear.dart';
 import 'package:flutter/material.dart';
-import 'package:camelus/config/palette.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -33,12 +33,40 @@ class UserImage extends StatelessWidget {
             color: Theme.of(context).colorScheme.primary,
             shape: BoxShape.circle,
           ),
-          child: SvgPicture.network("${Dicebear.baseUrl}$pubkey"),
+          child: SvgPicture.network(
+            "${Dicebear.baseUrl}$pubkey",
+            fit: BoxFit.cover,
+          ),
         ),
       );
     }
 
     final pictureUrl = imageUrl!;
+
+    // Check if it's a data URI
+    if (pictureUrl.startsWith('data:')) {
+      try {
+        final base64String = pictureUrl.split(',').last;
+        final bytes = base64Decode(base64String);
+        return ClipOval(
+          child: SizedBox.fromSize(
+            size: Size.fromRadius(size / 2),
+            child: Container(
+              color: Theme.of(context).colorScheme.surface,
+              child: Image.memory(
+                bytes,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return Icon(Icons.error);
+                },
+              ),
+            ),
+          ),
+        );
+      } catch (e) {
+        // Fallback if decoding fails
+      }
+    }
 
     // Check if it's a GIF and should be disabled
     if (disableGif && pictureUrl.toLowerCase().endsWith('.gif')) {
@@ -48,7 +76,10 @@ class UserImage extends StatelessWidget {
           size: Size.fromRadius(size / 2),
           child: Container(
             color: Theme.of(context).colorScheme.surface,
-            child: Icon(Icons.image, color: Paletter.getDarkGray(context)),
+            child: Icon(
+              Icons.image,
+              color: Theme.of(context).colorScheme.surfaceContainerHighest,
+            ),
           ),
         ),
       );
@@ -63,11 +94,51 @@ class UserImage extends StatelessWidget {
           child: CachedNetworkImage(
             imageUrl: pictureUrl,
             filterQuality: filterQuality,
-            progressIndicatorBuilder: (context, url, downloadProgress) =>
-                CircularProgressIndicator(
-              value: downloadProgress.progress,
+            progressIndicatorBuilder: (context, url, downloadProgress) {
+              final progress = downloadProgress.progress ?? 0.0;
+
+              return Stack(
+                children: [
+                  // Background SVG avatar
+                  Container(
+                    height: size,
+                    width: size,
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.primary,
+                      shape: BoxShape.circle,
+                    ),
+                    child: SvgPicture.network(
+                      "${Dicebear.baseUrl}$pubkey",
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                  // Transparency overlay that slides up as progress increases
+                  Positioned.fill(
+                    child: Align(
+                      alignment: Alignment.bottomCenter,
+                      child: FractionallySizedBox(
+                        heightFactor: 1 - progress,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.black.withValues(
+                              alpha: 0.5,
+                            ), //! hard coded color
+                            borderRadius: BorderRadius.vertical(
+                              top: Radius.circular(size / 2),
+                              bottom: Radius.circular(size / 2),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              );
+            },
+            errorWidget: (context, url, error) => SvgPicture.network(
+              "${Dicebear.baseUrl}$pubkey",
+              fit: BoxFit.cover,
             ),
-            errorWidget: (context, url, error) => const Icon(Icons.error),
             cacheKey: pictureUrl,
             memCacheWidth: cacheHeight ?? 150,
             maxHeightDiskCache: cacheHeight ?? 150,

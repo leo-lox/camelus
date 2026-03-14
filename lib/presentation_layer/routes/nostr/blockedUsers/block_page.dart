@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../../config/palette.dart';
 import '../../../../domain_layer/entities/nostr_tag.dart';
 import '../../../atoms/long_button.dart';
 import '../../../providers/metadata_state_provider.dart';
@@ -50,15 +49,11 @@ class _BlockPageState extends ConsumerState<BlockPage> {
     super.initState();
   }
 
-  void _blockUser(
-    String pubkey,
-  ) async {
+  void _blockUser(String pubkey) async {
     throw UnimplementedError();
   }
 
-  void _unblockUser(
-    String pubkey,
-  ) async {
+  void _unblockUser(String pubkey) async {
     throw UnimplementedError();
   }
 
@@ -99,17 +94,16 @@ class _BlockPageState extends ConsumerState<BlockPage> {
 
   @override
   Widget build(BuildContext context) {
-    final user =
-        ref.watch(metadataStateProvider(widget.userPubkey)).userMetadata;
+    final user = ref
+        .watch(metadataStateProvider(widget.userPubkey))
+        .userMetadata;
 
     if (_reportSuccessful) {
       return Scaffold(
         body: SafeArea(
           child: Center(
             child: Container(
-              constraints: BoxConstraints(
-                maxWidth: 250,
-              ),
+              constraints: BoxConstraints(maxWidth: 250),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -117,26 +111,28 @@ class _BlockPageState extends ConsumerState<BlockPage> {
                   Text(
                     AppLocalizations.of(context)!.reportSent,
                     style: TextStyle(
-                        color: Theme.of(context).colorScheme.onSurface,
-                        fontSize: 30,
-                        fontWeight: FontWeight.bold),
+                      color: Theme.of(context).colorScheme.onSurface,
+                      fontSize: 30,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   const SizedBox(height: 20),
                   Text(
                     AppLocalizations.of(context)!.thankYouForReport,
                     style: TextStyle(
-                        color: Paletter.getLightGray(context), fontSize: 20),
+                      color: Theme.of(context).colorScheme.inverseSurface,
+                      fontSize: 20,
+                    ),
                   ),
                   const SizedBox(height: 20),
                   SizedBox(
                     height: 40,
                     width: MediaQuery.of(context).size.width * 0.75,
                     child: longButton(
-                        inverted: true,
-                        name: AppLocalizations.of(context)!.goBack,
-                        onPressed: () => {
-                              context.pop(),
-                            }),
+                      inverted: true,
+                      name: AppLocalizations.of(context)!.goBack,
+                      onPressed: () => {context.pop()},
+                    ),
                   ),
                 ],
               ),
@@ -162,61 +158,69 @@ class _BlockPageState extends ConsumerState<BlockPage> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(AppLocalizations.of(context)!.user,
-                          style: TextStyle(
-                              color: Paletter.getLightGray(context),
-                              fontSize: 20)),
+                      Text(
+                        AppLocalizations.of(context)!.user,
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.inverseSurface,
+                          fontSize: 20,
+                        ),
+                      ),
                       const SizedBox(width: 10),
-                      Text(user?.name ?? user?.nip05 ?? widget.userPubkey,
-                          style: TextStyle(
-                              color: Theme.of(context).colorScheme.onSurface,
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold)),
+                      Text(
+                        user?.name ?? user?.nip05 ?? widget.userPubkey,
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.onSurface,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ],
                   ),
                   const SizedBox(height: 20),
                   FutureBuilder(
-                      future: Future.delayed(Duration(seconds: 1)),
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return SizedBox(
-                            height: 40,
-                            width: MediaQuery.of(context).size.width * 0.75,
-                            child: longButton(
-                                name: AppLocalizations.of(context)!.loading,
-                                loading: true,
-                                onPressed: () {}),
-                          );
-                        }
-
+                    future: Future.delayed(Duration(seconds: 1)),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
                         return SizedBox(
                           height: 40,
                           width: MediaQuery.of(context).size.width * 0.75,
                           child: longButton(
-                              name: isUserBlocked
-                                  ? AppLocalizations.of(context)!.unblock
-                                  : AppLocalizations.of(context)!.block,
-                              inverted: !isUserBlocked,
-                              loading: requestLoading,
-                              onPressed: () {
-                                if (isUserBlocked) {
-                                  _unblockUser(widget.userPubkey);
-                                } else {
-                                  _blockUser(widget.userPubkey);
-                                }
-                                setState(() {
-                                  isUserBlocked = !isUserBlocked;
-                                });
-                              }),
+                            name: AppLocalizations.of(context)!.loading,
+                            loading: true,
+                            onPressed: () {},
+                          ),
                         );
-                      }),
+                      }
+
+                      return SizedBox(
+                        height: 40,
+                        width: MediaQuery.of(context).size.width * 0.75,
+                        child: longButton(
+                          name: isUserBlocked
+                              ? AppLocalizations.of(context)!.unblock
+                              : AppLocalizations.of(context)!.block,
+                          inverted: !isUserBlocked,
+                          loading: requestLoading,
+                          onPressed: () {
+                            if (isUserBlocked) {
+                              _unblockUser(widget.userPubkey);
+                            } else {
+                              _blockUser(widget.userPubkey);
+                            }
+                            setState(() {
+                              isUserBlocked = !isUserBlocked;
+                            });
+                          },
+                        ),
+                      );
+                    },
+                  ),
                   const SizedBox(height: 10),
                   Column(
                     children: [
                       const SizedBox(height: 100),
-                      //text user input
 
+                      //text user input
                       GridView.count(
                         crossAxisCount: 2,
                         childAspectRatio: 4.5 / 1,
@@ -224,11 +228,13 @@ class _BlockPageState extends ConsumerState<BlockPage> {
                         mainAxisSpacing: 10,
                         crossAxisSpacing: 10,
                         children: getReportReasons(context)
-                            .map((reason) => longButton(
-                                  name: reason,
-                                  onPressed: () => {_setReportReason(reason)},
-                                  inverted: _reportReason == reason,
-                                ))
+                            .map(
+                              (reason) => longButton(
+                                name: reason,
+                                onPressed: () => {_setReportReason(reason)},
+                                inverted: _reportReason == reason,
+                              ),
+                            )
                             .toList(),
                       ),
 
@@ -240,30 +246,25 @@ class _BlockPageState extends ConsumerState<BlockPage> {
                           decoration: InputDecoration(
                             isDense: true,
                             hintText: widget.postId != null
-                                ? AppLocalizations.of(context)!
-                                    .whatIsWrongWithPost
-                                : AppLocalizations.of(context)!
-                                    .whatIsWrongWithUser,
-                            hintStyle: TextStyle(
-                                color: Theme.of(context).colorScheme.onSurface,
-                                letterSpacing: 1.1),
+                                ? AppLocalizations.of(
+                                    context,
+                                  )!.whatIsWrongWithPost
+                                : AppLocalizations.of(
+                                    context,
+                                  )!.whatIsWrongWithUser,
+                            hintStyle: TextStyle(letterSpacing: 1.1),
                             filled: true,
-                            fillColor: Paletter.getExtraDarkGray(context),
                             enabledBorder: OutlineInputBorder(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(10.0)),
-                              borderSide: BorderSide(
-                                  color: Paletter.getExtraDarkGray(context)),
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(10.0),
+                              ),
                             ),
                             focusedBorder: OutlineInputBorder(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(10.0)),
-                              borderSide: BorderSide(
-                                  color: Theme.of(context).colorScheme.surface),
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(10.0),
+                              ),
                             ),
                           ),
-                          style: TextStyle(
-                              color: Theme.of(context).colorScheme.onSurface),
                           minLines: 3,
                           maxLines: 5,
                         ),
@@ -272,7 +273,9 @@ class _BlockPageState extends ConsumerState<BlockPage> {
 
                       Text(
                         AppLocalizations.of(context)!.reportsAreSentToRelays,
-                        style: TextStyle(color: Paletter.getGray(context)),
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.inverseSurface,
+                        ),
                       ),
 
                       const SizedBox(height: 10),
@@ -280,8 +283,11 @@ class _BlockPageState extends ConsumerState<BlockPage> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Text(AppLocalizations.of(context)!
-                              .additionallyReportToCamelus),
+                          Text(
+                            AppLocalizations.of(
+                              context,
+                            )!.additionallyReportToCamelus,
+                          ),
                           const SizedBox(width: 10),
                           Switch(
                             value: reportToCamelus,
@@ -290,8 +296,9 @@ class _BlockPageState extends ConsumerState<BlockPage> {
                                 reportToCamelus = value;
                               });
                             },
-                            activeThumbColor:
-                                Theme.of(context).colorScheme.onSurface,
+                            activeThumbColor: Theme.of(
+                              context,
+                            ).colorScheme.onSurface,
                           ),
                         ],
                       ),
@@ -300,18 +307,19 @@ class _BlockPageState extends ConsumerState<BlockPage> {
                         height: 40,
                         width: MediaQuery.of(context).size.width * 0.75,
                         child: longButton(
-                            name: widget.postId != null
-                                ? AppLocalizations.of(context)!.reportPost
-                                : AppLocalizations.of(context)!.reportUser,
-                            inverted: true,
-                            loading: _reportLoading,
-                            onPressed: () => {_submitReport()}),
+                          name: widget.postId != null
+                              ? AppLocalizations.of(context)!.reportPost
+                              : AppLocalizations.of(context)!.reportUser,
+                          inverted: true,
+                          loading: _reportLoading,
+                          onPressed: () => {_submitReport()},
+                        ),
                       ),
                     ],
                   ),
                 ],
               ),
-            )
+            ),
           ],
         ),
       ),

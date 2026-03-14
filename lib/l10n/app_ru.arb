@@ -52,7 +52,6 @@
   "following": "Подписки",
   "followers": "Подписчики",
   "profile": "Профиль",
-  "bookmarks": "Закладки",
   "notImplementedYet": "Ещё не реализовано",
   "payments": "Платежи",
   "blocklist": "Список блокировок",
@@ -182,5 +181,249 @@
   "teal": "Бирюзовый",
   "pink": "Розовый",
   "indigo": "Индиго",
-  "welcome": "Добро пожаловать"
+  "welcome": "Добро пожаловать",
+  "bookmarks": "Закладки",
+  "removeBookmark": "Удалить эту закладку?",
+  "bookmarkRemoved": "Закладка удалена",
+  "noPrivateBookmarks": "Пока нет приватных закладок",
+  "noPublicBookmarks": "Пока нет публичных закладок",
+  "privateBookmarks": "Приватные",
+  "publicBookmarks": "Публичные",
+  "addToBookmarks": "Добавить в закладки",
+  "removeFromBookmarks": "Удалить из закладок",
+  "addingToBookmarks": "Добавление в закладки...",
+  "removingFromBookmarks": "Удаление из закладок...",
+  "failedToAddBookmark": "Не удалось добавить закладку",
+  "failedToRemoveBookmark": "Не удалось удалить закладку",
+  "pleaseLoginToManageFileServers": "Пожалуйста, войдите, чтобы управлять файловыми серверами",
+  "welcomeTo": "добро пожаловать в",
+  "joinTheConversation": "присоединиться к разговору",
+  "browseWithoutLogin": "Просмотр без входа",
+  "loginRegistrationRequired": "Требуется вход/регистрация",
+  "pleaseLoginToInteract": "Пожалуйста, войдите/зарегистрируйтесь, чтобы взаимодействовать с постами",
+  "loginRegister": "Войти/Зарегистрироваться",
+  "all": "Все",
+  "mentions": "Упоминания",
+  "preview": "Предпросмотр",
+  "relayAlreadyExists": "Реле уже существует",
+  "relayAlreadyExistsMessage": "Это реле уже добавлено",
+  "discardChanges": "Отменить изменения",
+  "discardChangesMessage": "Вы хотите отменить изменения?",
+  "deleteRelay": "Удалить реле",
+  "delete": "Удалить",
+  "noTextFoundInClipboard": "Текст не найден в буфере обмена",
+  "pleaseEnterValidBunkerUrl": "Пожалуйста, введите действительный URL bunker",
+  "failedToConnectToBunker": "Не удалось подключиться к bunker",
+  "reactedToYourPost": "отреагировал на вашу запись",
+  "repliedToYourPost": "ответил на вашу запись",
+  "mentionedYouInThread": "упомянул вас в ветке",
+  "repostedYourPost": "поделился вашей записью",
+  "mentionedYou": "упомянул вас",
+  "interactedWithYourPost": "взаимодействовал с вашей записью",
+  "whenSomeoneInteractsWithYourPosts": "Когда кто-то взаимодействует с вашими записями",
+  "noNotifications": "Нет уведомлений",
+  "endOfNotifications": "Конец уведомлений",
+  "trends": "Тренды",
+  "recentStarterPacks": "Недавние стартовые пакеты",
+  "noResultsFound": "Результаты не найдены",
+  "people": "Люди",
+  "notes": "Заметки",
+  "searchForHashtags": "Искать хештеги",
+  "nip05Address": "Адрес NIP-05",
+  "repostHasNoInformation": "Этот репост не содержит информации",
+  "invalidSignature": "Недействительная подпись",
+  "deletionRequested": "Запрошено удаление",
+  "unknownStarterPack": "Неизвестный стартовый пакет",
+  "noStarterPacksFound": "Стартовые пакеты не найдены",
+  "searchToAddUser": "Искать, чтобы добавить пользователя",
+  "noServersFound": "Серверы не найдены",
+  "noFilterFound": "Фильтр не найден",
+  "replyToPrefix": "ответить на",
+  "andMoreCount": "и еще {count}",
+  "@andMoreCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "noteNotFound": "Заметка не найдена",
+  "shared": " поделился",
+  "loadingMightFail": "Загрузка может не удаться",
+  "bugReportMessage": "Сообщить об ошибке",
+  "noMoreNotesToShow": "Больше нет заметок для показа",
+  "trendingPeople": "Популярные люди",
+  "trendingHashtags": "Популярные хештеги",
+  "somethingWentWrong": "Что-то пошло не так",
+  "noConnection": "Нет соединения",
+  "reconnectingToRelays": "Переподключение к реле",
+  "addRelay": "Добавить реле",
+  "read": "Чтение",
+  "write": "Запись",
+  "starterPack": "Стартовый пакет",
+  "deleteStarterPack": "Удалить стартовый пакет",
+  "deleteStarterPackConfirm": "Вы уверены, что хотите удалить этот стартовый пакет? Это действие нельзя отменить.",
+  "share": "Поделиться",
+  "starterPackBy": "Стартовый пакет от {author}",
+  "@starterPackBy": {
+    "placeholders": {
+      "author": {
+        "type": "String"
+      }
+    }
+  },
+  "you": "вы",
+  "addToStarterPackTitle": "Добавить {name} в стартовый пакет",
+  "@addToStarterPackTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "createNewStarterPack": "Создать новый стартовый пакет",
+  "upload": "Загрузить",
+  "createYourStarterPack": "Создайте свой стартовый пакет",
+  "inviteFriendsToFollow": "Пригласите друзей подписаться на ваших любимых людей",
+  "title": "Название",
+  "description": "Описание",
+  "yourStarterPack": "ваш стартовый пакет",
+  "shareWithFriends": "Поделитесь с друзьями и помогите им открыть для себя замечательных людей!",
+  "shareStarterPack": "поделиться стартовым пакетом",
+  "publishStarterPack": "опубликовать стартовый пакет",
+  "addUsersToContinue": "добавить пользователей для продолжения",
+  "addUserMenuHint": "Добавить пользователя в список",
+  "show": "Показать",
+  "pushNotifications": "Push-уведомления",
+  "receiveNotificationsAboutReplies": "Получать уведомления об ответах",
+  "enableNotificationsForReplies": "Включить уведомления для ответов",
+  "notificationsDeniedInSettings": "Уведомления запрещены в настройках",
+  "welcomeTo": "Добро пожаловать в",
+  "joinTheConversation": "Присоединяйтесь к разговору",
+  "errorLoadingNote": "Ошибка загрузки заметки",
+  "errorPrefix": "Ошибка: {error}",
+  "@errorPrefix": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "errorProcessingLink": "Ошибка обработки ссылки",
+  "processingLink": "Обработка ссылки",
+  "noMatchingActionFound": "Подходящее действие не найдено",
+  "worksOnlyIfInCache": "Работает только если в кэше",
+  "mastodonAddress": "Адрес Mastodon",
+  "amberLogin": "Вход через Amber",
+  "seedPhraseLogin": "Вход через сид-фразу",
+  "bunkerLogin": "Вход через Bunker",
+  "iHaveReadAndAcceptThe": "Я прочитал и принимаю",
+  "installAmber": "Установить Amber",
+  "authoriseAmber": "Авторизовать Amber",
+  "connect": "Подключить",
+  "followCount": "продолжить с {count}/{target} людьми",
+  "@followCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "target": {
+        "type": "int"
+      }
+    }
+  },
+  "notAvailable": "Недоступно",
+  "post": "Опубликовать",
+  "newPostsCount": "{count} новых записей",
+  "@newPostsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "noteReference": "Ссылка на заметку",
+  "createStarterPack": "Создать стартовый пакет",
+  "createAnother": "Создать еще один",
+  "starterPackIsLive": "🎉 Ваш стартовый пакет опубликован!",
+  "searchHint": "Поиск",
+  "bunkerUrlHint": "bunker://",
+  "continueWithPeople": "продолжить с {count} людьми",
+  "@continueWithPeople": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "unknown": "Неизвестно",
+  "follow": "подписаться",
+  "unfollow": "отписаться",
+  "invalidBunkerUrl": "Недействительный URL bunker. Должен начинаться с bunker://",
+  "failedToConnectWithError": "Не удалось подключиться: {error}",
+  "@failedToConnectWithError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "byUsingCamelusYouAgree": "Используя Camelus, вы соглашаетесь с ",
+  "@byUsingCamelusYouAgree": {
+    "description": "Text before terms and conditions link on onboarding page"
+  },
+  "searchUserHint": "Поиск по имени, NIP-05 или npub...",
+  "searchToStartConversation": "Найдите пользователя, чтобы начать разговор",
+  "enterAtLeast2Characters": "Введите минимум 2 символа",
+  "noUsersFound": "Пользователи не найдены",
+  "chatRelayStatus": "Статус реле",
+  "chatRelayExcellent": "Отлично",
+  "chatRelayDegraded": "Ограничено",
+  "chatRelayPoor": "Плохо",
+  "yourDmRelays": "Ваши DM реле",
+  "peerDmRelays": "DM реле контакта",
+  "noRelaysFound": "Реле не найдены",
+  "debugTools": "Инструменты отладки",
+  "refreshRelayDiscovery": "Обновить обнаружение реле",
+  "deletionNotSupportedByRelays": "Сообщение удалено локально, но реле могут не поддерживать удаление",
+  "testDeletionSupport": "Тест поддержки удаления",
+  "deletionSupported": "Удаление поддерживается",
+  "deletionNotSupported": "Удаление не поддерживается",
+  "testing": "Тестирование...",
+  "testFailed": "Тест не пройден",
+  "relayRejectsGiftWrap": "Отклоняет gift wrap",
+  "relayRejectsDeletion": "Отклоняет удаление",
+  "networkError": "Ошибка сети",
+  "timeout": "Таймаут",
+  "privacyPrivate": "Приватно (безопасно)",
+  "privacyLeaks": "Утечка конфиденциальности",
+  "testPrivacy": "Тест конфиденциальности",
+  "testAllRelays": "Тестировать все реле",
+  "testAllRelaysDescription": "Тестирует поддержку удаления и конфиденциальность для всех подключенных реле",
+  "relayStatusExcellentDescription": "Подключено к {myCount} вашим реле и {peerCount} реле контакта.",
+  "@relayStatusExcellentDescription": {
+    "placeholders": {
+      "myCount": {"type": "int"},
+      "peerCount": {"type": "int"}
+    }
+  },
+  "relayStatusDegradedMyOnly": "Подключено к вашим реле, но не к DM реле контакта. Сообщения могут задерживаться.",
+  "relayStatusDegradedPeerOnly": "Подключено к реле контакта, но не к вашим DM реле. Вы можете пропустить сообщения.",
+  "relayStatusDegradedPartial": "Частичное подключение. Некоторые сообщения могут задерживаться.",
+  "relayStatusPoorDescription": "Нет подключенных DM реле. Сообщения могут не доставляться.",
+  "relayStatusLoadingDescription": "Загрузка информации о реле...",
+  "noteToSelf": "Заметка себе",
+  "noteToSelfHint": "Сохраняйте сообщения, ссылки и заметки для себя",
+  "dmFollows": "Подписки",
+  "dmKnown": "Известные",
+  "dmRequests": "Запросы",
+  "noFollowsConversations": "Нет разговоров с людьми, на которых вы подписаны",
+  "noKnownConversations": "Нет разговоров с известными контактами",
+  "noMessageRequests": "Нет запросов на сообщения",
+  "failed": "Ошибка"
+  ,
+  "imprint": "Выходные данные",
+  "@imprint": {
+    "description": "Imprint page title"
+  }
 }

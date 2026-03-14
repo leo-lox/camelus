@@ -3,6 +3,7 @@ import 'dart:typed_data';
 
 import 'package:camelus/l10n/app_localizations.dart';
 import 'package:camelus/presentation_layer/atoms/crop_avatar.dart';
+import 'package:camelus/presentation_layer/components/responsive_center.dart';
 import 'package:camelus/domain_layer/entities/onboarding_user_info.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -29,7 +30,7 @@ class OnboardingPicture extends ConsumerStatefulWidget {
 class _OnboardingPictureState extends ConsumerState<OnboardingPicture> {
   bool pictureSelected = false;
 
-  _pickFile() async {
+  Future<void> _pickFile() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
       allowMultiple: false,
       type: FileType.image,
@@ -58,14 +59,12 @@ class _OnboardingPictureState extends ConsumerState<OnboardingPicture> {
     }
   }
 
-  _openCropImagePopup(Uint8List imageData) {
+  void _openCropImagePopup(Uint8List imageData) {
     // push fullscreen widget
     Navigator.push(
       context,
       MaterialPageRoute<Uint8List>(
-        builder: (context) => CropAvatar(
-          imageData: imageData,
-        ),
+        builder: (context) => CropAvatar(imageData: imageData),
       ),
     ).then((value) {
       if (value != null) {
@@ -88,23 +87,23 @@ class _OnboardingPictureState extends ConsumerState<OnboardingPicture> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
+      body: ResponsiveCenter(
+        maxWidth: 600,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            const Spacer(
-              flex: 1,
-            ),
+            const Spacer(flex: 1),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.baseline,
               textBaseline: TextBaseline.alphabetic,
               children: [
-                Text(AppLocalizations.of(context)!.welcome, style: const TextStyle(fontSize: 20)),
-                const SizedBox(
-                  width: 5,
+                Text(
+                  AppLocalizations.of(context)!.welcome,
+                  style: const TextStyle(fontSize: 20),
                 ),
+                const SizedBox(width: 5),
                 Text(
                   widget.signUpInfo.name ?? '',
                   style: const TextStyle(
@@ -114,46 +113,40 @@ class _OnboardingPictureState extends ConsumerState<OnboardingPicture> {
                 ),
               ],
             ),
-            const Spacer(
-              flex: 1,
-            ),
+            const Spacer(flex: 1),
             InkWell(
               borderRadius: BorderRadius.all(Radius.circular(50)),
               onTap: () {
                 _pickFile();
               },
               child: widget.signUpInfo.picture == null
-                  ? const CameraUpload(
-                      size: 125,
-                    )
+                  ? const CameraUpload(size: 125)
                   : ClipOval(
                       child: SizedBox.fromSize(
                         size: const Size.square(125),
                         child: Container(
-                            color: Theme.of(context).colorScheme.surface,
-                            child:
-                                Image.memory(widget.signUpInfo.picture!.bytes)),
+                          color: Theme.of(context).colorScheme.surface,
+                          child: Image.memory(widget.signUpInfo.picture!.bytes),
+                        ),
                       ),
                     ),
             ),
-            const Spacer(
-              flex: 1,
-            ),
-            Container(
+            const Spacer(flex: 1),
+            Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
-              width: 400,
-              height: 40,
-              child: longButton(
-                name: pictureSelected ? "next" : "skip",
-                onPressed: (() {
-                  widget.pictureCallback();
-                }),
-                inverted: pictureSelected,
+              child: SizedBox(
+                width: double.infinity,
+                height: 40,
+                child: longButton(
+                  name: pictureSelected ? "next" : "skip",
+                  onPressed: (() {
+                    widget.pictureCallback();
+                  }),
+                  inverted: pictureSelected,
+                ),
               ),
             ),
-            const SizedBox(
-              height: 15,
-            ),
+            const SizedBox(height: 15),
           ],
         ),
       ),

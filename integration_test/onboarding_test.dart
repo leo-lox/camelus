@@ -4,7 +4,7 @@ import 'package:integration_test/integration_test.dart';
 import 'package:flutter/material.dart';
 import 'package:camelus/main.dart' as app;
 
-main() {
+void main() {
   //IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized();
@@ -24,8 +24,10 @@ main() {
       await tester.tap(find.widgetWithText(ElevatedButton, 'next'));
       await tester.pumpAndSettle();
       expect(find.byType(SnackBar), findsOneWidget);
-      expect(find.text('Please read and accept the terms and conditions first'),
-          findsOneWidget);
+      expect(
+        find.text('Please read and accept the terms and conditions first'),
+        findsOneWidget,
+      );
       await tester.pumpAndSettle();
 
       await tester.tap(find.byType(Checkbox));

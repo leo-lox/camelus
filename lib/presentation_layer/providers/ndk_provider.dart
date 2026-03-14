@@ -1,5 +1,6 @@
 import 'package:ndk/domain_layer/entities/cashu/cashu_user_seedphrase.dart';
 import 'package:ndk/ndk.dart';
+import 'package:ndk_flutter/ndk_flutter.dart';
 import 'package:riverpod/riverpod.dart';
 
 import '../../config/default_relays.dart';
@@ -13,16 +14,14 @@ final ndkProvider = Provider<Ndk>((ref) {
   final bloomFilterRef = ref.read(bloomFilterReferenceProvider);
 
   final NdkConfig ndkConfig = NdkConfig(
-      engine: NdkEngine.JIT,
-      cache: db!,
-      eventVerifier: eventVerifier,
-      bootstrapRelays: camelusBootstrapRelays,
-      logLevel: Logger.logLevels.warning,
-      defaultBroadcastConsiderDonePercent: 0.2,
-      eventOutFilters: [bloomFilterRef],
-      cashuUserSeedphrase: CashuUserSeedphrase(
-          seedPhrase:
-              "market grid grocery useless into bag earn dove measure stay elephant bright"));
+    engine: NdkEngine.JIT,
+    cache: db!,
+    eventVerifier: eventVerifier,
+    bootstrapRelays: camelusBootstrapRelays,
+    logLevel: Logger.logLevels.info,
+    defaultBroadcastConsiderDonePercent: 0.2,
+    eventOutFilters: [bloomFilterRef],
+  );
 
   final ndk = Ndk(ndkConfig);
   return ndk;
@@ -34,13 +33,20 @@ final ndkProviderLight = Provider<Ndk>((ref) {
   final db = ref.read(dbNdkProvider);
 
   final NdkConfig ndkConfig = NdkConfig(
-      cache: db!,
-      eventVerifier: eventVerifier,
-      bootstrapRelays: [],
-      logLevel: Logger.logLevels.warning,
-      eventOutFilters: [],
-      defaultQueryTimeout: Duration(seconds: 5));
+    cache: db!,
+    eventVerifier: eventVerifier,
+    bootstrapRelays: [],
+    logLevel: Logger.logLevels.warning,
+    eventOutFilters: [],
+    defaultQueryTimeout: Duration(seconds: 5),
+  );
 
   final ndk = Ndk(ndkConfig);
   return ndk;
+});
+
+/// NdkFlutter wrapper for Flutter widgets
+final ndkFlutterProvider = Provider<NdkFlutter>((ref) {
+  final ndk = ref.watch(ndkProvider);
+  return NdkFlutter(ndk: ndk);
 });

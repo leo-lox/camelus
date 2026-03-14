@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
-import '../../../../../config/palette.dart';
 import '../../../../providers/language_provider.dart';
 
 class LocaleSettingsPage extends ConsumerStatefulWidget {
@@ -45,9 +44,9 @@ class LocaleSettingsPageState extends ConsumerState<LocaleSettingsPage> {
     setState(() {
       _isSystemLanguage =
           currentLocale.languageCode == systemLocale.languageCode &&
-              (currentLocale.countryCode == systemLocale.countryCode ||
-                  (currentLocale.countryCode == null &&
-                      systemLocale.countryCode == null));
+          (currentLocale.countryCode == systemLocale.countryCode ||
+              (currentLocale.countryCode == null &&
+                  systemLocale.countryCode == null));
     });
   }
 
@@ -67,11 +66,15 @@ class LocaleSettingsPageState extends ConsumerState<LocaleSettingsPage> {
           ListTile(
             title: Text(
               AppLocalizations.of(context)!.useSystemLanguage,
-              style: TextStyle(color: Paletter.getLightGray(context)),
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.inverseSurface,
+              ),
             ),
             trailing: _isSystemLanguage
-                ? Icon(PhosphorIcons.check(),
-                    color: Theme.of(context).colorScheme.onSurface)
+                ? Icon(
+                    PhosphorIcons.check(),
+                    color: Theme.of(context).colorScheme.onSurface,
+                  )
                 : null,
             onTap: () async {
               await languageNotifier.resetToSystemLanguage(context);
@@ -82,7 +85,10 @@ class LocaleSettingsPageState extends ConsumerState<LocaleSettingsPage> {
             tileColor: Theme.of(context).colorScheme.surface,
           ),
 
-          Divider(color: Paletter.getDarkGray(context), height: 1),
+          Divider(
+            color: Theme.of(context).colorScheme.surfaceContainerHighest,
+            height: 1,
+          ),
 
           // Available languages list
           Expanded(
@@ -91,18 +97,23 @@ class LocaleSettingsPageState extends ConsumerState<LocaleSettingsPage> {
               itemBuilder: (context, index) {
                 final localeInfo = availableLocales[index];
                 final locale = localeInfo['locale'] as Locale;
-                final isSelected = !_isSystemLanguage &&
+                final isSelected =
+                    !_isSystemLanguage &&
                     currentLocale.languageCode == locale.languageCode &&
                     currentLocale.countryCode == locale.countryCode;
 
                 return ListTile(
                   title: Text(
                     localeInfo['name'],
-                    style: TextStyle(color: Paletter.getLightGray(context)),
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.inverseSurface,
+                    ),
                   ),
                   trailing: isSelected
-                      ? Icon(PhosphorIcons.check(),
-                          color: Theme.of(context).colorScheme.onSurface)
+                      ? Icon(
+                          PhosphorIcons.check(),
+                          color: Theme.of(context).colorScheme.onSurface,
+                        )
                       : null,
                   onTap: () async {
                     await languageNotifier.changeLanguage(locale);

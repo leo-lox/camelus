@@ -1,132 +1,134 @@
+import 'dart:convert';
+
+import 'package:camelus/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../config/palette.dart';
+import '../../../data_layer/models/nostr_note_model.dart';
 import '../../../domain_layer/entities/nostr_note.dart';
-import '../../../domain_layer/entities/nostr_tag.dart';
 import '../../../helpers/helpers.dart';
-import '../../providers/get_notes_provider.dart';
 import '../../providers/metadata_state_provider.dart';
-import 'nostr_parser.dart';
+import '../../providers/ndk_provider.dart';
+import '../../providers/parsed_note_cache_provider.dart';
+import '../../routing/route_paths.dart';
 import 'note_card_container.dart';
 import 'skeleton_note.dart';
+
+final _repostedNoteProvider = Provider.family<NostrNote?, String>((
+  ref,
+  content,
+) {
+  try {
+    final noteModel = NostrNoteModel.fromJson(jsonDecode(content));
+    ref.read(ndkProvider).config.cache.saveEvent(noteModel.toNDKEvent());
+
+    return noteModel;
+  } catch (_) {
+    return null;
+  }
+});
 
 class NoteCardRepost extends ConsumerWidget {
   final NostrNote repostEvent;
 
-  const NoteCardRepost({
-    super.key,
-    required this.repostEvent,
-  });
+  const NoteCardRepost({super.key, required this.repostEvent});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final notesP = ref.read(getNotesProvider);
-    final repostedByMetadata =
-        ref.watch(metadataStateProvider(repostEvent.pubkey)).userMetadata;
-
-    final noteEtag = repostEvent.tags.cast<NostrTag?>().firstWhere(
-          (element) => element?.type == 'e',
-          orElse: () => null,
-        );
-
-    if (noteEtag == null) {
-      return Text("Repost has no information where to fetch the post");
-    }
-
-    final displayNoteStream = notesP.getNote(
-      noteEtag.value,
-    );
+    final repostedNote = ref.watch(_repostedNoteProvider(repostEvent.content));
 
     return Column(
       children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          child: Row(
-            children: [
-              SvgPicture.asset(
-                'assets/icons/retweet.svg',
-                height: 18,
-                colorFilter: ColorFilter.mode(
-                  Color.fromARGB(255, 22, 163, 74),
-                  BlendMode.srcATop,
-                ),
-              ),
-              SizedBox(width: 10),
-              GestureDetector(
-                onTap: () {
-                  // navigate to the profile of the user who reposted
+        _RepostHeader(repostEvent: repostEvent),
+        if (repostedNote == null)
+          Text(
+            'Failed to parse reposted note',
+            style: TextStyle(color: Theme.of(context).colorScheme.error),
+          )
+        else
+          _RepostedNoteBody(note: repostedNote),
+      ],
+    );
+  }
+}
 
-                  context.push('/nostr/profile/${repostEvent.pubkey}');
-                },
-                child: RichText(
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  text: TextSpan(
-                    style: TextStyle(color: Paletter.getGray(context)),
-                    children: [
-                      TextSpan(
-                        text: repostedByMetadata?.name ??
-                            Helpers.shortHr(repostEvent.pubkey),
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 15,
-                        ),
-                      ),
-                      TextSpan(
-                        text: ' shared',
-                        style: TextStyle(
-                          fontSize: 14,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
+class _RepostHeader extends ConsumerWidget {
+  final NostrNote repostEvent;
+
+  const _RepostHeader({required this.repostEvent});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final name = ref.watch(
+      metadataStateProvider(
+        repostEvent.pubkey,
+      ).select((s) => s.userMetadata?.name),
+    );
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Row(
+        children: [
+          SvgPicture.asset(
+            'assets/icons/retweet.svg',
+            height: 18,
+            colorFilter: const ColorFilter.mode(
+              Color.fromARGB(255, 22, 163, 74),
+              BlendMode.srcATop,
+            ),
           ),
-        ),
-        StreamBuilder(
-          stream: displayNoteStream,
-          builder: (context, snapshot) {
-            if (!snapshot.hasData) {
-              return Column(
-                children: [
-                  if (noteEtag.recommendedRelay == null)
-                    Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Column(
-                        children: [
-                          Text(
-                              "loading might fail, the repost has no information where to fetch the post"),
-                          SizedBox(height: 10),
-                          Text(
-                              "This is a bug, please report it to the developers"),
-                          SizedBox(height: 10),
-                          Text(
-                            "repostId: ${repostEvent.id} ${repostEvent.sources}",
-                            style: TextStyle(
-                              fontSize: 10,
-                              color: Paletter.getDarkGray(context),
-                            ),
-                          ),
-                        ],
+          const SizedBox(width: 10),
+          Expanded(
+            child: GestureDetector(
+              onTap: () =>
+                  context.push(RoutePaths.profile(pubkey: repostEvent.pubkey)),
+              child: RichText(
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                text: TextSpan(
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.inverseSurface,
+                  ),
+                  children: [
+                    TextSpan(
+                      text: name ?? Helpers.shortHr(repostEvent.pubkey),
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15,
                       ),
                     ),
-                  SkeletonNote(hideBottomAction: true),
-                ],
-              );
-            }
+                    TextSpan(
+                      text: AppLocalizations.of(context)!.shared,
+                      style: const TextStyle(fontSize: 14),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
 
-            return NoteCardContainer(
-              key: PageStorageKey(repostEvent.id),
-              note: NostrParser.parseEventSync(snapshot.data!),
-            );
-          },
-        ),
-      ],
+class _RepostedNoteBody extends ConsumerWidget {
+  final NostrNote note;
+
+  const _RepostedNoteBody({required this.note});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final parsedAsync = ref.watch(parsedNoteCacheProvider(note));
+
+    return parsedAsync.when(
+      data: (parsed) => parsed == null
+          ? const SizedBox.shrink()
+          : NoteCardContainer(key: PageStorageKey(parsed.id), note: parsed),
+      loading: () => const SkeletonNote(hideBottomAction: true),
+      error: (_, _) => const SizedBox.shrink(),
     );
   }
 }
