@@ -256,6 +256,47 @@ final routes = [
               starterPackIdentifier: state.extra as StarterPackIdentifier,
             ),
           ),
+
+          GoRoute(
+            path: '/wallet/dashboard',
+            builder: (context, state) => WalletNavigation(title: "a"),
+          ),
+          GoRoute(
+            path: '/wallet/receive',
+            builder: (context, state) => WalletReceivePage(),
+          ),
+          GoRoute(
+            path: '/wallet/receive/ecash',
+            builder: (context, state) => WalletReceiveEcashCompleterPage(),
+          ),
+          GoRoute(
+            path: '/wallet/mints',
+            builder: (context, state) => WalletNavigation(title: "a"),
+          ),
+          GoRoute(
+            path: '/wallet/pay',
+            builder: (context, state) => WalletPayPage(),
+          ),
+          GoRoute(
+            path: '/wallet/add_mint',
+            builder: (context, state) => const AddMintPage(),
+          ),
+          GoRoute(
+            path: '/wallet/mint_details',
+            builder: (context, state) =>
+                MintInfoPage(mintUrl: state.extra as String?),
+          ),
+          GoRoute(
+            path: '/wallet/transactions/detail',
+            builder: (context, state) => WalletTransactionDetailPage(
+              transaction: state.extra as ndk_entities.WalletTransaction,
+            ),
+          ),
+
+          GoRoute(
+            path: '/wallet/pay/done',
+            builder: (context, state) => WalletPayDone(),
+          ),
         ],
       ),
       // Routes outside the shell (no persistent layout)
@@ -278,47 +319,6 @@ final routes = [
               int.tryParse(state.uri.queryParameters['start'] ?? '0') ?? 0;
           return EventGalleryPage(eventId: eventId, startIndex: start);
         },
-      ),
-
-      GoRoute(
-        path: '/wallet/dashboard',
-        builder: (context, state) => WalletNavigation(title: "a"),
-      ),
-      GoRoute(
-        path: '/wallet/receive',
-        builder: (context, state) => WalletReceivePage(),
-      ),
-      GoRoute(
-        path: '/wallet/receive/ecash',
-        builder: (context, state) => WalletReceiveEcashCompleterPage(),
-      ),
-      GoRoute(
-        path: '/wallet/mints',
-        builder: (context, state) => WalletNavigation(title: "a"),
-      ),
-      GoRoute(
-        path: '/wallet/pay',
-        builder: (context, state) => WalletPayPage(),
-      ),
-      GoRoute(
-        path: '/wallet/add_mint',
-        builder: (context, state) => const AddMintPage(),
-      ),
-      GoRoute(
-        path: '/wallet/mint_details',
-        builder: (context, state) =>
-            MintInfoPage(mintUrl: state.extra as String?),
-      ),
-      GoRoute(
-        path: '/wallet/transactions/detail',
-        builder: (context, state) => WalletTransactionDetailPage(
-          transaction: state.extra as ndk_entities.WalletTransaction,
-        ),
-      ),
-
-      GoRoute(
-        path: '/wallet/pay/done',
-        builder: (context, state) => WalletPayDone(),
       ),
     ],
   ),

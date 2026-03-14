@@ -277,7 +277,7 @@ class NostrSideMenu extends ConsumerWidget {
                       ),
                       _drawerItem(
                         label: AppLocalizations.of(context)!.payments,
-                        routeName: 'payments',
+                        routeName: '/wallet/dashboard',
                         icon: PhosphorIcons.lightning(),
                         onTap: () {
                           context.push('/wallet/dashboard');
