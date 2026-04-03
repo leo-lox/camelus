@@ -84,10 +84,11 @@ dependencies:
 
   # ndk imports
   ndk: ^0.8.2-dev.1
+  ndk_flutter: ^0.8.2-dev.1
   #ndk_rust_verifier: ^0.5.0
 
   ndk_objectbox: ^0.2.8
-  ndk_flutter: ^0.0.2
+  
   
   image: ^4.3.0
   flutter_list_view: ^1.1.29
