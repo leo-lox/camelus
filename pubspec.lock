@@ -1206,10 +1206,10 @@ packages:
     dependency: "direct main"
     description:
       name: ndk_objectbox
-      sha256: "079e45e3db978816d314137235c3bf4643d0bb93117ce00aecb96315a3aa131a"
+      sha256: "24a54aea7aae083bf7efb8bded6d90a3760ef206d98d57b7319c71a13fcfcac8"
       url: "https://pub.dev"
     source: hosted
-    version: "0.2.11"
+    version: "0.2.9"
   nip07_event_signer:
     dependency: transitive
     description:
@@ -1574,10 +1574,10 @@ packages:
     dependency: "direct main"
     description:
       name: sembast_cache_manager
-      sha256: "62e63fb7bf9558d409416ddaa782f254f765c7ac691c69bb0f294fb40bc90593"
+      sha256: b0cf6bf85d299bee58a7d91a3a802b0c1dc8b30b7349f74b9b68041e522ea751
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.7"
+    version: "1.0.8-dev.4"
   sembast_web:
     dependency: "direct main"
     description:
