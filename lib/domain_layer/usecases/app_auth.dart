@@ -2,14 +2,13 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:ui';
 
-import 'package:amberflutter/amberflutter.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ndk/data_layer/repositories/signers/nip46_event_signer.dart';
 import 'package:ndk/ndk.dart';
-import 'package:ndk_amber/ndk_amber.dart';
+import 'package:ndk_flutter/ndk_flutter.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import '../../config/camelus_config.dart';
 import '../../l10n/app_localizations.dart';

@@ -13,6 +13,7 @@ import firebase_core
 import firebase_messaging
 import flutter_local_notifications
 import flutter_secure_storage_darwin
+import mobile_scanner
 import objectbox_flutter_libs
 import package_info_plus
 import screen_retriever_macos
@@ -33,6 +34,7 @@ func RegisterGeneratedPlugins(registry: FlutterPluginRegistry) {
   FLTFirebaseMessagingPlugin.register(with: registry.registrar(forPlugin: "FLTFirebaseMessagingPlugin"))
   FlutterLocalNotificationsPlugin.register(with: registry.registrar(forPlugin: "FlutterLocalNotificationsPlugin"))
   FlutterSecureStorageDarwinPlugin.register(with: registry.registrar(forPlugin: "FlutterSecureStorageDarwinPlugin"))
+  MobileScannerPlugin.register(with: registry.registrar(forPlugin: "MobileScannerPlugin"))
   ObjectboxFlutterLibsPlugin.register(with: registry.registrar(forPlugin: "ObjectboxFlutterLibsPlugin"))
   FPPPackageInfoPlusPlugin.register(with: registry.registrar(forPlugin: "FPPPackageInfoPlusPlugin"))
   ScreenRetrieverMacosPlugin.register(with: registry.registrar(forPlugin: "ScreenRetrieverMacosPlugin"))
