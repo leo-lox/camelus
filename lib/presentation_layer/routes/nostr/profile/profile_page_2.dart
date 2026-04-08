@@ -2,9 +2,11 @@ import 'package:camelus/l10n/app_localizations.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:ndk/ndk.dart' as ndk_entities;
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -13,6 +15,8 @@ import '../../../../domain_layer/entities/feed_filter.dart';
 import '../../../../domain_layer/entities/user_metadata.dart';
 import '../../../../domain_layer/usecases/app_auth.dart';
 import '../../../../helpers/helpers.dart';
+import '../../../atoms/trust_rank_atom.dart';
+import '../../../providers/trusted_assertions_provider.dart';
 import '../../../routing/route_paths.dart';
 import '../../../atoms/back_button_round.dart';
 import '../../../atoms/follow_button.dart';
@@ -183,6 +187,25 @@ class _BuildProfileHeader extends ConsumerWidget {
   Widget build(BuildContext context, ref) {
     final contacts = ref.watch(contactListStateProvider(userMetadata.pubkey));
 
+    final metricsAsync = ref.watch(
+      userMetricsProvider(
+        UserMetricsParams(
+          pubkey: userMetadata.pubkey,
+          metrics: {
+            ndk_entities.Nip85Metric.rank,
+            ndk_entities.Nip85Metric.postCount,
+            ndk_entities.Nip85Metric.followers,
+          },
+        ),
+      ),
+    );
+
+    final metrics = metricsAsync.maybeWhen(
+      data: (data) => data,
+      error: (error, stackTrace) => null,
+      orElse: () => null,
+    );
+
     return Stack(
       children: [
         // Banner Image
@@ -298,13 +321,20 @@ class _BuildProfileHeader extends ConsumerWidget {
                   ],
                 ),
                 SizedBox(height: 10),
-                Text(
-                  userMetadata.name ?? Helpers().shortHr(userMetadata.pubkey),
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: Theme.of(context).colorScheme.onSurface,
-                  ),
+                Row(
+                  children: [
+                    Text(
+                      userMetadata.name ??
+                          Helpers().shortHr(userMetadata.pubkey),
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).colorScheme.onSurface,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    TrustRankAtom(trustRank: metrics?.rank ?? 0),
+                  ],
                 ),
 
                 GestureDetector(
@@ -339,7 +369,18 @@ class _BuildProfileHeader extends ConsumerWidget {
                     displayFollowing(contacts.contactList, context),
                     SizedBox(width: 16),
                     Text(
-                      AppLocalizations.of(context)!.followers,
+                      '${AppLocalizations.of(context)!.followers}: ${metrics?.followers ?? '...'}',
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.inverseSurface,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ],
+                ),
+                Row(
+                  children: [
+                    Text(
+                      '${AppLocalizations.of(context)!.posts}: ${metrics?.postCount ?? '...'}',
                       style: TextStyle(
                         color: Theme.of(context).colorScheme.inverseSurface,
                         fontSize: 14,
