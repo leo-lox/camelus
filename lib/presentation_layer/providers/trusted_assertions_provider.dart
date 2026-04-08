@@ -59,6 +59,28 @@ class EventMetricsParams {
   }
 }
 
+class UserMetricsParams {
+  final String pubkey;
+  final Set<Nip85Metric>? metrics;
+  final List<Nip85TrustedProvider>? providers;
+
+  const UserMetricsParams({
+    required this.pubkey,
+    this.metrics,
+    this.providers = APP_DEFAULT_NIP85_PROVIDERS,
+  });
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is UserMetricsParams &&
+          runtimeType == other.runtimeType &&
+          pubkey == other.pubkey;
+
+  @override
+  int get hashCode => pubkey.hashCode;
+}
+
 /// Provider for getting event metrics from NIP-85 trusted assertions
 /// Results are streamed per unique parameter combination
 ///
@@ -78,6 +100,18 @@ final eventMetricsProvider =
       // ignore: experimental_member_use
       return ndk.ta.streamEventMetrics(
         params.eventId,
+        metrics: params.metrics,
+        providers: params.providers,
+      );
+    });
+
+final userMetricsProvider =
+    StreamProvider.family<Nip85UserMetrics, UserMetricsParams>((ref, params) {
+      final ndk = ref.watch(ndkProvider);
+
+      // ignore: experimental_member_use
+      return ndk.ta.streamUserMetrics(
+        params.pubkey,
         metrics: params.metrics,
         providers: params.providers,
       );
