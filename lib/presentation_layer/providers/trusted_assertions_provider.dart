@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:ndk/ndk.dart';
 import 'package:riverpod/riverpod.dart';
 
@@ -93,8 +95,18 @@ class UserMetricsParams {
 ///   ),
 /// ));
 /// ```
-final eventMetricsProvider =
-    StreamProvider.family<Nip85EventMetrics, EventMetricsParams>((ref, params) {
+final eventMetricsProvider = StreamProvider.autoDispose
+    .family<Nip85EventMetrics, EventMetricsParams>((ref, params) {
+      final link = ref.keepAlive();
+      Timer? timer;
+
+      ref.onCancel(() {
+        timer = Timer(const Duration(minutes: 1), () => link.close());
+      });
+      ref.onResume(() {
+        timer?.cancel();
+      });
+
       final ndk = ref.watch(ndkProvider);
 
       // ignore: experimental_member_use
@@ -105,8 +117,18 @@ final eventMetricsProvider =
       );
     });
 
-final userMetricsProvider =
-    StreamProvider.family<Nip85UserMetrics, UserMetricsParams>((ref, params) {
+final userMetricsProvider = StreamProvider.autoDispose
+    .family<Nip85UserMetrics, UserMetricsParams>((ref, params) {
+      final link = ref.keepAlive();
+      Timer? timer;
+
+      ref.onCancel(() {
+        timer = Timer(const Duration(minutes: 1), () => link.close());
+      });
+      ref.onResume(() {
+        timer?.cancel();
+      });
+
       final ndk = ref.watch(ndkProvider);
 
       // ignore: experimental_member_use
