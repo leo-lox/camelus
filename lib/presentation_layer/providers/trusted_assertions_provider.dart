@@ -23,11 +23,40 @@ class EventMetricsParams {
       other is EventMetricsParams &&
           runtimeType == other.runtimeType &&
           eventId == other.eventId &&
-          metrics == other.metrics &&
-          providers == other.providers;
+          _setEquals(metrics, other.metrics) &&
+          _listEquals(providers, other.providers);
 
   @override
-  int get hashCode => Object.hash(eventId, metrics, providers);
+  int get hashCode =>
+      Object.hash(eventId, _setHash(metrics), _listHash(providers));
+
+  static bool _setEquals<T>(Set<T>? a, Set<T>? b) {
+    if (identical(a, b)) return true;
+    if (a == null || b == null || a.length != b.length) return false;
+    for (final value in a) {
+      if (!b.contains(value)) return false;
+    }
+    return true;
+  }
+
+  static bool _listEquals<T>(List<T>? a, List<T>? b) {
+    if (identical(a, b)) return true;
+    if (a == null || b == null || a.length != b.length) return false;
+    for (var i = 0; i < a.length; i++) {
+      if (a[i] != b[i]) return false;
+    }
+    return true;
+  }
+
+  static int _setHash<T>(Set<T>? values) {
+    if (values == null) return 0;
+    return Object.hashAllUnordered(values);
+  }
+
+  static int _listHash<T>(List<T>? values) {
+    if (values == null) return 0;
+    return Object.hashAll(values);
+  }
 }
 
 /// Provider for getting event metrics from NIP-85 trusted assertions
