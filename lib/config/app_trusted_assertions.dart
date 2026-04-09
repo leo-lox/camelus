@@ -3,37 +3,37 @@
 import 'package:ndk/entities.dart';
 
 /// Default relay for NIP-85 trusted assertions
-const String DEFAULT_NIP85_RELAY = 'ws://localhost:3334';
+const String DEFAULT_NIP85_RELAY = 'ws://192.168.0.21:3334';
 
 /// Default trusted providers for NIP-85 assertions
 const List<Nip85TrustedProvider> APP_DEFAULT_NIP85_PROVIDERS = [
   // ===========================================================================
   // USER METRICS (kind 30382)
   // ===========================================================================
-  // Nip85TrustedProvider(
-  //   kind: Nip85Kind.user,
-  //   metric: Nip85Metric.followers,
-  //   pubkey: '3116ea6afb590a19455d7b39ae3317c62b2bbb236986788b7e0ae12ec2281101',
-  //   relay: DEFAULT_NIP85_RELAY,
-  // ),
-  // Nip85TrustedProvider(
-  //   kind: Nip85Kind.user,
-  //   metric: Nip85Metric.rank,
-  //   pubkey: 'cbeb151f3f5c4925c392c2b79936c3acd3c5c73a8ad60173ee6e43ff9112cfe1',
-  //   relay: DEFAULT_NIP85_RELAY,
-  // ),
+  Nip85TrustedProvider(
+    kind: Nip85Kind.user,
+    metric: Nip85Metric.followers,
+    pubkey: '3116ea6afb590a19455d7b39ae3317c62b2bbb236986788b7e0ae12ec2281101',
+    relay: DEFAULT_NIP85_RELAY,
+  ),
+  Nip85TrustedProvider(
+    kind: Nip85Kind.user,
+    metric: Nip85Metric.rank,
+    pubkey: 'cbeb151f3f5c4925c392c2b79936c3acd3c5c73a8ad60173ee6e43ff9112cfe1',
+    relay: DEFAULT_NIP85_RELAY,
+  ),
   // Nip85TrustedProvider(
   //   kind: Nip85Kind.user,
   //   metric: Nip85Metric.firstCreatedAt,
   //   pubkey: '367afc8744a62f99f0d6aa70b7a5506f57c302aff3ea72cf7cc7346371f82a25',
   //   relay: DEFAULT_NIP85_RELAY,
   // ),
-  // Nip85TrustedProvider(
-  //   kind: Nip85Kind.user,
-  //   metric: Nip85Metric.postCount,
-  //   pubkey: 'c3e5ec4ccddc5b8535dab6dd3db3281923ee280f9aea6295ed68b571fc296fbc',
-  //   relay: DEFAULT_NIP85_RELAY,
-  // ),
+  Nip85TrustedProvider(
+    kind: Nip85Kind.user,
+    metric: Nip85Metric.postCount,
+    pubkey: 'c3e5ec4ccddc5b8535dab6dd3db3281923ee280f9aea6295ed68b571fc296fbc',
+    relay: DEFAULT_NIP85_RELAY,
+  ),
   // Nip85TrustedProvider(
   //   kind: Nip85Kind.user,
   //   metric: Nip85Metric.replyCount,
@@ -113,37 +113,37 @@ const List<Nip85TrustedProvider> APP_DEFAULT_NIP85_PROVIDERS = [
   Nip85TrustedProvider(
     kind: Nip85Kind.event,
     metric: Nip85Metric.commentCount,
-    pubkey: 'bc96b59ff2fff7a2597dadcf5bddafb2880169df24c0f9eb7210cdf916d9c620',
+    pubkey: '6352c486e590896220b5964d46225bc57059a90971273ddfa50ed2da6cae8eaa',
     relay: DEFAULT_NIP85_RELAY,
   ),
   Nip85TrustedProvider(
     kind: Nip85Kind.event,
     metric: Nip85Metric.quoteCount,
-    pubkey: 'bc96b59ff2fff7a2597dadcf5bddafb2880169df24c0f9eb7210cdf916d9c620',
+    pubkey: '35ad1c3d023180e1fd96dece9a51bfeed721dafb0a80e72517f338aae1b1f7de',
     relay: DEFAULT_NIP85_RELAY,
   ),
   Nip85TrustedProvider(
     kind: Nip85Kind.event,
     metric: Nip85Metric.repostCount,
-    pubkey: 'bc96b59ff2fff7a2597dadcf5bddafb2880169df24c0f9eb7210cdf916d9c620',
+    pubkey: 'b18ceb02a32e73994685ddd2f417d042d88c676e0da715e802b994701c78f61b',
     relay: DEFAULT_NIP85_RELAY,
   ),
   Nip85TrustedProvider(
     kind: Nip85Kind.event,
     metric: Nip85Metric.reactionCount,
-    pubkey: 'bc96b59ff2fff7a2597dadcf5bddafb2880169df24c0f9eb7210cdf916d9c620',
+    pubkey: '52251a59c4a62b0bd7dc3b3786b7ebf51f9cb6d2907123fc82334e4903612926',
     relay: DEFAULT_NIP85_RELAY,
   ),
   Nip85TrustedProvider(
     kind: Nip85Kind.event,
     metric: Nip85Metric.zapCount,
-    pubkey: 'bc96b59ff2fff7a2597dadcf5bddafb2880169df24c0f9eb7210cdf916d9c620',
+    pubkey: '2ee673c52e97c5a92815f9d4555365196860121a17a1cc54c06818f5d21c59bf',
     relay: DEFAULT_NIP85_RELAY,
   ),
   Nip85TrustedProvider(
     kind: Nip85Kind.event,
     metric: Nip85Metric.zapAmount,
-    pubkey: 'bc96b59ff2fff7a2597dadcf5bddafb2880169df24c0f9eb7210cdf916d9c620',
+    pubkey: '2ee673c52e97c5a92815f9d4555365196860121a17a1cc54c06818f5d21c59bf',
     relay: DEFAULT_NIP85_RELAY,
   ),
 
