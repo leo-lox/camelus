@@ -1183,10 +1183,9 @@ packages:
   ndk:
     dependency: "direct main"
     description:
-      name: ndk
-      sha256: b45ce59d9a5c2b090ccf442d4cad3144102bb35db81fd918b98f03bc2f774531
-      url: "https://pub.dev"
-    source: hosted
+      path: "../ndk/packages/ndk"
+      relative: true
+    source: path
     version: "0.8.2-dev.1"
   ndk_bip32_keys:
     dependency: transitive
