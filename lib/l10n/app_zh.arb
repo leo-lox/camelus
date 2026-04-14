@@ -424,4 +424,9 @@
   "noKnownConversations": "没有与已知联系人的对话",
   "noMessageRequests": "没有消息请求",
   "failed": "失败"
+  ,
+  "imprint": "法律声明",
+  "@imprint": {
+    "description": "Imprint page title"
+  }
 }

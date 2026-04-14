@@ -1639,8 +1639,12 @@
   "@relayStatusExcellentDescription": {
     "description": "Status description when relay connection is excellent",
     "placeholders": {
-      "myCount": {"type": "int"},
-      "peerCount": {"type": "int"}
+      "myCount": {
+        "type": "int"
+      },
+      "peerCount": {
+        "type": "int"
+      }
     }
   },
   "relayStatusDegradedMyOnly": "Connected to your relays, but not to peer's DM relays. Messages may be delayed.",
@@ -1694,5 +1698,9 @@
   "noMessageRequests": "No message requests",
   "@noMessageRequests": {
     "description": "Empty state for requests DM tab"
+  },
+  "imprint": "Imprint",
+  "@imprint": {
+    "description": "Imprint page title"
   }
 }

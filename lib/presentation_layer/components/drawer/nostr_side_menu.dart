@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
-import 'package:package_info_plus/package_info_plus.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -91,12 +89,6 @@ class NostrSideMenu extends ConsumerWidget {
         );
       },
     );
-  }
-
-  Future<PackageInfo> _getPackageInfo() async {
-    PackageInfo packageInfo = await PackageInfo.fromPlatform();
-
-    return packageInfo;
   }
 
   void navigateToProfile(BuildContext context, String pubkey) {
@@ -324,7 +316,7 @@ class NostrSideMenu extends ConsumerWidget {
           ),
           _divider(context),
           Padding(
-            padding: const EdgeInsets.only(left: 20),
+            padding: const EdgeInsets.only(left: 5),
             child: _textButton(
               text: AppLocalizations.of(context)!.settings,
               onPressed: () {
@@ -334,56 +326,54 @@ class NostrSideMenu extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: 10),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(20, 10, 15, 20),
-            child: _textButton(
-              text: AppLocalizations.of(context)!.termsOfService,
-              context: context,
-              onPressed: () {
-                // lauch url
-                Uri url = Uri.parse("https://camelus.app/terms");
-                launchUrl(url, mode: LaunchMode.externalApplication);
-              },
-            ),
-          ),
 
-          Padding(
-            padding: EdgeInsets.only(left: 20),
-            child: FutureBuilder(
-              future: _getPackageInfo(),
-              builder: (context, snapshot) {
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'v${snapshot.data?.version}',
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.onSurface,
-                        fontSize: 10,
-                      ),
-                    ),
-                    Text(
-                      'build ${snapshot.data?.buildNumber}',
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.onSurface,
-                        fontSize: 8,
-                      ),
-                    ),
-                    Text(
-                      '${snapshot.data?.buildSignature}',
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.onSurface,
-                        fontSize: 6,
-                      ),
-                    ),
-                  ],
-                );
-              },
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              TextButton(
+                style: TextButton.styleFrom(
+                  padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  minimumSize: const Size(50, 10),
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                ),
+                onPressed: () {
+                  final url = Uri.parse("https://camelus.app/terms");
+                  launchUrl(url, mode: LaunchMode.externalApplication);
+                },
+                child: Text(
+                  AppLocalizations.of(context)!.termsOfService,
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface,
+                    fontSize: 12,
+                    fontWeight: FontWeight.normal,
+                  ),
+                ),
+              ),
+
+              TextButton(
+                style: TextButton.styleFrom(
+                  padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  minimumSize: const Size(50, 10),
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                ),
+                onPressed: () {
+                  final url = Uri.parse("https://camelus.app/imprint");
+                  launchUrl(url, mode: LaunchMode.externalApplication);
+                },
+                child: Text(
+                  AppLocalizations.of(context)!.imprint,
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface,
+                    fontSize: 12,
+                    fontWeight: FontWeight.normal,
+                  ),
+                ),
+              ),
+            ],
           ),
           _divider(context),
           Padding(
-            padding: const EdgeInsets.fromLTRB(20, 10, 15, 20),
+            padding: const EdgeInsets.fromLTRB(20, 0, 15, 10),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -404,15 +394,7 @@ class NostrSideMenu extends ConsumerWidget {
                     onPressed: () {
                       openQrShareDialog(context, currentUserPubkey);
                     },
-                    icon: SvgPicture.asset(
-                      'assets/icons/qr-code.svg',
-                      colorFilter: ColorFilter.mode(
-                        Theme.of(context).colorScheme.primary,
-                        BlendMode.srcIn,
-                      ),
-                      height: 22,
-                      width: 22,
-                    ),
+                    icon: Icon(PhosphorIcons.qrCode()),
                   ),
               ],
             ),

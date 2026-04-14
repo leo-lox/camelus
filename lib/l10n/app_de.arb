@@ -465,4 +465,9 @@
   "noFollowsConversations": "Keine Unterhaltungen mit Personen, denen Sie folgen",
   "noKnownConversations": "Keine Unterhaltungen mit bekannten Kontakten",
   "noMessageRequests": "Keine Nachrichtenanfragen"
+  ,
+  "imprint": "Impressum",
+  "@imprint": {
+    "description": "Imprint page title"
+  }
 }

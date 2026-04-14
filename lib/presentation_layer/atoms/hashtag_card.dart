@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 
 class HashtagCard extends StatelessWidget {
@@ -39,13 +37,16 @@ class HashtagCard extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 5),
-                Text(
-                  hashtag,
-                  style: const TextStyle(
-                    height: BorderSide.strokeAlignCenter,
-                    letterSpacing: 1,
-                    fontSize: 22,
-                    fontWeight: FontWeight.w600,
+                Expanded(
+                  child: Text(
+                    hashtag,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      height: BorderSide.strokeAlignCenter,
+                      letterSpacing: 1,
+                      fontSize: 22,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
               ],
@@ -63,7 +64,7 @@ class HashtagCard extends StatelessWidget {
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  "posts",
+                  "people",
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w400,
@@ -101,13 +102,13 @@ class HashtagCardSkeleton extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 5),
-              Container(
-                // random between 100 and 200
-                width: 80 + (140 * (Random().nextDouble() * 1.0)),
-                height: 40,
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.surface,
-                  borderRadius: BorderRadius.circular(5),
+              Expanded(
+                child: Container(
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.surface,
+                    borderRadius: BorderRadius.circular(5),
+                  ),
                 ),
               ),
             ],

@@ -424,4 +424,9 @@
   "noKnownConversations": "既知の連絡先との会話はありません",
   "noMessageRequests": "メッセージリクエストはありません",
   "failed": "失敗"
+  ,
+  "imprint": "インプリント",
+  "@imprint": {
+    "description": "Imprint page title"
+  }
 }

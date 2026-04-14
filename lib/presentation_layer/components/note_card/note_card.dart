@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:ndk/entities.dart' as ndk_entities;
 
 import '../../../data_layer/models/post_context.dart';
 import '../../../domain_layer/entities/nostr_note.dart';
@@ -15,6 +16,7 @@ import '../../atoms/my_profile_picture.dart';
 import '../../providers/ndk_provider.dart';
 import '../../providers/reactions_state_provider.dart';
 import '../../providers/reposts_state_provider.dart';
+import '../../providers/trusted_assertions_provider.dart';
 import '../bottom_sheet_share.dart';
 import '../write_post.dart';
 import 'bottom_action_row.dart';
@@ -46,10 +48,31 @@ class NoteCard extends ConsumerWidget {
     final ndk = ref.watch(ndkProvider);
     final canSign = !ndk.accounts.cannotSign;
 
+    // Watch trusted assertions metrics stream
+    final metricsAsync = ref.watch(
+      eventMetricsProvider(
+        EventMetricsParams(
+          eventId: note.nostrNote.id,
+          metrics: {
+            ndk_entities.Nip85Metric.commentCount,
+            ndk_entities.Nip85Metric.repostCount,
+            ndk_entities.Nip85Metric.reactionCount,
+          },
+        ),
+      ),
+    );
+
+    final metrics = metricsAsync.maybeWhen(
+      data: (data) => data,
+      error: (error, stackTrace) => null,
+
+      orElse: () => null,
+    );
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        if (note.nostrNote.sigValid != true) _buildInvalidSignature(),
+        if (note.nostrNote.sigValid == false) _buildInvalidSignature(),
         Padding(
           padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
           child: Column(
@@ -87,6 +110,9 @@ class NoteCard extends ConsumerWidget {
               child: BottomActionRow(
                 isLiked: ref.watch(postLikeProvider(note.nostrNote)).isLiked,
                 key: ValueKey("${note.id}bottom_action_row"),
+                commentCount: metrics?.commentCount,
+                retweetCount: metrics?.repostCount,
+                likeCount: metrics?.reactionCount,
                 onComment: () {
                   if (!canSign) {
                     AppAuth.showLoginPrompt(context);

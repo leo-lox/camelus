@@ -468,4 +468,9 @@
   "noFollowsConversations": "No hay conversaciones con personas que sigues",
   "noKnownConversations": "No hay conversaciones con contactos conocidos",
   "noMessageRequests": "No hay solicitudes de mensajes"
+  ,
+  "imprint": "Aviso legal",
+  "@imprint": {
+    "description": "Imprint page title"
+  }
 }

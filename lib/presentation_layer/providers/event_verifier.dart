@@ -1,6 +1,5 @@
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:ndk/ndk.dart';
-import 'package:ndk_rust_verifier/ndk_rust_verifier.dart';
 import 'package:ndk_flutter/ndk_flutter.dart' show WebEventVerifier;
 import 'package:ndk/entities.dart' as ndk_entities;
 import 'package:riverpod/riverpod.dart';
