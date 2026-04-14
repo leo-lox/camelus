@@ -11,6 +11,7 @@ import '../ndk_provider.dart';
 enum AddNip65RelayResult { success, invalidUrl, alreadyExists, saveFailed }
 
 class Nip65RelaySettingsState {
+  final Map<String, ReadWriteMarker> originalRelays;
   final Map<String, ReadWriteMarker> relays;
   final int? createdAt;
   final bool isLoading;
@@ -18,6 +19,7 @@ class Nip65RelaySettingsState {
   final String? error;
 
   const Nip65RelaySettingsState({
+    this.originalRelays = const {},
     this.relays = const {},
     this.createdAt,
     this.isLoading = false,
@@ -25,7 +27,25 @@ class Nip65RelaySettingsState {
     this.error,
   });
 
+  bool get hasChanges {
+    if (relays.length != originalRelays.length) {
+      return true;
+    }
+
+    for (final entry in relays.entries) {
+      final original = originalRelays[entry.key];
+      if (original == null ||
+          original.isRead != entry.value.isRead ||
+          original.isWrite != entry.value.isWrite) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
   Nip65RelaySettingsState copyWith({
+    Map<String, ReadWriteMarker>? originalRelays,
     Map<String, ReadWriteMarker>? relays,
     Object? createdAt = _keepValue,
     bool? isLoading,
@@ -33,6 +53,7 @@ class Nip65RelaySettingsState {
     Object? error = _keepValue,
   }) {
     return Nip65RelaySettingsState(
+      originalRelays: originalRelays ?? this.originalRelays,
       relays: relays ?? this.relays,
       createdAt: createdAt == _keepValue ? this.createdAt : createdAt as int?,
       isLoading: isLoading ?? this.isLoading,
@@ -48,6 +69,7 @@ enum _RelayRole { inbox, outbox }
 
 class Nip65RelaySettingsNotifier extends Notifier<Nip65RelaySettingsState> {
   late final String? myPubkey;
+  bool _didScheduleInitialLoad = false;
 
   @override
   Nip65RelaySettingsState build() {
@@ -57,8 +79,11 @@ class Nip65RelaySettingsNotifier extends Notifier<Nip65RelaySettingsState> {
     _inboxOutbox = inboxOutbox;
     myPubkey = pubkey;
 
-    if (myPubkey != null) {
-      _loadFromCacheThenFetch();
+    if (myPubkey != null && !_didScheduleInitialLoad) {
+      _didScheduleInitialLoad = true;
+      Future<void>(() async {
+        await _loadFromCacheThenFetch();
+      });
     }
 
     return const Nip65RelaySettingsState();
@@ -88,6 +113,7 @@ class Nip65RelaySettingsNotifier extends Notifier<Nip65RelaySettingsState> {
 
       if (nip65 == null) {
         state = state.copyWith(
+          originalRelays: {},
           relays: {},
           createdAt: null,
           isLoading: false,
@@ -96,8 +122,10 @@ class Nip65RelaySettingsNotifier extends Notifier<Nip65RelaySettingsState> {
         return;
       }
 
+      final fetchedRelays = Map<String, ReadWriteMarker>.from(nip65.relays);
       state = state.copyWith(
-        relays: Map<String, ReadWriteMarker>.from(nip65.relays),
+        originalRelays: fetchedRelays,
+        relays: fetchedRelays,
         createdAt: nip65.createdAt,
         isLoading: false,
         error: null,
@@ -114,6 +142,69 @@ class Nip65RelaySettingsNotifier extends Notifier<Nip65RelaySettingsState> {
 
   Future<AddNip65RelayResult> addOutboxRelay(String relayUrl) {
     return _addRelay(relayUrl, role: _RelayRole.outbox);
+  }
+
+  AddNip65RelayResult addRelay(String relayUrl) {
+    final normalized = _normalizeRelayUrl(relayUrl);
+    if (normalized == null) {
+      return AddNip65RelayResult.invalidUrl;
+    }
+
+    if (state.relays.containsKey(normalized)) {
+      return AddNip65RelayResult.alreadyExists;
+    }
+
+    state = state.copyWith(
+      relays: Map<String, ReadWriteMarker>.from(state.relays)
+        ..[normalized] = ReadWriteMarker.readWrite,
+    );
+
+    return AddNip65RelayResult.success;
+  }
+
+  void setRelayPermissions(
+    String relayUrl, {
+    required bool isRead,
+    required bool isWrite,
+  }) {
+    final existing = state.relays[relayUrl];
+    if (existing == null) {
+      return;
+    }
+
+    final updatedRelays = Map<String, ReadWriteMarker>.from(state.relays);
+    if (!isRead && !isWrite) {
+      updatedRelays.remove(relayUrl);
+    } else {
+      updatedRelays[relayUrl] = _markerFrom(isRead: isRead, isWrite: isWrite);
+    }
+
+    state = state.copyWith(relays: updatedRelays);
+  }
+
+  void removeRelay(String relayUrl) {
+    if (!state.relays.containsKey(relayUrl)) {
+      return;
+    }
+
+    state = state.copyWith(
+      relays: Map<String, ReadWriteMarker>.from(state.relays)..remove(relayUrl),
+    );
+  }
+
+  void discardChanges() {
+    state = state.copyWith(
+      relays: Map<String, ReadWriteMarker>.from(state.originalRelays),
+      error: null,
+    );
+  }
+
+  Future<bool> saveChanges() {
+    if (!state.hasChanges) {
+      return Future.value(true);
+    }
+
+    return _saveRelays(state.relays);
   }
 
   Future<AddNip65RelayResult> _addRelay(
@@ -206,15 +297,21 @@ class Nip65RelaySettingsNotifier extends Notifier<Nip65RelaySettingsState> {
       );
 
       if (refreshed != null) {
+        final refreshedRelays = Map<String, ReadWriteMarker>.from(
+          refreshed.relays,
+        );
         state = state.copyWith(
-          relays: Map<String, ReadWriteMarker>.from(refreshed.relays),
+          originalRelays: refreshedRelays,
+          relays: refreshedRelays,
           createdAt: refreshed.createdAt,
           isSaving: false,
           error: null,
         );
       } else {
+        final savedRelays = Map<String, ReadWriteMarker>.from(relays);
         state = state.copyWith(
-          relays: relays,
+          originalRelays: savedRelays,
+          relays: savedRelays,
           createdAt: createdAt,
           isSaving: false,
           error: null,

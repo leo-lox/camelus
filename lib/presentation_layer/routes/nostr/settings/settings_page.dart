@@ -63,15 +63,9 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
             },
           ),
           ListTile(
-            title: Text('${AppLocalizations.of(context)!.relays} (NIP-65)'),
+            title: Text(AppLocalizations.of(context)!.relays),
             onTap: () {
-              context.push('/settings/nip65-relays');
-            },
-          ),
-          ListTile(
-            title: Text(AppLocalizations.of(context)!.dmRelays),
-            onTap: () {
-              context.push('/settings/dm-relays');
+              context.push('/settings/relays');
             },
           ),
 

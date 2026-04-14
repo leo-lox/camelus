@@ -76,13 +76,15 @@ class DirectMessageRepositoryImpl implements DirectMessageRepository {
   }) async {
     try {
       if (pubkey == myPubkey) {
-        return await inboxOutbox.getDmRelaysSelf(forceRefresh: forceRefresh);
+        return (await inboxOutbox.getDmRelaysSelf(
+          forceRefresh: forceRefresh,
+        )).relays;
       }
 
-      return await inboxOutbox.getDmRelays(
+      return (await inboxOutbox.getDmRelays(
         pubkey: pubkey,
         forceRefresh: forceRefresh,
-      );
+      )).relays;
     } catch (e) {
       log('DM: Error getting DM relays via InboxOutbox for $pubkey: $e');
       return [];
