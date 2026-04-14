@@ -18,8 +18,8 @@ import '../layouts/three_colum_layout.dart';
 import '../routes/deeplink_reciever_page.dart';
 import '../routes/home_page_desktop.dart';
 import '../routes/home_page_mobile.dart';
+import '../routes/nostr/blockedUsers/blocklist_page.dart';
 import '../routes/nostr/event_gallery_page.dart';
-import '../routes/nostr/blockedUsers/blocked_users.dart';
 import '../routes/nostr/bookmarks/bookmarks_page.dart';
 import '../routes/nostr/event_view/event_view_page.dart';
 import '../routes/nostr/onboarding/onboarding.dart';
@@ -233,7 +233,7 @@ final routes = [
           ),
           GoRoute(
             path: '/blocked-users',
-            builder: (context, state) => const BlockedUsers(),
+            builder: (context, state) => const BlocklistPage(),
           ),
           GoRoute(
             path: '/edit-starter-pack',
