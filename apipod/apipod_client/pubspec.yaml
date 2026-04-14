@@ -6,7 +6,7 @@ environment:
 
 dependencies:
   serverpod_client: 3.3.1
-  ndk: ^0.7.1-dev.2
+  ndk: '>=0.7.1 <1.0.0'
 
 
 dependency_overrides:

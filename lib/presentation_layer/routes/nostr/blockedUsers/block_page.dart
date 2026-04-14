@@ -1,12 +1,11 @@
-import 'dart:async';
 import 'package:camelus/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../../domain_layer/entities/nostr_tag.dart';
 import '../../../atoms/long_button.dart';
 import '../../../providers/metadata_state_provider.dart';
+import '../../../providers/moderation/blocklist_provider.dart';
 import '../../../providers/moderation/moderation_provider.dart';
 import '../../../providers/ndk_provider.dart';
 
@@ -21,11 +20,8 @@ class BlockPage extends ConsumerStatefulWidget {
 }
 
 class _BlockPageState extends ConsumerState<BlockPage> {
-  bool isUserBlocked = false;
   bool requestLoading = false;
   bool reportToCamelus = true;
-
-  List<NostrTag> contentTags = [];
 
   final TextEditingController _textController = TextEditingController();
   String _reportReason = "";
@@ -50,11 +46,35 @@ class _BlockPageState extends ConsumerState<BlockPage> {
   }
 
   void _blockUser(String pubkey) async {
-    throw UnimplementedError();
+    setState(() {
+      requestLoading = true;
+    });
+
+    try {
+      await ref.read(blocklistNotifierProvider.notifier).blockPubkey(pubkey);
+    } finally {
+      if (mounted) {
+        setState(() {
+          requestLoading = false;
+        });
+      }
+    }
   }
 
   void _unblockUser(String pubkey) async {
-    throw UnimplementedError();
+    setState(() {
+      requestLoading = true;
+    });
+
+    try {
+      await ref.read(blocklistNotifierProvider.notifier).unblockPubkey(pubkey);
+    } finally {
+      if (mounted) {
+        setState(() {
+          requestLoading = false;
+        });
+      }
+    }
   }
 
   void _setReportReason(String reason) {
@@ -97,6 +117,10 @@ class _BlockPageState extends ConsumerState<BlockPage> {
     final user = ref
         .watch(metadataStateProvider(widget.userPubkey))
         .userMetadata;
+    final blocklistState = ref.watch(blocklistNotifierProvider);
+    final isUserBlocked = blocklistState.blockedPubkeys.contains(
+      widget.userPubkey,
+    );
 
     if (_reportSuccessful) {
       return Scaffold(
@@ -177,44 +201,35 @@ class _BlockPageState extends ConsumerState<BlockPage> {
                     ],
                   ),
                   const SizedBox(height: 20),
-                  FutureBuilder(
-                    future: Future.delayed(Duration(seconds: 1)),
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return SizedBox(
-                          height: 40,
-                          width: MediaQuery.of(context).size.width * 0.75,
-                          child: longButton(
-                            name: AppLocalizations.of(context)!.loading,
-                            loading: true,
-                            onPressed: () {},
-                          ),
-                        );
-                      }
-
-                      return SizedBox(
-                        height: 40,
-                        width: MediaQuery.of(context).size.width * 0.75,
-                        child: longButton(
-                          name: isUserBlocked
-                              ? AppLocalizations.of(context)!.unblock
-                              : AppLocalizations.of(context)!.block,
-                          inverted: !isUserBlocked,
-                          loading: requestLoading,
-                          onPressed: () {
-                            if (isUserBlocked) {
-                              _unblockUser(widget.userPubkey);
-                            } else {
-                              _blockUser(widget.userPubkey);
-                            }
-                            setState(() {
-                              isUserBlocked = !isUserBlocked;
-                            });
-                          },
-                        ),
-                      );
-                    },
-                  ),
+                  if (blocklistState.isLoading)
+                    SizedBox(
+                      height: 40,
+                      width: MediaQuery.of(context).size.width * 0.75,
+                      child: longButton(
+                        name: AppLocalizations.of(context)!.loading,
+                        loading: true,
+                        onPressed: () {},
+                      ),
+                    )
+                  else
+                    SizedBox(
+                      height: 40,
+                      width: MediaQuery.of(context).size.width * 0.75,
+                      child: longButton(
+                        name: isUserBlocked
+                            ? AppLocalizations.of(context)!.unblock
+                            : AppLocalizations.of(context)!.block,
+                        inverted: !isUserBlocked,
+                        loading: requestLoading,
+                        onPressed: () {
+                          if (isUserBlocked) {
+                            _unblockUser(widget.userPubkey);
+                          } else {
+                            _blockUser(widget.userPubkey);
+                          }
+                        },
+                      ),
+                    ),
                   const SizedBox(height: 10),
                   Column(
                     children: [

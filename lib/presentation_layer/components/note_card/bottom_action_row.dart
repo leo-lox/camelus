@@ -100,7 +100,7 @@ class _BottomActionRowState extends State<BottomActionRow>
 
   @override
   Widget build(BuildContext context) {
-    final defaultColor = Theme.of(context).colorScheme.surfaceContainerHighest;
+    final defaultColor = Theme.of(context).colorScheme.secondary;
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -121,6 +121,7 @@ class _BottomActionRowState extends State<BottomActionRow>
             color: widget.isRetweeted ? Color.fromARGB(255, 22, 163, 74) : null,
             onTap: widget.onRetweet,
             repostController: _repostController,
+            count: widget.retweetCount,
           ),
         ),
         Expanded(child: _buildLikeButton()),
@@ -149,7 +150,7 @@ class _BottomActionRowState extends State<BottomActionRow>
   }
 
   Widget _buildLikeButton() {
-    final defaultColor = Theme.of(context).colorScheme.surfaceContainerHighest;
+    final defaultColor = Theme.of(context).colorScheme.secondary;
     return SizedBox(
       height: 35,
       // width is removed so that parent Flex (Expanded) can control sizing
@@ -177,10 +178,7 @@ class _BottomActionRowState extends State<BottomActionRow>
                 const SizedBox(width: 5),
                 Text(
                   widget.likeCount.toString(),
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.inverseSurface,
-                    fontSize: 16,
-                  ),
+                  style: TextStyle(color: defaultColor, fontSize: 16),
                 ),
               ],
             ],
@@ -207,14 +205,14 @@ class _BottomActionRowState extends State<BottomActionRow>
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              if (icon != null) icon,
+              ?icon,
 
               if (count != null) ...[
                 const SizedBox(width: 5),
                 Text(
                   count.toString(),
                   style: TextStyle(
-                    color: Theme.of(context).colorScheme.inverseSurface,
+                    color: Theme.of(context).colorScheme.secondary,
                     fontSize: 16,
                   ),
                 ),
@@ -235,9 +233,7 @@ Widget _buildRetweetButton({
 }) {
   return Builder(
     builder: (context) {
-      final defaultColor = Theme.of(
-        context,
-      ).colorScheme.surfaceContainerHighest;
+      final defaultColor = Theme.of(context).colorScheme.secondary;
       return SizedBox(
         height: 35,
         // width removed for flexibility
