@@ -49,6 +49,7 @@ import '../routes/wallet/wallet_pay/wallet_pay_done/wallet_pay_done.dart';
 import '../routes/wallet/wallet_pay/wallet_pay_page.dart';
 import '../routes/wallet/wallet_receive/rcv_completers/wallet_rcv_ecash_completer_page.dart';
 import '../routes/wallet/wallet_receive/wallet_receive_page.dart';
+import '../routes/wallet/wallet_shell_page.dart';
 import '../routes/wallet/wallet_transaction/wallet_transaction_detail_page.dart';
 
 String? decodeProfileIdentifierToPubkey(String rawIdentifier) {
@@ -256,46 +257,66 @@ final routes = [
               starterPackIdentifier: state.extra as StarterPackIdentifier,
             ),
           ),
-
-          GoRoute(
-            path: '/wallet/dashboard',
-            builder: (context, state) => WalletNavigation(title: "a"),
-          ),
-          GoRoute(
-            path: '/wallet/receive',
-            builder: (context, state) => WalletReceivePage(),
-          ),
-          GoRoute(
-            path: '/wallet/receive/ecash',
-            builder: (context, state) => WalletReceiveEcashCompleterPage(),
-          ),
-          GoRoute(
-            path: '/wallet/mints',
-            builder: (context, state) => WalletNavigation(title: "a"),
-          ),
-          GoRoute(
-            path: '/wallet/pay',
-            builder: (context, state) => WalletPayPage(),
-          ),
-          GoRoute(
-            path: '/wallet/add_mint',
-            builder: (context, state) => const AddMintPage(),
-          ),
-          GoRoute(
-            path: '/wallet/mint_details',
-            builder: (context, state) =>
-                MintInfoPage(mintUrl: state.extra as String?),
-          ),
-          GoRoute(
-            path: '/wallet/transactions/detail',
-            builder: (context, state) => WalletTransactionDetailPage(
-              transaction: state.extra as ndk_entities.WalletTransaction,
-            ),
-          ),
-
-          GoRoute(
-            path: '/wallet/pay/done',
-            builder: (context, state) => WalletPayDone(),
+          ShellRoute(
+            builder: (context, state, child) => WalletShellPage(child: child),
+            routes: [
+              GoRoute(
+                path: '/wallet',
+                redirect: (context, state) {
+                  if (state.uri.path == '/wallet') {
+                    return '/wallet/dashboard';
+                  }
+                  return null;
+                },
+                routes: [
+                  GoRoute(
+                    path: 'dashboard',
+                    builder: (context, state) => WalletNavigation(title: 'a'),
+                  ),
+                  GoRoute(
+                    path: 'receive',
+                    builder: (context, state) => WalletReceivePage(),
+                    routes: [
+                      GoRoute(
+                        path: 'ecash',
+                        builder: (context, state) =>
+                            WalletReceiveEcashCompleterPage(),
+                      ),
+                    ],
+                  ),
+                  GoRoute(
+                    path: 'mints',
+                    builder: (context, state) => WalletNavigation(title: 'a'),
+                  ),
+                  GoRoute(
+                    path: 'pay',
+                    builder: (context, state) => WalletPayPage(),
+                    routes: [
+                      GoRoute(
+                        path: 'done',
+                        builder: (context, state) => WalletPayDone(),
+                      ),
+                    ],
+                  ),
+                  GoRoute(
+                    path: 'add_mint',
+                    builder: (context, state) => const AddMintPage(),
+                  ),
+                  GoRoute(
+                    path: 'mint_details',
+                    builder: (context, state) =>
+                        MintInfoPage(mintUrl: state.extra as String?),
+                  ),
+                  GoRoute(
+                    path: 'transactions/detail',
+                    builder: (context, state) => WalletTransactionDetailPage(
+                      transaction:
+                          state.extra as ndk_entities.WalletTransaction,
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ),
         ],
       ),
