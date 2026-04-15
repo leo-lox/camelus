@@ -1,7 +1,8 @@
+// ignore_for_file: experimental_member_use
+
 import 'package:ndk/entities.dart' as ndk_entities;
 import 'package:ndk/ndk.dart';
-import 'package:riverpod/legacy.dart';
-import 'package:riverpod/riverpod.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../providers/ndk_provider.dart';
 import '../wallet_providers/wallet_combined_state_provider.dart';
@@ -33,33 +34,38 @@ class WalletTransactionListState {
 }
 
 class WalletTransactionListNotifier
-    extends StateNotifier<WalletTransactionListState> {
-  final Ndk _ndk;
-  final Ref ref;
-  WalletTransactionListNotifier({required Ndk ndk, required this.ref})
-    : _ndk = ndk,
-      super(
-        WalletTransactionListState(transactions: [], pendingTransactions: []),
-      ) {
+    extends Notifier<WalletTransactionListState> {
+  Ndk get _ndk => ref.watch(ndkProvider);
+
+  @override
+  WalletTransactionListState build() {
+    final combinedState = ref.read(walletCombinedProvider);
+
     ref.listen(walletCombinedProvider, (previous, next) {
       if (next.pendingTransactions != previous?.pendingTransactions ||
           next.recentTransactions != previous?.recentTransactions) {
         state = state.copyWith(pendingTransactions: next.pendingTransactions);
       }
-    }, fireImmediately: true);
-    _loadMore();
+    });
+
+    Future.microtask(_loadMore);
+    return WalletTransactionListState(
+      transactions: [],
+      pendingTransactions: combinedState.pendingTransactions,
+    );
   }
 
-  _loadMore() async {
-    throw UnimplementedError("Loading more transactions is currently disabled");
-    // final transactions = await _ndk.wallets.combinedTransactions(
-    //   limit: limit,
-    //   offset: state.offset,
-    // );
-    // state = state.copyWith(
-    //   transactions: [...state.transactions, ...transactions],
-    //   offset: state.offset + transactions.length,
-    // );
+  Future<void> _loadMore() async {
+    if (!ref.mounted) return;
+    final transactions = await _ndk.wallets.combinedTransactions(
+      limit: limit,
+      offset: state.offset,
+    );
+    if (!ref.mounted) return;
+    state = state.copyWith(
+      transactions: [...state.transactions, ...transactions],
+      offset: state.offset + transactions.length,
+    );
   }
 
   void reset() {
@@ -71,10 +77,6 @@ class WalletTransactionListNotifier
 }
 
 final walletTransactionListProvider =
-    StateNotifierProvider<
-      WalletTransactionListNotifier,
-      WalletTransactionListState
-    >((ref) {
-      final ndk = ref.watch(ndkProvider);
-      return WalletTransactionListNotifier(ndk: ndk, ref: ref);
-    });
+    NotifierProvider<WalletTransactionListNotifier, WalletTransactionListState>(
+      WalletTransactionListNotifier.new,
+    );

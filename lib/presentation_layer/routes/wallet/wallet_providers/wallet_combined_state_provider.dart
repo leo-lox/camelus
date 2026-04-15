@@ -1,10 +1,10 @@
+// ignore_for_file: experimental_member_use
+
 import 'dart:async';
 
 import 'package:ndk/entities.dart' as ndk_entities;
 import 'package:ndk/ndk.dart';
-import 'package:riverpod/legacy.dart';
-
-import 'package:riverpod/riverpod.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../providers/db_ndk_provider.dart';
 import '../../../providers/ndk_provider.dart';
@@ -39,40 +39,34 @@ class WalletCombinedState {
 }
 
 final walletCombinedProvider =
-    StateNotifierProvider.autoDispose<
+    NotifierProvider.autoDispose<
       WalletCombinedStateNotifier,
       WalletCombinedState
-    >((ref) {
-      final ndk = ref.watch(ndkProvider);
-      final ndkDb = ref.watch(dbNdkProvider)!;
+    >(WalletCombinedStateNotifier.new);
 
-      return WalletCombinedStateNotifier(ndk, ndkDb);
-    });
-
-class WalletCombinedStateNotifier extends StateNotifier<WalletCombinedState> {
-  final Ndk _ndk;
-  final CacheManager ndkDb;
+class WalletCombinedStateNotifier extends Notifier<WalletCombinedState> {
+  Ndk get _ndk => ref.watch(ndkProvider);
 
   final _subscriptions = <StreamSubscription>[];
 
-  WalletCombinedStateNotifier(this._ndk, this.ndkDb)
-    : super(
-        WalletCombinedState(
-          balances: [],
-          recentTransactions: [],
-          pendingTransactions: [],
-          wallets: [],
-        ),
-      ) {
-    _initializeState();
-  }
-
   @override
-  void dispose() {
-    for (final subscription in _subscriptions) {
-      subscription.cancel();
-    }
-    super.dispose();
+  WalletCombinedState build() {
+    ref.watch(dbNdkProvider)!;
+
+    ref.onDispose(() {
+      for (final subscription in _subscriptions) {
+        subscription.cancel();
+      }
+    });
+
+    _initializeState();
+
+    return WalletCombinedState(
+      balances: [],
+      recentTransactions: [],
+      pendingTransactions: [],
+      wallets: [],
+    );
   }
 
   Future<void> _initializeState() async {
