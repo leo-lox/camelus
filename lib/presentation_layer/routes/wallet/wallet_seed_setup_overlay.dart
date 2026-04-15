@@ -125,12 +125,12 @@ class _WalletSeedSetupOverlayState
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              'Experimental Wallet',
+              'Unlock Wallet',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
             ),
             const SizedBox(height: 8),
             const Text(
-              'This wallet feature is experimental. Your stored seed is password-protected, enter your password to continue.',
+              'Your stored seed is password-protected, enter your password to continue. Warning: Entering a wrong password will not raise an error, technically a new wallet seed will be generated (not advised!)',
             ),
             const SizedBox(height: 16),
             TextField(
@@ -297,11 +297,7 @@ class _WalletSeedSetupOverlayState
                 child: longButton(
                   name: _isSubmitting ? 'Saving...' : 'I saved my seed phrase',
                   onPressed: () {
-                    _isSubmitting
-                        ? null
-                        : () {
-                            _confirmSeed(seedPhrase);
-                          };
+                    _isSubmitting ? null : _confirmSeed(seedPhrase);
                   },
                   inverted: true,
                 ),
