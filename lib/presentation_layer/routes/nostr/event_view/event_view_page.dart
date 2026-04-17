@@ -36,6 +36,7 @@ class EventViewPageState extends ConsumerState<EventViewPage> {
   List<FlattenedComment> _flattenedComments = [];
 
   bool _userHasScrolled = false;
+  bool _didInitialAutoScroll = false;
   double _lastScrollPosition = 0;
 
   @override
@@ -171,8 +172,9 @@ class EventViewPageState extends ConsumerState<EventViewPage> {
 
   @override
   Widget build(BuildContext context) {
-    if (!_userHasScrolled) {
-      Future.delayed(Duration(milliseconds: 200)).then((_) {
+    if (!_userHasScrolled && !_didInitialAutoScroll) {
+      _didInitialAutoScroll = true;
+      Future.delayed(Duration(milliseconds: 500)).then((_) {
         scrollToNote(widget._openNoteId);
       });
     }
@@ -206,7 +208,7 @@ class EventViewPageState extends ConsumerState<EventViewPage> {
         // ),
       ),
       body: FlutterListView(
-        key: PageStorageKey<String>('feed_events${eventFeedState.hashCode}'),
+        key: PageStorageKey<String>('feed_events_${widget._rootNoteId}'),
         controller: eventViewController,
         cacheExtent: 600,
         physics: const AlwaysScrollableScrollPhysics(
