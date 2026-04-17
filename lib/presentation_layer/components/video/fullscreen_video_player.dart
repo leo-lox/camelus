@@ -73,6 +73,11 @@ class _FullScreenVideoPlayerState extends ConsumerState<FullScreenVideoPlayer> {
             return const SizedBox.shrink();
           }
 
+          final aspectRatio = controller.value.aspectRatio;
+          final safeAspectRatio = (!aspectRatio.isFinite || aspectRatio <= 0)
+              ? 16 / 9
+              : aspectRatio;
+
           return GestureDetector(
             onTap: () {
               videoStateNoti.showControls();
@@ -81,7 +86,7 @@ class _FullScreenVideoPlayerState extends ConsumerState<FullScreenVideoPlayer> {
               children: [
                 Center(
                   child: AspectRatio(
-                    aspectRatio: controller.value.aspectRatio,
+                    aspectRatio: safeAspectRatio,
                     child: VideoPlayer(controller),
                   ),
                 ),

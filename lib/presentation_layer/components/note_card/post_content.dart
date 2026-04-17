@@ -206,6 +206,8 @@ class PostContentWidget extends ConsumerWidget {
         return InlineVideoPlayer(
           videoId: segment.metadata!,
           initVideoLink: segment.metadata!,
+          profileIdentifier: post.pubkey,
+          eventId: post.id,
           authorPubkey: post.pubkey,
         );
 

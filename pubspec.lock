@@ -1186,7 +1186,7 @@ packages:
       path: "../ndk/packages/ndk"
       relative: true
     source: path
-    version: "0.8.2-dev.2"
+    version: "0.8.2-dev.3"
   ndk_bip32_keys:
     dependency: transitive
     description:
@@ -1201,7 +1201,7 @@ packages:
       path: "../ndk/packages/ndk_flutter"
       relative: true
     source: path
-    version: "0.8.2-dev.2"
+    version: "0.8.2-dev.3"
   ndk_objectbox:
     dependency: "direct main"
     description:
@@ -1214,10 +1214,10 @@ packages:
     dependency: transitive
     description:
       name: nip07_event_signer
-      sha256: "0d1cbfaa9b5868ebd99bf38cfd40210e2ecaa20a63d1257762c2600e894500e1"
+      sha256: "13ca0290ea9b7a1e2f39d20c49a1f41b1dff097ef568f90d5985e62e483bd5b1"
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.10-dev.2"
+    version: "1.0.10-dev.4"
   nm:
     dependency: transitive
     description:
