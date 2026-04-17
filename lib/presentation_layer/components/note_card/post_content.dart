@@ -36,11 +36,15 @@ final isContentRevealedProvider =
 class PostContentWidget extends ConsumerWidget {
   final ParsedPost post;
   final double _fontSize;
+  final String? suppressedVideoId;
+  final String? suppressedVideoLink;
 
   const PostContentWidget({
     super.key,
     required this.post,
     required final double fontSize,
+    this.suppressedVideoId,
+    this.suppressedVideoLink,
   }) : _fontSize = fontSize;
 
   @override
@@ -203,15 +207,39 @@ class PostContentWidget extends ConsumerWidget {
         return const SizedBox.shrink();
 
       case ContentType.video:
+        final videoRef = segment.metadata;
+        if (_isSuppressedVideo(videoRef)) {
+          return SupressedVideoOverlay();
+        }
+
         return InlineVideoPlayer(
           videoId: segment.metadata!,
           initVideoLink: segment.metadata!,
+          profileIdentifier: post.pubkey,
+          eventId: post.id,
           authorPubkey: post.pubkey,
         );
 
       default:
         return const SizedBox.shrink();
     }
+  }
+
+  bool _isSuppressedVideo(String? videoRef) {
+    if (videoRef == null || videoRef.isEmpty) {
+      return false;
+    }
+
+    final ref = videoRef.trim();
+    final suppressedId = suppressedVideoId?.trim();
+    final suppressedLink = suppressedVideoLink?.trim();
+
+    return (suppressedId != null &&
+            suppressedId.isNotEmpty &&
+            ref == suppressedId) ||
+        (suppressedLink != null &&
+            suppressedLink.isNotEmpty &&
+            ref == suppressedLink);
   }
 
   TextSpan _buildTextSpan(
@@ -278,5 +306,38 @@ class PostContentWidget extends ConsumerWidget {
 
   void _openLink(String url) {
     launchUrlString(url, mode: LaunchMode.externalApplication);
+  }
+}
+
+class SupressedVideoOverlay extends StatelessWidget {
+  const SupressedVideoOverlay({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 220,
+      width: double.infinity,
+      margin: const EdgeInsets.only(bottom: 8),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(10),
+        color: Colors.black.withValues(alpha: 0.65),
+      ),
+      child: Center(
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(PhosphorIcons.playCircle(), color: Colors.white, size: 26),
+            const SizedBox(width: 10),
+            const Text(
+              'Currently playing in fullscreen',
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

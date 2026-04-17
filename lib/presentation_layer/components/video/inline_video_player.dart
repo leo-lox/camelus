@@ -1,16 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:video_player/video_player.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 
 import '../../providers/moderation/moderation_state_provider.dart';
-import 'fullscreen_video_player.dart';
+import '../../routes/nostr/fullscreen_video_page.dart';
 import 'video_player_state_provider.dart';
 
 class InlineVideoPlayer extends ConsumerWidget {
   final String videoId;
   final String initVideoLink;
+  final String profileIdentifier;
+  final String eventId;
   final String? authorPubkey;
   final double maxHeight;
 
@@ -18,6 +21,8 @@ class InlineVideoPlayer extends ConsumerWidget {
     super.key,
     required this.videoId,
     required this.initVideoLink,
+    required this.profileIdentifier,
+    required this.eventId,
     required this.authorPubkey,
     this.maxHeight = 300,
   });
@@ -37,14 +42,27 @@ class InlineVideoPlayer extends ConsumerWidget {
           borderRadius: BorderRadius.circular(10),
           child: videoStateAsync.when(
             loading: () => _buildLoading(context, constraints.maxWidth),
-            error: (_, __) => _buildRetry(context, ref, constraints.maxWidth),
+            error: (_, _) => _buildRetry(context, ref, constraints.maxWidth),
             data: (videoState) {
               final controller = videoState.controller;
               if (controller == null) {
                 return _buildLoading(context, constraints.maxWidth);
               }
 
+              final size = controller.value.size;
               final aspectRatio = controller.value.aspectRatio;
+              final hasInvalidVideoMetrics =
+                  !aspectRatio.isFinite ||
+                  aspectRatio <= 0 ||
+                  !size.width.isFinite ||
+                  !size.height.isFinite ||
+                  size.width <= 0 ||
+                  size.height <= 0;
+
+              if (hasInvalidVideoMetrics) {
+                return _buildLoading(context, constraints.maxWidth);
+              }
+
               final naturalHeight = constraints.maxWidth / aspectRatio;
               final clampedHeight = naturalHeight.clamp(0.0, maxHeight);
 
@@ -63,8 +81,8 @@ class InlineVideoPlayer extends ConsumerWidget {
                         fit: BoxFit.cover,
                         clipBehavior: Clip.hardEdge,
                         child: SizedBox(
-                          width: controller.value.size.width,
-                          height: controller.value.size.height,
+                          width: size.width,
+                          height: size.height,
                           child: VideoPlayer(controller),
                         ),
                       ),
@@ -169,9 +187,12 @@ class InlineVideoPlayer extends ConsumerWidget {
   }
 
   void _enterFullScreen(BuildContext context) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (_) => FullScreenVideoPlayer(videoKey: _videoKey),
+    context.push(
+      FullScreenVideoPage.location(
+        profileIdentifier: profileIdentifier,
+        eventId: eventId,
+        videoId: _videoKey.videoId,
+        videoLink: _videoKey.initialLink,
       ),
     );
   }

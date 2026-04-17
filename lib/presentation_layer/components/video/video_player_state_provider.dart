@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:collection';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ndk/ndk.dart';
@@ -41,13 +42,14 @@ class VideoState {
 
   VideoState copyWith({
     VideoPlayerController? controller,
+    bool clearController = false,
     String? videoLink,
     bool? showControls,
     bool? isPlaying,
     double? volume,
   }) {
     return VideoState(
-      controller: controller ?? this.controller,
+      controller: clearController ? null : controller ?? this.controller,
       videoLink: videoLink ?? this.videoLink,
       showControls: showControls ?? this.showControls,
       isPlaying: isPlaying ?? this.isPlaying,
@@ -62,6 +64,10 @@ final videoPlayerProvider = AsyncNotifierProvider.autoDispose
     );
 
 class VideoPlayerNotifier extends AsyncNotifier<VideoState> {
+  static const int _maxActiveControllers = 4;
+  static final Queue<VideoPlayerNotifier> _activeNotifiers =
+      Queue<VideoPlayerNotifier>();
+
   final VideoPlayerKey key;
   late final Ndk ndk;
   VideoPlayerController? _controller;
@@ -76,7 +82,7 @@ class VideoPlayerNotifier extends AsyncNotifier<VideoState> {
 
     ref.onDispose(() {
       _hideControlsTimer?.cancel();
-      _controller?.dispose();
+      unawaited(_releaseControllerInternal(shouldUpdateState: false));
     });
 
     return _initializeVideo();
@@ -89,16 +95,23 @@ class VideoPlayerNotifier extends AsyncNotifier<VideoState> {
       throw Exception('Unable to resolve video url');
     }
 
-    await _controller?.dispose();
+    await _releaseControllerInternal(shouldUpdateState: false);
 
     final myController = VideoPlayerController.networkUrl(
       Uri.parse(processedLink),
     );
-    await myController.setLooping(true);
-    await myController.setVolume(0);
-    await myController.initialize();
+
+    try {
+      await myController.setLooping(true);
+      await myController.setVolume(0);
+      await myController.initialize();
+    } catch (_) {
+      await myController.dispose();
+      rethrow;
+    }
 
     _controller = myController;
+    _registerActiveNotifier();
 
     return VideoState(controller: myController, videoLink: processedLink);
   }
@@ -126,7 +139,12 @@ class VideoPlayerNotifier extends AsyncNotifier<VideoState> {
   void play({bool userInteraction = false}) {
     final current = _value;
     final controller = current?.controller;
-    if (current == null || controller == null) return;
+    if (current == null) return;
+
+    if (controller == null) {
+      retry();
+      return;
+    }
 
     controller.play();
     _setValue(current.copyWith(isPlaying: true));
@@ -189,5 +207,48 @@ class VideoPlayerNotifier extends AsyncNotifier<VideoState> {
     } catch (_) {
       return null;
     }
+  }
+
+  void _registerActiveNotifier() {
+    _activeNotifiers.remove(this);
+    _activeNotifiers.addLast(this);
+
+    while (_activeNotifiers.length > _maxActiveControllers) {
+      final oldest = _activeNotifiers.removeFirst();
+      if (identical(oldest, this)) {
+        continue;
+      }
+      unawaited(oldest._releaseControllerInternal());
+    }
+  }
+
+  Future<void> _releaseControllerInternal({
+    bool shouldUpdateState = true,
+  }) async {
+    final controller = _controller;
+    _controller = null;
+
+    if (controller != null) {
+      await controller.dispose();
+    }
+
+    _activeNotifiers.remove(this);
+
+    if (!shouldUpdateState) {
+      return;
+    }
+
+    final current = _value;
+    if (current == null) {
+      return;
+    }
+
+    _setValue(
+      current.copyWith(
+        clearController: true,
+        isPlaying: false,
+        showControls: false,
+      ),
+    );
   }
 }

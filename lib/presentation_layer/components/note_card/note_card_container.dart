@@ -12,8 +12,16 @@ import 'note_card.dart';
 class NoteCardContainer extends ConsumerWidget {
   final ParsedPost note;
   final double? fontSize;
+  final String? suppressedVideoId;
+  final String? suppressedVideoLink;
 
-  const NoteCardContainer({super.key, required this.note, this.fontSize});
+  const NoteCardContainer({
+    super.key,
+    required this.note,
+    this.fontSize,
+    this.suppressedVideoId,
+    this.suppressedVideoLink,
+  });
 
   static void _onNoteTab(BuildContext context, ParsedPost myNote) {
     var refEvents = myNote.nostrNote.getTagEvents;
@@ -71,6 +79,8 @@ class NoteCardContainer extends ConsumerWidget {
               myMetadata: myMetadata,
               key: ValueKey('note-${note.id}'),
               fontSize: fontSize ?? 17,
+              suppressedVideoId: suppressedVideoId,
+              suppressedVideoLink: suppressedVideoLink,
             ),
           ],
         ),

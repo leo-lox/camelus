@@ -23,11 +23,15 @@ class FlattenedComment {
 class FlatCommentWidget extends ConsumerWidget {
   final FlattenedComment comment;
   final bool isHighlighted;
+  final String? suppressedVideoId;
+  final String? suppressedVideoLink;
 
   const FlatCommentWidget({
     super.key,
     required this.comment,
     this.isHighlighted = false,
+    this.suppressedVideoId,
+    this.suppressedVideoLink,
   });
 
   @override
@@ -79,6 +83,8 @@ class FlatCommentWidget extends ConsumerWidget {
                     key: ValueKey(comment.note.id),
                     note: parsedNote,
                     fontSize: isHighlighted ? 17.5 : 16,
+                    suppressedVideoId: suppressedVideoId,
+                    suppressedVideoLink: suppressedVideoLink,
                   ),
                 ],
               ),

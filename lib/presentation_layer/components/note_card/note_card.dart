@@ -28,6 +28,8 @@ class NoteCard extends ConsumerWidget {
   final ParsedPost note;
   final UserMetadata? myMetadata;
   final bool hideBottomBar;
+  final String? suppressedVideoId;
+  final String? suppressedVideoLink;
 
   final double fontSize;
 
@@ -37,6 +39,8 @@ class NoteCard extends ConsumerWidget {
     required this.myMetadata,
     this.hideBottomBar = false,
     this.fontSize = 17,
+    this.suppressedVideoId,
+    this.suppressedVideoLink,
   });
 
   @override
@@ -98,6 +102,8 @@ class NoteCard extends ConsumerWidget {
                 key: ValueKey("${note.id}split_content"),
                 post: note,
                 fontSize: fontSize,
+                suppressedVideoId: suppressedVideoId,
+                suppressedVideoLink: suppressedVideoLink,
               ),
             ],
           ),
