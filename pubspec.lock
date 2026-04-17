@@ -1225,7 +1225,7 @@ packages:
       path: "../ndk/packages/ndk"
       relative: true
     source: path
-    version: "0.8.2-dev.2"
+    version: "0.8.2-dev.3"
   ndk_bip32_keys:
     dependency: transitive
     description:
@@ -1240,7 +1240,7 @@ packages:
       path: "../ndk/packages/ndk_flutter"
       relative: true
     source: path
-    version: "0.8.2-dev.2"
+    version: "0.8.2-dev.3"
   ndk_objectbox:
     dependency: "direct main"
     description:

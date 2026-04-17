@@ -1,4 +1,4 @@
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ndk/shared/nips/nip19/nip19.dart';
 import 'package:ndk/entities.dart' as ndk_entities;
@@ -21,6 +21,7 @@ import '../routes/home_page_desktop.dart';
 import '../routes/home_page_mobile.dart';
 import '../routes/nostr/blockedUsers/blocklist_page.dart';
 import '../routes/nostr/event_gallery_page.dart';
+import '../routes/nostr/fullscreen_video_page.dart';
 import '../routes/nostr/bookmarks/bookmarks_page.dart';
 import '../routes/nostr/event_view/event_view_page.dart';
 import '../routes/nostr/onboarding/onboarding.dart';
@@ -339,6 +340,20 @@ final routes = [
           final start =
               int.tryParse(state.uri.queryParameters['start'] ?? '0') ?? 0;
           return EventGalleryPage(eventId: eventId, startIndex: start);
+        },
+      ),
+      GoRoute(
+        path: '/profile/:profileIdentifier/status/:eventId/video',
+        builder: (context, state) {
+          final eventId = state.pathParameters['eventId']!;
+          final selectedVideoId = state.uri.queryParameters['video'];
+          final videoLink = state.uri.queryParameters['src'];
+
+          return FullScreenVideoPage(
+            eventId: eventId,
+            videoId: selectedVideoId,
+            videoLink: videoLink,
+          );
         },
       ),
     ],

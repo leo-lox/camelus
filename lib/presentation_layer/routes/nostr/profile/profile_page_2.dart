@@ -335,7 +335,7 @@ class _BuildProfileHeader extends ConsumerWidget {
                       ),
                     ),
                     const SizedBox(width: 8),
-                    TrustRankAtom(trustRank: metrics?.rank ?? 0),
+                    TrustRankAtom(trustRank: metrics?.rank),
                   ],
                 ),
 
