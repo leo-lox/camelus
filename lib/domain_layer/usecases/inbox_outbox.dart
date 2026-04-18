@@ -1,3 +1,4 @@
+import '../entities/dm_relays.dart';
 import '../entities/nip_65.dart';
 import '../repositories/inbox_outbox_repository.dart';
 
@@ -20,11 +21,11 @@ class InboxOutbox {
     );
   }
 
-  Future<List<String>> getDmRelaysSelf({bool forceRefresh = false}) {
+  Future<DmRelays> getDmRelaysSelf({bool forceRefresh = false}) {
     return _inboxOutboxRepository.getDmRelaysSelf(forceRefresh: forceRefresh);
   }
 
-  Future<List<String>> getDmRelays({
+  Future<DmRelays> getDmRelays({
     required String pubkey,
     bool forceRefresh = false,
   }) {
@@ -34,7 +35,7 @@ class InboxOutbox {
     );
   }
 
-  Future<List<String>> setDmRelays(List<String> relays) {
+  Future<DmRelays> setDmRelays(List<String> relays) {
     return _inboxOutboxRepository.setDmRelays(relays);
   }
 

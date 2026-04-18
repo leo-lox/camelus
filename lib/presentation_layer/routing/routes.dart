@@ -29,6 +29,7 @@ import '../routes/nostr/profile/profile_resolver_page.dart';
 import '../routes/nostr/relays_page.dart';
 import '../routes/nostr/search_feed_page/search_feed_page.dart';
 import '../routes/nostr/settings/developer/developer_settings.dart';
+import '../routes/nostr/settings/relays/relays_settings.dart';
 import '../routes/nostr/settings/notifications/notifications_settings.dart';
 import '../routes/nostr/settings/theme/theme_settings.dart';
 import '../routes/notification_page.dart';
@@ -38,7 +39,6 @@ import '../routes/nostr/settings/inital_route/inital_route_settings.dart';
 import '../routes/nostr/settings/locale/locale_settings.dart';
 import '../routes/nostr/settings/moderation/moderation_settings.dart';
 import '../routes/nostr/settings/settings_page.dart';
-import '../routes/nostr/settings/dm_relays/dm_relays_settings.dart';
 import '../routes/messages/dm_list_page.dart';
 import '../routes/messages/dm_thread_page.dart';
 import '../routes/messages/new_dm_page.dart';
@@ -165,9 +165,10 @@ final routes = [
                 path: 'theme',
                 builder: (context, state) => const ThemeSettingsPage(),
               ),
+
               GoRoute(
-                path: 'dm-relays',
-                builder: (context, state) => const DmRelaysSettings(),
+                path: 'relays',
+                builder: (context, state) => const Nip65RelaysSettings(),
               ),
               GoRoute(
                 path: 'notifications',

@@ -62,6 +62,12 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
               context.push('/settings/notifications');
             },
           ),
+          ListTile(
+            title: Text(AppLocalizations.of(context)!.relays),
+            onTap: () {
+              context.push('/settings/relays');
+            },
+          ),
 
           ListTile(
             title: Text(AppLocalizations.of(context)!.initialRoute),
@@ -81,12 +87,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
               _navigateToFileServers();
             },
           ),
-          ListTile(
-            title: Text(AppLocalizations.of(context)!.dmRelays),
-            onTap: () {
-              context.push('/settings/dm-relays');
-            },
-          ),
+
           ListTile(
             title: const Text('Developer settings'),
             onTap: () {
