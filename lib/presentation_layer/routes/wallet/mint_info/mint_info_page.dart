@@ -23,9 +23,17 @@ class MintInfoPage extends ConsumerWidget {
         backgroundColor: Theme.of(context).colorScheme.surface,
         appBar: AppBar(
           backgroundColor: Theme.of(context).colorScheme.surface,
-          title: Text('Mint Info'),
+          title: Text(
+            'Mint Info',
+            style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+          ),
         ),
-        body: Center(child: Text('Mint not found')),
+        body: Center(
+          child: Text(
+            'Mint not found',
+            style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+          ),
+        ),
       );
     }
 
@@ -35,7 +43,10 @@ class MintInfoPage extends ConsumerWidget {
       backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.surface,
-        title: Text('Mint Info'),
+        title: Text(
+          'Mint Info',
+          style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+        ),
       ),
       body: SingleChildScrollView(
         child: Padding(

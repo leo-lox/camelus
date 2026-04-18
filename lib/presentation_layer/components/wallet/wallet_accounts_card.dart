@@ -43,10 +43,7 @@ class WalletAccountsCard extends ConsumerWidget {
                 //     Color.fromARGB(255, 7, 238, 176),
                 //     Color.fromARGB(255, 11, 189, 243),
                 //   ],
-                //   stops: [
-                //     0,
-                //     1,
-                //   ],
+                //   stops: [0, 1],
                 //   focal: Alignment.center,
                 //   radius: 2,
                 // ),

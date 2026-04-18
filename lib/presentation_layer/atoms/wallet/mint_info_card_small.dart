@@ -15,7 +15,10 @@ class MintInfoCardSmall extends StatelessWidget {
       color: Theme.of(context).colorScheme.surface,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
-        side: BorderSide(color: Colors.white.withValues(alpha: 0.5), width: 1),
+        side: BorderSide(
+          color: Theme.of(context).colorScheme.onSurface.withAlpha(128),
+          width: 1,
+        ),
       ),
       child: Container(
         decoration: BoxDecoration(borderRadius: BorderRadius.circular(16)),
@@ -50,7 +53,7 @@ class MintInfoCardSmall extends StatelessWidget {
                         Text(
                           mintInfo.name ?? 'Unknown Mint',
                           style: TextStyle(
-                            color: Colors.white,
+                            color: Theme.of(context).colorScheme.onSurface,
                             fontSize: 22,
                             fontWeight: FontWeight.bold,
                           ),
@@ -118,7 +121,10 @@ class MintInfoCardSmall extends StatelessWidget {
                       Expanded(
                         child: Text(
                           mintInfo.motd!,
-                          style: TextStyle(color: Colors.white, fontSize: 16),
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.onSurface,
+                            fontSize: 16,
+                          ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),

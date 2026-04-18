@@ -152,7 +152,7 @@ class _QrScan extends ConsumerState<WalletQrScan> {
               height: 120,
               width: double.infinity,
               decoration: BoxDecoration(
-                color: Colors.black.withValues(alpha: 0.8),
+                color: Theme.of(context).colorScheme.surface.withAlpha(200),
                 borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(20),
                   topRight: Radius.circular(20),
@@ -181,7 +181,9 @@ class _QrScan extends ConsumerState<WalletQrScan> {
                             backgroundColor: Theme.of(
                               context,
                             ).colorScheme.primary,
-                            foregroundColor: Colors.white,
+                            foregroundColor: Theme.of(
+                              context,
+                            ).colorScheme.onPrimary,
                           ),
                         ),
                       ],
@@ -201,7 +203,7 @@ class _QrScan extends ConsumerState<WalletQrScan> {
                 backgroundColor: Theme.of(
                   context,
                 ).colorScheme.primary.withValues(alpha: 0.5),
-                color: Colors.white,
+                color: Theme.of(context).colorScheme.onPrimary,
               ),
             ),
 
