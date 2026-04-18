@@ -114,7 +114,7 @@ class ErrorStep extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: Colors.red.shade50,
+            color: Theme.of(context).colorScheme.errorContainer,
             borderRadius: BorderRadius.circular(8),
             border: Border.all(color: Colors.red.shade200),
           ),
@@ -159,7 +159,7 @@ class SuccessStep extends StatelessWidget {
               style: TextStyle(
                 fontSize: 48,
                 fontWeight: FontWeight.bold,
-                color: Colors.white,
+                color: Theme.of(context).colorScheme.onSurface,
               ),
             ),
             const SizedBox(width: 16),
@@ -168,7 +168,7 @@ class SuccessStep extends StatelessWidget {
               style: TextStyle(
                 fontSize: 48,
                 fontWeight: FontWeight.bold,
-                color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                color: Theme.of(context).colorScheme.onSurface,
               ),
             ),
           ],
@@ -182,7 +182,7 @@ class SuccessStep extends StatelessWidget {
           width: 240,
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: Theme.of(context).colorScheme.surfaceContainerHighest,
             borderRadius: BorderRadius.circular(8),
           ),
           child: AnimatedQr(qrCodeData: outputToken!.toV4TokenString()),
@@ -197,6 +197,7 @@ class SuccessStep extends StatelessWidget {
           child: CopyClipboardButton(
             value: outputToken!.toV4TokenString(),
             copyText: "Copy Token",
+            backgroundColor: Theme.of(context).colorScheme.onSurfaceVariant,
           ),
         ),
       ],
@@ -233,12 +234,12 @@ class TransactionState extends ConsumerWidget {
 
     if (myTransaction.state == ndk_entities.WalletTransactionState.pending) {
       icon = PhosphorIcons.hourglass();
-      color = Theme.of(context).colorScheme.surface;
+      color = Theme.of(context).colorScheme.onSurfaceVariant;
       title = 'pending ecash';
     } else if (myTransaction.state ==
         ndk_entities.WalletTransactionState.failed) {
       icon = PhosphorIcons.warningCircle();
-      color = Theme.of(context).colorScheme.surface;
+      color = Theme.of(context).colorScheme.error;
       title = 'failed';
     } else {
       icon = PhosphorIcons.checkCircle();

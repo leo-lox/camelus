@@ -11,15 +11,19 @@ class WalletFriendsStrip extends StatelessWidget {
       width: MediaQuery.of(context).size.width,
       height: 130,
       decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.1),
-          borderRadius: const BorderRadius.all(Radius.circular(10))),
+        color: Theme.of(context).colorScheme.surfaceContainer,
+        borderRadius: const BorderRadius.all(Radius.circular(10)),
+      ),
       child: Column(
         children: [
-          const Padding(
-            padding: EdgeInsets.fromLTRB(15, 4, 15, 0),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(15, 4, 15, 0),
             child: Text(
               "friends",
-              style: TextStyle(color: Colors.white, fontSize: 24),
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onSurface,
+                fontSize: 24,
+              ),
             ),
           ),
           Container(
@@ -34,13 +38,11 @@ class WalletFriendsStrip extends StatelessWidget {
                     children: const [
                       CircleAvatar(
                         backgroundImage: NetworkImage(
-                            "https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg"),
+                          "https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg",
+                        ),
                         radius: 30,
                       ),
-                      Text(
-                        "user1",
-                        style: TextStyle(fontSize: 15),
-                      ),
+                      Text("user1", style: TextStyle(fontSize: 15)),
                     ],
                   ),
                 ),
@@ -52,13 +54,11 @@ class WalletFriendsStrip extends StatelessWidget {
                     children: const [
                       CircleAvatar(
                         backgroundImage: NetworkImage(
-                            "https://www.venmond.com/demo/vendroid/img/avatar/big.jpg"),
+                          "https://www.venmond.com/demo/vendroid/img/avatar/big.jpg",
+                        ),
                         radius: 30,
                       ),
-                      Text(
-                        "user2",
-                        style: TextStyle(fontSize: 15),
-                      ),
+                      Text("user2", style: TextStyle(fontSize: 15)),
                     ],
                   ),
                 ),
@@ -66,15 +66,17 @@ class WalletFriendsStrip extends StatelessWidget {
                 InkWell(
                   borderRadius: const BorderRadius.all(Radius.circular(50)),
                   onTap: () => {log("todo")},
-                  child: const CircleAvatar(
-                    backgroundColor: Colors.white60,
+                  child: CircleAvatar(
+                    backgroundColor: Theme.of(
+                      context,
+                    ).colorScheme.surfaceContainerHighest,
                     radius: 30,
                     child: Icon(Icons.add),
                   ),
                 ),
               ],
             ),
-          )
+          ),
         ],
       ),
     );

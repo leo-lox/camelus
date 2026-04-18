@@ -30,18 +30,17 @@ class _CopyClipboardButtonState extends State<CopyClipboardButton> {
       width: double.infinity,
       child: ElevatedButton.icon(
         onPressed: _copied ? null : _copyToClipboard,
-        icon:
-            Icon(_copied ? PhosphorIcons.check() : PhosphorIcons.copySimple()),
+        icon: Icon(
+          _copied ? PhosphorIcons.check() : PhosphorIcons.copySimple(),
+        ),
         label: Text(_copied ? widget.copyDoneText : widget.copyText),
         style: ElevatedButton.styleFrom(
           backgroundColor: _copied
               ? widget.backgroundColor
-              : Theme.of(context).colorScheme.primary,
+              : Theme.of(context).colorScheme.secondaryContainer,
           foregroundColor: widget.backgroundColor,
           padding: const EdgeInsets.symmetric(vertical: 16),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         ),
       ),
     );

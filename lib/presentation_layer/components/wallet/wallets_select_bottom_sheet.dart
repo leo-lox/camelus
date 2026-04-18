@@ -13,7 +13,7 @@ Future<String?> showWalletsSelectBottomSheet({
   return showModalBottomSheet<String>(
     context: context,
     isScrollControlled: true,
-    backgroundColor: Theme.of(context).colorScheme.surface,
+    backgroundColor: Theme.of(context).colorScheme.primary,
     builder: (ctx) {
       final size = MediaQuery.of(ctx).size;
 
@@ -27,12 +27,12 @@ Future<String?> showWalletsSelectBottomSheet({
           // upper bound
           constraints: BoxConstraints(maxHeight: size.height * maxHeightFactor),
           decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surface,
+            color: Theme.of(context).colorScheme.surfaceDim,
             borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
             boxShadow: [
               BoxShadow(
                 blurRadius: 16,
-                color: Theme.of(context).colorScheme.surface,
+                color: Theme.of(context).colorScheme.surfaceDim,
               ),
             ],
           ),
@@ -46,7 +46,7 @@ Future<String?> showWalletsSelectBottomSheet({
                   width: 40,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: Theme.of(context).colorScheme.onSurface,
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -57,7 +57,7 @@ Future<String?> showWalletsSelectBottomSheet({
                     child: Text(
                       title,
                       style: TextStyle(
-                        color: Colors.white,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
                         fontSize: 20,
                         fontWeight: FontWeight.w600,
                       ),
@@ -73,7 +73,7 @@ Future<String?> showWalletsSelectBottomSheet({
                       ),
                     ),
                     child: SingleChildScrollView(
-                      padding: const EdgeInsets.fromLTRB(12, 8, 12, 16),
+                      padding: const EdgeInsets.fromLTRB(10, 8, 10, 16),
                       child: Wrap(
                         spacing: 12,
                         runSpacing: 12,

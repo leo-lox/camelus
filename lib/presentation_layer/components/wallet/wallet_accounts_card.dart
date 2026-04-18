@@ -28,6 +28,8 @@ class WalletAccountsCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Column(
       children: [
         Column(
@@ -48,10 +50,8 @@ class WalletAccountsCard extends ConsumerWidget {
                 //   focal: Alignment.center,
                 //   radius: 2,
                 // ),
-                border: Border.all(
-                  width: 1,
-                  color: Colors.white,
-                ),
+                color: colorScheme.surface,
+                border: Border.all(width: 1, color: colorScheme.outline),
                 // Make rounded corners
                 borderRadius: BorderRadius.circular(18.0),
               ),
@@ -64,16 +64,20 @@ class WalletAccountsCard extends ConsumerWidget {
                       children: [
                         Text(
                           alias,
-                          style: TextStyle(fontSize: 18),
+                          style: TextStyle(
+                            fontSize: 18,
+                            color: colorScheme.onSurfaceVariant,
+                          ),
                         ),
                         Container(
                           margin: const EdgeInsets.fromLTRB(10.0, 10, 0, 0),
                           child: Text(
                             title,
                             style: TextStyle(
-                                fontSize: 35,
-                                color: Colors.white,
-                                fontWeight: FontWeight.normal),
+                              fontSize: 35,
+                              color: colorScheme.onSurface,
+                              fontWeight: FontWeight.normal,
+                            ),
                           ),
                         ),
                         // const SizedBox(height: 5),
@@ -85,10 +89,10 @@ class WalletAccountsCard extends ConsumerWidget {
                               for (final balance in balances)
                                 Text(
                                   "${WalletNumberFormatting.formatAmount(amount: balance.amount, unit: balance.unit)} ${balance.unit}",
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontSize: 20,
                                     fontWeight: FontWeight.normal,
-                                    color: Colors.white60,
+                                    color: colorScheme.onSurfaceVariant,
                                   ),
                                 ),
                             ],
@@ -101,9 +105,10 @@ class WalletAccountsCard extends ConsumerWidget {
                       right: -50,
                       child: Transform(
                         transform: Matrix4.translationValues(
-                            MediaQuery.of(context).size.width * 0,
-                            -20.0,
-                            -20.0),
+                          MediaQuery.of(context).size.width * 0,
+                          -20.0,
+                          -20.0,
+                        ),
                         child: Lottie.asset(
                           'assets/animations/nfc-mood.json',
                           width: 150,

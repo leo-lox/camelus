@@ -63,7 +63,10 @@ class WalletTransactionCard extends StatelessWidget {
           transactionStatus.label,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.onSurface,
+            fontWeight: FontWeight.w600,
+          ),
         ),
         subtitle: Text(
           "${cashuTx != null ? _removeHttpPrefix(cashuTx.mintUrl) : ""}  • ${cashuTx != null ? _txType(cashuTx) : ''}",

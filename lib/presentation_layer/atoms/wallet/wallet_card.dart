@@ -30,13 +30,12 @@ class WalletCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return GestureDetector(
       onTap: isDisabled ? null : () => onTap(wallet.id),
       child: Container(
         decoration: BoxDecoration(
-          color:
-              backgroundColor ??
-              Theme.of(context).colorScheme.surfaceContainerHighest,
+          color: backgroundColor ?? colorScheme.surfaceContainerHighest,
           borderRadius: BorderRadius.circular(12),
         ),
         child: Padding(
@@ -45,12 +44,10 @@ class WalletCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               CircleAvatar(
-                backgroundColor: Theme.of(
-                  context,
-                ).colorScheme.primary.withValues(alpha: 0.8),
+                backgroundColor: colorScheme.primary.withValues(alpha: 0.8),
                 child: Text(
                   wallet.name.substring(0, 2).toUpperCase(),
-                  style: TextStyle(color: Colors.white, fontSize: 12),
+                  style: TextStyle(color: colorScheme.onPrimary, fontSize: 12),
                 ),
               ),
               const SizedBox(width: 12),
@@ -66,8 +63,8 @@ class WalletCard extends StatelessWidget {
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                           color: isDisabled
-                              ? Theme.of(context).colorScheme.onSurfaceVariant
-                              : Colors.white,
+                              ? colorScheme.onSurfaceVariant
+                              : colorScheme.onSurface,
                         ),
                       ),
                       Text(
@@ -75,8 +72,8 @@ class WalletCard extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 14,
                           color: isDisabled
-                              ? Theme.of(context).colorScheme.onSurfaceVariant
-                              : Theme.of(context).colorScheme.outline,
+                              ? colorScheme.onSurfaceVariant
+                              : colorScheme.outline,
                         ),
                       ),
                     ],
@@ -87,11 +84,12 @@ class WalletCard extends StatelessWidget {
               Spacer(flex: 1),
               if (showBalances)
                 Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     for (final b in balances)
                       Text(
                         "${WalletNumberFormatting.formatAmount(amount: b.amount, unit: b.unit)} ${b.unit}",
-                        style: TextStyle(color: Colors.white),
+                        style: TextStyle(color: colorScheme.onSurface),
                       ),
                   ],
                 ),

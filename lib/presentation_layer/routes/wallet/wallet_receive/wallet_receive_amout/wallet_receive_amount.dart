@@ -149,7 +149,7 @@ class _WalletPaySelectAmountState extends ConsumerState<WalletReceiveAmount> {
       backgroundColor: Theme.of(context).colorScheme.surface,
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(16, 24, 16, 16),
+          padding: const EdgeInsets.fromLTRB(10, 24, 10, 16),
           child: Column(
             children: [
               Container(

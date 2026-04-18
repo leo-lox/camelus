@@ -81,18 +81,20 @@ class WalletSelectReciever extends ConsumerWidget {
               decoration: InputDecoration(
                 isDense: true,
                 hintText: ' Search by name',
-                hintStyle: const TextStyle(
-                  color: Colors.white,
+                hintStyle: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
                   letterSpacing: 1.1,
                 ),
                 filled: true,
                 fillColor: Theme.of(context).colorScheme.surface,
-                enabledBorder: const OutlineInputBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(50.0)),
-                  borderSide: BorderSide(color: Colors.grey),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: const BorderRadius.all(Radius.circular(50.0)),
+                  borderSide: BorderSide(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
                 ),
                 focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(25.0)),
+                  borderRadius: const BorderRadius.all(Radius.circular(25.0)),
                   borderSide: BorderSide(
                     color: Theme.of(context).colorScheme.surface,
                   ),

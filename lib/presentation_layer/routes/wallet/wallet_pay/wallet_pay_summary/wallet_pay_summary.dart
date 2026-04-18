@@ -20,7 +20,10 @@ class WalletPaySummary extends ConsumerWidget {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         backgroundColor: Theme.of(context).colorScheme.error,
-        content: Text(message, style: TextStyle(color: Colors.white)),
+        content: Text(
+          message,
+          style: TextStyle(color: Theme.of(context).colorScheme.onError),
+        ),
       ),
     );
   }
@@ -78,7 +81,7 @@ class WalletPaySummary extends ConsumerWidget {
     }
 
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       body: Column(
         children: [
           Container(
@@ -104,7 +107,9 @@ class WalletPaySummary extends ConsumerWidget {
                         IconButton(
                           icon: Icon(
                             Icons.arrow_back,
-                            color: Colors.white,
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onInverseSurface,
                             size: 24,
                           ),
                           onPressed: () => backCallback(),
@@ -112,7 +117,9 @@ class WalletPaySummary extends ConsumerWidget {
                         Text(
                           'summary',
                           style: TextStyle(
-                            color: Colors.white,
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onInverseSurface,
                             fontSize: 20,
                             fontWeight: FontWeight.w500,
                           ),
@@ -120,7 +127,9 @@ class WalletPaySummary extends ConsumerWidget {
                         IconButton(
                           icon: Icon(
                             Icons.close,
-                            color: Theme.of(context).colorScheme.onSurface,
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onInverseSurface,
                             size: 24,
                           ),
                           onPressed: () {
@@ -145,7 +154,9 @@ class WalletPaySummary extends ConsumerWidget {
                                 )
                               : '0',
                           style: TextStyle(
-                            color: Colors.white,
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onInverseSurface,
                             fontSize: 48,
                             fontWeight: FontWeight.bold,
                           ),
@@ -155,7 +166,9 @@ class WalletPaySummary extends ConsumerWidget {
                           icon: Icon(
                             PhosphorIcons.notePencil(),
                             size: 24,
-                            color: Theme.of(context).colorScheme.primary,
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.primaryContainer,
                           ),
                           onPressed: () => backCallback(),
                         ),
@@ -164,7 +177,7 @@ class WalletPaySummary extends ConsumerWidget {
                     Text(
                       state.unit ?? '',
                       style: TextStyle(
-                        color: Colors.white,
+                        color: Theme.of(context).colorScheme.onInverseSurface,
                         fontSize: 18,
                         fontWeight: FontWeight.w400,
                       ),
@@ -184,7 +197,9 @@ class WalletPaySummary extends ConsumerWidget {
                 children: [
                   Container(
                     decoration: BoxDecoration(
-                      color: Color(0xFF2A2A2A),
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.surfaceContainerHighest,
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Column(
@@ -302,8 +317,20 @@ class WalletPaySummary extends ConsumerWidget {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(label, style: TextStyle(color: Colors.grey, fontSize: 12)),
-              Text(value, style: TextStyle(color: Colors.white, fontSize: 16)),
+              Text(
+                label,
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface,
+                  fontSize: 12,
+                ),
+              ),
+              Text(
+                value,
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface,
+                  fontSize: 16,
+                ),
+              ),
             ],
           ),
           if (isEditable && onEdit != null)
@@ -333,7 +360,10 @@ class ContactReciever extends StatelessWidget {
             ).colorScheme.primary.withValues(alpha: 0.8),
             child: Text(
               'NA',
-              style: TextStyle(color: Colors.white, fontSize: 12),
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onPrimary,
+                fontSize: 12,
+              ),
             ),
           ),
           SizedBox(width: 12),
@@ -343,15 +373,24 @@ class ContactReciever extends StatelessWidget {
               children: [
                 Text(
                   'receiver',
-                  style: TextStyle(color: Colors.grey, fontSize: 12),
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface,
+                    fontSize: 12,
+                  ),
                 ),
                 Text(
                   'NOT IMPLEMENTED',
-                  style: TextStyle(color: Colors.white, fontSize: 16),
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface,
+                    fontSize: 16,
+                  ),
                 ),
                 Text(
                   'send to pubkey not implemented',
-                  style: TextStyle(color: Colors.grey, fontSize: 14),
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    fontSize: 14,
+                  ),
                 ),
               ],
             ),
@@ -377,7 +416,10 @@ class TokenReciever extends StatelessWidget {
             ).colorScheme.primary.withValues(alpha: 0.8),
             child: Text(
               'TK',
-              style: TextStyle(color: Colors.white, fontSize: 12),
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onPrimary,
+                fontSize: 12,
+              ),
             ),
           ),
           SizedBox(width: 12),
@@ -395,7 +437,7 @@ class TokenReciever extends StatelessWidget {
                 Text(
                   'Token',
                   style: TextStyle(
-                    color: Colors.white,
+                    color: Theme.of(context).colorScheme.onSurface,
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                   ),
@@ -431,7 +473,10 @@ class WalletReciever extends StatelessWidget {
             ).colorScheme.primary.withValues(alpha: 0.8),
             child: Text(
               'NA',
-              style: TextStyle(color: Colors.white, fontSize: 12),
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onPrimary,
+                fontSize: 12,
+              ),
             ),
           ),
           SizedBox(width: 12),
@@ -441,15 +486,24 @@ class WalletReciever extends StatelessWidget {
               children: [
                 Text(
                   'receiver',
-                  style: TextStyle(color: Colors.grey, fontSize: 12),
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    fontSize: 12,
+                  ),
                 ),
                 Text(
                   'NOT IMPLEMENTED',
-                  style: TextStyle(color: Colors.white, fontSize: 16),
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    fontSize: 16,
+                  ),
                 ),
                 Text(
                   'send to wallet not implemented',
-                  style: TextStyle(color: Colors.grey, fontSize: 14),
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    fontSize: 14,
+                  ),
                 ),
               ],
             ),

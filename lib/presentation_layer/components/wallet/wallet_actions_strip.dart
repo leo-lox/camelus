@@ -15,9 +15,6 @@ class WalletActionsStrip extends StatelessWidget {
     required this.onHistory,
   });
 
-  final myIconColor = Colors.white70;
-  final myTextColor = Colors.white60;
-
   @override
   Widget build(BuildContext context) {
     return Padding(

@@ -23,7 +23,7 @@ class WalletTransactionListPage extends ConsumerWidget {
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Theme.of(context).colorScheme.surface,
-        foregroundColor: Colors.white,
+        foregroundColor: Theme.of(context).colorScheme.onSurface,
         title: const Text('Transactions'),
         leading: IconButton(
           icon: Icon(PhosphorIcons.caretLeft(), size: 24),
@@ -134,7 +134,7 @@ class _DateHeader extends StatelessWidget {
           child: Text(
             label,
             style: TextStyle(
-              color: Colors.white,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
               fontSize: 12.5,
               fontWeight: FontWeight.w600,
               letterSpacing: 0.2,

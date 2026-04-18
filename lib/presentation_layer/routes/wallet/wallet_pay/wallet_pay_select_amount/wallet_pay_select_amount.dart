@@ -104,8 +104,11 @@ class _WalletPaySelectAmountState extends ConsumerState<WalletPaySelectAmount> {
   showSnackBar(BuildContext context, String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        backgroundColor: Theme.of(context).colorScheme.onError,
-        content: Text(message, style: TextStyle(color: Colors.white)),
+        backgroundColor: Theme.of(context).colorScheme.onSurface,
+        content: Text(
+          message,
+          style: TextStyle(color: Theme.of(context).colorScheme.surface),
+        ),
       ),
     );
   }
@@ -134,7 +137,7 @@ class _WalletPaySelectAmountState extends ConsumerState<WalletPaySelectAmount> {
       backgroundColor: Theme.of(context).colorScheme.surface,
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(16, 24, 16, 16),
+          padding: const EdgeInsets.fromLTRB(10, 24, 10, 16),
           child: Column(
             children: [
               Container(
@@ -222,8 +225,11 @@ class _WalletPaySelectAmountState extends ConsumerState<WalletPaySelectAmount> {
                       ),
                     },
                     showHaptics: true,
-                    trackColor: Theme.of(context).colorScheme.onSurface,
+                    trackColor: Theme.of(context).colorScheme.surfaceContainer,
                     activeColor: Theme.of(context).colorScheme.primary,
+                    inactiveColor: Theme.of(
+                      context,
+                    ).colorScheme.onSurfaceVariant,
                   ),
                 ),
               ),
