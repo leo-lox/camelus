@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <!--
+    If you are serving your web app in a path other than the root, change the
+    href value below to reflect the base path you are serving from.
+
+    The path provided below has to start and end with a slash "/" in order for
+    it to work correctly.
+
+    For more details:
+    * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
+
+    This is a placeholder for base href that will be replaced by the value of
+    the `--base-href` argument provided to `flutter build`.
+  -->
+  <base href="$FLUTTER_BASE_HREF">
+
+  <meta charset="UTF-8">
+  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
+  <meta name="description" content="Decentralized microblogging">
+
+  <!-- iOS meta tags & icons -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="camelus">
+  <link rel="apple-touch-icon" href="icons/Icon-192.png">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="favicon.png" />
+
+  <title>camelus</title>
+  <link rel="manifest" href="manifest.json">
+
+  <style>
+    :root {
+      color-scheme: light dark;
+      --bg-color: #f3f5f7;
+      --text-color: #1f2933;
+      --emoji-stroke: rgba(31, 41, 51, 0.22);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg-color: #0f1216;
+        --text-color: #e7edf2;
+        --emoji-stroke: rgba(231, 237, 242, 0.086);
+      }
+    }
+
+    html,
+    body {
+      height: 100%;
+      margin: 0;
+      background: var(--bg-color);
+    }
+
+    body {
+      position: relative;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+    }
+
+    #emoji-canvas {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    #boot-screen {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      color: var(--text-color);
+      font-family: Poppins, "Segoe UI", sans-serif;
+      font-size: 18px;
+      letter-spacing: 0.03em;
+      z-index: 1;
+    }
+
+    #boot-screen img {
+      width: min(240px, 52vw);
+      height: auto;
+      display: block;
+    }
+  </style>
+
+</head>
+
+<body>
+  <canvas id="emoji-canvas" aria-hidden="true"></canvas>
+  <script>
+    (function () {
+      var canvas = document.getElementById("emoji-canvas");
+      if (!canvas) return;
+      var ctx = canvas.getContext("2d");
+      var dpr = window.devicePixelRatio || 1;
+      var emojis = ["😃","😄","😁","😆","😅","😂","🤣","😊","😇","🙂","🙃","😉","😌","😍","🥰","🤩","😘","😗","😙","😚","😋","😛","😜","😝","😺","😸","😹","😻","😼", "🐪","🌙","🐝","🌵","🌟","🧭","🦜","🪐","🍃","🧿","🍄","🪙","🐑","🪶","🌿","🪷","🦋","🪁","🐛","🌾","✨","🌸","🍂","🪴","🌈","🦂","🪺","🌺","🪲","🍀"];
+      var CELL = 70;
+      var FONT_SIZE = 18;
+      var ANGLE = 30 * Math.PI / 180;
+
+      // Paint once onto a large fixed canvas — no resize redraws
+      var SIZE = 5000;
+      canvas.width = SIZE * dpr;
+      canvas.height = SIZE * dpr;
+      canvas.style.width = SIZE + "px";
+      canvas.style.height = SIZE + "px";
+      canvas.style.left = "50%";
+      canvas.style.top = "50%";
+      canvas.style.transform = "translate(-50%, -50%)";
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+      ctx.globalAlpha = 0.24;
+      ctx.filter = "grayscale(1)";
+      ctx.font = FONT_SIZE + "px sans-serif";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+
+      ctx.translate(SIZE / 2, SIZE / 2);
+      ctx.rotate(ANGLE);
+      ctx.translate(-SIZE / 2, -SIZE / 2);
+
+      var idx = 0;
+      for (var y = 0; y < SIZE; y += CELL) {
+        for (var x = 0; x < SIZE; x += CELL) {
+          ctx.fillText(emojis[idx % emojis.length], x, y);
+          idx += 7;
+        }
+      }
+    })();
+  </script>
+  <div id="boot-screen" aria-label="Loading screen">
+    <img src="./icons/bg_logo.png" alt="Camelus logo">
+    <div>loading...</div>
+  </div>
+
+  <script async>
+
+    {{flutter_js}}
+    {{flutter_build_config}}
+
+    _flutter.loader.load({
+      onEntrypointLoaded: async function (engineInitializer) {
+        const appRunner = await engineInitializer.initializeEngine();
+        await appRunner.runApp();
+        const bootScreen = document.getElementById("boot-screen");
+        if (bootScreen) {
+          bootScreen.remove();
+        }
+
+      }
+    });
+  </script>
+</body>
+
+</html>
