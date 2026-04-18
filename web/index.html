@@ -1,118 +1,165 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
+  <head>
+    <base href="$FLUTTER_BASE_HREF" />
 
-<head>
-  <base href="$FLUTTER_BASE_HREF">
+    <meta charset="UTF-8" />
+    <meta content="IE=Edge" http-equiv="X-UA-Compatible" />
+    <meta
+      name="description"
+      content="hello blogger 👋 Join a better internet you control. No ads, no tracking."
+    />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://camelus.example.com/" />
 
-  <meta charset="UTF-8">
-  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
-  <meta name="description" content="hello blogger 👋 Join a better internet you control. No ads, no tracking.">
-  <meta name="robots" content="index, follow">
-  <link rel="canonical" href="https://camelus.example.com/">
+    <!-- Open Graph / Social Sharing -->
+    <meta property="og:title" content="Decentralized microblogging arrived" />
+    <meta
+      property="og:description"
+      content="hello blogger 👋 Join a better internet you control. No ads, no tracking."
+    />
+    <meta property="og:image" content="https://camelus.app/og/cover.png" />
+    <meta
+      property="og:logo"
+      content="https://camelus.app/images/icon_512.png"
+    />
+    <meta property="og:url" content="https://camelus.app" />
+    <meta property="og:type" content="website" />
 
-  <!-- Open Graph / Social Sharing -->
-  <meta property="og:title" content="Decentralized microblogging arrived" />
-  <meta property="og:description" content="hello blogger 👋 Join a better internet you control. No ads, no tracking." />
-  <meta property="og:image" content="https://camelus.app/og/cover.png" />
-  <meta property="og:logo" content="https://camelus.app/images/icon_512.png" />
-  <meta property="og:url" content="https://camelus.app" />
-  <meta property="og:type" content="website" />
+    <!-- iOS meta tags & icons -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <meta name="apple-mobile-web-app-title" content="camelus" />
+    <link rel="apple-touch-icon" href="icons/Icon-192.png" />
 
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="favicon.png" />
 
+    <title>camelus | decentralized microblogging</title>
+    <link rel="manifest" href="manifest.json" />
 
-  <!-- iOS meta tags & icons -->
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <meta name="apple-mobile-web-app-title" content="camelus">
-  <link rel="apple-touch-icon" href="icons/Icon-192.png">
-
-  <!-- Favicon -->
-  <link rel="icon" type="image/png" href="favicon.png" />
-
-  <title>camelus | decentralized microblogging</title>
-  <link rel="manifest" href="manifest.json">
-
-  <style>
-    :root {
-      color-scheme: light dark;
-      --bg-color: #f3f5f7;
-      --text-color: #1f2933;
-    }
-
-    @media (prefers-color-scheme: dark) {
+    <style>
       :root {
-        --bg-color: #0f1216;
-        --text-color: #e7edf2;
+        color-scheme: light dark;
+        --bg-color: #f3f5f7;
+        --text-color: #1f2933;
       }
-    }
 
-    html,
-    body {
-      height: 100%;
-      margin: 0;
-      background: var(--bg-color);
-      color: var(--text-color);
-      font-family: Poppins, "Segoe UI", sans-serif;
-    }
-
-    body {
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      overflow: hidden;
-    }
-
-    #boot-screen {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 6px;
-      font-size: 18px;
-      letter-spacing: 0.03em;
-    }
-
-    #boot-screen img {
-      width: min(240px, 52vw);
-      height: auto;
-      display: block;
-    }
-  </style>
-
-</head>
-
-<body>
-  <script>
-
-  </script>
-  <div id="boot-screen" aria-label="Loading screen">
-    <img src="./icons/bg_logo.png" alt="Camelus logo">
-    <div>loading...</div>
-  </div>
-
-  <noscript>
-    <div style="position:relative;padding:16px;background:#fff;color:#111;font-family:Arial,sans-serif;text-align:center;">
-      camelus requires JavaScript to run. For best results, enable JavaScript.
-    </div>
-  </noscript>
-
-  <script async>
-
-    {{flutter_js}}
-    {{flutter_build_config}}
-
-    _flutter.loader.load({
-      onEntrypointLoaded: async function (engineInitializer) {
-        const appRunner = await engineInitializer.initializeEngine();
-        await appRunner.runApp();
-        const bootScreen = document.getElementById("boot-screen");
-        if (bootScreen) {
-          bootScreen.remove();
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg-color: #0f1216;
+          --text-color: #e7edf2;
         }
-
       }
-    });
-  </script>
-</body>
 
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+        background: var(--bg-color);
+        color: var(--text-color);
+        font-family: Poppins, "Segoe UI", sans-serif;
+      }
+
+      body {
+        min-height: 100vh;
+        overflow: hidden;
+      }
+
+      #boot-screen {
+        position: fixed;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        font-size: 18px;
+        letter-spacing: 0.03em;
+        background: var(--bg-color);
+        z-index: 9999;
+        opacity: 1;
+        transition: opacity 520ms ease;
+      }
+
+      #boot-screen img {
+        width: min(240px, 52vw);
+        height: auto;
+        display: block;
+        transform-origin: center;
+        clip-path: inset(0 0 0 0 round 20px);
+        transition:
+          transform 720ms cubic-bezier(0.22, 1, 0.36, 1),
+          clip-path 720ms cubic-bezier(0.22, 1, 0.36, 1),
+          opacity 420ms ease;
+      }
+
+      #boot-screen.is-exiting {
+        opacity: 0;
+      }
+
+      #boot-screen.is-exiting img {
+        transform: scale(1.08);
+        clip-path: inset(0 -30vw 0 -30vw round 20px);
+        opacity: 0;
+      }
+    </style>
+  </head>
+
+  <body>
+    <script></script>
+    <div id="boot-screen" aria-label="Loading screen">
+      <img src="./icons/bg_logo.png" alt="Camelus logo" />
+      <div>loading...</div>
+    </div>
+
+    <noscript>
+      <div
+        style="
+          position: relative;
+          padding: 16px;
+          background: #fff;
+          color: #111;
+          font-family: Arial, sans-serif;
+          text-align: center;
+        "
+      >
+        camelus requires JavaScript to run. For best results, enable JavaScript.
+      </div>
+    </noscript>
+
+    <script async>
+      {
+        {
+          flutter_js;
+        }
+      }
+      {
+        {
+          flutter_build_config;
+        }
+      }
+
+      _flutter.loader.load({
+        onEntrypointLoaded: async function (engineInitializer) {
+          const appRunner = await engineInitializer.initializeEngine();
+          await appRunner.runApp();
+          const bootScreen = document.getElementById("boot-screen");
+          if (bootScreen) {
+            bootScreen.classList.add("is-exiting");
+
+            const removeBootScreen = () => {
+              if (bootScreen.isConnected) {
+                bootScreen.remove();
+              }
+            };
+            bootScreen.addEventListener("transitionend", removeBootScreen, {
+              once: true,
+            });
+            setTimeout(removeBootScreen, 900);
+          }
+        },
+      });
+    </script>
+  </body>
 </html>
