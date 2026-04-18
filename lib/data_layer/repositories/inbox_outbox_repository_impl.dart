@@ -1,3 +1,4 @@
+import '../../domain_layer/entities/dm_relays.dart';
 import '../../domain_layer/entities/nip_65.dart';
 import '../../domain_layer/repositories/inbox_outbox_repository.dart';
 import '../../config/nostr_kinds.dart';
@@ -35,7 +36,7 @@ class InboxOutboxRepositoryImpl implements InboxOutboxRepository {
   }
 
   @override
-  Future<List<String>> getDmRelays({
+  Future<DmRelays> getDmRelays({
     required String pubkey,
     bool forceRefresh = false,
   }) async {
@@ -45,21 +46,27 @@ class InboxOutboxRepositoryImpl implements InboxOutboxRepository {
       publicKey: pubkey,
     );
 
-    return list?.allRelays.toList() ?? const [];
+    return DmRelays(
+      relays: list?.allRelays.toList() ?? const [],
+      createdAt: list?.createdAt ?? 0,
+    );
   }
 
   @override
-  Future<List<String>> getDmRelaysSelf({bool forceRefresh = false}) async {
+  Future<DmRelays> getDmRelaysSelf({bool forceRefresh = false}) async {
     final list = await dartNdkSource.dartNdk.lists.getSingleNip51List(
       kDmRelayListKind,
       forceRefresh: forceRefresh,
     );
 
-    return list?.allRelays.toList() ?? const [];
+    return DmRelays(
+      relays: list?.allRelays.toList() ?? const [],
+      createdAt: list?.createdAt ?? 0,
+    );
   }
 
   @override
-  Future<List<String>> setDmRelays(List<String> relays) async {
+  Future<DmRelays> setDmRelays(List<String> relays) async {
     final normalized = <String>[];
     final seen = <String>{};
 
@@ -73,10 +80,12 @@ class InboxOutboxRepositoryImpl implements InboxOutboxRepository {
     }
 
     final current = await getDmRelaysSelf(forceRefresh: true);
-    final currentSet = current.toSet();
+    final currentSet = current.relays.toSet();
     final targetSet = normalized.toSet();
 
-    final toRemove = current.where((relay) => !targetSet.contains(relay));
+    final toRemove = current.relays.where(
+      (relay) => !targetSet.contains(relay),
+    );
     final toAdd = normalized.where((relay) => !currentSet.contains(relay));
 
     for (final relay in toRemove) {
@@ -96,7 +105,10 @@ class InboxOutboxRepositoryImpl implements InboxOutboxRepository {
     }
 
     if (toRemove.isEmpty && toAdd.isEmpty) {
-      return normalized;
+      return DmRelays(
+        relays: normalized,
+        createdAt: DateTime.now().millisecondsSinceEpoch,
+      );
     }
 
     return getDmRelaysSelf(forceRefresh: true);

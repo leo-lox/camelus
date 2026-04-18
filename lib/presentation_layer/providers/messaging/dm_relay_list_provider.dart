@@ -19,6 +19,7 @@ class DmRelayListState {
 
   final bool isLoading;
   final bool isSaving;
+  final int? lastSyncedAt;
   final String? error;
 
   const DmRelayListState({
@@ -26,6 +27,7 @@ class DmRelayListState {
     this.relays = const [],
     this.isLoading = false,
     this.isSaving = false,
+    this.lastSyncedAt,
     this.error,
   });
 
@@ -45,6 +47,7 @@ class DmRelayListState {
     List<String>? relays,
     bool? isLoading,
     bool? isSaving,
+    int? lastSyncedAt,
     String? error,
   }) {
     return DmRelayListState(
@@ -52,6 +55,7 @@ class DmRelayListState {
       relays: relays ?? this.relays,
       isLoading: isLoading ?? this.isLoading,
       isSaving: isSaving ?? this.isSaving,
+      lastSyncedAt: lastSyncedAt ?? this.lastSyncedAt,
       error: error,
     );
   }
@@ -59,6 +63,8 @@ class DmRelayListState {
 
 /// Provider for managing DM relay list (kind 10050)
 class DmRelayListNotifier extends Notifier<DmRelayListState> {
+  bool _didScheduleInitialLoad = false;
+
   @override
   DmRelayListState build() {
     final inboxOutboxInstance = ref.watch(inboxOutboxProvider);
@@ -67,8 +73,11 @@ class DmRelayListNotifier extends Notifier<DmRelayListState> {
     inboxOutbox = inboxOutboxInstance;
     myPubkey = myPubkeyValue;
 
-    if (myPubkey != null) {
-      _loadFromCacheThenFetch();
+    if (myPubkey != null && !_didScheduleInitialLoad) {
+      _didScheduleInitialLoad = true;
+      Future<void>(() async {
+        await _loadFromCacheThenFetch();
+      });
     }
 
     return const DmRelayListState();
@@ -80,11 +89,14 @@ class DmRelayListNotifier extends Notifier<DmRelayListState> {
   /// Load from cache first (instant), then fetch from network
   Future<void> _loadFromCacheThenFetch() async {
     // 1. Load from cache via NDK lists usecase (instant if available)
-    final relays = await inboxOutbox.getDmRelaysSelf();
+    final dmRelays = await inboxOutbox.getDmRelaysSelf();
 
-    if (relays.isNotEmpty) {
-      log('DM Relays: Loaded ${relays.length} relays from cache');
-      state = state.copyWith(originalRelays: relays, relays: relays);
+    if (dmRelays.relays.isNotEmpty) {
+      log('DM Relays: Loaded ${dmRelays.relays.length} relays from cache');
+      state = state.copyWith(
+        originalRelays: dmRelays.relays,
+        relays: dmRelays.relays,
+      );
     }
 
     // 2. Fetch from network in background
@@ -101,13 +113,18 @@ class DmRelayListNotifier extends Notifier<DmRelayListState> {
     }
 
     try {
-      final relays = await inboxOutbox.getDmRelaysSelf(forceRefresh: true);
+      final dmRelays = await inboxOutbox.getDmRelaysSelf(forceRefresh: true);
 
-      log('DM Relays: Fetched ${relays.length} relays from network');
+      final syncedAt = dmRelays.createdAt != 0
+          ? dmRelays.createdAt
+          : DateTime.now().millisecondsSinceEpoch ~/ 1000;
+
+      log('DM Relays: Fetched ${dmRelays.relays.length} relays from network');
       state = state.copyWith(
-        originalRelays: relays,
-        relays: relays,
+        originalRelays: dmRelays.relays,
+        relays: dmRelays.relays,
         isLoading: false,
+        lastSyncedAt: syncedAt,
       );
     } catch (e) {
       log('DM Relays: Error fetching: $e');
@@ -189,12 +206,14 @@ class DmRelayListNotifier extends Notifier<DmRelayListState> {
 
     try {
       final savedRelays = await inboxOutbox.setDmRelays(state.relays);
+      final syncedAt = DateTime.now().millisecondsSinceEpoch ~/ 1000;
 
-      log('DM Relays: Saved ${state.relays.length} relays');
+      log('DM Relays: Saved ${savedRelays.relays.length} relays');
       state = state.copyWith(
-        originalRelays: savedRelays,
-        relays: savedRelays,
+        originalRelays: savedRelays.relays,
+        relays: savedRelays.relays,
         isSaving: false,
+        lastSyncedAt: syncedAt,
       );
       return true;
     } catch (e) {
