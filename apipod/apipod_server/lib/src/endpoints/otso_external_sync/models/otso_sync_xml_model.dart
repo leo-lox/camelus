@@ -162,7 +162,7 @@ MapData(
     return OtsoSyncModel(
       id: id,
       source: "stopice",
-      body: "$comments",
+      body: comments,
       createdAt: postCreatedAtEpoch,
       latitude: lat,
       longitude: long,

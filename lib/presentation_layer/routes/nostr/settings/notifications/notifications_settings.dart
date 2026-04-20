@@ -135,7 +135,7 @@ class NotificationsSettingsPage extends ConsumerWidget {
                     decoration: BoxDecoration(
                       color: Theme.of(
                         context,
-                      ).colorScheme.surfaceVariant.withOpacity(0.3),
+                      ).colorScheme.surfaceContainerHighest.withOpacity(0.3),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Row(

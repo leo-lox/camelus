@@ -92,7 +92,7 @@ class _ImagesTileViewState extends ConsumerState<ImagesTileView> {
         aspectRatio: widget.maxHeight > 0 ? maxWidth / widget.maxHeight : 1.0,
         child: _imageLoading(),
       ),
-      error: (_, __) =>
+      error: (_, _) =>
           AspectRatio(aspectRatio: 1.0, child: const Icon(Icons.error)),
     );
   }

@@ -302,12 +302,12 @@ class OtsoPushEndpoint extends Endpoint {
       /// get the geotag with most presicion
       String eventGeoTag = OtsoHelpers.findLongestGValue(event.tags);
 
-      session.log("geotag: ${eventGeoTag}", level: LogLevel.debug);
+      session.log("geotag: $eventGeoTag", level: LogLevel.debug);
 
       final pubkeysToNotify =
           await getPubkeysToNotify(geoHash: eventGeoTag, session: session);
 
-      session.log("pubkeystoNotify: ${pubkeysToNotify}", level: LogLevel.debug);
+      session.log("pubkeystoNotify: $pubkeysToNotify", level: LogLevel.debug);
 
       /// send all devices their gift wrap event
       for (final devicePubkeyToNotify in pubkeysToNotify) {
@@ -508,7 +508,7 @@ class OtsoPushEndpoint extends Endpoint {
                   ".onError.listen, relay: ${relay.url} error: $error");
               s.log(
                 level: LogLevel.error,
-                "${message}",
+                "$message",
                 exception: message,
               );
               if (message is WebSocketException) {
