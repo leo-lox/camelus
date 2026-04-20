@@ -137,6 +137,17 @@ class WalletSeedInitialState extends Notifier<WalletSeedState> {
     _ndk.cashu.setCashuSeedPhrase(seed);
   }
 
+  Future<void> deleteSeed() async {
+    // Remove all known wallets first
+    final wallets = await _ndk.wallets.getWallets();
+    for (final wallet in wallets) {
+      await _ndk.wallets.removeWallet(wallet.id);
+    }
+
+    await secureStorage.delete(key: 'cashu_seed');
+    state = WalletSeedState(cashuSeed: null, isLoading: false);
+  }
+
   Future<String> generateSeedPhrase({
     Language language = Language.english,
     String passphrase = '',

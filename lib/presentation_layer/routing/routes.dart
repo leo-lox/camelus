@@ -33,6 +33,8 @@ import '../routes/nostr/settings/developer/developer_settings.dart';
 import '../routes/nostr/settings/relays/relays_settings.dart';
 import '../routes/nostr/settings/notifications/notifications_settings.dart';
 import '../routes/nostr/settings/theme/theme_settings.dart';
+import '../routes/wallet/wallet_restore/wallet_restore.dart';
+import '../routes/nostr/settings/wallet_settings.dart';
 import '../routes/notification_page.dart';
 import '../routes/search/search_page.dart';
 import '../routes/nostr/settings/file_servers/settings_file_servers.dart';
@@ -179,6 +181,16 @@ final routes = [
               GoRoute(
                 path: 'relays',
                 builder: (context, state) => const Nip65RelaysSettings(),
+              ),
+              GoRoute(
+                path: 'wallet',
+                builder: (context, state) => const WalletSettingsPage(),
+                routes: [
+                  GoRoute(
+                    path: 'restore',
+                    builder: (context, state) => const WalletRestorePage(),
+                  ),
+                ],
               ),
               GoRoute(
                 path: 'notifications',

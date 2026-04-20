@@ -34,6 +34,10 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     context.push('/settings/file-servers');
   }
 
+  void _navigateToWalletSettings() {
+    context.push('/settings/wallet');
+  }
+
   void _navigateToInitalRoute() {
     context.push('/settings/initial-route');
   }
@@ -67,6 +71,10 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
             onTap: () {
               context.push('/settings/relays');
             },
+          ),
+          ListTile(
+            title: const Text('Wallet'),
+            onTap: _navigateToWalletSettings,
           ),
 
           ListTile(
