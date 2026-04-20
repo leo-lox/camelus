@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ndk_flutter/ndk_flutter.dart';
+import 'package:flutter/foundation.dart';
 
 import '../presentation_layer/components/update_check/update_check.dart';
 import '../presentation_layer/providers/app_lifecycle_provider.dart';
@@ -33,8 +34,10 @@ class _AppInitializationShellState
           .read(languageProvider.notifier)
           .initializeWithSystemLocaleIfNeeded(context);
 
-      // deep links
-      DeepLinkService.initialize(context);
+      if (!kIsWeb) {
+        // deep links
+        DeepLinkService.initialize(context);
+      }
 
       // connectivity
       listenToConnectivityChanges(ref);
