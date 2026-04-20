@@ -10,7 +10,6 @@ import 'package:ndk/data_layer/repositories/signers/nip46_event_signer.dart';
 import 'package:ndk/ndk.dart';
 import 'package:ndk_flutter/ndk_flutter.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
-import '../../config/camelus_config.dart';
 import '../../l10n/app_localizations.dart';
 import '../../presentation_layer/providers/signer_provider.dart';
 import '../entities/stored_account.dart';

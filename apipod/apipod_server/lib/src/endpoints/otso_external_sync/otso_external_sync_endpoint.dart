@@ -160,7 +160,7 @@ class OtsoExternalSyncEndpoint extends Endpoint {
           ["expiration", "$in24h"],
           ..._geoHashTags(locationGeoHash.geohash),
         ],
-        content: "${_removeHtmlTags(r.body)}",
+        content: _removeHtmlTags(r.body),
       );
     });
 
