@@ -47,8 +47,8 @@ class WalletReceiveEcashCompleterPage extends ConsumerWidget {
                         amount: walletState.amount!,
                         unit: walletState.unit!,
                       ),
-                      style: const TextStyle(
-                        color: Colors.white,
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurface,
                         fontSize: 48,
                         fontWeight: FontWeight.bold,
                       ),
@@ -76,7 +76,10 @@ class WalletReceiveEcashCompleterPage extends ConsumerWidget {
                   child: SingleChildScrollView(
                     child: Text(
                       walletState.memo!,
-                      style: const TextStyle(color: Colors.white, fontSize: 16),
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurface,
+                        fontSize: 16,
+                      ),
                       textAlign: TextAlign.center,
                     ),
                   ),
@@ -85,7 +88,7 @@ class WalletReceiveEcashCompleterPage extends ConsumerWidget {
 
               if (walletState.errorMessage != null) ...[
                 Spacer(flex: 1),
-                _buildErrorCard(walletState.errorMessage!),
+                _ErrorCard(errorMessage: walletState.errorMessage!),
               ],
               Spacer(flex: 10),
             ],
@@ -146,7 +149,7 @@ class WalletReceiveEcashCompleterPage extends ConsumerWidget {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: color.withValues(alpha: 0.1),
+                color: color.withAlpha(25),
                 borderRadius: BorderRadius.circular(50),
               ),
               child: Icon(icon, color: color, size: 32),
@@ -166,7 +169,12 @@ class WalletReceiveEcashCompleterPage extends ConsumerWidget {
                   const SizedBox(height: 4),
                   Text(
                     subtitle,
-                    style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.onSurface.withAlpha(153),
+                    ),
                   ),
                 ],
               ),
@@ -182,17 +190,28 @@ class WalletReceiveEcashCompleterPage extends ConsumerWidget {
       ),
     );
   }
+}
 
-  Widget _buildErrorCard(String errorMessage) {
+class _ErrorCard extends StatelessWidget {
+  const _ErrorCard({required this.errorMessage});
+
+  final String errorMessage;
+
+  @override
+  Widget build(BuildContext context) {
     return Card(
       elevation: 2,
-      color: Colors.red[50],
+      color: Theme.of(context).colorScheme.onError,
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Icon(Icons.error_outline, color: Colors.red[700], size: 24),
+            Icon(
+              Icons.error_outline,
+              color: Theme.of(context).colorScheme.error,
+              size: 24,
+            ),
             const SizedBox(width: 12),
             Expanded(
               child: Column(
@@ -203,13 +222,16 @@ class WalletReceiveEcashCompleterPage extends ConsumerWidget {
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
-                      color: Colors.red[700],
+                      color: Theme.of(context).colorScheme.error,
                     ),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     errorMessage,
-                    style: TextStyle(fontSize: 14, color: Colors.red[600]),
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Theme.of(context).colorScheme.error,
+                    ),
                   ),
                 ],
               ),
