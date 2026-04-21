@@ -101,9 +101,7 @@
 </head>
 
 <body>
-  <script>
-
-  </script>
+  
   <div id="boot-screen" aria-label="Loading screen">
     <img src="./icons/bg_logo.png" alt="Camelus logo">
     <div>loading...</div>
@@ -138,6 +136,15 @@
 
       }
     });
+
+
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function () {
+      navigator.serviceWorker.register('firebase-messaging-sw.js', {
+        scope: '/firebase-cloud-messaging-push-scope',
+      });
+    });
+  }
   </script>
 </body>
 

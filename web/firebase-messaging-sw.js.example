@@ -1,0 +1,25 @@
+importScripts('https://www.gstatic.com/firebasejs/12.12.1/firebase-app-compat.js');
+importScripts('https://www.gstatic.com/firebasejs/12.12.1/firebase-messaging-compat.js');
+
+firebase.initializeApp({
+  apiKey: '',
+  authDomain: '',
+  projectId: '',
+  storageBucket: '',
+  messagingSenderId: '',
+  appId: '',
+});
+
+const messaging = firebase.messaging();
+
+// Optional: Handle background messages
+messaging.onBackgroundMessage((payload) => {
+  console.log('Received background message ', payload);
+  const notificationTitle = payload.notification.title;
+  const notificationOptions = {
+    body: payload.notification.body,
+    icon: '/icons/Icon-192.png'
+  };
+
+  return self.registration.showNotification(notificationTitle, notificationOptions);
+});
