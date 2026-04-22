@@ -409,8 +409,9 @@ class NotificationSettingsNotifier extends Notifier<NotificationSettingsState> {
     /// needed for iOS to ensure the APNs token is generated and linked to FCM before getting the FCM token
     await FirebaseMessaging.instance.getAPNSToken();
 
+    final vapidKey = String.fromEnvironment('FIREBASE_VAPID_KEY');
     final token = await FirebaseMessaging.instance.getToken(
-      vapidKey: kIsWeb ? String.fromEnvironment('FIREBASE_VAPID_KEY') : null,
+      vapidKey: kIsWeb ? vapidKey : null,
     );
     if (token != null) {
       final appDb = ref.read(dbAppProvider);
