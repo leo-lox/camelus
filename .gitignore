@@ -36,6 +36,7 @@ migrate_working_dir/
 /build/
 
 # Web related
+/web/firebase-messaging-sw.js
 
 # Symbolication related
 app.*.symbols
