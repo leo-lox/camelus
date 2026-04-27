@@ -9,7 +9,7 @@ class NostrListRepositoryImpl implements NostrListRepository {
   NostrListRepositoryImpl({required this.dartNdkSource});
 
   @override
-  Stream<List<NostrStarterPack>?> getPublicNostrStarterPacks({
+  Stream<List<NostrSet>?> getPublicNostrStarterPacks({
     required String pubKey,
     required int kind,
   }) {
@@ -22,9 +22,9 @@ class NostrListRepositoryImpl implements NostrListRepository {
     final listSets = ndkSets.asyncMap((sets) async {
       if (sets == null) return null;
 
-      final starterPacks = <NostrStarterPack>[];
+      final starterPacks = <NostrSet>[];
       for (final set in sets) {
-        final starterPack = NostrStarterPackModel.fromNDK(set);
+        final starterPack = NostrSetModel.fromNDK(set);
         starterPacks.add(starterPack);
       }
       return starterPacks;
@@ -33,17 +33,13 @@ class NostrListRepositoryImpl implements NostrListRepository {
   }
 
   @override
-  Future<NostrStarterPack> broadcastStarterPack({
-    required NostrStarterPack starterPack,
-  }) async {
-    final ndkStarterPack = NostrStarterPackModel.fromEntity(
-      starterPack,
-    ).toNDK();
+  Future<NostrSet> broadcastStarterPack({required NostrSet starterPack}) async {
+    final ndkSet = NostrSetModel.fromEntity(starterPack).toNDK();
     final result = await dartNdkSource.dartNdk.lists.setCompleteSet(
-      set: ndkStarterPack,
+      set: ndkSet,
       kind: NostrList.starterPack,
     );
-    return NostrStarterPackModel.fromNDK(result);
+    return NostrSetModel.fromNDK(result);
   }
 
   @override
@@ -55,7 +51,7 @@ class NostrListRepositoryImpl implements NostrListRepository {
   }
 
   @override
-  Future<NostrStarterPack?> addUserToStarterPack({
+  Future<NostrSet?> addUserToStarterPack({
     required String name,
     required String pubkey,
   }) async {
@@ -68,7 +64,7 @@ class NostrListRepositoryImpl implements NostrListRepository {
     if (ndkSet == null) {
       return null;
     }
-    return NostrStarterPackModel.fromNDK(ndkSet);
+    return NostrSetModel.fromNDK(ndkSet);
   }
 
   @override
@@ -112,5 +108,20 @@ class NostrListRepositoryImpl implements NostrListRepository {
     );
     if (ndkList == null) return null;
     return NostrListModel.fromNDK(ndkList);
+  }
+
+  @override
+  Future<NostrSet> broadcastSet({required NostrSet set}) async {
+    final ndkSet = NostrSetModel.fromEntity(set).toNDK();
+    final result = await dartNdkSource.dartNdk.lists.setCompleteSet(
+      set: ndkSet,
+      kind: set.kind,
+    );
+    return NostrSetModel.fromNDK(result);
+  }
+
+  @override
+  Future<void> deleteListSet({required String name, required int kind}) {
+    return dartNdkSource.dartNdk.lists.deleteSet(name: name, kind: kind);
   }
 }

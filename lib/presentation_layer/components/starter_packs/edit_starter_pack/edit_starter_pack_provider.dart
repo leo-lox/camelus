@@ -169,7 +169,7 @@ class EditStarterPackNotifier extends Notifier<StarterPackData> {
   int get titleCharacterCount => state.title.length;
 
   // Save method
-  Future<bool> broadcast(NostrStarterPack pack) async {
+  Future<bool> broadcast(NostrSet pack) async {
     if (!isValid) return false;
 
     state = state.copyWith(broadcasting: true);

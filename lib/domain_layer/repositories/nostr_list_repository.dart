@@ -1,18 +1,16 @@
 import '../entities/nostr_list.dart';
 
 abstract class NostrListRepository {
-  Stream<List<NostrStarterPack>?> getPublicNostrStarterPacks({
+  Stream<List<NostrSet>?> getPublicNostrStarterPacks({
     required String pubKey,
     required int kind,
   });
 
-  Future<NostrStarterPack> broadcastStarterPack({
-    required NostrStarterPack starterPack,
-  });
+  Future<NostrSet> broadcastStarterPack({required NostrSet starterPack});
 
   Future deleteStarterPack({required String name});
 
-  Future<NostrStarterPack?> addUserToStarterPack({
+  Future<NostrSet?> addUserToStarterPack({
     required String name,
     required String pubkey,
   });
@@ -34,4 +32,10 @@ abstract class NostrListRepository {
     required String value,
     required int kind,
   });
+
+  /// Broadcast any NIP-51 set (uses set.kind)
+  Future<NostrSet> broadcastSet({required NostrSet set});
+
+  /// Delete a NIP-51 set of any kind
+  Future<void> deleteListSet({required String name, required int kind});
 }

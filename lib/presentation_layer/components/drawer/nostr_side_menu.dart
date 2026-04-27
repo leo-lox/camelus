@@ -267,6 +267,14 @@ class NostrSideMenu extends ConsumerWidget {
                         },
                       ),
                       _drawerItem(
+                        label: AppLocalizations.of(context)!.lists,
+                        routeName: '/lists',
+                        icon: PhosphorIcons.listBullets(),
+                        onTap: () {
+                          context.push('/lists');
+                        },
+                      ),
+                      _drawerItem(
                         label: AppLocalizations.of(context)!.profile,
                         routeName:
                             '/profile/${Nip19.encodePubKey(currentUserPubkey)}',

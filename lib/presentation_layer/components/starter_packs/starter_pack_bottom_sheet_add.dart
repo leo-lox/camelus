@@ -142,11 +142,7 @@ class _StarterPackSelectionBottomSheetState
     );
   }
 
-  Widget _buildPackOption(
-    BuildContext context,
-    WidgetRef ref,
-    NostrStarterPack pack,
-  ) {
+  Widget _buildPackOption(BuildContext context, WidgetRef ref, NostrSet pack) {
     final isLoading = _loadingPacks.contains(pack.name);
     final isUserInPack = pack.elements.any(
       (element) => element.value == widget.userPubkey,
@@ -280,7 +276,7 @@ class _StarterPackSelectionBottomSheetState
   void _addUserToPack(
     BuildContext context,
     WidgetRef ref,
-    NostrStarterPack pack,
+    NostrSet pack,
   ) async {
     // Set loading state
     setState(() {

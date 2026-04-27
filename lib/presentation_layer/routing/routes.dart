@@ -12,6 +12,7 @@ import '../components/relays_connectivity_widget.dart';
 import '../components/right_sidebar/right_siedbar.dart';
 import '../components/starter_packs/edit_starter_pack/edit_starter_pack.dart';
 import '../components/starter_packs/open_starter_pack.dart';
+import '../../domain_layer/entities/list_identifier.dart';
 import '../layouts/mobile_bottom_menu_layout.dart';
 import '../layouts/responsive_layout.dart';
 import '../layouts/three_colum_layout.dart';
@@ -23,6 +24,8 @@ import '../routes/nostr/event_gallery_page.dart';
 import '../routes/nostr/fullscreen_video_page.dart';
 import '../routes/nostr/bookmarks/bookmarks_page.dart';
 import '../routes/nostr/event_view/event_view_page.dart';
+import '../routes/nostr/lists/edit_list_page.dart';
+import '../routes/nostr/lists/lists_page.dart';
 import '../routes/nostr/onboarding/onboarding.dart';
 import '../routes/nostr/profile/edit_profile_page.dart';
 import '../routes/nostr/profile/profile_resolver_page.dart';
@@ -236,6 +239,22 @@ final routes = [
           GoRoute(
             path: '/blocked-users',
             builder: (context, state) => const BlocklistPage(),
+          ),
+          GoRoute(
+            path: '/lists',
+            builder: (context, state) => const ListsPage(),
+          ),
+          GoRoute(
+            path: '/lists/:kind/:name/edit',
+            builder: (context, state) {
+              final kind = int.parse(state.pathParameters['kind']!);
+              final name = Uri.decodeComponent(state.pathParameters['name']!);
+              final isNew = state.uri.queryParameters['new'] == 'true';
+              return EditListPage(
+                identifier: ListIdentifier(name: name, kind: kind),
+                isNewList: isNew,
+              );
+            },
           ),
           GoRoute(
             path: '/edit-starter-pack',

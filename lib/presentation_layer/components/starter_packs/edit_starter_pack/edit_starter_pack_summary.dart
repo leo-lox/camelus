@@ -101,11 +101,12 @@ class _EditStarterPackSummaryState extends ConsumerState<EditStarterPackSummary>
 
     int now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
 
-    final myNostrPack = NostrStarterPack(
+    final myNostrPack = NostrSet(
       name: starterPackData.name,
       title: starterPackData.title,
       description: starterPackData.description,
       pubKey: ndk.accounts.getPublicKey()!,
+      kind: NostrList.starterPack,
       createdAt: now,
       image: starterPackData.imageUrl,
       elements: starterPackData.selectedUsers.map((userPubkey) {

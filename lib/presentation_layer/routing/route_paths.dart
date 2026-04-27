@@ -51,4 +51,13 @@ class RoutePaths {
     final encodedScrollIntoView = Uri.encodeQueryComponent(scrollIntoView);
     return '$basePath?scrollIntoView=$encodedScrollIntoView';
   }
+
+  static String listEdit({
+    required int kind,
+    required String name,
+    bool isNew = false,
+  }) {
+    final base = '/lists/$kind/${Uri.encodeComponent(name)}/edit';
+    return isNew ? '$base?new=true' : base;
+  }
 }

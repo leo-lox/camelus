@@ -7,7 +7,7 @@ import 'nostr_list_provider.dart';
 
 class NostrListsFollowState {
   final bool isLoading;
-  final List<NostrStarterPack> publicNostrFollowSets;
+  final List<NostrSet> publicNostrFollowSets;
 
   NostrListsFollowState({
     required this.isLoading,
@@ -16,7 +16,7 @@ class NostrListsFollowState {
 
   NostrListsFollowState copyWith({
     bool? isLoading,
-    List<NostrStarterPack>? publicNostrFollowSets,
+    List<NostrSet>? publicNostrFollowSets,
   }) {
     return NostrListsFollowState(
       isLoading: isLoading ?? this.isLoading,
@@ -33,9 +33,9 @@ final nostrListsFollowStateProvider =
     );
 
 class NostrListsNotifier extends Notifier<NostrListsFollowState> {
-  late final GetNostrLists _getNostrLists;
+  late GetNostrLists _getNostrLists;
   late final String _pubkey;
-  StreamSubscription<List<NostrStarterPack>?>? _subscription;
+  StreamSubscription<List<NostrSet>?>? _subscription;
 
   NostrListsNotifier(String pubkey) : _pubkey = pubkey;
 

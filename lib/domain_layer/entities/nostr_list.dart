@@ -176,7 +176,7 @@ class NostrListElement {
   });
 }
 
-class NostrStarterPack extends NostrList {
+class NostrSet extends NostrList {
   // name is d tag
   late String name;
   String? title;
@@ -188,8 +188,9 @@ class NostrStarterPack extends NostrList {
     return 'Nip51Set { $name}';
   }
 
-  /// Create a new StarterPack
-  NostrStarterPack({
+  /// Generic NIP-51 named set. Pass [kind] to specify the set type
+  /// (e.g. [NostrList.followSet], [NostrList.curationSet], [NostrList.starterPack]).
+  NostrSet({
     required super.pubKey,
     this.title,
     required this.name,
@@ -197,7 +198,7 @@ class NostrStarterPack extends NostrList {
     this.description,
     required super.createdAt,
     required super.elements,
-    super.kind = NostrList.starterPack,
+    required super.kind,
   });
 
   void parseSetTags(List tags) {
