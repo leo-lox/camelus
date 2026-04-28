@@ -7,6 +7,7 @@ import 'onboarding_invited_by.dart';
 import 'onboarding_login.dart';
 import 'onboarding_login_amber.dart';
 import 'onboarding_login_bunker.dart';
+import 'onboarding_login_extension.dart';
 import 'onboarding_login_select.dart';
 import 'onboarding_name.dart';
 import 'onboarding_page01.dart';
@@ -90,7 +91,7 @@ class _NostrOnboardingState extends ConsumerState<NostrOnboarding>
     _tabController = TabController(length: 6, initialIndex: 0, vsync: this);
 
     _loginTabController = TabController(
-      length: 4,
+      length: 5,
       initialIndex: 0,
       vsync: this,
     );
@@ -146,6 +147,13 @@ class _NostrOnboardingState extends ConsumerState<NostrOnboarding>
                     duration: const Duration(milliseconds: 500),
                   );
                 },
+                onPressedExtensionLogin: () {
+                  _loginTabController.animateTo(
+                    4,
+                    curve: Curves.easeInOut,
+                    duration: const Duration(milliseconds: 500),
+                  );
+                },
                 onPressedBack: () {
                   _horizontalPageController.animateToPage(
                     1,
@@ -173,6 +181,15 @@ class _NostrOnboardingState extends ConsumerState<NostrOnboarding>
                 },
               ),
               OnboardingLoginBunkerPage(
+                onPressedBack: () {
+                  _loginTabController.animateTo(
+                    0,
+                    curve: Curves.easeInOut,
+                    duration: const Duration(milliseconds: 500),
+                  );
+                },
+              ),
+              OnboardingLoginExtensionPage(
                 onPressedBack: () {
                   _loginTabController.animateTo(
                     0,
