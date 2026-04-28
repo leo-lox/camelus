@@ -1,4 +1,3 @@
-import 'package:camelus/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ndk/shared/nips/nip19/nip19.dart';
@@ -6,11 +5,12 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../../domain_layer/entities/list_identifier.dart';
 import '../../../../domain_layer/entities/nostr_list.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../../atoms/long_button.dart';
 import '../../../providers/search_provider.dart';
 import '../../../routes/search/search_state_notifier.dart';
 import '../../search_bar.dart';
-import '../../starter_packs/edit_starter_pack/edit_starter_pack_content.dart';
+import '../../person_select.dart';
 import 'edit_list_provider.dart';
 
 class EditListContent extends ConsumerStatefulWidget {
@@ -89,7 +89,9 @@ class _EditListContentState extends ConsumerState<EditListContent> {
     final searchNotifier = ref.watch(searchStateProvider.notifier);
     final searchService = ref.read(searchProvider);
 
-    final isPeopleList = widget.listIdentifier.kind == NostrList.followSet;
+    final isPeopleList =
+        widget.listIdentifier.kind == NostrList.followSet ||
+        widget.listIdentifier.kind == NostrList.starterPack;
 
     return Scaffold(
       body: Column(

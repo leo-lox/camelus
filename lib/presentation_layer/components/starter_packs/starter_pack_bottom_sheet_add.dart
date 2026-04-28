@@ -6,13 +6,13 @@ import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../domain_layer/entities/nostr_list.dart';
-import '../../../domain_layer/entities/starter_pack_identifier.dart';
 import '../../../helpers/helpers.dart';
 import '../../atoms/spinner_center.dart';
 import '../../providers/metadata_state_provider.dart';
 import '../../providers/ndk_provider.dart';
 import '../../providers/nostr_list_provider.dart';
 import '../../providers/nostr_lists_follow_state_provider.dart';
+import '../../routing/route_paths.dart';
 
 class StarterPackSelectionBottomSheet extends ConsumerStatefulWidget {
   final String userPubkey; // The user to be added to the pack
@@ -345,10 +345,10 @@ class _StarterPackSelectionBottomSheetState
 
   void _createNewPack(BuildContext context) {
     context.push(
-      '/edit-starter-pack',
-      extra: StarterPackIdentifier(
-        name: "i-${Helpers().getRandomString(10)}",
+      RoutePaths.starterPackEdit(
         pubkey: widget.currentUserPubkey,
+        name: 'i-${Helpers().getRandomString(10)}',
+        isNew: true,
       ),
     );
   }

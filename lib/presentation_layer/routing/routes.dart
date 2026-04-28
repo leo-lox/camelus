@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ndk/shared/nips/nip19/nip19.dart';
 
-import '../../domain_layer/entities/starter_pack_identifier.dart';
 import '../../lifecycle/app_init_shell.dart';
 import '../components/app_bottom_navigation_bar/app_bottom_navigation_bar.dart';
 import '../components/drawer/nostr_side_menu.dart';
@@ -10,9 +9,9 @@ import '../components/drawer/nostr_side_menu_post_button.dart';
 import '../components/drawer/side_menu_logo.dart';
 import '../components/relays_connectivity_widget.dart';
 import '../components/right_sidebar/right_siedbar.dart';
-import '../components/starter_packs/edit_starter_pack/edit_starter_pack.dart';
-import '../components/starter_packs/open_starter_pack.dart';
 import '../../domain_layer/entities/list_identifier.dart';
+import '../routes/nostr/starter_packs/starter_pack_page.dart';
+import '../routes/nostr/starter_packs/starter_pack_edit_page.dart';
 import '../layouts/mobile_bottom_menu_layout.dart';
 import '../layouts/responsive_layout.dart';
 import '../layouts/three_colum_layout.dart';
@@ -257,16 +256,33 @@ final routes = [
             },
           ),
           GoRoute(
-            path: '/edit-starter-pack',
-            builder: (context, state) => EditStarterPack(
-              starterPackIdentifier: state.extra as StarterPackIdentifier,
-            ),
-          ),
-          GoRoute(
-            path: '/open-starter-pack',
-            builder: (context, state) => OpenStarterPack(
-              starterPackIdentifier: state.extra as StarterPackIdentifier,
-            ),
+            path: '/starter/:pubkey/:name',
+            builder: (context, state) {
+              final pubkeyRaw = state.pathParameters['pubkey']!;
+              final pubkey =
+                  decodeProfileIdentifierToPubkey(pubkeyRaw) ?? pubkeyRaw;
+              final name = Uri.decodeComponent(state.pathParameters['name']!);
+              return StarterPackPage(pubkey: pubkey, name: name);
+            },
+            routes: [
+              GoRoute(
+                path: 'edit',
+                builder: (context, state) {
+                  final pubkeyRaw = state.pathParameters['pubkey']!;
+                  final pubkey =
+                      decodeProfileIdentifierToPubkey(pubkeyRaw) ?? pubkeyRaw;
+                  final name = Uri.decodeComponent(
+                    state.pathParameters['name']!,
+                  );
+                  final isNew = state.uri.queryParameters['new'] == 'true';
+                  return StarterPackEditPage(
+                    pubkey: pubkey,
+                    name: name,
+                    isNew: isNew,
+                  );
+                },
+              ),
+            ],
           ),
         ],
       ),

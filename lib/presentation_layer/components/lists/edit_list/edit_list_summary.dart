@@ -1,10 +1,12 @@
-import 'package:camelus/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:ndk/shared/nips/nip19/nip19.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../../../../domain_layer/entities/list_identifier.dart';
 import '../../../../domain_layer/entities/nostr_list.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../../atoms/long_button.dart';
 import '../../../providers/ndk_provider.dart';
 import '../../../providers/user_lists_provider.dart';
@@ -74,7 +76,11 @@ class EditListSummary extends ConsumerWidget {
       elements: data.selectedItems
           .map(
             (v) => NostrListElement(
-              tag: data.kind == NostrList.followSet ? 'p' : 'e',
+              tag:
+                  (data.kind == NostrList.followSet ||
+                      data.kind == NostrList.starterPack)
+                  ? 'p'
+                  : 'e',
               value: v,
               private: false,
             ),
@@ -120,6 +126,28 @@ class EditListSummary extends ConsumerWidget {
                       ),
                     ),
                   ),
+
+                // Share button after publishing a starter pack
+                if (data.broadcasted && data.kind == NostrList.starterPack) ...[
+                  const SizedBox(height: 16),
+                  Center(
+                    child: OutlinedButton.icon(
+                      onPressed: () {
+                        final npub = Nip19.encodePubKey(pubKey);
+                        final encodedName = Uri.encodeComponent(data.name);
+                        final url =
+                            'https://camelus.app/starter/$npub/$encodedName';
+                        SharePlus.instance.share(
+                          ShareParams(uri: Uri.parse(url)),
+                        );
+                      },
+                      icon: const Icon(Icons.share),
+                      label: Text(
+                        AppLocalizations.of(context)!.shareStarterPack,
+                      ),
+                    ),
+                  ),
+                ],
               ],
             ),
           ),

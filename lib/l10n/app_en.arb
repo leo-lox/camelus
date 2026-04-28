@@ -1727,6 +1727,10 @@
   "@curationSetKind": {
     "description": "Kind label for curation sets (kind 30004)"
   },
+  "starterPackKind": "Starter Pack",
+  "@starterPackKind": {
+    "description": "Kind label for starter packs (kind 39089)"
+  },
   "noListsYet": "No lists yet",
   "@noListsYet": {
     "description": "Empty state heading for lists page"

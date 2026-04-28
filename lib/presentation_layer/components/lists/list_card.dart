@@ -1,10 +1,10 @@
-import 'package:camelus/l10n/app_localizations.dart';
-import 'package:camelus/presentation_layer/atoms/my_profile_picture.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../domain_layer/entities/nostr_list.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../atoms/icon_patter.dart';
+import '../../atoms/my_profile_picture.dart';
 import '../../atoms/overlapting_avatars.dart';
 import '../../providers/metadata_state_provider.dart';
 
@@ -92,8 +92,10 @@ class ListCard extends ConsumerWidget {
               ],
             ),
 
-            // Overlapping avatars for follow sets
-            if (list.kind == NostrList.followSet && list.pubKeys.isNotEmpty)
+            // Overlapping avatars for follow sets and starter packs
+            if ((list.kind == NostrList.followSet ||
+                    list.kind == NostrList.starterPack) &&
+                list.pubKeys.isNotEmpty)
               Positioned(
                 top: 100,
                 left: 12,
@@ -143,10 +145,14 @@ class _KindBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isFollow = kind == NostrList.followSet;
-    final label = isFollow
-        ? AppLocalizations.of(context)!.followSetKind
-        : AppLocalizations.of(context)!.curationSetKind;
+    final String label;
+    if (kind == NostrList.followSet) {
+      label = AppLocalizations.of(context)!.followSetKind;
+    } else if (kind == NostrList.starterPack) {
+      label = AppLocalizations.of(context)!.starterPackKind;
+    } else {
+      label = AppLocalizations.of(context)!.curationSetKind;
+    }
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),

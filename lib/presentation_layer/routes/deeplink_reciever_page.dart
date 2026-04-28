@@ -10,7 +10,6 @@ import 'package:go_router/go_router.dart';
 import 'package:ndk/shared/nips/nip19/nip19.dart';
 
 import '../../domain_layer/entities/invite_data.dart';
-import '../../domain_layer/entities/starter_pack_identifier.dart';
 import '../../domain_layer/usecases/app_auth.dart';
 import '../../helpers/helpers.dart';
 import '../routing/route_paths.dart';
@@ -81,10 +80,7 @@ class _DeeplinkRecieverPageState extends ConsumerState<DeeplinkRecieverPage> {
   }
 
   void _navigateToStarterPack(String listName, String pubkey) {
-    context.go(
-      '/open-starter-pack',
-      extra: StarterPackIdentifier(name: listName, pubkey: pubkey),
-    );
+    context.go(RoutePaths.starterPack(pubkey: pubkey, name: listName));
   }
 
   Future<void> _nostrDecode({

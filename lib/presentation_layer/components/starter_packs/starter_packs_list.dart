@@ -1,15 +1,15 @@
-import 'package:camelus/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../domain_layer/entities/nostr_list.dart';
-import '../../../domain_layer/entities/starter_pack_identifier.dart';
 import '../../../helpers/helpers.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../atoms/long_button.dart';
 import '../../atoms/spinner_center.dart';
 import '../../providers/ndk_provider.dart';
 import '../../providers/nostr_lists_follow_state_provider.dart';
+import '../../routing/route_paths.dart';
 import 'starter_pack_card.dart';
 
 class StarterPacksList extends ConsumerWidget {
@@ -39,10 +39,10 @@ class StarterPacksList extends ConsumerWidget {
             inverted: true,
             onPressed: () {
               context.push(
-                '/edit-starter-pack',
-                extra: StarterPackIdentifier(
-                  name: "i-${Helpers().getRandomString(10)}", //create new
+                RoutePaths.starterPackEdit(
                   pubkey: pubkey,
+                  name: 'i-${Helpers().getRandomString(10)}',
+                  isNew: true,
                 ),
               );
             },
@@ -72,10 +72,10 @@ class StarterPacksList extends ConsumerWidget {
                   inverted: true,
                   onPressed: () {
                     context.push(
-                      '/edit-starter-pack',
-                      extra: StarterPackIdentifier(
-                        name: "i-${Helpers().getRandomString(10)}", //create new
+                      RoutePaths.starterPackEdit(
                         pubkey: pubkey,
+                        name: 'i-${Helpers().getRandomString(10)}',
+                        isNew: true,
                       ),
                     );
                   },
@@ -94,10 +94,9 @@ class StarterPacksList extends ConsumerWidget {
               pack: starterPacks,
               onTab: () {
                 context.push(
-                  '/open-starter-pack',
-                  extra: StarterPackIdentifier(
-                    name: starterPacks.name,
+                  RoutePaths.starterPack(
                     pubkey: pubkey,
+                    name: starterPacks.name,
                   ),
                 );
               },

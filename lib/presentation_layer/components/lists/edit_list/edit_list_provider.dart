@@ -150,7 +150,8 @@ class EditListNotifier extends Notifier<ListData> {
   }
 
   List<String> _extractItems(NostrSet list) {
-    if (list.kind == NostrList.followSet) {
+    if (list.kind == NostrList.followSet ||
+        list.kind == NostrList.starterPack) {
       return list.pubKeys.map((e) => e.value).toList();
     }
     if (list.kind == NostrList.curationSet) {
@@ -206,7 +207,11 @@ class EditListNotifier extends Notifier<ListData> {
       return false;
     }
 
-    final tag = state.kind == NostrList.followSet ? 'p' : 'e';
+    final tag =
+        (state.kind == NostrList.followSet ||
+            state.kind == NostrList.starterPack)
+        ? 'p'
+        : 'e';
     final elements = state.selectedItems
         .map((item) => NostrListElement(tag: tag, value: item, private: false))
         .toList();
