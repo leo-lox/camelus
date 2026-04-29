@@ -1211,7 +1211,7 @@ packages:
     source: hosted
     version: "0.2.9"
   nip07_event_signer:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: nip07_event_signer
       sha256: "4e37063c7e63c8694331c3b460ad060e68852e756a6aa36c19ac559acd79f103"

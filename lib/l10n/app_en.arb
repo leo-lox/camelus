@@ -1228,6 +1228,10 @@
   "@bunkerLogin": {
     "description": "Bunker login button label"
   },
+  "extensionLogin": "login with extension",
+  "@extensionLogin": {
+    "description": "Web extension (NIP-07) login button label"
+  },
   "iHaveReadAndAcceptThe": "I have read and accept the ",
   "@iHaveReadAndAcceptThe": {
     "description": "Terms acceptance checkbox prefix"
