@@ -11,6 +11,9 @@ class NostrList {
 
   static const int followSet = 30000;
   static const int starterPack = 39089;
+
+  /// Well-known d-tag name for the user's friends follow set (kind 30000).
+  static const String friendsSetName = "friends";
   static const int relaySet = 30002;
   static const int bookmarksSet = 30003;
   static const int curationSet = 30004;

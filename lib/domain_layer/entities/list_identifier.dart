@@ -2,7 +2,15 @@ class ListIdentifier {
   final String name;
   final int kind;
 
-  const ListIdentifier({required this.name, required this.kind});
+  /// Optional pre-filled title shown when creating a new list.
+  /// Not included in equality/hashCode so it doesn't affect provider identity.
+  final String? defaultTitle;
+
+  const ListIdentifier({
+    required this.name,
+    required this.kind,
+    this.defaultTitle,
+  });
 
   @override
   bool operator ==(Object other) {

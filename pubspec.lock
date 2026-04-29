@@ -1247,7 +1247,7 @@ packages:
       path: "../ndk/packages/objectbox"
       relative: true
     source: path
-    version: "0.2.11-dev.3"
+    version: "0.2.11-dev.5"
   nip07_event_signer:
     dependency: "direct main"
     description:

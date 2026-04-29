@@ -123,7 +123,7 @@ class EditListNotifier extends Notifier<ListData> {
     return ListData(
       name: identifier.name,
       kind: identifier.kind,
-      title: '',
+      title: identifier.defaultTitle ?? '',
       description: null,
       imageUrl: null,
       imageUploading: false,

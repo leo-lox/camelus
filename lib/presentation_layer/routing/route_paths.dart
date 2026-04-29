@@ -56,9 +56,16 @@ class RoutePaths {
     required int kind,
     required String name,
     bool isNew = false,
+    String? defaultTitle,
   }) {
     final base = '/lists/$kind/${Uri.encodeComponent(name)}/edit';
-    return isNew ? '$base?new=true' : base;
+    final params = <String, String>{
+      if (isNew) 'new': 'true',
+      if (defaultTitle != null && defaultTitle.isNotEmpty)
+        'defaultTitle': Uri.encodeQueryComponent(defaultTitle),
+    };
+    if (params.isEmpty) return base;
+    return '$base?${params.entries.map((e) => '${e.key}=${e.value}').join('&')}';
   }
 
   static String starterPack({required String pubkey, required String name}) {

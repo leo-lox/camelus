@@ -271,8 +271,18 @@ final routes = [
               final kind = int.parse(state.pathParameters['kind']!);
               final name = Uri.decodeComponent(state.pathParameters['name']!);
               final isNew = state.uri.queryParameters['new'] == 'true';
+              final defaultTitle =
+                  state.uri.queryParameters['defaultTitle'] != null
+                  ? Uri.decodeQueryComponent(
+                      state.uri.queryParameters['defaultTitle']!,
+                    )
+                  : null;
               return EditListPage(
-                identifier: ListIdentifier(name: name, kind: kind),
+                identifier: ListIdentifier(
+                  name: name,
+                  kind: kind,
+                  defaultTitle: defaultTitle,
+                ),
                 isNewList: isNew,
               );
             },
