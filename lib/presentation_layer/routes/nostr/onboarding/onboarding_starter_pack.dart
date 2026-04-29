@@ -150,18 +150,18 @@ class _OnboardingStarterPackState extends ConsumerState<OnboardingStarterPack> {
 // helper class to represent flattened items
 class _StarterPackItem {
   final bool isLoading;
-  final NostrStarterPack? nostrSet;
+  final NostrSet? nostrSet;
 
   _StarterPackItem._({required this.isLoading, this.nostrSet});
 
   factory _StarterPackItem.loading() => _StarterPackItem._(isLoading: true);
 
-  factory _StarterPackItem.starterPack(NostrStarterPack nostrSet) =>
+  factory _StarterPackItem.starterPack(NostrSet nostrSet) =>
       _StarterPackItem._(isLoading: false, nostrSet: nostrSet);
 }
 
 class OnboardingOpenStarterPack extends ConsumerStatefulWidget {
-  final NostrStarterPack followSet;
+  final NostrSet followSet;
   final List<String> selectedPubkeys;
 
   const OnboardingOpenStarterPack({

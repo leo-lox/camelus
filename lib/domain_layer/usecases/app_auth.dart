@@ -9,6 +9,7 @@ import 'package:go_router/go_router.dart';
 import 'package:ndk/data_layer/repositories/signers/nip46_event_signer.dart';
 import 'package:ndk/ndk.dart';
 import 'package:ndk_flutter/ndk_flutter.dart';
+import 'package:nip07_event_signer/nip07_event_signer.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import '../../l10n/app_localizations.dart';
 import '../../presentation_layer/providers/signer_provider.dart';
@@ -141,6 +142,15 @@ class AppAuth {
 
       case LoginType.anon:
         return null;
+
+      case LoginType.webExtension:
+        if (!kIsWeb) return null;
+        final webPubkey = startupAccountData.account?.pubkey;
+        if (webPubkey == null) return null;
+        final webSigner = Nip07EventSigner(cachedPublicKey: webPubkey);
+        ndk.accounts.loginExternalSigner(signer: webSigner);
+        signerNoti.setSigner(webSigner);
+        return webSigner;
 
       case LoginType.register:
         return null;

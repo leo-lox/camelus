@@ -12,6 +12,7 @@ class OnboardingLoginSelectPage extends ConsumerStatefulWidget {
   final Function onPressedSeedPhraseLogin;
   final Function onPressedAmberLogin;
   final Function onPressedBunkerLogin;
+  final Function onPressedExtensionLogin;
   final Function? onPressedBack;
 
   const OnboardingLoginSelectPage({
@@ -19,6 +20,7 @@ class OnboardingLoginSelectPage extends ConsumerStatefulWidget {
     required this.onPressedSeedPhraseLogin,
     required this.onPressedAmberLogin,
     required this.onPressedBunkerLogin,
+    required this.onPressedExtensionLogin,
     this.onPressedBack,
   });
   @override
@@ -114,6 +116,21 @@ class _OnboardingLoginSelectPageState
                   ),
                 ),
               ),
+              if (kIsWeb) const SizedBox(height: 20),
+              if (kIsWeb)
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+
+                  child: SizedBox(
+                    width: double.infinity,
+                    height: 35,
+                    child: longButton(
+                      name: AppLocalizations.of(context)!.extensionLogin,
+                      inverted: false,
+                      onPressed: () => widget.onPressedExtensionLogin(),
+                    ),
+                  ),
+                ),
             ],
           ),
         ),

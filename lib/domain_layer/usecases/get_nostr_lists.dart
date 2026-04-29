@@ -8,18 +8,14 @@ class GetNostrLists {
     : _nostrListRepository = nostrListRepository;
 
   /// gives you all the public sets by a user
-  Stream<List<NostrStarterPack>?> getPublicNostrStarterPacks({
-    required String pubKey,
-  }) {
+  Stream<List<NostrSet>?> getPublicNostrStarterPacks({required String pubKey}) {
     return _nostrListRepository.getPublicNostrStarterPacks(
       pubKey: pubKey,
       kind: NostrList.starterPack,
     );
   }
 
-  Future<NostrStarterPack> broadcastStarterPack({
-    required NostrStarterPack starterPack,
-  }) {
+  Future<NostrSet> broadcastStarterPack({required NostrSet starterPack}) {
     return _nostrListRepository.broadcastStarterPack(starterPack: starterPack);
   }
 
@@ -27,7 +23,7 @@ class GetNostrLists {
     return _nostrListRepository.deleteStarterPack(name: name);
   }
 
-  Future<NostrStarterPack?> addUserToStarterPack({
+  Future<NostrSet?> addUserToStarterPack({
     required String name,
     required String pubkey,
   }) {
@@ -72,5 +68,26 @@ class GetNostrLists {
       value: value,
       kind: kind,
     );
+  }
+
+  /// Get public sets of any kind for a given pubkey
+  Stream<List<NostrSet>?> getPublicSets({
+    required String pubKey,
+    required int kind,
+  }) {
+    return _nostrListRepository.getPublicNostrStarterPacks(
+      pubKey: pubKey,
+      kind: kind,
+    );
+  }
+
+  /// Broadcast a NIP-51 set of any kind (uses list.kind)
+  Future<NostrSet> broadcastList({required NostrSet list}) {
+    return _nostrListRepository.broadcastSet(set: list);
+  }
+
+  /// Delete a NIP-51 set of any kind
+  Future<void> deleteList({required String name, required int kind}) {
+    return _nostrListRepository.deleteListSet(name: name, kind: kind);
   }
 }

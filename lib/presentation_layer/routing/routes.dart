@@ -3,7 +3,6 @@ import 'package:go_router/go_router.dart';
 import 'package:ndk/shared/nips/nip19/nip19.dart';
 import 'package:ndk/entities.dart' as ndk_entities;
 
-import '../../domain_layer/entities/starter_pack_identifier.dart';
 import '../../lifecycle/app_init_shell.dart';
 import '../components/app_bottom_navigation_bar/app_bottom_navigation_bar.dart';
 import '../components/drawer/nostr_side_menu.dart';
@@ -11,8 +10,9 @@ import '../components/drawer/nostr_side_menu_post_button.dart';
 import '../components/drawer/side_menu_logo.dart';
 import '../components/relays_connectivity_widget.dart';
 import '../components/right_sidebar/right_siedbar.dart';
-import '../components/starter_packs/edit_starter_pack/edit_starter_pack.dart';
-import '../components/starter_packs/open_starter_pack.dart';
+import '../../domain_layer/entities/list_identifier.dart';
+import '../routes/nostr/starter_packs/starter_pack_page.dart';
+import '../routes/nostr/starter_packs/starter_pack_edit_page.dart';
 import '../layouts/mobile_bottom_menu_layout.dart';
 import '../layouts/responsive_layout.dart';
 import '../layouts/three_colum_layout.dart';
@@ -24,6 +24,8 @@ import '../routes/nostr/event_gallery_page.dart';
 import '../routes/nostr/fullscreen_video_page.dart';
 import '../routes/nostr/bookmarks/bookmarks_page.dart';
 import '../routes/nostr/event_view/event_view_page.dart';
+import '../routes/nostr/lists/edit_list_page.dart';
+import '../routes/nostr/lists/lists_page.dart';
 import '../routes/nostr/onboarding/onboarding.dart';
 import '../routes/nostr/profile/edit_profile_page.dart';
 import '../routes/nostr/profile/profile_resolver_page.dart';
@@ -260,16 +262,49 @@ final routes = [
             builder: (context, state) => const BlocklistPage(),
           ),
           GoRoute(
-            path: '/edit-starter-pack',
-            builder: (context, state) => EditStarterPack(
-              starterPackIdentifier: state.extra as StarterPackIdentifier,
-            ),
+            path: '/lists',
+            builder: (context, state) => const ListsPage(),
           ),
           GoRoute(
-            path: '/open-starter-pack',
-            builder: (context, state) => OpenStarterPack(
-              starterPackIdentifier: state.extra as StarterPackIdentifier,
-            ),
+            path: '/lists/:kind/:name/edit',
+            builder: (context, state) {
+              final kind = int.parse(state.pathParameters['kind']!);
+              final name = Uri.decodeComponent(state.pathParameters['name']!);
+              final isNew = state.uri.queryParameters['new'] == 'true';
+              return EditListPage(
+                identifier: ListIdentifier(name: name, kind: kind),
+                isNewList: isNew,
+              );
+            },
+          ),
+          GoRoute(
+            path: '/starter/:pubkey/:name',
+            builder: (context, state) {
+              final pubkeyRaw = state.pathParameters['pubkey']!;
+              final pubkey =
+                  decodeProfileIdentifierToPubkey(pubkeyRaw) ?? pubkeyRaw;
+              final name = Uri.decodeComponent(state.pathParameters['name']!);
+              return StarterPackPage(pubkey: pubkey, name: name);
+            },
+            routes: [
+              GoRoute(
+                path: 'edit',
+                builder: (context, state) {
+                  final pubkeyRaw = state.pathParameters['pubkey']!;
+                  final pubkey =
+                      decodeProfileIdentifierToPubkey(pubkeyRaw) ?? pubkeyRaw;
+                  final name = Uri.decodeComponent(
+                    state.pathParameters['name']!,
+                  );
+                  final isNew = state.uri.queryParameters['new'] == 'true';
+                  return StarterPackEditPage(
+                    pubkey: pubkey,
+                    name: name,
+                    isNew: isNew,
+                  );
+                },
+              ),
+            ],
           ),
           ShellRoute(
             builder: (context, state, child) => WalletShellPage(child: child),

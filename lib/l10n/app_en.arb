@@ -1228,6 +1228,10 @@
   "@bunkerLogin": {
     "description": "Bunker login button label"
   },
+  "extensionLogin": "login with extension",
+  "@extensionLogin": {
+    "description": "Web extension (NIP-07) login button label"
+  },
   "iHaveReadAndAcceptThe": "I have read and accept the ",
   "@iHaveReadAndAcceptThe": {
     "description": "Terms acceptance checkbox prefix"
@@ -1702,5 +1706,77 @@
   "imprint": "Imprint",
   "@imprint": {
     "description": "Imprint page title"
+  },
+  "lists": "Lists",
+  "@lists": {
+    "description": "Lists menu item and page title"
+  },
+  "createNewList": "Create new list",
+  "@createNewList": {
+    "description": "Button to create a new list"
+  },
+  "listTitle": "List title",
+  "@listTitle": {
+    "description": "Label for list title input"
+  },
+  "listDescription": "List description (optional)",
+  "@listDescription": {
+    "description": "Label for list description input"
+  },
+  "followSetKind": "Follow list (people)",
+  "@followSetKind": {
+    "description": "Kind label for follow sets (kind 30000)"
+  },
+  "curationSetKind": "Curation list (notes)",
+  "@curationSetKind": {
+    "description": "Kind label for curation sets (kind 30004)"
+  },
+  "starterPackKind": "Starter Pack",
+  "@starterPackKind": {
+    "description": "Kind label for starter packs (kind 39089)"
+  },
+  "noListsYet": "No lists yet",
+  "@noListsYet": {
+    "description": "Empty state heading for lists page"
+  },
+  "createYourFirstList": "Create your first list to get started",
+  "@createYourFirstList": {
+    "description": "Empty state sub-text for lists page"
+  },
+  "pasteNoteId": "Paste a note ID (note1 or nevent)",
+  "@pasteNoteId": {
+    "description": "Hint text for note ID input in curation list editor"
+  },
+  "invalidNoteId": "Invalid note identifier",
+  "@invalidNoteId": {
+    "description": "Validation error for bad note ID"
+  },
+  "publishList": "Publish list",
+  "@publishList": {
+    "description": "Button to publish a list"
+  },
+  "deleteList": "Delete list",
+  "@deleteList": {
+    "description": "Button to delete a list"
+  },
+  "deleteListConfirm": "Delete this list?",
+  "@deleteListConfirm": {
+    "description": "Title of the delete list confirmation dialog"
+  },
+  "deleteListMessage": "This will permanently delete the list from your profile.",
+  "@deleteListMessage": {
+    "description": "Body of the delete list confirmation dialog"
+  },
+  "listSaved": "List saved successfully",
+  "@listSaved": {
+    "description": "Confirmation message after a list is published"
+  },
+  "listDeleted": "List deleted",
+  "@listDeleted": {
+    "description": "Snackbar message after a list is deleted"
+  },
+  "selectListType": "Select list type",
+  "@selectListType": {
+    "description": "Title of the dialog to pick a list kind"
   }
 }

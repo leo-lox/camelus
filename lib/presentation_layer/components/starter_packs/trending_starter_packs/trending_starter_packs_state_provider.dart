@@ -9,7 +9,7 @@ import '../../../../domain_layer/entities/nostr_list.dart';
 
 class TrendingStarterPackState {
   final bool isLoading;
-  final List<NostrStarterPack> starterPacks;
+  final List<NostrSet> starterPacks;
 
   TrendingStarterPackState({
     required this.starterPacks,
@@ -18,7 +18,7 @@ class TrendingStarterPackState {
 
   TrendingStarterPackState copyWith({
     bool? isLoading,
-    List<NostrStarterPack>? starterPacks,
+    List<NostrSet>? starterPacks,
   }) {
     return TrendingStarterPackState(
       isLoading: isLoading ?? this.isLoading,
@@ -42,13 +42,13 @@ class TrendingStarterPackNotifier extends Notifier<TrendingStarterPackState> {
       filter: Filter(limit: 3, kinds: [NostrList.starterPack]),
     );
 
-    List<NostrStarterPack> myPacks = [];
+    List<NostrSet> myPacks = [];
     final StreamSubscription<Nip01Event> subscription = ndkResp.stream.listen((
       event,
     ) async {
       final ndkSet = await Nip51Set.fromEvent(event, null);
       if (ndkSet == null) return;
-      final rcvPack = NostrStarterPackModel.fromNDK(ndkSet);
+      final rcvPack = NostrSetModel.fromNDK(ndkSet);
       myPacks.add(rcvPack);
       state = state.copyWith(isLoading: false, starterPacks: myPacks);
     });

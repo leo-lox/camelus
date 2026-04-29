@@ -10,7 +10,7 @@ import '../../atoms/overlapting_avatars.dart';
 import '../../providers/metadata_state_provider.dart';
 
 class StarterPackCard extends ConsumerStatefulWidget {
-  final NostrStarterPack pack;
+  final NostrSet pack;
   final Function? onTab;
   const StarterPackCard({super.key, required this.pack, this.onTab});
 

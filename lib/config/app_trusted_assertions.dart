@@ -3,7 +3,7 @@
 import 'package:ndk/entities.dart';
 
 /// Default relay for NIP-85 trusted assertions
-const String DEFAULT_NIP85_RELAY = 'ws://localhost:3334';
+const String DEFAULT_NIP85_RELAY = 'wss://ta.eune1.relay.camelus.app';
 
 /// Default trusted providers for NIP-85 assertions
 const List<Nip85TrustedProvider> APP_DEFAULT_NIP85_PROVIDERS = [
@@ -16,12 +16,12 @@ const List<Nip85TrustedProvider> APP_DEFAULT_NIP85_PROVIDERS = [
   //   pubkey: '3116ea6afb590a19455d7b39ae3317c62b2bbb236986788b7e0ae12ec2281101',
   //   relay: DEFAULT_NIP85_RELAY,
   // ),
-  // Nip85TrustedProvider(
-  //   kind: Nip85Kind.user,
-  //   metric: Nip85Metric.rank,
-  //   pubkey: 'cbeb151f3f5c4925c392c2b79936c3acd3c5c73a8ad60173ee6e43ff9112cfe1',
-  //   relay: DEFAULT_NIP85_RELAY,
-  // ),
+  Nip85TrustedProvider(
+    kind: Nip85Kind.user,
+    metric: Nip85Metric.rank,
+    pubkey: 'f71c1e2e800bc17138cfcd8153330f59d8cad9a62a1e3c7329eaab5c24759275',
+    relay: DEFAULT_NIP85_RELAY,
+  ),
   // Nip85TrustedProvider(
   //   kind: Nip85Kind.user,
   //   metric: Nip85Metric.firstCreatedAt,
@@ -113,37 +113,37 @@ const List<Nip85TrustedProvider> APP_DEFAULT_NIP85_PROVIDERS = [
   Nip85TrustedProvider(
     kind: Nip85Kind.event,
     metric: Nip85Metric.commentCount,
-    pubkey: 'bc96b59ff2fff7a2597dadcf5bddafb2880169df24c0f9eb7210cdf916d9c620',
+    pubkey: '606f26975866c693db28b0ab58235bf7f11bc0605f2aed78877adb6474403ca0',
     relay: DEFAULT_NIP85_RELAY,
   ),
   Nip85TrustedProvider(
     kind: Nip85Kind.event,
     metric: Nip85Metric.quoteCount,
-    pubkey: 'bc96b59ff2fff7a2597dadcf5bddafb2880169df24c0f9eb7210cdf916d9c620',
+    pubkey: 'b4fd6a53f323457d934ef820f051e71f6c8289fa9dd41c74e3c4ed5558d1b151',
     relay: DEFAULT_NIP85_RELAY,
   ),
   Nip85TrustedProvider(
     kind: Nip85Kind.event,
     metric: Nip85Metric.repostCount,
-    pubkey: 'bc96b59ff2fff7a2597dadcf5bddafb2880169df24c0f9eb7210cdf916d9c620',
+    pubkey: '62808ed6dff1ea27bfb18991aacf273fd14ad72484c2cc3f5e1e9c919ec62880',
     relay: DEFAULT_NIP85_RELAY,
   ),
   Nip85TrustedProvider(
     kind: Nip85Kind.event,
     metric: Nip85Metric.reactionCount,
-    pubkey: 'bc96b59ff2fff7a2597dadcf5bddafb2880169df24c0f9eb7210cdf916d9c620',
+    pubkey: 'f837f2fa2fed595a59d3518d701c98166dd67b8dd82c3586cb62e64bf406a9fa',
     relay: DEFAULT_NIP85_RELAY,
   ),
   Nip85TrustedProvider(
     kind: Nip85Kind.event,
     metric: Nip85Metric.zapCount,
-    pubkey: 'bc96b59ff2fff7a2597dadcf5bddafb2880169df24c0f9eb7210cdf916d9c620',
+    pubkey: 'dce4cea14593a0b5c3a32e4ff3451ee37f6870d69668c33ccb49a824858d0dcb',
     relay: DEFAULT_NIP85_RELAY,
   ),
   Nip85TrustedProvider(
     kind: Nip85Kind.event,
     metric: Nip85Metric.zapAmount,
-    pubkey: 'bc96b59ff2fff7a2597dadcf5bddafb2880169df24c0f9eb7210cdf916d9c620',
+    pubkey: 'c3efb147bc97280f11f54120d3123d04a6cab4cb1e784b8c488e97651f746f17',
     relay: DEFAULT_NIP85_RELAY,
   ),
 
