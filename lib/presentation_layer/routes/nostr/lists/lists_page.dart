@@ -71,8 +71,22 @@ class ListsPage extends ConsumerWidget {
     if (kind == null) return;
     if (!context.mounted) return;
 
+    final isPrivate = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => _SelectPrivacyDialog(),
+    );
+    if (isPrivate == null) return;
+    if (!context.mounted) return;
+
     final name = _uuid.v4();
-    context.push(RoutePaths.listEdit(kind: kind, name: name, isNew: true));
+    context.push(
+      RoutePaths.listEdit(
+        kind: kind,
+        name: name,
+        isNew: true,
+        isPrivate: isPrivate,
+      ),
+    );
   }
 }
 
@@ -95,6 +109,42 @@ class _SelectListTypeDialog extends StatelessWidget {
             leading: Icon(PhosphorIcons.newspaper()),
             title: Text(AppLocalizations.of(context)!.curationSetKind),
             onTap: () => Navigator.of(context).pop(NostrList.curationSet),
+          ),
+        ],
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: Text(AppLocalizations.of(context)!.cancel),
+        ),
+      ],
+    );
+  }
+}
+
+// ── Select privacy dialog ──────────────────────────────────────────────────
+
+class _SelectPrivacyDialog extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text(AppLocalizations.of(context)!.listVisibility),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          ListTile(
+            leading: Icon(PhosphorIcons.globe()),
+            title: Text(AppLocalizations.of(context)!.publicList),
+            subtitle: Text(AppLocalizations.of(context)!.publicListDescription),
+            onTap: () => Navigator.of(context).pop(false),
+          ),
+          ListTile(
+            leading: Icon(PhosphorIcons.lock()),
+            title: Text(AppLocalizations.of(context)!.privateList),
+            subtitle: Text(
+              AppLocalizations.of(context)!.privateListDescription,
+            ),
+            onTap: () => Navigator.of(context).pop(true),
           ),
         ],
       ),

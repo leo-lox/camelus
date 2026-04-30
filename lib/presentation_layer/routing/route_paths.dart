@@ -57,12 +57,14 @@ class RoutePaths {
     required String name,
     bool isNew = false,
     String? defaultTitle,
+    bool isPrivate = false,
   }) {
     final base = '/lists/$kind/${Uri.encodeComponent(name)}/edit';
     final params = <String, String>{
       if (isNew) 'new': 'true',
       if (defaultTitle != null && defaultTitle.isNotEmpty)
         'defaultTitle': Uri.encodeQueryComponent(defaultTitle),
+      if (isPrivate) 'private': 'true',
     };
     if (params.isEmpty) return base;
     return '$base?${params.entries.map((e) => '${e.key}=${e.value}').join('&')}';

@@ -111,6 +111,25 @@ class NostrListRepositoryImpl implements NostrListRepository {
   }
 
   @override
+  Stream<List<NostrSet>?> getMyNostrSets({required int kind}) {
+    // Call without publicKey so NDK uses the full account signer,
+    // which allows decryption of private elements.
+    final ndkSets = dartNdkSource.dartNdk.lists.getPublicSets(
+      kind: kind,
+      forceRefresh: false,
+    );
+
+    return ndkSets.asyncMap((sets) async {
+      if (sets == null) return null;
+      final result = <NostrSet>[];
+      for (final set in sets) {
+        result.add(NostrSetModel.fromNDK(set));
+      }
+      return result;
+    });
+  }
+
+  @override
   Future<NostrSet> broadcastSet({required NostrSet set}) async {
     final ndkSet = NostrSetModel.fromEntity(set).toNDK();
     final result = await dartNdkSource.dartNdk.lists.setCompleteSet(

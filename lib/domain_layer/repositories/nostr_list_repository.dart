@@ -33,6 +33,10 @@ abstract class NostrListRepository {
     required int kind,
   });
 
+  /// Get the logged-in user's own NIP-51 sets (decrypts private elements).
+  /// Use this instead of [getPublicNostrStarterPacks] when fetching the current user's sets.
+  Stream<List<NostrSet>?> getMyNostrSets({required int kind});
+
   /// Broadcast any NIP-51 set (uses set.kind)
   Future<NostrSet> broadcastSet({required NostrSet set});
 

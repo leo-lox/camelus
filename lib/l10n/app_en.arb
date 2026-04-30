@@ -1778,5 +1778,25 @@
   "selectListType": "Select list type",
   "@selectListType": {
     "description": "Title of the dialog to pick a list kind"
+  },
+  "listVisibility": "List visibility",
+  "@listVisibility": {
+    "description": "Title of the dialog to pick public or private"
+  },
+  "publicList": "Public",
+  "@publicList": {
+    "description": "Option label for a public list"
+  },
+  "publicListDescription": "Anyone can see the members of this list",
+  "@publicListDescription": {
+    "description": "Subtitle for the public list option"
+  },
+  "privateList": "Private",
+  "@privateList": {
+    "description": "Option label for a private list"
+  },
+  "privateListDescription": "Only you can see the members of this list",
+  "@privateListDescription": {
+    "description": "Subtitle for the private list option"
   }
 }

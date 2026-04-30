@@ -271,6 +271,7 @@ final routes = [
               final kind = int.parse(state.pathParameters['kind']!);
               final name = Uri.decodeComponent(state.pathParameters['name']!);
               final isNew = state.uri.queryParameters['new'] == 'true';
+              final isPrivate = state.uri.queryParameters['private'] == 'true';
               final defaultTitle =
                   state.uri.queryParameters['defaultTitle'] != null
                   ? Uri.decodeQueryComponent(
@@ -282,6 +283,7 @@ final routes = [
                   name: name,
                   kind: kind,
                   defaultTitle: defaultTitle,
+                  isPrivate: isPrivate,
                 ),
                 isNewList: isNew,
               );

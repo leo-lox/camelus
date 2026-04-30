@@ -82,7 +82,7 @@ class EditListSummary extends ConsumerWidget {
                   ? 'p'
                   : 'e',
               value: v,
-              private: false,
+              private: data.isPrivate,
             ),
           )
           .toList(),

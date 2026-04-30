@@ -26,6 +26,7 @@ class WalletFriendsStrip extends ConsumerWidget {
       name: NostrList.friendsSetName,
       isNew: friendsSet == null,
       defaultTitle: friendsSet == null ? 'Friends' : null,
+      isPrivate: true,
     );
 
     return Container(

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../domain_layer/entities/nostr_list.dart';
 import '../../../l10n/app_localizations.dart';
@@ -52,8 +53,16 @@ class ListCard extends ConsumerWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Kind badge
-                      _KindBadge(kind: list.kind),
+                      // Kind badge + privacy badge
+                      Row(
+                        children: [
+                          _KindBadge(kind: list.kind),
+                          const SizedBox(width: 8),
+                          _PrivacyBadge(
+                            isPrivate: list.elements.any((e) => e.private),
+                          ),
+                        ],
+                      ),
                       const SizedBox(height: 6),
                       // Title
                       Text(
@@ -167,6 +176,45 @@ class _KindBadge extends StatelessWidget {
           color: Theme.of(context).colorScheme.primary,
           fontWeight: FontWeight.w600,
         ),
+      ),
+    );
+  }
+}
+
+class _PrivacyBadge extends StatelessWidget {
+  final bool isPrivate;
+  const _PrivacyBadge({required this.isPrivate});
+
+  @override
+  Widget build(BuildContext context) {
+    final color = isPrivate
+        ? Theme.of(context).colorScheme.tertiary
+        : Theme.of(context).colorScheme.secondary;
+    final label = isPrivate
+        ? AppLocalizations.of(context)!.privateList
+        : AppLocalizations.of(context)!.publicList;
+    final icon = isPrivate ? PhosphorIcons.lock() : PhosphorIcons.globe();
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 11, color: color),
+          const SizedBox(width: 4),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 11,
+              color: color,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
       ),
     );
   }

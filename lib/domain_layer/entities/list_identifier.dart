@@ -6,10 +6,15 @@ class ListIdentifier {
   /// Not included in equality/hashCode so it doesn't affect provider identity.
   final String? defaultTitle;
 
+  /// Whether the list's elements should be encrypted (NIP-51 private content).
+  /// Not included in equality/hashCode so it doesn't affect provider identity.
+  final bool isPrivate;
+
   const ListIdentifier({
     required this.name,
     required this.kind,
     this.defaultTitle,
+    this.isPrivate = false,
   });
 
   @override

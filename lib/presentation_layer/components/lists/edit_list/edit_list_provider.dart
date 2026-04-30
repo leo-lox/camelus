@@ -14,6 +14,7 @@ class ListData {
   final String? imageUrl;
   final bool imageUploading;
   final List<String> selectedItems;
+  final bool isPrivate;
   final bool broadcasting;
   final bool broadcasted;
 
@@ -25,6 +26,7 @@ class ListData {
     this.imageUrl,
     required this.imageUploading,
     required this.selectedItems,
+    required this.isPrivate,
     required this.broadcasting,
     required this.broadcasted,
   });
@@ -37,6 +39,7 @@ class ListData {
     String? imageUrl,
     bool? imageUploading,
     List<String>? selectedItems,
+    bool? isPrivate,
     bool? broadcasting,
     bool? broadcasted,
   }) {
@@ -48,6 +51,7 @@ class ListData {
       imageUrl: imageUrl ?? this.imageUrl,
       imageUploading: imageUploading ?? this.imageUploading,
       selectedItems: selectedItems ?? this.selectedItems,
+      isPrivate: isPrivate ?? this.isPrivate,
       broadcasting: broadcasting ?? this.broadcasting,
       broadcasted: broadcasted ?? this.broadcasted,
     );
@@ -61,6 +65,7 @@ class ListData {
     if (other.description != description) return false;
     if (other.imageUrl != imageUrl) return false;
     if (other.imageUploading != imageUploading) return false;
+    if (other.isPrivate != isPrivate) return false;
     if (other.broadcasting != broadcasting) return false;
     if (other.broadcasted != broadcasted) return false;
     if (other.selectedItems.length != selectedItems.length) return false;
@@ -76,6 +81,7 @@ class ListData {
     description,
     imageUrl,
     imageUploading,
+    isPrivate,
     broadcasting,
     broadcasted,
     Object.hashAll(selectedItems),
@@ -128,6 +134,7 @@ class EditListNotifier extends Notifier<ListData> {
       imageUrl: null,
       imageUploading: false,
       selectedItems: const [],
+      isPrivate: identifier.isPrivate,
       broadcasting: false,
       broadcasted: false,
     );
@@ -144,6 +151,7 @@ class EditListNotifier extends Notifier<ListData> {
       imageUrl: list.image,
       imageUploading: false,
       selectedItems: _extractItems(list),
+      isPrivate: list.elements.any((e) => e.private),
       broadcasting: false,
       broadcasted: false,
     );
@@ -213,7 +221,10 @@ class EditListNotifier extends Notifier<ListData> {
         ? 'p'
         : 'e';
     final elements = state.selectedItems
-        .map((item) => NostrListElement(tag: tag, value: item, private: false))
+        .map(
+          (item) =>
+              NostrListElement(tag: tag, value: item, private: state.isPrivate),
+        )
         .toList();
 
     final list = NostrSet(

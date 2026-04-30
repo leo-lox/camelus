@@ -81,6 +81,11 @@ class GetNostrLists {
     );
   }
 
+  /// Get the logged-in user's own sets, decrypting private elements.
+  Stream<List<NostrSet>?> getMySets({required int kind}) {
+    return _nostrListRepository.getMyNostrSets(kind: kind);
+  }
+
   /// Broadcast a NIP-51 set of any kind (uses list.kind)
   Future<NostrSet> broadcastList({required NostrSet list}) {
     return _nostrListRepository.broadcastSet(set: list);
