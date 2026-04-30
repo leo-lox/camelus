@@ -9,7 +9,6 @@ import 'package:ndk/entities.dart' as ndk_entities;
 import '../../../../../helpers/wallet_number_formatting.dart';
 import '../../../../atoms/wallet/wallet_card.dart';
 import '../../../../components/wallet/wallets_select_bottom_sheet.dart';
-import '../wallet_pay_done/wallet_pay_done.dart';
 import '../wallet_pay_state_provider.dart';
 
 class WalletPaySummary extends ConsumerWidget {
@@ -46,9 +45,22 @@ class WalletPaySummary extends ConsumerWidget {
         showSnackBar(context, 'Please select a unit');
         return false;
       }
-      //! only token support for now
-      if (state.recieverType != PaymentRecieverType.token) {
-        showSnackBar(context, 'Only token payments are supported for now');
+      if (state.recieverType != PaymentRecieverType.token &&
+          state.recieverType != PaymentRecieverType.lnInvoice &&
+          state.recieverType != PaymentRecieverType.lnAddress) {
+        showSnackBar(context, 'Payment type not yet supported');
+        return false;
+      }
+
+      if (state.recieverType == PaymentRecieverType.lnInvoice &&
+          (state.lnInvoice == null || state.lnInvoice!.isEmpty)) {
+        showSnackBar(context, 'Missing Lightning invoice');
+        return false;
+      }
+
+      if (state.recieverType == PaymentRecieverType.lnAddress &&
+          (state.lnAddress == null || state.lnAddress!.isEmpty)) {
+        showSnackBar(context, 'Missing Lightning Address');
         return false;
       }
 
@@ -73,11 +85,20 @@ class WalletPaySummary extends ConsumerWidget {
       final stateNotifier = ref.read(walletPayStateProvider.notifier);
       if (!isValid()) return;
 
-      stateNotifier.createToken(memo: state.memo);
-
-      /// navigate to done page
-
       context.pushReplacement('/wallet/pay/done');
+
+      switch (state.recieverType) {
+        case PaymentRecieverType.token:
+          stateNotifier.createToken(memo: state.memo);
+        case PaymentRecieverType.lnInvoice:
+          await stateNotifier.payLnInvoice(invoice: state.lnInvoice!);
+        case PaymentRecieverType.lnAddress:
+          await stateNotifier.resolveAndPayLnAddress();
+        default:
+          stateNotifier.setError(
+            errorMessage: 'Payment type not yet supported',
+          );
+      }
     }
 
     return Scaffold(
@@ -255,6 +276,12 @@ class WalletPaySummary extends ConsumerWidget {
                         ] else if (state.recieverType ==
                             PaymentRecieverType.wallet) ...[
                           WalletReciever(),
+                        ] else if (state.recieverType ==
+                            PaymentRecieverType.lnInvoice) ...[
+                          LnInvoiceReciever(invoice: state.lnInvoice ?? ''),
+                        ] else if (state.recieverType ==
+                            PaymentRecieverType.lnAddress) ...[
+                          LnAddressReciever(address: state.lnAddress ?? ''),
                         ],
                       ],
                     ),
@@ -500,6 +527,121 @@ class WalletReciever extends StatelessWidget {
                 ),
                 Text(
                   'send to wallet not implemented',
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    fontSize: 14,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class LnInvoiceReciever extends StatelessWidget {
+  final String invoice;
+  const LnInvoiceReciever({super.key, required this.invoice});
+
+  @override
+  Widget build(BuildContext context) {
+    final truncated = invoice.length > 30
+        ? '${invoice.substring(0, 15)}...${invoice.substring(invoice.length - 10)}'
+        : invoice;
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Row(
+        children: [
+          CircleAvatar(
+            backgroundColor: Theme.of(
+              context,
+            ).colorScheme.primary.withValues(alpha: 0.8),
+            child: Icon(
+              Icons.bolt,
+              color: Theme.of(context).colorScheme.onPrimary,
+              size: 18,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'receiver',
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface,
+                    fontSize: 12,
+                  ),
+                ),
+                Text(
+                  'Lightning Invoice',
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Text(
+                  truncated,
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    fontSize: 12,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class LnAddressReciever extends StatelessWidget {
+  final String address;
+  const LnAddressReciever({super.key, required this.address});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Row(
+        children: [
+          CircleAvatar(
+            backgroundColor: Theme.of(
+              context,
+            ).colorScheme.primary.withValues(alpha: 0.8),
+            child: Icon(
+              Icons.bolt,
+              color: Theme.of(context).colorScheme.onPrimary,
+              size: 18,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'receiver',
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface,
+                    fontSize: 12,
+                  ),
+                ),
+                Text(
+                  address,
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Text(
+                  'send via Lightning Address',
                   style: TextStyle(
                     color: Theme.of(context).colorScheme.onSurfaceVariant,
                     fontSize: 14,

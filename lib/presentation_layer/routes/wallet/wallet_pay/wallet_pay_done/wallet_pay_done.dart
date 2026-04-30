@@ -62,6 +62,15 @@ class WalletPayDone extends ConsumerWidget {
       );
     }
 
+    if (state.isSuccess) {
+      return LnSuccessStep(
+        amount: state.amount,
+        unit: state.unit,
+        recieverType: state.recieverType,
+        lnAddress: state.lnAddress,
+      );
+    }
+
     return Container();
   }
 }
@@ -78,7 +87,7 @@ class ProcessingStep extends StatelessWidget {
         CircularProgressIndicator(strokeWidth: 3),
         SizedBox(height: 24),
         Text(
-          'Creating Token...',
+          'Processing Payment...',
           style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
         ),
       ],
@@ -263,6 +272,64 @@ class TransactionState extends ConsumerWidget {
               ),
             ),
           ],
+        ),
+      ],
+    );
+  }
+}
+
+/// Success screen for Lightning payments (lnInvoice / lnAddress receiver types).
+class LnSuccessStep extends StatelessWidget {
+  final int? amount;
+  final String? unit;
+  final PaymentRecieverType? recieverType;
+  final String? lnAddress;
+
+  const LnSuccessStep({
+    super.key,
+    this.amount,
+    this.unit,
+    this.recieverType,
+    this.lnAddress,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final subtitle =
+        recieverType == PaymentRecieverType.lnAddress && lnAddress != null
+        ? 'to $lnAddress'
+        : 'Lightning invoice paid';
+
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Icon(PhosphorIcons.checkCircle(), color: Colors.green, size: 80),
+        const SizedBox(height: 24),
+        Text(
+          'Lightning Payment Sent!',
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            color: Theme.of(context).colorScheme.onSurface,
+          ),
+        ),
+        const SizedBox(height: 8),
+        if (amount != null && unit != null)
+          Text(
+            '${WalletNumberFormatting.formatAmount(amount: amount!, unit: unit!)} $unit',
+            style: TextStyle(
+              fontSize: 36,
+              fontWeight: FontWeight.bold,
+              color: Theme.of(context).colorScheme.onSurface,
+            ),
+          ),
+        const SizedBox(height: 8),
+        Text(
+          subtitle,
+          style: TextStyle(
+            fontSize: 16,
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
+          ),
         ),
       ],
     );

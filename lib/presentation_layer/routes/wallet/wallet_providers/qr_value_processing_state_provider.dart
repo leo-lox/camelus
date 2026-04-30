@@ -37,9 +37,13 @@ class QRScanTypeResult {
   QRScanTypeResult({required this.value, required this.type});
 }
 
-enum QRScanTypes { cashuToken, lightningInvoice, unknown }
+enum QRScanTypes { cashuToken, lightningInvoice, lnAddress, unknown }
 
 class QRScannerNotifier extends Notifier<QRScannerState> {
+  static final _lnAddressRegex = RegExp(
+    r'^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$',
+  );
+
   @override
   QRScannerState build() => QRScannerState(
     isProcessing: false,
@@ -67,7 +71,13 @@ class QRScannerNotifier extends Notifier<QRScannerState> {
       state = state.copyWith(
         isProcessing: false,
         navigationTarget: QRNavigationTarget.sendPage,
-        navigationData: {'lightningInvoice': result.value},
+        navigationData: {'lnInvoice': result.value},
+      );
+    } else if (result.type == QRScanTypes.lnAddress) {
+      state = state.copyWith(
+        isProcessing: false,
+        navigationTarget: QRNavigationTarget.sendPage,
+        navigationData: {'lnAddress': result.value},
       );
     } else {
       state = state.copyWith(
@@ -106,6 +116,11 @@ class QRScannerNotifier extends Notifier<QRScannerState> {
       return QRScanTypeResult(
         value: qrData,
         type: QRScanTypes.lightningInvoice,
+      );
+    } else if (_lnAddressRegex.hasMatch(qrData.trim())) {
+      return QRScanTypeResult(
+        value: qrData.trim(),
+        type: QRScanTypes.lnAddress,
       );
     }
     return QRScanTypeResult(value: qrData, type: QRScanTypes.unknown);

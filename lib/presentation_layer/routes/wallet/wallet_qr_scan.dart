@@ -8,6 +8,8 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 import '../../atoms/spinner_center.dart';
 import '../../components/wallet/animated_qr_scanner.dart';
 import 'wallet_navigation.dart';
+import 'wallet_pay/ln_input_parser.dart';
+import 'wallet_pay/wallet_pay_state_provider.dart';
 import 'wallet_providers/qr_value_processing_state_provider.dart';
 import 'wallet_receive/rcv_completers/wallet_rcv_ecash_completer_state_provider.dart';
 
@@ -109,9 +111,45 @@ class _QrScan extends ConsumerState<WalletQrScan> {
             ref.read(walletNavigationProvider.notifier).changeDashboardPage(1);
             break;
           case QRNavigationTarget.sendPage:
-            throw UnimplementedError(
-              'Send page navigation is not implemented yet',
-            );
+            final payNotifier = ref.read(walletPayStateProvider.notifier);
+            payNotifier.reset();
+
+            final rawValue =
+                (next.navigationData!['lnInvoice'] ??
+                        next.navigationData!['lnAddress'])
+                    as String?;
+
+            if (rawValue != null) {
+              final parser = ref.read(lnInputParserProvider);
+              final parsed = parser.parse(rawValue);
+
+              switch (parsed) {
+                case LnInvoiceInput():
+                  payNotifier.updateLnInvoice(parsed.invoice);
+                  payNotifier.updateRecieverType(PaymentRecieverType.lnInvoice);
+                  if (parsed.amountSat != null) {
+                    payNotifier.updateAmount(parsed.amountSat!);
+                    payNotifier.updateUnit('sat');
+                  }
+                  if (parsed.description != null) {
+                    payNotifier.updateMemo(parsed.description);
+                  }
+                  final initialPage = parsed.amountSat != null ? 2 : 1;
+                  context.push(
+                    '/wallet/pay',
+                    extra: {'initialPage': initialPage},
+                  );
+                case LnAddressInput():
+                  payNotifier.updateLnAddress(parsed.address);
+                  payNotifier.updateRecieverType(PaymentRecieverType.lnAddress);
+                  context.push('/wallet/pay', extra: {'initialPage': 1});
+                case null:
+                  ref
+                      .read(qrScannerProvider.notifier)
+                      .setError('Unsupported QR content');
+              }
+            }
+            break;
         }
       }
     });

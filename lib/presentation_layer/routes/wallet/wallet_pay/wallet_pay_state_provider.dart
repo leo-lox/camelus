@@ -5,6 +5,7 @@ import 'package:riverpod/legacy.dart';
 
 import '../../../providers/ndk_provider.dart';
 import '../wallet_providers/wallet_combined_state_provider.dart';
+import 'lightning_address_resolver_provider.dart';
 
 class WalletPayState {
   final List<ndk_entities.Wallet> availableWallets;
@@ -20,6 +21,12 @@ class WalletPayState {
   final String? payToWalletId;
   final String? payFromWalletId;
   final Set<String>? supportedUnitsByWallet;
+
+  /// BOLT11 invoice string (for lnInvoice receiver type)
+  final String? lnInvoice;
+
+  /// Lightning address e.g. user@domain.com (for lnAddress receiver type)
+  final String? lnAddress;
 
   final bool isProcessing;
   final bool isError;
@@ -39,6 +46,8 @@ class WalletPayState {
     required this.payToPubkey,
     required this.payToWalletId,
     this.supportedUnitsByWallet,
+    this.lnInvoice,
+    this.lnAddress,
     this.isProcessing = false,
     this.isError = false,
     this.isSuccess = false,
@@ -67,6 +76,8 @@ class WalletPayState {
     String? payToPubkey,
     String? payToWalletId,
     Set<String>? supportedUnitsByWallet,
+    String? lnInvoice,
+    String? lnAddress,
     bool? isProcessing,
     bool? isError,
     bool? isSuccess,
@@ -86,6 +97,8 @@ class WalletPayState {
       payToWalletId: payToWalletId ?? this.payToWalletId,
       supportedUnitsByWallet:
           supportedUnitsByWallet ?? this.supportedUnitsByWallet,
+      lnInvoice: lnInvoice ?? this.lnInvoice,
+      lnAddress: lnAddress ?? this.lnAddress,
       isProcessing: isProcessing ?? this.isProcessing,
       isError: isError ?? this.isError,
       isSuccess: isSuccess ?? this.isSuccess,
@@ -99,7 +112,9 @@ class WalletPayState {
 enum PaymentRecieverType {
   token('token'),
   contact('contact'),
-  wallet('wallet');
+  wallet('wallet'),
+  lnInvoice('lnInvoice'),
+  lnAddress('lnAddress');
 
   final String value;
 
@@ -148,15 +163,23 @@ class WalletPayNotifier extends StateNotifier<WalletPayState> {
   }
 
   bool get valid {
-    return state.payFromWalletId != null &&
-        state.amount != null &&
-        state.unit != null &&
-        state.recieverType != null &&
-        (state.recieverType == PaymentRecieverType.contact
-            ? state.payToPubkey != null
-            : state.recieverType == PaymentRecieverType.wallet
-            ? state.payToWalletId != null
-            : true);
+    if (state.payFromWalletId == null) return false;
+    if (state.amount == null) return false;
+    if (state.unit == null) return false;
+    if (state.recieverType == null) return false;
+
+    switch (state.recieverType!) {
+      case PaymentRecieverType.contact:
+        return state.payToPubkey != null;
+      case PaymentRecieverType.wallet:
+        return state.payToWalletId != null;
+      case PaymentRecieverType.lnInvoice:
+        return state.lnInvoice != null;
+      case PaymentRecieverType.lnAddress:
+        return state.lnAddress != null;
+      case PaymentRecieverType.token:
+        return true;
+    }
   }
 
   void updatePayFromWalletId(String walletId) {
@@ -195,6 +218,14 @@ class WalletPayNotifier extends StateNotifier<WalletPayState> {
     state = state.copyWith(payToWalletId: walletId);
   }
 
+  void updateLnInvoice(String invoice) {
+    state = state.copyWith(lnInvoice: invoice);
+  }
+
+  void updateLnAddress(String address) {
+    state = state.copyWith(lnAddress: address);
+  }
+
   void setProcessing({bool isProcessing = true}) {
     state = state.copyWith(isProcessing: isProcessing);
   }
@@ -220,6 +251,14 @@ class WalletPayNotifier extends StateNotifier<WalletPayState> {
     );
   }
 
+  void setSuccessLn({String? transactionId}) {
+    state = state.copyWith(
+      isSuccess: true,
+      isProcessing: false,
+      transactionId: transactionId,
+    );
+  }
+
   void createToken({String? memo}) async {
     try {
       final result = await _ndk.cashu.initiateSpend(
@@ -240,6 +279,54 @@ class WalletPayNotifier extends StateNotifier<WalletPayState> {
     }
   }
 
+  /// Pay a BOLT11 lightning invoice by melting Cashu tokens.
+  Future<void> payLnInvoice({required String invoice}) async {
+    setProcessing();
+    try {
+      final draft = await _ndk.cashu.initiateRedeem(
+        mintUrl: state.payFromWallet!.id,
+        request: invoice,
+        unit: state.unit ?? 'sat',
+        method: 'bolt11',
+      );
+
+      await for (final tx in _ndk.cashu.redeem(draftRedeemTransaction: draft)) {
+        if (tx.state == ndk_entities.WalletTransactionState.failed) {
+          setError(errorMessage: 'Lightning payment failed');
+          return;
+        }
+        if (tx.state == ndk_entities.WalletTransactionState.completed) {
+          setSuccessLn(transactionId: tx.id);
+          return;
+        }
+      }
+      // Stream ended without explicit success — treat as success if no error
+      if (!state.isError) {
+        setSuccessLn();
+      }
+    } catch (e) {
+      setError(errorMessage: e.toString());
+    }
+  }
+
+  /// Resolve a Lightning Address to a BOLT11 invoice and pay it.
+  Future<void> resolveAndPayLnAddress() async {
+    final address = state.lnAddress;
+    final amount = state.amount;
+    if (address == null || amount == null) {
+      setError(errorMessage: 'Missing Lightning Address or amount');
+      return;
+    }
+    setProcessing();
+    try {
+      final resolver = ref.read(lightningAddressResolverProvider);
+      final invoice = await resolver.resolveToInvoice(address, amount);
+      await payLnInvoice(invoice: invoice);
+    } catch (e) {
+      setError(errorMessage: e.toString());
+    }
+  }
+
   void reset() {
     state = WalletPayState(
       availableBalances: state.availableBalances,
@@ -252,6 +339,8 @@ class WalletPayNotifier extends StateNotifier<WalletPayState> {
       payToPubkey: null,
       payToWalletId: null,
       supportedUnitsByWallet: null,
+      lnInvoice: null,
+      lnAddress: null,
       isProcessing: false,
       isError: false,
       isSuccess: false,

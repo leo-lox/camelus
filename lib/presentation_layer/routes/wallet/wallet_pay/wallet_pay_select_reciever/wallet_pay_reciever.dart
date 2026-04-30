@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ndk/entities.dart' as ndk_entities;
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../../../domain_layer/entities/user_metadata.dart';
 
@@ -8,8 +10,8 @@ import '../../../../../helpers/helpers.dart';
 import '../../../../../helpers/wallet_number_formatting.dart';
 import '../../../../atoms/long_button.dart';
 import '../../../../atoms/my_profile_picture.dart';
-import '../wallet_pay_select_amount/wallet_pay_select_amount.dart';
 
+import '../ln_input_parser.dart';
 import '../wallet_pay_state_provider.dart';
 import 'wallet_pay_reciever_state_provider.dart';
 
@@ -26,6 +28,91 @@ class WalletSelectReciever extends ConsumerWidget {
   _onTokenSelected(WalletPayNotifier notifier) {
     notifier.updateRecieverType(PaymentRecieverType.token);
     doneCallback();
+  }
+
+  /// Parses [input] (BOLT11 invoice or Lightning Address) via [LnInputParser],
+  /// pre-fills notifier fields, and advances the flow.
+  void _applyParsedLnInput(
+    BuildContext context,
+    WalletPayNotifier notifier,
+    LnInputParser parser,
+    String input,
+  ) {
+    final parsed = parser.parse(input);
+    if (parsed == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Invalid Lightning invoice or address')),
+      );
+      return;
+    }
+    switch (parsed) {
+      case LnInvoiceInput():
+        if (parsed.amountSat != null) {
+          notifier.updateAmount(parsed.amountSat!);
+          notifier.updateUnit('sat');
+        }
+        if (parsed.description != null) {
+          notifier.updateMemo(parsed.description);
+        }
+        notifier.updateLnInvoice(parsed.invoice);
+        notifier.updateRecieverType(PaymentRecieverType.lnInvoice);
+      case LnAddressInput():
+        notifier.updateLnAddress(parsed.address);
+        notifier.updateRecieverType(PaymentRecieverType.lnAddress);
+    }
+    doneCallback();
+  }
+
+  void _onLnAddressSelected(WalletPayNotifier notifier, String lnAddress) {
+    notifier.updateLnAddress(lnAddress);
+    notifier.updateRecieverType(PaymentRecieverType.lnAddress);
+    doneCallback();
+  }
+
+  Future<void> _showPasteInvoiceDialog(
+    BuildContext context,
+    WalletPayNotifier notifier,
+    LnInputParser parser,
+  ) async {
+    // Pre-fill from clipboard if available
+    String initial = '';
+    final clipData = await Clipboard.getData(Clipboard.kTextPlain);
+    if (clipData?.text != null) {
+      initial = clipData!.text!.trim();
+    }
+
+    if (!context.mounted) return;
+
+    await showDialog<void>(
+      context: context,
+      builder: (dialogCtx) {
+        final controller = TextEditingController(text: initial);
+        return AlertDialog(
+          title: const Text('Paste Invoice or Lightning Address'),
+          content: TextField(
+            controller: controller,
+            maxLines: 4,
+            decoration: const InputDecoration(
+              hintText: 'lnbc... or user@domain.com',
+              border: OutlineInputBorder(),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogCtx).pop(),
+              child: const Text('Cancel'),
+            ),
+            FilledButton(
+              onPressed: () {
+                Navigator.of(dialogCtx).pop();
+                _applyParsedLnInput(context, notifier, parser, controller.text);
+              },
+              child: const Text('Confirm'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   _onContactSelected({
@@ -50,6 +137,7 @@ class WalletSelectReciever extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(walletPayRecieverProvider(walletId));
     final notifier = ref.read(walletPayRecieverProvider(walletId).notifier);
+    final parser = ref.read(lnInputParserProvider);
 
     final paymentStateNotifier = ref.watch(walletPayStateProvider.notifier);
 
@@ -105,39 +193,83 @@ class WalletSelectReciever extends ConsumerWidget {
         ),
       ),
       body: SafeArea(
-        child: state.isLoading
-            ? const Center(child: CircularProgressIndicator())
-            : Column(
+        child: Column(
+          children: [
+            // scrollable results
+            Expanded(
+              child: ListView(
+                padding: const EdgeInsets.fromLTRB(12, 8, 12, 12),
                 children: [
-                  // scrollable results
-                  Expanded(
-                    child: ListView(
-                      padding: const EdgeInsets.fromLTRB(12, 8, 12, 12),
-                      children: [
-                        if (state.searchQuery.trim().isEmpty)
-                          _Island(
-                            title: "Anonymous Token",
-                            child: longButton(
-                              name: "create token",
-                              onPressed: () =>
-                                  _onTokenSelected(paymentStateNotifier),
-                            ),
-                          ),
-                        if (state.searchQuery.trim().isEmpty)
-                          _Island(
-                            title: 'Recent contacts',
-                            child: _ContactsList(
+                  if (state.searchQuery.trim().isEmpty)
+                    _Island(
+                      title: "Anonymous Token",
+                      child: longButton(
+                        name: "create token",
+                        onPressed: () => _onTokenSelected(paymentStateNotifier),
+                      ),
+                    ),
+                  if (state.searchQuery.trim().isEmpty)
+                    _Island(
+                      title: 'Lightning Invoice',
+                      child: longButton(
+                        name: 'paste invoice',
+                        onPressed: () => _showPasteInvoiceDialog(
+                          context,
+                          paymentStateNotifier,
+                          parser,
+                        ),
+                      ),
+                    ),
+                  // Detect Lightning Address typed in the search box
+                  if (parser.isLightningAddress(state.searchQuery))
+                    _Island(
+                      title: 'Lightning Address',
+                      child: ListTile(
+                        leading: Icon(
+                          PhosphorIcons.lightning(),
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
+                        title: Text(state.searchQuery.trim()),
+                        subtitle: const Text('Send via Lightning Address'),
+                        onTap: () => _onLnAddressSelected(
+                          paymentStateNotifier,
+                          state.searchQuery.trim(),
+                        ),
+                      ),
+                    ),
+                  if (state.searchQuery.trim().isEmpty)
+                    _Island(
+                      title: 'Recent contacts',
+                      child: state.isLoading
+                          ? const Padding(
+                              padding: EdgeInsets.all(12.0),
+                              child: Center(
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                ),
+                              ),
+                            )
+                          : _ContactsList(
                               contacts: state.recentContacts,
                               onTap: (c) => _onContactSelected(
                                 notifier: paymentStateNotifier,
                                 pubkey: c.pubkey,
                               ),
                             ),
-                          ),
-                        if (state.searchQuery.trim().isNotEmpty)
-                          _Island(
-                            title: 'Matching contacts',
-                            child: _ContactsList(
+                    ),
+                  if (state.searchQuery.trim().isNotEmpty)
+                    _Island(
+                      title: 'Matching contacts',
+                      child: state.isLoading
+                          ? const Padding(
+                              padding: EdgeInsets.all(12.0),
+                              child: Center(
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                ),
+                              ),
+                            )
+                          : _ContactsList(
                               contacts: state.filteredContacts,
                               onTap: (c) => _onContactSelected(
                                 notifier: paymentStateNotifier,
@@ -148,34 +280,41 @@ class WalletSelectReciever extends ConsumerWidget {
                                 child: Text('No matching contacts'),
                               ),
                             ),
-                          ),
-                        _Island(
-                          title: 'Suggestions',
-                          child: Wrap(
-                            spacing: 8,
-                            runSpacing: 8,
-                            children: [
-                              _SuggestionChip(
-                                label: 'action 1',
-                                icon: Icons.account_balance_wallet_outlined,
-                                onTap: () {},
-                              ),
-                              _SuggestionChip(
-                                label: 'action 2',
-                                icon: Icons.group_outlined,
-                                onTap: () {},
-                              ),
-                              _SuggestionChip(
-                                label: 'action 3',
-                                icon: Icons.receipt_long_outlined,
-                                onTap: () {},
-                              ),
-                            ],
-                          ),
+                    ),
+                  _Island(
+                    title: 'Suggestions',
+                    child: Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: [
+                        _SuggestionChip(
+                          label: 'action 1',
+                          icon: Icons.account_balance_wallet_outlined,
+                          onTap: () {},
                         ),
-                        _Island(
-                          title: 'All wallets',
-                          child: _WalletsList(
+                        _SuggestionChip(
+                          label: 'action 2',
+                          icon: Icons.group_outlined,
+                          onTap: () {},
+                        ),
+                        _SuggestionChip(
+                          label: 'action 3',
+                          icon: Icons.receipt_long_outlined,
+                          onTap: () {},
+                        ),
+                      ],
+                    ),
+                  ),
+                  _Island(
+                    title: 'All wallets',
+                    child: state.isLoading
+                        ? const Padding(
+                            padding: EdgeInsets.all(12.0),
+                            child: Center(
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            ),
+                          )
+                        : _WalletsList(
                             wallets: state.filteredWallets,
                             balances: state.balances,
                             selectedWalletId: state.selectedWalletId,
@@ -184,12 +323,12 @@ class WalletSelectReciever extends ConsumerWidget {
                               walletId: wallet.id,
                             ),
                           ),
-                        ),
-                      ],
-                    ),
                   ),
                 ],
               ),
+            ),
+          ],
+        ),
       ),
 
       /// next button

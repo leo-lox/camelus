@@ -6,9 +6,9 @@ import 'wallet_pay_select_reciever/wallet_pay_reciever.dart';
 import 'wallet_pay_summary/wallet_pay_summary.dart';
 
 class WalletPayPage extends ConsumerStatefulWidget {
-  const WalletPayPage({
-    super.key,
-  });
+  final int initialPage;
+
+  const WalletPayPage({super.key, this.initialPage = 0});
 
   @override
   ConsumerState<WalletPayPage> createState() => _WalletPayPageState();
@@ -17,9 +17,22 @@ class WalletPayPage extends ConsumerStatefulWidget {
 class _WalletPayPageState extends ConsumerState<WalletPayPage>
     with TickerProviderStateMixin {
   final PageController _horizontalPageController = PageController(
-    initialPage: 0,
     keepPage: true,
   );
+
+  @override
+  void initState() {
+    super.initState();
+    // Jump to the requested page after the first frame so the controller
+    // is attached to the PageView before we call jumpToPage.
+    if (widget.initialPage != 0) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          _horizontalPageController.jumpToPage(widget.initialPage);
+        }
+      });
+    }
+  }
 
   bool horizontalScrollLock = false;
 

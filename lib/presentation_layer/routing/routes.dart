@@ -351,7 +351,11 @@ final routes = [
                   ),
                   GoRoute(
                     path: 'pay',
-                    builder: (context, state) => WalletPayPage(),
+                    builder: (context, state) {
+                      final extra = state.extra as Map<String, dynamic>?;
+                      final initialPage = (extra?['initialPage'] as int?) ?? 0;
+                      return WalletPayPage(initialPage: initialPage);
+                    },
                     routes: [
                       GoRoute(
                         path: 'done',
