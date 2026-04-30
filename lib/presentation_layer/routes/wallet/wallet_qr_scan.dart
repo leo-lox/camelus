@@ -6,6 +6,7 @@ import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../atoms/spinner_center.dart';
+import '../../components/wallet/animated_qr_scanner.dart';
 import 'wallet_navigation.dart';
 import 'wallet_providers/qr_value_processing_state_provider.dart';
 import 'wallet_receive/rcv_completers/wallet_rcv_ecash_completer_state_provider.dart';
@@ -58,12 +59,33 @@ class _QrScan extends ConsumerState<WalletQrScan> {
   }
 
   void _processValue(String barcode) {
-    ref.read(qrScannerProvider.notifier).processQRCode(barcode);
+    if (barcode.toLowerCase().startsWith('ur:')) {
+      ref.read(animatedQrScannerProvider.notifier).processPart(barcode);
+    } else {
+      ref.read(qrScannerProvider.notifier).processQRCode(barcode);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final qrScannerState = ref.watch(qrScannerProvider);
+
+    // listen for completed animated (UR) QR tokens
+    ref.listen(animatedQrScannerProvider, (previous, next) {
+      if (previous?.completedToken == null && next.completedToken != null) {
+        ref.read(animatedQrScannerProvider.notifier).reset();
+
+        final rcvProvider = ref.read(
+          walletReceiveEcashCompleterProvider.notifier,
+        );
+        rcvProvider.receiveEcash(
+          tokenString: next.completedToken!.toV4TokenString(),
+        );
+
+        context.push('/wallet/receive/ecash');
+        ref.read(walletNavigationProvider.notifier).changeDashboardPage(1);
+      }
+    });
 
     // apperently this is save to do with riverpod
     ref.listen(qrScannerProvider, (previous, next) {
@@ -90,7 +112,6 @@ class _QrScan extends ConsumerState<WalletQrScan> {
             throw UnimplementedError(
               'Send page navigation is not implemented yet',
             );
-            break;
         }
       }
     });
@@ -193,6 +214,15 @@ class _QrScan extends ConsumerState<WalletQrScan> {
               ),
             ),
           ),
+
+          /// animated QR scan progress overlay
+          Positioned(
+            bottom: 135,
+            left: 20,
+            right: 20,
+            child: AnimatedQrScanProgress(),
+          ),
+
           if (qrScannerState.isProcessing)
             Positioned(
               bottom: 115,

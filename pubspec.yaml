@@ -117,6 +117,8 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   system_theme: ^3.1.2
+  ur:
+    path: ../ndk/packages/bc_ur
   
 
   
@@ -132,6 +134,12 @@ dependency_overrides:
     
   ndk_flutter:
     path: ../ndk/packages/ndk_flutter
+    # git:
+    #   url: https://github.com/relaystr/ndk.git
+    #   path: packages/ndk_flutter
+    #   ref: master
+  nip07_event_signer:
+    path: ../ndk/packages/nip07_event_signer
     # git:
     #   url: https://github.com/relaystr/ndk.git
     #   path: packages/ndk_flutter

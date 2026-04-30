@@ -1,5 +1,4 @@
-import 'package:flutter_riverpod/legacy.dart';
-import 'package:riverpod/riverpod.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class QRScannerState {
   final bool isProcessing;
@@ -40,16 +39,14 @@ class QRScanTypeResult {
 
 enum QRScanTypes { cashuToken, lightningInvoice, unknown }
 
-class QRScannerNotifier extends StateNotifier<QRScannerState> {
-  QRScannerNotifier()
-    : super(
-        QRScannerState(
-          isProcessing: false,
-          error: null,
-          navigationTarget: null,
-          navigationData: null,
-        ),
-      );
+class QRScannerNotifier extends Notifier<QRScannerState> {
+  @override
+  QRScannerState build() => QRScannerState(
+    isProcessing: false,
+    error: null,
+    navigationTarget: null,
+    navigationData: null,
+  );
 
   void setError(String error) {
     state = state.copyWith(error: error);
@@ -95,9 +92,17 @@ class QRScannerNotifier extends StateNotifier<QRScannerState> {
 
   Future<QRScanTypeResult> _analyzeQRData(String qrData) async {
     // Analyze the QR data and return the appropriate type
-    if (qrData.startsWith('cashuB')) {
+
+    // Check for UR-encoded tokens (both single and multi-part)
+    if (qrData.toLowerCase().startsWith('ur:')) {
       return QRScanTypeResult(value: qrData, type: QRScanTypes.cashuToken);
-    } else if (qrData.startsWith('lightning:')) {
+    }
+
+    // Check for traditional Cashu tokens
+    if (qrData.startsWith('cashuB') || qrData.startsWith('cashuA')) {
+      return QRScanTypeResult(value: qrData, type: QRScanTypes.cashuToken);
+    } else if (qrData.startsWith('lightning:') ||
+        qrData.toLowerCase().startsWith('lnbc')) {
       return QRScanTypeResult(
         value: qrData,
         type: QRScanTypes.lightningInvoice,
@@ -108,6 +113,6 @@ class QRScannerNotifier extends StateNotifier<QRScannerState> {
 }
 
 final qrScannerProvider =
-    StateNotifierProvider.autoDispose<QRScannerNotifier, QRScannerState>(
-      (ref) => QRScannerNotifier(),
+    NotifierProvider.autoDispose<QRScannerNotifier, QRScannerState>(
+      QRScannerNotifier.new,
     );

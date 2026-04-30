@@ -185,7 +185,7 @@ class SuccessStep extends StatelessWidget {
             color: Theme.of(context).colorScheme.surfaceContainerHighest,
             borderRadius: BorderRadius.circular(8),
           ),
-          child: AnimatedQr(qrCodeData: outputToken!.toV4TokenString()),
+          child: AnimatedQr(token: outputToken!),
         ),
         const SizedBox(height: 32),
 

@@ -1225,7 +1225,7 @@ packages:
       path: "../ndk/packages/ndk"
       relative: true
     source: path
-    version: "0.8.2-dev.5"
+    version: "0.8.2-dev.6"
   ndk_bip32_keys:
     dependency: transitive
     description:
@@ -1240,22 +1240,21 @@ packages:
       path: "../ndk/packages/ndk_flutter"
       relative: true
     source: path
-    version: "0.8.2-dev.5"
+    version: "0.8.2-dev.6"
   ndk_objectbox:
     dependency: "direct main"
     description:
       path: "../ndk/packages/objectbox"
       relative: true
     source: path
-    version: "0.2.11-dev.5"
+    version: "0.2.11-dev.6"
   nip07_event_signer:
     dependency: "direct main"
     description:
-      name: nip07_event_signer
-      sha256: "4e37063c7e63c8694331c3b460ad060e68852e756a6aa36c19ac559acd79f103"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.0.10-dev.5"
+      path: "../ndk/packages/nip07_event_signer"
+      relative: true
+    source: path
+    version: "1.0.10-dev.6"
   nm:
     dependency: transitive
     description:
@@ -2005,6 +2004,13 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.3.2"
+  ur:
+    dependency: "direct main"
+    description:
+      path: "../ndk/packages/bc_ur"
+      relative: true
+    source: path
+    version: "0.1.0"
   url_launcher:
     dependency: "direct main"
     description:

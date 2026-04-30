@@ -1,28 +1,47 @@
-import 'dart:typed_data';
-import 'dart:convert' show base64Decode, base64Url, utf8;
+import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:bc_ur_dart/bc_ur_dart.dart';
+import 'package:ndk/entities.dart';
 import 'package:pretty_qr_code/pretty_qr_code.dart';
-import 'dart:async';
+import 'package:ur/cashu_token_ur_encoder.dart';
+import 'package:ur/ur_encoder.dart';
+
+import '../../routes/wallet/wallet_providers/qr_settings_provider.dart';
 
 class AnimatedQr extends ConsumerStatefulWidget {
-  final String? qrCodeData;
+  final CashuToken token;
+  final double size;
 
-  const AnimatedQr({super.key, this.qrCodeData});
+  const AnimatedQr({super.key, required this.token, this.size = 200});
 
   @override
-  ConsumerState<AnimatedQr> createState() => AnimatedQrState();
+  ConsumerState<AnimatedQr> createState() => _AnimatedQrState();
 }
 
-class AnimatedQrState extends ConsumerState<AnimatedQr> {
+class _AnimatedQrState extends ConsumerState<AnimatedQr> {
+  String? _currentQrData;
   Timer? _timer;
-  int _currentIndex = 0;
-  List<String> _urParts = [];
-  UR? _encoder;
-
+  UREncoder? _encoder;
+  bool _isSinglePart = false;
+  int _currentPartIndex = 0;
+  int _totalParts = 0;
   bool showAnimatedQr = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeEncoder();
+  }
+
+  @override
+  void didUpdateWidget(AnimatedQr oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.token != widget.token) {
+      _timer?.cancel();
+      _initializeEncoder();
+    }
+  }
 
   @override
   void dispose() {
@@ -30,158 +49,139 @@ class AnimatedQrState extends ConsumerState<AnimatedQr> {
     super.dispose();
   }
 
-  @override
-  void initState() {
-    super.initState();
-    _initializeUR();
+  void _initializeEncoder() {
+    _setupMultiPartEncoding();
   }
 
-  @override
-  void didUpdateWidget(AnimatedQr oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.qrCodeData != widget.qrCodeData) {
-      _timer?.cancel();
-      _initializeUR();
+  void _setupMultiPartEncoding() {
+    final settings = ref.read(qrSettingsProvider);
+
+    _encoder = CashuTokenUrEncoder.createMultiPartEncoder(
+      token: widget.token,
+      maxFragmentLen: settings.maxFragmentLen,
+    );
+
+    if (_encoder != null) {
+      final firstPart = _encoder!.nextPart();
+      setState(() {
+        _currentQrData = firstPart;
+        _isSinglePart = false;
+        _currentPartIndex = 1;
+      });
+
+      _estimateTotalParts();
+      _startAnimation();
     }
   }
 
-  void _initializeUR() {
-    if (widget.qrCodeData != null && widget.qrCodeData!.isNotEmpty) {
-      try {
-        final tokenString = widget.qrCodeData!;
-
-        Uint8List bytes;
-        if (tokenString.startsWith('cashuB')) {
-          /// remove cashuB prefix
-          final tokenData = tokenString.substring(6);
-
-          /// fix: add padding for base64url decoding
-          String paddedTokenData = tokenData;
-          while (paddedTokenData.length % 4 != 0) {
-            paddedTokenData += '=';
-          }
-
-          bytes = base64Url.decode(paddedTokenData);
-        } else {
-          bytes = utf8.encode(tokenString);
-        }
-
-        const int maxLength = 200;
-
-        _encoder = UR(
-          payload: bytes,
-          maxLength: maxLength,
-          type: "bytes",
-        );
-
-        _urParts.clear();
-
-        final minParts = (bytes.length / maxLength).ceil();
-        final targetParts = (minParts * 1.5).ceil(); // 50% overhead
-
-        for (int i = 0; i < targetParts; i++) {
-          final part = _encoder!.next();
-          _urParts.add(part);
-        }
-
-        if (_urParts.isNotEmpty) {
-          _startAnimation();
-        }
-      } catch (e) {
-        // fallback to single QR code if UR encoding fails
-        _urParts = [widget.qrCodeData!];
-      }
+  void _estimateTotalParts() {
+    int count = 1;
+    while (!_encoder!.isComplete) {
+      _encoder!.nextPart();
+      count++;
     }
+    _totalParts = count;
+
+    // Reset encoder with same settings
+    final settings = ref.read(qrSettingsProvider);
+    _encoder = CashuTokenUrEncoder.createMultiPartEncoder(
+      token: widget.token,
+      maxFragmentLen: settings.maxFragmentLen,
+    );
+    _currentPartIndex = 0;
   }
 
   void _startAnimation() {
-    if (_urParts.length > 1) {
-      _timer = Timer.periodic(const Duration(milliseconds: 500), (timer) {
-        if (mounted) {
-          setState(() {
-            _currentIndex = (_currentIndex + 1) % _urParts.length;
-          });
-        }
-      });
-    }
+    final settings = ref.read(qrSettingsProvider);
+
+    _timer?.cancel();
+    _timer = Timer.periodic(Duration(milliseconds: settings.frameDelayMs), (_) {
+      if (_encoder != null && mounted) {
+        final nextPart = _encoder!.nextPart();
+        setState(() {
+          _currentQrData = nextPart;
+          _currentPartIndex = (_currentPartIndex % _totalParts) + 1;
+        });
+      }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_urParts.isEmpty) {
-      return Container(
-        width: 200,
-        height: 200,
-        decoration: BoxDecoration(
-          border: Border.all(color: Colors.grey),
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: const Center(
-          child: Text(
-            'No QR Data',
-            style: TextStyle(color: Colors.grey),
+    ref.listen<QrSettings>(qrSettingsProvider, (previous, next) {
+      if (previous?.frameDelayMs != next.frameDelayMs ||
+          previous?.maxFragmentLen != next.maxFragmentLen) {
+        _timer?.cancel();
+        _initializeEncoder();
+      }
+    });
+
+    if (_currentQrData == null) {
+      return SizedBox(
+        width: widget.size,
+        height: widget.size,
+        child: Center(
+          child: CircularProgressIndicator(
+            color: Theme.of(context).colorScheme.primary,
           ),
         ),
       );
     }
 
-    return Container(
-      child: Column(
-        children: [
-          if (showAnimatedQr && _urParts.isNotEmpty)
-            PrettyQrView.data(
-              data: _urParts[_currentIndex],
-              decoration: const PrettyQrDecoration(
-                shape: PrettyQrSmoothSymbol(
-                  color: Colors.black,
-                ),
-                background: Colors.white,
-              ),
+    final qrData = showAnimatedQr
+        ? _currentQrData!
+        : widget.token.toV4TokenString();
+
+    return Column(
+      children: [
+        Container(
+          width: widget.size,
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: PrettyQrView.data(
+            data: qrData,
+            decoration: const PrettyQrDecoration(
+              shape: PrettyQrSmoothSymbol(color: Colors.black),
+              background: Colors.white,
             ),
-          const SizedBox(height: 8),
-          if (!showAnimatedQr)
-            PrettyQrView.data(
-              data: widget.qrCodeData ?? '',
-              decoration: const PrettyQrDecoration(
-                shape: PrettyQrSmoothSymbol(
-                  color: Colors.black,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Row(
+          children: [
+            if (showAnimatedQr && !_isSinglePart && _totalParts > 0)
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.black, width: 1),
                 ),
-                background: Colors.white,
-              ),
-            ),
-          Row(
-            children: [
-              if (showAnimatedQr && _urParts.length > 1)
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.black, width: 1),
-                  ),
-                  child: Text(
-                    '${_currentIndex + 1}/${_urParts.length}',
-                    style: const TextStyle(
-                      color: Colors.black,
-                      fontSize: 10,
-                      fontWeight: FontWeight.bold,
-                    ),
+                child: Text(
+                  '$_currentPartIndex/$_totalParts',
+                  style: const TextStyle(
+                    color: Colors.black,
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
-              const Spacer(),
-              Switch(
-                  activeColor: Colors.black,
-                  value: showAnimatedQr,
-                  onChanged: (value) {
-                    setState(() {
-                      showAnimatedQr = value;
-                    });
-                  }),
-            ],
-          )
-        ],
-      ),
+              ),
+            const Spacer(),
+            Switch(
+              activeColor: Colors.black,
+              value: showAnimatedQr,
+              onChanged: (value) {
+                setState(() {
+                  showAnimatedQr = value;
+                });
+              },
+            ),
+          ],
+        ),
+      ],
     );
   }
 }
