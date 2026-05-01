@@ -9,6 +9,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:ndk/shared/nips/nip19/nip19.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../providers/app_bar_provider/app_bottom_bar_provider.dart';
+import '../../providers/wallet_settings_provider.dart';
 import '../../routing/route_paths.dart';
 import '../../providers/messaging/dm_conversations_provider.dart';
 import '../../providers/ndk_provider.dart';
@@ -283,14 +284,15 @@ class NostrSideMenu extends ConsumerWidget {
                           navigateToProfile(context, currentUserPubkey);
                         },
                       ),
-                      _drawerItem(
-                        label: AppLocalizations.of(context)!.payments,
-                        routeName: '/wallet/dashboard',
-                        icon: PhosphorIcons.lightning(),
-                        onTap: () {
-                          context.push('/wallet/dashboard');
-                        },
-                      ),
+                      if (ref.watch(experimentalFeaturesProvider).wallet)
+                        _drawerItem(
+                          label: AppLocalizations.of(context)!.payments,
+                          routeName: '/wallet/dashboard',
+                          icon: PhosphorIcons.lightning(),
+                          onTap: () {
+                            context.push('/wallet/dashboard');
+                          },
+                        ),
                       _drawerItem(
                         label: AppLocalizations.of(context)!.blocklist,
                         routeName: '/blocked-users',

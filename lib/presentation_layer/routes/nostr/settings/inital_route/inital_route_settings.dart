@@ -29,30 +29,6 @@ class InitalRouteSettings extends ConsumerStatefulWidget {
 }
 
 class InitalRouteSettingsState extends ConsumerState<InitalRouteSettings> {
-  // List of available routes
-  final List<String> routes = [
-    '/home',
-    '/posts-and-replies',
-    '/search',
-    '/notifications',
-  ];
-
-  // Get localized route label
-  String _getRouteLabel(BuildContext context, String route) {
-    switch (route) {
-      case '/':
-        return AppLocalizations.of(context)!.routeHome;
-      case '/posts-and-replies':
-        return AppLocalizations.of(context)!.routePostsAndReplies;
-      case '/search':
-        return AppLocalizations.of(context)!.routeSearch;
-      case '/notifications':
-        return AppLocalizations.of(context)!.routeNotifications;
-      default:
-        return route;
-    }
-  }
-
   Future<void> _laodInitialRoute() async {
     final loadedRoute = await ref.read(initalRouteProvider).getInitialRoute();
     ref.read(selectedRouteProvider.notifier).setRoute(loadedRoute);
@@ -67,37 +43,56 @@ class InitalRouteSettingsState extends ConsumerState<InitalRouteSettings> {
 
   @override
   Widget build(BuildContext context) {
-    final selectedRoute = ref.watch(selectedRouteProvider);
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(AppLocalizations.of(context)!.initialRouteSettings),
+      appBar: AppBar(title: Text(l10n.initialRouteSettings)),
+      body: ListView(
+        children: [
+          _RouteListTile(route: '/home', name: l10n.routeHome),
+          _RouteListTile(
+            route: '/posts-and-replies',
+            name: l10n.routePostsAndReplies,
+          ),
+          _RouteListTile(route: '/search', name: l10n.routeSearch),
+          _RouteListTile(
+            route: '/notifications',
+            name: l10n.routeNotifications,
+          ),
+          _RouteListTile(route: '/wallet/dashboard', name: l10n.payments),
+          _RouteListTile(route: '/messages', name: l10n.messages),
+        ],
       ),
-      body: ListView.builder(
-        itemCount: routes.length,
-        itemBuilder: (context, index) {
-          final route = routes[index];
-          return ListTile(
-            title: Text(
-              _getRouteLabel(context, route),
-              style: TextStyle(
-                color: Theme.of(context).colorScheme.inverseSurface,
-              ),
-            ),
-            trailing: selectedRoute == route
-                ? Icon(
-                    PhosphorIcons.check(),
-                    color: Theme.of(context).colorScheme.onSurface,
-                  )
-                : null,
-            onTap: () {
-              ref.read(selectedRouteProvider.notifier).setRoute(route);
-              ref.read(initalRouteProvider).saveInitialRoute(route);
-            },
-            tileColor: Theme.of(context).colorScheme.surface,
-          );
-        },
+    );
+  }
+}
+
+class _RouteListTile extends ConsumerWidget {
+  final String route;
+  final String name;
+
+  const _RouteListTile({required this.route, required this.name});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final selectedRoute = ref.watch(selectedRouteProvider);
+
+    return ListTile(
+      title: Text(
+        name,
+        style: TextStyle(color: Theme.of(context).colorScheme.inverseSurface),
       ),
+      trailing: selectedRoute == route
+          ? Icon(
+              PhosphorIcons.check(),
+              color: Theme.of(context).colorScheme.onSurface,
+            )
+          : null,
+      onTap: () {
+        ref.read(selectedRouteProvider.notifier).setRoute(route);
+        ref.read(initalRouteProvider).saveInitialRoute(route);
+      },
+      tileColor: Theme.of(context).colorScheme.surface,
     );
   }
 }
