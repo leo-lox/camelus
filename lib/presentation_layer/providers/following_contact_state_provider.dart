@@ -116,6 +116,19 @@ class ContactListNotifier extends Notifier<ContactListState> {
   }
 
   Future<void> setContacts(List<String> pubkeys) async {
-    return _followUseCase.setContacts(pubkeys);
+    await _followUseCase.setContacts(pubkeys);
+    final updatedContactList = ContactList(
+      pubKey: _pubkey,
+      contacts: pubkeys,
+      contactRelays: state.contactList.contactRelays,
+      petnames: state.contactList.petnames,
+      followedTags: state.contactList.followedTags,
+      followedCommunities: state.contactList.followedCommunities,
+      followedEvents: state.contactList.followedEvents,
+      sources: state.contactList.sources,
+      createdAt: DateTime.now().millisecondsSinceEpoch ~/ 1000,
+      loadedTimestamp: DateTime.now().millisecondsSinceEpoch ~/ 1000,
+    );
+    state = state.copyWith(isLoading: false, contactList: updatedContactList);
   }
 }
