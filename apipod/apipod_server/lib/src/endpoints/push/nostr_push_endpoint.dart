@@ -585,7 +585,7 @@ class NostrPushEndpoint extends Endpoint {
                       .contains("The URL's protocol must be one of") ||
                   error.message
                       .toString()
-                      .contains("to many reconnection attempts")) {
+                      .contains("too many reconnection attempts")) {
                 _relayPool!.remove(relay.url);
 
                 await _withSession(enableLogging: true, (s) async {
