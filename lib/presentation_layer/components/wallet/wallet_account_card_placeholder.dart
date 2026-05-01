@@ -20,7 +20,7 @@ class WalletAccountCardPlaceholder extends StatelessWidget {
         ),
         child: Center(
           child: Text(
-            'add wallet +',
+            'add mint +',
             style: TextStyle(
               fontSize: 16,
               color: Theme.of(context).colorScheme.onSurfaceVariant,
