@@ -327,9 +327,9 @@ class NostrPushEndpoint extends Endpoint {
 
       // Check if the event kind is in the user's subscribed kinds
       if (!subscribedKinds.contains(event.kind)) {
-        session.log(
-            'Event kind ${event.kind} not in subscribed kinds $subscribedKinds for ${pubkeyTag[1]}',
-            level: LogLevel.debug);
+        // session.log(
+        //     'Event kind ${event.kind} not in subscribed kinds $subscribedKinds for ${pubkeyTag[1]}',
+        //     level: LogLevel.debug);
         return;
       }
 
