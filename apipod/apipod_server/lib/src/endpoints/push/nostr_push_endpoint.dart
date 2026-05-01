@@ -498,19 +498,21 @@ class NostrPushEndpoint extends Endpoint {
               reconnectSubId: PushConfig.subscriptionId,
             ));
 
-        _relayPool!.onOpen.listen((relay) {
-          _withSession(enableLogging: true, (s) async {
-            s.log(level: LogLevel.info, "onOpen.listen ${relay.url}");
-            s.log(
-                level: LogLevel.info,
-                "relayPool relays: ${_relayPool!.myRelays.length}");
-          });
+        _subscriptions.add(
+          _relayPool!.onOpen.listen((relay) {
+            _withSession(enableLogging: true, (s) async {
+              s.log(level: LogLevel.info, "onOpen.listen ${relay.url}");
+              s.log(
+                  level: LogLevel.info,
+                  "relayPool relays: ${_relayPool!.myRelays.length}");
+            });
 
-          relay.subscribe(
-            PushConfig.subscriptionId,
-            PushConfig.subscriptionFilter,
-          );
-        });
+            relay.subscribe(
+              PushConfig.subscriptionId,
+              PushConfig.subscriptionFilter,
+            );
+          }),
+        );
 
         _subscriptions.add(
           _relayPool!.onEvent.listen((relayEvent) async {
