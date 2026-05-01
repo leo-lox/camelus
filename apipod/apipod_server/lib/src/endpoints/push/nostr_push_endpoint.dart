@@ -322,9 +322,6 @@ class NostrPushEndpoint extends Endpoint {
         return;
       }
 
-      session.log(
-          'Processing event ${event.id} with kind ${event.kind} for pubkey ${pubkeyTag[1]} from relay ${relay.url}');
-
       // Get the subscribed kinds for this user and relay
       final subscribedKinds = await getKindsByPubKey(session, pubkeyTag[1]);
 
