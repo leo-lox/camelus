@@ -5,6 +5,7 @@ import 'package:camelus/presentation_layer/components/full_screen_loading.dart';
 import 'package:camelus/presentation_layer/components/responsive_center.dart';
 import 'package:camelus/presentation_layer/providers/messaging/dm_conversations_provider.dart';
 import 'package:camelus/presentation_layer/providers/ndk_provider.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -87,14 +88,14 @@ ${_privateKey.mnemonicSentence}
     String? uploadedPicture;
     String? uploadedBanner;
 
-    final metadataP = ref.watch(metadataProvider);
+    final metadataP = ref.read(metadataProvider);
 
-    final myContactListNotifier = ref.watch(
+    final myContactListNotifier = ref.read(
       contactListStateProvider(_privateKey.publicKey).notifier,
     );
 
     final inboxOutboxP = ref.read(inboxOutboxProvider);
-    final fileUploadP = ref.watch(fileUploadProvider);
+    final fileUploadP = ref.read(fileUploadProvider);
 
     // set nip65 - inbox/outbox
     final Nip65 myNip65 = Nip65(
@@ -119,18 +120,38 @@ ${_privateKey.mnemonicSentence}
       });
 
       try {
-        uploadedPicture = (await fileUploadP.uploadImage(
+        final picResults = await fileUploadP.uploadImage(
           widget.userInfo.picture!,
-        ))[0].descriptor!.url;
-      } catch (_) {}
+        );
+        uploadedPicture = picResults
+            .where((e) => e.descriptor?.url.isNotEmpty == true)
+            .firstOrNull
+            ?.descriptor
+            ?.url;
+      } catch (e) {
+        // log error but continue
+        if (kDebugMode) {
+          print('Error uploading profile picture: $e');
+        }
+      }
     }
 
     if (widget.userInfo.banner != null) {
       try {
-        uploadedBanner = (await fileUploadP.uploadImage(
+        final bannerResults = await fileUploadP.uploadImage(
           widget.userInfo.banner!,
-        ))[0].descriptor!.url;
-      } catch (_) {}
+        );
+        uploadedBanner = bannerResults
+            .where((e) => e.descriptor?.url.isNotEmpty == true)
+            .firstOrNull
+            ?.descriptor
+            ?.url;
+      } catch (e) {
+        // log error but continue
+        if (kDebugMode) {
+          print('Error uploading banner: $e');
+        }
+      }
     }
 
     final UserMetadata userMetadata = UserMetadata(
