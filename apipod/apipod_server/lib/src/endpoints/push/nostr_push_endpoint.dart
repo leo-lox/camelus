@@ -306,7 +306,7 @@ class NostrPushEndpoint extends Endpoint {
     ndk.Nip01Event event,
     Relay relay,
   ) async {
-    await _withSession(enableLogging: false, (session) async {
+    await _withSession(enableLogging: true, (session) async {
       // Get the last added pubkey (usually the direct reply)
       List<String> pubkeyTag;
       try {
@@ -321,6 +321,9 @@ class NostrPushEndpoint extends Endpoint {
         // hellthread prevention
         return;
       }
+
+      session.log(
+          'Processing event ${event.id} with kind ${event.kind} for pubkey ${pubkeyTag[1]} from relay ${relay.url}');
 
       // Get the subscribed kinds for this user and relay
       final subscribedKinds = await getKindsByPubKey(session, pubkeyTag[1]);
