@@ -19,10 +19,12 @@ class NewDmPage extends ConsumerStatefulWidget {
 class _NewDmPageState extends ConsumerState<NewDmPage> {
   final TextEditingController _searchController = TextEditingController();
   final FocusNode _searchFocusNode = FocusNode();
+  late SearchStateNotifier _searchNotifier;
 
   @override
   void initState() {
     super.initState();
+    _searchNotifier = ref.read(searchStateProvider.notifier);
     // Auto-focus the search field
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _searchFocusNode.requestFocus();
@@ -33,8 +35,8 @@ class _NewDmPageState extends ConsumerState<NewDmPage> {
   void dispose() {
     _searchController.dispose();
     _searchFocusNode.dispose();
-    // Clear search state when leaving
-    ref.read(searchStateProvider.notifier).clearSearch();
+    // Delay the provider mutation so it runs after the widget tree is finalized.
+    Future(() => _searchNotifier.clearSearch());
     super.dispose();
   }
 
