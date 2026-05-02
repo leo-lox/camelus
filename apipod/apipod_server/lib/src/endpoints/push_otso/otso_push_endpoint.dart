@@ -460,20 +460,22 @@ class OtsoPushEndpoint extends Endpoint {
             ));
 
         // Set up event handlers
-        _relayPool!.onOpen.listen((relay) {
-          _withSession(enableLogging: true, (s) async {
-            s.log(level: LogLevel.info, "onOpen.listen ${relay.url}");
-            s.log(
-                level: LogLevel.info,
-                "relayPool relays: ${_relayPool!.myRelays.length}");
-          });
+        _subscriptions.add(
+          _relayPool!.onOpen.listen((relay) {
+            _withSession(enableLogging: true, (s) async {
+              s.log(level: LogLevel.info, "onOpen.listen ${relay.url}");
+              s.log(
+                  level: LogLevel.info,
+                  "relayPool relays: ${_relayPool!.myRelays.length}");
+            });
 
-          // Subscribe to specific event kinds when a relay connects
-          relay.subscribe(
-            OtsoPushConfig.subscriptionId,
-            OtsoPushConfig.subscriptionFilter,
-          );
-        });
+            // Subscribe to specific event kinds when a relay connects
+            relay.subscribe(
+              OtsoPushConfig.subscriptionId,
+              OtsoPushConfig.subscriptionFilter,
+            );
+          }),
+        );
 
         _subscriptions.add(
           _relayPool!.onEvent.listen((relayEvent) {
@@ -547,7 +549,7 @@ class OtsoPushEndpoint extends Endpoint {
                       .contains("The URL's protocol must be one of") ||
                   error.message
                       .toString()
-                      .contains("to many reconnection attempts")) {
+                      .contains("too many reconnection attempts")) {
                 _relayPool!.remove(relay.url);
 
                 await _withSession(enableLogging: true, (s) async {

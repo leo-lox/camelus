@@ -29,50 +29,53 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
       );
     } catch (_) {
       // Already initialized at native level — safe to continue
+      print('[BG_FCM] Firebase.initializeApp skipped/already initialized');
     }
   }
 
-  final providerContainer = await _setupProviderBackgroundThread();
+  try {
+    final providerContainer = await _setupProviderBackgroundThread();
 
-  await processFcmData(
-    data: message.data,
-    provider: providerContainer,
-    isBackground: true,
-  );
+    await processFcmData(
+      data: message.data,
+      provider: providerContainer,
+      isBackground: true,
+    );
 
-  // close db after processing
-  providerContainer.read(dbNdkProvider)!.close();
+    // close db after processing
+    final db = providerContainer.read(dbNdkProvider);
+    if (db != null) {
+      db.close();
+    }
+  } catch (e, st) {
+    print('[BG_FCM] handler fatal error: $e');
+    print('[BG_FCM] handler stack: $st');
+    // Do not rethrow in background isolate; keep service alive for next messages.
+  }
 }
 
 Future<ProviderContainer> _setupProviderBackgroundThread() async {
   final providerContainer = ProviderContainer();
 
   // init ndk db
-  // db could already be open by main thread
+  // Prefer a fresh open in the bg isolate, but fall back to attach mode.
   DbObjectBox dbCacheManager;
 
   final dbPath = await DbPaths.getNdkDbPath();
 
-  //final isDbOpen = Store.isOpen(dbPath);
-
-  // if (isDbOpen) {
-  //   dbCacheManager = DbObjectBox(attach: true, directory: dbPath);
-  // } else {
-  //   dbCacheManager = DbObjectBox(attach: false, directory: dbPath);
-  // }
-
   try {
-    dbCacheManager = DbObjectBox(attach: true, directory: dbPath);
+    dbCacheManager = DbObjectBox(attach: false, directory: dbPath);
     await dbCacheManager.dbRdy;
-  } catch (e) {
-    // Attach failed → main thread doesn't have store open
-    log("Store attach failed, opening fresh: $e");
+  } catch (eFalse) {
+    print('[BG_FCM] attach=false failed: $eFalse');
     try {
-      dbCacheManager = DbObjectBox(attach: false, directory: dbPath);
+      dbCacheManager = DbObjectBox(attach: true, directory: dbPath);
       await dbCacheManager.dbRdy;
-    } catch (e2) {
-      log("ERROR: Could not open/attach ObjectBox: $e2");
-      // Fall back to no-DB or throw
+    } catch (eTrue) {
+      log(
+        'ERROR: Could not open ObjectBox in background isolate (attach=false then attach=true): $eTrue',
+      );
+      print('[BG_FCM] attach=true fallback failed: $eTrue');
       rethrow;
     }
   }
@@ -87,6 +90,5 @@ Future<ProviderContainer> _setupProviderBackgroundThread() async {
     signerNoti: providerContainer.read(signerProvider.notifier),
     ndk: providerContainer.read(ndkProviderLight),
   );
-
   return providerContainer;
 }

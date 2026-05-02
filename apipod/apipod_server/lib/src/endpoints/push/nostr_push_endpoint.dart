@@ -306,7 +306,7 @@ class NostrPushEndpoint extends Endpoint {
     ndk.Nip01Event event,
     Relay relay,
   ) async {
-    await _withSession(enableLogging: false, (session) async {
+    await _withSession(enableLogging: true, (session) async {
       // Get the last added pubkey (usually the direct reply)
       List<String> pubkeyTag;
       try {
@@ -327,9 +327,9 @@ class NostrPushEndpoint extends Endpoint {
 
       // Check if the event kind is in the user's subscribed kinds
       if (!subscribedKinds.contains(event.kind)) {
-        session.log(
-            'Event kind ${event.kind} not in subscribed kinds $subscribedKinds for ${pubkeyTag[1]}',
-            level: LogLevel.debug);
+        // session.log(
+        //     'Event kind ${event.kind} not in subscribed kinds $subscribedKinds for ${pubkeyTag[1]}',
+        //     level: LogLevel.debug);
         return;
       }
 
@@ -400,19 +400,19 @@ class NostrPushEndpoint extends Endpoint {
 
               // Keep iOS data-only so the app can parse encryptedEvent
               // and create its own local notification in background.
-              notification: null,
-              apns: ApnsConfig(
-                headers: {
-                  'apns-priority':
-                      '10', // 10 is for immediate, 5 is for background
-                  'apns-push-type': 'alert', // background
-                },
-                payload: ApnsPayload(
-                  aps: Aps(
-                    contentAvailable: true,
-                  ),
-                ),
-              ),
+              // notification: null,
+              // apns: ApnsConfig(
+              //   headers: {
+              //     'apns-priority':
+              //         '10', // 10 is for immediate, 5 is for background
+              //     'apns-push-type': 'alert', // background
+              //   },
+              //   payload: ApnsPayload(
+              //     aps: Aps(
+              //       contentAvailable: true,
+              //     ),
+              //   ),
+              // ),
             ),
           );
 
@@ -498,19 +498,21 @@ class NostrPushEndpoint extends Endpoint {
               reconnectSubId: PushConfig.subscriptionId,
             ));
 
-        _relayPool!.onOpen.listen((relay) {
-          _withSession(enableLogging: true, (s) async {
-            s.log(level: LogLevel.info, "onOpen.listen ${relay.url}");
-            s.log(
-                level: LogLevel.info,
-                "relayPool relays: ${_relayPool!.myRelays.length}");
-          });
+        _subscriptions.add(
+          _relayPool!.onOpen.listen((relay) {
+            _withSession(enableLogging: true, (s) async {
+              s.log(level: LogLevel.info, "onOpen.listen ${relay.url}");
+              s.log(
+                  level: LogLevel.info,
+                  "relayPool relays: ${_relayPool!.myRelays.length}");
+            });
 
-          relay.subscribe(
-            PushConfig.subscriptionId,
-            PushConfig.subscriptionFilter,
-          );
-        });
+            relay.subscribe(
+              PushConfig.subscriptionId,
+              PushConfig.subscriptionFilter,
+            );
+          }),
+        );
 
         _subscriptions.add(
           _relayPool!.onEvent.listen((relayEvent) async {
@@ -583,7 +585,7 @@ class NostrPushEndpoint extends Endpoint {
                       .contains("The URL's protocol must be one of") ||
                   error.message
                       .toString()
-                      .contains("to many reconnection attempts")) {
+                      .contains("too many reconnection attempts")) {
                 _relayPool!.remove(relay.url);
 
                 await _withSession(enableLogging: true, (s) async {

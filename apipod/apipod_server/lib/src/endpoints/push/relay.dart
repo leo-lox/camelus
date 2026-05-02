@@ -46,39 +46,40 @@ class Relay {
   /// Creates a new relay connection
   Relay(this.url, {RelayOptions? options})
       : options = options ?? RelayOptions() {
-    _initWebsocket();
+    _connect();
   }
 
-  /// Initializes the WebSocket connection
-  Future<void> _initWebsocket() async {
+  /// Connects and handles errors from the initial connection attempt
+  Future<void> _connect() async {
     try {
-      _ws = WebSocketChannel.connect(
-        Uri.parse(url),
-      );
-
-      await _ws!.ready;
-
-      //closeReason = null;
-
-      _ws!.stream.listen(
-        _handleMessage,
-        onDone: () {
-          closeReason = _ws!.closeReason;
-          _handleClose();
-        },
-        onError: _handleError,
-      );
-
-      _ws!.ready.then((value) {
-        // Emit open event
-        _openController.add(this);
-      });
+      await _initWebsocket();
     } catch (e) {
       _errorController.add(e);
       if (options.reconnect) {
         _scheduleReconnect();
       }
     }
+  }
+
+  /// Initializes the WebSocket connection (throws on failure)
+  Future<void> _initWebsocket() async {
+    _ws = WebSocketChannel.connect(
+      Uri.parse(url),
+    );
+
+    await _ws!.ready;
+
+    _ws!.stream.listen(
+      _handleMessage,
+      onDone: () {
+        closeReason = _ws!.closeReason;
+        _handleClose();
+      },
+      onError: _handleError,
+    );
+
+    // Emit open event once, after listener is attached
+    _openController.add(this);
   }
 
   /// Handles incoming WebSocket messages
@@ -141,13 +142,15 @@ class Relay {
         reconnectAttempts = 0;
         _handleOpen();
       } catch (e) {
+        _errorController.add(e);
         reconnectDelay = (reconnectDelay * 1.5).toInt();
         reconnectAttempts = reconnectAttempts + 1;
 
         if (reconnectAttempts >= 10) {
-          _errorController.add("to many reconnection attempts");
+          _errorController.add("too many reconnection attempts");
         }
 
+        _reconnecting = false;
         _scheduleReconnect();
       }
     });
