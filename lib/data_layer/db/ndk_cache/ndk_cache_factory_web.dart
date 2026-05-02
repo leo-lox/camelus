@@ -1,9 +1,4 @@
 import 'package:ndk/data_layer/repositories/wallets/sembast_wallets_repo.dart';
-import 'package:ndk/domain_layer/entities/cashu/cashu_keyset.dart';
-import 'package:ndk/domain_layer/entities/cashu/cashu_mint_info.dart';
-import 'package:ndk/domain_layer/entities/cashu/cashu_proof.dart';
-import 'package:ndk/domain_layer/entities/nip_05.dart';
-import 'package:ndk/domain_layer/entities/user_relay_list.dart';
 import 'package:ndk/domain_layer/entities/wallet/wallet.dart';
 import 'package:ndk/domain_layer/entities/wallet/wallet_transaction.dart';
 import 'package:ndk/domain_layer/entities/wallet/wallet_type.dart';
@@ -97,5 +92,10 @@ class MyCombinedDb extends SembastCacheManager implements SembastWalletsRepo {
   @override
   Future<void> storeWallet(Wallet wallet) {
     return _walletsRepo.storeWallet(wallet);
+  }
+
+  @override
+  Future<void> removeTransactions(List<String>? transactionIds) {
+    return _walletsRepo.removeTransactions(transactionIds);
   }
 }
