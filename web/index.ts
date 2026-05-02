@@ -7,6 +7,18 @@ export async function handler(request: Request) {
     return fetch(upstreamUrl, request);
   }
 
+  const imageExtensions = ['.png', '.jpg', '.jpeg', '.gif', '.svg', '.webp', '.ico'];
+  const isImage = imageExtensions.some(ext => url.pathname.toLowerCase().endsWith(ext));
+
+  if (isImage) {
+    const response = await fetch("https://" + url.host + url.pathname);
+    return new Response(response.body, {
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+      },
+    });
+  }
+
   const response = await fetch(
     "https://" + url.host + "/index.html"
   );
