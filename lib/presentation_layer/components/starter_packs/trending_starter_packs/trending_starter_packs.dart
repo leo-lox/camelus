@@ -25,8 +25,8 @@ class TrendingStarterPacks extends ConsumerWidget {
         itemCount: state.starterPacks.length,
         itemBuilder: (context, index) {
           final myPack = state.starterPacks[index];
-          return SizedBox(
-            width: MediaQuery.of(context).size.width * 0.70,
+          return ConstrainedBox(
+            constraints: BoxConstraints(maxWidth: 300),
             child: Container(
               margin: EdgeInsets.only(left: index == 0 ? 8.0 : 0.0, right: 4.0),
               child: StarterPackCard(

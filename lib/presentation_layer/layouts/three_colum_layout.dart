@@ -14,8 +14,8 @@ class ThreeColumnLayout extends StatelessWidget {
     required this.leftSidebar,
     required this.mainContent,
     required this.rightSidebar,
-    this.minMainContentWidth = 400,
-    this.maxMainContentWidth = 600,
+    this.minMainContentWidth = 600,
+    this.maxMainContentWidth = 850,
     this.leftSidebarWidth = 280,
     this.rightSidebarWidth = 320,
   });

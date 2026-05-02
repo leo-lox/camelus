@@ -306,7 +306,7 @@ class NostrPushEndpoint extends Endpoint {
     ndk.Nip01Event event,
     Relay relay,
   ) async {
-    await _withSession(enableLogging: true, (session) async {
+    await _withSession(enableLogging: false, (session) async {
       // Get the last added pubkey (usually the direct reply)
       List<String> pubkeyTag;
       try {
