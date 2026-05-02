@@ -25,7 +25,7 @@ platform :android do
 
   desc "Deploy a new version to Google Play"
   lane :production do
-    sh "flutter build appbundle --release --obfuscate --split-debug-info=/myBuilds/obfuscate" # build the app bundle
+    sh "flutter build appbundle --release --obfuscate --split-debug-info=./myBuilds/obfuscate" # build the app bundle
     #gradle(task: "clean assembleRelease")
     upload_to_play_store(
       aab: '../build/app/outputs/bundle/release/app-release.aab',
@@ -35,7 +35,7 @@ platform :android do
 
   desc "Deploy a new version to open Testing Track"
   lane :beta do
-    sh "flutter build appbundle --release --obfuscate --split-debug-info=/myBuilds/obfuscate" # build the app bundle
+    sh "flutter build appbundle --release --obfuscate --split-debug-info=./myBuilds/obfuscate" # build the app bundle
     #gradle(
     #  task: 'bundle',
     #  build_type: 'Release'

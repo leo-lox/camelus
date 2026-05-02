@@ -61,6 +61,7 @@ isar.dll
 
 # fastlane specific
 **/fastlane/report.xml
+**/vendor/bundle
 
 # deliver temporary files
 **/fastlane/Preview.html
