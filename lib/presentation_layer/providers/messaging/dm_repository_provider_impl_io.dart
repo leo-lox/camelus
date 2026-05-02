@@ -1,6 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../data_layer/db/object_box_camelus/db_camelus.dart';
 import '../../../data_layer/repositories/direct_message_repository_impl.dart';
 import '../../../domain_layer/repositories/direct_message_repository.dart';
 import '../inbox_outbox_provider.dart';
@@ -17,11 +16,9 @@ DirectMessageRepository? createDmRepository(Ref ref) {
     return null;
   }
 
-  final dbImpl = dbApp as DbAppImpl;
-
   final repository = DirectMessageRepositoryImpl(
     ndk: ndk,
-    getStore: () => dbImpl.store,
+    appDb: dbApp,
     myPubkey: signer.getPublicKey(),
     inboxOutbox: inboxOutbox,
   );

@@ -4,7 +4,6 @@ import 'package:ndk/entities.dart';
 
 import '../../domain_layer/entities/direct_message.dart';
 import '../../domain_layer/entities/nostr_tag.dart';
-import '../db/object_box_camelus/schema/db_nip17_message.dart';
 import 'nostr_tag_model.dart';
 
 /// Data model for DirectMessage with conversion methods.
@@ -24,12 +23,13 @@ class DirectMessageModel extends DirectMessage {
     super.relaysTotal,
   });
 
-  /// Create from ObjectBox database entity
-  factory DirectMessageModel.fromDb(DbNip17Message db) {
+  /// Create from a plain Map (used by both Sembast and ObjectBox helpers).
+  factory DirectMessageModel.fromMap(Map<String, dynamic> map) {
     List<NostrTag> parsedTags = [];
-    if (db.tags.isNotEmpty) {
+    final tagsStr = map['tags'] as String? ?? '';
+    if (tagsStr.isNotEmpty) {
       try {
-        final List<dynamic> tagsJson = jsonDecode(db.tags);
+        final List<dynamic> tagsJson = jsonDecode(tagsStr);
         parsedTags = tagsJson
             .map((tag) => NostrTagModel.fromJson(tag as List<dynamic>))
             .toList();
@@ -40,7 +40,7 @@ class DirectMessageModel extends DirectMessage {
 
     // Parse sendStatus: 0=pending, 1=sent, 2=failed
     MessageSendStatus status;
-    switch (db.sendStatus) {
+    switch (map['sendStatus'] as int? ?? 1) {
       case 0:
         status = MessageSendStatus.pending;
         break;
@@ -52,17 +52,57 @@ class DirectMessageModel extends DirectMessage {
     }
 
     return DirectMessageModel(
-      id: db.eventId,
-      senderPubkey: db.senderPubkey,
-      peerPubkey: db.peerPubkey,
-      content: db.content,
-      createdAt: db.createdAt,
-      isOutgoing: db.isOutgoing,
+      id: map['eventId'] as String,
+      senderPubkey: map['senderPubkey'] as String,
+      peerPubkey: map['peerPubkey'] as String,
+      content: map['content'] as String,
+      createdAt: map['createdAt'] as int,
+      isOutgoing: map['isOutgoing'] as bool,
       tags: parsedTags,
       sendStatus: status,
-      recipientGiftWrapId: db.recipientGiftWrapId,
-      failureReason: db.failureReason,
+      recipientGiftWrapId: map['recipientGiftWrapId'] as String?,
+      failureReason: map['failureReason'] as String?,
     );
+  }
+
+  /// Convert to a plain Map (used by both Sembast and ObjectBox helpers).
+  /// Gift-wrap JSON fields are intentionally excluded — they are persisted
+  /// separately via [AppDb.dmPersistGiftWraps].
+  Map<String, dynamic> toMap({required String ownerPubkey}) {
+    String tagsJson = '';
+    if (tags.isNotEmpty) {
+      final tagsList = tags.map((tag) => tag.toList()).toList();
+      tagsJson = jsonEncode(tagsList);
+    }
+
+    // Convert sendStatus: pending=0, sent=1, failed=2
+    int statusInt;
+    switch (sendStatus) {
+      case MessageSendStatus.pending:
+        statusInt = 0;
+        break;
+      case MessageSendStatus.failed:
+        statusInt = 2;
+        break;
+      case MessageSendStatus.sent:
+        statusInt = 1;
+        break;
+    }
+
+    return {
+      'ownerPubkey': ownerPubkey,
+      'eventId': id,
+      'senderPubkey': senderPubkey,
+      'peerPubkey': peerPubkey,
+      'content': content,
+      'createdAt': createdAt,
+      'tags': tagsJson,
+      'replyToEventId': replyToEventId,
+      'isOutgoing': isOutgoing,
+      'sendStatus': statusInt,
+      'recipientGiftWrapId': recipientGiftWrapId,
+      'failureReason': failureReason,
+    };
   }
 
   /// Create from an unwrapped NIP-17 rumor event (kind 14) after gift wrap decryption.
@@ -103,45 +143,6 @@ class DirectMessageModel extends DirectMessage {
       createdAt: rumor.createdAt,
       isOutgoing: isOutgoing,
       tags: parsedTags,
-    );
-  }
-
-  /// Convert to ObjectBox database entity
-  /// [ownerPubkey] - The pubkey of the logged-in user who owns this message
-  DbNip17Message toDb({required String ownerPubkey}) {
-    String tagsJson = '';
-    if (tags.isNotEmpty) {
-      final tagsList = tags.map((tag) => tag.toList()).toList();
-      tagsJson = jsonEncode(tagsList);
-    }
-
-    // Convert sendStatus: pending=0, sent=1, failed=2
-    int statusInt;
-    switch (sendStatus) {
-      case MessageSendStatus.pending:
-        statusInt = 0;
-        break;
-      case MessageSendStatus.failed:
-        statusInt = 2;
-        break;
-      case MessageSendStatus.sent:
-        statusInt = 1;
-        break;
-    }
-
-    return DbNip17Message(
-      ownerPubkey: ownerPubkey,
-      eventId: id,
-      senderPubkey: senderPubkey,
-      peerPubkey: peerPubkey,
-      content: content,
-      createdAt: createdAt,
-      tags: tagsJson,
-      replyToEventId: replyToEventId,
-      isOutgoing: isOutgoing,
-      sendStatus: statusInt,
-      recipientGiftWrapId: recipientGiftWrapId,
-      failureReason: failureReason,
     );
   }
 

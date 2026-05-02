@@ -1,3 +1,5 @@
+// ignore_for_file: experimental_member_use
+
 import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
@@ -5,16 +7,14 @@ import 'dart:developer';
 import 'package:ndk/ndk.dart';
 
 import '../../domain_layer/entities/direct_message.dart';
-import '../../domain_layer/usecases/inbox_outbox.dart';
-import '../models/nostr_tag_model.dart';
 import '../../domain_layer/entities/dm_conversation.dart';
+import '../../domain_layer/repositories/app_db.dart';
 import '../../domain_layer/repositories/direct_message_repository.dart';
-import '../../objectbox.g.dart';
-import '../db/object_box_camelus/schema/db_nip17_conversation.dart';
-import '../db/object_box_camelus/schema/db_nip17_message.dart';
+import '../../domain_layer/usecases/inbox_outbox.dart';
 import '../models/direct_message_model.dart';
+import '../models/nostr_tag_model.dart';
 
-/// Implementation of [DirectMessageRepository] using NDK and ObjectBox.
+/// Implementation of [DirectMessageRepository] using NDK and AppDb.
 ///
 /// This handles NIP-17 private direct messages:
 /// - Kind 14: Chat message (rumor, unsigned)
@@ -22,7 +22,7 @@ import '../models/direct_message_model.dart';
 /// - Kind 1059: Gift wrap (final envelope)
 class DirectMessageRepositoryImpl implements DirectMessageRepository {
   final Ndk ndk;
-  final Future<Store> Function() getStore;
+  final AppDb _appDb;
   final String myPubkey;
   final InboxOutbox inboxOutbox;
 
@@ -47,10 +47,10 @@ class DirectMessageRepositoryImpl implements DirectMessageRepository {
 
   DirectMessageRepositoryImpl({
     required this.ndk,
-    required this.getStore,
+    required AppDb appDb,
     required this.myPubkey,
     required this.inboxOutbox,
-  });
+  }) : _appDb = appDb;
 
   // ============ DM Relay Discovery ============
 
@@ -123,140 +123,51 @@ class DirectMessageRepositoryImpl implements DirectMessageRepository {
     }
   }
 
-  // ============ Conversations ============
-
   @override
   Stream<List<DmConversation>> watchConversations() async* {
     // Emit initial data
-    yield await _getConversationsFromDb();
+    yield await _appDb.dmGetConversations(ownerPubkey: myPubkey);
 
     // Listen for updates
     yield* _conversationsController.stream;
   }
 
-  Future<List<DmConversation>> _getConversationsFromDb() async {
-    final store = await getStore();
-    final convBox = store.box<DbNip17Conversation>();
-    final messageBox = store.box<DbNip17Message>();
-
-    // Filter by ownerPubkey to only show conversations for the current user
-    final query = convBox
-        .query(DbNip17Conversation_.ownerPubkey.equals(myPubkey))
-        .order(DbNip17Conversation_.lastMessageAt, flags: Order.descending)
-        .build();
-
-    final conversations = query.find();
-    query.close();
-
-    return conversations
-        .map((db) => _dbConversationToEntity(db, messageBox))
-        .toList();
-  }
-
-  DmConversation _dbConversationToEntity(
-    DbNip17Conversation db,
-    Box<DbNip17Message> messageBox,
-  ) {
-    // Filter by both ownerPubkey and peerPubkey
-    final msgQuery = messageBox
-        .query(
-          DbNip17Message_.ownerPubkey.equals(myPubkey) &
-              DbNip17Message_.peerPubkey.equals(db.peerPubkey),
-        )
-        .order(DbNip17Message_.createdAt, flags: Order.descending)
-        .build();
-    final lastMessageDb = msgQuery.findFirst();
-    msgQuery.close();
-
-    return DmConversation(
-      peerPubkey: db.peerPubkey,
-      lastMessageAt: db.lastMessageAt,
-      unreadCount: db.unreadCount,
-      lastMessagePreview: db.lastMessagePreview,
-      lastMessageIsOutgoing: db.lastMessageIsOutgoing,
-      lastMessage: lastMessageDb != null
-          ? DirectMessageModel.fromDb(lastMessageDb)
-          : null,
-    );
-  }
-
   void _notifyConversationsChanged() async {
-    final conversations = await _getConversationsFromDb();
+    final conversations = await _appDb.dmGetConversations(
+      ownerPubkey: myPubkey,
+    );
     _conversationsController.add(conversations);
     _notifyUnreadCountChanged();
   }
 
   @override
   Future<DmConversation?> getConversation(String peerPubkey) async {
-    final store = await getStore();
-    final convBox = store.box<DbNip17Conversation>();
-    final messageBox = store.box<DbNip17Message>();
-
-    // Filter by ownerPubkey to only get conversation for the current user
-    final query = convBox
-        .query(
-          DbNip17Conversation_.ownerPubkey.equals(myPubkey) &
-              DbNip17Conversation_.peerPubkey.equals(peerPubkey),
-        )
-        .build();
-    final db = query.findFirst();
-    query.close();
-
-    if (db == null) return null;
-
-    return _dbConversationToEntity(db, messageBox);
+    return _appDb.dmGetConversation(
+      ownerPubkey: myPubkey,
+      peerPubkey: peerPubkey,
+    );
   }
 
   @override
   Future<void> markConversationAsRead(String peerPubkey) async {
-    final store = await getStore();
-    final box = store.box<DbNip17Conversation>();
-
-    store.runInTransaction(TxMode.write, () {
-      // Filter by ownerPubkey to only update conversation for the current user
-      final query = box
-          .query(
-            DbNip17Conversation_.ownerPubkey.equals(myPubkey) &
-                DbNip17Conversation_.peerPubkey.equals(peerPubkey),
-          )
-          .build();
-      final db = query.findFirst();
-      query.close();
-
-      if (db != null) {
-        db.unreadCount = 0;
-        box.put(db);
-      }
-    });
-
+    await _appDb.dmMarkConversationRead(
+      ownerPubkey: myPubkey,
+      peerPubkey: peerPubkey,
+    );
     _notifyConversationsChanged();
   }
 
   @override
   Stream<int> watchTotalUnreadCount() async* {
     // Emit initial count
-    yield await _getTotalUnreadCount();
+    yield await _appDb.dmGetTotalUnreadCount(ownerPubkey: myPubkey);
 
     // Listen for updates
     yield* _unreadCountController.stream;
   }
 
-  Future<int> _getTotalUnreadCount() async {
-    final store = await getStore();
-    final box = store.box<DbNip17Conversation>();
-
-    // Filter by ownerPubkey to only count unread for the current user
-    final query = box
-        .query(DbNip17Conversation_.ownerPubkey.equals(myPubkey))
-        .build();
-    final conversations = query.find();
-    query.close();
-
-    return conversations.fold<int>(0, (sum, c) => sum + c.unreadCount);
-  }
-
   void _notifyUnreadCountChanged() async {
-    final count = await _getTotalUnreadCount();
+    final count = await _appDb.dmGetTotalUnreadCount(ownerPubkey: myPubkey);
     _unreadCountController.add(count);
   }
 
@@ -265,7 +176,10 @@ class DirectMessageRepositoryImpl implements DirectMessageRepository {
   @override
   Stream<List<DirectMessage>> watchMessages(String peerPubkey) async* {
     // Emit initial data
-    yield await _getMessagesFromDb(peerPubkey);
+    yield await _appDb.dmGetMessagesByPeer(
+      ownerPubkey: myPubkey,
+      peerPubkey: peerPubkey,
+    );
 
     // Get or create controller for this peer
     _messagesControllers[peerPubkey] ??=
@@ -275,29 +189,13 @@ class DirectMessageRepositoryImpl implements DirectMessageRepository {
     yield* _messagesControllers[peerPubkey]!.stream;
   }
 
-  Future<List<DirectMessage>> _getMessagesFromDb(String peerPubkey) async {
-    final store = await getStore();
-    final box = store.box<DbNip17Message>();
-
-    // Filter by ownerPubkey to only get messages for the current user
-    final query = box
-        .query(
-          DbNip17Message_.ownerPubkey.equals(myPubkey) &
-              DbNip17Message_.peerPubkey.equals(peerPubkey),
-        )
-        .order(DbNip17Message_.createdAt)
-        .build();
-
-    final messages = query.find();
-    query.close();
-
-    return messages.map((db) => DirectMessageModel.fromDb(db)).toList();
-  }
-
   void _notifyMessagesChanged(String peerPubkey) async {
     final controller = _messagesControllers[peerPubkey];
     if (controller != null) {
-      final messages = await _getMessagesFromDb(peerPubkey);
+      final messages = await _appDb.dmGetMessagesByPeer(
+        ownerPubkey: myPubkey,
+        peerPubkey: peerPubkey,
+      );
       controller.add(messages);
     }
   }
@@ -307,7 +205,10 @@ class DirectMessageRepositoryImpl implements DirectMessageRepository {
   void _notifyMessageUpdate(String peerPubkey, DirectMessage updatedMsg) async {
     final controller = _messagesControllers[peerPubkey];
     if (controller == null) return;
-    final messages = await _getMessagesFromDb(peerPubkey);
+    final messages = await _appDb.dmGetMessagesByPeer(
+      ownerPubkey: myPubkey,
+      peerPubkey: peerPubkey,
+    );
     // Replace the matching message with the in-memory (transient) version
     final merged = messages
         .map<DirectMessage>((m) => m.id == updatedMsg.id ? updatedMsg : m)
@@ -414,16 +315,9 @@ class DirectMessageRepositoryImpl implements DirectMessageRepository {
   @override
   Future<bool> loadOlderMessages(String peerPubkey) async {
     // Get the oldest message timestamp from local DB for the current user
-    final store = await getStore();
-    final box = store.box<DbNip17Message>();
-
-    // Filter by ownerPubkey to only get messages for the current user
-    final query = box
-        .query(DbNip17Message_.ownerPubkey.equals(myPubkey))
-        .order(DbNip17Message_.createdAt)
-        .build();
-    final oldestMessage = query.findFirst();
-    query.close();
+    final oldestMessage = await _appDb.dmGetOldestMessage(
+      ownerPubkey: myPubkey,
+    );
 
     if (oldestMessage == null) {
       // No messages yet, do a regular fetch
@@ -441,9 +335,9 @@ class DirectMessageRepositoryImpl implements DirectMessageRepository {
       'DM: Loading older messages before $oldestTimestamp (since=$fetchSince until=$fetchUntil)',
     );
 
-    final previousCount = box.count();
+    final previousCount = await _appDb.dmCountMessages(ownerPubkey: myPubkey);
     await fetchMessages(since: fetchSince, until: fetchUntil);
-    final newCount = box.count();
+    final newCount = await _appDb.dmCountMessages(ownerPubkey: myPubkey);
 
     final foundNew = newCount > previousCount;
     log(
@@ -476,21 +370,11 @@ class DirectMessageRepositoryImpl implements DirectMessageRepository {
 
   @override
   Future<int?> getOldestMessageTimestamp(String peerPubkey) async {
-    final store = await getStore();
-    final box = store.box<DbNip17Message>();
-
-    // Filter by ownerPubkey to only get messages for the current user
-    final query = box
-        .query(
-          DbNip17Message_.ownerPubkey.equals(myPubkey) &
-              DbNip17Message_.peerPubkey.equals(peerPubkey),
-        )
-        .order(DbNip17Message_.createdAt)
-        .build();
-    final oldestMessage = query.findFirst();
-    query.close();
-
-    return oldestMessage?.createdAt;
+    final msg = await _appDb.dmGetOldestMessageByPeer(
+      ownerPubkey: myPubkey,
+      peerPubkey: peerPubkey,
+    );
+    return msg?.createdAt;
   }
 
   @override
@@ -1056,50 +940,12 @@ class DirectMessageRepositoryImpl implements DirectMessageRepository {
 
   @override
   Future<DirectMessage?> getCachedMessage(String giftWrapId) async {
-    final store = await getStore();
-    final box = store.box<DbNip17Message>();
-
-    // Filter by ownerPubkey to only get messages for the current user
-    final query = box
-        .query(
-          DbNip17Message_.ownerPubkey.equals(myPubkey) &
-              DbNip17Message_.eventId.equals(giftWrapId),
-        )
-        .build();
-    final db = query.findFirst();
-    query.close();
-
-    if (db == null) return null;
-
-    return DirectMessageModel.fromDb(db);
+    return _appDb.dmGetMessage(ownerPubkey: myPubkey, giftWrapId: giftWrapId);
   }
 
   @override
   Future<void> cacheDecryptedMessage(DirectMessage message) async {
-    final store = await getStore();
-    final box = store.box<DbNip17Message>();
-
-    // Check if already exists for this user
-    final query = box
-        .query(
-          DbNip17Message_.ownerPubkey.equals(myPubkey) &
-              DbNip17Message_.eventId.equals(message.id),
-        )
-        .build();
-    final existing = query.findFirst();
-    query.close();
-
-    final model = DirectMessageModel.fromEntity(message);
-    final dbMessage = model.toDb(ownerPubkey: myPubkey);
-
-    if (existing != null) {
-      // Update existing message (preserve dbId and persisted gift wrap JSON)
-      dbMessage.dbId = existing.dbId;
-      dbMessage.selfGiftWrapJson = existing.selfGiftWrapJson;
-      dbMessage.recipientGiftWrapJson = existing.recipientGiftWrapJson;
-    }
-
-    box.put(dbMessage);
+    await _appDb.dmPutMessage(ownerPubkey: myPubkey, message: message);
   }
 
   /// Store serialised gift wrap events in the DB record so that [resendMessage]
@@ -1109,21 +955,12 @@ class DirectMessageRepositoryImpl implements DirectMessageRepository {
     required String selfGiftWrapJson,
     String? recipientGiftWrapJson,
   }) async {
-    final store = await getStore();
-    final box = store.box<DbNip17Message>();
-    final query = box
-        .query(
-          DbNip17Message_.ownerPubkey.equals(myPubkey) &
-              DbNip17Message_.eventId.equals(messageId),
-        )
-        .build();
-    final existing = query.findFirst();
-    query.close();
-    if (existing != null) {
-      existing.selfGiftWrapJson = selfGiftWrapJson;
-      existing.recipientGiftWrapJson = recipientGiftWrapJson;
-      box.put(existing);
-    }
+    await _appDb.dmPersistGiftWraps(
+      ownerPubkey: myPubkey,
+      messageId: messageId,
+      selfGiftWrapJson: selfGiftWrapJson,
+      recipientGiftWrapJson: recipientGiftWrapJson,
+    );
   }
 
   /// Load a persisted gift wrap from the DB as a fallback when the NDK
@@ -1132,20 +969,11 @@ class DirectMessageRepositoryImpl implements DirectMessageRepository {
     String messageId, {
     required bool isSelf,
   }) async {
-    final store = await getStore();
-    final box = store.box<DbNip17Message>();
-    final query = box
-        .query(
-          DbNip17Message_.ownerPubkey.equals(myPubkey) &
-              DbNip17Message_.eventId.equals(messageId),
-        )
-        .build();
-    final existing = query.findFirst();
-    query.close();
-    if (existing == null) return null;
-    final json = isSelf
-        ? existing.selfGiftWrapJson
-        : existing.recipientGiftWrapJson;
+    final json = await _appDb.dmGetGiftWrapJson(
+      ownerPubkey: myPubkey,
+      messageId: messageId,
+      isSelf: isSelf,
+    );
     if (json == null) return null;
     try {
       return Nip01EventModel.fromJson(jsonDecode(json) as Map<String, dynamic>);
@@ -1162,43 +990,48 @@ class DirectMessageRepositoryImpl implements DirectMessageRepository {
     DirectMessage message, {
     required bool incrementUnread,
   }) async {
-    final store = await getStore();
-    final box = store.box<DbNip17Conversation>();
+    final existing = await _appDb.dmGetConversation(
+      ownerPubkey: myPubkey,
+      peerPubkey: message.peerPubkey,
+    );
 
-    store.runInTransaction(TxMode.write, () {
-      // Filter by ownerPubkey to only update conversation for the current user
-      final query = box
-          .query(
-            DbNip17Conversation_.ownerPubkey.equals(myPubkey) &
-                DbNip17Conversation_.peerPubkey.equals(message.peerPubkey),
-          )
-          .build();
-      var conversation = query.findFirst();
-      query.close();
+    final DmConversation updated;
+    if (existing == null) {
+      updated = DmConversation(
+        peerPubkey: message.peerPubkey,
+        lastMessageAt: message.createdAt,
+        unreadCount: incrementUnread ? 1 : 0,
+        lastMessagePreview: _truncatePreview(message.content),
+        lastMessageIsOutgoing: message.isOutgoing,
+      );
+    } else {
+      int newUnread = existing.unreadCount;
+      if (incrementUnread) newUnread++;
 
-      if (conversation == null) {
-        conversation = DbNip17Conversation(
-          ownerPubkey: myPubkey,
-          peerPubkey: message.peerPubkey,
-          lastMessageAt: message.createdAt,
-          unreadCount: incrementUnread ? 1 : 0,
-          lastMessagePreview: _truncatePreview(message.content),
-          lastMessageIsOutgoing: message.isOutgoing,
-        );
-      } else {
-        // Only update if this message is newer
-        if (message.createdAt >= conversation.lastMessageAt) {
-          conversation.lastMessageAt = message.createdAt;
-          conversation.lastMessagePreview = _truncatePreview(message.content);
-          conversation.lastMessageIsOutgoing = message.isOutgoing;
-        }
-        if (incrementUnread) {
-          conversation.unreadCount++;
-        }
+      int newLastMessageAt = existing.lastMessageAt;
+      String newPreview = existing.lastMessagePreview;
+      bool newIsOutgoing = existing.lastMessageIsOutgoing;
+
+      // Only update preview/timestamp if this message is newer
+      if (message.createdAt >= existing.lastMessageAt) {
+        newLastMessageAt = message.createdAt;
+        newPreview = _truncatePreview(message.content);
+        newIsOutgoing = message.isOutgoing;
       }
 
-      box.put(conversation);
-    });
+      updated = DmConversation(
+        peerPubkey: existing.peerPubkey,
+        lastMessageAt: newLastMessageAt,
+        unreadCount: newUnread,
+        lastMessagePreview: newPreview,
+        lastMessageIsOutgoing: newIsOutgoing,
+      );
+    }
+
+    await _appDb.dmPutConversation(
+      ownerPubkey: myPubkey,
+      conversation: updated,
+    );
   }
 
   String _truncatePreview(String content, {int maxLength = 100}) {
@@ -1221,22 +1054,11 @@ class DirectMessageRepositoryImpl implements DirectMessageRepository {
       final peerPubkey = message.peerPubkey;
 
       // 1. Delete from local cache FIRST (immediate, no flicker)
-      final store = await getStore();
-      final box = store.box<DbNip17Message>();
-
-      final query = box
-          .query(
-            DbNip17Message_.ownerPubkey.equals(myPubkey) &
-                DbNip17Message_.eventId.equals(messageId),
-          )
-          .build();
-      final dbMessage = query.findFirst();
-      query.close();
-
-      if (dbMessage != null) {
-        box.remove(dbMessage.dbId);
-        log('DM: Removed message from local cache');
-      }
+      await _appDb.dmDeleteMessage(
+        ownerPubkey: myPubkey,
+        giftWrapId: messageId,
+      );
+      log('DM: Removed message from local cache');
 
       // 2. Update conversation and notify listeners immediately
       await _recalculateConversation(peerPubkey);
@@ -1282,42 +1104,36 @@ class DirectMessageRepositoryImpl implements DirectMessageRepository {
 
   /// Recalculate conversation metadata after message deletion
   Future<void> _recalculateConversation(String peerPubkey) async {
-    final store = await getStore();
-    final messageBox = store.box<DbNip17Message>();
-    final conversationBox = store.box<DbNip17Conversation>();
-
-    // Get the latest message for this peer (filtered by ownerPubkey)
-    final query = messageBox
-        .query(
-          DbNip17Message_.ownerPubkey.equals(myPubkey) &
-              DbNip17Message_.peerPubkey.equals(peerPubkey),
-        )
-        .order(DbNip17Message_.createdAt, flags: Order.descending)
-        .build();
-    final latestMessage = query.findFirst();
-    query.close();
-
-    // Get the conversation (filtered by ownerPubkey)
-    final convQuery = conversationBox
-        .query(
-          DbNip17Conversation_.ownerPubkey.equals(myPubkey) &
-              DbNip17Conversation_.peerPubkey.equals(peerPubkey),
-        )
-        .build();
-    final conversation = convQuery.findFirst();
-    convQuery.close();
-
-    if (conversation == null) return;
+    final latestMessage = await _appDb.dmGetLatestMessageByPeer(
+      ownerPubkey: myPubkey,
+      peerPubkey: peerPubkey,
+    );
 
     if (latestMessage == null) {
-      // No more messages - delete the conversation
-      conversationBox.remove(conversation.dbId);
+      // No more messages — delete the conversation
+      await _appDb.dmDeleteConversation(
+        ownerPubkey: myPubkey,
+        peerPubkey: peerPubkey,
+      );
     } else {
-      // Update with latest message
-      conversation.lastMessageAt = latestMessage.createdAt;
-      conversation.lastMessagePreview = _truncatePreview(latestMessage.content);
-      conversation.lastMessageIsOutgoing = latestMessage.isOutgoing;
-      conversationBox.put(conversation);
+      // Update conversation with latest message details
+      final existing = await _appDb.dmGetConversation(
+        ownerPubkey: myPubkey,
+        peerPubkey: peerPubkey,
+      );
+      if (existing != null) {
+        final updated = DmConversation(
+          peerPubkey: peerPubkey,
+          lastMessageAt: latestMessage.createdAt,
+          unreadCount: existing.unreadCount,
+          lastMessagePreview: _truncatePreview(latestMessage.content),
+          lastMessageIsOutgoing: latestMessage.isOutgoing,
+        );
+        await _appDb.dmPutConversation(
+          ownerPubkey: myPubkey,
+          conversation: updated,
+        );
+      }
     }
   }
 
@@ -1327,32 +1143,10 @@ class DirectMessageRepositoryImpl implements DirectMessageRepository {
   Future<Set<String>> getPeersWithOutgoingMessages(
     List<String> peerPubkeys,
   ) async {
-    if (peerPubkeys.isEmpty) return {};
-
-    final store = await getStore();
-    final box = store.box<DbNip17Message>();
-
-    final result = <String>{};
-
-    // Query for outgoing messages for the given peers (filtered by ownerPubkey)
-    // We use a single query with OR conditions for efficiency
-    final query = box
-        .query(
-          DbNip17Message_.ownerPubkey.equals(myPubkey) &
-              DbNip17Message_.isOutgoing.equals(true) &
-              DbNip17Message_.peerPubkey.oneOf(peerPubkeys),
-        )
-        .build();
-
-    final messages = query.find();
-    query.close();
-
-    // Collect unique peer pubkeys
-    for (final msg in messages) {
-      result.add(msg.peerPubkey);
-    }
-
-    return result;
+    return _appDb.dmGetPeersWithOutgoingMessages(
+      ownerPubkey: myPubkey,
+      peerPubkeys: peerPubkeys,
+    );
   }
 
   // ============ Cleanup ============
