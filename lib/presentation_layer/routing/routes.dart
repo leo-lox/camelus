@@ -373,7 +373,7 @@ final routes = [
                         MintInfoPage(mintUrl: state.extra as String?),
                   ),
                   GoRoute(
-                    path: 'transactions/detail',
+                    path: 'transactions/:transactionId',
                     builder: (context, state) => WalletTransactionDetailPage(
                       transaction:
                           state.extra as ndk_entities.WalletTransaction,

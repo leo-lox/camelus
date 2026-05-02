@@ -105,7 +105,7 @@ class WalletTransactionCard extends StatelessWidget {
           ],
         ),
         onTap: () {
-          context.push('/wallet/transactions/detail', extra: tx);
+          context.push('/wallet/transactions/${tx.id}', extra: tx);
         },
       ),
     );

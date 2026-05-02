@@ -152,7 +152,7 @@ class _WalletDashboardState extends ConsumerState<WalletDashboard>
                 transactions: combinedWallet.recentTransactions,
                 pendingTransactions: combinedWallet.pendingTransactions,
                 onTap: (tx) {
-                  context.push('/wallet/transactions/detail', extra: tx);
+                  context.push('/wallet/transactions/${tx.id}', extra: tx);
                 },
               ),
             ),
