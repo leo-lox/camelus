@@ -428,5 +428,9 @@
   "imprint": "ข้อมูลทางกฎหมาย",
   "@imprint": {
     "description": "Imprint page title"
+  },
+  "about": "เกี่ยวกับ",
+  "@about": {
+    "description": "About page link in footer"
   }
 }

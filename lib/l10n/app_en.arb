@@ -1707,6 +1707,10 @@
   "@imprint": {
     "description": "Imprint page title"
   },
+  "about": "About",
+  "@about": {
+    "description": "About page link in footer"
+  },
   "lists": "Lists",
   "@lists": {
     "description": "Lists menu item and page title"

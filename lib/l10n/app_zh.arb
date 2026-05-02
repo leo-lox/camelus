@@ -428,5 +428,9 @@
   "imprint": "法律声明",
   "@imprint": {
     "description": "Imprint page title"
+  },
+  "about": "关于",
+  "@about": {
+    "description": "About page link in footer"
   }
 }

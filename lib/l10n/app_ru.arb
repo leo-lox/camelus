@@ -428,5 +428,9 @@
   "imprint": "Выходные данные",
   "@imprint": {
     "description": "Imprint page title"
+  },
+  "about": "О приложении",
+  "@about": {
+    "description": "About page link in footer"
   }
 }

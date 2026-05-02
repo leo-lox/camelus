@@ -341,7 +341,26 @@ class NostrSideMenu extends ConsumerWidget {
                   tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 ),
                 onPressed: () {
-                  final url = Uri.parse("https://camelus.app/terms");
+                  final url = Uri.parse("https://about.camelus.app/");
+                  launchUrl(url, mode: LaunchMode.externalApplication);
+                },
+                child: Text(
+                  AppLocalizations.of(context)!.about,
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface,
+                    fontSize: 12,
+                    fontWeight: FontWeight.normal,
+                  ),
+                ),
+              ),
+              TextButton(
+                style: TextButton.styleFrom(
+                  padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  minimumSize: const Size(50, 10),
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                ),
+                onPressed: () {
+                  final url = Uri.parse("https://about.camelus.app/terms");
                   launchUrl(url, mode: LaunchMode.externalApplication);
                 },
                 child: Text(
@@ -361,7 +380,7 @@ class NostrSideMenu extends ConsumerWidget {
                   tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 ),
                 onPressed: () {
-                  final url = Uri.parse("https://camelus.app/imprint");
+                  final url = Uri.parse("https://about.camelus.app/imprint");
                   launchUrl(url, mode: LaunchMode.externalApplication);
                 },
                 child: Text(

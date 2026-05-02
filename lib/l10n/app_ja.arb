@@ -428,5 +428,9 @@
   "imprint": "インプリント",
   "@imprint": {
     "description": "Imprint page title"
+  },
+  "about": "について",
+  "@about": {
+    "description": "About page link in footer"
   }
 }

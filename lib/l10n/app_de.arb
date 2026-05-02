@@ -469,5 +469,9 @@
   "imprint": "Impressum",
   "@imprint": {
     "description": "Imprint page title"
+  },
+  "about": "Über",
+  "@about": {
+    "description": "About page link in footer"
   }
 }

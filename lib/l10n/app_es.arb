@@ -472,5 +472,9 @@
   "imprint": "Aviso legal",
   "@imprint": {
     "description": "Imprint page title"
+  },
+  "about": "Acerca de",
+  "@about": {
+    "description": "About page link in footer"
   }
 }
