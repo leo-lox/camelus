@@ -1,16 +1,121 @@
-camelus:
-  android:
-    identifier: de.lox.dev.camelus
-    name: camelus
-    summary: camelus is the truly decentralized social network build on the nostr protocol
-    description: camelus the decentralized social network build on the nostr protocol. \nYour data your control!
-    repository: https://github.com/camelus-hq/camelus.git
-    license: GPL-3.0
-    builder: npub1camelhq7t54m7hkata58sklug2vm83masprf2lx8n0zdykke6vcqxl9339
-    artifacts:
-      app-armeabi-v7a-release.apk:
-        platform: armeabi-v7a
-      app-arm64-v8a-release.apk:
-        platform: arm64-v8a
-      app-x86_64-release.apk:
-        platform: x86_64
+# ═══════════════════════════════════════════════════════════════════
+# SOURCE CONFIGURATION
+# ═══════════════════════════════════════════════════════════════════
+
+# RUN:
+# zsp publish zapstore.yaml
+
+# Source code repository URL or NIP-34 naddr (for display in app store)
+repository: https://github.com/camelus-hq/camelus
+
+# Where to fetch APKs (if different from repository)
+# Can be URL string, local path, or object with version extractor
+# Local paths: ./build/app-release.apk, ../builds/*.apk
+# release_source: https://f-droid.org/packages/com.example.app
+release_source: https://artifacts.camelus.app/android/90/app-arm64-v8a-release.apk
+
+# Regex pattern to filter APK assets from releases
+# (rarely needed - system auto-selects best arm64-v8a APK)
+match: ".*arm64.*\\.apk$"
+
+# ═══════════════════════════════════════════════════════════════════
+# APP METADATA
+# ═══════════════════════════════════════════════════════════════════
+
+# App name (overrides APK label)
+name: camelus
+
+# Short one-line description
+summary: Decentralized microblogging arrived 👋
+
+# Full description (supports markdown)
+description: |
+  Share your moments instantly with Camelus
+
+  Camelus is a refreshingly simple way to share your thoughts, photos, and connect with people who matter. No complicated setup, no tech knowledge required.
+  
+  Why you'll love Camelus:
+  • Clean, Ad-Free Experience: Focus on content that matters, not distractions
+  • Your Space, Your Rules: Control what you want to see and customize your feed
+  • Lightning Fast: Designed to be responsive even on slower connections
+  • Privacy First: Your data stays yours - we don't track or sell your information
+
+  Camelus connects you to a growing global community while keeping things simple. No algorithms deciding what you see - just chronological posts from people you choose to follow.
+
+  Join thousands of others and start your microblogging journey.
+
+  Download today and start posting in under a minute!
+  
+
+
+# Category tags
+tags:
+  - community
+  - tools
+  - nostr
+  - camelus
+  - microblogging
+  - social
+  - decentralized
+
+# SPDX license identifier
+license: GPL-3.0
+
+# App homepage
+website: https://camelus.app
+
+# ═══════════════════════════════════════════════════════════════════
+# MEDIA
+# ═══════════════════════════════════════════════════════════════════
+
+# App icon (local path or URL, otherwise extracted from APK)
+icon: https://artifacts.camelus.app/icon.png
+
+# Screenshots (local paths or URLs)
+images:
+  - "https://artifacts.camelus.app/images/phoneScreenshots/1_en-GB.png"
+  - "https://artifacts.camelus.app/images/phoneScreenshots/2_en-GB.png"
+  - "https://artifacts.camelus.app/images/phoneScreenshots/3_en-GB.png"
+  - "https://artifacts.camelus.app/images/phoneScreenshots/4_en-GB.png"
+
+# ═══════════════════════════════════════════════════════════════════
+# RELEASE CONFIGURATION
+# ═══════════════════════════════════════════════════════════════════
+
+# Release notes file or URL (extracts section matching version if Keep a Changelog format)
+release_notes: ./CHANGELOG.md
+
+# ═══════════════════════════════════════════════════════════════════
+# NOSTR-SPECIFIC
+# ═══════════════════════════════════════════════════════════════════
+
+# Nostr NIPs supported by this app (for Nostr clients)
+# supported_nips:
+#    - "01"
+#    - "02"
+#    - "05"
+#    - "06"
+#    - "27"
+#    - "46"
+
+# Minimum version code users should update to
+min_allowed_version_code: 90
+
+# ═══════════════════════════════════════════════════════════════════
+# VARIANTS
+# ═══════════════════════════════════════════════════════════════════
+
+# APK variant patterns (for apps with multiple builds)
+# variants:
+#   fdroid: ".*-fdroid-.*\\.apk$"
+#   google: ".*-google-.*\\.apk$"
+
+# ═══════════════════════════════════════════════════════════════════
+# METADATA SOURCES
+# ═══════════════════════════════════════════════════════════════════
+
+# External sources for metadata enrichment
+# Note: metadata is fetched automatically for new releases (use --skip-metadata to disable)
+metadata_sources:
+  - playstore
+  #- fdroid
