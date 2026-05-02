@@ -19,6 +19,9 @@ class DirectMessageModel extends DirectMessage {
     super.tags,
     super.sendStatus,
     super.recipientGiftWrapId,
+    super.failureReason,
+    super.relaysSent,
+    super.relaysTotal,
   });
 
   /// Create from ObjectBox database entity
@@ -58,6 +61,7 @@ class DirectMessageModel extends DirectMessage {
       tags: parsedTags,
       sendStatus: status,
       recipientGiftWrapId: db.recipientGiftWrapId,
+      failureReason: db.failureReason,
     );
   }
 
@@ -137,6 +141,7 @@ class DirectMessageModel extends DirectMessage {
       isOutgoing: isOutgoing,
       sendStatus: statusInt,
       recipientGiftWrapId: recipientGiftWrapId,
+      failureReason: failureReason,
     );
   }
 
@@ -152,6 +157,9 @@ class DirectMessageModel extends DirectMessage {
       tags: message.tags,
       sendStatus: message.sendStatus,
       recipientGiftWrapId: message.recipientGiftWrapId,
+      failureReason: message.failureReason,
+      relaysSent: message.relaysSent,
+      relaysTotal: message.relaysTotal,
     );
   }
 }

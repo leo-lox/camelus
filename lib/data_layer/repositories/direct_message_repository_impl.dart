@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:developer';
 
 import 'package:ndk/ndk.dart';
@@ -37,6 +38,12 @@ class DirectMessageRepositoryImpl implements DirectMessageRepository {
   _messagesControllers = {};
   final StreamController<int> _unreadCountController =
       StreamController<int>.broadcast();
+
+  /// Tracks per-peer whether we have loaded all history.
+  /// The global ndk.fetchedRanges cannot distinguish between peers, so we
+  /// maintain our own set. Resets on app restart (acceptable — a single extra
+  /// "Load more" tap is the worst case).
+  final Set<String> _peersWithBeginningReached = {};
 
   DirectMessageRepositoryImpl({
     required this.ndk,
@@ -295,6 +302,19 @@ class DirectMessageRepositoryImpl implements DirectMessageRepository {
     }
   }
 
+  /// Push an in-memory update for a single message to the UI without persisting
+  /// the transient fields (e.g. relay progress) to the database.
+  void _notifyMessageUpdate(String peerPubkey, DirectMessage updatedMsg) async {
+    final controller = _messagesControllers[peerPubkey];
+    if (controller == null) return;
+    final messages = await _getMessagesFromDb(peerPubkey);
+    // Replace the matching message with the in-memory (transient) version
+    final merged = messages
+        .map<DirectMessage>((m) => m.id == updatedMsg.id ? updatedMsg : m)
+        .toList();
+    controller.add(merged);
+  }
+
   @override
   Future<void> fetchMessages({int? since, int? until}) async {
     // Default: fetch last 30 days if not specified
@@ -392,7 +412,7 @@ class DirectMessageRepositoryImpl implements DirectMessageRepository {
   }
 
   @override
-  Future<bool> loadOlderMessages() async {
+  Future<bool> loadOlderMessages(String peerPubkey) async {
     // Get the oldest message timestamp from local DB for the current user
     final store = await getStore();
     final box = store.box<DbNip17Message>();
@@ -445,6 +465,10 @@ class DirectMessageRepositoryImpl implements DirectMessageRepository {
         );
       }
       log('DM: Recorded range from 0 (beginning) to $fetchUntil');
+      // Mark this specific peer as having reached the beginning so that
+      // hasReachedBeginning() returns a per-peer accurate result instead of
+      // relying on the global ndk.fetchedRanges which covers all peers.
+      _peersWithBeginningReached.add(peerPubkey);
     }
 
     return foundNew;
@@ -471,19 +495,9 @@ class DirectMessageRepositoryImpl implements DirectMessageRepository {
 
   @override
   Future<bool> hasReachedBeginning(String peerPubkey) async {
-    final filter = Filter(kinds: [1059], pTags: [myPubkey]);
-
-    // Get all fetched ranges for this filter (Map<relayUrl, RelayFetchedRanges>)
-    final rangesMap = await ndk.fetchedRanges.getForFilter(filter);
-
-    // Check if any relay has reached the oldest (oldest == 0)
-    final hasReachedOldest = rangesMap.values.any((r) => r.reachedOldest);
-
-    log(
-      'DM: hasReachedBeginning($peerPubkey): $hasReachedOldest (relays=${rangesMap.length})',
-    );
-
-    return hasReachedOldest;
+    final reached = _peersWithBeginningReached.contains(peerPubkey);
+    log('DM: hasReachedBeginning($peerPubkey): $reached');
+    return reached;
   }
 
   @override
@@ -517,14 +531,22 @@ class DirectMessageRepositoryImpl implements DirectMessageRepository {
       explicitRelays: dmRelays.isNotEmpty ? dmRelays : null,
     );
 
-    _dmSubscription!.stream.listen((giftWrap) async {
-      log('DM: Subscription received gift wrap id=${giftWrap.id}');
-      final message = await _processGiftWrap(giftWrap, isRealTime: true);
-      if (message != null) {
-        log('DM: New message processed from ${message.senderPubkey}');
-        _newMessageController.add(message);
-      }
-    });
+    _dmSubscription!.stream.listen(
+      (giftWrap) async {
+        log('DM: Subscription received gift wrap id=${giftWrap.id}');
+        final message = await _processGiftWrap(giftWrap, isRealTime: true);
+        if (message != null) {
+          log('DM: New message processed from ${message.senderPubkey}');
+          _newMessageController.add(message);
+        }
+      },
+      onError: (Object error, StackTrace stackTrace) {
+        // Log but do NOT let a stream error kill the subscription.
+        // Without this handler the default cancelOnError behaviour would
+        // stop all subsequent incoming messages for the session.
+        log('DM: Subscription stream error (continuing): $error');
+      },
+    );
   }
 
   /// Process a gift wrap event, decrypt it, and cache the result.
@@ -595,6 +617,10 @@ class DirectMessageRepositoryImpl implements DirectMessageRepository {
 
     final now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
 
+    // Track whether the message was staged to local DB (so the catch block can
+    // mark it as failed instead of leaving it stuck as pending).
+    DirectMessageModel? stagedMessage;
+
     try {
       // 1. Create the rumor (unsigned kind 14 event)
       final rumor = await ndk.giftWrap.createRumor(
@@ -643,7 +669,23 @@ class DirectMessageRepositoryImpl implements DirectMessageRepository {
       );
 
       await cacheDecryptedMessage(localMessage);
+      stagedMessage = localMessage;
       await _updateConversation(localMessage, incrementUnread: false);
+
+      // Persist serialised gift wrap JSON so resend works after app restart
+      // (NDK in-memory cache does not survive restarts).
+      await _persistGiftWrapsToDb(
+        messageId: selfGiftWrap.id,
+        selfGiftWrapJson: jsonEncode(
+          Nip01EventModel.fromEntity(selfGiftWrap).toJson(),
+        ),
+        recipientGiftWrapJson: isSelfMessage
+            ? null
+            : jsonEncode(
+                Nip01EventModel.fromEntity(recipientGiftWrap).toJson(),
+              ),
+      );
+
       _notifyMessagesChanged(recipientPubkey);
       _notifyConversationsChanged();
 
@@ -664,41 +706,130 @@ class DirectMessageRepositoryImpl implements DirectMessageRepository {
         );
       }
 
-      // 6. Broadcast gift wraps
+      // 6. Broadcast gift wraps — self first, then recipient after a short delay
+      // to avoid triggering rate limits on relays that are strict.
       const dmTimeout = Duration(minutes: 1);
+
+      // Compute known relay totals upfront (0 = NDK will choose defaults)
+      final selfRelayCount = isSelfMessage ? 0 : myRelays.length;
+      final recipientRelayCount = recipientRelays.length;
+      final knownTotal = selfRelayCount + recipientRelayCount;
+
+      // Push "0/N" progress immediately so the UI shows the total right away
+      if (knownTotal > 0) {
+        _notifyMessageUpdate(
+          recipientPubkey,
+          localMessage.copyWith(relaysSent: 0, relaysTotal: knownTotal),
+        );
+      }
+
+      // Broadcast self gift wrap first
+      NdkBroadcastResponse? selfBroadcast;
+      if (!isSelfMessage) {
+        selfBroadcast = ndk.broadcast.broadcast(
+          nostrEvent: selfGiftWrap,
+          specificRelays: myRelays.isNotEmpty ? myRelays : null,
+          timeout: dmTimeout,
+        );
+        // Rate-limiting delay between the two broadcast calls
+        await Future.delayed(const Duration(milliseconds: 1500));
+      }
+
+      // Then broadcast to recipient
       final recipientBroadcast = ndk.broadcast.broadcast(
         nostrEvent: recipientGiftWrap,
         specificRelays: recipientRelays.isNotEmpty ? recipientRelays : null,
         timeout: dmTimeout,
       );
 
-      final selfBroadcast = isSelfMessage
-          ? null
-          : ndk.broadcast.broadcast(
-              nostrEvent: selfGiftWrap,
-              specificRelays: myRelays.isNotEmpty ? myRelays : null,
-              timeout: dmTimeout,
-            );
+      // 7. Listen to both broadcast streams for live relay-count progress.
+      // Counts are tracked with plain ints; access is safe because Dart's
+      // event loop is single-threaded — callbacks never run concurrently.
+      int selfConfirmedCount = 0;
+      int recipientConfirmedCount = 0;
+      // Running total inferred from stream emissions (covers unknown-total case)
+      int streamSelfTotal = selfRelayCount;
+      int streamRecipientTotal = recipientRelayCount;
 
-      // 7. Wait for relay confirmations
+      void pushProgress() {
+        final total = streamSelfTotal + streamRecipientTotal;
+        if (total == 0) return; // still unknown, skip update
+        _notifyMessageUpdate(
+          recipientPubkey,
+          localMessage.copyWith(
+            relaysSent: selfConfirmedCount + recipientConfirmedCount,
+            relaysTotal: total,
+          ),
+        );
+      }
+
+      selfBroadcast?.broadcastDone.listen(
+        (responses) {
+          selfConfirmedCount = responses
+              .where((r) => r.broadcastSuccessful)
+              .length;
+          // Update total from actual relay count once relays respond
+          if (responses.length > streamSelfTotal) {
+            streamSelfTotal = responses.length;
+          }
+          pushProgress();
+        },
+        onError: (_) {}, // individual relay errors must not cancel the listener
+      );
+
+      recipientBroadcast.broadcastDone.listen((responses) {
+        recipientConfirmedCount = responses
+            .where((r) => r.broadcastSuccessful)
+            .length;
+        if (responses.length > streamRecipientTotal) {
+          streamRecipientTotal = responses.length;
+        }
+        pushProgress();
+      }, onError: (_) {});
+
+      // 8. Await final responses
       final recipientResponses = await recipientBroadcast.broadcastDoneFuture;
       final recipientConfirmed = recipientResponses.any(
         (r) => r.broadcastSuccessful,
       );
 
-      final selfConfirmed =
-          selfBroadcast == null ||
-          (await selfBroadcast.broadcastDoneFuture).any(
-            (r) => r.broadcastSuccessful,
+      // Self-broadcast failure means our own backup copy wasn't stored, but the
+      // peer still received the message — do NOT mark as failed in that case.
+      if (selfBroadcast != null) {
+        final selfResponses = await selfBroadcast.broadcastDoneFuture;
+        final selfConfirmed = selfResponses.any((r) => r.broadcastSuccessful);
+        if (!selfConfirmed) {
+          log(
+            'DM: Warning - self-backup broadcast failed (peer may have received message)',
           );
+        }
+      }
 
-      final relayConfirmed = recipientConfirmed && selfConfirmed;
+      // Build a human-readable reason when the message was not delivered.
+      String? failureReason;
+      if (!recipientConfirmed) {
+        if (recipientRelays.isEmpty && recipientResponses.isEmpty) {
+          failureReason =
+              'No DM relay found for recipient (tried default relays)';
+        } else {
+          final reasons = recipientResponses
+              .where((r) => !r.broadcastSuccessful && r.msg.isNotEmpty)
+              .map((r) => '${r.relayUrl}: ${r.msg}')
+              .toList();
+          failureReason = reasons.isNotEmpty
+              ? reasons.join('\n')
+              : 'No relay confirmed delivery';
+        }
+        log('DM: Send failed. Reason: $failureReason');
+      }
 
-      // 8. Update message status based on relay confirmation
+      // 9. Persist final status (relay count fields are transient, not stored)
       final finalMessage = localMessage.copyWith(
-        sendStatus: relayConfirmed
+        sendStatus: recipientConfirmed
             ? MessageSendStatus.sent
             : MessageSendStatus.failed,
+        failureReason: failureReason,
+        clearFailureReason: recipientConfirmed,
       );
 
       await cacheDecryptedMessage(finalMessage);
@@ -706,12 +837,24 @@ class DirectMessageRepositoryImpl implements DirectMessageRepository {
       _notifyConversationsChanged();
 
       log(
-        'DM: Message ${relayConfirmed ? 'sent successfully' : 'failed - no relay confirmation'}',
+        'DM: Message ${recipientConfirmed ? 'sent successfully' : 'failed - no relay confirmation'}',
       );
 
       return finalMessage;
     } catch (e) {
       log('DM: Error sending message: $e');
+      // If the message was already staged (cached as pending), update it to
+      // failed so it doesn't get stuck in the pending state forever.
+      if (stagedMessage != null) {
+        final failedMessage = stagedMessage.copyWith(
+          sendStatus: MessageSendStatus.failed,
+          failureReason: e.toString(),
+        );
+        await cacheDecryptedMessage(failedMessage);
+        _notifyMessagesChanged(recipientPubkey);
+        _notifyConversationsChanged();
+        return failedMessage;
+      }
       rethrow;
     }
   }
@@ -730,11 +873,17 @@ class DirectMessageRepositoryImpl implements DirectMessageRepository {
       return false;
     }
 
-    // 2. Load gift wraps from NDK cache
-    // The self gift wrap ID is the same as the message ID
-    final selfGiftWrap = await ndk.config.cache.loadEvent(messageId);
+    // 2. Load gift wraps — try NDK in-memory cache first, fall back to DB.
+    // The self gift wrap ID is the same as the message ID.
+    Nip01Event? selfGiftWrap = await ndk.config.cache.loadEvent(messageId);
     if (selfGiftWrap == null) {
-      log('DM: Cannot resend - gift wrap not found in cache for $messageId');
+      log('DM: NDK cache miss for $messageId, trying DB-persisted gift wrap');
+      selfGiftWrap = await _loadGiftWrapFromDb(messageId, isSelf: true);
+    }
+    if (selfGiftWrap == null) {
+      log(
+        'DM: Cannot resend - gift wrap not found in cache or DB for $messageId',
+      );
       return false;
     }
 
@@ -744,6 +893,9 @@ class DirectMessageRepositoryImpl implements DirectMessageRepository {
       recipientGiftWrap = await ndk.config.cache.loadEvent(
         message.recipientGiftWrapId!,
       );
+      if (recipientGiftWrap == null) {
+        recipientGiftWrap = await _loadGiftWrapFromDb(messageId, isSelf: false);
+      }
     }
 
     try {
@@ -766,10 +918,32 @@ class DirectMessageRepositoryImpl implements DirectMessageRepository {
         'DM: Resending to recipient relays: ${recipientRelays.isNotEmpty ? recipientRelays : "default"}',
       );
 
-      // 5. Broadcast gift wraps
-      // For self-messages or when we only have recipient gift wrap, use selfGiftWrap
+      // 5. Broadcast gift wraps — self first, then recipient after a short delay
       const dmTimeout = Duration(minutes: 1);
       final giftWrapForRecipient = recipientGiftWrap ?? selfGiftWrap;
+
+      final selfRelayCount = isSelfMessage ? 0 : myRelays.length;
+      final recipientRelayCount = recipientRelays.length;
+      final knownTotal = selfRelayCount + recipientRelayCount;
+
+      // Push "0/N" progress immediately
+      if (knownTotal > 0) {
+        _notifyMessageUpdate(
+          message.peerPubkey,
+          pendingMessage.copyWith(relaysSent: 0, relaysTotal: knownTotal),
+        );
+      }
+
+      // Self broadcast first
+      NdkBroadcastResponse? selfBroadcast;
+      if (!isSelfMessage) {
+        selfBroadcast = ndk.broadcast.broadcast(
+          nostrEvent: selfGiftWrap,
+          specificRelays: myRelays.isNotEmpty ? myRelays : null,
+          timeout: dmTimeout,
+        );
+        await Future.delayed(const Duration(milliseconds: 1500));
+      }
 
       final recipientBroadcast = ndk.broadcast.broadcast(
         nostrEvent: giftWrapForRecipient,
@@ -777,13 +951,43 @@ class DirectMessageRepositoryImpl implements DirectMessageRepository {
         timeout: dmTimeout,
       );
 
-      final selfBroadcast = isSelfMessage
-          ? null
-          : ndk.broadcast.broadcast(
-              nostrEvent: selfGiftWrap,
-              specificRelays: myRelays.isNotEmpty ? myRelays : null,
-              timeout: dmTimeout,
-            );
+      // Live relay-count progress listeners
+      int selfConfirmedCount = 0;
+      int recipientConfirmedCount = 0;
+      int streamSelfTotal = selfRelayCount;
+      int streamRecipientTotal = recipientRelayCount;
+
+      void pushProgress() {
+        final total = streamSelfTotal + streamRecipientTotal;
+        if (total == 0) return;
+        _notifyMessageUpdate(
+          message.peerPubkey,
+          pendingMessage.copyWith(
+            relaysSent: selfConfirmedCount + recipientConfirmedCount,
+            relaysTotal: total,
+          ),
+        );
+      }
+
+      selfBroadcast?.broadcastDone.listen((responses) {
+        selfConfirmedCount = responses
+            .where((r) => r.broadcastSuccessful)
+            .length;
+        if (responses.length > streamSelfTotal) {
+          streamSelfTotal = responses.length;
+        }
+        pushProgress();
+      }, onError: (_) {});
+
+      recipientBroadcast.broadcastDone.listen((responses) {
+        recipientConfirmedCount = responses
+            .where((r) => r.broadcastSuccessful)
+            .length;
+        if (responses.length > streamRecipientTotal) {
+          streamRecipientTotal = responses.length;
+        }
+        pushProgress();
+      }, onError: (_) {});
 
       // 6. Wait for relay confirmations
       final recipientResponses = await recipientBroadcast.broadcastDoneFuture;
@@ -791,19 +995,36 @@ class DirectMessageRepositoryImpl implements DirectMessageRepository {
         (r) => r.broadcastSuccessful,
       );
 
-      final selfConfirmed =
-          selfBroadcast == null ||
-          (await selfBroadcast.broadcastDoneFuture).any(
-            (r) => r.broadcastSuccessful,
-          );
+      // Self-broadcast failure means backup wasn't stored but peer may have
+      // received the message — do NOT mark as failed in that case.
+      if (selfBroadcast != null) {
+        final selfResponses = await selfBroadcast.broadcastDoneFuture;
+        final selfConfirmed = selfResponses.any((r) => r.broadcastSuccessful);
+        if (!selfConfirmed) {
+          log('DM: Warning - self-backup resend broadcast failed');
+        }
+      }
 
-      final relayConfirmed = recipientConfirmed && selfConfirmed;
+      // Build a human-readable reason when the resend was not delivered.
+      String? failureReason;
+      if (!recipientConfirmed) {
+        final reasons = recipientResponses
+            .where((r) => !r.broadcastSuccessful && r.msg.isNotEmpty)
+            .map((r) => '${r.relayUrl}: ${r.msg}')
+            .toList();
+        failureReason = reasons.isNotEmpty
+            ? reasons.join('\n')
+            : 'No relay confirmed delivery';
+        log('DM: Resend failed. Reason: $failureReason');
+      }
 
-      // 7. Update message status based on relay confirmation
+      // 7. Update message status based on recipient relay confirmation only
       final finalMessage = message.copyWith(
-        sendStatus: relayConfirmed
+        sendStatus: recipientConfirmed
             ? MessageSendStatus.sent
             : MessageSendStatus.failed,
+        failureReason: failureReason,
+        clearFailureReason: recipientConfirmed,
       );
 
       await cacheDecryptedMessage(finalMessage);
@@ -811,16 +1032,17 @@ class DirectMessageRepositoryImpl implements DirectMessageRepository {
       _notifyConversationsChanged();
 
       log(
-        'DM: Resend ${relayConfirmed ? 'successful' : 'failed - no relay confirmation'}',
+        'DM: Resend ${recipientConfirmed ? 'successful' : 'failed - no relay confirmation'}',
       );
 
-      return relayConfirmed;
+      return recipientConfirmed;
     } catch (e) {
       log('DM: Error resending message $messageId: $e');
 
-      // Update status to failed
+      // Update status to failed with the exception as reason
       final failedMessage = message.copyWith(
         sendStatus: MessageSendStatus.failed,
+        failureReason: e.toString(),
       );
       await cacheDecryptedMessage(failedMessage);
       _notifyMessagesChanged(message.peerPubkey);
@@ -871,11 +1093,68 @@ class DirectMessageRepositoryImpl implements DirectMessageRepository {
     final dbMessage = model.toDb(ownerPubkey: myPubkey);
 
     if (existing != null) {
-      // Update existing message (preserve dbId for ObjectBox)
+      // Update existing message (preserve dbId and persisted gift wrap JSON)
       dbMessage.dbId = existing.dbId;
+      dbMessage.selfGiftWrapJson = existing.selfGiftWrapJson;
+      dbMessage.recipientGiftWrapJson = existing.recipientGiftWrapJson;
     }
 
     box.put(dbMessage);
+  }
+
+  /// Store serialised gift wrap events in the DB record so that [resendMessage]
+  /// can recover them after an app restart (NDK cache is in-memory only).
+  Future<void> _persistGiftWrapsToDb({
+    required String messageId,
+    required String selfGiftWrapJson,
+    String? recipientGiftWrapJson,
+  }) async {
+    final store = await getStore();
+    final box = store.box<DbNip17Message>();
+    final query = box
+        .query(
+          DbNip17Message_.ownerPubkey.equals(myPubkey) &
+              DbNip17Message_.eventId.equals(messageId),
+        )
+        .build();
+    final existing = query.findFirst();
+    query.close();
+    if (existing != null) {
+      existing.selfGiftWrapJson = selfGiftWrapJson;
+      existing.recipientGiftWrapJson = recipientGiftWrapJson;
+      box.put(existing);
+    }
+  }
+
+  /// Load a persisted gift wrap from the DB as a fallback when the NDK
+  /// in-memory cache has been cleared (e.g. after app restart).
+  Future<Nip01Event?> _loadGiftWrapFromDb(
+    String messageId, {
+    required bool isSelf,
+  }) async {
+    final store = await getStore();
+    final box = store.box<DbNip17Message>();
+    final query = box
+        .query(
+          DbNip17Message_.ownerPubkey.equals(myPubkey) &
+              DbNip17Message_.eventId.equals(messageId),
+        )
+        .build();
+    final existing = query.findFirst();
+    query.close();
+    if (existing == null) return null;
+    final json = isSelf
+        ? existing.selfGiftWrapJson
+        : existing.recipientGiftWrapJson;
+    if (json == null) return null;
+    try {
+      return Nip01EventModel.fromJson(jsonDecode(json) as Map<String, dynamic>);
+    } catch (e) {
+      log(
+        'DM: Error parsing stored gift wrap JSON (isSelf=$isSelf) for $messageId: $e',
+      );
+      return null;
+    }
   }
 
   /// Update or create conversation record

@@ -51,6 +51,18 @@ class DbNip17Message {
   /// Gift wrap events are stored in NDK cache.
   String? recipientGiftWrapId;
 
+  /// JSON-encoded self gift wrap event (kind 1059) for reliable resend after
+  /// app restart (NDK in-memory cache does not survive restarts).
+  String? selfGiftWrapJson;
+
+  /// JSON-encoded recipient gift wrap event (kind 1059) for reliable resend.
+  /// Only set for outgoing messages to non-self recipients.
+  String? recipientGiftWrapJson;
+
+  /// Human-readable reason why the message failed to send.
+  /// Only set when sendStatus == 2 (failed).
+  String? failureReason;
+
   DbNip17Message({
     this.ownerPubkey = '',
     this.eventId = '',
@@ -63,5 +75,8 @@ class DbNip17Message {
     this.isOutgoing = false,
     this.sendStatus = 1,
     this.recipientGiftWrapId,
+    this.selfGiftWrapJson,
+    this.recipientGiftWrapJson,
+    this.failureReason,
   });
 }

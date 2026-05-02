@@ -48,6 +48,18 @@ class DirectMessage {
   /// Gift wrap events are stored in NDK cache.
   final String? recipientGiftWrapId;
 
+  /// Human-readable reason why the message failed to send.
+  /// Only set when [sendStatus] is [MessageSendStatus.failed].
+  final String? failureReason;
+
+  /// Number of relays that have confirmed receipt (transient, not persisted).
+  /// Only meaningful while [sendStatus] is [MessageSendStatus.pending].
+  final int relaysSent;
+
+  /// Total number of relays being broadcast to (transient, not persisted).
+  /// 0 means unknown (NDK is using default relays).
+  final int relaysTotal;
+
   DirectMessage({
     required this.id,
     required this.senderPubkey,
@@ -58,6 +70,9 @@ class DirectMessage {
     this.tags = const [],
     this.sendStatus = MessageSendStatus.sent,
     this.recipientGiftWrapId,
+    this.failureReason,
+    this.relaysSent = 0,
+    this.relaysTotal = 0,
   });
 
   /// Create a copy of this message with updated fields
@@ -71,6 +86,11 @@ class DirectMessage {
     List<NostrTag>? tags,
     MessageSendStatus? sendStatus,
     String? recipientGiftWrapId,
+    // Use [clearFailureReason]=true to explicitly set failureReason to null
+    bool clearFailureReason = false,
+    String? failureReason,
+    int? relaysSent,
+    int? relaysTotal,
   }) {
     return DirectMessage(
       id: id ?? this.id,
@@ -82,6 +102,11 @@ class DirectMessage {
       tags: tags ?? this.tags,
       sendStatus: sendStatus ?? this.sendStatus,
       recipientGiftWrapId: recipientGiftWrapId ?? this.recipientGiftWrapId,
+      failureReason: clearFailureReason
+          ? null
+          : (failureReason ?? this.failureReason),
+      relaysSent: relaysSent ?? this.relaysSent,
+      relaysTotal: relaysTotal ?? this.relaysTotal,
     );
   }
 

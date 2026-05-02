@@ -100,6 +100,19 @@ class _DmMessageBubbleState extends State<DmMessageBubble> {
                         const SizedBox(height: 4),
                         _buildStatusRow(context),
                       ],
+                      if (isFailed && widget.message.failureReason != null) ...[
+                        const SizedBox(height: 4),
+                        Text(
+                          widget.message.failureReason!,
+                          style: TextStyle(
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onErrorContainer
+                                .withValues(alpha: 0.8),
+                            fontSize: 11,
+                          ),
+                        ),
+                      ],
                     ],
                   ),
                 ),
@@ -123,6 +136,8 @@ class _DmMessageBubbleState extends State<DmMessageBubble> {
     final sendStatus = widget.message.sendStatus;
     final isFailed = sendStatus == MessageSendStatus.failed;
     final isSent = sendStatus == MessageSendStatus.sent;
+    final isPending = sendStatus == MessageSendStatus.pending;
+    final hasRelayCount = isPending && widget.message.relaysTotal > 0;
 
     final textColor = isFailed
         ? Theme.of(context).colorScheme.onErrorContainer.withValues(alpha: 0.7)
@@ -153,8 +168,16 @@ class _DmMessageBubbleState extends State<DmMessageBubble> {
             ),
           ),
         ),
+        // Relay delivery counter shown while the message is pending
+        if (hasRelayCount) ...[
+          const SizedBox(width: 6),
+          Text(
+            '${widget.message.relaysSent}/${widget.message.relaysTotal}',
+            style: TextStyle(color: textColor, fontSize: 11),
+          ),
+        ],
         // Reserve space for check mark on outgoing messages
-        if (isOutgoing && !isFailed) ...[
+        if (isOutgoing && !isFailed && !hasRelayCount) ...[
           const SizedBox(width: 4),
           Icon(
             PhosphorIcons.checkCircle(),

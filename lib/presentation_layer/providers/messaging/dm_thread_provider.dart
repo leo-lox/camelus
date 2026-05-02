@@ -236,7 +236,7 @@ class DmThreadNotifier extends Notifier<DmThreadState> {
 
     try {
       // loadOlderMessages returns true if new messages were found
-      final foundMore = await repository.loadOlderMessages();
+      final foundMore = await repository.loadOlderMessages(peerPubkey);
 
       state = state.copyWith(
         isLoadingOlder: false,

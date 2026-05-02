@@ -32,8 +32,9 @@ abstract class DirectMessageRepository {
   Future<void> fetchMessages({int? since, int? until});
 
   /// Load older messages (before the oldest currently loaded message).
+  /// [peerPubkey] is used to track per-peer beginning-reached state.
   /// Returns true if any new messages were found, false if we've reached the beginning.
-  Future<bool> loadOlderMessages();
+  Future<bool> loadOlderMessages(String peerPubkey);
 
   /// Get the oldest message timestamp for a conversation.
   /// Returns null if no messages exist.

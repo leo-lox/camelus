@@ -108,7 +108,7 @@ final _entities = <obx_int.ModelEntity>[
   obx_int.ModelEntity(
     id: const obx_int.IdUid(9, 5397343319776606099),
     name: 'DbNip17Message',
-    lastPropertyId: const obx_int.IdUid(14, 4147261140443002825),
+    lastPropertyId: const obx_int.IdUid(17, 7458893023940427464),
     flags: 0,
     properties: <obx_int.ModelProperty>[
       obx_int.ModelProperty(
@@ -187,6 +187,24 @@ final _entities = <obx_int.ModelEntity>[
         type: 9,
         flags: 2048,
         indexId: const obx_int.IdUid(9, 6864549305007800035),
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(15, 6278198688892552292),
+        name: 'selfGiftWrapJson',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(16, 5187685732925693948),
+        name: 'recipientGiftWrapJson',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(17, 7458893023940427464),
+        name: 'failureReason',
+        type: 9,
+        flags: 0,
       ),
     ],
     relations: <obx_int.ModelRelation>[],
@@ -432,7 +450,16 @@ obx_int.ModelDefinition getObjectBoxModel() {
             ? null
             : fbb.writeString(object.recipientGiftWrapId!);
         final ownerPubkeyOffset = fbb.writeString(object.ownerPubkey);
-        fbb.startTable(15);
+        final selfGiftWrapJsonOffset = object.selfGiftWrapJson == null
+            ? null
+            : fbb.writeString(object.selfGiftWrapJson!);
+        final recipientGiftWrapJsonOffset = object.recipientGiftWrapJson == null
+            ? null
+            : fbb.writeString(object.recipientGiftWrapJson!);
+        final failureReasonOffset = object.failureReason == null
+            ? null
+            : fbb.writeString(object.failureReason!);
+        fbb.startTable(18);
         fbb.addInt64(0, object.dbId);
         fbb.addOffset(1, eventIdOffset);
         fbb.addOffset(2, senderPubkeyOffset);
@@ -445,6 +472,9 @@ obx_int.ModelDefinition getObjectBoxModel() {
         fbb.addInt64(9, object.sendStatus);
         fbb.addOffset(12, recipientGiftWrapIdOffset);
         fbb.addOffset(13, ownerPubkeyOffset);
+        fbb.addOffset(14, selfGiftWrapJsonOffset);
+        fbb.addOffset(15, recipientGiftWrapJsonOffset);
+        fbb.addOffset(16, failureReasonOffset);
         fbb.finish(fbb.endTable());
         return object.dbId;
       },
@@ -493,6 +523,15 @@ obx_int.ModelDefinition getObjectBoxModel() {
         final recipientGiftWrapIdParam = const fb.StringReader(
           asciiOptimization: true,
         ).vTableGetNullable(buffer, rootOffset, 28);
+        final selfGiftWrapJsonParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGetNullable(buffer, rootOffset, 32);
+        final recipientGiftWrapJsonParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGetNullable(buffer, rootOffset, 34);
+        final failureReasonParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGetNullable(buffer, rootOffset, 36);
         final object = DbNip17Message(
           ownerPubkey: ownerPubkeyParam,
           eventId: eventIdParam,
@@ -505,6 +544,9 @@ obx_int.ModelDefinition getObjectBoxModel() {
           isOutgoing: isOutgoingParam,
           sendStatus: sendStatusParam,
           recipientGiftWrapId: recipientGiftWrapIdParam,
+          selfGiftWrapJson: selfGiftWrapJsonParam,
+          recipientGiftWrapJson: recipientGiftWrapJsonParam,
+          failureReason: failureReasonParam,
         )..dbId = const fb.Int64Reader().vTableGet(buffer, rootOffset, 4, 0);
 
         return object;
@@ -629,5 +671,20 @@ class DbNip17Message_ {
   /// See [DbNip17Message.ownerPubkey].
   static final ownerPubkey = obx.QueryStringProperty<DbNip17Message>(
     _entities[2].properties[11],
+  );
+
+  /// See [DbNip17Message.selfGiftWrapJson].
+  static final selfGiftWrapJson = obx.QueryStringProperty<DbNip17Message>(
+    _entities[2].properties[12],
+  );
+
+  /// See [DbNip17Message.recipientGiftWrapJson].
+  static final recipientGiftWrapJson = obx.QueryStringProperty<DbNip17Message>(
+    _entities[2].properties[13],
+  );
+
+  /// See [DbNip17Message.failureReason].
+  static final failureReason = obx.QueryStringProperty<DbNip17Message>(
+    _entities[2].properties[14],
   );
 }

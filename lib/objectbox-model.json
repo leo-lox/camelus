@@ -81,7 +81,7 @@
     },
     {
       "id": "9:5397343319776606099",
-      "lastPropertyId": "14:4147261140443002825",
+      "lastPropertyId": "17:7458893023940427464",
       "name": "DbNip17Message",
       "properties": [
         {
@@ -154,6 +154,21 @@
           "indexId": "9:6864549305007800035",
           "type": 9,
           "flags": 2048
+        },
+        {
+          "id": "15:6278198688892552292",
+          "name": "selfGiftWrapJson",
+          "type": 9
+        },
+        {
+          "id": "16:5187685732925693948",
+          "name": "recipientGiftWrapJson",
+          "type": 9
+        },
+        {
+          "id": "17:7458893023940427464",
+          "name": "failureReason",
+          "type": 9
         }
       ],
       "relations": []
