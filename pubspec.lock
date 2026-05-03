@@ -136,13 +136,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.2.0"
-  bc_ur_dart:
-    dependency: "direct main"
-    description:
-      path: "../fx-wallet-packages/packages/bc_ur_dart"
-      relative: true
-    source: path
-    version: "0.1.19"
   bech32:
     dependency: "direct main"
     description:
@@ -2259,14 +2252,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "6.6.1"
-  xrandom:
-    dependency: transitive
-    description:
-      name: xrandom
-      sha256: d843a7f4004d91b5a0341a28a781fddaf92a5b377f776a06a08e7a9320e95ad3
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.7.2"
   xxh3:
     dependency: "direct main"
     description:

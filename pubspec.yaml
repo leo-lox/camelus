@@ -107,7 +107,6 @@ dependencies:
   flutter_chat_types: ^3.6.2
   visibility_detector: ^0.4.0+2
   pretty_qr_code: ^3.5.0
-  bc_ur_dart: ^0.1.19
   mobile_scanner: ^7.0.1
   bolt11_decoder: ^1.0.2
   decimal: ^2.3.3
@@ -163,8 +162,6 @@ dependency_overrides:
      # url: https://github.com/relaystr/ndk.git
       #path: packages/amber
     #  ref: nip-59-gift-wrap
-  bc_ur_dart:
-    path: ../fx-wallet-packages/packages/bc_ur_dart
 
   bip32:
     git: 
