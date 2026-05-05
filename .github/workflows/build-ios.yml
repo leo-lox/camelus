@@ -50,6 +50,13 @@ jobs:
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
           cp profile.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/
 
+
+      - name: Set up CocoaPods
+        run: |
+          cd ios
+          pod repo update
+          pod install
+
       - name: Create symbols directory
         run: mkdir -p build/ios/symbols
 
