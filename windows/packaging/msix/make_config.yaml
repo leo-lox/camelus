@@ -1,0 +1,5 @@
+display_name: Camelus
+publisher_display_name: Camelus
+identity_name: YourPublisher.Camelus  # from Microsoft Partner Center
+msix_version: 1.0.0.0
+logo_path: assets/app_icons/icon.png
