@@ -50,12 +50,16 @@ jobs:
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
           cp profile.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/
 
+      - name: Create symbols directory
+        run: mkdir -p build/ios/symbols
+
       - name: Build IPA with FastForge
         run: |
           fastforge package \
             --platform ios \
             --targets ipa \
             --flutter-build-args obfuscate \
+            --flutter-build-args split-debug-info=build/ios/symbols \
             --build-export-options-plist ios/ExportOptions.plist
 
       - name: Upload IPA artifact
