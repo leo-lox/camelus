@@ -5,12 +5,13 @@ icon: assets/app_icons/icon.png
 keywords:
   - Camelus
   - Nostr
+  - Mircroblogging
 
 generic_name: Camelus
 
 categories:
-  - Social
   - Network
+  - Feed
 
 startup_notify: true
 
