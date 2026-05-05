@@ -75,7 +75,7 @@ jobs:
             --targets ipa \
             --flutter-build-args obfuscate \
             --flutter-build-args split-debug-info=build/ios/symbols \
-            --flutter-build-args dart-define-from-file=dart_defines.json
+            --flutter-build-args dart-define-from-file=dart_defines.json \
             --build-export-options-plist ios/ExportOptions.plist
 
       - name: Upload IPA artifact
