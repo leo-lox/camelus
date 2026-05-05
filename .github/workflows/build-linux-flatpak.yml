@@ -1,0 +1,61 @@
+name: Build Linux Flatpak
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            clang cmake git ninja-build pkg-config \
+            libgtk-3-dev liblzma-dev libstdc++-12-dev \
+            libsecret-1-dev \
+            flatpak flatpak-builder
+
+      - name: Setup Flatpak
+        run: |
+          sudo flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+          sudo flatpak install -y org.freedesktop.Sdk//23.08
+          sudo flatpak install -y org.freedesktop.Platform//23.08
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+          cache-key: "flutter-:os:-:channel:-:version:-:arch:-:hash:"
+          cache-path: "${{ runner.tool_cache }}/flutter/:channel:-:version:-:arch:"
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Decode dart_defines.json
+        run: |
+          echo "${{ secrets.DART_DEFINES_JSON_BASE64 }}" | base64 --decode > dart_defines.json
+
+      - name: Build Flutter Linux
+        run: |
+          flutter build linux --release \
+            --dart-define-from-file=dart_defines.json
+
+      - name: Build Flatpak
+        run: |
+          cd flatpak
+          flatpak-builder --force-clean --repo=repo build-dir de.lox.dev.camelus.yml
+          flatpak build-bundle repo camelus.flatpak de.lox.dev.camelus
+
+      - name: Upload Flatpak artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-flatpak
+          path: flatpak/camelus.flatpak
