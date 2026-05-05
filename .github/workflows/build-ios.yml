@@ -52,7 +52,11 @@ jobs:
 
       - name: Build IPA with FastForge
         run: |
-          fastforge package --platform ios --target-platform ios --build-mode release
+          fastforge package \
+            --platform ios \
+            --targets ipa \
+            --flutter-build-args obfuscate \
+            --build-export-options-plist ios/ExportOptions.plist
 
       - name: Upload IPA artifact
         uses: actions/upload-artifact@v4
