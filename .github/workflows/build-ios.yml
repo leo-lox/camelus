@@ -57,6 +57,14 @@ jobs:
           pod repo update
           pod install
 
+      - name: Decode dart_defines.json
+        run: |
+          echo "${{ secrets.DART_DEFINES_JSON_BASE64 }}" | base64 --decode > dart_defines.json
+   
+      - name: Decode GoogleService-Info.plist
+        run: |
+          echo "${{ secrets.GOOGLE_SERVICE_INFO_PLIST_BASE64 }}" | base64 --decode > ios/Runner/GoogleService-Info.plist
+
       - name: Create symbols directory
         run: mkdir -p build/ios/symbols
 
@@ -67,6 +75,7 @@ jobs:
             --targets ipa \
             --flutter-build-args obfuscate \
             --flutter-build-args split-debug-info=build/ios/symbols \
+            --flutter-build-args dart-define-from-file=dart_defines.json
             --build-export-options-plist ios/ExportOptions.plist
 
       - name: Upload IPA artifact
