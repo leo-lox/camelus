@@ -242,7 +242,11 @@ class _OnboardingLoginPageState extends ConsumerState<OnboardingLoginPage> {
           maxWidth: 700,
           child: LayoutBuilder(
             builder: (context, constraints) {
-              return SingleChildScrollView(
+              return GestureDetector(
+                onTap: () {
+                  FocusManager.instance.primaryFocus?.unfocus();
+                },
+                child: SingleChildScrollView(
                 child: ConstrainedBox(
                   constraints: BoxConstraints(minHeight: constraints.maxHeight),
                   child: IntrinsicHeight(
@@ -388,7 +392,6 @@ class _OnboardingLoginPageState extends ConsumerState<OnboardingLoginPage> {
                             child: TextField(
                               onSubmitted: (value) {
                                 _addWords(value);
-                                _inputFocusNode.requestFocus();
                               },
                               focusNode: _inputFocusNode,
                               autofillHints: Language.english.list,
@@ -483,6 +486,7 @@ class _OnboardingLoginPageState extends ConsumerState<OnboardingLoginPage> {
                                   height: 31,
                                   child: ElevatedButton(
                                     onPressed: () {
+                                      _inputFocusNode.unfocus();
                                       _addWords(_inputController.text);
                                     },
                                     style: ElevatedButton.styleFrom(
@@ -611,6 +615,7 @@ class _OnboardingLoginPageState extends ConsumerState<OnboardingLoginPage> {
                     ),
                   ),
                 ),
+              ),
               );
             },
           ),
