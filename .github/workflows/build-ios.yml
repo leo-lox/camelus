@@ -5,13 +5,15 @@ on:
     branches: [ main ]
   workflow_dispatch:
     inputs:
-      target:
-        description: "Target"
-        required: true
-        default: "ios-ipa"
-        type: choice
-        options:
-          - "ios-ipa"
+      flutter_version:
+        description: 'Flutter version to use'
+        required: false
+        default: 'stable'
+        type: string
+      build_number:
+        description: 'Build number override'
+        required: false
+        type: string
 
 jobs:
   build:
@@ -24,7 +26,7 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.41.9'
+          flutter-version: ${{ github.event.inputs.flutter_version || '3.41.9' }}
           channel: 'stable'
 
       - name: Install dependencies
