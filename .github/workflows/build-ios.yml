@@ -4,6 +4,14 @@ on:
   push:
     branches: [ main ]
   workflow_dispatch:
+    inputs:
+      target:
+        description: "Target"
+        required: true
+        default: "ios-ipa"
+        type: choice
+        options:
+          - "ios-ipa"
 
 jobs:
   build:
