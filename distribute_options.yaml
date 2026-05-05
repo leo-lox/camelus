@@ -13,3 +13,11 @@ releases:
             split-debug-info: build/ios/symbols
         publish:
           target: appstore
+  - name: linux
+    jobs:
+      - name: release-linux-appimage
+        package:
+          platform: linux
+          target: appimage
+          build_args:
+            dart-define-from-file: dart_defines.json
