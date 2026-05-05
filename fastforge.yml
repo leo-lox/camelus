@@ -1,0 +1,6 @@
+targets:
+  - name: ios-ipa
+    platform: ios
+    build_mode: release
+    build_args:
+      - --export-options-plist=ios/ExportOptions.plist
