@@ -1,0 +1,15 @@
+output: dist/
+releases:
+  - name: appstore
+    jobs:
+      - name: release-ios
+        package:
+          platform: ios
+          target: ipa
+          build_args:
+            export-options-plist: ios/ExportOptions.plist
+            dart-define-from-file: dart_defines.json
+            obfuscate: true
+            split-debug-info: build/ios/symbols
+        publish:
+          target: appstore

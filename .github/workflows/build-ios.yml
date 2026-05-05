@@ -51,6 +51,12 @@ jobs:
           cp profile.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/
 
 
+      - name: Install App Store Connect API Key
+        run: |
+          mkdir -p ~/private_keys
+          echo "${{ secrets.APP_STORE_CONNECT_API_KEY_BASE64 }}" | base64 --decode > ~/private_keys/AuthKey_${{ secrets.APP_STORE_CONNECT_KEY_ID }}.p8
+
+
       - name: Set up CocoaPods
         run: |
           cd ios
@@ -68,15 +74,25 @@ jobs:
       - name: Create symbols directory
         run: mkdir -p build/ios/symbols
 
-      - name: Build IPA with FastForge
+      # - name: Build IPA with FastForge
+      #   run: |
+      #     fastforge package \
+      #       --platform ios \
+      #       --targets ipa \
+      #       --flutter-build-args obfuscate \
+      #       --flutter-build-args split-debug-info=build/ios/symbols \
+      #       --flutter-build-args dart-define-from-file=dart_defines.json \
+      #       --build-export-options-plist ios/ExportOptions.plist
+
+      - name: Build and publish to App Store
+        env:
+          APPSTORE_APIKEY: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
+          APPSTORE_APIISSUER: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
         run: |
-          fastforge package \
-            --platform ios \
-            --targets ipa \
-            --flutter-build-args obfuscate \
-            --flutter-build-args split-debug-info=build/ios/symbols \
-            --flutter-build-args dart-define-from-file=dart_defines.json \
-            --build-export-options-plist ios/ExportOptions.plist
+          fastforge release --name appstore
+
+
+      
 
       - name: Upload IPA artifact
         uses: actions/upload-artifact@v4
@@ -89,3 +105,4 @@ jobs:
         run: |
           security delete-keychain build.keychain || true
           rm -f certificate.p12 profile.mobileprovision
+          rm -rf ~/private_keys
