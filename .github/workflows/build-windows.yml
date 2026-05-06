@@ -1,8 +1,8 @@
 name: Build Windows (EXE + MSIX)
 
 on:
-  push:
-    branches: [main]
+  release:
+    types: [published]
   workflow_dispatch:
 
 jobs:
@@ -40,6 +40,12 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Upload to GitHub Release
+        if: github.event_name == 'release'
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/**/*.exe
+
       - name: Upload EXE artifact
         uses: actions/upload-artifact@v4
         with:
@@ -72,6 +78,13 @@ jobs:
 
       - name: Build MSIX
         run: fastforge release --name windows-msix
+
+
+      - name: Upload to GitHub Release
+        if: github.event_name == 'release'
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/**/*.msix
 
       - name: Upload MSIX artifact
         uses: actions/upload-artifact@v4
