@@ -17,18 +17,43 @@ on:
         default: false
 
 jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - id: set-matrix
+        shell: bash
+        run: |
+          archs=()
+
+          if [ "${{ github.event_name }}" == "release" ]; then
+            archs+=("x64")
+          else
+            if [ "${{ github.event.inputs.build_x64 }}" == "true" ]; then
+              archs+=("x64")
+            fi
+            if [ "${{ github.event.inputs.build_arm64 }}" == "true" ]; then
+              archs+=("arm64")
+            fi
+          fi
+
+          # Fallback to x64 if nothing selected
+          if [ ${#archs[@]} -eq 0 ]; then
+            archs+=("x64")
+          fi
+
+          # Build JSON array
+          json=$(printf '"%s",' "${archs[@]}")
+          json="[${json%,}]"
+          echo "matrix=$json" >> $GITHUB_OUTPUT
+
   build-exe:
+    needs: prepare
     runs-on: windows-latest
     strategy:
       matrix:
-        include:
-          - arch: x64
-            enabled: ${{ github.event.inputs.build_x64 == 'true' || github.event_name == 'release' }}
-          - arch: arm64
-            enabled: ${{ github.event.inputs.build_arm64 == 'true' || github.event_name == 'release' }}
-    
-    # Skip if not enabled
-    if: matrix.enabled
+        arch: ${{ fromJSON(needs.prepare.outputs.matrix) }}
 
     steps:
       - name: Checkout code
@@ -101,7 +126,6 @@ jobs:
   #     - name: Build MSIX
   #       run: fastforge release --name windows-msix
 
-
   #     - name: Upload to GitHub Release
   #       if: github.event_name == 'release'
   #       uses: softprops/action-gh-release@v2
@@ -114,7 +138,6 @@ jobs:
   #         name: windows-msix
   #         path: dist/**/*.msix
 
-    
 
       # - name: Configure Microsoft Store CLI
       #   uses: microsoft/microsoft-store-apppublisher@v1.1
@@ -134,6 +157,3 @@ jobs:
       #   with:
       #     name: windows-msix
       #     path: dist/**/*.msix
-
-      
-      
