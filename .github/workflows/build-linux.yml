@@ -57,13 +57,18 @@ jobs:
 
       - name: Install appimagetool
         run: |
+          sudo apt-get install -y libfuse2 fuse
+          sudo modprobe fuse || true
+          sudo chmod 666 /dev/fuse || true
+
           if [ "${{ matrix.arch }}" == "arm64" ]; then
-            wget -O appimagetool "https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-aarch64.AppImage"
+            wget -O appimagetool.AppImage "https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-aarch64.AppImage"
           else
-            wget -O appimagetool "https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-x86_64.AppImage"
+            wget -O appimagetool.AppImage "https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-x86_64.AppImage"
           fi
-          chmod +x appimagetool
-          sudo mv appimagetool /usr/local/bin/
+          chmod +x appimagetool.AppImage
+          sudo mv appimagetool.AppImage /usr/local/bin/appimagetool
+
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
