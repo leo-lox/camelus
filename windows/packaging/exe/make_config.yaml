@@ -1,0 +1,8 @@
+app_id: 7d199e2a-2278-478f-88c7-af410c4ebbad  # generate your own GUID
+publisher: Your Name
+publisher_url: https://github.com/camelus-hq/camelus
+display_name: Camelus
+create_desktop_icon: true
+setup_icon_file: windows\runner\resources\app_icon.ico
+locales:
+  - en

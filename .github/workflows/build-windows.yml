@@ -1,0 +1,117 @@
+name: Build Windows (EXE + MSIX)
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+jobs:
+  build-exe:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+          cache-key: "flutter-:os:-:channel:-:version:-:arch:-:hash:"
+          cache-path: "${{ runner.tool_cache }}/flutter/:channel:-:version:-:arch:"
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Install FastForge
+        run: dart pub global activate fastforge
+
+      - name: Install Inno Setup
+        run: choco install innosetup -y
+
+      - name: Decode dart_defines.json
+        shell: bash
+        run: |
+          echo "${{ secrets.DART_DEFINES_JSON_BASE64 }}" | base64 --decode > dart_defines.json
+
+      - name: Build EXE installer
+        run: fastforge release --name windows-exe
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload to GitHub Release
+        if: github.event_name == 'release'
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/**/*.exe
+
+      - name: Upload EXE artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-exe
+          path: dist/**/*.exe
+
+  build-msix:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Install FastForge
+        run: dart pub global activate fastforge
+
+      - name: Decode dart_defines.json
+        shell: bash
+        run: |
+          echo "${{ secrets.DART_DEFINES_JSON_BASE64 }}" | base64 --decode > dart_defines.json
+
+      - name: Build MSIX
+        run: fastforge release --name windows-msix
+
+
+      - name: Upload to GitHub Release
+        if: github.event_name == 'release'
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/**/*.msix
+
+      - name: Upload MSIX artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-msix
+          path: dist/**/*.msix
+
+    
+
+      # - name: Configure Microsoft Store CLI
+      #   uses: microsoft/microsoft-store-apppublisher@v1.1
+
+      # - name: Reconfigure store credentials
+      #   run: msstore reconfigure `
+      #         --tenantId ${{ secrets.AZURE_AD_TENANT_ID }} `
+      #         --sellerId ${{ secrets.SELLER_ID }} `
+      #         --clientId ${{ secrets.AZURE_AD_APPLICATION_CLIENT_ID }} `
+      #         --clientSecret ${{ secrets.AZURE_AD_APPLICATION_SECRET }}
+
+      # - name: Publish to Microsoft Store
+      #   run: msstore publish (Get-ChildItem -Path dist -Filter *.msix -Recurse | Select-Object -First 1 -ExpandProperty FullName) -id YOUR_STORE_PRODUCT_ID
+
+      # - name: Upload MSIX artifact
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: windows-msix
+      #     path: dist/**/*.msix
+
+      
+      
