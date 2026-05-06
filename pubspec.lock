@@ -1215,9 +1215,11 @@ packages:
   ndk:
     dependency: "direct main"
     description:
-      path: "../ndk/packages/ndk"
-      relative: true
-    source: path
+      path: "packages/ndk"
+      ref: "tmp/camelus/1-10-0"
+      resolved-ref: "29314e42c9b99abbeeb9ae66ca21bf84115b82d4"
+      url: "https://github.com/relaystr/ndk.git"
+    source: git
     version: "0.8.2-dev.6"
   ndk_bip32_keys:
     dependency: transitive
@@ -1230,23 +1232,29 @@ packages:
   ndk_flutter:
     dependency: "direct main"
     description:
-      path: "../ndk/packages/ndk_flutter"
-      relative: true
-    source: path
+      path: "packages/ndk_flutter"
+      ref: "tmp/camelus/1-10-0"
+      resolved-ref: "29314e42c9b99abbeeb9ae66ca21bf84115b82d4"
+      url: "https://github.com/relaystr/ndk.git"
+    source: git
     version: "0.8.2-dev.6"
   ndk_objectbox:
     dependency: "direct main"
     description:
-      path: "../ndk/packages/objectbox"
-      relative: true
-    source: path
+      path: "packages/objectbox"
+      ref: "tmp/camelus/1-10-0"
+      resolved-ref: "29314e42c9b99abbeeb9ae66ca21bf84115b82d4"
+      url: "https://github.com/relaystr/ndk.git"
+    source: git
     version: "0.2.11-dev.6"
   nip07_event_signer:
     dependency: "direct main"
     description:
-      path: "../ndk/packages/nip07_event_signer"
-      relative: true
-    source: path
+      path: "packages/nip07_event_signer"
+      ref: "tmp/camelus/1-10-0"
+      resolved-ref: "29314e42c9b99abbeeb9ae66ca21bf84115b82d4"
+      url: "https://github.com/relaystr/ndk.git"
+    source: git
     version: "1.0.10-dev.6"
   nm:
     dependency: transitive
@@ -2000,9 +2008,11 @@ packages:
   ur:
     dependency: "direct main"
     description:
-      path: "../ndk/packages/bc_ur"
-      relative: true
-    source: path
+      path: "packages/bc_ur"
+      ref: "tmp/camelus/1-10-0"
+      resolved-ref: "29314e42c9b99abbeeb9ae66ca21bf84115b82d4"
+      url: "https://github.com/relaystr/ndk.git"
+    source: git
     version: "0.1.0"
   url_launcher:
     dependency: "direct main"
