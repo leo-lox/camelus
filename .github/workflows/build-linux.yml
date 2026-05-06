@@ -58,12 +58,15 @@ jobs:
       - name: Install appimagetool
         run: |
           if [ "${{ matrix.arch }}" == "arm64" ]; then
-            wget -O appimagetool "https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-aarch64.AppImage"
+            wget -O appimagetool.AppImage "https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-aarch64.AppImage"
           else
-            wget -O appimagetool "https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-x86_64.AppImage"
+            wget -O appimagetool.AppImage "https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-x86_64.AppImage"
           fi
-          chmod +x appimagetool
-          sudo mv appimagetool /usr/local/bin/
+          chmod +x appimagetool.AppImage
+          ./appimagetool.AppImage --appimage-extract
+          sudo mv squashfs-root /opt/appimagetool
+          sudo ln -s /opt/appimagetool/AppRun /usr/local/bin/appimagetool
+
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
