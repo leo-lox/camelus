@@ -82,7 +82,7 @@ jobs:
           echo "${{ secrets.DART_DEFINES_JSON_BASE64 }}" | base64 --decode > dart_defines.json
 
       - name: Build EXE installer (${{ matrix.arch }})
-        run: fastforge release --name windows-exe-${{ matrix.arch }}
+        run: fastforge release --name windows-exe
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 

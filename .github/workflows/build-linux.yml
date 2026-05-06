@@ -85,7 +85,7 @@ jobs:
 
       - name: Build AppImage (${{ matrix.arch }})
         run: |
-          fastforge release --name linux-${{ matrix.arch }}
+          fastforge release --name linux
 
       - name: Upload to GitHub Release
         if: github.event_name == 'release'
