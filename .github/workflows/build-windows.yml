@@ -52,45 +52,45 @@ jobs:
           name: windows-exe
           path: dist/**/*.exe
 
-  build-msix:
-    runs-on: windows-latest
+  # build-msix:
+  #   runs-on: windows-latest
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v4
 
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          channel: stable
-          cache: true
+  #     - name: Setup Flutter
+  #       uses: subosito/flutter-action@v2
+  #       with:
+  #         channel: stable
+  #         cache: true
 
-      - name: Install dependencies
-        run: flutter pub get
+  #     - name: Install dependencies
+  #       run: flutter pub get
 
-      - name: Install FastForge
-        run: dart pub global activate fastforge
+  #     - name: Install FastForge
+  #       run: dart pub global activate fastforge
 
-      - name: Decode dart_defines.json
-        shell: bash
-        run: |
-          echo "${{ secrets.DART_DEFINES_JSON_BASE64 }}" | base64 --decode > dart_defines.json
+  #     - name: Decode dart_defines.json
+  #       shell: bash
+  #       run: |
+  #         echo "${{ secrets.DART_DEFINES_JSON_BASE64 }}" | base64 --decode > dart_defines.json
 
-      - name: Build MSIX
-        run: fastforge release --name windows-msix
+  #     - name: Build MSIX
+  #       run: fastforge release --name windows-msix
 
 
-      - name: Upload to GitHub Release
-        if: github.event_name == 'release'
-        uses: softprops/action-gh-release@v2
-        with:
-          files: dist/**/*.msix
+  #     - name: Upload to GitHub Release
+  #       if: github.event_name == 'release'
+  #       uses: softprops/action-gh-release@v2
+  #       with:
+  #         files: dist/**/*.msix
 
-      - name: Upload MSIX artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: windows-msix
-          path: dist/**/*.msix
+  #     - name: Upload MSIX artifact
+  #       uses: actions/upload-artifact@v4
+  #       with:
+  #         name: windows-msix
+  #         path: dist/**/*.msix
 
     
 
