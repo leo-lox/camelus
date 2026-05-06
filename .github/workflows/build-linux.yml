@@ -4,47 +4,14 @@ on:
   release:
     types: [published]
   workflow_dispatch:
-    inputs:
-      architecture:
-        description: 'Target Architecture'
-        required: true
-        type: choice
-        options:
-          - x64
-          - arm64
-          - both
-        default: x64
 
 jobs:
-  prepare:
-    runs-on: ubuntu-latest
-    outputs:
-      matrix: ${{ steps.set-matrix.outputs.matrix }}
-    steps:
-      - id: set-matrix
-        run: |
-          if [ "${{ github.event.inputs.architecture }}" == "both" ] || [ "${{ github.event_name }}" == "release" ]; then
-            echo 'matrix=["x64","arm64"]' >> $GITHUB_OUTPUT
-          else
-            echo 'matrix=["${{ github.event.inputs.architecture || 'x64' }}"]' >> $GITHUB_OUTPUT
-          fi
-
   build:
-    needs: prepare
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        arch: ${{ fromJSON(needs.prepare.outputs.matrix) }}
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Set up QEMU for cross-compilation
-        if: matrix.arch == 'arm64'
-        uses: docker/setup-qemu-action@v3
-        with:
-          platforms: arm64
 
       - name: Install dependencies
         run: |
@@ -57,18 +24,9 @@ jobs:
 
       - name: Install appimagetool
         run: |
-          sudo apt-get install -y libfuse2 fuse
-          sudo modprobe fuse || true
-          sudo chmod 666 /dev/fuse || true
-
-          if [ "${{ matrix.arch }}" == "arm64" ]; then
-            wget -O appimagetool.AppImage "https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-aarch64.AppImage"
-          else
-            wget -O appimagetool.AppImage "https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-x86_64.AppImage"
-          fi
-          chmod +x appimagetool.AppImage
-          sudo mv appimagetool.AppImage /usr/local/bin/appimagetool
-
+          wget -O appimagetool "https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-x86_64.AppImage"
+          chmod +x appimagetool
+          sudo mv appimagetool /usr/local/bin/
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
@@ -88,7 +46,7 @@ jobs:
         run: |
           echo "${{ secrets.DART_DEFINES_JSON_BASE64 }}" | base64 --decode > dart_defines.json
 
-      - name: Build AppImage (${{ matrix.arch }})
+      - name: Build AppImage
         run: |
           fastforge release --name linux
 
@@ -101,5 +59,5 @@ jobs:
       - name: Upload AppImage artifact
         uses: actions/upload-artifact@v4
         with:
-          name: linux-appimage-${{ matrix.arch }}
+          name: linux-appimage
           path: dist/**/*.AppImage
