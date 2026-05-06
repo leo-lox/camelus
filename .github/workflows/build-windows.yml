@@ -4,10 +4,31 @@ on:
   release:
     types: [published]
   workflow_dispatch:
+    inputs:
+      build_x64:
+        description: 'Build x64'
+        required: false
+        type: boolean
+        default: true
+      build_arm64:
+        description: 'Build ARM64'
+        required: false
+        type: boolean
+        default: false
 
 jobs:
   build-exe:
     runs-on: windows-latest
+    strategy:
+      matrix:
+        include:
+          - arch: x64
+            enabled: ${{ github.event.inputs.build_x64 == 'true' || github.event_name == 'release' }}
+          - arch: arm64
+            enabled: ${{ github.event.inputs.build_arm64 == 'true' || github.event_name == 'release' }}
+    
+    # Skip if not enabled
+    if: matrix.enabled
 
     steps:
       - name: Checkout code
@@ -35,8 +56,8 @@ jobs:
         run: |
           echo "${{ secrets.DART_DEFINES_JSON_BASE64 }}" | base64 --decode > dart_defines.json
 
-      - name: Build EXE installer
-        run: fastforge release --name windows-exe
+      - name: Build EXE installer (${{ matrix.arch }})
+        run: fastforge release --name windows-exe-${{ matrix.arch }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -49,8 +70,9 @@ jobs:
       - name: Upload EXE artifact
         uses: actions/upload-artifact@v4
         with:
-          name: windows-exe
+          name: windows-exe-${{ matrix.arch }}
           path: dist/**/*.exe
+
 
   # build-msix:
   #   runs-on: windows-latest
