@@ -1,8 +1,8 @@
 name: Build iOS IPA
 
 on:
-  push:
-    branches: [main]
+  release:
+    types: [published]
   workflow_dispatch:
 
 jobs:
@@ -50,12 +50,10 @@ jobs:
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
           cp profile.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/
 
-
       - name: Install App Store Connect API Key
         run: |
           mkdir -p ~/private_keys
           echo "${{ secrets.APP_STORE_CONNECT_API_KEY_BASE64 }}" | base64 --decode > ~/private_keys/AuthKey_${{ secrets.APP_STORE_CONNECT_KEY_ID }}.p8
-
 
       - name: Set up CocoaPods
         run: |
@@ -66,7 +64,7 @@ jobs:
       - name: Decode dart_defines.json
         run: |
           echo "${{ secrets.DART_DEFINES_JSON_BASE64 }}" | base64 --decode > dart_defines.json
-   
+
       - name: Decode GoogleService-Info.plist
         run: |
           echo "${{ secrets.GOOGLE_SERVICE_INFO_PLIST_BASE64 }}" | base64 --decode > ios/Runner/GoogleService-Info.plist
@@ -91,8 +89,11 @@ jobs:
         run: |
           fastforge release --name appstore
 
-
-      
+      - name: Upload IPA to GitHub Release
+        if: github.event_name == 'release'
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/**/*.ipa
 
       - name: Upload IPA artifact
         uses: actions/upload-artifact@v4

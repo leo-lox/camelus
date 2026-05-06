@@ -1,8 +1,8 @@
 name: Build Linux Flatpak
 
 on:
-  push:
-    branches: [main]
+  release:
+    types: [published]
   workflow_dispatch:
 
 jobs:
@@ -53,6 +53,12 @@ jobs:
           cd flatpak
           flatpak-builder --force-clean --repo=repo build-dir de.lox.dev.camelus.yml
           flatpak build-bundle repo camelus.flatpak de.lox.dev.camelus
+
+      - name: Upload to GitHub Release
+        if: github.event_name == 'release'
+        uses: softprops/action-gh-release@v2
+        with:
+          files: flatpak/camelus.flatpak
 
       - name: Upload Flatpak artifact
         uses: actions/upload-artifact@v4
