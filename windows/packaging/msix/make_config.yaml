@@ -1,5 +1,12 @@
 display_name: Camelus
 publisher_display_name: Camelus
 identity_name: Camelus.camelus
-msix_version: 1.0.0.0
+publisher: CN=35C14D84-C23C-4EC1-8D61-76E636B16E72
+msix_version: 1.10.1.0
 logo_path: assets/app_icons/icon.png
+languages:
+  - en-US
+store: true
+
+protocol_activation: camelus
+app_uri_handler_hosts: camelus.app, www.camelus.app
