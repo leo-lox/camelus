@@ -25,8 +25,8 @@ jobs:
       - name: Setup Flatpak
         run: |
           sudo flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
-          sudo flatpak install -y org.freedesktop.Sdk//23.08
-          sudo flatpak install -y org.freedesktop.Platform//23.08
+          sudo flatpak install -y org.freedesktop.Sdk//25.08
+          sudo flatpak install -y org.freedesktop.Platform//25.08
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
