@@ -26,7 +26,7 @@ modules:
       - type: dir
         path: ../build/linux/x64/release/
       - type: file
-        path: icon.png
+        path: assets/app_icons/icon.png
       - type: file
         path: de.lox.dev.camelus.desktop
       - type: file
