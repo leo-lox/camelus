@@ -4,10 +4,14 @@ on:
   release:
     types: [published]
   workflow_dispatch:
+  
 
 jobs:
   build-exe:
     runs-on: windows-latest
+    permissions:
+      contents: write
+
 
     steps:
       - name: Checkout code
