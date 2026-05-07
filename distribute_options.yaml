@@ -29,8 +29,8 @@ releases:
           target: exe
           build_args:
             dart-define-from-file: dart_defines.json
-        publish:
-          target: github
+        # publish:
+        #   target: github
 
   - name: windows-msix
     jobs:
