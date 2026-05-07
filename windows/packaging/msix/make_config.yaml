@@ -5,7 +5,7 @@ publisher: CN=35C14D84-C23C-4EC1-8D61-76E636B16E72
 msix_version: 1.10.1.0
 logo_path: assets/app_icons/icon.png
 languages: en-US, de-DE, fr-FR, es-ES, ja-JP,  pt-PT, ru-RU, zh-CN, th-TH
-store: true
+store: "true"
 
 protocol_activation: camelus
 app_uri_handler_hosts: camelus.app, www.camelus.app
