@@ -27,6 +27,9 @@ import '../routes/nostr/event_view/event_view_page.dart';
 import '../routes/nostr/lists/edit_list_page.dart';
 import '../routes/nostr/lists/lists_page.dart';
 import '../routes/nostr/map/map_page.dart';
+import '../routes/nostr/map/navigation_page.dart';
+import '../routes/nostr/map/valhalla_routing_service.dart';
+import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 import '../routes/nostr/onboarding/onboarding.dart';
 import '../routes/nostr/profile/edit_profile_page.dart';
 import '../routes/nostr/profile/profile_resolver_page.dart';
@@ -258,7 +261,23 @@ final routes = [
             path: '/bookmarks',
             builder: (context, state) => const BookmarksPage(),
           ),
-          GoRoute(path: '/map', builder: (context, state) => const MapPage()),
+          GoRoute(
+            path: '/map',
+            builder: (context, state) => const MapPage(),
+            routes: [
+              GoRoute(
+                path: 'navigation',
+                builder: (context, state) {
+                  final extra = state.extra as Map<String, dynamic>;
+                  return NavigationPage(
+                    routeResponse:
+                        extra['routeResponse'] as ValhallaRouteResponse,
+                    routePoints: extra['routePoints'] as List<Point>,
+                  );
+                },
+              ),
+            ],
+          ),
           GoRoute(
             path: '/blocked-users',
             builder: (context, state) => const BlocklistPage(),
