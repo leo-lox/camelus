@@ -23,6 +23,7 @@ class RouteState {
   final String? error;
   final bool isRoutePanelOpen;
   final int focusedWaypointIndex;
+  final List<TransitType> transitTypes;
 
   // Geocoding state per waypoint
   final List<GeocodingResult> geocodingResults;
@@ -37,6 +38,7 @@ class RouteState {
     this.error,
     this.isRoutePanelOpen = false,
     this.focusedWaypointIndex = 0,
+    this.transitTypes = kDefaultTransitTypes,
     this.geocodingResults = const [],
     this.isGeocoding = false,
   });
@@ -65,6 +67,7 @@ class RouteState {
     bool clearError = false,
     bool? isRoutePanelOpen,
     int? focusedWaypointIndex,
+    List<TransitType>? transitTypes,
     List<GeocodingResult>? geocodingResults,
     bool? isGeocoding,
     bool clearRouteResponses = false,
@@ -80,6 +83,7 @@ class RouteState {
       error: clearError ? null : (error ?? this.error),
       isRoutePanelOpen: isRoutePanelOpen ?? this.isRoutePanelOpen,
       focusedWaypointIndex: focusedWaypointIndex ?? this.focusedWaypointIndex,
+      transitTypes: transitTypes ?? this.transitTypes,
       geocodingResults: geocodingResults ?? this.geocodingResults,
       isGeocoding: isGeocoding ?? this.isGeocoding,
     );
@@ -235,6 +239,22 @@ class RouteNotifier extends Notifier<RouteState> {
     _autoFetchRoute();
   }
 
+  /// Toggle a transit type on/off for multimodal routing.
+  /// At least one type must remain enabled.
+  void toggleTransitType(TransitType type) {
+    final current = state.transitTypes;
+    final updated = current.contains(type)
+        ? current.where((t) => t != type).toList()
+        : [...current, type];
+    if (updated.isEmpty) return; // keep at least one
+    state = state.copyWith(
+      transitTypes: updated,
+      clearError: true,
+      clearRouteResponses: true,
+    );
+    _autoFetchRoute();
+  }
+
   /// Check if all waypoints have valid coordinates and auto-fetch.
   void _autoFetchRoute() {
     if (!state.canRoute || state.isRouting) return;
@@ -283,6 +303,7 @@ class RouteNotifier extends Notifier<RouteState> {
       final responses = await ValhallaRoutingService.fetchRoutes(
         locations: locations,
         costing: state.travelMode,
+        transitTypes: state.transitTypes,
       );
 
       if (state.isRoutePanelOpen) {

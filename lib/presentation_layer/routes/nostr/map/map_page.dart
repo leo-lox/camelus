@@ -94,12 +94,12 @@ class _MapPageState extends ConsumerState<MapPage> {
 
     return Scaffold(
       extendBodyBehindAppBar: true,
-      appBar: AppBar(
-        title: Text(l10n.map),
-        backgroundColor: Colors.transparent,
-        elevation: 1,
-        surfaceTintColor: Colors.transparent,
-      ),
+      // appBar: AppBar(
+      //   title: Text(l10n.map),
+      //   backgroundColor: Colors.transparent,
+      //   elevation: 1,
+      //   surfaceTintColor: Colors.transparent,
+      // ),
       floatingActionButton: const RouteFab(),
       body: Stack(
         children: [

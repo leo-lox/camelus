@@ -13,18 +13,37 @@ enum TravelMode {
   final String value;
 }
 
+/// Transit types that can be included/excluded in multimodal routing.
+/// Maps to Valhalla's `transit_types` costing option.
+enum TransitType {
+  bus('bus', 'Bus'),
+  tram('tram', 'Tram'),
+  rail('rail', 'Train'),
+  subway('subway', 'Metro'),
+  ferry('ferry', 'Ferry');
+
+  const TransitType(this.value, this.label);
+  final String value;
+  final String label;
+}
+
+/// All transit types enabled by default.
+const kDefaultTransitTypes = TransitType.values;
+
 /// A Valhalla route request payload.
 class ValhallaRouteRequest {
   final List<ValhallaLocation> locations;
   final TravelMode costing;
   final String units;
   final String language;
+  final List<TransitType> transitTypes;
 
   const ValhallaRouteRequest({
     required this.locations,
     required this.costing,
     this.units = 'kilometers',
     this.language = 'en',
+    this.transitTypes = kDefaultTransitTypes,
   });
 
   Map<String, dynamic> toJson() {
@@ -36,9 +55,12 @@ class ValhallaRouteRequest {
       'alternates': 3,
     };
 
-    // Multimodal/transit requires a date_time parameter.
+    // Multimodal/transit requires a date_time parameter and transit costing options.
     if (costing == TravelMode.multimodal) {
       json['date_time'] = {'type': 0}; // 0 = depart now
+      json['costing_options'] = {
+        'transit': {'transit_types': transitTypes.map((t) => t.value).toList()},
+      };
     }
 
     return json;
@@ -262,6 +284,7 @@ class ValhallaRoutingService {
     required TravelMode costing,
     String units = 'kilometers',
     String language = 'en',
+    List<TransitType> transitTypes = kDefaultTransitTypes,
   }) async {
     if (locations.length < 2) {
       throw ArgumentError('At least 2 locations are required');
@@ -272,6 +295,7 @@ class ValhallaRoutingService {
       costing: costing,
       units: units,
       language: language,
+      transitTypes: transitTypes,
     );
 
     final uri = Uri.parse('$_baseUrl/route');

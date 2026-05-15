@@ -75,6 +75,21 @@ class RouteSummarySheet extends ConsumerWidget {
                 ),
               ),
 
+              // Transit type filter (only shown in multimodal mode)
+              if (routeState.travelMode == TravelMode.multimodal)
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 4,
+                  ),
+                  child: _TransitTypeFilter(
+                    selectedTypes: routeState.transitTypes,
+                    onToggle: (type) {
+                      ref.read(routeProvider.notifier).toggleTransitType(type);
+                    },
+                  ),
+                ),
+
               // Summary bar
               Container(
                 padding: const EdgeInsets.symmetric(
@@ -275,6 +290,67 @@ class _TravelModeSelector extends StatelessWidget {
         textStyle: WidgetStatePropertyAll(theme.textTheme.labelSmall),
         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
       ),
+    );
+  }
+}
+
+/// A row of toggleable transit type chips for multimodal routing.
+class _TransitTypeFilter extends StatelessWidget {
+  final List<TransitType> selectedTypes;
+  final ValueChanged<TransitType> onToggle;
+
+  const _TransitTypeFilter({
+    required this.selectedTypes,
+    required this.onToggle,
+  });
+
+  static const _typeIcons = <TransitType, IconData Function()>{
+    TransitType.bus: PhosphorIcons.bus,
+    TransitType.tram: PhosphorIcons.trainSimple,
+    TransitType.rail: PhosphorIcons.train,
+    TransitType.subway: PhosphorIcons.signpost,
+    TransitType.ferry: PhosphorIcons.sailboat,
+  };
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Wrap(
+      spacing: 6,
+      runSpacing: 4,
+      children: TransitType.values.map((type) {
+        final isSelected = selectedTypes.contains(type);
+        final iconBuilder = _typeIcons[type]!;
+        return FilterChip(
+          selected: isSelected,
+          label: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(iconBuilder(), size: 14),
+              const SizedBox(width: 4),
+              Text(type.label),
+            ],
+          ),
+          onSelected: (_) => onToggle(type),
+          visualDensity: VisualDensity.compact,
+          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          showCheckmark: false,
+          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+          labelStyle: theme.textTheme.labelSmall?.copyWith(
+            color: isSelected
+                ? theme.colorScheme.onSecondaryContainer
+                : theme.colorScheme.onSurfaceVariant,
+          ),
+          side: BorderSide(
+            color: isSelected
+                ? theme.colorScheme.secondary
+                : theme.colorScheme.outlineVariant,
+          ),
+          backgroundColor: theme.colorScheme.surfaceContainerHighest,
+          selectedColor: theme.colorScheme.secondaryContainer,
+        );
+      }).toList(),
     );
   }
 }
