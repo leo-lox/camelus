@@ -297,6 +297,38 @@
   "@blocklist": {
     "description": "Blocklist menu item"
   },
+  "map": "Map",
+  "@map": {
+    "description": "Map menu item and page title"
+  },
+  "locationDetails": "Location Details",
+  "@locationDetails": {
+    "description": "Title of the location info bottom sheet on the map page"
+  },
+  "latitude": "Latitude",
+  "@latitude": {
+    "description": "Label for latitude coordinate"
+  },
+  "longitude": "Longitude",
+  "@longitude": {
+    "description": "Label for longitude coordinate"
+  },
+  "address": "Address",
+  "@address": {
+    "description": "Label for the resolved address from reverse geocoding"
+  },
+  "name": "Name",
+  "@name": {
+    "description": "Label for POI name"
+  },
+  "category": "Category",
+  "@category": {
+    "description": "Label for POI category"
+  },
+  "poiGroup": "Group",
+  "@poiGroup": {
+    "description": "Label for POI group type"
+  },
   "settings": "Settings",
   "@settings": {
     "description": "Settings button and page title"

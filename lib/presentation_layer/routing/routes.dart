@@ -26,6 +26,7 @@ import '../routes/nostr/bookmarks/bookmarks_page.dart';
 import '../routes/nostr/event_view/event_view_page.dart';
 import '../routes/nostr/lists/edit_list_page.dart';
 import '../routes/nostr/lists/lists_page.dart';
+import '../routes/nostr/map/map_page.dart';
 import '../routes/nostr/onboarding/onboarding.dart';
 import '../routes/nostr/profile/edit_profile_page.dart';
 import '../routes/nostr/profile/profile_resolver_page.dart';
@@ -257,6 +258,7 @@ final routes = [
             path: '/bookmarks',
             builder: (context, state) => const BookmarksPage(),
           ),
+          GoRoute(path: '/map', builder: (context, state) => const MapPage()),
           GoRoute(
             path: '/blocked-users',
             builder: (context, state) => const BlocklistPage(),

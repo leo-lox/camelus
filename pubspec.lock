@@ -144,6 +144,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.2.2"
+  benchmark:
+    dependency: transitive
+    description:
+      name: benchmark
+      sha256: cb3eeea01e3f054df76ee9775ca680f3afa5f19f39b2bb426ba78ba27654493b
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.3.0"
   bip32:
     dependency: "direct main"
     description:
@@ -465,6 +473,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.0.1"
+  dart_sort_queue:
+    dependency: transitive
+    description:
+      name: dart_sort_queue
+      sha256: f3353ba8b4850e072d3368757f62edb79af34a9703c3e3df9c59342721f5f5b1
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.2+3"
   dart_style:
     dependency: transitive
     description:
@@ -871,6 +887,14 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  geotypes:
+    dependency: transitive
+    description:
+      name: geotypes
+      sha256: "5bedf57de92283133dd221e363812ef50eaaba414f0823b1974ef7d84b86991f"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.2"
   glob:
     dependency: transitive
     description:
@@ -1148,6 +1172,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.3.3"
+  mapbox_maps_flutter:
+    dependency: "direct main"
+    description:
+      name: mapbox_maps_flutter
+      sha256: c2043d610ae976831b958f9ca22627a729f22598f5b339e3c94eb8d883f918ce
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.23.1"
   matcher:
     dependency: transitive
     description:
@@ -1215,12 +1247,10 @@ packages:
   ndk:
     dependency: "direct main"
     description:
-      path: "packages/ndk"
-      ref: "tmp/camelus/1-10-0"
-      resolved-ref: "29314e42c9b99abbeeb9ae66ca21bf84115b82d4"
-      url: "https://github.com/relaystr/ndk.git"
-    source: git
-    version: "0.8.2-dev.6"
+      path: "../ndk/packages/ndk"
+      relative: true
+    source: path
+    version: "0.8.2-dev.8"
   ndk_bip32_keys:
     dependency: transitive
     description:
@@ -1232,21 +1262,17 @@ packages:
   ndk_flutter:
     dependency: "direct main"
     description:
-      path: "packages/ndk_flutter"
-      ref: "tmp/camelus/1-10-0"
-      resolved-ref: "29314e42c9b99abbeeb9ae66ca21bf84115b82d4"
-      url: "https://github.com/relaystr/ndk.git"
-    source: git
-    version: "0.8.2-dev.6"
+      path: "../ndk/packages/ndk_flutter"
+      relative: true
+    source: path
+    version: "0.8.2-dev.8"
   ndk_objectbox:
     dependency: "direct main"
     description:
-      path: "packages/objectbox"
-      ref: "tmp/camelus/1-10-0"
-      resolved-ref: "29314e42c9b99abbeeb9ae66ca21bf84115b82d4"
-      url: "https://github.com/relaystr/ndk.git"
-    source: git
-    version: "0.2.11-dev.6"
+      path: "../ndk/packages/objectbox"
+      relative: true
+    source: path
+    version: "0.2.11-dev.8"
   nip07_event_signer:
     dependency: "direct main"
     description:
@@ -1528,6 +1554,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.2.3"
+  rbush:
+    dependency: transitive
+    description:
+      name: rbush
+      sha256: "48b683421b4afb43a642f82c6aa31911e54f3069143d31c7d33cbe329df13403"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.1.1"
   riverpod:
     dependency: "direct main"
     description:
@@ -1885,6 +1919,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.4.1"
+  sweepline_intersections:
+    dependency: transitive
+    description:
+      name: sweepline_intersections
+      sha256: a665c707200a4f07140a4029b41a7c4883beb3f04322cd8e08ebf650f69e1176
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.4"
   sync_http:
     dependency: transitive
     description:
@@ -1989,6 +2031,30 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.18.0"
+  turf:
+    dependency: transitive
+    description:
+      name: turf
+      sha256: "7684654c561e751332bc2fa6e9bb7bcf0c71bad5315acf126206e7ecfef67256"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.12"
+  turf_equality:
+    dependency: transitive
+    description:
+      name: turf_equality
+      sha256: f0f44ffe389547941358e0d3d4a747db2bd56115b32ff1cede5e5bdf3126a3e2
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.1.0"
+  turf_pip:
+    dependency: transitive
+    description:
+      name: turf_pip
+      sha256: ba4fd414baffd5d7b30880658ad6db82461c49ec023f8ffd0c23d398ad8b14be
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.2"
   typed_data:
     dependency: transitive
     description:

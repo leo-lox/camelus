@@ -86,7 +86,6 @@ dependencies:
   ndk: ^0.8.2-dev.5
   ndk_flutter: ^0.8.2-dev.5
   nip07_event_signer: ^1.0.10-dev.5
-  #ndk_rust_verifier: ^0.5.0
 
   ndk_objectbox: ^0.2.8
   
@@ -119,6 +118,7 @@ dependencies:
   system_theme: ^3.1.2
   ur:
     path: ../ndk/packages/bc_ur
+  mapbox_maps_flutter: ^2.23.1
   
 
   
@@ -132,35 +132,30 @@ dependency_overrides:
        ref: tmp/camelus/1-10-0
 
   ndk:
-    #path: ../ndk/packages/ndk
-     git:
-       url: https://github.com/relaystr/ndk.git
-       path: packages/ndk
-       ref: tmp/camelus/1-10-0
+    path: ../ndk/packages/ndk
+    #  git:
+    #    url: https://github.com/relaystr/ndk.git
+    #    path: packages/ndk
+    #    ref: tmp/camelus/1-10-0
     
   ndk_flutter:
-    #path: ../ndk/packages/ndk_flutter
-     git:
-       url: https://github.com/relaystr/ndk.git
-       path: packages/ndk_flutter
-       ref: tmp/camelus/1-10-0
+    path: ../ndk/packages/ndk_flutter
+    #  git:
+    #    url: https://github.com/relaystr/ndk.git
+    #    path: packages/ndk_flutter
+    #    ref: tmp/camelus/1-10-0
   nip07_event_signer:
     #path: ../ndk/packages/nip07_event_signer
      git:
        url: https://github.com/relaystr/ndk.git
        path: packages/nip07_event_signer
        ref: tmp/camelus/1-10-0
-  #ndk_rust_verifier:
-  #  path: ../ndk/packages/rust_verifier
-    #git:
-    #  url: https://github.com/relaystr/ndk.git
-    #  path: packages/rust_verifier
   ndk_objectbox:
-    #path: ../ndk/packages/objectbox
-    git:
-       url: https://github.com/relaystr/ndk.git
-       path: packages/objectbox
-       ref: tmp/camelus/1-10-0
+    path: ../ndk/packages/objectbox
+    # git:
+    #    url: https://github.com/relaystr/ndk.git
+    #    path: packages/objectbox
+    #    ref: tmp/camelus/1-10-0
 
   #ndk_amber:
     #path: ../ndk/packages/amber

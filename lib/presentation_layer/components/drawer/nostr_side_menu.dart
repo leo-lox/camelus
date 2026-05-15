@@ -301,6 +301,14 @@ class NostrSideMenu extends ConsumerWidget {
                           context.push('/blocked-users');
                         },
                       ),
+                      _drawerItem(
+                        label: AppLocalizations.of(context)!.map,
+                        routeName: '/map',
+                        icon: PhosphorIcons.mapTrifold(),
+                        onTap: () {
+                          context.push('/map');
+                        },
+                      ),
                     ] else ...[
                       // Show login option when not authenticated
                       _drawerItem(

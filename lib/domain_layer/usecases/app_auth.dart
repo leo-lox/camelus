@@ -118,6 +118,7 @@ class AppAuth {
 
         try {
           final signer = Nip46EventSigner(
+            eventSignerFactory: Bip340EventSignerFactory(),
             connection: startupAccountData.account!.bunkerConnection!,
             requests: ndk.requests,
             broadcast: ndk.broadcast,
