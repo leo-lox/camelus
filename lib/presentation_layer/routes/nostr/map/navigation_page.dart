@@ -121,8 +121,10 @@ class _NavigationPageState extends ConsumerState<NavigationPage> {
       ),
     );
 
-    // Draw origin/destination markers
+    // Draw origin/destination markers and intermediate waypoints
     await _waypointManager!.deleteAll();
+
+    // Origin
     await _waypointManager!.create(
       CircleAnnotationOptions(
         geometry: Point(
@@ -131,12 +133,45 @@ class _NavigationPageState extends ConsumerState<NavigationPage> {
             points.first.coordinates.lat,
           ),
         ),
-        circleRadius: 8.0,
+        circleRadius: 10.0,
         circleColor: Colors.green.value,
         circleStrokeColor: Colors.white.value,
         circleStrokeWidth: 3.0,
       ),
     );
+
+    // Intermediate waypoints (start of each leg after the first)
+    final legs = widget.routeResponse.legs;
+    if (legs.length > 1) {
+      // Track cumulative point offset across legs
+      int pointOffset = 0;
+      for (int legIndex = 1; legIndex < legs.length; legIndex++) {
+        // Each leg's shape starts at the same point where the previous leg ended,
+        // so we skip it to avoid duplicate markers.
+        pointOffset += ValhallaRoutingService.decodePolyline6(
+          legs[legIndex - 1].shape,
+        ).length;
+        if (pointOffset < points.length) {
+          final wpPoint = points[pointOffset];
+          await _waypointManager!.create(
+            CircleAnnotationOptions(
+              geometry: Point(
+                coordinates: Position(
+                  wpPoint.coordinates.lng,
+                  wpPoint.coordinates.lat,
+                ),
+              ),
+              circleRadius: 8.0,
+              circleColor: Colors.orange.value,
+              circleStrokeColor: Colors.white.value,
+              circleStrokeWidth: 3.0,
+            ),
+          );
+        }
+      }
+    }
+
+    // Destination
     await _waypointManager!.create(
       CircleAnnotationOptions(
         geometry: Point(
@@ -145,7 +180,7 @@ class _NavigationPageState extends ConsumerState<NavigationPage> {
             points.last.coordinates.lat,
           ),
         ),
-        circleRadius: 8.0,
+        circleRadius: 10.0,
         circleColor: Colors.red.value,
         circleStrokeColor: Colors.white.value,
         circleStrokeWidth: 3.0,

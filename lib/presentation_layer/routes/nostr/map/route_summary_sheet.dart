@@ -154,10 +154,7 @@ class RouteSummarySheet extends ConsumerWidget {
                         borderRadius: BorderRadius.circular(20),
                         onTap: () {
                           final response = routeState.routeResponse!;
-                          final routePoints =
-                              ValhallaRoutingService.decodePolyline6(
-                                response.fullShape,
-                              );
+                          final routePoints = response.decodedShape;
                           context.push(
                             '/map/navigation',
                             extra: {

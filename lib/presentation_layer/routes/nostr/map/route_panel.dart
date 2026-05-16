@@ -99,7 +99,9 @@ class RoutePanel extends ConsumerWidget {
                     waypointIndex: i,
                     hintText: i == 0
                         ? 'Choose starting point'
-                        : 'Choose destination',
+                        : i == routeState.waypoints.length - 1
+                        ? 'Choose destination'
+                        : 'Add stop',
                     isFirst: i == 0,
                     isLast: i == routeState.waypoints.length - 1,
                   ),

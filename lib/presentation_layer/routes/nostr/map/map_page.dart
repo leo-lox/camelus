@@ -67,28 +67,22 @@ class _MapPageState extends ConsumerState<MapPage> {
         return;
       }
 
-      // Clear old routes when routes are cleared or changed
-      if (prevResponses != null &&
-          prevResponses.isNotEmpty &&
-          (nextResponses.isEmpty ||
-              !_listEquals(prevResponses, nextResponses))) {
-        _clearRouteAnnotations();
-      }
-
-      // Draw new routes (all alternatives)
+      // Clear and redraw when routes change
       if (nextResponses.isNotEmpty &&
           nextResponses.every((r) => r.isSuccess) &&
           (prevResponses == null ||
-              !_listEquals(prevResponses, nextResponses))) {
+              !_listEquals(prevResponses, nextResponses) ||
+              previous?.selectedRouteIndex != next.selectedRouteIndex)) {
+        // Draw directly (drawRoutes clears internally)
         _drawRoutes(nextResponses, next.selectedRouteIndex);
+        return;
       }
 
-      // Redraw when selection changes (style update only)
+      // Clear when routes are removed
       if (prevResponses != null &&
-          nextResponses.isNotEmpty &&
-          _listEquals(prevResponses, nextResponses) &&
-          previous?.selectedRouteIndex != next.selectedRouteIndex) {
-        _drawRoutes(nextResponses, next.selectedRouteIndex);
+          prevResponses.isNotEmpty &&
+          nextResponses.isEmpty) {
+        _clearRouteAnnotations();
       }
     });
 
@@ -429,7 +423,7 @@ class _MapPageState extends ConsumerState<MapPage> {
     // Draw each route
     for (int i = 0; i < responses.length; i++) {
       final response = responses[i];
-      final points = ValhallaRoutingService.decodePolyline6(response.fullShape);
+      final points = response.decodedShape;
       if (points.isEmpty) continue;
 
       final coordinates = points
@@ -578,9 +572,7 @@ class _MapPageState extends ConsumerState<MapPage> {
     double minDist = double.infinity;
 
     for (int i = 0; i < _routeAlternatives.length; i++) {
-      final points = ValhallaRoutingService.decodePolyline6(
-        _routeAlternatives[i].fullShape,
-      );
+      final points = _routeAlternatives[i].decodedShape;
       for (final point in points) {
         final dLat = point.coordinates.lat.toDouble() - lat;
         final dLng = point.coordinates.lng.toDouble() - lng;

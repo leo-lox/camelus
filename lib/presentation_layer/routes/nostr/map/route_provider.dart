@@ -258,7 +258,7 @@ class RouteNotifier extends Notifier<RouteState> {
   /// Check if all waypoints have valid coordinates and auto-fetch.
   void _autoFetchRoute() {
     if (!state.canRoute || state.isRouting) return;
-    final allValid = state.waypoints.every((wp) => wp.lat != 0 || wp.lon != 0);
+    final allValid = state.waypoints.every((wp) => wp.lat != 0 && wp.lon != 0);
     if (allValid) {
       fetchRoute();
     }

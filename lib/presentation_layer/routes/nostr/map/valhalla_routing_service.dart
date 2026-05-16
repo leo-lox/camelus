@@ -219,8 +219,17 @@ class ValhallaRouteResponse {
   /// Whether the route was successful (status 0).
   bool get isSuccess => statusCode == '0';
 
-  /// The combined encoded polyline shape from all legs.
-  String get fullShape => legs.map((l) => l.shape).join('');
+  /// Decode all legs' polyline shapes into a single list of [Point]s.
+  ///
+  /// Each leg's shape is decoded separately (they use delta encoding that
+  /// resets per leg) and the point lists are concatenated.
+  List<Point> get decodedShape {
+    final allPoints = <Point>[];
+    for (final leg in legs) {
+      allPoints.addAll(ValhallaRoutingService.decodePolyline6(leg.shape));
+    }
+    return allPoints;
+  }
 }
 
 /// Valhalla routing service using the public API.
