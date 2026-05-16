@@ -1,5 +1,3 @@
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
@@ -7,6 +5,7 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import 'live_location_provider.dart';
 import 'navigation_provider.dart';
+import 'user_location_overlay.dart';
 import 'valhalla_routing_service.dart';
 
 /// Full-screen turn-by-turn navigation page.
@@ -33,32 +32,15 @@ class NavigationPage extends ConsumerStatefulWidget {
 
 class _NavigationPageState extends ConsumerState<NavigationPage> {
   late MapboxMap _mapboxMap;
+  bool _mapInitialized = false;
+
   PolylineAnnotationManager? _routeLineManager;
   PolylineAnnotationManager? _upcomingLineManager;
   CircleAnnotationManager? _waypointManager;
-  CircleAnnotationManager? _userPuckManager;
-  PolylineAnnotationManager? _headingIndicatorManager;
-
-  // Annotation instances for smooth puck updates (no delete+create flicker)
-  CircleAnnotation? _puckAnnotation;
-  final List<PolylineAnnotation?> _headingAnnotations = [];
-
-  // Camera state
-  DateTime _lastCameraUpdate = DateTime.fromMillisecondsSinceEpoch(0);
-  static const _cameraThrottleMs = 400;
-
-  /// True when the camera is following the user. Set to false when the user
-  /// manually pans/zooms the map; reset to true when they tap the recenter button.
-  bool _isFollowingUser = true;
-
-  /// True when the map bearing follows the user's heading. When false, north
-  /// is always up. Toggled via the orientation button.
-  bool _isHeadingUp = true;
 
   @override
   void initState() {
     super.initState();
-    // Start navigation + location services immediately
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref
           .read(navigationProvider.notifier)
@@ -66,27 +48,18 @@ class _NavigationPageState extends ConsumerState<NavigationPage> {
             routeResponse: widget.routeResponse,
             routePoints: widget.routePoints,
           );
-      // Request permission and start GPS tracking
       ref.read(liveLocationProvider.notifier).requestPermissionAndStart();
     });
   }
 
-  // Stored subscriptions so we can cancel them before dispose
-  ProviderSubscription<UserLocation?>? _locationSubscription;
   ProviderSubscription<NavigationState?>? _navSubscription;
 
   @override
   void dispose() {
-    // Cancel subscriptions BEFORE super.dispose to prevent ref usage
-    // after the widget is unmounted
-    _locationSubscription?.close();
     _navSubscription?.close();
     _routeLineManager?.deleteAll();
     _upcomingLineManager?.deleteAll();
     _waypointManager?.deleteAll();
-    _userPuckManager?.deleteAll();
-    _headingIndicatorManager?.deleteAll();
-    // Clear navigation state when leaving
     ref.read(navigationProvider.notifier).stopNavigation();
     super.dispose();
   }
@@ -94,27 +67,40 @@ class _NavigationPageState extends ConsumerState<NavigationPage> {
   @override
   Widget build(BuildContext context) {
     final navState = ref.watch(navigationProvider);
-    final locPermission = ref
-        .watch(liveLocationProvider.notifier)
-        .permissionStatus;
-    final userLoc = ref.watch(liveLocationProvider);
 
     if (navState == null) {
-      return Scaffold(body: Center(child: CircularProgressIndicator()));
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
     return Scaffold(
       body: Stack(
         children: [
-          // Full-screen map
           MapWidget(onMapCreated: _onMapCreated),
 
-          // Location permission banner (shown over everything)
-          if (locPermission == LocationPermissionStatus.denied ||
-              locPermission == LocationPermissionStatus.permanentlyDenied)
-            _PermissionBanner(
-              isPermanentlyDenied:
-                  locPermission == LocationPermissionStatus.permanentlyDenied,
+          // Shared user location overlay (puck + recenter + orientation toggle)
+          if (_mapInitialized)
+            UserLocationOverlay(
+              mapboxMap: _mapboxMap,
+              onLocationUpdate: (loc) {
+                if (!navState.isPreviewMode) {
+                  ref.read(navigationProvider.notifier).updateUserLocation(loc);
+                }
+              },
+              zoomProvider: () {
+                final ns = ref.read(navigationProvider);
+                return ns?.speedBasedZoom;
+              },
+              pitchProvider: () {
+                final ns = ref.read(navigationProvider);
+                return ns?.speedBasedPitch;
+              },
+              cameraPadding: MbxEdgeInsets(
+                top: 280,
+                bottom: 140,
+                left: 32,
+                right: 32,
+              ),
+              extraControl: _PreviewToggle(navState: navState),
             ),
 
           // Top: instruction card
@@ -122,40 +108,6 @@ class _NavigationPageState extends ConsumerState<NavigationPage> {
 
           // Bottom: ETA bar
           _EtaBar(navState: navState),
-
-          // Navigation controls FAB cluster (bottom-right, above ETA bar)
-          if (userLoc != null)
-            Positioned(
-              right: 16,
-              bottom: 90,
-              child: SafeArea(
-                top: false,
-                child: _NavigationControls(
-                  navState: navState,
-                  isFollowingUser: _isFollowingUser,
-                  isHeadingUp: _isHeadingUp,
-                  onRecenter: () {
-                    setState(() => _isFollowingUser = true);
-                    // Immediately fly to user location
-                    final loc = ref.read(liveLocationProvider);
-                    if (loc != null) {
-                      final updatedNavState = ref.read(navigationProvider);
-                      if (updatedNavState != null) {
-                        _updateLiveCamera(updatedNavState, loc);
-                      }
-                    }
-                  },
-                  onToggleOrientation: () {
-                    setState(() => _isHeadingUp = !_isHeadingUp);
-                  },
-                  onTogglePreview: () {
-                    ref.read(navigationProvider.notifier).togglePreviewMode();
-                    // Switching to preview also re-enables following
-                    setState(() => _isFollowingUser = true);
-                  },
-                ),
-              ),
-            ),
         ],
       ),
     );
@@ -163,53 +115,11 @@ class _NavigationPageState extends ConsumerState<NavigationPage> {
 
   Future<void> _onMapCreated(MapboxMap mapboxMap) async {
     _mapboxMap = mapboxMap;
+    if (!mounted) return;
+    setState(() => _mapInitialized = true);
+
     await _drawRoute();
     await _setupMapStyle();
-
-    // Create annotation managers for user puck + heading indicator
-    _userPuckManager ??= await _mapboxMap.annotations
-        .createCircleAnnotationManager(id: 'nav-user-puck');
-    _headingIndicatorManager ??= await _mapboxMap.annotations
-        .createPolylineAnnotationManager(id: 'nav-heading-indicator');
-
-    // Pre-create puck + heading annotations so we can update them in-place
-    // (avoids deleteAll+create flicker on every GPS tick)
-    await _ensurePuckAnnotations();
-
-    // Detect user gestures: pause camera following when the user pans/zooms
-    _mapboxMap.setOnMapMoveListener((context) {
-      if (_isFollowingUser) {
-        setState(() => _isFollowingUser = false);
-      }
-    });
-    _mapboxMap.setOnMapZoomListener((context) {
-      if (_isFollowingUser) {
-        setState(() => _isFollowingUser = false);
-      }
-    });
-
-    // Listen for live location updates (GPS + compass fused)
-    _locationSubscription = ref.listenManual<UserLocation?>(
-      liveLocationProvider,
-      (prev, next) {
-        if (!mounted) return;
-        if (next != null) {
-          _updateUserPuck(next);
-          // Feed location to navigation provider for auto-advance
-          final navState = ref.read(navigationProvider);
-          if (navState != null && !navState.isPreviewMode) {
-            ref.read(navigationProvider.notifier).updateUserLocation(next);
-          }
-          // Update camera in live mode (only if following user)
-          final updatedNavState = ref.read(navigationProvider);
-          if (updatedNavState != null &&
-              !updatedNavState.isPreviewMode &&
-              _isFollowingUser) {
-            _updateLiveCamera(updatedNavState, next);
-          }
-        }
-      },
-    );
 
     // Listen for navigation state changes to update the upcoming segment
     _navSubscription = ref.listenManual<NavigationState?>(navigationProvider, (
@@ -259,151 +169,6 @@ class _NavigationPageState extends ConsumerState<NavigationPage> {
     } catch (_) {
       // Terrain/sky setup is optional; navigation still works without it
     }
-  }
-
-  /// Pre-create puck and heading annotations so they can be updated
-  /// in-place (avoids flicker from delete+create on every GPS tick).
-  Future<void> _ensurePuckAnnotations() async {
-    if (_userPuckManager == null || _headingIndicatorManager == null) return;
-
-    if (_puckAnnotation == null) {
-      _puckAnnotation = await _userPuckManager!.create(
-        CircleAnnotationOptions(
-          geometry: Point(coordinates: Position(0, 0)),
-          circleRadius: 10.0,
-          circleColor: const Color(0xFF2196F3).value,
-          circleStrokeColor: Colors.white.value,
-          circleStrokeWidth: 4.0,
-        ),
-      );
-    }
-
-    // 3 polylines: shaft + left arm + right arm
-    if (_headingAnnotations.length < 3) {
-      _headingAnnotations.clear();
-      final created = await _headingIndicatorManager!.createMulti([
-        PolylineAnnotationOptions(
-          geometry: LineString(coordinates: [Position(0, 0), Position(0, 0)]),
-          lineColor: const Color(0xFF2196F3).value,
-          lineWidth: 5.0,
-          lineOpacity: 0.9,
-        ),
-        PolylineAnnotationOptions(
-          geometry: LineString(coordinates: [Position(0, 0), Position(0, 0)]),
-          lineColor: const Color(0xFF2196F3).value,
-          lineWidth: 4.0,
-          lineOpacity: 0.8,
-        ),
-        PolylineAnnotationOptions(
-          geometry: LineString(coordinates: [Position(0, 0), Position(0, 0)]),
-          lineColor: const Color(0xFF2196F3).value,
-          lineWidth: 4.0,
-          lineOpacity: 0.8,
-        ),
-      ]);
-      _headingAnnotations.addAll(created);
-    }
-  }
-
-  /// Update the user's position puck on the map (smooth, no flicker).
-  Future<void> _updateUserPuck(UserLocation loc) async {
-    if (_userPuckManager == null || _headingIndicatorManager == null) return;
-    if (_puckAnnotation == null || _headingAnnotations.length < 3) return;
-
-    final userPoint = Point(coordinates: Position(loc.longitude, loc.latitude));
-
-    // Update puck position in-place
-    _puckAnnotation!.geometry = userPoint;
-    await _userPuckManager!.update(_puckAnnotation!);
-
-    // Compute heading arrow geometry
-    final headingRad = loc.heading * math.pi / 180;
-    const arrowLengthMeters = 25.0;
-    const metersPerDegree = 111320.0;
-    final tailLatDelta = arrowLengthMeters / metersPerDegree;
-    final tailLngDelta =
-        arrowLengthMeters /
-        (metersPerDegree * math.cos(loc.latitude * math.pi / 180));
-
-    final tailLat = loc.latitude - tailLatDelta * math.cos(headingRad);
-    final tailLng = loc.longitude - tailLngDelta * math.sin(headingRad);
-
-    const armLengthMeters = 8.0;
-    final armLatDelta = armLengthMeters / metersPerDegree;
-    final armLngDelta =
-        armLengthMeters /
-        (metersPerDegree * math.cos(loc.latitude * math.pi / 180));
-    const armAngle = 0.4;
-
-    final leftArmLat =
-        tailLat -
-        armLatDelta * math.cos(headingRad - armAngle) +
-        armLatDelta * math.cos(headingRad);
-    final leftArmLng =
-        tailLng -
-        armLngDelta * math.sin(headingRad - armAngle) +
-        armLngDelta * math.sin(headingRad);
-    final rightArmLat =
-        tailLat -
-        armLatDelta * math.cos(headingRad + armAngle) +
-        armLatDelta * math.cos(headingRad);
-    final rightArmLng =
-        tailLng -
-        armLngDelta * math.sin(headingRad + armAngle) +
-        armLngDelta * math.sin(headingRad);
-
-    // Update heading polylines in-place
-    final shaftLine = LineString(
-      coordinates: [
-        Position(tailLng, tailLat),
-        Position(loc.longitude, loc.latitude),
-      ],
-    );
-    _headingAnnotations[0]!.geometry = shaftLine;
-    await _headingIndicatorManager!.update(_headingAnnotations[0]!);
-
-    final leftLine = LineString(
-      coordinates: [
-        Position(tailLng, tailLat),
-        Position(leftArmLng, leftArmLat),
-      ],
-    );
-    _headingAnnotations[1]!.geometry = leftLine;
-    await _headingIndicatorManager!.update(_headingAnnotations[1]!);
-
-    final rightLine = LineString(
-      coordinates: [
-        Position(tailLng, tailLat),
-        Position(rightArmLng, rightArmLat),
-      ],
-    );
-    _headingAnnotations[2]!.geometry = rightLine;
-    await _headingIndicatorManager!.update(_headingAnnotations[2]!);
-  }
-
-  /// Update camera to follow user in live mode with heading-up orientation.
-  Future<void> _updateLiveCamera(
-    NavigationState navState,
-    UserLocation loc,
-  ) async {
-    final now = DateTime.now();
-    if (now.difference(_lastCameraUpdate).inMilliseconds < _cameraThrottleMs) {
-      return;
-    }
-    _lastCameraUpdate = now;
-
-    final userPoint = Point(coordinates: Position(loc.longitude, loc.latitude));
-
-    await _mapboxMap.flyTo(
-      CameraOptions(
-        center: userPoint,
-        zoom: navState.speedBasedZoom,
-        bearing: _isHeadingUp ? loc.heading : 0.0,
-        pitch: navState.speedBasedPitch,
-        padding: MbxEdgeInsets(top: 280, bottom: 140, left: 32, right: 32),
-      ),
-      MapAnimationOptions(duration: 300, startDelay: 0),
-    );
   }
 
   /// Update camera for preview mode — position at the current maneuver start.
@@ -549,175 +314,36 @@ class _NavigationPageState extends ConsumerState<NavigationPage> {
   }
 }
 
-/// Location permission request banner — shown when location is not granted.
-class _PermissionBanner extends ConsumerWidget {
-  final bool isPermanentlyDenied;
+/// Preview mode toggle button — passed as [UserLocationOverlay.extraControl].
+class _PreviewToggle extends ConsumerWidget {
+  final NavigationState navState;
 
-  const _PermissionBanner({required this.isPermanentlyDenied});
+  const _PreviewToggle({required this.navState});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Positioned.fill(
-      child: Container(
-        color: Colors.black.withValues(alpha: 0.8),
-        child: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(32),
-            child: Material(
-              elevation: 8,
-              borderRadius: BorderRadius.circular(20),
-              color: Theme.of(context).colorScheme.surface,
-              child: Padding(
-                padding: const EdgeInsets.all(24),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      PhosphorIcons.mapPinLine(),
-                      size: 48,
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      'Location Access Required',
-                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      isPermanentlyDenied
-                          ? 'Location permission was permanently denied. Please enable it in your device settings to use turn-by-turn navigation.'
-                          : 'Turn-by-turn navigation requires access to your location. Please grant the permission to continue.',
-                      textAlign: TextAlign.center,
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    FilledButton.icon(
-                      onPressed: () {
-                        ref
-                            .read(liveLocationProvider.notifier)
-                            .requestPermissionAndStart();
-                      },
-                      icon: Icon(PhosphorIcons.navigationArrow()),
-                      label: Text(
-                        isPermanentlyDenied
-                            ? 'Open Settings'
-                            : 'Grant Permission',
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-/// Navigation controls cluster — recenter button + orientation toggle + preview toggle.
-/// Google Maps-style vertical stack on the right side of the map.
-class _NavigationControls extends StatelessWidget {
-  final NavigationState navState;
-  final bool isFollowingUser;
-  final bool isHeadingUp;
-  final VoidCallback onRecenter;
-  final VoidCallback onToggleOrientation;
-  final VoidCallback onTogglePreview;
-
-  const _NavigationControls({
-    required this.navState,
-    required this.isFollowingUser,
-    required this.isHeadingUp,
-    required this.onRecenter,
-    required this.onToggleOrientation,
-    required this.onTogglePreview,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        // Recenter / follow button
-        _NavControlButton(
-          icon: isFollowingUser
-              ? PhosphorIcons.navigationArrow()
-              : PhosphorIcons.crosshair(),
-          tooltip: isFollowingUser ? 'Following' : 'Re-center',
-          isActive: isFollowingUser,
-          onPressed: onRecenter,
-        ),
-        const SizedBox(height: 8),
-        // Orientation toggle (heading-up vs north-up)
-        _NavControlButton(
-          icon: isHeadingUp
-              ? PhosphorIcons.compass()
-              : PhosphorIcons.compassRose(),
-          tooltip: isHeadingUp ? 'Heading up' : 'North up',
-          isActive: isHeadingUp,
-          onPressed: onToggleOrientation,
-        ),
-        const SizedBox(height: 8),
-        // Preview mode toggle
-        _NavControlButton(
-          icon: navState.isPreviewMode
-              ? PhosphorIcons.navigationArrow()
-              : PhosphorIcons.eye(),
-          tooltip: navState.isPreviewMode ? 'Live mode' : 'Preview mode',
-          isActive: navState.isPreviewMode,
-          onPressed: onTogglePreview,
-          activeColor: theme.colorScheme.tertiaryContainer,
-        ),
-      ],
-    );
-  }
-}
-
-/// Individual button in the navigation controls cluster.
-class _NavControlButton extends StatelessWidget {
-  final IconData icon;
-  final String tooltip;
-  final bool isActive;
-  final VoidCallback onPressed;
-  final Color? activeColor;
-
-  const _NavControlButton({
-    required this.icon,
-    required this.tooltip,
-    required this.onPressed,
-    this.isActive = false,
-    this.activeColor,
-  });
-
-  @override
-  Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
     return Material(
       elevation: 4,
       borderRadius: BorderRadius.circular(28),
-      color: isActive
-          ? (activeColor ?? theme.colorScheme.primaryContainer)
+      color: navState.isPreviewMode
+          ? theme.colorScheme.tertiaryContainer
           : theme.colorScheme.surface,
       shadowColor: Colors.black.withValues(alpha: 0.15),
       child: InkWell(
         customBorder: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(28),
         ),
-        onTap: onPressed,
+        onTap: () {
+          ref.read(navigationProvider.notifier).togglePreviewMode();
+        },
         child: Padding(
           padding: const EdgeInsets.all(12),
           child: Icon(
-            icon,
+            navState.isPreviewMode ? Icons.navigation : Icons.visibility,
             size: 22,
-            color: isActive
+            color: navState.isPreviewMode
                 ? theme.colorScheme.primary
                 : theme.colorScheme.onSurfaceVariant,
           ),

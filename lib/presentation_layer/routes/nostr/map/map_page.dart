@@ -9,6 +9,7 @@ import 'route_provider.dart';
 import 'route_panel.dart';
 import 'route_fab.dart';
 import 'route_summary_sheet.dart';
+import 'user_location_overlay.dart';
 import 'valhalla_routing_service.dart';
 
 class MapPage extends ConsumerStatefulWidget {
@@ -20,6 +21,7 @@ class MapPage extends ConsumerStatefulWidget {
 
 class _MapPageState extends ConsumerState<MapPage> {
   late MapboxMap _mapboxMap;
+  bool _mapInitialized = false;
 
   // Route annotation managers
   PolylineAnnotationManager? _routeLineManager;
@@ -106,6 +108,13 @@ class _MapPageState extends ConsumerState<MapPage> {
             // ),
             onMapCreated: _onMapCreated,
           ),
+          // User location overlay (puck + recenter + heading toggle)
+          if (_mapInitialized)
+            UserLocationOverlay(
+              mapboxMap: _mapboxMap,
+              defaultZoom: 16.0,
+              defaultPitch: 0.0,
+            ),
           // Route planning panel (top of map)
           const RoutePanel(),
           // Location details bottom sheet
@@ -313,6 +322,8 @@ class _MapPageState extends ConsumerState<MapPage> {
 
   Future<void> _onMapCreated(MapboxMap mapboxMap) async {
     _mapboxMap = mapboxMap;
+    if (!mounted) return;
+    setState(() => _mapInitialized = true);
     // Tap on POI features → get name/category directly from map data
     _mapboxMap.addInteraction(TapInteraction(StandardPOIs(), _onPoiTap));
     // Tap on empty map area → get raw coordinates
