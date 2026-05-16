@@ -119,10 +119,8 @@ dependencies:
   ur:
     path: ../ndk/packages/bc_ur
   mapbox_maps_flutter: ^2.23.1
-  
-
-  
-
+  geolocator: ^14.0.2
+  flutter_compass: ^0.8.1
 
 dependency_overrides:
   ur:

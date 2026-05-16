@@ -50,6 +50,10 @@
     <string>Microphone access is used to record videos and send them in posts</string>
     <key>NSPhotoLibraryUsageDescription</key>
     <string>Photo access is used to add account profile, include pictures in posts</string>
+    <key>NSLocationWhenInUseUsageDescription</key>
+    <string>Location is required for turn-by-turn navigation</string>
+    <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+    <string>Location is required for turn-by-turn navigation</string>
     <key>UIApplicationSceneManifest</key>
     <dict>
         <key>UIApplicationSupportsMultipleScenes</key>
