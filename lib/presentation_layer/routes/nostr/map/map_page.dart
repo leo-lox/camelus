@@ -311,12 +311,34 @@ class _MapPageState extends ConsumerState<MapPage> {
     );
   }
 
-  void _onMapCreated(MapboxMap mapboxMap) {
+  Future<void> _onMapCreated(MapboxMap mapboxMap) async {
     _mapboxMap = mapboxMap;
     // Tap on POI features → get name/category directly from map data
     _mapboxMap.addInteraction(TapInteraction(StandardPOIs(), _onPoiTap));
     // Tap on empty map area → get raw coordinates
     _mapboxMap.addInteraction(TapInteraction.onMap(_onMapTap));
+
+    // Enable 3D terrain
+    await _mapboxMap.style.setStyleTerrain(
+      '{"source": "mapbox-dem", "exaggeration": 1.5}',
+    );
+    await _mapboxMap.style.addSource(
+      RasterDemSource(
+        id: 'mapbox-dem',
+        url: 'mapbox://mapbox.mapbox-terrain-dem-v1',
+        tileSize: 514,
+        maxzoom: 14,
+      ),
+    );
+
+    await _mapboxMap.style.addLayer(
+      SkyLayer(
+        id: 'sky-layer',
+        skyType: SkyType.ATMOSPHERE,
+        skyAtmosphereSun: [0.0, 0.0],
+        skyAtmosphereSunIntensity: 15.0,
+      ),
+    );
   }
 
   void _onPoiTap(
