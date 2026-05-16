@@ -28,6 +28,7 @@ import '../routes/nostr/lists/edit_list_page.dart';
 import '../routes/nostr/lists/lists_page.dart';
 import '../routes/nostr/map/map_page.dart';
 import '../routes/nostr/map/navigation_page.dart';
+import '../routes/nostr/map/route_provider.dart';
 import '../routes/nostr/map/valhalla_routing_service.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 import '../routes/nostr/onboarding/onboarding.dart';
@@ -273,6 +274,10 @@ final routes = [
                     routeResponse:
                         extra['routeResponse'] as ValhallaRouteResponse,
                     routePoints: extra['routePoints'] as List<Point>,
+                    travelMode:
+                        extra['travelMode'] as TravelMode? ?? TravelMode.auto,
+                    waypoints:
+                        extra['waypoints'] as List<RouteWaypoint>? ?? const [],
                   );
                 },
               ),

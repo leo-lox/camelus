@@ -160,6 +160,8 @@ class RouteSummarySheet extends ConsumerWidget {
                             extra: {
                               'routeResponse': response,
                               'routePoints': routePoints,
+                              'travelMode': routeState.travelMode,
+                              'waypoints': routeState.waypoints,
                             },
                           );
                         },

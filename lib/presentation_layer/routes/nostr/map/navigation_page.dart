@@ -5,6 +5,7 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import 'live_location_provider.dart';
 import 'navigation_provider.dart';
+import 'route_provider.dart';
 import 'user_location_overlay.dart';
 import 'valhalla_routing_service.dart';
 
@@ -19,11 +20,15 @@ import 'valhalla_routing_service.dart';
 class NavigationPage extends ConsumerStatefulWidget {
   final ValhallaRouteResponse routeResponse;
   final List<Point> routePoints;
+  final TravelMode travelMode;
+  final List<RouteWaypoint> waypoints;
 
   const NavigationPage({
     super.key,
     required this.routeResponse,
     required this.routePoints,
+    this.travelMode = TravelMode.auto,
+    this.waypoints = const [],
   });
 
   @override
@@ -47,6 +52,8 @@ class _NavigationPageState extends ConsumerState<NavigationPage> {
           .startNavigation(
             routeResponse: widget.routeResponse,
             routePoints: widget.routePoints,
+            travelMode: widget.travelMode,
+            originalWaypoints: widget.waypoints,
           );
       ref.read(liveLocationProvider.notifier).requestPermissionAndStart();
     });
@@ -83,7 +90,15 @@ class _NavigationPageState extends ConsumerState<NavigationPage> {
               mapboxMap: _mapboxMap,
               onLocationUpdate: (loc) {
                 if (!navState.isPreviewMode) {
-                  ref.read(navigationProvider.notifier).updateUserLocation(loc);
+                  // Schedule in a microtask to avoid mutating provider
+                  // state while another provider listener is still firing.
+                  Future.microtask(() {
+                    if (mounted) {
+                      ref
+                          .read(navigationProvider.notifier)
+                          .updateUserLocation(loc);
+                    }
+                  });
                 }
               },
               zoomProvider: () {
@@ -102,6 +117,9 @@ class _NavigationPageState extends ConsumerState<NavigationPage> {
               ),
               extraControl: _PreviewToggle(navState: navState),
             ),
+
+          // Recalculation banner
+          if (navState.isRecalculating) const _RecalculatingBanner(),
 
           // Top: instruction card
           _InstructionCard(navState: navState),
@@ -138,6 +156,10 @@ class _NavigationPageState extends ConsumerState<NavigationPage> {
                 next.currentManeuverIndex != prev.currentManeuverIndex)) {
           _updatePreviewCamera(next);
         }
+        // When recalculation finishes, redraw the route polyline
+        if (prev != null && prev.isRecalculating && !next.isRecalculating) {
+          _drawRouteFromState(next);
+        }
       }
     });
 
@@ -173,14 +195,15 @@ class _NavigationPageState extends ConsumerState<NavigationPage> {
 
   /// Update camera for preview mode — position at the current maneuver start.
   Future<void> _updatePreviewCamera(NavigationState? navState) async {
-    if (navState == null || widget.routePoints.isEmpty) return;
+    if (navState == null) return;
 
     final maneuver = navState.currentManeuver;
     if (maneuver == null) return;
 
+    final points = navState.routePoints;
     final segmentStart = maneuver.beginShapeIndex;
-    if (segmentStart < widget.routePoints.length) {
-      final targetPoint = widget.routePoints[segmentStart];
+    if (segmentStart < points.length) {
+      final targetPoint = points[segmentStart];
       await _mapboxMap.flyTo(
         CameraOptions(
           center: targetPoint,
@@ -192,7 +215,23 @@ class _NavigationPageState extends ConsumerState<NavigationPage> {
     }
   }
 
-  Future<void> _drawRoute() async {
+  /// Redraw the route polyline from the current navigation state.
+  /// Called after off-route recalculation completes.
+  Future<void> _drawRouteFromState(NavigationState navState) async {
+    await _drawRoute(
+      routePoints: navState.routePoints,
+      routeResponse: navState.routeResponse,
+    );
+    _updateUpcomingSegment(navState);
+  }
+
+  Future<void> _drawRoute({
+    List<Point>? routePoints,
+    ValhallaRouteResponse? routeResponse,
+  }) async {
+    final points = routePoints ?? widget.routePoints;
+    final response = routeResponse ?? widget.routeResponse;
+
     _routeLineManager ??= await _mapboxMap.annotations
         .createPolylineAnnotationManager(id: 'nav-route-line');
     _upcomingLineManager ??= await _mapboxMap.annotations
@@ -200,7 +239,6 @@ class _NavigationPageState extends ConsumerState<NavigationPage> {
     _waypointManager ??= await _mapboxMap.annotations
         .createCircleAnnotationManager(id: 'nav-waypoints');
 
-    final points = widget.routePoints;
     if (points.isEmpty) return;
 
     // Draw the full route in a muted color
@@ -239,7 +277,7 @@ class _NavigationPageState extends ConsumerState<NavigationPage> {
     );
 
     // Intermediate waypoints (start of each leg after the first)
-    final legs = widget.routeResponse.legs;
+    final legs = response.legs;
     if (legs.length > 1) {
       int pointOffset = 0;
       for (int legIndex = 1; legIndex < legs.length; legIndex++) {
@@ -346,6 +384,52 @@ class _PreviewToggle extends ConsumerWidget {
             color: navState.isPreviewMode
                 ? theme.colorScheme.primary
                 : theme.colorScheme.onSurfaceVariant,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Banner shown at the top when a route recalculation is in progress.
+class _RecalculatingBanner extends StatelessWidget {
+  const _RecalculatingBanner();
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return SafeArea(
+      bottom: false,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
+        child: Material(
+          elevation: 4,
+          borderRadius: BorderRadius.circular(12),
+          color: theme.colorScheme.tertiaryContainer,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                SizedBox(
+                  width: 18,
+                  height: 18,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: theme.colorScheme.onTertiaryContainer,
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Text(
+                  'Recalculating route…',
+                  style: theme.textTheme.labelLarge?.copyWith(
+                    color: theme.colorScheme.onTertiaryContainer,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
