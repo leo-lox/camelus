@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_compass/flutter_compass.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -8,10 +9,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 class UserLocation {
   final double latitude;
   final double longitude;
+
   /// Heading in degrees, 0 = North, clockwise. Fused from compass + GPS.
   final double heading;
+
   /// Speed in meters per second.
   final double speed;
+
   /// Horizontal accuracy in meters.
   final double accuracy;
   final DateTime timestamp;
@@ -117,12 +121,30 @@ class LiveLocationNotifier extends Notifier<UserLocation?> {
     // Start compass stream first (it's fast to init)
     _startCompassStream();
 
+    late LocationSettings locationSettings;
+    if (defaultTargetPlatform == TargetPlatform.android) {
+      locationSettings = AndroidSettings(
+        accuracy: LocationAccuracy.bestForNavigation,
+        distanceFilter: 0,
+
+        forceLocationManager: true,
+        foregroundNotificationConfig: const ForegroundNotificationConfig(
+          notificationText:
+              "Example app will continue to receive your location even when you aren't using it",
+          notificationTitle: "Running in Background",
+          enableWakeLock: true,
+        ),
+      );
+    } else {
+      locationSettings = const LocationSettings(
+        accuracy: LocationAccuracy.bestForNavigation,
+      );
+    }
+
     // Get initial position for an immediate fix
     try {
       final initial = await Geolocator.getCurrentPosition(
-        locationSettings: const LocationSettings(
-          accuracy: LocationAccuracy.high,
-        ),
+        locationSettings: locationSettings,
       );
       _lastPosition = initial;
       _emitFusedLocation();
@@ -131,20 +153,16 @@ class LiveLocationNotifier extends Notifier<UserLocation?> {
     }
 
     // Start continuous position stream
-    _positionSub = Geolocator.getPositionStream(
-      locationSettings: const LocationSettings(
-        accuracy: LocationAccuracy.high,
-        distanceFilter: 3, // ~3 meters of movement
-      ),
-    ).listen(
-      (position) {
-        _lastPosition = position;
-        _emitFusedLocation();
-      },
-      onError: (_) {
-        // Position stream errors are non-fatal; keep compass running
-      },
-    );
+    _positionSub =
+        Geolocator.getPositionStream(locationSettings: locationSettings).listen(
+          (position) {
+            _lastPosition = position;
+            _emitFusedLocation();
+          },
+          onError: (_) {
+            // Position stream errors are non-fatal; keep compass running
+          },
+        );
   }
 
   void _startCompassStream() {
