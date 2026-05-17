@@ -491,20 +491,20 @@ class _UserLocationOverlayState extends ConsumerState<UserLocationOverlay>
 
     final userPoint = Point(coordinates: Position(loc.longitude, loc.latitude));
 
-    await widget.mapboxMap.flyTo(
+    await widget.mapboxMap.easeTo(
       CameraOptions(
         center: userPoint,
         zoom: zoom,
         bearing: _isHeadingUp ? loc.heading : 0.0,
         pitch: pitch,
-        padding:
-            widget.cameraPadding ??
-            MbxEdgeInsets(
-              top: MediaQuery.of(context).padding.top + 16,
-              left: 16,
-              bottom: 16,
-              right: 80,
-            ),
+        // padding:
+        //     widget.cameraPadding ??
+        //     MbxEdgeInsets(
+        //       top: MediaQuery.of(context).padding.top + 16,
+        //       left: 16,
+        //       bottom: 16,
+        //       right: 80,
+        //     ),
       ),
       MapAnimationOptions(duration: 300, startDelay: 0),
     );
