@@ -71,7 +71,8 @@ class UserLocationOverlay extends ConsumerStatefulWidget {
       _UserLocationOverlayState();
 }
 
-class _UserLocationOverlayState extends ConsumerState<UserLocationOverlay> {
+class _UserLocationOverlayState extends ConsumerState<UserLocationOverlay>
+    with TickerProviderStateMixin {
   // Annotation managers
   CircleAnnotationManager? _userPuckManager;
   PolylineAnnotationManager? _headingIndicatorManager;
@@ -79,6 +80,19 @@ class _UserLocationOverlayState extends ConsumerState<UserLocationOverlay> {
   // Annotation instances for smooth in-place updates (no flicker)
   CircleAnnotation? _puckAnnotation;
   final List<PolylineAnnotation?> _headingAnnotations = [];
+
+  // Smooth interpolation between GPS fixes
+  late final AnimationController _puckAnimController;
+  double _fromLat = 0.0;
+  double _fromLng = 0.0;
+  double _fromHeading = 0.0;
+  double _toLat = 0.0;
+  double _toLng = 0.0;
+  double _toHeading = 0.0;
+  double _displayLat = 0.0;
+  double _displayLng = 0.0;
+  double _displayHeading = 0.0;
+  static const _puckAnimDurationMs = 500;
 
   // Camera state
   DateTime _lastCameraUpdate = DateTime.fromMillisecondsSinceEpoch(0);
@@ -96,6 +110,10 @@ class _UserLocationOverlayState extends ConsumerState<UserLocationOverlay> {
   @override
   void initState() {
     super.initState();
+    _puckAnimController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: _puckAnimDurationMs),
+    )..addListener(_onPuckAnimTick);
     // Request permission and start GPS tracking on first frame
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(liveLocationProvider.notifier).requestPermissionAndStart();
@@ -121,6 +139,7 @@ class _UserLocationOverlayState extends ConsumerState<UserLocationOverlay> {
 
   @override
   void dispose() {
+    _puckAnimController.dispose();
     _locationSubscription?.close();
     _userPuckManager?.deleteAll();
     _headingIndicatorManager?.deleteAll();
@@ -294,41 +313,98 @@ class _UserLocationOverlayState extends ConsumerState<UserLocationOverlay> {
   }
 
   // ---------------------------------------------------------------------------
+  // Smooth puck interpolation
+  // ---------------------------------------------------------------------------
+
+  void _onPuckAnimTick() {
+    final t = Curves.easeOutSine.transform(_puckAnimController.value);
+    // Lerping angles requires wrapping to handle 350→10 correctly.
+    final dHeading = _toHeading - _fromHeading;
+    final shortestAngle = (dHeading + 540) % 360 - 180;
+    _displayLat = _fromLat + (_toLat - _fromLat) * t;
+    _displayLng = _fromLng + (_toLng - _fromLng) * t;
+    _displayHeading = _fromHeading + shortestAngle * t;
+    _renderPuck(_displayLat, _displayLng, _displayHeading);
+  }
+
+  /// Snap the puck immediately to a location (no animation),
+  /// used for the very first fix and after recentering.
+  void _snapPuck(double lat, double lng, double heading) {
+    _displayLat = lat;
+    _displayLng = lng;
+    _displayHeading = heading;
+    _fromLat = lat;
+    _fromLng = lng;
+    _fromHeading = heading;
+    _toLat = lat;
+    _toLng = lng;
+    _toHeading = heading;
+    _puckAnimController.stop();
+    _renderPuck(lat, lng, heading);
+  }
+
+  void _animatePuckTo(double lat, double lng, double heading) {
+    _fromLat = _displayLat;
+    _fromLng = _displayLng;
+    _fromHeading = _displayHeading;
+    _toLat = lat;
+    _toLng = lng;
+    _toHeading = heading;
+    _puckAnimController.forward(from: 0);
+  }
+
+  // ---------------------------------------------------------------------------
   // Puck
   // ---------------------------------------------------------------------------
 
   Future<void> _updateUserPuck(UserLocation loc) async {
+    if (_puckAnnotation == null || _headingAnnotations.length < 3) {
+      // Annotations not ready yet — snap when they become available
+      _snapPuck(loc.latitude, loc.longitude, loc.heading);
+      return;
+    }
+
+    // First fix ever — just snap (nothing to interpolate from)
+    if (_puckAnimController.status == AnimationStatus.dismissed &&
+        _displayLat == 0.0 &&
+        _displayLng == 0.0) {
+      _snapPuck(loc.latitude, loc.longitude, loc.heading);
+      return;
+    }
+
+    _animatePuckTo(loc.latitude, loc.longitude, loc.heading);
+  }
+
+  /// Actually move the annotation objects to the given position.
+  Future<void> _renderPuck(double lat, double lng, double heading) async {
     if (_puckAnnotation == null || _headingAnnotations.length < 3) return;
 
-    final userPoint = Point(coordinates: Position(loc.longitude, loc.latitude));
+    final userPoint = Point(coordinates: Position(lng, lat));
 
     // Update puck dot in-place
     _puckAnnotation!.geometry = userPoint;
     try {
       await _userPuckManager!.update(_puckAnnotation!);
     } catch (_) {
-      // Annotation was removed from the map (e.g. style change) — recreate
       await _recreateAnnotations();
       return;
     }
 
     // Compute heading arrow geometry
-    final headingRad = loc.heading * math.pi / 180;
+    final headingRad = heading * math.pi / 180;
     const arrowLengthMeters = 25.0;
     const metersPerDegree = 111320.0;
     final tailLatDelta = arrowLengthMeters / metersPerDegree;
     final tailLngDelta =
-        arrowLengthMeters /
-        (metersPerDegree * math.cos(loc.latitude * math.pi / 180));
+        arrowLengthMeters / (metersPerDegree * math.cos(lat * math.pi / 180));
 
-    final tailLat = loc.latitude - tailLatDelta * math.cos(headingRad);
-    final tailLng = loc.longitude - tailLngDelta * math.sin(headingRad);
+    final tailLat = lat - tailLatDelta * math.cos(headingRad);
+    final tailLng = lng - tailLngDelta * math.sin(headingRad);
 
     const armLengthMeters = 8.0;
     final armLatDelta = armLengthMeters / metersPerDegree;
     final armLngDelta =
-        armLengthMeters /
-        (metersPerDegree * math.cos(loc.latitude * math.pi / 180));
+        armLengthMeters / (metersPerDegree * math.cos(lat * math.pi / 180));
     const armAngle = 0.4;
 
     final leftArmLat =
@@ -353,10 +429,7 @@ class _UserLocationOverlayState extends ConsumerState<UserLocationOverlay> {
       final LineString geom;
       if (i == 0) {
         geom = LineString(
-          coordinates: [
-            Position(tailLng, tailLat),
-            Position(loc.longitude, loc.latitude),
-          ],
+          coordinates: [Position(tailLng, tailLat), Position(lng, lat)],
         );
       } else if (i == 1) {
         geom = LineString(
@@ -441,6 +514,7 @@ class _UserLocationOverlayState extends ConsumerState<UserLocationOverlay> {
     setState(() => _isFollowingUser = true);
     final loc = ref.read(liveLocationProvider);
     if (loc != null) {
+      _snapPuck(loc.latitude, loc.longitude, loc.heading);
       _lastCameraUpdate = DateTime.fromMillisecondsSinceEpoch(0);
       _lastHeadingUpdate = DateTime.fromMillisecondsSinceEpoch(0);
       await _updateCamera(loc);
