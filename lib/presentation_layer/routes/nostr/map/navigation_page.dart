@@ -90,15 +90,7 @@ class _NavigationPageState extends ConsumerState<NavigationPage> {
               mapboxMap: _mapboxMap,
               onLocationUpdate: (loc) {
                 if (!navState.isPreviewMode) {
-                  // Schedule in a microtask to avoid mutating provider
-                  // state while another provider listener is still firing.
-                  Future.microtask(() {
-                    if (mounted) {
-                      ref
-                          .read(navigationProvider.notifier)
-                          .updateUserLocation(loc);
-                    }
-                  });
+                  ref.read(navigationProvider.notifier).updateUserLocation(loc);
                 }
               },
               zoomProvider: () {

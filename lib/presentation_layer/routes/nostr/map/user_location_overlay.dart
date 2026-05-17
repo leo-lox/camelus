@@ -237,6 +237,18 @@ class _UserLocationOverlayState extends ConsumerState<UserLocationOverlay> {
     }
   }
 
+  /// Recreate annotations after they were removed from the map
+  /// (e.g. due to a style change). Clears cached references and re-adds them.
+  Future<void> _recreateAnnotations() async {
+    _puckAnnotation = null;
+    _headingAnnotations.clear();
+    // Annotation managers may also be invalid after a style change
+    _userPuckManager = null;
+    _headingIndicatorManager = null;
+    await _createAnnotationManagers();
+    await _ensurePuckAnnotations();
+  }
+
   void _setupGestureListeners() {
     widget.mapboxMap.setOnMapMoveListener((context) {
       if (_isFollowingUser) {
@@ -292,7 +304,13 @@ class _UserLocationOverlayState extends ConsumerState<UserLocationOverlay> {
 
     // Update puck dot in-place
     _puckAnnotation!.geometry = userPoint;
-    await _userPuckManager!.update(_puckAnnotation!);
+    try {
+      await _userPuckManager!.update(_puckAnnotation!);
+    } catch (_) {
+      // Annotation was removed from the map (e.g. style change) — recreate
+      await _recreateAnnotations();
+      return;
+    }
 
     // Compute heading arrow geometry
     final headingRad = loc.heading * math.pi / 180;
@@ -331,29 +349,38 @@ class _UserLocationOverlayState extends ConsumerState<UserLocationOverlay> {
         armLngDelta * math.sin(headingRad);
 
     // Update polylines in-place
-    _headingAnnotations[0]!.geometry = LineString(
-      coordinates: [
-        Position(tailLng, tailLat),
-        Position(loc.longitude, loc.latitude),
-      ],
-    );
-    await _headingIndicatorManager!.update(_headingAnnotations[0]!);
-
-    _headingAnnotations[1]!.geometry = LineString(
-      coordinates: [
-        Position(tailLng, tailLat),
-        Position(leftArmLng, leftArmLat),
-      ],
-    );
-    await _headingIndicatorManager!.update(_headingAnnotations[1]!);
-
-    _headingAnnotations[2]!.geometry = LineString(
-      coordinates: [
-        Position(tailLng, tailLat),
-        Position(rightArmLng, rightArmLat),
-      ],
-    );
-    await _headingIndicatorManager!.update(_headingAnnotations[2]!);
+    for (int i = 0; i < 3; i++) {
+      final LineString geom;
+      if (i == 0) {
+        geom = LineString(
+          coordinates: [
+            Position(tailLng, tailLat),
+            Position(loc.longitude, loc.latitude),
+          ],
+        );
+      } else if (i == 1) {
+        geom = LineString(
+          coordinates: [
+            Position(tailLng, tailLat),
+            Position(leftArmLng, leftArmLat),
+          ],
+        );
+      } else {
+        geom = LineString(
+          coordinates: [
+            Position(tailLng, tailLat),
+            Position(rightArmLng, rightArmLat),
+          ],
+        );
+      }
+      _headingAnnotations[i]!.geometry = geom;
+      try {
+        await _headingIndicatorManager!.update(_headingAnnotations[i]!);
+      } catch (_) {
+        await _recreateAnnotations();
+        return;
+      }
+    }
   }
 
   // ---------------------------------------------------------------------------

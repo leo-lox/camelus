@@ -126,6 +126,7 @@ class LiveLocationNotifier extends Notifier<UserLocation?> {
       locationSettings = AndroidSettings(
         accuracy: LocationAccuracy.bestForNavigation,
         distanceFilter: 0,
+        intervalDuration: const Duration(milliseconds: 800),
 
         forceLocationManager: true,
         foregroundNotificationConfig: const ForegroundNotificationConfig(
@@ -137,6 +138,8 @@ class LiveLocationNotifier extends Notifier<UserLocation?> {
       );
     } else {
       locationSettings = const LocationSettings(
+        distanceFilter: 0,
+
         accuracy: LocationAccuracy.bestForNavigation,
       );
     }
