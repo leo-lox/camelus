@@ -28,7 +28,7 @@ class OnboardingLoginAmberPage extends ConsumerStatefulWidget {
 
 class _OnboardingLoginAmberPageState
     extends ConsumerState<OnboardingLoginAmberPage> {
-  final amber = Amberflutter();
+  final amber = Nip55Signer();
   bool _amberInstalled = false;
 
   bool _termsAndConditions = false;

@@ -9,14 +9,15 @@ import 'package:go_router/go_router.dart';
 import 'package:ndk/data_layer/repositories/signers/nip46_event_signer.dart';
 import 'package:ndk/ndk.dart';
 import 'package:ndk_flutter/ndk_flutter.dart';
-import 'package:nip07_event_signer/nip07_event_signer.dart';
+import 'package:nip07_event_signer/nip07_event_signer.dart'
+    hide Nip07EventSigner;
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import '../../l10n/app_localizations.dart';
 import '../../presentation_layer/providers/signer_provider.dart';
 import '../entities/stored_account.dart';
 
 /// This class is used to store and retrive user information from secure storage. \
-/// the storage keys [nostrKeys] and [amber] are used to store the user's keypair and amber public key respectively.
+/// the storage keys [nostrKeys] and [nip55Signer] are used to store the user's keypair and amber public key respectively.
 class AppAuth {
   static const accountStorageKey = kDebugMode
       ? "DEV_storedAccounts"
@@ -26,60 +27,59 @@ class AppAuth {
       : "activeAccountPubkey";
 
   static FlutterSecureStorage secureStorage = const FlutterSecureStorage();
-  static final amber = Amberflutter();
+  static final nip55Signer = Nip55Signer();
 
   /// logs in with amber and sets the storage flag for amber
-  static Future<AmberEventSigner> amberRegister() async {
+  static Future<Nip55EventSigner> amberRegister() async {
     final amberSigner = await _amberRegisterPopup();
     await secureStorage.write(key: "amber", value: amberSigner.publicKey);
 
     return amberSigner;
   }
 
-  static Future<AmberEventSigner> _amberRegisterPopup() async {
-    final installed = await amber.isAppInstalled();
+  static Future<Nip55EventSigner> _amberRegisterPopup() async {
+    final installed = await nip55Signer.isAppInstalled();
     if (!installed) {
-      throw Exception('Amber is not installed');
+      throw Exception('Nip55Signer is not installed');
     }
-    final amberValue = await amber.getPublicKey(
+    final amberValue = await nip55Signer.getPublicKey(
       permissions: [
-        const Permission(type: "nip04_encrypt"),
-        const Permission(type: "nip04_decrypt"),
-        const Permission(type: "nip44_encrypt"),
-        const Permission(type: "nip44_decrypt"),
-        const Permission(type: "sign_event", kind: 0),
-        const Permission(type: "sign_event", kind: 1),
-        const Permission(type: "sign_event", kind: 2),
-        const Permission(type: "sign_event", kind: 3),
-        const Permission(type: "sign_event", kind: 4),
-        const Permission(type: "sign_event", kind: 5),
-        const Permission(type: "sign_event", kind: 6),
-        const Permission(type: "sign_event", kind: 7),
+        const Nip55Permission(type: "nip04_encrypt"),
+        const Nip55Permission(type: "nip04_decrypt"),
+        const Nip55Permission(type: "nip44_encrypt"),
+        const Nip55Permission(type: "nip44_decrypt"),
+        const Nip55Permission(type: "sign_event", kind: 0),
+        const Nip55Permission(type: "sign_event", kind: 1),
+        const Nip55Permission(type: "sign_event", kind: 2),
+        const Nip55Permission(type: "sign_event", kind: 3),
+        const Nip55Permission(type: "sign_event", kind: 4),
+        const Nip55Permission(type: "sign_event", kind: 5),
+        const Nip55Permission(type: "sign_event", kind: 6),
+        const Nip55Permission(type: "sign_event", kind: 7),
         // nip 65
-        const Permission(type: "sign_event", kind: 10002),
+        const Nip55Permission(type: "sign_event", kind: 10002),
       ],
     );
 
     final npub = amberValue['signature'] ?? '';
     final pubkeyHex = Nip19.decode(npub);
 
-    final amberFlutterDS = AmberFlutterDS(amber);
-    final amberSigner = AmberEventSigner(
+    final amberSigner = Nip55EventSigner(
       publicKey: pubkeyHex,
-      amberFlutterDS: amberFlutterDS,
+      nip55Signer: nip55Signer,
     );
     return amberSigner;
   }
 
-  static Future<AmberEventSigner> _amberLogin(String amberPubkey) async {
-    final installed = await amber.isAppInstalled();
+  static Future<Nip55EventSigner> _amberLogin(String amberPubkey) async {
+    final installed = await nip55Signer.isAppInstalled();
     if (!installed) {
       throw Exception('Amber is not installed');
     }
-    final amberFlutterDS = AmberFlutterDS(amber);
-    final amberSigner = AmberEventSigner(
+
+    final amberSigner = Nip55EventSigner(
       publicKey: amberPubkey,
-      amberFlutterDS: amberFlutterDS,
+      nip55Signer: nip55Signer,
     );
     return amberSigner;
   }
@@ -118,6 +118,7 @@ class AppAuth {
 
         try {
           final signer = Nip46EventSigner(
+            eventSignerFactory: Bip340EventSignerFactory(),
             connection: startupAccountData.account!.bunkerConnection!,
             requests: ndk.requests,
             broadcast: ndk.broadcast,

@@ -80,7 +80,8 @@ dependencies:
   #amberflutter: ^0.0.9
   intl: any
   app_links: ^7.0.0
-  phosphor_flutter: ^2.1.0
+  #phosphor_flutter: ^2.1.0
+  phosphoricons_flutter: ^1.0.0
 
   # ndk imports
   ndk: ^0.8.2-dev.5
@@ -132,18 +133,18 @@ dependency_overrides:
        ref: tmp/camelus/1-10-0
 
   ndk:
-    #path: ../ndk/packages/ndk
-     git:
-       url: https://github.com/relaystr/ndk.git
-       path: packages/ndk
-       ref: tmp/camelus/1-10-0
+    path: ../ndk/packages/ndk
+    #  git:
+    #    url: https://github.com/relaystr/ndk.git
+    #    path: packages/ndk
+    #    ref: tmp/camelus/1-10-0
     
   ndk_flutter:
-    #path: ../ndk/packages/ndk_flutter
-     git:
-       url: https://github.com/relaystr/ndk.git
-       path: packages/ndk_flutter
-       ref: tmp/camelus/1-10-0
+    path: ../ndk/packages/ndk_flutter
+    #  git:
+    #    url: https://github.com/relaystr/ndk.git
+    #    path: packages/ndk_flutter
+    #    ref: tmp/camelus/1-10-0
   nip07_event_signer:
     #path: ../ndk/packages/nip07_event_signer
      git:
