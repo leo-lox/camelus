@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
 class IconPattern extends StatelessWidget {
   final BorderRadiusGeometry? borderRadius;
@@ -29,10 +29,10 @@ class IconPattern extends StatelessWidget {
             final col = index % 5;
 
             final icons = [
-              PhosphorIcons.house(),
-              PhosphorIcons.users(),
-              PhosphorIcons.personSimpleTaiChi(),
-              PhosphorIcons.personSimple(),
+              PhosphorIcons.house,
+              PhosphorIcons.users,
+              PhosphorIcons.personSimpleTaiChi,
+              PhosphorIcons.personSimple,
             ];
 
             return Positioned(

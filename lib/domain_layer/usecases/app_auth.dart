@@ -11,7 +11,7 @@ import 'package:ndk/ndk.dart';
 import 'package:ndk_flutter/ndk_flutter.dart';
 import 'package:nip07_event_signer/nip07_event_signer.dart'
     hide Nip07EventSigner;
-import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 import '../../l10n/app_localizations.dart';
 import '../../presentation_layer/providers/signer_provider.dart';
 import '../entities/stored_account.dart';
@@ -236,7 +236,7 @@ class AppAuth {
         filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
         child: AlertDialog(
           icon: Icon(
-            PhosphorIcons.lockKey(),
+            PhosphorIcons.lockKey,
             size: 48,
             color: Theme.of(context).colorScheme.primary,
           ),

@@ -2,7 +2,7 @@ import 'package:camelus/presentation_layer/atoms/long_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
 import 'package:ndk/entities.dart' as ndk_entities;
 
@@ -185,7 +185,7 @@ class WalletPaySummary extends ConsumerWidget {
                         SizedBox(width: 4),
                         IconButton(
                           icon: Icon(
-                            PhosphorIcons.notePencil(),
+                            PhosphorIcons.notePencil,
                             size: 24,
                             color: Theme.of(
                               context,
@@ -244,7 +244,7 @@ class WalletPaySummary extends ConsumerWidget {
                               .toList(),
                           onTap: (_) {},
                           tralling: IconButton(
-                            icon: Icon(PhosphorIcons.notePencil(), size: 25),
+                            icon: Icon(PhosphorIcons.notePencil, size: 25),
                             color: Theme.of(context).colorScheme.primary,
                             onPressed: () async {
                               final selectedId =
@@ -362,7 +362,7 @@ class WalletPaySummary extends ConsumerWidget {
           ),
           if (isEditable && onEdit != null)
             IconButton(
-              icon: Icon(PhosphorIcons.notePencil(), size: 25),
+              icon: Icon(PhosphorIcons.notePencil, size: 25),
               color: Theme.of(context).colorScheme.primary,
               onPressed: isEditable ? onEdit : null,
             ),

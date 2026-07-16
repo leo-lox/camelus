@@ -12,7 +12,7 @@ import 'package:flutter_list_view/flutter_list_view.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 import '../providers/notification_settings_provider.dart';
@@ -62,7 +62,7 @@ class _NotificationPageState extends ConsumerState<NotificationPage>
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Icon(
-                PhosphorIcons.userCircle(),
+                PhosphorIcons.userCircle,
                 size: 64,
                 color: Theme.of(context).colorScheme.primary,
               ),
@@ -399,7 +399,7 @@ class _NotificationPageState extends ConsumerState<NotificationPage>
     switch (notification.type) {
       case NotificationTypeFeed.reaction:
         if (notification.sourceNote.content == '+') {
-          icon = PhosphorIcons.heart(PhosphorIconsStyle.bold);
+          icon = PhosphorIcons.heartBold;
           iconColor = Theme.of(context).colorScheme.error;
         } else {
           return Text(
@@ -409,7 +409,7 @@ class _NotificationPageState extends ConsumerState<NotificationPage>
         }
 
       case NotificationTypeFeed.reply:
-        icon = PhosphorIcons.arrowBendUpLeft();
+        icon = PhosphorIcons.arrowBendUpLeft;
         iconColor = Theme.of(context).colorScheme.primary;
         break;
 
@@ -423,11 +423,11 @@ class _NotificationPageState extends ConsumerState<NotificationPage>
           ),
         );
       case NotificationTypeFeed.mention:
-        icon = PhosphorIcons.at();
+        icon = PhosphorIcons.at;
         iconColor = Colors.orange;
         break;
       default:
-        icon = PhosphorIcons.question();
+        icon = PhosphorIcons.question;
         iconColor = Theme.of(context).colorScheme.primary;
         break;
     }

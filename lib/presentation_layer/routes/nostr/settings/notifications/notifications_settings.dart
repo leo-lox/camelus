@@ -2,7 +2,7 @@ import 'package:camelus/l10n/app_localizations.dart';
 import 'package:camelus/presentation_layer/providers/notification_settings_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
 class NotificationsSettingsPage extends ConsumerWidget {
   const NotificationsSettingsPage({super.key});
@@ -18,7 +18,7 @@ class NotificationsSettingsPage extends ConsumerWidget {
         scrolledUnderElevation: 0,
         backgroundColor: Theme.of(context).colorScheme.surface,
         leading: IconButton(
-          icon: Icon(PhosphorIcons.arrowLeft()),
+          icon: Icon(PhosphorIcons.arrowLeft),
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text(l10n.pushNotifications),
@@ -37,7 +37,7 @@ class NotificationsSettingsPage extends ConsumerWidget {
                   Row(
                     children: [
                       Icon(
-                        PhosphorIcons.bell(),
+                        PhosphorIcons.bell,
                         color: Theme.of(context).colorScheme.primary,
                         size: 24,
                       ),
@@ -109,7 +109,7 @@ class NotificationsSettingsPage extends ConsumerWidget {
                         child: Row(
                           children: [
                             Icon(
-                              PhosphorIcons.warning(),
+                              PhosphorIcons.warning,
                               color: Colors.orangeAccent,
                               size: 16,
                             ),
@@ -142,20 +142,20 @@ class NotificationsSettingsPage extends ConsumerWidget {
                       children: [
                         if (state.syncSuccessVisible)
                           Icon(
-                            PhosphorIcons.checkCircle(),
+                            PhosphorIcons.checkCircle,
                             color: Theme.of(context).colorScheme.primary,
                             size: 18,
                           )
                         else if (state.syncError != null &&
                             state.syncError!.isNotEmpty)
                           Icon(
-                            PhosphorIcons.xCircle(),
+                            PhosphorIcons.xCircle,
                             color: Theme.of(context).colorScheme.error,
                             size: 18,
                           )
                         else
                           Icon(
-                            PhosphorIcons.clockCounterClockwise(),
+                            PhosphorIcons.clockCounterClockwise,
                             color: Theme.of(
                               context,
                             ).colorScheme.onSurfaceVariant,
@@ -209,7 +209,7 @@ class NotificationsSettingsPage extends ConsumerWidget {
                 Row(
                   children: [
                     Icon(
-                      PhosphorIcons.broadcast(),
+                      PhosphorIcons.broadcast,
                       size: 20,
                       color: Theme.of(context).colorScheme.primary,
                     ),
@@ -329,7 +329,7 @@ class NotificationsSettingsPage extends ConsumerWidget {
             child: Row(
               children: [
                 Icon(
-                  PhosphorIcons.faders(),
+                  PhosphorIcons.faders,
                   size: 20,
                   color: Theme.of(context).colorScheme.primary,
                 ),

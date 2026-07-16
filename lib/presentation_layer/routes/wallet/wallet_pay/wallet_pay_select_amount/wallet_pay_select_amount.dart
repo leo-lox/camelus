@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ndk/entities.dart' as ndk_entities;
-import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
 import '../../../../atoms/currency_picker_bar.dart';
 import '../../../../atoms/long_button.dart';
@@ -158,7 +158,7 @@ class _WalletPaySelectAmountState extends ConsumerState<WalletPaySelectAmount> {
                       .toList(),
                   onTap: (_) {},
                   tralling: IconButton(
-                    icon: Icon(PhosphorIcons.notePencil(), size: 25),
+                    icon: Icon(PhosphorIcons.notePencil, size: 25),
                     color: Theme.of(context).colorScheme.primary,
                     onPressed: () async {
                       final selectedId = await showWalletsSelectBottomSheet(

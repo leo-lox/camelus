@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
 import '../../providers/messaging/dm_relay_health_provider.dart';
 import 'dm_relay_debug.dart';
@@ -29,13 +29,13 @@ class DmRelayIndicator extends ConsumerWidget {
   PhosphorIconData _getStatusIcon(DmRelayHealthStatus status) {
     switch (status) {
       case DmRelayHealthStatus.excellent:
-        return PhosphorIcons.shieldCheck(PhosphorIconsStyle.regular);
+        return PhosphorIcons.shieldCheck;
       case DmRelayHealthStatus.degraded:
-        return PhosphorIcons.shieldWarning(PhosphorIconsStyle.regular);
+        return PhosphorIcons.shieldWarning;
       case DmRelayHealthStatus.poor:
-        return PhosphorIcons.shieldSlash(PhosphorIconsStyle.regular);
+        return PhosphorIcons.shieldSlash;
       case DmRelayHealthStatus.unknown:
-        return PhosphorIcons.shield(PhosphorIconsStyle.regular);
+        return PhosphorIcons.shield;
     }
   }
 }

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ndk/entities.dart' as ndk_entities;
-import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 class MintInfoCardSmall extends StatelessWidget {
@@ -113,7 +113,7 @@ class MintInfoCardSmall extends StatelessWidget {
                   child: Row(
                     children: [
                       Icon(
-                        PhosphorIcons.megaphone(),
+                        PhosphorIcons.megaphone,
                         size: 16,
                         color: Theme.of(context).colorScheme.primary,
                       ),
@@ -189,7 +189,7 @@ class MintInfoCardSmall extends StatelessWidget {
                     child: Row(
                       children: [
                         Icon(
-                          PhosphorIcons.userCircle(),
+                          PhosphorIcons.userCircle,
                           size: 14,
                           color: Theme.of(
                             context,
@@ -216,7 +216,7 @@ class MintInfoCardSmall extends StatelessWidget {
                 Row(
                   children: [
                     Icon(
-                      PhosphorIcons.link(),
+                      PhosphorIcons.link,
                       size: 16,
                       color: Theme.of(
                         context,
@@ -300,7 +300,7 @@ class MintInfoCardSmall extends StatelessWidget {
         borderRadius: BorderRadius.circular(8),
       ),
       child: Icon(
-        PhosphorIcons.bank(),
+        PhosphorIcons.bank,
         size: 24,
         color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
       ),

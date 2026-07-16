@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 import 'package:video_player/video_player.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 
@@ -119,12 +119,8 @@ class InlineVideoPlayer extends ConsumerWidget {
                                 padding: const EdgeInsets.all(12),
                                 child: Icon(
                                   videoState.isPlaying
-                                      ? PhosphorIcons.pause(
-                                          PhosphorIconsStyle.fill,
-                                        )
-                                      : PhosphorIcons.play(
-                                          PhosphorIconsStyle.fill,
-                                        ),
+                                      ? PhosphorIcons.pauseFill
+                                      : PhosphorIcons.playFill,
                                   color: theme.colorScheme.onSurface,
                                   size: 32,
                                 ),
@@ -230,7 +226,7 @@ class InlineVideoPlayer extends ConsumerWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Icon(
-                PhosphorIcons.arrowClockwise(),
+                PhosphorIcons.arrowClockwise,
                 color: theme.colorScheme.onSurface,
                 size: 28,
               ),
@@ -310,8 +306,8 @@ class _BottomControls extends StatelessWidget {
                   visualDensity: VisualDensity.compact,
                   icon: Icon(
                     videoState.volume == 0.0
-                        ? PhosphorIcons.speakerSlash(PhosphorIconsStyle.fill)
-                        : PhosphorIcons.speakerHigh(PhosphorIconsStyle.fill),
+                        ? PhosphorIcons.speakerSlashFill
+                        : PhosphorIcons.speakerHighFill,
                     color: theme.colorScheme.onSurface,
                   ),
                   onPressed: onMuteToggle,
@@ -320,7 +316,7 @@ class _BottomControls extends StatelessWidget {
                   iconSize: 20,
                   visualDensity: VisualDensity.compact,
                   icon: Icon(
-                    PhosphorIcons.cornersOut(),
+                    PhosphorIcons.cornersOut,
                     color: theme.colorScheme.onSurface,
                   ),
                   onPressed: onFullScreen,

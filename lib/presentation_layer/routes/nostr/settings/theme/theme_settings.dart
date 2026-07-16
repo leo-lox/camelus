@@ -2,7 +2,7 @@ import 'package:camelus/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
 import '../../../../providers/theme_provider.dart';
 
@@ -40,12 +40,12 @@ class ThemeSettingsPage extends ConsumerWidget {
               ),
             ),
             leading: Icon(
-              PhosphorIcons.circleHalf(),
+              PhosphorIcons.circleHalf,
               color: Theme.of(context).colorScheme.onSurface,
             ),
             trailing: themeState.mode == ThemeMode.system
                 ? Icon(
-                    PhosphorIcons.check(),
+                    PhosphorIcons.check,
                     color: Theme.of(context).colorScheme.primary,
                   )
                 : null,
@@ -63,12 +63,12 @@ class ThemeSettingsPage extends ConsumerWidget {
               ),
             ),
             leading: Icon(
-              PhosphorIcons.sun(),
+              PhosphorIcons.sun,
               color: Theme.of(context).colorScheme.onSurface,
             ),
             trailing: themeState.mode == ThemeMode.light
                 ? Icon(
-                    PhosphorIcons.check(),
+                    PhosphorIcons.check,
                     color: Theme.of(context).colorScheme.primary,
                   )
                 : null,
@@ -86,12 +86,12 @@ class ThemeSettingsPage extends ConsumerWidget {
               ),
             ),
             leading: Icon(
-              PhosphorIcons.moon(),
+              PhosphorIcons.moon,
               color: Theme.of(context).colorScheme.onSurface,
             ),
             trailing: themeState.mode == ThemeMode.dark
                 ? Icon(
-                    PhosphorIcons.check(),
+                    PhosphorIcons.check,
                     color: Theme.of(context).colorScheme.primary,
                   )
                 : null,
@@ -127,12 +127,12 @@ class ThemeSettingsPage extends ConsumerWidget {
               ),
             ),
             leading: Icon(
-              PhosphorIcons.circleHalf(),
+              PhosphorIcons.circleHalf,
               color: Theme.of(context).colorScheme.onSurface,
             ),
             trailing: themeState.type == ThemeType.system
                 ? Icon(
-                    PhosphorIcons.check(),
+                    PhosphorIcons.check,
                     color: Theme.of(context).colorScheme.primary,
                   )
                 : null,
@@ -150,12 +150,12 @@ class ThemeSettingsPage extends ConsumerWidget {
               ),
             ),
             leading: Icon(
-              PhosphorIcons.palette(),
+              PhosphorIcons.palette,
               color: Theme.of(context).colorScheme.onSurface,
             ),
             trailing: themeState.type == ThemeType.camelus
                 ? Icon(
-                    PhosphorIcons.check(),
+                    PhosphorIcons.check,
                     color: Theme.of(context).colorScheme.primary,
                   )
                 : null,
@@ -185,7 +185,7 @@ class ThemeSettingsPage extends ConsumerWidget {
             ),
             trailing: themeState.type == ThemeType.nostr
                 ? Icon(
-                    PhosphorIcons.check(),
+                    PhosphorIcons.check,
                     color: Theme.of(context).colorScheme.primary,
                   )
                 : null,
@@ -393,11 +393,7 @@ class _ColorOption extends StatelessWidget {
                   : null,
             ),
             child: isSelected
-                ? Icon(
-                    PhosphorIcons.check(PhosphorIconsStyle.bold),
-                    color: Colors.white,
-                    size: 30,
-                  )
+                ? Icon(PhosphorIcons.checkBold, color: Colors.white, size: 30)
                 : null,
           ),
           const SizedBox(height: 8),

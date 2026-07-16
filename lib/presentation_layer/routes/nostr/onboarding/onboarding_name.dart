@@ -3,7 +3,7 @@ import 'package:camelus/presentation_layer/atoms/long_button.dart';
 import 'package:camelus/domain_layer/entities/onboarding_user_info.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
 import '../../../components/responsive_center.dart';
 
@@ -64,7 +64,7 @@ class _OnboardingNameState extends ConsumerState<OnboardingName> {
                   alignment: Alignment.topLeft,
                   child: IconButton(
                     icon: Icon(
-                      PhosphorIcons.arrowLeft(),
+                      PhosphorIcons.arrowLeft,
                       color: Theme.of(context).colorScheme.onSurface,
                     ),
                     onPressed: () => widget.onPressedBack!(),

@@ -5,7 +5,7 @@ import 'package:camelus/presentation_layer/providers/wallet_settings_provider.da
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
 class SettingsPage extends ConsumerStatefulWidget {
   const SettingsPage({super.key});
@@ -51,55 +51,55 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
       body: ListView(
         children: [
           ListTile(
-            leading: PhosphorIcon(PhosphorIcons.translate()),
+            leading: PhosphorIcon(PhosphorIcons.translate),
             title: Text(AppLocalizations.of(context)!.languageSettings),
             onTap: () {
               context.push('/settings/locale');
             },
           ),
           ListTile(
-            leading: PhosphorIcon(PhosphorIcons.palette()),
+            leading: PhosphorIcon(PhosphorIcons.palette),
             title: Text(AppLocalizations.of(context)!.theme),
             onTap: () {
               context.push('/settings/theme');
             },
           ),
           ListTile(
-            leading: PhosphorIcon(PhosphorIcons.bell()),
+            leading: PhosphorIcon(PhosphorIcons.bell),
             title: Text(AppLocalizations.of(context)!.pushNotifications),
             onTap: () {
               context.push('/settings/notifications');
             },
           ),
           ListTile(
-            leading: PhosphorIcon(PhosphorIcons.cellSignalFull()),
+            leading: PhosphorIcon(PhosphorIcons.cellSignalFull),
             title: Text(AppLocalizations.of(context)!.relays),
             onTap: () {
               context.push('/settings/relays');
             },
           ),
           ListTile(
-            leading: PhosphorIcon(PhosphorIcons.wallet()),
+            leading: PhosphorIcon(PhosphorIcons.wallet),
             title: const Text('Wallet'),
             onTap: _navigateToWalletSettings,
           ),
 
           ListTile(
-            leading: PhosphorIcon(PhosphorIcons.house()),
+            leading: PhosphorIcon(PhosphorIcons.house),
             title: Text(AppLocalizations.of(context)!.initialRoute),
             onTap: () {
               _navigateToInitalRoute();
             },
           ),
           ListTile(
-            leading: PhosphorIcon(PhosphorIcons.shield()),
+            leading: PhosphorIcon(PhosphorIcons.shield),
             title: Text(AppLocalizations.of(context)!.moderation),
             onTap: () {
               context.push('/settings/moderation');
             },
           ),
           ListTile(
-            leading: PhosphorIcon(PhosphorIcons.hardDrives()),
+            leading: PhosphorIcon(PhosphorIcons.hardDrives),
             title: Text(AppLocalizations.of(context)!.fileServers),
             onTap: () {
               _navigateToFileServers();
@@ -107,7 +107,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
           ),
 
           ListTile(
-            leading: PhosphorIcon(PhosphorIcons.code()),
+            leading: PhosphorIcon(PhosphorIcons.code),
             title: const Text('Developer settings'),
             onTap: () {
               context.push('/settings/developer');
@@ -115,7 +115,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
           ),
           Divider(),
           ListTile(
-            leading: PhosphorIcon(PhosphorIcons.signOut()),
+            leading: PhosphorIcon(PhosphorIcons.signOut),
             title: Text(AppLocalizations.of(context)!.logout),
             onTap: () {
               _logout();

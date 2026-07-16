@@ -7,7 +7,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
+import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
 import '../../../../domain_layer/entities/feed_filter.dart';
 
@@ -173,7 +174,7 @@ class _HomePageMobileState extends ConsumerState<HomePageMobile>
             ? FloatingActionButton(
                 backgroundColor: Theme.of(context).colorScheme.onPrimary,
                 child: Icon(
-                  PhosphorIcons.plus(),
+                  PhosphorIcons.plus,
                   color: Theme.of(context).colorScheme.onSurface,
                   size: 27,
                 ),
@@ -182,7 +183,7 @@ class _HomePageMobileState extends ConsumerState<HomePageMobile>
             : FloatingActionButton(
                 backgroundColor: Theme.of(context).colorScheme.onPrimary,
                 child: Icon(
-                  PhosphorIcons.signIn(),
+                  PhosphorIcons.signIn,
                   color: Theme.of(context).colorScheme.onSurface,
                   size: 27,
                 ),
@@ -335,7 +336,7 @@ class MobileFeedHeader extends ConsumerWidget {
     // If no pubkey (read-only mode), show a login button
     if (pubkey == null) {
       return IconButton(
-        icon: Icon(PhosphorIcons.userCircle()),
+        icon: Icon(PhosphorIcons.userCircle),
         onPressed: () => context.push('/onboarding'),
       );
     }

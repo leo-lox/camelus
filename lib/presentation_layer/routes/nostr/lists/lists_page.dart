@@ -2,7 +2,7 @@ import 'package:camelus/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../../domain_layer/entities/nostr_list.dart';
@@ -31,7 +31,7 @@ class ListsPage extends ConsumerWidget {
         title: Text(AppLocalizations.of(context)!.lists),
         actions: [
           IconButton(
-            icon: Icon(PhosphorIcons.plus()),
+            icon: Icon(PhosphorIcons.plus),
             tooltip: AppLocalizations.of(context)!.createNewList,
             onPressed: () => _showCreateDialog(context, ref),
           ),
@@ -101,12 +101,12 @@ class _SelectListTypeDialog extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           ListTile(
-            leading: Icon(PhosphorIcons.users()),
+            leading: Icon(PhosphorIcons.users),
             title: Text(AppLocalizations.of(context)!.followSetKind),
             onTap: () => Navigator.of(context).pop(NostrList.followSet),
           ),
           ListTile(
-            leading: Icon(PhosphorIcons.newspaper()),
+            leading: Icon(PhosphorIcons.newspaper),
             title: Text(AppLocalizations.of(context)!.curationSetKind),
             onTap: () => Navigator.of(context).pop(NostrList.curationSet),
           ),
@@ -133,13 +133,13 @@ class _SelectPrivacyDialog extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           ListTile(
-            leading: Icon(PhosphorIcons.globe()),
+            leading: Icon(PhosphorIcons.globe),
             title: Text(AppLocalizations.of(context)!.publicList),
             subtitle: Text(AppLocalizations.of(context)!.publicListDescription),
             onTap: () => Navigator.of(context).pop(false),
           ),
           ListTile(
-            leading: Icon(PhosphorIcons.lock()),
+            leading: Icon(PhosphorIcons.lock),
             title: Text(AppLocalizations.of(context)!.privateList),
             subtitle: Text(
               AppLocalizations.of(context)!.privateListDescription,
@@ -171,7 +171,7 @@ class _EmptyListsState extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(
-            PhosphorIcons.listBullets(),
+            PhosphorIcons.listBullets,
             size: 64,
             color: Theme.of(
               context,

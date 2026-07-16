@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -211,7 +211,7 @@ class NostrSideMenu extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _drawerItem(
-                      icon: PhosphorIcons.house(),
+                      icon: PhosphorIcons.house,
                       label: AppLocalizations.of(context)!.routeHome,
                       routeName: '/home',
                       onTap: () {
@@ -223,7 +223,7 @@ class NostrSideMenu extends ConsumerWidget {
                     ),
                     if (!hideOnMobile)
                       _drawerItem(
-                        icon: PhosphorIcons.magnifyingGlass(),
+                        icon: PhosphorIcons.magnifyingGlass,
                         label: AppLocalizations.of(context)!.explore,
                         routeName: '/search',
                         onTap: () {
@@ -235,7 +235,7 @@ class NostrSideMenu extends ConsumerWidget {
                       ),
                     if (!hideOnMobile)
                       _drawerItem(
-                        icon: PhosphorIcons.bell(),
+                        icon: PhosphorIcons.bell,
                         label: AppLocalizations.of(context)!.routeNotifications,
                         routeName: '/notifications',
                         onTap: () {
@@ -247,7 +247,7 @@ class NostrSideMenu extends ConsumerWidget {
                       ),
                     if (!hideOnMobile && currentUserPubkey != null)
                       _drawerItem(
-                        icon: PhosphorIcons.chatCircle(),
+                        icon: PhosphorIcons.chatCircle,
                         label: AppLocalizations.of(context)!.messages,
                         routeName: '/messages',
                         badgeCount: dmUnreadCount,
@@ -262,7 +262,7 @@ class NostrSideMenu extends ConsumerWidget {
                       _drawerItem(
                         label: AppLocalizations.of(context)!.bookmarks,
                         routeName: '/bookmarks',
-                        icon: PhosphorIcons.bookmarkSimple(),
+                        icon: PhosphorIcons.bookmarkSimple,
                         onTap: () {
                           context.push('/bookmarks');
                         },
@@ -270,7 +270,7 @@ class NostrSideMenu extends ConsumerWidget {
                       _drawerItem(
                         label: AppLocalizations.of(context)!.lists,
                         routeName: '/lists',
-                        icon: PhosphorIcons.listBullets(),
+                        icon: PhosphorIcons.listBullets,
                         onTap: () {
                           context.push('/lists');
                         },
@@ -279,7 +279,7 @@ class NostrSideMenu extends ConsumerWidget {
                         label: AppLocalizations.of(context)!.profile,
                         routeName:
                             '/profile/${Nip19.encodePubKey(currentUserPubkey)}',
-                        icon: PhosphorIcons.user(),
+                        icon: PhosphorIcons.user,
                         onTap: () {
                           navigateToProfile(context, currentUserPubkey);
                         },
@@ -288,7 +288,7 @@ class NostrSideMenu extends ConsumerWidget {
                         _drawerItem(
                           label: AppLocalizations.of(context)!.payments,
                           routeName: '/wallet/dashboard',
-                          icon: PhosphorIcons.lightning(),
+                          icon: PhosphorIcons.lightning,
                           onTap: () {
                             context.push('/wallet/dashboard');
                           },
@@ -296,7 +296,7 @@ class NostrSideMenu extends ConsumerWidget {
                       _drawerItem(
                         label: AppLocalizations.of(context)!.blocklist,
                         routeName: '/blocked-users',
-                        icon: PhosphorIcons.yinYang(),
+                        icon: PhosphorIcons.yinYang,
                         onTap: () {
                           context.push('/blocked-users');
                         },
@@ -306,7 +306,7 @@ class NostrSideMenu extends ConsumerWidget {
                       _drawerItem(
                         label: AppLocalizations.of(context)!.login,
                         routeName: '/onboarding',
-                        icon: PhosphorIcons.signIn(),
+                        icon: PhosphorIcons.signIn,
                         onTap: () {
                           context.push('/onboarding');
                         },
@@ -406,8 +406,8 @@ class NostrSideMenu extends ConsumerWidget {
                   },
                   icon: Icon(
                     ref.watch(themeProvider).mode == ThemeMode.dark
-                        ? PhosphorIcons.moon()
-                        : PhosphorIcons.sun(),
+                        ? PhosphorIcons.moon
+                        : PhosphorIcons.sun,
                     color: Theme.of(context).colorScheme.primary,
                     size: 22,
                   ),
@@ -417,7 +417,7 @@ class NostrSideMenu extends ConsumerWidget {
                     onPressed: () {
                       openQrShareDialog(context, currentUserPubkey);
                     },
-                    icon: Icon(PhosphorIcons.qrCode()),
+                    icon: Icon(PhosphorIcons.qrCode),
                   ),
               ],
             ),

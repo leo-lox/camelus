@@ -3,7 +3,7 @@ import 'package:camelus/presentation_layer/components/note_card/nostr_parser.dar
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 import '../../../../domain_layer/entities/nostr_note.dart';
 import '../../../../domain_layer/entities/parsed_post.dart';
 import '../../../atoms/spinner_center.dart';
@@ -79,7 +79,7 @@ class _BookmarksPageState extends ConsumerState<BookmarksPage>
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
-              PhosphorIcons.bookmarkSimple(),
+              PhosphorIcons.bookmarkSimple,
               size: 64,
               color: Theme.of(context).colorScheme.outline,
             ),
@@ -111,7 +111,7 @@ class _BookmarksPageState extends ConsumerState<BookmarksPage>
             alignment: Alignment.centerRight,
             padding: const EdgeInsets.only(right: 20),
             child: Icon(
-              PhosphorIcons.trash(),
+              PhosphorIcons.trash,
               color: Colors.white,
             ), //! hard coded color
           ),
@@ -127,7 +127,7 @@ class _BookmarksPageState extends ConsumerState<BookmarksPage>
               //   child: Row(
               //     children: [
               //       Icon(
-              //         PhosphorIcons.clock(),
+              //         PhosphorIcons.clock,
               //         size: 14,
               //         color: Theme.of(context).colorScheme.outline,
               //       ),
@@ -194,7 +194,7 @@ class _BookmarksPageState extends ConsumerState<BookmarksPage>
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(PhosphorIcons.lock(), size: 16),
+                  Icon(PhosphorIcons.lock, size: 16),
                   const SizedBox(width: 8),
                   Text(AppLocalizations.of(context)!.privateBookmarks),
                   if (bookmarksState.privateBookmarks.isNotEmpty)
@@ -220,7 +220,7 @@ class _BookmarksPageState extends ConsumerState<BookmarksPage>
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(PhosphorIcons.globeHemisphereWest(), size: 16),
+                  Icon(PhosphorIcons.globeHemisphereWest, size: 16),
                   const SizedBox(width: 8),
                   Text(AppLocalizations.of(context)!.publicBookmarks),
                   if (bookmarksState.publicBookmarks.isNotEmpty)

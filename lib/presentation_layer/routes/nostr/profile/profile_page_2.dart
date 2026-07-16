@@ -6,7 +6,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ndk/ndk.dart' as ndk_entities;
-import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../domain_layer/entities/contact_list.dart';
@@ -524,7 +524,7 @@ class _DmButton extends ConsumerWidget {
           ),
         ),
         child: PhosphorIcon(
-          PhosphorIcons.chatCircle(PhosphorIconsStyle.regular),
+          PhosphorIcons.chatCircle,
           size: 25,
           color: Theme.of(context).colorScheme.onSurface,
         ),

@@ -1,6 +1,6 @@
 import 'package:camelus/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
 class SearchBarWidget extends StatefulWidget {
   final Function(String) onSearchChanged;
@@ -77,8 +77,8 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
                 widget.leading ??
                 IconButton(
                   icon: _searchFocusNode.hasFocus
-                      ? Icon(PhosphorIcons.arrowLeft())
-                      : Icon(PhosphorIcons.magnifyingGlass(), size: 23),
+                      ? Icon(PhosphorIcons.arrowLeft)
+                      : Icon(PhosphorIcons.magnifyingGlass, size: 23),
                   color: Theme.of(context).colorScheme.onSurface,
                   onPressed: () {
                     _searchController.clear();
@@ -127,7 +127,7 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
               width: 41,
               height: 41,
               child: IconButton(
-                icon: Icon(PhosphorIcons.question(), size: 23),
+                icon: Icon(PhosphorIcons.question, size: 23),
                 color: Theme.of(context).colorScheme.onSurface,
                 onPressed: () => widget.helpSearch(context),
               ),

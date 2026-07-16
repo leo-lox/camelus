@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
 import '../../../domain_layer/entities/nostr_list.dart';
 import '../../../l10n/app_localizations.dart';
@@ -193,7 +193,7 @@ class _PrivacyBadge extends StatelessWidget {
     final label = isPrivate
         ? AppLocalizations.of(context)!.privateList
         : AppLocalizations.of(context)!.publicList;
-    final icon = isPrivate ? PhosphorIcons.lock() : PhosphorIcons.globe();
+    final icon = isPrivate ? PhosphorIcons.lock : PhosphorIcons.globe;
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),

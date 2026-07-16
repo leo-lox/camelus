@@ -3,7 +3,7 @@ import 'package:camelus/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
 import 'package:ndk/shared/nips/nip19/nip19.dart';
 import '../../../domain_layer/entities/dm_conversation.dart';
@@ -64,7 +64,7 @@ class _DmListPageState extends ConsumerState<DmListPage>
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Icon(
-                PhosphorIcons.userCircle(),
+                PhosphorIcons.userCircle,
                 size: 64,
                 color: Theme.of(context).colorScheme.primary,
               ),
@@ -98,7 +98,7 @@ class _DmListPageState extends ConsumerState<DmListPage>
         actions: [
           IconButton(
             icon: Icon(
-              PhosphorIcons.pencilSimpleLine(),
+              PhosphorIcons.pencilSimpleLine,
               color: Theme.of(context).colorScheme.onSurface,
             ),
             onPressed: () => context.push('/messages/new'),
@@ -312,7 +312,7 @@ class _DmListPageState extends ConsumerState<DmListPage>
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(
-            PhosphorIcons.warning(),
+            PhosphorIcons.warning,
             size: 48,
             color: Theme.of(context).colorScheme.error,
           ),
@@ -359,7 +359,7 @@ class _DmListPageState extends ConsumerState<DmListPage>
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Icon(
-                      PhosphorIcons.chatCircle(),
+                      PhosphorIcons.chatCircle,
                       size: 64,
                       color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
@@ -387,7 +387,7 @@ class _DmListPageState extends ConsumerState<DmListPage>
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
-              PhosphorIcons.chatCircle(),
+              PhosphorIcons.chatCircle,
               size: 64,
               color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
@@ -442,7 +442,7 @@ class _NoteToSelfTile extends ConsumerWidget {
                 ),
               ),
               child: Icon(
-                PhosphorIcons.check(PhosphorIconsStyle.bold),
+                PhosphorIcons.checkBold,
                 color: Theme.of(context).colorScheme.onPrimary,
                 size: 10,
               ),

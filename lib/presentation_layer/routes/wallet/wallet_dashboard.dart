@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
 import '../../atoms/my_profile_picture.dart';
 import '../../components/drawer/nostr_drawer.dart';
@@ -76,7 +76,7 @@ class _WalletDashboardState extends ConsumerState<WalletDashboard>
         ),
         actions: [
           IconButton(
-            icon: Icon(PhosphorIcons.plusCircle(), size: 30),
+            icon: Icon(PhosphorIcons.plusCircle, size: 30),
             onPressed: () {
               context.push('/wallet/add_mint');
             },

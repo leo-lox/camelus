@@ -4,7 +4,7 @@ import 'package:camelus/presentation_layer/providers/ndk_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ndk/entities.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 class RelaysPage extends ConsumerStatefulWidget {
@@ -27,7 +27,7 @@ class _RelaysPageState extends ConsumerState<RelaysPage> {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-          icon: Icon(PhosphorIcons.arrowLeft()),
+          icon: Icon(PhosphorIcons.arrowLeft),
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text(AppLocalizations.of(context)!.relays),
@@ -84,7 +84,7 @@ class _RelaysPageState extends ConsumerState<RelaysPage> {
                                                   context,
                                                 ).colorScheme.inverseSurface,
                                                 child: Icon(
-                                                  PhosphorIcons.globe(),
+                                                  PhosphorIcons.globe,
                                                   color: Theme.of(context)
                                                       .colorScheme
                                                       .surfaceContainerHighest,
@@ -105,7 +105,7 @@ class _RelaysPageState extends ConsumerState<RelaysPage> {
                                         ),
                                       ),
                                       child: Icon(
-                                        PhosphorIcons.globe(),
+                                        PhosphorIcons.globe,
                                         color: Theme.of(
                                           context,
                                         ).colorScheme.surfaceContainerHighest,
@@ -142,8 +142,8 @@ class _RelaysPageState extends ConsumerState<RelaysPage> {
                               ),
                               Icon(
                                 relay.isConnected
-                                    ? PhosphorIcons.plugsConnected()
-                                    : PhosphorIcons.plugs(),
+                                    ? PhosphorIcons.plugsConnected
+                                    : PhosphorIcons.plugs,
                                 color: relay.isConnected
                                     ? Theme.of(context).colorScheme.primary
                                     : Colors.orangeAccent, //! hard coded color
@@ -159,13 +159,13 @@ class _RelaysPageState extends ConsumerState<RelaysPage> {
                             children: [
                               _StatItem(
                                 context: context,
-                                icon: PhosphorIcons.arrowDown(),
+                                icon: PhosphorIcons.arrowDown,
                                 label: AppLocalizations.of(context)!.eventsRead,
                                 value: relay.stats.eventsRead.toString(),
                               ),
                               _StatItem(
                                 context: context,
-                                icon: PhosphorIcons.arrowUp(),
+                                icon: PhosphorIcons.arrowUp,
                                 label: AppLocalizations.of(
                                   context,
                                 )!.eventsWritten,
@@ -173,7 +173,7 @@ class _RelaysPageState extends ConsumerState<RelaysPage> {
                               ),
                               _StatItem(
                                 context: context,
-                                icon: PhosphorIcons.lighthouse(),
+                                icon: PhosphorIcons.lighthouse,
                                 label: AppLocalizations.of(
                                   context,
                                 )!.connectionSource,

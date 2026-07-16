@@ -7,7 +7,7 @@ import 'package:flutter_list_view/flutter_list_view.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ndk/shared/nips/nip19/nip19.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
 import '../../../domain_layer/entities/direct_message.dart';
 import '../../atoms/my_profile_picture.dart';
@@ -101,7 +101,7 @@ class _DmThreadPageState extends ConsumerState<DmThreadPage> {
         backgroundColor: Theme.of(context).colorScheme.surface,
         leading: IconButton(
           icon: Icon(
-            PhosphorIcons.arrowLeft(),
+            PhosphorIcons.arrowLeft,
             color: Theme.of(context).colorScheme.onSurface,
           ),
           onPressed: () => context.pop(),
@@ -174,7 +174,7 @@ class _DmThreadPageState extends ConsumerState<DmThreadPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
-              PhosphorIcons.warning(),
+              PhosphorIcons.warning,
               size: 48,
               color: Theme.of(context).colorScheme.error,
             ),
@@ -295,7 +295,7 @@ class _DmThreadPageState extends ConsumerState<DmThreadPage> {
                 .read(dmThreadProvider(_peerPubkey).notifier)
                 .loadOlderMessages();
           },
-          icon: Icon(PhosphorIcons.arrowUp()),
+          icon: Icon(PhosphorIcons.arrowUp),
           label: Text(AppLocalizations.of(context)!.loadOlderMessages),
         ),
       ),
@@ -324,7 +324,7 @@ class _DmThreadPageState extends ConsumerState<DmThreadPage> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Icon(
-                PhosphorIcons.lock(),
+                PhosphorIcons.lock,
                 size: 14,
                 color: Theme.of(context).colorScheme.primary,
               ),
@@ -392,7 +392,7 @@ class _DmThreadPageState extends ConsumerState<DmThreadPage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Icon(
-                  PhosphorIcons.lock(),
+                  PhosphorIcons.lock,
                   size: 14,
                   color: Theme.of(context).colorScheme.primary,
                 ),
@@ -459,7 +459,7 @@ class _DmThreadPageState extends ConsumerState<DmThreadPage> {
           IconButton(
             onPressed: _sendMessage,
             icon: Icon(
-              PhosphorIcons.paperPlaneTilt(PhosphorIconsStyle.fill),
+              PhosphorIcons.paperPlaneTiltFill,
               color: Theme.of(context).colorScheme.primary,
             ),
           ),

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ndk/entities.dart' as ndk_entities;
-import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
 import '../../../../../domain_layer/entities/user_metadata.dart';
 
@@ -226,7 +226,7 @@ class WalletSelectReciever extends ConsumerWidget {
                       title: 'Lightning Address',
                       child: ListTile(
                         leading: Icon(
-                          PhosphorIcons.lightning(),
+                          PhosphorIcons.lightning,
                           color: Theme.of(context).colorScheme.primary,
                         ),
                         title: Text(state.searchQuery.trim()),

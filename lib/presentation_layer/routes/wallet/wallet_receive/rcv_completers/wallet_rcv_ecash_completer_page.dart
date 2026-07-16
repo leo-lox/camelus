@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
 import '../../../../../helpers/wallet_number_formatting.dart';
 import '../../../../atoms/long_button.dart';
@@ -119,22 +119,22 @@ class WalletReceiveEcashCompleterPage extends ConsumerWidget {
     String subtitle;
 
     if (state.isPending) {
-      icon = PhosphorIcons.hourglass();
+      icon = PhosphorIcons.hourglass;
       color = Theme.of(context).colorScheme.primary;
       title = 'Processing';
       subtitle = 'Receiving...';
     } else if (state.isError) {
-      icon = PhosphorIcons.warningCircle();
+      icon = PhosphorIcons.warningCircle;
       color = Theme.of(context).colorScheme.error;
       title = 'Failed';
       subtitle = 'transaction failed';
     } else if (state.isSuccess) {
-      icon = PhosphorIcons.checkCircle();
+      icon = PhosphorIcons.checkCircle;
       color = Colors.green;
       title = 'Success';
       subtitle = 'received successfully';
     } else {
-      icon = PhosphorIcons.info();
+      icon = PhosphorIcons.info;
       color = Colors.grey;
       title = 'Ready';
       subtitle = 'waiting for transaction';

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
 class WalletActionsStrip extends StatelessWidget {
   final void Function() onScan;
@@ -30,7 +30,7 @@ class WalletActionsStrip extends StatelessWidget {
               padding: const EdgeInsets.all(2),
               child: _actionButton(
                 context: context,
-                iconData: PhosphorIcons.barcode(),
+                iconData: PhosphorIcons.barcode,
                 onTab: () => onScan(),
                 text: "scan",
               ),
@@ -39,7 +39,7 @@ class WalletActionsStrip extends StatelessWidget {
               padding: const EdgeInsets.all(2),
               child: _actionButton(
                 context: context,
-                iconData: PhosphorIcons.wallet(),
+                iconData: PhosphorIcons.wallet,
                 onTab: () => onPay(),
                 text: "pay",
               ),
@@ -48,7 +48,7 @@ class WalletActionsStrip extends StatelessWidget {
               padding: const EdgeInsets.all(2),
               child: _actionButton(
                 context: context,
-                iconData: PhosphorIcons.piggyBank(),
+                iconData: PhosphorIcons.piggyBank,
                 onTab: () => onReceive(),
                 text: "receive",
               ),
@@ -57,7 +57,7 @@ class WalletActionsStrip extends StatelessWidget {
               padding: const EdgeInsets.all(2),
               child: _actionButton(
                 context: context,
-                iconData: PhosphorIcons.receipt(),
+                iconData: PhosphorIcons.receipt,
                 text: "history",
                 onTab: () => onHistory(),
               ),

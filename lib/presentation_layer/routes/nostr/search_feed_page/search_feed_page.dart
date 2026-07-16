@@ -1,7 +1,7 @@
 import 'package:camelus/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
 import '../../../../domain_layer/entities/feed_filter.dart';
 import '../../../components/generic_feed.dart';
@@ -113,7 +113,7 @@ class _SearchFeedPageState extends State<SearchFeedPage> {
               externalFocusNode: _searchFocusNode,
               externalController: _searchController,
               leading: IconButton(
-                icon: Icon(PhosphorIcons.arrowLeft()),
+                icon: Icon(PhosphorIcons.arrowLeft),
                 onPressed: () {
                   context.pop();
                 },

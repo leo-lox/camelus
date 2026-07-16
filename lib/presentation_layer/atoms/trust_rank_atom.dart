@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
 /// Visual indicator for a trust rank value.
 ///
@@ -104,15 +104,15 @@ enum _TrustLevel {
 PhosphorIconData _trustIcon(_TrustLevel level) {
   switch (level) {
     case _TrustLevel.untrusted:
-      return PhosphorIcons.shieldSlash(PhosphorIconsStyle.regular);
+      return PhosphorIcons.shieldSlash;
     case _TrustLevel.somewhatTrusted:
-      return PhosphorIcons.warning(PhosphorIconsStyle.regular);
+      return PhosphorIcons.warning;
     case _TrustLevel.okTrust:
-      return PhosphorIcons.shield(PhosphorIconsStyle.regular);
+      return PhosphorIcons.shield;
     case _TrustLevel.goodTrust:
-      return PhosphorIcons.shieldCheck(PhosphorIconsStyle.regular);
+      return PhosphorIcons.shieldCheck;
     case _TrustLevel.trusted:
-      return PhosphorIcons.shieldStar(PhosphorIconsStyle.regular);
+      return PhosphorIcons.shieldStar;
   }
 }
 

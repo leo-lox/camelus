@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
 import '../atoms/my_profile_picture.dart';
 import '../atoms/nip_05_text.dart';
@@ -66,7 +66,7 @@ class PersonSelect extends ConsumerWidget {
         children: [
           if (!isReorderMode)
             Icon(
-              selected ? PhosphorIcons.checkCircle() : PhosphorIcons.circle(),
+              selected ? PhosphorIcons.checkCircle : PhosphorIcons.circle,
               color: Theme.of(context).colorScheme.onSurface,
             ),
           if (isReorderMode)
@@ -76,7 +76,7 @@ class PersonSelect extends ConsumerWidget {
                 color: Colors.transparent,
                 height: 80,
                 width: 50,
-                child: Icon(PhosphorIcons.dotsSixVertical()),
+                child: Icon(PhosphorIcons.dotsSixVertical),
               ),
             ),
         ],

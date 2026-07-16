@@ -5,7 +5,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import '../../../domain_layer/entities/parsed_post.dart';
 import '../../routing/route_paths.dart';
@@ -157,7 +157,7 @@ class PostContentWidget extends ConsumerWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Icon(
-                        PhosphorIcons.warningOctagon(),
+                        PhosphorIcons.warningOctagon,
                         color: Theme.of(context).colorScheme.error,
                         size: 32,
                       ),
@@ -326,7 +326,7 @@ class SupressedVideoOverlay extends StatelessWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(PhosphorIcons.playCircle(), color: Colors.white, size: 26),
+            Icon(PhosphorIcons.playCircle, color: Colors.white, size: 26),
             const SizedBox(width: 10),
             const Text(
               'Currently playing in fullscreen',

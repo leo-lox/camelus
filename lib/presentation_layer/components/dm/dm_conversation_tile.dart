@@ -1,7 +1,7 @@
 import 'package:camelus/helpers/helpers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
 import '../../../domain_layer/entities/direct_message.dart';
 import '../../../domain_layer/entities/dm_conversation.dart';
@@ -115,19 +115,19 @@ class DmConversationTile extends ConsumerWidget {
     switch (sendStatus) {
       case MessageSendStatus.pending:
         return Icon(
-          PhosphorIcons.circleDashed(),
+          PhosphorIcons.circleDashed,
           size: 14,
           color: Theme.of(context).colorScheme.onSurfaceVariant,
         );
       case MessageSendStatus.failed:
         return Icon(
-          PhosphorIcons.xCircle(),
+          PhosphorIcons.xCircle,
           size: 14,
           color: Theme.of(context).colorScheme.error,
         );
       case MessageSendStatus.sent:
         return Icon(
-          PhosphorIcons.checkCircle(),
+          PhosphorIcons.checkCircle,
           size: 14,
           color: Theme.of(context).colorScheme.onSurfaceVariant,
         );

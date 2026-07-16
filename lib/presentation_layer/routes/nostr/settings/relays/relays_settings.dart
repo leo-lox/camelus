@@ -2,7 +2,7 @@ import 'package:camelus/l10n/app_localizations.dart';
 import 'package:camelus/domain_layer/entities/feed_filter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
 import '../../../../providers/generic_feed_provider.dart';
 import '../../../../providers/messaging/dm_relay_list_provider.dart';
@@ -293,7 +293,7 @@ class _Nip65RelaysSettingsState extends ConsumerState<Nip65RelaysSettings> {
           scrolledUnderElevation: 0,
           backgroundColor: Theme.of(context).colorScheme.surface,
           leading: IconButton(
-            icon: Icon(PhosphorIcons.arrowLeft()),
+            icon: Icon(PhosphorIcons.arrowLeft),
             onPressed: _onBackPressed,
           ),
           title: Text(l10n.relays),
@@ -313,7 +313,7 @@ class _Nip65RelaysSettingsState extends ConsumerState<Nip65RelaysSettings> {
                 child: Text(l10n.saveChanges),
               ),
             IconButton(
-              icon: Icon(PhosphorIcons.arrowClockwise()),
+              icon: Icon(PhosphorIcons.arrowClockwise),
               onPressed: (isSaving || hasUnsavedChanges) ? null : _refreshAll,
               tooltip: l10n.refresh,
             ),
@@ -332,7 +332,7 @@ class _Nip65RelaysSettingsState extends ConsumerState<Nip65RelaysSettings> {
               child: Row(
                 children: [
                   Icon(
-                    PhosphorIcons.info(),
+                    PhosphorIcons.info,
                     color: Theme.of(context).colorScheme.onPrimaryContainer,
                   ),
                   const SizedBox(width: 12),
@@ -394,7 +394,7 @@ class _Nip65RelaysSettingsState extends ConsumerState<Nip65RelaysSettings> {
                   const SizedBox(width: 12),
                   IconButton.filled(
                     onPressed: isSaving ? null : _addNip65Relay,
-                    icon: Icon(PhosphorIcons.plus()),
+                    icon: Icon(PhosphorIcons.plus),
                     tooltip: l10n.addRelay,
                   ),
                 ],
@@ -476,7 +476,7 @@ class _Nip65RelaysSettingsState extends ConsumerState<Nip65RelaysSettings> {
                   const SizedBox(width: 12),
                   IconButton.filled(
                     onPressed: isSaving ? null : _addDmRelay,
-                    icon: Icon(PhosphorIcons.plus()),
+                    icon: Icon(PhosphorIcons.plus),
                     tooltip: l10n.addRelay,
                   ),
                 ],
@@ -542,7 +542,7 @@ class _Nip65RelaysSettingsState extends ConsumerState<Nip65RelaysSettings> {
           borderRadius: BorderRadius.circular(8),
         ),
         child: Icon(
-          PhosphorIcons.globe(),
+          PhosphorIcons.globe,
           color: Theme.of(context).colorScheme.onPrimaryContainer,
         ),
       ),
@@ -583,7 +583,7 @@ class _Nip65RelaysSettingsState extends ConsumerState<Nip65RelaysSettings> {
       ),
       trailing: IconButton(
         icon: Icon(
-          PhosphorIcons.trash(),
+          PhosphorIcons.trash,
           color: Theme.of(context).colorScheme.error,
         ),
         onPressed: isSaving ? null : () => _removeNip65Relay(relay),
@@ -615,7 +615,7 @@ class _Nip65RelaysSettingsState extends ConsumerState<Nip65RelaysSettings> {
           borderRadius: BorderRadius.circular(8),
         ),
         child: Icon(
-          PhosphorIcons.globe(),
+          PhosphorIcons.globe,
           color: isPendingDeletion
               ? Theme.of(context).colorScheme.onSurfaceVariant
               : Theme.of(context).colorScheme.onPrimaryContainer,
@@ -642,8 +642,8 @@ class _Nip65RelaysSettingsState extends ConsumerState<Nip65RelaysSettings> {
       trailing: IconButton(
         icon: Icon(
           isPendingDeletion
-              ? PhosphorIcons.arrowCounterClockwise()
-              : PhosphorIcons.trash(),
+              ? PhosphorIcons.arrowCounterClockwise
+              : PhosphorIcons.trash,
           color: isPendingDeletion
               ? Theme.of(context).colorScheme.primary
               : Theme.of(context).colorScheme.error,

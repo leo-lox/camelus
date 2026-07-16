@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nip07_event_signer/nip07_event_signer.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../domain_layer/entities/stored_account.dart';
@@ -143,7 +143,7 @@ class _OnboardingLoginExtensionPageState
                   children: [
                     IconButton(
                       icon: Icon(
-                        PhosphorIcons.arrowLeft(),
+                        PhosphorIcons.arrowLeft,
                         color: colorScheme.onSurface,
                       ),
                       onPressed: () => widget.onPressedBack!(),
@@ -307,7 +307,7 @@ class _ExtensionCard extends StatelessWidget {
             Row(
               children: [
                 Icon(
-                  PhosphorIcons.puzzlePiece(),
+                  PhosphorIcons.puzzlePiece,
                   size: 18,
                   color: colorScheme.primary,
                 ),
@@ -339,7 +339,7 @@ class _ExtensionCard extends StatelessWidget {
             Row(
               children: [
                 Icon(
-                  PhosphorIcons.arrowSquareOut(),
+                  PhosphorIcons.arrowSquareOut,
                   size: 11,
                   color: colorScheme.primary,
                 ),

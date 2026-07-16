@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
 class CopyClipboardButton extends StatefulWidget {
   final String value;
@@ -31,7 +31,7 @@ class _CopyClipboardButtonState extends State<CopyClipboardButton> {
       child: ElevatedButton.icon(
         onPressed: _copied ? null : _copyToClipboard,
         icon: Icon(
-          _copied ? PhosphorIcons.check() : PhosphorIcons.copySimple(),
+          _copied ? PhosphorIcons.check : PhosphorIcons.copySimple,
         ),
         label: Text(_copied ? widget.copyDoneText : widget.copyText),
         style: ElevatedButton.styleFrom(

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 import 'dart:math' as math;
 
 class BottomActionRow extends StatefulWidget {
@@ -109,7 +109,7 @@ class _BottomActionRowState extends State<BottomActionRow>
           child: _buildActionButton(
             onTap: widget.onComment,
             icon: Icon(
-              PhosphorIcons.chatTeardropText(),
+              PhosphorIcons.chatTeardropText,
               size: BottomActionRow.iconSize,
               color: defaultColor,
             ),
@@ -129,7 +129,7 @@ class _BottomActionRowState extends State<BottomActionRow>
           child: _buildActionButton(
             onTap: widget.onShare,
             icon: Icon(
-              PhosphorIcons.share(),
+              PhosphorIcons.share,
               size: BottomActionRow.iconSize,
               color: defaultColor,
             ),
@@ -139,7 +139,7 @@ class _BottomActionRowState extends State<BottomActionRow>
           child: _buildActionButton(
             onTap: widget.onMore,
             icon: Icon(
-              PhosphorIcons.dotsThree(PhosphorIconsStyle.bold),
+              PhosphorIcons.dotsThree,
               size: BottomActionRow.iconSize,
               color: defaultColor,
             ),
@@ -166,8 +166,8 @@ class _BottomActionRowState extends State<BottomActionRow>
                 scale: _animation,
                 child: Icon(
                   widget.isLiked
-                      ? PhosphorIcons.heart(PhosphorIconsStyle.fill)
-                      : PhosphorIcons.heart(),
+                      ? PhosphorIcons.heartFill
+                      : PhosphorIcons.heart,
                   size: BottomActionRow.iconSize,
                   color: widget.isLiked
                       ? Color.fromARGB(255, 230, 40, 85)
@@ -248,7 +248,7 @@ Widget _buildRetweetButton({
                 AnimatedBuilder(
                   animation: repostController,
                   child: Icon(
-                    PhosphorIcons.repeat(),
+                    PhosphorIcons.repeat,
                     size: BottomActionRow.iconSize,
                     color: color ?? defaultColor,
                   ),

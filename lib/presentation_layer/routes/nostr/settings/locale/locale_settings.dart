@@ -1,7 +1,7 @@
 import 'package:camelus/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
 import '../../../../providers/language_provider.dart';
 
@@ -72,7 +72,7 @@ class LocaleSettingsPageState extends ConsumerState<LocaleSettingsPage> {
             ),
             trailing: _isSystemLanguage
                 ? Icon(
-                    PhosphorIcons.check(),
+                    PhosphorIcons.check,
                     color: Theme.of(context).colorScheme.onSurface,
                   )
                 : null,
@@ -111,7 +111,7 @@ class LocaleSettingsPageState extends ConsumerState<LocaleSettingsPage> {
                   ),
                   trailing: isSelected
                       ? Icon(
-                          PhosphorIcons.check(),
+                          PhosphorIcons.check,
                           color: Theme.of(context).colorScheme.onSurface,
                         )
                       : null,

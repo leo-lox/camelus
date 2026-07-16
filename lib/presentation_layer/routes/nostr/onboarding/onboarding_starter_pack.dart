@@ -1,7 +1,7 @@
 import 'package:camelus/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
 import '../../../../config/onboard_conf.dart';
 import '../../../../domain_layer/entities/nostr_list.dart';
@@ -323,8 +323,8 @@ class _OnboardingOpenStarterPackState
                   ),
                   trailing: Icon(
                     selectedPubkeys.contains(displayPubkey)
-                        ? PhosphorIcons.checkCircle()
-                        : PhosphorIcons.circle(),
+                        ? PhosphorIcons.checkCircle
+                        : PhosphorIcons.circle,
                     color: Theme.of(context).colorScheme.onSurface,
                   ),
                 );

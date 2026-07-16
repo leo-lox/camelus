@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ndk/ndk.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 import 'package:riverpod/legacy.dart';
 import '../../../atoms/long_button.dart';
 import 'package:ndk/entities.dart' as ndk_entities;
@@ -213,7 +213,7 @@ class AddMintPage extends ConsumerWidget {
     }
 
     if (state.isValid == true) {
-      return Icon(PhosphorIcons.checkCircle(), color: Colors.green);
+      return Icon(PhosphorIcons.checkCircle, color: Colors.green);
     }
 
     return null;

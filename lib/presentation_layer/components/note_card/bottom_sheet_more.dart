@@ -4,7 +4,7 @@ import 'package:camelus/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
 import '../../../domain_layer/entities/nostr_list.dart';
 import '../../../domain_layer/entities/nostr_note.dart';
@@ -182,7 +182,7 @@ class _MoreOptionsBottomSheetState
           child: Row(
             children: [
               Icon(
-                PhosphorIcons.warningCircle(),
+                PhosphorIcons.warningCircle,
                 color: Theme.of(context).colorScheme.error,
                 size: 24,
               ),
@@ -207,7 +207,7 @@ class _MoreOptionsBottomSheetState
       return _buildOptionTile(
         BottomSheetOption(
           leading: Icon(
-            PhosphorIcons.bookmarkSimple(PhosphorIconsStyle.fill),
+            PhosphorIcons.bookmarkSimpleFill,
             color: Theme.of(context).colorScheme.primary,
           ),
           label: AppLocalizations.of(context)!.removeFromBookmarks,
@@ -220,7 +220,7 @@ class _MoreOptionsBottomSheetState
     return _buildOptionTile(
       BottomSheetOption(
         leading: Icon(
-          PhosphorIcons.bookmarkSimple(),
+          PhosphorIcons.bookmarkSimple,
           color: Theme.of(context).colorScheme.inverseSurface,
         ),
         label: AppLocalizations.of(context)!.addToBookmarks,
@@ -234,7 +234,7 @@ class _MoreOptionsBottomSheetState
       _buildOptionTile(
         BottomSheetOption(
           leading: Icon(
-            PhosphorIcons.userCirclePlus(),
+            PhosphorIcons.userCirclePlus,
             color: Theme.of(context).colorScheme.inverseSurface,
           ),
           label: AppLocalizations.of(context)!.addToStarterPack,
@@ -245,7 +245,7 @@ class _MoreOptionsBottomSheetState
       _buildOptionTile(
         BottomSheetOption(
           leading: Icon(
-            PhosphorIcons.speakerSimpleSlash(),
+            PhosphorIcons.speakerSimpleSlash,
             color: Theme.of(context).colorScheme.inverseSurface,
           ),
           label: AppLocalizations.of(context)!.blockReport,

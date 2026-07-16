@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
 import '../providers/ndk_provider.dart';
 
@@ -32,8 +32,8 @@ class RelaysConnectivityWidget extends ConsumerWidget {
             children: [
               Icon(
                 isConnected
-                    ? PhosphorIcons.cellSignalFull()
-                    : PhosphorIcons.cellSignalSlash(),
+                    ? PhosphorIcons.cellSignalFull
+                    : PhosphorIcons.cellSignalSlash,
                 key: ValueKey(isConnected),
               ),
               const SizedBox(width: 5),

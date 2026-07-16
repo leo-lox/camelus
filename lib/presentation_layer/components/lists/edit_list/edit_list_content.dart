@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ndk/shared/nips/nip19/nip19.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
 import '../../../../domain_layer/entities/list_identifier.dart';
 import '../../../../domain_layer/entities/nostr_list.dart';
@@ -270,7 +270,7 @@ class _PeopleSearchHeader extends ConsumerWidget {
       helpSearch: (_) {},
       trailing: IconButton(
         icon: Icon(
-          PhosphorIcons.listNumbers(),
+          PhosphorIcons.listNumbers,
           color: isReorderMode
               ? Theme.of(context).colorScheme.primary
               : Theme.of(context).colorScheme.onSurface,

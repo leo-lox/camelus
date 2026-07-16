@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
 import '../../atoms/spinner_center.dart';
 import '../../components/wallet/animated_qr_scanner.dart';
@@ -234,7 +234,7 @@ class _QrScan extends ConsumerState<WalletQrScan> {
                               }
                             });
                           },
-                          icon: Icon(PhosphorIcons.clipboardText(), size: 18),
+                          icon: Icon(PhosphorIcons.clipboardText, size: 18),
                           label: const Text('paste from clipboard'),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Theme.of(

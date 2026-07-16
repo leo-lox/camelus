@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ndk/shared/nips/nip19/nip19.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../../../domain_layer/entities/feed_filter.dart';
@@ -229,7 +229,7 @@ class _StarterPackPageState extends ConsumerState<StarterPackPage> {
                   if (isOwnStarterPack)
                     PopupMenuButton<String>(
                       icon: Icon(
-                        PhosphorIcons.dotsThreeVertical(),
+                        PhosphorIcons.dotsThreeVertical,
                         color: Theme.of(context).colorScheme.onSurface,
                       ),
                       color: Theme.of(context).colorScheme.surface,
@@ -247,7 +247,7 @@ class _StarterPackPageState extends ConsumerState<StarterPackPage> {
                           child: Row(
                             children: [
                               Icon(
-                                PhosphorIcons.pen(),
+                                PhosphorIcons.pen,
                                 color: Theme.of(context).colorScheme.onSurface,
                                 size: 20,
                               ),
@@ -268,7 +268,7 @@ class _StarterPackPageState extends ConsumerState<StarterPackPage> {
                           child: Row(
                             children: [
                               Icon(
-                                PhosphorIcons.trash(),
+                                PhosphorIcons.trash,
                                 color: Colors.red,
                                 size: 20,
                               ),
@@ -322,7 +322,7 @@ class _StarterPackPageState extends ConsumerState<StarterPackPage> {
                                       ),
                                     )
                                   : Icon(
-                                      PhosphorIcons.users(),
+                                      PhosphorIcons.users,
                                       color: Theme.of(
                                         context,
                                       ).colorScheme.primary,

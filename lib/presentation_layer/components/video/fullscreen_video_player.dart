@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 import 'package:video_player/video_player.dart';
 
 import 'video_player_state_provider.dart';
@@ -108,8 +108,8 @@ class _FullScreenVideoPlayerState extends ConsumerState<FullScreenVideoPlayer> {
                           child: Center(
                             child: Icon(
                               videoState.isPlaying
-                                  ? PhosphorIcons.pause()
-                                  : PhosphorIcons.play(),
+                                  ? PhosphorIcons.pause
+                                  : PhosphorIcons.play,
                               color: Colors.white,
                               size: 80.0,
                             ),
@@ -146,8 +146,8 @@ class _FullScreenVideoPlayerState extends ConsumerState<FullScreenVideoPlayer> {
                           IconButton(
                             icon: Icon(
                               videoState.volume == 0.0
-                                  ? PhosphorIcons.speakerSlash()
-                                  : PhosphorIcons.speakerHigh(),
+                                  ? PhosphorIcons.speakerSlash
+                                  : PhosphorIcons.speakerHigh,
                               color: Colors.white,
                               size: 28,
                             ),
@@ -167,7 +167,7 @@ class _FullScreenVideoPlayerState extends ConsumerState<FullScreenVideoPlayer> {
                           ),
                           IconButton(
                             icon: Icon(
-                              PhosphorIcons.cornersIn(),
+                              PhosphorIcons.cornersIn,
                               color: Colors.white,
                               size: 28,
                             ),

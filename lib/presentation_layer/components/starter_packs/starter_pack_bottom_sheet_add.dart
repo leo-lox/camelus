@@ -3,7 +3,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
 import '../../../domain_layer/entities/nostr_list.dart';
 import '../../../helpers/helpers.dart';
@@ -124,7 +124,7 @@ class _StarterPackSelectionBottomSheetState
       children: [
         const SizedBox(height: 20),
         Icon(
-          PhosphorIcons.listPlus(),
+          PhosphorIcons.listPlus,
           size: 30,
           color: Theme.of(context).colorScheme.inverseSurface,
         ),
@@ -164,7 +164,7 @@ class _StarterPackSelectionBottomSheetState
             child: Row(
               children: [
                 Icon(
-                  PhosphorIcons.users(),
+                  PhosphorIcons.users,
                   color: Theme.of(context).colorScheme.inverseSurface,
                   size: 20,
                 ),
@@ -214,7 +214,7 @@ class _StarterPackSelectionBottomSheetState
 
     if (showCheck) {
       return Icon(
-        PhosphorIcons.check(),
+        PhosphorIcons.check,
         color: wasJustAdded
             ? Theme.of(context).colorScheme.primary
             : Theme.of(context).colorScheme.inverseSurface,
@@ -223,7 +223,7 @@ class _StarterPackSelectionBottomSheetState
     }
 
     return Icon(
-      PhosphorIcons.plus(),
+      PhosphorIcons.plus,
       color: Theme.of(context).colorScheme.inverseSurface,
       size: 16,
     );
@@ -250,7 +250,7 @@ class _StarterPackSelectionBottomSheetState
             child: Row(
               children: [
                 Icon(
-                  PhosphorIcons.plus(),
+                  PhosphorIcons.plus,
                   color: Theme.of(context).colorScheme.inverseSurface,
                   size: 20,
                 ),
@@ -322,7 +322,7 @@ class _StarterPackSelectionBottomSheetState
           SnackBar(
             content: Row(
               children: [
-                Icon(PhosphorIcons.warning(), size: 20),
+                Icon(PhosphorIcons.warning, size: 20),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(

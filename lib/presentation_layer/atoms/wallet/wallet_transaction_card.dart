@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:ndk/entities.dart' as ndk_entities;
-import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 import 'package:timeago_flutter/timeago_flutter.dart' as timeago;
 
 import '../../../helpers/wallet_number_formatting.dart';
@@ -183,21 +183,21 @@ TransactionStatus _getTransactionStatus(
   if (isPending || isDraft) {
     return TransactionStatus(
       label: 'Pending',
-      icon: PhosphorIcons.dotsThreeCircle(),
+      icon: PhosphorIcons.dotsThreeCircle,
       color: Colors.blue,
       isStrikethrough: false,
     );
   } else if (isFailed) {
     return TransactionStatus(
       label: 'Failed ${isIncoming ? 'Incoming' : 'Outgoing'}',
-      icon: PhosphorIcons.warningCircle(),
+      icon: PhosphorIcons.warningCircle,
       color: Theme.of(context).colorScheme.error,
       isStrikethrough: true,
     );
   } else if (isCanceled) {
     return TransactionStatus(
       label: 'Canceled ${isIncoming ? 'Incoming' : 'Outgoing'}',
-      icon: PhosphorIcons.xCircle(),
+      icon: PhosphorIcons.xCircle,
       color: Theme.of(context).colorScheme.onError,
       isStrikethrough: true,
     );
@@ -207,8 +207,8 @@ TransactionStatus _getTransactionStatus(
         ? Colors.green
         : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.8);
     final icon = isIncoming
-        ? PhosphorIcons.arrowDown()
-        : PhosphorIcons.arrowUp();
+        ? PhosphorIcons.arrowDown
+        : PhosphorIcons.arrowUp;
 
     return TransactionStatus(
       label: isIncoming ? 'Incoming' : 'Outgoing',

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
 import '../../../l10n/app_localizations.dart';
 import '../../providers/messaging/dm_relay_health_provider.dart';
@@ -303,8 +303,8 @@ class DmRelayDebugContent extends ConsumerWidget {
           // Connection status icon
           PhosphorIcon(
             relay.isConnected
-                ? PhosphorIcons.plugsConnected()
-                : PhosphorIcons.plugs(),
+                ? PhosphorIcons.plugsConnected
+                : PhosphorIcons.plugs,
             size: 20,
           ),
           const SizedBox(width: 12),
@@ -351,7 +351,7 @@ class DmRelayDebugContent extends ConsumerWidget {
                   )
                 : IconButton(
                     icon: Icon(
-                      PhosphorIcons.flask(),
+                      PhosphorIcons.flask,
                       size: 18,
                       color: Theme.of(context).colorScheme.primary,
                     ),
@@ -385,31 +385,31 @@ class DmRelayDebugContent extends ConsumerWidget {
         case RelayPrivacySupport.private:
           color = Colors.green;
           text = l10n.privacyPrivate;
-          icon = PhosphorIcons.lockKey();
+          icon = PhosphorIcons.lockKey;
         case RelayPrivacySupport.leaksToEveryone:
           color = Colors.red;
           text = l10n.privacyLeaks;
-          icon = PhosphorIcons.warning();
+          icon = PhosphorIcons.warning;
         case RelayPrivacySupport.relayRejectsGiftWrap:
           color = Colors.orange;
           text = l10n.relayRejectsGiftWrap;
-          icon = PhosphorIcons.prohibit();
+          icon = PhosphorIcons.prohibit;
         case RelayPrivacySupport.networkError:
           color = Colors.orange;
           text = l10n.networkError;
-          icon = PhosphorIcons.wifiSlash();
+          icon = PhosphorIcons.wifiSlash;
         case RelayPrivacySupport.timeout:
           color = Colors.orange;
           text = l10n.timeout;
-          icon = PhosphorIcons.clockCountdown();
+          icon = PhosphorIcons.clockCountdown;
         case RelayPrivacySupport.otherError:
           color = Colors.orange;
           text = l10n.testFailed;
-          icon = PhosphorIcons.warning();
+          icon = PhosphorIcons.warning;
         case RelayPrivacySupport.testing:
           color = Colors.blue;
           text = l10n.testing;
-          icon = PhosphorIcons.circleNotch();
+          icon = PhosphorIcons.circleNotch;
         case RelayPrivacySupport.unknown:
           return const SizedBox.shrink();
       }
@@ -420,35 +420,35 @@ class DmRelayDebugContent extends ConsumerWidget {
         case RelayDeletionSupport.supported:
           color = Colors.green;
           text = l10n.deletionSupported;
-          icon = PhosphorIcons.checkCircle();
+          icon = PhosphorIcons.checkCircle;
         case RelayDeletionSupport.notSupported:
           color = Colors.red;
           text = l10n.deletionNotSupported;
-          icon = PhosphorIcons.xCircle();
+          icon = PhosphorIcons.xCircle;
         case RelayDeletionSupport.relayRejectsGiftWrap:
           color = Colors.orange;
           text = l10n.relayRejectsGiftWrap;
-          icon = PhosphorIcons.prohibit();
+          icon = PhosphorIcons.prohibit;
         case RelayDeletionSupport.relayRejectsDeletion:
           color = Colors.orange;
           text = l10n.relayRejectsDeletion;
-          icon = PhosphorIcons.prohibit();
+          icon = PhosphorIcons.prohibit;
         case RelayDeletionSupport.networkError:
           color = Colors.orange;
           text = l10n.networkError;
-          icon = PhosphorIcons.wifiSlash();
+          icon = PhosphorIcons.wifiSlash;
         case RelayDeletionSupport.timeout:
           color = Colors.orange;
           text = l10n.timeout;
-          icon = PhosphorIcons.clockCountdown();
+          icon = PhosphorIcons.clockCountdown;
         case RelayDeletionSupport.otherError:
           color = Colors.orange;
           text = l10n.testFailed;
-          icon = PhosphorIcons.warning();
+          icon = PhosphorIcons.warning;
         case RelayDeletionSupport.testing:
           color = Colors.blue;
           text = l10n.testing;
-          icon = PhosphorIcons.circleNotch();
+          icon = PhosphorIcons.circleNotch;
         case RelayDeletionSupport.unknown:
           return const SizedBox.shrink();
       }
@@ -516,7 +516,7 @@ class DmRelayDebugContent extends ConsumerWidget {
         const SizedBox(height: 4),
         ListTile(
           leading: Icon(
-            PhosphorIcons.arrowClockwise(),
+            PhosphorIcons.arrowClockwise,
             color: Theme.of(context).colorScheme.primary,
           ),
           title: Text(l10n.refreshRelayDiscovery),
@@ -528,7 +528,7 @@ class DmRelayDebugContent extends ConsumerWidget {
         ),
         ListTile(
           leading: Icon(
-            PhosphorIcons.flask(),
+            PhosphorIcons.flask,
             color: Theme.of(context).colorScheme.primary,
           ),
           title: Text(l10n.testAllRelays),
@@ -551,13 +551,13 @@ class DmRelayDebugContent extends ConsumerWidget {
   PhosphorIconData _getStatusIcon(DmRelayHealthStatus status) {
     switch (status) {
       case DmRelayHealthStatus.excellent:
-        return PhosphorIcons.shieldCheck(PhosphorIconsStyle.regular);
+        return PhosphorIcons.shieldCheck;
       case DmRelayHealthStatus.degraded:
-        return PhosphorIcons.shieldWarning(PhosphorIconsStyle.regular);
+        return PhosphorIcons.shieldWarning;
       case DmRelayHealthStatus.poor:
-        return PhosphorIcons.shieldSlash(PhosphorIconsStyle.regular);
+        return PhosphorIcons.shieldSlash;
       case DmRelayHealthStatus.unknown:
-        return PhosphorIcons.shield(PhosphorIconsStyle.regular);
+        return PhosphorIcons.shield;
     }
   }
 

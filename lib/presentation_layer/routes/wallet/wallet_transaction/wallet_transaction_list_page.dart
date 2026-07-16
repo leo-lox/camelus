@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
 import 'package:ndk/entities.dart' as ndk_entities;
 
@@ -26,7 +26,7 @@ class WalletTransactionListPage extends ConsumerWidget {
         foregroundColor: Theme.of(context).colorScheme.onSurface,
         title: const Text('Transactions'),
         leading: IconButton(
-          icon: Icon(PhosphorIcons.caretLeft(), size: 24),
+          icon: Icon(PhosphorIcons.caretLeft, size: 24),
           onPressed: () {
             ref.read(walletNavigationProvider.notifier).changeMainPage(0);
           },

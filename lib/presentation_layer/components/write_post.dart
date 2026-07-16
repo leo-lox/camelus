@@ -19,7 +19,7 @@ import 'package:flutter_mentions/flutter_mentions.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:lottie/lottie.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
 import 'post_overflow.dart';
 import 'write_post/post_settings_dialog.dart';
@@ -284,7 +284,7 @@ class _WritePostState extends ConsumerState<WritePost> {
             SizedBox(width: 10),
             _buildActionButton(
               icon: Icon(
-                PhosphorIcons.image(),
+                PhosphorIcons.image,
                 color: Theme.of(context).colorScheme.inverseSurface,
                 size: 25,
               ),
@@ -292,7 +292,7 @@ class _WritePostState extends ConsumerState<WritePost> {
             ),
             _buildActionButton(
               icon: Icon(
-                PhosphorIcons.gearSix(),
+                PhosphorIcons.gearSix,
                 color: Theme.of(context).colorScheme.inverseSurface,
                 size: 25,
               ),

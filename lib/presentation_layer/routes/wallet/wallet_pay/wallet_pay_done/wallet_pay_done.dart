@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ndk/entities.dart' as ndk_entities;
-import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
 import '../../../../../helpers/wallet_number_formatting.dart';
 import '../../../../atoms/copy_to_clipboard.dart';
@@ -242,16 +242,16 @@ class TransactionState extends ConsumerWidget {
     String title;
 
     if (myTransaction.state == ndk_entities.WalletTransactionState.pending) {
-      icon = PhosphorIcons.hourglass();
+      icon = PhosphorIcons.hourglass;
       color = Theme.of(context).colorScheme.onSurfaceVariant;
       title = 'pending ecash';
     } else if (myTransaction.state ==
         ndk_entities.WalletTransactionState.failed) {
-      icon = PhosphorIcons.warningCircle();
+      icon = PhosphorIcons.warningCircle;
       color = Theme.of(context).colorScheme.error;
       title = 'failed';
     } else {
-      icon = PhosphorIcons.checkCircle();
+      icon = PhosphorIcons.checkCircle;
       color = Colors.green;
       title = 'ecash claimed';
     }
@@ -303,7 +303,7 @@ class LnSuccessStep extends StatelessWidget {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Icon(PhosphorIcons.checkCircle(), color: Colors.green, size: 80),
+        Icon(PhosphorIcons.checkCircle, color: Colors.green, size: 80),
         const SizedBox(height: 24),
         Text(
           'Lightning Payment Sent!',
