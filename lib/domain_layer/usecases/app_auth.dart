@@ -9,8 +9,6 @@ import 'package:go_router/go_router.dart';
 import 'package:ndk/data_layer/repositories/signers/nip46_event_signer.dart';
 import 'package:ndk/ndk.dart';
 import 'package:ndk_flutter/ndk_flutter.dart';
-import 'package:nip07_event_signer/nip07_event_signer.dart'
-    hide Nip07EventSigner;
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 import '../../l10n/app_localizations.dart';
 import '../../presentation_layer/providers/signer_provider.dart';

@@ -1210,7 +1210,7 @@ packages:
       path: "../ndk/packages/ndk"
       relative: true
     source: path
-    version: "0.8.4-dev.8"
+    version: "0.8.4-dev.10"
   ndk_bip32_keys:
     dependency: transitive
     description:
@@ -1225,25 +1225,14 @@ packages:
       path: "../ndk/packages/ndk_flutter"
       relative: true
     source: path
-    version: "0.8.4-dev.11"
+    version: "0.8.4-dev.13"
   ndk_objectbox:
     dependency: "direct main"
     description:
-      path: "packages/objectbox"
-      ref: "tmp/camelus/1-10-0"
-      resolved-ref: "29314e42c9b99abbeeb9ae66ca21bf84115b82d4"
-      url: "https://github.com/relaystr/ndk.git"
-    source: git
-    version: "0.2.11-dev.6"
-  nip07_event_signer:
-    dependency: "direct main"
-    description:
-      path: "packages/nip07_event_signer"
-      ref: "tmp/camelus/1-10-0"
-      resolved-ref: "29314e42c9b99abbeeb9ae66ca21bf84115b82d4"
-      url: "https://github.com/relaystr/ndk.git"
-    source: git
-    version: "1.0.10-dev.6"
+      path: "../ndk/packages/objectbox"
+      relative: true
+    source: path
+    version: "0.2.12-dev.10"
   nm:
     dependency: transitive
     description:
