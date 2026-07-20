@@ -31,7 +31,7 @@ class _OnboardingPictureState extends ConsumerState<OnboardingPicture> {
   bool pictureSelected = false;
 
   Future<void> _pickFile() async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles(
+    FilePickerResult? result = await FilePicker.pickFiles(
       allowMultiple: false,
       type: FileType.image,
       dialogTitle: "select image",

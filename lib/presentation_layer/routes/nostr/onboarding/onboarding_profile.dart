@@ -30,7 +30,7 @@ class OnboardingProfile extends ConsumerStatefulWidget {
 
 class _OnboardingProfileState extends ConsumerState<OnboardingProfile> {
   Future<MemFile?> _pickFile() async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles(
+    FilePickerResult? result = await FilePicker.pickFiles(
       allowMultiple: false,
       type: FileType.image,
       dialogTitle: AppLocalizations.of(context)!.selectImage,
