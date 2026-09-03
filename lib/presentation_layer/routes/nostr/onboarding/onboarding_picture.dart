@@ -31,14 +31,13 @@ class _OnboardingPictureState extends ConsumerState<OnboardingPicture> {
   bool pictureSelected = false;
 
   Future<void> _pickFile() async {
-    FilePickerResult? result = await FilePicker.pickFiles(
-      allowMultiple: false,
+    final result = await FilePicker.pickFile(
       type: FileType.image,
       dialogTitle: "select image",
     );
 
     if (result != null) {
-      File file = File(result.files.single.path!);
+      File file = File(result.path!);
       try {
         final myImage = await RemoveImageMetadata.fileToMemFile(file);
 

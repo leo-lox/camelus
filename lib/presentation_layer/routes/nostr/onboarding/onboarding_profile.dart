@@ -30,14 +30,13 @@ class OnboardingProfile extends ConsumerStatefulWidget {
 
 class _OnboardingProfileState extends ConsumerState<OnboardingProfile> {
   Future<MemFile?> _pickFile() async {
-    FilePickerResult? result = await FilePicker.pickFiles(
-      allowMultiple: false,
+    final result = await FilePicker.pickFile(
       type: FileType.image,
       dialogTitle: AppLocalizations.of(context)!.selectImage,
     );
 
     if (result != null) {
-      File file = File(result.files.single.path!);
+      File file = File(result.path!);
       try {
         final myImage = await RemoveImageMetadata.fileToMemFile(file);
 
@@ -53,7 +52,6 @@ class _OnboardingProfileState extends ConsumerState<OnboardingProfile> {
       }
       return null;
     } else {
-      // User canceled the picker
       return null;
     }
   }
