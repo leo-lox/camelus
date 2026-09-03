@@ -15,6 +15,7 @@ import 'package:camelus/presentation_layer/providers/search_provider.dart';
 import 'package:camelus/presentation_layer/providers/write_post_state.provider.dart';
 import 'package:camelus/config/default_suggestions.dart';
 import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart' as flutter_material;
 import 'package:flutter_mentions/flutter_mentions.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
@@ -355,8 +356,8 @@ class _WritePostState extends ConsumerState<WritePost> {
           color: Theme.of(context).colorScheme.onSurface,
           fontSize: 21,
         ),
-        decoration: InputDecoration(
-          border: InputBorder.none,
+        decoration: flutter_material.InputDecoration(
+          border: flutter_material.InputBorder.none,
           hintText: AppLocalizations.of(context)!.whatsOnYourMind,
           hintStyle: TextStyle(
             color: Theme.of(context).colorScheme.inverseSurface,
