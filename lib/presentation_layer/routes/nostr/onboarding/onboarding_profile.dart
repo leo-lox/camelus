@@ -4,7 +4,7 @@ import 'dart:typed_data';
 import 'package:camelus/l10n/app_localizations.dart';
 import 'package:camelus/presentation_layer/components/edit_profile.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../domain_layer/entities/mem_file.dart';
@@ -30,14 +30,13 @@ class OnboardingProfile extends ConsumerStatefulWidget {
 
 class _OnboardingProfileState extends ConsumerState<OnboardingProfile> {
   Future<MemFile?> _pickFile() async {
-    FilePickerResult? result = await FilePicker.pickFiles(
-      allowMultiple: false,
+    final result = await FilePicker.pickFile(
       type: FileType.image,
       dialogTitle: AppLocalizations.of(context)!.selectImage,
     );
 
     if (result != null) {
-      File file = File(result.files.single.path!);
+      File file = File(result.path!);
       try {
         final myImage = await RemoveImageMetadata.fileToMemFile(file);
 
@@ -53,7 +52,6 @@ class _OnboardingProfileState extends ConsumerState<OnboardingProfile> {
       }
       return null;
     } else {
-      // User canceled the picker
       return null;
     }
   }

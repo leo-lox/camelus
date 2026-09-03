@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -16,7 +16,7 @@ class WalletReceiveType extends ConsumerWidget {
 
   const WalletReceiveType({super.key, required this.doneCallback});
 
-  _onPasteToken(BuildContext context, WidgetRef ref) async {
+  Future<void> _onPasteToken(BuildContext context, WidgetRef ref) async {
     final userClipboard = await _handleReadClipboard();
     if (userClipboard == null || userClipboard.isEmpty) {
       _showError(context, 'Clipboard is empty or invalid');
@@ -46,7 +46,7 @@ class WalletReceiveType extends ConsumerWidget {
     }
   }
 
-  _showError(BuildContext context, String message) {
+  void _showError(BuildContext context, String message) {
     if (!context.mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -206,7 +206,7 @@ class _WalletsList extends StatelessWidget {
       physics: const NeverScrollableScrollPhysics(),
       shrinkWrap: true,
       itemCount: wallets.length,
-      separatorBuilder: (_, __) => const Divider(height: 1),
+      separatorBuilder: (_, _) => const Divider(height: 1),
       itemBuilder: (context, i) {
         final w = wallets[i];
         final wBallances = balances.where((b) => b.walletId == w.id);

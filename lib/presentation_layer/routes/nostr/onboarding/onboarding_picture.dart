@@ -6,7 +6,7 @@ import 'package:camelus/presentation_layer/atoms/crop_avatar.dart';
 import 'package:camelus/presentation_layer/components/responsive_center.dart';
 import 'package:camelus/domain_layer/entities/onboarding_user_info.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../domain_layer/usecases/remove_image_metadata.dart';
@@ -31,14 +31,13 @@ class _OnboardingPictureState extends ConsumerState<OnboardingPicture> {
   bool pictureSelected = false;
 
   Future<void> _pickFile() async {
-    FilePickerResult? result = await FilePicker.pickFiles(
-      allowMultiple: false,
+    final result = await FilePicker.pickFile(
       type: FileType.image,
       dialogTitle: "select image",
     );
 
     if (result != null) {
-      File file = File(result.files.single.path!);
+      File file = File(result.path!);
       try {
         final myImage = await RemoveImageMetadata.fileToMemFile(file);
 

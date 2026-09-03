@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 class WalletSheetSendReceive extends StatelessWidget {
   const WalletSheetSendReceive(
@@ -11,7 +11,7 @@ class WalletSheetSendReceive extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return SizedBox(
       width: MediaQuery.of(context).size.width,
       child: Padding(
         padding: EdgeInsets.only(top: 25), // const EdgeInsets.all(15),

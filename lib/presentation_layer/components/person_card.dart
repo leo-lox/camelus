@@ -2,7 +2,7 @@ import 'package:camelus/helpers/helpers.dart';
 import 'package:camelus/presentation_layer/atoms/follow_button.dart';
 import 'package:camelus/presentation_layer/atoms/my_profile_picture.dart';
 import 'package:camelus/presentation_layer/atoms/nip_05_text.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class PersonCard extends ConsumerWidget {

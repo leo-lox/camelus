@@ -1,7 +1,7 @@
 import 'package:camelus/presentation_layer/routes/nostr/onboarding/onboarding.dart';
 import 'package:camelus/presentation_layer/routes/nostr/onboarding/onboarding_login.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 void main() {

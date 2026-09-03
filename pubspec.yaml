@@ -31,6 +31,7 @@ dependencies:
     sdk: flutter
   flutter_web_plugins:
     sdk: flutter
+  material_ui: any
   cupertino_icons: ^1.0.2
   flutter_hooks: ^0.21.2
   riverpod: ^3.0.3
@@ -50,10 +51,9 @@ dependencies:
   url_launcher: ^6.1.7
   lottie: ^3.0.0
   flutter_launcher_icons: ^0.14.1
-  file_picker: ^11.0.2
-  image_picker: ^1.1.2
+  file_picker: ^12.2.0
+  image_picker: ^1.2.3
   mime: ^2.0.0
-  flutter_mentions: ^2.0.1
   photo_view: ^0.15.0
   qr_flutter: ^4.0.0
   shared_preferences: ^2.5.5
@@ -66,30 +66,30 @@ dependencies:
   pointycastle: ^4.0.0
   #device_preview: ^1.1.0
   bip39_mnemonic: ^4.0.1
-  bip32: ^2.0.0
+  #bip32: ^2.0.0
+  bip32_keys: ^3.1.4
+
   crop_your_image: ^2.0.0
-  package_info_plus: ^9.0.1
+  package_info_plus: ^10.2.1
   rxdart: ^0.28.0
   shimmer: ^3.0.0
   flutter_force_directed_graph: ^1.0.7
   objectbox: ^5.3.2
   objectbox_flutter_libs: any
-  sembast: ^3.8.5+1
-  sembast_web: ^2.4.1
-  sembast_cache_manager: ^1.0.7-dev.12
-  #amberflutter: ^0.0.9
+  sembast: ^3.8.9+1
+  sembast_web: ^2.4.5+1
   intl: any
   app_links: ^7.0.0
   #phosphor_flutter: ^2.1.0
   phosphoricons_flutter: ^1.0.0
 
   # ndk imports
-  ndk: ^0.8.2-dev.5
-  ndk_flutter: ^0.8.2-dev.5
+  ndk: ^0.9.0
+  ndk_flutter: ^0.9.0
   #nip07_event_signer: ^1.0.10-dev.5
   #ndk_rust_verifier: ^0.5.0
 
-  ndk_objectbox: ^0.2.8
+  ndk_objectbox: ^0.2.12+1
   
   
   image: ^4.3.0
@@ -102,7 +102,7 @@ dependencies:
   firebase_core: 4.7.0
   flutter_local_notifications: ^19.4.2
   path: ^1.9.1
-  share_plus: ^12.0.2
+  share_plus: ^13.3.0
   connectivity_plus: ^6.1.4
   flutter_link_previewer: ^3.2.2
   flutter_chat_types: ^3.6.2
@@ -120,9 +120,11 @@ dependencies:
   system_theme: ^3.3.0
   ur:
     path: ../ndk/packages/bc_ur
+
   
 
   
+
 
 
 dependency_overrides:
@@ -130,17 +132,17 @@ dependency_overrides:
      git:
        url: https://github.com/relaystr/ndk.git
        path: packages/bc_ur
-       ref: tmp/camelus/1-10-0
+       #ref: tmp/camelus/1-10-0
 
-  ndk:
-    path: ../ndk/packages/ndk
-    #  git:
-    #    url: https://github.com/relaystr/ndk.git
-    #    path: packages/ndk
-    #    ref: tmp/camelus/1-10-0
+  # ndk:
+  #   path: ../ndk/packages/ndk
+  #   #  git:
+  #   #    url: https://github.com/relaystr/ndk.git
+  #   #    path: packages/ndk
+  #   #    ref: tmp/camelus/1-10-0
     
-  ndk_flutter:
-    path: ../ndk/packages/ndk_flutter
+  # ndk_flutter:
+  #   path: ../ndk/packages/ndk_flutter
     #  git:
     #    url: https://github.com/relaystr/ndk.git
     #    path: packages/ndk_flutter
@@ -156,8 +158,8 @@ dependency_overrides:
     #git:
     #  url: https://github.com/relaystr/ndk.git
     #  path: packages/rust_verifier
-  ndk_objectbox:
-    path: ../ndk/packages/objectbox
+  # ndk_objectbox:
+  #   path: ../ndk/packages/objectbox
     # git:
     #    url: https://github.com/relaystr/ndk.git
     #    path: packages/objectbox
@@ -170,10 +172,10 @@ dependency_overrides:
       #path: packages/amber
     #  ref: nip-59-gift-wrap
 
-  bip32:
-    git: 
-      url: https://github.com/5eeman/bip32-dart.git
-      ref: 9db7cf7c9e3a4e61f145ca43b01469c6464dce89
+  # bip32:
+  #   git: 
+  #     url: https://github.com/5eeman/bip32-dart.git
+  #     ref: 9db7cf7c9e3a4e61f145ca43b01469c6464dce89
 
 
 

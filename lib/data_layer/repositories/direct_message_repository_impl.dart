@@ -777,9 +777,7 @@ class DirectMessageRepositoryImpl implements DirectMessageRepository {
       recipientGiftWrap = await ndk.config.cache.loadEvent(
         message.recipientGiftWrapId!,
       );
-      if (recipientGiftWrap == null) {
-        recipientGiftWrap = await _loadGiftWrapFromDb(messageId, isSelf: false);
-      }
+      recipientGiftWrap ??= await _loadGiftWrapFromDb(messageId, isSelf: false);
     }
 
     try {

@@ -1,9 +1,8 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
-import 'package:ndk/entities.dart' as ndk_entities;
 import 'package:pretty_qr_code/pretty_qr_code.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -17,7 +16,7 @@ class WalletReceiveRequest extends ConsumerWidget {
   final Function backCallback;
   const WalletReceiveRequest({super.key, required this.backCallback});
 
-  showSnackBar(BuildContext context, String message) {
+  void showSnackBar(BuildContext context, String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         backgroundColor: Theme.of(context).colorScheme.error,
@@ -26,7 +25,7 @@ class WalletReceiveRequest extends ConsumerWidget {
     );
   }
 
-  _launchBolt11Url(String url) async {
+  Future<void> _launchBolt11Url(String url) async {
     final Uri uri = Uri.parse(url);
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.platformDefault);

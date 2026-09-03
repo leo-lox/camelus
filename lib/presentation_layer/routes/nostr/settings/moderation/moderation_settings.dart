@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:camelus/l10n/app_localizations.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../../domain_layer/entities/bloom_filter_data.dart';

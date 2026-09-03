@@ -1,5 +1,5 @@
 import 'package:camelus/presentation_layer/atoms/long_button.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -330,7 +330,7 @@ class _WalletOverlayCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Positioned.fill(
       child: Container(
-        color: Colors.black.withOpacity(0.55),
+        color: Colors.black.withValues(alpha: 0.55),
         padding: const EdgeInsets.all(20),
         alignment: Alignment.center,
         child: ConstrainedBox(

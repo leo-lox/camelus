@@ -4,7 +4,7 @@ import 'package:camelus/l10n/app_localizations.dart';
 
 import 'package:camelus/presentation_layer/components/note_card/note_card_container.dart';
 import 'package:camelus/presentation_layer/components/note_card/skeleton_note.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_list_view/flutter_list_view.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 

@@ -1,11 +1,11 @@
-import 'package:bip32/bip32.dart' as bip32;
+import 'package:bip32_keys/bip32_keys.dart';
 import 'package:camelus/l10n/app_localizations.dart';
 import 'package:camelus/presentation_layer/atoms/long_button.dart';
 import 'package:camelus/presentation_layer/components/responsive_center.dart';
 import 'package:camelus/helpers/bip340.dart';
 import 'package:camelus/helpers/helpers.dart';
 import 'package:flutter/gestures.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hex/hex.dart';
@@ -91,12 +91,12 @@ class _OnboardingLoginPageState extends ConsumerState<OnboardingLoginPage> {
       // list int to bytes
 
       final Uint8List seedBytes = Uint8List.fromList(mnemonic3.entropy);
-      bip32.BIP32 node = bip32.BIP32.fromSeed(seedBytes);
+      final node = Bip32Keys.fromSeed(seedBytes);
 
       //  m/44'/1237'/<account>'/0/0
-      bip32.BIP32 child = node.derivePath("m/44'/1237'/0'/0/0");
+      final child = node.derivePath("m/44'/1237'/0'/0/0");
 
-      final privkeyHex = HEX.encode(child.privateKey!);
+      final privkeyHex = HEX.encode(child.private!);
 
       var pubkey = Bip340().getPublicKey(privkeyHex);
       var privKeyHr = Helpers.encodeBech32(privkeyHex, 'nsec');

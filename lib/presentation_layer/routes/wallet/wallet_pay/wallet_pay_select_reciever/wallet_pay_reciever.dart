@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ndk/entities.dart' as ndk_entities;
@@ -25,7 +25,7 @@ class WalletSelectReciever extends ConsumerWidget {
     required this.doneCallback,
   });
 
-  _onTokenSelected(WalletPayNotifier notifier) {
+  void _onTokenSelected(WalletPayNotifier notifier) {
     notifier.updateRecieverType(PaymentRecieverType.token);
     doneCallback();
   }
@@ -115,7 +115,7 @@ class WalletSelectReciever extends ConsumerWidget {
     );
   }
 
-  _onContactSelected({
+  void _onContactSelected({
     required WalletPayNotifier notifier,
     required String pubkey,
   }) {
@@ -124,7 +124,7 @@ class WalletSelectReciever extends ConsumerWidget {
     doneCallback();
   }
 
-  _onWalletSelected({
+  void _onWalletSelected({
     required WalletPayNotifier notifier,
     required String walletId,
   }) {
@@ -406,7 +406,7 @@ class _ContactsList extends StatelessWidget {
       physics: const NeverScrollableScrollPhysics(),
       shrinkWrap: true,
       itemCount: contacts.length,
-      separatorBuilder: (_, __) => const Divider(height: 1),
+      separatorBuilder: (_, _) => const Divider(height: 1),
       itemBuilder: (context, i) {
         final c = contacts[i];
         return ListTile(
@@ -452,7 +452,7 @@ class _WalletsList extends StatelessWidget {
       physics: const NeverScrollableScrollPhysics(),
       shrinkWrap: true,
       itemCount: wallets.length,
-      separatorBuilder: (_, __) => const Divider(height: 1),
+      separatorBuilder: (_, _) => const Divider(height: 1),
       itemBuilder: (context, i) {
         final w = wallets[i];
         final wBallances = balances.where((b) => b.walletId == w.id);

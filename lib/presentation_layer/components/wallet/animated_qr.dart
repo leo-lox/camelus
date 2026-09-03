@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ndk/entities.dart';
 import 'package:pretty_qr_code/pretty_qr_code.dart';
@@ -171,7 +171,7 @@ class _AnimatedQrState extends ConsumerState<AnimatedQr> {
               ),
             const Spacer(),
             Switch(
-              activeColor: Colors.black,
+              activeThumbColor: Colors.black,
               value: showAnimatedQr,
               onChanged: (value) {
                 setState(() {

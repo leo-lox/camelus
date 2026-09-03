@@ -1,6 +1,6 @@
 import 'dart:typed_data';
 
-import 'package:bip32/bip32.dart' as bip32;
+import 'package:bip32_keys/bip32_keys.dart';
 import 'package:bip39_mnemonic/bip39_mnemonic.dart';
 import 'package:hex/hex.dart';
 
@@ -31,12 +31,12 @@ class GeneratePrivateKey {
   /// [returns] private key as hex string
   static String _getPrivkeyFromSeed(Mnemonic myMnemonic) {
     final Uint8List seedBytes = Uint8List.fromList(myMnemonic.entropy);
-    bip32.BIP32 node = bip32.BIP32.fromSeed(seedBytes);
+    final node = Bip32Keys.fromSeed(seedBytes);
 
     //  m/44'/1237'/<account>'/0/0
-    bip32.BIP32 child = node.derivePath("m/44'/1237'/0'/0/0");
+    final child = node.derivePath("m/44'/1237'/0'/0/0");
 
-    final privkeyHex = HEX.encode(child.privateKey!);
+    final privkeyHex = HEX.encode(child.private!);
 
     return privkeyHex;
   }

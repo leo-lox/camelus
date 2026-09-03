@@ -1,5 +1,5 @@
 import 'dart:math' as math;
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
 
 class ChangeResult {
@@ -235,7 +235,7 @@ class _CurrencyPickerBarState extends State<CurrencyPickerBar>
                         BoxShadow(
                           color: Theme.of(
                             context,
-                          ).colorScheme.shadow.withOpacity(0.06),
+                          ).colorScheme.shadow.withValues(alpha: 0.06),
                           blurRadius: 10,
                           offset: const Offset(0, 3),
                         ),

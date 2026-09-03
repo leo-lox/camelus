@@ -14,13 +14,14 @@ import 'package:camelus/presentation_layer/providers/metadata_state_provider.dar
 import 'package:camelus/presentation_layer/providers/search_provider.dart';
 import 'package:camelus/presentation_layer/providers/write_post_state.provider.dart';
 import 'package:camelus/config/default_suggestions.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_mentions/flutter_mentions.dart';
+import 'package:flutter/widgets.dart' as flutter_widgets;
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:lottie/lottie.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
+import 'mentions/mentions_text_field.dart';
 import 'post_overflow.dart';
 import 'write_post/post_settings_dialog.dart';
 
@@ -34,9 +35,8 @@ class WritePost extends ConsumerStatefulWidget {
 }
 
 class _WritePostState extends ConsumerState<WritePost> {
-  //final TextEditingController _textEditingController = TextEditingController();
-  final GlobalKey<FlutterMentionsState> _textEditingControllerKey =
-      GlobalKey<FlutterMentionsState>();
+  final GlobalKey<MentionsTextFieldState> _textEditingControllerKey =
+      GlobalKey<MentionsTextFieldState>();
   final FocusNode _focusNode = FocusNode();
 
   List<Map<String, dynamic>> _mentionsSearchResults = [];
@@ -136,9 +136,9 @@ class _WritePostState extends ConsumerState<WritePost> {
           .read(writePostStateProvider.notifier)
           .updateReplyToNote(widget.context?.replyToNote);
 
-      _textEditingControllerKey.currentState?.controller?.text = ref
-          .read(writePostStateProvider)
-          .markupText;
+      _textEditingControllerKey.currentState?.setMarkupText(
+        ref.read(writePostStateProvider).markupText,
+      );
     });
   }
 
@@ -181,7 +181,7 @@ class _WritePostState extends ConsumerState<WritePost> {
             ],
           ),
 
-        Container(
+        flutter_widgets.Container(
           width: double.infinity,
           //height: MediaQuery.of(context).size.height * 0.4,
           padding: const EdgeInsets.only(top: 0, left: 0, right: 0),
@@ -237,7 +237,7 @@ class _WritePostState extends ConsumerState<WritePost> {
         itemBuilder: (BuildContext context, int index) {
           return Stack(
             children: [
-              Container(
+              flutter_widgets.Container(
                 margin: const EdgeInsets.only(left: 10, right: 10),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(10),
@@ -337,40 +337,27 @@ class _WritePostState extends ConsumerState<WritePost> {
     );
   }
 
-  Container _writingArea() {
-    return Container(
+  flutter_widgets.Container _writingArea() {
+    return flutter_widgets.Container(
       //height: 200,
       padding: const EdgeInsets.only(left: 20, right: 20),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10),
         //border: Border.all(color: Theme.of(context).colorScheme.primary), //debug
       ),
-      child: FlutterMentions(
+      child: MentionsTextField(
         key: _textEditingControllerKey,
-        keyboardType: TextInputType.multiline,
-        keyboardAppearance: Brightness.dark,
-        suggestionPosition: SuggestionPosition.Top,
         focusNode: _focusNode,
-        style: TextStyle(
+        textStyle: TextStyle(
           color: Theme.of(context).colorScheme.onSurface,
           fontSize: 21,
         ),
-        decoration: InputDecoration(
-          border: InputBorder.none,
-          hintText: AppLocalizations.of(context)!.whatsOnYourMind,
-          hintStyle: TextStyle(
-            color: Theme.of(context).colorScheme.inverseSurface,
-            fontSize: 20,
-          ),
+        hintText: AppLocalizations.of(context)!.whatsOnYourMind,
+        hintStyle: TextStyle(
+          color: Theme.of(context).colorScheme.inverseSurface,
+          fontSize: 20,
         ),
-        maxLines: 10,
-        minLines: 5,
-        onMentionAdd: (p0) {
-          // only triggers when user selects a mention from the list
-          log("mention added: $p0");
-        },
         onMarkupChanged: (p0) {
-          // triggers when something is typed in the text fields
           ref.read(writePostStateProvider.notifier).updateMarkup(p0);
         },
         onSearchChanged: (String trigger, search) {
@@ -382,86 +369,71 @@ class _WritePostState extends ConsumerState<WritePost> {
             _searchHashtags(search);
           }
         },
-        suggestionListDecoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surface,
-          borderRadius: BorderRadius.circular(20),
-        ),
-        mentions: [
-          Mention(
-            suggestionBuilder: (data) {
-              return Container(
-                padding: const EdgeInsets.all(10.0),
-                child: Row(
-                  children: <Widget>[
-                    ClipOval(
-                      child: SizedBox.fromSize(
-                        size: const Size.fromRadius(30), // Image radius
-                        child: Container(
-                          color: Theme.of(context).colorScheme.surface,
-                          child: simplePicture(data['picture'], data['id']),
-                        ),
+        mentionData: {
+          '@': _mentionsSearchResults,
+          '#': _mentionsSearchResultsHashTags,
+        },
+        suggestionBuilder: (trigger, data) {
+          if (trigger == '@') {
+            return flutter_widgets.Container(
+              padding: const EdgeInsets.all(10.0),
+              child: Row(
+                children: <Widget>[
+                  ClipOval(
+                    child: SizedBox.fromSize(
+                      size: const Size.fromRadius(30), // Image radius
+                      child: flutter_widgets.Container(
+                        color: Theme.of(context).colorScheme.surface,
+                        child: simplePicture(data['picture'], data['id']),
                       ),
                     ),
-                    const SizedBox(width: 20.0),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Text(
-                          data['name'] ?? "",
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.inverseSurface,
-                            fontSize: 20,
-                          ),
+                  ),
+                  const SizedBox(width: 20.0),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Text(
+                        data['name'] ?? "",
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.inverseSurface,
+                          fontSize: 20,
                         ),
-                        Text(
-                          '${data['nip05'] ?? ""}',
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.inverseSurface,
-                            fontSize: 12,
-                          ),
+                      ),
+                      Text(
+                        '${data['nip05'] ?? ""}',
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.inverseSurface,
+                          fontSize: 12,
                         ),
-                      ],
-                    ),
-                  ],
-                ),
-              );
-            },
-            trigger: "@",
-            matchAll: true,
-            disableMarkup: false,
-            style: TextStyle(color: Theme.of(context).colorScheme.primary),
-            data: _mentionsSearchResults,
-          ),
-          Mention(
-            suggestionBuilder: (data) {
-              return Container(
-                padding: const EdgeInsets.all(10.0),
-                child: Row(
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            );
+          }
+
+          return flutter_widgets.Container(
+            padding: const EdgeInsets.all(10.0),
+            child: Row(
+              children: <Widget>[
+                const SizedBox(width: 20.0),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    const SizedBox(width: 20.0),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Text(
-                          data['display'] != null ? "#${data['display']}" : "",
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.inverseSurface,
-                            fontSize: 20,
-                          ),
-                        ),
-                      ],
+                    Text(
+                      data['display'] != null ? "#${data['display']}" : "",
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.inverseSurface,
+                        fontSize: 20,
+                      ),
                     ),
                   ],
                 ),
-              );
-            },
-            trigger: "#",
-            matchAll: true,
-            disableMarkup: true,
-            style: TextStyle(color: Colors.purple),
-            data: _mentionsSearchResultsHashTags,
-          ),
-        ],
+              ],
+            ),
+          );
+        },
       ),
     );
   }
@@ -526,7 +498,7 @@ class _TopBar extends ConsumerWidget {
             Expanded(
               child: SizedBox(
                 width: MediaQuery.of(context).size.width * 0.6,
-                child: Container(
+                child: flutter_widgets.Container(
                   margin: const EdgeInsets.symmetric(
                     vertical: 5,
                     horizontal: 10,

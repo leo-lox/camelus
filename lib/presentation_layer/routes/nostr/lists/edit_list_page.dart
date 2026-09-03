@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 import '../../../../domain_layer/entities/list_identifier.dart';
 import '../../../components/lists/edit_list/edit_list.dart';

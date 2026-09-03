@@ -1,5 +1,5 @@
 import 'package:camelus/presentation_layer/atoms/wallet/wallet_card.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ndk/entities.dart' as ndk_entities;
@@ -74,7 +74,7 @@ class _WalletPaySelectAmountState extends ConsumerState<WalletPaySelectAmount> {
     super.dispose();
   }
 
-  _onSwitchCurrency({
+  void _onSwitchCurrency({
     required String previousUnit,
     required String currentUnit,
   }) {
@@ -101,7 +101,7 @@ class _WalletPaySelectAmountState extends ConsumerState<WalletPaySelectAmount> {
     }
   }
 
-  showSnackBar(BuildContext context, String message) {
+  void showSnackBar(BuildContext context, String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         backgroundColor: Theme.of(context).colorScheme.onSurface,

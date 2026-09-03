@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
@@ -21,10 +21,10 @@ class RelaysConnectivityWidget extends ConsumerWidget {
           final isConnected =
               snapshot.hasData &&
               snapshot.data!.isNotEmpty &&
-              snapshot.data!.values.any((e) => e.isConnected);
+              snapshot.data!.any((e) => e.isConnected);
 
           final connectedCount = snapshot.hasData && snapshot.data!.isNotEmpty
-              ? snapshot.data!.values.where((e) => e.isConnected).length
+              ? snapshot.data!.where((e) => e.isConnected).length
               : 0;
 
           //log("Stream updated: isConnected=$isConnected, count=$connectedCount");
