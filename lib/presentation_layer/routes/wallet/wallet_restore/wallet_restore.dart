@@ -6,7 +6,7 @@ import 'package:camelus/presentation_layer/atoms/wallet/mint_info_card_small.dar
 import 'package:camelus/presentation_layer/providers/ndk_provider.dart';
 import 'package:camelus/presentation_layer/routes/wallet/wallet_providers/wallet_seed_state_provider.dart';
 import 'package:camelus/presentation_layer/routes/wallet/wallet_restore/wallet_restore_state_provider.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ndk/entities.dart';
 

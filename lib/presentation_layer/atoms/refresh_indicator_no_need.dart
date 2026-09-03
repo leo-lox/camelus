@@ -1,5 +1,5 @@
 import 'package:custom_refresh_indicator/custom_refresh_indicator.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// A custom refresh indicator widget that displays a message instead of the usual indicator
 ///

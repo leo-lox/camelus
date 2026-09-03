@@ -1,5 +1,5 @@
 import 'package:camelus/presentation_layer/components/note_card/bottom_action_row.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:shimmer/shimmer.dart';
 
 class SkeletonNote extends StatelessWidget {

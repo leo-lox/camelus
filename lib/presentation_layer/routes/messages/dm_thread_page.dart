@@ -1,7 +1,7 @@
 import 'package:camelus/helpers/helpers.dart';
 import 'package:camelus/presentation_layer/routing/route_paths.dart';
 import 'package:camelus/l10n/app_localizations.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_list_view/flutter_list_view.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

@@ -3,7 +3,7 @@ import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:camelus/presentation_layer/atoms/long_button.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:crop_your_image/crop_your_image.dart';
 
 class CropAvatar extends StatefulWidget {

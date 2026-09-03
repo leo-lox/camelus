@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:ndk/entities.dart' as ndk_entities;
 
 import '../../../helpers/wallet_number_formatting.dart';

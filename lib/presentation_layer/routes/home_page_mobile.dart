@@ -4,7 +4,7 @@ import 'package:camelus/l10n/app_localizations.dart';
 import 'package:camelus/presentation_layer/atoms/spinner_center.dart';
 import 'package:camelus/presentation_layer/providers/metadata_state_provider.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';

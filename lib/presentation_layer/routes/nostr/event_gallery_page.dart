@@ -1,7 +1,7 @@
 import 'package:camelus/presentation_layer/components/images_gallery.dart';
 import 'package:camelus/presentation_layer/providers/event_feed/event_feed_provider.dart';
 import 'package:camelus/presentation_layer/providers/parsed_note_cache_provider.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class EventGalleryPage extends ConsumerStatefulWidget {

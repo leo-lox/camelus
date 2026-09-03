@@ -87,3 +87,5 @@ build-dir/
 
 /lib/l10n/*.dart
 /untranslated-messages.txt
+# Widget Preview related
+.widget_preview/

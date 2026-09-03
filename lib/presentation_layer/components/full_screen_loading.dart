@@ -1,6 +1,6 @@
 import 'dart:math';
 import 'dart:ui';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 // A widget that displays a full-screen loading animation with text and animated blobs.
 class FullScreenLoading extends StatefulWidget {

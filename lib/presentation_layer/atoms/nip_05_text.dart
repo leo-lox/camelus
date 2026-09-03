@@ -1,5 +1,5 @@
 import 'package:camelus/helpers/helpers.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 class Nip05Text extends StatelessWidget {
   final String pubkey;

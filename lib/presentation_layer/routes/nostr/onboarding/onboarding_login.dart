@@ -5,7 +5,7 @@ import 'package:camelus/presentation_layer/components/responsive_center.dart';
 import 'package:camelus/helpers/bip340.dart';
 import 'package:camelus/helpers/helpers.dart';
 import 'package:flutter/gestures.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hex/hex.dart';

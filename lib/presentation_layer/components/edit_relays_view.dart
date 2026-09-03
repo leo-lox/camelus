@@ -3,7 +3,7 @@ import 'package:camelus/domain_layer/entities/relay.dart';
 import 'package:camelus/l10n/app_localizations.dart';
 import 'package:camelus/presentation_layer/atoms/long_button.dart';
 import 'package:camelus/presentation_layer/providers/edit_relays_provider.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class EditRelaysView extends ConsumerStatefulWidget {

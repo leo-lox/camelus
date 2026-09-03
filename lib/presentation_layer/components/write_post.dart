@@ -14,7 +14,7 @@ import 'package:camelus/presentation_layer/providers/metadata_state_provider.dar
 import 'package:camelus/presentation_layer/providers/search_provider.dart';
 import 'package:camelus/presentation_layer/providers/write_post_state.provider.dart';
 import 'package:camelus/config/default_suggestions.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_mentions/flutter_mentions.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';

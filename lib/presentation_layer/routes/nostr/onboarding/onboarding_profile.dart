@@ -4,7 +4,7 @@ import 'dart:typed_data';
 import 'package:camelus/l10n/app_localizations.dart';
 import 'package:camelus/presentation_layer/components/edit_profile.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../domain_layer/entities/mem_file.dart';
