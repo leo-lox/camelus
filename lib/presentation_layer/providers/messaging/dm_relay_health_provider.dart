@@ -89,7 +89,7 @@ class DmRelayHealthNotifier extends Notifier<DmRelayHealthState> {
   late final String peerPubkey;
 
   StreamSubscription? _connectivitySubscription;
-  Map<String, RelayConnectivity>? _currentConnectivity;
+  List<RelayConnectivity>? _currentConnectivity;
 
   DmRelayHealthNotifier(this.peerPubkey);
 
@@ -179,7 +179,9 @@ class DmRelayHealthNotifier extends Notifier<DmRelayHealthState> {
 
   bool _isRelayConnected(String url) {
     if (_currentConnectivity == null) return false;
-    return _currentConnectivity![url]?.isConnected ?? false;
+    return _currentConnectivity!.any(
+      (connectivity) => connectivity.url == url && connectivity.isConnected,
+    );
   }
 
   Future<List<String>> _fetchDmRelaysForPubkey(String pubkey) async {
@@ -254,9 +256,7 @@ class DmRelayHealthNotifier extends Notifier<DmRelayHealthState> {
         });
   }
 
-  void _updateConnectivityStatus(
-    Map<String, RelayConnectivity> connectivityMap,
-  ) {
+  void _updateConnectivityStatus(List<RelayConnectivity> connectivityList) {
     if (state.myRelays.isEmpty && state.peerRelays.isEmpty) {
       // Not yet loaded relays, skip update
       return;
@@ -264,13 +264,19 @@ class DmRelayHealthNotifier extends Notifier<DmRelayHealthState> {
 
     // Update my relays connectivity
     final updatedMyRelays = state.myRelays.map((relay) {
-      final isConnected = connectivityMap[relay.url]?.isConnected ?? false;
+      final isConnected = connectivityList.any(
+        (connectivity) =>
+            connectivity.url == relay.url && connectivity.isConnected,
+      );
       return relay.copyWith(isConnected: isConnected);
     }).toList();
 
     // Update peer relays connectivity
     final updatedPeerRelays = state.peerRelays.map((relay) {
-      final isConnected = connectivityMap[relay.url]?.isConnected ?? false;
+      final isConnected = connectivityList.any(
+        (connectivity) =>
+            connectivity.url == relay.url && connectivity.isConnected,
+      );
       return relay.copyWith(isConnected: isConnected);
     }).toList();
 

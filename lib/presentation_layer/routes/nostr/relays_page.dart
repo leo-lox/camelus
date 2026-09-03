@@ -33,19 +33,17 @@ class _RelaysPageState extends ConsumerState<RelaysPage> {
         title: Text(AppLocalizations.of(context)!.relays),
       ),
       body: SafeArea(
-        child: StreamBuilder<Map<String, RelayConnectivity>>(
+        child: StreamBuilder<List<RelayConnectivity>>(
           stream: ndk.connectivity.relayConnectivityChanges,
           builder: (context, snapshot) {
             if (snapshot.hasData && snapshot.data != null) {
-              final relaysMap = snapshot.data!;
-              final entries = relaysMap.entries.toList();
+              final relays = snapshot.data!;
 
               return ListView.builder(
-                itemCount: entries.length,
+                itemCount: relays.length,
                 itemBuilder: (context, index) {
-                  final entry = entries[index];
-                  final url = entry.key;
-                  final relay = entry.value;
+                  final relay = relays[index];
+                  final url = relay.url;
 
                   // Check if this relay has privacy policy or terms of service
                   final hasPrivacyPolicy =
