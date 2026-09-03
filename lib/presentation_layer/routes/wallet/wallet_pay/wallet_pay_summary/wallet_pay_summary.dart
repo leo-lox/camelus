@@ -15,7 +15,7 @@ class WalletPaySummary extends ConsumerWidget {
   final Function backCallback;
   const WalletPaySummary({super.key, required this.backCallback});
 
-  showSnackBar(BuildContext context, String message) {
+  void showSnackBar(BuildContext context, String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         backgroundColor: Theme.of(context).colorScheme.error,

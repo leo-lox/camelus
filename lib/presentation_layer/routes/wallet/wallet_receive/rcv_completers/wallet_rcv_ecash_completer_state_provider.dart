@@ -1,7 +1,6 @@
 import 'package:ndk/entities.dart' as ndk_entities;
 import 'package:ndk/ndk.dart';
 import 'package:riverpod/legacy.dart';
-import 'package:riverpod/riverpod.dart';
 
 import '../../../../providers/ndk_provider.dart';
 

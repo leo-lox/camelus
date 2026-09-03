@@ -76,7 +76,7 @@ class _WalletPaySelectAmountState extends ConsumerState<WalletReceiveAmount> {
     super.dispose();
   }
 
-  _onSwitchCurrency({
+  void _onSwitchCurrency({
     required String previousUnit,
     required String currentUnit,
   }) {
@@ -104,7 +104,7 @@ class _WalletPaySelectAmountState extends ConsumerState<WalletReceiveAmount> {
     }
   }
 
-  showSnackBar(BuildContext context, String message) {
+  void showSnackBar(BuildContext context, String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         backgroundColor: Theme.of(context).colorScheme.error,
@@ -235,7 +235,7 @@ class _WalletPaySelectAmountState extends ConsumerState<WalletReceiveAmount> {
                     showHaptics: true,
                     trackColor: Theme.of(
                       context,
-                    ).colorScheme.onSurface.withOpacity(0.1),
+                    ).colorScheme.onSurface.withValues(alpha: 0.1),
                     activeColor: Theme.of(context).colorScheme.primary,
                   ),
                 ),

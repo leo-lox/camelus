@@ -23,7 +23,7 @@ class _WalletReceivePageState extends ConsumerState<WalletReceivePage>
 
   bool horizontalScrollLock = false;
 
-  _navigateToNextPage() {
+  void _navigateToNextPage() {
     if (_horizontalPageController.page != null) {
       _horizontalPageController.nextPage(
         duration: const Duration(milliseconds: 300),
@@ -32,7 +32,7 @@ class _WalletReceivePageState extends ConsumerState<WalletReceivePage>
     }
   }
 
-  _navigateToPreviousPage() {
+  void _navigateToPreviousPage() {
     if (_horizontalPageController.page != null) {
       _horizontalPageController.previousPage(
         duration: const Duration(milliseconds: 300),

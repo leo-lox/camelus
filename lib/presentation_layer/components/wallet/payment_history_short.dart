@@ -1,9 +1,6 @@
 import 'package:material_ui/material_ui.dart';
-import 'package:intl/intl.dart';
 import 'package:ndk/entities.dart' as ndk_entities;
-import 'package:timeago/timeago.dart' as timeago;
 
-import '../../../helpers/wallet_number_formatting.dart';
 import '../../atoms/wallet/wallet_transaction_card.dart';
 
 class PaymentHistoryShort extends StatelessWidget {

@@ -330,7 +330,7 @@ class _WalletOverlayCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Positioned.fill(
       child: Container(
-        color: Colors.black.withOpacity(0.55),
+        color: Colors.black.withValues(alpha: 0.55),
         padding: const EdgeInsets.all(20),
         alignment: Alignment.center,
         child: ConstrainedBox(

@@ -171,7 +171,7 @@ class _AnimatedQrState extends ConsumerState<AnimatedQr> {
               ),
             const Spacer(),
             Switch(
-              activeColor: Colors.black,
+              activeThumbColor: Colors.black,
               value: showAnimatedQr,
               onChanged: (value) {
                 setState(() {

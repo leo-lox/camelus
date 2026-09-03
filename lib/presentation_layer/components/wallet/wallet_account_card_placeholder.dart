@@ -11,7 +11,7 @@ class WalletAccountCardPlaceholder extends StatelessWidget {
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surfaceVariant,
+          color: Theme.of(context).colorScheme.surfaceContainerHighest,
           borderRadius: BorderRadius.circular(18.0),
           border: Border.all(
             width: 1,
