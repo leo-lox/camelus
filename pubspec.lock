@@ -136,17 +136,8 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.2.2"
-  bip32:
-    dependency: "direct main"
-    description:
-      path: "."
-      ref: "9db7cf7c9e3a4e61f145ca43b01469c6464dce89"
-      resolved-ref: "9db7cf7c9e3a4e61f145ca43b01469c6464dce89"
-      url: "https://github.com/5eeman/bip32-dart.git"
-    source: git
-    version: "2.0.1"
   bip32_keys:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: bip32_keys
       sha256: "40f3bcdbb6dac449d95405d58aa203706a917a27eca76cea10b54715aebd53c6"
@@ -979,10 +970,10 @@ packages:
     dependency: transitive
     description:
       name: idb_shim
-      sha256: "6cd94b71a33f1223b01ea2b359c3a6fde5980872b23b31d176a64c74d4dede57"
+      sha256: e36a748165663a165e1f292e9d85af6e3aa087f6e2291d16f86b2035103b2950
       url: "https://pub.dev"
     source: hosted
-    version: "2.8.5+2"
+    version: "2.9.8"
   image:
     dependency: "direct main"
     description:
@@ -1231,24 +1222,27 @@ packages:
   ndk:
     dependency: "direct main"
     description:
-      path: "../ndk/packages/ndk"
-      relative: true
-    source: path
-    version: "0.9.1-dev.1"
+      name: ndk
+      sha256: "719e1537d63833101ab7de3e4c6d530d484a2a3090c6ca6054cb0f48af7fe88b"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.9.0"
   ndk_flutter:
     dependency: "direct main"
     description:
-      path: "../ndk/packages/ndk_flutter"
-      relative: true
-    source: path
-    version: "0.9.0-dev.1"
+      name: ndk_flutter
+      sha256: "2a4a4c3273e48d31c529edbf8a096ffa9791eba320d936a67398e000eb57696c"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.9.0"
   ndk_objectbox:
     dependency: "direct main"
     description:
-      path: "../ndk/packages/objectbox"
-      relative: true
-    source: path
-    version: "0.2.12-dev.3"
+      name: ndk_objectbox
+      sha256: "10e9ae81d72cf4fe06c5863f606927f096addcfb6f23b442c3746260ea0aaf9c"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.2.12+1"
   nm:
     dependency: transitive
     description:
@@ -1605,26 +1599,18 @@ packages:
     dependency: "direct main"
     description:
       name: sembast
-      sha256: "139cf71496105de32e7a08a4e3a1ead0f81c4a616ec9703ed07e8f0d10cdd505"
+      sha256: a58b26925e23071cf0f4754d8449aabe829e9a9930a872fb18e6ae4c2c88e025
       url: "https://pub.dev"
     source: hosted
-    version: "3.8.6"
-  sembast_cache_manager:
-    dependency: "direct main"
-    description:
-      name: sembast_cache_manager
-      sha256: "62e63fb7bf9558d409416ddaa782f254f765c7ac691c69bb0f294fb40bc90593"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.0.7"
+    version: "3.8.9+1"
   sembast_web:
     dependency: "direct main"
     description:
       name: sembast_web
-      sha256: eaeb2f14613098fb8b363b01ae4e280031736b7ae1aa38653dbee0d47af6e3ea
+      sha256: f466feb09fd2b403ebe3f462880a6f9118e1488f14e32a61e21f9209264a066b
       url: "https://pub.dev"
     source: hosted
-    version: "2.4.4+1"
+    version: "2.4.5+1"
   serverpod_client:
     dependency: transitive
     description:
@@ -1890,10 +1876,10 @@ packages:
     dependency: transitive
     description:
       name: synchronized
-      sha256: c254ade258ec8282947a0acbbc90b9575b4f19673533ee46f2f6e9b3aeefd7c0
+      sha256: "3a7b5d17422dd0f8d5c6c14feaa5a1c65638b9455f871a96f08437562c046931"
       url: "https://pub.dev"
     source: hosted
-    version: "3.4.0"
+    version: "3.4.1+2"
   system_theme:
     dependency: "direct main"
     description:
@@ -2002,8 +1988,8 @@ packages:
     dependency: "direct main"
     description:
       path: "packages/bc_ur"
-      ref: "tmp/camelus/1-10-0"
-      resolved-ref: "29314e42c9b99abbeeb9ae66ca21bf84115b82d4"
+      ref: HEAD
+      resolved-ref: c33e598656930453e6c0ad0e77a8287efecffdcb
       url: "https://github.com/relaystr/ndk.git"
     source: git
     version: "0.1.0"
