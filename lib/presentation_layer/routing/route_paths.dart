@@ -83,4 +83,8 @@ class RoutePaths {
         '/starter/${Nip19.encodePubKey(pubkey)}/${Uri.encodeComponent(name)}/edit';
     return isNew ? '$base?new=true' : base;
   }
+
+  static String map() => '/map';
+
+  static String mapNavigation() => '${map()}/navigation';
 }
