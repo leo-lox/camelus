@@ -221,14 +221,6 @@ class NostrSideMenu extends ConsumerWidget {
                             .selectTab(NavigationTab.home);
                       },
                     ),
-                    _drawerItem(
-                      label: "map",
-                      routeName: RoutePaths.map(),
-                      icon: PhosphorIcons.mapTrifold,
-                      onTap: () {
-                        context.push(RoutePaths.map());
-                      },
-                    ),
                     if (!hideOnMobile)
                       _drawerItem(
                         icon: PhosphorIcons.magnifyingGlass,

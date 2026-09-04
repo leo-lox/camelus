@@ -120,9 +120,6 @@ dependencies:
   system_theme: ^3.3.0
   ur:
     path: ../ndk/packages/bc_ur
-  mapbox_maps_flutter: ^2.30.0
-  geolocator: ^14.0.2
-  flutter_tts: ^4.2.5
 
   
 

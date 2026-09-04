@@ -1,4 +1,3 @@
-import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ndk_flutter/ndk_flutter.dart';
@@ -27,11 +26,6 @@ class _AppInitializationShellState
   void initState() {
     super.initState();
     _initializeAppServices();
-
-    String mapboxAccessToken = const String.fromEnvironment(
-      "MAPBOX_ACCESS_TOKEN",
-    );
-    MapboxOptions.setAccessToken(mapboxAccessToken);
   }
 
   void _initializeAppServices() {

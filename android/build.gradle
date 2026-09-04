@@ -14,14 +14,6 @@ subprojects {
     project.evaluationDependsOn(':app')
 }
 
-// mapbox_maps_flutter 2.30.0 configures Kotlin compiler options even when
-// AGP 9 causes it to skip applying the Kotlin Android plugin itself.
-gradle.beforeProject { project ->
-    if (project.name == 'mapbox_maps_flutter') {
-        project.pluginManager.apply('org.jetbrains.kotlin.android')
-    }
-}
-
 tasks.register("clean", Delete) {
     delete rootProject.buildDir
 }
