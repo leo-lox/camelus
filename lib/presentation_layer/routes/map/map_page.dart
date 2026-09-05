@@ -1,15 +1,18 @@
 import 'dart:typed_data';
-import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 
 import '../../../domain_layer/entities/map_coordinate.dart';
-import '../../../domain_layer/entities/navigation_route.dart';
-import '../../routing/route_paths.dart';
+import 'atoms/location_action_button.dart';
+import 'atoms/location_details_sheet.dart';
+import 'atoms/map_error_banner.dart';
+import 'atoms/map_search_bar.dart';
+import 'atoms/map_search_results.dart';
+import 'atoms/navigation_action_button.dart';
 import 'map_state_notifier.dart';
+import 'utils/map_pin_generator.dart';
 
 class MapPage extends ConsumerStatefulWidget {
   const MapPage({super.key});
@@ -20,13 +23,29 @@ class MapPage extends ConsumerStatefulWidget {
 
 class _MapPageState extends ConsumerState<MapPage> {
   final _searchController = TextEditingController();
+  late final DraggableScrollableController _sheetController;
   MapboxMap? _map;
   PointAnnotationManager? _pointManager;
   PolylineAnnotationManager? _lineManager;
-  Future<Uint8List>? _pinImage;
+  Uint8List? _cachedPinBytes;
+
+  @override
+  void initState() {
+    super.initState();
+    _sheetController = DraggableScrollableController();
+    _sheetController.addListener(_onSheetChanged);
+  }
+
+  void _onSheetChanged() {
+    if (mounted) {
+      setState(() {});
+    }
+  }
 
   @override
   void dispose() {
+    _sheetController.removeListener(_onSheetChanged);
+    _sheetController.dispose();
     _searchController.dispose();
     super.dispose();
   }
@@ -49,6 +68,7 @@ class _MapPageState extends ConsumerState<MapPage> {
         pulsingEnabled: true,
         puckBearingEnabled: true,
         puckBearing: PuckBearing.HEADING,
+        showAccuracyRing: true,
       ),
     );
     if (!mounted || _map != map) return;
@@ -64,9 +84,12 @@ class _MapPageState extends ConsumerState<MapPage> {
     if (!mounted || _map != map) return;
     await _lineManager?.deleteAll();
     if (!mounted || _map != map) return;
+
     final destination = state.destination;
     if (destination != null) {
-      final pinImage = await (_pinImage ??= _createPinImage(colorScheme.error));
+      _cachedPinBytes ??= await MapPinGenerator.createPinImage(
+        colorScheme.error,
+      );
       if (!mounted || _map != map) return;
       await _pointManager?.create(
         PointAnnotationOptions(
@@ -76,7 +99,7 @@ class _MapPageState extends ConsumerState<MapPage> {
               destination.coordinate.latitude,
             ),
           ),
-          image: pinImage,
+          image: _cachedPinBytes!,
           iconAnchor: IconAnchor.BOTTOM,
         ),
       );
@@ -99,43 +122,21 @@ class _MapPageState extends ConsumerState<MapPage> {
   Position _position(MapCoordinate coordinate) =>
       Position(coordinate.longitude, coordinate.latitude);
 
-  Future<Uint8List> _createPinImage(Color color) async {
-    const size = ui.Size(72, 72);
-    final recorder = ui.PictureRecorder();
-    final canvas = Canvas(recorder);
-    final painter = TextPainter(
-      text: TextSpan(
-        text: String.fromCharCode(Icons.location_on.codePoint),
-        style: TextStyle(
-          color: color,
-          fontFamily: Icons.location_on.fontFamily,
-          package: Icons.location_on.fontPackage,
-          fontSize: size.width,
-        ),
-      ),
-      textDirection: TextDirection.ltr,
-    )..layout();
-    painter.paint(canvas, Offset((size.width - painter.width) / 2, 0));
-    final image = await recorder.endRecording().toImage(
-      size.width.toInt(),
-      size.height.toInt(),
+  Future<void> _flyToLocation(MapCoordinate location) async {
+    final map = _map;
+    if (map == null || !mounted) return;
+    await map.flyTo(
+      CameraOptions(center: Point(coordinates: _position(location)), zoom: 15),
+      MapAnimationOptions(duration: 650),
     );
-    final bytes = await image.toByteData(format: ui.ImageByteFormat.png);
-    image.dispose();
-    return bytes!.buffer.asUint8List();
   }
 
-  Future<void> _locateUser() async {
-    await ref.read(mapStateProvider.notifier).locateUser();
-    final location = ref.read(mapStateProvider).currentLocation;
-    if (location != null) {
-      await _map?.flyTo(
-        CameraOptions(
-          center: Point(coordinates: _position(location)),
-          zoom: 14,
-        ),
-        MapAnimationOptions(duration: 650),
-      );
+  Future<void> _handleLocationFabTap() async {
+    await ref.read(mapStateProvider.notifier).onLocationFabPressed();
+    final currentState = ref.read(mapStateProvider);
+    if (currentState.currentLocation != null &&
+        currentState.locationStatus == LocationLockStatus.lockedCentered) {
+      await _flyToLocation(currentState.currentLocation!);
     }
   }
 
@@ -159,110 +160,54 @@ class _MapPageState extends ConsumerState<MapPage> {
       ) ??
       Future.value();
 
-  Widget _locationSheet(MapState state) {
-    final destination = state.destination!;
-    return DraggableScrollableSheet(
-      initialChildSize: 0.32,
-      minChildSize: 0.18,
-      maxChildSize: 0.72,
-      builder: (context, scrollController) => Material(
-        elevation: 12,
-        color: Theme.of(context).colorScheme.surface,
-        child: ListView(
-          controller: scrollController,
-          padding: const EdgeInsets.fromLTRB(24, 12, 24, 24),
-          children: [
-            Center(
-              child: Container(
-                width: 32,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.outlineVariant,
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
-            ),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    destination.name,
-                    style: Theme.of(context).textTheme.titleLarge,
-                  ),
-                ),
-                IconButton(
-                  tooltip: 'Close location details',
-                  onPressed: ref
-                      .read(mapStateProvider.notifier)
-                      .closeLocationSheet,
-                  icon: const Icon(Icons.close),
-                ),
-              ],
-            ),
-            if (destination.address.isNotEmpty) Text(destination.address),
-            const SizedBox(height: 16),
-            SegmentedButton<TravelMode>(
-              segments: const [
-                ButtonSegment(
-                  value: TravelMode.driving,
-                  icon: Icon(Icons.directions_car),
-                  tooltip: 'Driving',
-                ),
-                ButtonSegment(
-                  value: TravelMode.walking,
-                  icon: Icon(Icons.directions_walk),
-                  tooltip: 'Walking',
-                ),
-                ButtonSegment(
-                  value: TravelMode.cycling,
-                  icon: Icon(Icons.directions_bike),
-                  tooltip: 'Cycling',
-                ),
-              ],
-              selected: {state.travelMode},
-              onSelectionChanged: (modes) => ref
-                  .read(mapStateProvider.notifier)
-                  .setTravelMode(modes.first),
-            ),
-            const SizedBox(height: 16),
-            if (state.isRouting)
-              const LinearProgressIndicator()
-            else if (state.route != null)
-              FilledButton.icon(
-                onPressed: () => context.push(RoutePaths.mapNavigation()),
-                icon: const Icon(Icons.navigation),
-                label: Text(
-                  'Start ${(state.route!.lengthMeters / 1000).toStringAsFixed(1)} km',
-                ),
-              )
-            else
-              FilledButton.icon(
-                onPressed: () =>
-                    ref.read(mapStateProvider.notifier).calculateRoute(),
-                icon: const Icon(Icons.directions),
-                label: const Text('Get directions'),
-              ),
-          ],
-        ),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(mapStateProvider);
-    final scheme = Theme.of(context).colorScheme;
+
+    ref.listen<MapState>(mapStateProvider, (previous, next) {
+      if (previous?.destination != next.destination ||
+          previous?.route != next.route) {
+        _render(next);
+      }
+
+      if (next.destination == null && _searchController.text.isNotEmpty) {
+        _searchController.clear();
+      }
+
+      final location = next.currentLocation;
+      if (location != null) {
+        final becameLocked =
+            previous?.locationStatus != LocationLockStatus.lockedCentered &&
+            next.locationStatus == LocationLockStatus.lockedCentered;
+        if (becameLocked) {
+          _flyToLocation(location);
+        }
+      }
+    });
+
+    final hasRoute = state.route != null;
+    final mediaQuery = MediaQuery.of(context);
+    final screenHeight = mediaQuery.size.height;
+    final isSheetOpen = state.destination != null && state.isLocationSheetOpen;
+
+    final double currentSheetExtent = isSheetOpen && _sheetController.isAttached
+        ? _sheetController.size
+        : (isSheetOpen ? 0.35 : 0.0);
+
+    final double fabBottom = isSheetOpen
+        ? (currentSheetExtent * screenHeight) + 16.0
+        : 24.0;
+
+    final bool hideFabGroup = isSheetOpen && currentSheetExtent >= 0.50;
 
     return Scaffold(
       body: Stack(
         children: [
           MapWidget(
-            viewport: CameraViewportState(
-              center: Point(coordinates: Position(13.405, 52.52)),
-              zoom: 10,
-            ),
             onMapCreated: _onMapCreated,
+            onScrollListener: (_) {
+              ref.read(mapStateProvider.notifier).onMapMovedByUser();
+            },
           ),
           SafeArea(
             child: Align(
@@ -271,69 +216,21 @@ class _MapPageState extends ConsumerState<MapPage> {
                 constraints: const BoxConstraints(maxWidth: 680),
                 child: Padding(
                   padding: const EdgeInsets.all(16),
-                  child: Material(
-                    elevation: 5,
-                    borderRadius: BorderRadius.circular(8),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        TextField(
-                          controller: _searchController,
-                          onChanged: ref
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      MapSearchBar(controller: _searchController),
+                      const SizedBox(height: 8),
+                      MapSearchResults(
+                        onPlaceTap: (place) {
+                          _searchController.text = place.name;
+                          ref
                               .read(mapStateProvider.notifier)
-                              .setQuery,
-                          decoration: InputDecoration(
-                            hintText: 'Search for a destination',
-                            prefixIcon: const Icon(Icons.search),
-                            suffixIcon: state.isSearching
-                                ? const Padding(
-                                    padding: EdgeInsets.all(14),
-                                    child: SizedBox(
-                                      width: 18,
-                                      height: 18,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2,
-                                      ),
-                                    ),
-                                  )
-                                : null,
-                            border: InputBorder.none,
-                            contentPadding: const EdgeInsets.symmetric(
-                              vertical: 16,
-                            ),
-                          ),
-                        ),
-                        if (state.suggestions.isNotEmpty)
-                          ConstrainedBox(
-                            constraints: const BoxConstraints(maxHeight: 280),
-                            child: ListView.separated(
-                              shrinkWrap: true,
-                              itemCount: state.suggestions.length,
-                              separatorBuilder: (_, _) =>
-                                  const Divider(height: 1),
-                              itemBuilder: (context, index) {
-                                final place = state.suggestions[index];
-                                return ListTile(
-                                  leading: const Icon(
-                                    Icons.location_on_outlined,
-                                  ),
-                                  title: Text(place.name),
-                                  subtitle: place.address.isEmpty
-                                      ? null
-                                      : Text(place.address),
-                                  onTap: () {
-                                    _searchController.text = place.name;
-                                    ref
-                                        .read(mapStateProvider.notifier)
-                                        .selectDestination(place);
-                                    _focusPlace(place.coordinate);
-                                  },
-                                );
-                              },
-                            ),
-                          ),
-                      ],
-                    ),
+                              .selectDestination(place);
+                          _focusPlace(place.coordinate);
+                        },
+                      ),
+                    ],
                   ),
                 ),
               ),
@@ -341,32 +238,38 @@ class _MapPageState extends ConsumerState<MapPage> {
           ),
           Positioned(
             right: 16,
-            bottom: state.route == null ? 24 : 150,
-            child: FloatingActionButton(
-              tooltip: 'Find my location',
-              backgroundColor: scheme.surface,
-              foregroundColor: scheme.onSurface,
-              onPressed: _locateUser,
-              child: const Icon(Icons.my_location),
-            ),
-          ),
-          if (state.destination != null && state.isLocationSheetOpen)
-            _locationSheet(state),
-          if (state.error != null)
-            Positioned(
-              left: 16,
-              right: 16,
-              bottom: 16,
-              child: MaterialBanner(
-                content: Text(state.error!),
-                actions: [
-                  TextButton(
-                    onPressed: _locateUser,
-                    child: const Text('Retry'),
-                  ),
-                ],
+            bottom: fabBottom,
+            child: AnimatedOpacity(
+              duration: const Duration(milliseconds: 200),
+              opacity: hideFabGroup ? 0.0 : 1.0,
+              child: IgnorePointer(
+                ignoring: hideFabGroup,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    NavigationActionButton(
+                      onPressed: () {
+                        // Start route navigation (no logic for now)
+                      },
+                    ),
+                    const SizedBox(height: 12),
+                    LocationActionButton(
+                      onPressed: _handleLocationFabTap,
+                      hasActiveRoute: hasRoute,
+                    ),
+                  ],
+                ),
               ),
             ),
+          ),
+          LocationDetailsSheet(controller: _sheetController),
+          const Positioned(
+            left: 0,
+            right: 0,
+            bottom: 24,
+            child: MapErrorBanner(),
+          ),
         ],
       ),
     );

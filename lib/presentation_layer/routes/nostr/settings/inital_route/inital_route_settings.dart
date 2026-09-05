@@ -61,6 +61,7 @@ class InitalRouteSettingsState extends ConsumerState<InitalRouteSettings> {
           ),
           _RouteListTile(route: '/wallet/dashboard', name: l10n.payments),
           _RouteListTile(route: '/messages', name: l10n.messages),
+          _RouteListTile(route: '/map', name: "map"),
         ],
       ),
     );

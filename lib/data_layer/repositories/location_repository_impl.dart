@@ -8,6 +8,12 @@ class LocationRepositoryImpl implements LocationRepository {
   LocationRepositoryImpl(this._dataSource);
 
   @override
+  Future<bool> checkPermission() => _dataSource.checkPermission();
+
+  @override
+  Future<bool> requestPermission() => _dataSource.requestPermission();
+
+  @override
   Future<MapCoordinate> getCurrentLocation() =>
       _dataSource.getCurrentLocation();
 

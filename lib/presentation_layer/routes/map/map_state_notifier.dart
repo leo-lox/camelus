@@ -8,6 +8,13 @@ import '../../../domain_layer/entities/map_place.dart';
 import '../../../domain_layer/entities/navigation_route.dart';
 import '../../providers/map_providers.dart';
 
+enum LocationLockStatus {
+  permissionNotGiven,
+  searching,
+  lockedCentered,
+  lockedUncentered,
+}
+
 class MapState {
   final String query;
   final List<MapPlace> suggestions;
@@ -19,6 +26,7 @@ class MapState {
   final bool isRouting;
   final bool isLocationSheetOpen;
   final int activeManeuverIndex;
+  final LocationLockStatus locationStatus;
   final String? error;
 
   const MapState({
@@ -32,6 +40,7 @@ class MapState {
     this.isRouting = false,
     this.isLocationSheetOpen = false,
     this.activeManeuverIndex = 0,
+    this.locationStatus = LocationLockStatus.permissionNotGiven,
     this.error,
   });
 
@@ -46,9 +55,11 @@ class MapState {
     bool? isRouting,
     bool? isLocationSheetOpen,
     int? activeManeuverIndex,
+    LocationLockStatus? locationStatus,
     String? error,
     bool clearDestination = false,
     bool clearRoute = false,
+    bool clearError = false,
   }) => MapState(
     query: query ?? this.query,
     suggestions: suggestions ?? this.suggestions,
@@ -60,7 +71,8 @@ class MapState {
     isRouting: isRouting ?? this.isRouting,
     isLocationSheetOpen: isLocationSheetOpen ?? this.isLocationSheetOpen,
     activeManeuverIndex: activeManeuverIndex ?? this.activeManeuverIndex,
-    error: error,
+    locationStatus: locationStatus ?? this.locationStatus,
+    error: clearError ? null : error ?? this.error,
   );
 }
 
@@ -85,7 +97,7 @@ class MapStateNotifier extends Notifier<MapState> {
     state = state.copyWith(
       query: query,
       isSearching: query.trim().isNotEmpty,
-      error: null,
+      clearError: true,
     );
     _searchTimer?.cancel();
     if (query.trim().length < 2) {
@@ -117,7 +129,7 @@ class MapStateNotifier extends Notifier<MapState> {
       suggestions: const [],
       query: destination.name,
       isLocationSheetOpen: true,
-      error: null,
+      clearError: true,
     );
   }
 
@@ -134,7 +146,7 @@ class MapStateNotifier extends Notifier<MapState> {
       query: '',
       clearRoute: true,
       isLocationSheetOpen: true,
-      error: null,
+      clearError: true,
     );
     try {
       final place = await ref.read(reverseGeocodeProvider)(coordinate);
@@ -156,18 +168,70 @@ class MapStateNotifier extends Notifier<MapState> {
     }
   }
 
-  void closeLocationSheet() =>
-      state = state.copyWith(isLocationSheetOpen: false);
+  void closeLocationSheet() => state = state.copyWith(
+    isLocationSheetOpen: false,
+    clearDestination: true,
+    clearRoute: true,
+    query: '',
+  );
+
+  void clearError() => state = state.copyWith(clearError: true);
+
+  Future<void> onLocationFabPressed() async {
+    if (state.locationStatus == LocationLockStatus.searching) return;
+
+    if (state.locationStatus == LocationLockStatus.permissionNotGiven ||
+        state.currentLocation == null) {
+      state = state.copyWith(
+        locationStatus: LocationLockStatus.searching,
+        clearError: true,
+      );
+      try {
+        final hasPermission = await ref
+            .read(locationRepositoryProvider)
+            .requestPermission();
+        if (!hasPermission) {
+          state = state.copyWith(
+            locationStatus: LocationLockStatus.permissionNotGiven,
+            error: 'Location permission required to find your location.',
+          );
+          return;
+        }
+        final location = await ref
+            .read(locationRepositoryProvider)
+            .getCurrentLocation();
+        state = state.copyWith(
+          currentLocation: location,
+          locationStatus: LocationLockStatus.lockedCentered,
+          clearError: true,
+        );
+      } catch (error) {
+        state = state.copyWith(
+          locationStatus: LocationLockStatus.permissionNotGiven,
+          error: error.toString(),
+        );
+      }
+    } else {
+      // Location is available: set state to lockedCentered
+      state = state.copyWith(
+        locationStatus: LocationLockStatus.lockedCentered,
+        clearError: true,
+      );
+    }
+  }
+
+  void onMapMovedByUser() {
+    if (state.locationStatus == LocationLockStatus.lockedCentered) {
+      state = state.copyWith(
+        locationStatus: LocationLockStatus.lockedUncentered,
+      );
+    }
+  }
 
   Future<void> locateUser({bool follow = false}) async {
-    try {
-      final location = await ref
-          .read(locationRepositoryProvider)
-          .getCurrentLocation();
-      state = state.copyWith(currentLocation: location, error: null);
-      if (follow) _startLocationUpdates();
-    } catch (error) {
-      state = state.copyWith(error: error.toString());
+    await onLocationFabPressed();
+    if (follow && state.currentLocation != null) {
+      _startLocationUpdates();
     }
   }
 
@@ -175,7 +239,7 @@ class MapStateNotifier extends Notifier<MapState> {
     final origin = state.currentLocation;
     final destination = state.destination;
     if (origin == null || destination == null) return;
-    state = state.copyWith(isRouting: true, clearRoute: true, error: null);
+    state = state.copyWith(isRouting: true, clearRoute: true, clearError: true);
     try {
       final route = await ref.read(getDirectionsProvider)(
         origin: origin,

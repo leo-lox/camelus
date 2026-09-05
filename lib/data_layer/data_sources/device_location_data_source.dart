@@ -3,6 +3,27 @@ import 'package:geolocator/geolocator.dart';
 import '../../domain_layer/entities/map_coordinate.dart';
 
 class DeviceLocationDataSource {
+  Future<bool> checkPermission() async {
+    if (!await Geolocator.isLocationServiceEnabled()) {
+      return false;
+    }
+    final permission = await Geolocator.checkPermission();
+    return permission == LocationPermission.whileInUse ||
+        permission == LocationPermission.always;
+  }
+
+  Future<bool> requestPermission() async {
+    if (!await Geolocator.isLocationServiceEnabled()) {
+      return false;
+    }
+    var permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+    }
+    return permission == LocationPermission.whileInUse ||
+        permission == LocationPermission.always;
+  }
+
   Future<MapCoordinate> getCurrentLocation() async {
     await _ensurePermission();
     final position = await Geolocator.getCurrentPosition(
