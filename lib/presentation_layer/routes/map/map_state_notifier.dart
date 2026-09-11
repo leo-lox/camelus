@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../domain_layer/entities/map_coordinate.dart';
 import '../../../domain_layer/entities/map_place.dart';
 import '../../../domain_layer/entities/navigation_route.dart';
+import '../../../domain_layer/entities/user_location_report.dart';
 import '../../providers/map_providers.dart';
 
 enum LocationLockStatus {
@@ -27,6 +28,7 @@ class MapState {
   final bool isLocationSheetOpen;
   final int activeManeuverIndex;
   final LocationLockStatus locationStatus;
+  final UserLocationReport? selectedLocationReport;
   final String? error;
 
   const MapState({
@@ -41,6 +43,7 @@ class MapState {
     this.isLocationSheetOpen = false,
     this.activeManeuverIndex = 0,
     this.locationStatus = LocationLockStatus.permissionNotGiven,
+    this.selectedLocationReport,
     this.error,
   });
 
@@ -56,9 +59,11 @@ class MapState {
     bool? isLocationSheetOpen,
     int? activeManeuverIndex,
     LocationLockStatus? locationStatus,
+    UserLocationReport? selectedLocationReport,
     String? error,
     bool clearDestination = false,
     bool clearRoute = false,
+    bool clearSelectedLocationReport = false,
     bool clearError = false,
   }) => MapState(
     query: query ?? this.query,
@@ -72,6 +77,9 @@ class MapState {
     isLocationSheetOpen: isLocationSheetOpen ?? this.isLocationSheetOpen,
     activeManeuverIndex: activeManeuverIndex ?? this.activeManeuverIndex,
     locationStatus: locationStatus ?? this.locationStatus,
+    selectedLocationReport: clearSelectedLocationReport
+        ? null
+        : selectedLocationReport ?? this.selectedLocationReport,
     error: clearError ? null : error ?? this.error,
   );
 }
@@ -129,6 +137,7 @@ class MapStateNotifier extends Notifier<MapState> {
       suggestions: const [],
       query: destination.name,
       isLocationSheetOpen: true,
+      clearSelectedLocationReport: true,
       clearError: true,
     );
   }
@@ -146,6 +155,7 @@ class MapStateNotifier extends Notifier<MapState> {
       query: '',
       clearRoute: true,
       isLocationSheetOpen: true,
+      clearSelectedLocationReport: true,
       clearError: true,
     );
     try {
@@ -174,6 +184,16 @@ class MapStateNotifier extends Notifier<MapState> {
     clearRoute: true,
     query: '',
   );
+
+  void selectLocationReport(UserLocationReport report) =>
+      state = state.copyWith(
+        selectedLocationReport: report,
+        isLocationSheetOpen: false,
+        clearDestination: true,
+      );
+
+  void closeLocationReportSheet() =>
+      state = state.copyWith(clearSelectedLocationReport: true);
 
   void clearError() => state = state.copyWith(clearError: true);
 

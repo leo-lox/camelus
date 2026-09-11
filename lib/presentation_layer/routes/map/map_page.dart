@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
@@ -5,14 +6,20 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 
 import '../../../domain_layer/entities/map_coordinate.dart';
+import '../../../domain_layer/entities/user_location_report.dart';
+import '../../../domain_layer/entities/user_metadata.dart';
+import '../../providers/metadata_provider.dart';
 import 'atoms/location_action_button.dart';
 import 'atoms/location_details_sheet.dart';
+import 'atoms/location_report_details_sheet.dart';
 import 'atoms/map_error_banner.dart';
 import 'atoms/map_search_bar.dart';
 import 'atoms/map_search_results.dart';
 import 'atoms/navigation_action_button.dart';
+import 'map_location_reports_notifier.dart';
 import 'map_state_notifier.dart';
 import 'utils/map_pin_generator.dart';
+import 'utils/user_location_pin_generator.dart';
 
 class MapPage extends ConsumerStatefulWidget {
   const MapPage({super.key});
@@ -27,7 +34,14 @@ class _MapPageState extends ConsumerState<MapPage> {
   MapboxMap? _map;
   PointAnnotationManager? _pointManager;
   PolylineAnnotationManager? _lineManager;
+  PointAnnotationManager? _reportManager;
   Uint8List? _cachedPinBytes;
+  final Map<String, PointAnnotation> _reportAnnotationsByEventId = {};
+  final Map<String, UserLocationReport> _reportsByAnnotationId = {};
+  final Map<String, StreamSubscription<UserMetadata>>
+  _metadataSubscriptionsByEventId = {};
+  Timer? _viewportDebounce;
+  double _reportOpacity = 0;
 
   @override
   void initState() {
@@ -44,6 +58,10 @@ class _MapPageState extends ConsumerState<MapPage> {
 
   @override
   void dispose() {
+    _viewportDebounce?.cancel();
+    for (final subscription in _metadataSubscriptionsByEventId.values) {
+      subscription.cancel();
+    }
     _sheetController.removeListener(_onSheetChanged);
     _sheetController.dispose();
     _searchController.dispose();
@@ -62,6 +80,10 @@ class _MapPageState extends ConsumerState<MapPage> {
     if (!mounted || _map != map) return;
     _lineManager = await map.annotations.createPolylineAnnotationManager();
     if (!mounted || _map != map) return;
+    _reportManager = await map.annotations.createPointAnnotationManager();
+    _reportManager?.tapEvents(onTap: _onReportAnnotationTap);
+    await _reportManager?.setIconOpacity(_reportOpacity);
+    if (!mounted || _map != map) return;
     await map.location.updateSettings(
       LocationComponentSettings(
         enabled: true,
@@ -73,6 +95,124 @@ class _MapPageState extends ConsumerState<MapPage> {
     );
     if (!mounted || _map != map) return;
     await _render(ref.read(mapStateProvider));
+    await _onViewportSettled();
+  }
+
+  void _scheduleViewportUpdate() {
+    _viewportDebounce?.cancel();
+    _viewportDebounce = Timer(
+      const Duration(milliseconds: 400),
+      _onViewportSettled,
+    );
+  }
+
+  Future<void> _onViewportSettled() async {
+    final map = _map;
+    if (map == null || !mounted) return;
+    final cameraState = await map.getCameraState();
+    if (!mounted || _map != map) return;
+    _onCameraChanged(cameraState.zoom);
+    final center = MapCoordinate(
+      latitude: cameraState.center.coordinates.lat.toDouble(),
+      longitude: cameraState.center.coordinates.lng.toDouble(),
+    );
+    ref
+        .read(mapLocationReportsProvider.notifier)
+        .onViewportChanged(center, cameraState.zoom);
+  }
+
+  // pins are fully transparent at minZoomForReports and fully opaque one
+  // zoom level above it, so they fade in/out proportionally while zooming
+  double _reportOpacityForZoom(double zoom) {
+    const minZoom = MapLocationReportsNotifier.minZoomForReports;
+    const fullZoom = minZoom + 1;
+    if (zoom <= minZoom) return 0;
+    if (zoom >= fullZoom) return 1;
+    return zoom - minZoom;
+  }
+
+  void _onCameraChanged(double zoom) {
+    final opacity = _reportOpacityForZoom(zoom);
+    if ((opacity - _reportOpacity).abs() > 0.001) {
+      _reportOpacity = opacity;
+      final manager = _reportManager;
+      if (manager != null) {
+        unawaited(manager.setIconOpacity(opacity));
+      }
+    }
+  }
+
+  void _onReportAnnotationTap(PointAnnotation annotation) {
+    final report = _reportsByAnnotationId[annotation.id];
+    if (report == null) return;
+    ref.read(mapStateProvider.notifier).selectLocationReport(report);
+  }
+
+  Future<void> _syncReportAnnotations(List<UserLocationReport> reports) async {
+    final manager = _reportManager;
+    if (manager == null || !mounted) return;
+    final ringColor = Theme.of(context).colorScheme.secondary;
+
+    final currentEventIds = reports.map((report) => report.eventId).toSet();
+    final removedEventIds = _reportAnnotationsByEventId.keys
+        .where((eventId) => !currentEventIds.contains(eventId))
+        .toList();
+    for (final eventId in removedEventIds) {
+      final annotation = _reportAnnotationsByEventId.remove(eventId);
+      if (annotation != null) {
+        _reportsByAnnotationId.remove(annotation.id);
+        await manager.delete(annotation);
+      }
+      await _metadataSubscriptionsByEventId.remove(eventId)?.cancel();
+    }
+
+    for (final report in reports) {
+      if (_reportAnnotationsByEventId.containsKey(report.eventId)) continue;
+
+      // show a pin right away; the avatar is filled in once metadata streams in
+      final placeholderBytes =
+          await UserLocationPinGenerator.createPlaceholderPinImage(
+            ringColor: ringColor,
+          );
+      if (!mounted || _reportManager != manager) return;
+      if (_reportAnnotationsByEventId.containsKey(report.eventId)) continue;
+
+      final annotation = await manager.create(
+        PointAnnotationOptions(
+          geometry: Point(coordinates: _position(report.coordinate)),
+          image: placeholderBytes,
+          iconAnchor: IconAnchor.BOTTOM,
+        ),
+      );
+      _reportAnnotationsByEventId[report.eventId] = annotation;
+      _reportsByAnnotationId[annotation.id] = report;
+
+      _metadataSubscriptionsByEventId[report.eventId] = ref
+          .read(metadataProvider)
+          .getMetadataByPubkey(report.pubkey)
+          .listen((metadata) => _onReportMetadata(report, metadata, ringColor));
+    }
+  }
+
+  Future<void> _onReportMetadata(
+    UserLocationReport report,
+    UserMetadata metadata,
+    Color ringColor,
+  ) async {
+    final manager = _reportManager;
+    final annotation = _reportAnnotationsByEventId[report.eventId];
+    if (manager == null || annotation == null || !mounted) return;
+
+    final pinBytes = await UserLocationPinGenerator.createPinImage(
+      pubkey: report.pubkey,
+      avatarUrl: metadata.picture,
+      ringColor: ringColor,
+    );
+    if (!mounted || _reportManager != manager) return;
+    if (_reportAnnotationsByEventId[report.eventId] != annotation) return;
+
+    annotation.image = pinBytes;
+    await manager.update(annotation);
   }
 
   Future<void> _render(MapState state) async {
@@ -185,10 +325,20 @@ class _MapPageState extends ConsumerState<MapPage> {
       }
     });
 
+    ref.listen<MapLocationReportsState>(mapLocationReportsProvider, (
+      previous,
+      next,
+    ) {
+      _syncReportAnnotations(next.reports);
+    });
+
     final hasRoute = state.route != null;
     final mediaQuery = MediaQuery.of(context);
     final screenHeight = mediaQuery.size.height;
-    final isSheetOpen = state.destination != null && state.isLocationSheetOpen;
+    final isDestinationSheetOpen =
+        state.destination != null && state.isLocationSheetOpen;
+    final isReportSheetOpen = state.selectedLocationReport != null;
+    final isSheetOpen = isDestinationSheetOpen || isReportSheetOpen;
 
     final double currentSheetExtent = isSheetOpen && _sheetController.isAttached
         ? _sheetController.size
@@ -207,6 +357,10 @@ class _MapPageState extends ConsumerState<MapPage> {
             onMapCreated: _onMapCreated,
             onScrollListener: (_) {
               ref.read(mapStateProvider.notifier).onMapMovedByUser();
+            },
+            onCameraChangeListener: (data) {
+              _onCameraChanged(data.cameraState.zoom);
+              _scheduleViewportUpdate();
             },
           ),
           SafeArea(
@@ -263,7 +417,10 @@ class _MapPageState extends ConsumerState<MapPage> {
               ),
             ),
           ),
-          LocationDetailsSheet(controller: _sheetController),
+          if (isDestinationSheetOpen)
+            LocationDetailsSheet(controller: _sheetController),
+          if (isReportSheetOpen)
+            LocationReportDetailsSheet(controller: _sheetController),
           const Positioned(
             left: 0,
             right: 0,

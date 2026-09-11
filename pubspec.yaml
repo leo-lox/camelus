@@ -123,6 +123,7 @@ dependencies:
   mapbox_maps_flutter: ^2.30.0
   geolocator: ^14.0.2
   flutter_tts: ^4.2.5
+  dart_geohash: ^2.1.0
 
   
 
